@@ -2,83 +2,80 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B2CCA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 21:07:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBC0ACA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 21:15:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96B81217D6
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 21:07:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEC0A21479
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 21:15:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VOvO2X1T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B81217D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UBL1r0HG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEC0A21479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPCEa-0000VZ-Nz
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 17:07:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55364)
+	id 1iPCMm-0005Go-Rt
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 17:15:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41197)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iPBfF-0001HI-Ty
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 16:30:59 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iPCKD-0003hQ-1E
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 17:13:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iPBfC-00009B-Ef
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 16:30:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27933
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iPBf8-00007i-RD
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 16:30:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572294650;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rJ4wAqz5xekXMi1xDHNlkyfQwb/j+zoys/vRTL7dJIw=;
- b=VOvO2X1TvQ4gyfNtNTSGj9ajzXlF5IxNT4wK2aVCNl9HtWrURwgmzqpVRpeDHtwQvuZpsF
- SqtTo1TAe2LNOEaRk3gVGLEY+f1xdPWFVpsBECPOpUMruV26IPpUQpUxVY0eowftqFZ/6W
- P9pMq+ILCr2I6TsWDbkBESSIGa3zkb8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-137-D0DnBl-2MDmXBbtL2pFDyA-1; Mon, 28 Oct 2019 16:30:46 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF64E1005509;
- Mon, 28 Oct 2019 20:30:44 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-123-183.rdu2.redhat.com
- [10.10.123.183])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C3D3F6085E;
- Mon, 28 Oct 2019 20:30:38 +0000 (UTC)
-Date: Mon, 28 Oct 2019 16:30:36 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 21/26] tests/boot_linux_console: Test the raspi2 UART1
- (16550 based)
-Message-ID: <20191028203036.GB18794@localhost.localdomain>
-References: <20191028073441.6448-1-philmd@redhat.com>
- <20191028073441.6448-22-philmd@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iPCKB-0003pf-KX
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 17:13:16 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:43258)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iPCKB-0003ow-EL
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 17:13:15 -0400
+Received: by mail-ot1-x344.google.com with SMTP id b19so5567167otq.10
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 14:13:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GyjR0Mt25HWJJcFrencpKRwn/ou68jOyiWVAcYKGGzM=;
+ b=UBL1r0HGojNWT78HwcSPUrRGt4f+8YtbQCAr1azXjwEkSUhhL9RJIarjWTBxV/a8Uk
+ Ga55PFxz4MmC0mCKWAZBFTMJWT8Q9AyD2JmzY4Cc8rbmZyrpzY0gAVS0v7dlpDpiYseD
+ kdMn7CdhjlStJxlwUqB0QO2uJCdsQ+51MUwhGg7n5L2mp4JlzS6oepZgf9mxdByhT8zs
+ mKA0M0oO8Bw5fCUGEtMV1EJMNR7C4vETBBBJuG/kGVZ0jCjQ1TWtdOclcHbBEsgXSAv5
+ NsdcYJYdrLuVwNi9XZxe5vh8cEay2u+rnUIIduxiO+ZsrCc0eBpPi/9FXvjSUIOh+ctT
+ AsJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GyjR0Mt25HWJJcFrencpKRwn/ou68jOyiWVAcYKGGzM=;
+ b=OlBfT1CH56hd8GAo/Zpdqpm7BZfEYRkPvcLoDwslo8XV7AlGyW/bcUFRE2lthyKUsX
+ CYD8L5M0hBQnaHQ8QV2/YxooyayWK70H5m4NHmbu9vnnmjcXm4c7kCeRJoPpSG4B1Fm5
+ Atd8Dbm1LBwg5UpdpzXSKicN0QpcP/StNdrJB5XAKY/qXn+AuuOYzvD6tqLNElvuIlCk
+ 4MxKu+Hv6BBODVK2n+XivCwkI+evCecnmdnWMWGnDhj3JDR8cTjqsoLaFv7aaWnwLIFR
+ AHHdqJrzAwoE0TCa4HGTjpif2TTZiGprkluunWGoPPnSiRde2l4G4eN3gyquVs+//o6u
+ OnKA==
+X-Gm-Message-State: APjAAAU64AmF6ztm6hhA4daENQEV23qHAnfENUVwaPweq9QjsmP1q+/w
+ iN9fSh2QlcpoVX1NIt5RloavEiFNbJF/CNnNjwGa7w==
+X-Google-Smtp-Source: APXvYqxPtT+XzSfu69AKHxBO/nld1OwE2IKECQFqzNnh+9S0DTMjMehKcmhy8ZZDAp48vOsnC7JFnk4/TqmGDdMpp4Y=
+X-Received: by 2002:a05:6830:ca:: with SMTP id
+ x10mr14419213oto.221.1572297194337; 
+ Mon, 28 Oct 2019 14:13:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191028073441.6448-22-philmd@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: D0DnBl-2MDmXBbtL2pFDyA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20191028121501.15279-1-mreitz@redhat.com>
+In-Reply-To: <20191028121501.15279-1-mreitz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 28 Oct 2019 21:13:16 +0000
+Message-ID: <CAFEAcA9A41vp_WDOWxw_+tWTsLppW8Z0Gg0yWCWOK3KSmGtyog@mail.gmail.com>
+Subject: Re: [PULL 00/69] Block patches for softfreeze
+To: Max Reitz <mreitz@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,64 +87,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org,
- Fabien Chouteau <chouteau@adacore.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- Kamil Rytarowski <kamil@netbsd.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 28, 2019 at 08:34:36AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->=20
-> The current do_test_arm_raspi2() case tests the PL011 UART0.
-> Our model also supports the AUX UART (16550 based).
-> We can very simply test the UART1 with Linux, modifying the
-> kernel command line.
->=20
-> Add few lines to expand our previous test and cover the AUX
-> UART.
->=20
-> Reviewed-by: Alex Benn=E9e <alex.bennee@linaro.org>
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
-> Tested-by: Cleber Rosa <crosa@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
->  tests/acceptance/boot_linux_console.py | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->=20
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index cc0c73b9c1..1c9ff2bda3 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -301,6 +301,7 @@ class BootLinuxConsole(MachineTest):
->          """
->          serial_kernel_cmdline =3D {
->              0: 'earlycon=3Dpl011,0x3f201000 console=3DttyAMA0',
-> +            1: 'earlycon=3Duart8250,mmio32,0x3f215040 console=3DttyS1,11=
-5200'
->          }
->          deb_url =3D ('http://archive.raspberrypi.org/debian/'
->                     'pool/main/r/raspberrypi-firmware/'
-> @@ -311,7 +312,7 @@ class BootLinuxConsole(MachineTest):
->          dtb_path =3D self.extract_from_deb(deb_path, '/boot/bcm2709-rpi-=
-2-b.dtb')
-> =20
->          self.vm.set_machine('raspi2')
-> -        self.vm.set_console()
-> +        self.vm.set_console(console_index=3Duart_id)
+On Mon, 28 Oct 2019 at 12:15, Max Reitz <mreitz@redhat.com> wrote:
+>
+> The following changes since commit 187f35512106501fe9a11057f4d8705431e0026d:
+>
+>   Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-next-251019-3' into staging (2019-10-26 10:13:48 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/XanClic/qemu.git tags/pull-block-2019-10-28
+>
+> for you to fetch changes up to ba9c45139e2938b8d20ce407db83a31bc9e5066c:
+>
+>   qemu-iotests: restrict 264 to qcow2 only (2019-10-28 13:09:43 +0100)
+>
+> ----------------------------------------------------------------
+> Block patches for softfreeze:
+> - iotest patches
+> - Improve performance of the mirror block job in write-blocking mode
+> - Limit memory usage for the backup block job
+> - Add discard and write-zeroes support to the NVMe host block driver
+> - Fix a bug in the mirror job
+> - Prevent the qcow2 driver from creating technically non-compliant qcow2
+>   v3 images (where there is not enough extra data for snapshot table
+>   entries)
+> - Allow callers of bdrv_truncate() (etc.) to determine whether the file
+>   must be resized to the exact given size or whether it is OK for block
+>   devices not to shrink
 
-While this was tested and looks good by itself, it depends on a
-solution to the problem responded on
-<20191028073441.6448-2-philmd@redhat.com>.
+Applied, thanks.
 
-- Cleber.
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
+-- PMM
 
