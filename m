@@ -2,69 +2,77 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 392CDCA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 02:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BCEACA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 02:58:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BB2820717
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 02:06:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BB2820717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id C1019208C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 02:58:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KX1WeQQq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1019208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOuQG-0005iS-5S
-	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 22:06:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49545)
+	id 1iOvEo-00070B-Ug
+	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 22:58:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54193)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iOuPX-0005Bg-7f
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 22:05:36 -0400
+ (envelope-from <coiby.xu@gmail.com>) id 1iOvE5-0006CG-Su
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 22:57:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iOuPV-0004RF-Dl
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 22:05:34 -0400
-Received: from mga05.intel.com ([192.55.52.43]:26908)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iOuPV-0004Ke-5y
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 22:05:33 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 27 Oct 2019 19:05:23 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,238,1569308400"; d="scan'208";a="400677972"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.179])
- ([10.239.196.179])
- by fmsmga006.fm.intel.com with ESMTP; 27 Oct 2019 19:05:22 -0700
-Subject: Re: [PATCH v13 06/12] numa: Extend CLI to provide memory latency and
- bandwidth information
-To: Eduardo Habkost <ehabkost@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-References: <20191020111125.27659-1-tao3.xu@intel.com>
- <20191020111125.27659-7-tao3.xu@intel.com>
- <20191023172854.42c495d5@redhat.com>
- <9e30d8fe-7274-4ee8-3c4b-64c370141358@intel.com>
- <20191025152720.4068bfae@redhat.com> <87wocsobil.fsf@dusky.pond.sub.org>
- <20191025205141.GF6744@habkost.net>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <71543104-7254-c25e-e87c-d73a894bcc2e@intel.com>
-Date: Mon, 28 Oct 2019 10:05:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <coiby.xu@gmail.com>) id 1iOvE4-0005hq-AF
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 22:57:49 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:38513)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1iOvE4-0005h8-2S
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 22:57:48 -0400
+Received: by mail-lj1-x244.google.com with SMTP id q78so9639916lje.5
+ for <qemu-devel@nongnu.org>; Sun, 27 Oct 2019 19:57:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:from:date:message-id:subject:to;
+ bh=zhYXlb7qG9qsgY2rR5GRQQ5cxTYzrGD+oeJZGMlj038=;
+ b=KX1WeQQqZjRuKUZNcaOoAesL34Kg4knj/vPFA3O1N5PFGMM/iRZ4UFMXs30IicODkM
+ i1i/MONEYBIIgkuZ6WoRq1TJFBeMRRVgzaz4q9HKHU1b1MQQ2Z9DCuQc6R2Du05lbO5r
+ Xm2iYv67+gzvQ0y3r4X3WR23R1ehRox7FbEEgrPwj0vcxcEEdRI7ChPsBMaHi3zvh6NV
+ aNhlXgByDTne+sGhQXcGNPcrRuSjYLq6fZvSOqHGETkd7cxjWMS3Sj//h7ZjLy/yCOrH
+ FZ2/Mlq+++wI04g7qLG0DK6QK3b26JQnPjA/ASxj1xfRnzin+kSy1Vg5c4PedoD6F+Dz
+ DBxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+ bh=zhYXlb7qG9qsgY2rR5GRQQ5cxTYzrGD+oeJZGMlj038=;
+ b=RZ3DGtMq1YioJFhubnKjT8C2bgofC8WJiQxk6Sf9ytdLtnxzkx/7fS2p/TXU5293qG
+ ZmLxrrwvtDAJp9FWQ/0Yv1TJ/Xj4E0oNuI0huGLYzO/Jvq03IAKhtNxj1JoMKP5aalI5
+ v9QZ/NZmkEGf/DBSmPawhfzQDo3rawY7FonBN0k0KDjZln6cL0uPMAp42Rv4TeYLL/2o
+ noYdonM/BCXbf2+WvkK7sip3LZ8vyEa3+vWYua4HuwgMx43fHhecng/zrTz73BQG4uvo
+ +ZY8jz7mJbvawBHk+HQs9vA5MCXGbrFsDVnwEH1JKvvglf0PRdkBexWLaZxteBJB3rfr
+ WN7w==
+X-Gm-Message-State: APjAAAWoilzS8iz/JwVlROtQ3CIEfGB9PjDHelWEHARTqj80PYubsUHY
+ 9KXsfGlsGwNdeLAwU6kBzIVP5PaN5Y/gKsFb/G69HOhWNa7CxQ==
+X-Google-Smtp-Source: APXvYqzX/g5MWufU8zU4KOK9GdUN+mj0rfFBxMMz1MBpJqgXFlgapxwJzEEXp+TSJ6QWeE6fXe0xrHJO+mAePIpeNSU=
+X-Received: by 2002:a05:651c:120c:: with SMTP id
+ i12mr1840574lja.123.1572231465440; 
+ Sun, 27 Oct 2019 19:57:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191025205141.GF6744@habkost.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From: Coiby Xu <coiby.xu@gmail.com>
+Date: Mon, 28 Oct 2019 10:57:09 +0800
+Message-ID: <CAJAkqrUo+8qJGAMprEY2ZxqL-3meHo-56PYc_M1oxXNy5SVvow@mail.gmail.com>
+Subject: Failure of troublesome vhost-user/flags-mismatch test can't be
+ reproduced
+To: qemu-devel@nongnu.org
+Content-Type: multipart/alternative; boundary="000000000000009d590595efaa5f"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.43
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,79 +84,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Liu, Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/26/2019 4:51 AM, Eduardo Habkost wrote:
-> On Fri, Oct 25, 2019 at 09:44:50PM +0200, Markus Armbruster wrote:
->> Igor Mammedov <imammedo@redhat.com> writes:
->>
->>> On Fri, 25 Oct 2019 14:33:53 +0800
->>> Tao Xu <tao3.xu@intel.com> wrote:
->>>
->>>> On 10/23/2019 11:28 PM, Igor Mammedov wrote:
->>>>> On Sun, 20 Oct 2019 19:11:19 +0800
->>>>> Tao Xu <tao3.xu@intel.com> wrote:
->>>> [...]
->>>>>> +#
->>>>>> +# @access-bandwidth: access bandwidth (MB/s)
->>>>>> +#
->>>>>> +# @read-bandwidth: read bandwidth (MB/s)
->>>>>> +#
->>>>>> +# @write-bandwidth: write bandwidth (MB/s)
->>>>> I think units here are not appropriate, values stored in fields are
->>>>> minimal base units only and nothing else (i.e. ps and B/s)
->>>>>    
->>>> Eric suggest me to drop picoseconds. So here I can use ns. For
->>>> bandwidth, if we use B/s here, does it let user or developer to
->>>> misunderstand that the smallest unit is B/s ?
->>>
->>> It's not nanoseconds or MB/s stored in theses fields, isn't it?
->>> I'd specify units in which value is stored or drop units altogether.
->>>
->>> Maybe Eric and Markus can suggest a better way to describe fields.
->>
->> This isn't review (yet), just an attempt to advise more quickly on
->> general QAPI/QMP conventions.
->>
->> Unit prefixes like Mebi- are nice for humans, because 1MiB is clearer
->> than 1048576B.
->>
->> QMP is for machines.  We eschew unit prefixes and unit symbols there.
->> The unit is implied.  Unit prefixes only complicate things.  Machines
->> can deal with 1048576 easily.  Also dealing 1024Ki and 1Mi is additional
->> work.  We therefore use JSON numbers for byte counts, not strings with
->> units.
->>
->> The general rule is "always use the plainest implied unit that would
->> do."  There are exceptions, mostly due to review failure.
->>
->> Byte rates should be in bytes per second.
->>
->> For time, we've made a godawful mess.  The plainest unit is clearly the
->> second.  We commonly need sub-second granularity, though.
->> Floating-point seconds are unpopular for some reason :)  Instead we use
->> milli-, micro-, and nanoseconds, and even (seconds, microseconds) pairs.
->>
->> QAPI schema documentation describes both the generated C and the QMP
->> wire protocol.  It must be written with the implied unit.  If you send a
->> byte rate in bytes per second via QMP, that's what you document.  Even
->> if a human interface lets you specify the byte rate in MiB/s.
->>
->> Does this make sense?
-> 
-> This makes sense for the bandwidth fields.  We still need to
-> decide how to represent the latency field, though.
-> 
-> Seconds would be the obvious choice, if only it didn't risk
-> silently losing precision when converting numbers to floats.
-> 
-Got it. I will use bytes per second for bandwidth here. Usually we use 
-nanosecond for memory latency, so if we use second for latency, it may 
-lose precision. So can I use nanosecond here, because we now use 
-nanosecond as smallest time unit.
+--000000000000009d590595efaa5f
+Content-Type: text/plain; charset="UTF-8"
+
+Hi,
+
+Can anyone reproduce the failure of one troublesome test
+vhost-user/flags-mismatch (https://wiki.qemu.org/Testing/CI/TroublesomeTests)
+which has been disabled since Aug 15 2017 (
+https://patchwork.kernel.org/patch/9939431/)?  Last month I downloaded QEMU
+source code (commit ID: 3483534ec3) and this version also failed this test.
+After debugging this issue, I thought I have fixed this issue by saving
+acknowledged features after vhost backend disconnect with the client
+(qemu). But later I reviewed the commit history of net/vhost-user.c and
+found out this test failed on my machines because of  a newly introduced
+bug from a recent commit (https://patchwork.kernel.org/patch/11054781/) on
+July 29 2019 and this new bug has already been fixed by a more recent
+commit (
+https://lists.sr.ht/~philmd/qemu/%3C20190924162044.11414-1-amorenoz%40redhat.com%3E).
+After more investigation, it surprised me both 3.1.0 and 2.9.1could pass
+vhost-user/flags-mismatch test. According to the comments on the commit
+https://patchwork.kernel.org/patch/9939431/ which disabled the
+vhost-user/flags-mismatch and other two tests, it seems the tests are only
+broken on travis. Maybe we should re-investigate this issue to re-enable
+the test so similar bugs like
+https://bugzilla.redhat.com/show_bug.cgi?id=1738768 could be prevented in
+the first place.
+
+Btw we can excluisvely check this test on latest QEMU by given TESTPATH and
+setting QTEST_VHOST_USER_FIXME environment variable,
+    QTEST_VHOST_USER_FIXME=1
+QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=qemu-img
+tests/qos-test -p
+/x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/virtio-net-pci/virtio-net/virtio-net-tests/vhost-user/flags-mismatch
+
+
+-- 
+*Best regards,*
+*Coiby*
+
+--000000000000009d590595efaa5f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div>Hi,<br><br>Can anyone reproduce the failure of one tr=
+oublesome test vhost-user/flags-mismatch (<a href=3D"https://wiki.qemu.org/=
+Testing/CI/TroublesomeTests" target=3D"_blank">https://wiki.qemu.org/Testin=
+g/CI/TroublesomeTests</a>) which has been disabled since Aug 15 2017 (<a hr=
+ef=3D"https://patchwork.kernel.org/patch/9939431/" target=3D"_blank">https:=
+//patchwork.kernel.org/patch/9939431/</a>)?=C2=A0 Last month I downloaded Q=
+EMU source code (commit ID: 3483534ec3) and this version also failed this t=
+est. After debugging this issue, I thought I have fixed this issue by savin=
+g acknowledged features after vhost backend disconnect with the client (qem=
+u). But later I reviewed the commit history of net/vhost-user.c and found o=
+ut this test failed on my machines because of =C2=A0a newly introduced bug =
+from a recent commit (<a href=3D"https://patchwork.kernel.org/patch/1105478=
+1/" target=3D"_blank">https://patchwork.kernel.org/patch/11054781/</a>) on =
+July 29 2019 and this new bug has already been fixed by a more recent commi=
+t (<a href=3D"https://lists.sr.ht/~philmd/qemu/%3C20190924162044.11414-1-am=
+orenoz%40redhat.com%3E" target=3D"_blank">https://lists.sr.ht/~philmd/qemu/=
+%3C20190924162044.11414-1-amorenoz%40redhat.com%3E</a>). After more investi=
+gation, it surprised me both 3.1.0 and 2.9.1could pass vhost-user/flags-mis=
+match test. According to the comments on the commit <a href=3D"https://patc=
+hwork.kernel.org/patch/9939431/" target=3D"_blank">https://patchwork.kernel=
+.org/patch/9939431/</a> which disabled the vhost-user/flags-mismatch and ot=
+her two tests, it seems the tests are only broken on travis. Maybe we shoul=
+d re-investigate this issue to re-enable the test so similar bugs like <a h=
+ref=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1738768">https://bugzi=
+lla.redhat.com/show_bug.cgi?id=3D1738768</a>=C2=A0could be prevented in the=
+ first place.=C2=A0</div><div><br></div><div>Btw we can excluisvely check t=
+his test on latest QEMU by given TESTPATH and setting=C2=A0QTEST_VHOST_USER=
+_FIXME environment variable,</div><div>=C2=A0 =C2=A0 QTEST_VHOST_USER_FIXME=
+=3D1 QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=
+=3Dqemu-img tests/qos-test -p /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/=
+virtio-net-pci/virtio-net/virtio-net-tests/vhost-user/flags-mismatch<br></d=
+iv><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr" data-smartmail=
+=3D"gmail_signature"><div dir=3D"ltr"><div><div dir=3D"ltr"><div><i>Best re=
+gards,</i></div><font color=3D"#00cccc"><i>Coiby</i></font><div><font color=
+=3D"#00cccc"><br></font></div></div></div></div></div></div>
+
+--000000000000009d590595efaa5f--
 
