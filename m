@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B39CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:23:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF7CCA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:24:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4EDC20663
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:23:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBC6220663
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:24:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPcCJ7pS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4EDC20663
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fj4JF2ht"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBC6220663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP4zC-0000JL-6D
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 09:23:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51066)
+	id 1iP50N-0001OU-2S
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 09:24:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iP3xQ-0003d7-8D
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:14 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iP3xb-0003p1-5x
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iP3xJ-0002Eo-Bp
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57330
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iP3xZ-0002Ot-82
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:22 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39466
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP3xJ-0002CC-3u
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:05 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP3xZ-0002OX-3u
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572265021;
+ s=mimecast20190719; t=1572265040;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AEWfKLHP0Mmcgw2XnEAAUVX8I6NYdFGqjUtq4PtaZKY=;
- b=CPcCJ7pSp3GTSQYBU6sYsahLK0jxI+jwPcvMTHVY7ftJicPaufb3cBJErI9zWNmlJ1lLoa
- Q5tODF0CZEXDUH/DiJJ8tYmYLgVxxwTjdaAnX38Sgna2WjoUyr3mB/uLeP3EbZ2pHkhrHX
- 9FyLoK6Jg+Fk2rpVru+epbevPSTBUw8=
+ bh=6aKuvnMVQFuDU56JNrd/dh0dSuS58g2T5cVoRy4wUis=;
+ b=fj4JF2htImgh3yg94VK7OIt+SpNcjl5ma6VM+cSq7wdOL55b/jDkaZQ1U/ifxg1QDxJ9WT
+ KwFz7LRwFX4y+tpABZR2tcMisUbEL94Duv/HNLS9e09u9A655yNlc5WM1q9Ye95P8mSW93
+ g+B4YoaJWOmIcBbo/0SFlGxgCLuOaDg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-334-uBLxAiTiND6CAl8nxLF83w-1; Mon, 28 Oct 2019 08:17:00 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-389-3zlq06D3Or-0OHPcpcfeIw-1; Mon, 28 Oct 2019 08:17:17 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D6BE10052E0;
- Mon, 28 Oct 2019 12:16:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18C8E800FF1;
+ Mon, 28 Oct 2019 12:17:16 +0000 (UTC)
 Received: from localhost (ovpn-117-83.ams2.redhat.com [10.36.117.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DDC005C1D6;
- Mon, 28 Oct 2019 12:16:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B49A75DA2C;
+ Mon, 28 Oct 2019 12:17:15 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 56/69] qcow2: Fix overly long snapshot tables
-Date: Mon, 28 Oct 2019 13:14:48 +0100
-Message-Id: <20191028121501.15279-57-mreitz@redhat.com>
+Subject: [PULL 63/69] block: Do not truncate file node when formatting
+Date: Mon, 28 Oct 2019 13:14:55 +0100
+Message-Id: <20191028121501.15279-64-mreitz@redhat.com>
 In-Reply-To: <20191028121501.15279-1-mreitz@redhat.com>
 References: <20191028121501.15279-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: uBLxAiTiND6CAl8nxLF83w-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 3zlq06D3Or-0OHPcpcfeIw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,208 +90,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We currently refuse to open qcow2 images with overly long snapshot
-tables.  This patch makes qemu-img check -r all drop all offending
-entries past what we deem acceptable.
+There is no reason why the format drivers need to truncate the protocol
+node when formatting it.  When using the old .bdrv_co_create_ops()
+interface, the file will be created with no size option anyway, which
+generally gives it a size of 0.  (Exceptions are block devices, which
+cannot be truncated anyway.)
 
-The user cannot choose which snapshots are removed.  This is fine
-because we have chosen the maximum snapshot table size to be so large
-(64 MB) that it cannot be reasonably reached.  If the snapshot table
-exceeds this size, the image has probably been corrupted in some way; in
-this case, it is most important to just make the image usable such that
-the user can copy off at least the active layer.
-(Also note that the snapshots will be removed only with "-r all", so a
-plain "check" or "check -r leaks" will not delete any data.)
+When using blockdev-create, the user must have given the file node some
+size anyway, so there is no reason why we should override that.
+
+qed is an exception, it needs the file to start completely empty (as
+explained by c743849bee7333c7ef256b7e12e34ed6f907064f).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20191011152814.14791-13-mreitz@redhat.com
+Message-id: 20190918095144.955-4-mreitz@redhat.com
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-snapshot.c | 88 +++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 78 insertions(+), 10 deletions(-)
+ block/parallels.c | 5 -----
+ block/qcow.c      | 5 -----
+ block/qcow2.c     | 6 ------
+ 3 files changed, 16 deletions(-)
 
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 582eb3386a..366d9f574c 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -29,15 +29,24 @@
- #include "qemu/error-report.h"
- #include "qemu/cutils.h"
+diff --git a/block/parallels.c b/block/parallels.c
+index 7cd2714b69..905cac35c6 100644
+--- a/block/parallels.c
++++ b/block/parallels.c
+@@ -563,11 +563,6 @@ static int coroutine_fn parallels_co_create(BlockdevCr=
+eateOptions* opts,
+     blk_set_allow_write_beyond_eof(blk, true);
 =20
-+static void qcow2_free_single_snapshot(BlockDriverState *bs, int i)
-+{
-+    BDRVQcow2State *s =3D bs->opaque;
-+
-+    assert(i >=3D 0 && i < s->nb_snapshots);
-+    g_free(s->snapshots[i].name);
-+    g_free(s->snapshots[i].id_str);
-+    g_free(s->snapshots[i].unknown_extra_data);
-+    memset(&s->snapshots[i], 0, sizeof(s->snapshots[i]));
-+}
-+
- void qcow2_free_snapshots(BlockDriverState *bs)
- {
-     BDRVQcow2State *s =3D bs->opaque;
-     int i;
+     /* Create image format */
+-    ret =3D blk_truncate(blk, 0, PREALLOC_MODE_OFF, errp);
+-    if (ret < 0) {
+-        goto out;
+-    }
+-
+     bat_entries =3D DIV_ROUND_UP(total_size, cl_size);
+     bat_sectors =3D DIV_ROUND_UP(bat_entry_off(bat_entries), cl_size);
+     bat_sectors =3D (bat_sectors *  cl_size) >> BDRV_SECTOR_BITS;
+diff --git a/block/qcow.c b/block/qcow.c
+index 5bdf72ba33..17705015ca 100644
+--- a/block/qcow.c
++++ b/block/qcow.c
+@@ -858,11 +858,6 @@ static int coroutine_fn qcow_co_create(BlockdevCreateO=
+ptions *opts,
+     blk_set_allow_write_beyond_eof(qcow_blk, true);
 =20
-     for(i =3D 0; i < s->nb_snapshots; i++) {
--        g_free(s->snapshots[i].name);
--        g_free(s->snapshots[i].id_str);
--        g_free(s->snapshots[i].unknown_extra_data);
-+        qcow2_free_single_snapshot(bs, i);
+     /* Create image format */
+-    ret =3D blk_truncate(qcow_blk, 0, PREALLOC_MODE_OFF, errp);
+-    if (ret < 0) {
+-        goto exit;
+-    }
+-
+     memset(&header, 0, sizeof(header));
+     header.magic =3D cpu_to_be32(QCOW_MAGIC);
+     header.version =3D cpu_to_be32(QCOW_VERSION);
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 8d4f38ae74..bf29d1c460 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3391,12 +3391,6 @@ qcow2_co_create(BlockdevCreateOptions *create_option=
+s, Error **errp)
      }
-     g_free(s->snapshots);
-     s->snapshots =3D NULL;
-@@ -48,6 +57,14 @@ void qcow2_free_snapshots(BlockDriverState *bs)
-  * If @repair is true, try to repair a broken snapshot table instead
-  * of just returning an error:
-  *
-+ * - If the snapshot table was too long, set *nb_clusters_reduced to
-+ *   the number of snapshots removed off the end.
-+ *   The caller will update the on-disk nb_snapshots accordingly;
-+ *   this leaks clusters, but is safe.
-+ *   (The on-disk information must be updated before
-+ *   qcow2_check_refcounts(), because that function relies on
-+ *   s->nb_snapshots to reflect the on-disk value.)
-+ *
-  * - If there were snapshots with too much extra metadata, increment
-  *   *extra_data_dropped for each.
-  *   This requires the caller to eventually rewrite the whole snapshot
-@@ -59,6 +76,7 @@ void qcow2_free_snapshots(BlockDriverState *bs)
-  *   extra data.)
-  */
- static int qcow2_do_read_snapshots(BlockDriverState *bs, bool repair,
-+                                   int *nb_clusters_reduced,
-                                    int *extra_data_dropped,
-                                    Error **errp)
- {
-@@ -67,7 +85,7 @@ static int qcow2_do_read_snapshots(BlockDriverState *bs, =
-bool repair,
-     QCowSnapshotExtraData extra;
-     QCowSnapshot *sn;
-     int i, id_str_size, name_size;
--    int64_t offset;
-+    int64_t offset, pre_sn_offset;
-     uint64_t table_length =3D 0;
-     int ret;
+     blk_set_allow_write_beyond_eof(blk, true);
 =20
-@@ -83,6 +101,7 @@ static int qcow2_do_read_snapshots(BlockDriverState *bs,=
- bool repair,
-     for(i =3D 0; i < s->nb_snapshots; i++) {
-         bool truncate_unknown_extra_data =3D false;
-=20
-+        pre_sn_offset =3D offset;
-         table_length =3D ROUND_UP(table_length, 8);
-=20
-         /* Read statically sized part of the snapshot header */
-@@ -197,9 +216,31 @@ static int qcow2_do_read_snapshots(BlockDriverState *b=
-s, bool repair,
-         if (table_length > QCOW_MAX_SNAPSHOTS_SIZE ||
-             offset - s->snapshots_offset > INT_MAX)
-         {
--            ret =3D -EFBIG;
--            error_setg(errp, "Snapshot table is too big");
--            goto fail;
-+            if (!repair) {
-+                ret =3D -EFBIG;
-+                error_setg(errp, "Snapshot table is too big");
-+                error_append_hint(errp, "You can force-remove all %u "
-+                                  "overhanging snapshots with qemu-img che=
-ck "
-+                                  "-r all\n", s->nb_snapshots - i);
-+                goto fail;
-+            }
-+
-+            fprintf(stderr, "Discarding %u overhanging snapshots (snapshot=
- "
-+                    "table is too big)\n", s->nb_snapshots - i);
-+
-+            *nb_clusters_reduced +=3D (s->nb_snapshots - i);
-+
-+            /* Discard current snapshot also */
-+            qcow2_free_single_snapshot(bs, i);
-+
-+            /*
-+             * This leaks all the rest of the snapshot table and the
-+             * snapshots' clusters, but we run in check -r all mode,
-+             * so qcow2_check_refcounts() will take care of it.
-+             */
-+            s->nb_snapshots =3D i;
-+            offset =3D pre_sn_offset;
-+            break;
-         }
-     }
-=20
-@@ -214,7 +255,7 @@ fail:
-=20
- int qcow2_read_snapshots(BlockDriverState *bs, Error **errp)
- {
--    return qcow2_do_read_snapshots(bs, false, NULL, errp);
-+    return qcow2_do_read_snapshots(bs, false, NULL, NULL, errp);
- }
-=20
- /* add at the end of the file a new list of snapshots */
-@@ -382,6 +423,7 @@ int coroutine_fn qcow2_check_read_snapshot_table(BlockD=
-riverState *bs,
- {
-     BDRVQcow2State *s =3D bs->opaque;
-     Error *local_err =3D NULL;
-+    int nb_clusters_reduced =3D 0;
-     int extra_data_dropped =3D 0;
-     int ret;
-     struct {
-@@ -419,7 +461,8 @@ int coroutine_fn qcow2_check_read_snapshot_table(BlockD=
-riverState *bs,
-=20
-     qemu_co_mutex_unlock(&s->lock);
-     ret =3D qcow2_do_read_snapshots(bs, fix & BDRV_FIX_ERRORS,
--                                  &extra_data_dropped, &local_err);
-+                                  &nb_clusters_reduced, &extra_data_droppe=
-d,
-+                                  &local_err);
-     qemu_co_mutex_lock(&s->lock);
-     if (ret < 0) {
-         result->check_errors++;
-@@ -432,7 +475,32 @@ int coroutine_fn qcow2_check_read_snapshot_table(Block=
-DriverState *bs,
-=20
-         return ret;
-     }
--    result->corruptions +=3D extra_data_dropped;
-+    result->corruptions +=3D nb_clusters_reduced + extra_data_dropped;
-+
-+    if (nb_clusters_reduced) {
-+        /*
-+         * Update image header now, because:
-+         * (1) qcow2_check_refcounts() relies on s->nb_snapshots to be
-+         *     the same as what the image header says,
-+         * (2) this leaks clusters, but qcow2_check_refcounts() will
-+         *     fix that.
-+         */
-+        assert(fix & BDRV_FIX_ERRORS);
-+
-+        snapshot_table_pointer.nb_snapshots =3D cpu_to_be32(s->nb_snapshot=
-s);
-+        ret =3D bdrv_pwrite_sync(bs->file, offsetof(QCowHeader, nb_snapsho=
-ts),
-+                               &snapshot_table_pointer.nb_snapshots,
-+                               sizeof(snapshot_table_pointer.nb_snapshots)=
-);
-+        if (ret < 0) {
-+            result->check_errors++;
-+            fprintf(stderr, "ERROR failed to update the snapshot count in =
-the "
-+                    "image header: %s\n", strerror(-ret));
-+            return ret;
-+        }
-+
-+        result->corruptions_fixed +=3D nb_clusters_reduced;
-+        result->corruptions -=3D nb_clusters_reduced;
-+    }
-=20
-     return 0;
- }
+-    /* Clear the protocol layer and preallocate it if necessary */
+-    ret =3D blk_truncate(blk, 0, PREALLOC_MODE_OFF, errp);
+-    if (ret < 0) {
+-        goto out;
+-    }
+-
+     /* Write the header */
+     QEMU_BUILD_BUG_ON((1 << MIN_CLUSTER_BITS) < sizeof(*header));
+     header =3D g_malloc0(cluster_size);
 --=20
 2.21.0
 
