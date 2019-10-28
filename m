@@ -2,55 +2,59 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A022CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:57:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B27B4CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:58:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DAA720650
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:57:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DAA720650
+	by mail.kernel.org (Postfix) with ESMTPS id 85DA720650
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:58:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85DA720650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOztq-0000ax-SJ
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 03:57:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48680)
+	id 1iOzuZ-0002VJ-CI
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 03:57:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48809)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iOzpI-0000Qb-Tw
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:35 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1iOzpf-0001Ei-2L
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iOzpG-0002of-Ag
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:32 -0400
-Received: from mga04.intel.com ([192.55.52.120]:47953)
+ (envelope-from <tao3.xu@intel.com>) id 1iOzpc-00030M-PX
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:53 -0400
+Received: from mga04.intel.com ([192.55.52.120]:47960)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iOzpG-0002mJ-28
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:30 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iOzpc-0002p5-Eo
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:52 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 28 Oct 2019 00:52:25 -0700
+ 28 Oct 2019 00:52:52 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,239,1569308400"; d="scan'208";a="224558699"
+X-IronPort-AV: E=Sophos;i="5.68,239,1569308400"; d="scan'208";a="224558805"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga004.fm.intel.com with ESMTP; 28 Oct 2019 00:52:23 -0700
+ by fmsmga004.fm.intel.com with ESMTP; 28 Oct 2019 00:52:49 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
  ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
  mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
-Subject: [PATCH v14 00/11] Build ACPI Heterogeneous Memory Attribute Table
- (HMAT)
-Date: Mon, 28 Oct 2019 15:52:09 +0800
-Message-Id: <20191028075220.25673-1-tao3.xu@intel.com>
+Subject: [PATCH v14 10/11] hmat acpi: Build Memory Side Cache Information
+ Structure(s)
+Date: Mon, 28 Oct 2019 15:52:19 +0800
+Message-Id: <20191028075220.25673-11-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191028075220.25673-1-tao3.xu@intel.com>
+References: <20191028075220.25673-1-tao3.xu@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -67,101 +71,132 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, jonathan.cameron@huawei.com
+ qemu-devel@nongnu.org, Daniel Black <daniel@linux.ibm.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series of patches will build Heterogeneous Memory Attribute Table (HMAT)
-according to the command line. The ACPI HMAT describes the memory attributes,
-such as memory side cache attributes and bandwidth and latency details,
-related to the Memory Proximity Domain.
-The software is expected to use HMAT information as hint for optimization.
+From: Liu Jingqi <jingqi.liu@intel.com>
 
-In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
-the platform's HMAT tables.
+This structure describes memory side cache information for memory
+proximity domains if the memory side cache is present and the
+physical device forms the memory side cache.
+The software could use this information to effectively place
+the data in memory to maximize the performance of the system
+memory that use the memory side cache.
 
-The V13 patches link:
-https://patchwork.kernel.org/cover/11200909/
+Reviewed-by: Daniel Black <daniel@linux.ibm.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
+---
 
-Changelog:
-v14:
-    - Reuse the codes of do_strtosz to build qemu_strtotime_ns
-      (Eduardo)
-    - Squash patch v13 01/12 and 02/12 together (Daniel and Eduardo)
-    - Drop time unit picosecond (Eric)
-    - Use qemu ctz64 and clz64 instead of builtin function
-v13:
-    - Modify some text description
-    - Drop "initiator_valid" field in struct NodeInfo
-    - Reuse Garray to store the raw bandwidth and bandwidth data
-    - Calculate common base unit using range bitmap
-    - Add a patch to alculate hmat latency and bandwidth entry list
-    - Drop the total_levels option and use readable cache size
-    - Remove the unnecessary head file
-    - Use decimal notation with appropriate suffix for cache size
-v12:
-    - Fix a bug that a memory-only node without initiator setting
-      doesn't report error. (reported by Danmei Wei)
-    - Fix a bug that if HMAT is enabled and without hmat-lb setting,
-      QEMU will crash. (reported by Danmei Wei)
-v11:
-    - Move numa option patches forward.
-    - Add num_initiator in Numa_state to record the number of
-    initiators.
-    - Simplify struct HMAT_LB_Info, use uint64_t array to store data.
-    - Drop hmat_get_base().
-    - Calculate base in build_hmat_lb().
-v10:
-    - Add qemu_strtotime_ps() to convert strings with time suffixes
-    to numbers, and add some tests for it.
-    - Add qapi buildin type time, and add some tests for it.
-    - Add machine oprion properties "-machine hmat=on|off" for
-	  enabling or disabling HMAT in QEMU.
+No changes in v14.
 
-Liu Jingqi (5):
-  numa: Extend CLI to provide memory latency and bandwidth information
-  numa: Extend CLI to provide memory side cache information
-  hmat acpi: Build Memory Proximity Domain Attributes Structure(s)
-  hmat acpi: Build System Locality Latency and Bandwidth Information
-    Structure(s)
-  hmat acpi: Build Memory Side Cache Information Structure(s)
+Changes in v13:
+    - rename level as cache_level
+---
+ hw/acpi/hmat.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 71 insertions(+), 1 deletion(-)
 
-Tao Xu (6):
-  util/cutils: Add qemu_strtotime_ns()
-  qapi: Add builtin type time
-  tests: Add test for QAPI builtin type time
-  numa: Extend CLI to provide initiator information for numa nodes
-  numa: Calculate hmat latency and bandwidth entry list
-  tests/bios-tables-test: add test cases for ACPI HMAT
-
- hw/acpi/Kconfig                    |   7 +-
- hw/acpi/Makefile.objs              |   1 +
- hw/acpi/hmat.c                     | 263 ++++++++++++++++++++++++++
- hw/acpi/hmat.h                     |  42 +++++
- hw/core/machine.c                  |  64 +++++++
- hw/core/numa.c                     | 284 ++++++++++++++++++++++++++++-
- hw/i386/acpi-build.c               |   5 +
- include/qapi/visitor-impl.h        |   4 +
- include/qapi/visitor.h             |   8 +
- include/qemu/cutils.h              |   1 +
- include/sysemu/numa.h              | 104 +++++++++++
- qapi/machine.json                  | 178 +++++++++++++++++-
- qapi/opts-visitor.c                |  22 +++
- qapi/qapi-visit-core.c             |  12 ++
- qapi/qobject-input-visitor.c       |  18 ++
- qapi/trace-events                  |   1 +
- qemu-options.hx                    |  96 +++++++++-
- scripts/qapi/schema.py             |   1 +
- tests/bios-tables-test.c           |  44 +++++
- tests/test-cutils.c                | 204 +++++++++++++++++++++
- tests/test-keyval.c                | 122 +++++++++++++
- tests/test-qobject-input-visitor.c |  29 +++
- util/cutils.c                      |  89 +++++----
- 23 files changed, 1555 insertions(+), 44 deletions(-)
- create mode 100644 hw/acpi/hmat.c
- create mode 100644 hw/acpi/hmat.h
-
+diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+index 6ec1310e62..931aa60678 100644
+--- a/hw/acpi/hmat.c
++++ b/hw/acpi/hmat.c
+@@ -135,14 +135,63 @@ static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
+     }
+ }
+ 
++/* ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure: Table 5-147 */
++static void build_hmat_cache(GArray *table_data, HMAT_Cache_Info *hmat_cache)
++{
++    /*
++     * Cache Attributes: Bits [3:0] – Total Cache Levels
++     * for this Memory Proximity Domain
++     */
++    uint32_t cache_attr = hmat_cache->total_levels & 0xF;
++
++    /* Bits [7:4] : Cache Level described in this structure */
++    cache_attr |= (hmat_cache->level & 0xF) << 4;
++
++    /* Bits [11:8] - Cache Associativity */
++    cache_attr |= (hmat_cache->associativity & 0x7) << 8;
++
++    /* Bits [15:12] - Write Policy */
++    cache_attr |= (hmat_cache->write_policy & 0x7) << 12;
++
++    /* Bits [31:16] - Cache Line size in bytes */
++    cache_attr |= (hmat_cache->line_size & 0xFFFF) << 16;
++
++    cache_attr = cpu_to_le32(cache_attr);
++
++    /* Type */
++    build_append_int_noprefix(table_data, 2, 2);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Length */
++    build_append_int_noprefix(table_data, 32, 4);
++    /* Proximity Domain for the Memory */
++    build_append_int_noprefix(table_data, hmat_cache->proximity, 4);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 4);
++    /* Memory Side Cache Size */
++    build_append_int_noprefix(table_data, hmat_cache->size, 8);
++    /* Cache Attributes */
++    build_append_int_noprefix(table_data, cache_attr, 4);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /*
++     * Number of SMBIOS handles (n)
++     * Linux kernel uses Memory Side Cache Information Structure
++     * without SMBIOS entries for now, so set Number of SMBIOS handles
++     * as 0.
++     */
++    build_append_int_noprefix(table_data, 0, 2);
++}
++
+ /* Build HMAT sub table structures */
+ static void hmat_build_table_structs(GArray *table_data, NumaState *numa_state)
+ {
+     uint16_t flags;
+     uint32_t num_initiator = 0;
+     uint32_t initiator_list[MAX_NODES];
+-    int i, hierarchy, type;
++    int i, hierarchy, type, cache_level, total_levels;
+     HMAT_LB_Info *hmat_lb;
++    HMAT_Cache_Info *hmat_cache;
+ 
+     for (i = 0; i < numa_state->num_nodes; i++) {
+         flags = 0;
+@@ -176,6 +225,27 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *numa_state)
+             }
+         }
+     }
++
++    /*
++     * ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure:
++     * Table 5-147
++     */
++    for (i = 0; i < numa_state->num_nodes; i++) {
++        total_levels = 0;
++        for (cache_level = 1; cache_level <= MAX_HMAT_CACHE_LEVEL;
++             cache_level++) {
++            if (numa_state->hmat_cache[i][cache_level]) {
++                total_levels++;
++            }
++        }
++        for (cache_level = 0; cache_level <= total_levels; cache_level++) {
++            hmat_cache = numa_state->hmat_cache[i][cache_level];
++            if (hmat_cache) {
++                hmat_cache->total_levels = total_levels;
++                build_hmat_cache(table_data, hmat_cache);
++            }
++        }
++    }
+ }
+ 
+ void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_state)
 -- 
 2.20.1
 
