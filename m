@@ -2,83 +2,85 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A079CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 14:52:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85D22CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 14:58:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54EA4208C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 14:52:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y53J5nP6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54EA4208C0
+	by mail.kernel.org (Postfix) with ESMTPS id 582B820873
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 14:58:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 582B820873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP6Ng-0000TC-EU
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 10:52:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43430)
+	id 1iP6T5-0006D6-Ev
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 10:58:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44157)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iP6Mp-0007yZ-UA
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:51:36 -0400
+ (envelope-from <mst@redhat.com>) id 1iP6Rx-00054h-Fw
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:56:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iP6Mn-0008US-20
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:51:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34241
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iP6Rw-0002xX-3w
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:56:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41134)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iP6Mm-0008SQ-UK
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:51:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572274290;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=U0G07qLqCUu82KfuXdWRsDNz+fA3QGXz2xF86i5poy0=;
- b=Y53J5nP6p3glNdyedlsEs6ieyEuSFslxxmiiR81n7Mu0cItWZ+a9jeJu6Vc+DEt+2RDtuh
- b908EFa3R+usq6NMMQ2AAWbbnxCVMSIrhPnhJ2naABLhuktBN4NhXU46G5sV0VMVFmQahd
- LTJMPL119Vk/tH1Ym6Z4C2ronvWUl5E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-XsHMlSJyOtWFuPvgE-0DqQ-1; Mon, 28 Oct 2019 10:51:26 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iP6Rv-0002x9-S8
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:56:52 -0400
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08354107AD28;
- Mon, 28 Oct 2019 14:51:24 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-123-183.rdu2.redhat.com
- [10.10.123.183])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 59D3526360;
- Mon, 28 Oct 2019 14:51:14 +0000 (UTC)
-Date: Mon, 28 Oct 2019 10:51:12 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 01/26] python/qemu/machine: Allow to use other serial
- consoles than default
-Message-ID: <20191028145112.GA965@localhost.localdomain>
-References: <20191028073441.6448-1-philmd@redhat.com>
- <20191028073441.6448-2-philmd@redhat.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id A581E36961
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 14:56:50 +0000 (UTC)
+Received: by mail-qk1-f198.google.com with SMTP id 18so3809918qka.3
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 07:56:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=QtNd0UMqofsV+XZWmGpconlIFxP5DQnlNLXPHI1qYVA=;
+ b=FCPxIngkNFsowL0SgPTAuIH+6HJhn+l98jifsZT/M93ZJ3PeuAUY2ChXl35+PPTKBy
+ 0MMaM7qUZhR+rR+PtFvZOSh3z99tDsmlC/XnYygnhrKyJdYwMx3GFsQd1SESEJg/fAg+
+ qBTCXvnYOTNi5Ekq4zVnL7Qgxie2zVbfr6Aeg4gp4umaLmgxCgUyaawvX069cWLhoVcK
+ YWNCWOKbbDMBA3BQ85rqYGHovnYjxuWCAJ9PFAPj4iKXFKJcdYoD8L+GD1WfX/1NmVA6
+ GY1vEQ3G7uxca+CZuYK/DOZl/Qv4LGOzFzihOYJeeQTn46yUXoNu47wo70w8wJZwwExr
+ ZAdw==
+X-Gm-Message-State: APjAAAVuvkczGi1C7hJcQ9xjT+7rsd9xQK8RKhsOuKPWsMsONZWKJ290
+ 1+jWuMn5CG483rgQy1Vi4rC7Zeu/3i2sG3NhwxVkP/OODXLzPYZbSCXZbX38JY1pEN0/3aPXMc0
+ gzXkL12PumUVzjC4=
+X-Received: by 2002:a37:610f:: with SMTP id v15mr15487588qkb.98.1572274609945; 
+ Mon, 28 Oct 2019 07:56:49 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwVqh1AavhfAL3N/XFU4xnwB0M3GWSLGvejcePz3nI6KDoPRMDZQjnEw5dr2p7IfEnb9i2/Zg==
+X-Received: by 2002:a37:610f:: with SMTP id v15mr15487560qkb.98.1572274609617; 
+ Mon, 28 Oct 2019 07:56:49 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-10-77.red.bezeqint.net. [79.176.10.77])
+ by smtp.gmail.com with ESMTPSA id
+ p17sm5696481qkm.135.2019.10.28.07.56.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 28 Oct 2019 07:56:48 -0700 (PDT)
+Date: Mon, 28 Oct 2019 10:56:41 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: gengdongjiu <gengdongjiu@huawei.com>
+Subject: Re: [PATCH v20 0/5] Add ARMv8 RAS virtualization support in QEMU
+Message-ID: <20191028104834-mutt-send-email-mst@kernel.org>
+References: <20191026032447.20088-1-zhengxiang9@huawei.com>
+ <20191027061450-mutt-send-email-mst@kernel.org>
+ <6c44268a-2676-3fa1-226d-29877b21dbea@huawei.com>
+ <20191028042645-mutt-send-email-mst@kernel.org>
+ <1edda59a-8b3d-1eec-659a-05356d55ed22@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20191028073441.6448-2-philmd@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: XsHMlSJyOtWFuPvgE-0DqQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <1edda59a-8b3d-1eec-659a-05356d55ed22@huawei.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,62 +92,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org,
- Fabien Chouteau <chouteau@adacore.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- Kamil Rytarowski <kamil@netbsd.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
+ imammedo@redhat.com, pbonzini@redhat.com, mtosatti@redhat.com,
+ qemu-devel@nongnu.org, linuxarm@huawei.com, shannon.zhaosl@gmail.com,
+ Xiang Zheng <zhengxiang9@huawei.com>, qemu-arm@nongnu.org, james.morse@arm.com,
+ xuwei5@huawei.com, jonathan.cameron@huawei.com, wanghaibin.wang@huawei.com,
+ lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 28, 2019 at 08:34:16AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
->=20
-> Currently the QEMU Python module limits the QEMUMachine class to
-> use the first serial console.
->=20
-> Some machines/guest might use another console than the first one as
-> the 'boot console'. For example the Raspberry Pi uses the second
-> (AUX) console.
->=20
-> To be able to use the Nth console as default, we simply need to
-> connect all the N - 1 consoles to the null chardev.
->=20
-> Add an index argument, so we can use a specific serial console as
-> default.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
-> ---
-> v2:
-> - renamed 'console_index', added docstring (Cleber)
-> - reworded description (pm215)
-> ---
->  python/qemu/machine.py | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->=20
-> diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-> index 128a3d1dc2..6fa68fa35a 100644
-> --- a/python/qemu/machine.py
-> +++ b/python/qemu/machine.py
-> @@ -235,6 +235,8 @@ class QEMUMachine(object):
->                  '-display', 'none', '-vga', 'none']
->          if self._machine is not None:
->              args.extend(['-machine', self._machine])
-> +        for i in range(self._console_index):
-> +            args.extend(['-serial', 'null'])
+On Mon, Oct 28, 2019 at 09:50:21PM +0800, gengdongjiu wrote:
+> Hi Michael,
+> 
+> On 2019/10/28 16:28, Michael S. Tsirkin wrote:
+> >>> gets some testing.  I'll leave this decision to the ARM maintainer.  For
+> >>> ACPI parts:
+> >>>
+> >>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> >> Got it, Thanks for the Reviewed-by from Michael.
+> >>
+> >> Hi Michael,
+> >>   According to discussion with QEMU community, I finished and developed the whole ARM RAS virtualization solution, and introduce the ARM APEI table in the first time.
+> >> For the newly created files, which are mainly about ARM APEI/GHES part,I would like to maintain them. If you agree it, whether I can add new maintainers[1]? thanks a lot.
+> >>
+> >>
+> >> [1]:
+> >> +ARM APEI Subsystem
+> >> +M: Dongjiu Geng <gengdongjiu@huawei.com>
+> >> +M: Xiang zheng <zhengxiang9@huawei.com>
+> >> +L: qemu-arm@nongnu.org
+> >> +S: Maintained
+> >> +F: hw/acpi/acpi_ghes.c
+> >> +F: include/hw/acpi/acpi_ghes.h
+> >> +F: docs/specs/acpi_hest_ghes.rst
+> >>
+> > I think for now you want to be a designated reviewer.  So I'd use an R:
+> > tag.
+> 
+>  Thanks for the reply.
+>  I want to be a maintainer for my newly created files, so whether I can use M: tag. I would like to contribute some time to maintain that, thanks a lot.
 
-This will get executed even when set_console() is never called, so it
-will result in an AttributeError because 'self._console_index' does
-not exist.
+This will fundamentally be up to Peter.
 
-It's also a good practice to define all attributes on __init__(), so
-I'd suggest that as a fix.
+Reviewing patches is generally the best way to become a maintainer,
+that's why I suggested the R: tag.
 
-- Cleber.
 
+> > 
+> >>>
+> >>>> ---
 
