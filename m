@@ -2,54 +2,70 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C786CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 06:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1FF0CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 06:34:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E0C020873
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 06:10:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E0C020873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id C437B20862
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 06:34:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C437B20862
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=h3c.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOyEn-0003uR-FO
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 02:10:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38758)
+	id 1iOybn-00066I-Tg
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 02:34:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40641)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1iOyDy-0003I7-Ay
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 02:09:55 -0400
+ (envelope-from <tu.guoyi@h3c.com>) id 1iOyaw-0004dq-BP
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 02:33:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1iOyDw-0002Sw-CD
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 02:09:54 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:53082)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1iOyDr-0002OC-BD; Mon, 28 Oct 2019 02:09:48 -0400
-Received: from apples.localdomain (unknown [194.62.217.57])
- by charlie.dont.surf (Postfix) with ESMTPSA id DEC0DBF426;
- Mon, 28 Oct 2019 06:09:43 +0000 (UTC)
-Date: Mon, 28 Oct 2019 07:09:40 +0100
-From: Klaus Birkelund <its@irrelevant.dk>
-To: qemu-block@nongnu.org
-Subject: Re: [PATCH v2 00/20] nvme: support NVMe v1.3d, SGLs and multiple
- namespaces
-Message-ID: <20191028060940.GA561856@apples.localdomain>
-References: <20191015103900.313928-1-its@irrelevant.dk>
+ (envelope-from <tu.guoyi@h3c.com>) id 1iOyau-0006Gj-D8
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 02:33:37 -0400
+Received: from smtp.h3c.com ([60.191.123.50]:32062 helo=h3cspam02-ex.h3c.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tu.guoyi@h3c.com>)
+ id 1iOyat-00060B-3c; Mon, 28 Oct 2019 02:33:36 -0400
+Received: from DAG2EX02-BASE.srv.huawei-3com.com ([10.8.0.65])
+ by h3cspam02-ex.h3c.com with ESMTPS id x9S6X6cd028044
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Mon, 28 Oct 2019 14:33:06 +0800 (GMT-8)
+ (envelope-from tu.guoyi@h3c.com)
+Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
+ DAG2EX02-BASE.srv.huawei-3com.com (10.8.0.65) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Mon, 28 Oct 2019 14:33:08 +0800
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
+ by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%6])
+ with mapi id 15.01.1713.004; Mon, 28 Oct 2019 14:33:08 +0800
+From: Tuguoyi <tu.guoyi@h3c.com>
+To: "vsementsov@virtuozzo.com" <vsementsov@virtuozzo.com>, "kwolf@redhat.com"
+ <kwolf@redhat.com>, "mreitz@redhat.com" <mreitz@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: [PATCH v2] qcow2-bitmap: Fix uint64_t left-shift overflow
+Thread-Topic: [PATCH v2] qcow2-bitmap: Fix uint64_t left-shift overflow
+Thread-Index: AdWNWOAJ7czUdZfnT3+PEnECPxQetw==
+Date: Mon, 28 Oct 2019 06:33:08 +0000
+Message-ID: <494aedb644bf434f8eee0263aa17aa23@h3c.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.125.108.112]
+x-sender-location: DAG2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191015103900.313928-1-its@irrelevant.dk>
-User-Agent: Mutt/1.12.2 (2019-09-21)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 128.199.63.193
+X-DNSRBL: 
+X-MAIL: h3cspam02-ex.h3c.com x9S6X6cd028044
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 60.191.123.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -61,103 +77,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Javier Gonzalez <javier@javigon.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Paul Durrant <Paul.Durrant@citrix.com>,
- Keith Busch <kbusch@kernel.org>, Stephen Bates <sbates@raithlin.com>
+Cc: Chengchiwen <chengchiwen@h3c.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Wangyongqing <w_yongqing@h3c.com>, Changlimin <changlimin@h3c.com>,
+ Gaoliang <liang_gao@h3c.com>, Wangyong <wang.yongD@h3c.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 15, 2019 at 12:38:40PM +0200, Klaus Jensen wrote:
-> Hi,
-> 
-> (Quick note to Fam): most of this series is irrelevant to you as the
-> maintainer of the nvme block driver, but patch "nvme: add support for
-> scatter gather lists" touches block/nvme.c due to changes in the shared
-> NvmeCmd struct.
-> 
-> Anyway, v2 comes with a good bunch of changes. Compared to v1[1], I have
-> squashed some commits in the beginning of the series and heavily
-> refactored "nvme: support multiple block requests per request" into the
-> new commit "nvme: allow multiple aios per command".
-> 
-> I have also removed the original implementation of the Abort command
-> (commit "nvme: add support for the abort command") as it is currently
-> too tricky to test reliably. It has been replaced by a stub that,
-> besides a trivial sanity check, just fails to abort the given command.
-> *Some* implementation of the Abort command is mandatory, but given the
-> "best effort" nature of the command this is acceptable for now. When the
-> device gains support for arbitration it should be less tricky to test.
-> 
-> The support for multiple namespaces is now backwards compatible. The
-> nvme device still accepts a 'drive' parameter, but for multiple
-> namespaces the use of 'nvme-ns' devices are required. I also integrated
-> some feedback from Paul so the device supports non-consecutive namespace
-> ids.
-> 
-> I have also added some new commits at the end:
-> 
->   - "nvme: bump controller pci device id" makes sure the Linux kernel
->     doesn't apply any quirks to the controller that it no longer has.
->   - "nvme: handle dma errors" won't actually do anything before this[2]
->     fix to include/hw/pci/pci.h is merged. With these two patches added,
->     the device reliably passes some additional nasty tests from blktests
->     (block/011 "disable PCI device while doing I/O" and block/019 "break
->     PCI link device while doing I/O"). Before this patch, block/011
->     would pass from time to time if you were lucky, but would at least
->     mess up the controller pretty badly, causing a reset in the best
->     case.
-> 
-> 
->   [1]: https://patchwork.kernel.org/project/qemu-devel/list/?series=142383
->   [2]: https://patchwork.kernel.org/patch/11184911/
-> 
-> 
-> Klaus Jensen (20):
->   nvme: remove superfluous breaks
->   nvme: move device parameters to separate struct
->   nvme: add missing fields in the identify controller data structure
->   nvme: populate the mandatory subnqn and ver fields
->   nvme: allow completion queues in the cmb
->   nvme: add support for the abort command
->   nvme: refactor device realization
->   nvme: add support for the get log page command
->   nvme: add support for the asynchronous event request command
->   nvme: add logging to error information log page
->   nvme: add missing mandatory features
->   nvme: bump supported specification version to 1.3
->   nvme: refactor prp mapping
->   nvme: allow multiple aios per command
->   nvme: add support for scatter gather lists
->   nvme: support multiple namespaces
->   nvme: bump controller pci device id
->   nvme: remove redundant NvmeCmd pointer parameter
->   nvme: make lba data size configurable
->   nvme: handle dma errors
-> 
->  block/nvme.c           |   18 +-
->  hw/block/Makefile.objs |    2 +-
->  hw/block/nvme-ns.c     |  139 +++
->  hw/block/nvme-ns.h     |   60 ++
->  hw/block/nvme.c        | 1863 +++++++++++++++++++++++++++++++++-------
->  hw/block/nvme.h        |  219 ++++-
->  hw/block/trace-events  |   37 +-
->  include/block/nvme.h   |  132 ++-
->  8 files changed, 2094 insertions(+), 376 deletions(-)
->  create mode 100644 hw/block/nvme-ns.c
->  create mode 100644 hw/block/nvme-ns.h
-> 
-> -- 
-> 2.23.0
-> 
-
-Gentle ping on this.
-
-I'm aware that this is a lot to go through, but I would like to know if
-anyone has had a chance to look at it?
-
-
-https://patchwork.kernel.org/project/qemu-devel/list/?series=187637
-
+SW4gY2hlY2tfY29uc3RyYWludHNfb25fYml0bWFwKCksIHRoZSBzYW5pdHkgY2hlY2sgb24gdGhl
+DQpncmFudWxhcml0eSB3aWxsIGNhdXNlIHVpbnQ2NF90IGludGVnZXIgbGVmdC1zaGlmdCBvdmVy
+Zmxvdw0Kd2hlbiBjbHVzdGVyX3NpemUgaXMgMk0gYW5kIHRoZSBncmFudWxhcml0eSBpcyBCSUdH
+RVIgdGhhbg0KMzJLLiBBcyBhIHJlc3VsdCwgZm9yIGEgcWNvdzIgZGlzayB3aXRoIGNsdXN0ZXJf
+c2l6ZSBzZXQgdG8NCjJNLCB3ZSBjb3VsZCBub3QgZXZlbiBjcmVhdGUgYSBkaXJ0eSBiaXRtYXAg
+d2l0aCBkZWZhdWx0DQpncmFudWxhcml0eS4gVGhpcyBwYXRjaCBmaXggdGhlIGlzc3VlIGJ5IGRp
+dmlkaW5nIEBsZW4gYnkNCmdyYW51bGFyaXR5IGluc3RlYWQuDQoNClNpZ25lZC1vZmYtYnk6IEd1
+b3lpIFR1IDx0dS5ndW95aUBoM2MuY29tPg0KLS0tDQogYmxvY2svcWNvdzItYml0bWFwLmMgfCA0
+ICsrLS0NCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0K
+DQpkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzItYml0bWFwLmMgYi9ibG9jay9xY293Mi1iaXRtYXAu
+Yw0KaW5kZXggOTgyOTRhNy4uNzFhYzgyMiAxMDA2NDQNCi0tLSBhL2Jsb2NrL3Fjb3cyLWJpdG1h
+cC5jDQorKysgYi9ibG9jay9xY293Mi1iaXRtYXAuYw0KQEAgLTE3Miw4ICsxNzIsOCBAQCBzdGF0
+aWMgaW50IGNoZWNrX2NvbnN0cmFpbnRzX29uX2JpdG1hcChCbG9ja0RyaXZlclN0YXRlICpicywN
+CiAgICAgfQ0KIA0KICAgICBpZiAoKGxlbiA+ICh1aW50NjRfdClCTUVfTUFYX1BIWVNfU0laRSA8
+PCBncmFudWxhcml0eV9iaXRzKSB8fA0KLSAgICAgICAgKGxlbiA+ICh1aW50NjRfdClCTUVfTUFY
+X1RBQkxFX1NJWkUgKiBzLT5jbHVzdGVyX3NpemUgPDwNCi0gICAgICAgICAgICAgICBncmFudWxh
+cml0eV9iaXRzKSkNCisgICAgICAgIChESVZfUk9VTkRfVVAobGVuLCBncmFudWxhcml0eSkgPiAo
+dWludDY0X3QpQk1FX01BWF9UQUJMRV9TSVpFICoNCisgICAgICAgICAgICAgICAgcy0+Y2x1c3Rl
+cl9zaXplKSkNCiAgICAgew0KICAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiVG9vIG11Y2ggc3Bh
+Y2Ugd2lsbCBiZSBvY2N1cGllZCBieSB0aGUgYml0bWFwLiAiDQogICAgICAgICAgICAgICAgICAg
+ICJVc2UgbGFyZ2VyIGdyYW51bGFyaXR5Iik7DQotLSANCjIuNy40DQo=
 
