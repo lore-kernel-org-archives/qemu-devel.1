@@ -2,79 +2,105 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0868CCA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 14:39:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B32CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 14:41:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5D3821721
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 14:39:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F0C921721
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 14:41:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DOZD1xDm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5D3821721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X3o+LaRJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F0C921721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP6BR-0004Ac-EY
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 10:39:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41283)
+	id 1iP6Ct-0006BB-9f
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 10:41:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41369)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iP6AY-0003Mc-4S
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:38:55 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iP6BA-0004E2-6M
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:39:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iP6AW-0001qR-PN
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:38:53 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:42339)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iP6AW-0001q7-Jh
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:38:52 -0400
-Received: by mail-ot1-x344.google.com with SMTP id b16so6794043otk.9
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 07:38:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=X2KeoQSDaeUXBZP+4dNiSnEGONnNU3yfXPQF87eI0wM=;
- b=DOZD1xDmS5jV0Zo2gtIbBRRTyXcFl1XWuwDBCN+d1x4xynqjXD/FmuVJaYbhxQf36D
- OomDaYUAUp3uKPUx1jd+m1wkplfE1yMrM/M2RQUUow8CvFZfSH61AFlpc8TkFc0SDXUz
- Ey4UuMrWpijBgnAm0JCV9IBEP36XSEd4i/YTbf7NexFbF/FKMxtg6J7VisoJ6v8RRKnZ
- 24vnHi/SObH5s0p+VNbjInHTfgv0urnC3e1nsY2PRtYWLDwOQi9z2xIeBIrMb9uQWrgo
- 7URRJvk0cphgHQCFWVZ+Jpwsvcp5JmhqnIsrLvdj7fdjPJOHPOW+XWTva13cFJBWIZzx
- rZig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=X2KeoQSDaeUXBZP+4dNiSnEGONnNU3yfXPQF87eI0wM=;
- b=aGSn1FsOGL3u8gxp5Nq4LcTMyRMrpFWc+6Db2ModdJ3N9SqsOmxdSYPzzFy2OD7a3Q
- h+R6HXnDJREhusX3AzRUDPJACOyZnlP/HaiCEsNbJZYWbY953lDdW9KC68K4yxtgLkgY
- USym1MB3ZcuL8ZfMnrVBMk5Skd0WB1n4E2d0nWSy6MQ500Ynf1X47bOe27O49nGI+62e
- ARtphiaN5CLWtK9u8JU9zFvO/TDdFC8JsXTdKQaukBkRPDSHl/PF2XSZNowpDWOHw/ku
- 1pQWkoRlOTkfYeG20QCCwtXQBHD2pBsCD5xWG1hZOw+XKKOf3K0S/8W7DWIf3LY5Fb7b
- 0EdA==
-X-Gm-Message-State: APjAAAWLTvOFhPKfDIDzfH7548GIsBNhVikgJuqz+z+lcDA6lp/PDOVk
- 2bOO1WumyXHmIgbaHCyKgtS5fYY7+Q9lqtwZ4dX9yw==
-X-Google-Smtp-Source: APXvYqwuG4brMuW49kDBC+0mxvf6q3RtwqhZPtwZAAOfCsOxrGPd59StVTwqh+EpWDmzAwdeANoFeFgLF21gQbR/Hks=
-X-Received: by 2002:a9d:398a:: with SMTP id y10mr13171318otb.97.1572273531538; 
- Mon, 28 Oct 2019 07:38:51 -0700 (PDT)
+ (envelope-from <mreitz@redhat.com>) id 1iP6B7-0002Cz-D0
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:39:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41648
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP6B7-0002Bc-7J
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:39:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572273568;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=JOEaCZBWFlGnuKWmeO/5lq568I21ICDYRueR38soCuI=;
+ b=X3o+LaRJ/sJgu23ZELQ/XI/4HgEcogH3lAvlJ7MaAex3bOE7SeYiSTVSN9tVd6H1SMDCTP
+ JGKqVGlbZypjfuiB8tCXXnlJmDMUdCXAXlTliz04dFBKAR0zKSDpTgf3lznIrULubWw+kv
+ yn9BbZ82bxGM4Oy5npoDvi+V6L4VeTk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-120-KR0kqCwFPM6ZujgJBiayTg-1; Mon, 28 Oct 2019 10:39:26 -0400
+X-MC-Unique: KR0kqCwFPM6ZujgJBiayTg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA3285E4;
+ Mon, 28 Oct 2019 14:39:25 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-83.ams2.redhat.com
+ [10.36.117.83])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C6CFB10027A1;
+ Mon, 28 Oct 2019 14:39:24 +0000 (UTC)
+Subject: Re: [PATCH v2] qemu-img.texi: Describe data_file and data_file_raw
+To: Han Han <hhan@redhat.com>, qemu-devel@nongnu.org
+References: <20191021011421.24748-1-hhan@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <2beb5143-1ad6-14c4-d0d1-bd9f7aa429f5@redhat.com>
+Date: Mon, 28 Oct 2019 15:39:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20191026193824.11926-1-mst@redhat.com>
-In-Reply-To: <20191026193824.11926-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 28 Oct 2019 14:38:51 +0000
-Message-ID: <CAFEAcA85WdNnMTgtr1LoWoutDGPjUh5TxxUNGOm3=wYVRvvJqA@mail.gmail.com>
-Subject: Re: [PULL 00/25] virtio: features, tests
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+In-Reply-To: <20191021011421.24748-1-hhan@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="AxGdkiBMdLMUwB6HBqLr8D6ZQK2owcGWu"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,39 +112,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 26 Oct 2019 at 20:39, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> The following changes since commit 58560ad254fbda71d4daa6622d71683190070ee2:
->
->   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-4.2-20191024' into staging (2019-10-24 16:22:58 +0100)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to 909c548c539b4136e3abf2377980dad6274c4c2e:
->
->   virtio: drop unused virtio_device_stop_ioeventfd() function (2019-10-25 07:46:22 -0400)
->
-> ----------------------------------------------------------------
-> virtio: features, tests
->
-> libqos update with support for virtio 1.
-> Packed ring support for virtio.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->
-> ----------------------------------------------------------------
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AxGdkiBMdLMUwB6HBqLr8D6ZQK2owcGWu
+Content-Type: multipart/mixed; boundary="2dFxeuxfgiQfCH56fbYdPPGnjk9cIajxO"
 
-Applied, thanks.
+--2dFxeuxfgiQfCH56fbYdPPGnjk9cIajxO
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+On 21.10.19 03:14, Han Han wrote:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1763105
+>=20
+> Signed-off-by: Han Han <hhan@redhat.com>
+> ---
+>  qemu-img.texi | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+>=20
+> diff --git a/qemu-img.texi b/qemu-img.texi
+> index b5156d6316..983c6122f8 100644
+> --- a/qemu-img.texi
+> +++ b/qemu-img.texi
+> @@ -763,6 +763,16 @@ file which is COW and has data blocks already, it co=
+uldn't be changed to NOCOW
+>  by setting @code{nocow=3Don}. One can issue @code{lsattr filename} to ch=
+eck if
+>  the NOCOW flag is set or not (Capital 'C' is NOCOW flag).
 
--- PMM
+Usually, I try not to be pedantic about specific phrasing and the like,
+but this is going in the man page, so I suppose I have to be.
+
+> +@item data_file
+> +File name of data file that is stored in the image and used as a default=
+ for
+
+This sounds a bit like the data file itself were stored in the image.
+
+Also, I don=92t think the bit about this being a default is necessary
+because several qcow2 creation options are in some way only defaults
+than can be overridden at runtime (like lazy_refcounts or backing_file).
+ So I don=92t think there is a need to make a mention of that here.
+
+> +opening the image. If the option is used, qcow2 file only stores the met=
+adata
+> +for the image.
+
+Maybe:
+
+Path to a file in which to store all guest data.  If this option is
+used, the qcow2 file will only contain the image's metadata.
+
+> +
+> +@item data_file_raw
+> +This option requires @option{data_file}. If this option is set to @code{=
+on},
+> +qemu will always keep the external data file consistent as a standalone
+> +read-only raw image. Default value is @code{off}.
+
+For this paragraph OTOH I have absolutely no complaints. :-)
+
+Max
+
+
+--2dFxeuxfgiQfCH56fbYdPPGnjk9cIajxO--
+
+--AxGdkiBMdLMUwB6HBqLr8D6ZQK2owcGWu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl22/ZsACgkQ9AfbAGHV
+z0C8dgf8Dt5pcxszzUHuNXSTMK/2fFfM1ziAmr8+/C9swbTWdVHuhfFg9bKsgCI1
+vj8BPReSqn6ttIrEsZfHdfRcWN3ugulYgVnwvIPRaL3+3neqwa7fadShWi4p29x8
+x+mG4VWNMP2P27k/Xh+ZlKEmrZLOLbmbUgk06c1mqokj7K8730i42TgYyYsoI52S
+cH3Y8J8HNWlPJbpiQddzXY/Fjpz59+BYzbKs+Py6JGCAsJncUQS6VmCBq+0t7MR4
+/ll3e9xmQfm5ZnsXSmb9/W2Ktub79KoYsVj+YonZUOU1JbNFu69cXiqN/GhOlAJI
+uPJ8627R4h23lyM97f1bl/4jOIYerw==
+=nCiH
+-----END PGP SIGNATURE-----
+
+--AxGdkiBMdLMUwB6HBqLr8D6ZQK2owcGWu--
+
 
