@@ -2,77 +2,61 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BCEACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 02:58:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B903ECA9EAF
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 03:17:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1019208C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 02:58:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KX1WeQQq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1019208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 88CBA20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 03:17:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88CBA20679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOvEo-00070B-Ug
-	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 22:58:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54193)
+	id 1iOvXX-0002OP-LN
+	for qemu-devel@archiver.kernel.org; Sun, 27 Oct 2019 23:17:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55832)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <coiby.xu@gmail.com>) id 1iOvE5-0006CG-Su
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 22:57:51 -0400
+ (envelope-from <zhengxiang9@huawei.com>) id 1iOvWs-0001az-F9
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 23:17:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <coiby.xu@gmail.com>) id 1iOvE4-0005hq-AF
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 22:57:49 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:38513)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <coiby.xu@gmail.com>) id 1iOvE4-0005h8-2S
- for qemu-devel@nongnu.org; Sun, 27 Oct 2019 22:57:48 -0400
-Received: by mail-lj1-x244.google.com with SMTP id q78so9639916lje.5
- for <qemu-devel@nongnu.org>; Sun, 27 Oct 2019 19:57:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to;
- bh=zhYXlb7qG9qsgY2rR5GRQQ5cxTYzrGD+oeJZGMlj038=;
- b=KX1WeQQqZjRuKUZNcaOoAesL34Kg4knj/vPFA3O1N5PFGMM/iRZ4UFMXs30IicODkM
- i1i/MONEYBIIgkuZ6WoRq1TJFBeMRRVgzaz4q9HKHU1b1MQQ2Z9DCuQc6R2Du05lbO5r
- Xm2iYv67+gzvQ0y3r4X3WR23R1ehRox7FbEEgrPwj0vcxcEEdRI7ChPsBMaHi3zvh6NV
- aNhlXgByDTne+sGhQXcGNPcrRuSjYLq6fZvSOqHGETkd7cxjWMS3Sj//h7ZjLy/yCOrH
- FZ2/Mlq+++wI04g7qLG0DK6QK3b26JQnPjA/ASxj1xfRnzin+kSy1Vg5c4PedoD6F+Dz
- DBxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=zhYXlb7qG9qsgY2rR5GRQQ5cxTYzrGD+oeJZGMlj038=;
- b=RZ3DGtMq1YioJFhubnKjT8C2bgofC8WJiQxk6Sf9ytdLtnxzkx/7fS2p/TXU5293qG
- ZmLxrrwvtDAJp9FWQ/0Yv1TJ/Xj4E0oNuI0huGLYzO/Jvq03IAKhtNxj1JoMKP5aalI5
- v9QZ/NZmkEGf/DBSmPawhfzQDo3rawY7FonBN0k0KDjZln6cL0uPMAp42Rv4TeYLL/2o
- noYdonM/BCXbf2+WvkK7sip3LZ8vyEa3+vWYua4HuwgMx43fHhecng/zrTz73BQG4uvo
- +ZY8jz7mJbvawBHk+HQs9vA5MCXGbrFsDVnwEH1JKvvglf0PRdkBexWLaZxteBJB3rfr
- WN7w==
-X-Gm-Message-State: APjAAAWoilzS8iz/JwVlROtQ3CIEfGB9PjDHelWEHARTqj80PYubsUHY
- 9KXsfGlsGwNdeLAwU6kBzIVP5PaN5Y/gKsFb/G69HOhWNa7CxQ==
-X-Google-Smtp-Source: APXvYqzX/g5MWufU8zU4KOK9GdUN+mj0rfFBxMMz1MBpJqgXFlgapxwJzEEXp+TSJ6QWeE6fXe0xrHJO+mAePIpeNSU=
-X-Received: by 2002:a05:651c:120c:: with SMTP id
- i12mr1840574lja.123.1572231465440; 
- Sun, 27 Oct 2019 19:57:45 -0700 (PDT)
+ (envelope-from <zhengxiang9@huawei.com>) id 1iOvWr-0005e7-EX
+ for qemu-devel@nongnu.org; Sun, 27 Oct 2019 23:17:14 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:37100 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
+ id 1iOvWn-0005b9-L4; Sun, 27 Oct 2019 23:17:09 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 732D27EEE96640117F5;
+ Mon, 28 Oct 2019 11:17:00 +0800 (CST)
+Received: from [127.0.0.1] (10.133.224.57) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Mon, 28 Oct 2019
+ 11:16:53 +0800
+Subject: Re: [PATCH v20 0/5] Add ARMv8 RAS virtualization support in QEMU
+To: "Michael S. Tsirkin" <mst@redhat.com>, <peter.maydell@linaro.org>
+References: <20191026032447.20088-1-zhengxiang9@huawei.com>
+ <20191027061450-mutt-send-email-mst@kernel.org>
+From: Xiang Zheng <zhengxiang9@huawei.com>
+Message-ID: <b4cba864-6689-a425-af8e-4fb4a95d4482@huawei.com>
+Date: Mon, 28 Oct 2019 11:16:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-From: Coiby Xu <coiby.xu@gmail.com>
-Date: Mon, 28 Oct 2019 10:57:09 +0800
-Message-ID: <CAJAkqrUo+8qJGAMprEY2ZxqL-3meHo-56PYc_M1oxXNy5SVvow@mail.gmail.com>
-Subject: Failure of troublesome vhost-user/flags-mismatch test can't be
- reproduced
-To: qemu-devel@nongnu.org
-Content-Type: multipart/alternative; boundary="000000000000009d590595efaa5f"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::244
+In-Reply-To: <20191027061450-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,88 +68,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: ehabkost@redhat.com, kvm@vger.kernel.org, wanghaibin.wang@huawei.com,
+ mtosatti@redhat.com, linuxarm@huawei.com, qemu-devel@nongnu.org,
+ gengdongjiu@huawei.com, shannon.zhaosl@gmail.com, qemu-arm@nongnu.org,
+ james.morse@arm.com, jonathan.cameron@huawei.com, imammedo@redhat.com,
+ pbonzini@redhat.com, xuwei5@huawei.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000009d590595efaa5f
-Content-Type: text/plain; charset="UTF-8"
 
-Hi,
 
-Can anyone reproduce the failure of one troublesome test
-vhost-user/flags-mismatch (https://wiki.qemu.org/Testing/CI/TroublesomeTests)
-which has been disabled since Aug 15 2017 (
-https://patchwork.kernel.org/patch/9939431/)?  Last month I downloaded QEMU
-source code (commit ID: 3483534ec3) and this version also failed this test.
-After debugging this issue, I thought I have fixed this issue by saving
-acknowledged features after vhost backend disconnect with the client
-(qemu). But later I reviewed the commit history of net/vhost-user.c and
-found out this test failed on my machines because of  a newly introduced
-bug from a recent commit (https://patchwork.kernel.org/patch/11054781/) on
-July 29 2019 and this new bug has already been fixed by a more recent
-commit (
-https://lists.sr.ht/~philmd/qemu/%3C20190924162044.11414-1-amorenoz%40redhat.com%3E).
-After more investigation, it surprised me both 3.1.0 and 2.9.1could pass
-vhost-user/flags-mismatch test. According to the comments on the commit
-https://patchwork.kernel.org/patch/9939431/ which disabled the
-vhost-user/flags-mismatch and other two tests, it seems the tests are only
-broken on travis. Maybe we should re-investigate this issue to re-enable
-the test so similar bugs like
-https://bugzilla.redhat.com/show_bug.cgi?id=1738768 could be prevented in
-the first place.
+On 2019/10/27 18:17, Michael S. Tsirkin wrote:
+> On Sat, Oct 26, 2019 at 11:24:42AM +0800, Xiang Zheng wrote:
+>> In the ARMv8 platform, the CPU error types are synchronous external abort(SEA)
+>> and SError Interrupt (SEI). If exception happens in guest, sometimes it's better
+>> for guest to perform the recovery, because host does not know the detailed
+>> information of guest. For example, if an exception happens in a user-space
+>> application within guest, host does not know which application encounters
+>> errors.
+>>
+>> For the ARMv8 SEA/SEI, KVM or host kernel delivers SIGBUS to notify userspace.
+>> After user space gets the notification, it will record the CPER into guest GHES
+>> buffer and inject an exception or IRQ into guest.
+>>
+>> In the current implementation, if the type of SIGBUS is BUS_MCEERR_AR, we will
+>> treat it as a synchronous exception, and notify guest with ARMv8 SEA
+>> notification type after recording CPER into guest.
+>>
+>> This series of patches are based on Qemu 4.1, which include two parts:
+>> 1. Generate APEI/GHES table.
+>> 2. Handle the SIGBUS signal, record the CPER in runtime and fill it into guest
+>>    memory, then notify guest according to the type of SIGBUS.
+>>
+>> The whole solution was suggested by James(james.morse@arm.com); The solution of
+>> APEI section was suggested by Laszlo(lersek@redhat.com).
+>> Show some discussions in [1].
+>>
+>> This series of patches have already been tested on ARM64 platform with RAS
+>> feature enabled:
+>> Show the APEI part verification result in [2].
+>> Show the BUS_MCEERR_AR SIGBUS handling verification result in [3].
+> 
+> 
+> This looks mostly OK to me.  I sent some minor style comments but they
+> can be addressed by follow up patches.
+> 
+> Maybe it's a good idea to merge this before soft freeze to make sure it
+> gets some testing.  I'll leave this decision to the ARM maintainer.  For
+> ACPI parts:
+> 
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> 
 
-Btw we can excluisvely check this test on latest QEMU by given TESTPATH and
-setting QTEST_VHOST_USER_FIXME environment variable,
-    QTEST_VHOST_USER_FIXME=1
-QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=qemu-img
-tests/qos-test -p
-/x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/virtio-net-pci/virtio-net/virtio-net-tests/vhost-user/flags-mismatch
+Hi Peter,
 
+I can address the style comments and send the series of patches before soft
+freeze if needed. And if there is no window before soft freeze, I can also
+address them by follow up patches. :)
 
 -- 
-*Best regards,*
-*Coiby*
 
---000000000000009d590595efaa5f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Thanks,
+Xiang
 
-<div dir=3D"ltr"><div>Hi,<br><br>Can anyone reproduce the failure of one tr=
-oublesome test vhost-user/flags-mismatch (<a href=3D"https://wiki.qemu.org/=
-Testing/CI/TroublesomeTests" target=3D"_blank">https://wiki.qemu.org/Testin=
-g/CI/TroublesomeTests</a>) which has been disabled since Aug 15 2017 (<a hr=
-ef=3D"https://patchwork.kernel.org/patch/9939431/" target=3D"_blank">https:=
-//patchwork.kernel.org/patch/9939431/</a>)?=C2=A0 Last month I downloaded Q=
-EMU source code (commit ID: 3483534ec3) and this version also failed this t=
-est. After debugging this issue, I thought I have fixed this issue by savin=
-g acknowledged features after vhost backend disconnect with the client (qem=
-u). But later I reviewed the commit history of net/vhost-user.c and found o=
-ut this test failed on my machines because of =C2=A0a newly introduced bug =
-from a recent commit (<a href=3D"https://patchwork.kernel.org/patch/1105478=
-1/" target=3D"_blank">https://patchwork.kernel.org/patch/11054781/</a>) on =
-July 29 2019 and this new bug has already been fixed by a more recent commi=
-t (<a href=3D"https://lists.sr.ht/~philmd/qemu/%3C20190924162044.11414-1-am=
-orenoz%40redhat.com%3E" target=3D"_blank">https://lists.sr.ht/~philmd/qemu/=
-%3C20190924162044.11414-1-amorenoz%40redhat.com%3E</a>). After more investi=
-gation, it surprised me both 3.1.0 and 2.9.1could pass vhost-user/flags-mis=
-match test. According to the comments on the commit <a href=3D"https://patc=
-hwork.kernel.org/patch/9939431/" target=3D"_blank">https://patchwork.kernel=
-.org/patch/9939431/</a> which disabled the vhost-user/flags-mismatch and ot=
-her two tests, it seems the tests are only broken on travis. Maybe we shoul=
-d re-investigate this issue to re-enable the test so similar bugs like <a h=
-ref=3D"https://bugzilla.redhat.com/show_bug.cgi?id=3D1738768">https://bugzi=
-lla.redhat.com/show_bug.cgi?id=3D1738768</a>=C2=A0could be prevented in the=
- first place.=C2=A0</div><div><br></div><div>Btw we can excluisvely check t=
-his test on latest QEMU by given TESTPATH and setting=C2=A0QTEST_VHOST_USER=
-_FIXME environment variable,</div><div>=C2=A0 =C2=A0 QTEST_VHOST_USER_FIXME=
-=3D1 QTEST_QEMU_BINARY=3Dx86_64-softmmu/qemu-system-x86_64 QTEST_QEMU_IMG=
-=3Dqemu-img tests/qos-test -p /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/=
-virtio-net-pci/virtio-net/virtio-net-tests/vhost-user/flags-mismatch<br></d=
-iv><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr" data-smartmail=
-=3D"gmail_signature"><div dir=3D"ltr"><div><div dir=3D"ltr"><div><i>Best re=
-gards,</i></div><font color=3D"#00cccc"><i>Coiby</i></font><div><font color=
-=3D"#00cccc"><br></font></div></div></div></div></div></div>
-
---000000000000009d590595efaa5f--
 
