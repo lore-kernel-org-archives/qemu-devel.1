@@ -2,83 +2,79 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E978BCA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 15:51:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E8B9CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 15:58:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE06C20717
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 15:51:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE06C20717
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1851620717
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 15:58:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MWTO52OY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1851620717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP7J5-0000P7-2W
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 11:51:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51870)
+	id 1iP7Po-0004km-F6
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 11:58:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iP6yz-0001of-Gn
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:31:02 -0400
+ (envelope-from <berrange@redhat.com>) id 1iP7Gs-0002tO-77
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:49:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iP6yx-0006RM-Rm
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:31:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41646)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iP6yx-0006Qz-K7
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:30:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iP6yv-0006ev-Sy
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 15:30:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id B927C2E80CC
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 15:30:57 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 28 Oct 2019 15:23:24 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1848556@bugs.launchpad.net>
+ (envelope-from <berrange@redhat.com>) id 1iP7Go-0000yR-Bg
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:49:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24933
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iP7Go-0000xS-6R
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:49:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572277764;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=LYyFgvbIyV2bgI5AwnVSyRwn5Dl1RQToy+rVHgO0MZc=;
+ b=MWTO52OYYhS3LW+xdieHK7wSBp/a7te5E7iWY900JtAXwTxezIcU0s95nzq9IyM2n+BxYd
+ HQn+ZrdbRB8yLroVaXIAi0rQgN6f7v62eMrU8PHrz/boGP4+GO7oP/+guJR++eNCF0Hdn4
+ xtcmKyggWeWCZ9pWo2vyVQjQMP2MTSg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-38-8pEEe0NtNC-5sQ6m6K6RzQ-1; Mon, 28 Oct 2019 11:49:23 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56F3E85B6EF
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 15:49:22 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-112-24.ams2.redhat.com
+ [10.36.112.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6E0B85D9C5;
+ Mon, 28 Oct 2019 15:49:19 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Triaged; importance=Medium; assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=Triaged; importance=Medium;
- assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Triaged; importance=Medium;
- assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: paelzer rodsmith xanclic
-X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
-Message-Id: <157227620481.28442.9340123097528106243.malone@chaenomeles.canonical.com>
-Subject: [Bug 1848556] Re: qemu-img check failing on remote image in Eoan
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 92881c102f989d39eb9e6653b642d8985816a274
+Subject: [PULL 0/4] Crypto luks patches
+Date: Mon, 28 Oct 2019 16:49:10 +0100
+Message-Id: <20191028154914.84821-1-berrange@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 8pEEe0NtNC-5sQ6m6K6RzQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,93 +83,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1848556 <1848556@bugs.launchpad.net>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-FYI: uploaded to 20.04 Focal, considering SRUs (Eoan) after this
-completes
+The following changes since commit 187f35512106501fe9a11057f4d8705431e0026d=
+:
 
--- =
+  Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-next-2510=
+19-3' into staging (2019-10-26 10:13:48 +0100)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1848556
+are available in the Git repository at:
 
-Title:
-  qemu-img check failing on remote image in Eoan
+  https://github.com/berrange/qemu tags/crypto-luks-pull-request
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Triaged
-Status in qemu source package in Eoan:
-  Triaged
-Status in qemu source package in Focal:
-  Triaged
+for you to fetch changes up to dc2207af2de162005f7e9e534850d07232290cee:
 
-Bug description:
-  Ubuntu SRU Template:
+  crypto: add support for nettle's native XTS impl (2019-10-28 16:45:07 +01=
+00)
 
-  [Impact]
+----------------------------------------------------------------
+crypto: improve performance of ciphers in XTS mode
 
-   * There is fallout due to changes in libcurl that affect qemu and might =
+Currently QEMU uses its own XTS cipher mode, however, this has
+relatively poor performance.
 
-     lead to a hang.
+Gcrypt now includes its own XTS cipher which is at least x2 faster than
+what we get with QEMU's on Fedora/RHEL hosts. With gcrypt git master, a
+further x5-6 speed up is seen.
 
-   * Fix by backporting the upstream fix
+This is essential for QEMU's LUKS performance to be viable.
 
-  [Test Case]
+----------------------------------------------------------------
 
-   * If you have network just run
-     $ qemu-img check http://10.193.37.117/cloud/eoan-server-cloudimg-amd64=
-.img
+Daniel P. Berrang=C3=A9 (4):
+  tests: allow filtering crypto cipher benchmark tests
+  tests: benchmark crypto with fixed data size, not time period
+  crypto: add support for gcrypt's native XTS impl
+  crypto: add support for nettle's native XTS impl
 
-   * Without network, install apache2, and get a complex qemu file (like a =
+ configure                       | 40 ++++++++++++++
+ crypto/Makefile.objs            |  2 +-
+ crypto/cipher-gcrypt.c          | 97 ++++++++++++++++++++++-----------
+ crypto/cipher-nettle.c          | 18 ++++++
+ tests/Makefile.include          |  2 +-
+ tests/benchmark-crypto-cipher.c | 39 ++++++++-----
+ tests/benchmark-crypto-hash.c   | 17 +++---
+ 7 files changed, 159 insertions(+), 56 deletions(-)
 
-     cloud image) onto the system. Then access the file via apache http but =
+--=20
+2.23.0
 
-     not localhost (that would work)
-
-  [Regression Potential]
-
-   * The change is local to the libcurl usage of qemu, so that could be =
-
-     affected. But then this is what has been found to not work here, so I'=
-d =
-
-     expect not too much trouble. But if so then in the curl usage (which =
-
-     means disks on http)
-
-  [Other Info]
-   =
-
-   * n/a
-
-  ---
-
-  The "qemu-img check" function is failing on remote (HTTP-hosted)
-  images, beginning with Ubuntu 19.10 (qemu-utils version 1:4.0+dfsg-
-  0ubuntu9). With previous versions, through Ubuntu 19.04/qemu-utils
-  version 1:3.1+dfsg-2ubuntu3.5, the following worked:
-
-  $ /usr/bin/qemu-img check  http://10.193.37.117/cloud/eoan-server-cloudim=
-g-amd64.img
-  No errors were found on the image.
-  19778/36032 =3D 54.89% allocated, 90.34% fragmented, 89.90% compressed cl=
-usters
-  Image end offset: 514064384
-
-  The 10.193.37.117 server holds an Apache server that hosts the cloud
-  images on a LAN. Beginning with Ubuntu 19.10/qemu-utils 1:4.0+dfsg-
-  0ubuntu9, the same command never returns. (I've left it for up to an
-  hour with no change.) I'm able to wget the image from the same server
-  and installation on which qemu-img check fails. I've tried several
-  .img files on the server, ranging from Bionic to Eoan, with the same
-  results with all of them.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1848556/+subscriptions
 
