@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 020B6CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7800CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:51:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD02121721
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:47:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47CCF208C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:51:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="iwASB9gC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD02121721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="WMzbUqIE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47CCF208C0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP8B2-0001rx-Sd
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 12:47:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34692)
+	id 1iP8ER-0003lE-NW
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 12:51:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34719)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@sifive.com>) id 1iP7Pb-0005H0-Nk
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:32 -0400
+ (envelope-from <palmer@sifive.com>) id 1iP7Pc-0005Jt-Sk
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@sifive.com>) id 1iP7Pa-0003rF-EF
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:31 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:39535)
+ (envelope-from <palmer@sifive.com>) id 1iP7Pb-0003rz-Hx
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:32 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:42998)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iP7PZ-0003qa-9A
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:30 -0400
-Received: by mail-pf1-x444.google.com with SMTP id v4so7155177pff.6
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 08:58:29 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iP7Pb-0003rQ-Ci
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:31 -0400
+Received: by mail-pg1-x542.google.com with SMTP id f14so7152375pgi.9
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 08:58:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=TOZjPGaqbzlFPxN/8nnP07xTCGhUqh822BhqPA8uXpI=;
- b=iwASB9gCR+Q34m6kt71AMJfjamKq1lgOWHW89I4nYHzkp0zieNZPcVfKEoLwFEcHoq
- tY5riL3Cyc1UxctufTDZ0wWLPYUZCnZExo/4hzFvEcR+OCiKAvPCC+iWJ8lYQfL9LCxY
- Lve2GgX5MsKyvOzOJE6kcdxb9PMcIQsNLNeqcUmXikBHOsYchMUwpb+YmpKjWbv+qvOV
- S6eRlc/9jfPR3DFopaS087MYifM9EEkxjFb7cWVJBdnQhycdTq9v9vz9fFuSi7FattKr
- cQN/fC3PUIUFBl/SD1pnn6dQTjPlNnDkZtDNo/SZvUIlFQUeyIKWxh7DhvMeyluZEuJs
- T4yg==
+ bh=e7M7/g3Lxi9UwHK1x9XgkX5SPo7otVzIHSY4iLY4NQw=;
+ b=WMzbUqIEG28xpHs6tMe/y+DW0zlwaXdKlHfXv8sJZowe0ki4eerPCVb9XTQ7tLIHkc
+ dKBAl0vhKTr1y9PdXHjbNdwv3ShMUm0sfs80hvbBPjSulHo05HjyTIWDZFVdHEZFtfrB
+ CAznVIdGtvpjNFoMuivYUgEJl1/srbvvZ7VPpKOZfkYRxV8LRknUKbAqLAVOuVCAY/g1
+ o1dctuHostUthxAHDH6pTqo6x6rggjXXYTYyq3/JmXJvXojWVfMxYCeyrtFIloHtTWsP
+ 8MCDLIjY+wWhpYW29sQ7kupqFh2EVtHB+X2UhCIf8lWcykAztCCT9FU1l56qW6Mm87m+
+ Fitw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=TOZjPGaqbzlFPxN/8nnP07xTCGhUqh822BhqPA8uXpI=;
- b=akzOaYpcKyfJAk0jPXsHFqBTOWdFGTZGpx5yheYXTJwoH0Yi+5O6P7sgAvyqi6YRNB
- 8KKmyHFcI1jUgK1EHVKcyipO5lXNmxd4G7xumq5grHF5cYwtlGHM47NgCV1rPh1RupUa
- YVvP0gGMrM4TcW7o+WSn2P19vm3BKsa8GF5YaBuKmoeoNJTzNstKuDltO4/8ZWa4xg99
- m5xs0gEmSydlzeo3KAjmNUmqf9QfoBoz3cj+T8VpIcdfO7UuLgmjOz4P7dD+WO7fAPkw
- sMfph/RDOThPSW9ryzgFftYjPC9RAfE//jMgNW5yPB9E87uaZfIsyjQxdvs8nU9cGSKi
- uEbw==
-X-Gm-Message-State: APjAAAWb+HjBi70Rs+yWZ729em+TfXUFxlk4ck5fKfCm1Hbk5re1p680
- qLfWWWlEGtY5XrlpmbTWHjK+D7dE8Pdy6w==
-X-Google-Smtp-Source: APXvYqzj3WqwHSFucM/P1z4zbJlAFrGp+ItW+DIcMFnJOQM8ORekePfOMgoscrj921vx0aYdbpMLFQ==
-X-Received: by 2002:a17:90a:9306:: with SMTP id p6mr17835pjo.16.1572278307994; 
- Mon, 28 Oct 2019 08:58:27 -0700 (PDT)
+ bh=e7M7/g3Lxi9UwHK1x9XgkX5SPo7otVzIHSY4iLY4NQw=;
+ b=jcEJRJw1FQjk8uSLhg+MoLUBczLTZeDW2XMSr35gjVYzPpHFm1wGtBXZncu3k99BlS
+ 4KWohJbfsDhK950uBgRVwX2340s4Z+XV/GKqesFz4aWnc2ErDnFSyc1QG5mfoieQS53u
+ m3wLAlq8zI7d/oWLBpNO8RYmc4vef7bsrfH/QCZS74vES7DD5KfQpj6JpA84S+il0Lw+
+ iUR7dGIo0UkUvbR4zoCFwORSBSB8T2Vu50pXjAZrhyaH9+zywx6ZuQrKMCiUtX2Fi4OE
+ y6iz0TI5rnHGEdfAggYkXm7ogjnkynM/P4wgSQ1R0/KlVfGM+YZqqs3Aeb59OruFB13/
+ omvw==
+X-Gm-Message-State: APjAAAUYqYEOuSOpiIEP7xgw4k5yxady/0hh/IO6VGMj6ILaZJeW/81+
+ 5Gp1UPg654+6YyVj/9NOcaLIgXiFdkLvIQ==
+X-Google-Smtp-Source: APXvYqzHLJyhtdaSgzal0XpUko9I7J+6wasJrNFWVDwB0l7HmdoDXXNpG8+uLNIOO3QLOsZkAm4Omg==
+X-Received: by 2002:a63:9543:: with SMTP id t3mr21805496pgn.350.1572278310012; 
+ Mon, 28 Oct 2019 08:58:30 -0700 (PDT)
 Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id v25sm10646364pfn.78.2019.10.28.08.58.27
+ by smtp.gmail.com with ESMTPSA id l11sm12942229pgf.73.2019.10.28.08.58.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 28 Oct 2019 08:58:27 -0700 (PDT)
-Subject: [PULL 07/18] riscv/sifive_u: Add L2-LIM cache memory
-Date: Mon, 28 Oct 2019 08:48:51 -0700
-Message-Id: <20191028154902.32491-8-palmer@sifive.com>
+ Mon, 28 Oct 2019 08:58:29 -0700 (PDT)
+Subject: [PULL 08/18] riscv/sifive_u: Add QSPI memory region
+Date: Mon, 28 Oct 2019 08:48:52 -0700
+Message-Id: <20191028154902.32491-9-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191028154902.32491-1-palmer@sifive.com>
 References: <20191028154902.32491-1-palmer@sifive.com>
@@ -79,7 +79,7 @@ From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,78 +100,67 @@ Sender: "Qemu-devel"
 
 From: Alistair Francis <alistair.francis@wdc.com>
 
-On reset only a single L2 cache way is enabled, the others are exposed
-as memory that can be used by early boot firmware. This L2 region is
-generally disabled using the WayEnable register at a later stage in the
-boot process. To allow firmware to target QEMU and the HiFive Unleashed
-let's add the L2 LIM (LooselyIntegrated Memory).
+The HiFive Unleashed uses is25wp256 SPI NOR flash. There is currently no
+model of this in QEMU, so to allow boot firmware developers to use QEMU
+to target the Unleashed let's add a chunk of memory to represent the QSPI0
+memory mapped flash. This can be targeted using QEMU's -device loader
+command line option.
 
-Ideally we would want to adjust the size of this chunk of memory as the
-L2 Cache Controller WayEnable register is incremented. Unfortunately I
-don't see a nice way to handle reducing or blocking out the L2 LIM while
-still allowing it be re returned to all enabled from a reset.
+In the future we can look at adding a model for the is25wp256 flash.
 
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- hw/riscv/sifive_u.c         | 16 ++++++++++++++++
- include/hw/riscv/sifive_u.h |  1 +
- 2 files changed, 17 insertions(+)
+ hw/riscv/sifive_u.c         | 8 ++++++++
+ include/hw/riscv/sifive_u.h | 1 +
+ 2 files changed, 9 insertions(+)
 
 diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 1ac51e3632..fbaa3a234e 100644
+index fbaa3a234e..a32d6773a8 100644
 --- a/hw/riscv/sifive_u.c
 +++ b/hw/riscv/sifive_u.c
-@@ -65,6 +65,7 @@ static const struct MemmapEntry {
-     [SIFIVE_U_DEBUG] =    {        0x0,      0x100 },
-     [SIFIVE_U_MROM] =     {     0x1000,    0x11000 },
-     [SIFIVE_U_CLINT] =    {  0x2000000,    0x10000 },
-+    [SIFIVE_U_L2LIM] =    {  0x8000000,  0x2000000 },
-     [SIFIVE_U_PLIC] =     {  0xc000000,  0x4000000 },
-     [SIFIVE_U_PRCI] =     { 0x10000000,     0x1000 },
+@@ -71,6 +71,7 @@ static const struct MemmapEntry {
      [SIFIVE_U_UART0] =    { 0x10010000,     0x1000 },
-@@ -432,6 +433,7 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-     const struct MemmapEntry *memmap = sifive_u_memmap;
+     [SIFIVE_U_UART1] =    { 0x10011000,     0x1000 },
+     [SIFIVE_U_OTP] =      { 0x10070000,     0x1000 },
++    [SIFIVE_U_FLASH0] =   { 0x20000000, 0x10000000 },
+     [SIFIVE_U_DRAM] =     { 0x80000000,        0x0 },
+     [SIFIVE_U_GEM] =      { 0x10090000,     0x2000 },
+     [SIFIVE_U_GEM_MGMT] = { 0x100a0000,     0x1000 },
+@@ -314,6 +315,7 @@ static void riscv_sifive_u_init(MachineState *machine)
+     SiFiveUState *s = g_new0(SiFiveUState, 1);
      MemoryRegion *system_memory = get_system_memory();
-     MemoryRegion *mask_rom = g_new(MemoryRegion, 1);
-+    MemoryRegion *l2lim_mem = g_new(MemoryRegion, 1);
-     qemu_irq plic_gpios[SIFIVE_U_PLIC_NUM_SOURCES];
-     char *plic_hart_config;
-     size_t plic_hart_config_len;
-@@ -460,6 +462,20 @@ static void riscv_sifive_u_soc_realize(DeviceState *dev, Error **errp)
-     memory_region_add_subregion(system_memory, memmap[SIFIVE_U_MROM].base,
-                                 mask_rom);
+     MemoryRegion *main_mem = g_new(MemoryRegion, 1);
++    MemoryRegion *flash0 = g_new(MemoryRegion, 1);
+     int i;
  
-+    /*
-+     * Add L2-LIM at reset size.
-+     * This should be reduced in size as the L2 Cache Controller WayEnable
-+     * register is incremented. Unfortunately I don't see a nice (or any) way
-+     * to handle reducing or blocking out the L2 LIM while still allowing it
-+     * be re returned to all enabled after a reset. For the time being, just
-+     * leave it enabled all the time. This won't break anything, but will be
-+     * too generous to misbehaving guests.
-+     */
-+    memory_region_init_ram(l2lim_mem, NULL, "riscv.sifive.u.l2lim",
-+                           memmap[SIFIVE_U_L2LIM].size, &error_fatal);
-+    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_L2LIM].base,
-+                                l2lim_mem);
+     /* Initialize SoC */
+@@ -329,6 +331,12 @@ static void riscv_sifive_u_init(MachineState *machine)
+     memory_region_add_subregion(system_memory, memmap[SIFIVE_U_DRAM].base,
+                                 main_mem);
+ 
++    /* register QSPI0 Flash */
++    memory_region_init_ram(flash0, NULL, "riscv.sifive.u.flash0",
++                           memmap[SIFIVE_U_FLASH0].size, &error_fatal);
++    memory_region_add_subregion(system_memory, memmap[SIFIVE_U_FLASH0].base,
++                                flash0);
 +
-     /* create PLIC hart topology configuration string */
-     plic_hart_config_len = (strlen(SIFIVE_U_PLIC_HART_CONFIG) + 1) *
-                            ms->smp.cpus;
+     /* create device tree */
+     create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+ 
 diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
-index 4850805ee7..66ee76a780 100644
+index 66ee76a780..0062276190 100644
 --- a/include/hw/riscv/sifive_u.h
 +++ b/include/hw/riscv/sifive_u.h
-@@ -58,6 +58,7 @@ enum {
-     SIFIVE_U_DEBUG,
-     SIFIVE_U_MROM,
-     SIFIVE_U_CLINT,
-+    SIFIVE_U_L2LIM,
-     SIFIVE_U_PLIC,
-     SIFIVE_U_PRCI,
+@@ -64,6 +64,7 @@ enum {
      SIFIVE_U_UART0,
+     SIFIVE_U_UART1,
+     SIFIVE_U_OTP,
++    SIFIVE_U_FLASH0,
+     SIFIVE_U_DRAM,
+     SIFIVE_U_GEM,
+     SIFIVE_U_GEM_MGMT
 -- 
 2.21.0
 
