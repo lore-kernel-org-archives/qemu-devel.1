@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C22ECA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 12:51:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62892CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 12:51:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4683820873
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 12:51:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D88820873
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 12:51:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RRtvfQBC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4683820873
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h6h40v7e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D88820873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP4UM-00012A-Tc
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 08:51:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50250)
+	id 1iP4Ue-0001j7-B6
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 08:51:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50526)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iP3wB-0001xR-KV
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:15:56 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iP3wa-0002OZ-03
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:16:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iP3wA-0001XD-9p
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:15:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44209
+ (envelope-from <mreitz@redhat.com>) id 1iP3wY-0001lV-Op
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:16:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55531
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP3wA-0001Wv-5t
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:15:54 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP3wY-0001kf-KY
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:16:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572264953;
+ s=mimecast20190719; t=1572264978;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6GmQnVN7RpWtGc1vbCo4n/Sp17GVmocc+188KfQn4pg=;
- b=RRtvfQBC1fgFxnGMpmUBHpaYcVE/E2XmA21wMROCRFnXKxFJLmhp6EziftdAMlFFH8UaQl
- hh87fGJe2SiONM3lucSAmxCMGK6PVTv7jy1bbkLWGD6z8xB+wpHAAtMWF5AQWqJO48VKza
- k9dcAQ4Ym7uNRgpXUfXq62khPjubfJw=
+ bh=C+MXzl/3CFa1bQWMYehBdS2keQt5KxH37UFTv13JeXw=;
+ b=h6h40v7e4kFzlGCXEceW7UX/CkMMoKwMRANWmJhSI1EpGy477bMHsancbjYueQ9j3mpVd2
+ aaw/modQaONIaBAclL+sS28UE1KHDfuFz7e0xWMNWkdkl2yD3QYEqVDkiNfi7il2Qs4b9F
+ 4fXUD+15cKMREbwT6cnOZgN+u9Wf4NA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-318-rmmaSws2NaG2TieHwZ-kIA-1; Mon, 28 Oct 2019 08:15:52 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-202-T-IqAX4LPEmgeE5c1PjXvg-1; Mon, 28 Oct 2019 08:16:14 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DA71180496E;
- Mon, 28 Oct 2019 12:15:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA792107AD28;
+ Mon, 28 Oct 2019 12:16:13 +0000 (UTC)
 Received: from localhost (ovpn-117-83.ams2.redhat.com [10.36.117.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E6F18100164D;
- Mon, 28 Oct 2019 12:15:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 53BEE5DA2C;
+ Mon, 28 Oct 2019 12:16:13 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 23/69] iotests/182: Create socket in $SOCK_DIR
-Date: Mon, 28 Oct 2019 13:14:15 +0100
-Message-Id: <20191028121501.15279-24-mreitz@redhat.com>
+Subject: [PULL 34/69] iotests/267: Create socket in $SOCK_DIR
+Date: Mon, 28 Oct 2019 13:14:26 +0100
+Message-Id: <20191028121501.15279-35-mreitz@redhat.com>
 In-Reply-To: <20191028121501.15279-1-mreitz@redhat.com>
 References: <20191028121501.15279-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: rmmaSws2NaG2TieHwZ-kIA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: T-IqAX4LPEmgeE5c1PjXvg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
@@ -92,35 +92,54 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-id: 20191017133155.5327-23-mreitz@redhat.com
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-id: 20191017133155.5327-12-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/182 | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/267     | 4 ++--
+ tests/qemu-iotests/267.out | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
-index 7f494eb9bb..1ccb850055 100755
---- a/tests/qemu-iotests/182
-+++ b/tests/qemu-iotests/182
-@@ -31,7 +31,7 @@ _cleanup()
+diff --git a/tests/qemu-iotests/267 b/tests/qemu-iotests/267
+index d37a67c012..170e173c0a 100755
+--- a/tests/qemu-iotests/267
++++ b/tests/qemu-iotests/267
+@@ -29,7 +29,7 @@ status=3D1=09# failure is the default!
+ _cleanup()
  {
      _cleanup_test_img
-     rm -f "$TEST_IMG.overlay"
--    rm -f "$TEST_DIR/nbd.socket"
-+    rm -f "$SOCK_DIR/nbd.socket"
+-    rm -f "$TEST_DIR/nbd"
++    rm -f "$SOCK_DIR/nbd"
  }
  trap "_cleanup; exit \$status" 0 1 2 3 15
 =20
-@@ -133,7 +133,7 @@ success_or_failure=3Dy _send_qemu_cmd $QEMU_HANDLE \
-           'addr': {
-               'type': 'unix',
-               'data': {
--                  'path': '$TEST_DIR/nbd.socket'
-+                  'path': '$SOCK_DIR/nbd.socket'
-               } } } }" \
-     'return' \
-     'error'
+@@ -143,7 +143,7 @@ echo
+=20
+ IMGOPTS=3D"backing_file=3D$TEST_IMG.base" _make_test_img $size
+ cat <<EOF |
+-nbd_server_start unix:$TEST_DIR/nbd
++nbd_server_start unix:$SOCK_DIR/nbd
+ nbd_server_add -w backing-fmt
+ savevm snap0
+ info snapshots
+diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
+index 9d812e3c72..8dddb4baa4 100644
+--- a/tests/qemu-iotests/267.out
++++ b/tests/qemu-iotests/267.out
+@@ -161,7 +161,7 @@ Internal snapshots on backing file:
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D134217728 backing_file=
+=3DTEST_DIR/t.IMGFMT.base
+ Testing: -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT.base,node-na=
+me=3Dbacking-file -blockdev driver=3DIMGFMT,file=3Dbacking-file,node-name=
+=3Dbacking-fmt -blockdev driver=3Dfile,filename=3DTEST_DIR/t.IMGFMT,node-na=
+me=3Dfile -blockdev driver=3DIMGFMT,file=3Dfile,backing=3Dbacking-fmt,node-=
+name=3Dfmt
+ QEMU X.Y.Z monitor - type 'help' for more information
+-(qemu) nbd_server_start unix:TEST_DIR/nbd
++(qemu) nbd_server_start unix:SOCK_DIR/nbd
+ (qemu) nbd_server_add -w backing-fmt
+ (qemu) savevm snap0
+ (qemu) info snapshots
 --=20
 2.21.0
 
