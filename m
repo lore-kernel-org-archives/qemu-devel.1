@@ -4,75 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C9CCA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE19CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:07:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FEBC20717
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:06:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7CD420717
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:07:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bhZXFBGY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FEBC20717
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bh0XOtht"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7CD420717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP4j9-0000Lb-5F
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 09:06:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50943)
+	id 1iP4jw-0001I8-8k
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 09:07:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51438)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iP3xH-0003IA-S2
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:05 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iP3xs-0004O6-5D
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iP3xB-00028w-V4
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35096
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iP3xm-0002Xr-JZ
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:36 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55383
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP3xB-00024r-Ok
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:16:57 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP3xm-0002XK-8f
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572265011;
+ s=mimecast20190719; t=1572265053;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bJM2+9gNPSmHQaqUcxmZtG8O2VsIhH9fUg2cSb1GHbA=;
- b=bhZXFBGYoHpbmwADeTH9BcoyIYwCPc2LhKIZ8LagTD3R+K11fRYkaGna2JMZNDBW4W+3W3
- ISZ637wu1PlJYHbeuwgOnLAJUPLvaGBDn4A5zkGnuzJz35Rqdl5I7bXdCsmz9E6/7K0lvl
- 53rViySIFsegP8YVwCzmwDkiZgdjp84=
+ bh=Rjjz3MsAGUfHfQ9MWUBX1nt5O6CnXPytlrmKQsKSedM=;
+ b=bh0XOthtOMRiztCTm8rYF90DTRE9QlNSBd8E5fDeAvBFBFUIxc4Zv8oWh6weaH1yXv5Plb
+ 1tDZRAOxAd9ay1ZsE+H4iJpOL8K8q+msMxwbU43jaiPK7LOEJ/IVMqLE1y0Rwmt5Usgbsj
+ 5ZGTtkwj/zSX5V4w30OgntILMlLhUOI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-129-59498fmLPfio9I5MUyqozw-1; Mon, 28 Oct 2019 08:16:47 -0400
+ us-mta-283-qrVjP8ooM2G6QniIJQdXkw-1; Mon, 28 Oct 2019 08:17:29 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC669476;
- Mon, 28 Oct 2019 12:16:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94A88476;
+ Mon, 28 Oct 2019 12:17:28 +0000 (UTC)
 Received: from localhost (ovpn-117-83.ams2.redhat.com [10.36.117.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7ED965D6BB;
- Mon, 28 Oct 2019 12:16:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 38B465D6BB;
+ Mon, 28 Oct 2019 12:17:28 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 50/69] qcow2: Put qcow2_upgrade() into its own function
-Date: Mon, 28 Oct 2019 13:14:42 +0100
-Message-Id: <20191028121501.15279-51-mreitz@redhat.com>
+Subject: [PULL 69/69] qemu-iotests: restrict 264 to qcow2 only
+Date: Mon, 28 Oct 2019 13:15:01 +0100
+Message-Id: <20191028121501.15279-70-mreitz@redhat.com>
 In-Reply-To: <20191028121501.15279-1-mreitz@redhat.com>
 References: <20191028121501.15279-1-mreitz@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 59498fmLPfio9I5MUyqozw-1
+X-MC-Unique: qrVjP8ooM2G6QniIJQdXkw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,95 +91,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This does not make sense right now, but it will make sense once we need
-to do more than to just update s->qcow_version.
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+264 is unprepared to run with different formats, for example luks needs
+handling keys, cloop doesn't support image creation, vpc creates image
+larger than requested (which breaks "Backup completed: 5242880" in test
+output).
+
+The test is here to check nbd-reconnect feature and we actually don't
+need it for all formats. Let's restrict it to qcow2 only.
+
+Reported-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-id: 20191025145023.6182-1-vsementsov@virtuozzo.com
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20191011152814.14791-7-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2.c | 43 ++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 38 insertions(+), 5 deletions(-)
+ tests/qemu-iotests/264 | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 60ed084e5c..af08757055 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -4912,12 +4912,46 @@ static int qcow2_downgrade(BlockDriverState *bs, in=
-t target_version,
-     return 0;
- }
+diff --git a/tests/qemu-iotests/264 b/tests/qemu-iotests/264
+index c8cd97ae2b..131366422b 100755
+--- a/tests/qemu-iotests/264
++++ b/tests/qemu-iotests/264
+@@ -24,6 +24,8 @@ import iotests
+ from iotests import qemu_img_create, qemu_io_silent_check, file_path, \
+         qemu_nbd_popen, log
 =20
-+/*
-+ * Upgrades an image's version.  While newer versions encompass all
-+ * features of older versions, some things may have to be presented
-+ * differently.
-+ */
-+static int qcow2_upgrade(BlockDriverState *bs, int target_version,
-+                         BlockDriverAmendStatusCB *status_cb, void *cb_opa=
-que,
-+                         Error **errp)
-+{
-+    BDRVQcow2State *s =3D bs->opaque;
-+    int current_version =3D s->qcow_version;
-+    int ret;
++iotests.verify_image_format(supported_fmts=3D['qcow2'])
 +
-+    /* This is qcow2_upgrade(), not qcow2_downgrade() */
-+    assert(target_version > current_version);
-+
-+    /* There are no other versions (yet) that you can upgrade to */
-+    assert(target_version =3D=3D 3);
-+
-+    status_cb(bs, 0, 1, cb_opaque);
-+
-+    s->qcow_version =3D target_version;
-+    ret =3D qcow2_update_header(bs);
-+    if (ret < 0) {
-+        s->qcow_version =3D current_version;
-+        error_setg_errno(errp, -ret, "Failed to update the image header");
-+        return ret;
-+    }
-+    status_cb(bs, 1, 1, cb_opaque);
-+
-+    return 0;
-+}
-+
- typedef enum Qcow2AmendOperation {
-     /* This is the value Qcow2AmendHelperCBInfo::last_operation will be
-      * statically initialized to so that the helper CB can discern the fir=
-st
-      * invocation from an operation change */
-     QCOW2_NO_OPERATION =3D 0,
-=20
-+    QCOW2_UPGRADING,
-     QCOW2_CHANGING_REFCOUNT_ORDER,
-     QCOW2_DOWNGRADING,
- } Qcow2AmendOperation;
-@@ -5100,17 +5134,16 @@ static int qcow2_amend_options(BlockDriverState *bs=
-, QemuOpts *opts,
-     helper_cb_info =3D (Qcow2AmendHelperCBInfo){
-         .original_status_cb =3D status_cb,
-         .original_cb_opaque =3D cb_opaque,
--        .total_operations =3D (new_version < old_version)
-+        .total_operations =3D (new_version !=3D old_version)
-                           + (s->refcount_bits !=3D refcount_bits)
-     };
-=20
-     /* Upgrade first (some features may require compat=3D1.1) */
-     if (new_version > old_version) {
--        s->qcow_version =3D new_version;
--        ret =3D qcow2_update_header(bs);
-+        helper_cb_info.current_operation =3D QCOW2_UPGRADING;
-+        ret =3D qcow2_upgrade(bs, new_version, &qcow2_amend_helper_cb,
-+                            &helper_cb_info, errp);
-         if (ret < 0) {
--            s->qcow_version =3D old_version;
--            error_setg_errno(errp, -ret, "Failed to update the image heade=
-r");
-             return ret;
-         }
-     }
+ disk_a, disk_b, nbd_sock =3D file_path('disk_a', 'disk_b', 'nbd-sock')
+ nbd_uri =3D 'nbd+unix:///?socket=3D' + nbd_sock
+ size =3D 5 * 1024 * 1024
 --=20
 2.21.0
 
