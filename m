@@ -6,48 +6,49 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 163AECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59260CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:02:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E17BB20862
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:01:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E17BB20862
+	by mail.kernel.org (Postfix) with ESMTPS id 297DD20862
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:02:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 297DD20862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOzxj-0000Ig-S5
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 04:01:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48826)
+	id 1iOzyi-0001vQ-S3
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 04:02:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48742)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iOzpg-0001Je-LH
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:57 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1iOzpU-0000tj-Ha
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iOzpf-00031u-Dp
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:56 -0400
+ (envelope-from <tao3.xu@intel.com>) id 1iOzpT-0002vQ-8x
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:44 -0400
 Received: from mga04.intel.com ([192.55.52.120]:47960)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iOzpf-0002p5-4G
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:55 -0400
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iOzpT-0002p5-1Y
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:43 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 28 Oct 2019 00:52:54 -0700
+ 28 Oct 2019 00:52:42 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,239,1569308400"; d="scan'208";a="224558817"
+X-IronPort-AV: E=Sophos;i="5.68,239,1569308400"; d="scan'208";a="224558775"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga004.fm.intel.com with ESMTP; 28 Oct 2019 00:52:52 -0700
+ by fmsmga004.fm.intel.com with ESMTP; 28 Oct 2019 00:52:40 -0700
 From: Tao Xu <tao3.xu@intel.com>
 To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
  ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
  mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
-Subject: [PATCH v14 11/11] tests/bios-tables-test: add test cases for ACPI HMAT
-Date: Mon, 28 Oct 2019 15:52:20 +0800
-Message-Id: <20191028075220.25673-12-tao3.xu@intel.com>
+Subject: [PATCH v14 06/11] numa: Calculate hmat latency and bandwidth entry
+ list
+Date: Mon, 28 Oct 2019 15:52:15 +0800
+Message-Id: <20191028075220.25673-7-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191028075220.25673-1-tao3.xu@intel.com>
 References: <20191028075220.25673-1-tao3.xu@intel.com>
@@ -67,101 +68,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jingqi Liu <Jingqi.liu@intel.com>, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Daniel Black <daniel@linux.ibm.com>,
- jonathan.cameron@huawei.com
+Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, jonathan.cameron@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ACPI table HMAT has been introduced, QEMU now builds HMAT tables for
-Heterogeneous Memory with boot option '-numa node'.
+Compress HMAT latency and bandwidth raw data into uint16_t data,
+which can be stored in HMAT table.
 
-Add test cases on PC and Q35 machines with 2 numa nodes.
-Because HMAT is generated when system enable numa, the
-following tables need to be added for this test:
-  tests/acpi-test-data/pc/*.acpihmat
-  tests/acpi-test-data/pc/HMAT.*
-  tests/acpi-test-data/q35/*.acpihmat
-  tests/acpi-test-data/q35/HMAT.*
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
 Suggested-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
-No changes in v14.
-
-Changes in v13:
-    - Use decimal notation with appropriate suffix for cache size
+Changes in v14:
+    - Convert latency from ns to ps, because ACPI 6.3 HMAT table use
+      ps as minimum unit
 ---
- tests/bios-tables-test.c | 44 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+ hw/core/numa.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 58 insertions(+), 1 deletion(-)
 
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 0b33fb265f..96803c1f20 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -947,6 +947,48 @@ static void test_acpi_virt_tcg_numamem(void)
- 
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index f391760c20..523dd80822 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -483,6 +483,47 @@ static void complete_init_numa_distance(MachineState *ms)
+     }
  }
  
-+static void test_acpi_tcg_acpi_hmat(const char *machine)
++static void calculate_hmat_entry_list(HMAT_LB_Info *hmat_lb, int num_nodes)
 +{
-+    test_data data;
++    int i, index;
++    uint16_t *entry_list;
++    uint64_t base;
++    GArray *lb_data_list;
++    HMAT_LB_Data *lb_data;
 +
-+    memset(&data, 0, sizeof(data));
-+    data.machine = machine;
-+    data.variant = ".acpihmat";
-+    test_acpi_one(" -machine hmat=on"
-+                  " -smp 2,sockets=2"
-+                  " -m 128M,slots=2,maxmem=1G"
-+                  " -object memory-backend-ram,size=64M,id=m0"
-+                  " -object memory-backend-ram,size=64M,id=m1"
-+                  " -numa node,nodeid=0,memdev=m0"
-+                  " -numa node,nodeid=1,memdev=m1,initiator=0"
-+                  " -numa cpu,node-id=0,socket-id=0"
-+                  " -numa cpu,node-id=0,socket-id=1"
-+                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
-+                  "data-type=access-latency,latency=5ns"
-+                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
-+                  "data-type=access-bandwidth,bandwidth=500M"
-+                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
-+                  "data-type=access-latency,latency=10ns"
-+                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
-+                  "data-type=access-bandwidth,bandwidth=100M"
-+                  " -numa hmat-cache,node-id=0,size=10K,level=1,assoc=direct,"
-+                  "policy=write-back,line=8"
-+                  " -numa hmat-cache,node-id=1,size=10K,level=1,assoc=direct,"
-+                  "policy=write-back,line=8",
-+                  &data);
-+    free_test_data(&data);
++    if (hmat_lb->data_type <= HMAT_LB_DATA_WRITE_LATENCY) {
++        base = hmat_lb->base_latency;
++        lb_data_list = hmat_lb->latency;
++    } else {
++        base = hmat_lb->base_bandwidth;
++        lb_data_list = hmat_lb->bandwidth;
++    }
++
++    entry_list = g_malloc0(lb_data_list->len * sizeof(uint16_t));
++    for (i = 0; i < lb_data_list->len; i++) {
++        lb_data = &g_array_index(lb_data_list, HMAT_LB_Data, i);
++        index = lb_data->initiator * num_nodes + lb_data->target;
++        if (entry_list[index]) {
++            error_report("Duplicate configuration of the latency for "
++                "initiator=%d and target=%d.", lb_data->initiator,
++                lb_data->target);
++            exit(1);
++        }
++
++        entry_list[index] = (uint16_t)(lb_data->rawdata / base);
++    }
++
++    if (hmat_lb->data_type <= HMAT_LB_DATA_WRITE_LATENCY) {
++        /* Convert latency base from nanoseconds to picosecond */
++        hmat_lb->base_latency = base * 1000;
++        hmat_lb->entry_latency = entry_list;
++    } else {
++        /* Convert bandwidth base from Byte to Megabyte */
++        hmat_lb->base_bandwidth = base / MiB;
++        hmat_lb->entry_bandwidth = entry_list;
++    }
 +}
 +
-+static void test_acpi_q35_tcg_acpi_hmat(void)
-+{
-+    test_acpi_tcg_acpi_hmat(MACHINE_Q35);
-+}
-+
-+static void test_acpi_piix4_tcg_acpi_hmat(void)
-+{
-+    test_acpi_tcg_acpi_hmat(MACHINE_PC);
-+}
-+
- static void test_acpi_virt_tcg(void)
+ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+                                  int nb_nodes, ram_addr_t size)
  {
-     test_data data = {
-@@ -991,6 +1033,8 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
-         qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm);
-         qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
-+        qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_hmat);
-+        qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat);
-     } else if (strcmp(arch, "aarch64") == 0) {
-         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
-         qtest_add_func("acpi/virt/numamem", test_acpi_virt_tcg_numamem);
+@@ -521,9 +562,10 @@ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+ 
+ void numa_complete_configuration(MachineState *ms)
+ {
+-    int i;
++    int i, hierarchy, type;
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+     NodeInfo *numa_info = ms->numa_state->nodes;
++    HMAT_LB_Info *numa_hmat_lb;
+ 
+     /*
+      * If memory hotplug is enabled (slots > 0) but without '-numa'
+@@ -620,6 +662,21 @@ void numa_complete_configuration(MachineState *ms)
+             /* Validation succeeded, now fill in any missing distances. */
+             complete_init_numa_distance(ms);
+         }
++
++        if (ms->numa_state->hmat_enabled) {
++            for (hierarchy = HMAT_LB_MEM_MEMORY;
++                 hierarchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hierarchy++) {
++                for (type = HMAT_LB_DATA_ACCESS_LATENCY;
++                    type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
++                    numa_hmat_lb = ms->numa_state->hmat_lb[hierarchy][type];
++
++                    if (numa_hmat_lb) {
++                        calculate_hmat_entry_list(numa_hmat_lb,
++                                                  ms->numa_state->num_nodes);
++                    }
++                }
++            }
++        }
+     }
+ }
+ 
 -- 
 2.20.1
 
