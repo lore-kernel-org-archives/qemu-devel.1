@@ -2,68 +2,67 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57117CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 18:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD8CCA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 18:48:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 27DA120873
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 18:43:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27DA120873
+	by mail.kernel.org (Postfix) with ESMTPS id C4DE620862
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 18:48:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4DE620862
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP9zN-0003aB-31
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 14:43:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56455)
+	id 1iPA3e-0006yH-PR
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 14:48:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56543)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iP9Zh-0002YO-Vh
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 14:17:07 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iP9Zl-0002dP-Tk
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 14:17:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iP9Zg-0003xD-LO
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 14:17:05 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:37703)
+ (envelope-from <laurent@vivier.eu>) id 1iP9Zk-0003zx-AL
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 14:17:09 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:60413)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iP9Zg-0003w4-Bq; Mon, 28 Oct 2019 14:17:04 -0400
+ id 1iP9Zh-0003w1-A1; Mon, 28 Oct 2019 14:17:05 -0400
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MpUpW-1hdxG41tG8-00psSJ; Mon, 28 Oct 2019 19:16:52 +0100
+ id 1MbBUc-1hsIjC3cKm-00bZ7P; Mon, 28 Oct 2019 19:16:51 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/11] esp: move get_cmd() post-DMA code to get_cmd_cb()
-Date: Mon, 28 Oct 2019 19:16:34 +0100
-Message-Id: <20191028181643.5143-3-laurent@vivier.eu>
+Subject: [PULL 00/11] Q800 branch patches
+Date: Mon, 28 Oct 2019 19:16:32 +0100
+Message-Id: <20191028181643.5143-1-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191028181643.5143-1-laurent@vivier.eu>
-References: <20191028181643.5143-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:KoHlabvA03FPSJtuk/zidWr5y9K83Kjw8M/6QBYO9SOrVlvEj0q
- Y+Fx2srY+x9yshKO/JHF0k3ROtiME7Vy+nBvUC0FFcLIxPABVCuf54y1pKWQHp9vdTOBx1T
- KnWPh9qksyK61U687NLS6gPWAyG3GO6kApNJ2vT7ZjiEWt+tNL/tniilDPB5aBS72OPP4Ux
- FZY20yGhpgaS2S6JALd/A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:/AS9RZQHuQ0=:gn5w/ToHbGeW7B0irQRTDi
- AsUS4MNxHANf041FJEQqpqD+MUJCr3rVlFha10fEkyJv4cKLbHxh4OHGIKKzwUoZ09hJmz/bU
- UeG5LY/Edonh7c8wN7Ja0bTmZdgbxPVHaQhNalhIh7GF+vkW+sRn3j61iHR+SfA5Ue94VpEWS
- dqzaH3xPLxRuDhlKSUf/oYje0HkfAE8TzZYOdUTi0Jjkb/CEQOqFeYwT5QgN4gRnZQTZv59zW
- bPG51kYUj6+umEaI4e1PiC8w7nJD4/fvJFPNCZ65w6Xyw2HGKt3uqH2sMKA7VYqXUTS1LZkeg
- KerEsMKZY16Hzaxt/0xZcWKRiHgtqZZfJhcoxtfCve3D+ADXRK4La2w9vB8N1m4XzZ9ri/cy2
- GLMa4EmssZMVQd04z80wb299IsoG109WCe6ORU9YnbfAjXwotCqOTLHcVXQmFxbewo1+jEaIQ
- koakGuYK1+IJeNhy0ZXIzfV8jaZog+pXKhemcirURI+E14UWIPhqBEFfh3jqK/vl/zGKJtda9
- z0rFyIt2eqtt6/sZKnYoNxzV8xTOh0DJr2As/6w7uuJwWyRDoDEyE1zrXTZUpjWoVszGLrcMO
- hfyEPHBoeVAV2zgPrB0W+oe/mY6/BNx8dwXFlT+zB+lkyRvBenxj4bG5Z0fdVySCtx+j0eXyH
- iInbs2HgaVok5SzpxLo5s2IszbRKPbkOX5lQpfaxOOp6mA/dyiTSBjrBxeBmBrl3AGBISEhuh
- Qro+3vymdKwQNKpHRhKiSEKda2FIoOcw5SStyrCXEse+62H4kRzJSSMwGjteRAq+SLy4llMvb
- 3SnaXTJ9MvbW4qBxkLczAhjxKRvmepHkk8ucvP9ebY393hL3r3wl/i2GBtJI4HmkOPn4T36xO
- /PNJMkTo8CvR6IlVpskl0kK9mYS6T0rht8128yTSY=
+X-Provags-ID: V03:K1:mMMU4cXoEHN5TnzjANB+/dSImJ6IEK3aAIawCdrqNq1s8KFjJJD
+ OIS8tIC+I9fD8NmeRhA4d+DNXtOagaF4DSLjAAR2hXX9hqLSAeQSODadhINnwoHiTNHGCPb
+ 6VE1dAecBv4Vet5PK22pM8mdXjjmK0Qs8NOuEwOH+sc9fIZPnZircVMB4XfAiCAI1VHo7/M
+ sy+WzZeR7pOeT1oGen9LQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:nDwjzI0WGB8=:lAzhoercHctGbMSz2w86GP
+ dMQoYX0XU2uPvLX96E7j7xyHL8xu+gGb8VRZmTzR5M0w843+hDXirDFkCrHCkXA75+0YWrhZf
+ Rqwtb3m+LB82GiX3jFpkkhLFqaZNekz78zBrXuMZaqhJV0oonVSx5mzbtd7CsbD7Qk7NibTW+
+ pcvtjJ+SdiZCNe0ZRslszjDko2DByPtLOGP1nxJhGdQMOQwKPnJz7Vy1aoBYT5xIFECtc6eZR
+ Jrt15Dq5nbloI/X5qiIVXOKhGMM6O9N9Sazhc+1qeC6zvsgetkB4LU6N8waBDXbxAr4A5W3EX
+ GbUbAw/C84Pmz3F330ZPF5tInPUi07qMAaAQteXl8/4A0j7tZQUDiML9Ew+68OihyBPULGsM9
+ NbLdgJ9Ff6YYJ0vZUqk0HE5gqgz0wsWCm2+Wawb2TYPdhioA26n7b+5suMEMjKJc0MfoxYMmA
+ y+oeGNILKy696QtlD0DmzF7q8OitVX0hX01XUvMa8l3tPbXLtt3R/9/+8W3F+J4bMDpOpFWqP
+ A+QhXzImj5lmEV2ccXjvK1rmO/TEgTPCsPIfEBUFzlwx531CI3hOSlWNiUltIBc8X/lwAyRxE
+ b5xFKMVGgx6UMzRCtFRPa/XZDM4CyTwq/U1t/kfs1g585d0KQYyhEZhN3h7cgcp5Nhf+vS996
+ NjeqD59tv5OD6FIpKqYi4oBWDlPgjarfCmNGvDR9vx5Em0ksd1PttLxPBIB41feEJe4lkIhMQ
+ H4r+CPicOhlnJZz9zGXGJeJCXDHgnjoT0D4DrJ1xPLfCtzbjRzXdWpTz7cKJIUTJMuodzQmRA
+ tG/AZuiGfO+0M0da4p+L+rvhtk7+RClBUpxUEvrUf06+p+7u5iR2QUjxL4io1zKYPfdQuEEOG
+ s/45nk35x7KsOlD/EQlJc5o8JNmRK7WRc1libwzGo=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 217.72.192.73
@@ -81,86 +80,96 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
  qemu-block@nongnu.org, Jason Wang <jasowang@redhat.com>,
  Laurent Vivier <laurent@vivier.eu>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will be needed to implement pseudo-DMA
+The following changes since commit 7bc8f9734213b76e76631a483be13d6737c2adbc:
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20191026164546.30020-3-laurent@vivier.eu>
----
- hw/scsi/esp.c | 46 +++++++++++++++++++++++++++++-----------------
- 1 file changed, 29 insertions(+), 17 deletions(-)
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20191025' into staging (2019-10-25 13:12:16 +0100)
 
-diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-index 09b28cba17..0230ede21d 100644
---- a/hw/scsi/esp.c
-+++ b/hw/scsi/esp.c
-@@ -84,6 +84,34 @@ void esp_request_cancelled(SCSIRequest *req)
-     }
- }
- 
-+static int get_cmd_cb(ESPState *s)
-+{
-+    int target;
-+
-+    target = s->wregs[ESP_WBUSID] & BUSID_DID;
-+
-+    s->ti_size = 0;
-+    s->ti_rptr = 0;
-+    s->ti_wptr = 0;
-+
-+    if (s->current_req) {
-+        /* Started a new command before the old one finished.  Cancel it.  */
-+        scsi_req_cancel(s->current_req);
-+        s->async_len = 0;
-+    }
-+
-+    s->current_dev = scsi_device_find(&s->bus, 0, target, 0);
-+    if (!s->current_dev) {
-+        /* No such drive */
-+        s->rregs[ESP_RSTAT] = 0;
-+        s->rregs[ESP_RINTR] = INTR_DC;
-+        s->rregs[ESP_RSEQ] = SEQ_0;
-+        esp_raise_irq(s);
-+        return -1;
-+    }
-+    return 0;
-+}
-+
- static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
- {
-     uint32_t dmalen;
-@@ -108,23 +136,7 @@ static uint32_t get_cmd(ESPState *s, uint8_t *buf, uint8_t buflen)
-     }
-     trace_esp_get_cmd(dmalen, target);
- 
--    s->ti_size = 0;
--    s->ti_rptr = 0;
--    s->ti_wptr = 0;
--
--    if (s->current_req) {
--        /* Started a new command before the old one finished.  Cancel it.  */
--        scsi_req_cancel(s->current_req);
--        s->async_len = 0;
--    }
--
--    s->current_dev = scsi_device_find(&s->bus, 0, target, 0);
--    if (!s->current_dev) {
--        // No such drive
--        s->rregs[ESP_RSTAT] = 0;
--        s->rregs[ESP_RINTR] = INTR_DC;
--        s->rregs[ESP_RSEQ] = SEQ_0;
--        esp_raise_irq(s);
-+    if (get_cmd_cb(s) < 0) {
-         return 0;
-     }
-     return dmalen;
+are available in the Git repository at:
+
+  git://github.com/vivier/qemu-m68k.git tags/q800-branch-pull-request
+
+for you to fetch changes up to f7d85525f14b99aaa7bf561c9f3cf11c85a080c9:
+
+  BootLinuxConsoleTest: Test the Quadra 800 (2019-10-28 19:07:22 +0100)
+
+----------------------------------------------------------------
+Add Macintosh Quadra 800 machine in hw/m68k
+
+----------------------------------------------------------------
+
+Laurent Vivier (10):
+  esp: move handle_ti_cmd() cleanup code to esp_do_dma().
+  esp: move get_cmd() post-DMA code to get_cmd_cb()
+  esp: add pseudo-DMA as used by Macintosh
+  dp8393x: manage big endian bus
+  hw/m68k: add VIA support
+  hw/m68k: implement ADB bus support for via
+  hw/m68k: add Nubus support
+  hw/m68k: add Nubus macfb video card
+  hw/m68k: add a dummy SWIM floppy controller
+  hw/m68k: define Macintosh Quadra 800
+
+Philippe Mathieu-Daudé (1):
+  BootLinuxConsoleTest: Test the Quadra 800
+
+ default-configs/m68k-softmmu.mak       |   1 +
+ hw/m68k/bootinfo.h                     | 114 +++
+ include/hw/block/swim.h                |  76 ++
+ include/hw/display/macfb.h             |  64 ++
+ include/hw/misc/mac_via.h              | 115 +++
+ include/hw/nubus/mac-nubus-bridge.h    |  24 +
+ include/hw/nubus/nubus.h               |  69 ++
+ include/hw/scsi/esp.h                  |  15 +
+ arch_init.c                            |   4 +
+ hw/block/swim.c                        | 489 +++++++++++++
+ hw/display/macfb.c                     | 477 ++++++++++++
+ hw/m68k/q800.c                         | 401 ++++++++++
+ hw/misc/mac_via.c                      | 964 +++++++++++++++++++++++++
+ hw/net/dp8393x.c                       |  88 ++-
+ hw/nubus/mac-nubus-bridge.c            |  45 ++
+ hw/nubus/nubus-bridge.c                |  34 +
+ hw/nubus/nubus-bus.c                   | 111 +++
+ hw/nubus/nubus-device.c                | 215 ++++++
+ hw/scsi/esp.c                          | 336 ++++++++-
+ vl.c                                   |   3 +-
+ MAINTAINERS                            |  14 +
+ hw/Kconfig                             |   1 +
+ hw/Makefile.objs                       |   1 +
+ hw/block/Kconfig                       |   3 +
+ hw/block/Makefile.objs                 |   1 +
+ hw/display/Kconfig                     |   5 +
+ hw/display/Makefile.objs               |   1 +
+ hw/m68k/Kconfig                        |  10 +
+ hw/m68k/Makefile.objs                  |   1 +
+ hw/misc/Kconfig                        |   5 +
+ hw/misc/Makefile.objs                  |   1 +
+ hw/nubus/Kconfig                       |   2 +
+ hw/nubus/Makefile.objs                 |   4 +
+ qemu-options.hx                        |   2 +-
+ tests/acceptance/boot_linux_console.py |  24 +
+ 35 files changed, 3659 insertions(+), 61 deletions(-)
+ create mode 100644 hw/m68k/bootinfo.h
+ create mode 100644 include/hw/block/swim.h
+ create mode 100644 include/hw/display/macfb.h
+ create mode 100644 include/hw/misc/mac_via.h
+ create mode 100644 include/hw/nubus/mac-nubus-bridge.h
+ create mode 100644 include/hw/nubus/nubus.h
+ create mode 100644 hw/block/swim.c
+ create mode 100644 hw/display/macfb.c
+ create mode 100644 hw/m68k/q800.c
+ create mode 100644 hw/misc/mac_via.c
+ create mode 100644 hw/nubus/mac-nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bridge.c
+ create mode 100644 hw/nubus/nubus-bus.c
+ create mode 100644 hw/nubus/nubus-device.c
+ create mode 100644 hw/nubus/Kconfig
+ create mode 100644 hw/nubus/Makefile.objs
+
 -- 
 2.21.0
 
