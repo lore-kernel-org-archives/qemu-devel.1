@@ -2,60 +2,78 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 017F8CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA2ACA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:59:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDCFF214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:58:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDCFF214AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id EA06220650
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:59:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/vIgrpB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA06220650
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOzvA-0004Po-96
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 03:58:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48706)
+	id 1iOzwS-0006eV-Nv
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 03:59:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46830)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iOzpL-0000Vk-M9
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:39 -0400
+ (envelope-from <philmd@redhat.com>) id 1iOzaX-0005Vz-AZ
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:37:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iOzpK-0002qb-4x
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:35 -0400
-Received: from mga04.intel.com ([192.55.52.120]:47960)
+ (envelope-from <philmd@redhat.com>) id 1iOzaW-0003Ba-0O
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:37:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21540
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iOzpJ-0002p5-Th
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:34 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 28 Oct 2019 00:52:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,239,1569308400"; d="scan'208";a="224558735"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga004.fm.intel.com with ESMTP; 28 Oct 2019 00:52:31 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
- ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
- mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
-Subject: [PATCH v14 03/11] tests: Add test for QAPI builtin type time
-Date: Mon, 28 Oct 2019 15:52:12 +0800
-Message-Id: <20191028075220.25673-4-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191028075220.25673-1-tao3.xu@intel.com>
-References: <20191028075220.25673-1-tao3.xu@intel.com>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iOzaV-0003BQ-Sw
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:37:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572248235;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qUG75H2spVNxXKyZ7ESRf9W2wg4FjIjlM9ygXXLckWM=;
+ b=X/vIgrpB/uyEz/EGiOtdSO0MIuCieip8jWHTpXAUR8KwNOhhbI3QClm08ub/5T8S4+etU0
+ 0Pa0fT7g0KgYmCQ1mCM3G8raIMEf0AshM+aqHbKRyC3Bwg2gML12rHugS83KAY6oFblFcw
+ RnHeriaeYNxVRMUWpPvJQuZJuMHvDaE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-391-Vm82sYMkMT2VoywxBwY2OA-1; Mon, 28 Oct 2019 03:37:11 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46245800D41;
+ Mon, 28 Oct 2019 07:37:10 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-86.brq.redhat.com [10.40.204.86])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BC9C819C69;
+ Mon, 28 Oct 2019 07:37:02 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 16/26] tests/acceptance: Test Sandalfoot initrd on the PReP/40p
+Date: Mon, 28 Oct 2019 08:34:31 +0100
+Message-Id: <20191028073441.6448-17-philmd@redhat.com>
+In-Reply-To: <20191028073441.6448-1-philmd@redhat.com>
+References: <20191028073441.6448-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.120
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: Vm82sYMkMT2VoywxBwY2OA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,214 +85,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, jonathan.cameron@huawei.com
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Kamil Rytarowski <kamil@netbsd.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add tests for time input such as zero, around limit of precision,
-signed upper limit, actual upper limit, beyond limits, time suffixes,
-and etc.
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
+User case from:
+https://mail.coreboot.org/pipermail/openbios/2018-May/010360.html
+
+Sandalfoot info:
+http://www.juneau-lug.org/sandalfoot.php
+
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-
-Changes in v14:
-    - Drop time unit picosecond (Eric)
+v3:
+- use avocado_qemu.wait_for_console_pattern (Cleber)
+- use exec_command_and_wait_for_pattern
+- check getenv(AVOCADO_ALLOW_UNTRUSTED_CODE) (pm215)
 ---
- tests/test-keyval.c                | 122 +++++++++++++++++++++++++++++
- tests/test-qobject-input-visitor.c |  29 +++++++
- 2 files changed, 151 insertions(+)
+ tests/acceptance/ppc_prep_40p.py | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/tests/test-keyval.c b/tests/test-keyval.c
-index 09b0ae3c68..28e2e34084 100644
---- a/tests/test-keyval.c
-+++ b/tests/test-keyval.c
-@@ -490,6 +490,127 @@ static void test_keyval_visit_size(void)
-     visit_free(v);
- }
- 
-+static void test_keyval_visit_time(void)
-+{
-+    Error *err = NULL;
-+    Visitor *v;
-+    QDict *qdict;
-+    uint64_t time;
+diff --git a/tests/acceptance/ppc_prep_40p.py b/tests/acceptance/ppc_prep_4=
+0p.py
+index b4109a7af3..c5ecabf52f 100644
+--- a/tests/acceptance/ppc_prep_40p.py
++++ b/tests/acceptance/ppc_prep_40p.py
+@@ -11,6 +11,7 @@ import logging
+ from avocado import skipIf
+ from avocado import skipUnless
+ from avocado_qemu import MachineTest
++from avocado_qemu import exec_command_and_wait_for_pattern
+ from avocado_qemu import wait_for_console_pattern
+=20
+=20
+@@ -101,3 +102,33 @@ class IbmPrep40pMachine(MachineTest):
+=20
+         self.vm.launch()
+         wait_for_console_pattern(self, 'NetBSD/prep BOOT, Revision 1.9')
 +
-+    /* Lower limit zero */
-+    qdict = keyval_parse("time1=0", NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmpuint(time, ==, 0);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code=
+')
++    def test_sandalfoot_busybox(self):
++        """
++        :avocado: tags=3Darch:ppc
++        :avocado: tags=3Dmachine:40p
++        """
++        drive_url =3D ('http://www.juneau-lug.org/zImage.initrd.sandalfoot=
+')
++        drive_hash =3D 'dacacfc4085ea51d34d99ef70e972b849e2c6949'
++        drive_path =3D self.fetch_asset(drive_url, asset_hash=3Ddrive_hash=
+)
 +
-+    /* Around limit of precision: 2^53-1, 2^53, 2^53+1 */
-+    qdict = keyval_parse("time1=9007199254740991,"
-+                         "time2=9007199254740992,"
-+                         "time3=9007199254740993",
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0x1fffffffffffff);
-+    visit_type_time(v, "time2", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0x20000000000000);
-+    visit_type_time(v, "time3", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0x20000000000000);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++        self.vm.set_machine('40p')
++        self.vm.set_console()
++        self.vm.add_args('-cdrom', drive_path,
++                         '-boot', 'd')
 +
-+    /* Close to signed upper limit 0x7ffffffffffffc00 (53 msbs set) */
-+    qdict = keyval_parse("time1=9223372036854774784," /* 7ffffffffffffc00 */
-+                         "time2=9223372036854775295", /* 7ffffffffffffdff */
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0x7ffffffffffffc00);
-+    visit_type_time(v, "time2", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0x7ffffffffffffc00);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++        self.vm.launch()
++        wait_for_console_pattern(self, 'Now booting the kernel')
 +
-+    /* Close to actual upper limit 0xfffffffffffff800 (53 msbs set) */
-+    qdict = keyval_parse("time1=18446744073709549568," /* fffffffffffff800 */
-+                         "time2=18446744073709550591", /* fffffffffffffbff */
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0xfffffffffffff800);
-+    visit_type_time(v, "time2", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0xfffffffffffff800);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++        msg =3D 'Please press Enter to activate this console.'
++        wait_for_console_pattern(self, msg)
 +
-+    /* Beyond limits */
-+    qdict = keyval_parse("time1=-1,"
-+                         "time2=18446744073709550592", /* fffffffffffffc00 */
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_type_time(v, "time2", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++        version =3D 'BusyBox v0.60.0 (2001.08.19-09:26+0000) Built-in shel=
+l (ash)'
++        exec_command_and_wait_for_pattern(self, '', version)
 +
-+    /* Suffixes */
-+    qdict = keyval_parse("time1=2ns,time2=3.4us,time3=5ms,time4=600s",
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmpuint(time, ==, 2);
-+    visit_type_time(v, "time2", &time, &error_abort);
-+    g_assert_cmpuint(time, ==, 3400);
-+    visit_type_time(v, "time3", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 5 * 1000 * 1000);
-+    visit_type_time(v, "time4", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 600 * 1000000000LL);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++        uname =3D 'Linux ppc 2.4.18 #5 Wed May 21 23:50:43 AKDT 2003 ppc u=
+nknown'
++        exec_command_and_wait_for_pattern(self, 'uname -a', uname)
 +
-+    /* Beyond limit with suffix */
-+    qdict = keyval_parse("time1=1844674407370955s", NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
-+
-+    /* Trailing crap */
-+    qdict = keyval_parse("time1=89ks,time2=ns", NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_type_time(v, "time2", &time, &err);;
-+    error_free_or_abort(&err);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
-+}
-+
- static void test_keyval_visit_dict(void)
- {
-     Error *err = NULL;
-@@ -678,6 +799,7 @@ int main(int argc, char *argv[])
-     g_test_add_func("/keyval/visit/bool", test_keyval_visit_bool);
-     g_test_add_func("/keyval/visit/number", test_keyval_visit_number);
-     g_test_add_func("/keyval/visit/size", test_keyval_visit_size);
-+    g_test_add_func("/keyval/visit/time", test_keyval_visit_time);
-     g_test_add_func("/keyval/visit/dict", test_keyval_visit_dict);
-     g_test_add_func("/keyval/visit/list", test_keyval_visit_list);
-     g_test_add_func("/keyval/visit/optional", test_keyval_visit_optional);
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 6bacabf063..55138042b8 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -366,6 +366,31 @@ static void test_visitor_in_size_str_fail(TestInputVisitorData *data,
-     error_free_or_abort(&err);
- }
- 
-+static void test_visitor_in_time_str_keyval(TestInputVisitorData *data,
-+                                            const void *unused)
-+{
-+    uint64_t res, value = 265 * 1000 * 1000;
-+    Visitor *v;
-+
-+    v = visitor_input_test_init_full(data, true, "\"265ms\"");
-+
-+    visit_type_time(v, NULL, &res, &error_abort);
-+    g_assert_cmpfloat(res, ==, value);
-+}
-+
-+static void test_visitor_in_time_str_fail(TestInputVisitorData *data,
-+                                          const void *unused)
-+{
-+    uint64_t res = 0;
-+    Visitor *v;
-+    Error *err = NULL;
-+
-+    v = visitor_input_test_init(data, "\"265ms\"");
-+
-+    visit_type_time(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+}
-+
- static void test_visitor_in_string(TestInputVisitorData *data,
-                                    const void *unused)
- {
-@@ -1311,6 +1336,10 @@ int main(int argc, char **argv)
-                            NULL, test_visitor_in_size_str_keyval);
-     input_visitor_test_add("/visitor/input/size_str_fail",
-                            NULL, test_visitor_in_size_str_fail);
-+    input_visitor_test_add("/visitor/input/time_str_keyval",
-+                           NULL, test_visitor_in_time_str_keyval);
-+    input_visitor_test_add("/visitor/input/time_str_fail",
-+                           NULL, test_visitor_in_time_str_fail);
-     input_visitor_test_add("/visitor/input/string",
-                            NULL, test_visitor_in_string);
-     input_visitor_test_add("/visitor/input/enum",
--- 
-2.20.1
++        cpu =3D 'PReP IBM 6015/7020 (Sandalfoot/Sandalbow)'
++        exec_command_and_wait_for_pattern(self, 'cat /proc/cpuinfo', cpu)
+--=20
+2.21.0
 
 
