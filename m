@@ -2,71 +2,74 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B9EECA9EC0
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 00:00:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F5CCA9EC0
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 00:03:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C74C7217D6
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 00:00:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A75E208C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 00:03:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y7weCE22"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C74C7217D6
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="baWaSTrN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A75E208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPEvp-0006B3-K2
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 20:00:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59076)
+	id 1iPEz6-0000ok-79
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 20:03:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59078)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iPEn8-00030D-0W
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:51:19 -0400
+ (envelope-from <crosa@redhat.com>) id 1iPEn2-00030E-Gn
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:51:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iPEmD-0003ps-8W
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:50:22 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:22134
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <crosa@redhat.com>) id 1iPEmi-000447-6E
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:50:53 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27111
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iPEmD-0003pa-55
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:50:21 -0400
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iPEmi-00043x-2O
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:50:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572306620;
+ s=mimecast20190719; t=1572306651;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=evki2+LIwMIfbh6FJal6w1iIajDVQHzxsGx7W7eMlTQ=;
- b=Y7weCE22/HBtvgi7KiTSO50xaG59c82yjT5bCxIMpUnG4nfq8Aq4DyoXRhYR7GijAdSPiy
- QY8QnPWdHnhoKWxTXFJqlc4znA003SuFPNiO0e0gn3ZprUBo+7ARPDoeIgqEUQA3DxDF2r
- zcK5OcePMxPGoFWAr7CRowY0O7k/uns=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=T/h5Mu4l1z5TOdMHU7EB2bBpFUlN0UPgScRucOaFCRw=;
+ b=baWaSTrN6iu2xntt//xaG3TIQfun3IZMk7Cl1SM23Xtn5F/+XiV2X99Spqe8dIaJhvj+5g
+ U9erYKTZqEIWFpW462bIHGVwoESrt1m/heoKAj5vJq0WzJ2BTt7ZTNPN4iFJwHZNYHbSJy
+ Muk0rOxPjYmolfQzWrO+NYafaHxFGaU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-CBlD05JBN2iA2jzm89TBig-1; Mon, 28 Oct 2019 19:50:16 -0400
+ us-mta-17-KEOnj2NhNoi_Zl0145RD9A-1; Mon, 28 Oct 2019 19:50:44 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC7238017DD;
- Mon, 28 Oct 2019 23:50:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 412C9476;
+ Mon, 28 Oct 2019 23:50:43 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-123-183.rdu2.redhat.com
  [10.10.123.183])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ABE1F5C1B2;
- Mon, 28 Oct 2019 23:50:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 257F55C1B2;
+ Mon, 28 Oct 2019 23:50:41 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PULL 0/16] Python (acceptance tests) queue, 2019-10-28
-Date: Mon, 28 Oct 2019 19:49:46 -0400
-Message-Id: <20191028235002.17691-1-crosa@redhat.com>
+Subject: [PULL 9/16] .travis.yml: Let the avocado job run the Leon3 test
+Date: Mon, 28 Oct 2019 19:49:55 -0400
+Message-Id: <20191028235002.17691-10-crosa@redhat.com>
+In-Reply-To: <20191028235002.17691-1-crosa@redhat.com>
+References: <20191028235002.17691-1-crosa@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: CBlD05JBN2iA2jzm89TBig-1
+X-MC-Unique: KEOnj2NhNoi_Zl0145RD9A-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -86,6 +89,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Fabien Chouteau <chouteau@adacore.com>,
  KONRAD Frederic <frederic.konrad@adacore.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
@@ -98,55 +102,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit aaffb853359829a37daaf883c773e8320b55c723=
-:
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-  Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2019-10-28=
-' into staging (2019-10-28 14:40:01 +0000)
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-Id: <20191028073441.6448-13-philmd@redhat.com>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+---
+ .travis.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-are available in the Git repository at:
-
-  git://github.com/clebergnu/qemu.git tags/python-next-pull-request
-
-for you to fetch changes up to efdb45bfd72745038909dfd1e970a827cb8d5d7e:
-
-  tests/boot_linux_console: Run BusyBox on 5KEc 64-bit cpu (2019-10-28 19:0=
-4:04 -0400)
-
-----------------------------------------------------------------
-
-Cleber Rosa (4):
-  MAINTAINERS: update location of Python libraries
-  Acceptance tests: work around socket dir
-  Python libs: close console sockets before shutting down the VMs
-  Acceptance tests: refactor wait_for_console_pattern
-
-Philippe Mathieu-Daud=C3=A9 (12):
-  tests/acceptance: Fix wait_for_console_pattern() hangs
-  tests/acceptance: Send <carriage return> on serial lines
-  tests/acceptance: Refactor exec_command_and_wait_for_pattern()
-  tests/acceptance: Add test that boots the HelenOS microkernel on Leon3
-  .travis.yml: Let the avocado job run the Leon3 test
-  tests/acceptance: Add test that runs NetBSD 4.0 installer on PRep/40p
-  tests/acceptance: Test OpenBIOS on the PReP/40p
-  .travis.yml: Let the avocado job run the 40p tests
-  tests/boot_linux_console: Use Avocado archive::gzip_uncompress()
-  tests/boot_linux_console: Add a test for the Raspberry Pi 2
-  tests/boot_linux_console: Add initrd test for the Exynos4210
-  tests/boot_linux_console: Run BusyBox on 5KEc 64-bit cpu
-
- .travis.yml                               |   2 +-
- MAINTAINERS                               |   4 +-
- python/qemu/machine.py                    |  11 +-
- tests/acceptance/avocado_qemu/__init__.py |  48 ++++++-
- tests/acceptance/boot_linux_console.py    | 167 +++++++++++++++++-----
- tests/acceptance/linux_ssh_mips_malta.py  |  18 +--
- tests/acceptance/machine_sparc_leon3.py   |  34 +++++
- tests/acceptance/ppc_prep_40p.py          |  82 +++++++++++
- 8 files changed, 308 insertions(+), 58 deletions(-)
- create mode 100644 tests/acceptance/machine_sparc_leon3.py
- create mode 100644 tests/acceptance/ppc_prep_40p.py
-
+diff --git a/.travis.yml b/.travis.yml
+index ba3a8d4cfc..6ebd1af0d9 100644
+--- a/.travis.yml
++++ b/.travis.yml
+@@ -271,7 +271,7 @@ matrix:
+=20
+     # Acceptance (Functional) tests
+     - env:
+-        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-sof=
+tmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmm=
+u,alpha-softmmu,ppc64-softmmu,m68k-softmmu"
++        - CONFIG=3D"--python=3D/usr/bin/python3 --target-list=3Dx86_64-sof=
+tmmu,mips-softmmu,mips64el-softmmu,aarch64-softmmu,arm-softmmu,s390x-softmm=
+u,alpha-softmmu,ppc64-softmmu,m68k-softmmu,sparc-softmmu"
+         - TEST_CMD=3D"make check-acceptance"
+       after_failure:
+         - cat tests/results/latest/job.log
 --=20
 2.21.0
 
