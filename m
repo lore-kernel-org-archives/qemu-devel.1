@@ -2,86 +2,101 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF99ACA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 11:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED44ECA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 11:23:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B778C2086D
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 11:22:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5C522086D
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 11:23:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZE9YMubl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B778C2086D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IF/ZU75z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5C522086D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP36j-0001jv-I9
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 07:22:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44400)
+	id 1iP375-00027v-8a
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 07:23:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44424)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <drjones@redhat.com>) id 1iP34u-0007Dp-VR
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:20:54 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iP34n-0007Vt-OL
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:20:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <drjones@redhat.com>) id 1iP2uv-0001GN-VC
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:10:35 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53871
+ (envelope-from <mreitz@redhat.com>) id 1iP2vS-0001SH-8C
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:11:07 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52431
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iP2uv-0001Fr-Qz
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:10:33 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP2vS-0001S6-3O
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:11:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572261032;
+ s=mimecast20190719; t=1572261065;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zohqijfxF5D9YM71qCzB9euIglsluQox3t0/XjbXgTE=;
- b=ZE9YMublszE0G0GIcowr5Vd4Fl4A5ymWPyv2OMv+kq1AhtZUBrbFQ5Cv9wUtY8NEpU9663
- XUcRszZhuyCVv2bu0Fw7WVJl1yewLRlxx00o/ioeaKM17RM/UGFSzyMMDvgccaEnY2kuBg
- BcM7PpXm8OgJDSfL8IRk022gZwpt/8Q=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=EA4nX+LBSUW3Lb9wcm5Kmt7VZ+aZCtsp8pm8VNRzm/E=;
+ b=IF/ZU75znIB1ZeBUR5HsS5gICrL60Mdjab0c++XwFYSDhi3ZSyW6jQOCuvJchNoqUGVIsI
+ LYIsFDGewoIu4KGsX60iKoWjM9oIsRATsxLW9jU3lKehOom/YUhFp4tyMyXBrYk5vHg2ii
+ Wz8x3W6hm6E5BIGm+Kyma9cJg2sQo84=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-L_tPP8M3NpqZxkRUTSAoGg-1; Mon, 28 Oct 2019 07:10:29 -0400
+ us-mta-124-K7Ju_c0VMIOZehv6dJWADw-1; Mon, 28 Oct 2019 07:11:01 -0400
+X-MC-Unique: K7Ju_c0VMIOZehv6dJWADw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC76A107AD28;
- Mon, 28 Oct 2019 11:10:27 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
- (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AFF4C5DA5B;
- Mon, 28 Oct 2019 11:10:27 +0000 (UTC)
-Received: from zmail22.collab.prod.int.phx2.redhat.com
- (zmail22.collab.prod.int.phx2.redhat.com [10.5.83.26])
- by colo-mx.corp.redhat.com (Postfix) with ESMTP id 5C8DE18089DC;
- Mon, 28 Oct 2019 11:10:27 +0000 (UTC)
-Date: Mon, 28 Oct 2019 07:10:27 -0400 (EDT)
-From: Andrew Jones <drjones@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <557725864.14167224.1572261027082.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CAFEAcA9ZdrAgMhdfUxz0OJnM-dF9XGwR-+FeqnyJAsrntGgL_A@mail.gmail.com>
-References: <20191024121808.9612-1-drjones@redhat.com>
- <CAFEAcA9ehcuktCTGR0xpTvZegUkr99H62F_fiT7RY_L_dqgN4g@mail.gmail.com>
- <CAFEAcA981jAU6F9RRWBuzg+_5JDrd-ip-L_awtzdZFqKmewMvA@mail.gmail.com>
- <20191025135159.44siz7g3szpz23og@kamzik.brq.redhat.com>
- <CAFEAcA9ZdrAgMhdfUxz0OJnM-dF9XGwR-+FeqnyJAsrntGgL_A@mail.gmail.com>
-Subject: Re: [PATCH v7 0/9] target/arm/kvm: enable SVE in guests
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECDF9800D5F;
+ Mon, 28 Oct 2019 11:10:59 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-83.ams2.redhat.com
+ [10.36.117.83])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EC26667600;
+ Mon, 28 Oct 2019 11:10:55 +0000 (UTC)
+Subject: Re: [PATCH 0/8] block: Add @exact parameter to bdrv_co_truncate()
+To: qemu-block@nongnu.org
+References: <20190918095144.955-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <0dbdc19b-c740-92e1-4ee7-294d3d7581e1@redhat.com>
+Date: Mon, 28 Oct 2019 12:10:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Originating-IP: [10.33.36.124, 10.4.196.23, 10.5.101.130, 10.4.195.29]
-Thread-Topic: target/arm/kvm: enable SVE in guests
-Thread-Index: 6FyxgKxkmPsj++mnzc7OD2PU83owkg==
+In-Reply-To: <20190918095144.955-1-mreitz@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: L_tPP8M3NpqZxkRUTSAoGg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="yBBtTOcrqWgaU6ApJEKiI8nbLj6PMeLkJ"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -96,95 +111,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: m mizuma <m.mizuma@jp.fujitsu.com>,
- Beata Michalska <beata.michalska@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, qemu-arm <qemu-arm@nongnu.org>,
- Igor Mammedov <imammedo@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Dave P Martin <Dave.Martin@arm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--yBBtTOcrqWgaU6ApJEKiI8nbLj6PMeLkJ
+Content-Type: multipart/mixed; boundary="DfuUGou6JQGaPermJIjMsnzC1fxRzDwT5"
 
-Apologies if this mail is messed up. I'm having trouble with a hotel's netw=
-ork and am forced to use a webui.
+--DfuUGou6JQGaPermJIjMsnzC1fxRzDwT5
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
------ Original Message -----
-> On Fri, 25 Oct 2019 at 14:52, Andrew Jones <drjones@redhat.com> wrote:
-> >
-> > On Fri, Oct 25, 2019 at 01:06:26PM +0100, Peter Maydell wrote:
-> > > Fails 'make check' on my aarch32-compile-in-chroot-on-aarch64
-> > > machine:
-> >
-> > Are there easy-to-follow instructions for setting this environment up
-> > somewhere?
+On 18.09.19 11:51, Max Reitz wrote:
+> Hi,
 >=20
-> It's an ancient setup, so not really. But it's just an
-> Ubuntu 32-bit chroot inside an Ubuntu 64-bit host. I use
-> schroot to manage it.
+> This series is supposed to pull out some of the problems from my
+> =E2=80=9CGeneric file creation fallback=E2=80=9D series.
 >=20
+> The blk_truncate_for_formatting() function added there was buggy, as
+> Maxim noted, in that it did not check whether blk_truncate() actually
+> resized the block node to the target offset.  One way to fix this is to
+> add a parameter to it that forces the block driver to do so, and that is
+> done by this series.
 >=20
+> I think this is generally useful (you can see the diff stat saldo is
+> only +23 lines), because it allows us to drop a special check in
+> qemu-img resize, and it fixes a bug in qed (which has relied on this
+> behavior for over 8 years, but unfortunately bdrv_truncate()=E2=80=99s be=
+havior
+> changed quite exactly 8 years ago).
 >=20
-> > I guess the problem is how we're determining if KVM is available, which
-> > is like this
-> >
-> > int main(int argc, char **argv)
-> > {
-> >     bool kvm_available =3D false;
-> >
-> >     if (!access("/dev/kvm",  R_OK | W_OK)) {
-> > #if defined(HOST_AARCH64)
-> >         kvm_available =3D g_str_equal(qtest_get_arch(), "aarch64");
-> > #elif defined(HOST_ARM)
-> >         kvm_available =3D g_str_equal(qtest_get_arch(), "arm");
-> > #endif
-> >     }
+> However, in the process I noticed we actually don=E2=80=99t need
+> blk_truncate_for_formatting(): The underlying problem is that some
+> format drivers truncate their underlying file node to 0 before
+> formatting it to drop all data.  So they should pass exact=3Dtrue, but
+> they cannot, because this would break creation on block devices.  Hence
+> blk_truncate_for_formatting().
 >=20
-> > So we need /dev/kvm and the QEMU binary arch type (qemu-system-arm in
-> > this case) needs to match the host arch type. The problem is that
-> > HOST_<type> doesn't imply anything about the actual host arch type.
-> > <type> comes from the configure $ARCH variable, which for 'arm'
-> > comes from the $cpu variable, which for 'arm' comes from whether or
-> > not the compiler defines __arm__, and cross compilers certainly do.
-> > I guess we'd have the same problem in an aarch32-compile-in-chroot-on-
-> > <any-other-type> environment, if a cross compiler is used for the
-> > compiling. I should change the KVM available check to something that
-> > uses the actual host arch type. I assume the following works, but
-> > I don't know if I'm allowed to use uname() in these tests, and, if
-> > not, then I don't know what the right way to get the actual host
-> > type is.
+> It turns out, though, that three of the four drivers in question don=E2=
+=80=99t
+> need to truncate their file node at all.  The remaining one is qed which
+> simply really should pass exact=3Dtrue (it=E2=80=99s a bug fix).
 >=20
-> This all feels like it's trying to do the wrong thing, ie
-> replicate the logic within QEMU that decides whether to use
-> KVM or not. Some possible other approaches:
->=20
->  * If you want to know whether you can run the qemu binary
->    with -accel kvm, then just try that and see if it succeeds.
+> (I do drop those blk_truncate() invocations in this series, because
+> otherwise I feel like it is impossible to decide whether they should get
+> exact=3Dfalse or exact=3Dtrue.  Either way is wrong.)
 
-That's what's happening here, but the failure happens in qtest_init(), so
-there's no way to avoid the assert.
+Thanks for the review, I=E2=80=99ve applied the series to my block branch a=
+nd
+changed the comment in qed.c as requested and suggested by Maxim on patch 7=
+:
 
->  * Or use '-accel kvm:tcg' and make the test work so that it
->    will pass for both KVM and TCG
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-For the KVM tests, I'd prefer we specifically test the 'host' cpu type,
-which requires we specifically test with KVM. That said, we can use
-the fallback along with an additional query to make sure 'host' is
-ok to use.
+Max
 
->  * Or use QMP to query what accelerators are available, assuming
->    there's a QMP command for that
 
-Looks like we can check for kvm with query-kvm.=20
+--DfuUGou6JQGaPermJIjMsnzC1fxRzDwT5--
 
-I'll rework patch 2/9 using the fallback and kvm query to ensure
-kvm can be used. I can even add a test or two that ensure 'host'
-is ok to use.
+--yBBtTOcrqWgaU6ApJEKiI8nbLj6PMeLkJ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
-drew
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl22zL4ACgkQ9AfbAGHV
+z0BFvAgAoRgG5m6J/MnfL+xDj0uBA6vDUlwZ3srH0V/6O1/2hgnv47nr0HD/NvQp
+bQc8AmR68r0NWhFq57Y6hi3Vjgoz1tFRJRFEAM1y9mzJX2848eh2QFnKtecGNOTe
+J5eiv2B3DzeyykCZ/PNsMizhRwkSLJ+pH9H9IMDElaaxw/JVRRBOEhNfyhPZ9OVD
+RLYnirHhES73TjNo9Xyni2nQ5JhP3hj/Jf1lFFKqCp8oS2GOR2wX5xzrFY0dLAOm
+GkFU6uKWq27UPk2uW5iEM19dGIYC8aD7+2+6Moe1CGrClf4Gt5WxUPSnTPcNQU9z
+sqa+BNmiMvSjL8JYQOqkbyUtJkIDJg==
+=2dKI
+-----END PGP SIGNATURE-----
+
+--yBBtTOcrqWgaU6ApJEKiI8nbLj6PMeLkJ--
 
 
