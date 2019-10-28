@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61B04C47E49
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 10:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 744BACA9EBC
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 10:56:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E00F1214D9
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 10:52:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3DBFA20650
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 10:56:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J6Gem6RG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E00F1214D9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AS4Nv917"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DBFA20650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP2dg-0006jI-Q8
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 06:52:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41782)
+	id 1iP2hY-0003A4-EH
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 06:56:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42413)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iP2bm-0005P0-1b
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:50:47 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iP2gE-0001w1-32
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:55:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iP2bk-0001yU-TT
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:50:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28481
+ (envelope-from <mreitz@redhat.com>) id 1iP2gC-0003ij-SS
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:55:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38448
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP2bk-0001yM-OC
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:50:44 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP2gC-0003iW-Ob
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:55:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572259844;
+ s=mimecast20190719; t=1572260120;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=jSzBXlBwiHJ7IN9NaR68LlgrulxCZWqWUnh48pXtx6U=;
- b=J6Gem6RGmmwgcaWMjsGeO2NcG5DKeejwx5dVVdwqMs9oauq1HHTRKf6cfVmvWKO1m7gZKn
- xkP4q7kzhYW5Jx/yx1ebJ4GvPB+CtySwIc6Wj773RQczuxwKQlDs1RH1/eMgjOaI0hcbAi
- 6qS43IIONcjbqmgyjc6rP1zQTKdJObc=
+ bh=gNOCa3nYpanzpqqlvfvQ+5bNSridXK2jUHs49eFfX1o=;
+ b=AS4Nv917LiXQd4SKqfbQ3censOG4SpExq5m/GtLqeVvwg+LPyCjJEGiKbMTldKIV27hi+8
+ m2TbY/0phzViRfnn3x4r5Lb6jDHPUL/XOQyHgbRH01yX1FI0I41neEt29mBmDdN+sZ+rVw
+ vDKyvtbWI6CUOWL5eSXnsped+RMCAP8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-274-b3pez1qaM8CPOn9QaIOREg-1; Mon, 28 Oct 2019 06:50:38 -0400
-X-MC-Unique: b3pez1qaM8CPOn9QaIOREg-1
+ us-mta-378-b4vHBF3OMPGU-AMuX_L0yA-1; Mon, 28 Oct 2019 06:55:12 -0400
+X-MC-Unique: b4vHBF3OMPGU-AMuX_L0yA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14EFC80183E;
- Mon, 28 Oct 2019 10:50:37 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C58AF80183E;
+ Mon, 28 Oct 2019 10:55:11 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-117-83.ams2.redhat.com
  [10.36.117.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A63445D6A9;
- Mon, 28 Oct 2019 10:50:33 +0000 (UTC)
-Subject: Re: [PATCH v3 0/4] mirror: Do not dereference invalid pointers
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BADD85D6A9;
+ Mon, 28 Oct 2019 10:55:10 +0000 (UTC)
+Subject: Re: [PATCH v3 00/16] qcow2: Let check -r all repair some snapshot bits
 To: qemu-block@nongnu.org
-References: <20191014153931.20699-1-mreitz@redhat.com>
+References: <20191011152814.14791-1-mreitz@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,17 +86,17 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b6a3407f-178f-0e70-29bb-13e17a3128fc@redhat.com>
-Date: Mon, 28 Oct 2019 11:50:32 +0100
+Message-ID: <5ebf7590-0627-970a-5023-507f5b4569e6@redhat.com>
+Date: Mon, 28 Oct 2019 11:55:09 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191014153931.20699-1-mreitz@redhat.com>
+In-Reply-To: <20191011152814.14791-1-mreitz@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="Q7LjPe7oGiWICUb3yfHenhNnTiAtJbZto"
+ boundary="SJwcF0Qlb6mPFzutH8XJvx883hDmQZ1fG"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -111,81 +111,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Q7LjPe7oGiWICUb3yfHenhNnTiAtJbZto
-Content-Type: multipart/mixed; boundary="BL2njPCphUU67rxVfHBaxfsKnOT9uq1Sk"
+--SJwcF0Qlb6mPFzutH8XJvx883hDmQZ1fG
+Content-Type: multipart/mixed; boundary="EBPpbx4c6GSQbepnCxGQgL8fphYu4jlWG"
 
---BL2njPCphUU67rxVfHBaxfsKnOT9uq1Sk
+--EBPpbx4c6GSQbepnCxGQgL8fphYu4jlWG
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 14.10.19 17:39, Max Reitz wrote:
+On 11.10.19 17:27, Max Reitz wrote:
 > Hi,
 >=20
-> v2=E2=80=99s cover letter should explain everything:
+> The v1 cover letter explained this series=E2=80=99s purpose:
+> https://lists.nongnu.org/archive/html/qemu-block/2019-07/msg01290.html
 >=20
-> https://lists.nongnu.org/archive/html/qemu-block/2019-09/msg01079.html
->=20
->=20
-> v3:
-> - Patch 2: Use input visitor as proposed by Vladimir
->=20
-> git-backport-diff against v2:
->=20
-> Key:
-> [----] : patches are identical
-> [####] : number of functional differences between upstream/downstream pat=
-ch
-> [down] : patch is downstream-only
-> The flags [FC] indicate (F)unctional and (C)ontextual differences, respec=
-tively
->=20
-> 001/4:[----] [--] 'mirror: Do not dereference invalid pointers'
-> 002/4:[0041] [FC] 'blkdebug: Allow taking/unsharing permissions'
-> 003/4:[----] [--] 'iotests: Add @error to wait_until_completed'
-> 004/4:[----] [--] 'iotests: Add test for failing mirror complete'
+> The v2 cover letter explained the v2 changes:
+> https://lists.nongnu.org/archive/html/qemu-block/2019-08/msg00921.html
 >=20
 >=20
-> Max Reitz (4):
->   mirror: Do not dereference invalid pointers
->   blkdebug: Allow taking/unsharing permissions
->   iotests: Add @error to wait_until_completed
->   iotests: Add test for failing mirror complete
+> The only changes in v3 are:
+> - Patches 12 and 13: Added notes to the commit messages why it=E2=80=99s =
+OK to
+>                      not let the user choose which snapshots to drop
+>=20
+> (I wanted to also address Eric=E2=80=99s idea of letting
+> QCowSnapshot.extra_data_size be always >=3D sizeof(QCowSnapshotExtraData)
+> and thus save the MAX(sizeof(extra), sn->extra_data_size) in
+> qcow2_write_snapshots(), but that doesn=E2=80=99t really work, because th=
+en we
+> have no way of knowing later whether the image is compliant and thus
+> needs fixing or not.  He gave me an R-b anyway, so I guess it=E2=80=99s f=
+ine.
+> O:-))
+>=20
+> This series now has R-bs from Eric on all patches.  I=E2=80=99m only post=
+ing it
+> because I felt a bit bad about just taking the series as-is and add the
+> commit notes to 12 and 13 while applying it.
+> (Also, maybe there is someone who saw me have a bit of discussion with
+> Eric and thus assumed I would definitely send a v3 that they could then
+> review.)
+>=20
+>=20
+> Max Reitz (16):
+>   include: Move endof() up from hw/virtio/virtio.h
+>   qcow2: Use endof()
+>   qcow2: Add Error ** to qcow2_read_snapshots()
+>   qcow2: Keep unknown extra snapshot data
+>   qcow2: Make qcow2_write_snapshots() public
+>   qcow2: Put qcow2_upgrade() into its own function
+>   qcow2: Write v3-compliant snapshot list on upgrade
+>   qcow2: Separate qcow2_check_read_snapshot_table()
+>   qcow2: Add qcow2_check_fix_snapshot_table()
+>   qcow2: Fix broken snapshot table entries
+>   qcow2: Keep track of the snapshot table length
+>   qcow2: Fix overly long snapshot tables
+>   qcow2: Repair snapshot table with too many entries
+>   qcow2: Fix v3 snapshot table entry compliancy
+>   iotests: Add peek_file* functions
+>   iotests: Test qcow2's snapshot table handling
+>=20
+>  block/qcow2.h                |  15 +-
+>  include/hw/virtio/virtio.h   |   7 -
+>  include/qemu/compiler.h      |   7 +
+>  block/qcow2-snapshot.c       | 323 +++++++++++++++++++--
+>  block/qcow2.c                | 155 +++++++++--
+>  hw/block/virtio-blk.c        |   4 +-
+>  hw/net/virtio-net.c          |  10 +-
+>  tests/qemu-iotests/261       | 523 +++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/261.out   | 346 +++++++++++++++++++++++
+>  tests/qemu-iotests/common.rc |  20 ++
+>  tests/qemu-iotests/group     |   1 +
+>  11 files changed, 1354 insertions(+), 57 deletions(-)
+>  create mode 100755 tests/qemu-iotests/261
+>  create mode 100644 tests/qemu-iotests/261.out
 
-I=E2=80=99ve applied patch 1 to my block branch, and I=E2=80=99ll send a fo=
-r-next series
-(for-5.0, I suppose?) for the rest.
+Thanks for the review, applied to my block branch:
+
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
 Max
 
 
---BL2njPCphUU67rxVfHBaxfsKnOT9uq1Sk--
+--EBPpbx4c6GSQbepnCxGQgL8fphYu4jlWG--
 
---Q7LjPe7oGiWICUb3yfHenhNnTiAtJbZto
+--SJwcF0Qlb6mPFzutH8XJvx883hDmQZ1fG
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl22x/gACgkQ9AfbAGHV
-z0DOfAgAmn4Ip5DQOFEwr+IC3KMA/e2ssFFxKmfkGB5VrA56UzabBZeEuylT5RO4
-Qa8pd7TGxn/SIataBUPnlPGxuGnw5nSy9SIExuuHrtlvMHyWwxVd/qKR1BqXjzMT
-7kjlUw2VcNZkiGXbJ+2C9ETeWpUxNrj3PZGBBdozXCv1PILfd07bHP7Gv0ocIKNg
-jG/ILTbvILzBSkLqQHV2p3x+fOluBOZfTJ7/icx9WYwQz/zbi1s3HT5MM54lrtRm
-YPMrND8ymJm8prOmNSKocwldPXfskZ1z4IAOL4eohcFqrBPWgioySAAWW8K9hSp9
-hZ+tHrkddH0Pr30t6IXQfOlsnkf3aQ==
-=3lUp
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl22yQ0ACgkQ9AfbAGHV
+z0CKaQgApYYsynsE17r4T7wDPb4b7ZSjVCgeQB9Spt/74iuknldbw3jLYouyUjsX
+UYEAJVOuoMfTG+wvXvxX1mXwMlB+TFp36IytrXTPcAMmtvuysM00L62hzjRbskTE
+Mh/6rh0qdOYUCHI+Esp6DSJWJCEbs/m5rbiql2j09PRQ8BHhy0tV49cf3/yeBUZK
+qILyPXdvNSyQTnqfNCYMLWHjC6px3D+tmyAwyR8AO5l6Vrg5eQlKMhJ4HVaukrZY
+Zttdn+yLQ5fffps2iyNZBnd6lcxTJ9c7Tthz6VpA1Eia8r/V+HU+8IJzBGS4lELA
+zWGGCVqLtaJteZDMZ6Q0X/Rl1yPqqQ==
+=JT2Y
 -----END PGP SIGNATURE-----
 
---Q7LjPe7oGiWICUb3yfHenhNnTiAtJbZto--
+--SJwcF0Qlb6mPFzutH8XJvx883hDmQZ1fG--
 
 
