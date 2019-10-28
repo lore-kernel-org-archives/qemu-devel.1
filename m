@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EC51CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 12:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32348CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 12:47:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DE1820578
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 12:44:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1695204FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 12:47:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CTvF7mg5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DE1820578
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hknui58x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1695204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP4Ny-0006Mi-VT
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 08:44:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50406)
+	id 1iP4Qr-00049b-Hi
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 08:47:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50248)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iP3wS-0002FB-9r
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:16:13 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iP3wB-0001x0-9s
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:15:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iP3wQ-0001gH-4K
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:16:12 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34105
+ (envelope-from <mreitz@redhat.com>) id 1iP3wA-0001X7-8I
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:15:55 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:25332
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP3wP-0001fe-Am
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:16:10 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP3wA-0001Wx-4i
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:15:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572264968;
+ s=mimecast20190719; t=1572264953;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=aQySpcdMF2qRUs1pIR4JbiwZcLMvjua8tE1iMlsuzl4=;
- b=CTvF7mg5MUdKEe+gTlIWjbiaQHq68qyZDTS1S61UelmQIR7cykLJEy5s/soynWjoBaiG9e
- N3pJUZommYfoW2VhoaAi9XPmgwBOzooD5Eso1HKQTDG/5PgH5izHq1BeHEdmupvj+tYyU7
- hFg6JvrdKNnBELcfqQuC3aW8KYZTQ3E=
+ bh=lPGrGamxeSG5kU8cyjtAGmTiygdK/rXU1SwofdY8sCw=;
+ b=Hknui58xzrzknTHIsCiezad114eBvUgwOpE6fPg4IdNiBeVmMbiK7S5G8BIb2JydGA7i3K
+ +PHppVwb/sJfV9AH6JUu2pjEymluRlanFCMxAYeqzsFzSuf64Pn9zHOUkdE77WtmVmWLBJ
+ eHRvXtJMSF66OVM6dBBpjSNnqcS15VM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-c7-SvNFNNCG3_RNQZyFR1g-1; Mon, 28 Oct 2019 08:16:04 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-173-ds5LUK8kMWW6_PXjQcyzvg-1; Mon, 28 Oct 2019 08:15:50 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 807DD80183E;
- Mon, 28 Oct 2019 12:16:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43D6C476;
+ Mon, 28 Oct 2019 12:15:49 +0000 (UTC)
 Received: from localhost (ovpn-117-83.ams2.redhat.com [10.36.117.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 248705DA32;
- Mon, 28 Oct 2019 12:16:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DED385C1D6;
+ Mon, 28 Oct 2019 12:15:48 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 29/69] iotests/208: Create socket in $SOCK_DIR
-Date: Mon, 28 Oct 2019 13:14:21 +0100
-Message-Id: <20191028121501.15279-30-mreitz@redhat.com>
+Subject: [PULL 22/69] iotests/181: Create socket in $SOCK_DIR
+Date: Mon, 28 Oct 2019 13:14:14 +0100
+Message-Id: <20191028121501.15279-23-mreitz@redhat.com>
 In-Reply-To: <20191028121501.15279-1-mreitz@redhat.com>
 References: <20191028121501.15279-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: c7-SvNFNNCG3_RNQZyFR1g-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: ds5LUK8kMWW6_PXjQcyzvg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,25 +92,26 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20191017133155.5327-18-mreitz@redhat.com
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-id: 20191017133155.5327-11-mreitz@redhat.com
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/208 | 2 +-
+ tests/qemu-iotests/181 | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/208 b/tests/qemu-iotests/208
-index 1e202388dc..546eb1de3e 100755
---- a/tests/qemu-iotests/208
-+++ b/tests/qemu-iotests/208
-@@ -26,7 +26,7 @@ iotests.verify_image_format(supported_fmts=3D['generic'])
+diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
+index e317e63422..378c2899d1 100755
+--- a/tests/qemu-iotests/181
++++ b/tests/qemu-iotests/181
+@@ -26,7 +26,7 @@ echo "QA output created by $seq"
 =20
- with iotests.FilePath('disk.img') as disk_img_path, \
-      iotests.FilePath('disk-snapshot.img') as disk_snapshot_img_path, \
--     iotests.FilePath('nbd.sock') as nbd_sock_path, \
-+     iotests.FilePath('nbd.sock', iotests.sock_dir) as nbd_sock_path, \
-      iotests.VM() as vm:
+ status=3D1=09# failure is the default!
 =20
-     img_size =3D '10M'
+-MIG_SOCKET=3D"${TEST_DIR}/migrate"
++MIG_SOCKET=3D"${SOCK_DIR}/migrate"
+=20
+ _cleanup()
+ {
 --=20
 2.21.0
 
