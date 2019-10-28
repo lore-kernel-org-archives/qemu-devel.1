@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4CA3CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 23:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5A2CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 23:56:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CAF820880
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 23:56:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5053B20880
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 23:56:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JsiA26DO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CAF820880
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gRRRKzJn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5053B20880
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPEsB-0000ei-8h
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 19:56:31 -0400
+	id 1iPEsH-0000ho-4T
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 19:56:37 -0400
 Received: from eggs.gnu.org ([2001:470:142:3::10]:59078)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iPEmz-00030E-Ts
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:51:11 -0400
+ (envelope-from <crosa@redhat.com>) id 1iPEn6-00030E-4C
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:51:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iPEmy-0004Ci-FY
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:51:09 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47202
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <crosa@redhat.com>) id 1iPEmM-0003t5-DM
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:50:31 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28248
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iPEmy-0004CA-Bf
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:51:08 -0400
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iPEmM-0003sw-9S
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:50:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572306667;
+ s=mimecast20190719; t=1572306629;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UWhgKlH5o3d18/XCNXITY8aCThrxw3temt1UK/QzEIE=;
- b=JsiA26DOXfyKM7tSokNP/1oDp5gCRw150cDkRIN5xGrH2B6sAufzcdBca0mx7C+qQEOYRn
- letysC6ZTtRCfmHabwftoXNTG6WrRZuqR/QJnL5DkMg7nqESW1zVstcmzSP3yEDxOuXrKe
- nnTEMubSl+HNf7MYUBc+KbklREcwQhE=
+ bh=i+lJPdsGeMs3BF2wFOXYa7r3dy/b1LSDIBRWO5Wf60Y=;
+ b=gRRRKzJnabsZkNZ1bmrJGPHnXbVb48jjSDvvxx4M4nit+ttgtc6juDK2sJ92Sc51t0GNeD
+ i10HFHgwY6KIZ2904/ZSONnH5Wlw2uz/V06auoq2bnIDTahxV9vHQNZfvEEOVU+nO94muz
+ f9e9TTh0f1q1RxDOeKuc5Bbt5MCslsg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-32-x-j4Nd05PWmFJh8hXwOceQ-1; Mon, 28 Oct 2019 19:51:03 -0400
+ us-mta-130-Q5dPP90nPsOLDaZhJWiXhQ-1; Mon, 28 Oct 2019 19:50:26 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 028F91800DCB;
- Mon, 28 Oct 2019 23:51:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5673B1005509;
+ Mon, 28 Oct 2019 23:50:24 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-123-183.rdu2.redhat.com
  [10.10.123.183])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DDA315C1B2;
- Mon, 28 Oct 2019 23:50:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BEC065C1B2;
+ Mon, 28 Oct 2019 23:50:21 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
  Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PULL 14/16] tests/boot_linux_console: Add a test for the Raspberry
- Pi 2
-Date: Mon, 28 Oct 2019 19:50:00 -0400
-Message-Id: <20191028235002.17691-15-crosa@redhat.com>
+Subject: [PULL 4/16] Acceptance tests: refactor wait_for_console_pattern
+Date: Mon, 28 Oct 2019 19:49:50 -0400
+Message-Id: <20191028235002.17691-5-crosa@redhat.com>
 In-Reply-To: <20191028235002.17691-1-crosa@redhat.com>
 References: <20191028235002.17691-1-crosa@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: x-j4Nd05PWmFJh8hXwOceQ-1
+X-MC-Unique: Q5dPP90nPsOLDaZhJWiXhQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,9 +87,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>,
+Cc: Fam Zheng <fam@euphon.net>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <arikalo@wavecomp.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Fabien Chouteau <chouteau@adacore.com>,
  KONRAD Frederic <frederic.konrad@adacore.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
@@ -98,91 +97,188 @@ Cc: Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>,
  Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
  qemu-ppc@nongnu.org, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+ Aurelien Jarno <aurelien@aurel32.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+The same utility method is already present in two different test
+files, so let's consolidate it into a single utility function.
 
-Similar to the x86_64/pc test, it boots a Linux kernel on a raspi2
-board and verify the serial is working.
-
-The kernel image and DeviceTree blob are built by the Raspbian
-project (based on Debian):
-https://www.raspbian.org/RaspbianImages
-as recommended by the Raspberry Pi project:
-https://www.raspberrypi.org/downloads/raspbian/
-
-If ARM is a target being built, "make check-acceptance" will
-automatically include this test by the use of the "arch:arm" tags.
-
-Alternatively, this test can be run using:
-
-    $ avocado run -t arch:arm tests/acceptance
-    $ avocado run -t machine:raspi2 tests/acceptance
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20191028073441.6448-21-philmd@redhat.com>
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Message-Id: <20190916164011.7653-1-crosa@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+[PMD: failure_message is optional]
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Message-Id: <20191028073441.6448-3-philmd@redhat.com>
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/acceptance/boot_linux_console.py | 36 ++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ tests/acceptance/avocado_qemu/__init__.py | 25 +++++++++++++++++++++
+ tests/acceptance/boot_linux_console.py    | 27 +++++------------------
+ tests/acceptance/linux_ssh_mips_malta.py  | 18 +++------------
+ 3 files changed, 33 insertions(+), 37 deletions(-)
 
+diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/a=
+vocado_qemu/__init__.py
+index 711c29609a..772771e205 100644
+--- a/tests/acceptance/avocado_qemu/__init__.py
++++ b/tests/acceptance/avocado_qemu/__init__.py
+@@ -8,6 +8,7 @@
+ # This work is licensed under the terms of the GNU GPL, version 2 or
+ # later.  See the COPYING file in the top-level directory.
+=20
++import logging
+ import os
+ import sys
+ import uuid
+@@ -54,6 +55,30 @@ def pick_default_qemu_bin(arch=3DNone):
+         return qemu_bin_from_src_dir_path
+=20
+=20
++def wait_for_console_pattern(test, success_message, failure_message=3DNone=
+):
++    """
++    Waits for messages to appear on the console, while logging the content
++
++    :param test: an Avocado test containing a VM that will have its consol=
+e
++                 read and probed for a success or failure message
++    :type test: :class:`avocado_qemu.Test`
++    :param success_message: if this message appears, test succeeds
++    :param failure_message: if this message appears, test fails
++    """
++    console =3D test.vm.console_socket.makefile()
++    console_logger =3D logging.getLogger('console')
++    while True:
++        msg =3D console.readline().strip()
++        if not msg:
++            continue
++        console_logger.debug(msg)
++        if success_message in msg:
++            break
++        if failure_message and failure_message in msg:
++            fail =3D 'Failure message found in console: %s' % failure_mess=
+age
++            test.fail(fail)
++
++
+ class Test(avocado.Test):
+     def setUp(self):
+         self._vms =3D {}
 diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot=
 _linux_console.py
-index 67d7e96d98..a4fa31b411 100644
+index 8a9a314ab4..8897e0c253 100644
 --- a/tests/acceptance/boot_linux_console.py
 +++ b/tests/acceptance/boot_linux_console.py
-@@ -292,6 +292,42 @@ class BootLinuxConsole(Test):
-         self.vm.launch()
-         self.wait_for_console_pattern('init started: BusyBox')
+@@ -9,12 +9,12 @@
+ # later.  See the COPYING file in the top-level directory.
 =20
-+    def do_test_arm_raspi2(self, uart_id):
-+        """
-+        The kernel can be rebuilt using the kernel source referenced
-+        and following the instructions on the on:
-+        https://www.raspberrypi.org/documentation/linux/kernel/building.md
-+        """
-+        serial_kernel_cmdline =3D {
-+            0: 'earlycon=3Dpl011,0x3f201000 console=3DttyAMA0',
-+        }
-+        deb_url =3D ('http://archive.raspberrypi.org/debian/'
-+                   'pool/main/r/raspberrypi-firmware/'
-+                   'raspberrypi-kernel_1.20190215-1_armhf.deb')
-+        deb_hash =3D 'cd284220b32128c5084037553db3c482426f3972'
-+        deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
-+        kernel_path =3D self.extract_from_deb(deb_path, '/boot/kernel7.img=
-')
-+        dtb_path =3D self.extract_from_deb(deb_path, '/boot/bcm2709-rpi-2-=
-b.dtb')
-+
-+        self.vm.set_machine('raspi2')
-+        self.vm.set_console()
-+        kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
-+                               serial_kernel_cmdline[uart_id])
-+        self.vm.add_args('-kernel', kernel_path,
-+                         '-dtb', dtb_path,
-+                         '-append', kernel_command_line)
-+        self.vm.launch()
-+        console_pattern =3D 'Kernel command line: %s' % kernel_command_lin=
-e
-+        self.wait_for_console_pattern(console_pattern)
-+
-+    def test_arm_raspi2_uart0(self):
-+        """
-+        :avocado: tags=3Darch:arm
-+        :avocado: tags=3Dmachine:raspi2
-+        :avocado: tags=3Ddevice:pl011
-+        """
-+        self.do_test_arm_raspi2(0)
-+
-     def test_s390x_s390_ccw_virtio(self):
+ import os
+-import logging
+ import lzma
+ import gzip
+ import shutil
+=20
+ from avocado_qemu import Test
++from avocado_qemu import wait_for_console_pattern
+ from avocado.utils import process
+ from avocado.utils import archive
+=20
+@@ -29,31 +29,14 @@ class BootLinuxConsole(Test):
+=20
+     KERNEL_COMMON_COMMAND_LINE =3D 'printk.time=3D0 '
+=20
+-    def wait_for_console_pattern(self, success_message,
+-                                 failure_message=3D'Kernel panic - not syn=
+cing'):
+-        """
+-        Waits for messages to appear on the console, while logging the con=
+tent
+-
+-        :param success_message: if this message appears, test succeeds
+-        :param failure_message: if this message appears, test fails
+-        """
+-        console =3D self.vm.console_socket.makefile()
+-        console_logger =3D logging.getLogger('console')
+-        while True:
+-            msg =3D console.readline().strip()
+-            if not msg:
+-                continue
+-            console_logger.debug(msg)
+-            if success_message in msg:
+-                break
+-            if failure_message in msg:
+-                fail =3D 'Failure message found in console: %s' % failure_=
+message
+-                self.fail(fail)
++    def wait_for_console_pattern(self, success_message):
++        wait_for_console_pattern(self, success_message,
++                                 failure_message=3D'Kernel panic - not syn=
+cing')
+=20
+     def exec_command_and_wait_for_pattern(self, command, success_message):
+         command +=3D '\n'
+         self.vm.console_socket.sendall(command.encode())
+-        self.wait_for_console_pattern(success_message)
++        wait_for_console_pattern(self, success_message)
+=20
+     def extract_from_deb(self, deb, path):
          """
-         :avocado: tags=3Darch:s390x
+diff --git a/tests/acceptance/linux_ssh_mips_malta.py b/tests/acceptance/li=
+nux_ssh_mips_malta.py
+index aa12001942..fc13f9e4d4 100644
+--- a/tests/acceptance/linux_ssh_mips_malta.py
++++ b/tests/acceptance/linux_ssh_mips_malta.py
+@@ -13,6 +13,7 @@ import time
+=20
+ from avocado import skipUnless
+ from avocado_qemu import Test
++from avocado_qemu import wait_for_console_pattern
+ from avocado.utils import process
+ from avocado.utils import archive
+ from avocado.utils import ssh
+@@ -69,19 +70,6 @@ class LinuxSSH(Test):
+     def setUp(self):
+         super(LinuxSSH, self).setUp()
+=20
+-    def wait_for_console_pattern(self, success_message,
+-                                 failure_message=3D'Oops'):
+-        console =3D self.vm.console_socket.makefile()
+-        console_logger =3D logging.getLogger('console')
+-        while True:
+-            msg =3D console.readline()
+-            console_logger.debug(msg.strip())
+-            if success_message in msg:
+-                break
+-            if failure_message in msg:
+-                fail =3D 'Failure message found in console: %s' % failure_=
+message
+-                self.fail(fail)
+-
+     def get_portfwd(self):
+         res =3D self.vm.command('human-monitor-command',
+                               command_line=3D'info usernet')
+@@ -137,7 +125,7 @@ class LinuxSSH(Test):
+=20
+         self.log.info('VM launched, waiting for sshd')
+         console_pattern =3D 'Starting OpenBSD Secure Shell server: sshd'
+-        self.wait_for_console_pattern(console_pattern)
++        wait_for_console_pattern(self, console_pattern, 'Oops')
+         self.log.info('sshd ready')
+=20
+         self.ssh_connect('root', 'root')
+@@ -145,7 +133,7 @@ class LinuxSSH(Test):
+     def shutdown_via_ssh(self):
+         self.ssh_command('poweroff')
+         self.ssh_disconnect_vm()
+-        self.wait_for_console_pattern('Power down')
++        wait_for_console_pattern(self, 'Power down', 'Oops')
+=20
+     def ssh_command_output_contains(self, cmd, exp):
+         stdout, _ =3D self.ssh_command(cmd)
 --=20
 2.21.0
 
