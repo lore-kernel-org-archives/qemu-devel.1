@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21438CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:37:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6D38CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:38:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF6A7214AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:37:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 839C72054F
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 07:38:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dMhO/xYT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF6A7214AF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K9PoLbax"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 839C72054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOzaR-0004Yh-D2
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 03:37:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46542)
+	id 1iOzbF-0005v5-Am
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 03:38:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46603)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iOzZ5-0002eB-7K
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:35:48 -0400
+ (envelope-from <philmd@redhat.com>) id 1iOzZR-0003Zm-5z
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:36:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iOzZ3-0002S2-U6
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:35:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41281
+ (envelope-from <philmd@redhat.com>) id 1iOzZQ-0002jV-3V
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:36:09 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47678
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iOzZ3-0002R0-Q7
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:35:45 -0400
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iOzZP-0002jO-W8
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:36:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572248145;
+ s=mimecast20190719; t=1572248167;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qdlzS2f9QS5to3RqqnJkrW+4/KuEVpCzWPZ19K1R0TU=;
- b=dMhO/xYTV5XVl8XSFacDLpO64LbyvmfN0R3WMHnn+iFsapC7ftUcliRPoG9YJIqJgVIgHa
- uK1Y284U6itXOiaJASFIDfpzKrPx0D0srdz3i76DC5gTBntNHPJEPSFhWPxo755Db3PrAk
- 1pZm2WXAu1Iz8zqfPNshd9VdQqnAkDQ=
+ bh=e5YHjJMRwCWhL/THwFANm4p0o/BO4tR4zachgKDUC3o=;
+ b=K9PoLbaxlW4O7uxXRsHZm5A+eTHNQpDk295pLG8N2SHAoOm6yKOgDAigfuBVbWLU9eVazv
+ 0lKaNrr5wyOCfzXupLN5IbJzhNgSPW5wNN7sJm4IYcCVKE+xttfJKtEvYRefRoA46VFb9/
+ 7QYyolzuxId/qhmTNiT8pSWiFapPmfM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-263-ICEuQP9JOvuvltOmXZ_35w-1; Mon, 28 Oct 2019 03:35:40 -0400
+ us-mta-356-Sfy6b838Nzivm-TQMaS1DQ-1; Mon, 28 Oct 2019 03:36:02 -0400
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5663107AD29;
- Mon, 28 Oct 2019 07:35:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F852107AD28;
+ Mon, 28 Oct 2019 07:36:01 +0000 (UTC)
 Received: from x1w.redhat.com (ovpn-204-86.brq.redhat.com [10.40.204.86])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B674519C69;
- Mon, 28 Oct 2019 07:35:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C11E319C69;
+ Mon, 28 Oct 2019 07:35:51 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/26] tests/acceptance: Refactor
- exec_command_and_wait_for_pattern()
-Date: Mon, 28 Oct 2019 08:34:20 +0100
-Message-Id: <20191028073441.6448-6-philmd@redhat.com>
+Subject: [PATCH 08/26] tests/acceptance: Introduce LinuxUserTest base class
+Date: Mon, 28 Oct 2019 08:34:23 +0100
+Message-Id: <20191028073441.6448-9-philmd@redhat.com>
 In-Reply-To: <20191028073441.6448-1-philmd@redhat.com>
 References: <20191028073441.6448-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: ICEuQP9JOvuvltOmXZ_35w-1
+X-MC-Unique: Sfy6b838Nzivm-TQMaS1DQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,100 +97,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Refactor the exec_command_and_wait_for_pattern() utility method
-so we can reuse it in other files.
+Similarly to the MachineTest base class, this class contains
+methods common to linux-user tests.
 
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v2: fix self -> test, failure_message is optional, added doc
-v3: reword because after rebasing only 1 file has to be modified
----
- tests/acceptance/avocado_qemu/__init__.py | 19 +++++++++++++++++++
- tests/acceptance/boot_linux_console.py    | 18 +++++++-----------
- 2 files changed, 26 insertions(+), 11 deletions(-)
+ tests/acceptance/avocado_qemu/__init__.py | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/a=
 vocado_qemu/__init__.py
-index a0450e5263..bdece76723 100644
+index d23681818d..2611a5146c 100644
 --- a/tests/acceptance/avocado_qemu/__init__.py
 +++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -79,6 +79,25 @@ def wait_for_console_pattern(test, success_message, fail=
-ure_message=3DNone):
-             test.fail(fail)
+@@ -14,6 +14,7 @@ import sys
+ import uuid
 =20
+ import avocado
++from avocado.utils import process
 =20
-+def exec_command_and_wait_for_pattern(test, command,
-+                                      success_message, failure_message=3DN=
-one):
-+    """
-+    Send a command to a console (appending CRLF characters), then wait
-+    for success_message to appear on the console, while logging the.
-+    content. Mark the test as failed if failure_message is found instead.
-+
-+    :param test: an Avocado test containing a VM that will have its consol=
-e
-+                 read and probed for a success or failure message
-+    :type test: :class:`avocado_qemu.Test`
-+    :param command: the command to send
-+    :param success_message: if this message appears, test succeeds
-+    :param failure_message: if this message appears, test fails
-+    """
-+    command +=3D '\r'
-+    test.vm.console_socket.sendall(command.encode())
-+    wait_for_console_pattern(test, success_message, failure_message)
+ SRC_ROOT_DIR =3D os.path.join(os.path.dirname(__file__), '..', '..', '..')
+ sys.path.append(os.path.join(SRC_ROOT_DIR, 'python'))
+@@ -138,3 +139,11 @@ class MachineTest(Test):
+     def tearDown(self):
+         for vm in self._vms.values():
+             vm.shutdown()
 +
 +
- class Test(avocado.Test):
-     def setUp(self):
-         self._vms =3D {}
-diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot=
-_linux_console.py
-index f9b77af359..4b419b0559 100644
---- a/tests/acceptance/boot_linux_console.py
-+++ b/tests/acceptance/boot_linux_console.py
-@@ -14,6 +14,7 @@ import gzip
- import shutil
-=20
- from avocado_qemu import Test
-+from avocado_qemu import exec_command_and_wait_for_pattern
- from avocado_qemu import wait_for_console_pattern
- from avocado.utils import process
- from avocado.utils import archive
-@@ -33,11 +34,6 @@ class BootLinuxConsole(Test):
-         wait_for_console_pattern(self, success_message,
-                                  failure_message=3D'Kernel panic - not syn=
-cing')
-=20
--    def exec_command_and_wait_for_pattern(self, command, success_message):
--        command +=3D '\r'
--        self.vm.console_socket.sendall(command.encode())
--        wait_for_console_pattern(self, success_message)
--
-     def extract_from_deb(self, deb, path):
-         """
-         Extracts a file from a deb package into the test workdir
-@@ -166,12 +162,12 @@ class BootLinuxConsole(Test):
-         self.vm.launch()
-         self.wait_for_console_pattern('Boot successful.')
-=20
--        self.exec_command_and_wait_for_pattern('cat /proc/cpuinfo',
--                                               'BogoMIPS')
--        self.exec_command_and_wait_for_pattern('uname -a',
--                                               'Debian')
--        self.exec_command_and_wait_for_pattern('reboot',
--                                               'reboot: Restarting system'=
-)
-+        exec_command_and_wait_for_pattern(self, 'cat /proc/cpuinfo',
-+                                                'BogoMIPS')
-+        exec_command_and_wait_for_pattern(self, 'uname -a',
-+                                                'Debian')
-+        exec_command_and_wait_for_pattern(self, 'reboot',
-+                                                'reboot: Restarting system=
-')
-=20
-     def do_test_mips_malta32el_nanomips(self, kernel_url, kernel_hash):
-         kernel_path_xz =3D self.fetch_asset(kernel_url, asset_hash=3Dkerne=
-l_hash)
++class LinuxUserTest(Test):
++    def setUp(self):
++        self.base_setUp("%s-linux-user", "qemu-%s")
++
++    def run(self, cmd):
++        return process.run("%s %s" % (self.qemu_bin, cmd))
 --=20
 2.21.0
 
