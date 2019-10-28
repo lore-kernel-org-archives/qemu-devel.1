@@ -2,61 +2,77 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F9ECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9108CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:08:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45634204FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:07:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45634204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id B154C20B7C
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:08:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B154C20B7C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP03l-0005Cq-4b
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 04:07:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48780)
+	id 1iP04Q-0007tC-HV
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 04:08:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50362)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iOzpa-00016A-Je
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:52 -0400
+ (envelope-from <eperezma@redhat.com>) id 1iP01i-00018k-P8
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:05:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iOzpY-0002yC-Rx
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:50 -0400
-Received: from mga04.intel.com ([192.55.52.120]:47960)
+ (envelope-from <eperezma@redhat.com>) id 1iP01h-0001Uw-1q
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:05:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52602)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iOzpY-0002p5-H1
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:48 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 28 Oct 2019 00:52:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,239,1569308400"; d="scan'208";a="224558792"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga004.fm.intel.com with ESMTP; 28 Oct 2019 00:52:44 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
- ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
- mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
-Subject: [PATCH v14 08/11] hmat acpi: Build Memory Proximity Domain Attributes
- Structure(s)
-Date: Mon, 28 Oct 2019 15:52:17 +0800
-Message-Id: <20191028075220.25673-9-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191028075220.25673-1-tao3.xu@intel.com>
-References: <20191028075220.25673-1-tao3.xu@intel.com>
+ (Exim 4.71) (envelope-from <eperezma@redhat.com>) id 1iP01e-0001Sb-NA
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:05:19 -0400
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DE3074ACA7
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 08:05:14 +0000 (UTC)
+Received: by mail-qk1-f197.google.com with SMTP id s3so9564468qkd.6
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 01:05:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=r7hTAQ1WgoU+NAucRbsF5ze0sj+UvC4uJvFMhrJBTz4=;
+ b=JJi9Y6ku0+TvTyRm3x6kQfH9gjygVmrVMFNCDbUyl9DeOj5n+NFX2nRtroP+pkQY38
+ qiFEy9dmzi7w9Z9qhNd7G75FfHeGpRp8e/7z3qEybYsTjIiWkO51b5+z7cpDCnqW6Eoc
+ fB2EbvBlXUQwpD7NjaCy3NNAj5I5F6+gtY8J3Ia96xV3lkUkulotx+uppBWI2uWw0H4D
+ 5KJezPziLQnHQjZF+ywX31lnPLh6H5YD3ExRqYHoiuYLg1/Zh1ztjIPOBhQEJLgfVXio
+ GaYwchDJMK0hLBz5x1skwMhlzsD73rs2xj9NwyZfsqk1uL6cQ+NqG9pN4WeIN548N79C
+ BROg==
+X-Gm-Message-State: APjAAAXoDyvNNolRbpHu7jbzk1yBlwdYCCTjF5EWDnh5GQqXIqxkEgQc
+ ZX3I4i+A1imcX/qCErKc8NuJRodbtqkA9O8uVjxT+xmYkBb05sMcc3qjuYtwQLIvf+DxsEN6tKU
+ iT2Prf/3AHOFfvbP7pXeLsMQy1r8Wuks=
+X-Received: by 2002:a0c:fb0c:: with SMTP id c12mr15675369qvp.96.1572249914131; 
+ Mon, 28 Oct 2019 01:05:14 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqw9e7+cWoT89ESLVOKmUIwcxQzNzjFd0XTmGOBwNo0UW+0kbqcy/+2Dq5oJqz8ywlybCkIAbdboBdQ+RzeEpOg=
+X-Received: by 2002:a0c:fb0c:: with SMTP id c12mr15675347qvp.96.1572249913908; 
+ Mon, 28 Oct 2019 01:05:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.120
+References: <20191025083527.30803-1-eperezma@redhat.com>
+ <20191025073257-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20191025073257-mutt-send-email-mst@kernel.org>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Mon, 28 Oct 2019 09:04:37 +0100
+Message-ID: <CAJaqyWceninjEU6RWdObW6FNx45j9bMs9j13xK=C2UkWssGrNg@mail.gmail.com>
+Subject: Re: [PATCH v7 0/8] Packed virtqueue for virtio
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,269 +84,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Daniel Black <daniel@linux.ibm.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-block@nongnu.org, Amit Shah <amit@kernel.org>,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Fam Zheng <fam@euphon.net>, Jens Freimann <jfreimann@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liu Jingqi <jingqi.liu@intel.com>
+Hi Michael.
 
-HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-(HMAT). The specification references below link:
-http://www.uefi.org/sites/default/files/resources/ACPI_6_3_final_Jan30.pdf
+Totally agree with you. I investigated that for a short time but in
+the end I tested manually with the coverage instrumentation, trying to
+exercise the same "code" as current tests touches in split virtqueues.
 
-It describes the memory attributes, such as memory side cache
-attributes and bandwidth and latency details, related to the
-Memory Proximity Domain. The software is
-expected to use this information as hint for optimization.
+I will automate at least these paths.
 
-This structure describes Memory Proximity Domain Attributes by memory
-subsystem and its associativity with processor proximity domain as well as
-hint for memory usage.
+Thanks!
 
-In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and report
-the platform's HMAT tables.
 
-Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
-
-No changes in v14.
-
-Changes in v13:
-    - Remove the unnecessary head file.
----
- hw/acpi/Kconfig       |  7 ++-
- hw/acpi/Makefile.objs |  1 +
- hw/acpi/hmat.c        | 99 +++++++++++++++++++++++++++++++++++++++++++
- hw/acpi/hmat.h        | 42 ++++++++++++++++++
- hw/i386/acpi-build.c  |  5 +++
- 5 files changed, 152 insertions(+), 2 deletions(-)
- create mode 100644 hw/acpi/hmat.c
- create mode 100644 hw/acpi/hmat.h
-
-diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-index 12e3f1e86e..54209c6f2f 100644
---- a/hw/acpi/Kconfig
-+++ b/hw/acpi/Kconfig
-@@ -7,6 +7,7 @@ config ACPI_X86
-     select ACPI_NVDIMM
-     select ACPI_CPU_HOTPLUG
-     select ACPI_MEMORY_HOTPLUG
-+    select ACPI_HMAT
- 
- config ACPI_X86_ICH
-     bool
-@@ -23,6 +24,10 @@ config ACPI_NVDIMM
-     bool
-     depends on ACPI
- 
-+config ACPI_HMAT
-+    bool
-+    depends on ACPI
-+
- config ACPI_PCI
-     bool
-     depends on ACPI && PCI
-@@ -33,5 +38,3 @@ config ACPI_VMGENID
-     depends on PC
- 
- config ACPI_HW_REDUCED
--    bool
--    depends on ACPI
-diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-index 655a9c1973..517bd88704 100644
---- a/hw/acpi/Makefile.objs
-+++ b/hw/acpi/Makefile.objs
-@@ -7,6 +7,7 @@ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
- common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
- common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
- common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
-+common-obj-$(CONFIG_ACPI_HMAT) += hmat.o
- common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
- 
- common-obj-y += acpi_interface.o
-diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-new file mode 100644
-index 0000000000..c595098ba7
---- /dev/null
-+++ b/hw/acpi/hmat.c
-@@ -0,0 +1,99 @@
-+/*
-+ * HMAT ACPI Implementation
-+ *
-+ * Copyright(C) 2019 Intel Corporation.
-+ *
-+ * Author:
-+ *  Liu jingqi <jingqi.liu@linux.intel.com>
-+ *  Tao Xu <tao3.xu@intel.com>
-+ *
-+ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-+ * (HMAT)
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "sysemu/numa.h"
-+#include "hw/acpi/hmat.h"
-+
-+/*
-+ * ACPI 6.3:
-+ * 5.2.27.3 Memory Proximity Domain Attributes Structure: Table 5-145
-+ */
-+static void build_hmat_mpda(GArray *table_data, uint16_t flags,
-+                            uint16_t initiator, uint16_t mem_node)
-+{
-+
-+    /* Memory Proximity Domain Attributes Structure */
-+    /* Type */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Length */
-+    build_append_int_noprefix(table_data, 40, 4);
-+    /* Flags */
-+    build_append_int_noprefix(table_data, flags, 2);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 2);
-+    /* Proximity Domain for the Attached Initiator */
-+    build_append_int_noprefix(table_data, initiator, 4);
-+    /* Proximity Domain for the Memory */
-+    build_append_int_noprefix(table_data, mem_node, 4);
-+    /* Reserved */
-+    build_append_int_noprefix(table_data, 0, 4);
-+    /*
-+     * Reserved:
-+     * Previously defined as the Start Address of the System Physical
-+     * Address Range. Deprecated since ACPI Spec 6.3.
-+     */
-+    build_append_int_noprefix(table_data, 0, 8);
-+    /*
-+     * Reserved:
-+     * Previously defined as the Range Length of the region in bytes.
-+     * Deprecated since ACPI Spec 6.3.
-+     */
-+    build_append_int_noprefix(table_data, 0, 8);
-+}
-+
-+/* Build HMAT sub table structures */
-+static void hmat_build_table_structs(GArray *table_data, NumaState *numa_state)
-+{
-+    uint16_t flags;
-+    int i;
-+
-+    for (i = 0; i < numa_state->num_nodes; i++) {
-+        flags = 0;
-+
-+        if (numa_state->nodes[i].initiator < MAX_NODES) {
-+            flags |= HMAT_PROXIMITY_INITIATOR_VALID;
-+        }
-+
-+        build_hmat_mpda(table_data, flags, numa_state->nodes[i].initiator, i);
-+    }
-+}
-+
-+void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_state)
-+{
-+    int hmat_start = table_data->len;
-+
-+    /* reserve space for HMAT header  */
-+    acpi_data_push(table_data, 40);
-+
-+    hmat_build_table_structs(table_data, numa_state);
-+
-+    build_header(linker, table_data,
-+                 (void *)(table_data->data + hmat_start),
-+                 "HMAT", table_data->len - hmat_start, 2, NULL, NULL);
-+}
-diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-new file mode 100644
-index 0000000000..437dbc6872
---- /dev/null
-+++ b/hw/acpi/hmat.h
-@@ -0,0 +1,42 @@
-+/*
-+ * HMAT ACPI Implementation Header
-+ *
-+ * Copyright(C) 2019 Intel Corporation.
-+ *
-+ * Author:
-+ *  Liu jingqi <jingqi.liu@linux.intel.com>
-+ *  Tao Xu <tao3.xu@intel.com>
-+ *
-+ * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-+ * (HMAT)
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>
-+ */
-+
-+#ifndef HMAT_H
-+#define HMAT_H
-+
-+#include "hw/acpi/aml-build.h"
-+
-+/*
-+ * ACPI 6.3: 5.2.27.3 Memory Proximity Domain Attributes Structure,
-+ * Table 5-145, Field "flag", Bit [0]: set to 1 to indicate that data in
-+ * the Proximity Domain for the Attached Initiator field is valid.
-+ * Other bits reserved.
-+ */
-+#define HMAT_PROXIMITY_INITIATOR_VALID  0x1
-+
-+void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_state);
-+
-+#endif
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index d9435ba0b3..3c936cd262 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -68,6 +68,7 @@
- #include "hw/i386/intel_iommu.h"
- 
- #include "hw/acpi/ipmi.h"
-+#include "hw/acpi/hmat.h"
- 
- /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
-  * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
-@@ -2718,6 +2719,10 @@ void acpi_build(AcpiBuildTables *tables, MachineState *machine)
-             acpi_add_table(table_offsets, tables_blob);
-             build_slit(tables_blob, tables->linker, machine);
-         }
-+        if (machine->numa_state->hmat_enabled) {
-+            acpi_add_table(table_offsets, tables_blob);
-+            build_hmat(tables_blob, tables->linker, machine->numa_state);
-+        }
-     }
-     if (acpi_get_mcfg(&mcfg)) {
-         acpi_add_table(table_offsets, tables_blob);
--- 
-2.20.1
-
+On Fri, Oct 25, 2019 at 1:35 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> On Fri, Oct 25, 2019 at 10:35:19AM +0200, Eugenio P=C3=A9rez wrote:
+> > Hi:
+> >
+> > This is an updated version of packed virtqueue support based on Wei and=
+ Jason's
+> > V6, mainly solving the clang leak detector error CI gave.
+>
+>
+> Looks good, I will queue this up.
+>
+> It would be nice to add libqos based tests on top,
+> based on Stefan's work.
+>
+>
+> > Please review.
+> >
+> > Changes from V6:
+> > - Commit reorder: Squash bugfix and sepparate big changes into smaller =
+commits.
+> >
+> > Changes from V5:
+> > - Fix qemu's CI asan error.
+> > - Move/copy rcu comments.
+> > - Merge duplicated vdev->broken check between split and packet version.
+> >
+> > Eugenio P=C3=A9rez (2):
+> >   virtio: Free blk virqueues at unrealize()
+> >   virtio: Free rnd virqueue at unrealize()
+> >
+> > Jason Wang (4):
+> >   virtio: basic packed virtqueue support
+> >   virtio: event suppression support for packed ring
+> >   vhost_net: enable packed ring support
+> >   virtio: add property to enable packed virtqueue
+> >
+> > Wei Xu (2):
+> >   virtio: basic structure for packed ring
+> >   virtio: device/driver area size calculation refactor for split ring
+> >
+> >  hw/block/virtio-blk.c       |    7 +-
+> >  hw/char/virtio-serial-bus.c |    2 +-
+> >  hw/net/vhost_net.c          |    2 +
+> >  hw/scsi/virtio-scsi.c       |    3 +-
+> >  hw/virtio/virtio-rng.c      |    1 +
+> >  hw/virtio/virtio.c          | 1154 +++++++++++++++++++++++++++++++++++=
++++-----
+> >  include/hw/virtio/virtio.h  |   14 +-
+> >  7 files changed, 1045 insertions(+), 138 deletions(-)
+> >
+> > --
+> > 2.16.5
 
