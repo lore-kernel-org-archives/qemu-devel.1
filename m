@@ -2,78 +2,84 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 408D2CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:00:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B67CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:06:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AD1220717
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:00:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E642208C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:06:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aHPsl0wD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AD1220717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="Dxmdq4nJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E642208C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP7R6-0007Gj-Kg
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 12:00:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32945)
+	id 1iP7XA-00081B-Th
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 12:06:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34581)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iP7H5-0003ha-Lt
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:49:44 -0400
+ (envelope-from <palmer@sifive.com>) id 1iP7PW-00059D-B2
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iP7H4-00013n-IG
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:49:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39596
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iP7H4-00013b-FB
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:49:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572277782;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xwDekJskiz1kDqJoWdljY/MNvrSkK6g6oZezH+6KCeA=;
- b=aHPsl0wDJDNA/eiy2QzFnoq3yTed1VCoBAtkjuuP+Y+LVo+Nv1cB6PLMi85C60RoY2Nfwq
- UKV/Bxkvb8b/WqcrH+nDT841I2wjWbFXIPASvLmt0imlRsZNTQWRpcI36Axvw0sn68lwtj
- C/3EoPeVlIc5NUp/y8PRTZdNsAUMl8A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-UpT8IQhSPWiHG5Zxk300gA-1; Mon, 28 Oct 2019 11:49:40 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 98709801E64
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 15:49:39 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-112-24.ams2.redhat.com
- [10.36.112.24])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A91AE5D9C5;
- Mon, 28 Oct 2019 15:49:23 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/4] tests: allow filtering crypto cipher benchmark tests
-Date: Mon, 28 Oct 2019 16:49:11 +0100
-Message-Id: <20191028154914.84821-2-berrange@redhat.com>
-In-Reply-To: <20191028154914.84821-1-berrange@redhat.com>
-References: <20191028154914.84821-1-berrange@redhat.com>
+ (envelope-from <palmer@sifive.com>) id 1iP7PU-0003o9-Qf
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:26 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:34681)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iP7PU-0003nL-Jj
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:24 -0400
+Received: by mail-pl1-x644.google.com with SMTP id k7so5796981pll.1
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 08:58:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding:cc:from:to;
+ bh=KVgeN0kV4rTOGuMaTvCma73OJgV+QlUJdKVdYosiemI=;
+ b=Dxmdq4nJbMj1u9pgGfALUNhV5z+bWW0CVWMMiFggrhjk3Eh2ig8pYD5fY80MQivOAj
+ 3AQl0RTkGUSbb3/rAEVD//PBeOBmJhsRvziXZDLitUxDrY1Nz/pPc85RAHAXFFPb5NCr
+ 39dYjhkN7XdGRTNtXtTr9bIJLIpH4GU5+Pwgl0YcZKusvm5OKg2WAl5Ba3StyhTR3nv/
+ aue/c/BD7jCmTpya6bu8cwvn95SaLBQmh/6Hoe+d7I/a5PQWHJw3P2dgVaTbZx4gEF1n
+ sz9kNKK9954sejNjRHLdawUsFLUH+2mdOBXEsaLL3RucOczQiUMNYlXBQXSTakj4LEU4
+ v9Pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding:cc:from:to;
+ bh=KVgeN0kV4rTOGuMaTvCma73OJgV+QlUJdKVdYosiemI=;
+ b=BSFLwikUkH9zuxWEB/RVnAUXzMNgR/lqK5cRO8Ug4fTibPkfZyLQIlHb6osE+DWViQ
+ vZt8NivIImzOYStXkbO5PkieeywxoVg8SZaDTEG/0WlQ86+6asJoaymnMQd6BrNjDQSn
+ /Ibm34vbjRzUVJ9bs5DkbKVxx1mOXuiSp5OrR0ETd6h3NBKytZIKPMug4ygbPmCE2xTF
+ uO2rRiIO8griwDLM3cDkJgN/BjjnIcQK5RmA1LM2ialKVM/SBx6QRXtnW1rHtFoXiDHq
+ OSV37+eoQg9HFj/TEaALLKs9a2ZLOCTPqtkRW/oEZzzIaxxknBrFsdZs5YLD1XRRgqdv
+ 7yEQ==
+X-Gm-Message-State: APjAAAUjqe6f3AA/f9HZ2OyxtwTe8VlaujPNGwBr8Wmkfouf7wAD75gI
+ N0ayoJhkPMBei0wb2tyc8zsCh64GAyHU5A==
+X-Google-Smtp-Source: APXvYqycMFTOUlc633473BiPzYqZqNZdApPOPWCL/q9JLmQErJ0ETr1pqXWwWgt8DXSbsfAi7WRYfw==
+X-Received: by 2002:a17:902:44c:: with SMTP id 70mr182075ple.176.1572278303088; 
+ Mon, 28 Oct 2019 08:58:23 -0700 (PDT)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id i63sm5234094pgc.31.2019.10.28.08.58.22
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 28 Oct 2019 08:58:22 -0700 (PDT)
+Subject: [PULL 04/18] riscv: hw: Drop "clock-frequency" property of cpu nodes
+Date: Mon, 28 Oct 2019 08:48:48 -0700
+Message-Id: <20191028154902.32491-5-palmer@sifive.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191028154902.32491-1-palmer@sifive.com>
+References: <20191028154902.32491-1-palmer@sifive.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: UpT8IQhSPWiHG5Zxk300gA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Transfer-Encoding: 8bit
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::644
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,62 +91,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>,
+ qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ Palmer Dabbelt <palmer@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add support for specifying a cipher mode and chunk size as argv to
-filter which combinations are benchmarked. For example to only
-benchmark XTS mode with 512 byte chunks:
+From: Bin Meng <bmeng.cn@gmail.com>
 
-  ./tests/benchmark-crypto-cipher xts 512
+The "clock-frequency" property of cpu nodes isn't required. Drop it.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+This is to keep in sync with Linux kernel commit below:
+https://patchwork.kernel.org/patch/11133031/
+
+Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- tests/benchmark-crypto-cipher.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ hw/riscv/sifive_u.c         | 2 --
+ hw/riscv/spike.c            | 2 --
+ hw/riscv/virt.c             | 2 --
+ include/hw/riscv/sifive_u.h | 1 -
+ include/hw/riscv/spike.h    | 4 ----
+ include/hw/riscv/virt.h     | 4 ----
+ 6 files changed, 15 deletions(-)
 
-diff --git a/tests/benchmark-crypto-cipher.c b/tests/benchmark-crypto-ciphe=
-r.c
-index 67fdf8c31d..3ca31a2779 100644
---- a/tests/benchmark-crypto-cipher.c
-+++ b/tests/benchmark-crypto-cipher.c
-@@ -161,15 +161,26 @@ static void test_cipher_speed_xts_aes_256(const void =
-*opaque)
-=20
- int main(int argc, char **argv)
- {
-+    char *alg =3D NULL;
-+    char *size =3D NULL;
-     g_test_init(&argc, &argv, NULL);
-     g_assert(qcrypto_init(NULL) =3D=3D 0);
-=20
- #define ADD_TEST(mode, cipher, keysize, chunk)                          \
--    g_test_add_data_func(                                               \
-+    if ((!alg || g_str_equal(alg, #mode)) &&                            \
-+        (!size || g_str_equal(size, #chunk)))                           \
-+        g_test_add_data_func(                                           \
-         "/crypto/cipher/" #mode "-" #cipher "-" #keysize "/chunk-" #chunk,=
- \
-         (void *)chunk,                                                  \
-         test_cipher_speed_ ## mode ## _ ## cipher ## _ ## keysize)
-=20
-+    if (argc >=3D 2) {
-+        alg =3D argv[1];
-+    }
-+    if (argc >=3D 3) {
-+        size =3D argv[2];
-+    }
-+
- #define ADD_TESTS(chunk)                        \
-     do {                                        \
-         ADD_TEST(ecb, aes, 128, chunk);         \
---=20
-2.23.0
+diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+index 9f8e84bf2e..02dd76176e 100644
+--- a/hw/riscv/sifive_u.c
++++ b/hw/riscv/sifive_u.c
+@@ -151,8 +151,6 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa;
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+-                              SIFIVE_U_CLOCK_FREQ);
+         /* cpu 0 is the management hart that does not have mmu */
+         if (cpu != 0) {
+             qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
+index d60415d190..8bbffbcd0f 100644
+--- a/hw/riscv/spike.c
++++ b/hw/riscv/spike.c
+@@ -102,8 +102,6 @@ static void create_fdt(SpikeState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+-                              SPIKE_CLOCK_FREQ);
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index d36f5625ec..13030619d4 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -161,8 +161,6 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+         char *intc = g_strdup_printf("/cpus/cpu@%d/interrupt-controller", cpu);
+         char *isa = riscv_isa_string(&s->soc.harts[cpu]);
+         qemu_fdt_add_subnode(fdt, nodename);
+-        qemu_fdt_setprop_cell(fdt, nodename, "clock-frequency",
+-                              VIRT_CLOCK_FREQ);
+         qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+         qemu_fdt_setprop_string(fdt, nodename, "riscv,isa", isa);
+         qemu_fdt_setprop_string(fdt, nodename, "compatible", "riscv");
+diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+index e4df298c23..4850805ee7 100644
+--- a/include/hw/riscv/sifive_u.h
++++ b/include/hw/riscv/sifive_u.h
+@@ -75,7 +75,6 @@ enum {
+ };
+ 
+ enum {
+-    SIFIVE_U_CLOCK_FREQ = 1000000000,
+     SIFIVE_U_HFCLK_FREQ = 33333333,
+     SIFIVE_U_RTCCLK_FREQ = 1000000
+ };
+diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
+index 03d870363c..dc770421bc 100644
+--- a/include/hw/riscv/spike.h
++++ b/include/hw/riscv/spike.h
+@@ -38,10 +38,6 @@ enum {
+     SPIKE_DRAM
+ };
+ 
+-enum {
+-    SPIKE_CLOCK_FREQ = 1000000000
+-};
+-
+ #if defined(TARGET_RISCV32)
+ #define SPIKE_V1_09_1_CPU TYPE_RISCV_CPU_RV32GCSU_V1_09_1
+ #define SPIKE_V1_10_0_CPU TYPE_RISCV_CPU_RV32GCSU_V1_10_0
+diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+index 6e5fbe5d3b..68978a13e8 100644
+--- a/include/hw/riscv/virt.h
++++ b/include/hw/riscv/virt.h
+@@ -55,10 +55,6 @@ enum {
+     VIRTIO_NDEV = 0x35 /* Arbitrary maximum number of interrupts */
+ };
+ 
+-enum {
+-    VIRT_CLOCK_FREQ = 1000000000
+-};
+-
+ #define VIRT_PLIC_HART_CONFIG "MS"
+ #define VIRT_PLIC_NUM_SOURCES 127
+ #define VIRT_PLIC_NUM_PRIORITIES 7
+-- 
+2.21.0
 
 
