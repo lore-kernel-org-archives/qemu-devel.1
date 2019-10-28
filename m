@@ -2,89 +2,54 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC8ADCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 05:47:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C786CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 06:10:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DCE5204FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 05:47:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iUC0TSJd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DCE5204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4E0C020873
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 06:10:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E0C020873
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51026 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOxsT-0003N1-NS
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 01:47:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37315)
+	id 1iOyEn-0003uR-FO
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 02:10:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38758)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iOxrj-0002Kj-5d
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 01:46:56 -0400
+ (envelope-from <its@irrelevant.dk>) id 1iOyDy-0003I7-Ay
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 02:09:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iOxrg-0008Kv-PT
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 01:46:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57980
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <its@irrelevant.dk>) id 1iOyDw-0002Sw-CD
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 02:09:54 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:53082)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iOxrg-0008KK-MR
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 01:46:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572241611;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DYU5enKK9OjKzV0PS0WzG0v+t43VUN3xt6liLWc5t4Y=;
- b=iUC0TSJd/YVH/+cbwQ+fWuRx4X+w3xpY8gZpveGl6HFc0BCVa1/iriHioTPU9E1K5gbUQw
- siwfk8sVAZ+z06UW1uDdqRWHVYgS7ET2z5bRulAQBDrwrOZckKfSP02ABeVM6VfvfIxjZj
- RpJ6j1GGbuSAWIMzSlz1mKzaJYksO1o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-91-mK2TWLsJPU-lggAmzz1uBg-1; Mon, 28 Oct 2019 01:46:45 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6B9B51005510;
- Mon, 28 Oct 2019 05:46:44 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 11AA05DA2C;
- Mon, 28 Oct 2019 05:46:43 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 15C6511385C9; Mon, 28 Oct 2019 06:46:42 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v13 06/12] numa: Extend CLI to provide memory latency and
- bandwidth information
-References: <20191020111125.27659-1-tao3.xu@intel.com>
- <20191020111125.27659-7-tao3.xu@intel.com>
- <20191023172854.42c495d5@redhat.com>
- <9e30d8fe-7274-4ee8-3c4b-64c370141358@intel.com>
- <20191025152720.4068bfae@redhat.com>
- <87wocsobil.fsf@dusky.pond.sub.org>
- <20191025205141.GF6744@habkost.net>
- <71543104-7254-c25e-e87c-d73a894bcc2e@intel.com>
-Date: Mon, 28 Oct 2019 06:46:42 +0100
-In-Reply-To: <71543104-7254-c25e-e87c-d73a894bcc2e@intel.com> (Tao Xu's
- message of "Mon, 28 Oct 2019 10:05:21 +0800")
-Message-ID: <87tv7tv2v1.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1iOyDr-0002OC-BD; Mon, 28 Oct 2019 02:09:48 -0400
+Received: from apples.localdomain (unknown [194.62.217.57])
+ by charlie.dont.surf (Postfix) with ESMTPSA id DEC0DBF426;
+ Mon, 28 Oct 2019 06:09:43 +0000 (UTC)
+Date: Mon, 28 Oct 2019 07:09:40 +0100
+From: Klaus Birkelund <its@irrelevant.dk>
+To: qemu-block@nongnu.org
+Subject: Re: [PATCH v2 00/20] nvme: support NVMe v1.3d, SGLs and multiple
+ namespaces
+Message-ID: <20191028060940.GA561856@apples.localdomain>
+References: <20191015103900.313928-1-its@irrelevant.dk>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: mK2TWLsJPU-lggAmzz1uBg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191015103900.313928-1-its@irrelevant.dk>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,21 +61,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, "Liu, Jingqi" <jingqi.liu@intel.com>,
- "Du, Fan" <fan.du@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Javier Gonzalez <javier@javigon.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Paul Durrant <Paul.Durrant@citrix.com>,
+ Keith Busch <kbusch@kernel.org>, Stephen Bates <sbates@raithlin.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tao Xu <tao3.xu@intel.com> writes:
+On Tue, Oct 15, 2019 at 12:38:40PM +0200, Klaus Jensen wrote:
+> Hi,
+> 
+> (Quick note to Fam): most of this series is irrelevant to you as the
+> maintainer of the nvme block driver, but patch "nvme: add support for
+> scatter gather lists" touches block/nvme.c due to changes in the shared
+> NvmeCmd struct.
+> 
+> Anyway, v2 comes with a good bunch of changes. Compared to v1[1], I have
+> squashed some commits in the beginning of the series and heavily
+> refactored "nvme: support multiple block requests per request" into the
+> new commit "nvme: allow multiple aios per command".
+> 
+> I have also removed the original implementation of the Abort command
+> (commit "nvme: add support for the abort command") as it is currently
+> too tricky to test reliably. It has been replaced by a stub that,
+> besides a trivial sanity check, just fails to abort the given command.
+> *Some* implementation of the Abort command is mandatory, but given the
+> "best effort" nature of the command this is acceptable for now. When the
+> device gains support for arbitration it should be less tricky to test.
+> 
+> The support for multiple namespaces is now backwards compatible. The
+> nvme device still accepts a 'drive' parameter, but for multiple
+> namespaces the use of 'nvme-ns' devices are required. I also integrated
+> some feedback from Paul so the device supports non-consecutive namespace
+> ids.
+> 
+> I have also added some new commits at the end:
+> 
+>   - "nvme: bump controller pci device id" makes sure the Linux kernel
+>     doesn't apply any quirks to the controller that it no longer has.
+>   - "nvme: handle dma errors" won't actually do anything before this[2]
+>     fix to include/hw/pci/pci.h is merged. With these two patches added,
+>     the device reliably passes some additional nasty tests from blktests
+>     (block/011 "disable PCI device while doing I/O" and block/019 "break
+>     PCI link device while doing I/O"). Before this patch, block/011
+>     would pass from time to time if you were lucky, but would at least
+>     mess up the controller pretty badly, causing a reset in the best
+>     case.
+> 
+> 
+>   [1]: https://patchwork.kernel.org/project/qemu-devel/list/?series=142383
+>   [2]: https://patchwork.kernel.org/patch/11184911/
+> 
+> 
+> Klaus Jensen (20):
+>   nvme: remove superfluous breaks
+>   nvme: move device parameters to separate struct
+>   nvme: add missing fields in the identify controller data structure
+>   nvme: populate the mandatory subnqn and ver fields
+>   nvme: allow completion queues in the cmb
+>   nvme: add support for the abort command
+>   nvme: refactor device realization
+>   nvme: add support for the get log page command
+>   nvme: add support for the asynchronous event request command
+>   nvme: add logging to error information log page
+>   nvme: add missing mandatory features
+>   nvme: bump supported specification version to 1.3
+>   nvme: refactor prp mapping
+>   nvme: allow multiple aios per command
+>   nvme: add support for scatter gather lists
+>   nvme: support multiple namespaces
+>   nvme: bump controller pci device id
+>   nvme: remove redundant NvmeCmd pointer parameter
+>   nvme: make lba data size configurable
+>   nvme: handle dma errors
+> 
+>  block/nvme.c           |   18 +-
+>  hw/block/Makefile.objs |    2 +-
+>  hw/block/nvme-ns.c     |  139 +++
+>  hw/block/nvme-ns.h     |   60 ++
+>  hw/block/nvme.c        | 1863 +++++++++++++++++++++++++++++++++-------
+>  hw/block/nvme.h        |  219 ++++-
+>  hw/block/trace-events  |   37 +-
+>  include/block/nvme.h   |  132 ++-
+>  8 files changed, 2094 insertions(+), 376 deletions(-)
+>  create mode 100644 hw/block/nvme-ns.c
+>  create mode 100644 hw/block/nvme-ns.h
+> 
+> -- 
+> 2.23.0
+> 
 
-> Got it. I will use bytes per second for bandwidth here. Usually we use
-> nanosecond for memory latency, so if we use second for latency, it may
-> lose precision. So can I use nanosecond here, because we now use
-> nanosecond as smallest time unit.
+Gentle ping on this.
 
-Sounds fair, go ahead.
+I'm aware that this is a lot to go through, but I would like to know if
+anyone has had a chance to look at it?
+
+
+https://patchwork.kernel.org/project/qemu-devel/list/?series=187637
 
 
