@@ -6,74 +6,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F9E7CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:09:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A4ECA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:09:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39F42208C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:09:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A497C208C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:09:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MKtmZadt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39F42208C0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQQQhiwb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A497C208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP7a6-0006qy-MP
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 12:09:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33034)
+	id 1iP7a9-0006s8-0K
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 12:09:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32995)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iP7HN-0004ec-IZ
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:50:08 -0400
+ (envelope-from <berrange@redhat.com>) id 1iP7HB-0003xl-1d
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:49:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iP7HL-00019W-KX
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:50:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39704
+ (envelope-from <berrange@redhat.com>) id 1iP7H9-00015g-Jt
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:49:48 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36807
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iP7HL-00019B-GX
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:49:59 -0400
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iP7H9-00015V-GB
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:49:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572277799;
+ s=mimecast20190719; t=1572277787;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Njq2xoulQgk96sQoBAc/2Clpi/XrfAdJezkanbUlKGo=;
- b=MKtmZadthcM5ytkVMWUNHUl4qeIFyBIbpE/KS8AWKa7qnSXgrFpoHb/Dl8iDYWZwaPNJpv
- Rpa9g/BYtW0LTqQigZwOrHQbaxllaHDEL5A+UhDzBVhXMrm6WQJwRtyK4YwH4diGaUofH4
- JyAJoNuE/vuu2+m3Cz4mkLuvNsB8Bdo=
+ bh=c+h/i9leFm5UIiefBkZRC/Y4pHCEuRBjNrZH7giOCj0=;
+ b=CQQQhiwbyQPFDtXv8q0PQV/vHHn2472+hjHu4NrndQVNtJ9EgAztIAQRljaqQc9ePnBoMg
+ EeC/wx6cTZE7Aa1qmUWEfY0/wE16Ik4RncHu4IfjiQWJp82KtCj6l8P7Lk2EdAbAwFS8we
+ DMvte1L6/uzrDQZkiZOSvdMOsMNJMKA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-vmfVhUNqMlmqPjdSQabQsg-1; Mon, 28 Oct 2019 11:49:57 -0400
+ us-mta-348-VWhYsZjpPJGruDk7Gxsyqg-1; Mon, 28 Oct 2019 11:49:45 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99928476
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 15:49:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF17B107AD28
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 15:49:44 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-112-24.ams2.redhat.com
  [10.36.112.24])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 25AAB5D9C5;
- Mon, 28 Oct 2019 15:49:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 267CF5D9C8;
+ Mon, 28 Oct 2019 15:49:39 +0000 (UTC)
 From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 3/4] crypto: add support for gcrypt's native XTS impl
-Date: Mon, 28 Oct 2019 16:49:13 +0100
-Message-Id: <20191028154914.84821-4-berrange@redhat.com>
+Subject: [PULL 2/4] tests: benchmark crypto with fixed data size,
+ not time period
+Date: Mon, 28 Oct 2019 16:49:12 +0100
+Message-Id: <20191028154914.84821-3-berrange@redhat.com>
 In-Reply-To: <20191028154914.84821-1-berrange@redhat.com>
 References: <20191028154914.84821-1-berrange@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: vmfVhUNqMlmqPjdSQabQsg-1
+X-MC-Unique: VWhYsZjpPJGruDk7Gxsyqg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,357 +93,150 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Libgcrypt 1.8.0 added support for the XTS mode. Use this because long
-term we wish to delete QEMU's XTS impl to avoid carrying private crypto
-algorithm impls.
+Currently the crypto benchmarks are processing data in varying chunk
+sizes, over a fixed time period. This turns out to be a terrible idea
+because with small chunk sizes the overhead of checking the elapsed
+time on each loop iteration masks the true performance.
 
-As an added benefit, using this improves performance from 531 MB/sec to
-670 MB/sec, since we are avoiding several layers of function call
-indirection.
+Benchmarking over a fixed data size avoids the loop running any system
+calls which can interfere with the performance measurements.
 
-This is even more noticable with the gcrypt builds in Fedora or RHEL-8
-which have a non-upstream patch for FIPS mode which does mutex locking.
-This is catastrophic for encryption performance with small block sizes,
-meaning this patch improves encryption from 240 MB/sec to 670 MB/sec.
+Before this change
+
+Enc chunk 512 bytes 2283.47 MB/sec Dec chunk 512 bytes 2236.23 MB/sec OK
+Enc chunk 4096 bytes 2744.97 MB/sec Dec chunk 4096 bytes 2614.71 MB/sec OK
+Enc chunk 16384 bytes 2777.53 MB/sec Dec chunk 16384 bytes 2678.44 MB/sec O=
+K
+Enc chunk 65536 bytes 2809.34 MB/sec Dec chunk 65536 bytes 2699.47 MB/sec O=
+K
+
+After this change
+
+Enc chunk 512 bytes 2058.22 MB/sec Dec chunk 512 bytes 2030.11 MB/sec OK
+Enc chunk 4096 bytes 2699.27 MB/sec Dec chunk 4096 bytes 2573.78 MB/sec OK
+Enc chunk 16384 bytes 2748.52 MB/sec Dec chunk 16384 bytes 2653.76 MB/sec O=
+K
+Enc chunk 65536 bytes 2814.08 MB/sec Dec chunk 65536 bytes 2712.74 MB/sec O=
+K
+
+The actual crypto performance hasn't changed, which shows how
+significant the mis-measurement has been for small data sizes.
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 ---
- configure              | 22 ++++++++++
- crypto/Makefile.objs   |  2 +-
- crypto/cipher-gcrypt.c | 97 ++++++++++++++++++++++++++++--------------
- tests/Makefile.include |  2 +-
- 4 files changed, 88 insertions(+), 35 deletions(-)
+ tests/benchmark-crypto-cipher.c | 26 ++++++++++++++------------
+ tests/benchmark-crypto-hash.c   | 17 +++++++++--------
+ 2 files changed, 23 insertions(+), 20 deletions(-)
 
-diff --git a/configure b/configure
-index 145fcabbb3..d1e9e457ce 100755
---- a/configure
-+++ b/configure
-@@ -474,6 +474,8 @@ gnutls=3D""
- nettle=3D""
- gcrypt=3D""
- gcrypt_hmac=3D"no"
-+gcrypt_xts=3D"no"
-+qemu_private_xts=3D"yes"
- auth_pam=3D""
- vte=3D""
- virglrenderer=3D""
-@@ -2911,6 +2913,18 @@ EOF
-         if compile_prog "$gcrypt_cflags" "$gcrypt_libs" ; then
-             gcrypt_hmac=3Dyes
-         fi
-+        cat > $TMPC << EOF
-+#include <gcrypt.h>
-+int main(void) {
-+  gcry_cipher_hd_t handle;
-+  gcry_cipher_open(&handle, GCRY_CIPHER_AES, GCRY_CIPHER_MODE_XTS, 0);
-+  return 0;
-+}
-+EOF
-+        if compile_prog "$gcrypt_cflags" "$gcrypt_libs" ; then
-+            gcrypt_xts=3Dyes
-+            qemu_private_xts=3Dno
-+        fi
-     elif test "$gcrypt" =3D "yes"; then
-         feature_not_found "gcrypt" "Install gcrypt devel >=3D 1.5.0"
-     else
-@@ -6326,6 +6340,11 @@ echo "VTE support       $vte $(echo_version $vte $vt=
-eversion)"
- echo "TLS priority      $tls_priority"
- echo "GNUTLS support    $gnutls"
- echo "libgcrypt         $gcrypt"
-+if test "$gcrypt" =3D "yes"
-+then
-+   echo "  hmac            $gcrypt_hmac"
-+   echo "  XTS             $gcrypt_xts"
-+fi
- echo "nettle            $nettle $(echo_version $nettle $nettle_version)"
- echo "libtasn1          $tasn1"
- echo "PAM               $auth_pam"
-@@ -6804,6 +6823,9 @@ if test "$nettle" =3D "yes" ; then
-   echo "CONFIG_NETTLE=3Dy" >> $config_host_mak
-   echo "CONFIG_NETTLE_VERSION_MAJOR=3D${nettle_version%%.*}" >> $config_ho=
-st_mak
- fi
-+if test "$qemu_private_xts" =3D "yes" ; then
-+  echo "CONFIG_QEMU_PRIVATE_XTS=3Dy" >> $config_host_mak
-+fi
- if test "$tasn1" =3D "yes" ; then
-   echo "CONFIG_TASN1=3Dy" >> $config_host_mak
- fi
-diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index 7fe2fa9da2..cdb01f9de9 100644
---- a/crypto/Makefile.objs
-+++ b/crypto/Makefile.objs
-@@ -31,7 +31,7 @@ crypto-obj-y +=3D ivgen-essiv.o
- crypto-obj-y +=3D ivgen-plain.o
- crypto-obj-y +=3D ivgen-plain64.o
- crypto-obj-y +=3D afsplit.o
--crypto-obj-y +=3D xts.o
-+crypto-obj-$(CONFIG_QEMU_PRIVATE_XTS) +=3D xts.o
- crypto-obj-y +=3D block.o
- crypto-obj-y +=3D block-qcow.o
- crypto-obj-y +=3D block-luks.o
-diff --git a/crypto/cipher-gcrypt.c b/crypto/cipher-gcrypt.c
-index 5cece9b244..2864099527 100644
---- a/crypto/cipher-gcrypt.c
-+++ b/crypto/cipher-gcrypt.c
-@@ -19,7 +19,9 @@
-  */
+diff --git a/tests/benchmark-crypto-cipher.c b/tests/benchmark-crypto-ciphe=
+r.c
+index 3ca31a2779..53032334ec 100644
+--- a/tests/benchmark-crypto-cipher.c
++++ b/tests/benchmark-crypto-cipher.c
+@@ -21,11 +21,12 @@ static void test_cipher_speed(size_t chunk_size,
+ {
+     QCryptoCipher *cipher;
+     Error *err =3D NULL;
+-    double total =3D 0.0;
+     uint8_t *key =3D NULL, *iv =3D NULL;
+     uint8_t *plaintext =3D NULL, *ciphertext =3D NULL;
+     size_t nkey;
+     size_t niv;
++    const size_t total =3D 2 * GiB;
++    size_t remain;
 =20
- #include "qemu/osdep.h"
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
- #include "crypto/xts.h"
-+#endif
- #include "cipherpriv.h"
+     if (!qcrypto_cipher_supports(alg, mode)) {
+         return;
+@@ -58,33 +59,34 @@ static void test_cipher_speed(size_t chunk_size,
+                                       &err) =3D=3D 0);
 =20
- #include <gcrypt.h>
-@@ -59,10 +61,12 @@ bool qcrypto_cipher_supports(QCryptoCipherAlgorithm alg=
-,
- typedef struct QCryptoCipherGcrypt QCryptoCipherGcrypt;
- struct QCryptoCipherGcrypt {
-     gcry_cipher_hd_t handle;
--    gcry_cipher_hd_t tweakhandle;
-     size_t blocksize;
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-+    gcry_cipher_hd_t tweakhandle;
-     /* Initialization vector or Counter */
-     uint8_t *iv;
-+#endif
- };
-=20
- static void
-@@ -74,10 +78,12 @@ qcrypto_gcrypt_cipher_free_ctx(QCryptoCipherGcrypt *ctx=
-,
-     }
-=20
-     gcry_cipher_close(ctx->handle);
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-     if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
-         gcry_cipher_close(ctx->tweakhandle);
-     }
-     g_free(ctx->iv);
-+#endif
-     g_free(ctx);
- }
-=20
-@@ -94,8 +100,14 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCry=
-ptoCipherAlgorithm alg,
-=20
-     switch (mode) {
-     case QCRYPTO_CIPHER_MODE_ECB:
-+        gcrymode =3D GCRY_CIPHER_MODE_ECB;
-+        break;
-     case QCRYPTO_CIPHER_MODE_XTS:
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-         gcrymode =3D GCRY_CIPHER_MODE_ECB;
-+#else
-+        gcrymode =3D GCRY_CIPHER_MODE_XTS;
-+#endif
-         break;
-     case QCRYPTO_CIPHER_MODE_CBC:
-         gcrymode =3D GCRY_CIPHER_MODE_CBC;
-@@ -172,6 +184,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCry=
-ptoCipherAlgorithm alg,
-                    gcry_strerror(err));
-         goto error;
-     }
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-     if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
-         err =3D gcry_cipher_open(&ctx->tweakhandle, gcryalg, gcrymode, 0);
-         if (err !=3D 0) {
-@@ -180,6 +193,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCry=
-ptoCipherAlgorithm alg,
-             goto error;
-         }
-     }
-+#endif
-=20
-     if (alg =3D=3D QCRYPTO_CIPHER_ALG_DES_RFB) {
-         /* We're using standard DES cipher from gcrypt, so we need
-@@ -191,6 +205,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCry=
-ptoCipherAlgorithm alg,
-         g_free(rfbkey);
-         ctx->blocksize =3D 8;
-     } else {
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-         if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
-             nkey /=3D 2;
-             err =3D gcry_cipher_setkey(ctx->handle, key, nkey);
-@@ -201,8 +216,11 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCr=
-yptoCipherAlgorithm alg,
-             }
-             err =3D gcry_cipher_setkey(ctx->tweakhandle, key + nkey, nkey)=
-;
-         } else {
-+#endif
-             err =3D gcry_cipher_setkey(ctx->handle, key, nkey);
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-         }
-+#endif
-         if (err !=3D 0) {
-             error_setg(errp, "Cannot set key: %s",
-                        gcry_strerror(err));
-@@ -228,6 +246,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCry=
-ptoCipherAlgorithm alg,
-         }
-     }
-=20
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-     if (mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
-         if (ctx->blocksize !=3D XTS_BLOCK_SIZE) {
-             error_setg(errp,
-@@ -237,6 +256,7 @@ static QCryptoCipherGcrypt *qcrypto_cipher_ctx_new(QCry=
-ptoCipherAlgorithm alg,
-         }
-         ctx->iv =3D g_new0(uint8_t, ctx->blocksize);
-     }
-+#endif
-=20
-     return ctx;
-=20
-@@ -253,6 +273,7 @@ qcrypto_gcrypt_cipher_ctx_free(QCryptoCipher *cipher)
- }
-=20
-=20
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
- static void qcrypto_gcrypt_xts_encrypt(const void *ctx,
-                                        size_t length,
-                                        uint8_t *dst,
-@@ -272,6 +293,7 @@ static void qcrypto_gcrypt_xts_decrypt(const void *ctx,
-     err =3D gcry_cipher_decrypt((gcry_cipher_hd_t)ctx, dst, length, src, l=
-ength);
-     g_assert(err =3D=3D 0);
- }
-+#endif
-=20
- static int
- qcrypto_gcrypt_cipher_encrypt(QCryptoCipher *cipher,
-@@ -289,20 +311,23 @@ qcrypto_gcrypt_cipher_encrypt(QCryptoCipher *cipher,
-         return -1;
-     }
-=20
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-     if (cipher->mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
-         xts_encrypt(ctx->handle, ctx->tweakhandle,
-                     qcrypto_gcrypt_xts_encrypt,
-                     qcrypto_gcrypt_xts_decrypt,
-                     ctx->iv, len, out, in);
--    } else {
--        err =3D gcry_cipher_encrypt(ctx->handle,
--                                  out, len,
--                                  in, len);
--        if (err !=3D 0) {
--            error_setg(errp, "Cannot encrypt data: %s",
--                       gcry_strerror(err));
--            return -1;
--        }
-+        return 0;
+     g_test_timer_start();
+-    do {
++    remain =3D total;
++    while (remain) {
+         g_assert(qcrypto_cipher_encrypt(cipher,
+                                         plaintext,
+                                         ciphertext,
+                                         chunk_size,
+                                         &err) =3D=3D 0);
+-        total +=3D chunk_size;
+-    } while (g_test_timer_elapsed() < 1.0);
++        remain -=3D chunk_size;
 +    }
-+#endif
-+
-+    err =3D gcry_cipher_encrypt(ctx->handle,
-+                              out, len,
-+                              in, len);
-+    if (err !=3D 0) {
-+        error_setg(errp, "Cannot encrypt data: %s",
-+                   gcry_strerror(err));
-+        return -1;
-     }
++    g_test_timer_elapsed();
 =20
-     return 0;
-@@ -325,20 +350,23 @@ qcrypto_gcrypt_cipher_decrypt(QCryptoCipher *cipher,
-         return -1;
-     }
+-    total /=3D MiB;
+     g_print("Enc chunk %zu bytes ", chunk_size);
+-    g_print("%.2f MB/sec ", total / g_test_timer_last());
++    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last());
 =20
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-     if (cipher->mode =3D=3D QCRYPTO_CIPHER_MODE_XTS) {
-         xts_decrypt(ctx->handle, ctx->tweakhandle,
-                     qcrypto_gcrypt_xts_encrypt,
-                     qcrypto_gcrypt_xts_decrypt,
-                     ctx->iv, len, out, in);
--    } else {
--        err =3D gcry_cipher_decrypt(ctx->handle,
--                                  out, len,
--                                  in, len);
--        if (err !=3D 0) {
--            error_setg(errp, "Cannot decrypt data: %s",
--                       gcry_strerror(err));
--            return -1;
--        }
-+        return 0;
+-    total =3D 0.0;
+     g_test_timer_start();
+-    do {
++    remain =3D total;
++    while (remain) {
+         g_assert(qcrypto_cipher_decrypt(cipher,
+                                         plaintext,
+                                         ciphertext,
+                                         chunk_size,
+                                         &err) =3D=3D 0);
+-        total +=3D chunk_size;
+-    } while (g_test_timer_elapsed() < 1.0);
++        remain -=3D chunk_size;
 +    }
-+#endif
-+
-+    err =3D gcry_cipher_decrypt(ctx->handle,
-+                              out, len,
-+                              in, len);
-+    if (err !=3D 0) {
-+        error_setg(errp, "Cannot decrypt data: %s",
-+                   gcry_strerror(err));
-+        return -1;
-     }
++    g_test_timer_elapsed();
 =20
-     return 0;
-@@ -358,24 +386,27 @@ qcrypto_gcrypt_cipher_setiv(QCryptoCipher *cipher,
-         return -1;
-     }
+-    total /=3D MiB;
+     g_print("Dec chunk %zu bytes ", chunk_size);
+-    g_print("%.2f MB/sec ", total / g_test_timer_last());
++    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last());
 =20
-+#ifdef CONFIG_QEMU_PRIVATE_XTS
-     if (ctx->iv) {
-         memcpy(ctx->iv, iv, niv);
--    } else {
--        if (cipher->mode =3D=3D QCRYPTO_CIPHER_MODE_CTR) {
--            err =3D gcry_cipher_setctr(ctx->handle, iv, niv);
--            if (err !=3D 0) {
--                error_setg(errp, "Cannot set Counter: %s",
-+        return 0;
+     qcrypto_cipher_free(cipher);
+     g_free(plaintext);
+diff --git a/tests/benchmark-crypto-hash.c b/tests/benchmark-crypto-hash.c
+index 9b6f7a9155..7f659f7323 100644
+--- a/tests/benchmark-crypto-hash.c
++++ b/tests/benchmark-crypto-hash.c
+@@ -20,7 +20,8 @@ static void test_hash_speed(const void *opaque)
+     size_t chunk_size =3D (size_t)opaque;
+     uint8_t *in =3D NULL, *out =3D NULL;
+     size_t out_len =3D 0;
+-    double total =3D 0.0;
++    const size_t total =3D 2 * GiB;
++    size_t remain;
+     struct iovec iov;
+     int ret;
+=20
+@@ -31,20 +32,20 @@ static void test_hash_speed(const void *opaque)
+     iov.iov_len =3D chunk_size;
+=20
+     g_test_timer_start();
+-    do {
++    remain =3D total;
++    while (remain) {
+         ret =3D qcrypto_hash_bytesv(QCRYPTO_HASH_ALG_SHA256,
+                                   &iov, 1, &out, &out_len,
+                                   NULL);
+         g_assert(ret =3D=3D 0);
+=20
+-        total +=3D chunk_size;
+-    } while (g_test_timer_elapsed() < 5.0);
++        remain -=3D chunk_size;
 +    }
-+#endif
-+
-+    if (cipher->mode =3D=3D QCRYPTO_CIPHER_MODE_CTR) {
-+        err =3D gcry_cipher_setctr(ctx->handle, iv, niv);
-+        if (err !=3D 0) {
-+            error_setg(errp, "Cannot set Counter: %s",
-                        gcry_strerror(err));
--                return -1;
--            }
--        } else {
--            gcry_cipher_reset(ctx->handle);
--            err =3D gcry_cipher_setiv(ctx->handle, iv, niv);
--            if (err !=3D 0) {
--                error_setg(errp, "Cannot set IV: %s",
-+            return -1;
-+        }
-+    } else {
-+        gcry_cipher_reset(ctx->handle);
-+        err =3D gcry_cipher_setiv(ctx->handle, iv, niv);
-+        if (err !=3D 0) {
-+            error_setg(errp, "Cannot set IV: %s",
-                        gcry_strerror(err));
--                return -1;
--            }
-+            return -1;
-         }
-     }
++    g_test_timer_elapsed();
 =20
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 09e5b410dc..4efdd0cd6e 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -140,7 +140,7 @@ check-unit-y +=3D tests/test-base64$(EXESUF)
- check-unit-$(call land,$(CONFIG_BLOCK),$(if $(CONFIG_NETTLE),y,$(CONFIG_GC=
-RYPT))) +=3D tests/test-crypto-pbkdf$(EXESUF)
- check-unit-$(CONFIG_BLOCK) +=3D tests/test-crypto-ivgen$(EXESUF)
- check-unit-$(CONFIG_BLOCK)  +=3D tests/test-crypto-afsplit$(EXESUF)
--check-unit-$(CONFIG_BLOCK)  +=3D tests/test-crypto-xts$(EXESUF)
-+check-unit-$(if $(CONFIG_BLOCK),$(CONFIG_QEMU_PRIVATE_XTS)) +=3D tests/tes=
-t-crypto-xts$(EXESUF)
- check-unit-$(CONFIG_BLOCK)  +=3D tests/test-crypto-block$(EXESUF)
- check-unit-y +=3D tests/test-logging$(EXESUF)
- check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_REPLICATION)) +=3D tests/t=
-est-replication$(EXESUF)
+-    total /=3D MiB;
+     g_print("sha256: ");
+-    g_print("Testing chunk_size %zu bytes ", chunk_size);
+-    g_print("done: %.2f MB in %.2f secs: ", total, g_test_timer_last());
+-    g_print("%.2f MB/sec\n", total / g_test_timer_last());
++    g_print("Hash %zu GB chunk size %zu bytes ", total / GiB, chunk_size);
++    g_print("%.2f MB/sec ", (double)total / MiB / g_test_timer_last());
+=20
+     g_free(out);
+     g_free(in);
 --=20
 2.23.0
 
