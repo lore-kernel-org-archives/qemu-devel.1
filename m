@@ -2,61 +2,78 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59260CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C97EFCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:03:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 297DD20862
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:02:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 297DD20862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 924F920862
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:03:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hO+O1Nuf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 924F920862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iOzyi-0001vQ-S3
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 04:02:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48742)
+	id 1iP000-0004xW-54
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 04:03:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46894)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iOzpU-0000tj-Ha
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:45 -0400
+ (envelope-from <philmd@redhat.com>) id 1iOzb4-0006dc-Hg
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:37:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iOzpT-0002vQ-8x
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:44 -0400
-Received: from mga04.intel.com ([192.55.52.120]:47960)
+ (envelope-from <philmd@redhat.com>) id 1iOzb3-0003Mk-80
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:37:50 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48657
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iOzpT-0002p5-1Y
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:52:43 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 28 Oct 2019 00:52:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,239,1569308400"; d="scan'208";a="224558775"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga004.fm.intel.com with ESMTP; 28 Oct 2019 00:52:40 -0700
-From: Tao Xu <tao3.xu@intel.com>
-To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
- ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
- mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
-Subject: [PATCH v14 06/11] numa: Calculate hmat latency and bandwidth entry
- list
-Date: Mon, 28 Oct 2019 15:52:15 +0800
-Message-Id: <20191028075220.25673-7-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191028075220.25673-1-tao3.xu@intel.com>
-References: <20191028075220.25673-1-tao3.xu@intel.com>
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iOzb3-0003Me-4O
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:37:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572248268;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=IDUvrjK68pf787swjbRFwfhRHhyBW2iMlo9TSJvmLf0=;
+ b=hO+O1Nufcx++UQeCgGdTSQ6GMjuiEvwf08i7nCVMlW18Ws9MxJG6YjQG7wtl6jAvzqZAh6
+ rVEv2q5L/RdVZdh+CDt1QeNJUCMlQGvGRbkbxdnDKXxTxjiOZ2jDKdhN6CfnfD/gMVygI8
+ T9CA3N0l0hAvRyDuAIimoFiwP5eG2Ws=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-199-XJZ44S2INma5kNiI6YXVJQ-1; Mon, 28 Oct 2019 03:37:46 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5D1480183E;
+ Mon, 28 Oct 2019 07:37:44 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-86.brq.redhat.com [10.40.204.86])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DB15F19C69;
+ Mon, 28 Oct 2019 07:37:29 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 19/26] tests/boot_linux_console: Use Avocado
+ archive::gzip_uncompress()
+Date: Mon, 28 Oct 2019 08:34:34 +0100
+Message-Id: <20191028073441.6448-20-philmd@redhat.com>
+In-Reply-To: <20191028073441.6448-1-philmd@redhat.com>
+References: <20191028073441.6448-1-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.120
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: XJZ44S2INma5kNiI6YXVJQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,113 +85,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, jonathan.cameron@huawei.com
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Kamil Rytarowski <kamil@netbsd.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Compress HMAT latency and bandwidth raw data into uint16_t data,
-which can be stored in HMAT table.
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Avocado 67.0 [*] introduced the avocado.utils.archive module which
+provides handling of gzip files. Use the gzip_uncompress() method.
+
+[*] https://avocado-framework.readthedocs.io/en/67.0/api/utils/avocado.util=
+s.html#avocado.utils.archive.gzip_uncompress
+
+Suggested-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
-
-Changes in v14:
-    - Convert latency from ns to ps, because ACPI 6.3 HMAT table use
-      ps as minimum unit
+v2: New patch replacing the gunzip() refactor
 ---
- hw/core/numa.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 58 insertions(+), 1 deletion(-)
+ tests/acceptance/boot_linux_console.py | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/hw/core/numa.c b/hw/core/numa.c
-index f391760c20..523dd80822 100644
---- a/hw/core/numa.c
-+++ b/hw/core/numa.c
-@@ -483,6 +483,47 @@ static void complete_init_numa_distance(MachineState *ms)
-     }
- }
- 
-+static void calculate_hmat_entry_list(HMAT_LB_Info *hmat_lb, int num_nodes)
-+{
-+    int i, index;
-+    uint16_t *entry_list;
-+    uint64_t base;
-+    GArray *lb_data_list;
-+    HMAT_LB_Data *lb_data;
-+
-+    if (hmat_lb->data_type <= HMAT_LB_DATA_WRITE_LATENCY) {
-+        base = hmat_lb->base_latency;
-+        lb_data_list = hmat_lb->latency;
-+    } else {
-+        base = hmat_lb->base_bandwidth;
-+        lb_data_list = hmat_lb->bandwidth;
-+    }
-+
-+    entry_list = g_malloc0(lb_data_list->len * sizeof(uint16_t));
-+    for (i = 0; i < lb_data_list->len; i++) {
-+        lb_data = &g_array_index(lb_data_list, HMAT_LB_Data, i);
-+        index = lb_data->initiator * num_nodes + lb_data->target;
-+        if (entry_list[index]) {
-+            error_report("Duplicate configuration of the latency for "
-+                "initiator=%d and target=%d.", lb_data->initiator,
-+                lb_data->target);
-+            exit(1);
-+        }
-+
-+        entry_list[index] = (uint16_t)(lb_data->rawdata / base);
-+    }
-+
-+    if (hmat_lb->data_type <= HMAT_LB_DATA_WRITE_LATENCY) {
-+        /* Convert latency base from nanoseconds to picosecond */
-+        hmat_lb->base_latency = base * 1000;
-+        hmat_lb->entry_latency = entry_list;
-+    } else {
-+        /* Convert bandwidth base from Byte to Megabyte */
-+        hmat_lb->base_bandwidth = base / MiB;
-+        hmat_lb->entry_bandwidth = entry_list;
-+    }
-+}
-+
- void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size)
- {
-@@ -521,9 +562,10 @@ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
- 
- void numa_complete_configuration(MachineState *ms)
- {
--    int i;
-+    int i, hierarchy, type;
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
-     NodeInfo *numa_info = ms->numa_state->nodes;
-+    HMAT_LB_Info *numa_hmat_lb;
- 
-     /*
-      * If memory hotplug is enabled (slots > 0) but without '-numa'
-@@ -620,6 +662,21 @@ void numa_complete_configuration(MachineState *ms)
-             /* Validation succeeded, now fill in any missing distances. */
-             complete_init_numa_distance(ms);
-         }
-+
-+        if (ms->numa_state->hmat_enabled) {
-+            for (hierarchy = HMAT_LB_MEM_MEMORY;
-+                 hierarchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hierarchy++) {
-+                for (type = HMAT_LB_DATA_ACCESS_LATENCY;
-+                    type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
-+                    numa_hmat_lb = ms->numa_state->hmat_lb[hierarchy][type];
-+
-+                    if (numa_hmat_lb) {
-+                        calculate_hmat_entry_list(numa_hmat_lb,
-+                                                  ms->numa_state->num_nodes);
-+                    }
-+                }
-+            }
-+        }
-     }
- }
- 
--- 
-2.20.1
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot=
+_linux_console.py
+index 67b396169b..a689c09cfe 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -146,10 +146,7 @@ class BootLinuxConsole(MachineTest):
+         initrd_hash =3D 'bf806e17009360a866bf537f6de66590de349a99'
+         initrd_path_gz =3D self.fetch_asset(initrd_url, asset_hash=3Dinitr=
+d_hash)
+         initrd_path =3D self.workdir + "rootfs.cpio"
+-
+-        with gzip.open(initrd_path_gz, 'rb') as f_in:
+-            with open(initrd_path, 'wb') as f_out:
+-                shutil.copyfileobj(f_in, f_out)
++        archive.gzip_uncompress(initrd_path_gz, initrd_path)
+=20
+         self.vm.set_machine('malta')
+         self.vm.set_console()
+--=20
+2.21.0
 
 
