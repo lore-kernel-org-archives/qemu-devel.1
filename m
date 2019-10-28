@@ -2,65 +2,69 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC5FCA9EBE
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 10:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 566B9CA9EBC
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 10:48:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39CA921479
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 10:39:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EA6620873
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 10:48:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bK9QviXu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39CA921479
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYScR7ZV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EA6620873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP2QV-0005mh-7T
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 06:39:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39927)
+	id 1iP2ZC-0001Jg-9w
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 06:48:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iP2Nl-0001x6-L1
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:36:18 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iP2Y4-0000UZ-2w
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:46:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iP2Nh-0003Oi-J0
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:36:17 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40164
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iP2Xx-000091-1W
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:46:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53781
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP2Nd-0003NK-Nl
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:36:11 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP2Xv-00007l-Vp
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 06:46:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572258969;
+ s=mimecast20190719; t=1572259607;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=G+vCLlx0fDHB7KbSrQjMe9VzeIgMb0X5byshvWFBOVU=;
- b=bK9QviXu18XBXBAc9yCZtSREVaq1rwLNS12kIUxbDJLkx9LAL+SpszV0+CC8Tr7b79gEF4
- 2C+zlJjUZJx1rum63Bvfng1G/tEgstF2017ZKVo3pgdJJlt07QGB92021NsHj3/ZLS9xNf
- vM6eMFYP5dqfmbUKQhTtwP4lMSgX7kQ=
+ bh=wYc1rhNKYZHzz+g1uzf6e4YRxpSoIu7/tdkyhCLswO8=;
+ b=XYScR7ZVAA/n3S7aTYixphgRHuNqbJnVtKvOTD2o8kTbq7h45V/iFG/WAGp/1sQhFidMth
+ YsCstuQiGHzMlFXpF+oI6geCMzq+Vb0U5zpiXIgUvXufpB+blBOKFGEHb5QaMr4ru5Sg5s
+ w+2TKAi1KhNlhjXIvnvVSNB+SYDHVUU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-405-8uqyUoiePcGWlYmm59wVKQ-1; Mon, 28 Oct 2019 06:36:06 -0400
-X-MC-Unique: 8uqyUoiePcGWlYmm59wVKQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-410-RRvW5u2xM1-n3gGahVqwZg-1; Mon, 28 Oct 2019 06:46:45 -0400
+X-MC-Unique: RRvW5u2xM1-n3gGahVqwZg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE8A9107AD28;
- Mon, 28 Oct 2019 10:36:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FB97476;
+ Mon, 28 Oct 2019 10:46:44 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-117-83.ams2.redhat.com
  [10.36.117.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3A2B060160;
- Mon, 28 Oct 2019 10:36:00 +0000 (UTC)
-Subject: Re: [PATCH v2 0/2] block/nvme: add support for write zeros and discard
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190913133627.28450-1-mlevitsk@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9ACC35DA32;
+ Mon, 28 Oct 2019 10:46:40 +0000 (UTC)
+Subject: Re: [PATCH v3 2/4] blkdebug: Allow taking/unsharing permissions
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+References: <20191014153931.20699-1-mreitz@redhat.com>
+ <20191014153931.20699-3-mreitz@redhat.com>
+ <2341e2c4-5a80-7995-dbbd-a43d75f43dcf@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,20 +90,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <24390891-6aef-f457-7648-71846360a09c@redhat.com>
-Date: Mon, 28 Oct 2019 11:35:59 +0100
+Message-ID: <acf6833b-4a4f-2c52-76c8-9e5da818202d@redhat.com>
+Date: Mon, 28 Oct 2019 11:46:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20190913133627.28450-1-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <2341e2c4-5a80-7995-dbbd-a43d75f43dcf@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="rMZHpyiKVj3rLyrraWEHGG1l54I6Qbf4g"
+ boundary="KG6S7sbyHmSe4eCO6OWcRcIJ3EP5qU1lo"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,69 +115,201 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Keith Busch <kbusch@kernel.org>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rMZHpyiKVj3rLyrraWEHGG1l54I6Qbf4g
-Content-Type: multipart/mixed; boundary="kDx9JBpfKsBAyobJ4PaWJKANKhMqvsO5r"
+--KG6S7sbyHmSe4eCO6OWcRcIJ3EP5qU1lo
+Content-Type: multipart/mixed; boundary="bXB9zminQuEKXm1ygDKEsqgtNDk1Xk7nz"
 
---kDx9JBpfKsBAyobJ4PaWJKANKhMqvsO5r
+--bXB9zminQuEKXm1ygDKEsqgtNDk1Xk7nz
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 13.09.19 15:36, Maxim Levitsky wrote:
-> This is the second part of the patches I prepared
-> for this driver back when I worked on mdev-nvme.
+On 16.10.19 13:13, Vladimir Sementsov-Ogievskiy wrote:
+> 14.10.2019 18:39, Max Reitz wrote:
+>> Sometimes it is useful to be able to add a node to the block graph that
+>> takes or unshare a certain set of permissions for debugging purposes.
+>> This patch adds this capability to blkdebug.
+>>
+>> (Note that you cannot make blkdebug release or share permissions that it
+>> needs to take or cannot share, because this might result in assertion
+>> failures in the block layer.  But if the blkdebug node has no parents,
+>> it will not take any permissions and share everything by default, so you
+>> can then freely choose what permissions to take and share.)
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>   qapi/block-core.json | 14 ++++++-
+>>   block/blkdebug.c     | 91 +++++++++++++++++++++++++++++++++++++++++++-
+>>   2 files changed, 103 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index f66553aac7..054ce651de 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -3453,6 +3453,16 @@
+>>   #
+>>   # @set-state:       array of state-change descriptions
+>>   #
+>> +# @take-child-perms: Permissions to take on @image in addition to what
+>> +#                    is necessary anyway (which depends on how the
+>> +#                    blkdebug node is used).  Defaults to none.
+>> +#                    (since 4.2)
+>> +#
+>> +# @unshare-child-perms: Permissions not to share on @image in addition
+>> +#                       to what cannot be shared anyway (which depends
+>> +#                       on how the blkdebug node is used).  Defaults
+>> +#                       to none.  (since 4.2)
+>> +#
+>>   # Since: 2.9
+>>   ##
+>>   { 'struct': 'BlockdevOptionsBlkdebug',
+>> @@ -3462,7 +3472,9 @@
+>>               '*opt-write-zero': 'int32', '*max-write-zero': 'int32',
+>>               '*opt-discard': 'int32', '*max-discard': 'int32',
+>>               '*inject-error': ['BlkdebugInjectErrorOptions'],
+>> -            '*set-state': ['BlkdebugSetStateOptions'] } }
+>> +            '*set-state': ['BlkdebugSetStateOptions'],
+>> +            '*take-child-perms': ['BlockPermission'],
+>> +            '*unshare-child-perms': ['BlockPermission'] } }
+>>  =20
+>>   ##
+>>   # @BlockdevOptionsBlklogwrites:
+>> diff --git a/block/blkdebug.c b/block/blkdebug.c
+>> index 5ae96c52b0..6807c03065 100644
+>> --- a/block/blkdebug.c
+>> +++ b/block/blkdebug.c
+>> @@ -28,10 +28,14 @@
+>>   #include "qemu/cutils.h"
+>>   #include "qemu/config-file.h"
+>>   #include "block/block_int.h"
+>> +#include "block/qdict.h"
+>>   #include "qemu/module.h"
+>>   #include "qemu/option.h"
+>> +#include "qapi/qapi-visit-block-core.h"
+>>   #include "qapi/qmp/qdict.h"
+>> +#include "qapi/qmp/qlist.h"
+>>   #include "qapi/qmp/qstring.h"
+>> +#include "qapi/qobject-input-visitor.h"
+>>   #include "sysemu/qtest.h"
+>>  =20
+>>   typedef struct BDRVBlkdebugState {
+>> @@ -44,6 +48,9 @@ typedef struct BDRVBlkdebugState {
+>>       uint64_t opt_discard;
+>>       uint64_t max_discard;
+>>  =20
+>> +    uint64_t take_child_perms;
+>> +    uint64_t unshare_child_perms;
+>> +
+>>       /* For blkdebug_refresh_filename() */
+>>       char *config_file;
+>>  =20
+>> @@ -344,6 +351,67 @@ static void blkdebug_parse_filename(const char *fil=
+ename, QDict *options,
+>>       qdict_put_str(options, "x-image", filename);
+>>   }
+>>  =20
+>> +static int blkdebug_parse_perm_list(uint64_t *dest, QDict *options,
+>> +                                    const char *prefix, Error **errp)
+>> +{
+>> +    int ret =3D 0;
+>> +    QDict *subqdict =3D NULL;
+>> +    QObject *crumpled_subqdict =3D NULL;
+>> +    Visitor *v =3D NULL;
+>> +    BlockPermissionList *perm_list =3D NULL, *element;
+>> +    Error *local_err =3D NULL;
+>> +
+>> +    qdict_extract_subqdict(options, &subqdict, prefix);
+>> +    if (!qdict_size(subqdict)) {
 >=20
-> V2: addressed review feedback, no major changes
 >=20
-> Best regards,
-> =09Maxim Levitsky
->=20
-> Maxim Levitsky (2):
->   block/nvme: add support for write zeros
->   block/nvme: add support for discard
->=20
->  block/nvme.c         | 155 ++++++++++++++++++++++++++++++++++++++++++-
->  block/trace-events   |   3 +
->  include/block/nvme.h |  19 +++++-
->  3 files changed, 175 insertions(+), 2 deletions(-)
-Thanks, fixed the indentation in nvme.h in patch 1, and applied to my
-block branch:
+> Hmm, you consider it as a success, so you mean default. Then, it's safer =
+to
+> set *dest =3D 0 here.
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+=E2=80=9CSafer=E2=80=9D depends on the purpose of this function, and right =
+now it=E2=80=99s
+simply to set all fields that are given in the options; not to reset any
+that aren=E2=80=99t.
 
-For the record, I don=E2=80=99t think !!x has benefits over x !=3D 0 and I
-personally prefer bool y =3D x over any of it. O:-)
+I suppose there=E2=80=99s no harm in changing the purpose of the function, =
+though.
+
+>> +        goto out;
+>> +    }
+>> +
+>> +    crumpled_subqdict =3D qdict_crumple(subqdict, errp);
+>> +    if (!crumpled_subqdict) {
+>> +        ret =3D -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>> +    v =3D qobject_input_visitor_new(crumpled_subqdict);
+>> +    visit_type_BlockPermissionList(v, NULL, &perm_list, &local_err);
+>> +    if (local_err) {
+>> +        error_propagate(errp, local_err);
+>> +        ret =3D -EINVAL;
+>> +        goto out;
+>> +    }
+>> +
+>=20
+> I'd prefer explicitly set *dest =3D 0 here too.
+>=20
+>> +    for (element =3D perm_list; element; element =3D element->next) {
+>> +        *dest |=3D UINT64_C(1) << element->value;
+>=20
+> Hmm, so, you rely on correct correspondence between generated BlockPermis=
+sion enum
+> and unnamed enum with BLK_PERM_* constants...
+>=20
+> I'm afraid it's unsafe, so, in xdbg_graph_add_edge() special mapping vari=
+able is
+> used + QEMU_BUILD_BUG_ON on BLK_PERM_ALL.
+>=20
+> I think something like this should be done here.
+
+I don=E2=80=99t really like it because I think it=E2=80=99s cool to have a =
+1-to-1
+relationship between the BLK_PERM_* constants and what=E2=80=99s defined in
+QAPI.  I don=E2=80=99t quite like assuming there isn=E2=80=99t, because the=
+re=E2=80=99s no
+reason why they wouldn=E2=80=99t correspond.
+
+In fact, I=E2=80=99d rather define the BLK_PERM_* constants based on the QA=
+PI
+enum, but I don=E2=80=99t know whether we want to include the QAPI header i=
+nto
+block.h.  ...Well, judging from a quick test it looks like the header is
+included into it recursively anyway.  So maybe I=E2=80=99ll do that instead=
+.
 
 Max
 
 
---kDx9JBpfKsBAyobJ4PaWJKANKhMqvsO5r--
+--bXB9zminQuEKXm1ygDKEsqgtNDk1Xk7nz--
 
---rMZHpyiKVj3rLyrraWEHGG1l54I6Qbf4g
+--KG6S7sbyHmSe4eCO6OWcRcIJ3EP5qU1lo
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl22xI8ACgkQ9AfbAGHV
-z0D5JwgAkrnRzWtT+O4tbiMH1Ko6pD6cYfZgGUR0otSjsX05EK5T5JT42QSc/7fX
-NnmLAmBBbMy2hEUdENs41OiFkDbqUkrajMX+zp4y9tONe0VSqXZOxzyVBdf25iBz
-Pvmf+gFZI7+xVAxCvOEbF+HFlOx+6ueh/22av2/vIZbZ8baMo0cCIhcQYuVpTap+
-JoQkG+/cpGzO8PrTp29pdLonro2F+p43nbWw+B65/bZBfzRSGEbsY6KKLz8d3sZ1
-L4/Ubkpah2jWlgzFNdeStCuuysVApaMCxpz0qTMgHO/NawDY1V+sHBz5xMH8Giwf
-zIDamMF9G+CqKYgczWIbxGTxmcODFw==
-=nXPV
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl22xw8ACgkQ9AfbAGHV
+z0CksggAryIIsdA/J1Gv+qE7rxrLo7eKNNosriuLJvqD8MA+W6WaXROphLhYLRxT
+6VVXya+6xUVjjVDnKPkcBHCut7J1zY0qNCSsY9JF2bxHKHLASdWtvD7Njely+pHQ
+/OyA7+1o8kE63kXVdLwpA6VmWu4+97Z7mYc1skRqSurtVAZDgDtDzi2ziFVgrFPu
+0l+K+p6JIK4VEsAjP+zm3GQXGXt5djCuIrBqC0gHd7O3xvvZ83kl0RUWQJvAIzsN
+moEJ447Jj2S4wkJGZyYM8+VflTCxmqnFvf0V1tKQiCmdF4vbb+xG8hrFnK/j+mnt
+ZirAOIiihuOMiiEaWEN9YxNAuJGorQ==
+=XPuU
 -----END PGP SIGNATURE-----
 
---rMZHpyiKVj3rLyrraWEHGG1l54I6Qbf4g--
+--KG6S7sbyHmSe4eCO6OWcRcIJ3EP5qU1lo--
 
 
