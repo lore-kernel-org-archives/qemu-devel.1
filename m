@@ -2,91 +2,105 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF53CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 09:08:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF16FCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 09:25:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE91D214E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 09:08:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86A662184C
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 09:25:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lwIE6DrJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE91D214E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GTT5s5T6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86A662184C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP10S-0004Wx-5R
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 05:08:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56671)
+	id 1iP1Gu-0001h9-MX
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 05:25:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59298)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iP0zS-0003hH-91
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 05:07:11 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iP1G8-0000lz-RN
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 05:24:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iP0zR-00028p-0P
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 05:07:06 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:34758)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iP0zQ-00028R-ON
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 05:07:04 -0400
-Received: by mail-wr1-x436.google.com with SMTP id t16so8979957wrr.1
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 02:07:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=XoDIoR0TngnAzD1nasyFGteeNTtHgJGNXI5tJ+0a9do=;
- b=lwIE6DrJjkyFk7fL3mNXjGK/3NVOxpObZkhOn2SgVxU7MFXpBip76QSEYHC6I9/d1T
- 43tYxBY5etPE/If1DzMdYvFlvQZYRhXM0GRlNT5gDYYtrbdX4HhQGCliJ4S0H++i697J
- fwYjpCe93y0PiJLnNbL9MJxVYcBeDCsOurcgtDHg2rbCG1jhffzWRRyhdFSeQ3LVdbZL
- yWANgdiej/RwsppKLeYr/FEAqRwo+yXSvO/JSBiORJ1a5smoREXS6LK6HZ7b01YJpfNr
- qRh0TkQFuXwWAji279iEPE0ZkphewEHAX9gEV99WoUWUJzTbeS1gUXbj7vhz6ZQpW7Kh
- KQ/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=XoDIoR0TngnAzD1nasyFGteeNTtHgJGNXI5tJ+0a9do=;
- b=M1+vMBEM8gyCHNHSQiX+cJl4GaU80LOKLFH1o5lRzjSs5H3Jw50ZauWwGioMoyL6dJ
- 3qR4pebSJNPFBH90iIUHS3xhh4u4ypoi9/uowskUcOPRVTzPBiRG4PsLg2eyE+w+L023
- b/lCZxec8nxgABv8MFzDPK5CJc3nNGFjVDz/IZnfPuGtvTYfVUou4y6nPQ+86Ve+nKbM
- 5c9UcisdgFRzxi+svPwp0QpW53JWaFlsbmBXU/PHlzGdtPJMIa00+/7oHFEmsSjmeob4
- tQ6BQcZb5giv8zX0zB4Jfz0ru42757XKxJEZ9mTQY2Rs7b5dCdD7GqBR/Xgm45xbDM3S
- uEfg==
-X-Gm-Message-State: APjAAAW3eHAdMNF4A6VsrgJDnzbTvVvP242T5l7NccvEGYS5GOr0OApg
- U2rPH74jtR+mU4D/y4lYq57xxQ==
-X-Google-Smtp-Source: APXvYqxNJpoEdyhX3L9TSR51oyAKY9itbMZ3HXVYa2E9qKrjpPFp37a7NTTyyhileBzn55yV7oQDdQ==
-X-Received: by 2002:adf:e38a:: with SMTP id e10mr14685369wrm.348.1572253623196; 
- Mon, 28 Oct 2019 02:07:03 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u21sm13367947wmu.27.2019.10.28.02.07.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 28 Oct 2019 02:07:02 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id EB0691FF87;
- Mon, 28 Oct 2019 09:07:01 +0000 (GMT)
-References: <20191025063713.23374-1-alex.bennee@linaro.org>
- <87lft9rnfs.fsf@dusky.pond.sub.org> <87lft8lvdh.fsf@linaro.org>
- <874kzw60bp.fsf@dusky.pond.sub.org>
- <CAFEAcA88xPAcDYmD=dDZeBh12eYZLHfK0qA5_WfTuDQPpx7mNQ@mail.gmail.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL v2 00/73] tcg plugins and testing updates
-In-reply-to: <CAFEAcA88xPAcDYmD=dDZeBh12eYZLHfK0qA5_WfTuDQPpx7mNQ@mail.gmail.com>
-Date: Mon, 28 Oct 2019 09:07:01 +0000
-Message-ID: <878sp5w85m.fsf@linaro.org>
+ (envelope-from <mreitz@redhat.com>) id 1iP1G5-0001RY-Oj
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 05:24:19 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21676
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP1G3-0001QS-Bl
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 05:24:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572254653;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=o6Cn4LEG1PhPMnkGj0g4D/KSzUxfsxTs7X+NvCzk61c=;
+ b=GTT5s5T6pSlD8vLJCFqte64g33LmJ630OJkSEG0A+phlhjQx6Kd7L45ExdACyg8DmzbgTN
+ VvOjQ6GvnLTTZTcMGNpW5raPNGhA7iaHsEbBUCorjtQaCZ1qD/XalNQgjEmk0bwmphMZJT
+ QZni9NoodmC1mbPRx35kLpAHI03wVfw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-310-kvMc1ISAPNG552fADF0R6w-1; Mon, 28 Oct 2019 05:24:09 -0400
+X-MC-Unique: kvMc1ISAPNG552fADF0R6w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A0111800E00;
+ Mon, 28 Oct 2019 09:24:08 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-83.ams2.redhat.com
+ [10.36.117.83])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4F51960BF7;
+ Mon, 28 Oct 2019 09:24:03 +0000 (UTC)
+Subject: Re: [RFC 0/3] block/file-posix: Work around XFS bug
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <20191025095849.25283-1-mreitz@redhat.com>
+ <20191027123555.GN4472@stefanha-x1.localdomain>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <81bb0f91-2671-c9e5-f791-c7470dfd75ce@redhat.com>
+Date: Mon, 28 Oct 2019 10:24:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::436
+In-Reply-To: <20191027123555.GN4472@stefanha-x1.localdomain>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="cHPowuVqOi0S5EauPeUKdmYzR2bmJmdkY"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,63 +112,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--cHPowuVqOi0S5EauPeUKdmYzR2bmJmdkY
+Content-Type: multipart/mixed; boundary="Q4TEFuBVvY4w3qJeDcwlPFKChlrrMytsl"
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--Q4TEFuBVvY4w3qJeDcwlPFKChlrrMytsl
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> On Fri, 25 Oct 2019 at 21:24, Markus Armbruster <armbru@redhat.com> wrote:
->> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->> > I'd rather not unless we can make an exception for late merging of the
->> > PR. I've worked quite hard to make sure everything is ready for the 4.2
->> > window and I'd rather not miss a whole release cycle on a
->> > misunderstanding of what these plugins allow.
+On 27.10.19 13:35, Stefan Hajnoczi wrote:
+> On Fri, Oct 25, 2019 at 11:58:46AM +0200, Max Reitz wrote:
+>> As for how we can address the issue, I see three ways:
+>> (1) The one presented in this series: On XFS with aio=3Dnative, we exten=
+d
+>>     tracked requests for post-EOF fallocate() calls (i.e., write-zero
+>>     operations) to reach until infinity (INT64_MAX in practice), mark
+>>     them serializing and wait for other conflicting requests.
 >>
->> I think there are multiple ways to avoid the nuclear outcome.
+>>     Advantages:
+>>     + Limits the impact to very specific cases
+>>       (And that means it wouldn=E2=80=99t hurt too much to keep this wor=
+karound
+>>       even when the XFS driver has been fixed)
+>>     + Works around the bug where it happens, namely in file-posix
 >>
->> Coming to a conclusion before the soft freeze is the nicest one.
->>
->> Making an exception for late merging is another one, but Peter may
->> prefer not to.
->>
->> Yet another one is merging the pull request before the soft freeze with
->> the understanding that it'll be reverted unless we come to a positive
->> conclusion before say -rc0 (Nov 5).  I'm confident we can work it out in
->> Lyon.
->
-> I'm happy with any of these (and we have a longstanding rule
-> that as long as a version of the pullreq was on list before soft
-> freeze it's ok to apply before hardfreeze, even if it needed to
-> go through a few versions or was otherwise a bit delayed).
->
-> In practice, since I'm on holiday Mon/Tues and this hotel wifi is
-> awful it's quite likely that I wouldn't get round to actually processing
-> a pullreq with the TCG plugins in it before we all get a chance
-> to talk face-to-face on Wednesday anyhow :-)
+>>     Disadvantages:
+>>     - A bit complex
+>>     - A bit of a layering violation (should file-posix have access to
+>>       tracked requests?)
+>=20
+> Your patch series is reasonable.  I don't think it's too bad.
+>=20
+> The main question is how to detect the XFS fix once it ships.  XFS
+> already has a ton of ioctls, so maybe they don't mind adding a
+> feature/quirk bit map ioctl for publishing information about bug fixes
+> to userspace.  I didn't see another obvious way of doing it, maybe a
+> mount option that the kernel automatically sets and that gets reported
+> to userspace?
 
-I do actually have a little bit in my talk about the history of plugins
-and the worries about GPL circumnavigation in my talk on Friday but that
-doesn't stop us previewing it on Wednesday ;-)
+I=E2=80=99ll add a note to the RH BZ.
 
->
-> Alex: I suggest you send out a pullreq with the plugins stuff
-> (I've just applied your testing pullreq), and then we can
-> make sure it gets over the "passes merge build/tests" hurdle.
+> If we imagine that XFS will not provide a mechanism to detect the
+> presence of the fix, then could we ask QEMU package maintainers to
+> ./configure --disable-xfs-fallocate-beyond-eof-workaround at some point
+> in the future when their distro has been shipping a fixed kernel for a
+> while?  It's ugly because it doesn't work if the user installs an older
+> custom-built kernel on the host.  But at least it will cover 98% of
+> users...
 
-I'll spin a new PR. I split the testing changes (and reverted the netbsd
-autoinstall patch again) and sent that on Friday. Would it be OK still
-to base the plugins PR on top of the new testing PR to avoid the
-conflicts in Travis?
+:-/
 
->
-> thanks
-> -- PMM
+I don=E2=80=99t like it, but I suppose it would work.  We could also
+automatically enable this disabling option in configure when we detect
+uname to report a kernel version that must include the fix.  (This
+wouldn=E2=80=99t work for kernel with backported fixes, but those disappear=
+ over
+time...)
+
+Max
 
 
---
-Alex Benn=C3=A9e
+--Q4TEFuBVvY4w3qJeDcwlPFKChlrrMytsl--
+
+--cHPowuVqOi0S5EauPeUKdmYzR2bmJmdkY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl22s7IACgkQ9AfbAGHV
+z0BceQf/SV7UpE+ovGnPCIMvBEtPfgHnSF1QW5ud/X1P8ATQSkJapUvYRv8CezmX
+co1xVDWRzrOExU/R7ur2w8MMcBknRgS2Yt15dIFxlcnRcOofzKWTARnK+yP3rZVy
+q4ydqc/+shETMv/DWJVFWwjLRVN99jPBWbTONSJ9ToTNIAYTtyPQD+0VsYk+BZC/
+J5Zta5kINRK8wKZ/ukborjVtyiZK9gBQBHkYml94PBn4Z867Qr4a2bXBsjX+wfWK
+r4mFqVbe1hyjfmaoNU7fRr6cj3bhKtHJJdsf+JGxuMOXgojaqA4fmIAQtNqxAQLu
+hhy5vP3UFFIQgoDWxHRq8eZEs8Jn/A==
+=gaqh
+-----END PGP SIGNATURE-----
+
+--cHPowuVqOi0S5EauPeUKdmYzR2bmJmdkY--
+
 
