@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D673CA9EC2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C97C47E49
 	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 15:03:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C8CC21479
+	by mail.kernel.org (Postfix) with ESMTPS id 1CF44214E0
 	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 15:03:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="InAaFjoJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C8CC21479
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QJsBxjAe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CF44214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP6YL-0002iW-Nj
+	id 1iP6YL-0002j7-Pb
 	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 11:03:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44563)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44657)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iP6Uj-0007UJ-J3
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:59:48 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iP6Us-0007Zd-AM
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:59:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iP6Ui-00043B-4Q
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:59:45 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51787)
+ (envelope-from <richard.henderson@linaro.org>) id 1iP6Ur-00046d-A4
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:59:54 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40287)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iP6Uh-00042j-UP
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:59:44 -0400
-Received: by mail-wm1-x341.google.com with SMTP id q70so9832657wme.1
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 07:59:43 -0700 (PDT)
+ id 1iP6Ur-00045z-42
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 10:59:53 -0400
+Received: by mail-wm1-x344.google.com with SMTP id w9so9478285wmm.5
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 07:59:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=MG1IpXQvrz4SptVhLZ2ZL/egepQYBWYRd+NyOkeOFrk=;
- b=InAaFjoJ0Df8tu1vuD+ZBd/ql3baejSfDlUFPASBNmVp5ugnlLzyjTrjstCpTgKnRg
- suUsPm8cO4eLOekYsVeEO27o9fDJpFeqSb0IUP+Z0kDyWl7g+Yl6nqd7RG8Y8/REY+73
- 6mGVuQwDGqRO1ulZo+s+pxycp2lPXgxvzflA4MsHI7uW0Y2nX5IxIrTgSWKgZVYAUBhQ
- A5QIapzUVANWgUaFq3F1exeqhSxEfl050gstB4AcCWYeqhDuTTDRCUKanHkiI1fsfZr1
- u+FgeRU0PvXi3SMc1mKyNVtb2FwQRbZieDDt8cqfH36FSaWlDBxWd2cEsezsWlRWEMsn
- Ivdw==
+ bh=Q9PA/XGaFb/7jgxWdyktquMDL4GhIzWDsxOacBvv2es=;
+ b=QJsBxjAeUya1E38QxU+EpNhYxqKnYUTcQa6vLp0TIjsiEtoH7rif02B86Qv/Vr+Rd1
+ dBoY9UDqjHxE1OZXxQ+lvD08m6mBDbgFxD5NYiv92XnTQ3le1fcVmwP8LDh1WmX7LKtq
+ i01yirOZZJD4o2kWz5rZV2KCFSeFxkdWa0DjvAJMVOBSuLotX/zPn3Tt79iYuWLLcVdC
+ GOANLSbHgkaw4LZnfen06yrjzdWe3GnPvxiGYcRoqLXb0YsZYdyBU8z5F0GMEsygkvn9
+ 6XmEcY9LAaKlifH7WkbPkx7BUVK17ZBXvSZkNCh+LxXJCi2Kt1Ultxnpd0XxIcoKBFyc
+ UpwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=MG1IpXQvrz4SptVhLZ2ZL/egepQYBWYRd+NyOkeOFrk=;
- b=GjmJ+E55n2if/MxpFgG+RUhFxiYe7rehPKsM8ze4sCWzO5jOM8e5bkwklAyWeu++Pn
- dPbRfhyX5oixeJY7h74k34rWspiW/SZwn7AhVJHsU15RSbLfEaUIcL8HY66tPDe9NRVv
- ktxc8AME32BTQW6MLbobFCBwBULO0XoyCAIeakPM+8YUTmIZKk9FkvZO4wRdk3T0zE43
- 1Rq1ZbMrgwFWa+2oPdoHZlS/b54nl/wkPNlkytp8TaSLk9LnjBaZ9qShYG0lSoFGH8Uk
- +a0GY4kkNG+v3C0wtL2tJ0aO3mIxqUvbRCnFuYvQnmYjtpA1yQBlWTb12Ov0+8xQst9D
- ikMw==
-X-Gm-Message-State: APjAAAWSFDOLiROwklBILtv+QOyyKov3mmAjrE8oAIXvnC+RlKFnvzaV
- tGlETUHZWqAw0qzgQKbpcXvko+4b03xInA==
-X-Google-Smtp-Source: APXvYqw4fn15a9WwHYWIMJKRwdSgEuhaDgEooNNu4EWnNNQo5vpRdPmSHuJBvnXLOcN2OVBmr6oAGA==
-X-Received: by 2002:a1c:2d4b:: with SMTP id t72mr418413wmt.112.1572274782572; 
- Mon, 28 Oct 2019 07:59:42 -0700 (PDT)
+ bh=Q9PA/XGaFb/7jgxWdyktquMDL4GhIzWDsxOacBvv2es=;
+ b=YCzbBwdDJmM5a0vLaYZ0/6fWaVDHagfHFasDkj6VxDbjO3TilbTC8rDuYuNco7BQM1
+ +LddUihnCDA0V9lSDJtPWlA2XlUzvW84BZZv8xqO5C4fgLBwxMzVGInHrJb267CRDirC
+ F4Vm8fjUaXX1a42xd/fxVznYocppE9D62GRMRD3/eNMzFFJa0zbSEeIU0wOAZ8EaDurT
+ dUzoJ13uH6+st0mhfJ9DV0V7mmIPAsaRkExFAgi2p4H4iorvE6xKcOpWl+O6y0C8shwA
+ pKlJr961OVz0yoXX5YVPiiRxfzDCtJimTJG8ILIiyc/aDlY/M9dPlIpfnPhFtTD+yGGi
+ 3eHg==
+X-Gm-Message-State: APjAAAVPETGrtyZqiBl2WYLlXiqOqoGL9B79TzLsqaByl5UwNtGd8vlG
+ lySDPGBJ5klvOlHMU0PnnDLFwIzW371DSg==
+X-Google-Smtp-Source: APXvYqxx+M2uzGr09fMIa45wyr5mpiqlBhi78Bg8v068VK2aAOMWMdZ0Q8dVBLihqL+XaRMl8i6AuQ==
+X-Received: by 2002:a1c:44:: with SMTP id 65mr369743wma.93.1572274791780;
+ Mon, 28 Oct 2019 07:59:51 -0700 (PDT)
 Received: from localhost.localdomain (230.106.138.88.rev.sfr.net.
  [88.138.106.230])
- by smtp.gmail.com with ESMTPSA id 143sm14842876wmb.33.2019.10.28.07.59.41
+ by smtp.gmail.com with ESMTPSA id 143sm14842876wmb.33.2019.10.28.07.59.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 28 Oct 2019 07:59:42 -0700 (PDT)
+ Mon, 28 Oct 2019 07:59:51 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 04/12] exec: Split out variable page size support to
- exec-vary.c
-Date: Mon, 28 Oct 2019 15:59:29 +0100
-Message-Id: <20191028145937.10914-5-richard.henderson@linaro.org>
+Subject: [PULL v2 12/12] translate-all: Remove tb_alloc
+Date: Mon, 28 Oct 2019 15:59:37 +0100
+Message-Id: <20191028145937.10914-13-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191028145937.10914-1-richard.henderson@linaro.org>
 References: <20191028145937.10914-1-richard.henderson@linaro.org>
@@ -83,7 +82,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,172 +99,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The next patch will play a trick with "const" that will
-confuse the compiler about the uses of target_page_bits
-within exec.c.  Moving everything to a new file prevents
-this confusion.
+Since 2ac01d6dafab, this function does only two things: assert a
+lock is held, and call tcg_tb_alloc.  It is used exactly once,
+and its user has already done the assert.
 
-No functional change so far.
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Clement Deschamps <clement.deschamps@greensocs.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- Makefile.target       |  2 +-
- include/qemu-common.h |  6 +++++
- exec-vary.c           | 57 +++++++++++++++++++++++++++++++++++++++++++
- exec.c                | 34 --------------------------
- 4 files changed, 64 insertions(+), 35 deletions(-)
- create mode 100644 exec-vary.c
+ accel/tcg/translate-all.c | 20 ++------------------
+ 1 file changed, 2 insertions(+), 18 deletions(-)
 
-diff --git a/Makefile.target b/Makefile.target
-index 5e916230c4..ca3d14efe1 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -107,7 +107,7 @@ obj-y += trace/
- 
- #########################################################
- # cpu emulator library
--obj-y += exec.o
-+obj-y += exec.o exec-vary.o
- obj-y += accel/
- obj-$(CONFIG_TCG) += tcg/tcg.o tcg/tcg-op.o tcg/tcg-op-vec.o tcg/tcg-op-gvec.o
- obj-$(CONFIG_TCG) += tcg/tcg-common.o tcg/optimize.o
-diff --git a/include/qemu-common.h b/include/qemu-common.h
-index 8d84db90b0..082da59e85 100644
---- a/include/qemu-common.h
-+++ b/include/qemu-common.h
-@@ -74,6 +74,12 @@ void cpu_exec_step_atomic(CPUState *cpu);
-  */
- bool set_preferred_target_page_bits(int bits);
- 
-+/**
-+ * finalize_target_page_bits:
-+ * Commit the final value set by set_preferred_target_page_bits.
-+ */
-+void finalize_target_page_bits(void);
-+
- /**
-  * Sends a (part of) iovec down a socket, yielding when the socket is full, or
-  * Receives data into a (part of) iovec from a socket,
-diff --git a/exec-vary.c b/exec-vary.c
-new file mode 100644
-index 0000000000..48c0ab306c
---- /dev/null
-+++ b/exec-vary.c
-@@ -0,0 +1,57 @@
-+/*
-+ * Variable page size handling
-+ *
-+ *  Copyright (c) 2003 Fabrice Bellard
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "exec/exec-all.h"
-+
-+#ifdef TARGET_PAGE_BITS_VARY
-+int target_page_bits;
-+bool target_page_bits_decided;
-+#endif
-+
-+bool set_preferred_target_page_bits(int bits)
-+{
-+    /*
-+     * The target page size is the lowest common denominator for all
-+     * the CPUs in the system, so we can only make it smaller, never
-+     * larger. And we can't make it smaller once we've committed to
-+     * a particular size.
-+     */
-+#ifdef TARGET_PAGE_BITS_VARY
-+    assert(bits >= TARGET_PAGE_BITS_MIN);
-+    if (target_page_bits == 0 || target_page_bits > bits) {
-+        if (target_page_bits_decided) {
-+            return false;
-+        }
-+        target_page_bits = bits;
-+    }
-+#endif
-+    return true;
-+}
-+
-+void finalize_target_page_bits(void)
-+{
-+#ifdef TARGET_PAGE_BITS_VARY
-+    if (target_page_bits == 0) {
-+        target_page_bits = TARGET_PAGE_BITS_MIN;
-+    }
-+    target_page_bits_decided = true;
-+#endif
-+}
-diff --git a/exec.c b/exec.c
-index fb0943cfed..5bf181d23e 100644
---- a/exec.c
-+++ b/exec.c
-@@ -91,11 +91,6 @@ AddressSpace address_space_memory;
- static MemoryRegion io_mem_unassigned;
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index f9b7ba159d..ae063b53f9 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -1156,23 +1156,6 @@ void tcg_exec_init(unsigned long tb_size)
  #endif
+ }
  
--#ifdef TARGET_PAGE_BITS_VARY
--int target_page_bits;
--bool target_page_bits_decided;
--#endif
--
- CPUTailQ cpus = QTAILQ_HEAD_INITIALIZER(cpus);
- 
- /* current CPU in the current thread. It is only valid inside
-@@ -109,37 +104,8 @@ int use_icount;
- uintptr_t qemu_host_page_size;
- intptr_t qemu_host_page_mask;
- 
--bool set_preferred_target_page_bits(int bits)
+-/*
+- * Allocate a new translation block. Flush the translation buffer if
+- * too many translation blocks or too much generated code.
+- */
+-static TranslationBlock *tb_alloc(target_ulong pc)
 -{
--    /* The target page size is the lowest common denominator for all
--     * the CPUs in the system, so we can only make it smaller, never
--     * larger. And we can't make it smaller once we've committed to
--     * a particular size.
--     */
--#ifdef TARGET_PAGE_BITS_VARY
--    assert(bits >= TARGET_PAGE_BITS_MIN);
--    if (target_page_bits == 0 || target_page_bits > bits) {
--        if (target_page_bits_decided) {
--            return false;
--        }
--        target_page_bits = bits;
+-    TranslationBlock *tb;
+-
+-    assert_memory_lock();
+-
+-    tb = tcg_tb_alloc(tcg_ctx);
+-    if (unlikely(tb == NULL)) {
+-        return NULL;
 -    }
--#endif
--    return true;
+-    return tb;
 -}
 -
- #if !defined(CONFIG_USER_ONLY)
+ /* call with @p->lock held */
+ static inline void invalidate_page_bitmap(PageDesc *p)
+ {
+@@ -1681,6 +1664,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     TCGProfile *prof = &tcg_ctx->prof;
+     int64_t ti;
+ #endif
++
+     assert_memory_lock();
  
--static void finalize_target_page_bits(void)
--{
--#ifdef TARGET_PAGE_BITS_VARY
--    if (target_page_bits == 0) {
--        target_page_bits = TARGET_PAGE_BITS_MIN;
--    }
--    target_page_bits_decided = true;
--#endif
--}
--
- typedef struct PhysPageEntry PhysPageEntry;
+     phys_pc = get_page_addr_code(env, pc);
+@@ -1706,7 +1690,7 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+     }
  
- struct PhysPageEntry {
+  buffer_overflow:
+-    tb = tb_alloc(pc);
++    tb = tcg_tb_alloc(tcg_ctx);
+     if (unlikely(!tb)) {
+         /* flush must be done */
+         tb_flush(cpu);
 -- 
 2.17.1
 
