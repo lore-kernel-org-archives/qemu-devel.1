@@ -2,65 +2,68 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED44ECA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 11:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE9EBCA9EC2
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 11:25:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5C522086D
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 11:23:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7C630214D9
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 11:25:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IF/ZU75z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5C522086D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g8z6GaRB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C630214D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP375-00027v-8a
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 07:23:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44424)
+	id 1iP38x-0004gO-QJ
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 07:25:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44620)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iP34n-0007Vt-OL
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:20:48 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iP34y-00089M-Ss
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:20:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iP2vS-0001SH-8C
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:11:07 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52431
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iP2t5-0000gf-MQ
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:08:40 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48885
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP2vS-0001S6-3O
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:11:06 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP2t5-0000gT-Hz
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 07:08:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572261065;
+ s=mimecast20190719; t=1572260918;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=EA4nX+LBSUW3Lb9wcm5Kmt7VZ+aZCtsp8pm8VNRzm/E=;
- b=IF/ZU75znIB1ZeBUR5HsS5gICrL60Mdjab0c++XwFYSDhi3ZSyW6jQOCuvJchNoqUGVIsI
- LYIsFDGewoIu4KGsX60iKoWjM9oIsRATsxLW9jU3lKehOom/YUhFp4tyMyXBrYk5vHg2ii
- Wz8x3W6hm6E5BIGm+Kyma9cJg2sQo84=
+ bh=xknq4rBmDHducxBsNrT1udUV+ODOwE7PYt+4y7weaWo=;
+ b=g8z6GaRBrPI9jyNErbU6u04kFepbV8oQ1mJlw5F2YVPXGXyhKOJQXSD0vzv9rs3MqlP0u8
+ jsy8Iv3n1rYv/uXZPKkvhnYG7ijBeCc0/PoZAQ4ka1z1GvoVZJoshkngdzrbDiC3fvfB0T
+ 0ITsETkv6w8V+keWw4jsi6xv3uoEPno=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-124-K7Ju_c0VMIOZehv6dJWADw-1; Mon, 28 Oct 2019 07:11:01 -0400
-X-MC-Unique: K7Ju_c0VMIOZehv6dJWADw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-18-0r0LwqIBOxmMm-JKVIpxRw-1; Mon, 28 Oct 2019 07:08:37 -0400
+X-MC-Unique: 0r0LwqIBOxmMm-JKVIpxRw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECDF9800D5F;
- Mon, 28 Oct 2019 11:10:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1ED9C800D5E;
+ Mon, 28 Oct 2019 11:08:36 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-117-83.ams2.redhat.com
  [10.36.117.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EC26667600;
- Mon, 28 Oct 2019 11:10:55 +0000 (UTC)
-Subject: Re: [PATCH 0/8] block: Add @exact parameter to bdrv_co_truncate()
-To: qemu-block@nongnu.org
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 100785D6A9;
+ Mon, 28 Oct 2019 11:08:31 +0000 (UTC)
+Subject: Re: [PATCH 7/8] block: Pass truncate exact=true where reasonable
+To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-block@nongnu.org
 References: <20190918095144.955-1-mreitz@redhat.com>
+ <20190918095144.955-8-mreitz@redhat.com>
+ <0cda25dcff5e74358c304111fd31e3c9859d1a52.camel@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,20 +89,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <0dbdc19b-c740-92e1-4ee7-294d3d7581e1@redhat.com>
-Date: Mon, 28 Oct 2019 12:10:54 +0100
+Message-ID: <46620e6b-a227-8f9c-51fd-67109281d323@redhat.com>
+Date: Mon, 28 Oct 2019 12:08:30 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20190918095144.955-1-mreitz@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <0cda25dcff5e74358c304111fd31e3c9859d1a52.camel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="yBBtTOcrqWgaU6ApJEKiI8nbLj6PMeLkJ"
+ boundary="YuFn4DkmQBuIUtveQKcDjosaH4Bex10Pl"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,85 +115,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---yBBtTOcrqWgaU6ApJEKiI8nbLj6PMeLkJ
-Content-Type: multipart/mixed; boundary="DfuUGou6JQGaPermJIjMsnzC1fxRzDwT5"
+--YuFn4DkmQBuIUtveQKcDjosaH4Bex10Pl
+Content-Type: multipart/mixed; boundary="OQ4RVpxlE1DqCVWztvQmyaXf7VSNXgxXX"
 
---DfuUGou6JQGaPermJIjMsnzC1fxRzDwT5
+--OQ4RVpxlE1DqCVWztvQmyaXf7VSNXgxXX
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 18.09.19 11:51, Max Reitz wrote:
-> Hi,
->=20
-> This series is supposed to pull out some of the problems from my
-> =E2=80=9CGeneric file creation fallback=E2=80=9D series.
->=20
-> The blk_truncate_for_formatting() function added there was buggy, as
-> Maxim noted, in that it did not check whether blk_truncate() actually
-> resized the block node to the target offset.  One way to fix this is to
-> add a parameter to it that forces the block driver to do so, and that is
-> done by this series.
->=20
-> I think this is generally useful (you can see the diff stat saldo is
-> only +23 lines), because it allows us to drop a special check in
-> qemu-img resize, and it fixes a bug in qed (which has relied on this
-> behavior for over 8 years, but unfortunately bdrv_truncate()=E2=80=99s be=
-havior
-> changed quite exactly 8 years ago).
->=20
-> However, in the process I noticed we actually don=E2=80=99t need
-> blk_truncate_for_formatting(): The underlying problem is that some
-> format drivers truncate their underlying file node to 0 before
-> formatting it to drop all data.  So they should pass exact=3Dtrue, but
-> they cannot, because this would break creation on block devices.  Hence
-> blk_truncate_for_formatting().
->=20
-> It turns out, though, that three of the four drivers in question don=E2=
-=80=99t
-> need to truncate their file node at all.  The remaining one is qed which
-> simply really should pass exact=3Dtrue (it=E2=80=99s a bug fix).
->=20
-> (I do drop those blk_truncate() invocations in this series, because
-> otherwise I feel like it is impossible to decide whether they should get
-> exact=3Dfalse or exact=3Dtrue.  Either way is wrong.)
+On 18.09.19 22:52, Maxim Levitsky wrote:
+> On Wed, 2019-09-18 at 11:51 +0200, Max Reitz wrote:
+>> This is a change in behavior, so all instances need a good
+>> justification.  The comments added here should explain my reasoning.
+>>
+>> qed already had a comment that suggests it always expected
+>> bdrv_truncate()/blk_truncate() to behave as if exact=3Dtrue were passed
+>> (c743849bee7 came eight months before 55b949c8476), so it was simply
+>> broken until now.
+>>
+>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+>> ---
+>>  block/parallels.c | 11 +++++++++--
+>>  block/qcow2.c     |  6 +++++-
+>>  block/qed.c       |  2 +-
+>>  qemu-img.c        |  7 ++++++-
+>>  qemu-io-cmds.c    |  7 ++++++-
+>>  5 files changed, 27 insertions(+), 6 deletions(-)
 
-Thanks for the review, I=E2=80=99ve applied the series to my block branch a=
-nd
-changed the comment in qed.c as requested and suggested by Maxim on patch 7=
-:
+[...]
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+>> diff --git a/block/qed.c b/block/qed.c
+>> index 7c2a65af40..8005cfc305 100644
+>> --- a/block/qed.c
+>> +++ b/block/qed.c
+>> @@ -674,7 +674,7 @@ static int coroutine_fn bdrv_qed_co_create(BlockdevC=
+reateOptions *opts,
+>>      l1_size =3D header.cluster_size * header.table_size;
+>> =20
+>>      /* File must start empty and grow, check truncate is supported */
+> I would update the above comment, with something like
+>=20
+> "QED format requires the underlying file to have the exact expected lengt=
+h,
+> which is 0 on creation"
+> Or something similar.
+
+I=E2=80=99ll change it to:
+
+The QED format associates file length with allocation status,
+so a new file (which is empty) must have a length of 0.
+
+Hope that=E2=80=99s OK. :-)
 
 Max
 
 
---DfuUGou6JQGaPermJIjMsnzC1fxRzDwT5--
+--OQ4RVpxlE1DqCVWztvQmyaXf7VSNXgxXX--
 
---yBBtTOcrqWgaU6ApJEKiI8nbLj6PMeLkJ
+--YuFn4DkmQBuIUtveQKcDjosaH4Bex10Pl
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl22zL4ACgkQ9AfbAGHV
-z0BFvAgAoRgG5m6J/MnfL+xDj0uBA6vDUlwZ3srH0V/6O1/2hgnv47nr0HD/NvQp
-bQc8AmR68r0NWhFq57Y6hi3Vjgoz1tFRJRFEAM1y9mzJX2848eh2QFnKtecGNOTe
-J5eiv2B3DzeyykCZ/PNsMizhRwkSLJ+pH9H9IMDElaaxw/JVRRBOEhNfyhPZ9OVD
-RLYnirHhES73TjNo9Xyni2nQ5JhP3hj/Jf1lFFKqCp8oS2GOR2wX5xzrFY0dLAOm
-GkFU6uKWq27UPk2uW5iEM19dGIYC8aD7+2+6Moe1CGrClf4Gt5WxUPSnTPcNQU9z
-sqa+BNmiMvSjL8JYQOqkbyUtJkIDJg==
-=2dKI
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl22zC4ACgkQ9AfbAGHV
+z0BTNgf9FXX0FSHEDN4TW5aVVzO1glYNyJ1l1ecel5OkgYFKQwwNqj2WO1wTmA9h
+jdLXL/kZpMhJGeGKcWRPk1hktRMCYBVdpzbwGnMPvxRtDe2+eSdB+AsoSkLuJKwx
+CFJLrWFSZvRFkHQ2wdkLAQim8H/CHwVcPhUYv3m8jiZ5ZIpXi3xONB6Y9mZTf6uc
+blMHIJYSRJTAafnxGu2JnJXtgFLmy7cTpYYphGLr4qCxaLeQDiOwnoiz0t9bg4NC
+bdnlWMjFYAfomcZ/06uuBlcd5zu+A6XHs/0rjn9ZjQDqN1SGmUxztjMfy4WZGDro
+WAsRVxuym0ipayzrjfRFR5/o/GKXBw==
+=c9GZ
 -----END PGP SIGNATURE-----
 
---yBBtTOcrqWgaU6ApJEKiI8nbLj6PMeLkJ--
+--YuFn4DkmQBuIUtveQKcDjosaH4Bex10Pl--
 
 
