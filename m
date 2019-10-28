@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B10C1CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF5FCA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:20:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F96020650
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:20:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7BDB720650
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 13:20:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gjVP2ugH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F96020650
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hrgeKGLM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BDB720650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP4wI-0003nD-C0
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 09:20:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51027)
+	id 1iP4x3-0004Qs-DN
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 09:20:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51194)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iP3xO-0003Zw-Us
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:12 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iP3xY-0003kU-Py
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iP3xJ-0002FI-Fd
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:08 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53979
+ (envelope-from <mreitz@redhat.com>) id 1iP3xX-0002NV-DV
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:20 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52095
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP3xJ-0002A1-7n
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:05 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iP3xX-0002MZ-5K
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 08:17:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572265019;
+ s=mimecast20190719; t=1572265038;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0kPed5/fsHktSEaX2QTOmKq2J20PAl/gvdH8RRD3K/M=;
- b=gjVP2ugHunTxvmLbem0uNLDq3S+h8SSa8DJYv70oXHAUWjsZ9EhvexFPEsVdRjnjq0nA4p
- KXU7+TVqgXPK2QwqsnzYI54G7xXCMlphjpBfQp0XdnGypwwSkVyJzj6SkNkIyWvEjG3tDy
- vSS6H5zEZ5Xti6WxcHRj/ZeKcYxFlnI=
+ bh=cQcWinhkCWGpNGRCGIX778zf+/fAN8/KiI2OgoQdaJc=;
+ b=hrgeKGLMoUhr1DUp2klZNjdsM+G2giu1NhjbC0iBsmfW+R45jhuADSvs2AX1UDfpwZhsYt
+ U8SY7TfpjzbR1U+gKPhJID9wVWPjWX5v2D5a7SwFXHsoSDQ35c6GR9KK1KeJdT6jIBB0z7
+ vazRE+bIUpiPMJrvKm8rnnJyXf4OTog=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-UFj1NjvBOJerjysGg9R4hw-1; Mon, 28 Oct 2019 08:16:58 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-245-ym_DuMvsM3-H66AlGGUwFg-1; Mon, 28 Oct 2019 08:17:14 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36B8280183E;
- Mon, 28 Oct 2019 12:16:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F2FA180496E;
+ Mon, 28 Oct 2019 12:17:14 +0000 (UTC)
 Received: from localhost (ovpn-117-83.ams2.redhat.com [10.36.117.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CD43E100164D;
- Mon, 28 Oct 2019 12:16:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A952D6084E;
+ Mon, 28 Oct 2019 12:17:13 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 55/69] qcow2: Keep track of the snapshot table length
-Date: Mon, 28 Oct 2019 13:14:47 +0100
-Message-Id: <20191028121501.15279-56-mreitz@redhat.com>
+Subject: [PULL 62/69] block/cor: Drop cor_co_truncate()
+Date: Mon, 28 Oct 2019 13:14:54 +0100
+Message-Id: <20191028121501.15279-63-mreitz@redhat.com>
 In-Reply-To: <20191028121501.15279-1-mreitz@redhat.com>
 References: <20191028121501.15279-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: UFj1NjvBOJerjysGg9R4hw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: ym_DuMvsM3-H66AlGGUwFg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,60 +90,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When repairing the snapshot table, we truncate entries that have too
-much extra data.  This frees up space that we do not have to count
-towards the snapshot table size.
+No other filter driver has a .bdrv_co_truncate() implementation, and
+there is no need to because the general block layer code can handle it
+just as well.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Message-id: 20191011152814.14791-12-mreitz@redhat.com
+Message-id: 20190918095144.955-3-mreitz@redhat.com
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/qcow2-snapshot.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ block/copy-on-read.c | 8 --------
+ 1 file changed, 8 deletions(-)
 
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 53dc1635ec..582eb3386a 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -68,6 +68,7 @@ static int qcow2_do_read_snapshots(BlockDriverState *bs, =
-bool repair,
-     QCowSnapshot *sn;
-     int i, id_str_size, name_size;
-     int64_t offset;
-+    uint64_t table_length =3D 0;
-     int ret;
+diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+index 6631f30205..e95223d3cb 100644
+--- a/block/copy-on-read.c
++++ b/block/copy-on-read.c
+@@ -73,13 +73,6 @@ static int64_t cor_getlength(BlockDriverState *bs)
+ }
 =20
-     if (!s->nb_snapshots) {
-@@ -82,6 +83,8 @@ static int qcow2_do_read_snapshots(BlockDriverState *bs, =
-bool repair,
-     for(i =3D 0; i < s->nb_snapshots; i++) {
-         bool truncate_unknown_extra_data =3D false;
 =20
-+        table_length =3D ROUND_UP(table_length, 8);
-+
-         /* Read statically sized part of the snapshot header */
-         offset =3D ROUND_UP(offset, 8);
-         ret =3D bdrv_pread(bs->file, offset, &h, sizeof(h));
-@@ -184,7 +187,16 @@ static int qcow2_do_read_snapshots(BlockDriverState *b=
-s, bool repair,
-         offset +=3D name_size;
-         sn->name[name_size] =3D '\0';
+-static int coroutine_fn cor_co_truncate(BlockDriverState *bs, int64_t offs=
+et,
+-                                        PreallocMode prealloc, Error **err=
+p)
+-{
+-    return bdrv_co_truncate(bs->file, offset, prealloc, errp);
+-}
+-
+-
+ static int coroutine_fn cor_co_preadv(BlockDriverState *bs,
+                                       uint64_t offset, uint64_t bytes,
+                                       QEMUIOVector *qiov, int flags)
+@@ -139,7 +132,6 @@ static BlockDriver bdrv_copy_on_read =3D {
+     .bdrv_child_perm                    =3D cor_child_perm,
 =20
--        if (offset - s->snapshots_offset > QCOW_MAX_SNAPSHOTS_SIZE) {
-+        /* Note that the extra data may have been truncated */
-+        table_length +=3D sizeof(h) + sn->extra_data_size + id_str_size +
-+                        name_size;
-+        if (!repair) {
-+            assert(table_length =3D=3D offset - s->snapshots_offset);
-+        }
-+
-+        if (table_length > QCOW_MAX_SNAPSHOTS_SIZE ||
-+            offset - s->snapshots_offset > INT_MAX)
-+        {
-             ret =3D -EFBIG;
-             error_setg(errp, "Snapshot table is too big");
-             goto fail;
+     .bdrv_getlength                     =3D cor_getlength,
+-    .bdrv_co_truncate                   =3D cor_co_truncate,
+=20
+     .bdrv_co_preadv                     =3D cor_co_preadv,
+     .bdrv_co_pwritev                    =3D cor_co_pwritev,
 --=20
 2.21.0
 
