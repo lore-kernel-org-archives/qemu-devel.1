@@ -2,85 +2,83 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D219CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84483CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:11:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18701208C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:09:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B273208C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 16:11:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="E7Bv8nsz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18701208C0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QCyAYrjn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B273208C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP7aW-0007sl-SC
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 12:09:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34609)
+	id 1iP7bn-0001bE-RY
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 12:11:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33323)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@sifive.com>) id 1iP7PX-0005BQ-OT
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:28 -0400
+ (envelope-from <crosa@redhat.com>) id 1iP7IR-0008Hr-JA
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:51:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@sifive.com>) id 1iP7PW-0003pA-D3
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:27 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:43367)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iP7PW-0003om-6R
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:26 -0400
-Received: by mail-pg1-x541.google.com with SMTP id l24so7144946pgh.10
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 08:58:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding:cc:from:to;
- bh=Wcazrf1d/6yq7xUtsUWqMfgOcS0Og4vhQQt08gFl/0k=;
- b=E7Bv8nszzqYRNDu0wJ0GehmOgmGOZ507uv3L5jUofx2a4PCFKaGL3TujuL514uP+Hm
- Y6gzyVya/vUMm6W0Ch8YvQ/vQN9j1ohUh7PWzWNtXiJL+9pMTe6L/ivadbZtAT7ArOkB
- RPoPhI5QBudqISQNA7euZOlodKygmOZEdSS8ckPKW4lkaQPn7K/c3ygP1tU700ZUQdYK
- 0C90H+hghYx/5YxFY2J2fBxW47B6pnTjCKa+/tmwvES5sQN5NgrVZvzq0ErHQlqvm8Ei
- dtZiTbgNGPAFzS9YTMg9PJtbehEy+l29v+9Y0xnE797RaI1lHnIFMcwbj4e5mJ1KiSzP
- 9uUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding:cc:from:to;
- bh=Wcazrf1d/6yq7xUtsUWqMfgOcS0Og4vhQQt08gFl/0k=;
- b=Q+ekQOV9/6q9nHwa820HWK9ap1RrH4dkCg8U0fpYbOEDyoW1x5c1wtmyaX1kKxd3i8
- w+2gGf1aXfyC7Jg7Ia8q1zcP7/YAzIbEMNy/aWptbWP+9qornKOPi4FsAF0rVPG5CZpB
- BIe4PB+E1Od62/kOYcRrna1AoqS99c/qr5II2aR6GJe8SvGsJk7h+3ciyMgEcl0NoBWF
- 5h3maS+qdYfPsWnwfX9GrM6W46uEQcfUsBy9RBPbRYxwULG9N1Cs9bRGetb93zwxODwr
- uwSnU3RCzHUbJjrNXzlYi/uzqJsjURn0cEL010DGhJ9NyaTAj0zOv3iIDgSMAGt1VinV
- P8BQ==
-X-Gm-Message-State: APjAAAXo5/frVQ5svf6wgN7b3O+FAn8cvhcycD5vRCvbu8HPMJ8BQIUj
- p9ESq2s2okwmuOGAwzBNwKfsv8caD2ESsA==
-X-Google-Smtp-Source: APXvYqzmrhPmJxA2AbMG1Lt+nDArHSJ0TD1DWwygocl6qh3nZ3wzPD1OQN2Rae9luzF5CgsarQ650A==
-X-Received: by 2002:aa7:80c6:: with SMTP id a6mr20617068pfn.89.1572278304867; 
- Mon, 28 Oct 2019 08:58:24 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id i123sm13313009pfe.145.2019.10.28.08.58.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 28 Oct 2019 08:58:24 -0700 (PDT)
-Subject: [PULL 05/18] riscv: sifive_u: Add ethernet0 to the aliases node
-Date: Mon, 28 Oct 2019 08:48:49 -0700
-Message-Id: <20191028154902.32491-6-palmer@sifive.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191028154902.32491-1-palmer@sifive.com>
-References: <20191028154902.32491-1-palmer@sifive.com>
+ (envelope-from <crosa@redhat.com>) id 1iP7IP-0001aC-7Y
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:51:06 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50146
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iP7IP-0001a0-3q
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:51:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572277864;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nUjErUB6VYTRpoCKD3YtEUeb45jYgzFoarIvEkowYI4=;
+ b=QCyAYrjnWs9UcpXOMZv5uQUW1u0wAUX31qQyj9tJtxILDo1+WQsgDCCOcpcPI4xmigNmU/
+ I8Y3QgU0isbB6zVQAqUz04oF/4YakaOV4ctXJXrVGCtvvh+3KNYg2+ZKmMHlFzmsMMnyIG
+ 6RCs1SqJC/ZR311rSIGW/LrINDfg5jU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-213-xPqRm--ANniQUeaD4qucWg-1; Mon, 28 Oct 2019 11:51:01 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D05F2476;
+ Mon, 28 Oct 2019 15:50:59 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-123-183.rdu2.redhat.com
+ [10.10.123.183])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E3DC360BF7;
+ Mon, 28 Oct 2019 15:50:53 +0000 (UTC)
+Date: Mon, 28 Oct 2019 11:50:51 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 05/26] tests/acceptance: Refactor
+ exec_command_and_wait_for_pattern()
+Message-ID: <20191028155051.GD3978@localhost.localdomain>
+References: <20191028073441.6448-1-philmd@redhat.com>
+ <20191028073441.6448-6-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-From: Palmer Dabbelt <palmer@sifive.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::541
+In-Reply-To: <20191028073441.6448-6-philmd@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: xPqRm--ANniQUeaD4qucWg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,54 +90,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Palmer Dabbelt <palmer@sifive.com>,
- qemu-devel@nongnu.org, Alistair Francis <alistair.francis@wdc.com>,
- Bin Meng <bmeng.cn@gmail.com>,
- ilippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-devel@nongnu.org,
+ Fabien Chouteau <chouteau@adacore.com>, Kamil Rytarowski <kamil@netbsd.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bmeng.cn@gmail.com>
+On Mon, Oct 28, 2019 at 08:34:20AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Refactor the exec_command_and_wait_for_pattern() utility method
+> so we can reuse it in other files.
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+> v2: fix self -> test, failure_message is optional, added doc
+> v3: reword because after rebasing only 1 file has to be modified
+> ---
+>  tests/acceptance/avocado_qemu/__init__.py | 19 +++++++++++++++++++
+>  tests/acceptance/boot_linux_console.py    | 18 +++++++-----------
+>  2 files changed, 26 insertions(+), 11 deletions(-)
 
-U-Boot expects this alias to be in place in order to fix up the mac
-address of the ethernet node.
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
 
-This is to keep in sync with Linux kernel commit below:
-https://patchwork.kernel.org/patch/11133033/
+Queuing on my python-next branch (and sending shortly in a PR).
 
-Signed-off-by: Bin Meng <bmeng.cn@gmail.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
----
- hw/riscv/sifive_u.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index 02dd76176e..1ac51e3632 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -270,6 +270,10 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-         s->soc.gem.conf.macaddr.a, ETH_ALEN);
-     qemu_fdt_setprop_cell(fdt, nodename, "#address-cells", 1);
-     qemu_fdt_setprop_cell(fdt, nodename, "#size-cells", 0);
-+
-+    qemu_fdt_add_subnode(fdt, "/aliases");
-+    qemu_fdt_setprop_string(fdt, "/aliases", "ethernet0", nodename);
-+
-     g_free(nodename);
- 
-     nodename = g_strdup_printf("/soc/ethernet@%lx/ethernet-phy@0",
-@@ -297,7 +301,6 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
-         qemu_fdt_setprop_string(fdt, "/chosen", "bootargs", cmdline);
-     }
- 
--    qemu_fdt_add_subnode(fdt, "/aliases");
-     qemu_fdt_setprop_string(fdt, "/aliases", "serial0", nodename);
- 
-     g_free(nodename);
--- 
-2.21.0
+Thanks,
+- Cleber.
 
 
