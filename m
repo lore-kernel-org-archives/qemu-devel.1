@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89247CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 17:13:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFD2CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 17:14:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 543AA21721
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 17:13:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10FA821721
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 17:14:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="YURNv/wF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 543AA21721
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="REX1WUoN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10FA821721
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP8Zl-0005tz-3u
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 13:13:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35005)
+	id 1iP8al-0006z5-EB
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 13:14:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34978)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@sifive.com>) id 1iP7Pu-0005sv-9H
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:51 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@sifive.com>) id 1iP7Pt-00047l-6j
+ (envelope-from <palmer@sifive.com>) id 1iP7Pt-0005pp-81
  for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:50 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:34135)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <palmer@sifive.com>) id 1iP7Pr-000468-Hi
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:48 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:46416)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iP7Pt-000477-1d
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:49 -0400
-Received: by mail-pf1-x441.google.com with SMTP id b128so7174819pfa.1
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 08:58:48 -0700 (PDT)
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iP7Pr-00045Z-CY
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 11:58:47 -0400
+Received: by mail-pf1-x441.google.com with SMTP id b25so7136501pfi.13
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 08:58:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding:cc:from:to;
- bh=o43RPnYxBJ6zG1efVp6eoAI+8V+9lXTJj+YBPx9n47c=;
- b=YURNv/wF0HooB/D3oxv2eoYK+Ml+CuSzNM2RBfdsnX0rrsGRkRn0Vz32SDxZeEllXv
- Z2HSCqCkPjkQv6aJY4CaT5LUhhWmXdp0y9vO9AFSxWvWBHfu5ovrHiLK/Uh8DGdme5UM
- i3zej0czQ7Z381cjq6XEGj3zGeV1iwYQCZJn2kMA+TkCKxWUR4meynzV+1N7kLVFwaV0
- FWZ9LPO9ZjaHHD7gj8rIvQrDZcOyHQNJHSVnIxidFJ731HGyVgiBnOL7XwkkxWpPJIKS
- XRED1kR3rsfM+7vDHkuI9ToLK589NLBGiP+5yJQq8Wr5cQx3ht/K8cxTVdZzhKQHoiFJ
- uyNQ==
+ bh=B4DzWJmRClZnGWtF1qIJV4FygyaOxQSP++ywZKquvFY=;
+ b=REX1WUoNliqFnVDLbWcSAI0HkPLKE7LIwfHXecIbHCYQfPUoGR5mTG1K7ylgS14BWH
+ IsDj/4rjWozlR7PYQL6O+kXEEbo2bLEYXI2geYiJV2XD8gyEBRlgn72aQTEORi9R5Xxm
+ ei67dasHslcUMaAtBd4m+Of77M3iq3iNjVPnEdccmIyrQ0kVfhzyyGuzrMXlDEClJ4+z
+ 4ckEvJtdMKRIQEeiBwdg7PMz6YqyynpGjK/o9xe/UEeX2za5Nixv5dPr7bitLHYmJKGx
+ UrXcOAQVTLeVeL61gvNHnlNGeh/Xnzt2jRyfALT9OtLyAQZF9SWSuELjfTu/lY01h5zi
+ eJbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding:cc:from:to;
- bh=o43RPnYxBJ6zG1efVp6eoAI+8V+9lXTJj+YBPx9n47c=;
- b=Db+FqIRFNebxQJ3aUV1ftvm3WyPdOa+MPOt2nwJzimskZyi4keR9ikyz51MHZFiZmF
- bAHz96+0HIBuEuRWv8z5L1b3L00wrU6REMDB7AtIqRgPngbV4eBQlGeZqqubXB/bHImt
- IZMqExg+SZEtCO5mDyZFwurQCFbsto2PE9+ceui7gq92J0BcHKh2+ejsNE1DgV+TdXwA
- 0pAcM7kjeSH32oVRABFLt6CfPPyxJiGH0IN9YFfgpbh8o95DXi9BFcCRLEk8KuZl6DcX
- ECMin/X8/6vF+L2UuiDVxk/XXFpmHsljoPD2IuZVwGUFMsUQ8U/cFfyUXFlvDmaAqQC0
- U60A==
-X-Gm-Message-State: APjAAAWaYEr898Wz8PdIk2aZP5H4RP4X5YduzpCVRMaiKidJtxaZkoj2
- onVN6Z4BmcX9Ti1hhRSFM0MX09Q2kwqfwg==
-X-Google-Smtp-Source: APXvYqxDmMHQz8muQRofK2H2gzvTBJSerDtfjffa7I72LYufKlKkxhHCgeB+0zSpFJvgagDLdOau7A==
-X-Received: by 2002:a63:5d06:: with SMTP id r6mr21640753pgb.216.1572278327779; 
- Mon, 28 Oct 2019 08:58:47 -0700 (PDT)
+ bh=B4DzWJmRClZnGWtF1qIJV4FygyaOxQSP++ywZKquvFY=;
+ b=J/bJ7GuoaK1jo6SWjpVTNlnaX5bq9jMQiKdPFs+EEM4NOg0xfmYmNkP377qcriagHO
+ Hi3MsQuI/433SiE8YLZjODBV40q2/zPSyAvfz2SjeTRevfF+rO8K6mGsyfAwAACJubDS
+ tMvSdumFwLo24Ij6KX9Wps1EPqS7rMSiFHbScDNTxsO5+/f2Nb5w7IFHovoHvJb1lqYY
+ +8/zKiUawKYkvF5cHfb5/1LTpamCn/OWrGk2pFZZPaV018M1GatCTk3kI66Y3s6xveul
+ 8HRytp5c9DEeapkNHNePhxd9sERydEDwa7fiy8G1RyM1QA74VyVazahbuXbpuD4QEwm8
+ pBLw==
+X-Gm-Message-State: APjAAAWZmioO+tm+ZZ3g5jgyiDhnir4GQqb4NkBiSy/FEkv1f16M/RuA
+ XZzJyD1N6yphOlLcgHdixBLc+wwiVe03Zg==
+X-Google-Smtp-Source: APXvYqxFFSQWgC+jiM/JRB7o4WqgnTYD7vT75XHmBLnW1lZwqNYX4kdzSjSLnk7gUf2Vo+H1h3qC0Q==
+X-Received: by 2002:a62:1e06:: with SMTP id e6mr20552435pfe.181.1572278326126; 
+ Mon, 28 Oct 2019 08:58:46 -0700 (PDT)
 Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id g17sm10503611pgn.37.2019.10.28.08.58.46
+ by smtp.gmail.com with ESMTPSA id 66sm3855725pgi.49.2019.10.28.08.58.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 28 Oct 2019 08:58:47 -0700 (PDT)
-Subject: [PULL 18/18] target/riscv: PMP violation due to wrong size parameter
-Date: Mon, 28 Oct 2019 08:49:02 -0700
-Message-Id: <20191028154902.32491-19-palmer@sifive.com>
+ Mon, 28 Oct 2019 08:58:45 -0700 (PDT)
+Subject: [PULL 17/18] riscv/boot: Fix possible memory leak
+Date: Mon, 28 Oct 2019 08:49:01 -0700
+Message-Id: <20191028154902.32491-18-palmer@sifive.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191028154902.32491-1-palmer@sifive.com>
 References: <20191028154902.32491-1-palmer@sifive.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 From: Palmer Dabbelt <palmer@sifive.com>
 To: Peter Maydell <peter.maydell@linaro.org>
@@ -91,68 +92,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dayeol Lee <dayeol@berkeley.edu>,
- Richard Henderson <richard.henderson@linaro.org>,
- Palmer Dabbelt <palmer@sifive.com>, qemu-riscv@nongnu.org,
- qemu-devel@nongnu.org
+Cc: qemu-riscv@nongnu.org, Palmer Dabbelt <palmer@sifive.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>, Bin Meng <bmeng.cn@gmail.com>,
+ ilippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Dayeol Lee <dayeol@berkeley.edu>
+From: Alistair Francis <alistair.francis@wdc.com>
 
-riscv_cpu_tlb_fill() uses the `size` parameter to check PMP violation
-using pmp_hart_has_privs().
-However, if the size is unknown (=0), the ending address will be
-`addr - 1` as it is `addr + size - 1` in `pmp_hart_has_privs()`.
-This always causes a false PMP violation on the starting address of the
-range, as `addr - 1` is not in the range.
+Coverity (CID 1405786) thinks that there is a possible memory leak as
+we don't guarantee that the memory allocated from riscv_find_firmware()
+is freed. This is a false positive, but let's tidy up the code to fix
+the warning.
 
-In order to fix, we just assume that all bytes from addr to the end of
-the page will be accessed if the size is unknown.
-
-Signed-off-by: Dayeol Lee <dayeol@berkeley.edu>
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
 ---
- target/riscv/pmp.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ hw/riscv/boot.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
-index d4f1007109..0e6b640fbd 100644
---- a/target/riscv/pmp.c
-+++ b/target/riscv/pmp.c
-@@ -223,6 +223,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
+index 2e92fb0680..7fee98d2f8 100644
+--- a/hw/riscv/boot.c
++++ b/hw/riscv/boot.c
+@@ -38,7 +38,7 @@ void riscv_find_and_load_firmware(MachineState *machine,
+                                   const char *default_machine_firmware,
+                                   hwaddr firmware_load_addr)
  {
-     int i = 0;
-     int ret = -1;
-+    int pmp_size = 0;
-     target_ulong s = 0;
-     target_ulong e = 0;
-     pmp_priv_t allowed_privs = 0;
-@@ -232,11 +233,21 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
-         return true;
+-    char *firmware_filename;
++    char *firmware_filename = NULL;
+ 
+     if (!machine->firmware) {
+         /*
+@@ -70,14 +70,11 @@ void riscv_find_and_load_firmware(MachineState *machine,
+          * if no -bios option is set without breaking anything.
+          */
+         firmware_filename = riscv_find_firmware(default_machine_firmware);
+-    } else {
+-        firmware_filename = machine->firmware;
+-        if (strcmp(firmware_filename, "none")) {
+-            firmware_filename = riscv_find_firmware(firmware_filename);
+-        }
++    } else if (strcmp(machine->firmware, "none")) {
++        firmware_filename = riscv_find_firmware(machine->firmware);
      }
  
-+    /*
-+     * if size is unknown (0), assume that all bytes
-+     * from addr to the end of the page will be accessed.
-+     */
-+    if (size == 0) {
-+        pmp_size = -(addr | TARGET_PAGE_MASK);
-+    } else {
-+        pmp_size = size;
-+    }
-+
-     /* 1.10 draft priv spec states there is an implicit order
-          from low to high */
-     for (i = 0; i < MAX_RISCV_PMPS; i++) {
-         s = pmp_is_in_range(env, i, addr);
--        e = pmp_is_in_range(env, i, addr + size - 1);
-+        e = pmp_is_in_range(env, i, addr + pmp_size - 1);
- 
-         /* partially inside */
-         if ((s + e) == 1) {
+-    if (strcmp(firmware_filename, "none")) {
++    if (firmware_filename) {
+         /* If not "none" load the firmware */
+         riscv_load_firmware(firmware_filename, firmware_load_addr);
+         g_free(firmware_filename);
 -- 
 2.21.0
 
