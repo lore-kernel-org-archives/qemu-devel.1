@@ -2,85 +2,79 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 834E3CA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D9DFCA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:06:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39C0E20862
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:06:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 109F520862
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 08:06:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FwZKW/l1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39C0E20862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V+jR5qSK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 109F520862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP02V-00023q-2Z
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 04:06:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49767)
+	id 1iP02q-0002nN-DO
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 04:06:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46975)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iOzxn-0001Q9-GL
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:01:20 -0400
+ (envelope-from <philmd@redhat.com>) id 1iOzba-0007Rr-1I
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:38:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iOzxm-00072n-6e
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:01:19 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43747)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iOzxm-00071c-17
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 04:01:18 -0400
-Received: by mail-ot1-x343.google.com with SMTP id b19so3718987otq.10
- for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 01:01:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=jvy9yhjUB7jtHPPdv445hWuM0aMCW0LFbuGUJZBXGKg=;
- b=FwZKW/l1oVB7hOevt5zvcl1yHLTg9ouk5ncvEUHdaZ6J36Zt3JoFbBmnx3R4ht8Uo2
- R26HQCvwU2rqG4DH8m5DoQ0N2OXFOo4cjzZvkYAXuPgUkM9drsjK3C36vvj6iP+1nzGe
- pAdEbAjiDnU0RdK/27PSJP/4xZsVXwQxd3tPyULhldepo3fw+JNgVTAS4n5MD+YcGukk
- VVo826TyXsn08M3RW9BLGQLwvmyt1boB0+nOpRyCh6Azy6C6htzC1COWFFNuT2c4bqek
- 3dYGBRjcrNGYcyIw+lxJNSG2jjAeZhrr86dHYOqzHpCZuUzS5Vd+oEWHUKqO0/WDBdwa
- 8Xtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=jvy9yhjUB7jtHPPdv445hWuM0aMCW0LFbuGUJZBXGKg=;
- b=UAacgCVkHpBdZR6gGtT5XdApxsls1bQ7G0QoijS7m3gotCzMolYm2TwR5qK7xcaSVj
- DX6HREqgIL25HU9N9ZuyCpKEHFwZHkjfxzsZyzCkxM4h3ieG95gq1Pm5nrefE/TLY++X
- KhpzOSG1SS2xOsKKs2jGtq+8yUm0EzajLVbltnPoMu1u6rVteMAU0udV1a7YplqEaoVS
- +usv9hleUHgwhkWnO+O65/Bv8Wg/l7b4Bn0MljTFo6M6Yb/Ec59ookPWHHrFKkve4WdX
- FfUB28Tnyrj/gxjIf/t7pmxiMysl8YXlF2/Xobs/QvEdYpz7YlTn99lqnnipsqmIAPBh
- Q6PA==
-X-Gm-Message-State: APjAAAV+b84TyktajDg/KcLMPGyIKIdg8yRzExEcrhtlJ0/cW+a52AVO
- kIaNhhjYjB68GW8bOGzfm73C7kensQs9UHr8vPI=
-X-Google-Smtp-Source: APXvYqyYRMh2OZM6d+FKfzuMajImCV6waThbpDHqqIZYZ6JHIApROU3EeiBQ2a/SS8LSMdbaJXgwlCeKuFkIqbZ71pU=
-X-Received: by 2002:a05:6830:1d8f:: with SMTP id
- y15mr4099241oti.121.1572249677003; 
- Mon, 28 Oct 2019 01:01:17 -0700 (PDT)
-MIME-Version: 1.0
-Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Mon, 28 Oct 2019 01:01:16
- -0700 (PDT)
-In-Reply-To: <20191028073441.6448-4-philmd@redhat.com>
+ (envelope-from <philmd@redhat.com>) id 1iOzbY-0003a6-Pl
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:38:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39674
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iOzbY-0003Zo-MK
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 03:38:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572248300;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wtyVhPrMDClfaWp/tnoq600EcuRYbAk2G8WCARC2TA0=;
+ b=V+jR5qSKCyCabaVB6Nv+6vjByuRT/JWTQ/0z2FHIIPU8A2HD3UfCk2wUuDR7Gn/z+ew4Q8
+ U34zsVhSI7kJJnW2zRTkRzqfw+cQ3FyeFkG90Q5r3XQsUemuEnCGctQltpowU5DVmLHg0B
+ /IUHxPmmlzzRPJTzithtnLuyLLIwNh8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-341-epZOA5yEPHu0YBpzAuv5NA-1; Mon, 28 Oct 2019 03:38:11 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A46F1800D7E;
+ Mon, 28 Oct 2019 07:38:10 +0000 (UTC)
+Received: from x1w.redhat.com (ovpn-204-86.brq.redhat.com [10.40.204.86])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1731F19C69;
+ Mon, 28 Oct 2019 07:38:04 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 21/26] tests/boot_linux_console: Test the raspi2 UART1 (16550
+ based)
+Date: Mon, 28 Oct 2019 08:34:36 +0100
+Message-Id: <20191028073441.6448-22-philmd@redhat.com>
+In-Reply-To: <20191028073441.6448-1-philmd@redhat.com>
 References: <20191028073441.6448-1-philmd@redhat.com>
- <20191028073441.6448-4-philmd@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Mon, 28 Oct 2019 09:01:16 +0100
-Message-ID: <CAL1e-=iDs5v4S5A8_-0XmjvTEbhJ71+yH=nKJT_ZvtQF3idPeQ@mail.gmail.com>
-Subject: Re: [PATCH 03/26] tests/acceptance: Fixe wait_for_console_pattern()
- hangs
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000007f20e50595f3e751"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: epZOA5yEPHu0YBpzAuv5NA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,115 +87,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Kamil Rytarowski <kamil@netbsd.org>, Fabien Chouteau <chouteau@adacore.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  KONRAD Frederic <frederic.konrad@adacore.com>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Kamil Rytarowski <kamil@netbsd.org>,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Cleber Rosa <crosa@redhat.com>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000007f20e50595f3e751
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-On Monday, October 28, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
->
-wrote:
+The current do_test_arm_raspi2() case tests the PL011 UART0.
+Our model also supports the AUX UART (16550 based).
+We can very simply test the UART1 with Linux, modifying the
+kernel command line.
 
-> Because of a possible deadlock (QEMU waiting for the socket to
-> become writable) let's close the console socket as soon as we
-> stop to use it.
->
-> Suggested-by: Cleber Rosa <crosa@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> ---
->  tests/acceptance/avocado_qemu/__init__.py | 1 +
->  1 file changed, 1 insertion(+)
->
->
-Fixe -> Fix
+Add few lines to expand our previous test and cover the AUX
+UART.
 
-You missed my r-b again, given in:
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
+Tested-by: Cleber Rosa <crosa@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ tests/acceptance/boot_linux_console.py | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg06376.html
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot=
+_linux_console.py
+index cc0c73b9c1..1c9ff2bda3 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -301,6 +301,7 @@ class BootLinuxConsole(MachineTest):
+         """
+         serial_kernel_cmdline =3D {
+             0: 'earlycon=3Dpl011,0x3f201000 console=3DttyAMA0',
++            1: 'earlycon=3Duart8250,mmio32,0x3f215040 console=3DttyS1,1152=
+00'
+         }
+         deb_url =3D ('http://archive.raspberrypi.org/debian/'
+                    'pool/main/r/raspberrypi-firmware/'
+@@ -311,7 +312,7 @@ class BootLinuxConsole(MachineTest):
+         dtb_path =3D self.extract_from_deb(deb_path, '/boot/bcm2709-rpi-2-=
+b.dtb')
+=20
+         self.vm.set_machine('raspi2')
+-        self.vm.set_console()
++        self.vm.set_console(console_index=3Duart_id)
+         kernel_command_line =3D (self.KERNEL_COMMON_COMMAND_LINE +
+                                serial_kernel_cmdline[uart_id])
+         self.vm.add_args('-kernel', kernel_path,
+@@ -329,6 +330,14 @@ class BootLinuxConsole(MachineTest):
+         """
+         self.do_test_arm_raspi2(0)
+=20
++    def test_arm_raspi2_uart1(self):
++        """
++        :avocado: tags=3Darch:arm
++        :avocado: tags=3Dmachine:raspi2
++        :avocado: tags=3Ddevice:bcm2835_aux
++        """
++        self.do_test_arm_raspi2(1)
++
+     def test_s390x_s390_ccw_virtio(self):
+         """
+         :avocado: tags=3Darch:s390x
+--=20
+2.21.0
 
-A.
-
-
-
-> diff --git a/tests/acceptance/avocado_qemu/__init__.py
-> b/tests/acceptance/avocado_qemu/__init__.py
-> index e3101cba30..a0450e5263 100644
-> --- a/tests/acceptance/avocado_qemu/__init__.py
-> +++ b/tests/acceptance/avocado_qemu/__init__.py
-> @@ -74,6 +74,7 @@ def wait_for_console_pattern(test, success_message,
-> failure_message=3DNone):
->          if success_message in msg:
->              break
->          if failure_message and failure_message in msg:
-> +            console.close()
->              fail =3D 'Failure message found in console: %s' %
-> failure_message
->              test.fail(fail)
->
-> --
-> 2.21.0
->
->
->
-
---0000000000007f20e50595f3e751
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Monday, October 28, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a hre=
-f=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><blockqu=
-ote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc s=
-olid;padding-left:1ex">Because of a possible deadlock (QEMU waiting for the=
- socket to<br>
-become writable) let&#39;s close the console socket as soon as we<br>
-stop to use it.<br>
-<br>
-Suggested-by: Cleber Rosa &lt;<a href=3D"mailto:crosa@redhat.com">crosa@red=
-hat.com</a>&gt;<br>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
-hat.com">philmd@redhat.com</a>&gt;<br>
----<br>
-=C2=A0tests/acceptance/avocado_qemu/<wbr>__init__.py | 1 +<br>
-=C2=A01 file changed, 1 insertion(+)<br>
-<br></blockquote><div><br></div><div>Fixe -&gt; Fix</div><div><br></div><di=
-v>You missed my r-b again, given in:</div><div><br></div><div><a href=3D"ht=
-tps://lists.gnu.org/archive/html/qemu-devel/2019-10/msg06376.html">https://=
-lists.gnu.org/archive/html/qemu-devel/2019-10/msg06376.html</a><br></div><d=
-iv><br></div><div>A.</div><div><br></div><div>=C2=A0</div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex">
-diff --git a/tests/acceptance/avocado_<wbr>qemu/__init__.py b/tests/accepta=
-nce/avocado_<wbr>qemu/__init__.py<br>
-index e3101cba30..a0450e5263 100644<br>
---- a/tests/acceptance/avocado_<wbr>qemu/__init__.py<br>
-+++ b/tests/acceptance/avocado_<wbr>qemu/__init__.py<br>
-@@ -74,6 +74,7 @@ def wait_for_console_pattern(test, success_message, failu=
-re_message=3DNone):<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if success_message in msg:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if failure_message and failure_message in=
- msg:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 console.close()<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0fail =3D &#39;Failure messa=
-ge found in console: %s&#39; % failure_message<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0test.fail(fail)<br>
-=C2=A0<br>
--- <br>
-2.21.0<br>
-<br>
-<br>
-</blockquote>
-
---0000000000007f20e50595f3e751--
 
