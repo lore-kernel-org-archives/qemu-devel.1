@@ -2,83 +2,81 @@ Return-Path: <SRS0=Szrt=YV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94760CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 18:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B40CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 18:31:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6900421744
-	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 18:28:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E05C214E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 28 Oct 2019 18:31:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iI8upqqY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6900421744
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zb+Y25r8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E05C214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iP9kb-0002yx-V0
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 14:28:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43168)
+	id 1iP9np-0006XU-Be
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 14:31:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52273)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iP8B2-0002Zj-6x
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 12:47:33 -0400
+ (envelope-from <crosa@redhat.com>) id 1iP97h-0005nN-45
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 13:48:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iP8Az-0007jN-0H
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 12:47:30 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:27127
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <crosa@redhat.com>) id 1iP97e-0003sQ-KO
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 13:48:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43369
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iP8Aw-0007gz-SL
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 12:47:27 -0400
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iP97e-0003sE-GY
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 13:48:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572281245;
+ s=mimecast20190719; t=1572284885;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RQltGlws9vvQiSWinUnZY84Ux+YubCBA+KpudcuhUwY=;
- b=iI8upqqY+SznAzXR8jZrNI/qPPJ2J+8o5Umkcp2zCjd4Cyn1/dwzmItV1a8Cid6s5MiEOU
- CcBi9PAs7LFpAqdHkiym8UlqDwXEul2ZaJqCLNJmeSJD/4CO8V9Lg3eEYFBpY5BdfwLHPv
- 3kOMYNGHxBbsxHnEtOnVPSn6ReKnEIU=
+ bh=X40D0sUGfbz+CpcuKsYbiQS6eByO+AV7AyritEyes0s=;
+ b=Zb+Y25r8qr8gd05gO1VLREnvM9DxQsUIvouK0osO+P9lw7KM6Fj04F8RXnvGNTO4KcAp+8
+ 16EF/59homaCoL5WQv7zxRdAJyGONCGhh5z+qw62BwztSHFh4v7q5lr/kEmUIbIhJoAWgB
+ DhKF12CvswmF415/h4R4I3p+5NJFAig=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-UtAvauPOObaCxDcaykz2Ag-1; Mon, 28 Oct 2019 12:47:22 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-306-Z0VMWLWzNw-hQ-eOtghidA-1; Mon, 28 Oct 2019 13:48:02 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DF2885B6EF;
- Mon, 28 Oct 2019 16:47:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 035A01005509;
+ Mon, 28 Oct 2019 17:48:01 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-123-183.rdu2.redhat.com
  [10.10.123.183])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F1F145DA8C;
- Mon, 28 Oct 2019 16:47:13 +0000 (UTC)
-Date: Mon, 28 Oct 2019 12:47:11 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 522585C559;
+ Mon, 28 Oct 2019 17:47:45 +0000 (UTC)
+Date: Mon, 28 Oct 2019 13:47:43 -0400
 From: Cleber Rosa <crosa@redhat.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 11/26] tests/acceptance: Add test that boots Linux up to
- BusyBox on Leon3
-Message-ID: <20191028164711.GF3978@localhost.localdomain>
+Subject: Re: [PATCH 14/26] tests/acceptance: Test Open Firmware on the PReP/40p
+Message-ID: <20191028174743.GI3978@localhost.localdomain>
 References: <20191028073441.6448-1-philmd@redhat.com>
- <20191028073441.6448-12-philmd@redhat.com>
+ <20191028073441.6448-15-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191028073441.6448-12-philmd@redhat.com>
+In-Reply-To: <20191028073441.6448-15-philmd@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: UtAvauPOObaCxDcaykz2Ag-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: Z0VMWLWzNw-hQ-eOtghidA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,88 +94,36 @@ Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
  Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
  Kamil Rytarowski <kamil@netbsd.org>,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
  Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+ Aurelien Jarno <aurelien@aurel32.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 28, 2019 at 08:34:26AM +0100, Philippe Mathieu-Daud=E9 wrote:
+On Mon, Oct 28, 2019 at 08:34:29AM +0100, Philippe Mathieu-Daud=E9 wrote:
 > From: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 >=20
-> Gaisler provides convenient images:
-> https://www.gaisler.com/index.php/downloads/linux
+> User case from:
+> https://tyom.blogspot.com/2019/04/aixprep-under-qemu-how-to.html
 >=20
-> HOWTO build:
-> https://www.gaisler.com/index.php/products/operating-systems/linux
->=20
+> Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> Acked-by: Artyom Tarasenko <atar4qemu@gmail.com>
+> Tested-by: Cleber Rosa <crosa@redhat.com>
+> Reviewed-by: Cleber Rosa <crosa@redhat.com>
 > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 > ---
->  tests/acceptance/machine_sparc_leon3.py | 28 +++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
+> v3: use avocado_qemu.wait_for_console_pattern (Cleber)
+> ---
+>  tests/acceptance/ppc_prep_40p.py | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
 >=20
-> diff --git a/tests/acceptance/machine_sparc_leon3.py b/tests/acceptance/m=
-achine_sparc_leon3.py
-> index a1394ba8ad..1172fd5da0 100644
-> --- a/tests/acceptance/machine_sparc_leon3.py
-> +++ b/tests/acceptance/machine_sparc_leon3.py
-> @@ -10,6 +10,8 @@ import logging
-> =20
->  from avocado import skipIf
->  from avocado_qemu import MachineTest
-> +from avocado_qemu import wait_for_console_pattern
-> +from avocado_qemu import exec_command_and_wait_for_pattern
-> =20
-> =20
->  class Leon3Machine(MachineTest):
-> @@ -35,3 +37,29 @@ class Leon3Machine(MachineTest):
-> =20
->          wait_for_console_pattern(self,'Copyright (c) 2001-2014 HelenOS p=
-roject')
->          wait_for_console_pattern(self,'Booting the kernel ...')
-> +
-> +    def test_leon3_linux_kernel_4_9_busybox(self):
-> +        """
-> +        :avocado: tags=3Darch:sparc
-> +        :avocado: tags=3Dmachine:leon3
-> +        """
-> +        kernel_url =3D ('https://www.gaisler.com/anonftp/linux/linux-4/i=
-mages/'
-> +                     'leon-linux-4.9/leon-linux-4.9-1.0/up/image.ram')
-> +        kernel_hash =3D '289bd1bcca10cda76d0ef2264a8657adc251f5f5'
-> +        kernel_path =3D self.fetch_asset(kernel_url, asset_hash=3Dkernel=
-_hash)
-> +
-> +        self.vm.set_machine('leon3_generic')
-> +        self.vm.set_console()
-> +        self.vm.add_args('-kernel', kernel_path)
-> +
-> +        self.vm.launch()
-> +
-> +        wait_for_console_pattern(self, 'TYPE: Leon3 System-on-a-Chip')
-> +
-> +        wait_for_console_pattern(self, 'Welcome to Buildroot')
-> +
-> +        wait_for_console_pattern(self, 'buildroot login:')
-> +        exec_command_and_wait_for_pattern(self, 'root', '#')
 
-On my testing, I never got passed this point (the prompt after the
-username is never received/acknowledged).
+Queuing on my python-next branch (and sending shortly in a PR).
 
-> +        uname =3D 'Linux buildroot 4.9.54-00018-g62dab2c #2 ' \
-> +                'Wed Oct 18 09:45:51 CEST 2017 sparc GNU/Linux'
-
-A matter of style, certainly, but I find this better:
-
-        uname =3D ('Linux buildroot 4.9.54-00018-g62dab2c #2 '
-                 'Wed Oct 18 09:45:51 CEST 2017 sparc GNU/Linux')
-
+Thanks,
 - Cleber.
-
-> +        exec_command_and_wait_for_pattern(self, 'uname -a', uname)
-> --=20
-> 2.21.0
->=20
 
 
