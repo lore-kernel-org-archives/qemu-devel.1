@@ -2,66 +2,50 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37815CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 14:32:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24382CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 15:13:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01FDA2087E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 14:32:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="xMEFJQmW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01FDA2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hostfission.com
+	by mail.kernel.org (Postfix) with ESMTPS id E97BC20856
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 15:13:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E97BC20856
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPSYD-0004Sj-5j
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 10:32:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34443)
+	id 1iPTB5-0002Ya-Gl
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 11:12:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39155)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geoff@hostfission.com>) id 1iPSXM-0003oX-4D
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:31:57 -0400
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iPT85-0007wy-KX
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 11:09:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geoff@hostfission.com>) id 1iPSXI-0008KH-SS
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:31:55 -0400
-Received: from mail1.hostfission.com ([139.99.139.48]:58716)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <geoff@hostfission.com>) id 1iPSXF-0008Gi-JE
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:31:50 -0400
-Received: from www1.hostfission.com (www1.hostfission.com [139.99.139.52])
- by mail1.hostfission.com (Postfix) with ESMTP id 31C944BA08
- for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 01:31:42 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=hostfission.com;
- s=mail; t=1572359502;
- bh=GR2WUNdsqxs5OyiHgrm+E2Ii7l/sjRDk4Ictleq6Y/Y=;
- h=To:Subject:Date:From:From;
- b=xMEFJQmWKjarqY/FwDBcJeUtWCM6GiuM9JAK5Urxe5Q6P/PneEftv+nYZf68NTr7i
- OJ6OAw3l3LVi3O1IH5q3VtxvvLrWNsfgD6hF/eNSsaf0uS4TItVhCkyFO+VJ4kgKM5
- 4kdkfrpV77vx908qs2UWLYoS+wvrtM8ZpKfQzbDk=
-Received: by www1.hostfission.com (Postfix, from userid 1000)
- id 20CDC83472; Wed, 30 Oct 2019 01:31:42 +1100 (AEDT)
-To: qemu-devel@nongnu.org
-Subject: RFC: New device for zero-copy VM memory access
-X-PHP-Originating-Script: 0:rcube.php
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iPT80-00051f-OP
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 11:09:53 -0400
+Received: from relay.sw.ru ([185.231.240.75]:37192)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iPT7r-0004yz-17; Tue, 29 Oct 2019 11:09:39 -0400
+Received: from [10.94.3.0] (helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.2)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iPT7n-00062X-F9; Tue, 29 Oct 2019 18:09:35 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH] block/block-copy: fix s->copy_size for compressed cluster
+Date: Tue, 29 Oct 2019 18:09:34 +0300
+Message-Id: <20191029150934.26416-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Wed, 30 Oct 2019 01:31:42 +1100
-From: geoff@hostfission.com
-Message-ID: <c83fe0e7157562c3c17598917977eb4d@hostfission.com>
-X-Sender: geoff@hostfission.com
-User-Agent: Roundcube Webmail/1.2.3
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 139.99.139.48
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,82 +57,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi All,
+0e2402452f1f20429 allowed writes larger than cluster, but that's
+unsupported for compressed write. Fix it.
 
-Over the past week, I have been working to come up with a solution to 
-the
-memory transfer performance issues that hinder the Looking Glass 
-Project.
+Fixes: 0e2402452f1f20429
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/block-copy.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Currently Looking Glass works by using the IVSHMEM shared memory device 
-which
-is fed by an application that captures the guest's video output. While 
-this
-works it is sub-optimal because we first have to perform a CPU copy of 
-the
-captured frame into shared RAM, and then back out again for display. 
-Because
-the destination buffers are allocated by closed proprietary code 
-(DirectX, or
-NVidia NvFBC) there is no way to have the frame placed directly into the
-IVSHMEM shared ram.
+diff --git a/block/block-copy.c b/block/block-copy.c
+index c39cc9cffe..79798a1567 100644
+--- a/block/block-copy.c
++++ b/block/block-copy.c
+@@ -109,9 +109,9 @@ BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *target,
+         s->use_copy_range = false;
+         s->copy_size = cluster_size;
+     } else if (write_flags & BDRV_REQ_WRITE_COMPRESSED) {
+-        /* Compression is not supported for copy_range */
++        /* Compression supports only cluster-size writes and no copy-range. */
+         s->use_copy_range = false;
+-        s->copy_size = MAX(cluster_size, BLOCK_COPY_MAX_BUFFER);
++        s->copy_size = cluster_size;
+     } else {
+         /*
+          * copy_range does not respect max_transfer (it's a TODO), so we factor
+-- 
+2.21.0
 
-This new device, currently named `introspection` (which needs a more 
-suitable
-name, porthole perhaps?), provides a means of translating guest physical
-addresses to host virtual addresses, and finally to the host offsets in 
-RAM for
-file-backed memory guests. It does this by means of a simple protocol 
-over a
-unix socket (chardev) which is supplied the appropriate fd for the VM's 
-system
-RAM. The guest (in this case, Windows), when presented with the address 
-of a
-userspace buffer and size, will mlock the appropriate pages into RAM and 
-pass
-guest physical addresses to the virtual device.
-
-This device and the windows driver have been designed in such a way that 
-it's a
-utility device for any project and/or application that could make use of 
-it.
-The PCI subsystem vendor and device ID are used to provide a means of 
-device
-identification in cases where multiple devices may be in use for 
-differing
-applications. This also allows one common driver to be used for any 
-other
-projects wishing to build on this device.
-
-My ultimate goal is to get this to a state where it could be accepted 
-upstream
-into Qemu at which point Looking Glass would be modified to use it 
-instead of
-the IVSHMEM device.
-
-My git repository with the new device can be found at:
-https://github.com/gnif/qemu
-
-The new device is:
-https://github.com/gnif/qemu/blob/master/hw/misc/introspection.c
-
-Looking Glass:
-https://looking-glass.hostfission.com/
-
-The windows driver, while working, needs some cleanup before the source 
-is
-published. I intend to maintain both this device and the windows driver
-including producing a signed Windows 10 driver if Redhat are unwilling 
-or
-unable.
-
-Kind Regards,
-Geoffrey McRae
-
-HostFission
-https://hostfission.com
 
