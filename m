@@ -2,74 +2,83 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98788CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 17:52:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EA88CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 18:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 705672086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 17:52:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 705672086A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0936320679
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 18:17:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n8VR3fF4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0936320679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPVfW-0003mj-JG
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 13:52:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36903)
+	id 1iPW40-0004tD-2y
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 14:17:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40160)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iPVef-0002IF-VW
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 13:51:43 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iPW2d-0003nr-CT
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 14:16:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iPVee-0000Kp-OC
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 13:51:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45518)
+ (envelope-from <peter.maydell@linaro.org>) id 1iPVtG-0004cj-KF
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 14:06:47 -0400
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35297)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iPVed-0000KF-8c
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 13:51:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iPVeb-0006gA-F4
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 17:51:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5A9232E80C8
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 17:51:37 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iPVtG-0004c2-Ed
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 14:06:46 -0400
+Received: by mail-ot1-x342.google.com with SMTP id z6so10596999otb.2
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 11:06:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/ZpOBpkmuHhyFlC0yLyEw0pQYVuMMLKFxg7JU51845Y=;
+ b=n8VR3fF4Nvfs9ryuFx7Y1f9dTKb3W+9MVZmab4KogY8JlfmuJgHLPfLV36TqJek2T8
+ pxQ1bu1YbNgFe3swNuKy9NtqIfUM37vC86mNpFPMGv+y3LXSrB911jMmmHwBCrLMFRBx
+ re3fMII+KKWWhhNEbJjwUmTo6YgGFWnFgKwX419uPdhUIOXTmbetzaOUw9CL6FzbIkVU
+ GGsQVjXMKwajr0MiDaOQ1X5CYvFbqDOBa1Gd8pEBTHK7AIk9mpQnOQ1acMyJnE9YKzIJ
+ RqvjXQ1/xcyHOSHck9sV1CB0cvAJ8carrP78L2XcycnhMYoPnTolRgWdVAC7GF1iljE6
+ O1Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/ZpOBpkmuHhyFlC0yLyEw0pQYVuMMLKFxg7JU51845Y=;
+ b=DOVrhXeBZ2Y17qWip08XrbkoejPeZK7aUk0I4x9+9mOa9YvpRrfwgdCkjMxdxfFhlj
+ 7qijuadhmi34CPx6czt303az8gUU3k6ybsEiGzipUrXAZTpNe4Qcrug1Z9thLn5uVHgd
+ xR3JpZ/Xwj8vhjV6necwfhG9YAnqrpLO6RemXEov5XEH5dalZuNvjicV3VZdhnj1egEF
+ ioBJ3R5BEhFy3CCb1kurV1psTETF9Ek+I7e/qRbwKBNlSmBHJNxlvIvhqOnmS/l96ZdG
+ QRxrqz5vBpIfM0NGPsTt3uHQoWptPsBrMP8qTcsYGnM7oFebzzf/ryj7MMRKFYk+HE3T
+ nJQQ==
+X-Gm-Message-State: APjAAAUHNQisoTN9GKxF+wgVFdwC8ZSPw5QQPHGjYSGYBp4VHhA1TWKp
+ rSrexDfLNaFEPuPjzjskvypfSBs5g+Xyymzo7AVzig==
+X-Google-Smtp-Source: APXvYqxlr0Lsl4K0DGyDxk13se3HUJTg/bjFHvRiyP1yvzy0BuAxu82aNuCVKu8OE/d1F0OKK7OSZomfkKyRdiE3tdo=
+X-Received: by 2002:a05:6830:ca:: with SMTP id
+ x10mr18275357oto.221.1572372403650; 
+ Tue, 29 Oct 2019 11:06:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 29 Oct 2019 17:44:33 -0000
-From: tm <1850378@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: riscv
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: palmerdabbelt tm42
-X-Launchpad-Bug-Reporter: tm (tm42)
-X-Launchpad-Bug-Modifier: tm (tm42)
-References: <157235518365.28116.9958641157871998206.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157237107385.18979.70135991890023720.malone@wampee.canonical.com>
-Subject: [Bug 1850378] Re: RISC-V unreliable IPIs
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 21b585b5e2261e7fb7a724ebf1f1b678eb197a44
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+References: <20191028181643.5143-1-laurent@vivier.eu>
+In-Reply-To: <20191028181643.5143-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 29 Oct 2019 18:06:44 +0000
+Message-ID: <CAFEAcA_yMKGnxQA36fDZW4KePLzCK4fxb=xjEJViQnkJaFULdw@mail.gmail.com>
+Subject: Re: [PULL 00/11] Q800 branch patches
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,61 +87,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1850378 <1850378@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I created a minimal example from my setup. I'm running a kernel 4.19.57 wit=
-h a custom firmware based on bbl (https://github.com/riscv/riscv-pk). =
+On Mon, 28 Oct 2019 at 18:48, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> The following changes since commit 7bc8f9734213b76e76631a483be13d6737c2adbc:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20191025' into staging (2019-10-25 13:12:16 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu-m68k.git tags/q800-branch-pull-request
+>
+> for you to fetch changes up to f7d85525f14b99aaa7bf561c9f3cf11c85a080c9:
+>
+>   BootLinuxConsoleTest: Test the Quadra 800 (2019-10-28 19:07:22 +0100)
+>
+> ----------------------------------------------------------------
+> Add Macintosh Quadra 800 machine in hw/m68k
+>
+> ----------------------------------------------------------------
 
-An ioctl device from a kernel module is used to execute the code above in k=
-ernel space.
-In the example, the userspace application proceeds after a couple of second=
-s without receiving the custom IPI.
+Applied, thanks.
 
-** Attachment added: "example.tar.gz"
-   https://bugs.launchpad.net/qemu/+bug/1850378/+attachment/5301219/+files/=
-example.tar.gz
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1850378
-
-Title:
-  RISC-V unreliable IPIs
-
-Status in QEMU:
-  New
-
-Bug description:
-  I am working on a project with custom inter processor interrupts (IPIs) o=
-n the RISC-V virt machine.
-  After upgrading from version 3.1.0 to 4.1.0 which fixes a related issue (=
-https://github.com/riscv/riscv-qemu/issues/132) I am able to use the CPU ho=
-tplug feature.
-
-  However, if I try to use IPIs for communication between two cores, the
-  wfi instruction behaves strangely. Either it does not return, or it
-  returns on timer interrupts, even though they are disabled. The code,
-  I use on one core to wait for an interrupt is the following.
-
-  	csr_clear(sie, SIE_SEIE | SIE_STIE);
-  	do {
-  		wait_for_interrupt();
-  		sipval =3D csr_read(sip);
-  		sieval =3D csr_read(sie);
-  		scauseval =3D csr_read(scause) & 0xFF;
-  	/* only break if wfi returns for an software interrupt */
-  	} while ((sipval & sieval) =3D=3D 0 && scauseval !=3D 1);
-  	csr_set(sie, SIE_SEIE | SIE_STIE);
-
-  Since the resulting sequence does not seem to be deterministic, my
-  guess is, that it has something to do with the communication of qemu's
-  threads for the different cores.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1850378/+subscriptions
+-- PMM
 
