@@ -2,108 +2,114 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD634CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 08:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2512CA9EC3
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 10:08:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97F2920663
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 08:52:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80C8420830
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 10:08:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TLMXUMpN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97F2920663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="giw3YxOR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80C8420830
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPNEx-0007SP-Jt
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 04:52:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43230)
+	id 1iPOQ4-0007Uv-JT
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 06:08:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54825)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iPNDZ-0006GX-Og
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 04:51:11 -0400
+ (envelope-from <saipava@xilinx.com>) id 1iPOPL-0006H2-Vk
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 06:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iPNDW-00087J-W3
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 04:51:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22919
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iPNDW-00086t-Q8
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 04:51:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572339066;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=qwbfk7oJEcfwd5S9gIDlQfDjvLwLYMJy3QF/hxKVX4E=;
- b=TLMXUMpNTZg0elCi15mg66tXuLe1IArfdl93co2gAhxpeqqRqDYIW7e17UcGuALXV5lqmS
- S5V9pfxao29CPbo9aUwPUrXKaBa0CFTGK+ySr4EKF//8hPtLxb/0uaCCQ8+Ab6y+wspQZv
- RXCa7BFHlEb7Po/LRD/0BvTR00ILh6s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-77-tl1Ataw3P8KcaW0kSkZw8Q-1; Tue, 29 Oct 2019 04:50:58 -0400
-X-MC-Unique: tl1Ataw3P8KcaW0kSkZw8Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1038800C80;
- Tue, 29 Oct 2019 08:50:57 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-116-124.ams2.redhat.com
- [10.36.116.124])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A732260863;
- Tue, 29 Oct 2019 08:50:52 +0000 (UTC)
-Subject: Re: [RFC 0/3] block/file-posix: Work around XFS bug
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-References: <20191025095849.25283-1-mreitz@redhat.com>
- <20191027123555.GN4472@stefanha-x1.localdomain>
- <20191028110408.GB3579@localhost.localdomain>
- <44565375-b051-e782-4988-c3e0b1745e37@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <9780d020-e573-866f-dce4-d99d73f1f5e8@redhat.com>
-Date: Tue, 29 Oct 2019 09:50:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <saipava@xilinx.com>) id 1iPOPK-0007n0-Mo
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 06:07:23 -0400
+Received: from mail-eopbgr690053.outbound.protection.outlook.com
+ ([40.107.69.53]:8727 helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <saipava@xilinx.com>) id 1iPOPJ-0007mF-FQ
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 06:07:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oWE7yqKNVKicZUKX6746eZQgkHvWz4K3jxDd1yCH/ODFIgO+6oDZUWiqG1cw/E3xdx3ioCkkfd8/EdzYlbw1bySQ7NNyhr3KNvmrqv0f6FuUe3yNEWHLA6HqtGP16IyCp2OZhH57iV3c8g7eUdBVBefapQEgtpZcf06YbB+gODhq/ipGs8TEmhV8aQWZLCUgd+jhVWp7HoPoBBFUYAKx2ErdqTbrfHN6ugENCfcwv4qf+5z5+/0bQsRMcsJTU7zePk9TMzcUKcbdqXITGo8ceKq96MPSbzj+WPLUciY6Osv+CI+6wddziGvsRfVUFxyg5jEgZomDkkIS9Pq6RfGmQA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3OFQAgxzKMl2/hNQOmfZLJMyciYtVh2h3xRGwpAkXzc=;
+ b=RfvwcsZtXKVC9yNSufl0uGhsvc+ZkpEl9vGeab8otvk1s2yXngzFiKysZdaYHADUmrTSQm9YV0z67hDtJyP9fOAuMohhk/F0krVJCJsP8e4JMKkQr5DmfH50C0YOh4xae1fPpmI1L7HB59HpFWc969+QuZ0gQhN0JkgulROiEob+RvCPfnYOKqYvMQhL3BSquFycsyL8uts0JObt8RYUn74T1ttOa+xK9QgBfvwcT6mCTd1Kb6sbcnCRt6tiMjMSTT1xtAHvDJNyZGnmO6Ewsgz8jFK7n3nB40/6mmdc1TKLnBLPOiEfWptsJZNRv85slD8wOK3tVU71xufgLJN0EA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
+ dkim=pass header.d=xilinx.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3OFQAgxzKMl2/hNQOmfZLJMyciYtVh2h3xRGwpAkXzc=;
+ b=giw3YxORu6ORClcpZ2kyGahagREXlLafpwJwE+Nz3K6aCaFzacKszr5vi5RKxEt8wtQEUYf47aY0q5zoUgKPBGMCVCfIgc994KufUcIeTPls1eVhAh0YRGbIZa1BX8UkndhTzE+EWNNu1qfRaDP+4LsRsZcMMgnlC6ymLQGUY3Y=
+Received: from MN2PR02MB5935.namprd02.prod.outlook.com (20.179.86.87) by
+ MN2PR02MB6333.namprd02.prod.outlook.com (52.132.173.85) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2387.24; Tue, 29 Oct 2019 10:07:19 +0000
+Received: from MN2PR02MB5935.namprd02.prod.outlook.com
+ ([fe80::f112:f0f9:7b15:74ed]) by MN2PR02MB5935.namprd02.prod.outlook.com
+ ([fe80::f112:f0f9:7b15:74ed%6]) with mapi id 15.20.2387.027; Tue, 29 Oct 2019
+ 10:07:19 +0000
+From: Sai Pavan Boddu <saipava@xilinx.com>
+To: Francisco Iglesias <frasse.iglesias@gmail.com>
+Subject: RE: [PATCH v5] ssi: xilinx_spips: Skip spi bus update for a few
+ register writes
+Thread-Topic: [PATCH v5] ssi: xilinx_spips: Skip spi bus update for a few
+ register writes
+Thread-Index: AQHVizaJS7lTJ/WsXEWclDEjOUkX3qdxaPAA
+Date: Tue, 29 Oct 2019 10:07:19 +0000
+Message-ID: <MN2PR02MB5935B0443A9AB09711949107CA610@MN2PR02MB5935.namprd02.prod.outlook.com>
+References: <1571981531-27498-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <20191025131713.pthu3ihbuhllzszd@fralle-msi>
+In-Reply-To: <20191025131713.pthu3ihbuhllzszd@fralle-msi>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=saipava@xilinx.com; 
+x-originating-ip: [149.199.50.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: d06c236f-e256-425f-5507-08d75c57c89b
+x-ms-traffictypediagnostic: MN2PR02MB6333:|MN2PR02MB6333:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MN2PR02MB633385A66AB775A27850A5A7CA610@MN2PR02MB6333.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:139;
+x-forefront-prvs: 0205EDCD76
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10009020)(4636009)(376002)(396003)(136003)(39850400004)(366004)(346002)(189003)(199004)(13464003)(66066001)(71200400001)(71190400001)(3846002)(6116002)(26005)(4326008)(14454004)(2906002)(52536014)(6506007)(478600001)(53546011)(102836004)(186003)(6916009)(66946007)(33656002)(7736002)(256004)(64756008)(9686003)(15650500001)(66446008)(66556008)(66476007)(81166006)(81156014)(7696005)(305945005)(76116006)(5660300002)(229853002)(99286004)(446003)(486006)(11346002)(74316002)(86362001)(54906003)(14444005)(6246003)(8936002)(76176011)(476003)(6436002)(25786009)(55016002)(316002)(8676002);
+ DIR:OUT; SFP:1101; SCL:1; SRVR:MN2PR02MB6333;
+ H:MN2PR02MB5935.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: xilinx.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: taAjdBL3lULQ8Ut/V3duf7vXt0+TBjY+MMxAAP3JX9GUYVaCi8nX+LWLvG5X6zfYs3yYrSl0b1iSVqB4ZAiAkxx+c3TjIxnuY7tTIDBFrLNzIlaSjdmSULUc1nrUsQ6fimnBLXe6mryxJRen6fbUaGsLmCpsvLeOhdpdMjnCjOePp7gwUxHMMauPo9s69BltZIWJ9Uz3Rqisj7tz10cEBLk0mDZnZg8drRfasS83Pq+ITKfcnpdNHJ3AwVRVOmoFQJxGeB/9CyDEdCBfYvjYedKBaVSPRv19MX0xRyiut3abkqYkf0xkKQF0c/18IZ2UXUpzO/Br3/JgTdAH/+/SdkImUVaTipUh+K71oI7G991Yh4ww72V7XRo1e5Uz9b81KopAjIrBX32+9Jb11plZeL6FIcoKvleQ/AnGe2hjEbQLvNphNmNqgJGlPcuFcs/R
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <44565375-b051-e782-4988-c3e0b1745e37@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="2XHFDAcRiRzgTFkjV70vYlClaTzCIIPRP"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d06c236f-e256-425f-5507-08d75c57c89b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Oct 2019 10:07:19.1439 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: SIrn3QGgBmm/tjG92ccfl3ucwtNFqoV2EH8BVcz4aMwUlXa1dqeRNY99znYN0Ahz9xILTJlmIRzikMzYALsjeQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR02MB6333
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.69.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,126 +121,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Edgar Iglesias <edgari@xilinx.com>, Alistair Francis <alistair@alistair23.me>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2XHFDAcRiRzgTFkjV70vYlClaTzCIIPRP
-Content-Type: multipart/mixed; boundary="nyFGOSYrHPEsqQ22rTN9NK5QJLRx54G1Y"
+Thanks Francisco & Alistair for review.
+I have sent V6 with Review tags and commit message fix.
 
---nyFGOSYrHPEsqQ22rTN9NK5QJLRx54G1Y
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Regards,
+Sai Pavan
 
-On 28.10.19 12:25, Vladimir Sementsov-Ogievskiy wrote:
-> 28.10.2019 14:04, Kevin Wolf wrote:
->> Am 27.10.2019 um 13:35 hat Stefan Hajnoczi geschrieben:
->>> On Fri, Oct 25, 2019 at 11:58:46AM +0200, Max Reitz wrote:
-
-[...]
-
->>>> (3) Drop handle_alloc_space(), i.e. revert c8bb23cbdbe32f.
->>>>      To my knowledge I=E2=80=99m the only one who has provided any ben=
-chmarks for
->>>>      this commit, and even then I was a bit skeptical because it perfo=
-rms
->>>>      well in some cases and bad in others.  I concluded that it=E2=80=
-=99s
->>>>      probably worth it because the =E2=80=9Csome cases=E2=80=9D are mo=
-re likely to occur.
->>>>
->>>>      Now we have this problem of corruption here (granted due to a bug=
- in
->>>>      the XFS driver), and another report of massively degraded
->>>>      performance on ppc64
->>>>      (https://bugzilla.redhat.com/show_bug.cgi?id=3D1745823 =E2=80=93 =
-sorry, a
->>>>      private BZ; I hate that :-/  The report is about 40 % worse
->>>>      performance for an in-guest fio write benchmark.)
->>>>
->>>>      So I have to ask the question about what the justification for
->>>>      keeping c8bb23cbdbe32f is.  How much does performance increase wi=
-th
->>>>      it actually?  (On non-(ppc64+XFS) machines, obviously)
->>>>
->>>>      Advantages:
->>>>      + Trivial
->>>>      + No layering violations
->>>>      + We wouldn=E2=80=99t need to keep track of whether the kernel bu=
-g has been
->>>>        fixed or not
->>>>      + Fixes the ppc64+XFS performance problem
->>>>
->>>>      Disadvantages:
->>>>      - Reverts cluster allocation performance to pre-c8bb23cbdbe32f
->>>>        levels, whatever that means
->>>
->>> My favorite because it is clean and simple, but Vladimir has a valid
->>> use-case for requiring this performance optimization so reverting isn't
->>> an option.
->>
->> Vladimir also said that qcow2 subclusters would probably also solve his
->> problem, so maybe reverting and applying the subcluster patches instead
->> is a possible solution, too?
+> -----Original Message-----
+> From: Francisco Iglesias <frasse.iglesias@gmail.com>
+> Sent: Friday, October 25, 2019 6:47 PM
+> To: Sai Pavan Boddu <saipava@xilinx.com>
+> Cc: Alistair Francis <alistair@alistair23.me>; Peter Maydell
+> <peter.maydell@linaro.org>; Edgar Iglesias <edgari@xilinx.com>; qemu-
+> devel@nongnu.org
+> Subject: Re: [PATCH v5] ssi: xilinx_spips: Skip spi bus update for a few =
+register
+> writes
 >=20
-> I'm not sure about ssd case, it may need write-zero optimization anyway.
-
-What exactly do you need?  Do you actually need to write zeroes (e.g.
-because you=E2=80=99re storing images on block devices) or would it be
-sufficient to just drop the COW areas when bdrv_has_zero_init() and
-bdrv_has_zero_init_truncate() are true?
-
-I=E2=80=99m asking because Dave Chinner said
-(https://bugzilla.redhat.com/show_bug.cgi?id=3D1765547#c7) that
-fallocate() is always slow at least with aio=3Dnative because it needs to
-wait for all concurrent AIO writes to finish, and so it causes the AIO
-pipeline to stall.
-
-(He suggested using XFS extent size hints to get the same effect as
-write-zeroes for free, basically, but I don=E2=80=99t know whether that=E2=
-=80=99s really
-useful to us; as unallocated areas on XFS read back as zero anyway.)
-
->> We already have some cases where the existing handle_alloc_space()
->> causes performance to actually become worse, and serialising requests as
->> a workaround isn't going to make performance any better. So even on
->> these grounds, keeping commit c8bb23cbdbe32f is questionable.
->>
+> Hi Sai,
 >=20
-> Can keeping handle_alloc_space under some config option be an option?
-
-Hm.  A config option is weird if you=E2=80=99re the only one who=E2=80=99s =
-going to
-enable it.  But other than that I don=E2=80=99t have anything against it.
-
-Max
-
-
---nyFGOSYrHPEsqQ22rTN9NK5QJLRx54G1Y--
-
---2XHFDAcRiRzgTFkjV70vYlClaTzCIIPRP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl23/WoACgkQ9AfbAGHV
-z0C8LwgAtLkCIFZnozIb+uTr8niqqEMJx3NWA89w5IdGxdjXApTN8UIVrMvsXT+N
-fgfuq0lJCZ9MIL+WpunAW8R3RDKsKf/HrDiAg/RDpcMsBnA2qyBY6DmWSTo6tuFn
-Kx3/IXprshLNxsO9QItRFhaS+8zqV8PsUjBTPjOZaLJtSonnldJrh6aauFdaa17M
-Jvd1xbKv3YOypfPKKGjYHjo0A7IkQrlw8kRN7z9pnNifdhTG6b+gveDgVtYsdxWW
-vTrOXD2Ugx0M2vLtPBZDdbxZ0TlIdsu301mhLsKSplizBe/x5O7PN6vJBr2VyYiU
-YlzG+Nl5izTZriLxbRF1SRlgOv6EMw==
-=v7Om
------END PGP SIGNATURE-----
-
---2XHFDAcRiRzgTFkjV70vYlClaTzCIIPRP--
-
+> On [2019 Oct 25] Fri 11:02:11, Sai Pavan Boddu wrote:
+> > A few configuration register writes need not update the spi bus state,
+> > so just return after register write.
+>=20
+> s/register write/the register write/
+>=20
+> >
+> > Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+>=20
+> After above change:
+>=20
+> Reviewed-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+> Tested-by: Francisco Iglesias <frasse.iglesias@gmail.com>
+>=20
+> Best regards,
+> Francisco Iglesias
+>=20
+> > ---
+> >
+> > Changes for V2:
+> > 	Just skip update of spips cs and fifos
+> > 	Update commit message accordingly
+> > Changes for V4:
+> > 	Avoid checking for zynqmp qspi
+> > 	Skip spi bus update for few of the registers Changes for V4:
+> > 	Move the register list to existing switch case above.
+> > Change for V5:
+> > 	Fixed Commit message.
+> >
+> >  hw/ssi/xilinx_spips.c | 22 ++++++++++++++++++----
+> >  1 file changed, 18 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/ssi/xilinx_spips.c b/hw/ssi/xilinx_spips.c index
+> > a309c71..0d6c2e1 100644
+> > --- a/hw/ssi/xilinx_spips.c
+> > +++ b/hw/ssi/xilinx_spips.c
+> > @@ -109,6 +109,7 @@
+> >  #define R_GPIO              (0x30 / 4)
+> >  #define R_LPBK_DLY_ADJ      (0x38 / 4)
+> >  #define R_LPBK_DLY_ADJ_RESET (0x33)
+> > +#define R_IOU_TAPDLY_BYPASS (0x3C / 4)
+> >  #define R_TXD1              (0x80 / 4)
+> >  #define R_TXD2              (0x84 / 4)
+> >  #define R_TXD3              (0x88 / 4)
+> > @@ -139,6 +140,8 @@
+> >  #define R_LQSPI_STS         (0xA4 / 4)
+> >  #define LQSPI_STS_WR_RECVD      (1 << 1)
+> >
+> > +#define R_DUMMY_CYCLE_EN    (0xC8 / 4)
+> > +#define R_ECO               (0xF8 / 4)
+> >  #define R_MOD_ID            (0xFC / 4)
+> >
+> >  #define R_GQSPI_SELECT          (0x144 / 4)
+> > @@ -970,6 +973,7 @@ static void xilinx_spips_write(void *opaque,
+> > hwaddr addr,  {
+> >      int mask =3D ~0;
+> >      XilinxSPIPS *s =3D opaque;
+> > +    bool try_flush =3D true;
+> >
+> >      DB_PRINT_L(0, "addr=3D" TARGET_FMT_plx " =3D %x\n", addr,
+> (unsigned)value);
+> >      addr >>=3D 2;
+> > @@ -1019,13 +1023,23 @@ static void xilinx_spips_write(void *opaque,
+> hwaddr addr,
+> >          tx_data_bytes(&s->tx_fifo, (uint32_t)value, 3,
+> >                        s->regs[R_CONFIG] & R_CONFIG_ENDIAN);
+> >          goto no_reg_update;
+> > +    /* Skip SPI bus update for below registers writes */
+> > +    case R_GPIO:
+> > +    case R_LPBK_DLY_ADJ:
+> > +    case R_IOU_TAPDLY_BYPASS:
+> > +    case R_DUMMY_CYCLE_EN:
+> > +    case R_ECO:
+> > +        try_flush =3D false;
+> > +        break;
+> >      }
+> >      s->regs[addr] =3D (s->regs[addr] & ~mask) | (value & mask);
+> >  no_reg_update:
+> > -    xilinx_spips_update_cs_lines(s);
+> > -    xilinx_spips_check_flush(s);
+> > -    xilinx_spips_update_cs_lines(s);
+> > -    xilinx_spips_update_ixr(s);
+> > +    if (try_flush) {
+> > +        xilinx_spips_update_cs_lines(s);
+> > +        xilinx_spips_check_flush(s);
+> > +        xilinx_spips_update_cs_lines(s);
+> > +        xilinx_spips_update_ixr(s);
+> > +    }
+> >  }
+> >
+> >  static const MemoryRegionOps spips_ops =3D {
+> > --
+> > 2.7.4
+> >
 
