@@ -2,81 +2,72 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71193CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 00:10:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F12DCA9EC0
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 00:10:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35342208C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 00:10:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="deICxhNr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35342208C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0D541208C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 00:10:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D541208C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=FreeBSD.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPF5a-0001B0-Bd
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 20:10:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59076)
+	id 1iPF5m-0000sk-4y
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 20:10:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32933)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iPEn6-00030D-Ks
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:51:17 -0400
+ (envelope-from <kevans@FreeBSD.org>) id 1iPF3M-00078y-Jy
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 20:08:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iPEmH-0003rm-Ua
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:50:27 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60548
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <kevans@FreeBSD.org>) id 1iPF3K-0001NC-LN
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 20:08:04 -0400
+Received: from mx2.freebsd.org ([96.47.72.81]:61982)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iPEmH-0003rd-Qm
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 19:50:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572306625;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HOgyww85CaZTd33qjudOfCpcXibyYIgkL0SAsN2TQtI=;
- b=deICxhNrxb9hiU5MmH6wPIMlIm5N7acyYe+aiZecs1wKMGBYbrRiG2hs/CMOMj5u9JuauF
- wOztrxDBWNqyFksZ29ttmzb8Qz+pRPpP7cnljQDjTwHpuAP3KwiCRNJKWNHLPilUGYdnIs
- frCjX8Nx3dqBLEjfQmEWZIN6Pd5/kJE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-1ta5b690MvGw4gmZGWRACg-1; Mon, 28 Oct 2019 19:50:23 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C63A8017DD;
- Mon, 28 Oct 2019 23:50:21 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-123-183.rdu2.redhat.com
- [10.10.123.183])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B90D5C1B2;
- Mon, 28 Oct 2019 23:50:19 +0000 (UTC)
-From: Cleber Rosa <crosa@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
-Subject: [PULL 3/16] Python libs: close console sockets before shutting down
- the VMs
-Date: Mon, 28 Oct 2019 19:49:49 -0400
-Message-Id: <20191028235002.17691-4-crosa@redhat.com>
-In-Reply-To: <20191028235002.17691-1-crosa@redhat.com>
-References: <20191028235002.17691-1-crosa@redhat.com>
+ (Exim 4.71) (envelope-from <kevans@FreeBSD.org>) id 1iPF3K-0001MX-HP
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 20:08:02 -0400
+Received: from mx1.freebsd.org (mx1.freebsd.org [IPv6:2610:1c1:1:606c::19:1])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+ (Client CN "mx1.freebsd.org",
+ Issuer "Let's Encrypt Authority X3" (verified OK))
+ by mx2.freebsd.org (Postfix) with ESMTPS id E963689CA0
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 00:08:00 +0000 (UTC)
+ (envelope-from kevans@FreeBSD.org)
+Received: from smtp.freebsd.org (smtp.freebsd.org
+ [IPv6:2610:1c1:1:606c::24b:4])
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+ server-signature RSA-PSS (4096 bits)
+ client-signature RSA-PSS (4096 bits) client-digest SHA256)
+ (Client CN "smtp.freebsd.org",
+ Issuer "Let's Encrypt Authority X3" (verified OK))
+ by mx1.freebsd.org (Postfix) with ESMTPS id 472Bk84dslz4g0l;
+ Tue, 29 Oct 2019 00:08:00 +0000 (UTC)
+ (envelope-from kevans@FreeBSD.org)
+Received: from shiva.audeuro.com (unknown [209.182.120.228])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (Client did not present a certificate)
+ (Authenticated sender: kevans/mail)
+ by smtp.freebsd.org (Postfix) with ESMTPSA id 151C517EF6;
+ Tue, 29 Oct 2019 00:07:59 +0000 (UTC)
+ (envelope-from kevans@FreeBSD.org)
+Date: Mon, 28 Oct 2019 19:07:57 -0500
+From: Kyle Evans <kevans@FreeBSD.org>
+To: qemu-devel@nongnu.org
+Subject: safe_syscall design guidance
+Message-ID: <20191029000757.r2ma5qt3zoic5ynd@shiva.audeuro.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 1ta5b690MvGw4gmZGWRACg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: NeoMutt/20180716
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 96.47.72.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,64 +79,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- qemu-ppc@nongnu.org, Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: kevans@FreeBSD.org, imp@FreeBSD.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, the console socket on QEMUMachine is closed after the QMP
-command to gracefully exit QEMU is executed.  Because of a possible
-deadlock (QEMU waiting for the socket to become writable) let's close
-the console socket earlier.
+Hi,
 
-Reference: <20190607034214.GB22416@habkost.net>
-Reference: https://bugs.launchpad.net/qemu/+bug/1829779
-From: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20190911023558.4880-2-crosa@redhat.com>
----
- python/qemu/machine.py | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+We're working on improving bsd-user in a local tree and rebasing forward
+to get our work suitable for upstreaming. I'm porting the safe_syscall stuff
+over to bsd-user, and would like to get some design guidance as it may best
+be implemented with some refactoring of linux-user.
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index 2024e8b1b1..a4631d6934 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -277,10 +277,6 @@ class QEMUMachine(object):
-=20
-         self._qemu_log_path =3D None
-=20
--        if self._console_socket is not None:
--            self._console_socket.close()
--            self._console_socket =3D None
--
-         if self._temp_dir is not None:
-             shutil.rmtree(self._temp_dir)
-             self._temp_dir =3D None
-@@ -342,6 +338,13 @@ class QEMUMachine(object):
-         """
-         Terminate the VM and clean up
-         """
-+        # If we keep the console socket open, we may deadlock waiting
-+        # for QEMU to exit, while QEMU is waiting for the socket to
-+        # become writeable.
-+        if self._console_socket is not None:
-+            self._console_socket.close()
-+            self._console_socket =3D None
+Below is an example of the refactoring my initial approach takes. I'm
+omitting !x86_64 in this e-mail because it's all along the same lines and
+only including the part relevant to linux-user. Effectively, linux-user/host
+is moved to qemu-user/host along with ^/linux-user/safe-syscall.S.
+
+Some bits specific to FreeBSD, also likely other *BSD but I've not yet
+verified, are sprinkled throughout host/*/* parts; this is the main point I
+suspect may be objectionable. FreeBSD indicates syscall error differently
+than Linux, and *context bits are also different. Other OS-specific bits
+for other arch are similar to the diff below.
+
+A full version of this can be found in my tree, currently only available on
+GitHub: https://github.com/kevans91/qemu-bsd-user/tree/safe_syscall -- this
+is applied to our version, currently based on qemu 3.1.
+
+Thoughts?
+
+Thanks,
+
+Kyle Evans
+diff --git a/Makefile.target b/Makefile.target
+index 61f28d3722..13b3b13706 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -113,7 +113,7 @@ obj-$(call notempty,$(TARGET_XML_FILES)) += gdbstub-xml.o
+ ifdef CONFIG_LINUX_USER
+ 
+ QEMU_CFLAGS+=-I$(SRC_PATH)/linux-user/$(TARGET_ABI_DIR) \
+-             -I$(SRC_PATH)/linux-user/host/$(ARCH) \
++             -I$(SRC_PATH)/qemu-user/host/$(ARCH) \
+              -I$(SRC_PATH)/linux-user
+ 
+ obj-y += linux-user/
+@@ -128,6 +128,7 @@ ifdef CONFIG_BSD_USER
+ 
+ QEMU_CFLAGS+=-I$(SRC_PATH)/bsd-user/$(TARGET_ABI_DIR) \
+              -I$(SRC_PATH)/bsd-user/$(HOST_VARIANT_DIR) \
++             -I$(SRC_PATH)/qemu-user/host/$(ARCH) \
+              -I$(SRC_PATH)/bsd-user \
+              -D_WANT_SEMUN
+ obj-y += bsd-user/
+diff --git a/linux-user/Makefile.objs b/linux-user/Makefile.objs
+index 769b8d8336..6089fc3a06 100644
+--- a/linux-user/Makefile.objs
++++ b/linux-user/Makefile.objs
+@@ -1,6 +1,6 @@
+ obj-y = main.o syscall.o strace.o mmap.o signal.o \
+ 	elfload.o linuxload.o uaccess.o uname.o \
+-	safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
++	../qemu-user/safe-syscall.o $(TARGET_ABI_DIR)/signal.o \
+         $(TARGET_ABI_DIR)/cpu_loop.o exit.o fd-trans.o
+ 
+ obj-$(TARGET_HAS_BFLT) += flatload.o
+diff --git a/linux-user/host/x86_64/hostdep.h b/qemu-user/host/x86_64/hostdep.h
+similarity index 78%
+rename from linux-user/host/x86_64/hostdep.h
+rename to qemu-user/host/x86_64/hostdep.h
+index a4fefb5114..7aa233a116 100644
+--- a/linux-user/host/x86_64/hostdep.h
++++ b/qemu-user/host/x86_64/hostdep.h
+@@ -21,11 +21,17 @@
+ extern char safe_syscall_start[];
+ extern char safe_syscall_end[];
+ 
++#ifndef __FreeBSD__
++#define DEFINE_PCREG(puc)	&((ucontext_t *)(puc))->uc_mcontext.gregs[REG_RIP]
++#else
++typedef __register_t greg_t;
++#define DEFINE_PCREG(puc)   &((ucontext_t *)(puc))->uc_mcontext.mc_rip
++#endif
 +
-         if self.is_running():
-             try:
-                 if not has_quit:
---=20
-2.21.0
-
+ /* Adjust the signal context to rewind out of safe-syscall if we're in it */
+ static inline void rewind_if_in_safe_syscall(void *puc)
+ {
+-    ucontext_t *uc = puc;
+-    greg_t *pcreg = &uc->uc_mcontext.gregs[REG_RIP];
++    greg_t *pcreg = DEFINE_PCREG(puc);
+ 
+     if (*pcreg > (uintptr_t)safe_syscall_start
+         && *pcreg < (uintptr_t)safe_syscall_end) {
+diff --git a/linux-user/host/x86_64/safe-syscall.inc.S b/qemu-user/host/x86_64/safe-syscall.inc.S
+similarity index 98%
+rename from linux-user/host/x86_64/safe-syscall.inc.S
+rename to qemu-user/host/x86_64/safe-syscall.inc.S
+index f36992daa3..2b52e122d4 100644
+--- a/linux-user/host/x86_64/safe-syscall.inc.S
++++ b/qemu-user/host/x86_64/safe-syscall.inc.S
+@@ -72,6 +72,11 @@ safe_syscall_start:
+         syscall
+ safe_syscall_end:
+         /* code path for having successfully executed the syscall */
++#ifdef __FreeBSD__
++        jnb 2f
++        neg	%rax
++2:
++#endif
+         pop     %rbp
+         .cfi_remember_state
+         .cfi_def_cfa_offset 8
+diff --git a/linux-user/safe-syscall.S b/qemu-user/safe-syscall.S
+similarity index 100%
+rename from linux-user/safe-syscall.S
+rename to qemu-user/safe-syscall.S
 
