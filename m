@@ -2,82 +2,79 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C59BCA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 13:15:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FAFCCA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 13:27:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 448FD20856
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 13:15:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47E2420578
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 13:27:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Us3Mb6IM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 448FD20856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="crqaGqY/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47E2420578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPRL2-00040c-Gl
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 09:15:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51583)
+	id 1iPRWm-0004Pr-EN
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 09:27:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53968)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iPRJD-0002Br-Uj
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 09:13:17 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iPRUy-0002Wg-7l
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 09:25:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iPR5c-0004vx-Jt
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:59:16 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35207
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iPR5c-0004vf-EH
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:59:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572353951;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IT1aPRF+1g7Z8aX2+tr2mCf+DyouEE6m2YdtgYq10r8=;
- b=Us3Mb6IMDEHWFHNmcku+W8XiinnhDozcv7Jmhvs1xE5zw/MKeX3eWXUpVCwAUUEBnVf1o6
- 4CGifMMhm4oLnUyqavK3QsCvL4u3KZdTRh2GbrKNdFGxnf07ylQf3+yZXmWXR1VPv6H5d7
- 55ZClEWEFDUmaiLTkQa6AOYyTbC28y4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-266-dqC57J3BPn2GAqJAOpd1-g-1; Tue, 29 Oct 2019 08:59:09 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C459C801E64;
- Tue, 29 Oct 2019 12:59:08 +0000 (UTC)
-Received: from work-vm (ovpn-116-79.ams2.redhat.com [10.36.116.79])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 38AF260863;
- Tue, 29 Oct 2019 12:56:49 +0000 (UTC)
-Date: Tue, 29 Oct 2019 12:56:41 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH] fw_cfg: Allow reboot-timeout=-1 again
-Message-ID: <20191029125641.GC16329@work-vm>
-References: <20191025165706.177653-1-dgilbert@redhat.com>
- <87a79o4jjb.fsf@dusky.pond.sub.org> <20191028134700.GB2961@work-vm>
- <87lft3sqhf.fsf@dusky.pond.sub.org>
+ (envelope-from <alistair23@gmail.com>) id 1iPRUw-00071o-0G
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 09:25:23 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:33345)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iPRUt-00070E-9d; Tue, 29 Oct 2019 09:25:19 -0400
+Received: by mail-lj1-x242.google.com with SMTP id t5so7434048ljk.0;
+ Tue, 29 Oct 2019 06:25:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=tg/r3g2zVMvHDV0jcIg3a709gbA5NPrFDTOpzHBbLLc=;
+ b=crqaGqY/68L3RiLj2L3R6MQA4PUvaO0Q10JGL7gxmEzAFZM04B1RojYvAI8rMV0Dac
+ UDmFe35RO8mf2ZKqfdhLTpc8QALIKMt4Eyp9WsK3y9StEqw9EYlC4T4PC6+1A+cDCIXC
+ G450Xup+taJJWLP9/CxlqElNmz7CJPaFEX2JhfcjeM4L6ow4jefu8Gdm/WVk8q2pan6Z
+ TmL1f+/sNyTzfNuFxnWJJSUahzZ4GGCYe/FYn59ZwgRgOyPdihizPyXn400JttWDQDct
+ YbTP392diY4lSk4eH4QDMxn7q+aIsQdg/4CJF4WuoYGhi7i2DtAlf6CcJS9r+f8w1kfs
+ P59Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=tg/r3g2zVMvHDV0jcIg3a709gbA5NPrFDTOpzHBbLLc=;
+ b=k/oMld/T/8hOrQ1vu9v9jJnEJDxBAsAYFRE7VON2FzNMxxqBYurLnF/sivDyixgRDS
+ tFUuR2PsX6aXKMjE9S4yaxqDPsOl1xlsjrWqnTbwx6fCijuOXWvCKZYfbckO1Vh+epIB
+ bt8m6sSQsevDOUsWWVClB10o3+jGrQQB2nrUKvPWIL65WBa9DSxWCA4W8bLxJx2YfgGF
+ 7ynkuO1gWvJd9jD+X+pdH5K6xf83RNDiwfIO5Ti6E0ggxe6am4LrPy7er7B0FhihtqwJ
+ Qa+bsrnoWqkSMv7R0So4chEp2ZmKWeWV60PWaeKdCDnjke5an+fC/t42YIPXHCXSQfsm
+ Eucw==
+X-Gm-Message-State: APjAAAWNdNoQ7Npd9VOR901UgR1aUfM06jSeHcucqPok3wePXteaBoiI
+ yENeI1JoLJMeqjR8ndRIHFKCG6nkld/7Y9+AzAc=
+X-Google-Smtp-Source: APXvYqwMjbdhdJwlGca6cDVqUZcc0MC7e6HXDMjnRSi57azLi03G2Z6XdhMrO936lJhdjZMKfa4y53VgkaYlSfTPlDs=
+X-Received: by 2002:a2e:b54d:: with SMTP id a13mr2815554ljn.4.1572355517867;
+ Tue, 29 Oct 2019 06:25:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87lft3sqhf.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: dqC57J3BPn2GAqJAOpd1-g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191025042734.69244-1-anup.patel@wdc.com>
+In-Reply-To: <20191025042734.69244-1-anup.patel@wdc.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 29 Oct 2019 14:24:50 +0100
+Message-ID: <CAKmqyKMQz-OMFQRTdmpBpGMLiZ_ZM+UL5T5aAWZ5F1fC6vddOQ@mail.gmail.com>
+Subject: Re: [PATCH v5 0/2] RTC support for QEMU RISC-V virt machine
+To: Anup Patel <Anup.Patel@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,96 +86,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, liq3ea@gmail.com, qemu-devel@nongnu.org,
- kraxel@redhat.com, lersek@redhat.com, hhan@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Anup Patel <anup@brainfault.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
->=20
-> > * Markus Armbruster (armbru@redhat.com) wrote:
-> >> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
-> >>=20
-> >> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >> >
-> >> > Commit ee5d0f89de3e53cdb0dc added range checking on reboot-timeout
-> >> > to only allow the range 0..65535; however both qemu and libvirt docu=
-ment
-> >> > the special value -1  to mean don't reboot.
-> >> > Allow it again.
-> >> >
-> >> > Fixes: ee5d0f89de3e53cdb0dc ("fw_cfg: Fix -boot reboot-timeout error=
- checking")
-> >> > RH bz: https://bugzilla.redhat.com/show_bug.cgi?id=3D1765443
-> >> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> > ---
-> >> >  hw/nvram/fw_cfg.c | 5 +++--
-> >> >  1 file changed, 3 insertions(+), 2 deletions(-)
-> >> >
-> >> > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> >> > index 7dc3ac378e..1a9ec44232 100644
-> >> > --- a/hw/nvram/fw_cfg.c
-> >> > +++ b/hw/nvram/fw_cfg.c
-> >> > @@ -247,10 +247,11 @@ static void fw_cfg_reboot(FWCfgState *s)
-> >> > =20
-> >> >      if (reboot_timeout) {
-> >> >          rt_val =3D qemu_opt_get_number(opts, "reboot-timeout", -1);
-> >> > +
-> >> >          /* validate the input */
-> >> > -        if (rt_val < 0 || rt_val > 0xffff) {
-> >> > +        if (rt_val < -1 || rt_val > 0xffff) {
-> >> >              error_report("reboot timeout is invalid,"
-> >> > -                         "it should be a value between 0 and 65535"=
-);
-> >> > +                         "it should be a value between -1 and 65535=
-");
-> >> >              exit(1);
-> >> >          }
-> >> >      }
-> >>=20
-> >> Semantic conflict with "PATCH] qemu-options.hx: Update for
-> >> reboot-timeout parameter", Message-Id:
-> >> <20191015151451.727323-1-hhan@redhat.com>.
-> >
-> > Thanks for spotting that.
-> > I think Han and also submitted patches to review it from libvirt
-> > and it wasn't obvious what to do.  (Cc'd Han in).
-> >
-> >> I'm too tired right now to risk an opinion on which one we want.
-> >
-> > As is everyone else !  The problem here is that its documented
-> > as a valid thing to do, and libvirt does it, and you might have=20
-> > a current XML file that did it.  Now I think you could change libvirt
-> > to omit the reboot-timeout parameter if it was called with -1.
-> >
-> > So given its a documented thing in both qemu and libvirt xml
-> > if we want to remove it then it sohuld be deprecated properly - but it'=
-s
-> > already broken.
->=20
-> Since commit ee5d0f89d, v4.0.0.
->=20
-> If that commit had not made it into a release, we'd certainly treat the
-> loss of "-1 means don't reboot" as regression.
->=20
-> But it has.  We can treat it as a regression anyway.  We can also
-> declare "ship has sailed".
->=20
-> I'm leaning towads the former.
->=20
-> If we restore "-1 means don't reboot", then I don't see a need to
-> deprecate it.  Just keep it.
->=20
-> What do you think?
+On Fri, Oct 25, 2019 at 6:28 AM Anup Patel <Anup.Patel@wdc.com> wrote:
+>
+> This series adds RTC device to QEMU RISC-V virt machine. We have
+> selected Goldfish RTC device model for this. It's a pretty simple
+> synthetic device with few MMIO registers and no dependency external
+> clock. The driver for Goldfish RTC is already available in Linux so
+> we just need to enable it in Kconfig for RISCV and also update Linux
+> defconfigs.
+>
+> We have tested this series with Linux-5.4-rc4 plus defconfig changes
+> available in 'goldfish_rtc_v2' branch of:
+> https://github.com/avpatel/linux.git
 
-That's also my view; especially since the problem seems to be an easy
-fix.
+@Peter Maydell this has been reviewed, do you mind taking this in you
+next PR? I don't see a maintainer for hw/rtc.
 
-Dave
+Alistair
 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+>
+> Changes since v4:
+>  - Fixed typo in trace event usage
+>  - Moved goldfish_rtc.h to correct location
+>
+> Changes since v3:
+>  - Address all nit comments from Alistair
+>
+> Changes since v2:
+>  - Rebased on RTC code refactoring
+>
+> Changes since v1:
+>  - Implemented VMState save/restore callbacks
+>
+> Anup Patel (2):
+>   hw: rtc: Add Goldfish RTC device
+>   riscv: virt: Use Goldfish RTC device
+>
+>  hw/riscv/Kconfig              |   1 +
+>  hw/riscv/virt.c               |  15 ++
+>  hw/rtc/Kconfig                |   3 +
+>  hw/rtc/Makefile.objs          |   1 +
+>  hw/rtc/goldfish_rtc.c         | 288 ++++++++++++++++++++++++++++++++++
+>  hw/rtc/trace-events           |   4 +
+>  include/hw/riscv/virt.h       |   2 +
+>  include/hw/rtc/goldfish_rtc.h |  46 ++++++
+>  8 files changed, 360 insertions(+)
+>  create mode 100644 hw/rtc/goldfish_rtc.c
+>  create mode 100644 include/hw/rtc/goldfish_rtc.h
+>
+> --
+> 2.17.1
+>
 
