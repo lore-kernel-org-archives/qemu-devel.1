@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B75BCA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 11:51:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6FC1CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 11:51:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0235D222C7
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 11:51:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2F7F222C7
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 11:51:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VGo03DYT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0235D222C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RfNIRFTU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2F7F222C7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPQ27-0006H3-Js
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 07:51:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40395)
+	id 1iPQ2O-0006Xr-JU
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 07:51:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1iPQ0f-0004eu-Tc
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 07:50:03 -0400
+ (envelope-from <jfreimann@redhat.com>) id 1iPQ0w-0005FK-5c
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 07:50:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1iPQ0e-0002Eh-7h
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 07:50:01 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39089
+ (envelope-from <jfreimann@redhat.com>) id 1iPQ0u-0002Lo-0p
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 07:50:18 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31995
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1iPQ0e-0002EM-46
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 07:50:00 -0400
+ id 1iPQ0t-0002LV-TE
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 07:50:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572349799;
+ s=mimecast20190719; t=1572349815;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=OI8mQHo6NpJ2TX7FUKcl4Coaz0cX7IW7/TlAD8b3TEo=;
- b=VGo03DYTlByBUcSgjfBVBgmMVZH6oVZcrp5JBLG8Y1l3FvwGfOiAmd6lRnxT0yjT10c4Gt
- iGpCasWJdPKEuyEwddkaRJt5Waqbi4hT1V/baIGT6IiotyZAtKLofiHirATE0NykvnOiyv
- kSPNDQzJkr64HG2JjkCSbxtewqUr61c=
+ bh=C1+Dj+oJ0W2gdUtrFcQu9e/PwdooobomOmASz0Vr4QI=;
+ b=RfNIRFTU+xdtE/X0UehMEy6iHnZJjG7AAvpAtgwQvFJrU6ib8MsBBSmHiBDh+YNZ7YdF9G
+ w3HeU1BaknOa8tNt4sq5QiOevuzQkz42MVLjZmA4qNYftJuWdDLZJzFDvSAu6PCjF3F5u+
+ 9sIUNEx6jn2Q2E22RwW3J2ZaXepWBig=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-6ZkR-M8rPl6aR14tf3oa7w-1; Tue, 29 Oct 2019 07:49:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-398-Vp5CA-o0MrG_mMsRlw1e-Q-1; Tue, 29 Oct 2019 07:50:11 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35E101800D55;
- Tue, 29 Oct 2019 11:49:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD8158017DD;
+ Tue, 29 Oct 2019 11:50:10 +0000 (UTC)
 Received: from localhost (ovpn-116-231.ams2.redhat.com [10.36.116.231])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 653A45D6C3;
- Tue, 29 Oct 2019 11:49:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F3985FCA6;
+ Tue, 29 Oct 2019 11:49:58 +0000 (UTC)
 From: Jens Freimann <jfreimann@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 01/11] qdev/qbus: add hidden device support
-Date: Tue, 29 Oct 2019 12:48:55 +0100
-Message-Id: <20191029114905.6856-2-jfreimann@redhat.com>
+Subject: [PATCH v7 02/11] pci: add option for net failover
+Date: Tue, 29 Oct 2019 12:48:56 +0100
+Message-Id: <20191029114905.6856-3-jfreimann@redhat.com>
 In-Reply-To: <20191029114905.6856-1-jfreimann@redhat.com>
 References: <20191029114905.6856-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 6ZkR-M8rPl6aR14tf3oa7w-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: Vp5CA-o0MrG_mMsRlw1e-Q-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,245 +93,94 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds support for hiding a device to the qbus and qdev APIs.  The
-first user of this will be the virtio-net failover feature but the API
-introduced with this patch could be used to implement other features as
-well, for example hiding pci devices when a pci bus is powered off.
+This patch adds a failover_pair_id property to PCIDev which is
+used to link the primary device in a failover pair (the PCI dev) to
+a standby (a virtio-net-pci) device.
 
-qdev_device_add() is modified to check for a failover_pair_id
-argument in the option string. A DeviceListener callback
-should_be_hidden() is added. It can be used by a standby device to
-inform qdev that this device should not be added now. The standby device
-handler can store the device options to plug the device in at a later
-point in time.
-
-One reason for hiding the device is that we don't want to expose both
-devices to the guest kernel until the respective virtio feature bit
-VIRTIO_NET_F_STANDBY was negotiated and we know that the devices will be
-handled correctly by the guest.
-
-More information on the kernel feature this is using:
- https://www.kernel.org/doc/html/latest/networking/net_failover.html
-
-An example where the primary device is a vfio-pci device and the standby
-device is a virtio-net device:
-
-A device is hidden when it has an "failover_pair_id" option, e.g.
-
- -device virtio-net-pci,...,failover=3Don,...
- -device vfio-pci,...,failover_pair_id=3Dnet1,...
+It only supports ethernet devices. Also currently it only supports
+PCIe devices. The requirement for PCIe is because it doesn't support
+other hotplug controllers at the moment. The failover functionality can
+be added to other hotplug controllers like ACPI, SHCP,... later on.
 
 Signed-off-by: Jens Freimann <jfreimann@redhat.com>
 ---
- hw/core/qdev.c         | 24 ++++++++++++++++++++++++
- include/hw/qdev-core.h | 29 +++++++++++++++++++++++++++++
- qdev-monitor.c         | 41 +++++++++++++++++++++++++++++++++++++----
- vl.c                   |  6 ++++--
- 4 files changed, 94 insertions(+), 6 deletions(-)
+ hw/pci/pci.c         | 31 +++++++++++++++++++++++++++++++
+ include/hw/pci/pci.h |  3 +++
+ 2 files changed, 34 insertions(+)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index cbad6c1d55..3b8d43d0fd 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -212,6 +212,30 @@ void device_listener_unregister(DeviceListener *listen=
-er)
-     QTAILQ_REMOVE(&device_listeners, listener, link);
- }
-=20
-+bool qdev_should_hide_device(QemuOpts *opts)
-+{
-+    int rc =3D -1;
-+    DeviceListener *listener;
-+
-+    QTAILQ_FOREACH(listener, &device_listeners, link) {
-+       if (listener->should_be_hidden) {
-+            /*
-+             * should_be_hidden_will return
-+             *  1 if device matches opts and it should be hidden
-+             *  0 if device matches opts and should not be hidden
-+             *  -1 if device doesn't match ops
-+             */
-+            rc =3D listener->should_be_hidden(listener, opts);
-+        }
-+
-+        if (rc > 0) {
-+            break;
-+        }
-+    }
-+
-+    return rc > 0;
-+}
-+
- void qdev_set_legacy_instance_id(DeviceState *dev, int alias_id,
-                                  int required_for_version)
- {
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index aa123f88cb..710981af36 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -78,6 +78,19 @@ typedef void (*BusUnrealize)(BusState *bus, Error **errp=
-);
-  * respective parent types.
-  *   </para>
-  * </note>
-+ *
-+ * # Hiding a device #
-+ * To hide a device, a DeviceListener function should_be_hidden() needs to
-+ * be registered.
-+ * It can be used to defer adding a device and therefore hide it from the
-+ * guest. The handler registering to this DeviceListener can save the QOpt=
-s
-+ * passed to it for re-using it later and must return that it wants the de=
-vice
-+ * to be/remain hidden or not. When the handler function decides the devic=
-e
-+ * shall not be hidden it will be added in qdev_device_add() and
-+ * realized as any other device. Otherwise qdev_device_add() will return e=
-arly
-+ * without adding the device. The guest will not see a "hidden" device
-+ * until it was marked don't hide and qdev_device_add called again.
-+ *
-  */
- typedef struct DeviceClass {
-     /*< private >*/
-@@ -154,6 +167,12 @@ struct DeviceState {
- struct DeviceListener {
-     void (*realize)(DeviceListener *listener, DeviceState *dev);
-     void (*unrealize)(DeviceListener *listener, DeviceState *dev);
-+    /*
-+     * This callback is called upon init of the DeviceState and allows to
-+     * inform qdev that a device should be hidden, depending on the device
-+     * opts, for example, to hide a standby device.
-+     */
-+    int (*should_be_hidden)(DeviceListener *listener, QemuOpts *device_opt=
-s);
-     QTAILQ_ENTRY(DeviceListener) link;
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index aa05c2b9b2..824ab4ed7b 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -75,6 +75,8 @@ static Property pci_props[] =3D {
+                     QEMU_PCIE_LNKSTA_DLLLA_BITNR, true),
+     DEFINE_PROP_BIT("x-pcie-extcap-init", PCIDevice, cap_present,
+                     QEMU_PCIE_EXTCAP_INIT_BITNR, true),
++    DEFINE_PROP_STRING("failover_pair_id", PCIDevice,
++                       failover_pair_id),
+     DEFINE_PROP_END_OF_LIST()
  };
 =20
-@@ -451,4 +470,14 @@ static inline bool qbus_is_hotpluggable(BusState *bus)
- void device_listener_register(DeviceListener *listener);
- void device_listener_unregister(DeviceListener *listener);
+@@ -2077,6 +2079,7 @@ static void pci_qdev_realize(DeviceState *qdev, Error=
+ **errp)
+     ObjectClass *klass =3D OBJECT_CLASS(pc);
+     Error *local_err =3D NULL;
+     bool is_default_rom;
++    uint16_t class_id;
 =20
-+/**
-+ * @qdev_should_hide_device:
-+ * @opts: QemuOpts as passed on cmdline.
-+ *
-+ * Check if a device should be added.
-+ * When a device is added via qdev_device_add() this will be called,
-+ * and return if the device should be added now or not.
-+ */
-+bool qdev_should_hide_device(QemuOpts *opts);
-+
- #endif
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 148df9cacf..ffa08c670f 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -32,9 +32,11 @@
- #include "qemu/help_option.h"
- #include "qemu/option.h"
- #include "qemu/qemu-print.h"
-+#include "qemu/option_int.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/sysemu.h"
- #include "migration/misc.h"
-+#include "migration/migration.h"
-=20
- /*
-  * Aliases were a bad idea from the start.  Let's keep them
-@@ -562,13 +564,36 @@ void qdev_set_id(DeviceState *dev, const char *id)
+     /* initialize cap_present for pci_is_express() and pci_config_size(),
+      * Note that hybrid PCIs are not set automatically and need to manage
+@@ -2101,6 +2104,34 @@ static void pci_qdev_realize(DeviceState *qdev, Erro=
+r **errp)
+         }
      }
- }
 =20
-+static int is_failover_device(void *opaque, const char *name, const char *=
-value,
-+                        Error **errp)
-+{
-+    if (strcmp(name, "failover_pair_id") =3D=3D 0) {
-+        QemuOpts *opts =3D (QemuOpts *)opaque;
-+
-+        if (qdev_should_hide_device(opts)) {
-+            return 1;
++    if (pci_dev->failover_pair_id) {
++        if (!pci_bus_is_express(pci_get_bus(pci_dev))) {
++            error_setg(errp, "failover primary device must be on "
++                             "PCIExpress bus");
++            error_propagate(errp, local_err);
++            pci_qdev_unrealize(DEVICE(pci_dev), NULL);
++            return;
++        }
++        class_id =3D pci_get_word(pci_dev->config + PCI_CLASS_DEVICE);
++        if (class_id !=3D PCI_CLASS_NETWORK_ETHERNET) {
++            error_setg(errp, "failover primary device is not an "
++                             "Ethernet device");
++            error_propagate(errp, local_err);
++            pci_qdev_unrealize(DEVICE(pci_dev), NULL);
++            return;
++        }
++        if (!(pci_dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION)
++            && (PCI_FUNC(pci_dev->devfn) =3D=3D 0)) {
++            qdev->allow_unplug_during_migration =3D true;
++        } else {
++            error_setg(errp, "failover: primary device must be in its own =
+"
++                              "PCI slot");
++            error_propagate(errp, local_err);
++            pci_qdev_unrealize(DEVICE(pci_dev), NULL);
++            return;
 +        }
 +    }
 +
-+    return 0;
-+}
+     /* rom loading */
+     is_default_rom =3D false;
+     if (pci_dev->romfile =3D=3D NULL && pc->romfile !=3D NULL) {
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index f3f0ffd5fb..69d1f0228b 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -352,6 +352,9 @@ struct PCIDevice {
+     MSIVectorUseNotifier msix_vector_use_notifier;
+     MSIVectorReleaseNotifier msix_vector_release_notifier;
+     MSIVectorPollNotifier msix_vector_poll_notifier;
 +
-+static bool should_hide_device(QemuOpts *opts)
-+{
-+    if (qemu_opt_foreach(opts, is_failover_device, opts, NULL) =3D=3D 0) {
-+        return false;
-+    }
-+    return true;
-+}
-+
- DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
- {
-     DeviceClass *dc;
-     const char *driver, *path;
--    DeviceState *dev;
-+    DeviceState *dev =3D NULL;
-     BusState *bus =3D NULL;
-     Error *err =3D NULL;
-+    bool hide;
++    /* ID of standby device in net_failover pair */
++    char *failover_pair_id;
+ };
 =20
-     driver =3D qemu_opt_get(opts, "driver");
-     if (!driver) {
-@@ -602,11 +627,17 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **=
-errp)
-             return NULL;
-         }
-     }
--    if (qdev_hotplug && bus && !qbus_is_hotpluggable(bus)) {
-+    hide =3D should_hide_device(opts);
-+
-+    if ((hide || qdev_hotplug) && bus && !qbus_is_hotpluggable(bus)) {
-         error_setg(errp, QERR_BUS_NO_HOTPLUG, bus->name);
-         return NULL;
-     }
-=20
-+    if (hide) {
-+        return NULL;
-+    }
-+
-     if (!migration_is_idle()) {
-         error_setg(errp, "device_add not allowed while migrating");
-         return NULL;
-@@ -648,8 +679,10 @@ DeviceState *qdev_device_add(QemuOpts *opts, Error **e=
-rrp)
-=20
- err_del_dev:
-     error_propagate(errp, err);
--    object_unparent(OBJECT(dev));
--    object_unref(OBJECT(dev));
-+    if (dev) {
-+        object_unparent(OBJECT(dev));
-+        object_unref(OBJECT(dev));
-+    }
-     return NULL;
- }
-=20
-diff --git a/vl.c b/vl.c
-index 4a7d011661..171f11be39 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2207,10 +2207,12 @@ static int device_init_func(void *opaque, QemuOpts =
-*opts, Error **errp)
-     DeviceState *dev;
-=20
-     dev =3D qdev_device_add(opts, errp);
--    if (!dev) {
-+    if (!dev && *errp) {
-+        error_report_err(*errp);
-         return -1;
-+    } else if (dev) {
-+        object_unref(OBJECT(dev));
-     }
--    object_unref(OBJECT(dev));
-     return 0;
- }
-=20
+ void pci_register_bar(PCIDevice *pci_dev, int region_num,
 --=20
 2.21.0
 
