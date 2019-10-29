@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 316DFCA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:15:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFD8CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:15:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 073D02086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:15:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 073D02086A
+	by mail.kernel.org (Postfix) with ESMTPS id 6F77620862
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:15:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F77620862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPahX-0005kW-Kt
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 19:14:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42802)
+	id 1iPai8-00066p-Ow
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 19:15:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43445)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iPaTU-0008BH-9f
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:30 -0400
+ (envelope-from <mst@redhat.com>) id 1iPaU3-0000S3-Kt
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:01:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iPaTO-0003Fg-9h
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46648)
+ (envelope-from <mst@redhat.com>) id 1iPaU2-0004DN-DR
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:01:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47970)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iPaTK-0003A3-6Y
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:20 -0400
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iPaU2-0004CR-0q
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:01:02 -0400
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 67FA1C056807
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 23:00:15 +0000 (UTC)
-Received: by mail-qk1-f198.google.com with SMTP id p68so269473qkf.9
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 16:00:15 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 32055C058CA4
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 23:01:01 +0000 (UTC)
+Received: by mail-qt1-f198.google.com with SMTP id l32so521325qtk.9
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 16:01:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=H3q8OWUdteaAjDBaTxa/GS8RhYWnQs5bsyBylGoVtsE=;
- b=Df9UJb5Uw2CDw9mdbkuTCacSDuFz7VjdMLCtY4wU8LtzwaytvNy9aqAuC/aOXc34gx
- ynGivNjSMeYbtOSEvhl6PNrPs2mPX7a1ipxn1TSwD/ZqkN76UsQlQXZM+iVGGUf8hPQH
- 5+OfAY+eHGXYmJuyJDicUt1QELjWjxHRl9zmfpU99EHn9RSV0/I/oJkqi/oKf7NSrr4L
- 8CW8dQQ9HGrs5OBq2iCUZk5oVer11u4qwWw68lQeSCkEq+wZRkDC6cVRAsrURdtZmZ3Q
- OWNkGxCCyWwemEUETbpVSdkbpEyI4ugrWoKmLeYRCidiDji+TKgzpoa1JYf3xA3gwllB
- 82XA==
-X-Gm-Message-State: APjAAAVUcjZyhYcxJCTr0y5ZI0uH4fTNjoFLv34wsAb3wo/YHCxozw8K
- F3GGsP2prKJx1mBrEIGTM8cqbshb4eEqCblsOjqJrqqTdg4+i7Ie2LSgJjtY62RZpMhypCGir7x
- Nrj3PsgDRykZsgXA=
-X-Received: by 2002:a05:6214:14ac:: with SMTP id
- bo12mr24832172qvb.67.1572390014352; 
- Tue, 29 Oct 2019 16:00:14 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwqQjc1abgL7dxAd/q6ukrzDnthCNOQ8JlwXQ/kBuMl0R9gJ0MbIEms4NshxBpdQI9Gmw0bow==
-X-Received: by 2002:a05:6214:14ac:: with SMTP id
- bo12mr24832144qvb.67.1572390014076; 
- Tue, 29 Oct 2019 16:00:14 -0700 (PDT)
+ bh=nXqJo2N6krLPlsmVICbK9BFQvUyjLuOzQw6gEq62j5U=;
+ b=jT84P2EYUhCrPVm7UyntjcCb1zb/Cl333CkUUz/7eHWMgw+w1mG+KdyDRL/R7E8Nph
+ o1kK3IV++uXlc3Q3K94mWT6VyTIunqyRSLiJBBqhFslNPjay27UuGJQ8p/jyxDNbMGwF
+ LsbSLZTL7ZhU7gtynitvb3r9SjDVFie3mW8/FvuGSEqCkv5syyBAKYGu6pG54aWd8QN6
+ v0R+y39dycbKZOWFFtKCMpNrWGXtrhBqh7QpKkElcta+bSG0TqW3cNmCcu9MAD3XApDU
+ VUP6Sl1Yfe/BeDcH07RDd5QUE9RNsvMOWqgSFithUzteF6ersXBZNhHkflp4kc7otjt3
+ gm6Q==
+X-Gm-Message-State: APjAAAVDKKR/iZDb6pS9LhEalXbaXJOvj38TJiGQf1OAykQOPzucNE+o
+ nHMlHxOEEFz0U/G2y0s919tu3BlIKgTP1fvJjuYMJvhUI10NjlMt/ET4xI6vbXVWWPNFfw0zhaz
+ INEY6CHkW9NoBUHE=
+X-Received: by 2002:a05:6214:1109:: with SMTP id
+ e9mr8074896qvs.129.1572390060148; 
+ Tue, 29 Oct 2019 16:01:00 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzv7t4sEPsB3INjZpjonLSyl7MxE64WcjeUoDgQm7aVZmTf66dTEDKUGbMDRSJxmrJKCOorpQ==
+X-Received: by 2002:a05:6214:1109:: with SMTP id
+ e9mr8074876qvs.129.1572390059953; 
+ Tue, 29 Oct 2019 16:00:59 -0700 (PDT)
 Received: from redhat.com (94.222.26.109.rev.sfr.net. [109.26.222.94])
- by smtp.gmail.com with ESMTPSA id k18sm80584qtj.69.2019.10.29.16.00.12
+ by smtp.gmail.com with ESMTPSA id x22sm96314qtq.15.2019.10.29.16.00.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Oct 2019 16:00:13 -0700 (PDT)
-Date: Tue, 29 Oct 2019 19:00:10 -0400
+ Tue, 29 Oct 2019 16:00:59 -0700 (PDT)
+Date: Tue, 29 Oct 2019 19:00:56 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/14] pci: add option for net failover
-Message-ID: <20191029225932.14585-3-mst@redhat.com>
+Subject: [PULL 09/14] libqos: tolerate wait-unplug migration state
+Message-ID: <20191029225932.14585-10-mst@redhat.com>
 References: <20191029225932.14585-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -91,102 +91,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Jens Freimann <jfreimann@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Jens Freimann <jfreimann@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Jens Freimann <jfreimann@redhat.com>
 
-This patch adds a failover_pair_id property to PCIDev which is
-used to link the primary device in a failover pair (the PCI dev) to
-a standby (a virtio-net-pci) device.
-
-It only supports ethernet devices. Also currently it only supports
-PCIe devices. The requirement for PCIe is because it doesn't support
-other hotplug controllers at the moment. The failover functionality can
-be added to other hotplug controllers like ACPI, SHCP,... later on.
-
 Signed-off-by: Jens Freimann <jfreimann@redhat.com>
-Message-Id: <20191029114905.6856-3-jfreimann@redhat.com>
+Message-Id: <20191029114905.6856-10-jfreimann@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/pci/pci.c         | 31 +++++++++++++++++++++++++++++++
- include/hw/pci/pci.h |  3 +++
- 2 files changed, 34 insertions(+)
+ tests/libqos/libqos.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index aa05c2b9b2..824ab4ed7b 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -75,6 +75,8 @@ static Property pci_props[] = {
-                     QEMU_PCIE_LNKSTA_DLLLA_BITNR, true),
-     DEFINE_PROP_BIT("x-pcie-extcap-init", PCIDevice, cap_present,
-                     QEMU_PCIE_EXTCAP_INIT_BITNR, true),
-+    DEFINE_PROP_STRING("failover_pair_id", PCIDevice,
-+                       failover_pair_id),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-@@ -2077,6 +2079,7 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
-     ObjectClass *klass = OBJECT_CLASS(pc);
-     Error *local_err = NULL;
-     bool is_default_rom;
-+    uint16_t class_id;
- 
-     /* initialize cap_present for pci_is_express() and pci_config_size(),
-      * Note that hybrid PCIs are not set automatically and need to manage
-@@ -2101,6 +2104,34 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
+diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
+index d71557c5cb..f229eb2cb8 100644
+--- a/tests/libqos/libqos.c
++++ b/tests/libqos/libqos.c
+@@ -125,7 +125,8 @@ void migrate(QOSState *from, QOSState *to, const char *uri)
+             break;
          }
-     }
  
-+    if (pci_dev->failover_pair_id) {
-+        if (!pci_bus_is_express(pci_get_bus(pci_dev))) {
-+            error_setg(errp, "failover primary device must be on "
-+                             "PCIExpress bus");
-+            error_propagate(errp, local_err);
-+            pci_qdev_unrealize(DEVICE(pci_dev), NULL);
-+            return;
-+        }
-+        class_id = pci_get_word(pci_dev->config + PCI_CLASS_DEVICE);
-+        if (class_id != PCI_CLASS_NETWORK_ETHERNET) {
-+            error_setg(errp, "failover primary device is not an "
-+                             "Ethernet device");
-+            error_propagate(errp, local_err);
-+            pci_qdev_unrealize(DEVICE(pci_dev), NULL);
-+            return;
-+        }
-+        if (!(pci_dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION)
-+            && (PCI_FUNC(pci_dev->devfn) == 0)) {
-+            qdev->allow_unplug_during_migration = true;
-+        } else {
-+            error_setg(errp, "failover: primary device must be in its own "
-+                              "PCI slot");
-+            error_propagate(errp, local_err);
-+            pci_qdev_unrealize(DEVICE(pci_dev), NULL);
-+            return;
-+        }
-+    }
-+
-     /* rom loading */
-     is_default_rom = false;
-     if (pci_dev->romfile == NULL && pc->romfile != NULL) {
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index f3f0ffd5fb..69d1f0228b 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -352,6 +352,9 @@ struct PCIDevice {
-     MSIVectorUseNotifier msix_vector_use_notifier;
-     MSIVectorReleaseNotifier msix_vector_release_notifier;
-     MSIVectorPollNotifier msix_vector_poll_notifier;
-+
-+    /* ID of standby device in net_failover pair */
-+    char *failover_pair_id;
- };
- 
- void pci_register_bar(PCIDevice *pci_dev, int region_num,
+-        if ((strcmp(st, "setup") == 0) || (strcmp(st, "active") == 0)) {
++        if ((strcmp(st, "setup") == 0) || (strcmp(st, "active") == 0)
++            || (strcmp(st, "wait-unplug") == 0)) {
+             qobject_unref(rsp);
+             g_usleep(5000);
+             continue;
 -- 
 MST
 
