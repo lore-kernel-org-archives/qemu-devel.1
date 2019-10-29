@@ -2,79 +2,81 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7544ECA9EC0
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 02:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDCE5CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 02:45:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EF1520862
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 02:44:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B694120862
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 02:45:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q/z4+kRR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EF1520862
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ihUwVMWw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B694120862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPHUH-0002j3-Cv
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 22:44:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54396)
+	id 1iPHVj-00043q-Ml
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 22:45:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54644)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1iPHPV-0004jN-1E
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:39:06 -0400
+ (envelope-from <dgilbert@redhat.com>) id 1iPHPy-0005RC-E8
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:39:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1iPHOR-0002b5-OX
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:38:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20105
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iPHE4-0002nH-67
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:27:17 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31330
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iPHOR-0002aj-Ky
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:37:59 -0400
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iPHE4-0002mr-1j
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:27:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572316679;
+ s=mimecast20190719; t=1572316035;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Fuw48XRF32YYLQXUaTJftLwF7yl/U7ecUZNqNcY/RpI=;
- b=Q/z4+kRRfICUiTNeQchvQE+EUokr2x3oeU/KBOT4skuHFPG7PMwuvVTuDQR2zPm6/ToZjk
- qKPwElkyjKBjpwCFZMK4mgcncwFaGzIj0YREbL1JZ0ZE8/gLMjmAX8ew8/dIg/h1pUOMrn
- 6DciE29y5mCLg2wDnVbjc+f+REHG9rA=
+ bh=4+pNno2PCh6rUihtsvipclfEDrjWGAhizo+zRW/b3Ig=;
+ b=ihUwVMWwzEFD8TAlYHnHJjyTPgrJellTK7s/8deVHvQw6r9J3KJgTOGSj2ey9pPdFf+Qel
+ 84vvaFH3GV50yPdGxWWeM5MwYuTjSI6FVSMpFXJwrdoOifkXx24WPaOaIXULt5KmACrSpY
+ 4JlQOoh7GJyao7C/kJI5jAxwwJbxLIY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-rYpRP4R3M--UerTbk9ECYg-1; Mon, 28 Oct 2019 22:37:55 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-222-ow0BY0V2OPGrqiNrzjmU9w-1; Mon, 28 Oct 2019 22:27:13 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AB158017CC;
- Tue, 29 Oct 2019 02:37:54 +0000 (UTC)
-Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-230.pek2.redhat.com
- [10.72.12.230])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E852A19C77;
- Tue, 29 Oct 2019 02:37:48 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Subject: [PULL V2 2/4] virtio: new post_load hook
-Date: Tue, 29 Oct 2019 10:37:39 +0800
-Message-Id: <1572316661-20043-3-git-send-email-jasowang@redhat.com>
-In-Reply-To: <1572316661-20043-1-git-send-email-jasowang@redhat.com>
-References: <1572316661-20043-1-git-send-email-jasowang@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: rYpRP4R3M--UerTbk9ECYg-1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8932B1005509;
+ Tue, 29 Oct 2019 02:27:12 +0000 (UTC)
+Received: from work-vm (ovpn-116-127.ams2.redhat.com [10.36.116.127])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 545D01001B28;
+ Tue, 29 Oct 2019 02:27:02 +0000 (UTC)
+Date: Tue, 29 Oct 2019 02:26:59 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [PATCH] fw_cfg: Allow reboot-timeout=-1 again
+Message-ID: <20191029022659.GD2508@work-vm>
+References: <20191025165706.177653-1-dgilbert@redhat.com>
+ <37ac197c-f20e-dd05-ff6a-13a2171c7148@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <37ac197c-f20e-dd05-ff6a-13a2171c7148@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: ow0BY0V2OPGrqiNrzjmU9w-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,74 +88,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>,
- Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>,
- qemu-stable@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: liq3ea@gmail.com, philmd@redhat.com, qemu-devel@nongnu.org,
+ armbru@redhat.com, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Michael S. Tsirkin" <mst@redhat.com>
+* Laszlo Ersek (lersek@redhat.com) wrote:
+> On 10/25/19 18:57, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >
+> > Commit ee5d0f89de3e53cdb0dc added range checking on reboot-timeout
+> > to only allow the range 0..65535; however both qemu and libvirt documen=
+t
+> > the special value -1  to mean don't reboot.
+> > Allow it again.
+> >
+> > Fixes: ee5d0f89de3e53cdb0dc ("fw_cfg: Fix -boot reboot-timeout error ch=
+ecking")
+> > RH bz: https://bugzilla.redhat.com/show_bug.cgi?id=3D1765443
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  hw/nvram/fw_cfg.c | 5 +++--
+> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> > index 7dc3ac378e..1a9ec44232 100644
+> > --- a/hw/nvram/fw_cfg.c
+> > +++ b/hw/nvram/fw_cfg.c
+> > @@ -247,10 +247,11 @@ static void fw_cfg_reboot(FWCfgState *s)
+> >
+> >      if (reboot_timeout) {
+> >          rt_val =3D qemu_opt_get_number(opts, "reboot-timeout", -1);
+> > +
+> >          /* validate the input */
+> > -        if (rt_val < 0 || rt_val > 0xffff) {
+> > +        if (rt_val < -1 || rt_val > 0xffff) {
+> >              error_report("reboot timeout is invalid,"
+> > -                         "it should be a value between 0 and 65535");
+> > +                         "it should be a value between -1 and 65535");
+> >              exit(1);
+> >          }
+> >      }
+> >
+>=20
+> Ouch.
+>=20
+> Here's the prototype of qemu_opt_get_number():
+>=20
+> > uint64_t qemu_opt_get_number(QemuOpts *opts, const char *name, uint64_t=
+ defval);
+>=20
+> So, when we call it, here's what we actually do:
+>=20
+>         rt_val =3D (int64_t)qemu_opt_get_number(opts, "reboot-timeout", (=
+uint64_t)-1);
+>                  ^^^^^^^^^                                            ^^^=
+^^^^^^^
+>=20
+> The conversion to uint64_t is fine.
+>=20
+> The conversion to int64_t is not great:
+>=20
+> > Otherwise, the new type is signed and the value cannot be represented
+> > in it; either the result is implementation-defined or an
+> > implementation-defined signal is raised.
+>=20
+> I guess we're exploiting two's complement, as the implementation-defined
+> result. Not great. :)
+>=20
+> Here's what I'd prefer:
+>=20
+> > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> > index 7dc3ac378ee0..16413550a1da 100644
+> > --- a/hw/nvram/fw_cfg.c
+> > +++ b/hw/nvram/fw_cfg.c
+> > @@ -237,7 +237,7 @@ static void fw_cfg_bootsplash(FWCfgState *s)
+> >  static void fw_cfg_reboot(FWCfgState *s)
+> >  {
+> >      const char *reboot_timeout =3D NULL;
+> > -    int64_t rt_val =3D -1;
+> > +    uint64_t rt_val =3D -1;
+> >      uint32_t rt_le32;
+> >
+> >      /* get user configuration */
+> > @@ -248,9 +248,9 @@ static void fw_cfg_reboot(FWCfgState *s)
+> >      if (reboot_timeout) {
+> >          rt_val =3D qemu_opt_get_number(opts, "reboot-timeout", -1);
+> >          /* validate the input */
+> > -        if (rt_val < 0 || rt_val > 0xffff) {
+> > +        if (rt_val > 0xffff && rt_val !=3D (uint64_t)-1) {
+> >              error_report("reboot timeout is invalid,"
+> > -                         "it should be a value between 0 and 65535");
+> > +                         "it should be a value between -1 and 65535");
+> >              exit(1);
+> >          }
+> >      }
 
-Post load hook in virtio vmsd is called early while device is processed,
-and when VirtIODevice core isn't fully initialized.  Most device
-specific code isn't ready to deal with a device in such state, and
-behaves weirdly.
+I think I'm fine with that as well; want to add a signed off and post?
 
-Add a new post_load hook in a device class instead.  Devices should use
-this unless they specifically want to verify the migration stream as
-it's processed, e.g. for bounds checking.
+> (
+>=20
+> The trick is that strtoull(), in
+>=20
+>   qemu_opt_get_number()
+>     qemu_opt_get_number_helper()
+>       parse_option_number()
+>         qemu_strtou64()
+>           strtoull()
+>=20
+> turns "-1" into (uint64_t)-1, which counts as a valid conversion, per
+> spec:
 
-Cc: qemu-stable@nongnu.org
-Suggested-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Mikhail Sennikovsky <mikhail.sennikovskii@cloud.ionos.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/virtio/virtio.c         | 7 +++++++
- include/hw/virtio/virtio.h | 6 ++++++
- 2 files changed, 13 insertions(+)
+It's rather scary how much we rely on the grubby depths of the
+implementations of our conversion routines.
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 527df03..54a46e2 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2291,6 +2291,13 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int=
- version_id)
-     }
-     rcu_read_unlock();
-=20
-+    if (vdc->post_load) {
-+        ret =3D vdc->post_load(vdev);
-+        if (ret) {
-+            return ret;
-+        }
-+    }
-+
-     return 0;
- }
-=20
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 48e8d04..ca4f9c0 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -158,6 +158,12 @@ typedef struct VirtioDeviceClass {
-      */
-     void (*save)(VirtIODevice *vdev, QEMUFile *f);
-     int (*load)(VirtIODevice *vdev, QEMUFile *f, int version_id);
-+    /* Post load hook in vmsd is called early while device is processed, a=
-nd
-+     * when VirtIODevice isn't fully initialized.  Devices should use this=
- instead,
-+     * unless they specifically want to verify the migration stream as it'=
-s
-+     * processed, e.g. for bounds checking.
-+     */
-+    int (*post_load)(VirtIODevice *vdev);
-     const VMStateDescription *vmsd;
- } VirtioDeviceClass;
-=20
---=20
-2.5.0
+> > If the subject sequence has the expected form and the value of /base/
+> > is zero, the sequence of characters starting with the first digit is
+> > interpreted as an integer constant according to the rules of 6.4.4.1.
+> > If the subject sequence has the expected form and the value of /base/
+> > is between 2 and 36, it is used as the base for conversion, ascribing
+> > to each letter its value as given above. If the subject sequence
+> > begins with a minus sign, the value resulting from the conversion is
+> > negated (in the return type). A pointer to the final string is stored
+> > in the object pointed to by /endptr/, provided that /endptr/ is not a
+> > null pointer.
+>=20
+> )
+>=20
+> I don't insist though; if Phil is OK with the posted patch, I won't try
+> to block it.
+
+I'm happy either way.
+
+Dave
+
+> Thanks
+> Laszlo
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
