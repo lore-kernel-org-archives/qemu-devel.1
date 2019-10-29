@@ -7,55 +7,56 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67AF2CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 14:23:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42036CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 14:23:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 316B720659
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 14:23:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0C61E20830
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 14:23:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="V+vWWGka"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 316B720659
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="V6/Dkmvn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C61E20830
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57646 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPSPP-0007W4-3B
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 10:23:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33218)
+	id 1iPSPe-0007ox-6G
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 10:23:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33228)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iPSOT-0006Lb-KP
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:22:47 -0400
+ (envelope-from <dgibson@ozlabs.org>) id 1iPSOU-0006Q4-Mi
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:22:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iPSOS-00053K-2c
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:22:45 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:60267)
+ (envelope-from <dgibson@ozlabs.org>) id 1iPSOS-00054B-Sy
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:22:46 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:41587)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iPSOQ-0004zI-Vf
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iPSOQ-0004zX-Ve
  for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:22:44 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 472YhC1X4nz9sRf; Wed, 30 Oct 2019 01:22:27 +1100 (AEDT)
+ id 472YhD5xDWz9sR4; Wed, 30 Oct 2019 01:22:35 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1572358955;
- bh=HzmZZNI1K+5CLWZCzfNyEnSmfjsfV5LboTZr/oWFEz4=;
+ d=gibson.dropbear.id.au; s=201602; t=1572358956;
+ bh=/OsjRqAbu3lpJDivohmd7XhSBhLtc95gs65ePZiLNzg=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=V+vWWGkaoMquBtZB1lxNHNqMsntFep3dr/7kzJ9og6/c8h+auK+FGRsAZdG/MWDk5
- /ZWK40HkTV0D1k2ulc355kxYF/6jZ1XXpBUdv+6qtnQ8NaicawCyMwItpjzJjM5ZwR
- pxOI+oK+dNAek2OHCKdRLMLcQUHBuzhm66dez1Hw=
-Date: Tue, 29 Oct 2019 12:50:47 +0100
+ b=V6/DkmvnNQXDcPjBd+GwtHw0nTEjmP+Ii3RvDBtpjRpXnbln93Br5/+MNDT5cGGyE
+ HABMKH6W91vQe7fUb4gQEx/bB4LH0nJTDGTeJn+DeWxiDOC/owZ+E6rcmtVBpndVnZ
+ apZjyY70LUh5kmEHvBmkx010j0CPznDaUrwfJMfY=
+Date: Tue, 29 Oct 2019 13:15:44 +0100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [RFC v2 07/22] hw/pci: introduce pci_device_iommu_context()
-Message-ID: <20191029115047.GR3552@umbus.metropole.lan>
+Subject: Re: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid
+ alloc/free
+Message-ID: <20191029121544.GS3552@umbus.metropole.lan>
 References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-8-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-10-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="A1VS04HCCjrR2aaM"
+ protocol="application/pgp-signature"; boundary="oJFDFiWc3BlD0xT/"
 Content-Disposition: inline
-In-Reply-To: <1571920483-3382-8-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1571920483-3382-10-git-send-email-yi.l.liu@intel.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -81,19 +82,15 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---A1VS04HCCjrR2aaM
+--oJFDFiWc3BlD0xT/
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 24, 2019 at 08:34:28AM -0400, Liu Yi L wrote:
-> This patch adds pci_device_iommu_context() to get an iommu_context
-> for a given device. A new callback is added in PCIIOMMUOps. Users
-> who wants to listen to events issued by vIOMMU could use this new
-> interface to get an iommu_context and register their own notifiers,
-> then wait for notifications from vIOMMU. e.g. VFIO is the first user
-> of it to listen to the PASID_ALLOC/PASID_BIND/CACHE_INV events and
-> propagate the events to host.
+On Thu, Oct 24, 2019 at 08:34:30AM -0400, Liu Yi L wrote:
+> This patch adds pasid alloc/free notifiers for vfio-pci. It is
+> supposed to be fired by vIOMMU. VFIO then sends PASID allocation
+> or free request to host.
 >=20
 > Cc: Kevin Tian <kevin.tian@intel.com>
 > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -102,69 +99,195 @@ On Thu, Oct 24, 2019 at 08:34:28AM -0400, Liu Yi L wrote:
 > Cc: Yi Sun <yi.y.sun@linux.intel.com>
 > Cc: David Gibson <david@gibson.dropbear.id.au>
 > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-
 > ---
->  hw/pci/pci.c         | 16 ++++++++++++++++
->  include/hw/pci/pci.h |  5 +++++
->  2 files changed, 21 insertions(+)
+>  hw/vfio/common.c         |  9 ++++++
+>  hw/vfio/pci.c            | 81 ++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  include/hw/iommu/iommu.h | 15 +++++++++
+>  3 files changed, 105 insertions(+)
 >=20
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index b5ce9ca..4e6af06 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -2625,6 +2625,22 @@ AddressSpace *pci_device_iommu_address_space(PCIDe=
-vice *dev)
->      return &address_space_memory;
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index d418527..e6ad21c 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -1436,6 +1436,7 @@ static void vfio_disconnect_container(VFIOGroup *gr=
+oup)
+>      if (QLIST_EMPTY(&container->group_list)) {
+>          VFIOAddressSpace *space =3D container->space;
+>          VFIOGuestIOMMU *giommu, *tmp;
+> +        VFIOIOMMUContext *giommu_ctx, *ctx;
+> =20
+>          QLIST_REMOVE(container, next);
+> =20
+> @@ -1446,6 +1447,14 @@ static void vfio_disconnect_container(VFIOGroup *g=
+roup)
+>              g_free(giommu);
+>          }
+> =20
+> +        QLIST_FOREACH_SAFE(giommu_ctx, &container->iommu_ctx_list,
+> +                                                   iommu_ctx_next, ctx) {
+> +            iommu_ctx_notifier_unregister(giommu_ctx->iommu_ctx,
+> +                                                      &giommu_ctx->n);
+> +            QLIST_REMOVE(giommu_ctx, iommu_ctx_next);
+> +            g_free(giommu_ctx);
+> +        }
+> +
+>          trace_vfio_disconnect_container(container->fd);
+>          close(container->fd);
+>          g_free(container);
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 12fac39..8721ff6 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -2699,11 +2699,80 @@ static void vfio_unregister_req_notifier(VFIOPCID=
+evice *vdev)
+>      vdev->req_enabled =3D false;
 >  }
 > =20
-> +IOMMUContext *pci_device_iommu_context(PCIDevice *dev)
+> +static void vfio_register_iommu_ctx_notifier(VFIOPCIDevice *vdev,
+> +                                             IOMMUContext *iommu_ctx,
+> +                                             IOMMUCTXNotifyFn fn,
+> +                                             IOMMUCTXEvent event)
 > +{
-> +    PCIBus *bus =3D pci_get_bus(dev);
-> +    PCIBus *iommu_bus =3D bus;
+> +    VFIOContainer *container =3D vdev->vbasedev.group->container;
+> +    VFIOIOMMUContext *giommu_ctx;
 > +
-> +    while (iommu_bus && !iommu_bus->iommu_ops && iommu_bus->parent_dev) {
-> +        iommu_bus =3D pci_get_bus(iommu_bus->parent_dev);
-> +    }
-> +    if (iommu_bus && iommu_bus->iommu_ops &&
-> +        iommu_bus->iommu_ops->get_iommu_context) {
-> +        return iommu_bus->iommu_ops->get_iommu_context(bus,
-> +                           iommu_bus->iommu_opaque, dev->devfn);
-> +    }
-> +    return NULL;
+> +    giommu_ctx =3D g_malloc0(sizeof(*giommu_ctx));
+> +    giommu_ctx->container =3D container;
+> +    giommu_ctx->iommu_ctx =3D iommu_ctx;
+> +    QLIST_INSERT_HEAD(&container->iommu_ctx_list,
+> +                      giommu_ctx,
+> +                      iommu_ctx_next);
+> +    iommu_ctx_notifier_register(iommu_ctx,
+> +                                &giommu_ctx->n,
+> +                                fn,
+> +                                event);
 > +}
 > +
->  void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *ops, void *opaque)
->  {
->      bus->iommu_ops =3D ops;
-> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-> index d9fed8d..ccada47 100644
-> --- a/include/hw/pci/pci.h
-> +++ b/include/hw/pci/pci.h
-> @@ -9,6 +9,8 @@
-> =20
->  #include "hw/pci/pcie.h"
-> =20
-> +#include "hw/iommu/iommu.h"
+> +static void vfio_iommu_pasid_alloc_notify(IOMMUCTXNotifier *n,
+> +                                          IOMMUCTXEventData *event_data)
+> +{
+> +    VFIOIOMMUContext *giommu_ctx =3D container_of(n, VFIOIOMMUContext, n=
+);
+> +    VFIOContainer *container =3D giommu_ctx->container;
+> +    IOMMUCTXPASIDReqDesc *pasid_req =3D
+> +                              (IOMMUCTXPASIDReqDesc *) event_data->data;
+> +    struct vfio_iommu_type1_pasid_request req;
+> +    unsigned long argsz;
+> +    int pasid;
 > +
->  extern bool pci_available;
+> +    argsz =3D sizeof(req);
+> +    req.argsz =3D argsz;
+> +    req.flag =3D VFIO_IOMMU_PASID_ALLOC;
+> +    req.min_pasid =3D pasid_req->min_pasid;
+> +    req.max_pasid =3D pasid_req->max_pasid;
+> +
+> +    pasid =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> +    if (pasid < 0) {
+> +        error_report("%s: %d, alloc failed", __func__, -errno);
+> +    }
+> +    pasid_req->alloc_result =3D pasid;
+
+Altering the event data from the notifier doesn't make sense.  By
+definition there can be multiple notifiers on the chain, so in that
+case which one is responsible for updating the writable field?
+
+> +}
+> +
+> +static void vfio_iommu_pasid_free_notify(IOMMUCTXNotifier *n,
+> +                                          IOMMUCTXEventData *event_data)
+> +{
+> +    VFIOIOMMUContext *giommu_ctx =3D container_of(n, VFIOIOMMUContext, n=
+);
+> +    VFIOContainer *container =3D giommu_ctx->container;
+> +    IOMMUCTXPASIDReqDesc *pasid_req =3D
+> +                              (IOMMUCTXPASIDReqDesc *) event_data->data;
+> +    struct vfio_iommu_type1_pasid_request req;
+> +    unsigned long argsz;
+> +    int ret =3D 0;
+> +
+> +    argsz =3D sizeof(req);
+> +    req.argsz =3D argsz;
+> +    req.flag =3D VFIO_IOMMU_PASID_FREE;
+> +    req.pasid =3D pasid_req->pasid;
+> +
+> +    ret =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> +    if (ret !=3D 0) {
+> +        error_report("%s: %d, pasid %u free failed",
+> +                   __func__, -errno, (unsigned) pasid_req->pasid);
+> +    }
+> +    pasid_req->free_result =3D ret;
+
+Same problem here.
+
+> +}
+> +
+>  static void vfio_realize(PCIDevice *pdev, Error **errp)
+>  {
+>      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
+>      VFIODevice *vbasedev_iter;
+>      VFIOGroup *group;
+> +    IOMMUContext *iommu_context;
+>      char *tmp, *subsys, group_path[PATH_MAX], *group_name;
+>      Error *err =3D NULL;
+>      ssize_t len;
+> @@ -3000,6 +3069,18 @@ static void vfio_realize(PCIDevice *pdev, Error **=
+errp)
+>      vfio_register_req_notifier(vdev);
+>      vfio_setup_resetfn_quirk(vdev);
 > =20
->  /* PCI bus */
-> @@ -484,9 +486,12 @@ typedef struct PCIIOMMUOps PCIIOMMUOps;
->  struct PCIIOMMUOps {
->      AddressSpace * (*get_address_space)(PCIBus *bus,
->                                  void *opaque, int32_t devfn);
-> +    IOMMUContext * (*get_iommu_context)(PCIBus *bus,
-> +                                void *opaque, int32_t devfn);
+> +    iommu_context =3D pci_device_iommu_context(pdev);
+> +    if (iommu_context) {
+> +        vfio_register_iommu_ctx_notifier(vdev,
+> +                                         iommu_context,
+> +                                         vfio_iommu_pasid_alloc_notify,
+> +                                         IOMMU_CTX_EVENT_PASID_ALLOC);
+> +        vfio_register_iommu_ctx_notifier(vdev,
+> +                                         iommu_context,
+> +                                         vfio_iommu_pasid_free_notify,
+> +                                         IOMMU_CTX_EVENT_PASID_FREE);
+> +    }
+> +
+>      return;
+> =20
+>  out_teardown:
+> diff --git a/include/hw/iommu/iommu.h b/include/hw/iommu/iommu.h
+> index c22c442..4352afd 100644
+> --- a/include/hw/iommu/iommu.h
+> +++ b/include/hw/iommu/iommu.h
+> @@ -31,10 +31,25 @@
+>  typedef struct IOMMUContext IOMMUContext;
+> =20
+>  enum IOMMUCTXEvent {
+> +    IOMMU_CTX_EVENT_PASID_ALLOC,
+> +    IOMMU_CTX_EVENT_PASID_FREE,
+>      IOMMU_CTX_EVENT_NUM,
 >  };
+>  typedef enum IOMMUCTXEvent IOMMUCTXEvent;
 > =20
->  AddressSpace *pci_device_iommu_address_space(PCIDevice *dev);
-> +IOMMUContext *pci_device_iommu_context(PCIDevice *dev);
->  void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *iommu_ops, void *op=
-aque);
-> =20
->  static inline void
+> +union IOMMUCTXPASIDReqDesc {
+> +    struct {
+> +        uint32_t min_pasid;
+> +        uint32_t max_pasid;
+> +        int32_t alloc_result; /* pasid allocated for the alloc request */
+> +    };
+> +    struct {
+> +        uint32_t pasid; /* pasid to be free */
+> +        int free_result;
+> +    };
+> +};
+
+Apart from theproblem with writable fields, using a big union for
+event data is pretty ugly.  If you need this different information for
+the different events, it might make more sense to have a separate
+notifier chain with a separate call interface for each event type,
+rather than trying to multiplex them together.
+
+> +typedef union IOMMUCTXPASIDReqDesc IOMMUCTXPASIDReqDesc;
+> +
+>  struct IOMMUCTXEventData {
+>      IOMMUCTXEvent event;
+>      uint64_t length;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -172,25 +295,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---A1VS04HCCjrR2aaM
+--oJFDFiWc3BlD0xT/
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl24J5QACgkQbDjKyiDZ
-s5JJ3g/+Lur05gbjGYLYlgvjdq2Pn85zjxpG5uoDmWI86UluvDcz4lN/3ZVe5IK/
-cG7aTArqvvTbmv4QI7SljHU4/luRHPZbfsgyXwpoxCuJbtc+vB7RjSHQJhOZVocs
-oHkQs+Nk/x0AT7WJz9aCfcCUEKr0cyUxci5EwsxHba9predsU7uyatFgrUwqrUV/
-E7Lh8bxPrl2tWqC1xDX2BUmL3HzHHAq27kPEgxhBaMlMbtO7t3U0p3+ZFNIBTuIY
-R8p/5zo3tsl1cKkLkI9tFSe3BZlIcC6ypXr8I3SV3xac0sJoXjMQFsjhPHfD+D5M
-OBxikWjIS0mK9hJEaJl/9hFOELjcOyzLmoKzNUEs60i9XqdU1TD/q+yfGXDe0Krd
-4LtqR+hsMwbHc0yKmIaG8162ugJDGkhJ43DK9WLka/EP7TN3B6YRK8M5+MaZCdnJ
-IogG+tUJPhPE5UElBdxqNDQ0lif2tpJkIWW0Il5Lzl9iNvaCP4XS48fvah3B1pOI
-uHPYcyHMThofGIxKR17yX38BHLHebkCxN3jC1BEJGw/uBd8LlpkurHKeiXL6nmYV
-7PwzjpIaoKRBu+jVogotItllNAHjd6HkGoxYl3wySJfFVSPUG/2dow68LrZLDBu6
-SiuCMG0dQpGcqNjwhjFDk887x7TbIzrCb1g5i4xKYgcrmmWMCrY=
-=hQKS
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl24LW0ACgkQbDjKyiDZ
+s5KArg//VdtrUL7LmSAtXr99bFhDGE9HfD3kDksbBRHS+VU1LojEx4QPyQO+ClxS
+6jXrsk6kq2pM+W+pCRm6fK3fd6Z+hoABjh35Auj3oqwZ+XGunGKv1Wd29v+dMBAC
+UYFWL99tF5K8mjPtQQuMS98JyeaJCTdRdkE7gjlwHCynYbXlpKHwLxE9lxB5Mq7D
+6JCuzfIsXggYUxGUe36a6SCJ1wjS5Bck1jxJM6W9u5LqOf5wq8UgyZC36edraATO
+CxcYwbJYcaSJlybiFUOs8ZhP2MxRJwFdkjl+51n8bxlCCNYoyhjlbTiIweEBQmfv
+AHM5kiSc8hvBTuBUWzeLdkqS1X3dJ8CrWtKHVkaA4abZmLgSYqerUUmxvF1W5Jb+
+TBlu9NIZnAMtfKFEjzykYARPbROMspaJi/6MElcNF/XdBr2mZVP4L+kD2voewEG/
+Yg3EIItfdear1JNPsIKLTkHadZ2ELjHEd/nS96ePVUxEF9D/Apk69W0lh7P8td5I
+IImUFxKzX9TV5JeAW0Ys6eQI3GOQV8Ajz4oaSymS3V8Y3YHdBSMR4kCLGpD1p9Us
+5+Lj1MxdaOmgme+kYCnlkJ+yMAP5ByWh/je5o3Og50loG9qf1HY7/VnhawRoQj4i
+wjF4eGEH12W56qReBEs5kZSnCESJCMg/4HS2P7SV0L3vG7rtZhk=
+=imxI
 -----END PGP SIGNATURE-----
 
---A1VS04HCCjrR2aaM--
+--oJFDFiWc3BlD0xT/--
 
