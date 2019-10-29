@@ -2,91 +2,82 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B336ACA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 12:08:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9380FCA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 12:10:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C940208E3
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 12:08:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57219208E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 12:10:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YHm/MI/k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C940208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RKzpfHmj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57219208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPQIE-0000q2-OV
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 08:08:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43865)
+	id 1iPQKT-0002sR-Hz
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 08:10:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iPQGz-0008C7-DI
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:06:54 -0400
+ (envelope-from <armbru@redhat.com>) id 1iPQJn-0002D0-IU
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:09:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iPQGx-0002iw-VS
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:06:53 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55910)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iPQGx-0002ie-Oo
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:06:51 -0400
-Received: by mail-wm1-x342.google.com with SMTP id g24so2279888wmh.5
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 05:06:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=VPlGQ7wiTwl9CcFULnKvBeCqKRS3cLaQMb0vNthj84M=;
- b=YHm/MI/keHG8GAuuPX2u1uDlCHlaFqMltUevpi+GR6sgWfuy/nVhQfGCTgXO+UO9pI
- 5k0LflwRekuiCTMmr6OaUkKYPn6tQobSXZrPw2S/LLrWb747NxiRNW1d7pi2x+hwjCb+
- beXjZ04vRHK6/tQwMm17dyYvT2V4pR5cS7LYSbJWNX0v+eGIUnB1Td8Z34HXGacM5vAX
- ZD98PgedrfRPZnOoLZFZpCsqDJUUSK/Fk5lqPbuXqlyKKDV5yyiO7uWZfufXISpA6bZ1
- wX2i23PAMuI0ROXi5Jqag2dfYQX39lVhXrUqUdlIMM6oWv3utz1Km6uwZi5leDI4N83G
- w/9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=VPlGQ7wiTwl9CcFULnKvBeCqKRS3cLaQMb0vNthj84M=;
- b=Sz3a4r6hIi8VfafhWPsPiqDEPJbWbkBqevuiP9abypfoBW+neFTwZoh7PdbOhr1r18
- 5As8b3THWLUq+SRN/UhSHTvp/NSonjR8Q5E2puGwDhr9QCN2Dwt2yyOzx4O2TgBkbdtR
- cl259F4S8Q2NtRy8vyCgHGGRS6kA1LE5yKfL2KHVoepN2gwd9qVnWVn4gmYZH3msWrxC
- 3XlK+xoQFXdIYt6w4fvd0KMKPaETLCwSs010IqQLgza0aWC6CZ+nmB0YEic4rsMDWN2I
- AdbiNyF+wDtgtZYetKjUaJJV6jhZOvX/mJVOY2slnYtsdJs7xxr7ieHO/HbEgtFVbwCR
- PP+g==
-X-Gm-Message-State: APjAAAXj/tLTc3YV/tBGNua7XiNtXMWguqsCfRjqJnSKVaMtiuJtCnWB
- AFRGxkpU4BJzc2LnTogX9lq5kg==
-X-Google-Smtp-Source: APXvYqwT7NE9OgwBPMF9KFwmFMRfx9IvABV83qRa1CGHdaIZAIcIPc2f4jpb8b2nt0qbDCwip02nxA==
-X-Received: by 2002:a7b:ce0c:: with SMTP id m12mr3849388wmc.38.1572350810459; 
- Tue, 29 Oct 2019 05:06:50 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id p15sm14083969wrs.94.2019.10.29.05.06.48
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Oct 2019 05:06:49 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 883A21FF87;
- Tue, 29 Oct 2019 12:06:48 +0000 (GMT)
-References: <20191018181705.17957-1-ehabkost@redhat.com>
- <20191018181705.17957-2-ehabkost@redhat.com>
- <5310d333-b264-67a4-0103-44b6b7be6ff9@redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v5 1/3] tests/vm: netbsd autoinstall, using serial console
-In-reply-to: <5310d333-b264-67a4-0103-44b6b7be6ff9@redhat.com>
-Date: Tue, 29 Oct 2019 12:06:48 +0000
-Message-ID: <87sgnb92nb.fsf@linaro.org>
+ (envelope-from <armbru@redhat.com>) id 1iPQJk-0003cq-HD
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:09:45 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42940
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iPQJk-0003cc-6R
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:09:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572350982;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+2QuszJQurX8wM1v+jBOWdbOR/WeJ3uxnTy2bUIIW8g=;
+ b=RKzpfHmj5YzVplPVDO7k9iWtMdeRUUvcQa0zctyHZhjeBHWRZXAAncw0waI4J7Nq+T/TcK
+ Kzy/fAGjkodFP5o6gHzuBedOhGYaoFtt0S7nfGSVzXeeZNufhwIQsyFfeIHyIoF2YHB7zR
+ jOHmRdkIEc170JpjgH737su6+abdYjs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-58-swv2kXADM6yWhGVJaYBwSQ-1; Tue, 29 Oct 2019 08:09:39 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 91E655E6;
+ Tue, 29 Oct 2019 12:09:38 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AF212100EBAE;
+ Tue, 29 Oct 2019 12:09:29 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 2583B11385C9; Tue, 29 Oct 2019 13:09:16 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH] fw_cfg: Allow reboot-timeout=-1 again
+References: <20191025165706.177653-1-dgilbert@redhat.com>
+ <87a79o4jjb.fsf@dusky.pond.sub.org> <20191028134700.GB2961@work-vm>
+Date: Tue, 29 Oct 2019 13:09:16 +0100
+In-Reply-To: <20191028134700.GB2961@work-vm> (David Alan Gilbert's message of
+ "Mon, 28 Oct 2019 13:47:00 +0000")
+Message-ID: <87lft3sqhf.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: swv2kXADM6yWhGVJaYBwSQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,90 +89,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- =?utf-8?Q?Daniel_P=2E_Be?= =?utf-8?Q?rrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Kamil Rytarowski <kamil@netbsd.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Kamil Rytarowski <n54@gmx.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: lersek@redhat.com, liq3ea@gmail.com, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, hhan@redhat.com, philmd@redhat.com,
+ kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-Thomas Huth <thuth@redhat.com> writes:
-
-> On 18/10/2019 20.17, Eduardo Habkost wrote:
->> From: Gerd Hoffmann <kraxel@redhat.com>
->>
->> Instead of fetching the prebuilt image from patchew download the install
->> iso and prepare the image locally.  Install to disk, using the serial
->> console.  Create qemu user, configure ssh login.  Install packages
->> needed for qemu builds.
->>
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->> Reviewed-by: Kamil Rytarowski <n54@gmx.com>
->> Tested-by: Thomas Huth <thuth@redhat.com>
->> [ehabkost: rebased to latest qemu.git master]
->> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
->> ---
->>  tests/vm/netbsd | 189 +++++++++++++++++++++++++++++++++++++++++++++---
->>  1 file changed, 179 insertions(+), 10 deletions(-)
->>
->> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
->> index ee9eaeab50..49a99477f4 100755
->> --- a/tests/vm/netbsd
->> +++ b/tests/vm/netbsd
->> @@ -2,10 +2,11 @@
->>  #
->>  # NetBSD VM image
->>  #
->> -# Copyright 2017 Red Hat Inc.
->> +# Copyright 2017-2019 Red Hat Inc.
->>  #
->>  # Authors:
->>  #  Fam Zheng <famz@redhat.com>
->> +#  Gerd Hoffmann <kraxel@redhat.com>
->>  #
->>  # This code is licensed under the GPL version 2 or later.  See
->>  # the COPYING file in the top-level directory.
->> @@ -13,30 +14,198 @@
->>
->>  import os
->>  import sys
->> +import time
->>  import subprocess
->>  import basevm
->>
->>  class NetBSDVM(basevm.BaseVM):
->>      name =3D "netbsd"
->>      arch =3D "x86_64"
->> +
->> +    link =3D "https://cdn.netbsd.org/pub/NetBSD/NetBSD-8.0/images/NetBS=
-D-8.0-amd64.iso"
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> writes:
+>>=20
+>> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> >
+>> > Commit ee5d0f89de3e53cdb0dc added range checking on reboot-timeout
+>> > to only allow the range 0..65535; however both qemu and libvirt docume=
+nt
+>> > the special value -1  to mean don't reboot.
+>> > Allow it again.
+>> >
+>> > Fixes: ee5d0f89de3e53cdb0dc ("fw_cfg: Fix -boot reboot-timeout error c=
+hecking")
+>> > RH bz: https://bugzilla.redhat.com/show_bug.cgi?id=3D1765443
+>> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> > ---
+>> >  hw/nvram/fw_cfg.c | 5 +++--
+>> >  1 file changed, 3 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+>> > index 7dc3ac378e..1a9ec44232 100644
+>> > --- a/hw/nvram/fw_cfg.c
+>> > +++ b/hw/nvram/fw_cfg.c
+>> > @@ -247,10 +247,11 @@ static void fw_cfg_reboot(FWCfgState *s)
+>> > =20
+>> >      if (reboot_timeout) {
+>> >          rt_val =3D qemu_opt_get_number(opts, "reboot-timeout", -1);
+>> > +
+>> >          /* validate the input */
+>> > -        if (rt_val < 0 || rt_val > 0xffff) {
+>> > +        if (rt_val < -1 || rt_val > 0xffff) {
+>> >              error_report("reboot timeout is invalid,"
+>> > -                         "it should be a value between 0 and 65535");
+>> > +                         "it should be a value between -1 and 65535")=
+;
+>> >              exit(1);
+>> >          }
+>> >      }
+>>=20
+>> Semantic conflict with "PATCH] qemu-options.hx: Update for
+>> reboot-timeout parameter", Message-Id:
+>> <20191015151451.727323-1-hhan@redhat.com>.
 >
-> I'd like to suggest to go immediately with 8.1 instead of 8.0. I tested
-> it and it worked for me out-of-the-box, without further modifications.
-
-*Sigh* I had to drop this from my PR after it broke again. It looked
- like it was getting stuck on the installer waiting for something. I had
- it working at one point so I'm not sure why it's not working again.
-
-The rest of the patches are merged now though.
-
+> Thanks for spotting that.
+> I think Han and also submitted patches to review it from libvirt
+> and it wasn't obvious what to do.  (Cc'd Han in).
 >
->> +
->> +        if os.path.exists(img):
->> +            os.remove(img)
+>> I'm too tired right now to risk an opinion on which one we want.
 >
-> These two lines have been removed recently with commit
-> fcd2060e8efff83b7bdef04323077f87e011fdc4 ... please drop them from the
-> patch.
+> As is everyone else !  The problem here is that its documented
+> as a valid thing to do, and libvirt does it, and you might have=20
+> a current XML file that did it.  Now I think you could change libvirt
+> to omit the reboot-timeout parameter if it was called with -1.
 >
->  Thanks,
->   Thomas
+> So given its a documented thing in both qemu and libvirt xml
+> if we want to remove it then it sohuld be deprecated properly - but it's
+> already broken.
 
+Since commit ee5d0f89d, v4.0.0.
 
---
-Alex Benn=C3=A9e
+If that commit had not made it into a release, we'd certainly treat the
+loss of "-1 means don't reboot" as regression.
+
+But it has.  We can treat it as a regression anyway.  We can also
+declare "ship has sailed".
+
+I'm leaning towads the former.
+
+If we restore "-1 means don't reboot", then I don't see a need to
+deprecate it.  Just keep it.
+
+What do you think?
+
 
