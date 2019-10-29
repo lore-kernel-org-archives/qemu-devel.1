@@ -2,70 +2,84 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F9D9CA9EB9
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 05:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DADBCA9EB9
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 05:20:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47F6520663
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 05:18:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47F6520663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id EF39F2087F
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 05:20:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LY2vVsG0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF39F2087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPJtV-00020k-AL
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 01:18:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46586)
+	id 1iPJvL-0003VD-TW
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 01:20:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46687)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iPJsj-0001Le-5k
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 01:17:26 -0400
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iPJtl-0002Vh-17
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 01:18:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iPJsh-0000So-6p
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 01:17:24 -0400
-Resent-Date: Tue, 29 Oct 2019 01:17:24 -0400
-Resent-Message-Id: <E1iPJsh-0000So-6p@eggs.gnu.org>
-Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21809)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iPJsh-0000ST-1I
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 01:17:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1572326220; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=AksQYuMNF67fwAR8UpEjBUvOAzw5qDwYhTGlbMCZvQmBOkRCD6FCeTCedajVaQAMWxwtNiBrqjHTgnb2k75tsv+imFXG6nq5o7QCHpjG/0W1ii5Xu+by3yRPDalhDexlvkOZlXbewyFrWvlL39KDuOyeGQ/kgJzjPU6D8/MtObw=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1572326220;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=HkM3Qv96WzBQhmUJnnkJxSUpHY2IJlh2g07M/KKB8qc=; 
- b=PHmnadXauzgQZnpytLOo2NxH9XZCATxhDDT37GEYbJBRsEyVsmFQfq2xaBGokvMGWwNXNCDFcjemqjjpAeSEoNg9oh0IKesmKbDcMO9Yeu8eV+08ck3CR/lXIojRC2VkStJIg51LyvoQJiuupK1rJ2kxb8dUOoZGbFeqsqVGDoU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1572326219105785.9482270175024;
- Mon, 28 Oct 2019 22:16:59 -0700 (PDT)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iPJtj-0000mn-8a
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 01:18:28 -0400
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:34735)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iPJti-0000mI-V3
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 01:18:27 -0400
+Received: by mail-ot1-x332.google.com with SMTP id m19so8756621otp.1
+ for <qemu-devel@nongnu.org>; Mon, 28 Oct 2019 22:18:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=lumdLydA9oGXW9YM5W5Ui826YkmkN/DTSbkxPOxW+ho=;
+ b=LY2vVsG0MXamRxfz4XHvxroBbAQ92AT8L2T8cjQ7OGZezdWEAuhq9rQvaqPkYKWkNz
+ bp8JeDmBcN8LuCQLEPgQfJEIyl5nt5lg1s0vUYFZCsdko1D65uYkxoYVD9hNHLYgmY3X
+ t1KSIHgTBl4DEvJLoI1xMUK8IVNSGzPpdBFqznqLNf/hMLHdcpmPDkV9x5qni+Xcwmr/
+ 91lSO+vo/BC5qI7xlr3kevL2oRVrdZfaV+B6MLYfw1lH6lfZjRLuyFiVFN1QDjL3Dha1
+ hmyXmtj/lYIwgqHS/lmzKTEae0s7xR+/k5mQnJWmKIm8YpjfUVj6uhXntdI6nyhEg9x9
+ AadA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=lumdLydA9oGXW9YM5W5Ui826YkmkN/DTSbkxPOxW+ho=;
+ b=di6tiKSWKqJoBYTzK4AAXl26Xo3Ts8nfWHqZari0U+8gAzlYByr5luyvDYMSXGCSt1
+ ptbAtprS8YSBt+hvT6ISbLYctI9P1+cyF2FEkD/r+Cb49isW3hdkjG9aDHh/86lvaFU2
+ s3Dzs2S9oasoBy9/v8LFhgt7TFN/NtHwRbnFdLZ6C+4JQWj4RHbiKLnlr+aWhDUvGT2i
+ agL27KNwk4QGKL04KF7z5a0k4NeJ5oOAOQyaKO6fMuaQXk0K7jXs5josbNQ2kPFrTBRi
+ QIHlZcOCq6mvX++FzoelFstjF8PPP2Dt2ePVcuV8KuuHngw1n7pOKwIbWJEykRY6TGBK
+ 5QKw==
+X-Gm-Message-State: APjAAAWdmDK1WsiUMauBfIyJ0rrban0zmS+dxMlaR2LYpjh56URyo35H
+ bM8m3QuX/cwj3QNjecea52QJOF70FvXJelj1h1M=
+X-Google-Smtp-Source: APXvYqyBBeL69ZnijOoKZDk9as7mIs7i79unioey7ooRjT5KmG+1kBn2owJAHIx2xm6nuLu4ImvrF9T2JEVowvpbOY4=
+X-Received: by 2002:a05:6830:1d8f:: with SMTP id
+ y15mr7684091oti.121.1572326305982; 
+ Mon, 28 Oct 2019 22:18:25 -0700 (PDT)
+MIME-Version: 1.0
+Received: by 2002:a9d:340a:0:0:0:0:0 with HTTP; Mon, 28 Oct 2019 22:18:25
+ -0700 (PDT)
 In-Reply-To: <20191028163447.18541-1-philmd@redhat.com>
+References: <20191028163447.18541-1-philmd@redhat.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 29 Oct 2019 06:18:25 +0100
+Message-ID: <CAL1e-=gK_Lf+ipsJxRPgyp01AuQiOeOn9QvzRxaR6LkTJiqhLA@mail.gmail.com>
 Subject: Re: [PULL 00/20] hw/i386/pc: Split PIIX3 southbridge from i440FX
  northbridge
-Message-ID: <157232621764.12254.9436453741991948476@37313f22b938>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Mon, 28 Oct 2019 22:16:59 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.58
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000f06ec4059605be40"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,109 +91,272 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, hpoussin@reactos.org, amarkovic@wavecomp.com,
- pbonzini@redhat.com, philmd@redhat.com, aurelien@aurel32.net
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyODE2MzQ0Ny4xODU0
-MS0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUFVMTCAwMC8yMF0gaHcvaTM4Ni9wYzogU3BsaXQgUElJWDMg
-c291dGhicmlkZ2UgZnJvbSBpNDQwRlggbm9ydGhicmlkZ2UKVHlwZTogc2VyaWVzCk1lc3NhZ2Ut
-aWQ6IDIwMTkxMDI4MTYzNDQ3LjE4NTQxLTEtcGhpbG1kQHJlZGhhdC5jb20KCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
-IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CjNkMWE4ZDIgaHcvcGNpLWhvc3QvaTQ0MGZ4OiBSZW1vdmUgdGhlIGxhc3QgUElJWDMgdHJhY2Vz
-CmYyZDI4NWMgaHcvcGNpLWhvc3Q6IFJlbmFtZSBpbmNvcnJlY3RseSBuYW1lZCAncGlpeCcgYXMg
-J2k0NDBmeCcKOTMyMTdhOCBody9wY2ktaG9zdC9waWl4OiBFeHRyYWN0IFBJSVgzIGZ1bmN0aW9u
-cyB0byBody9pc2EvcGlpeDMuYwo5YjIwM2UyIGh3L3BjaS1ob3N0L3BpaXg6IEZpeCBjb2RlIHN0
-eWxlIGlzc3Vlcwo3MDgwNjRiIGh3L3BjaS1ob3N0L3BpaXg6IE1vdmUgaTQ0MEZYIGRlY2xhcmF0
-aW9ucyB0byBody9wY2ktaG9zdC9pNDQwZnguaApjOTI4MWE2IGh3L3BjaS1ob3N0L3BpaXg6IERl
-ZmluZSBhbmQgdXNlIHRoZSBQSUlYIElSUSBSb3V0ZSBDb250cm9sIFJlZ2lzdGVycwpiMmRjMzI4
-IGh3L3BjaS1ob3N0L3BpaXg6IE1vdmUgUkNSX0lPUE9SVCByZWdpc3RlciBkZWZpbml0aW9uCjFm
-YmY3YzEgaHcvcGNpLWhvc3QvcGlpeDogRXh0cmFjdCBwaWl4M19jcmVhdGUoKQo5YWEwMDkxIGh3
-L2kzODY6IFJlbW92ZSBvYnNvbGV0ZSBMb2FkU3RhdGVIYW5kbGVyOjpsb2FkX3N0YXRlX29sZCBo
-YW5kbGVycwo1MDQwMzllIGh3L2lzYS9waWl4NDogTW92ZSBwaWl4NF9jcmVhdGUoKSB0byBody9p
-c2EvcGlpeDQuYwo4Yjk5MzhlIGh3L21pcHMvbWlwc19tYWx0YTogRXh0cmFjdCB0aGUgUElJWDQg
-Y3JlYXRpb24gY29kZSBhcyBwaWl4NF9jcmVhdGUoKQphNDhmYjQxIGh3L21pcHMvbWlwc19tYWx0
-YTogQ3JlYXRlIElERSBoYXJkIGRyaXZlIGFycmF5IGR5bmFtaWNhbGx5CmQzNTJjNmMgcGlpeDQ6
-IEFkZCBhIE1DMTQ2ODE4IFJUQyBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQK
-OTJkYTgyZSBwaWl4NDogQWRkIGFuIGk4MjU0IFBJVCBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBp
-biBkYXRhc2hlZXQKOTc1ZTdjMSBwaWl4NDogQWRkIGFuIGk4MjU3IERNQSBDb250cm9sbGVyIGFz
-IHNwZWNpZmllZCBpbiBkYXRhc2hlZXQKNjcwOWNiMCBwaWl4NDogUmVuYW1lIFBJSVg0IG9iamVj
-dCB0byBwaWl4NC1pc2EKOTRmZmEwOCBSZXZlcnQgImlycTogaW50cm9kdWNlIHFlbXVfaXJxX3By
-b3h5KCkiCjY1NzFiYmMgcGlpeDQ6IEFkZCBhbiBpODI1OSBJbnRlcnJ1cHQgQ29udHJvbGxlciBh
-cyBzcGVjaWZpZWQgaW4gZGF0YXNoZWV0CjFlZDBhODcgcGlpeDQ6IEFkZCB0aGUgUmVzZXQgQ29u
-dHJvbCBSZWdpc3Rlcgo0NGFlNjZjIE1BSU5UQUlORVJTOiBLZWVwIFBJSVg0IFNvdXRoIEJyaWRn
-ZSBzZXBhcmF0ZSBmcm9tIFBDIENoaXBzZXRzCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzIwIENo
-ZWNraW5nIGNvbW1pdCA0NGFlNjZjYWJkMmQgKE1BSU5UQUlORVJTOiBLZWVwIFBJSVg0IFNvdXRo
-IEJyaWRnZSBzZXBhcmF0ZSBmcm9tIFBDIENoaXBzZXRzKQoyLzIwIENoZWNraW5nIGNvbW1pdCAx
-ZWQwYTg3NTk5M2YgKHBpaXg0OiBBZGQgdGhlIFJlc2V0IENvbnRyb2wgUmVnaXN0ZXIpCjMvMjAg
-Q2hlY2tpbmcgY29tbWl0IDY1NzFiYmNiMTU2YyAocGlpeDQ6IEFkZCBhbiBpODI1OSBJbnRlcnJ1
-cHQgQ29udHJvbGxlciBhcyBzcGVjaWZpZWQgaW4gZGF0YXNoZWV0KQo0LzIwIENoZWNraW5nIGNv
-bW1pdCA5NGZmYTA4ZjIzNDYgKFJldmVydCAiaXJxOiBpbnRyb2R1Y2UgcWVtdV9pcnFfcHJveHko
-KSIpCjUvMjAgQ2hlY2tpbmcgY29tbWl0IDY3MDljYjAzYTUxYSAocGlpeDQ6IFJlbmFtZSBQSUlY
-NCBvYmplY3QgdG8gcGlpeDQtaXNhKQo2LzIwIENoZWNraW5nIGNvbW1pdCA5NzVlN2MxYzFjNWIg
-KHBpaXg0OiBBZGQgYW4gaTgyNTcgRE1BIENvbnRyb2xsZXIgYXMgc3BlY2lmaWVkIGluIGRhdGFz
-aGVldCkKNy8yMCBDaGVja2luZyBjb21taXQgOTJkYTgyZTIwOTU4IChwaWl4NDogQWRkIGFuIGk4
-MjU0IFBJVCBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQpCjgvMjAgQ2hlY2tp
-bmcgY29tbWl0IGQzNTJjNmNlMmJkZiAocGlpeDQ6IEFkZCBhIE1DMTQ2ODE4IFJUQyBDb250cm9s
-bGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE5MzogCmRl
-bGV0ZWQgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNjYg
-bGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8yMCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo5LzIw
-IENoZWNraW5nIGNvbW1pdCBhNDhmYjQxZjM0MzMgKGh3L21pcHMvbWlwc19tYWx0YTogQ3JlYXRl
-IElERSBoYXJkIGRyaXZlIGFycmF5IGR5bmFtaWNhbGx5KQoxMC8yMCBDaGVja2luZyBjb21taXQg
-OGI5OTM4ZTU3MGM2IChody9taXBzL21pcHNfbWFsdGE6IEV4dHJhY3QgdGhlIFBJSVg0IGNyZWF0
-aW9uIGNvZGUgYXMgcGlpeDRfY3JlYXRlKCkpCjExLzIwIENoZWNraW5nIGNvbW1pdCA1MDQwMzll
-MjdlNGQgKGh3L2lzYS9waWl4NDogTW92ZSBwaWl4NF9jcmVhdGUoKSB0byBody9pc2EvcGlpeDQu
-YykKMTIvMjAgQ2hlY2tpbmcgY29tbWl0IDlhYTAwOTE1OGZiNyAoaHcvaTM4NjogUmVtb3ZlIG9i
-c29sZXRlIExvYWRTdGF0ZUhhbmRsZXI6OmxvYWRfc3RhdGVfb2xkIGhhbmRsZXJzKQoxMy8yMCBD
-aGVja2luZyBjb21taXQgMWZiZjdjMTU1NzY3IChody9wY2ktaG9zdC9waWl4OiBFeHRyYWN0IHBp
-aXgzX2NyZWF0ZSgpKQoxNC8yMCBDaGVja2luZyBjb21taXQgYjJkYzMyODJhNmJmIChody9wY2kt
-aG9zdC9waWl4OiBNb3ZlIFJDUl9JT1BPUlQgcmVnaXN0ZXIgZGVmaW5pdGlvbikKMTUvMjAgQ2hl
-Y2tpbmcgY29tbWl0IGM5MjgxYTZmZWEyOSAoaHcvcGNpLWhvc3QvcGlpeDogRGVmaW5lIGFuZCB1
-c2UgdGhlIFBJSVggSVJRIFJvdXRlIENvbnRyb2wgUmVnaXN0ZXJzKQoxNi8yMCBDaGVja2luZyBj
-b21taXQgNzA4MDY0YjE4ZGIyIChody9wY2ktaG9zdC9waWl4OiBNb3ZlIGk0NDBGWCBkZWNsYXJh
-dGlvbnMgdG8gaHcvcGNpLWhvc3QvaTQ0MGZ4LmgpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzk4OiAKbmV3
-IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTAxIGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDE2LzIwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzIwIENo
-ZWNraW5nIGNvbW1pdCA5YjIwM2UyYWEzODAgKGh3L3BjaS1ob3N0L3BpaXg6IEZpeCBjb2RlIHN0
-eWxlIGlzc3VlcykKMTgvMjAgQ2hlY2tpbmcgY29tbWl0IDkzMjE3YThmZDE3ZCAoaHcvcGNpLWhv
-c3QvcGlpeDogRXh0cmFjdCBQSUlYMyBmdW5jdGlvbnMgdG8gaHcvaXNhL3BpaXgzLmMpCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzY1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBzcGFjZXMgcmVx
-dWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojMzE0OiBGSUxFOiBody9pc2EvcGlpeDMu
-YzoyNDU6CisgICAgLnN1YnNlY3Rpb25zID0gKGNvbnN0IFZNU3RhdGVEZXNjcmlwdGlvbipbXSkg
-ewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDog
-MSBlcnJvcnMsIDEgd2FybmluZ3MsIDkzNyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxOC8yMCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTkvMjAgQ2hlY2tpbmcgY29tbWl0IGYyZDI4NWNlZWYx
-MCAoaHcvcGNpLWhvc3Q6IFJlbmFtZSBpbmNvcnJlY3RseSBuYW1lZCAncGlpeCcgYXMgJ2k0NDBm
-eCcpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
-SU5FUlMgbmVlZCB1cGRhdGluZz8KIzY5OiAKcmVuYW1lIGZyb20gaHcvcGNpLWhvc3QvcGlpeC5j
-Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE5
-LzIwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjIwLzIwIENoZWNraW5nIGNvbW1pdCAzZDFh
-OGQyMTU5NmYgKGh3L3BjaS1ob3N0L2k0NDBmeDogUmVtb3ZlIHRoZSBsYXN0IFBJSVgzIHRyYWNl
-cykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAx
-OTEwMjgxNjM0NDcuMTg1NDEtMS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+--000000000000f06ec4059605be40
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Monday, October 28, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+>
+wrote:
+
+> Hi Peter,
+>
+> This is a X86/MIPS pull, Paolo and Aleksandar are OK I send it:
+>
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg04959.html
+>
+> Regards,
+>
+> Phil.
+>
+>
+Does this pull request apply on the current code base directly, or is
+dependant on prior application of other pull requests?
+
+Thanks?
+A.
+
+
+
+> The following changes since commit 9bb73502321d46f4d320fa17aa3820
+> 1445783fc4:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into
+> staging (2019-10-28 13:32:40 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/philmd/qemu.git tags/pc_split_i440fx_piix-
+> pull-request
+>
+> for you to fetch changes up to d1389352cde824ce8dab7c1a2ded150df6add124:
+>
+>   hw/pci-host/i440fx: Remove the last PIIX3 traces (2019-10-28 16:12:29
+> +0100)
+>
+> ----------------------------------------------------------------
+> The i440FX northbridge is only used by the PC machine, while the
+> PIIX southbridge is also used by the Malta MIPS machine.
+>
+> Split the PIIX3 southbridge from i440FX northbridge.
+>
+> ----------------------------------------------------------------
+>
+> Herv=C3=A9 Poussineau (5):
+>   piix4: Add the Reset Control Register
+>   piix4: Add an i8259 Interrupt Controller as specified in datasheet
+>   piix4: Rename PIIX4 object to piix4-isa
+>   piix4: Add an i8257 DMA Controller as specified in datasheet
+>   piix4: Add an i8254 PIT Controller as specified in datasheet
+>
+> Philippe Mathieu-Daud=C3=A9 (15):
+>   MAINTAINERS: Keep PIIX4 South Bridge separate from PC Chipsets
+>   Revert "irq: introduce qemu_irq_proxy()"
+>   piix4: Add a MC146818 RTC Controller as specified in datasheet
+>   hw/mips/mips_malta: Create IDE hard drive array dynamically
+>   hw/mips/mips_malta: Extract the PIIX4 creation code as piix4_create()
+>   hw/isa/piix4: Move piix4_create() to hw/isa/piix4.c
+>   hw/i386: Remove obsolete LoadStateHandler::load_state_old handlers
+>   hw/pci-host/piix: Extract piix3_create()
+>   hw/pci-host/piix: Move RCR_IOPORT register definition
+>   hw/pci-host/piix: Define and use the PIIX IRQ Route Control Registers
+>   hw/pci-host/piix: Move i440FX declarations to hw/pci-host/i440fx.h
+>   hw/pci-host/piix: Fix code style issues
+>   hw/pci-host/piix: Extract PIIX3 functions to hw/isa/piix3.c
+>   hw/pci-host: Rename incorrectly named 'piix' as 'i440fx'
+>   hw/pci-host/i440fx: Remove the last PIIX3 traces
+>
+>  MAINTAINERS                      |  14 +-
+>  hw/acpi/pcihp.c                  |   2 +-
+>  hw/acpi/piix4.c                  |  42 +--
+>  hw/core/irq.c                    |  14 -
+>  hw/i386/Kconfig                  |   3 +-
+>  hw/i386/acpi-build.c             |   5 +-
+>  hw/i386/pc_piix.c                |  10 +-
+>  hw/i386/xen/xen-hvm.c            |   5 +-
+>  hw/intc/apic_common.c            |  49 ----
+>  hw/isa/Kconfig                   |   4 +
+>  hw/isa/Makefile.objs             |   1 +
+>  hw/isa/piix3.c                   | 399 +++++++++++++++++++++++++++++
+>  hw/isa/piix4.c                   | 151 ++++++++++-
+>  hw/mips/gt64xxx_pci.c            |   5 +-
+>  hw/mips/mips_malta.c             |  46 +---
+>  hw/pci-host/Kconfig              |   3 +-
+>  hw/pci-host/Makefile.objs        |   2 +-
+>  hw/pci-host/{piix.c =3D> i440fx.c} | 424 +------------------------------
+>  hw/timer/i8254_common.c          |  40 ---
+>  include/hw/acpi/piix4.h          |   6 -
+>  include/hw/i386/pc.h             |  37 ---
+>  include/hw/irq.h                 |   5 -
+>  include/hw/isa/isa.h             |   2 +
+>  include/hw/pci-host/i440fx.h     |  36 +++
+>  include/hw/southbridge/piix.h    |  74 ++++++
+>  stubs/pci-host-piix.c            |   3 +-
+>  26 files changed, 699 insertions(+), 683 deletions(-)
+>  create mode 100644 hw/isa/piix3.c
+>  rename hw/pci-host/{piix.c =3D> i440fx.c} (58%)
+>  delete mode 100644 include/hw/acpi/piix4.h
+>  create mode 100644 include/hw/pci-host/i440fx.h
+>  create mode 100644 include/hw/southbridge/piix.h
+>
+> --
+> 2.21.0
+>
+>
+>
+
+--000000000000f06ec4059605be40
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Monday, October 28, 2019, Philippe Mathieu-Daud=C3=A9 &lt;<a hre=
+f=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br><blockqu=
+ote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc s=
+olid;padding-left:1ex">Hi Peter,<br>
+<br>
+This is a X86/MIPS pull, Paolo and Aleksandar are OK I send it:<br>
+<br>
+=C2=A0 <a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg=
+04959.html" target=3D"_blank">https://lists.gnu.org/archive/<wbr>html/qemu-=
+devel/2019-10/<wbr>msg04959.html</a><br>
+<br>
+Regards,<br>
+<br>
+Phil.<br>
+<br></blockquote><div><br></div><div>Does this pull request apply on the cu=
+rrent code base directly, or is dependant on prior application of other pul=
+l requests?</div><div><br></div><div>Thanks?</div><div>A.</div><div><br></d=
+iv><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0=
+ .8ex;border-left:1px #ccc solid;padding-left:1ex">
+The following changes since commit 9bb73502321d46f4d320fa17aa3820<wbr>14457=
+83fc4:<br>
+<br>
+=C2=A0 Merge remote-tracking branch &#39;remotes/mst/tags/for_<wbr>upstream=
+&#39; into staging (2019-10-28 13:32:40 +0000)<br>
+<br>
+are available in the Git repository at:<br>
+<br>
+=C2=A0 <a href=3D"https://gitlab.com/philmd/qemu.git" target=3D"_blank">htt=
+ps://gitlab.com/philmd/<wbr>qemu.git</a> tags/pc_split_i440fx_piix-<wbr>pul=
+l-request<br>
+<br>
+for you to fetch changes up to d1389352cde824ce8dab7c1a2ded15<wbr>0df6add12=
+4:<br>
+<br>
+=C2=A0 hw/pci-host/i440fx: Remove the last PIIX3 traces (2019-10-28 16:12:2=
+9 +0100)<br>
+<br>
+------------------------------<wbr>------------------------------<wbr>----<=
+br>
+The i440FX northbridge is only used by the PC machine, while the<br>
+PIIX southbridge is also used by the Malta MIPS machine.<br>
+<br>
+Split the PIIX3 southbridge from i440FX northbridge.<br>
+<br>
+------------------------------<wbr>------------------------------<wbr>----<=
+br>
+<br>
+Herv=C3=A9 Poussineau (5):<br>
+=C2=A0 piix4: Add the Reset Control Register<br>
+=C2=A0 piix4: Add an i8259 Interrupt Controller as specified in datasheet<b=
+r>
+=C2=A0 piix4: Rename PIIX4 object to piix4-isa<br>
+=C2=A0 piix4: Add an i8257 DMA Controller as specified in datasheet<br>
+=C2=A0 piix4: Add an i8254 PIT Controller as specified in datasheet<br>
+<br>
+Philippe Mathieu-Daud=C3=A9 (15):<br>
+=C2=A0 MAINTAINERS: Keep PIIX4 South Bridge separate from PC Chipsets<br>
+=C2=A0 Revert &quot;irq: introduce qemu_irq_proxy()&quot;<br>
+=C2=A0 piix4: Add a MC146818 RTC Controller as specified in datasheet<br>
+=C2=A0 hw/mips/mips_malta: Create IDE hard drive array dynamically<br>
+=C2=A0 hw/mips/mips_malta: Extract the PIIX4 creation code as piix4_create(=
+)<br>
+=C2=A0 hw/isa/piix4: Move piix4_create() to hw/isa/piix4.c<br>
+=C2=A0 hw/i386: Remove obsolete LoadStateHandler::load_state_<wbr>old handl=
+ers<br>
+=C2=A0 hw/pci-host/piix: Extract piix3_create()<br>
+=C2=A0 hw/pci-host/piix: Move RCR_IOPORT register definition<br>
+=C2=A0 hw/pci-host/piix: Define and use the PIIX IRQ Route Control Register=
+s<br>
+=C2=A0 hw/pci-host/piix: Move i440FX declarations to hw/pci-host/i440fx.h<b=
+r>
+=C2=A0 hw/pci-host/piix: Fix code style issues<br>
+=C2=A0 hw/pci-host/piix: Extract PIIX3 functions to hw/isa/piix3.c<br>
+=C2=A0 hw/pci-host: Rename incorrectly named &#39;piix&#39; as &#39;i440fx&=
+#39;<br>
+=C2=A0 hw/pci-host/i440fx: Remove the last PIIX3 traces<br>
+<br>
+=C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 |=C2=A0 14 +-<br>
+=C2=A0hw/acpi/pcihp.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 =C2=A02 +-<br>
+=C2=A0hw/acpi/piix4.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 42 +--<br>
+=C2=A0hw/core/irq.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 |=C2=A0 14 -<br>
+=C2=A0hw/i386/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 |=C2=A0 =C2=A03 +-<br>
+=C2=A0hw/i386/acpi-build.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A05 +-<br>
+=C2=A0hw/i386/pc_piix.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 |=C2=A0 10 +-<br>
+=C2=A0hw/i386/xen/xen-hvm.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 =C2=A05 +-<br>
+=C2=A0hw/intc/apic_common.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 49 ----<br>
+=C2=A0hw/isa/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0|=C2=A0 =C2=A04 +<br>
+=C2=A0hw/isa/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A01 +<br>
+=C2=A0hw/isa/piix3.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0| 399 +++++++++++++++++++++++++++++<br>
+=C2=A0hw/isa/piix4.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0| 151 ++++++++++-<br>
+=C2=A0hw/mips/gt64xxx_pci.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 =C2=A05 +-<br>
+=C2=A0hw/mips/mips_malta.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 46 +---<br>
+=C2=A0hw/pci-host/Kconfig=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=
+=C2=A0 =C2=A03 +-<br>
+=C2=A0hw/pci-host/Makefile.objs=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A02 =
++-<br>
+=C2=A0hw/pci-host/{piix.c =3D&gt; i440fx.c} | 424 +------------------------=
+-----<wbr>-<br>
+=C2=A0hw/timer/i8254_common.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 40 =
+---<br>
+=C2=A0include/hw/acpi/piix4.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=
+=A06 -<br>
+=C2=A0include/hw/i386/pc.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 37 ---<br>
+=C2=A0include/hw/irq.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0|=C2=A0 =C2=A05 -<br>
+=C2=A0include/hw/isa/isa.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
+=C2=A0 =C2=A02 +<br>
+=C2=A0include/hw/pci-host/i440fx.h=C2=A0 =C2=A0 =C2=A0|=C2=A0 36 +++<br>
+=C2=A0include/hw/southbridge/piix.h=C2=A0 =C2=A0 |=C2=A0 74 ++++++<br>
+=C2=A0stubs/pci-host-piix.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=
+=A0 =C2=A03 +-<br>
+=C2=A026 files changed, 699 insertions(+), 683 deletions(-)<br>
+=C2=A0create mode 100644 hw/isa/piix3.c<br>
+=C2=A0rename hw/pci-host/{piix.c =3D&gt; i440fx.c} (58%)<br>
+=C2=A0delete mode 100644 include/hw/acpi/piix4.h<br>
+=C2=A0create mode 100644 include/hw/pci-host/i440fx.h<br>
+=C2=A0create mode 100644 include/hw/southbridge/piix.h<br>
+<br>
+-- <br>
+2.21.0<br>
+<br>
+<br>
+</blockquote>
+
+--000000000000f06ec4059605be40--
 
