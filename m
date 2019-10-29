@@ -2,84 +2,84 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBBE7CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:31:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17FBCCA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:37:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B215B20578
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:31:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2DD020679
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:37:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oYsQRt39"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B215B20578
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YRRwadO7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2DD020679
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPZ5q-00053J-3O
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 17:31:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36612)
+	id 1iPZBW-00006C-U3
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 17:37:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36707)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iPYzh-0002E6-OX
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:39 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1iPYzs-0002HQ-M6
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iPYzg-0008Cg-8z
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:37 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:50794)
+ (envelope-from <mrolnik@gmail.com>) id 1iPYzp-0008N4-LO
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:47 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55411)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iPYzf-00089y-Mb
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:35 -0400
-Received: by mail-wm1-x330.google.com with SMTP id 11so4205146wmk.0
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 14:25:35 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iPYzo-0008Jl-7W
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:45 -0400
+Received: by mail-wm1-x344.google.com with SMTP id g24so4157057wmh.5
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 14:25:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=sXgUfb/k+VBdpZH8pPaVua4ZrgGvG7BUVKKWHWPW/NE=;
- b=oYsQRt39M+RHIB6/SjdCQ2ZtVehhACpzCMmxpC9MZr1oosdEW6sKB+qPuN7BbXIr/C
- 25aOtTZTpKXr1JcC/QnIy9rb/3HPStXuuvt2SVPpNSuzg3hchIf5KQvDSgq1hhiu3r2r
- Yh7rSIYGWThqvegeh+0PVS4Ahv2Z4zErCgWthh7JVAzpg0d8Fy83RqNgxqXQO8dWZp4o
- NaJEQMzEkmT6zOt7ssBhbh+pUrHjoVjFYG2MvuhLizvdSq0Zf22wIU9GHmkNAAuXJzsP
- jhfS9i1cKJ6SAhHhGac793+ihRh5vPZx8I5CGhaZtAxLlo0sn9BnjzEMQm7s3aHAUViX
- lijw==
+ bh=PevYNAEW2/rbU2HD9RmLzQ+eiZqSSbUKhGGl3bsW4n4=;
+ b=YRRwadO7Cg9G5gR4Uk79H7Isyow8x98LV5gvbQmZYxJY37vuLY3B1wtryPcKs8MkPm
+ 6syc8FQ90sAG7nUeauC/+uza7fdKBsdnWfvM4di53mI5VZxoojYdasy6JQtufcodNJmV
+ 2b9m1DcCTACWATvttSRjXedOa0NvRtSLR27M4+CiWKH0h2wyh3c/wdz9v8S3bkvM92mU
+ YOh+ezb+65Poq0a4J0/LW9NB9HE07UZfxp7EpmYkmpGoZeN7gYw14QlTYXwnlO1cBe6a
+ WYuQCWvYzGxriZjcc4fpIHeLgGJeYaqChJvd8yB93vg5FulKiZpbSk//d0m+AXWFiOGE
+ EBew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=sXgUfb/k+VBdpZH8pPaVua4ZrgGvG7BUVKKWHWPW/NE=;
- b=L6tapNfSp0CadyMjnyF2UuHhmR8svOLDDDAEchsE4j5AbawESCCPl0gVumnRdPANt+
- jRB+j+4Qf8xg1RBxSUF6tG66CjAybOE4N8J9sgfsbgELNhY6aTSMblF7YSGSMeU6mp3m
- /3GxK+hV/Uh5wqtpH9V4bHXjhj2BAxXGMjCQJWeaLUazRn/ba6AmS8Xw46omdmYlQiZw
- Ku2yxdy4jhKSohJRA31sbF8ZbdupclO6DdZGRm0rGE5pOmfpTTflQ+wCmG28vOXWSUzx
- sGttwgZCjtLG7fppbgUSAyjvxn1vzVlvaMrn7Bm1aRnxglpNz0LQvEoHLzp5pQ224zjn
- MX2A==
-X-Gm-Message-State: APjAAAU0JOkQCaXUieUcm0zGND76Rerb4ywMxeEr73hDq9DFImbWCRDV
- 1Jrok05z6vG2KYJnFDy9yH+2rVist2yrIw==
-X-Google-Smtp-Source: APXvYqzOzW84uVx0worMZX/s4MJvv4TndDyFsWjdu5TTnVyp9QYbINDQ7jDX9eYRfelXrQIZ2AlLzA==
-X-Received: by 2002:a1c:f302:: with SMTP id q2mr6164583wmq.142.1572384333957; 
- Tue, 29 Oct 2019 14:25:33 -0700 (PDT)
+ bh=PevYNAEW2/rbU2HD9RmLzQ+eiZqSSbUKhGGl3bsW4n4=;
+ b=InOPW+m5CiWFgNOIKRscTUNavGzU9A3d60D14wDL4MQYy+u9nIXXRY8YFteh9piMr2
+ l/fvUlax5j5O/9V+ACZTfJ7WM6RZx/wFmXj0H0VfwBXUiAC7tS0Jx7hiNU/7D3vKcxK8
+ 0QE4Q5InYNi7xcyD+8R1qsdrEIlYPDiEmnL5r3WnIrjlpltD+xIvv/UNQygsWCqR6ctq
+ PKajwec9Xy/qxtynFYeEBBbnrjEdv6qIduv5Hy/rVi+VByvM4ElI/LneBho9jf2SYfeB
+ 9nxQLYjM0SXqTauN1s6mC0CtAYIFtyLE30AhrDG5LTCvO9AQBFWGjeeU0ItvdFA1RIBi
+ IT9w==
+X-Gm-Message-State: APjAAAXZRBUcOH9NTi5ilRm6mU8wMHkyHMIUDtAB7T8ulvlRPyaEpyVG
+ qHd2QpD3NSMTqXgiZeRZ2O49RrS0rNS1+w==
+X-Google-Smtp-Source: APXvYqxJpuWbaDKWe15HVGFDhrsc5OjamQ2aLuIDrpYDOZbHNopCT2APhz1rXA8J1SZ4qwUKCDlM8Q==
+X-Received: by 2002:a1c:a943:: with SMTP id s64mr5916309wme.170.1572384340866; 
+ Tue, 29 Oct 2019 14:25:40 -0700 (PDT)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-79-178-97-184.red.bezeqint.net. [79.178.97.184])
- by smtp.gmail.com with ESMTPSA id 200sm4924730wme.32.2019.10.29.14.25.32
+ by smtp.gmail.com with ESMTPSA id 200sm4924730wme.32.2019.10.29.14.25.39
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Tue, 29 Oct 2019 14:25:33 -0700 (PDT)
+ Tue, 29 Oct 2019 14:25:40 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v35 04/13] target/avr: Add instruction translation - Registers
- definition
-Date: Tue, 29 Oct 2019 23:24:21 +0200
-Message-Id: <20191029212430.20617-5-mrolnik@gmail.com>
+Subject: [PATCH v35 08/13] target/avr: Add instruction translation - MCU
+ Control Instructions
+Date: Tue, 29 Oct 2019 23:24:25 +0200
+Message-Id: <20191029212430.20617-9-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20191029212430.20617-1-mrolnik@gmail.com>
 References: <20191029212430.20617-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::330
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,150 +98,206 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This includes:
+    - BREAK
+    - NOP
+    - SLEEP
+    - WDR
+
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
 ---
- target/avr/translate.c | 132 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 132 insertions(+)
- create mode 100644 target/avr/translate.c
+ target/avr/translate.c | 174 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 174 insertions(+)
 
 diff --git a/target/avr/translate.c b/target/avr/translate.c
-new file mode 100644
-index 0000000000..53c9892a60
---- /dev/null
+index f2ec2e2d2f..30ba13bdd7 100644
+--- a/target/avr/translate.c
 +++ b/target/avr/translate.c
-@@ -0,0 +1,132 @@
-+/*
-+ * QEMU AVR CPU
-+ *
-+ * Copyright (c) 2019 Michael Rolnik
-+ *
-+ * This library is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2.1 of the License, or (at your option) any later version.
-+ *
-+ * This library is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this library; if not, see
-+ * <http://www.gnu.org/licenses/lgpl-2.1.html>
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/qemu-print.h"
-+#include "tcg/tcg.h"
-+#include "cpu.h"
-+#include "exec/exec-all.h"
-+#include "disas/disas.h"
-+#include "tcg-op.h"
-+#include "exec/cpu_ldst.h"
-+#include "exec/helper-proto.h"
-+#include "exec/helper-gen.h"
-+#include "exec/log.h"
-+#include "exec/gdbstub.h"
-+#include "exec/translator.h"
-+#include "exec/gen-icount.h"
-+
-+/*
-+ *  Define if you want a BREAK instruction translated to a breakpoint
-+ *  Active debugging connection is assumed
-+ *  This is for
-+ *  https://github.com/seharris/qemu-avr-tests/tree/master/instruction-tests
-+ *  tests
-+ */
-+#undef BREAKPOINT_ON_BREAK
-+
-+static TCGv cpu_pc;
-+
-+static TCGv cpu_Cf;
-+static TCGv cpu_Zf;
-+static TCGv cpu_Nf;
-+static TCGv cpu_Vf;
-+static TCGv cpu_Sf;
-+static TCGv cpu_Hf;
-+static TCGv cpu_Tf;
-+static TCGv cpu_If;
-+
-+static TCGv cpu_rampD;
-+static TCGv cpu_rampX;
-+static TCGv cpu_rampY;
-+static TCGv cpu_rampZ;
-+
-+static TCGv cpu_r[NO_CPU_REGISTERS];
-+static TCGv cpu_eind;
-+static TCGv cpu_sp;
-+
-+static TCGv cpu_skip;
-+
-+static const char reg_names[NO_CPU_REGISTERS][8] = {
-+    "r0",  "r1",  "r2",  "r3",  "r4",  "r5",  "r6",  "r7",
-+    "r8",  "r9",  "r10", "r11", "r12", "r13", "r14", "r15",
-+    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
-+    "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
-+};
-+#define REG(x) (cpu_r[x])
-+
-+enum {
-+    DISAS_EXIT   = DISAS_TARGET_0,  /* We want return to the cpu main loop.  */
-+    DISAS_LOOKUP = DISAS_TARGET_1,  /* We have a variable condition exit.  */
-+    DISAS_CHAIN  = DISAS_TARGET_2,  /* We have a single condition exit.  */
-+};
-+
-+typedef struct DisasContext DisasContext;
-+
-+/* This is the state at translation time. */
-+struct DisasContext {
-+    TranslationBlock *tb;
-+
-+    CPUAVRState *env;
-+    CPUState *cs;
-+
-+    target_long npc;
-+    uint32_t opcode;
-+
-+    /* Routine used to access memory */
-+    int memidx;
-+    int bstate;
-+    int singlestep;
-+
-+    TCGv skip_var0;
-+    TCGv skip_var1;
-+    TCGCond skip_cond;
-+    bool free_skip_var0;
-+};
-+
-+static int to_A(DisasContext *ctx, int indx) { return 16 + (indx % 16); }
-+static int to_B(DisasContext *ctx, int indx) { return 16 + (indx % 8); }
-+static int to_C(DisasContext *ctx, int indx) { return 24 + (indx % 4) * 2; }
-+static int to_D(DisasContext *ctx, int indx) { return (indx % 16) * 2; }
-+
-+static uint16_t next_word(DisasContext *ctx)
+@@ -368,6 +368,115 @@ static bool trans_ADC(DisasContext *ctx, arg_ADC *a)
+ }
+ 
+ 
++static void gen_jmp_ez(DisasContext *ctx)
 +{
-+    return cpu_lduw_code(ctx->env, ctx->npc++ * 2);
-+}
-+
-+static int append_16(DisasContext *ctx, int x)
-+{
-+    return x << 16 | next_word(ctx);
++    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
++    tcg_gen_or_tl(cpu_pc, cpu_pc, cpu_eind);
++    ctx->bstate = DISAS_LOOKUP;
 +}
 +
 +
-+static bool avr_have_feature(DisasContext *ctx, int feature)
++static void gen_jmp_z(DisasContext *ctx)
 +{
-+    if (!avr_feature(ctx->env, feature)) {
-+        gen_helper_unsupported(cpu_env);
-+        ctx->bstate = DISAS_NORETURN;
-+        return false;
++    tcg_gen_deposit_tl(cpu_pc, cpu_r[30], cpu_r[31], 8, 8);
++    ctx->bstate = DISAS_LOOKUP;
++}
++
++
++/*
++ *  in the gen_set_addr & gen_get_addr functions
++ *  H assumed to be in 0x00ff0000 format
++ *  M assumed to be in 0x000000ff format
++ *  L assumed to be in 0x000000ff format
++ */
++static void gen_set_addr(TCGv addr, TCGv H, TCGv M, TCGv L)
++{
++
++    tcg_gen_andi_tl(L, addr, 0x000000ff);
++
++    tcg_gen_andi_tl(M, addr, 0x0000ff00);
++    tcg_gen_shri_tl(M, M, 8);
++
++    tcg_gen_andi_tl(H, addr, 0x00ff0000);
++}
++
++
++static void gen_set_xaddr(TCGv addr)
++{
++    gen_set_addr(addr, cpu_rampX, cpu_r[27], cpu_r[26]);
++}
++
++
++static void gen_set_yaddr(TCGv addr)
++{
++    gen_set_addr(addr, cpu_rampY, cpu_r[29], cpu_r[28]);
++}
++
++
++static void gen_set_zaddr(TCGv addr)
++{
++    gen_set_addr(addr, cpu_rampZ, cpu_r[31], cpu_r[30]);
++}
++
++
++static TCGv gen_get_addr(TCGv H, TCGv M, TCGv L)
++{
++    TCGv addr = tcg_temp_new_i32();
++
++    tcg_gen_deposit_tl(addr, M, H, 8, 8);
++    tcg_gen_deposit_tl(addr, L, addr, 8, 16);
++
++    return addr;
++}
++
++
++static TCGv gen_get_xaddr(void)
++{
++    return gen_get_addr(cpu_rampX, cpu_r[27], cpu_r[26]);
++}
++
++
++static TCGv gen_get_yaddr(void)
++{
++    return gen_get_addr(cpu_rampY, cpu_r[29], cpu_r[28]);
++}
++
++
++static TCGv gen_get_zaddr(void)
++{
++    return gen_get_addr(cpu_rampZ, cpu_r[31], cpu_r[30]);
++}
++
++
++/*
++ *  Load one byte indirect from data space to register and stores an clear
++ *  the bits in data space specified by the register. The instruction can only
++ *  be used towards internal SRAM.  The data location is pointed to by the Z (16
++ *  bits) Pointer Register in the Register File. Memory access is limited to the
++ *  current data segment of 64KB. To access another data segment in devices with
++ *  more than 64KB data space, the RAMPZ in register in the I/O area has to be
++ *  changed.  The Z-pointer Register is left unchanged by the operation. This
++ *  instruction is especially suited for clearing status bits stored in SRAM.
++ */
++static void gen_data_store(DisasContext *ctx, TCGv data, TCGv addr)
++{
++    if (ctx->tb->flags & TB_FLAGS_FULL_ACCESS) {
++        gen_helper_fullwr(cpu_env, data, addr);
++    } else {
++        tcg_gen_qemu_st8(data, addr, MMU_DATA_IDX); /* mem[addr] = data */
 +    }
++}
++
++static void gen_data_load(DisasContext *ctx, TCGv data, TCGv addr)
++{
++    if (ctx->tb->flags & TB_FLAGS_FULL_ACCESS) {
++        gen_helper_fullrd(data, cpu_env, addr);
++    } else {
++        tcg_gen_qemu_ld8u(data, addr, MMU_DATA_IDX); /* data = mem[addr] */
++    }
++}
++
++
+ /*
+  *  Subtracts an immediate value (0-63) from a register pair and places the
+  *  result in the register pair. This instruction operates on the upper four
+@@ -2618,3 +2727,68 @@ static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
+ 
+     return true;
+ }
++
++
++/*
++ *  The BREAK instruction is used by the On-chip Debug system, and is
++ *  normally not used in the application software. When the BREAK instruction is
++ *  executed, the AVR CPU is set in the Stopped Mode. This gives the On-chip
++ *  Debugger access to internal resources.  If any Lock bits are set, or either
++ *  the JTAGEN or OCDEN Fuses are unprogrammed, the CPU will treat the BREAK
++ *  instruction as a NOP and will not enter the Stopped mode.  This instruction
++ *  is not available in all devices. Refer to the device specific instruction
++ *  set summary.
++ */
++static bool trans_BREAK(DisasContext *ctx, arg_BREAK *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_BREAK)) {
++        return true;
++    }
++
++#ifdef BREAKPOINT_ON_BREAK
++    tcg_gen_movi_tl(cpu_pc, ctx->npc - 1);
++    gen_helper_debug(cpu_env);
++    ctx->bstate = DISAS_EXIT;
++#else
++    /* NOP */
++#endif
++
 +    return true;
 +}
 +
-+static bool decode_insn(DisasContext *ctx, uint16_t insn);
-+#include "decode_insn.inc.c"
 +
++/*
++ *  This instruction performs a single cycle No Operation.
++ */
++static bool trans_NOP(DisasContext *ctx, arg_NOP *a)
++{
++
++    /* NOP */
++
++    return true;
++}
++
++
++/*
++ *  This instruction sets the circuit in sleep mode defined by the MCU
++ *  Control Register.
++ */
++static bool trans_SLEEP(DisasContext *ctx, arg_SLEEP *a)
++{
++    gen_helper_sleep(cpu_env);
++    ctx->bstate = DISAS_NORETURN;
++    return true;
++}
++
++
++/*
++ *  This instruction resets the Watchdog Timer. This instruction must be
++ *  executed within a limited time given by the WD prescaler. See the Watchdog
++ *  Timer hardware specification.
++ */
++static bool trans_WDR(DisasContext *ctx, arg_WDR *a)
++{
++    gen_helper_wdr(cpu_env);
++
++    return true;
++}
 -- 
 2.17.2 (Apple Git-113)
 
