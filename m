@@ -2,80 +2,81 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CD2CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 10:48:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A551CA9EC4
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 10:50:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1095A2087F
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 10:48:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17A04208E3
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 10:50:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dc6Tqps/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1095A2087F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ych67S04"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17A04208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPP30-0006Wv-7b
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 06:48:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57023)
+	id 1iPP5T-0000x0-A5
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 06:50:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iPOeZ-000632-65
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 06:23:08 -0400
+ (envelope-from <alistair23@gmail.com>) id 1iPP4T-0007mR-Ju
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 06:49:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iPOeX-0001XX-0Y
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 06:23:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29523
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iPOeW-0001Wj-TH
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 06:23:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572344584;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jqNMt4RSIpJPAGi/jqfj8UinKDuq7x/cW6NIANBam4g=;
- b=Dc6Tqps/uB059zrGjPsr90/p7ISDG2S87faflWJhmF4dRcQUYRUGoOX6iuYjMfyMKgHHsy
- jrnFEbKK/iQZf037VXgc0HofD4HvcE/34Hfxsdv1push/WiPbj9QNVhhPTmLUrP1qI+jho
- npzStbOWA2Ompll6M5a94egbRp2H0r0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-UAAretzaNOmOeNmU5pdJzg-1; Tue, 29 Oct 2019 06:23:01 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 026EB5E4
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 10:23:01 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C4A5A1001B08
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 10:23:00 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 957C31132B56; Tue, 29 Oct 2019 11:22:28 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 08/19] qapi: Split .connect_doc(), .check_doc() off .check()
-Date: Tue, 29 Oct 2019 11:22:17 +0100
-Message-Id: <20191029102228.20740-9-armbru@redhat.com>
-In-Reply-To: <20191029102228.20740-1-armbru@redhat.com>
-References: <20191029102228.20740-1-armbru@redhat.com>
+ (envelope-from <alistair23@gmail.com>) id 1iPP4S-0006F9-43
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 06:49:53 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:46952)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iPP4R-0006EB-RQ; Tue, 29 Oct 2019 06:49:52 -0400
+Received: by mail-lf1-x143.google.com with SMTP id t8so10113811lfc.13;
+ Tue, 29 Oct 2019 03:49:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=6tRMUK9AjTpL0eDCVHY9YXGwvCZ+XOK7o1ibbiFRLso=;
+ b=Ych67S04MblOBWisxY38dhkMqTvxVy3Mko+iIIohihRxgf+OYVLI9ybQM1laDSB8h8
+ 0/1srQAYajNA4bleHztmg6Hj018KLpEs61mhi+KhINCSNu/oA/7SjL34SxFQPpENov9e
+ Im1vqnvbAI13imAJWvulER5Ua1i/zo1fxfdzvrE2UpB0r8dmrD3jtMC6nISAdQPwoO+F
+ 51I+ysYkv4DWcf0s0VbQUFW8uGlnwg+MOpB8pCjAQ0Q0rRBtZAtLeyXCJzp4SbFkzDjD
+ DN26B1f2y0sezuw/8C0O8tLNXRoZ9paYLAa/wQXy86BErbIth2NJgGZuKfY1e2ndy1hx
+ zpaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=6tRMUK9AjTpL0eDCVHY9YXGwvCZ+XOK7o1ibbiFRLso=;
+ b=I1jw/kEA3Vw2EHwv1yEc3i4SrIlL9cAZDi9HHPiBEtjIPApkRPkhQ9jdwOMNZnfjdo
+ Wls0MKvEJRPDo+5OyzzWbMQWD2x7R9uoI9abPrpXcOmRjkFmqFvQvgdCIFdKplf4SkzJ
+ E/MWiMTt2YRc6wicqHoJK3ozP4bKgK/L3rMArHCwME1uxJdgzdjL7k+tsXeTCNOvNiWO
+ 76o5JETejV4Vw50De+qU/uMHnkpgIotdLMr2EKg2tYH4PE0NUylxbfsw3F5CzboWT+Df
+ aYbQaAre7T+LxYUt3Sm8QXmVuVq9BmLgNOLAKvIKy9+KhJtjufgLv3C2v2kLS0qn+Jjb
+ QjGg==
+X-Gm-Message-State: APjAAAVN4LqgJZ077bT+SCkXc9pjqynVz3cPOnahvire+t+mbHW3IyIK
+ /7iUHjPMu4F3C0OoqoJAdUzoqiC/bpj1IfRx5oc=
+X-Google-Smtp-Source: APXvYqwids/NEX9KL9YUfzeF6QRE4Laz99sCMVzAHK7rVDyrTTpFPT+39+HF0rUztj9TnpMaCH9bGhyGdktxxF1expM=
+X-Received: by 2002:ac2:4a8f:: with SMTP id l15mr1970646lfp.5.1572346190264;
+ Tue, 29 Oct 2019 03:49:50 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: UAAretzaNOmOeNmU5pdJzg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <34350af3b53fadc50bfe4f1fbc452c7d3a8fe8f7.1570572202.git.alistair.francis@wdc.com>
+ <mhng-55b18e6b-d882-4d24-a4af-2cbecd403a49@palmer-si-x1c4>
+ <CAKmqyKPmKc2hhNkVrDgZerXVzyCyrS4WJjMY8fRKf8MNAwmLKg@mail.gmail.com>
+In-Reply-To: <CAKmqyKPmKc2hhNkVrDgZerXVzyCyrS4WJjMY8fRKf8MNAwmLKg@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 29 Oct 2019 11:49:23 +0100
+Message-ID: <CAKmqyKM9kKQxc7ZcSOMciqxBLUf=sWYzGJc98WkiOp3sozgq9g@mail.gmail.com>
+Subject: Re: [PATCH v1 1/1] target/riscv: Remove atomic accesses to MIP CSR
+To: Palmer Dabbelt <palmer@sifive.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,110 +88,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Splitting documentation checking off the .check() methods makes them a
-bit more focused, which is welcome, as some of them are pretty big.
-It also prepares the ground for the following commits.
+On Fri, Oct 18, 2019 at 7:44 PM Alistair Francis <alistair23@gmail.com> wrote:
+>
+> On Fri, Oct 18, 2019 at 9:51 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+> >
+> > On Tue, 08 Oct 2019 15:04:18 PDT (-0700), Alistair Francis wrote:
+> > > Instead of relying on atomics to access the MIP register let's update
+> > > our helper function to instead just lock the IO mutex thread before
+> > > writing. This follows the same concept as used in PPC for handling
+> > > interrupts
+> > >
+> > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > > ---
+> > >  target/riscv/cpu.c        |  5 ++--
+> > >  target/riscv/cpu.h        |  9 --------
+> > >  target/riscv/cpu_helper.c | 48 +++++++++++++++------------------------
+> > >  target/riscv/csr.c        |  2 +-
+> > >  4 files changed, 21 insertions(+), 43 deletions(-)
+> > >
+> > > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+> > > index f13e298a36..e09dd7aa23 100644
+> > > --- a/target/riscv/cpu.c
+> > > +++ b/target/riscv/cpu.c
+> > > @@ -224,8 +224,7 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+> > >  #ifndef CONFIG_USER_ONLY
+> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
+> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
+> > > -    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ",
+> > > -                 (target_ulong)atomic_read(&env->mip));
+> > > +    qemu_fprintf(f, " %s 0x%x\n", "mip     ", env->mip);
+> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
+> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mideleg ", env->mideleg);
+> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "medeleg ", env->medeleg);
+> > > @@ -275,7 +274,7 @@ static bool riscv_cpu_has_work(CPUState *cs)
+> > >       * Definition of the WFI instruction requires it to ignore the privilege
+> > >       * mode and delegation registers, but respect individual enables
+> > >       */
+> > > -    return (atomic_read(&env->mip) & env->mie) != 0;
+> > > +    return (env->mip & env->mie) != 0;
+> > >  #else
+> > >      return true;
+> > >  #endif
+> > > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+> > > index 124ed33ee4..a71473b243 100644
+> > > --- a/target/riscv/cpu.h
+> > > +++ b/target/riscv/cpu.h
+> > > @@ -121,15 +121,6 @@ struct CPURISCVState {
+> > >      target_ulong mhartid;
+> > >      target_ulong mstatus;
+> > >
+> > > -    /*
+> > > -     * CAUTION! Unlike the rest of this struct, mip is accessed asynchonously
+> > > -     * by I/O threads. It should be read with atomic_read. It should be updated
+> > > -     * using riscv_cpu_update_mip with the iothread mutex held. The iothread
+> > > -     * mutex must be held because mip must be consistent with the CPU inturrept
+> > > -     * state. riscv_cpu_update_mip calls cpu_interrupt or cpu_reset_interrupt
+> > > -     * wuth the invariant that CPU_INTERRUPT_HARD is set iff mip is non-zero.
+> > > -     * mip is 32-bits to allow atomic_read on 32-bit hosts.
+> > > -     */
+> > >      uint32_t mip;
+> > >      uint32_t miclaim;
+> > >
+> > > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+> > > index 87dd6a6ece..4334978c2e 100644
+> > > --- a/target/riscv/cpu_helper.c
+> > > +++ b/target/riscv/cpu_helper.c
+> > > @@ -19,6 +19,7 @@
+> > >
+> > >  #include "qemu/osdep.h"
+> > >  #include "qemu/log.h"
+> > > +#include "qemu/main-loop.h"
+> > >  #include "cpu.h"
+> > >  #include "exec/exec-all.h"
+> > >  #include "tcg-op.h"
+> > > @@ -38,7 +39,7 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
+> > >  {
+> > >      target_ulong mstatus_mie = get_field(env->mstatus, MSTATUS_MIE);
+> > >      target_ulong mstatus_sie = get_field(env->mstatus, MSTATUS_SIE);
+> > > -    target_ulong pending = atomic_read(&env->mip) & env->mie;
+> > > +    target_ulong pending = env->mip & env->mie;
+> > >      target_ulong mie = env->priv < PRV_M || (env->priv == PRV_M && mstatus_mie);
+> > >      target_ulong sie = env->priv < PRV_S || (env->priv == PRV_S && mstatus_sie);
+> > >      target_ulong irqs = (pending & ~env->mideleg & -mie) |
+> > > @@ -92,42 +93,29 @@ int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
+> > >      }
+> > >  }
+> > >
+> > > -struct CpuAsyncInfo {
+> > > -    uint32_t new_mip;
+> > > -};
+> > > -
+> > > -static void riscv_cpu_update_mip_irqs_async(CPUState *target_cpu_state,
+> > > -                                            run_on_cpu_data data)
+> > > -{
+> > > -    struct CpuAsyncInfo *info = (struct CpuAsyncInfo *) data.host_ptr;
+> > > -
+> > > -    if (info->new_mip) {
+> > > -        cpu_interrupt(target_cpu_state, CPU_INTERRUPT_HARD);
+> > > -    } else {
+> > > -        cpu_reset_interrupt(target_cpu_state, CPU_INTERRUPT_HARD);
+> > > -    }
+> > > -
+> > > -    g_free(info);
+> > > -}
+> > > -
+> > >  uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
+> > >  {
+> > >      CPURISCVState *env = &cpu->env;
+> > >      CPUState *cs = CPU(cpu);
+> > > -    struct CpuAsyncInfo *info;
+> > > -    uint32_t old, new, cmp = atomic_read(&env->mip);
+> > > +    uint32_t old = env->mip;
+> > > +    bool locked = false;
+> > > +
+> > > +    if (!qemu_mutex_iothread_locked()) {
+> > > +        locked = true;
+> > > +        qemu_mutex_lock_iothread();
+> > > +    }
+> >
+> > I must be lost here, because I have no idea what this is trying to do.
+>
+> We lock the QEMU IO Thread before we trigger an interrupt. This way we
+> can call it from the PLIC.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20191024110237.30963-9-armbru@redhat.com>
----
- scripts/qapi/schema.py | 34 +++++++++++++++++++++++++++-------
- 1 file changed, 27 insertions(+), 7 deletions(-)
+Ping! This missed the latest PR.
 
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index f7d68a35f4..9b62c8d74d 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -51,6 +51,12 @@ class QAPISchemaEntity(object):
-                                            os.path.dirname(schema.fname))
-         self._checked =3D True
-=20
-+    def connect_doc(self):
-+        pass
-+
-+    def check_doc(self):
-+        pass
-+
-     @property
-     def ifcond(self):
-         assert self._checked
-@@ -217,7 +223,10 @@ class QAPISchemaEnumType(QAPISchemaType):
-         seen =3D {}
-         for m in self.members:
-             m.check_clash(self.info, seen)
--            if self.doc:
-+
-+    def connect_doc(self):
-+        if self.doc:
-+            for m in self.members:
-                 self.doc.connect_member(m)
-=20
-     def is_implicit(self):
-@@ -345,8 +354,6 @@ class QAPISchemaObjectType(QAPISchemaType):
-         for m in self.local_members:
-             m.check(schema)
-             m.check_clash(self.info, seen)
--            if self.doc:
--                self.doc.connect_member(m)
-         members =3D seen.values()
-=20
-         if self.variants:
-@@ -358,9 +365,6 @@ class QAPISchemaObjectType(QAPISchemaType):
-         for f in self.features:
-             f.check_clash(self.info, seen)
-=20
--        if self.doc:
--            self.doc.check()
--
-         self.members =3D members  # mark completed
-=20
-     # Check that the members of this type do not cause duplicate JSON memb=
-ers,
-@@ -372,6 +376,15 @@ class QAPISchemaObjectType(QAPISchemaType):
-         for m in self.members:
-             m.check_clash(info, seen)
-=20
-+    def connect_doc(self):
-+        if self.doc:
-+            for m in self.local_members:
-+                self.doc.connect_member(m)
-+
-+    def check_doc(self):
-+        if self.doc:
-+            self.doc.check()
-+
-     @property
-     def ifcond(self):
-         assert self._checked
-@@ -639,8 +652,13 @@ class QAPISchemaAlternateType(QAPISchemaType):
-                         "%s can't be distinguished from '%s'"
-                         % (v.describe(self.info), types_seen[qt]))
-                 types_seen[qt] =3D v.name
--            if self.doc:
-+
-+    def connect_doc(self):
-+        if self.doc:
-+            for v in self.variants.variants:
-                 self.doc.connect_member(v)
-+
-+    def check_doc(self):
-         if self.doc:
-             self.doc.check()
-=20
-@@ -1043,6 +1061,8 @@ class QAPISchema(object):
-     def check(self):
-         for ent in self._entity_list:
-             ent.check(self)
-+            ent.connect_doc()
-+            ent.check_doc()
-=20
-     def visit(self, visitor):
-         visitor.visit_begin(self)
---=20
-2.21.0
+Alistair
 
+>
+> Alistair
+>
+> >
+> > > -    do {
+> > > -        old = cmp;
+> > > -        new = (old & ~mask) | (value & mask);
+> > > -        cmp = atomic_cmpxchg(&env->mip, old, new);
+> > > -    } while (old != cmp);
+> > > +    env->mip = (env->mip & ~mask) | (value & mask);
+> > >
+> > > -    info = g_new(struct CpuAsyncInfo, 1);
+> > > -    info->new_mip = new;
+> > > +    if (env->mip) {
+> > > +        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
+> > > +    } else {
+> > > +        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
+> > > +    }
+> > >
+> > > -    async_run_on_cpu(cs, riscv_cpu_update_mip_irqs_async,
+> > > -                     RUN_ON_CPU_HOST_PTR(info));
+> > > +    if (locked) {
+> > > +        qemu_mutex_unlock_iothread();
+> > > +    }
+> > >
+> > >      return old;
+> > >  }
+> > > diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> > > index f767ad24be..db0cc6ef55 100644
+> > > --- a/target/riscv/csr.c
+> > > +++ b/target/riscv/csr.c
+> > > @@ -579,7 +579,7 @@ static int rmw_mip(CPURISCVState *env, int csrno, target_ulong *ret_value,
+> > >      if (mask) {
+> > >          old_mip = riscv_cpu_update_mip(cpu, mask, (new_value & mask));
+> > >      } else {
+> > > -        old_mip = atomic_read(&env->mip);
+> > > +        old_mip = env->mip;
+> > >      }
+> > >
+> > >      if (ret_value) {
 
