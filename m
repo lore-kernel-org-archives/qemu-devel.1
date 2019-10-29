@@ -2,81 +2,70 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D46CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 02:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C367ACA9EC0
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 03:20:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D4C820663
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 02:57:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="daARlmtM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D4C820663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8332E20717
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 03:20:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8332E20717
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPHhk-0001jw-FP
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 22:57:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58823)
+	id 1iPI3y-0001a9-M0
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 23:20:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33276)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iPHh6-0001Ij-OZ
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:57:18 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iPI37-0000u2-Kg
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 23:20:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iPHh3-0002cI-TU
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:57:15 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21167
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iPHh3-0002bv-Oj
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:57:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572317832;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4NoRRDCibQ0LlV4SPI9mo/m54bCovxeK2cJflai7ikQ=;
- b=daARlmtMU8sYX528m2o4FObV2+1uSV1jwi+mgxwm6NcgbnfLxAkOtoYESi/339HlszyIvL
- by9HnxzC3E2xHYotuUR2ai49L6+gQ5bbPyI0oxVSFWIVZrA5284nZmL8b+cO5olqdW6vby
- uuatCjpqNmN2vGNao7ideFD2uGXKqTs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-0xtx22F2Pyuzqw6fdsuNPQ-1; Mon, 28 Oct 2019 22:57:11 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 968AF8017DD;
- Tue, 29 Oct 2019 02:57:10 +0000 (UTC)
-Received: from work-vm (ovpn-116-127.ams2.redhat.com [10.36.116.127])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EA0695D6C3;
- Tue, 29 Oct 2019 02:56:52 +0000 (UTC)
-Date: Tue, 29 Oct 2019 02:56:50 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Subject: Re: [PATCH v6 08/11] migration: add new migration state wait-unplug
-Message-ID: <20191029025650.GE2508@work-vm>
-References: <20191025121930.6855-1-jfreimann@redhat.com>
- <20191025121930.6855-9-jfreimann@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1iPI35-0004O1-NZ
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 23:20:01 -0400
+Resent-Date: Mon, 28 Oct 2019 23:20:01 -0400
+Resent-Message-Id: <E1iPI35-0004O1-NZ@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21429)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iPI35-0004NB-IE
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 23:19:59 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1572319180; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=CoC2lEG8kRKGND4daT5rxUm++X38nABLMLIkKxVtqYqfCME4UjMljKpibiyncIb+8ZP1F/J7HRkXjfxQ7I9oP8lcdf5wYrrEo+ehIprWNIB80I8xplN3dD868pTJdFl+1JUhU11TTdCGg6EJeKZjgU4oPCLlXQIGTWfwdsNndlM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1572319180;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=2O47FJJCaKJFFH28BxjvMXGgMRFfRlbCsPH/rXt92Us=; 
+ b=DTEPWj6kIzRmSKMI84cvQ1VPp7mtxm/vYv55YszhAoGOla0V8QSE2TgsIVn6FIxjp36sXQlkaaTuAKVcceupa+NVDLWg5/4EEPFfdtE3DdYh1LbKCPy4aAwfIVwt74kaGeAkzKlXCZzNNNoMHYYoVoeIeFuU6t3IrGfhzqYtBCU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1572319179313344.0201374822932;
+ Mon, 28 Oct 2019 20:19:39 -0700 (PDT)
+In-Reply-To: <20191028163447.18541-1-philmd@redhat.com>
+Subject: Re: [PULL 00/20] hw/i386/pc: Split PIIX3 southbridge from i440FX
+ northbridge
+Message-ID: <157231917799.12254.16002216359351107728@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <20191025121930.6855-9-jfreimann@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 0xtx22F2Pyuzqw6fdsuNPQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: philmd@redhat.com
+Date: Mon, 28 Oct 2019 20:19:39 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,246 +77,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
- mst@redhat.com, aadam@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org,
- armbru@redhat.com, alex.williamson@redhat.com, laine@redhat.com,
- ailan@redhat.com, parav@mellanox.com
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, hpoussin@reactos.org, amarkovic@wavecomp.com,
+ pbonzini@redhat.com, philmd@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Jens Freimann (jfreimann@redhat.com) wrote:
-> This patch adds a new migration state called wait-unplug.  It is entered
-> after the SETUP state if failover devices are present. It will transition
-> into ACTIVE once all devices were succesfully unplugged from the guest.
->=20
-> So if a guest doesn't respond or takes long to honor the unplug request
-> the user will see the migration state 'wait-unplug'.
->=20
-> In the migration thread we query failover devices if they're are still
-> pending the guest unplug. When all are unplugged the migration
-> continues. If one device won't unplug migration will stay in wait_unplug
-> state.
->=20
-> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
-> Acked-by: Cornelia Huck <cohuck@redhat.com>
-
-I think this is OK, so=20
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
-but see question below
-
-> ---
->  include/migration/vmstate.h |  2 ++
->  migration/migration.c       | 21 +++++++++++++++++++++
->  migration/migration.h       |  3 +++
->  migration/savevm.c          | 36 ++++++++++++++++++++++++++++++++++++
->  migration/savevm.h          |  2 ++
->  qapi/migration.json         |  5 ++++-
->  6 files changed, 68 insertions(+), 1 deletion(-)
->=20
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index b9ee563aa4..ac4f46a67d 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -186,6 +186,8 @@ struct VMStateDescription {
->      int (*pre_save)(void *opaque);
->      int (*post_save)(void *opaque);
->      bool (*needed)(void *opaque);
-> +    bool (*dev_unplug_pending)(void *opaque);
-> +
->      const VMStateField *fields;
->      const VMStateDescription **subsections;
->  };
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 3febd0f8f3..51764f2565 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -52,6 +52,7 @@
->  #include "hw/qdev-properties.h"
->  #include "monitor/monitor.h"
->  #include "net/announce.h"
-> +#include "qemu/queue.h"
-> =20
->  #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed thrott=
-ling */
-> =20
-> @@ -819,6 +820,7 @@ bool migration_is_setup_or_active(int state)
->      case MIGRATION_STATUS_SETUP:
->      case MIGRATION_STATUS_PRE_SWITCHOVER:
->      case MIGRATION_STATUS_DEVICE:
-> +    case MIGRATION_STATUS_WAIT_UNPLUG:
->          return true;
-> =20
->      default:
-> @@ -954,6 +956,9 @@ static void fill_source_migration_info(MigrationInfo =
-*info)
->      case MIGRATION_STATUS_CANCELLED:
->          info->has_status =3D true;
->          break;
-> +    case MIGRATION_STATUS_WAIT_UNPLUG:
-> +        info->has_status =3D true;
-> +        break;
->      }
->      info->status =3D s->state;
->  }
-> @@ -1694,6 +1699,7 @@ bool migration_is_idle(void)
->      case MIGRATION_STATUS_COLO:
->      case MIGRATION_STATUS_PRE_SWITCHOVER:
->      case MIGRATION_STATUS_DEVICE:
-> +    case MIGRATION_STATUS_WAIT_UNPLUG:
->          return false;
->      case MIGRATION_STATUS__MAX:
->          g_assert_not_reached();
-> @@ -3264,6 +3270,19 @@ static void *migration_thread(void *opaque)
-> =20
->      qemu_savevm_state_setup(s->to_dst_file);
-> =20
-> +    if (qemu_savevm_nr_failover_devices()) {
-> +        migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
-> +                          MIGRATION_STATUS_WAIT_UNPLUG);
-> +
-> +        while (s->state =3D=3D MIGRATION_STATUS_WAIT_UNPLUG &&
-> +                !qemu_savevm_state_guest_unplug_pending()) {
-> +            qemu_sem_timedwait(&s->wait_unplug_sem, 250);
-> +        }
-> +
-> +        migrate_set_state(&s->state, MIGRATION_STATUS_WAIT_UNPLUG,
-> +                MIGRATION_STATUS_ACTIVE);
-> +    }
-> +
->      s->setup_time =3D qemu_clock_get_ms(QEMU_CLOCK_HOST) - setup_start;
->      migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
->                        MIGRATION_STATUS_ACTIVE);
-> @@ -3511,6 +3530,7 @@ static void migration_instance_finalize(Object *obj=
-)
->      qemu_mutex_destroy(&ms->qemu_file_lock);
->      g_free(params->tls_hostname);
->      g_free(params->tls_creds);
-> +    qemu_sem_destroy(&ms->wait_unplug_sem);
->      qemu_sem_destroy(&ms->rate_limit_sem);
->      qemu_sem_destroy(&ms->pause_sem);
->      qemu_sem_destroy(&ms->postcopy_pause_sem);
-> @@ -3556,6 +3576,7 @@ static void migration_instance_init(Object *obj)
->      qemu_sem_init(&ms->postcopy_pause_rp_sem, 0);
->      qemu_sem_init(&ms->rp_state.rp_sem, 0);
->      qemu_sem_init(&ms->rate_limit_sem, 0);
-> +    qemu_sem_init(&ms->wait_unplug_sem, 0);
->      qemu_mutex_init(&ms->qemu_file_lock);
->  }
-> =20
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 4f2fe193dc..79b3dda146 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -206,6 +206,9 @@ struct MigrationState
->      /* Flag set once the migration thread called bdrv_inactivate_all */
->      bool block_inactive;
-> =20
-> +    /* Migration is waiting for guest to unplug device */
-> +    QemuSemaphore wait_unplug_sem;
-> +
->      /* Migration is paused due to pause-before-switchover */
->      QemuSemaphore pause_sem;
-> =20
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index 8d95e261f6..0f18dea49e 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -1113,6 +1113,42 @@ void qemu_savevm_state_header(QEMUFile *f)
->      }
->  }
-> =20
-> +int qemu_savevm_nr_failover_devices(void)
-> +{
-> +    SaveStateEntry *se;
-> +    int n =3D 0;
-> +
-> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-> +        if (se->vmsd && se->vmsd->dev_unplug_pending) {
-> +            n++;
-> +        }
-> +    }
-> +
-> +    return n;
-> +}
-> +
-> +bool qemu_savevm_state_guest_unplug_pending(void)
-> +{
-> +    int nr_failover_devs;
-> +    SaveStateEntry *se;
-> +    bool ret =3D false;
-> +    int n =3D 0;
-> +
-> +    nr_failover_devs =3D qemu_savevm_nr_failover_devices();
-> +
-> +    QTAILQ_FOREACH(se, &savevm_state.handlers, entry) {
-> +        if (!se->vmsd || !se->vmsd->dev_unplug_pending) {
-> +            continue;
-> +        }
-> +        ret =3D se->vmsd->dev_unplug_pending(se->opaque);
-> +        if (!ret) {
-> +            n++;
-> +        }
-> +    }
-> +
-> +    return n =3D=3D nr_failover_devs;
-
-I was expecting !=3D I think?  If all the devices say
-they've got one pending then doesn't n=3D=3Dnr_failover_devs and
-it returns true? But then what happens if only one has one pending?
-
-Dave
-
-> +}
-> +
->  void qemu_savevm_state_setup(QEMUFile *f)
->  {
->      SaveStateEntry *se;
-> diff --git a/migration/savevm.h b/migration/savevm.h
-> index 51a4b9caa8..c42b9c80ee 100644
-> --- a/migration/savevm.h
-> +++ b/migration/savevm.h
-> @@ -31,6 +31,8 @@
-> =20
->  bool qemu_savevm_state_blocked(Error **errp);
->  void qemu_savevm_state_setup(QEMUFile *f);
-> +int qemu_savevm_nr_failover_devices(void);
-> +bool qemu_savevm_state_guest_unplug_pending(void);
->  int qemu_savevm_state_resume_prepare(MigrationState *s);
->  void qemu_savevm_state_header(QEMUFile *f);
->  int qemu_savevm_state_iterate(QEMUFile *f, bool postcopy);
-> diff --git a/qapi/migration.json b/qapi/migration.json
-> index e9e7a97c03..b7348d0c8b 100644
-> --- a/qapi/migration.json
-> +++ b/qapi/migration.json
-> @@ -133,6 +133,9 @@
->  # @device: During device serialisation when pause-before-switchover is e=
-nabled
->  #        (since 2.11)
->  #
-> +# @wait-unplug: wait for device unplug request by guest OS to be complet=
-ed.
-> +#               (since 4.2)
-> +#
->  # Since: 2.3
->  #
->  ##
-> @@ -140,7 +143,7 @@
->    'data': [ 'none', 'setup', 'cancelling', 'cancelled',
->              'active', 'postcopy-active', 'postcopy-paused',
->              'postcopy-recover', 'completed', 'failed', 'colo',
-> -            'pre-switchover', 'device' ] }
-> +            'pre-switchover', 'device', 'wait-unplug' ] }
-> =20
->  ##
->  # @MigrationInfo:
-> --=20
-> 2.21.0
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyODE2MzQ0Ny4xODU0
+MS0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpTdWJqZWN0OiBbUFVMTCAwMC8yMF0gaHcvaTM4Ni9wYzogU3BsaXQgUElJWDMg
+c291dGhicmlkZ2UgZnJvbSBpNDQwRlggbm9ydGhicmlkZ2UKVHlwZTogc2VyaWVzCk1lc3NhZ2Ut
+aWQ6IDIwMTkxMDI4MTYzNDQ3LjE4NTQxLTEtcGhpbG1kQHJlZGhhdC5jb20KCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
+IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
+aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
+cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
+Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQx
+ZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVj
+dC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTU3MjMxNjY2MS0yMDA0My0xLWdp
+dC1zZW5kLWVtYWlsLWphc293YW5nQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8xNTcyMzE2NjYxLTIw
+MDQzLTEtZ2l0LXNlbmQtZW1haWwtamFzb3dhbmdAcmVkaGF0LmNvbQogLSBbdGFnIHVwZGF0ZV0g
+ICAgICBwYXRjaGV3LzIwMTkxMDI1MTIxOTMwLjY4NTUtMS1qZnJlaW1hbm5AcmVkaGF0LmNvbSAt
+PiBwYXRjaGV3LzIwMTkxMDI1MTIxOTMwLjY4NTUtMS1qZnJlaW1hbm5AcmVkaGF0LmNvbQpTd2l0
+Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjQ2YmU3NmIgaHcvcGNpLWhvc3QvaTQ0MGZ4OiBS
+ZW1vdmUgdGhlIGxhc3QgUElJWDMgdHJhY2VzCjJjZjUxZmIgaHcvcGNpLWhvc3Q6IFJlbmFtZSBp
+bmNvcnJlY3RseSBuYW1lZCAncGlpeCcgYXMgJ2k0NDBmeCcKYzBhNTQwZiBody9wY2ktaG9zdC9w
+aWl4OiBFeHRyYWN0IFBJSVgzIGZ1bmN0aW9ucyB0byBody9pc2EvcGlpeDMuYwo0Mzk1ZWVkIGh3
+L3BjaS1ob3N0L3BpaXg6IEZpeCBjb2RlIHN0eWxlIGlzc3VlcwpjMzU0YzBjIGh3L3BjaS1ob3N0
+L3BpaXg6IE1vdmUgaTQ0MEZYIGRlY2xhcmF0aW9ucyB0byBody9wY2ktaG9zdC9pNDQwZnguaApk
+YjdjZThiIGh3L3BjaS1ob3N0L3BpaXg6IERlZmluZSBhbmQgdXNlIHRoZSBQSUlYIElSUSBSb3V0
+ZSBDb250cm9sIFJlZ2lzdGVycwpkYTI0NTFhIGh3L3BjaS1ob3N0L3BpaXg6IE1vdmUgUkNSX0lP
+UE9SVCByZWdpc3RlciBkZWZpbml0aW9uCmVmYWYyMTkgaHcvcGNpLWhvc3QvcGlpeDogRXh0cmFj
+dCBwaWl4M19jcmVhdGUoKQplMTJlYjE4IGh3L2kzODY6IFJlbW92ZSBvYnNvbGV0ZSBMb2FkU3Rh
+dGVIYW5kbGVyOjpsb2FkX3N0YXRlX29sZCBoYW5kbGVycwphZWVkOWRhIGh3L2lzYS9waWl4NDog
+TW92ZSBwaWl4NF9jcmVhdGUoKSB0byBody9pc2EvcGlpeDQuYwowNDYxOTUxIGh3L21pcHMvbWlw
+c19tYWx0YTogRXh0cmFjdCB0aGUgUElJWDQgY3JlYXRpb24gY29kZSBhcyBwaWl4NF9jcmVhdGUo
+KQpjYzAwNDY0IGh3L21pcHMvbWlwc19tYWx0YTogQ3JlYXRlIElERSBoYXJkIGRyaXZlIGFycmF5
+IGR5bmFtaWNhbGx5CjRiNzRlNGIgcGlpeDQ6IEFkZCBhIE1DMTQ2ODE4IFJUQyBDb250cm9sbGVy
+IGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQKOTg1YmNiMSBwaWl4NDogQWRkIGFuIGk4MjU0IFBJ
+VCBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQKY2VhOTBkZiBwaWl4NDogQWRk
+IGFuIGk4MjU3IERNQSBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQKMmZmN2Q5
+OCBwaWl4NDogUmVuYW1lIFBJSVg0IG9iamVjdCB0byBwaWl4NC1pc2EKMjRiNDhlZCBSZXZlcnQg
+ImlycTogaW50cm9kdWNlIHFlbXVfaXJxX3Byb3h5KCkiCjkzNGE3Y2UgcGlpeDQ6IEFkZCBhbiBp
+ODI1OSBJbnRlcnJ1cHQgQ29udHJvbGxlciBhcyBzcGVjaWZpZWQgaW4gZGF0YXNoZWV0CjY3MDRh
+ZDUgcGlpeDQ6IEFkZCB0aGUgUmVzZXQgQ29udHJvbCBSZWdpc3RlcgpkMDMyNWNiIE1BSU5UQUlO
+RVJTOiBLZWVwIFBJSVg0IFNvdXRoIEJyaWRnZSBzZXBhcmF0ZSBmcm9tIFBDIENoaXBzZXRzCgo9
+PT0gT1VUUFVUIEJFR0lOID09PQoxLzIwIENoZWNraW5nIGNvbW1pdCBkMDMyNWNiOTY1YWUgKE1B
+SU5UQUlORVJTOiBLZWVwIFBJSVg0IFNvdXRoIEJyaWRnZSBzZXBhcmF0ZSBmcm9tIFBDIENoaXBz
+ZXRzKQoyLzIwIENoZWNraW5nIGNvbW1pdCA2NzA0YWQ1YjBmNjUgKHBpaXg0OiBBZGQgdGhlIFJl
+c2V0IENvbnRyb2wgUmVnaXN0ZXIpCjMvMjAgQ2hlY2tpbmcgY29tbWl0IDkzNGE3Y2UxYjc4NCAo
+cGlpeDQ6IEFkZCBhbiBpODI1OSBJbnRlcnJ1cHQgQ29udHJvbGxlciBhcyBzcGVjaWZpZWQgaW4g
+ZGF0YXNoZWV0KQo0LzIwIENoZWNraW5nIGNvbW1pdCAyNGI0OGVkMjk0YmYgKFJldmVydCAiaXJx
+OiBpbnRyb2R1Y2UgcWVtdV9pcnFfcHJveHkoKSIpCjUvMjAgQ2hlY2tpbmcgY29tbWl0IDJmZjdk
+OTg3YzhjOCAocGlpeDQ6IFJlbmFtZSBQSUlYNCBvYmplY3QgdG8gcGlpeDQtaXNhKQo2LzIwIENo
+ZWNraW5nIGNvbW1pdCBjZWE5MGRmZTQ5NzggKHBpaXg0OiBBZGQgYW4gaTgyNTcgRE1BIENvbnRy
+b2xsZXIgYXMgc3BlY2lmaWVkIGluIGRhdGFzaGVldCkKNy8yMCBDaGVja2luZyBjb21taXQgOTg1
+YmNiMWU1ZmJkIChwaWl4NDogQWRkIGFuIGk4MjU0IFBJVCBDb250cm9sbGVyIGFzIHNwZWNpZmll
+ZCBpbiBkYXRhc2hlZXQpCjgvMjAgQ2hlY2tpbmcgY29tbWl0IDRiNzRlNGIwOThlYyAocGlpeDQ6
+IEFkZCBhIE1DMTQ2ODE4IFJUQyBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQp
+CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
+UlMgbmVlZCB1cGRhdGluZz8KIzE5MzogCmRlbGV0ZWQgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6
+IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNjYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8yMCBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgo5LzIwIENoZWNraW5nIGNvbW1pdCBjYzAwNDY0MGQyNDEg
+KGh3L21pcHMvbWlwc19tYWx0YTogQ3JlYXRlIElERSBoYXJkIGRyaXZlIGFycmF5IGR5bmFtaWNh
+bGx5KQoxMC8yMCBDaGVja2luZyBjb21taXQgMDQ2MTk1MWM4YjU1IChody9taXBzL21pcHNfbWFs
+dGE6IEV4dHJhY3QgdGhlIFBJSVg0IGNyZWF0aW9uIGNvZGUgYXMgcGlpeDRfY3JlYXRlKCkpCjEx
+LzIwIENoZWNraW5nIGNvbW1pdCBhZWVkOWRhYTg5MjEgKGh3L2lzYS9waWl4NDogTW92ZSBwaWl4
+NF9jcmVhdGUoKSB0byBody9pc2EvcGlpeDQuYykKMTIvMjAgQ2hlY2tpbmcgY29tbWl0IGUxMmVi
+MThhNDg3NSAoaHcvaTM4NjogUmVtb3ZlIG9ic29sZXRlIExvYWRTdGF0ZUhhbmRsZXI6OmxvYWRf
+c3RhdGVfb2xkIGhhbmRsZXJzKQoxMy8yMCBDaGVja2luZyBjb21taXQgZWZhZjIxOTk1OWYyICho
+dy9wY2ktaG9zdC9waWl4OiBFeHRyYWN0IHBpaXgzX2NyZWF0ZSgpKQoxNC8yMCBDaGVja2luZyBj
+b21taXQgZGEyNDUxYWU2Zjk2IChody9wY2ktaG9zdC9waWl4OiBNb3ZlIFJDUl9JT1BPUlQgcmVn
+aXN0ZXIgZGVmaW5pdGlvbikKMTUvMjAgQ2hlY2tpbmcgY29tbWl0IGRiN2NlOGI3MjgzMSAoaHcv
+cGNpLWhvc3QvcGlpeDogRGVmaW5lIGFuZCB1c2UgdGhlIFBJSVggSVJRIFJvdXRlIENvbnRyb2wg
+UmVnaXN0ZXJzKQoxNi8yMCBDaGVja2luZyBjb21taXQgYzM1NGMwYzY4YmUwIChody9wY2ktaG9z
+dC9waWl4OiBNb3ZlIGk0NDBGWCBkZWNsYXJhdGlvbnMgdG8gaHcvcGNpLWhvc3QvaTQ0MGZ4Lmgp
+CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5F
+UlMgbmVlZCB1cGRhdGluZz8KIzk4OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVy
+cm9ycywgMSB3YXJuaW5ncywgMTAxIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE2LzIwIGhhcyBzdHls
+ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
+bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
+Q0ggaW4gTUFJTlRBSU5FUlMuCjE3LzIwIENoZWNraW5nIGNvbW1pdCA0Mzk1ZWVkYzA0MDAgKGh3
+L3BjaS1ob3N0L3BpaXg6IEZpeCBjb2RlIHN0eWxlIGlzc3VlcykKMTgvMjAgQ2hlY2tpbmcgY29t
+bWl0IGMwYTU0MGZjZTgyYiAoaHcvcGNpLWhvc3QvcGlpeDogRXh0cmFjdCBQSUlYMyBmdW5jdGlv
+bnMgdG8gaHcvaXNhL3BpaXgzLmMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
+bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzY1OiAKbmV3IGZpbGUgbW9k
+ZSAxMDA2NDQKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhW
+KQojMzE0OiBGSUxFOiBody9pc2EvcGlpeDMuYzoyNDU6CisgICAgLnN1YnNlY3Rpb25zID0gKGNv
+bnN0IFZNU3RhdGVEZXNjcmlwdGlvbipbXSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDEgd2FybmluZ3MsIDkzNyBsaW5l
+cyBjaGVja2VkCgpQYXRjaCAxOC8yMCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+ICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0g
+dG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTkvMjAg
+Q2hlY2tpbmcgY29tbWl0IDJjZjUxZmIzNThlMiAoaHcvcGNpLWhvc3Q6IFJlbmFtZSBpbmNvcnJl
+Y3RseSBuYW1lZCAncGlpeCcgYXMgJ2k0NDBmeCcpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
+ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzY5OiAKcmVu
+YW1lIGZyb20gaHcvcGNpLWhvc3QvcGlpeC5jCgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
+IDMyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE5LzIwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
+IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
+cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
+CjIwLzIwIENoZWNraW5nIGNvbW1pdCA0NmJlNzZiMDE3YmEgKGh3L3BjaS1ob3N0L2k0NDBmeDog
+UmVtb3ZlIHRoZSBsYXN0IFBJSVgzIHRyYWNlcykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
+bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQK
+aHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEwMjgxNjM0NDcuMTg1NDEtMS1waGlsbWRAcmVk
+aGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxl
+YXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
 
