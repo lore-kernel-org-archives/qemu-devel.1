@@ -2,70 +2,79 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57843CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 19:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC94BCA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 20:07:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FE6E20679
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 19:12:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9853420856
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 20:07:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=reactos.org header.i=@reactos.org header.b="Ft5w/OnX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FE6E20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=reactos.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xQkHjgX/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9853420856
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPWuW-0004cp-Sf
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 15:12:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35843)
+	id 1iPXli-0006Jl-KJ
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 16:07:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47312)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hpoussin@reactos.org>) id 1iPWsp-0003Ut-Hi
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 15:10:26 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iPXkb-0005Ca-BD
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 16:05:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hpoussin@reactos.org>) id 1iPWsm-0005tq-T7
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 15:10:23 -0400
-Received: from iserv.reactos.org ([2a01:4f8:1c17:5ae1::1]:56086)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <hpoussin@reactos.org>)
- id 1iPWsh-0005Vp-PI; Tue, 29 Oct 2019 15:10:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=reactos.org
- ; s=25047;
- h=Content-Transfer-Encoding:Content-Type:In-Reply-To:MIME-Version:
- Date:Message-ID:From:References:Cc:To:Subject:Sender:Reply-To:Content-ID:
- Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
- :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
- List-Post:List-Owner:List-Archive;
- bh=CL6KrJ+a0Zn6CAHj5C75lfwuzH+mCEzbVYVrO/bSTfk=; b=Ft5w/OnX98MPxODPARcU5W9CrS
- b2woFYFPPbTSOVoAuNsqidwLTViJgqnKDdofAYkmcH6/vM0/sJBJGHfEvBXHdtoJdB7BYCb0h0bnt
- rcfTBnVjmfcndmGAl5RPrpCOEoZmJetIdsFfE2XpjGC5OiAW5p9JbNbMhmUCyg10i5/c=;
-Received: from [2a01:e35:2e3e:3c40:810c:5dc0:a5b7:d589]
- by iserv.reactos.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.89) (envelope-from <hpoussin@reactos.org>)
- id 1iPWsa-0006hs-MN; Tue, 29 Oct 2019 19:10:10 +0000
-Subject: Re: [PATCH] fdc: support READ command with VERIFY DMA mode
-To: John Snow <jsnow@redhat.com>, Sven Schnelle <svens@stackframe.org>
-References: <20191020063800.29208-1-svens@stackframe.org>
- <9dce5dd0-1816-c0eb-4774-3020adc07cc0@redhat.com>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <ded2c05b-6b90-f3ad-0ef8-044b2c2b028c@reactos.org>
-Date: Tue, 29 Oct 2019 20:10:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <peter.maydell@linaro.org>) id 1iPXka-0008Ts-08
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 16:05:57 -0400
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:38330)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iPXkZ-0008T2-Pw
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 16:05:55 -0400
+Received: by mail-oi1-x234.google.com with SMTP id v186so10080274oie.5
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 13:05:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=RDCYIP1r7rRs5ndVLgJGdLUVPAHQsdFnGKrXoluN+Gk=;
+ b=xQkHjgX/Xw08sOLQe36/hyYyAoRkewn8tC61SKjzY5JarnEa5U8Vn9POZV23+j1L77
+ v0D/qxlRwL/0kr50I5hVyNf6vFnuXCTJSiw1EdwSLK7OV+Zc4HbxJHeHQoIGVUcFCvlx
+ WS54XKbPuyNVQhhS6yGyPzZbEvnky9HnrCqX6r1YZJ6wO3lpgIMhfl0Nt9snfefng2Jl
+ 1Ebc+wSKWZWJaRqZB/D2K6m7bqkBEsFOPPf2xNy53+au8EPS+S4nzVGVdoDX3rthhz2Q
+ gkf4xikZC9iUbJZzH8N3Mm4IzkzW6YI7VbvucMd22ohNn3tfWSSJsWIYw97Sf+mC8utm
+ BGuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=RDCYIP1r7rRs5ndVLgJGdLUVPAHQsdFnGKrXoluN+Gk=;
+ b=jp3x8EPuGv+tmTpJ4cXfqGP1mBQUlPm73tQs+GbJPfpmuAqOWMGxG5NYMUNyfm4R5+
+ QqpMLhg5H5jFwKcNkJnUnNCdR2W1RiT8A2FpG1uevig0HlyOIoKLX5yOwhIkuA0WiSK0
+ ikE4n47ZeqaD5B3S0zHzYrVu3y28f4M1o9t7scjVoS/TYpU5YygjzvtT7R2xtSyp0oJt
+ dxZM/9pT5D4xWqVCptdjk/jC7opCnEavL3DaTnuglCfqs3hb80ivrsrFBC7rVj3/vVLQ
+ rX9f7eYhtAo972eg8v1V619PUw48JgMuQP05R1CF6R0qp9a0A5+vPYj8KDX8Z4RpP7rH
+ 5I3g==
+X-Gm-Message-State: APjAAAWlQnyGd1LQSsyIcrq9OEfyGvZ8X6suIEqv/kO7vDYc05MMk8Qd
+ 6LssVBHIA3gllTcRkpKcotJl6t+eFwXuh3hau55fIw==
+X-Google-Smtp-Source: APXvYqx3aAGUbYYU+6QUNYXCjgIha6KwPQjeZBgXBSK1YoVfzLKDgbwWZ4NH4LQhPSLiihOElSFzFBPNnrmYta2dADA=
+X-Received: by 2002:aca:451:: with SMTP id 78mr5790869oie.170.1572379555052;
+ Tue, 29 Oct 2019 13:05:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <9dce5dd0-1816-c0eb-4774-3020adc07cc0@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <1572316661-20043-1-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1572316661-20043-1-git-send-email-jasowang@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 29 Oct 2019 20:05:56 +0000
+Message-ID: <CAFEAcA9P8+7fJceB2qZHH8rkQX5Jv0HS3sLBbNBtuUuceK0wtA@mail.gmail.com>
+Subject: Re: [PULL V2 0/4] Net patches
+To: Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a01:4f8:1c17:5ae1::1
+X-Received-From: 2607:f8b0:4864:20::234
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,116 +86,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- "open list:Floppy" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 29/10/2019 à 12:00, John Snow a écrit :
- >
- >
- > On 10/20/19 2:38 AM, Sven Schnelle wrote:
- >> While working on the Tulip driver i tried to write some Teledisk images to
- >> a floppy image which didn't work. Turned out that Teledisk checks the written
- >> data by issuing a READ command to the FDC but running the DMA controller
- >> in VERIFY mode. As we ignored the DMA request in that case, the DMA transfer
- >> never finished, and Teledisk reported an error.
- >>
- >
- > CC hpoussin@reactos.org, who sometimes submits patches here too.
- >
- >> Signed-off-by: Sven Schnelle <svens@stackframe.org>
- >> ---
- >>   hw/block/fdc.c | 10 +++++++---
- >>   1 file changed, 7 insertions(+), 3 deletions(-)
- >>
- >> diff --git a/hw/block/fdc.c b/hw/block/fdc.c
- >> index ac5d31e8c1..8a1228df78 100644
- >> --- a/hw/block/fdc.c
- >> +++ b/hw/block/fdc.c
- >> @@ -1733,7 +1733,8 @@ static void fdctrl_start_transfer(FDCtrl *fdctrl, int direction)
- >>               dma_mode_ok = (dma_mode == ISADMA_TRANSFER_WRITE);
- >>               break;
- >>           case FD_DIR_READ:
- >> -            dma_mode_ok = (dma_mode == ISADMA_TRANSFER_READ);
- >> +            dma_mode_ok = (dma_mode == ISADMA_TRANSFER_READ) ||
- >> +                          (dma_mode == ISADMA_TRANSFER_VERIFY);
- >
- > So we're enabling DMA when the command is an FD_DIR_READ command and the
- > dma_mode is VERIFY. Those read commands are:
- >
- > READ
- > READ TRACK
- > READ DELETED DATA
+On Tue, 29 Oct 2019 at 02:37, Jason Wang <jasowang@redhat.com> wrote:
+>
+> The following changes since commit 187f35512106501fe9a11057f4d8705431e0026d:
+>
+>   Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-next-251019-3' into staging (2019-10-26 10:13:48 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>
+> for you to fetch changes up to 1e907a32b77e5d418538453df5945242e43224fa:
+>
+>   COLO-compare: Fix incorrect `if` logic (2019-10-29 10:28:07 +0800)
+>
+> ----------------------------------------------------------------
+>
+> Changes from V1:
+>
+> - Fix compling issue
+>
+> ----------------------------------------------------------------
 
-OK for this part. However, in an ideal emulation world, the floppy drive controller shouldn't know
-what is the current DMA mode.
-I would remove this whole dma_mode_ok thing, and always assume that operating system does a sane thing.
-Then, get_transfer_mode() callback and the ISADMA_TRANSFER_* defines can also be removed.
+Applied, thanks.
 
- >
- >>               break;
- >>           case FD_DIR_VERIFY:
- >>               dma_mode_ok = true;
- >> @@ -1835,8 +1836,11 @@ static int fdctrl_transfer_handler (void *opaque, int nchan,
- >>           switch (fdctrl->data_dir) {
- >>           case FD_DIR_READ:
- >>               /* READ commands */
- >> -            k->write_memory(fdctrl->dma, nchan, fdctrl->fifo + rel_pos,
- >> -                            fdctrl->data_pos, len);
- >> +            if (k->get_transfer_mode(fdctrl->dma, fdctrl->dma_chann) !=
- >> +                ISADMA_TRANSFER_VERIFY) {
- >> +                k->write_memory(fdctrl->dma, nchan, fdctrl->fifo + rel_pos,
- >> +                        fdctrl->data_pos, len);
- >> +            }
- >
- > Would it horrify you to know I don't know how the VERIFY mode should
- > work? It's always nice when you google i8257 to look for information and
- > the top page of results are all QEMU patches.
- >
- > The i8257 spec says this:
- >
- > (3) DMA verify, which does not actually involve the
- > transfer of data. When an 8257 channel is in the DMA verify
- > mode, it will respond the same as described for transfer
- > operations, except that no memory or I/O read/write
- > control signals will be generated,
- >
- > Alright, looks good to me -- my question is if there aren't other
- > commands where we want to give this same treatment, but then again...
- > we've made it to 2019 without them, so...
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
-It doesn't seem good to me, as it fixes VERIFY mode only for fdc.
-Can you try to remove this part, and replace it by the following one (not tested) ?
-
---- a/hw/dma/i8257.c
-+++ b/hw/dma/i8257.c
-@@ -428,6 +428,11 @@ static int i8257_dma_write_memory(IsaDma *obj, int nchan, void *buf, int pos,
-      I8257Regs *r = &s->regs[nchan & 3];
-      hwaddr addr = ((r->pageh & 0x7f) << 24) | (r->page << 16) | r->now[ADDR];
-
-+    if (r->mode & 0xc0 == 0x00) {
-+       /* VERIFY mode, do nothing */
-+        return len;
-+    }
-+
-      if (r->mode & 0x20) {
-          int i;
-          uint8_t *p = buf;
-
-We may also fix i8257_dma_{read,write}_memory to correctly check for mode and refuse to
-do anything if mode is wrong.
-
- >
- >>               break;
- >>           case FD_DIR_WRITE:
- >>               /* WRITE commands */
- >>
- >
- > Reviewed-by: John Snow <jsnow@redhat.com>
- >
- >
-
-Hervé
+-- PMM
 
