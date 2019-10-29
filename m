@@ -2,83 +2,80 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DADD0CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 22:44:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D45D2CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 22:51:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A223220862
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 22:44:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OADnFkSz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A223220862
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTPS id A6C0C20659
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 22:51:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6C0C20659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPaDy-0007V7-Rv
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 18:44:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56905)
- by lists.gnu.org with esmtp (Exim 4.90_1) (envelope-from
- <3gsC4XQMKCtkEFUBJJBG9.7JHL9HP-89Q9GIJIBIP.JMB@flex--jkz.bounces.google.com>)
- id 1iPaCs-0006nB-9y
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 18:43:19 -0400
+	id 1iPaKO-0001H0-Nd
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 18:51:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34311)
+ by lists.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <mst@redhat.com>) id 1iPaJK-0000bH-Pv
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 18:50:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from
- <3gsC4XQMKCtkEFUBJJBG9.7JHL9HP-89Q9GIJIBIP.JMB@flex--jkz.bounces.google.com>)
- id 1iPaCq-000814-RG
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 18:43:18 -0400
-Received: from mail-pf1-x449.google.com ([2607:f8b0:4864:20::449]:38705)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from
- <3gsC4XQMKCtkEFUBJJBG9.7JHL9HP-89Q9GIJIBIP.JMB@flex--jkz.bounces.google.com>)
- id 1iPaCq-0007zB-Jf
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 18:43:16 -0400
-Received: by mail-pf1-x449.google.com with SMTP id d126so105940pfd.5
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 15:43:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=date:message-id:mime-version:subject:from:to:cc;
- bh=A/zRoxcJ70AtPg9UKjvYmlWZ/iLXm2eSiY11LZdX2fQ=;
- b=OADnFkSzM+AaP45sOyfWcn2zrA+FIXo6oGvu1flE0cKhJBbJM3xs6p9K3onLM9YeoQ
- 4GhIyYtgOUkSqHMlCgRp6Q6hlxr97fXd5Pm18krt+z/hwEl0niyqZIDPIiLuC2JoHNmm
- ma9Pr9Dh/f3vU6LEGUyqwDXTkS3w0gGtuE4qEqd8ddwrA6b4ndOkYW//8sbjB3DHZMUG
- xeMxrUCIDDNLV3akAFZ9yeZgm9WBabh6dGQGyBJ1gwt+Xj6WtP/zqNqAykVqMrTj3Kja
- RHsYwCHs1MX8k3NDH4W8n38gQaf8AM3k23+ut6AAqGdGGrmYjpzjDbe0DS8/WrZ6eEN+
- 0emQ==
+ (envelope-from <mst@redhat.com>) id 1iPaJG-0007xC-Vk
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 18:49:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44596)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iPaJE-0007v7-Uq
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 18:49:54 -0400
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 340E2C057EC0
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 22:49:51 +0000 (UTC)
+Received: by mail-qt1-f199.google.com with SMTP id i25so476241qtm.17
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 15:49:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
- bh=A/zRoxcJ70AtPg9UKjvYmlWZ/iLXm2eSiY11LZdX2fQ=;
- b=pR2LOusd6TA0qLID/n5OPjsXIuYXW5MUfQCEJCjA6o0+taAfoGDUc/n4iUGPVA+z0H
- Z6ZehdWIE9VQM+cnWIjCd9w1G95bwowTqSYDHvbkrYu1yi2XNfJ4WZjCtRRR0zI4wB+1
- gbgjx4DS1cXlBFqc+WlULxWdXEDNCDPhqRTygmxnRgrR0zjDzysLqNrVCiH3n9Mo6/EX
- +abRdA3pGUSTUZQLXonl94xK6z0Y63BY1ANOUxC4kuCgMwMKPAOjKbP/IgWAI+rAPGv4
- MSmy8UTGyfdok3Q0I94cVSNnB4G2EvejbV4r3Mb/zXe6N8WhshBuD+vSQtsrnoW4Jv0y
- v0mg==
-X-Gm-Message-State: APjAAAVbxPrimB4eY8l2zY23mAAdS3rP2XoKUDHAd5Bv+rMF08vssg7D
- 4ycjEZbTLGnez91GG7TRleEJHQrO1X1GubxQyvCNQFYYigCe4BmLnWY/ALNkJyK0omXdET9nYVm
- kSNsFDiaPA1v5yVmKfESRQnYDBKOQd2A3KgfwpdIsncqWuHTazk9n
-X-Google-Smtp-Source: APXvYqwZmKp434rx2dRdCN78kO8Ia/XAQkIH8AWwDE3Zs6+/0pjiKeL6VIlry/xiNPy2Rx0D8ep96h4=
-X-Received: by 2002:a63:5d04:: with SMTP id r4mr30143405pgb.22.1572388994492; 
- Tue, 29 Oct 2019 15:43:14 -0700 (PDT)
-Date: Tue, 29 Oct 2019 15:43:10 -0700
-Message-Id: <20191029224310.164025-1-jkz@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.24.0.rc0.303.g954a862665-goog
-Subject: [PATCH] linux-user: Support for NETLINK socket options
-From: Josh Kunz <jkz@google.com>
-To: qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, laurent@vivier.eu, Josh Kunz <jkz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::449
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=944mw5gX2SzzNlLE8f4CpUqXOEHJrmvCPvsTucWDTcM=;
+ b=e9/Cb8BLzeCMv/6RwJ8tlPCM9PhQlQlZfmHJksks1noSm7tQfPKwGfzHWmavF30zyP
+ sGH5ulCKBC/kAj2D6vwrMBOFd7bVuFGlzVM3Fy9LgX500c0QdogjHYzljVYA3xsw4wSY
+ gUNV1jgIMEU0uZSf+mSn613otNTPmJrS0vHaSdC/0CdLip08CZjnr9zoab4OKLrrprMR
+ 6LK4uV5c+aIOXuXgOIi5WtvTS4FikPPbeLOzKUsWIYa8uHJ6VU1iIOOs2ASRUegKzwqw
+ YdrAdTCQQ5UHgr4WCDPc3YzQTcI1gzpfDY9TJQ27DluHNFf2Id1EZ9B0xrIJ3C3sXU6W
+ rM9Q==
+X-Gm-Message-State: APjAAAXgEkl1SX71KmRL4n1lkgFPw7Gsay/0h0X5VFxm1raLGwETzHYa
+ 1+XrPolDhOZwX3weSEvRWgw4cO6WQOLIkMOWlwYimiHLoBnDfdy7ziiBr5Jz2MFF8UFHxplZXuU
+ KENE93H17z3OiRL8=
+X-Received: by 2002:a0c:e607:: with SMTP id z7mr14149320qvm.171.1572389390308; 
+ Tue, 29 Oct 2019 15:49:50 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyba6U8tviFBtDED+vl/3X698F/WxYf+1KSlaR7SGBtuxoEc+sOwfCU1DAYsNv3BvMhuJ7NcQ==
+X-Received: by 2002:a0c:e607:: with SMTP id z7mr14149300qvm.171.1572389389951; 
+ Tue, 29 Oct 2019 15:49:49 -0700 (PDT)
+Received: from redhat.com (94.222.26.109.rev.sfr.net. [109.26.222.94])
+ by smtp.gmail.com with ESMTPSA id p188sm278294qkb.33.2019.10.29.15.49.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 29 Oct 2019 15:49:48 -0700 (PDT)
+Date: Tue, 29 Oct 2019 18:49:44 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jens Freimann <jfreimann@redhat.com>
+Subject: Re: [PATCH v6 0/11] add failover feature for assigned network devices
+Message-ID: <20191029184912-mutt-send-email-mst@kernel.org>
+References: <20191025121930.6855-1-jfreimann@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191025121930.6855-1-jfreimann@redhat.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,142 +87,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: pkrempa@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
+ aadam@redhat.com, jasowang@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com, alex.williamson@redhat.com, laine@redhat.com,
+ ailan@redhat.com, armbru@redhat.com, parav@mellanox.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This change includes support for all AF_NETLINK socket options up to about
-kernel version 5.4 (5.4 is not formally released at the time of writing).
-Socket options that were introduced in kernel versions before the oldest
-currently stable kernel version are guarded by kernel version macros.
+On Fri, Oct 25, 2019 at 02:19:19PM +0200, Jens Freimann wrote:
+> This is implementing the host side of the net_failover concept
+> (https://www.kernel.org/doc/html/latest/networking/net_failover.html)
 
-This change has been built under gcc 8.3, and clang 9.0, and it passes
-`make check`. The netlink options have been tested by emulating some
-non-trival software that uses NETLINK socket options, but they have
-not been exaustively verified.
+OK so I put this on a next branch for now, to merge after the release.
+I plan to rebase it after rc1, and then stop rebasing.
 
-Signed-off-by: Josh Kunz <jkz@google.com>
----
- linux-user/syscall.c | 98 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 98 insertions(+)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 530c843303..cbfb8380a9 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2247,6 +2247,38 @@ set_timeout:
-             return -TARGET_EFAULT;
- 	ret = get_errno(setsockopt(sockfd, SOL_SOCKET, optname, &val, sizeof(val)));
-         break;
-+#ifdef SOL_NETLINK
-+    case SOL_NETLINK:
-+        switch (optname) {
-+        case NETLINK_PKTINFO:
-+        case NETLINK_ADD_MEMBERSHIP:
-+        case NETLINK_DROP_MEMBERSHIP:
-+        case NETLINK_BROADCAST_ERROR:
-+        case NETLINK_NO_ENOBUFS:
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0)
-+        case NETLINK_LISTEN_ALL_NSID:
-+        case NETLINK_CAP_ACK:
-+#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0) */
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
-+        case NETLINK_EXT_ACK:
-+#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0) */
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
-+        case NETLINK_GET_STRICT_CHK:
-+#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0) */
-+            break;
-+        default:
-+            goto unimplemented;
-+        }
-+        val = 0;
-+        if (optlen < sizeof(uint32_t)) {
-+            return -TARGET_EINVAL;
-+        }
-+        if (get_user_u32(val, optval_addr)) {
-+            return -TARGET_EFAULT;
-+        }
-+        ret = get_errno(setsockopt(sockfd, SOL_NETLINK, optname, &val, sizeof(val)));
-+        break;
-+#endif /* SOL_NETLINK */
-     default:
-     unimplemented:
-         gemu_log("Unsupported setsockopt level=%d optname=%d\n", level, optname);
-@@ -2531,6 +2563,72 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
-             break;
-         }
-         break;
-+#ifdef SOL_NETLINK
-+    case SOL_NETLINK:
-+        switch (optname) {
-+        case NETLINK_PKTINFO:
-+        case NETLINK_BROADCAST_ERROR:
-+        case NETLINK_NO_ENOBUFS:
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0)
-+        case NETLINK_LISTEN_ALL_NSID:
-+        case NETLINK_CAP_ACK:
-+#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0) */
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
-+        case NETLINK_EXT_ACK:
-+#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0) */
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
-+        case NETLINK_GET_STRICT_CHK:
-+#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0) */
-+            if (get_user_u32(len, optlen)) {
-+                return -TARGET_EFAULT;
-+            }
-+            if (len != sizeof(val)) {
-+                return -TARGET_EINVAL;
-+            }
-+            lv = len;
-+            ret = get_errno(getsockopt(sockfd, level, optname, &val, &lv));
-+            if (ret < 0) {
-+                return ret;
-+            }
-+            if (put_user_u32(lv, optlen)
-+                || put_user_u32(val, optval_addr)) {
-+                return -TARGET_EFAULT;
-+            }
-+            break;
-+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0)
-+        case NETLINK_LIST_MEMBERSHIPS:
-+        {
-+            if (get_user_u32(len, optlen)) {
-+                return -TARGET_EFAULT;
-+            }
-+            if (len < 0) {
-+                return -TARGET_EINVAL;
-+            }
-+            uint32_t *results = lock_user(VERIFY_WRITE, optval_addr, len, 1);
-+            if (!results) {
-+                return -TARGET_EFAULT;
-+            }
-+            lv = len;
-+            ret = get_errno(getsockopt(sockfd, level, optname, results, &lv));
-+            if (ret < 0) {
-+                unlock_user(results, optval_addr, 0);
-+                return ret;
-+            }
-+            /* swap host endianess to target endianess. */
-+            for (int i = 0; i < (len / sizeof(uint32_t)); i++) {
-+                results[i] = tswap32(results[i]);
-+            }
-+            if (put_user_u32(lv, optlen)) {
-+                return -TARGET_EFAULT;
-+            }
-+            unlock_user(results, optval_addr, 0);
-+            break;
-+        }
-+#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0) */
-+        default:
-+            goto unimplemented;
-+        }
-+#endif /* SOL_NETLINK */
-     default:
-     unimplemented:
-         gemu_log("getsockopt level=%d optname=%d not yet supported\n",
--- 
-2.24.0.rc0.303.g954a862665-goog
-
+> Changes since v5:
+> * rename net_failover_pair_id parameter/property to failover_pair_id
+> * in PCI code use pci_bus_is_express(). This won't fail on functions > 0
+> * make sure primary and standby can't be added to same PCI slot
+> * add documentation file in docs/ to virtio-net patch, add file to
+>    MAINTAINERS (added to networking devices section)
+> * add comment to QAPI event for failover negotiation, try to improve
+>    commit message 
+> 
+> The general idea is that we have a pair of devices, a vfio-pci and a
+> virtio-net device. Before migration the vfio device is unplugged and data
+> flows to the virtio-net device, on the target side another vfio-pci device
+> is plugged in to take over the data-path. In the guest the net_failover
+> module will pair net devices with the same MAC address.
+> 
+> * Patch 1 adds the infrastructure to hide the device for the qbus and qdev APIs
+> 
+> * Patch 2 adds checks to PCIDevice for only allowing ethernet devices as
+>   failover primary and only PCIExpress capable devices
+> 
+> * Patch 3 sets a new flag for PCIDevice 'partially_hotplugged' which we
+>   use to skip the unrealize code path when doing a unplug of the primary
+>   device
+> 
+> * Patch 4 sets the pending_deleted_event before triggering the guest
+>   unplug request
+> 
+> * Patch 5 and 6 add new qmp events, one sends the device id of a device
+>   that was just requested to be unplugged from the guest and another one
+>   to let libvirt know if VIRTIO_NET_F_STANDBY was negotiated
+> 
+> * Patch 7 make sure that we can unplug the vfio-device before
+>   migration starts
+> 
+> * Patch 8 adds a new migration state that is entered while we wait for
+>   devices to be unplugged by guest OS
+> 
+> * Patch 9 just adds the new migration state to a check in libqos code
+> 
+> * Patch 10 In the second patch the virtio-net uses the API to defer adding the vfio
+>   device until the VIRTIO_NET_F_STANDBY feature is acked. It also
+>   implements the migration handler to unplug the device from the guest and
+>   re-plug in case of migration failure
+> 
+> * Patch 11 allows migration for failover vfio-pci devices
+> 
+> Previous discussion:
+>   RFC v1 https://patchwork.ozlabs.org/cover/989098/
+>   RFC v2 https://www.mail-archive.com/qemu-devel@nongnu.org/msg606906.html
+>   v1: https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg03968.html
+>   v2: https://www.mail-archive.com/qemu-devel@nongnu.org/msg635214.html
+>   v3: https://patchew.org/QEMU/20191011112015.11785-1-jfreimann@redhat.com/
+>   v4: https://patchew.org/QEMU/20191018202040.30349-1-jfreimann@redhat.com/
+>   v5: https://patchew.org/QEMU/20191023082711.16694-1-jfreimann@redhat.com/
+> 
+> To summarize concerns/feedback from previous discussion:
+> 1.- guest OS can reject or worse _delay_ unplug by any amount of time.
+>   Migration might get stuck for unpredictable time with unclear reason.
+>   This approach combines two tricky things, hot/unplug and migration.
+>   -> We need to let libvirt know what's happening. Add new qmp events
+>      and a new migration state. When a primary device is (partially)
+>      unplugged (only from guest) we send a qmp event with the device id. When
+>      it is unplugged from the guest the DEVICE_DELETED event is sent.
+>      Migration will enter the wait-unplug state while waiting for the guest
+>      os to unplug all primary devices and then move on with migration.
+> 2. PCI devices are a precious ressource. The primary device should never
+>   be added to QEMU if it won't be used by guest instead of hiding it in
+>   QEMU.
+>   -> We only hotplug the device when the standby feature bit was
+>      negotiated. We save the device cmdline options until we need it for
+>      qdev_device_add()
+>      Hiding a device can be a useful concept to model. For example a
+>      pci device in a powered-off slot could be marked as hidden until the slot is
+>      powered on (mst).
+> 3. Management layer software should handle this. Open Stack already has
+>   components/code to handle unplug/replug VFIO devices and metadata to
+>   provide to the guest for detecting which devices should be paired.
+>   -> An approach that includes all software from firmware to
+>      higher-level management software wasn't tried in the last years. This is
+>      an attempt to keep it simple and contained in QEMU as much as possible.
+>      One of the problems that stopped management software and libvirt from
+>      implementing this idea is that it can't be sure that it's possible to
+>      re-plug the primary device. By not freeing the devices resources in QEMU
+>      and only asking the guest OS to unplug it is possible to re-plug the
+>      device in case of a migration failure.
+> 4. Hotplugging a device and then making it part of a failover setup is
+>    not possible
+>   -> addressed by extending qdev hotplug functions to check for hidden
+>      attribute, so e.g. device_add can be used to plug a device.
+> 
+> 
+> I have tested this with a mlx5 and igb NIC and was able to migrate the VM.
+> 
+> Command line example:
+> 
+> qemu-system-x86_64 -enable-kvm -m 3072 -smp 3 \
+>         -machine q35,kernel-irqchip=split -cpu host   \
+>         -serial stdio   \
+>         -net none \
+>         -qmp unix:/tmp/qmp.socket,server,nowait \
+>         -monitor telnet:127.0.0.1:5555,server,nowait \
+>         -device pcie-root-port,id=root0,multifunction=on,chassis=0,addr=0xa \
+>         -device pcie-root-port,id=root1,bus=pcie.0,chassis=1 \
+>         -device pcie-root-port,id=root2,bus=pcie.0,chassis=2 \
+>         -netdev tap,script=/root/bin/bridge.sh,downscript=no,id=hostnet1,vhost=on \
+>         -device virtio-net-pci,netdev=hostnet1,id=net1,mac=52:54:00:6f:55:cc,bus=root2,failover=on \
+> 	-device vfio-pci,host=5e:00.2,id=hostdev0,bus=root1,failover_pair_id =net1 \
+>         /root/rhel-guest-image-8.0-1781.x86_64.qcow2
+> 
+> I'm grateful for any remarks or ideas!
+> 
+> Thanks!
+> 
+> regards,
+> Jens 
+> 
+> 
+> Jens Freimann (11):
+>   qdev/qbus: add hidden device support
+>   pci: add option for net failover
+>   pci: mark devices partially unplugged
+>   pci: mark device having guest unplug request pending
+>   qapi: add unplug primary event
+>   qapi: add failover negotiated event
+>   migration: allow unplug during migration for failover devices
+>   migration: add new migration state wait-unplug
+>   libqos: tolerate wait-unplug migration state
+>   net/virtio: add failover support
+>   vfio: unplug failover primary device before migration
+> 
+>  MAINTAINERS                    |   1 +
+>  docs/virtio-net-failover.rst   |  68 ++++++++
+>  hw/core/qdev.c                 |  25 +++
+>  hw/net/virtio-net.c            | 302 +++++++++++++++++++++++++++++++++
+>  hw/pci/pci.c                   |  32 ++++
+>  hw/pci/pcie.c                  |   6 +
+>  hw/vfio/pci.c                  |  26 ++-
+>  hw/vfio/pci.h                  |   1 +
+>  include/hw/pci/pci.h           |   4 +
+>  include/hw/qdev-core.h         |  30 ++++
+>  include/hw/virtio/virtio-net.h |  12 ++
+>  include/hw/virtio/virtio.h     |   1 +
+>  include/migration/vmstate.h    |   2 +
+>  migration/migration.c          |  21 +++
+>  migration/migration.h          |   3 +
+>  migration/savevm.c             |  36 ++++
+>  migration/savevm.h             |   2 +
+>  qapi/migration.json            |  24 ++-
+>  qapi/net.json                  |  19 +++
+>  qdev-monitor.c                 |  43 ++++-
+>  tests/libqos/libqos.c          |   3 +-
+>  vl.c                           |   6 +-
+>  22 files changed, 652 insertions(+), 15 deletions(-)
+>  create mode 100644 docs/virtio-net-failover.rst
+> 
+> -- 
+> 2.21.0
 
