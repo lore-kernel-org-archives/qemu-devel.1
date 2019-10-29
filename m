@@ -2,65 +2,66 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42036CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 14:23:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37815CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 14:32:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C61E20830
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 14:23:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01FDA2087E
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 14:32:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="V6/Dkmvn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C61E20830
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="xMEFJQmW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01FDA2087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hostfission.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57648 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPSPe-0007ox-6G
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 10:23:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33228)
+	id 1iPSYD-0004Sj-5j
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 10:32:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34443)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iPSOU-0006Q4-Mi
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:22:48 -0400
+ (envelope-from <geoff@hostfission.com>) id 1iPSXM-0003oX-4D
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:31:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iPSOS-00054B-Sy
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:22:46 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:41587)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iPSOQ-0004zX-Ve
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:22:44 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 472YhD5xDWz9sR4; Wed, 30 Oct 2019 01:22:35 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1572358956;
- bh=/OsjRqAbu3lpJDivohmd7XhSBhLtc95gs65ePZiLNzg=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=V6/DkmvnNQXDcPjBd+GwtHw0nTEjmP+Ii3RvDBtpjRpXnbln93Br5/+MNDT5cGGyE
- HABMKH6W91vQe7fUb4gQEx/bB4LH0nJTDGTeJn+DeWxiDOC/owZ+E6rcmtVBpndVnZ
- apZjyY70LUh5kmEHvBmkx010j0CPznDaUrwfJMfY=
-Date: Tue, 29 Oct 2019 13:15:44 +0100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid
- alloc/free
-Message-ID: <20191029121544.GS3552@umbus.metropole.lan>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-10-git-send-email-yi.l.liu@intel.com>
+ (envelope-from <geoff@hostfission.com>) id 1iPSXI-0008KH-SS
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:31:55 -0400
+Received: from mail1.hostfission.com ([139.99.139.48]:58716)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <geoff@hostfission.com>) id 1iPSXF-0008Gi-JE
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 10:31:50 -0400
+Received: from www1.hostfission.com (www1.hostfission.com [139.99.139.52])
+ by mail1.hostfission.com (Postfix) with ESMTP id 31C944BA08
+ for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 01:31:42 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=hostfission.com;
+ s=mail; t=1572359502;
+ bh=GR2WUNdsqxs5OyiHgrm+E2Ii7l/sjRDk4Ictleq6Y/Y=;
+ h=To:Subject:Date:From:From;
+ b=xMEFJQmWKjarqY/FwDBcJeUtWCM6GiuM9JAK5Urxe5Q6P/PneEftv+nYZf68NTr7i
+ OJ6OAw3l3LVi3O1IH5q3VtxvvLrWNsfgD6hF/eNSsaf0uS4TItVhCkyFO+VJ4kgKM5
+ 4kdkfrpV77vx908qs2UWLYoS+wvrtM8ZpKfQzbDk=
+Received: by www1.hostfission.com (Postfix, from userid 1000)
+ id 20CDC83472; Wed, 30 Oct 2019 01:31:42 +1100 (AEDT)
+To: qemu-devel@nongnu.org
+Subject: RFC: New device for zero-copy VM memory access
+X-PHP-Originating-Script: 0:rcube.php
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="oJFDFiWc3BlD0xT/"
-Content-Disposition: inline
-In-Reply-To: <1571920483-3382-10-git-send-email-yi.l.liu@intel.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Wed, 30 Oct 2019 01:31:42 +1100
+From: geoff@hostfission.com
+Message-ID: <c83fe0e7157562c3c17598917977eb4d@hostfission.com>
+X-Sender: geoff@hostfission.com
+User-Agent: Roundcube Webmail/1.2.3
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 139.99.139.48
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,248 +73,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, qemu-devel@nongnu.org, peterx@redhat.com,
- eric.auger@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com,
- yi.y.sun@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi All,
 
---oJFDFiWc3BlD0xT/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Over the past week, I have been working to come up with a solution to 
+the
+memory transfer performance issues that hinder the Looking Glass 
+Project.
 
-On Thu, Oct 24, 2019 at 08:34:30AM -0400, Liu Yi L wrote:
-> This patch adds pasid alloc/free notifiers for vfio-pci. It is
-> supposed to be fired by vIOMMU. VFIO then sends PASID allocation
-> or free request to host.
->=20
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> ---
->  hw/vfio/common.c         |  9 ++++++
->  hw/vfio/pci.c            | 81 ++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  include/hw/iommu/iommu.h | 15 +++++++++
->  3 files changed, 105 insertions(+)
->=20
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index d418527..e6ad21c 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -1436,6 +1436,7 @@ static void vfio_disconnect_container(VFIOGroup *gr=
-oup)
->      if (QLIST_EMPTY(&container->group_list)) {
->          VFIOAddressSpace *space =3D container->space;
->          VFIOGuestIOMMU *giommu, *tmp;
-> +        VFIOIOMMUContext *giommu_ctx, *ctx;
-> =20
->          QLIST_REMOVE(container, next);
-> =20
-> @@ -1446,6 +1447,14 @@ static void vfio_disconnect_container(VFIOGroup *g=
-roup)
->              g_free(giommu);
->          }
-> =20
-> +        QLIST_FOREACH_SAFE(giommu_ctx, &container->iommu_ctx_list,
-> +                                                   iommu_ctx_next, ctx) {
-> +            iommu_ctx_notifier_unregister(giommu_ctx->iommu_ctx,
-> +                                                      &giommu_ctx->n);
-> +            QLIST_REMOVE(giommu_ctx, iommu_ctx_next);
-> +            g_free(giommu_ctx);
-> +        }
-> +
->          trace_vfio_disconnect_container(container->fd);
->          close(container->fd);
->          g_free(container);
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 12fac39..8721ff6 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2699,11 +2699,80 @@ static void vfio_unregister_req_notifier(VFIOPCID=
-evice *vdev)
->      vdev->req_enabled =3D false;
->  }
-> =20
-> +static void vfio_register_iommu_ctx_notifier(VFIOPCIDevice *vdev,
-> +                                             IOMMUContext *iommu_ctx,
-> +                                             IOMMUCTXNotifyFn fn,
-> +                                             IOMMUCTXEvent event)
-> +{
-> +    VFIOContainer *container =3D vdev->vbasedev.group->container;
-> +    VFIOIOMMUContext *giommu_ctx;
-> +
-> +    giommu_ctx =3D g_malloc0(sizeof(*giommu_ctx));
-> +    giommu_ctx->container =3D container;
-> +    giommu_ctx->iommu_ctx =3D iommu_ctx;
-> +    QLIST_INSERT_HEAD(&container->iommu_ctx_list,
-> +                      giommu_ctx,
-> +                      iommu_ctx_next);
-> +    iommu_ctx_notifier_register(iommu_ctx,
-> +                                &giommu_ctx->n,
-> +                                fn,
-> +                                event);
-> +}
-> +
-> +static void vfio_iommu_pasid_alloc_notify(IOMMUCTXNotifier *n,
-> +                                          IOMMUCTXEventData *event_data)
-> +{
-> +    VFIOIOMMUContext *giommu_ctx =3D container_of(n, VFIOIOMMUContext, n=
-);
-> +    VFIOContainer *container =3D giommu_ctx->container;
-> +    IOMMUCTXPASIDReqDesc *pasid_req =3D
-> +                              (IOMMUCTXPASIDReqDesc *) event_data->data;
-> +    struct vfio_iommu_type1_pasid_request req;
-> +    unsigned long argsz;
-> +    int pasid;
-> +
-> +    argsz =3D sizeof(req);
-> +    req.argsz =3D argsz;
-> +    req.flag =3D VFIO_IOMMU_PASID_ALLOC;
-> +    req.min_pasid =3D pasid_req->min_pasid;
-> +    req.max_pasid =3D pasid_req->max_pasid;
-> +
-> +    pasid =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
-> +    if (pasid < 0) {
-> +        error_report("%s: %d, alloc failed", __func__, -errno);
-> +    }
-> +    pasid_req->alloc_result =3D pasid;
+Currently Looking Glass works by using the IVSHMEM shared memory device 
+which
+is fed by an application that captures the guest's video output. While 
+this
+works it is sub-optimal because we first have to perform a CPU copy of 
+the
+captured frame into shared RAM, and then back out again for display. 
+Because
+the destination buffers are allocated by closed proprietary code 
+(DirectX, or
+NVidia NvFBC) there is no way to have the frame placed directly into the
+IVSHMEM shared ram.
 
-Altering the event data from the notifier doesn't make sense.  By
-definition there can be multiple notifiers on the chain, so in that
-case which one is responsible for updating the writable field?
+This new device, currently named `introspection` (which needs a more 
+suitable
+name, porthole perhaps?), provides a means of translating guest physical
+addresses to host virtual addresses, and finally to the host offsets in 
+RAM for
+file-backed memory guests. It does this by means of a simple protocol 
+over a
+unix socket (chardev) which is supplied the appropriate fd for the VM's 
+system
+RAM. The guest (in this case, Windows), when presented with the address 
+of a
+userspace buffer and size, will mlock the appropriate pages into RAM and 
+pass
+guest physical addresses to the virtual device.
 
-> +}
-> +
-> +static void vfio_iommu_pasid_free_notify(IOMMUCTXNotifier *n,
-> +                                          IOMMUCTXEventData *event_data)
-> +{
-> +    VFIOIOMMUContext *giommu_ctx =3D container_of(n, VFIOIOMMUContext, n=
-);
-> +    VFIOContainer *container =3D giommu_ctx->container;
-> +    IOMMUCTXPASIDReqDesc *pasid_req =3D
-> +                              (IOMMUCTXPASIDReqDesc *) event_data->data;
-> +    struct vfio_iommu_type1_pasid_request req;
-> +    unsigned long argsz;
-> +    int ret =3D 0;
-> +
-> +    argsz =3D sizeof(req);
-> +    req.argsz =3D argsz;
-> +    req.flag =3D VFIO_IOMMU_PASID_FREE;
-> +    req.pasid =3D pasid_req->pasid;
-> +
-> +    ret =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
-> +    if (ret !=3D 0) {
-> +        error_report("%s: %d, pasid %u free failed",
-> +                   __func__, -errno, (unsigned) pasid_req->pasid);
-> +    }
-> +    pasid_req->free_result =3D ret;
+This device and the windows driver have been designed in such a way that 
+it's a
+utility device for any project and/or application that could make use of 
+it.
+The PCI subsystem vendor and device ID are used to provide a means of 
+device
+identification in cases where multiple devices may be in use for 
+differing
+applications. This also allows one common driver to be used for any 
+other
+projects wishing to build on this device.
 
-Same problem here.
+My ultimate goal is to get this to a state where it could be accepted 
+upstream
+into Qemu at which point Looking Glass would be modified to use it 
+instead of
+the IVSHMEM device.
 
-> +}
-> +
->  static void vfio_realize(PCIDevice *pdev, Error **errp)
->  {
->      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
->      VFIODevice *vbasedev_iter;
->      VFIOGroup *group;
-> +    IOMMUContext *iommu_context;
->      char *tmp, *subsys, group_path[PATH_MAX], *group_name;
->      Error *err =3D NULL;
->      ssize_t len;
-> @@ -3000,6 +3069,18 @@ static void vfio_realize(PCIDevice *pdev, Error **=
-errp)
->      vfio_register_req_notifier(vdev);
->      vfio_setup_resetfn_quirk(vdev);
-> =20
-> +    iommu_context =3D pci_device_iommu_context(pdev);
-> +    if (iommu_context) {
-> +        vfio_register_iommu_ctx_notifier(vdev,
-> +                                         iommu_context,
-> +                                         vfio_iommu_pasid_alloc_notify,
-> +                                         IOMMU_CTX_EVENT_PASID_ALLOC);
-> +        vfio_register_iommu_ctx_notifier(vdev,
-> +                                         iommu_context,
-> +                                         vfio_iommu_pasid_free_notify,
-> +                                         IOMMU_CTX_EVENT_PASID_FREE);
-> +    }
-> +
->      return;
-> =20
->  out_teardown:
-> diff --git a/include/hw/iommu/iommu.h b/include/hw/iommu/iommu.h
-> index c22c442..4352afd 100644
-> --- a/include/hw/iommu/iommu.h
-> +++ b/include/hw/iommu/iommu.h
-> @@ -31,10 +31,25 @@
->  typedef struct IOMMUContext IOMMUContext;
-> =20
->  enum IOMMUCTXEvent {
-> +    IOMMU_CTX_EVENT_PASID_ALLOC,
-> +    IOMMU_CTX_EVENT_PASID_FREE,
->      IOMMU_CTX_EVENT_NUM,
->  };
->  typedef enum IOMMUCTXEvent IOMMUCTXEvent;
-> =20
-> +union IOMMUCTXPASIDReqDesc {
-> +    struct {
-> +        uint32_t min_pasid;
-> +        uint32_t max_pasid;
-> +        int32_t alloc_result; /* pasid allocated for the alloc request */
-> +    };
-> +    struct {
-> +        uint32_t pasid; /* pasid to be free */
-> +        int free_result;
-> +    };
-> +};
+My git repository with the new device can be found at:
+https://github.com/gnif/qemu
 
-Apart from theproblem with writable fields, using a big union for
-event data is pretty ugly.  If you need this different information for
-the different events, it might make more sense to have a separate
-notifier chain with a separate call interface for each event type,
-rather than trying to multiplex them together.
+The new device is:
+https://github.com/gnif/qemu/blob/master/hw/misc/introspection.c
 
-> +typedef union IOMMUCTXPASIDReqDesc IOMMUCTXPASIDReqDesc;
-> +
->  struct IOMMUCTXEventData {
->      IOMMUCTXEvent event;
->      uint64_t length;
+Looking Glass:
+https://looking-glass.hostfission.com/
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+The windows driver, while working, needs some cleanup before the source 
+is
+published. I intend to maintain both this device and the windows driver
+including producing a signed Windows 10 driver if Redhat are unwilling 
+or
+unable.
 
---oJFDFiWc3BlD0xT/
-Content-Type: application/pgp-signature; name="signature.asc"
+Kind Regards,
+Geoffrey McRae
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl24LW0ACgkQbDjKyiDZ
-s5KArg//VdtrUL7LmSAtXr99bFhDGE9HfD3kDksbBRHS+VU1LojEx4QPyQO+ClxS
-6jXrsk6kq2pM+W+pCRm6fK3fd6Z+hoABjh35Auj3oqwZ+XGunGKv1Wd29v+dMBAC
-UYFWL99tF5K8mjPtQQuMS98JyeaJCTdRdkE7gjlwHCynYbXlpKHwLxE9lxB5Mq7D
-6JCuzfIsXggYUxGUe36a6SCJ1wjS5Bck1jxJM6W9u5LqOf5wq8UgyZC36edraATO
-CxcYwbJYcaSJlybiFUOs8ZhP2MxRJwFdkjl+51n8bxlCCNYoyhjlbTiIweEBQmfv
-AHM5kiSc8hvBTuBUWzeLdkqS1X3dJ8CrWtKHVkaA4abZmLgSYqerUUmxvF1W5Jb+
-TBlu9NIZnAMtfKFEjzykYARPbROMspaJi/6MElcNF/XdBr2mZVP4L+kD2voewEG/
-Yg3EIItfdear1JNPsIKLTkHadZ2ELjHEd/nS96ePVUxEF9D/Apk69W0lh7P8td5I
-IImUFxKzX9TV5JeAW0Ys6eQI3GOQV8Ajz4oaSymS3V8Y3YHdBSMR4kCLGpD1p9Us
-5+Lj1MxdaOmgme+kYCnlkJ+yMAP5ByWh/je5o3Og50loG9qf1HY7/VnhawRoQj4i
-wjF4eGEH12W56qReBEs5kZSnCESJCMg/4HS2P7SV0L3vG7rtZhk=
-=imxI
------END PGP SIGNATURE-----
-
---oJFDFiWc3BlD0xT/--
+HostFission
+https://hostfission.com
 
