@@ -2,70 +2,65 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A98ACA9EC4
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 12:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FA34CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 12:25:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9A9D2087E
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 12:20:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 931AB21479
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 12:25:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="FDkD5ohP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9A9D2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Onst8pCO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 931AB21479
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPQUK-0000Iq-2X
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 08:20:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45438)
+	id 1iPQYs-0003jt-56
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 08:25:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45927)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iPQTG-0007fG-I5
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:19:36 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iPQXd-0002OB-I8
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:24:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iPQTE-0007aU-L9
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:19:34 -0400
-Received: from mail-eopbgr80100.outbound.protection.outlook.com
- ([40.107.8.100]:55033 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iPQTE-0007Zi-Af; Tue, 29 Oct 2019 08:19:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SORvcvbLLYjhNssVK4NgztJWI+dN+1v6L+jizfC+lfICCviGuzImN2aNpQFowPu1uuOhJtK2za9l6ZomriTDA4kw9nYJ7zLExF9lqmyZocmOumrdXdGT/lDdA6ZfrbIhva/ZWcuw3gkczknKgmbTL/RJTgV5KjqDnwKDzymNJpWGSCRInzgJWVNZd0RtLha2WQbw+T2FbdFVzL17c2/+Nz0Ru/y9C1i8Y6nB8PSudgEAgYKEcbj4NyeO4hpHshNRp7kRwmB66JPNV9TmTlVrk4cXmTrXZA1WcThMMy8XzFyl52HXECWYdygrIAnuJBp0iyTEEvbkeQi8u/BXopWeBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KEiqQ6JFxxZJJlGdxHWS3asfqXJ/WKq/APnscPzDgV4=;
- b=S2K29dAZ9wXyQCp2IRWfRBgXgC7MMe/NW1XqqYUoD4fWcyFBucREvPm9kste68QsRTgNRwylvw/c1KteyVimrRCFS8sf1UtBp7a9VD1/ZTnY/IWL3d8AM6w4aVFBF+XsmNdXVLGpSqdW2addPGsxSBgyitEGjkhzIjC6OA7aBmEiWHtwqLKBClAXlwtMDogdXx33cu2PVUzDFb44gAENkfSf5XY0Vc9MVplgHWC0paSiJAt5SuOX9uVSsjaoBXOTEuuDkE4D0i++hJVH52ovzAgqiro7VToAt9DUarezaUaI40dBP6DeYo/tc4n4rvhURIdBAM+Hn73yzJ+18i0nTw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KEiqQ6JFxxZJJlGdxHWS3asfqXJ/WKq/APnscPzDgV4=;
- b=FDkD5ohPd5PDoE2+W3OPdHbvzqpBKyxLZ3yNxSKWYzBB56gjnBQp7OijwhqfsFalv/dGuZTI9r1V4MgTMGGSuYTpKbni5wik2907BKdXp+NQCVt2nFStvfcSR4Cu4auxJbsq1phYm+v0GcT67VZlUOHkvdYwSCJVP0xWjvQN4ak=
-Received: from AM0PR08MB4097.eurprd08.prod.outlook.com (20.178.202.217) by
- AM0PR08MB3315.eurprd08.prod.outlook.com (52.134.93.16) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2387.20; Tue, 29 Oct 2019 12:19:28 +0000
-Received: from AM0PR08MB4097.eurprd08.prod.outlook.com
- ([fe80::6844:bb8c:7d2c:b119]) by AM0PR08MB4097.eurprd08.prod.outlook.com
- ([fe80::6844:bb8c:7d2c:b119%6]) with mapi id 15.20.2387.025; Tue, 29 Oct 2019
- 12:19:28 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan
- Hajnoczi <stefanha@redhat.com>
+ (envelope-from <mreitz@redhat.com>) id 1iPQXb-0001AL-NK
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:24:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26017
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iPQXb-0001A1-Hu
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 08:24:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572351843;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=/qhwA66/QiPsYu8qwZXGPYb5ICZV1DRwMXGuipp7f9U=;
+ b=Onst8pCOCYCEq9C0DAxZjdAjVAOG5MavpUddN9wivf1FIfZ22zn4ZvLENinp3tikt/D5z4
+ T5Y4oIbbbkQP5BNLyhUUmRA+x9RZEFueOXyeEgk396B49qiK84n9mubFC+3vgyM1iNWKA/
+ uiF03pu9FoAjjjDrXnK+Q+IMRojUjDo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-309-_em0CsBXNjyo2BwyU8CpjA-1; Tue, 29 Oct 2019 08:23:56 -0400
+X-MC-Unique: _em0CsBXNjyo2BwyU8CpjA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B2321005500;
+ Tue, 29 Oct 2019 12:23:55 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-116-124.ams2.redhat.com
+ [10.36.116.124])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D7A61001B11;
+ Tue, 29 Oct 2019 12:23:51 +0000 (UTC)
 Subject: Re: [RFC 0/3] block/file-posix: Work around XFS bug
-Thread-Topic: [RFC 0/3] block/file-posix: Work around XFS bug
-Thread-Index: AQHVixrVzIJNY5LqnE6V3J8eZcL1nqdub/GAgAF4sACAAAXuAIABZygAgAAxigCAAAIFAIAAAr6AgAABxACAAAI3AA==
-Date: Tue, 29 Oct 2019 12:19:28 +0000
-Message-ID: <4c3f9460-04e3-c6d4-8d98-dcb95b023b6b@virtuozzo.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 References: <20191025095849.25283-1-mreitz@redhat.com>
  <20191027123555.GN4472@stefanha-x1.localdomain>
  <20191028110408.GB3579@localhost.localdomain>
@@ -75,51 +70,46 @@ References: <20191025095849.25283-1-mreitz@redhat.com>
  <b93e2b5c-b245-e8eb-bd9e-cbde46290544@redhat.com>
  <319e9b81-407b-62d0-2f79-d12e0b24e457@virtuozzo.com>
  <73064426-f84e-15ec-eaf3-fc02a6b64351@redhat.com>
-In-Reply-To: <73064426-f84e-15ec-eaf3-fc02a6b64351@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0102CA0051.eurprd01.prod.exchangelabs.com
- (2603:10a6:7:7d::28) To AM0PR08MB4097.eurprd08.prod.outlook.com
- (2603:10a6:208:132::25)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191029151926524
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2bb05a14-6a7b-4c18-7d17-08d75c6a3ec8
-x-ms-traffictypediagnostic: AM0PR08MB3315:
-x-ms-exchange-purlcount: 2
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR08MB3315BF870CDEDAF222A48BABC1610@AM0PR08MB3315.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5516;
-x-forefront-prvs: 0205EDCD76
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(366004)(39850400004)(346002)(396003)(136003)(189003)(199004)(54906003)(110136005)(14454004)(486006)(6436002)(31686004)(316002)(86362001)(478600001)(76176011)(66946007)(52116002)(81166006)(81156014)(8676002)(4326008)(26005)(386003)(305945005)(2906002)(31696002)(7736002)(53546011)(6506007)(229853002)(99286004)(6246003)(8936002)(71200400001)(66066001)(6512007)(446003)(6306002)(5660300002)(11346002)(2616005)(6486002)(36756003)(476003)(71190400001)(64756008)(66556008)(66476007)(66446008)(186003)(102836004)(25786009)(3846002)(256004)(6116002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3315;
- H:AM0PR08MB4097.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: XdiTZSHQC5GqZ17wzxNPLEwFgVyJMuW0R9g0HlfUDHph7z/pZZTBK7UYRTzi6jiIcmzr8BxRjG/4+vg6TV8172QCAV6jrCNYQ2EVZoB/HDcGvsTSN5pB/crLJZUCjQ5ZgTpilJ1eMBkmTAMHF3nW3+JUWjhUu8hF0mLbt/EtL2OqwCaUnrve3fnSKPNtacM2T7LvQ4btHZ/KRXy7UqPD+XS5BK+4cyyBhaQAAs8vCtdSY/BxLU3kXsbapnQtF22Yo1kz1672Jp/G4MBVQx4New7uePdiz8m65039cXqfvo/kkOwDF74wmXC0VcOk/O9O1TD2LcQ9lW1kg/N5nWGC7FsMhh2I6oPKERhtb4ZdwiQ7zSOHfd4qA7FL42+PexGYGvYswIDwrHmF1vWHkcUL9d7X9HQxYIVF3xkfU96E+6iGmh98n7+I2FGZeEmo7kFRIEKMRBVVtx8FTErhvgIARpM4vAOfgRcD7v2CG7GfeOo=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <89D5EA5C2FF3A9438B955F0B1AA0C467@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ <4c3f9460-04e3-c6d4-8d98-dcb95b023b6b@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <9dd0be12-2460-2d9a-4c13-7c1f5110b5c1@redhat.com>
+Date: Tue, 29 Oct 2019 13:23:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2bb05a14-6a7b-4c18-7d17-08d75c6a3ec8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Oct 2019 12:19:28.7349 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bNC4D0ru7aDCAQpamIciO84RPUywKMOPRReHhIQL1ksOJBYMbcnQKs81l+6aO6qHwQTEKEMQECy2N86MK+9+aH/qC4klb+11dUszs17u29A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3315
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.8.100
+In-Reply-To: <4c3f9460-04e3-c6d4-8d98-dcb95b023b6b@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="2CVvJfP6Pu5XQhdTdsIpOGAV9w3aftXxu"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -139,125 +129,141 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjkuMTAuMjAxOSAxNToxMSwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAyOS4xMC4xOSAxMzowNSwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IDI5LjEwLjIwMTkgMTQ6NTUs
-IE1heCBSZWl0eiB3cm90ZToNCj4+PiBPbiAyOS4xMC4xOSAxMjo0OCwgVmxhZGltaXIgU2VtZW50
-c292LU9naWV2c2tpeSB3cm90ZToNCj4+Pj4gMjkuMTAuMjAxOSAxMTo1MCwgTWF4IFJlaXR6IHdy
-b3RlOg0KPj4+Pj4gT24gMjguMTAuMTkgMTI6MjUsIFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNr
-aXkgd3JvdGU6DQo+Pj4+Pj4gMjguMTAuMjAxOSAxNDowNCwgS2V2aW4gV29sZiB3cm90ZToNCj4+
-Pj4+Pj4gQW0gMjcuMTAuMjAxOSB1bSAxMzozNSBoYXQgU3RlZmFuIEhham5vY3ppIGdlc2Nocmll
-YmVuOg0KPj4+Pj4+Pj4gT24gRnJpLCBPY3QgMjUsIDIwMTkgYXQgMTE6NTg6NDZBTSArMDIwMCwg
-TWF4IFJlaXR6IHdyb3RlOg0KPj4+Pj4NCj4+Pj4+IFsuLi5dDQo+Pj4+Pg0KPj4+Pj4+Pj4+ICgz
-KSBEcm9wIGhhbmRsZV9hbGxvY19zcGFjZSgpLCBpLmUuIHJldmVydCBjOGJiMjNjYmRiZTMyZi4N
-Cj4+Pj4+Pj4+PiAgICAgICAgIFRvIG15IGtub3dsZWRnZSBJ4oCZbSB0aGUgb25seSBvbmUgd2hv
-IGhhcyBwcm92aWRlZCBhbnkgYmVuY2htYXJrcyBmb3INCj4+Pj4+Pj4+PiAgICAgICAgIHRoaXMg
-Y29tbWl0LCBhbmQgZXZlbiB0aGVuIEkgd2FzIGEgYml0IHNrZXB0aWNhbCBiZWNhdXNlIGl0IHBl
-cmZvcm1zDQo+Pj4+Pj4+Pj4gICAgICAgICB3ZWxsIGluIHNvbWUgY2FzZXMgYW5kIGJhZCBpbiBv
-dGhlcnMuICBJIGNvbmNsdWRlZCB0aGF0IGl04oCZcw0KPj4+Pj4+Pj4+ICAgICAgICAgcHJvYmFi
-bHkgd29ydGggaXQgYmVjYXVzZSB0aGUg4oCcc29tZSBjYXNlc+KAnSBhcmUgbW9yZSBsaWtlbHkg
-dG8gb2NjdXIuDQo+Pj4+Pj4+Pj4NCj4+Pj4+Pj4+PiAgICAgICAgIE5vdyB3ZSBoYXZlIHRoaXMg
-cHJvYmxlbSBvZiBjb3JydXB0aW9uIGhlcmUgKGdyYW50ZWQgZHVlIHRvIGEgYnVnIGluDQo+Pj4+
-Pj4+Pj4gICAgICAgICB0aGUgWEZTIGRyaXZlciksIGFuZCBhbm90aGVyIHJlcG9ydCBvZiBtYXNz
-aXZlbHkgZGVncmFkZWQNCj4+Pj4+Pj4+PiAgICAgICAgIHBlcmZvcm1hbmNlIG9uIHBwYzY0DQo+
-Pj4+Pj4+Pj4gICAgICAgICAoaHR0cHM6Ly9idWd6aWxsYS5yZWRoYXQuY29tL3Nob3dfYnVnLmNn
-aT9pZD0xNzQ1ODIzIOKAkyBzb3JyeSwgYQ0KPj4+Pj4+Pj4+ICAgICAgICAgcHJpdmF0ZSBCWjsg
-SSBoYXRlIHRoYXQgOi0vICBUaGUgcmVwb3J0IGlzIGFib3V0IDQwICUgd29yc2UNCj4+Pj4+Pj4+
-PiAgICAgICAgIHBlcmZvcm1hbmNlIGZvciBhbiBpbi1ndWVzdCBmaW8gd3JpdGUgYmVuY2htYXJr
-LikNCj4+Pj4+Pj4+Pg0KPj4+Pj4+Pj4+ICAgICAgICAgU28gSSBoYXZlIHRvIGFzayB0aGUgcXVl
-c3Rpb24gYWJvdXQgd2hhdCB0aGUganVzdGlmaWNhdGlvbiBmb3INCj4+Pj4+Pj4+PiAgICAgICAg
-IGtlZXBpbmcgYzhiYjIzY2JkYmUzMmYgaXMuICBIb3cgbXVjaCBkb2VzIHBlcmZvcm1hbmNlIGlu
-Y3JlYXNlIHdpdGgNCj4+Pj4+Pj4+PiAgICAgICAgIGl0IGFjdHVhbGx5PyAgKE9uIG5vbi0ocHBj
-NjQrWEZTKSBtYWNoaW5lcywgb2J2aW91c2x5KQ0KPj4+Pj4+Pj4+DQo+Pj4+Pj4+Pj4gICAgICAg
-ICBBZHZhbnRhZ2VzOg0KPj4+Pj4+Pj4+ICAgICAgICAgKyBUcml2aWFsDQo+Pj4+Pj4+Pj4gICAg
-ICAgICArIE5vIGxheWVyaW5nIHZpb2xhdGlvbnMNCj4+Pj4+Pj4+PiAgICAgICAgICsgV2Ugd291
-bGRu4oCZdCBuZWVkIHRvIGtlZXAgdHJhY2sgb2Ygd2hldGhlciB0aGUga2VybmVsIGJ1ZyBoYXMg
-YmVlbg0KPj4+Pj4+Pj4+ICAgICAgICAgICBmaXhlZCBvciBub3QNCj4+Pj4+Pj4+PiAgICAgICAg
-ICsgRml4ZXMgdGhlIHBwYzY0K1hGUyBwZXJmb3JtYW5jZSBwcm9ibGVtDQo+Pj4+Pj4+Pj4NCj4+
-Pj4+Pj4+PiAgICAgICAgIERpc2FkdmFudGFnZXM6DQo+Pj4+Pj4+Pj4gICAgICAgICAtIFJldmVy
-dHMgY2x1c3RlciBhbGxvY2F0aW9uIHBlcmZvcm1hbmNlIHRvIHByZS1jOGJiMjNjYmRiZTMyZg0K
-Pj4+Pj4+Pj4+ICAgICAgICAgICBsZXZlbHMsIHdoYXRldmVyIHRoYXQgbWVhbnMNCj4+Pj4+Pj4+
-DQo+Pj4+Pj4+PiBNeSBmYXZvcml0ZSBiZWNhdXNlIGl0IGlzIGNsZWFuIGFuZCBzaW1wbGUsIGJ1
-dCBWbGFkaW1pciBoYXMgYSB2YWxpZA0KPj4+Pj4+Pj4gdXNlLWNhc2UgZm9yIHJlcXVpcmluZyB0
-aGlzIHBlcmZvcm1hbmNlIG9wdGltaXphdGlvbiBzbyByZXZlcnRpbmcgaXNuJ3QNCj4+Pj4+Pj4+
-IGFuIG9wdGlvbi4NCj4+Pj4+Pj4NCj4+Pj4+Pj4gVmxhZGltaXIgYWxzbyBzYWlkIHRoYXQgcWNv
-dzIgc3ViY2x1c3RlcnMgd291bGQgcHJvYmFibHkgYWxzbyBzb2x2ZSBoaXMNCj4+Pj4+Pj4gcHJv
-YmxlbSwgc28gbWF5YmUgcmV2ZXJ0aW5nIGFuZCBhcHBseWluZyB0aGUgc3ViY2x1c3RlciBwYXRj
-aGVzIGluc3RlYWQNCj4+Pj4+Pj4gaXMgYSBwb3NzaWJsZSBzb2x1dGlvbiwgdG9vPw0KPj4+Pj4+
-DQo+Pj4+Pj4gSSdtIG5vdCBzdXJlIGFib3V0IHNzZCBjYXNlLCBpdCBtYXkgbmVlZCB3cml0ZS16
-ZXJvIG9wdGltaXphdGlvbiBhbnl3YXkuDQo+Pj4+Pg0KPj4+Pj4gV2hhdCBleGFjdGx5IGRvIHlv
-dSBuZWVkPyAgRG8geW91IGFjdHVhbGx5IG5lZWQgdG8gd3JpdGUgemVyb2VzIChlLmcuDQo+Pj4+
-PiBiZWNhdXNlIHlvdeKAmXJlIHN0b3JpbmcgaW1hZ2VzIG9uIGJsb2NrIGRldmljZXMpIG9yIHdv
-dWxkIGl0IGJlDQo+Pj4+PiBzdWZmaWNpZW50IHRvIGp1c3QgZHJvcCB0aGUgQ09XIGFyZWFzIHdo
-ZW4gYmRydl9oYXNfemVyb19pbml0KCkgYW5kDQo+Pj4+PiBiZHJ2X2hhc196ZXJvX2luaXRfdHJ1
-bmNhdGUoKSBhcmUgdHJ1ZT8NCj4+Pj4NCj4+Pj4gSG1tLCB3aGF0IGRvIHlvdSBtZWFuPyBXZSBu
-ZWVkIHRvIHplcm8gQ09XIGFyZWFzLiBTbywgb3JpZ2luYWwgd2F5IGlzIHRvDQo+Pj4+IHdyaXRl
-IHJlYWwgemVyb2VzLCBvcHRpbWl6ZWQgd2F5IGlzIGZhbGxvY2F0ZS4uIFdoYXQgZG8geW91IG1l
-YW4gYnkgZHJvcD8NCj4+Pj4gTWFyayBzdWJsdXN0ZXJzIGFzIHplcm9lcyBieSBtZXRhZGF0YT8N
-Cj4+Pg0KPj4+IFdoeSBkbyB5b3UgbmVlZCB0byB6ZXJvIENPVyBhcmVhcz8gIEZvciBub3JtYWwg
-ZmlsZXMsIGFueSBkYXRhIHdpbGwgcmVhZA0KPj4+IGFzIHplcm8gaWYgeW91IGRpZG7igJl0IHdy
-aXRlIGFueXRoaW5nIHRoZXJlLg0KPj4NCj4+IEhtbSwgYnV0IHdoZW4gYWxsb2NhdGluZyBuZXcg
-Y2x1c3RlciBpbiBxY293MiwgaXQncyBub3QgZ3VhcmFudGVlZCB0byBiZSB6ZXJvLA0KPj4gYXMg
-aXQgbWF5IGJlIHJldXNlZCBwcmV2aW91c2x5IGFsbG9jYXRlZCBjbHVzdGVyLi4NCj4gDQo+IEht
-LCByaWdodC4gIFdlIGNvdWxkIHNwZWNpYWwtY2FzZSBzb21ldGhpbmcgZm9yIGJleW9uZCB0aGUg
-RU9GLCBidXQgSQ0KPiBkb27igJl0IGtub3cgd2hldGhlciB0aGF0IHJlYWxseSBtYWtlcyBpdCBi
-ZXR0ZXIuDQo+IA0KPiBPVE9ILCBtYXliZSBhbGxvY2F0aW9ucyBhdCB0aGUgRU9GIGFyZSB0aGUg
-cmVhbCBib3R0bGVuZWNrLiAgUmV1c2luZw0KPiBleGlzdGluZyBjbHVzdGVycyBzaG91bGQgYmUg
-cmFyZSBlbm91Z2ggdGhhdCBtYXliZSB0aGUgZXhpc3RpbmcgY29kZQ0KPiB3aGljaCBleHBsaWNp
-dGx5IHdyaXRlcyB6ZXJvZXMgaXMgc3VmZmljaWVudC4NCg0KQnV0LCBhcyBJIHVuZGVyc3RhbmQg
-cHJlLUVPRiBmYWxsb2NhdGVzIGFyZSBzYWZlIGluIHhmcz8gU28sIHdlIG1heSBqdXN0IGRyb3Ag
-Y2FsbGluZw0KZmFsbG9jYXRlIHBhc3QtRU9GIChpdCdzIHplcm8gYW55d2F5KSBhbmQgZG8gZmFs
-bG9jYXRlIHByZS1FT0YgKGl0J3Mgc2FmZSkgPw0KKHRoZSBvbmx5IHNwZWNpYWwgY2FzZSBpcyBp
-bnRlcnNlY3RpbmcgRU9GLi4gc28gYmV0dGVyIGlzIGtlZXAgZmlsZSBsZW5ndGggYXQgY2x1c3Rl
-ci1zaXplDQpib3VuZGFyeSwgdHJ1bmNhdGluZyBvbiBleGl0KQ0KDQo+IA0KPj4+DQo+Pj4+IEJ1
-dCBzdGlsbCB3ZSdsbCBoYXZlIENPVyBhcmVhcyBpbiBzdWJjbHVzdGVyLCBhbmQgd2UnbGwgbmVl
-ZCB0byBkaXJlY3RseSB6ZXJvDQo+Pj4+IHRoZW0uLiBBbmQgZmFsbG9jYXRlIHdpbGwgbW9zdCBw
-cm9iYWJseSBiZSBmYXN0ZXIgb24gc3NkIGV4dDQgY2FzZS4uDQo+Pj4+DQo+Pj4+Pg0KPj4+Pj4g
-SeKAmW0gYXNraW5nIGJlY2F1c2UgRGF2ZSBDaGlubmVyIHNhaWQNCj4+Pj4+IChodHRwczovL2J1
-Z3ppbGxhLnJlZGhhdC5jb20vc2hvd19idWcuY2dpP2lkPTE3NjU1NDcjYzcpIHRoYXQNCj4+Pj4+
-IGZhbGxvY2F0ZSgpIGlzIGFsd2F5cyBzbG93IGF0IGxlYXN0IHdpdGggYWlvPW5hdGl2ZSBiZWNh
-dXNlIGl0IG5lZWRzIHRvDQo+Pj4+PiB3YWl0IGZvciBhbGwgY29uY3VycmVudCBBSU8gd3JpdGVz
-IHRvIGZpbmlzaCwgYW5kIHNvIGl0IGNhdXNlcyB0aGUgQUlPDQo+Pj4+PiBwaXBlbGluZSB0byBz
-dGFsbC4NCj4+Pj4+DQo+Pj4+PiAoSGUgc3VnZ2VzdGVkIHVzaW5nIFhGUyBleHRlbnQgc2l6ZSBo
-aW50cyB0byBnZXQgdGhlIHNhbWUgZWZmZWN0IGFzDQo+Pj4+PiB3cml0ZS16ZXJvZXMgZm9yIGZy
-ZWUsIGJhc2ljYWxseSwgYnV0IEkgZG9u4oCZdCBrbm93IHdoZXRoZXIgdGhhdOKAmXMgcmVhbGx5
-DQo+Pj4+PiB1c2VmdWwgdG8gdXM7IGFzIHVuYWxsb2NhdGVkIGFyZWFzIG9uIFhGUyByZWFkIGJh
-Y2sgYXMgemVybyBhbnl3YXkuKQ0KPj4+Pj4NCj4+Pj4+Pj4gV2UgYWxyZWFkeSBoYXZlIHNvbWUg
-Y2FzZXMgd2hlcmUgdGhlIGV4aXN0aW5nIGhhbmRsZV9hbGxvY19zcGFjZSgpDQo+Pj4+Pj4+IGNh
-dXNlcyBwZXJmb3JtYW5jZSB0byBhY3R1YWxseSBiZWNvbWUgd29yc2UsIGFuZCBzZXJpYWxpc2lu
-ZyByZXF1ZXN0cyBhcw0KPj4+Pj4+PiBhIHdvcmthcm91bmQgaXNuJ3QgZ29pbmcgdG8gbWFrZSBw
-ZXJmb3JtYW5jZSBhbnkgYmV0dGVyLiBTbyBldmVuIG9uDQo+Pj4+Pj4+IHRoZXNlIGdyb3VuZHMs
-IGtlZXBpbmcgY29tbWl0IGM4YmIyM2NiZGJlMzJmIGlzIHF1ZXN0aW9uYWJsZS4NCj4+Pj4+Pj4N
-Cj4+Pj4+Pg0KPj4+Pj4+IENhbiBrZWVwaW5nIGhhbmRsZV9hbGxvY19zcGFjZSB1bmRlciBzb21l
-IGNvbmZpZyBvcHRpb24gYmUgYW4gb3B0aW9uPw0KPj4+Pj4NCj4+Pj4+IEhtLiAgQSBjb25maWcg
-b3B0aW9uIGlzIHdlaXJkIGlmIHlvdeKAmXJlIHRoZSBvbmx5IG9uZSB3aG/igJlzIGdvaW5nIHRv
-DQo+Pj4+PiBlbmFibGUgaXQuICBCdXQgb3RoZXIgdGhhbiB0aGF0IEkgZG9u4oCZdCBoYXZlIGFu
-eXRoaW5nIGFnYWluc3QgaXQuDQo+Pj4+Pg0KPj4+Pg0KPj4+PiBJdCdzIGp1c3QgYSBiaXQgZWFz
-aWVyIGZvciB1cyB0byBtYWludGFpbiBjb25maWcgb3B0aW9uLCB0aGFuIG91dC1vZi10cmVlIHBh
-dGNoLg0KPj4+PiBPbiB0aGUgb3RoZXIgaGFuZCwgaXQncyBub3QgYSByZWFsIHByb2JsZW0gdG8g
-bWFpbnRhaW4gdGhpcyBvbmUgcGF0Y2ggaW4gc2VwYXJhdGUuDQo+Pj4+IEl0IG1heSByZXR1cm4g
-YWdhaW4gdG8gdGhlIHRyZWUsIHdoZW4gWEZTIGJ1ZyBmaXhlZC4NCj4+Pg0KPj4+IFdl4oCZbGwg
-c3RpbGwgaGF2ZSB0aGUgcHJvYmxlbSB0aGF0IGZhbGxvY2F0ZSgpIG11c3Qgc3RhbGwgYWlvPW5h
-dGl2ZQ0KPj4+IHJlcXVlc3RzLg0KPj4+DQo+Pg0KPj4gRG9lcyBpdCBtZWFuIHRoYXQgZmFsbG9j
-YXRlIGlzIGJhZCBpbiBnZW5lcmFsPyBQcmFjdGljZSBzaG93cyB0aGUgb3Bwb3NpdGUuLg0KPj4g
-QXQgbGVhc3QgSSBoYXZlIG15IGV4YW1wbGVzIHdpdGggcWVtdS1pbWcgYmVuY2guIENhbiB0aGF0
-IHRoaW5nIGJlIHNob3duIHdpdGgNCj4+IHFlbXUtaW1nIGJlbmNoIG9yIHNvbWV0aGluZz8NCj4g
-DQo+IEkgaGF2ZW7igJl0IGRvbmUgYmVuY2htYXJrcyB5ZXQsIGJ1dCBJIGRvbuKAmXQgdGhpbmsg
-TGF1cmVudCB3aWxsIG1pbmQgaWYgSQ0KPiBwYXN0ZSBoaXMgZmlvIGJlbmNobWFyayByZXN1bHRz
-IGZyb20gdGhlIHVuZm9ydHVuYXRlbHkgcHJpdmF0ZSBCWiBoZXJlOg0KPiANCj4gICAgICAgICAg
-IFFDT1cyIE9OIHwgICAgICAgICAgRVhUNCAgICAgICAgIHwgICAgICAgICAgWEZTICAgICAgICAg
-IHwNCj4gICAgICAgICAgICAgICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgIHwgICAgICAg
-ICAgICAgICAgICAgICAgIHwNCj4gKHJ3LCBicywgaW9kZXB0aCkgfCAgIDIuMTIuMCAgfCAgIDQu
-MS4wICAgfCAgIDIuMTIuMCAgfCAgIDQuMS4wICAgfA0KPiAtLS0tLS0tLS0tLS0tLS0tLS0rLS0t
-LS0tLS0tLS0rLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0rDQo+ICh3cml0ZSwg
-MTZrLCAxKSAgIHwgMTg2OEtpQi9zIHwgMTg2NUtpQi9zIHwgMTguNk1pQi9zIHwgMTMuN01pQi9z
-IHwNCj4gLS0tLS0tLS0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tKy0tLS0tLS0tLS0tKy0tLS0tLS0t
-LS0tKy0tLS0tLS0tLS0tKw0KPiAod3JpdGUsIDY0aywgMSkgICB8IDcwMzZLaUIvcyB8IDc0MTNL
-aUIvcyB8IDI3LjBNaUIvcyB8IDc0NjVLaUIvcyB8DQo+IC0tLS0tLS0tLS0tLS0tLS0tLSstLS0t
-LS0tLS0tLSstLS0tLS0tLS0tLSstLS0tLS0tLS0tLSstLS0tLS0tLS0tLSsNCj4gKHdyaXRlLCAg
-NGssIDgpICAgfCAgNTM1S2lCL3MgfCAgNTI0S2lCL3MgfCAxMy45TWlCL3MgfCAxNjYyS2lCL3Mg
-fA0KPiAtLS0tLS0tLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0rLS0tLS0tLS0tLS0rLS0tLS0tLS0t
-LS0rLS0tLS0tLS0tLS0rDQo+IA0KPiBBbmQgdGhhdCBqdXN0IGxvb2tzIGxpa2UgZXh0NCBwZXJm
-b3JtcyB3b3JzZSB3aXRoIGFpbz1uYXRpdmUgaW4gZ2VuZXJhbC4NCj4gICBCdXQgSeKAmWxsIGhh
-dmUgdG8gZG8gbXkgb3duIGJlbmNobWFya3MgZmlyc3QuDQo+IA0KPiBNYXgNCj4gDQoNCg0KLS0g
-DQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--2CVvJfP6Pu5XQhdTdsIpOGAV9w3aftXxu
+Content-Type: multipart/mixed; boundary="KKeqGNIpW8b5pe5pKwbzMByYfgjbrW2yJ"
+
+--KKeqGNIpW8b5pe5pKwbzMByYfgjbrW2yJ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 29.10.19 13:19, Vladimir Sementsov-Ogievskiy wrote:
+> 29.10.2019 15:11, Max Reitz wrote:
+>> On 29.10.19 13:05, Vladimir Sementsov-Ogievskiy wrote:
+>>> 29.10.2019 14:55, Max Reitz wrote:
+>>>> On 29.10.19 12:48, Vladimir Sementsov-Ogievskiy wrote:
+>>>>> 29.10.2019 11:50, Max Reitz wrote:
+>>>>>> On 28.10.19 12:25, Vladimir Sementsov-Ogievskiy wrote:
+>>>>>>> 28.10.2019 14:04, Kevin Wolf wrote:
+>>>>>>>> Am 27.10.2019 um 13:35 hat Stefan Hajnoczi geschrieben:
+>>>>>>>>> On Fri, Oct 25, 2019 at 11:58:46AM +0200, Max Reitz wrote:
+>>>>>>
+>>>>>> [...]
+>>>>>>
+>>>>>>>>>> (3) Drop handle_alloc_space(), i.e. revert c8bb23cbdbe32f.
+>>>>>>>>>>         To my knowledge I=E2=80=99m the only one who has provide=
+d any benchmarks for
+>>>>>>>>>>         this commit, and even then I was a bit skeptical because=
+ it performs
+>>>>>>>>>>         well in some cases and bad in others.  I concluded that =
+it=E2=80=99s
+>>>>>>>>>>         probably worth it because the =E2=80=9Csome cases=E2=80=
+=9D are more likely to occur.
+>>>>>>>>>>
+>>>>>>>>>>         Now we have this problem of corruption here (granted due=
+ to a bug in
+>>>>>>>>>>         the XFS driver), and another report of massively degrade=
+d
+>>>>>>>>>>         performance on ppc64
+>>>>>>>>>>         (https://bugzilla.redhat.com/show_bug.cgi?id=3D1745823 =
+=E2=80=93 sorry, a
+>>>>>>>>>>         private BZ; I hate that :-/  The report is about 40 % wo=
+rse
+>>>>>>>>>>         performance for an in-guest fio write benchmark.)
+>>>>>>>>>>
+>>>>>>>>>>         So I have to ask the question about what the justificati=
+on for
+>>>>>>>>>>         keeping c8bb23cbdbe32f is.  How much does performance in=
+crease with
+>>>>>>>>>>         it actually?  (On non-(ppc64+XFS) machines, obviously)
+>>>>>>>>>>
+>>>>>>>>>>         Advantages:
+>>>>>>>>>>         + Trivial
+>>>>>>>>>>         + No layering violations
+>>>>>>>>>>         + We wouldn=E2=80=99t need to keep track of whether the =
+kernel bug has been
+>>>>>>>>>>           fixed or not
+>>>>>>>>>>         + Fixes the ppc64+XFS performance problem
+>>>>>>>>>>
+>>>>>>>>>>         Disadvantages:
+>>>>>>>>>>         - Reverts cluster allocation performance to pre-c8bb23cb=
+dbe32f
+>>>>>>>>>>           levels, whatever that means
+>>>>>>>>>
+>>>>>>>>> My favorite because it is clean and simple, but Vladimir has a va=
+lid
+>>>>>>>>> use-case for requiring this performance optimization so reverting=
+ isn't
+>>>>>>>>> an option.
+>>>>>>>>
+>>>>>>>> Vladimir also said that qcow2 subclusters would probably also solv=
+e his
+>>>>>>>> problem, so maybe reverting and applying the subcluster patches in=
+stead
+>>>>>>>> is a possible solution, too?
+>>>>>>>
+>>>>>>> I'm not sure about ssd case, it may need write-zero optimization an=
+yway.
+>>>>>>
+>>>>>> What exactly do you need?  Do you actually need to write zeroes (e.g=
+.
+>>>>>> because you=E2=80=99re storing images on block devices) or would it =
+be
+>>>>>> sufficient to just drop the COW areas when bdrv_has_zero_init() and
+>>>>>> bdrv_has_zero_init_truncate() are true?
+>>>>>
+>>>>> Hmm, what do you mean? We need to zero COW areas. So, original way is=
+ to
+>>>>> write real zeroes, optimized way is fallocate.. What do you mean by d=
+rop?
+>>>>> Mark sublusters as zeroes by metadata?
+>>>>
+>>>> Why do you need to zero COW areas?  For normal files, any data will re=
+ad
+>>>> as zero if you didn=E2=80=99t write anything there.
+>>>
+>>> Hmm, but when allocating new cluster in qcow2, it's not guaranteed to b=
+e zero,
+>>> as it may be reused previously allocated cluster..
+>>
+>> Hm, right.  We could special-case something for beyond the EOF, but I
+>> don=E2=80=99t know whether that really makes it better.
+>>
+>> OTOH, maybe allocations at the EOF are the real bottleneck.  Reusing
+>> existing clusters should be rare enough that maybe the existing code
+>> which explicitly writes zeroes is sufficient.
+>=20
+> But, as I understand pre-EOF fallocates are safe in xfs? So, we may just =
+drop calling
+> fallocate past-EOF (it's zero anyway) and do fallocate pre-EOF (it's safe=
+) ?
+
+But probably slow still.  And there=E2=80=99s the question of how much
+complexity we want to heap onto this.
+
+Max
+
+
+--KKeqGNIpW8b5pe5pKwbzMByYfgjbrW2yJ--
+
+--2CVvJfP6Pu5XQhdTdsIpOGAV9w3aftXxu
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl24L1UACgkQ9AfbAGHV
+z0Bx0wf7BLwYX/2mjocttITUZsb9rXiamIy6PKz8nZ7rmFAAUbs0hbYULMhicw9h
+vDbMeoUSh7faOJ2z9gcJbCOERDx1Y+Zc8bqi63T3d8IaqpPzMmkkjNBjrDw6dNgS
+6eSUnritCc5414GcNZ5f+vp8/9SyrOLSafje1BpEbRwEddnfWJlcA1t0oUbYfin3
+YlpHXSoArxM5ScyxODwL/+3J41VPhR7bgE9AQpvZYN6boeJFR9XOjgbCofl8jzDp
+MTTJEsnugBMJwaSlV8fb8YvaNGJEvKTLg6QGsCM+iGIOyt9nPxUSS4x5aL36Ify8
++JmtoEx44K8kDLfhKWvpYh4DIEFVQQ==
+=gUWt
+-----END PGP SIGNATURE-----
+
+--2CVvJfP6Pu5XQhdTdsIpOGAV9w3aftXxu--
+
 
