@@ -6,69 +6,68 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 436FCCA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:12:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA715CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:14:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11BAD20862
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:12:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11BAD20862
+	by mail.kernel.org (Postfix) with ESMTPS id AB22220862
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:14:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB22220862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPaek-0002NQ-2Q
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 19:12:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43171)
+	id 1iPahB-0005Y6-J9
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 19:14:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43877)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iPaTl-00004w-F9
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:46 -0400
+ (envelope-from <mst@redhat.com>) id 1iPaUU-0000p3-H5
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:01:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iPaTk-0003jv-70
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49267)
+ (envelope-from <mst@redhat.com>) id 1iPaUT-0004tG-F4
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:01:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50072)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iPaTj-0003iA-Tn
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:44 -0400
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iPaUS-0004qH-K0
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:01:29 -0400
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 11E95368CF
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 23:00:43 +0000 (UTC)
-Received: by mail-qt1-f198.google.com with SMTP id t16so515504qtp.11
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 16:00:43 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 150725AFE9
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 23:01:26 +0000 (UTC)
+Received: by mail-qk1-f198.google.com with SMTP id x186so261163qke.13
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 16:01:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=P3u+b5+KX9c+8Ms/zyjrjs/OLh7mLvjvMFExc3PU094=;
- b=uksm2K8pWLCj++pz8DdoON0w0ShLS0NlYoX0BUwsy85cPrSb4BBtmGIKTK40ZP1yKN
- rJVXdTR0cZ3Yj2SvoZDgOtOLXbVWMZ7l2a5VoaNUoxK+dfN00lRflgqvJhEpeSe4Hjf6
- rblRezdUoBREANeHSMsU/5UoN0d408zE691HxRdEqCBhpB4qIOEzowWCcobIBFI1x12B
- mOXDWy5H4jDjy0F+w3H3xR/3YsGLvT8UePSvuAlqbIiKL+yU+CsA6I+JhK8NEvVTBkkE
- nnEqrW0sawzJd+T9xnkTksiX7CubINl5Zal0O7xQBiyjiFux40mjW9iPgKBTMc4sb0i6
- MUmw==
-X-Gm-Message-State: APjAAAXr5ENZp6DmBWQ/mUQ+f+3YP+zck3eRw7SFdfb3/LyKVJKQA9bz
- yGXprnYlU6puUfLfqZ5p8UPp2EFxBACS/05bqBcrcHMGLuLjbYVR9XVz9bwngmT4vKKwu63dQ3g
- 6SJKjfLsefiGfo8U=
-X-Received: by 2002:ac8:377d:: with SMTP id p58mr1886485qtb.198.1572390041831; 
- Tue, 29 Oct 2019 16:00:41 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwcbmEI8nR7pjy43qbmiHSMwu96vGSuhWXER46KICaG8SUuZZjrI0ZXP2jRf3AGNXBZjGFy5Q==
-X-Received: by 2002:ac8:377d:: with SMTP id p58mr1886446qtb.198.1572390041415; 
- Tue, 29 Oct 2019 16:00:41 -0700 (PDT)
+ bh=NIZIUZQMHD8MQB75aibzuLlMw0b/3b/p/eZpRql+nWE=;
+ b=ijRtHMUrTxZaF3yJYcr3lPG8YXay/0DNcP0k1+vfjr0PUnDSIVQOMW+NkqsoaSZSEM
+ 6pX4FBVGzhxmmLfkfrP7X+ExQoYtt/NKcRNWkC+/FE+udsSq0nUFSjFlDPdh5ojGzzh+
+ Wmuxi4PjMBD4Qmz6WfhG8G/wY8qBDNbPvAfSINrGrwQLyD8m7eDSExYD3sYduLiLpJnZ
+ otb4KaicTDJmTtbCRRhpssw36bndGpB/S5X+5a5o+XQnuKIPRw7YkunPhjMVlZAWxsFb
+ au+dVQpqjY0EiZ4WJA71gdF/RkvP+U+uk5E7Zc39bdTFdSv9WfwszLezcu5257a0h+nn
+ lLYQ==
+X-Gm-Message-State: APjAAAVsXYa2GJd8If9th1WWxrOkq9TwVUvkoyHro4+SKfTo+xtnZ3ro
+ EX+PgvyRIi0Yj5ZAX976db9iY2+TrFuZCFKHuMfgnY+m6XA5SnmaVjTjEsTUqq7yHx9wzhZkCTN
+ GwN3rkZmnwUJd6nU=
+X-Received: by 2002:a0c:fb06:: with SMTP id c6mr20324531qvp.249.1572390084808; 
+ Tue, 29 Oct 2019 16:01:24 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxC6H2Qf4NmNRdcd8gqruKRp5YmZ2ttJ49a9YfOjoFugY3dZMfZ635m5NGqJxx7hqHjdZSqzQ==
+X-Received: by 2002:a0c:fb06:: with SMTP id c6mr20324510qvp.249.1572390084599; 
+ Tue, 29 Oct 2019 16:01:24 -0700 (PDT)
 Received: from redhat.com (94.222.26.109.rev.sfr.net. [109.26.222.94])
- by smtp.gmail.com with ESMTPSA id u27sm280302qtj.5.2019.10.29.16.00.38
+ by smtp.gmail.com with ESMTPSA id w131sm487444qka.85.2019.10.29.16.01.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Oct 2019 16:00:40 -0700 (PDT)
-Date: Tue, 29 Oct 2019 19:00:37 -0400
+ Tue, 29 Oct 2019 16:01:23 -0700 (PDT)
+Date: Tue, 29 Oct 2019 19:01:21 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/14] migration: allow unplug during migration for failover
- devices
-Message-ID: <20191029225932.14585-8-mst@redhat.com>
+Subject: [PULL 13/14] virtio_net: use RCU_READ_LOCK_GUARD
+Message-ID: <20191029225932.14585-14-mst@redhat.com>
 References: <20191029225932.14585-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -90,85 +89,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Jens Freimann <jfreimann@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jens Freimann <jfreimann@redhat.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-In "b06424de62 migration: Disable hotplug/unplug during migration" we
-added a check to disable unplug for all devices until we have figured
-out what works. For failover primary devices qdev_unplug() is called
-from the migration handler, i.e. during migration.
+Use RCU_READ_LOCK_GUARD rather than the manual rcu_read_(un)lock call.
 
-This patch adds a flag to DeviceState which is set to false for all
-devices and makes an exception for PCI devices that are also
-primary devices in a failover pair.
-
-Signed-off-by: Jens Freimann <jfreimann@redhat.com>
-Message-Id: <20191029114905.6856-8-jfreimann@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20191025103403.120616-3-dgilbert@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/core/qdev.c         | 1 +
- hw/pci/pci.c           | 1 +
- include/hw/qdev-core.h | 1 +
- qdev-monitor.c         | 2 +-
- 4 files changed, 4 insertions(+), 1 deletion(-)
+ hw/net/virtio-net.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 3b8d43d0fd..cf1ba28fe3 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -996,6 +996,7 @@ static void device_initfn(Object *obj)
+diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+index 314f365e7c..97a5113f7e 100644
+--- a/hw/net/virtio-net.c
++++ b/hw/net/virtio-net.c
+@@ -1490,12 +1490,9 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
+ static ssize_t virtio_net_do_receive(NetClientState *nc, const uint8_t *buf,
+                                   size_t size)
+ {
+-    ssize_t r;
++    RCU_READ_LOCK_GUARD();
  
-     dev->instance_id_alias = -1;
-     dev->realized = false;
-+    dev->allow_unplug_during_migration = false;
+-    rcu_read_lock();
+-    r = virtio_net_receive_rcu(nc, buf, size);
+-    rcu_read_unlock();
+-    return r;
++    return virtio_net_receive_rcu(nc, buf, size);
+ }
  
-     object_property_add_bool(obj, "realized",
-                              device_get_realized, device_set_realized, NULL);
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 824ab4ed7b..c68498c0de 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -2130,6 +2130,7 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
-             pci_qdev_unrealize(DEVICE(pci_dev), NULL);
-             return;
-         }
-+        qdev->allow_unplug_during_migration = true;
-     }
- 
-     /* rom loading */
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index 710981af36..1518495b1e 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -156,6 +156,7 @@ struct DeviceState {
-     bool pending_deleted_event;
-     QemuOpts *opts;
-     int hotplugged;
-+    bool allow_unplug_during_migration;
-     BusState *parent_bus;
-     QLIST_HEAD(, NamedGPIOList) gpios;
-     QLIST_HEAD(, BusState) child_bus;
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index ffa08c670f..e6b112eb0a 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -851,7 +851,7 @@ void qdev_unplug(DeviceState *dev, Error **errp)
-         return;
-     }
- 
--    if (!migration_is_idle()) {
-+    if (!migration_is_idle() && !dev->allow_unplug_during_migration) {
-         error_setg(errp, "device_del not allowed while migrating");
-         return;
-     }
+ static void virtio_net_rsc_extract_unit4(VirtioNetRscChain *chain,
 -- 
 MST
 
