@@ -2,68 +2,82 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD055CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 22:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38F32CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:03:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9442C20659
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 22:55:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="SmVcbjNn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9442C20659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hostfission.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0C4F720862
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:03:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C4F720862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPaOL-0004Pw-P1
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 18:55:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37833)
+	id 1iPaWE-0001ex-C0
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 19:03:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42903)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geoff@hostfission.com>) id 1iPaN4-0003Mv-F4
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 18:53:52 -0400
+ (envelope-from <mst@redhat.com>) id 1iPaTa-0008Ek-0C
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geoff@hostfission.com>) id 1iPaN3-0003xD-4p
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 18:53:50 -0400
-Received: from mail1.hostfission.com ([139.99.139.48]:35132)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <geoff@hostfission.com>) id 1iPaN2-0003v6-Ff
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 18:53:49 -0400
-Received: from www1.hostfission.com (www1.hostfission.com [139.99.139.52])
- by mail1.hostfission.com (Postfix) with ESMTP id 4C3E64BA08
- for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 09:53:46 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=hostfission.com;
- s=mail; t=1572389626;
- bh=0+U2r/elV5WDGiokxyhq45aA7qy6JvbBnLXwU6igEiE=;
- h=To:Subject:Date:From:In-Reply-To:References:From;
- b=SmVcbjNnxIt2dUrI7Gm/ZjKROtdoIhdhd81g8DlktWENuxDFdJcfejttjppvI7SZt
- gNy+c7i+wAObqJz6RPO+V75DjdqS6G9xBmjTPPur5P6CdBWciSU7K12MWdqfr+fWpO
- I9ec6g+V5gx8NWouNSIhzcruryaAPCeUyCKV2a5U=
-Received: by www1.hostfission.com (Postfix, from userid 1000)
- id 3DC3281EB8; Wed, 30 Oct 2019 09:53:46 +1100 (AEDT)
+ (envelope-from <mst@redhat.com>) id 1iPaTY-0003P6-TD
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38486)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iPaTW-0003MG-Pa
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:30 -0400
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 5EE2A6AAEA
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 23:00:29 +0000 (UTC)
+Received: by mail-qk1-f198.google.com with SMTP id 125so257816qkj.12
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 16:00:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=FA5/lZk6lCS/6yerSfbbf7h1FFYnvdpxuf5qIw8oeJs=;
+ b=S0ntEtBuZQr34OrEIpJj213WQNyTTbKMm1NQQvwCtLwJ0U2vCgktIT7uA1vsBTvKoo
+ OzhQ0suoWiKlumPerTVjWfB/4YekUPIFSy2V3pR92NpnG5eNBmLeHuJQlCmbWfZdulp7
+ a144kzwWZ7h/ec4bUJ2vBAhtuHY1SUyFN2131EhA3rPjn5Ci+FWCCP3MiE3/wb31CBCw
+ YhQnZ9jrYsCOLQofKG3wcvISNuWF+9DIToFYEGq0JhHy/w5ZzdfLGVgcdUUOegkq3R/s
+ GN/Io9qi47IgdOVbzNbLsZjJ6QsrQxSa456YJy0vaCQWpIZPsy6pFXQ0tasfdgfnvGJy
+ zNZw==
+X-Gm-Message-State: APjAAAWZs5c+NfI/aY3LAb6u4RnE78m+R5me4nlqmJT5VuLehun5OQjM
+ HbkG56udQoEHcFR/siGgo0u9+0FsdcY6nW0WEWESJ64rPbm3L1rPJa33LkQAa5vilwZj+bfBRND
+ f079iYufZ5xj+/Wg=
+X-Received: by 2002:a0c:f4d2:: with SMTP id o18mr26307281qvm.100.1572390028168; 
+ Tue, 29 Oct 2019 16:00:28 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxP5SguC9C8aiSQ1AqL2MM2XRiuj5MEnCf2QVm5/phGVMmBoCNsBVbiZ1b1OI3urtaGqH/DMQ==
+X-Received: by 2002:a0c:f4d2:: with SMTP id o18mr26307249qvm.100.1572390027902; 
+ Tue, 29 Oct 2019 16:00:27 -0700 (PDT)
+Received: from redhat.com (94.222.26.109.rev.sfr.net. [109.26.222.94])
+ by smtp.gmail.com with ESMTPSA id t58sm98238qta.78.2019.10.29.16.00.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 29 Oct 2019 16:00:27 -0700 (PDT)
+Date: Tue, 29 Oct 2019 19:00:23 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: Re: RFC: New device for zero-copy VM memory access
-X-PHP-Originating-Script: 0:rcube.php
+Subject: [PULL 04/14] pci: mark device having guest unplug request pending
+Message-ID: <20191029225932.14585-5-mst@redhat.com>
+References: <20191029225932.14585-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Wed, 30 Oct 2019 09:53:46 +1100
-From: geoff@hostfission.com
-In-Reply-To: <c83fe0e7157562c3c17598917977eb4d@hostfission.com>
-References: <c83fe0e7157562c3c17598917977eb4d@hostfission.com>
-Message-ID: <028c23b219913d1f734d95a05d2b5809@hostfission.com>
-X-Sender: geoff@hostfission.com
-User-Agent: Roundcube Webmail/1.2.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191029225932.14585-1-mst@redhat.com>
+X-Mailer: git-send-email 2.22.0.678.g13338e74b8
+X-Mutt-Fcc: =sent
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 139.99.139.48
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,92 +89,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Jens Freimann <jfreimann@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Just to follow this up, here is a sample client application for this 
-device
+From: Jens Freimann <jfreimann@redhat.com>
 
-https://gist.github.com/gnif/77e7fb54604b42a1a98ecb8bf3d2cf46
+Set pending_deleted_event in DeviceState for failover
+primary devices that were successfully unplugged by the Guest OS.
 
--Geoff
+Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+Message-Id: <20191029114905.6856-5-jfreimann@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/pci/pcie.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-On 2019-10-30 01:31, geoff@hostfission.com wrote:
-> Hi All,
-> 
-> Over the past week, I have been working to come up with a solution to 
-> the
-> memory transfer performance issues that hinder the Looking Glass 
-> Project.
-> 
-> Currently Looking Glass works by using the IVSHMEM shared memory device 
-> which
-> is fed by an application that captures the guest's video output. While 
-> this
-> works it is sub-optimal because we first have to perform a CPU copy of 
-> the
-> captured frame into shared RAM, and then back out again for display. 
-> Because
-> the destination buffers are allocated by closed proprietary code 
-> (DirectX, or
-> NVidia NvFBC) there is no way to have the frame placed directly into 
-> the
-> IVSHMEM shared ram.
-> 
-> This new device, currently named `introspection` (which needs a more 
-> suitable
-> name, porthole perhaps?), provides a means of translating guest 
-> physical
-> addresses to host virtual addresses, and finally to the host offsets in 
-> RAM for
-> file-backed memory guests. It does this by means of a simple protocol 
-> over a
-> unix socket (chardev) which is supplied the appropriate fd for the VM's 
-> system
-> RAM. The guest (in this case, Windows), when presented with the address 
-> of a
-> userspace buffer and size, will mlock the appropriate pages into RAM 
-> and pass
-> guest physical addresses to the virtual device.
-> 
-> This device and the windows driver have been designed in such a way 
-> that it's a
-> utility device for any project and/or application that could make use 
-> of it.
-> The PCI subsystem vendor and device ID are used to provide a means of 
-> device
-> identification in cases where multiple devices may be in use for 
-> differing
-> applications. This also allows one common driver to be used for any 
-> other
-> projects wishing to build on this device.
-> 
-> My ultimate goal is to get this to a state where it could be accepted 
-> upstream
-> into Qemu at which point Looking Glass would be modified to use it 
-> instead of
-> the IVSHMEM device.
-> 
-> My git repository with the new device can be found at:
-> https://github.com/gnif/qemu
-> 
-> The new device is:
-> https://github.com/gnif/qemu/blob/master/hw/misc/introspection.c
-> 
-> Looking Glass:
-> https://looking-glass.hostfission.com/
-> 
-> The windows driver, while working, needs some cleanup before the source 
-> is
-> published. I intend to maintain both this device and the windows driver
-> including producing a signed Windows 10 driver if Redhat are unwilling 
-> or
-> unable.
-> 
-> Kind Regards,
-> Geoffrey McRae
-> 
-> HostFission
-> https://hostfission.com
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 19363ff8ce..08718188bb 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -457,6 +457,7 @@ static void pcie_unplug_device(PCIBus *bus, PCIDevice *dev, void *opaque)
+     HotplugHandler *hotplug_ctrl = qdev_get_hotplug_handler(DEVICE(dev));
+ 
+     if (dev->partially_hotplugged) {
++        dev->qdev.pending_deleted_event = false;
+         return;
+     }
+     hotplug_handler_unplug(hotplug_ctrl, DEVICE(dev), &error_abort);
+@@ -476,6 +477,8 @@ void pcie_cap_slot_unplug_request_cb(HotplugHandler *hotplug_dev,
+         return;
+     }
+ 
++    dev->pending_deleted_event = true;
++
+     /* In case user cancel the operation of multi-function hot-add,
+      * remove the function that is unexposed to guest individually,
+      * without interaction with guest.
+-- 
+MST
+
 
