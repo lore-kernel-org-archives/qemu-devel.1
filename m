@@ -2,70 +2,80 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC60CA9EC0
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 02:00:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D033CA9EC0
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 02:41:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DFF921835
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 02:00:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DFF921835
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id EB5C020862
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 02:41:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KTylI1cT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB5C020862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPGnj-0001u4-96
-	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 22:00:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51684)
+	id 1iPHRO-0006ZF-RQ
+	for qemu-devel@archiver.kernel.org; Mon, 28 Oct 2019 22:41:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54396)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iPGn6-0001LS-2i
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 21:59:25 -0400
+ (envelope-from <jasowang@redhat.com>) id 1iPHPP-0004jN-Kx
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:39:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iPGn4-0004E3-6d
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 21:59:23 -0400
-Resent-Date: Mon, 28 Oct 2019 21:59:23 -0400
-Resent-Message-Id: <E1iPGn4-0004E3-6d@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21453)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iPGn3-0004Dp-VT
- for qemu-devel@nongnu.org; Mon, 28 Oct 2019 21:59:22 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1572314338; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=aALoKZaQn4nFqs4b7bu2MDy6wdyb81U/Y0cKJJwO/01t3mlRgQ/2IRIbXOMGw4J2CbBPJWmgBnM21jat7T5sg/m/pIe4I0li11s+V1FqDhu+wyeo2XrgdEac0FwSmmVUTyQBgOh84C7ueVsKBJHSqZltW0Y5oR5ObCOA1hPCXtc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1572314338;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=La20kyd/pawRSJOGyRPTCuDBr6TNz1zby+BP6qadMoM=; 
- b=JbxWoJ7Seig1VkPjqIvjW57j+RFTTqMcKUy3YNM2zZP5/9slK1QDQGC4BYdhnkWPDiWEcvArci2OsKU49Xar33ljhMXzlSvwCjRk9H9w7hU/hX+9oyGB3k6qj85GPpVQCK1wxi77JixaD3ClTJmxfUtZzxJOfb1O88wj38miKcs=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1572314336499244.93313887708666;
- Mon, 28 Oct 2019 18:58:56 -0700 (PDT)
-In-Reply-To: <20191028163447.18541-1-philmd@redhat.com>
-Subject: Re: [PULL 00/20] hw/i386/pc: Split PIIX3 southbridge from i440FX
- northbridge
-Message-ID: <157231433519.12254.8903227661805058824@37313f22b938>
+ (envelope-from <jasowang@redhat.com>) id 1iPHOW-0002ew-Rg
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:38:05 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21004
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iPHOW-0002eb-NV
+ for qemu-devel@nongnu.org; Mon, 28 Oct 2019 22:38:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572316684;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Mqq0QtQcB1VeeGQg9dyFErPwgJ5qa8fOfYbjpHI7h6o=;
+ b=KTylI1cTrlCknpJLNpAJdOU4Mw6TWNp9cm8d1cJkpRPg6kF/7shiUu6LJSF06WYjnodJBx
+ i0c7y6Z+/lXW3qw7J3yOHehwtWXTIGQvpQGU/5swM2sv7GtBbHmQWCUK24MPA8xQ/qko+O
+ v6kjoQ1jVTltSvont5MXbG+gvg3VQ9Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-241-PSTmyjbXO42rL6AXni4phQ-1; Mon, 28 Oct 2019 22:38:00 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 517285E6;
+ Tue, 29 Oct 2019 02:37:59 +0000 (UTC)
+Received: from jason-ThinkPad-T430s.redhat.com (ovpn-12-230.pek2.redhat.com
+ [10.72.12.230])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 383C219C77;
+ Tue, 29 Oct 2019 02:37:56 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: qemu-devel@nongnu.org,
+	peter.maydell@linaro.org
+Subject: [PULL V2 4/4] COLO-compare: Fix incorrect `if` logic
+Date: Tue, 29 Oct 2019 10:37:41 +0800
+Message-Id: <1572316661-20043-5-git-send-email-jasowang@redhat.com>
+In-Reply-To: <1572316661-20043-1-git-send-email-jasowang@redhat.com>
+References: <1572316661-20043-1-git-send-email-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: philmd@redhat.com
-Date: Mon, 28 Oct 2019 18:58:56 -0700 (PDT)
-X-ZohoMailClient: External
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: PSTmyjbXO42rL6AXni4phQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,109 +87,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, hpoussin@reactos.org, amarkovic@wavecomp.com,
- pbonzini@redhat.com, philmd@redhat.com, aurelien@aurel32.net
+Cc: Jason Wang <jasowang@redhat.com>, Fan Yang <Fan_Yang@sjtu.edu.cn>,
+ qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyODE2MzQ0Ny4xODU0
-MS0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUFVMTCAwMC8yMF0gaHcvaTM4Ni9wYzogU3BsaXQgUElJWDMg
-c291dGhicmlkZ2UgZnJvbSBpNDQwRlggbm9ydGhicmlkZ2UKVHlwZTogc2VyaWVzCk1lc3NhZ2Ut
-aWQ6IDIwMTkxMDI4MTYzNDQ3LjE4NTQxLTEtcGhpbG1kQHJlZGhhdC5jb20KCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxs
-IHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdv
-cml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4u
-Cj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CjE5N2YzYzIgaHcvcGNpLWhvc3QvaTQ0MGZ4OiBSZW1vdmUgdGhlIGxhc3QgUElJWDMgdHJhY2Vz
-CjE1NzhjNTIgaHcvcGNpLWhvc3Q6IFJlbmFtZSBpbmNvcnJlY3RseSBuYW1lZCAncGlpeCcgYXMg
-J2k0NDBmeCcKMGNmOTU3YSBody9wY2ktaG9zdC9waWl4OiBFeHRyYWN0IFBJSVgzIGZ1bmN0aW9u
-cyB0byBody9pc2EvcGlpeDMuYwoyYmJmOWMyIGh3L3BjaS1ob3N0L3BpaXg6IEZpeCBjb2RlIHN0
-eWxlIGlzc3VlcwozMDRhNDAyIGh3L3BjaS1ob3N0L3BpaXg6IE1vdmUgaTQ0MEZYIGRlY2xhcmF0
-aW9ucyB0byBody9wY2ktaG9zdC9pNDQwZnguaAo4OTNlNzlmIGh3L3BjaS1ob3N0L3BpaXg6IERl
-ZmluZSBhbmQgdXNlIHRoZSBQSUlYIElSUSBSb3V0ZSBDb250cm9sIFJlZ2lzdGVycwo4ZjNjOTA1
-IGh3L3BjaS1ob3N0L3BpaXg6IE1vdmUgUkNSX0lPUE9SVCByZWdpc3RlciBkZWZpbml0aW9uCjc5
-OTQ0MWIgaHcvcGNpLWhvc3QvcGlpeDogRXh0cmFjdCBwaWl4M19jcmVhdGUoKQo3NDEyMjliIGh3
-L2kzODY6IFJlbW92ZSBvYnNvbGV0ZSBMb2FkU3RhdGVIYW5kbGVyOjpsb2FkX3N0YXRlX29sZCBo
-YW5kbGVycwo1MmRmYzMwIGh3L2lzYS9waWl4NDogTW92ZSBwaWl4NF9jcmVhdGUoKSB0byBody9p
-c2EvcGlpeDQuYwo2NDc4YjIxIGh3L21pcHMvbWlwc19tYWx0YTogRXh0cmFjdCB0aGUgUElJWDQg
-Y3JlYXRpb24gY29kZSBhcyBwaWl4NF9jcmVhdGUoKQo3Y2UwNzhlIGh3L21pcHMvbWlwc19tYWx0
-YTogQ3JlYXRlIElERSBoYXJkIGRyaXZlIGFycmF5IGR5bmFtaWNhbGx5CmEyMGZmYjEgcGlpeDQ6
-IEFkZCBhIE1DMTQ2ODE4IFJUQyBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQK
-MWZhZjc0ZCBwaWl4NDogQWRkIGFuIGk4MjU0IFBJVCBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBp
-biBkYXRhc2hlZXQKNWZhOTFhOCBwaWl4NDogQWRkIGFuIGk4MjU3IERNQSBDb250cm9sbGVyIGFz
-IHNwZWNpZmllZCBpbiBkYXRhc2hlZXQKOWY3Mjg0MSBwaWl4NDogUmVuYW1lIFBJSVg0IG9iamVj
-dCB0byBwaWl4NC1pc2EKYjM1YzU2ZCBSZXZlcnQgImlycTogaW50cm9kdWNlIHFlbXVfaXJxX3By
-b3h5KCkiCmU2YTA3NTYgcGlpeDQ6IEFkZCBhbiBpODI1OSBJbnRlcnJ1cHQgQ29udHJvbGxlciBh
-cyBzcGVjaWZpZWQgaW4gZGF0YXNoZWV0CjFiMzgzMTEgcGlpeDQ6IEFkZCB0aGUgUmVzZXQgQ29u
-dHJvbCBSZWdpc3RlcgpiNGJjNjZmIE1BSU5UQUlORVJTOiBLZWVwIFBJSVg0IFNvdXRoIEJyaWRn
-ZSBzZXBhcmF0ZSBmcm9tIFBDIENoaXBzZXRzCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzIwIENo
-ZWNraW5nIGNvbW1pdCBiNGJjNjZmNGRhODcgKE1BSU5UQUlORVJTOiBLZWVwIFBJSVg0IFNvdXRo
-IEJyaWRnZSBzZXBhcmF0ZSBmcm9tIFBDIENoaXBzZXRzKQoyLzIwIENoZWNraW5nIGNvbW1pdCAx
-YjM4MzExZTNjNzkgKHBpaXg0OiBBZGQgdGhlIFJlc2V0IENvbnRyb2wgUmVnaXN0ZXIpCjMvMjAg
-Q2hlY2tpbmcgY29tbWl0IGU2YTA3NTZjOTYxMiAocGlpeDQ6IEFkZCBhbiBpODI1OSBJbnRlcnJ1
-cHQgQ29udHJvbGxlciBhcyBzcGVjaWZpZWQgaW4gZGF0YXNoZWV0KQo0LzIwIENoZWNraW5nIGNv
-bW1pdCBiMzVjNTZkMmFmYjUgKFJldmVydCAiaXJxOiBpbnRyb2R1Y2UgcWVtdV9pcnFfcHJveHko
-KSIpCjUvMjAgQ2hlY2tpbmcgY29tbWl0IDlmNzI4NDFiZjZiYSAocGlpeDQ6IFJlbmFtZSBQSUlY
-NCBvYmplY3QgdG8gcGlpeDQtaXNhKQo2LzIwIENoZWNraW5nIGNvbW1pdCA1ZmE5MWE4ZDJhMjgg
-KHBpaXg0OiBBZGQgYW4gaTgyNTcgRE1BIENvbnRyb2xsZXIgYXMgc3BlY2lmaWVkIGluIGRhdGFz
-aGVldCkKNy8yMCBDaGVja2luZyBjb21taXQgMWZhZjc0ZGJkNGZkIChwaWl4NDogQWRkIGFuIGk4
-MjU0IFBJVCBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQpCjgvMjAgQ2hlY2tp
-bmcgY29tbWl0IGEyMGZmYjExOWQwOSAocGlpeDQ6IEFkZCBhIE1DMTQ2ODE4IFJUQyBDb250cm9s
-bGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE5MzogCmRl
-bGV0ZWQgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxNjYg
-bGluZXMgY2hlY2tlZAoKUGF0Y2ggOC8yMCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
-ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
-ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo5LzIw
-IENoZWNraW5nIGNvbW1pdCA3Y2UwNzhlMzg4MjQgKGh3L21pcHMvbWlwc19tYWx0YTogQ3JlYXRl
-IElERSBoYXJkIGRyaXZlIGFycmF5IGR5bmFtaWNhbGx5KQoxMC8yMCBDaGVja2luZyBjb21taXQg
-NjQ3OGIyMTNmZjI3IChody9taXBzL21pcHNfbWFsdGE6IEV4dHJhY3QgdGhlIFBJSVg0IGNyZWF0
-aW9uIGNvZGUgYXMgcGlpeDRfY3JlYXRlKCkpCjExLzIwIENoZWNraW5nIGNvbW1pdCA1MmRmYzMw
-ZmNkYWEgKGh3L2lzYS9waWl4NDogTW92ZSBwaWl4NF9jcmVhdGUoKSB0byBody9pc2EvcGlpeDQu
-YykKMTIvMjAgQ2hlY2tpbmcgY29tbWl0IDc0MTIyOWIyOWZjYiAoaHcvaTM4NjogUmVtb3ZlIG9i
-c29sZXRlIExvYWRTdGF0ZUhhbmRsZXI6OmxvYWRfc3RhdGVfb2xkIGhhbmRsZXJzKQoxMy8yMCBD
-aGVja2luZyBjb21taXQgNzk5NDQxYmVkYTlmIChody9wY2ktaG9zdC9waWl4OiBFeHRyYWN0IHBp
-aXgzX2NyZWF0ZSgpKQoxNC8yMCBDaGVja2luZyBjb21taXQgOGYzYzkwNWVmZjQ1IChody9wY2kt
-aG9zdC9waWl4OiBNb3ZlIFJDUl9JT1BPUlQgcmVnaXN0ZXIgZGVmaW5pdGlvbikKMTUvMjAgQ2hl
-Y2tpbmcgY29tbWl0IDg5M2U3OWYyZWE2NyAoaHcvcGNpLWhvc3QvcGlpeDogRGVmaW5lIGFuZCB1
-c2UgdGhlIFBJSVggSVJRIFJvdXRlIENvbnRyb2wgUmVnaXN0ZXJzKQoxNi8yMCBDaGVja2luZyBj
-b21taXQgMzA0YTQwMmIzZDkyIChody9wY2ktaG9zdC9waWl4OiBNb3ZlIGk0NDBGWCBkZWNsYXJh
-dGlvbnMgdG8gaHcvcGNpLWhvc3QvaTQ0MGZ4LmgpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBk
-ZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzk4OiAKbmV3
-IGZpbGUgbW9kZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTAxIGxpbmVz
-IGNoZWNrZWQKClBhdGNoIDE2LzIwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4g
-IElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0
-byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE3LzIwIENo
-ZWNraW5nIGNvbW1pdCAyYmJmOWMyYmRlNGIgKGh3L3BjaS1ob3N0L3BpaXg6IEZpeCBjb2RlIHN0
-eWxlIGlzc3VlcykKMTgvMjAgQ2hlY2tpbmcgY29tbWl0IDBjZjk1N2E5YTU1YiAoaHcvcGNpLWhv
-c3QvcGlpeDogRXh0cmFjdCBQSUlYMyBmdW5jdGlvbnMgdG8gaHcvaXNhL3BpaXgzLmMpCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzY1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9SOiBzcGFjZXMgcmVx
-dWlyZWQgYXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojMzE0OiBGSUxFOiBody9pc2EvcGlpeDMu
-YzoyNDU6CisgICAgLnN1YnNlY3Rpb25zID0gKGNvbnN0IFZNU3RhdGVEZXNjcmlwdGlvbipbXSkg
-ewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDog
-MSBlcnJvcnMsIDEgd2FybmluZ3MsIDkzNyBsaW5lcyBjaGVja2VkCgpQYXRjaCAxOC8yMCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
-ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTkvMjAgQ2hlY2tpbmcgY29tbWl0IDE1NzhjNTIxNmEy
-OSAoaHcvcGNpLWhvc3Q6IFJlbmFtZSBpbmNvcnJlY3RseSBuYW1lZCAncGlpeCcgYXMgJ2k0NDBm
-eCcpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRB
-SU5FUlMgbmVlZCB1cGRhdGluZz8KIzY5OiAKcmVuYW1lIGZyb20gaHcvcGNpLWhvc3QvcGlpeC5j
-Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDMyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDE5
-LzIwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjIwLzIwIENoZWNraW5nIGNvbW1pdCAxOTdm
-M2MyNjJhM2EgKGh3L3BjaS1ob3N0L2k0NDBmeDogUmVtb3ZlIHRoZSBsYXN0IFBJSVgzIHRyYWNl
-cykKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoK
-ClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAx
-OTEwMjgxNjM0NDcuMTg1NDEtMS1waGlsbWRAcmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gv
-P3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNo
-ZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBw
-YXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+From: Fan Yang <Fan_Yang@sjtu.edu.cn>
+
+'colo_mark_tcp_pkt' should return 'true' when packets are the same, and
+'false' otherwise.  However, it returns 'true' when
+'colo_compare_packet_payload' returns non-zero while
+'colo_compare_packet_payload' is just a 'memcmp'.  The result is that
+COLO-compare reports inconsistent TCP packets when they are actually
+the same.
+
+Fixes: f449c9e549c ("colo: compare the packet based on the tcp sequence num=
+ber")
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Signed-off-by: Fan Yang <Fan_Yang@sjtu.edu.cn>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ net/colo-compare.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 7489840..7ee17f2 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -319,7 +319,7 @@ static bool colo_mark_tcp_pkt(Packet *ppkt, Packet *spk=
+t,
+     *mark =3D 0;
+=20
+     if (ppkt->tcp_seq =3D=3D spkt->tcp_seq && ppkt->seq_end =3D=3D spkt->s=
+eq_end) {
+-        if (colo_compare_packet_payload(ppkt, spkt,
++        if (!colo_compare_packet_payload(ppkt, spkt,
+                                         ppkt->header_size, spkt->header_si=
+ze,
+                                         ppkt->payload_size)) {
+             *mark =3D COLO_COMPARE_FREE_SECONDARY | COLO_COMPARE_FREE_PRIM=
+ARY;
+@@ -329,7 +329,7 @@ static bool colo_mark_tcp_pkt(Packet *ppkt, Packet *spk=
+t,
+=20
+     /* one part of secondary packet payload still need to be compared */
+     if (!after(ppkt->seq_end, spkt->seq_end)) {
+-        if (colo_compare_packet_payload(ppkt, spkt,
++        if (!colo_compare_packet_payload(ppkt, spkt,
+                                         ppkt->header_size + ppkt->offset,
+                                         spkt->header_size + spkt->offset,
+                                         ppkt->payload_size - ppkt->offset)=
+) {
+@@ -348,7 +348,7 @@ static bool colo_mark_tcp_pkt(Packet *ppkt, Packet *spk=
+t,
+         /* primary packet is longer than secondary packet, compare
+          * the same part and mark the primary packet offset
+          */
+-        if (colo_compare_packet_payload(ppkt, spkt,
++        if (!colo_compare_packet_payload(ppkt, spkt,
+                                         ppkt->header_size + ppkt->offset,
+                                         spkt->header_size + spkt->offset,
+                                         spkt->payload_size - spkt->offset)=
+) {
+--=20
+2.5.0
 
 
