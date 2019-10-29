@@ -2,87 +2,84 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1557CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08596CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:45:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9BF920717
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:44:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B68DC20717
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:45:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HSQYkoeb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9BF920717
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZ1aQcEB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B68DC20717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPZI8-0006UL-VT
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 17:44:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36803)
+	id 1iPZIX-0006d4-PL
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 17:45:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36731)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iPYzz-0002Ln-Oz
+ (envelope-from <mrolnik@gmail.com>) id 1iPYzv-0002I9-FN
  for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iPYzx-0008VK-IQ
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:55 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:41795)
+ (envelope-from <mrolnik@gmail.com>) id 1iPYzp-0008Mb-Ju
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:49 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45996)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iPYzv-0008Ro-Fa
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:53 -0400
-Received: by mail-wr1-x431.google.com with SMTP id p4so15236849wrm.8
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 14:25:50 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iPYzl-0008I0-JG
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:43 -0400
+Received: by mail-wr1-x443.google.com with SMTP id q13so15212355wrs.12
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 14:25:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=iKfEk+z+TXN2xvp7jmgdiUZVCFR1Of+sYzS2Fb4La04=;
- b=HSQYkoebLry9gFjZG1tGHZLzc19fxpf68LfGqWys1bC7uiVoRJmeZql8aA7FgDLu8V
- 79kSvgoLJHlgzXIc18dLNclWyYteUqZhuCDeQZVgVpPuAS4PbRsRlPvd2AER8uscViZJ
- 5/Gmk4CecbmTP3W1+7ZW1S+Au9WZA3FTbwmr+L+ay6He3FqRAT0Z401XKmfXN++0qUeK
- LbFDuUhSxMWyNi99Ry2Cg+LSiH2VaWitwkBJSkhVVA7NmLVTYtdeTXCl+UPi4GGphOQi
- aWz2XAZYcTk+AxsDPj03ize9H0YC+z6QUXWte18unZeDxBxRnd0iGoTH1+UiSveN5amg
- bb5Q==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=PDvO1rvE0ZwIMwmyQXzDOgpL6QiwzoaK0zBS+hQZVKY=;
+ b=XZ1aQcEBCSwAxdtVW3/D1nU7R2zq2z+RcFbrT2bV9qLDxp7E1oGbj3s5LmiE/cyJwv
+ 82ZCatUuU1IsurcEBZTFy+wGaFh/L6rRp8pC9MH0YG3/J2osQ1HpNSN0dM9iXiX1hoet
+ HdXEqncKwAOTbVoqGNE+jlRvtswPg/BqgblBL4jS4s4Iw7mwtPW8rEdi71LP2hQjgTaA
+ 5duHjmJEabk2RuPnxgtJA17WRJXW9JrZb7OsXnRsX4IDVJ9ClmzQUqJOdl/HITgNVK0y
+ CPVe+N5uGkD54/Qkru+J8Ctm145SeXkVGY2XZ7lqp2X/ur6xPDbz+NLaie+6hvoQGnX9
+ 0QUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=iKfEk+z+TXN2xvp7jmgdiUZVCFR1Of+sYzS2Fb4La04=;
- b=tR2G6+dNmhDWNdM/J9iPNN8Ui9ArpV0Pxset8c4JVmCMq6Y/vSK3evj0XNlJJeosdI
- l5gyTySrNu8ddnmEOiyl+E3vUuoqFrfAQea2FzFHfYyXkUiNyZwCgUbeqrrmZUXs/F9l
- xjRptYz9WT87u7an+IT4QsexPVH7JPeGW2l+u4ug/tDK4e4ycE3Gprld5scawnFJ1V4J
- vvhNUU0D8ZrE32QLxAQ74xH2Dice0nWo9pRnWTg7zhuiQ7hhdJ7zTAUC6fNyvpcxu4vH
- qaX6tnLtJ4Kh6noTiuB2pYJ9yEofH/gBhVJY2mnljVpJLOuQiW68UHIldmJsRjU3JBQn
- 8gkw==
-X-Gm-Message-State: APjAAAVu4zC2dlZsLoP+nHFbAj3XHIlLvK6Vg7nkwDwBXyNhyyFS5Dx3
- pjYeCBL74E+tMNb/fl+1zhK66x6LlhMDxA==
-X-Google-Smtp-Source: APXvYqz64Je3TRfa5x0+86t+xoNK1QIi3SRLorUzmUjlLPE39u9uqSUHW4MZHhXMwTcYPx78CSHQfg==
-X-Received: by 2002:adf:9f08:: with SMTP id l8mr20784081wrf.325.1572384349470; 
- Tue, 29 Oct 2019 14:25:49 -0700 (PDT)
+ :references;
+ bh=PDvO1rvE0ZwIMwmyQXzDOgpL6QiwzoaK0zBS+hQZVKY=;
+ b=UugAaZuU5l4v3g3+i5AqdhhCE9Sm5GOgNF66VaUDBaKV/W+EMWw+MkSRp5E2yqhZPV
+ JoAR+stNoFycSQHYp+A2SnyGXPRTl+6e94H9WtDWaB0+pG9AsHSiCAae/nLjjYj1YXun
+ NgCk3yAsorL5t06bDNk02LP16oZjmk/uTWqo7UawlRPiPt4/OnV6HCriNVM61RL0uOlw
+ he2Zu/k7n//aLnx0FSFCZWhVhk+2GMoOSEO1ex3P83csxnpdH43pfqgO5vsmrYgojjyJ
+ esrJDX32cecACgP+3YLGdQzNPHTR3fXNRnBMBl9JhPk/eioLoF150oUGv+8wcYT4omgy
+ kozA==
+X-Gm-Message-State: APjAAAW+toU6tOhoRu6Gt7cg++qpw/qw11d0m1vcHUKpei2P/3NiGJWl
+ 7gKavGkh3HCAQEppyY3FsAxHirSUUomGoA==
+X-Google-Smtp-Source: APXvYqz5f4uxBD70eBlrEQybK5OgrT1MkB64PlHLFPPK2beExgFjOVGvQPOyBfY0RqE6EqSEPPbVxQ==
+X-Received: by 2002:adf:ea07:: with SMTP id q7mr21085861wrm.102.1572384339270; 
+ Tue, 29 Oct 2019 14:25:39 -0700 (PDT)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-79-178-97-184.red.bezeqint.net. [79.178.97.184])
- by smtp.gmail.com with ESMTPSA id 200sm4924730wme.32.2019.10.29.14.25.48
+ by smtp.gmail.com with ESMTPSA id 200sm4924730wme.32.2019.10.29.14.25.37
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Tue, 29 Oct 2019 14:25:49 -0700 (PDT)
+ Tue, 29 Oct 2019 14:25:38 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v35 13/13] target/avr: Add tests
-Date: Tue, 29 Oct 2019 23:24:30 +0200
-Message-Id: <20191029212430.20617-14-mrolnik@gmail.com>
+Subject: [PATCH v35 07/13] target/avr: Add instruction translation - Bit and
+ Bit-test Instructions
+Date: Tue, 29 Oct 2019 23:24:24 +0200
+Message-Id: <20191029212430.20617-8-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
 In-Reply-To: <20191029212430.20617-1-mrolnik@gmail.com>
 References: <20191029212430.20617-1-mrolnik@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::431
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,109 +98,1157 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-1. Avocado test
-    The test is based on
-    https://github.com/seharris/qemu-avr-tests/tree/master/free-rtos/Demo
-    demo which. If working correctly, prints 'ABCDEFGHIJKLMNOPQRSTUVWX' out.
-    it also demostrates that timer and IRQ are working
-
-2. Boot serial test
-    Print out 'T' through serial port
+This includes:
+    - LSR, ROR
+    - ASR
+    - SWAP
+    - SBI, CBI
+    - BST, BLD
+    - BSET, BCLR
 
 Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Acked-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/Makefile.include           |  2 ++
- tests/acceptance/machine_avr6.py | 36 ++++++++++++++++++++++++++++++++
- tests/boot-serial-test.c         | 10 +++++++++
- 3 files changed, 48 insertions(+)
- create mode 100644 tests/acceptance/machine_avr6.py
+ target/avr/translate.c | 1123 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 1123 insertions(+)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 7f487f65e7..3c077f6ca4 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -206,6 +206,8 @@ check-qtest-i386-y += tests/test-x86-cpuid-compat$(EXESUF)
- check-qtest-i386-y += tests/numa-test$(EXESUF)
- check-qtest-x86_64-y += $(check-qtest-i386-y)
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 4ef3294a40..f2ec2e2d2f 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -304,6 +304,15 @@ static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
+ }
  
-+check-qtest-avr-y += tests/boot-serial-test$(EXESUF)
-+
- check-qtest-alpha-y += tests/boot-serial-test$(EXESUF)
- check-qtest-alpha-$(CONFIG_VGA) += tests/display-vga-test$(EXESUF)
  
-diff --git a/tests/acceptance/machine_avr6.py b/tests/acceptance/machine_avr6.py
-new file mode 100644
-index 0000000000..0601080b01
---- /dev/null
-+++ b/tests/acceptance/machine_avr6.py
-@@ -0,0 +1,36 @@
-+import logging
-+import time
-+import distutils.spawn
++static void gen_rshift_ZNVSf(TCGv R)
++{
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
++    tcg_gen_shri_tl(cpu_Nf, R, 7); /* Nf = R(7) */
++    tcg_gen_xor_tl(cpu_Vf, cpu_Nf, cpu_Cf);
++    tcg_gen_xor_tl(cpu_Sf, cpu_Nf, cpu_Vf); /* Sf = Nf ^ Vf */
++}
 +
-+from avocado import skipUnless
-+from avocado_qemu import Test
-+from avocado.utils import process
 +
-+class AVR6Machine(Test):
-+    timeout = 5
-+
-+    def test_freertos(self):
-+        """
-+        :avocado: tags=arch:avr
-+        :avocado: tags=machine:sample
-+        """
-+        """
-+        https://github.com/seharris/qemu-avr-tests/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf
-+        constantly prints out 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
-+        """
-+        rom_url = 'https://github.com/seharris/qemu-avr-tests'
-+        rom_url += '/raw/master/free-rtos/Demo/AVR_ATMega2560_GCC/demo.elf'
-+        rom_hash = '7eb521f511ca8f2622e0a3c5e8dd686efbb911d4'
-+        rom_path = self.fetch_asset(rom_url, asset_hash=rom_hash)
-+
-+        self.vm.set_machine('sample')
-+        self.vm.add_args('-bios', rom_path)
-+        self.vm.add_args('-nographic')
-+        self.vm.launch()
-+
-+        time.sleep(2)
-+        self.vm.shutdown()
-+
-+        match = 'ABCDEFGHIJKLMNOPQRSTUVWXABCDEFGHIJKLMNOPQRSTUVWX'
-+
-+        self.assertIn(match, self.vm.get_log())
-diff --git a/tests/boot-serial-test.c b/tests/boot-serial-test.c
-index d3a54a0ba5..1121ed0db2 100644
---- a/tests/boot-serial-test.c
-+++ b/tests/boot-serial-test.c
-@@ -16,6 +16,15 @@
- #include "qemu/osdep.h"
- #include "libqtest.h"
+ /*
+  *  Adds two registers without the C Flag and places the result in the
+  *  destination register Rd.
+@@ -1495,3 +1504,1117 @@ static bool trans_BRBS(DisasContext *ctx, arg_BRBS *a)
+     return true;
+ }
  
-+static const uint8_t bios_avr[] = {
-+    0x88, 0xe0,             /* ldi r24, 0x08   */
-+    0x80, 0x93, 0xc1, 0x00, /* sts 0x00C1, r24 ; Enable tx */
-+    0x86, 0xe0,             /* ldi r24, 0x06   */
-+    0x80, 0x93, 0xc2, 0x00, /* sts 0x00C2, r24 ; Set the data bits to 8 */
-+    0x84, 0xe5,             /* ldi r24, 0x54   */
-+    0x80, 0x93, 0xc6, 0x00, /* sts 0x00C6, r24 ; Output 'T' */
-+};
 +
- static const uint8_t kernel_mcf5208[] = {
-     0x41, 0xf9, 0xfc, 0x06, 0x00, 0x00,     /* lea 0xfc060000,%a0 */
-     0x10, 0x3c, 0x00, 0x54,                 /* move.b #'T',%d0 */
-@@ -103,6 +112,7 @@ typedef struct testdef {
- 
- static testdef_t tests[] = {
-     { "alpha", "clipper", "", "PCI:" },
-+    { "avr", "sample", "", "T", sizeof(bios_avr), NULL, bios_avr },
-     { "ppc", "ppce500", "", "U-Boot" },
-     { "ppc", "40p", "-vga none -boot d", "Trying cd:," },
-     { "ppc", "g3beige", "", "PowerPC,750" },
++/*
++ *  This instruction makes a copy of one register into another. The source
++ *  register Rr is left unchanged, while the destination register Rd is loaded
++ *  with a copy of Rr.
++ */
++static bool trans_MOV(DisasContext *ctx, arg_MOV *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv Rr = cpu_r[a->rr];
++
++    tcg_gen_mov_tl(Rd, Rr);
++
++    return true;
++}
++
++
++/*
++ *  This instruction makes a copy of one register pair into another register
++ *  pair. The source register pair Rr+1:Rr is left unchanged, while the
++ *  destination register pair Rd+1:Rd is loaded with a copy of Rr + 1:Rr.  This
++ *  instruction is not available in all devices. Refer to the device specific
++ *  instruction set summary.
++ */
++static bool trans_MOVW(DisasContext *ctx, arg_MOVW *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_MOVW)) {
++        return true;
++    }
++
++    TCGv RdL = cpu_r[a->rd];
++    TCGv RdH = cpu_r[a->rd + 1];
++    TCGv RrL = cpu_r[a->rr];
++    TCGv RrH = cpu_r[a->rr + 1];
++
++    tcg_gen_mov_tl(RdH, RrH);
++    tcg_gen_mov_tl(RdL, RrL);
++
++    return true;
++}
++
++
++/*
++ * Loads an 8 bit constant directly to register 16 to 31.
++ */
++static bool trans_LDI(DisasContext *ctx, arg_LDI *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    int imm = a->imm;
++
++    tcg_gen_movi_tl(Rd, imm);
++
++    return true;
++}
++
++
++/*
++ *  Loads one byte from the data space to a register. For parts with SRAM,
++ *  the data space consists of the Register File, I/O memory and internal SRAM
++ *  (and external SRAM if applicable). For parts without SRAM, the data space
++ *  consists of the register file only. The EEPROM has a separate address space.
++ *  A 16-bit address must be supplied. Memory access is limited to the current
++ *  data segment of 64KB. The LDS instruction uses the RAMPD Register to access
++ *  memory above 64KB. To access another data segment in devices with more than
++ *  64KB data space, the RAMPD in register in the I/O area has to be changed.
++ *  This instruction is not available in all devices. Refer to the device
++ *  specific instruction set summary.
++ */
++static bool trans_LDS(DisasContext *ctx, arg_LDS *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = tcg_temp_new_i32();
++    TCGv H = cpu_rampD;
++    a->imm = next_word(ctx);
++
++    tcg_gen_mov_tl(addr, H); /* addr = H:M:L */
++    tcg_gen_shli_tl(addr, addr, 16);
++    tcg_gen_ori_tl(addr, addr, a->imm);
++
++    gen_data_load(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Loads one byte indirect from the data space to a register. For parts
++ *  with SRAM, the data space consists of the Register File, I/O memory and
++ *  internal SRAM (and external SRAM if applicable). For parts without SRAM, the
++ *  data space consists of the Register File only. In some parts the Flash
++ *  Memory has been mapped to the data space and can be read using this command.
++ *  The EEPROM has a separate address space.  The data location is pointed to by
++ *  the X (16 bits) Pointer Register in the Register File. Memory access is
++ *  limited to the current data segment of 64KB. To access another data segment
++ *  in devices with more than 64KB data space, the RAMPX in register in the I/O
++ *  area has to be changed.  The X-pointer Register can either be left unchanged
++ *  by the operation, or it can be post-incremented or predecremented.  These
++ *  features are especially suited for accessing arrays, tables, and Stack
++ *  Pointer usage of the X-pointer Register. Note that only the low byte of the
++ *  X-pointer is updated in devices with no more than 256 bytes data space. For
++ *  such devices, the high byte of the pointer is not used by this instruction
++ *  and can be used for other purposes. The RAMPX Register in the I/O area is
++ *  updated in parts with more than 64KB data space or more than 64KB Program
++ *  memory, and the increment/decrement is added to the entire 24-bit address on
++ *  such devices.  Not all variants of this instruction is available in all
++ *  devices. Refer to the device specific instruction set summary.  In the
++ *  Reduced Core tinyAVR the LD instruction can be used to achieve the same
++ *  operation as LPM since the program memory is mapped to the data memory
++ *  space.
++ */
++static bool trans_LDX1(DisasContext *ctx, arg_LDX1 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_xaddr();
++
++    gen_data_load(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LDX2(DisasContext *ctx, arg_LDX2 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_xaddr();
++
++    gen_data_load(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++
++    gen_set_xaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LDX3(DisasContext *ctx, arg_LDX3 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_xaddr();
++
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_load(ctx, Rd, addr);
++    gen_set_xaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_STX1(DisasContext *ctx, arg_STX1 *a)
++{
++    TCGv Rd = cpu_r[a->rr];
++    TCGv addr = gen_get_xaddr();
++
++    gen_data_store(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++static bool trans_STX2(DisasContext *ctx, arg_STX2 *a)
++{
++    TCGv Rd = cpu_r[a->rr];
++    TCGv addr = gen_get_xaddr();
++
++    gen_data_store(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++    gen_set_xaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++static bool trans_STX3(DisasContext *ctx, arg_STX3 *a)
++{
++    TCGv Rd = cpu_r[a->rr];
++    TCGv addr = gen_get_xaddr();
++
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_store(ctx, Rd, addr);
++    gen_set_xaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Loads one byte indirect with or without displacement from the data space
++ *  to a register. For parts with SRAM, the data space consists of the Register
++ *  File, I/O memory and internal SRAM (and external SRAM if applicable). For
++ *  parts without SRAM, the data space consists of the Register File only. In
++ *  some parts the Flash Memory has been mapped to the data space and can be
++ *  read using this command. The EEPROM has a separate address space.  The data
++ *  location is pointed to by the Y (16 bits) Pointer Register in the Register
++ *  File. Memory access is limited to the current data segment of 64KB. To
++ *  access another data segment in devices with more than 64KB data space, the
++ *  RAMPY in register in the I/O area has to be changed.  The Y-pointer Register
++ *  can either be left unchanged by the operation, or it can be post-incremented
++ *  or predecremented.  These features are especially suited for accessing
++ *  arrays, tables, and Stack Pointer usage of the Y-pointer Register. Note that
++ *  only the low byte of the Y-pointer is updated in devices with no more than
++ *  256 bytes data space. For such devices, the high byte of the pointer is not
++ *  used by this instruction and can be used for other purposes. The RAMPY
++ *  Register in the I/O area is updated in parts with more than 64KB data space
++ *  or more than 64KB Program memory, and the increment/decrement/displacement
++ *  is added to the entire 24-bit address on such devices.  Not all variants of
++ *  this instruction is available in all devices. Refer to the device specific
++ *  instruction set summary.  In the Reduced Core tinyAVR the LD instruction can
++ *  be used to achieve the same operation as LPM since the program memory is
++ *  mapped to the data memory space.
++ */
++static bool trans_LDY2(DisasContext *ctx, arg_LDY2 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
++
++    gen_data_load(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++
++    gen_set_yaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LDY3(DisasContext *ctx, arg_LDY3 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
++
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_load(ctx, Rd, addr);
++    gen_set_yaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LDDY(DisasContext *ctx, arg_LDDY *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
++
++    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
++    gen_data_load(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_STY2(DisasContext *ctx, arg_STY2 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
++
++    gen_data_store(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++    gen_set_yaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_STY3(DisasContext *ctx, arg_STY3 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
++
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_store(ctx, Rd, addr);
++    gen_set_yaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_STDY(DisasContext *ctx, arg_STDY *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_yaddr();
++
++    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
++    gen_data_store(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Loads one byte indirect with or without displacement from the data space
++ *  to a register. For parts with SRAM, the data space consists of the Register
++ *  File, I/O memory and internal SRAM (and external SRAM if applicable). For
++ *  parts without SRAM, the data space consists of the Register File only. In
++ *  some parts the Flash Memory has been mapped to the data space and can be
++ *  read using this command. The EEPROM has a separate address space.  The data
++ *  location is pointed to by the Z (16 bits) Pointer Register in the Register
++ *  File. Memory access is limited to the current data segment of 64KB. To
++ *  access another data segment in devices with more than 64KB data space, the
++ *  RAMPZ in register in the I/O area has to be changed.  The Z-pointer Register
++ *  can either be left unchanged by the operation, or it can be post-incremented
++ *  or predecremented.  These features are especially suited for Stack Pointer
++ *  usage of the Z-pointer Register, however because the Z-pointer Register can
++ *  be used for indirect subroutine calls, indirect jumps and table lookup, it
++ *  is often more convenient to use the X or Y-pointer as a dedicated Stack
++ *  Pointer. Note that only the low byte of the Z-pointer is updated in devices
++ *  with no more than 256 bytes data space. For such devices, the high byte of
++ *  the pointer is not used by this instruction and can be used for other
++ *  purposes. The RAMPZ Register in the I/O area is updated in parts with more
++ *  than 64KB data space or more than 64KB Program memory, and the
++ *  increment/decrement/displacement is added to the entire 24-bit address on
++ *  such devices.  Not all variants of this instruction is available in all
++ *  devices. Refer to the device specific instruction set summary.  In the
++ *  Reduced Core tinyAVR the LD instruction can be used to achieve the same
++ *  operation as LPM since the program memory is mapped to the data memory
++ *  space.  For using the Z-pointer for table lookup in Program memory see the
++ *  LPM and ELPM instructions.
++ */
++static bool trans_LDZ2(DisasContext *ctx, arg_LDZ2 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    gen_data_load(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++
++    gen_set_zaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LDZ3(DisasContext *ctx, arg_LDZ3 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_load(ctx, Rd, addr);
++
++    gen_set_zaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LDDZ(DisasContext *ctx, arg_LDDZ *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
++    gen_data_load(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_STZ2(DisasContext *ctx, arg_STZ2 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    gen_data_store(ctx, Rd, addr);
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++
++    gen_set_zaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_STZ3(DisasContext *ctx, arg_STZ3 *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_subi_tl(addr, addr, 1); /* addr = addr - 1 */
++    gen_data_store(ctx, Rd, addr);
++
++    gen_set_zaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_STDZ(DisasContext *ctx, arg_STDZ *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_addi_tl(addr, addr, a->imm); /* addr = addr + q */
++    gen_data_store(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++
++/*
++ *  Stores one byte from a Register to the data space. For parts with SRAM,
++ *  the data space consists of the Register File, I/O memory and internal SRAM
++ *  (and external SRAM if applicable). For parts without SRAM, the data space
++ *  consists of the Register File only. The EEPROM has a separate address space.
++ *  A 16-bit address must be supplied. Memory access is limited to the current
++ *  data segment of 64KB. The STS instruction uses the RAMPD Register to access
++ *  memory above 64KB. To access another data segment in devices with more than
++ *  64KB data space, the RAMPD in register in the I/O area has to be changed.
++ *  This instruction is not available in all devices. Refer to the device
++ *  specific instruction set summary.
++ */
++static bool trans_STS(DisasContext *ctx, arg_STS *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = tcg_temp_new_i32();
++    TCGv H = cpu_rampD;
++    a->imm = next_word(ctx);
++
++    tcg_gen_mov_tl(addr, H); /* addr = H:M:L */
++    tcg_gen_shli_tl(addr, addr, 16);
++    tcg_gen_ori_tl(addr, addr, a->imm);
++
++    gen_data_store(ctx, Rd, addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Loads one byte pointed to by the Z-register into the destination
++ *  register Rd. This instruction features a 100% space effective constant
++ *  initialization or constant data fetch. The Program memory is organized in
++ *  16-bit words while the Z-pointer is a byte address. Thus, the least
++ *  significant bit of the Z-pointer selects either low byte (ZLSB = 0) or high
++ *  byte (ZLSB = 1). This instruction can address the first 64KB (32K words) of
++ *  Program memory. The Zpointer Register can either be left unchanged by the
++ *  operation, or it can be incremented. The incrementation does not apply to
++ *  the RAMPZ Register.  Devices with Self-Programming capability can use the
++ *  LPM instruction to read the Fuse and Lock bit values.  Refer to the device
++ *  documentation for a detailed description.  The LPM instruction is not
++ *  available in all devices. Refer to the device specific instruction set
++ *  summary
++ */
++static bool trans_LPM1(DisasContext *ctx, arg_LPM1 *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_LPM)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[0];
++    TCGv addr = tcg_temp_new_i32();
++    TCGv H = cpu_r[31];
++    TCGv L = cpu_r[30];
++
++    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
++    tcg_gen_or_tl(addr, addr, L);
++
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LPM2(DisasContext *ctx, arg_LPM2 *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_LPM)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = tcg_temp_new_i32();
++    TCGv H = cpu_r[31];
++    TCGv L = cpu_r[30];
++
++    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
++    tcg_gen_or_tl(addr, addr, L);
++
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_LPMX(DisasContext *ctx, arg_LPMX *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_LPMX)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = tcg_temp_new_i32();
++    TCGv H = cpu_r[31];
++    TCGv L = cpu_r[30];
++
++    tcg_gen_shli_tl(addr, H, 8); /* addr = H:L */
++    tcg_gen_or_tl(addr, addr, L);
++
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++
++    tcg_gen_andi_tl(L, addr, 0xff);
++
++    tcg_gen_shri_tl(addr, addr, 8);
++    tcg_gen_andi_tl(H, addr, 0xff);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Loads one byte pointed to by the Z-register and the RAMPZ Register in
++ *  the I/O space, and places this byte in the destination register Rd. This
++ *  instruction features a 100% space effective constant initialization or
++ *  constant data fetch. The Program memory is organized in 16-bit words while
++ *  the Z-pointer is a byte address. Thus, the least significant bit of the
++ *  Z-pointer selects either low byte (ZLSB = 0) or high byte (ZLSB = 1). This
++ *  instruction can address the entire Program memory space. The Z-pointer
++ *  Register can either be left unchanged by the operation, or it can be
++ *  incremented. The incrementation applies to the entire 24-bit concatenation
++ *  of the RAMPZ and Z-pointer Registers.  Devices with Self-Programming
++ *  capability can use the ELPM instruction to read the Fuse and Lock bit value.
++ *  Refer to the device documentation for a detailed description.  This
++ *  instruction is not available in all devices. Refer to the device specific
++ *  instruction set summary.
++ */
++static bool trans_ELPM1(DisasContext *ctx, arg_ELPM1 *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_ELPM)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[0];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_ELPM2(DisasContext *ctx, arg_ELPM2 *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_ELPM)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++static bool trans_ELPMX(DisasContext *ctx, arg_ELPMX *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_ELPMX)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++
++    tcg_gen_qemu_ld8u(Rd, addr, MMU_CODE_IDX); /* Rd = mem[addr] */
++
++    tcg_gen_addi_tl(addr, addr, 1); /* addr = addr + 1 */
++
++    gen_set_zaddr(addr);
++
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  SPM can be used to erase a page in the Program memory, to write a page
++ *  in the Program memory (that is already erased), and to set Boot Loader Lock
++ *  bits. In some devices, the Program memory can be written one word at a time,
++ *  in other devices an entire page can be programmed simultaneously after first
++ *  filling a temporary page buffer. In all cases, the Program memory must be
++ *  erased one page at a time. When erasing the Program memory, the RAMPZ and
++ *  Z-register are used as page address. When writing the Program memory, the
++ *  RAMPZ and Z-register are used as page or word address, and the R1:R0
++ *  register pair is used as data(1). When setting the Boot Loader Lock bits,
++ *  the R1:R0 register pair is used as data. Refer to the device documentation
++ *  for detailed description of SPM usage. This instruction can address the
++ *  entire Program memory.  The SPM instruction is not available in all devices.
++ *  Refer to the device specific instruction set summary.  Note: 1. R1
++ *  determines the instruction high byte, and R0 determines the instruction low
++ *  byte.
++ */
++static bool trans_SPM(DisasContext *ctx, arg_SPM *a)
++{
++    /* TODO */
++    if (!avr_have_feature(ctx, AVR_FEATURE_SPM)) {
++        return true;
++    }
++
++    return true;
++}
++
++
++static bool trans_SPMX(DisasContext *ctx, arg_SPMX *a)
++{
++    /* TODO */
++    if (!avr_have_feature(ctx, AVR_FEATURE_SPMX)) {
++        return true;
++    }
++
++    return true;
++}
++
++
++/*
++ *  Loads data from the I/O Space (Ports, Timers, Configuration Registers,
++ *  etc.) into register Rd in the Register File.
++ */
++static bool trans_IN(DisasContext *ctx, arg_IN *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv port = tcg_const_i32(a->imm);
++
++    gen_helper_inb(Rd, cpu_env, port);
++
++    tcg_temp_free_i32(port);
++
++    return true;
++}
++
++
++/*
++ *  Stores data from register Rr in the Register File to I/O Space (Ports,
++ *  Timers, Configuration Registers, etc.).
++ */
++static bool trans_OUT(DisasContext *ctx, arg_OUT *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv port = tcg_const_i32(a->imm);
++
++    gen_helper_outb(cpu_env, port, Rd);
++
++    tcg_temp_free_i32(port);
++
++    return true;
++}
++
++
++/*
++ *  This instruction stores the contents of register Rr on the STACK. The
++ *  Stack Pointer is post-decremented by 1 after the PUSH.  This instruction is
++ *  not available in all devices. Refer to the device specific instruction set
++ *  summary.
++ */
++static bool trans_PUSH(DisasContext *ctx, arg_PUSH *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++
++    gen_data_store(ctx, Rd, cpu_sp);
++    tcg_gen_subi_tl(cpu_sp, cpu_sp, 1);
++
++    return true;
++}
++
++
++/*
++ *  This instruction loads register Rd with a byte from the STACK. The Stack
++ *  Pointer is pre-incremented by 1 before the POP.  This instruction is not
++ *  available in all devices. Refer to the device specific instruction set
++ *  summary.
++ */
++static bool trans_POP(DisasContext *ctx, arg_POP *a)
++{
++    /*
++     * Using a temp to work around some strange behaviour:
++     * tcg_gen_addi_tl(cpu_sp, cpu_sp, 1);
++     * gen_data_load(ctx, Rd, cpu_sp);
++     * seems to cause the add to happen twice.
++     * This doesn't happen if either the add or the load is removed.
++     */
++    TCGv t1 = tcg_temp_new_i32();
++    TCGv Rd = cpu_r[a->rd];
++
++    tcg_gen_addi_tl(t1, cpu_sp, 1);
++    gen_data_load(ctx, Rd, t1);
++    tcg_gen_mov_tl(cpu_sp, t1);
++
++    return true;
++}
++
++
++/*
++ *  Exchanges one byte indirect between register and data space.  The data
++ *  location is pointed to by the Z (16 bits) Pointer Register in the Register
++ *  File. Memory access is limited to the current data segment of 64KB. To
++ *  access another data segment in devices with more than 64KB data space, the
++ *  RAMPZ in register in the I/O area has to be changed.  The Z-pointer Register
++ *  is left unchanged by the operation. This instruction is especially suited
++ *  for writing/reading status bits stored in SRAM.
++ */
++static bool trans_XCH(DisasContext *ctx, arg_XCH *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t0 = tcg_temp_new_i32();
++    TCGv addr = gen_get_zaddr();
++
++    gen_data_load(ctx, t0, addr);
++    gen_data_store(ctx, Rd, addr);
++    tcg_gen_mov_tl(Rd, t0);
++
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Load one byte indirect from data space to register and set bits in data
++ *  space specified by the register. The instruction can only be used towards
++ *  internal SRAM.  The data location is pointed to by the Z (16 bits) Pointer
++ *  Register in the Register File. Memory access is limited to the current data
++ *  segment of 64KB. To access another data segment in devices with more than
++ *  64KB data space, the RAMPZ in register in the I/O area has to be changed.
++ *  The Z-pointer Register is left unchanged by the operation. This instruction
++ *  is especially suited for setting status bits stored in SRAM.
++ */
++static bool trans_LAS(DisasContext *ctx, arg_LAS *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
++        return true;
++    }
++
++    TCGv Rr = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++    TCGv t0 = tcg_temp_new_i32();
++    TCGv t1 = tcg_temp_new_i32();
++
++    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
++    tcg_gen_or_tl(t1, t0, Rr);
++
++    tcg_gen_mov_tl(Rr, t0); /* Rr = t0 */
++    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
++
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Load one byte indirect from data space to register and stores and clear
++ *  the bits in data space specified by the register. The instruction can
++ *  only be used towards internal SRAM.  The data location is pointed to by
++ *  the Z (16 bits) Pointer Register in the Register File. Memory access is
++ *  limited to the current data segment of 64KB. To access another data
++ *  segment in devices with more than 64KB data space, the RAMPZ in register
++ *  in the I/O area has to be changed.  The Z-pointer Register is left
++ *  unchanged by the operation. This instruction is especially suited for
++ *  clearing status bits stored in SRAM.
++ */
++static bool trans_LAC(DisasContext *ctx, arg_LAC *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
++        return true;
++    }
++
++    TCGv Rr = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++    TCGv t0 = tcg_temp_new_i32();
++    TCGv t1 = tcg_temp_new_i32();
++
++    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
++        /* t1 = t0 & (0xff - Rr) = t0 and ~Rr */
++    tcg_gen_andc_tl(t1, t0, Rr);
++
++    tcg_gen_mov_tl(Rr, t0); /* Rr = t0 */
++    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
++
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Load one byte indirect from data space to register and toggles bits in
++ *  the data space specified by the register.  The instruction can only be used
++ *  towards SRAM.  The data location is pointed to by the Z (16 bits) Pointer
++ *  Register in the Register File. Memory access is limited to the current data
++ *  segment of 64KB. To access another data segment in devices with more than
++ *  64KB data space, the RAMPZ in register in the I/O area has to be changed.
++ *  The Z-pointer Register is left unchanged by the operation. This instruction
++ *  is especially suited for changing status bits stored in SRAM.
++ */
++static bool trans_LAT(DisasContext *ctx, arg_LAT *a)
++{
++    if (!avr_have_feature(ctx, AVR_FEATURE_RMW)) {
++        return true;
++    }
++
++    TCGv Rd = cpu_r[a->rd];
++    TCGv addr = gen_get_zaddr();
++    TCGv t0 = tcg_temp_new_i32();
++    TCGv t1 = tcg_temp_new_i32();
++
++    gen_data_load(ctx, t0, addr); /* t0 = mem[addr] */
++    tcg_gen_xor_tl(t1, t0, Rd);
++
++    tcg_gen_mov_tl(Rd, t0); /* Rd = t0 */
++    gen_data_store(ctx, t1, addr); /* mem[addr] = t1 */
++
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++    tcg_temp_free_i32(addr);
++
++    return true;
++}
++
++
++/*
++ *  Shifts all bits in Rd one place to the right. Bit 7 is cleared. Bit 0 is
++ *  loaded into the C Flag of the SREG. This operation effectively divides an
++ *  unsigned value by two. The C Flag can be used to round the result.
++ */
++static bool trans_LSR(DisasContext *ctx, arg_LSR *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
++
++    tcg_gen_shri_tl(Rd, Rd, 1);
++
++    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, Rd, 0); /* Zf = Rd == 0 */
++    tcg_gen_movi_tl(cpu_Nf, 0);
++    tcg_gen_mov_tl(cpu_Vf, cpu_Cf);
++    tcg_gen_mov_tl(cpu_Sf, cpu_Vf);
++
++    return true;
++}
++
++
++/*
++ *  Shifts all bits in Rd one place to the right. The C Flag is shifted into
++ *  bit 7 of Rd. Bit 0 is shifted into the C Flag.  This operation, combined
++ *  with ASR, effectively divides multi-byte signed values by two. Combined with
++ *  LSR it effectively divides multi-byte unsigned values by two. The Carry Flag
++ *  can be used to round the result.
++ */
++static bool trans_ROR(DisasContext *ctx, arg_ROR *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t0 = tcg_temp_new_i32();
++
++    tcg_gen_shli_tl(t0, cpu_Cf, 7);
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1);
++    tcg_gen_shri_tl(Rd, Rd, 1);
++    tcg_gen_or_tl(Rd, Rd, t0);
++
++    gen_rshift_ZNVSf(Rd);
++
++    tcg_temp_free_i32(t0);
++
++    return true;
++}
++
++
++/*
++ *  Shifts all bits in Rd one place to the right. Bit 7 is held constant. Bit 0
++ *  is loaded into the C Flag of the SREG. This operation effectively divides a
++ *  signed value by two without changing its sign. The Carry Flag can be used to
++ *  round the result.
++ */
++static bool trans_ASR(DisasContext *ctx, arg_ASR *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t0 = tcg_temp_new_i32();
++
++    /* Cf */
++    tcg_gen_andi_tl(cpu_Cf, Rd, 1); /* Cf = Rd(0) */
++
++    /* op */
++    tcg_gen_andi_tl(t0, Rd, 0x80); /* Rd = (Rd & 0x80) | (Rd >> 1) */
++    tcg_gen_shri_tl(Rd, Rd, 1);
++    tcg_gen_or_tl(Rd, Rd, t0);
++
++    gen_rshift_ZNVSf(Rd);
++
++    tcg_temp_free_i32(t0);
++
++    return true;
++}
++
++
++/*
++ *  Swaps high and low nibbles in a register.
++ */
++static bool trans_SWAP(DisasContext *ctx, arg_SWAP *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t0 = tcg_temp_new_i32();
++    TCGv t1 = tcg_temp_new_i32();
++
++    tcg_gen_andi_tl(t0, Rd, 0x0f);
++    tcg_gen_shli_tl(t0, t0, 4);
++    tcg_gen_andi_tl(t1, Rd, 0xf0);
++    tcg_gen_shri_tl(t1, t1, 4);
++    tcg_gen_or_tl(Rd, t0, t1);
++
++    tcg_temp_free_i32(t1);
++    tcg_temp_free_i32(t0);
++
++    return true;
++}
++
++
++/*
++ *  Sets a specified bit in an I/O Register. This instruction operates on
++ *  the lower 32 I/O Registers -- addresses 0-31.
++ */
++static bool trans_SBI(DisasContext *ctx, arg_SBI *a)
++{
++    TCGv data = tcg_temp_new_i32();
++    TCGv port = tcg_const_i32(a->reg);
++
++    gen_helper_inb(data, cpu_env, port);
++    tcg_gen_ori_tl(data, data, 1 << a->bit);
++    gen_helper_outb(cpu_env, port, data);
++
++    tcg_temp_free_i32(port);
++    tcg_temp_free_i32(data);
++
++    return true;
++}
++
++
++/*
++ *  Clears a specified bit in an I/O Register. This instruction operates on
++ *  the lower 32 I/O Registers -- addresses 0-31.
++ */
++static bool trans_CBI(DisasContext *ctx, arg_CBI *a)
++{
++    TCGv data = tcg_temp_new_i32();
++    TCGv port = tcg_const_i32(a->reg);
++
++    gen_helper_inb(data, cpu_env, port);
++    tcg_gen_andi_tl(data, data, ~(1 << a->bit));
++    gen_helper_outb(cpu_env, port, data);
++
++    tcg_temp_free_i32(data);
++    tcg_temp_free_i32(port);
++
++    return true;
++}
++
++
++/*
++ *  Stores bit b from Rd to the T Flag in SREG (Status Register).
++ */
++static bool trans_BST(DisasContext *ctx, arg_BST *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++
++    tcg_gen_andi_tl(cpu_Tf, Rd, 1 << a->bit);
++    tcg_gen_shri_tl(cpu_Tf, cpu_Tf, a->bit);
++
++    return true;
++}
++
++
++/*
++ *  Copies the T Flag in the SREG (Status Register) to bit b in register Rd.
++ */
++static bool trans_BLD(DisasContext *ctx, arg_BLD *a)
++{
++    TCGv Rd = cpu_r[a->rd];
++    TCGv t1 = tcg_temp_new_i32();
++
++    tcg_gen_andi_tl(Rd, Rd, ~(1u << a->bit)); /* clear bit */
++    tcg_gen_shli_tl(t1, cpu_Tf, a->bit); /* create mask */
++    tcg_gen_or_tl(Rd, Rd, t1);
++
++    tcg_temp_free_i32(t1);
++
++    return true;
++}
++
++
++/*
++ *  Sets a single Flag or bit in SREG.
++ */
++static bool trans_BSET(DisasContext *ctx, arg_BSET *a)
++{
++    switch (a->bit) {
++    case 0x00:
++        tcg_gen_movi_tl(cpu_Cf, 0x01);
++        break;
++    case 0x01:
++        tcg_gen_movi_tl(cpu_Zf, 0x01);
++        break;
++    case 0x02:
++        tcg_gen_movi_tl(cpu_Nf, 0x01);
++        break;
++    case 0x03:
++        tcg_gen_movi_tl(cpu_Vf, 0x01);
++        break;
++    case 0x04:
++        tcg_gen_movi_tl(cpu_Sf, 0x01);
++        break;
++    case 0x05:
++        tcg_gen_movi_tl(cpu_Hf, 0x01);
++        break;
++    case 0x06:
++        tcg_gen_movi_tl(cpu_Tf, 0x01);
++        break;
++    case 0x07:
++        tcg_gen_movi_tl(cpu_If, 0x01);
++        break;
++    }
++
++    return true;
++}
++
++
++/*
++ *  Clears a single Flag in SREG.
++ */
++static bool trans_BCLR(DisasContext *ctx, arg_BCLR *a)
++{
++    switch (a->bit) {
++    case 0x00:
++        tcg_gen_movi_tl(cpu_Cf, 0x00);
++        break;
++    case 0x01:
++        tcg_gen_movi_tl(cpu_Zf, 0x00);
++        break;
++    case 0x02:
++        tcg_gen_movi_tl(cpu_Nf, 0x00);
++        break;
++    case 0x03:
++        tcg_gen_movi_tl(cpu_Vf, 0x00);
++        break;
++    case 0x04:
++        tcg_gen_movi_tl(cpu_Sf, 0x00);
++        break;
++    case 0x05:
++        tcg_gen_movi_tl(cpu_Hf, 0x00);
++        break;
++    case 0x06:
++        tcg_gen_movi_tl(cpu_Tf, 0x00);
++        break;
++    case 0x07:
++        tcg_gen_movi_tl(cpu_If, 0x00);
++        break;
++    }
++
++    return true;
++}
 -- 
 2.17.2 (Apple Git-113)
 
