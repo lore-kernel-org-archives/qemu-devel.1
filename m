@@ -6,68 +6,70 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA715CA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:14:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 316DFCA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:15:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB22220862
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:14:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB22220862
+	by mail.kernel.org (Postfix) with ESMTPS id 073D02086A
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 23:15:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 073D02086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPahB-0005Y6-J9
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 19:14:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43877)
+	id 1iPahX-0005kW-Kt
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 19:14:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iPaUU-0000p3-H5
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:01:33 -0400
+ (envelope-from <mst@redhat.com>) id 1iPaTU-0008BH-9f
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iPaUT-0004tG-F4
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:01:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50072)
+ (envelope-from <mst@redhat.com>) id 1iPaTO-0003Fg-9h
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46648)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iPaUS-0004qH-K0
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:01:29 -0400
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iPaTK-0003A3-6Y
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 19:00:20 -0400
 Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
  [209.85.222.198])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 150725AFE9
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 23:01:26 +0000 (UTC)
-Received: by mail-qk1-f198.google.com with SMTP id x186so261163qke.13
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 16:01:26 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 67FA1C056807
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 23:00:15 +0000 (UTC)
+Received: by mail-qk1-f198.google.com with SMTP id p68so269473qkf.9
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 16:00:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=NIZIUZQMHD8MQB75aibzuLlMw0b/3b/p/eZpRql+nWE=;
- b=ijRtHMUrTxZaF3yJYcr3lPG8YXay/0DNcP0k1+vfjr0PUnDSIVQOMW+NkqsoaSZSEM
- 6pX4FBVGzhxmmLfkfrP7X+ExQoYtt/NKcRNWkC+/FE+udsSq0nUFSjFlDPdh5ojGzzh+
- Wmuxi4PjMBD4Qmz6WfhG8G/wY8qBDNbPvAfSINrGrwQLyD8m7eDSExYD3sYduLiLpJnZ
- otb4KaicTDJmTtbCRRhpssw36bndGpB/S5X+5a5o+XQnuKIPRw7YkunPhjMVlZAWxsFb
- au+dVQpqjY0EiZ4WJA71gdF/RkvP+U+uk5E7Zc39bdTFdSv9WfwszLezcu5257a0h+nn
- lLYQ==
-X-Gm-Message-State: APjAAAVsXYa2GJd8If9th1WWxrOkq9TwVUvkoyHro4+SKfTo+xtnZ3ro
- EX+PgvyRIi0Yj5ZAX976db9iY2+TrFuZCFKHuMfgnY+m6XA5SnmaVjTjEsTUqq7yHx9wzhZkCTN
- GwN3rkZmnwUJd6nU=
-X-Received: by 2002:a0c:fb06:: with SMTP id c6mr20324531qvp.249.1572390084808; 
- Tue, 29 Oct 2019 16:01:24 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxC6H2Qf4NmNRdcd8gqruKRp5YmZ2ttJ49a9YfOjoFugY3dZMfZ635m5NGqJxx7hqHjdZSqzQ==
-X-Received: by 2002:a0c:fb06:: with SMTP id c6mr20324510qvp.249.1572390084599; 
- Tue, 29 Oct 2019 16:01:24 -0700 (PDT)
+ bh=H3q8OWUdteaAjDBaTxa/GS8RhYWnQs5bsyBylGoVtsE=;
+ b=Df9UJb5Uw2CDw9mdbkuTCacSDuFz7VjdMLCtY4wU8LtzwaytvNy9aqAuC/aOXc34gx
+ ynGivNjSMeYbtOSEvhl6PNrPs2mPX7a1ipxn1TSwD/ZqkN76UsQlQXZM+iVGGUf8hPQH
+ 5+OfAY+eHGXYmJuyJDicUt1QELjWjxHRl9zmfpU99EHn9RSV0/I/oJkqi/oKf7NSrr4L
+ 8CW8dQQ9HGrs5OBq2iCUZk5oVer11u4qwWw68lQeSCkEq+wZRkDC6cVRAsrURdtZmZ3Q
+ OWNkGxCCyWwemEUETbpVSdkbpEyI4ugrWoKmLeYRCidiDji+TKgzpoa1JYf3xA3gwllB
+ 82XA==
+X-Gm-Message-State: APjAAAVUcjZyhYcxJCTr0y5ZI0uH4fTNjoFLv34wsAb3wo/YHCxozw8K
+ F3GGsP2prKJx1mBrEIGTM8cqbshb4eEqCblsOjqJrqqTdg4+i7Ie2LSgJjtY62RZpMhypCGir7x
+ Nrj3PsgDRykZsgXA=
+X-Received: by 2002:a05:6214:14ac:: with SMTP id
+ bo12mr24832172qvb.67.1572390014352; 
+ Tue, 29 Oct 2019 16:00:14 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqwqQjc1abgL7dxAd/q6ukrzDnthCNOQ8JlwXQ/kBuMl0R9gJ0MbIEms4NshxBpdQI9Gmw0bow==
+X-Received: by 2002:a05:6214:14ac:: with SMTP id
+ bo12mr24832144qvb.67.1572390014076; 
+ Tue, 29 Oct 2019 16:00:14 -0700 (PDT)
 Received: from redhat.com (94.222.26.109.rev.sfr.net. [109.26.222.94])
- by smtp.gmail.com with ESMTPSA id w131sm487444qka.85.2019.10.29.16.01.22
+ by smtp.gmail.com with ESMTPSA id k18sm80584qtj.69.2019.10.29.16.00.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Oct 2019 16:01:23 -0700 (PDT)
-Date: Tue, 29 Oct 2019 19:01:21 -0400
+ Tue, 29 Oct 2019 16:00:13 -0700 (PDT)
+Date: Tue, 29 Oct 2019 19:00:10 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 13/14] virtio_net: use RCU_READ_LOCK_GUARD
-Message-ID: <20191029225932.14585-14-mst@redhat.com>
+Subject: [PULL 02/14] pci: add option for net failover
+Message-ID: <20191029225932.14585-3-mst@redhat.com>
 References: <20191029225932.14585-1-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -89,43 +91,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Jens Freimann <jfreimann@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Jens Freimann <jfreimann@redhat.com>
 
-Use RCU_READ_LOCK_GUARD rather than the manual rcu_read_(un)lock call.
+This patch adds a failover_pair_id property to PCIDev which is
+used to link the primary device in a failover pair (the PCI dev) to
+a standby (a virtio-net-pci) device.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <20191025103403.120616-3-dgilbert@redhat.com>
+It only supports ethernet devices. Also currently it only supports
+PCIe devices. The requirement for PCIe is because it doesn't support
+other hotplug controllers at the moment. The failover functionality can
+be added to other hotplug controllers like ACPI, SHCP,... later on.
+
+Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+Message-Id: <20191029114905.6856-3-jfreimann@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/net/virtio-net.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ hw/pci/pci.c         | 31 +++++++++++++++++++++++++++++++
+ include/hw/pci/pci.h |  3 +++
+ 2 files changed, 34 insertions(+)
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 314f365e7c..97a5113f7e 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -1490,12 +1490,9 @@ static ssize_t virtio_net_receive_rcu(NetClientState *nc, const uint8_t *buf,
- static ssize_t virtio_net_do_receive(NetClientState *nc, const uint8_t *buf,
-                                   size_t size)
- {
--    ssize_t r;
-+    RCU_READ_LOCK_GUARD();
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index aa05c2b9b2..824ab4ed7b 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -75,6 +75,8 @@ static Property pci_props[] = {
+                     QEMU_PCIE_LNKSTA_DLLLA_BITNR, true),
+     DEFINE_PROP_BIT("x-pcie-extcap-init", PCIDevice, cap_present,
+                     QEMU_PCIE_EXTCAP_INIT_BITNR, true),
++    DEFINE_PROP_STRING("failover_pair_id", PCIDevice,
++                       failover_pair_id),
+     DEFINE_PROP_END_OF_LIST()
+ };
  
--    rcu_read_lock();
--    r = virtio_net_receive_rcu(nc, buf, size);
--    rcu_read_unlock();
--    return r;
-+    return virtio_net_receive_rcu(nc, buf, size);
- }
+@@ -2077,6 +2079,7 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
+     ObjectClass *klass = OBJECT_CLASS(pc);
+     Error *local_err = NULL;
+     bool is_default_rom;
++    uint16_t class_id;
  
- static void virtio_net_rsc_extract_unit4(VirtioNetRscChain *chain,
+     /* initialize cap_present for pci_is_express() and pci_config_size(),
+      * Note that hybrid PCIs are not set automatically and need to manage
+@@ -2101,6 +2104,34 @@ static void pci_qdev_realize(DeviceState *qdev, Error **errp)
+         }
+     }
+ 
++    if (pci_dev->failover_pair_id) {
++        if (!pci_bus_is_express(pci_get_bus(pci_dev))) {
++            error_setg(errp, "failover primary device must be on "
++                             "PCIExpress bus");
++            error_propagate(errp, local_err);
++            pci_qdev_unrealize(DEVICE(pci_dev), NULL);
++            return;
++        }
++        class_id = pci_get_word(pci_dev->config + PCI_CLASS_DEVICE);
++        if (class_id != PCI_CLASS_NETWORK_ETHERNET) {
++            error_setg(errp, "failover primary device is not an "
++                             "Ethernet device");
++            error_propagate(errp, local_err);
++            pci_qdev_unrealize(DEVICE(pci_dev), NULL);
++            return;
++        }
++        if (!(pci_dev->cap_present & QEMU_PCI_CAP_MULTIFUNCTION)
++            && (PCI_FUNC(pci_dev->devfn) == 0)) {
++            qdev->allow_unplug_during_migration = true;
++        } else {
++            error_setg(errp, "failover: primary device must be in its own "
++                              "PCI slot");
++            error_propagate(errp, local_err);
++            pci_qdev_unrealize(DEVICE(pci_dev), NULL);
++            return;
++        }
++    }
++
+     /* rom loading */
+     is_default_rom = false;
+     if (pci_dev->romfile == NULL && pc->romfile != NULL) {
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index f3f0ffd5fb..69d1f0228b 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -352,6 +352,9 @@ struct PCIDevice {
+     MSIVectorUseNotifier msix_vector_use_notifier;
+     MSIVectorReleaseNotifier msix_vector_release_notifier;
+     MSIVectorPollNotifier msix_vector_poll_notifier;
++
++    /* ID of standby device in net_failover pair */
++    char *failover_pair_id;
+ };
+ 
+ void pci_register_bar(PCIDevice *pci_dev, int region_num,
 -- 
 MST
 
