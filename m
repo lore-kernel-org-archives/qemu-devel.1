@@ -2,66 +2,67 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E6DCCA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 13:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76542CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 13:37:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 568782086A
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 13:35:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 450272086A
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 13:37:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KuijhtSg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 568782086A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R0haXW32"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 450272086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPRei-0000js-F9
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 09:35:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55096)
+	id 1iPRgS-00038H-HJ
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 09:37:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55162)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iPRdO-000070-L8
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 09:34:07 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iPRdv-0000QN-5x
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 09:34:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iPRdM-0001SM-4R
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 09:34:05 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34482
+ (envelope-from <jsnow@redhat.com>) id 1iPRdt-0001Yp-Vm
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 09:34:39 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:40343
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iPRdL-0001Ro-Ns
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 09:34:04 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iPRdt-0001Yd-Sq
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 09:34:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572356042;
+ s=mimecast20190719; t=1572356077;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=HpWPsH0Drw2rQHTholMzOOSmI9UxOmVt5cRMU1EaIWg=;
- b=KuijhtSgyzFE6s0vWPpIgYs1DU/o6PjQJgEHMvT/0PgfJErSHJr/QZ2Q4PC9edlVYbiF1K
- dtj8M1HfEvuIzGO+lpi0wBR6+bzsg37ykGhgBtSwRBahkCOYgUW1nDDFW/+//K+nnHL4VV
- QrN/JJPIcMT3EjwLVAw/ozFJgVbuQMw=
+ bh=qalyYS9v4Zz1m9eq7mubx8oPBebp+r27ixgl8iPpRSE=;
+ b=R0haXW32XK1jnSrOEZz/SkCHa7PtQMWBG6xdVdSGzuRPYDjWb5zvq+mCbUy1R2QHSnPt1d
+ JhJuWGNpFTv049G1aHDQJfyE2yDNCK0C0eQIsOqlXUDrbkW9mSA9yB03dWNDeVfokZpx3E
+ OGNG3nFwRKlXFI0QthLK6LXPctSbbX8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-fsaWGVVFONixmiszcbBVmA-1; Tue, 29 Oct 2019 09:33:57 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-397-BQLB3w48NS2ZgmnQmUxbtA-1; Tue, 29 Oct 2019 09:34:32 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E9A8476;
- Tue, 29 Oct 2019 13:33:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 055561005500;
+ Tue, 29 Oct 2019 13:34:32 +0000 (UTC)
 Received: from [10.10.123.143] (ovpn-123-143.rdu2.redhat.com [10.10.123.143])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DB5E75D9C3;
- Tue, 29 Oct 2019 13:33:51 +0000 (UTC)
-Subject: Re: [PATCH v2 0/2] block/nvme: add support for write zeros and discard
-To: Max Reitz <mreitz@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BE22B5C223;
+ Tue, 29 Oct 2019 13:34:29 +0000 (UTC)
+Subject: Re: [PATCH] MAINTAINERS: add more bitmap-related to Dirty Bitmaps
+ section
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  qemu-devel@nongnu.org
-References: <20190913133627.28450-1-mlevitsk@redhat.com>
- <24390891-6aef-f457-7648-71846360a09c@redhat.com>
+References: <20191026165655.14112-1-vsementsov@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
 Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFTKefwBEAChvwqYC6saTzawbih87LqBYq0d5A8jXYXaiFMV/EvMSDqqY4EY6whXliNO
@@ -137,15 +138,15 @@ Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
  i0HjnLoJP5jDcoMTabZTIazXmJz3pKM11HYJ5/ZsTIf3ZRJJKIvXJpbmcAPVwTZII6XxiJdh
  RSSX4Mvd5pL/+5WI6NTdW6DMfigTtdd85fe6PwBNVJL2ZvBfsBJZ5rxg1TOH3KLsYBqBTgW2
  glQofxhkJhDEcvjLhe3Y2BlbCWKOmvM8XS9TRt0OwUs=
-Message-ID: <c3c30afc-9e28-fa10-9159-8843e5375d84@redhat.com>
-Date: Tue, 29 Oct 2019 09:33:49 -0400
+Message-ID: <77f48a13-e8d5-8c54-7a5e-aa86e0672fb1@redhat.com>
+Date: Tue, 29 Oct 2019 09:34:27 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <24390891-6aef-f457-7648-71846360a09c@redhat.com>
+In-Reply-To: <20191026165655.14112-1-vsementsov@virtuozzo.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: fsaWGVVFONixmiszcbBVmA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: BQLB3w48NS2ZgmnQmUxbtA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -163,46 +164,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-block@nongnu.org, Keith Busch <kbusch@kernel.org>,
- Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 10/28/19 6:35 AM, Max Reitz wrote:
-> On 13.09.19 15:36, Maxim Levitsky wrote:
->> This is the second part of the patches I prepared
->> for this driver back when I worked on mdev-nvme.
->>
->> V2: addressed review feedback, no major changes
->>
->> Best regards,
->> =09Maxim Levitsky
->>
->> Maxim Levitsky (2):
->>   block/nvme: add support for write zeros
->>   block/nvme: add support for discard
->>
->>  block/nvme.c         | 155 ++++++++++++++++++++++++++++++++++++++++++-
->>  block/trace-events   |   3 +
->>  include/block/nvme.h |  19 +++++-
->>  3 files changed, 175 insertions(+), 2 deletions(-)
-> Thanks, fixed the indentation in nvme.h in patch 1, and applied to my
-> block branch:
+On 10/26/19 12:56 PM, Vladimir Sementsov-Ogievskiy wrote:
+> Let's add bitmaps persistence qcow2 feature and postcopy bitmaps
+> migration to Dirty Bitmaps section.
 >=20
-> https://git.xanclic.moe/XanClic/qemu/commits/branch/block
->=20
-> For the record, I don=E2=80=99t think !!x has benefits over x !=3D 0 and =
-I
-> personally prefer bool y =3D x over any of it. O:-)
->=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Well, that's even better :) For me, it's about making booleans obvious
-as booleans and that's all.
+Reviewed-by: John Snow <jsnow@redhat.com>
 
---js
+> ---
+>  MAINTAINERS | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 556ce0bfe3..51f31b4011 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1829,6 +1829,8 @@ F: util/hbitmap.c
+>  F: block/dirty-bitmap.c
+>  F: include/qemu/hbitmap.h
+>  F: include/block/dirty-bitmap.h
+> +F: qcow2-bitmap.c
+> +F: migration/block-dirty-bitmap.c
+>  F: tests/test-hbitmap.c
+>  F: docs/interop/bitmaps.rst
+>  T: git https://github.com/jnsnow/qemu.git bitmaps
+>=20
 
 
