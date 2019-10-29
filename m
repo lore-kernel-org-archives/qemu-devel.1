@@ -2,85 +2,84 @@ Return-Path: <SRS0=qR42=YW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A98ECA9EAE
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80BA0CA9EAE
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:41:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B462F20679
-	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:37:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4138320717
+	for <qemu-devel@archiver.kernel.org>; Tue, 29 Oct 2019 21:41:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+92Wruy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B462F20679
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="noH3NJ1E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4138320717
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPZBe-0000NX-Fp
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 17:37:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36594)
+	id 1iPZFD-0003Lo-6o
+	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 17:41:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36732)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iPYzh-0002Dj-21
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:39 -0400
+ (envelope-from <mrolnik@gmail.com>) id 1iPYzv-0002IA-FN
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iPYze-00088f-7H
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:36 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:42054)
+ (envelope-from <mrolnik@gmail.com>) id 1iPYzr-0008Pe-M7
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:49 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33260)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iPYzd-00080b-Td
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:34 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id a15so2964156wrf.9
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 14:25:29 -0700 (PDT)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iPYzp-0008KS-Ia
+ for qemu-devel@nongnu.org; Tue, 29 Oct 2019 17:25:47 -0400
+Received: by mail-wr1-x443.google.com with SMTP id s1so35190wro.0
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 14:25:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=pC9aLUracZlBlcIom+YzM+Tg70tUM3QKVEOGKf0r7Bo=;
- b=D+92WruyHut5uiaU2psG/xw8S7PydgIFBAV+dUMJVewmKcyOqxqPtY4nvfWsW82NMg
- mFP9JoEQfp+JvjoWb7wk6XPvN0d6iKSt9MKgfmsJ8tJLAvylVTZKbv422coxeFJ8NQF4
- 0fSeG/TAXlbtOQ6kZp/3uqhFBnB/Ttrn5K5GBiQ1uKrz+3j4Tp3sRpOZZEo3sAbUD1Uq
- yAYjjh0CGZQJdzwXLfQJHAURwIC5htOiW9DWu5u90/Txq+iAE75/8nKa60jXd2ri/YDw
- EKMEpuUV9kk1u7pVCVZOG8Y2I8GDWrXvGs3C9dHzOjHCY7QNVAmxTV0rainmG2KwBUrj
- Da/w==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=Qd3GH9HPwVtreGrCS04zfrsEpWfzxdHqfHgWezVniXk=;
+ b=noH3NJ1EATQf94AM3iGJmcFnN6Vv7iDsQS7za3ul6la8bAVogn+L2EwrLWBYN6+cx0
+ /d/Bj3EnE0aNzPs485o8cfwhW17iFXqkQJ6xfSM2920vbuR1s8nIURYHTzdZyOyfSpYz
+ WGGhbbh/qbPlge47u0Vhd5Gl/ptD7TVZPI5e6nr6QKWSaMfWxqoq+x7ogeExxYNa71U9
+ HVr6R5F8SlWqzhLFQ6zD1MkxaQG5MfZDn8LcB4IIEetbOjF9ltnTMGgpeUe5h6vD42GZ
+ Ceyp1Nb1T8cmhVZJBRyfDqYadFZa0h0fHQfpEPUxHOVuOb1Si0K+lTF2eEAjNeIvOiA6
+ 99sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=pC9aLUracZlBlcIom+YzM+Tg70tUM3QKVEOGKf0r7Bo=;
- b=GSfN7uFeoyG4co3KqE+8es4NLJMp7AJTwCVNhsuJbLNK7QlzBiwxc1wK2nJ45uZ8vG
- o+2Dit1YfHk3RzVJ4OH7El/GRQ3tYKkc8ZIYdRLRyK/urbi/wgrjpQtf+Z2lMCxUP0YQ
- tyfzgCASPUKArRwNf+1PvxqgCThcN6qVQWkjoHFI1GjS9j/rYGUUiMyq9dRWjFob76Y0
- OlzFzYe9LCcaQZ4ukXy+nDUdKzsl7QqQ7meVvXt+ytiIc/DXfxxiWKR5/GzWr/E1toyz
- Lyt9qNKaX/hDn+glEm7GyOyxAbklJFV5TBvVb69ADbcvQnXgRIbk8wKAKLZnrIx3nDjy
- r4rw==
-X-Gm-Message-State: APjAAAVRXk7TzjbKch2vxU4xeHHxwAqsXlCeWhW+HfHnP38PyRO+auCg
- Iv4mkK2PF8LK2GN4uYV6pF+YzXi4xZc=
-X-Google-Smtp-Source: APXvYqzgkK3hEnI0izb799n8Me2A4S/sp7uvC05iWymtR7Lx42tgqiV3J2lEUHjMXxJq1pw++LQoSA==
-X-Received: by 2002:a05:6000:118f:: with SMTP id
- g15mr6881807wrx.242.1572384326970; 
- Tue, 29 Oct 2019 14:25:26 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=Qd3GH9HPwVtreGrCS04zfrsEpWfzxdHqfHgWezVniXk=;
+ b=HtfbhWsji1cxOxZ3Hfl3bI4AVYTPXguuAEsnk+Qa/VJgkFEyK3c0w8Fl2jK5kdk46t
+ 7tlOEUiMD5OstMH2FoqPMjujaZfRWi+S6PHlewhWE+5tEj+H2UZruRW2JUrkcm35f0AJ
+ DRR6opCa3R+OcbCiiAyue1BdBM6TG85TpxdJd3O9wLSGyaMAH3rp+SKKRCPj7YH9OWoJ
+ ChiE4Uiz5DBwajWtISeDwKoszdt5CDP3LxhTCD5tWIzv2j2L/k6II6msu8R5e8NlUZBs
+ MdC9MuXqBCmvZ+1FDN2XLh6nFNDkfOeSxJHNxDk7gxK/OmJCYJ7y/ULYmwuZRpujDsuF
+ TeDw==
+X-Gm-Message-State: APjAAAXEQ9bH5/tFmmSrtfR1OMh5m7fxjXZKyoG9LPcmrjOYhvB+T9xQ
+ x2b57ThmQaNwA63WaoRmHn9MYgH2Hy8N6Q==
+X-Google-Smtp-Source: APXvYqyf654+1T0xS/t4MuvfTvgTbi/4EU2RKRe5x/MycnTJrEdMgWWCnhtmoxipuXt4PfItRSRXcA==
+X-Received: by 2002:adf:eec9:: with SMTP id a9mr7684286wrp.8.1572384342648;
+ Tue, 29 Oct 2019 14:25:42 -0700 (PDT)
 Received: from 8c859074c0ff.ant.amazon.com.com
  (bzq-79-178-97-184.red.bezeqint.net. [79.178.97.184])
- by smtp.gmail.com with ESMTPSA id 200sm4924730wme.32.2019.10.29.14.25.25
+ by smtp.gmail.com with ESMTPSA id 200sm4924730wme.32.2019.10.29.14.25.40
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
- Tue, 29 Oct 2019 14:25:26 -0700 (PDT)
+ Tue, 29 Oct 2019 14:25:42 -0700 (PDT)
 From: Michael Rolnik <mrolnik@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v35 00/13] QEMU AVR 8 bit cores
-Date: Tue, 29 Oct 2019 23:24:17 +0200
-Message-Id: <20191029212430.20617-1-mrolnik@gmail.com>
+Subject: [PATCH v35 09/13] target/avr: Add instruction translation - CPU main
+ translation function
+Date: Tue, 29 Oct 2019 23:24:26 +0200
+Message-Id: <20191029212430.20617-10-mrolnik@gmail.com>
 X-Mailer: git-send-email 2.17.2 (Apple Git-113)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191029212430.20617-1-mrolnik@gmail.com>
+References: <20191029212430.20617-1-mrolnik@gmail.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42d
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,325 +98,256 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series of patches adds 8bit AVR cores to QEMU.
-All instruction, except BREAK/DES/SPM/SPMX, are implemented. Not fully tested yet.
-However I was able to execute simple code with functions. e.g fibonacci calculation.
-This series of patches include a non real, sample board.
-No fuses support yet. PC is set to 0 at reset.
+Co-developed-by: Richard Henderson <richard.henderson@linaro.org>
+Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
 
-the patches include the following
-1. just a basic 8bit AVR CPU, without instruction decoding or translation
-2. CPU features which allow define the following 8bit AVR cores
-     avr1
-     avr2 avr25
-     avr3 avr31 avr35
-     avr4
-     avr5 avr51
-     avr6
-     xmega2 xmega4 xmega5 xmega6 xmega7
-3. a definition of sample machine with SRAM, FLASH and CPU which allows to execute simple code
-4. encoding for all AVR instructions
-5. interrupt handling
-6. helpers for IN, OUT, SLEEP, WBR & unsupported instructions
-7. a decoder which given an opcode decides what istruction it is
-8. translation of AVR instruction into TCG
-9. all features together
+Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+---
+ target/avr/translate.c | 234 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 234 insertions(+)
 
-changes since v3
-1. rampD/X/Y/Z registers are encoded as 0x00ff0000 (instead of 0x000000ff) for faster address manipulaton
-2. ffs changed to ctz32
-3. duplicate code removed at avr_cpu_do_interrupt
-4. using andc instead of not + and
-5. fixing V flag calculation in varios instructions
-6. freeing local variables in PUSH
-7. tcg_const_local_i32 -> tcg_const_i32
-8. using sextract32 instead of my implementation
-9. fixing BLD instruction
-10.xor(r) instead of 0xff - r at COM
-11.fixing MULS/MULSU not to modify inputs' content
-12.using SUB for NEG
-13.fixing tcg_gen_qemu_ld/st call in XCH
-
-changes since v4
-1. target is now defined as big endian in order to optimize push_ret/pop_ret
-2. all style warnings are fixed
-3. adding cpu_set/get_sreg functions
-4. simplifying gen_goto_tb as there is no real paging
-5. env->pc -> env->pc_w
-6. making flag dump more compact
-7. more spacing
-8. renaming CODE/DATA_INDEX -> MMU_CODE/DATA_IDX
-9. removing avr_set_feature
-10. SPL/SPH set bug fix
-11. switching stb_phys to cpu_stb_data
-12. cleaning up avr_decode
-13. saving sreg, rampD/X/Y/Z, eind in HW format (savevm)
-14. saving CPU features (savevm)
-
-changes since v5
-1. BLD bug fix
-2. decoder generator is added
-
-chages since v6
-1. using cpu_get_sreg/cpu_set_sreg in avr_cpu_gdb_read_register/avr_cpu_gdb_write_register
-2. configure the target as little endian because otherwise GDB does not work
-3. fixing and testing gen_push_ret/gen_pop_ret
-
-changes since v7
-1. folding back v6
-2. logging at helper_outb and helper_inb are done for non supported yet registers only
-3. MAINTAINERS updated
-
-changes since v8
-1. removing hw/avr from hw/Makefile.obj as it should not be built for all
-2. making linux compilable
-3. testing on
-    a. Mac, Apple LLVM version 7.0.0
-    b. Ubuntu 12.04, gcc 4.9.2
-    c. Fedora 23, gcc 5.3.1
-4. folding back some patches
-5. translation bug fixes for ORI, CPI, XOR instructions
-6. propper handling of cpu register writes though memory
-
-changes since v9
-1. removing forward declarations of static functions
-2. disabling debug prints
-3. switching to case range instead of if else if ...
-4. LD/ST IN/OUT accessing CPU maintainder registers are not routed to any device
-5. commenst about sample board and sample IO device added
-6. sample board description is more descriptive now
-7. memory_region_allocate_system_memory is used to create RAM
-8. now there are helper_fullrd & helper_fullwr when LD/ST try to access registers
-
-changes since v10
-1. movig back fullwr & fullrd into the commit where outb and inb were introduced
-2. changing tlb_fill function signature
-3. adding empty line between functions
-4. adding newline on the last line of the file
-5. using tb->flags to generae full access ST/LD instructions
-6. fixing SBRC bug
-7. folding back 10th commit
-8. whenever a new file is introduced it's added to Makefile.objs
-
-changes since v11
-1. updating to v2.7.0-rc
-2. removing assignment to env->fullacc from gen_intermediate_code
-
-changes since v12
-1. fixing spacing
-2. fixing get/put_segment functions
-3. removing target-avr/machine.h file
-4. VMSTATE_SINGLE_TEST -> VMSTATE_SINGLE
-5. comment spelling
-6. removing hw/avr/sample_io.c
-7. char const* -> const char*
-8. proper ram allocation
-9. fixing breakpoint functionality.
-10.env1 -> env
-11.fixing avr_cpu_gdb_write_register & avr_cpu_gdb_read_register functions
-12.any cpu is removed
-12.feature bits are not saved into vm state
-
-changes since v13
-1. rebasing to v2.7.0-rc1
-
-changes since v14
-1. I made self review with git gui tool. (I did not know such a thing exists)
-2. removing all double/tripple spaces
-3. removing comment reference to SampleIO
-4. folding back some changes, so there is not deleted lines in my code
-5. moving avr configuration, within configure file, before chris
-
-changes since v15
-1. removing IO registers cache from CPU
-2. implementing CBI/SBI as read(helper_inb), modify, write(helper_outb)
-3. implementing CBIC/SBIC as read(helper_inb), check, branch
-4. adding missing tcg_temp_free_i32 for tcg_const_i32
-
-changes since v16
-1. removing EXT IO registers knoledge from CPU. These registers are accessible
-   by LD/ST only. CPU has no interest in them
-
-changes since v17 (by Richard Henderson)
-This is Michael's v17, with some adjustments of my own:
-
-1. Fix the whitespace errors reported by "git am",
-2. Replace the utf-8 characters with normal ascii,
-3. Ditch the separate compilation of translate.c.
-
-I retained the two separate files that could be regenerated
-from the included cpugen program, but merged in translate-insn.c.
-Not that it matters, but the code generated is about 3k smaller.
-
-changes since v18
-1.  moving target-avr into target/avr
-2.  do not call cpu_exec_initfn function from avr_cpu_initfn
-3.  call cpu_exec_realizefn avr_cpu_realizefn
-4.  do not fail sample machine creation if no rom is suplied
-5.  add tcg_gen_exit_tb(0) for BS_BRANCH in gen_intermediate_code
-6.  fix a register getters/setters in machine.c
-7.  changing QEMU_ARCH_AVR from 1<<17 to 1<<18
-
-changes since v19
-1.  use decodetree.py tool to decode instructions
-2.  adding USART
-3.  adding 16 bit timer peripherals
-4.  changing QEMU_ARCH_AVR from 1<<18 to 1<<20
-5.  renaming tlb_fill to avr_cpu_tlb_fill
-
-changes since v20
-1.  use one CPU naming convention
-2.  merging insn16.decode & insn32.decode files
-3.  modifying skip next instruction mechanizm
-4.  translate BREAK as NOP for now
-
-changes since v21
-1.  Reorganize bstate.
-    This will make transition to <exec/translator.h> easier, and fixes a couple of bugs wrt single stepping
-    by richard.henderson@linaro.org
-2.  Drop cpc and fix page cross condition.
-    by richard.henderson@linaro.org
-3.  Refactor checking supported/unsupported instructions
-4.  Add gdb-xml/avr-cpu.xml
-
-changes since v22
-1.  Rebase
-2.  Split long comment
-
-changes since v23
-1.  remove avr_cpu_list_compare function
-2.  modify avr_cpu_class_by_name function
-3.  modify avr_cpu_list_entry function
-4.  modify avr_cpu_list function
-
-changes since v24
-1.  remove AVR_CPU_TYPE_NAME macro
-
-changes since v25
-1.  fix patches. every file belong to one patch only
-2.  change copyright year from 2016 to 2019
-3.  create mask device to emulate prr0/prr1
-
-changes since v26
-1.  add avocado acceptence test
-2.  add boot serial test
-
-changes since v27
-1.  list atmel2560 devices as unimplemented
-2.  fix sram base/size
-
-changes since v28
-1.  rebase
-2.  fix includes & build
-
-changes since v29
-1.  fixing ownership
-2.  using 'since' instread of 'added in'
-
-changes since v30
-1.  rebase
-
-changes since v31
-1.  splitting 'Add instruction translation' commit
-2.  fixing typo in qapi/machine.json sicne -> since
-3.  removing unintended changes in configure file
-4.  adding Richard Henderson as a co developer to 'Add instruction translation - CPU main translation funcions' commit
-
-changes since v32
-1.  modify cpu_get_sreg to treat sreg C as other flags, except sreg Z
-
-changes since v33
-1.  ensure flag C is always calculated as one bit
-2.  calculate flag Z as one bit, without using inverse logic
-
-changes since v34
-1.  rebase
-
-Michael Rolnik (12):
-  target/avr: Add outward facing interfaces and core CPU logic
-  target/avr: Add instruction helpers
-  target/avr: Add instruction decoding
-  target/avr: Add instruction translation - Registers definition
-  target/avr: Add instruction translation - Arithmetic and Logic
-    Instructions
-  target/avr: Add instruction translation - Branch Instructions
-  target/avr: Add instruction translation - Bit and Bit-test
-    Instructions
-  target/avr: Add instruction translation - MCU Control Instructions
-  target/avr: Add instruction translation - CPU main translation
-    function
-  target/avr: Add example board configuration
-  target/avr: Register AVR support with the rest of QEMU, the build
-    system, and the WMAINTAINERS file
-  target/avr: Add tests
-
-Sarah Harris (1):
-  target/avr: Add limited support for USART and 16 bit timer peripherals
-
- MAINTAINERS                      |    9 +
- arch_init.c                      |    2 +
- configure                        |    7 +
- default-configs/avr-softmmu.mak  |    5 +
- gdb-xml/avr-cpu.xml              |   49 +
- hw/Kconfig                       |    1 +
- hw/avr/Kconfig                   |    6 +
- hw/avr/Makefile.objs             |    1 +
- hw/avr/sample.c                  |  282 +++
- hw/char/Kconfig                  |    3 +
- hw/char/Makefile.objs            |    1 +
- hw/char/avr_usart.c              |  324 ++++
- hw/misc/Kconfig                  |    3 +
- hw/misc/Makefile.objs            |    2 +
- hw/misc/avr_mask.c               |  112 ++
- hw/timer/Kconfig                 |    3 +
- hw/timer/Makefile.objs           |    2 +
- hw/timer/avr_timer16.c           |  605 ++++++
- include/disas/dis-asm.h          |    6 +
- include/hw/char/avr_usart.h      |   97 +
- include/hw/misc/avr_mask.h       |   47 +
- include/hw/timer/avr_timer16.h   |   97 +
- include/sysemu/arch_init.h       |    1 +
- qapi/machine.json                |    3 +-
- target/avr/Makefile.objs         |   33 +
- target/avr/cpu-param.h           |   37 +
- target/avr/cpu-qom.h             |   54 +
- target/avr/cpu.c                 |  576 ++++++
- target/avr/cpu.h                 |  253 +++
- target/avr/gdbstub.c             |   85 +
- target/avr/helper.c              |  354 ++++
- target/avr/helper.h              |   29 +
- target/avr/insn.decode           |  175 ++
- target/avr/machine.c             |  121 ++
- target/avr/translate.c           | 3028 ++++++++++++++++++++++++++++++
- tests/Makefile.include           |    2 +
- tests/acceptance/machine_avr6.py |   36 +
- tests/boot-serial-test.c         |   10 +
- tests/machine-none-test.c        |    1 +
- 39 files changed, 6461 insertions(+), 1 deletion(-)
- create mode 100644 default-configs/avr-softmmu.mak
- create mode 100644 gdb-xml/avr-cpu.xml
- create mode 100644 hw/avr/Kconfig
- create mode 100644 hw/avr/Makefile.objs
- create mode 100644 hw/avr/sample.c
- create mode 100644 hw/char/avr_usart.c
- create mode 100644 hw/misc/avr_mask.c
- create mode 100644 hw/timer/avr_timer16.c
- create mode 100644 include/hw/char/avr_usart.h
- create mode 100644 include/hw/misc/avr_mask.h
- create mode 100644 include/hw/timer/avr_timer16.h
- create mode 100644 target/avr/Makefile.objs
- create mode 100644 target/avr/cpu-param.h
- create mode 100644 target/avr/cpu-qom.h
- create mode 100644 target/avr/cpu.c
- create mode 100644 target/avr/cpu.h
- create mode 100644 target/avr/gdbstub.c
- create mode 100644 target/avr/helper.c
- create mode 100644 target/avr/helper.h
- create mode 100644 target/avr/insn.decode
- create mode 100644 target/avr/machine.c
- create mode 100644 target/avr/translate.c
- create mode 100644 tests/acceptance/machine_avr6.py
-
+diff --git a/target/avr/translate.c b/target/avr/translate.c
+index 30ba13bdd7..fdf4e11f58 100644
+--- a/target/avr/translate.c
++++ b/target/avr/translate.c
+@@ -2792,3 +2792,237 @@ static bool trans_WDR(DisasContext *ctx, arg_WDR *a)
+ 
+     return true;
+ }
++
++
++void avr_cpu_tcg_init(void)
++{
++    int i;
++
++#define AVR_REG_OFFS(x) offsetof(CPUAVRState, x)
++    cpu_pc = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(pc_w), "pc");
++    cpu_Cf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregC), "Cf");
++    cpu_Zf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregZ), "Zf");
++    cpu_Nf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregN), "Nf");
++    cpu_Vf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregV), "Vf");
++    cpu_Sf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregS), "Sf");
++    cpu_Hf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregH), "Hf");
++    cpu_Tf = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregT), "Tf");
++    cpu_If = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sregI), "If");
++    cpu_rampD = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampD), "rampD");
++    cpu_rampX = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampX), "rampX");
++    cpu_rampY = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampY), "rampY");
++    cpu_rampZ = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(rampZ), "rampZ");
++    cpu_eind = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(eind), "eind");
++    cpu_sp = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(sp), "sp");
++    cpu_skip = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(skip), "skip");
++
++    for (i = 0; i < NO_CPU_REGISTERS; i++) {
++        cpu_r[i] = tcg_global_mem_new_i32(cpu_env, AVR_REG_OFFS(r[i]),
++                                          reg_names[i]);
++    }
++#undef AVR_REG_OFFS
++}
++
++static void translate(DisasContext *ctx)
++{
++    uint32_t opcode = next_word(ctx);
++
++    if (!decode_insn(ctx, opcode)) {
++        gen_helper_unsupported(cpu_env);
++        ctx->bstate = DISAS_NORETURN;
++    }
++}
++
++/* Standardize the cpu_skip condition to NE.  */
++static bool canonicalize_skip(DisasContext *ctx)
++{
++    switch (ctx->skip_cond) {
++    case TCG_COND_NEVER:
++        /* Normal case: cpu_skip is known to be false.  */
++        return false;
++
++    case TCG_COND_ALWAYS:
++        /*
++         * Breakpoint case: cpu_skip is known to be true, via TB_FLAGS_SKIP.
++         * The breakpoint is on the instruction being skipped, at the start
++         * of the TranslationBlock.  No need to update.
++         */
++        return false;
++
++    case TCG_COND_NE:
++        if (ctx->skip_var1 == NULL) {
++            tcg_gen_mov_tl(cpu_skip, ctx->skip_var0);
++        } else {
++            tcg_gen_xor_tl(cpu_skip, ctx->skip_var0, ctx->skip_var1);
++            ctx->skip_var1 = NULL;
++        }
++        break;
++
++    default:
++        /* Convert to a NE condition vs 0. */
++        if (ctx->skip_var1 == NULL) {
++            tcg_gen_setcondi_tl(ctx->skip_cond, cpu_skip, ctx->skip_var0, 0);
++        } else {
++            tcg_gen_setcond_tl(ctx->skip_cond, cpu_skip,
++                               ctx->skip_var0, ctx->skip_var1);
++            ctx->skip_var1 = NULL;
++        }
++        ctx->skip_cond = TCG_COND_NE;
++        break;
++    }
++    if (ctx->free_skip_var0) {
++        tcg_temp_free(ctx->skip_var0);
++        ctx->free_skip_var0 = false;
++    }
++    ctx->skip_var0 = cpu_skip;
++    return true;
++}
++
++void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
++{
++    CPUAVRState *env = cs->env_ptr;
++    DisasContext ctx = {
++        .tb = tb,
++        .cs = cs,
++        .env = env,
++        .memidx = 0,
++        .bstate = DISAS_NEXT,
++        .skip_cond = TCG_COND_NEVER,
++        .singlestep = cs->singlestep_enabled,
++    };
++    target_ulong pc_start = tb->pc / 2;
++    int num_insns = 0;
++
++    if (tb->flags & TB_FLAGS_FULL_ACCESS) {
++        /*
++         * This flag is set by ST/LD instruction we will regenerate it ONLY
++         * with mem/cpu memory access instead of mem access
++         */
++        max_insns = 1;
++    }
++    if (ctx.singlestep) {
++        max_insns = 1;
++    }
++
++    gen_tb_start(tb);
++
++    ctx.npc = pc_start;
++    if (tb->flags & TB_FLAGS_SKIP) {
++        ctx.skip_cond = TCG_COND_ALWAYS;
++        ctx.skip_var0 = cpu_skip;
++    }
++
++    do {
++        TCGLabel *skip_label = NULL;
++
++        /* translate current instruction */
++        tcg_gen_insn_start(ctx.npc);
++        num_insns++;
++
++        /*
++         * this is due to some strange GDB behavior
++         * let's assume main has address 0x100
++         * b main   - sets breakpoint at address 0x00000100 (code)
++         * b *0x100 - sets breakpoint at address 0x00800100 (data)
++         */
++        if (unlikely(!ctx.singlestep &&
++                (cpu_breakpoint_test(cs, OFFSET_CODE + ctx.npc * 2, BP_ANY) ||
++                 cpu_breakpoint_test(cs, OFFSET_DATA + ctx.npc * 2, BP_ANY)))) {
++            canonicalize_skip(&ctx);
++            tcg_gen_movi_tl(cpu_pc, ctx.npc);
++            gen_helper_debug(cpu_env);
++            goto done_generating;
++        }
++
++        /* Conditionally skip the next instruction, if indicated.  */
++        if (ctx.skip_cond != TCG_COND_NEVER) {
++            skip_label = gen_new_label();
++            if (ctx.skip_var0 == cpu_skip) {
++                /*
++                 * Copy cpu_skip so that we may zero it before the branch.
++                 * This ensures that cpu_skip is non-zero after the label
++                 * if and only if the skipped insn itself sets a skip.
++                 */
++                ctx.free_skip_var0 = true;
++                ctx.skip_var0 = tcg_temp_new();
++                tcg_gen_mov_tl(ctx.skip_var0, cpu_skip);
++                tcg_gen_movi_tl(cpu_skip, 0);
++            }
++            if (ctx.skip_var1 == NULL) {
++                tcg_gen_brcondi_tl(ctx.skip_cond, ctx.skip_var0, 0, skip_label);
++            } else {
++                tcg_gen_brcond_tl(ctx.skip_cond, ctx.skip_var0,
++                                  ctx.skip_var1, skip_label);
++                ctx.skip_var1 = NULL;
++            }
++            if (ctx.free_skip_var0) {
++                tcg_temp_free(ctx.skip_var0);
++                ctx.free_skip_var0 = false;
++            }
++            ctx.skip_cond = TCG_COND_NEVER;
++            ctx.skip_var0 = NULL;
++        }
++
++        translate(&ctx);
++
++        if (skip_label) {
++            canonicalize_skip(&ctx);
++            gen_set_label(skip_label);
++            if (ctx.bstate == DISAS_NORETURN) {
++                ctx.bstate = DISAS_CHAIN;
++            }
++        }
++    } while (ctx.bstate == DISAS_NEXT
++             && num_insns < max_insns
++             && (ctx.npc - pc_start) * 2 < TARGET_PAGE_SIZE - 4
++             && !tcg_op_buf_full());
++
++    if (tb->cflags & CF_LAST_IO) {
++        gen_io_end();
++    }
++
++    bool nonconst_skip = canonicalize_skip(&ctx);
++
++    switch (ctx.bstate) {
++    case DISAS_NORETURN:
++        assert(!nonconst_skip);
++        break;
++    case DISAS_NEXT:
++    case DISAS_TOO_MANY:
++    case DISAS_CHAIN:
++        if (!nonconst_skip) {
++            /* Note gen_goto_tb checks singlestep.  */
++            gen_goto_tb(&ctx, 1, ctx.npc);
++            break;
++        }
++        tcg_gen_movi_tl(cpu_pc, ctx.npc);
++        /* fall through */
++    case DISAS_LOOKUP:
++        if (!ctx.singlestep) {
++            tcg_gen_lookup_and_goto_ptr();
++            break;
++        }
++        /* fall through */
++    case DISAS_EXIT:
++        if (ctx.singlestep) {
++            gen_helper_debug(cpu_env);
++        } else {
++            tcg_gen_exit_tb(NULL, 0);
++        }
++        break;
++    default:
++        g_assert_not_reached();
++    }
++
++done_generating:
++    gen_tb_end(tb, num_insns);
++
++    tb->size = (ctx.npc - pc_start) * 2;
++    tb->icount = num_insns;
++}
++
++void restore_state_to_opc(CPUAVRState *env, TranslationBlock *tb,
++                            target_ulong *data)
++{
++    env->pc_w = data[0];
++}
 -- 
 2.17.2 (Apple Git-113)
 
