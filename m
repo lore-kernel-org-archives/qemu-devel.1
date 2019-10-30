@@ -2,63 +2,79 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A665CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 08:55:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C84ACA9EAF
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 09:00:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03FBE20578
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 08:55:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03FBE20578
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E2332083E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 09:00:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E2332083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPjlG-0001gX-72
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 04:55:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47821)
+	id 1iPjqI-0003mF-AN
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 05:00:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49434)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zhengxiang9@huawei.com>) id 1iPjhs-0000JO-Qt
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:51:59 -0400
+ (envelope-from <chen.zhang@intel.com>) id 1iPjp2-00036k-TN
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:59:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zhengxiang9@huawei.com>) id 1iPjhq-0001r0-3Q
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:51:56 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2257 helo=huawei.com)
+ (envelope-from <chen.zhang@intel.com>) id 1iPjow-0003nv-H5
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:59:18 -0400
+Received: from mga12.intel.com ([192.55.52.136]:22782)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
- id 1iPjhj-0008Rz-Na; Wed, 30 Oct 2019 04:51:48 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 299F56F97DFDA0DBAFBA;
- Wed, 30 Oct 2019 16:51:37 +0800 (CST)
-Received: from [127.0.0.1] (10.133.224.57) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Wed, 30 Oct 2019
- 16:51:29 +0800
-Subject: Re: [PATCH v20 3/5] ACPI: Add APEI GHES table generation support
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20191026032447.20088-1-zhengxiang9@huawei.com>
- <20191026032447.20088-4-zhengxiang9@huawei.com>
- <20191027060942-mutt-send-email-mst@kernel.org>
-From: Xiang Zheng <zhengxiang9@huawei.com>
-Message-ID: <606a239d-ed94-1064-2e73-eab124c0ebc6@huawei.com>
-Date: Wed, 30 Oct 2019 16:51:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.0
-MIME-Version: 1.0
-In-Reply-To: <20191027060942-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1iPjol-0002tY-No; Wed, 30 Oct 2019 04:59:04 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 30 Oct 2019 01:58:57 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,246,1569308400"; d="scan'208";a="205732082"
+Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
+ by FMSMGA003.fm.intel.com with ESMTP; 30 Oct 2019 01:58:57 -0700
+Received: from shsmsx103.ccr.corp.intel.com (10.239.4.69) by
+ fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 30 Oct 2019 01:58:57 -0700
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.108]) by
+ SHSMSX103.ccr.corp.intel.com ([169.254.4.60]) with mapi id 14.03.0439.000;
+ Wed, 30 Oct 2019 16:58:55 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
+Subject: RE: [PATCH v7 4/4] colo: Update Documentation for continuous
+ replication
+Thread-Topic: [PATCH v7 4/4] colo: Update Documentation for continuous
+ replication
+Thread-Index: AQHVincaMpHBgU67g0uTy7JyFHeLfKdy6wPw
+Date: Wed, 30 Oct 2019 08:58:54 +0000
+Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D78062E107D@shsmsx102.ccr.corp.intel.com>
+References: <cover.1571925699.git.lukasstraub2@web.de>
+ <ad91341a5cecb103530b303b26de5024b43eaadb.1571925700.git.lukasstraub2@web.de>
+In-Reply-To: <ad91341a5cecb103530b303b26de5024b43eaadb.1571925700.git.lukasstraub2@web.de>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.224.57]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.191
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTc4MzhjZWEtMjc5OS00ZWViLThlYWItNWVlN2Y2YWFmMTUzIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoidU9DTHFCWnYrMWo4dFcyZllka2E0QTN5MEwzSUpkbkZ5K0t5ZG9VcEZTY0FZSEI4dWFCdUdsUGkrNXp4MmlvWiJ9
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.136
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,522 +86,375 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
- wanghaibin.wang@huawei.com, mtosatti@redhat.com, linuxarm@huawei.com,
- qemu-devel@nongnu.org, gengdongjiu@huawei.com, shannon.zhaosl@gmail.com,
- qemu-arm@nongnu.org, james.morse@arm.com, jonathan.cameron@huawei.com,
- imammedo@redhat.com, pbonzini@redhat.com, xuwei5@huawei.com, lersek@redhat.com,
- rth@twiddle.net
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Wen Congyang <wency@cn.fujitsu.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Jason Wang <jasowang@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 2019/10/27 18:14, Michael S. Tsirkin wrote:
-> On Sat, Oct 26, 2019 at 11:24:45AM +0800, Xiang Zheng wrote:
->> From: Dongjiu Geng <gengdongjiu@huawei.com>
->>
->> This patch implements APEI GHES Table generation via fw_cfg blobs. Now
->> it only supports ARMv8 SEA, a type of GHESv2 error source. Afterwards,
->> we can extend the supported types if needed. For the CPER section,
->> currently it is memory section because kernel mainly wants userspace to
->> handle the memory errors.
->>
->> This patch follows the spec ACPI 6.2 to build the Hardware Error Source
->> table. For more detailed information, please refer to document:
->> docs/specs/acpi_hest_ghes.rst
->>
->> Suggested-by: Laszlo Ersek <lersek@redhat.com>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
->> ---
->>  default-configs/arm-softmmu.mak |   1 +
->>  hw/acpi/Kconfig                 |   4 +
->>  hw/acpi/Makefile.objs           |   1 +
->>  hw/acpi/acpi_ghes.c             | 217 ++++++++++++++++++++++++++++++++
->>  hw/acpi/aml-build.c             |   2 +
->>  hw/arm/virt-acpi-build.c        |  12 ++
->>  include/hw/acpi/acpi_ghes.h     | 106 ++++++++++++++++
->>  include/hw/acpi/aml-build.h     |   1 +
->>  8 files changed, 344 insertions(+)
->>  create mode 100644 hw/acpi/acpi_ghes.c
->>  create mode 100644 include/hw/acpi/acpi_ghes.h
->>
->> diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
->> index 1f2e0e7fde..5722f3130e 100644
->> --- a/default-configs/arm-softmmu.mak
->> +++ b/default-configs/arm-softmmu.mak
->> @@ -40,3 +40,4 @@ CONFIG_FSL_IMX25=y
->>  CONFIG_FSL_IMX7=y
->>  CONFIG_FSL_IMX6UL=y
->>  CONFIG_SEMIHOSTING=y
->> +CONFIG_ACPI_APEI=y
->> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
->> index 12e3f1e86e..ed8c34d238 100644
->> --- a/hw/acpi/Kconfig
->> +++ b/hw/acpi/Kconfig
->> @@ -23,6 +23,10 @@ config ACPI_NVDIMM
->>      bool
->>      depends on ACPI
->>  
->> +config ACPI_APEI
->> +    bool
->> +    depends on ACPI
->> +
->>  config ACPI_PCI
->>      bool
->>      depends on ACPI && PCI
->> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
->> index 655a9c1973..84474b0ca8 100644
->> --- a/hw/acpi/Makefile.objs
->> +++ b/hw/acpi/Makefile.objs
->> @@ -5,6 +5,7 @@ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu_hotplug.o
->>  common-obj-$(CONFIG_ACPI_MEMORY_HOTPLUG) += memory_hotplug.o
->>  common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) += cpu.o
->>  common-obj-$(CONFIG_ACPI_NVDIMM) += nvdimm.o
->> +common-obj-$(CONFIG_ACPI_APEI) += acpi_ghes.o
->>  common-obj-$(CONFIG_ACPI_VMGENID) += vmgenid.o
->>  common-obj-$(CONFIG_ACPI_HW_REDUCED) += generic_event_device.o
->>  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) += acpi-stub.o
->> diff --git a/hw/acpi/acpi_ghes.c b/hw/acpi/acpi_ghes.c
->> new file mode 100644
->> index 0000000000..23f8a9928c
->> --- /dev/null
->> +++ b/hw/acpi/acpi_ghes.c
->> @@ -0,0 +1,217 @@
->> +/*
->> + * Support for generating APEI tables and recording CPER for Guests
->> + *
->> + * Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
->> + *
->> + * Author: Dongjiu Geng <gengdongjiu@huawei.com>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License as published by
->> + * the Free Software Foundation; either version 2 of the License, or
->> + * (at your option) any later version.
->> +
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> +
->> + * You should have received a copy of the GNU General Public License along
->> + * with this program; if not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/acpi/acpi.h"
->> +#include "hw/acpi/aml-build.h"
->> +#include "hw/acpi/acpi_ghes.h"
->> +#include "hw/nvram/fw_cfg.h"
->> +#include "sysemu/sysemu.h"
->> +#include "qemu/error-report.h"
->> +
->> +/*
->> + * Hardware Error Notification
->> + * ACPI 4.0: 17.3.2.7 Hardware Error Notification
->> + */
->> +static void acpi_ghes_build_notify(GArray *table, const uint8_t type)
->> +{
->> +        /* Type */
->> +        build_append_int_noprefix(table, type, 1);
->> +        /*
->> +         * Length:
->> +         * Total length of the structure in bytes
->> +         */
->> +        build_append_int_noprefix(table, 28, 1);
->> +        /* Configuration Write Enable */
->> +        build_append_int_noprefix(table, 0, 2);
->> +        /* Poll Interval */
->> +        build_append_int_noprefix(table, 0, 4);
->> +        /* Vector */
->> +        build_append_int_noprefix(table, 0, 4);
->> +        /* Switch To Polling Threshold Value */
->> +        build_append_int_noprefix(table, 0, 4);
->> +        /* Switch To Polling Threshold Window */
->> +        build_append_int_noprefix(table, 0, 4);
->> +        /* Error Threshold Value */
->> +        build_append_int_noprefix(table, 0, 4);
->> +        /* Error Threshold Window */
->> +        build_append_int_noprefix(table, 0, 4);
->> +}
->> +
->> +/* Build table for the hardware error fw_cfg blob */
->> +void acpi_ghes_build_error_table(GArray *hardware_errors, BIOSLinker *linker)
->> +{
->> +    int i, error_status_block_offset;
->> +
->> +    /*
->> +     * | +--------------------------+
->> +     * | |    error_block_address   |
->> +     * | |      ..........          |
->> +     * | +--------------------------+
->> +     * | |    read_ack_register     |
->> +     * | |     ...........          |
->> +     * | +--------------------------+
->> +     * | |  Error Status Data Block |
->> +     * | |      ........            |
->> +     * | +--------------------------+
->> +     */
->> +
->> +    /* Build error_block_address */
->> +    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
->> +        build_append_int_noprefix(hardware_errors, 0, ACPI_GHES_ADDRESS_SIZE);
->> +    }
->> +
->> +    /* Build read_ack_register */
->> +    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
->> +        /*
->> +         * Initialize the value of read_ack_register to 1, so GHES can be
->> +         * writeable in the first time.
->> +         * ACPI 6.2: 18.3.2.8 Generic Hardware Error Source version 2
->> +         * (GHESv2 - Type 10)
->> +         */
->> +        build_append_int_noprefix(hardware_errors, 1, ACPI_GHES_ADDRESS_SIZE);
->> +    }
->> +
->> +    /* Generic Error Status Block offset in the hardware error fw_cfg blob */
->> +    error_status_block_offset = hardware_errors->len;
->> +
->> +    /* Build Error Status Data Block */
->> +    build_append_int_noprefix(hardware_errors, 0,
->> +        ACPI_GHES_MAX_RAW_DATA_LENGTH * ACPI_GHES_ERROR_SOURCE_COUNT);
->> +
->> +    /* Allocate guest memory for the hardware error fw_cfg blob */
->> +    bios_linker_loader_alloc(linker, ACPI_GHES_ERRORS_FW_CFG_FILE,
->> +                             hardware_errors, 1, false);
->> +
->> +    for (i = 0; i < ACPI_GHES_ERROR_SOURCE_COUNT; i++) {
->> +        /*
->> +         * Patch the address of Error Status Data Block into
->> +         * the error_block_address of hardware_errors fw_cfg blob
->> +         */
->> +        bios_linker_loader_add_pointer(linker,
->> +            ACPI_GHES_ERRORS_FW_CFG_FILE, ACPI_GHES_ADDRESS_SIZE * i,
->> +            ACPI_GHES_ADDRESS_SIZE, ACPI_GHES_ERRORS_FW_CFG_FILE,
->> +            error_status_block_offset + i * ACPI_GHES_MAX_RAW_DATA_LENGTH);
->> +    }
->> +
->> +    /*
->> +     * Write the address of hardware_errors fw_cfg blob into the
->> +     * hardware_errors_addr fw_cfg blob.
->> +     */
->> +    bios_linker_loader_write_pointer(linker, ACPI_GHES_DATA_ADDR_FW_CFG_FILE,
->> +        0, ACPI_GHES_ADDRESS_SIZE, ACPI_GHES_ERRORS_FW_CFG_FILE, 0);
->> +}
->> +
->> +/* Build Hardware Error Source Table */
->> +void acpi_ghes_build_hest(GArray *table_data, GArray *hardware_errors,
->> +                          BIOSLinker *linker)
->> +{
->> +    uint32_t hest_start = table_data->len;
->> +    uint32_t source_id = 0;
->> +
->> +    /* Hardware Error Source Table header*/
->> +    acpi_data_push(table_data, sizeof(AcpiTableHeader));
->> +
->> +    /* Error Source Count */
->> +    build_append_int_noprefix(table_data, ACPI_GHES_ERROR_SOURCE_COUNT, 4);
->> +
->> +    /*
->> +     * Type:
->> +     * Generic Hardware Error Source version 2(GHESv2 - Type 10)
->> +     */
->> +    build_append_int_noprefix(table_data, ACPI_GHES_SOURCE_GENERIC_ERROR_V2, 2);
->> +    /*
->> +     * Source Id
->> +     * Once we support more than one hardware error sources, we need to
->> +     * increase the value of this field.
->> +     */
->> +    build_append_int_noprefix(table_data, source_id, 2);
->> +    /* Related Source Id */
->> +    build_append_int_noprefix(table_data, 0xffff, 2);
->> +    /* Flags */
->> +    build_append_int_noprefix(table_data, 0, 1);
->> +    /* Enabled */
->> +    build_append_int_noprefix(table_data, 1, 1);
->> +
->> +    /* Number of Records To Pre-allocate */
->> +    build_append_int_noprefix(table_data, 1, 4);
->> +    /* Max Sections Per Record */
->> +    build_append_int_noprefix(table_data, 1, 4);
->> +    /* Max Raw Data Length */
->> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
->> +
->> +    /* Error Status Address */
->> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
->> +                     4 /* QWord access */, 0);
->> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->> +        ACPI_GHES_ERROR_STATUS_ADDRESS_OFFSET(hest_start, source_id),
->> +        ACPI_GHES_ADDRESS_SIZE, ACPI_GHES_ERRORS_FW_CFG_FILE,
->> +        source_id * ACPI_GHES_ADDRESS_SIZE);
->> +
->> +    /*
->> +     * Notification Structure
->> +     * Now only enable ARMv8 SEA notification type
->> +     */
->> +    acpi_ghes_build_notify(table_data, ACPI_GHES_NOTIFY_SEA);
-> 
-> OK so the way to write it is then:
-> 
->    acpi_ghes_build_notify(table_data, 8 /* ARMv8 SEA, ACPI 6.1: 18.3.2.9, Table 18-345 */);
-> 
-> 
->> +
->> +    /* Error Status Block Length */
->> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LENGTH, 4);
->> +
->> +    /*
->> +     * Read Ack Register
->> +     * ACPI 6.1: 18.3.2.8 Generic Hardware Error Source
->> +     * version 2 (GHESv2 - Type 10)
->> +     */
->> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
->> +                     4 /* QWord access */, 0);
->> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->> +        ACPI_GHES_READ_ACK_REGISTER_ADDRESS_OFFSET(hest_start, 0),
->> +        ACPI_GHES_ADDRESS_SIZE, ACPI_GHES_ERRORS_FW_CFG_FILE,
->> +        (ACPI_GHES_ERROR_SOURCE_COUNT + source_id) * ACPI_GHES_ADDRESS_SIZE);
->> +
->> +    /*
->> +     * Read Ack Preserve
->> +     * We only provide the first bit in Read Ack Register to OSPM to write
->> +     * while the other bits are preserved.
->> +     */
->> +    build_append_int_noprefix(table_data, ~0x1LL, 8);
->> +    /* Read Ack Write */
->> +    build_append_int_noprefix(table_data, 0x1, 8);
->> +
->> +    build_header(linker, table_data, (void *)(table_data->data + hest_start),
->> +        "HEST", table_data->len - hest_start, 1, NULL, "GHES");
->> +}
->> +
->> +static AcpiGhesState ges;
->> +void acpi_ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_error)
->> +{
->> +
->> +    size_t size = 2 * ACPI_GHES_ADDRESS_SIZE + ACPI_GHES_MAX_RAW_DATA_LENGTH;
->> +    size_t request_block_size = ACPI_GHES_ERROR_SOURCE_COUNT * size;
->> +
->> +    /* Create a read-only fw_cfg file for GHES */
->> +    fw_cfg_add_file(s, ACPI_GHES_ERRORS_FW_CFG_FILE, hardware_error->data,
->> +                    request_block_size);
->> +
->> +    /* Create a read-write fw_cfg file for Address */
->> +    fw_cfg_add_file_callback(s, ACPI_GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL,
->> +        NULL, &ges.ghes_addr_le, sizeof(ges.ghes_addr_le), false);
->> +}
->> diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
->> index 2c3702b882..3681ec6e3d 100644
->> --- a/hw/acpi/aml-build.c
->> +++ b/hw/acpi/aml-build.c
->> @@ -1578,6 +1578,7 @@ void acpi_build_tables_init(AcpiBuildTables *tables)
->>      tables->table_data = g_array_new(false, true /* clear */, 1);
->>      tables->tcpalog = g_array_new(false, true /* clear */, 1);
->>      tables->vmgenid = g_array_new(false, true /* clear */, 1);
->> +    tables->hardware_errors = g_array_new(false, true /* clear */, 1);
->>      tables->linker = bios_linker_loader_init();
->>  }
->>  
->> @@ -1588,6 +1589,7 @@ void acpi_build_tables_cleanup(AcpiBuildTables *tables, bool mfre)
->>      g_array_free(tables->table_data, true);
->>      g_array_free(tables->tcpalog, mfre);
->>      g_array_free(tables->vmgenid, mfre);
->> +    g_array_free(tables->hardware_errors, mfre);
->>  }
->>  
->>  /*
->> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
->> index 4cd50175e0..1b1fd273e4 100644
->> --- a/hw/arm/virt-acpi-build.c
->> +++ b/hw/arm/virt-acpi-build.c
->> @@ -48,6 +48,7 @@
->>  #include "sysemu/reset.h"
->>  #include "kvm_arm.h"
->>  #include "migration/vmstate.h"
->> +#include "hw/acpi/acpi_ghes.h"
->>  
->>  #define ARM_SPI_BASE 32
->>  
->> @@ -825,6 +826,13 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
->>      acpi_add_table(table_offsets, tables_blob);
->>      build_spcr(tables_blob, tables->linker, vms);
->>  
->> +    if (vms->ras) {
->> +        acpi_add_table(table_offsets, tables_blob);
->> +        acpi_ghes_build_error_table(tables->hardware_errors, tables->linker);
->> +        acpi_ghes_build_hest(tables_blob, tables->hardware_errors,
->> +                             tables->linker);
->> +    }
->> +
->>      if (ms->numa_state->num_nodes > 0) {
->>          acpi_add_table(table_offsets, tables_blob);
->>          build_srat(tables_blob, tables->linker, vms);
->> @@ -942,6 +950,10 @@ void virt_acpi_setup(VirtMachineState *vms)
->>      fw_cfg_add_file(vms->fw_cfg, ACPI_BUILD_TPMLOG_FILE, tables.tcpalog->data,
->>                      acpi_data_len(tables.tcpalog));
->>  
->> +    if (vms->ras) {
->> +        acpi_ghes_add_fw_cfg(vms->fw_cfg, tables.hardware_errors);
->> +    }
->> +
->>      build_state->rsdp_mr = acpi_add_rom_blob(virt_acpi_build_update,
->>                                               build_state, tables.rsdp,
->>                                               ACPI_BUILD_RSDP_FILE, 0);
->> diff --git a/include/hw/acpi/acpi_ghes.h b/include/hw/acpi/acpi_ghes.h
->> new file mode 100644
->> index 0000000000..219568a29b
->> --- /dev/null
->> +++ b/include/hw/acpi/acpi_ghes.h
->> @@ -0,0 +1,106 @@
->> +/*
->> + * Support for generating APEI tables and recording CPER for Guests
->> + *
->> + * Copyright (c) 2019 HUAWEI TECHNOLOGIES CO., LTD.
->> + *
->> + * Author: Dongjiu Geng <gengdongjiu@huawei.com>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License as published by
->> + * the Free Software Foundation; either version 2 of the License, or
->> + * (at your option) any later version.
->> +
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> +
->> + * You should have received a copy of the GNU General Public License along
->> + * with this program; if not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#ifndef ACPI_GHES_H
->> +#define ACPI_GHES_H
->> +
->> +#include "hw/acpi/bios-linker-loader.h"
->> +
->> +#define ACPI_GHES_ERRORS_FW_CFG_FILE        "etc/hardware_errors"
->> +#define ACPI_GHES_DATA_ADDR_FW_CFG_FILE     "etc/hardware_errors_addr"
->> +
->> +/*
->> + * The size of Address field in Generic Address Structure.
->> + * ACPI 2.0/3.0: 5.2.3.1 Generic Address Structure.
->> + */
->> +#define ACPI_GHES_ADDRESS_SIZE              8
->> +
->> +/* The max size in bytes for one error block */
->> +#define ACPI_GHES_MAX_RAW_DATA_LENGTH       0x1000
->> +
->> +/*
->> + * Now only support ARMv8 SEA notification type error source
->> + */
->> +#define ACPI_GHES_ERROR_SOURCE_COUNT        1
->> +
->> +/*
->> + * Generic Hardware Error Source version 2
->> + */
->> +#define ACPI_GHES_SOURCE_GENERIC_ERROR_V2   10
->> +
->> +/*
->> + * Values for Hardware Error Notification Type field
->> + */
->> +enum AcpiGhesNotifyType {
->> +    ACPI_GHES_NOTIFY_POLLED = 0,    /* Polled */
->> +    ACPI_GHES_NOTIFY_EXTERNAL = 1,  /* External Interrupt */
->> +    ACPI_GHES_NOTIFY_LOCAL = 2, /* Local Interrupt */
->> +    ACPI_GHES_NOTIFY_SCI = 3,   /* SCI */
->> +    ACPI_GHES_NOTIFY_NMI = 4,   /* NMI */
->> +    ACPI_GHES_NOTIFY_CMCI = 5,  /* CMCI, ACPI 5.0: 18.3.2.7, Table 18-290 */
->> +    ACPI_GHES_NOTIFY_MCE = 6,   /* MCE, ACPI 5.0: 18.3.2.7, Table 18-290 */
->> +    /* GPIO-Signal, ACPI 6.0: 18.3.2.7, Table 18-332 */
->> +    ACPI_GHES_NOTIFY_GPIO = 7,
->> +    /* ARMv8 SEA, ACPI 6.1: 18.3.2.9, Table 18-345 */
->> +    ACPI_GHES_NOTIFY_SEA = 8,
->> +    /* ARMv8 SEI, ACPI 6.1: 18.3.2.9, Table 18-345 */
->> +    ACPI_GHES_NOTIFY_SEI = 9,
->> +    /* External Interrupt - GSIV, ACPI 6.1: 18.3.2.9, Table 18-345 */
->> +    ACPI_GHES_NOTIFY_GSIV = 10,
->> +    /* Software Delegated Exception, ACPI 6.2: 18.3.2.9, Table 18-383 */
->> +    ACPI_GHES_NOTIFY_SDEI = 11,
->> +    ACPI_GHES_NOTIFY_RESERVED = 12 /* 12 and greater are reserved */
-> 
-> I'd just drop this enum then.
-> 
->> +};
->> +
->> +/*
->> + * | +--------------------------+ 0
->> + * | |        Header            |
->> + * | +--------------------------+ 40---+-
->> + * | | .................        |      |
->> + * | | error_status_address-----+ 60   |
->> + * | | .................        |      |
->> + * | | read_ack_register--------+ 104  92
->> + * | | read_ack_preserve        |      |
->> + * | | read_ack_write           |      |
->> + * + +--------------------------+ 132--+-
->> + *
->> + * From above GHES definition, the error status address offset is 60;
->> + * the Read Ack Register offset is 104, the whole size of GHESv2 is 92
->> + */
->> +
->> +/* The error status address offset in GHES */
->> +#define ACPI_GHES_ERROR_STATUS_ADDRESS_OFFSET(start_addr, n) (start_addr + \
->> +            60 + offsetof(struct AcpiGenericAddress, address) + n * 92)
->> +
->> +/* The Read Ack Register offset in GHES */
->> +#define ACPI_GHES_READ_ACK_REGISTER_ADDRESS_OFFSET(start_addr, n) (start_addr +\
->> +            104 + offsetof(struct AcpiGenericAddress, address) + n * 92)
->> +
->> +typedef struct AcpiGhesState {
->> +    uint64_t ghes_addr_le;
->> +} AcpiGhesState;
->> +
-> 
-> I think you should move all of the above implementation details to acpi_ghes.c
-> 
-> Just leave the APIs in the header.
-> 
-
-"ACPI_GHES_CPER_FAIL" and "ACPI_GHES_NOTIFY_SEA" macros will be used in the
-kvm_arch_on_sigbus_vcpu() funtion(in target/arm/kvm64.c). Shall we keep them in the
-header?
-
-> 
->> +void acpi_ghes_build_hest(GArray *table_data, GArray *hardware_error,
->> +                          BIOSLinker *linker);
->> +
->> +void acpi_ghes_build_error_table(GArray *hardware_errors, BIOSLinker *linker);
->> +void acpi_ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_errors);
-> 
-> 
-> 
-> 
->> +#endif
->> diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
->> index de4a406568..8f13620701 100644
->> --- a/include/hw/acpi/aml-build.h
->> +++ b/include/hw/acpi/aml-build.h
->> @@ -220,6 +220,7 @@ struct AcpiBuildTables {
->>      GArray *rsdp;
->>      GArray *tcpalog;
->>      GArray *vmgenid;
->> +    GArray *hardware_errors;
->>      BIOSLinker *linker;
->>  } AcpiBuildTables;
->>  
->> -- 
->> 2.19.1
->>
-> 
-> .
-> 
-
--- 
-
-Thanks,
-Xiang
-
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEx1a2FzIFN0cmF1YiA8bHVr
+YXNzdHJhdWIyQHdlYi5kZT4NCj4gU2VudDogVGh1cnNkYXksIE9jdG9iZXIgMjQsIDIwMTkgMTA6
+MjYgUE0NCj4gVG86IHFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4NCj4gQ2M6IFpo
+YW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT47IEphc29uIFdhbmcNCj4gPGphc293YW5n
+QHJlZGhhdC5jb20+OyBXZW4gQ29uZ3lhbmcgPHdlbmNvbmd5YW5nMkBodWF3ZWkuY29tPjsNCj4g
+V2VuIENvbmd5YW5nIDx3ZW5jeUBjbi5mdWppdHN1LmNvbT47IFhpZSBDaGFuZ2xvbmcNCj4gPHhp
+ZWNoYW5nbG9uZy5kQGdtYWlsLmNvbT47IEtldmluIFdvbGYgPGt3b2xmQHJlZGhhdC5jb20+OyBN
+YXggUmVpdHoNCj4gPG1yZWl0ekByZWRoYXQuY29tPjsgcWVtdS1ibG9jayA8cWVtdS1ibG9ja0Bu
+b25nbnUub3JnPg0KPiBTdWJqZWN0OiBbUEFUQ0ggdjcgNC80XSBjb2xvOiBVcGRhdGUgRG9jdW1l
+bnRhdGlvbiBmb3IgY29udGludW91cw0KPiByZXBsaWNhdGlvbg0KPiANCj4gRG9jdW1lbnQgdGhl
+IHFlbXUgY29tbWFuZC1saW5lIGFuZCBxbXAgY29tbWFuZHMgZm9yIGNvbnRpbnVvdXMNCj4gcmVw
+bGljYXRpb24NCj4gDQoNCkxvb2tzIGdvb2QgZm9yIG1lLCB0aGFua3MgZm9yIHlvdXIgaGFyZCB3
+b3JraW5nLg0KUmV2aWV3ZWQtYnk6IFpoYW5nIENoZW4gPGNoZW4uemhhbmdAaW50ZWwuY29tPg0K
+DQpUaGFua3MNClpoYW5nIENoZW4NCg0KPiBTaWduZWQtb2ZmLWJ5OiBMdWthcyBTdHJhdWIgPGx1
+a2Fzc3RyYXViMkB3ZWIuZGU+DQo+IC0tLQ0KPiAgZG9jcy9DT0xPLUZULnR4dCAgICAgICAgICAg
+fCAyMjQgKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLQ0KPiAgZG9jcy9ibG9j
+ay1yZXBsaWNhdGlvbi50eHQgfCAgMjggKysrLS0NCj4gIDIgZmlsZXMgY2hhbmdlZCwgMTg0IGlu
+c2VydGlvbnMoKyksIDY4IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2RvY3MvQ09M
+Ty1GVC50eHQgYi9kb2NzL0NPTE8tRlQudHh0IGluZGV4DQo+IGFkMjQ2ODBkMTMuLmM4ZTE3NDA5
+MzUgMTAwNjQ0DQo+IC0tLSBhL2RvY3MvQ09MTy1GVC50eHQNCj4gKysrIGIvZG9jcy9DT0xPLUZU
+LnR4dA0KPiBAQCAtMTQ1LDgxICsxNDUsMTg5IEBAIFRoZSBkaWFncmFtIGp1c3Qgc2hvd3MgdGhl
+IG1haW4gcW1wIGNvbW1hbmQsDQo+IHlvdSBjYW4gZ2V0IHRoZSBkZXRhaWwgIGluIHRlc3QgcHJv
+Y2VkdXJlLg0KPiANCj4gID09IFRlc3QgcHJvY2VkdXJlID09DQo+IC0xLiBTdGFydHVwIHFlbXUN
+Cj4gLVByaW1hcnk6DQo+IC0jIHFlbXUtc3lzdGVtLXg4Nl82NCAtYWNjZWwga3ZtIC1tIDIwNDgg
+LXNtcCAyIC1xbXAgc3RkaW8gLW5hbWUNCj4gcHJpbWFyeSBcDQo+IC0gIC1kZXZpY2UgcGlpeDMt
+dXNiLXVoY2kgLXZuYyA6NyBcDQo+IC0gIC1kZXZpY2UgdXNiLXRhYmxldCAtbmV0ZGV2IHRhcCxp
+ZD1objAsdmhvc3Q9b2ZmIFwNCj4gLSAgLWRldmljZSB2aXJ0aW8tbmV0LXBjaSxpZD1uZXQtcGNp
+MCxuZXRkZXY9aG4wIFwNCj4gLSAgLWRyaXZlIGlmPXZpcnRpbyxpZD1wcmltYXJ5LWRpc2swLGRy
+aXZlcj1xdW9ydW0scmVhZC1wYXR0ZXJuPWZpZm8sdm90ZS0NCj4gdGhyZXNob2xkPTEsXA0KPiAt
+ICAgICAgICAgY2hpbGRyZW4uMC5maWxlLmZpbGVuYW1lPTEucmF3LFwNCj4gLSAgICAgICAgIGNo
+aWxkcmVuLjAuZHJpdmVyPXJhdyAtUw0KPiAtU2Vjb25kYXJ5Og0KPiAtIyBxZW11LXN5c3RlbS14
+ODZfNjQgLWFjY2VsIGt2bSAtbSAyMDQ4IC1zbXAgMiAtcW1wIHN0ZGlvIC1uYW1lDQo+IHNlY29u
+ZGFyeSBcDQo+IC0gIC1kZXZpY2UgcGlpeDMtdXNiLXVoY2kgLXZuYyA6NyBcDQo+IC0gIC1kZXZp
+Y2UgdXNiLXRhYmxldCAtbmV0ZGV2IHRhcCxpZD1objAsdmhvc3Q9b2ZmIFwNCj4gLSAgLWRldmlj
+ZSB2aXJ0aW8tbmV0LXBjaSxpZD1uZXQtcGNpMCxuZXRkZXY9aG4wIFwNCj4gLSAgLWRyaXZlIGlm
+PW5vbmUsaWQ9c2Vjb25kYXJ5LWRpc2swLGZpbGUuZmlsZW5hbWU9MS5yYXcsZHJpdmVyPXJhdyxu
+b2RlLQ0KPiBuYW1lPW5vZGUwIFwNCj4gLSAgLWRyaXZlIGlmPXZpcnRpbyxpZD1hY3RpdmUtZGlz
+azAsZHJpdmVyPXJlcGxpY2F0aW9uLG1vZGU9c2Vjb25kYXJ5LFwNCj4gLSAgICAgICAgIGZpbGUu
+ZHJpdmVyPXFjb3cyLHRvcC1pZD1hY3RpdmUtZGlzazAsXA0KPiAtICAgICAgICAgZmlsZS5maWxl
+LmZpbGVuYW1lPS9tbnQvcmFtZnMvYWN0aXZlX2Rpc2suaW1nLFwNCj4gLSAgICAgICAgIGZpbGUu
+YmFja2luZy5kcml2ZXI9cWNvdzIsXA0KPiAtICAgICAgICAgZmlsZS5iYWNraW5nLmZpbGUuZmls
+ZW5hbWU9L21udC9yYW1mcy9oaWRkZW5fZGlzay5pbWcsXA0KPiAtICAgICAgICAgZmlsZS5iYWNr
+aW5nLmJhY2tpbmc9c2Vjb25kYXJ5LWRpc2swIFwNCj4gLSAgLWluY29taW5nIHRjcDowOjg4ODgN
+Cj4gLQ0KPiAtMi4gT24gU2Vjb25kYXJ5IFZNJ3MgUUVNVSBtb25pdG9yLCBpc3N1ZSBjb21tYW5k
+DQo+ICtOb3RlOiBIZXJlIHdlIGFyZSBydW5uaW5nIGJvdGggaW5zdGFuY2VzIG9uIHRoZSBzYW1l
+IGhvc3QgZm9yIHRlc3RpbmcsDQo+ICtjaGFuZ2UgdGhlIElQIEFkZHJlc3NlcyBpZiB5b3Ugd2Fu
+dCB0byBydW4gaXQgb24gdHdvIGhvc3RzLiBJbml0YWxseQ0KPiArMTI3LjAuMC4xIGlzIHRoZSBQ
+cmltYXJ5IEhvc3QgYW5kIDEyNy4wLjAuMiBpcyB0aGUgU2Vjb25kYXJ5IEhvc3QuDQo+ICsNCj4g
+Kz09IFN0YXJ0dXAgcWVtdSA9PQ0KPiArMS4gUHJpbWFyeToNCj4gK05vdGU6IEluaXRhbGx5LCAk
+aW1hZ2Vmb2xkZXIvcHJpbWFyeS5xY293MiBuZWVkcyB0byBiZSBjb3BpZWQgdG8gYWxsIGhvc3Rz
+Lg0KPiArWW91IGRvbid0IG5lZWQgdG8gY2hhbmdlIGFueSBJUCdzIGhlcmUsIGJlY2F1c2UgMC4w
+LjAuMCBsaXN0ZW5zIG9uIGFueQ0KPiAraW50ZXJmYWNlLiBUaGUgY2hhcmRldidzIHdpdGggMTI3
+LjAuMC4xIElQJ3MgbG9vcGJhY2sgdG8gdGhlIGxvY2FsIHFlbXUNCj4gK2luc3RhbmNlLg0KPiAr
+DQo+ICsjIGltYWdlZm9sZGVyPSIvbW50L3Ztcy9jb2xvLXRlc3QtcHJpbWFyeSINCj4gKw0KPiAr
+IyBxZW11LXN5c3RlbS14ODZfNjQgLWVuYWJsZS1rdm0gLWNwdSBxZW11NjQsK2t2bWNsb2NrIC1t
+IDUxMiAtc21wDQo+IDEgLXFtcCBzdGRpbyBcDQo+ICsgICAtZGV2aWNlIHBpaXgzLXVzYi11aGNp
+IC1kZXZpY2UgdXNiLXRhYmxldCAtbmFtZSBwcmltYXJ5IFwNCj4gKyAgIC1uZXRkZXYgdGFwLGlk
+PWhuMCx2aG9zdD1vZmYsaGVscGVyPS91c3IvbGliL3FlbXUvcWVtdS1icmlkZ2UtaGVscGVyDQo+
+IFwNCj4gKyAgIC1kZXZpY2UgcnRsODEzOSxpZD1lMCxuZXRkZXY9aG4wIFwNCj4gKyAgIC1jaGFy
+ZGV2IHNvY2tldCxpZD1taXJyb3IwLGhvc3Q9MC4wLjAuMCxwb3J0PTkwMDMsc2VydmVyLG5vd2Fp
+dCBcDQo+ICsgICAtY2hhcmRldiBzb2NrZXQsaWQ9Y29tcGFyZTEsaG9zdD0wLjAuMC4wLHBvcnQ9
+OTAwNCxzZXJ2ZXIsd2FpdCBcDQo+ICsgICAtY2hhcmRldiBzb2NrZXQsaWQ9Y29tcGFyZTAsaG9z
+dD0xMjcuMC4wLjEscG9ydD05MDAxLHNlcnZlcixub3dhaXQgXA0KPiArICAgLWNoYXJkZXYgc29j
+a2V0LGlkPWNvbXBhcmUwLTAsaG9zdD0xMjcuMC4wLjEscG9ydD05MDAxIFwNCj4gKyAgIC1jaGFy
+ZGV2IHNvY2tldCxpZD1jb21wYXJlX291dCxob3N0PTEyNy4wLjAuMSxwb3J0PTkwMDUsc2VydmVy
+LG5vd2FpdA0KPiBcDQo+ICsgICAtY2hhcmRldiBzb2NrZXQsaWQ9Y29tcGFyZV9vdXQwLGhvc3Q9
+MTI3LjAuMC4xLHBvcnQ9OTAwNSBcDQo+ICsgICAtb2JqZWN0IGZpbHRlci1taXJyb3IsaWQ9bTAs
+bmV0ZGV2PWhuMCxxdWV1ZT10eCxvdXRkZXY9bWlycm9yMCBcDQo+ICsgICAtb2JqZWN0IGZpbHRl
+ci0NCj4gcmVkaXJlY3RvcixuZXRkZXY9aG4wLGlkPXJlZGlyZTAscXVldWU9cngsaW5kZXY9Y29t
+cGFyZV9vdXQgXA0KPiArICAgLW9iamVjdCBmaWx0ZXItDQo+IHJlZGlyZWN0b3IsbmV0ZGV2PWhu
+MCxpZD1yZWRpcmUxLHF1ZXVlPXJ4LG91dGRldj1jb21wYXJlMCBcDQo+ICsgICAtb2JqZWN0IGlv
+dGhyZWFkLGlkPWlvdGhyZWFkMSBcDQo+ICsgICAtb2JqZWN0DQo+ICtjb2xvLWNvbXBhcmUsaWQ9
+Y29tcDAscHJpbWFyeV9pbj1jb21wYXJlMC0NCj4gMCxzZWNvbmRhcnlfaW49Y29tcGFyZTEsXA0K
+PiArb3V0ZGV2PWNvbXBhcmVfb3V0MCxpb3RocmVhZD1pb3RocmVhZDEgXA0KPiArICAgLWRyaXZl
+DQo+ICtpZj1pZGUsaWQ9Y29sby1kaXNrMCxkcml2ZXI9cXVvcnVtLHJlYWQtcGF0dGVybj1maWZv
+LHZvdGUtdGhyZXNob2xkPTEsXA0KPiArY2hpbGRyZW4uMC5maWxlLmZpbGVuYW1lPSRpbWFnZWZv
+bGRlci9wcmltYXJ5LnFjb3cyLGNoaWxkcmVuLjAuZHJpdmVyPXENCj4gK2NvdzIgLVMNCj4gKw0K
+PiArMi4gU2Vjb25kYXJ5Og0KPiArTm90ZTogQWN0aXZlIGFuZCBoaWRkZW4gaW1hZ2VzIG5lZWQg
+dG8gYmUgY3JlYXRlZCBvbmx5IG9uY2UgYW5kIHRoZQ0KPiArc2l6ZSBzaG91bGQgYmUgdGhlIHNh
+bWUgYXMgcHJpbWFyeS5xY293Mi4gQWdhaW4sIHlvdSBkb24ndCBuZWVkIHRvDQo+ICtjaGFuZ2Ug
+YW55IElQJ3MgaGVyZSwgZXhjZXB0IGZvciB0aGUgJHByaW1hcnlfaXAgdmFyaWFibGUuDQo+ICsN
+Cj4gKyMgaW1hZ2Vmb2xkZXI9Ii9tbnQvdm1zL2NvbG8tdGVzdC1zZWNvbmRhcnkiDQo+ICsjIHBy
+aW1hcnlfaXA9MTI3LjAuMC4xDQo+ICsNCj4gKyMgcWVtdS1pbWcgY3JlYXRlIC1mIHFjb3cyICRp
+bWFnZWZvbGRlci9zZWNvbmRhcnktYWN0aXZlLnFjb3cyIDEwRw0KPiArDQo+ICsjIHFlbXUtaW1n
+IGNyZWF0ZSAtZiBxY293MiAkaW1hZ2Vmb2xkZXIvc2Vjb25kYXJ5LWhpZGRlbi5xY293MiAxMEcN
+Cj4gKw0KPiArIyBxZW11LXN5c3RlbS14ODZfNjQgLWVuYWJsZS1rdm0gLWNwdSBxZW11NjQsK2t2
+bWNsb2NrIC1tIDUxMiAtc21wDQo+IDEgLXFtcCBzdGRpbyBcDQo+ICsgICAtZGV2aWNlIHBpaXgz
+LXVzYi11aGNpIC1kZXZpY2UgdXNiLXRhYmxldCAtbmFtZSBzZWNvbmRhcnkgXA0KPiArICAgLW5l
+dGRldiB0YXAsaWQ9aG4wLHZob3N0PW9mZixoZWxwZXI9L3Vzci9saWIvcWVtdS9xZW11LWJyaWRn
+ZS1oZWxwZXINCj4gXA0KPiArICAgLWRldmljZSBydGw4MTM5LGlkPWUwLG5ldGRldj1objAgXA0K
+PiArICAgLWNoYXJkZXYgc29ja2V0LGlkPXJlZDAsaG9zdD0kcHJpbWFyeV9pcCxwb3J0PTkwMDMs
+cmVjb25uZWN0PTEgXA0KPiArICAgLWNoYXJkZXYgc29ja2V0LGlkPXJlZDEsaG9zdD0kcHJpbWFy
+eV9pcCxwb3J0PTkwMDQscmVjb25uZWN0PTEgXA0KPiArICAgLW9iamVjdCBmaWx0ZXItcmVkaXJl
+Y3RvcixpZD1mMSxuZXRkZXY9aG4wLHF1ZXVlPXR4LGluZGV2PXJlZDAgXA0KPiArICAgLW9iamVj
+dCBmaWx0ZXItcmVkaXJlY3RvcixpZD1mMixuZXRkZXY9aG4wLHF1ZXVlPXJ4LG91dGRldj1yZWQx
+IFwNCj4gKyAgIC1vYmplY3QgZmlsdGVyLXJld3JpdGVyLGlkPXJldzAsbmV0ZGV2PWhuMCxxdWV1
+ZT1hbGwgXA0KPiArICAgLWRyaXZlDQo+IGlmPW5vbmUsaWQ9cGFyZW50MCxmaWxlLmZpbGVuYW1l
+PSRpbWFnZWZvbGRlci9wcmltYXJ5LnFjb3cyLGRyaXZlcj1xY293DQo+IDIgXA0KPiArICAgLWRy
+aXZlDQo+ICtpZj1ub25lLGlkPWNoaWxkczAsZHJpdmVyPXJlcGxpY2F0aW9uLG1vZGU9c2Vjb25k
+YXJ5LGZpbGUuZHJpdmVyPXFjb3cyLA0KPiArXA0KPiArdG9wLWlkPWNvbG8tZGlzazAsZmlsZS5m
+aWxlLmZpbGVuYW1lPSRpbWFnZWZvbGRlci9zZWNvbmRhcnktYWN0aXZlLnFjb3cNCj4gKzIsXA0K
+PiArZmlsZS5iYWNraW5nLmRyaXZlcj1xY293MixmaWxlLmJhY2tpbmcuZmlsZS5maWxlbmFtZT0k
+aW1hZ2Vmb2xkZXIvc2Vjb24NCj4gK2RhcnktaGlkZGVuLnFjb3cyLFwNCj4gK2ZpbGUuYmFja2lu
+Zy5iYWNraW5nPXBhcmVudDAgXA0KPiArICAgLWRyaXZlDQo+ICtpZj1pZGUsaWQ9Y29sby1kaXNr
+MCxkcml2ZXI9cXVvcnVtLHJlYWQtcGF0dGVybj1maWZvLHZvdGUtdGhyZXNob2xkPTEsXA0KPiAr
+Y2hpbGRyZW4uMD1jaGlsZHMwIFwNCj4gKyAgIC1pbmNvbWluZyB0Y3A6MC4wLjAuMDo5OTk4DQo+
+ICsNCj4gKw0KPiArMy4gT24gU2Vjb25kYXJ5IFZNJ3MgUUVNVSBtb25pdG9yLCBpc3N1ZSBjb21t
+YW5kDQo+ICB7J2V4ZWN1dGUnOidxbXBfY2FwYWJpbGl0aWVzJ30NCj4gLXsgJ2V4ZWN1dGUnOiAn
+bmJkLXNlcnZlci1zdGFydCcsDQo+IC0gICdhcmd1bWVudHMnOiB7J2FkZHInOiB7J3R5cGUnOiAn
+aW5ldCcsICdkYXRhJzogeydob3N0JzogJ3h4Lnh4Lnh4Lnh4JywgJ3BvcnQnOg0KPiAnODg4OSd9
+IH0gfSAtfQ0KPiAteydleGVjdXRlJzogJ25iZC1zZXJ2ZXItYWRkJywgJ2FyZ3VtZW50cyc6IHsn
+ZGV2aWNlJzogJ3NlY29uZGFyeS1kaXNrMCcsDQo+ICd3cml0YWJsZSc6IHRydWUgfSB9DQo+ICt7
+J2V4ZWN1dGUnOiAnbmJkLXNlcnZlci1zdGFydCcsICdhcmd1bWVudHMnOiB7J2FkZHInOiB7J3R5
+cGUnOiAnaW5ldCcsDQo+ICsnZGF0YSc6IHsnaG9zdCc6ICcwLjAuMC4wJywgJ3BvcnQnOiAnOTk5
+OSd9IH0gfSB9DQo+ICt7J2V4ZWN1dGUnOiAnbmJkLXNlcnZlci1hZGQnLCAnYXJndW1lbnRzJzog
+eydkZXZpY2UnOiAncGFyZW50MCcsDQo+ICsnd3JpdGFibGUnOiB0cnVlIH0gfQ0KPiANCj4gIE5v
+dGU6DQo+ICAgIGEuIFRoZSBxbXAgY29tbWFuZCBuYmQtc2VydmVyLXN0YXJ0IGFuZCBuYmQtc2Vy
+dmVyLWFkZCBtdXN0IGJlIHJ1bg0KPiAgICAgICBiZWZvcmUgcnVubmluZyB0aGUgcW1wIGNvbW1h
+bmQgbWlncmF0ZSBvbiBwcmltYXJ5IFFFTVUNCj4gICAgYi4gQWN0aXZlIGRpc2ssIGhpZGRlbiBk
+aXNrIGFuZCBuYmQgdGFyZ2V0J3MgbGVuZ3RoIHNob3VsZCBiZSB0aGUNCj4gICAgICAgc2FtZS4N
+Cj4gLSAgYy4gSXQgaXMgYmV0dGVyIHRvIHB1dCBhY3RpdmUgZGlzayBhbmQgaGlkZGVuIGRpc2sg
+aW4gcmFtZGlzay4NCj4gKyAgYy4gSXQgaXMgYmV0dGVyIHRvIHB1dCBhY3RpdmUgZGlzayBhbmQg
+aGlkZGVuIGRpc2sgaW4gcmFtZGlzay4gVGhleQ0KPiArICAgICB3aWxsIGJlIG1lcmdlZCBpbnRv
+IHRoZSBwYXJlbnQgZGlzayBvbiBmYWlsb3Zlci4NCj4gDQo+IC0zLiBPbiBQcmltYXJ5IFZNJ3Mg
+UUVNVSBtb25pdG9yLCBpc3N1ZSBjb21tYW5kOg0KPiArNC4gT24gUHJpbWFyeSBWTSdzIFFFTVUg
+bW9uaXRvciwgaXNzdWUgY29tbWFuZDoNCj4gIHsnZXhlY3V0ZSc6J3FtcF9jYXBhYmlsaXRpZXMn
+fQ0KPiAteyAnZXhlY3V0ZSc6ICdodW1hbi1tb25pdG9yLWNvbW1hbmQnLA0KPiAtICAnYXJndW1l
+bnRzJzogeydjb21tYW5kLWxpbmUnOiAnZHJpdmVfYWRkIC1uIGJ1ZGR5DQo+IGRyaXZlcj1yZXBs
+aWNhdGlvbixtb2RlPXByaW1hcnksZmlsZS5kcml2ZXI9bmJkLGZpbGUuaG9zdD14eC54eC54eC54
+eCxmaWxlLnANCj4gb3J0PTg4ODksZmlsZS5leHBvcnQ9c2Vjb25kYXJ5LWRpc2swLG5vZGUtbmFt
+ZT1uYmRfY2xpZW50MCd9fQ0KPiAteyAnZXhlY3V0ZSc6J3gtYmxvY2tkZXYtY2hhbmdlJywgJ2Fy
+Z3VtZW50cyc6eydwYXJlbnQnOiAncHJpbWFyeS1kaXNrMCcsDQo+ICdub2RlJzogJ25iZF9jbGll
+bnQwJyB9IH0gLXsgJ2V4ZWN1dGUnOiAnbWlncmF0ZS1zZXQtY2FwYWJpbGl0aWVzJywNCj4gLSAg
+ICAgICdhcmd1bWVudHMnOiB7J2NhcGFiaWxpdGllcyc6IFsgeydjYXBhYmlsaXR5JzogJ3gtY29s
+bycsICdzdGF0ZSc6IHRydWUgfSBdIH0gfQ0KPiAteyAnZXhlY3V0ZSc6ICdtaWdyYXRlJywgJ2Fy
+Z3VtZW50cyc6IHsndXJpJzogJ3RjcDp4eC54eC54eC54eDo4ODg4JyB9IH0NCj4gK3snZXhlY3V0
+ZSc6ICdodW1hbi1tb25pdG9yLWNvbW1hbmQnLCAnYXJndW1lbnRzJzogeydjb21tYW5kLWxpbmUn
+Og0KPiArJ2RyaXZlX2FkZCAtbiBidWRkeQ0KPiArZHJpdmVyPXJlcGxpY2F0aW9uLG1vZGU9cHJp
+bWFyeSxmaWxlLmRyaXZlcj1uYmQsZmlsZS5ob3N0PTEyNy4wLjAuMixmaWwNCj4gK2UucG9ydD05
+OTk5LGZpbGUuZXhwb3J0PXBhcmVudDAsbm9kZS1uYW1lPXJlcGxpY2F0aW9uMCd9fQ0KPiAreydl
+eGVjdXRlJzogJ3gtYmxvY2tkZXYtY2hhbmdlJywgJ2FyZ3VtZW50cyc6eydwYXJlbnQnOiAnY29s
+by1kaXNrMCcsDQo+ICsnbm9kZSc6ICdyZXBsaWNhdGlvbjAnIH0gfQ0KPiAreydleGVjdXRlJzog
+J21pZ3JhdGUtc2V0LWNhcGFiaWxpdGllcycsICdhcmd1bWVudHMnOiB7J2NhcGFiaWxpdGllcyc6
+IFsNCj4gK3snY2FwYWJpbGl0eSc6ICd4LWNvbG8nLCAnc3RhdGUnOiB0cnVlIH0gXSB9IH0NCj4g
+K3snZXhlY3V0ZSc6ICdtaWdyYXRlJywgJ2FyZ3VtZW50cyc6IHsndXJpJzogJ3RjcDoxMjcuMC4w
+LjI6OTk5OCcgfSB9DQo+IA0KPiAgICBOb3RlOg0KPiAgICBhLiBUaGVyZSBzaG91bGQgYmUgb25s
+eSBvbmUgTkJEIENsaWVudCBmb3IgZWFjaCBwcmltYXJ5IGRpc2suDQo+IC0gIGIuIHh4Lnh4Lnh4
+Lnh4IGlzIHRoZSBzZWNvbmRhcnkgcGh5c2ljYWwgbWFjaGluZSdzIGhvc3RuYW1lIG9yIElQDQo+
+IC0gIGMuIFRoZSBxbXAgY29tbWFuZCBsaW5lIG11c3QgYmUgcnVuIGFmdGVyIHJ1bm5pbmcgcW1w
+IGNvbW1hbmQgbGluZSBpbg0KPiArICBiLiBUaGUgcW1wIGNvbW1hbmQgbGluZSBtdXN0IGJlIHJ1
+biBhZnRlciBydW5uaW5nIHFtcCBjb21tYW5kIGxpbmUgaW4NCj4gICAgICAgc2Vjb25kYXJ5IHFl
+bXUuDQo+IA0KPiAtNC4gQWZ0ZXIgdGhlIGFib3ZlIHN0ZXBzLCB5b3Ugd2lsbCBzZWUsIHdoZW5l
+dmVyIHlvdSBtYWtlIGNoYW5nZXMgdG8gUFZNLA0KPiBTVk0gd2lsbCBiZSBzeW5jZWQuDQo+ICs1
+LiBBZnRlciB0aGUgYWJvdmUgc3RlcHMsIHlvdSB3aWxsIHNlZSwgd2hlbmV2ZXIgeW91IG1ha2Ug
+Y2hhbmdlcyB0byBQVk0sDQo+IFNWTSB3aWxsIGJlIHN5bmNlZC4NCj4gIFlvdSBjYW4gaXNzdWUg
+Y29tbWFuZCAneyAiZXhlY3V0ZSI6ICJtaWdyYXRlLXNldC1wYXJhbWV0ZXJzIiAsDQo+ICJhcmd1
+bWVudHMiOnsgIngtY2hlY2twb2ludC1kZWxheSI6IDIwMDAgfSB9Jw0KPiAtdG8gY2hhbmdlIHRo
+ZSBjaGVja3BvaW50IHBlcmlvZCB0aW1lDQo+ICt0byBjaGFuZ2UgdGhlIGlkbGUgY2hlY2twb2lu
+dCBwZXJpb2QgdGltZQ0KPiArDQo+ICs2LiBGYWlsb3ZlciB0ZXN0DQo+ICtZb3UgY2FuIGtpbGwg
+b25lIG9mIHRoZSBWTXMgYW5kIEZhaWxvdmVyIG9uIHRoZSBzdXJ2aXZpbmcgVk06DQo+ICsNCj4g
+K0lmIHlvdSBraWxsZWQgdGhlIFNlY29uZGFyeSwgdGhlbiBmb2xsb3cgIlByaW1hcnkgRmFpbG92
+ZXIiLiBBZnRlcg0KPiArdGhhdCwgaWYgeW91IHdhbnQgdG8gcmVzdW1lIHRoZSByZXBsaWNhdGlv
+biwgZm9sbG93ICJQcmltYXJ5IHJlc3VtZQ0KPiByZXBsaWNhdGlvbiINCj4gKw0KPiArSWYgeW91
+IGtpbGxlZCB0aGUgUHJpbWFyeSwgdGhlbiBmb2xsb3cgIlNlY29uZGFyeSBGYWlsb3ZlciIuIEFm
+dGVyDQo+ICt0aGF0LCBpZiB5b3Ugd2FudCB0byByZXN1bWUgdGhlIHJlcGxpY2F0aW9uLCBmb2xs
+b3cgIlNlY29uZGFyeSByZXN1bWUNCj4gcmVwbGljYXRpb24iDQo+ICsNCj4gKz09IFByaW1hcnkg
+RmFpbG92ZXIgPT0NCj4gK1RoZSBTZWNvbmRhcnkgZGllZCwgcmVzdW1lIG9uIHRoZSBQcmltYXJ5
+DQo+ICsNCj4gK3snZXhlY3V0ZSc6ICd4LWJsb2NrZGV2LWNoYW5nZScsICdhcmd1bWVudHMnOnsg
+J3BhcmVudCc6ICdjb2xvLWRpc2swJywNCj4gKydjaGlsZCc6ICdjaGlsZHJlbi4xJ30gfQ0KPiAr
+eydleGVjdXRlJzogJ2h1bWFuLW1vbml0b3ItY29tbWFuZCcsICdhcmd1bWVudHMnOnsgJ2NvbW1h
+bmQtbGluZSc6DQo+ICsnZHJpdmVfZGVsIHJlcGxpY2F0aW9uMCcgfSB9DQo+ICt7J2V4ZWN1dGUn
+OiAnb2JqZWN0LWRlbCcsICdhcmd1bWVudHMnOnsgJ2lkJzogJ2NvbXAwJyB9IH0NCj4gK3snZXhl
+Y3V0ZSc6ICdvYmplY3QtZGVsJywgJ2FyZ3VtZW50cyc6eyAnaWQnOiAnaW90aHJlYWQxJyB9IH0N
+Cj4gK3snZXhlY3V0ZSc6ICdvYmplY3QtZGVsJywgJ2FyZ3VtZW50cyc6eyAnaWQnOiAnbTAnIH0g
+fQ0KPiAreydleGVjdXRlJzogJ29iamVjdC1kZWwnLCAnYXJndW1lbnRzJzp7ICdpZCc6ICdyZWRp
+cmUwJyB9IH0NCj4gK3snZXhlY3V0ZSc6ICdvYmplY3QtZGVsJywgJ2FyZ3VtZW50cyc6eyAnaWQn
+OiAncmVkaXJlMScgfSB9DQo+ICt7J2V4ZWN1dGUnOiAneC1jb2xvLWxvc3QtaGVhcnRiZWF0JyB9
+DQo+ICsNCj4gKz09IFNlY29uZGFyeSBGYWlsb3ZlciA9PQ0KPiArVGhlIFByaW1hcnkgZGllZCwg
+cmVzdW1lIG9uIHRoZSBTZWNvbmRhcnkgYW5kIHByZXBhcmUgdG8gYmVjb21lIHRoZQ0KPiBuZXcN
+Cj4gK1ByaW1hcnkNCj4gKw0KPiAreydleGVjdXRlJzogJ25iZC1zZXJ2ZXItc3RvcCd9DQo+ICt7
+J2V4ZWN1dGUnOiAneC1jb2xvLWxvc3QtaGVhcnRiZWF0J30NCj4gKw0KPiAreydleGVjdXRlJzog
+J29iamVjdC1kZWwnLCAnYXJndW1lbnRzJzp7ICdpZCc6ICdmMicgfSB9DQo+ICt7J2V4ZWN1dGUn
+OiAnb2JqZWN0LWRlbCcsICdhcmd1bWVudHMnOnsgJ2lkJzogJ2YxJyB9IH0NCj4gK3snZXhlY3V0
+ZSc6ICdjaGFyZGV2LXJlbW92ZScsICdhcmd1bWVudHMnOnsgJ2lkJzogJ3JlZDEnIH0gfQ0KPiAr
+eydleGVjdXRlJzogJ2NoYXJkZXYtcmVtb3ZlJywgJ2FyZ3VtZW50cyc6eyAnaWQnOiAncmVkMCcg
+fSB9DQo+ICsNCj4gK3snZXhlY3V0ZSc6ICdjaGFyZGV2LWFkZCcsICdhcmd1bWVudHMnOnsgJ2lk
+JzogJ21pcnJvcjAnLCAnYmFja2VuZCc6DQo+ICt7J3R5cGUnOiAnc29ja2V0JywgJ2RhdGEnOiB7
+J2FkZHInOiB7ICd0eXBlJzogJ2luZXQnLCAnZGF0YSc6IHsgJ2hvc3QnOg0KPiArJzAuMC4wLjAn
+LCAncG9ydCc6ICc5MDAzJyB9IH0sICdzZXJ2ZXInOiB0cnVlIH0gfSB9IH0NCj4gK3snZXhlY3V0
+ZSc6ICdjaGFyZGV2LWFkZCcsICdhcmd1bWVudHMnOnsgJ2lkJzogJ2NvbXBhcmUxJywgJ2JhY2tl
+bmQnOg0KPiAreyd0eXBlJzogJ3NvY2tldCcsICdkYXRhJzogeydhZGRyJzogeyAndHlwZSc6ICdp
+bmV0JywgJ2RhdGEnOiB7ICdob3N0JzoNCj4gKycwLjAuMC4wJywgJ3BvcnQnOiAnOTAwNCcgfSB9
+LCAnc2VydmVyJzogdHJ1ZSB9IH0gfSB9DQo+ICt7J2V4ZWN1dGUnOiAnY2hhcmRldi1hZGQnLCAn
+YXJndW1lbnRzJzp7ICdpZCc6ICdjb21wYXJlMCcsICdiYWNrZW5kJzoNCj4gK3sndHlwZSc6ICdz
+b2NrZXQnLCAnZGF0YSc6IHsnYWRkcic6IHsgJ3R5cGUnOiAnaW5ldCcsICdkYXRhJzogeyAnaG9z
+dCc6DQo+ICsnMTI3LjAuMC4xJywgJ3BvcnQnOiAnOTAwMScgfSB9LCAnc2VydmVyJzogdHJ1ZSB9
+IH0gfSB9DQo+ICt7J2V4ZWN1dGUnOiAnY2hhcmRldi1hZGQnLCAnYXJndW1lbnRzJzp7ICdpZCc6
+ICdjb21wYXJlMC0wJywgJ2JhY2tlbmQnOg0KPiAreyd0eXBlJzogJ3NvY2tldCcsICdkYXRhJzog
+eydhZGRyJzogeyAndHlwZSc6ICdpbmV0JywgJ2RhdGEnOiB7ICdob3N0JzoNCj4gKycxMjcuMC4w
+LjEnLCAncG9ydCc6ICc5MDAxJyB9IH0sICdzZXJ2ZXInOiBmYWxzZSB9IH0gfSB9DQo+ICt7J2V4
+ZWN1dGUnOiAnY2hhcmRldi1hZGQnLCAnYXJndW1lbnRzJzp7ICdpZCc6ICdjb21wYXJlX291dCcs
+DQo+ICsnYmFja2VuZCc6IHsndHlwZSc6ICdzb2NrZXQnLCAnZGF0YSc6IHsnYWRkcic6IHsgJ3R5
+cGUnOiAnaW5ldCcsDQo+ICsnZGF0YSc6IHsgJ2hvc3QnOiAnMTI3LjAuMC4xJywgJ3BvcnQnOiAn
+OTAwNScgfSB9LCAnc2VydmVyJzogdHJ1ZSB9IH0gfQ0KPiArfQ0KPiAreydleGVjdXRlJzogJ2No
+YXJkZXYtYWRkJywgJ2FyZ3VtZW50cyc6eyAnaWQnOiAnY29tcGFyZV9vdXQwJywNCj4gKydiYWNr
+ZW5kJzogeyd0eXBlJzogJ3NvY2tldCcsICdkYXRhJzogeydhZGRyJzogeyAndHlwZSc6ICdpbmV0
+JywNCj4gKydkYXRhJzogeyAnaG9zdCc6ICcxMjcuMC4wLjEnLCAncG9ydCc6ICc5MDA1JyB9IH0s
+ICdzZXJ2ZXInOiBmYWxzZSB9IH0NCj4gK30gfQ0KPiArDQo+ICs9PSBQcmltYXJ5IHJlc3VtZSBy
+ZXBsaWNhdGlvbiA9PQ0KPiArUmVzdW1lIHJlcGxpY2F0aW9uIGFmdGVyIG5ldyBTZWNvbmRhcnkg
+aXMgdXAuDQo+ICsNCj4gK1N0YXJ0IHRoZSBuZXcgU2Vjb25kYXJ5IChTdGVwcyAyIGFuZCAzIGFi
+b3ZlKSwgdGhlbiBvbiB0aGUgUHJpbWFyeToNCj4gK3snZXhlY3V0ZSc6ICdkcml2ZS1taXJyb3In
+LCAnYXJndW1lbnRzJzp7ICdkZXZpY2UnOiAnY29sby1kaXNrMCcsDQo+ICsnam9iLWlkJzogJ3Jl
+c3luYycsICd0YXJnZXQnOiAnbmJkOi8vMTI3LjAuMC4yOjk5OTkvcGFyZW50MCcsICdtb2RlJzoN
+Cj4gKydleGlzdGluZycsICdmb3JtYXQnOiAncmF3JywgJ3N5bmMnOiAnZnVsbCd9IH0NCj4gKw0K
+PiArV2FpdCB1bnRpbCBkaXNrIGlzIHN5bmNlZCwgdGhlbjoNCj4gK3snZXhlY3V0ZSc6ICdzdG9w
+J30NCj4gK3snZXhlY3V0ZSc6ICdibG9jay1qb2ItY2FuY2VsJywgJ2FyZ3VtZW50cyc6eyAnZGV2
+aWNlJzogJ3Jlc3luYyd9IH0NCj4gKw0KPiAreydleGVjdXRlJzogJ2h1bWFuLW1vbml0b3ItY29t
+bWFuZCcsICdhcmd1bWVudHMnOnsgJ2NvbW1hbmQtbGluZSc6DQo+ICsnZHJpdmVfYWRkIC1uIGJ1
+ZGR5DQo+ICtkcml2ZXI9cmVwbGljYXRpb24sbW9kZT1wcmltYXJ5LGZpbGUuZHJpdmVyPW5iZCxm
+aWxlLmhvc3Q9MTI3LjAuMC4yLGZpbA0KPiArZS5wb3J0PTk5OTksZmlsZS5leHBvcnQ9cGFyZW50
+MCxub2RlLW5hbWU9cmVwbGljYXRpb24wJ319DQo+ICt7J2V4ZWN1dGUnOiAneC1ibG9ja2Rldi1j
+aGFuZ2UnLCAnYXJndW1lbnRzJzp7ICdwYXJlbnQnOiAnY29sby1kaXNrMCcsDQo+ICsnbm9kZSc6
+ICdyZXBsaWNhdGlvbjAnIH0gfQ0KPiArDQo+ICt7J2V4ZWN1dGUnOiAnb2JqZWN0LWFkZCcsICdh
+cmd1bWVudHMnOnsgJ3FvbS10eXBlJzogJ2ZpbHRlci1taXJyb3InLA0KPiArJ2lkJzogJ20wJywg
+J3Byb3BzJzogeyAnbmV0ZGV2JzogJ2huMCcsICdxdWV1ZSc6ICd0eCcsICdvdXRkZXYnOg0KPiAr
+J21pcnJvcjAnIH0gfSB9DQo+ICt7J2V4ZWN1dGUnOiAnb2JqZWN0LWFkZCcsICdhcmd1bWVudHMn
+OnsgJ3FvbS10eXBlJzoNCj4gKydmaWx0ZXItcmVkaXJlY3RvcicsICdpZCc6ICdyZWRpcmUwJywg
+J3Byb3BzJzogeyAnbmV0ZGV2JzogJ2huMCcsDQo+ICsncXVldWUnOiAncngnLCAnaW5kZXYnOiAn
+Y29tcGFyZV9vdXQnIH0gfSB9DQo+ICt7J2V4ZWN1dGUnOiAnb2JqZWN0LWFkZCcsICdhcmd1bWVu
+dHMnOnsgJ3FvbS10eXBlJzoNCj4gKydmaWx0ZXItcmVkaXJlY3RvcicsICdpZCc6ICdyZWRpcmUx
+JywgJ3Byb3BzJzogeyAnbmV0ZGV2JzogJ2huMCcsDQo+ICsncXVldWUnOiAncngnLCAnb3V0ZGV2
+JzogJ2NvbXBhcmUwJyB9IH0gfQ0KPiAreydleGVjdXRlJzogJ29iamVjdC1hZGQnLCAnYXJndW1l
+bnRzJzp7ICdxb20tdHlwZSc6ICdpb3RocmVhZCcsICdpZCc6DQo+ICsnaW90aHJlYWQxJyB9IH0N
+Cj4gK3snZXhlY3V0ZSc6ICdvYmplY3QtYWRkJywgJ2FyZ3VtZW50cyc6eyAncW9tLXR5cGUnOiAn
+Y29sby1jb21wYXJlJywNCj4gKydpZCc6ICdjb21wMCcsICdwcm9wcyc6IHsgJ3ByaW1hcnlfaW4n
+OiAnY29tcGFyZTAtMCcsICdzZWNvbmRhcnlfaW4nOg0KPiArJ2NvbXBhcmUxJywgJ291dGRldic6
+ICdjb21wYXJlX291dDAnLCAnaW90aHJlYWQnOiAnaW90aHJlYWQxJyB9IH0gfQ0KPiArDQo+ICt7
+J2V4ZWN1dGUnOiAnbWlncmF0ZS1zZXQtY2FwYWJpbGl0aWVzJywgJ2FyZ3VtZW50cyc6eyAnY2Fw
+YWJpbGl0aWVzJzogWw0KPiAreydjYXBhYmlsaXR5JzogJ3gtY29sbycsICdzdGF0ZSc6IHRydWUg
+fSBdIH0gfQ0KPiAreydleGVjdXRlJzogJ21pZ3JhdGUnLCAnYXJndW1lbnRzJzp7ICd1cmknOiAn
+dGNwOjEyNy4wLjAuMjo5OTk4JyB9IH0NCj4gKw0KPiArTm90ZToNCj4gK0lmIHRoaXMgUHJpbWFy
+eSBwcmV2aW91c2x5IHdhcyBhIFNlY29uZGFyeSwgdGhlbiB3ZSBuZWVkIHRvIGluc2VydCB0aGUN
+Cj4gK2ZpbHRlcnMgYmVmb3JlIHRoZSBmaWx0ZXItcmV3cml0ZXIgYnkgdXNpbmcgdGhlDQo+ICsi
+J2luc2VydCc6ICdiZWZvcmUnLCAncG9zaXRpb24nOiAnaWQ9cmV3MCciIE9wdGlvbnMuIFNlZSBi
+ZWxvdy4NCj4gKw0KPiArPT0gU2Vjb25kYXJ5IHJlc3VtZSByZXBsaWNhdGlvbiA9PQ0KPiArQmVj
+b21lIFByaW1hcnkgYW5kIHJlc3VtZSByZXBsaWNhdGlvbiBhZnRlciBuZXcgU2Vjb25kYXJ5IGlz
+IHVwLiBOb3RlDQo+ICt0aGF0IG5vdyAxMjcuMC4wLjEgaXMgdGhlIFNlY29uZGFyeSBhbmQgMTI3
+LjAuMC4yIGlzIHRoZSBQcmltYXJ5Lg0KPiArDQo+ICtTdGFydCB0aGUgbmV3IFNlY29uZGFyeSAo
+U3RlcHMgMiBhbmQgMyBhYm92ZSwgYnV0IHdpdGgNCj4gK3ByaW1hcnlfaXA9MTI3LjAuMC4yKSwg
+dGhlbiBvbiB0aGUgb2xkIFNlY29uZGFyeToNCj4gK3snZXhlY3V0ZSc6ICdkcml2ZS1taXJyb3In
+LCAnYXJndW1lbnRzJzp7ICdkZXZpY2UnOiAnY29sby1kaXNrMCcsDQo+ICsnam9iLWlkJzogJ3Jl
+c3luYycsICd0YXJnZXQnOiAnbmJkOi8vMTI3LjAuMC4xOjk5OTkvcGFyZW50MCcsICdtb2RlJzoN
+Cj4gKydleGlzdGluZycsICdmb3JtYXQnOiAncmF3JywgJ3N5bmMnOiAnZnVsbCd9IH0NCj4gKw0K
+PiArV2FpdCB1bnRpbCBkaXNrIGlzIHN5bmNlZCwgdGhlbjoNCj4gK3snZXhlY3V0ZSc6ICdzdG9w
+J30NCj4gK3snZXhlY3V0ZSc6ICdibG9jay1qb2ItY2FuY2VsJywgJ2FyZ3VtZW50cyc6eyAnZGV2
+aWNlJzogJ3Jlc3luYycgfSB9DQo+IA0KPiAtNS4gRmFpbG92ZXIgdGVzdA0KPiAtWW91IGNhbiBr
+aWxsIFByaW1hcnkgVk0gYW5kIHJ1biAneF9jb2xvX2xvc3RfaGVhcnRiZWF0JyBpbiBTZWNvbmRh
+cnkgVk0ncyAtDQo+IG1vbml0b3IgYXQgdGhlIHNhbWUgdGltZSwgdGhlbiBTVk0gd2lsbCBmYWls
+b3ZlciBhbmQgY2xpZW50IHdpbGwgbm90IGRldGVjdA0KPiB0aGlzIC1jaGFuZ2UuDQo+ICt7J2V4
+ZWN1dGUnOiAnaHVtYW4tbW9uaXRvci1jb21tYW5kJywgJ2FyZ3VtZW50cyc6eyAnY29tbWFuZC1s
+aW5lJzoNCj4gKydkcml2ZV9hZGQgLW4gYnVkZHkNCj4gK2RyaXZlcj1yZXBsaWNhdGlvbixtb2Rl
+PXByaW1hcnksZmlsZS5kcml2ZXI9bmJkLGZpbGUuaG9zdD0xMjcuMC4wLjEsZmlsDQo+ICtlLnBv
+cnQ9OTk5OSxmaWxlLmV4cG9ydD1wYXJlbnQwLG5vZGUtbmFtZT1yZXBsaWNhdGlvbjAnfX0NCj4g
+K3snZXhlY3V0ZSc6ICd4LWJsb2NrZGV2LWNoYW5nZScsICdhcmd1bWVudHMnOnsgJ3BhcmVudCc6
+ICdjb2xvLWRpc2swJywNCj4gKydub2RlJzogJ3JlcGxpY2F0aW9uMCcgfSB9DQo+IA0KPiAtQmVm
+b3JlIGlzc3VpbmcgJ3sgImV4ZWN1dGUiOiAieC1jb2xvLWxvc3QtaGVhcnRiZWF0IiB9JyBjb21t
+YW5kLCB3ZSBoYXZlIHRvDQo+IC1pc3N1ZSBibG9jayByZWxhdGVkIGNvbW1hbmQgdG8gc3RvcCBi
+bG9jayByZXBsaWNhdGlvbi4NCj4gLVByaW1hcnk6DQo+IC0gIFJlbW92ZSB0aGUgbmJkIGNoaWxk
+IGZyb20gdGhlIHF1b3J1bToNCj4gLSAgeyAnZXhlY3V0ZSc6ICd4LWJsb2NrZGV2LWNoYW5nZScs
+ICdhcmd1bWVudHMnOiB7J3BhcmVudCc6ICdjb2xvLWRpc2swJywgJ2NoaWxkJzoNCj4gJ2NoaWxk
+cmVuLjEnfX0NCj4gLSAgeyAnZXhlY3V0ZSc6ICdodW1hbi1tb25pdG9yLWNvbW1hbmQnLCdhcmd1
+bWVudHMnOiB7J2NvbW1hbmQtbGluZSc6DQo+ICdkcml2ZV9kZWwgYmxrLWJ1ZGR5MCd9fQ0KPiAt
+ICBOb3RlOiB0aGVyZSBpcyBubyBxbXAgY29tbWFuZCB0byByZW1vdmUgdGhlIGJsb2NrZGV2IG5v
+dw0KPiAreydleGVjdXRlJzogJ29iamVjdC1hZGQnLCAnYXJndW1lbnRzJzp7ICdxb20tdHlwZSc6
+ICdmaWx0ZXItbWlycm9yJywNCj4gKydpZCc6ICdtMCcsICdwcm9wcyc6IHsgJ2luc2VydCc6ICdi
+ZWZvcmUnLCAncG9zaXRpb24nOiAnaWQ9cmV3MCcsDQo+ICsnbmV0ZGV2JzogJ2huMCcsICdxdWV1
+ZSc6ICd0eCcsICdvdXRkZXYnOiAnbWlycm9yMCcgfSB9IH0NCj4gK3snZXhlY3V0ZSc6ICdvYmpl
+Y3QtYWRkJywgJ2FyZ3VtZW50cyc6eyAncW9tLXR5cGUnOg0KPiArJ2ZpbHRlci1yZWRpcmVjdG9y
+JywgJ2lkJzogJ3JlZGlyZTAnLCAncHJvcHMnOiB7ICdpbnNlcnQnOiAnYmVmb3JlJywNCj4gKydw
+b3NpdGlvbic6ICdpZD1yZXcwJywgJ25ldGRldic6ICdobjAnLCAncXVldWUnOiAncngnLCAnaW5k
+ZXYnOg0KPiArJ2NvbXBhcmVfb3V0JyB9IH0gfQ0KPiAreydleGVjdXRlJzogJ29iamVjdC1hZGQn
+LCAnYXJndW1lbnRzJzp7ICdxb20tdHlwZSc6DQo+ICsnZmlsdGVyLXJlZGlyZWN0b3InLCAnaWQn
+OiAncmVkaXJlMScsICdwcm9wcyc6IHsgJ2luc2VydCc6ICdiZWZvcmUnLA0KPiArJ3Bvc2l0aW9u
+JzogJ2lkPXJldzAnLCAnbmV0ZGV2JzogJ2huMCcsICdxdWV1ZSc6ICdyeCcsICdvdXRkZXYnOg0K
+PiArJ2NvbXBhcmUwJyB9IH0gfQ0KPiAreydleGVjdXRlJzogJ29iamVjdC1hZGQnLCAnYXJndW1l
+bnRzJzp7ICdxb20tdHlwZSc6ICdpb3RocmVhZCcsICdpZCc6DQo+ICsnaW90aHJlYWQxJyB9IH0N
+Cj4gK3snZXhlY3V0ZSc6ICdvYmplY3QtYWRkJywgJ2FyZ3VtZW50cyc6eyAncW9tLXR5cGUnOiAn
+Y29sby1jb21wYXJlJywNCj4gKydpZCc6ICdjb21wMCcsICdwcm9wcyc6IHsgJ3ByaW1hcnlfaW4n
+OiAnY29tcGFyZTAtMCcsICdzZWNvbmRhcnlfaW4nOg0KPiArJ2NvbXBhcmUxJywgJ291dGRldic6
+ICdjb21wYXJlX291dDAnLCAnaW90aHJlYWQnOiAnaW90aHJlYWQxJyB9IH0gfQ0KPiANCj4gLVNl
+Y29uZGFyeToNCj4gLSAgVGhlIHByaW1hcnkgaG9zdCBpcyBkb3duLCBzbyB3ZSBzaG91bGQgZG8g
+dGhlIGZvbGxvd2luZyB0aGluZzoNCj4gLSAgeyAnZXhlY3V0ZSc6ICduYmQtc2VydmVyLXN0b3An
+IH0NCj4gK3snZXhlY3V0ZSc6ICdtaWdyYXRlLXNldC1jYXBhYmlsaXRpZXMnLCAnYXJndW1lbnRz
+Jzp7ICdjYXBhYmlsaXRpZXMnOiBbDQo+ICt7J2NhcGFiaWxpdHknOiAneC1jb2xvJywgJ3N0YXRl
+JzogdHJ1ZSB9IF0gfSB9DQo+ICt7J2V4ZWN1dGUnOiAnbWlncmF0ZScsICdhcmd1bWVudHMnOnsg
+J3VyaSc6ICd0Y3A6MTI3LjAuMC4xOjk5OTgnIH0gfQ0KPiANCj4gID09IFRPRE8gPT0NCj4gLTEu
+IFN1cHBvcnQgY29udGludW91cyBWTSByZXBsaWNhdGlvbi4NCj4gLTIuIFN1cHBvcnQgc2hhcmVk
+IHN0b3JhZ2UuDQo+IC0zLiBEZXZlbG9wIHRoZSBoZWFydGJlYXQgcGFydC4NCj4gLTQuIFJlZHVj
+ZSBjaGVja3BvaW50IFZN4oCZcyBkb3dudGltZSB3aGlsZSBkb2luZyBjaGVja3BvaW50Lg0KPiAr
+MS4gU3VwcG9ydCBzaGFyZWQgc3RvcmFnZS4NCj4gKzIuIERldmVsb3AgdGhlIGhlYXJ0YmVhdCBw
+YXJ0Lg0KPiArMy4gUmVkdWNlIGNoZWNrcG9pbnQgVk3igJlzIGRvd250aW1lIHdoaWxlIGRvaW5n
+IGNoZWNrcG9pbnQuDQo+IGRpZmYgLS1naXQgYS9kb2NzL2Jsb2NrLXJlcGxpY2F0aW9uLnR4dCBi
+L2RvY3MvYmxvY2stcmVwbGljYXRpb24udHh0IGluZGV4DQo+IDZiZGU2NzM3ZmIuLjEwOGU5MTY2
+YTggMTAwNjQ0DQo+IC0tLSBhL2RvY3MvYmxvY2stcmVwbGljYXRpb24udHh0DQo+ICsrKyBiL2Rv
+Y3MvYmxvY2stcmVwbGljYXRpb24udHh0DQo+IEBAIC02NSwxMiArNjUsMTIgQEAgYmxvY2tzIHRo
+YXQgYXJlIGFscmVhZHkgaW4gUUVNVS4NCj4gICAgICAgICAgICAgICBeICAgICAgICAgICAgfHwg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgLi0tLS0tLS0tLS0NCj4gICAgICAgICAgICAgICB8
+ICAgICAgICAgICAgfHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgfCBTZWNvbmRhcnkNCj4g
+ICAgICAgICAgMSBRdW9ydW0gICAgICAgICAgfHwgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+Jy0tLS0tLS0tLS0NCj4gLSAgICAgICAgIC8gICAgICBcICAgICAgICAgfHwNCj4gLSAgICAgICAg
+LyAgICAgICAgXCAgICAgICAgfHwNCj4gLSAgIFByaW1hcnkgICAgMiBmaWx0ZXINCj4gLSAgICAg
+ZGlzayAgICAgICAgIF4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgdmlydGlvLWJsaw0KPiAtICAgICAgICAgICAgICAgICAgfCAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIF4NCj4gLSAgICAgICAgICAgICAgICAzIE5CRCAgLS0tLS0tLT4gIDMgTkJEICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICB8DQo+ICsgICAgICAgICAvICAg
+ICAgXCAgICAgICAgIHx8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICB2aXJ0aW8tYmxrDQo+ICsgICAgICAgIC8gICAgICAgIFwgICAgICAg
+IHx8ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgXg0KPiArICAgUHJpbWFyeSAgICAyIGZpbHRlciAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwNCj4gKyAg
+ICAgZGlzayAgICAgICAgIF4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgNyBRdW9ydW0NCj4gKyAgICAgICAgICAgICAgICAg
+IHwgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIC8NCj4gKyAgICAgICAgICAgICAgICAzIE5CRCAgLS0tLS0tLT4gIDMgTkJE
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgLw0KPiAgICAg
+ICAgICAgICAgICAgIGNsaWVudCAgICB8fCAgICAgc2VydmVyICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgMiBmaWx0ZXINCj4gICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgfHwgICAgICAgIF4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBeDQo+ICAtLS0tLS0tLS4gICAgICAgICAgICAgICAgIHx8ICAgICAgICB8ICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfA0KPiBAQCAtMTA2LDYgKzEw
+NiwxMCBAQCBhbnkgc3RhdGUgdGhhdCB3b3VsZCBvdGhlcndpc2UgYmUgbG9zdCBieSB0aGUNCj4g
+c3BlY3VsYXRpdmUgd3JpdGUtdGhyb3VnaCAgb2YgdGhlIE5CRCBzZXJ2ZXIgaW50byB0aGUgc2Vj
+b25kYXJ5IGRpc2suIFNvDQo+IGJlZm9yZSBibG9jayByZXBsaWNhdGlvbiwgIHRoZSBwcmltYXJ5
+IGRpc2sgYW5kIHNlY29uZGFyeSBkaXNrIHNob3VsZCBjb250YWluDQo+IHRoZSBzYW1lIGRhdGEu
+DQo+IA0KPiArNykgVGhlIHNlY29uZGFyeSBhbHNvIGhhcyBhIHF1b3J1bSBub2RlLCBzbyBhZnRl
+ciBzZWNvbmRhcnkgZmFpbG92ZXIgaXQNCj4gK2NhbiBiZWNvbWUgdGhlIG5ldyBwcmltYXJ5IGFu
+ZCBjb250aW51ZSByZXBsaWNhdGlvbi4NCj4gKw0KPiArDQo+ICA9PSBGYWlsdXJlIEhhbmRsaW5n
+ID09DQo+ICBUaGVyZSBhcmUgNyBpbnRlcm5hbCBlcnJvcnMgd2hlbiBibG9jayByZXBsaWNhdGlv
+biBpcyBydW5uaW5nOg0KPiAgMS4gSS9PIGVycm9yIG9uIHByaW1hcnkgZGlzaw0KPiBAQCAtMTcx
+LDE2ICsxNzUsMTggQEAgUHJpbWFyeToNCj4gICAgICAgbGVhZGluZyB3aGl0ZXNwYWNlLg0KPiAg
+ICA1LiBUaGUgcW1wIGNvbW1hbmQgbGluZSBtdXN0IGJlIHJ1biBhZnRlciBydW5uaW5nIHFtcCBj
+b21tYW5kIGxpbmUgaW4NCj4gICAgICAgc2Vjb25kYXJ5IHFlbXUuDQo+IC0gIDYuIEFmdGVyIGZh
+aWxvdmVyIHdlIG5lZWQgcmVtb3ZlIGNoaWxkcmVuLjEgKHJlcGxpY2F0aW9uIGRyaXZlcikuDQo+
+ICsgIDYuIEFmdGVyIHByaW1hcnkgZmFpbG92ZXIgd2UgbmVlZCByZW1vdmUgY2hpbGRyZW4uMSAo
+cmVwbGljYXRpb24gZHJpdmVyKS4NCj4gDQo+ICBTZWNvbmRhcnk6DQo+ICAgIC1kcml2ZSBpZj1u
+b25lLGRyaXZlcj1yYXcsZmlsZS5maWxlbmFtZT0xLnJhdyxpZD1jb2xvMSBcDQo+IC0gIC1kcml2
+ZSBpZj14eHgsaWQ9dG9weHh4LGRyaXZlcj1yZXBsaWNhdGlvbixtb2RlPXNlY29uZGFyeSx0b3At
+DQo+IGlkPXRvcHh4eFwNCj4gKyAgLWRyaXZlDQo+ICsgaWY9bm9uZSxpZD1jaGlsZHMxLGRyaXZl
+cj1yZXBsaWNhdGlvbixtb2RlPXNlY29uZGFyeSx0b3AtaWQ9Y2hpbGRzMQ0KPiAgICAgICAgICAg
+ZmlsZS5maWxlLmZpbGVuYW1lPWFjdGl2ZV9kaXNrLnFjb3cyLFwNCj4gICAgICAgICAgIGZpbGUu
+ZHJpdmVyPXFjb3cyLFwNCj4gICAgICAgICAgIGZpbGUuYmFja2luZy5maWxlLmZpbGVuYW1lPWhp
+ZGRlbl9kaXNrLnFjb3cyLFwNCj4gICAgICAgICAgIGZpbGUuYmFja2luZy5kcml2ZXI9cWNvdzIs
+XA0KPiAgICAgICAgICAgZmlsZS5iYWNraW5nLmJhY2tpbmc9Y29sbzENCj4gKyAgLWRyaXZlIGlm
+PXh4eCxkcml2ZXI9cXVvcnVtLHJlYWQtcGF0dGVybj1maWZvLGlkPXRvcC1kaXNrMSxcDQo+ICsg
+ICAgICAgICB2b3RlLXRocmVzaG9sZD0xLGNoaWxkcmVuLjA9Y2hpbGRzMQ0KPiANCj4gICAgVGhl
+biBydW4gcW1wIGNvbW1hbmQgaW4gc2Vjb25kYXJ5IHFlbXU6DQo+ICAgICAgeyAnZXhlY3V0ZSc6
+ICduYmQtc2VydmVyLXN0YXJ0JywNCj4gQEAgLTIzNCw2ICsyNDAsOCBAQCBTZWNvbmRhcnk6DQo+
+ICAgIFRoZSBwcmltYXJ5IGhvc3QgaXMgZG93biwgc28gd2Ugc2hvdWxkIGRvIHRoZSBmb2xsb3dp
+bmcgdGhpbmc6DQo+ICAgIHsgJ2V4ZWN1dGUnOiAnbmJkLXNlcnZlci1zdG9wJyB9DQo+IA0KPiAr
+UHJvbW90ZSBTZWNvbmRhcnkgdG8gUHJpbWFyeToNCj4gKyAgc2VlIENPTE8tRlQudHh0DQo+ICsN
+Cj4gIFRPRE86DQo+IC0xLiBDb250aW51b3VzIGJsb2NrIHJlcGxpY2F0aW9uDQo+IC0yLiBTaGFy
+ZWQgZGlzaw0KPiArMS4gU2hhcmVkIGRpc2sNCj4gLS0NCj4gMi4yMC4xDQo=
 
