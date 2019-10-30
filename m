@@ -2,83 +2,82 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B59CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 04:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7233BCA9EC0
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 06:16:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51DC120874
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 04:58:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D7D32067D
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 06:16:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="p/socSB8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51DC120874
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n4/4gNNa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D7D32067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPg3p-0004GR-EJ
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 00:58:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57132)
+	id 1iPhHJ-0002EX-CC
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 02:16:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42571)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1iPg2y-0003n6-BC
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 00:57:29 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iPhGY-0001ap-2e
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 02:15:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1iPg2x-0001Bv-9C
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 00:57:28 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42713)
+ (envelope-from <peter.maydell@linaro.org>) id 1iPhGW-00022R-La
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 02:15:33 -0400
+Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:38381)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iPg2w-0001BW-Us
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 00:57:27 -0400
-Received: by mail-pf1-x442.google.com with SMTP id 21so665080pfj.9
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 21:57:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dabbelt-com.20150623.gappssmtp.com; s=20150623;
- h=subject:date:message-id:mime-version:content-transfer-encoding:cc
- :from:to; bh=QD5lzKum+Qo4vVF6hgbVJbUU4Qh7RzWKO3RZ7H1Bm0A=;
- b=p/socSB8T1sjyFDkXRmQkZSCZSjjCS+9CUG52wW/nmYHbXtYvK7u4yE5u9dm37Ec9M
- wMuAZOzCptwbssantO/Vp3DVqKCEZe7gsaqrjpsBs1pXJfm50hRIaTCmO2Gdmn4MffGs
- 5+VHBrNwWV/+skvMAdRwz9ekDh+H3DtYl2DbWNxbgCJYsDg6nha4d//KFf3ZwDwDQRKl
- mPwpBg2i/uq7VUMl7/dKN+tokhHUxig1NcIwWDs1vmRCldQUC94OkdMLRDY9PRJ9Nr9N
- 6XP6CF7aZMR9jThKetWL3rqOjq5lEm4isjHC3f049MKXyt0SmOWO1aiOPybzAZBXa3/U
- DX5g==
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iPhGT-0001y3-Hl
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 02:15:31 -0400
+Received: by mail-ot1-x333.google.com with SMTP id r14so1124700otn.5
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 23:15:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=qNLvZ4NW7czofI39JBeLB5pWjDvdXKn28u1jTzVFPBY=;
+ b=n4/4gNNaqBDKUb9Ypa0hUOTwdTOyRmRuOV2zy1Ug/jvlJ+n65y65qZLVhyZGrg4NW5
+ ZpAs7X28zhDzy+bgn8ev93qcv+/dIgBMuWYEdUtSE1cD1yL1jEqsgS6lp3V/ET7jrSXM
+ DvgaCVP7zXv06YzUhMZs4afOSENyq2VWfYhGYcpnqWQGWNwjgI4l4cUYtLRh6LgJri0r
+ sINiakEdOlhFFlsN7IRGb1pP5xWKpGyjhNF3tToo8UKkzCmJRFDxdXfDTSv5yNekcVYg
+ 3YDXGx7IxkscAjdU0tQEv7xnO0E8ml24QwuspA/WVn1jQ5alLV4Zw7D6YxbfPp/zHG7B
+ fCNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:date:message-id:mime-version
- :content-transfer-encoding:cc:from:to;
- bh=QD5lzKum+Qo4vVF6hgbVJbUU4Qh7RzWKO3RZ7H1Bm0A=;
- b=Ppz5kmmOfb11itIX6jzjNifo4LAUp2+id2DB9k1rzW7moRmLceMOr23rLQd2tveuKk
- 1sfl6nrY2MlBO9KxgG3U8OUnQY7Eun+f7ozC1MDLTeeGPrPL4cwM3lIIuwg/BTqU2888
- FVe5UHrjUyNTo0Z8K8qLfalIr32gQSpavl0ASOeln+rlxrJiA/EtmCs6SorrfRI4y/kg
- KrTegf2Ss92rxX+2ou11NeSXEfXbJSk1ItIWjGhKnPBr3IrMsZPu5V5JRWPw1pkjwVwp
- EX23ZfLWpCxzKjmZTzSFiw775M+ta9YzLxwN2S9/DxDEf/YjDHwmDIl6GkbxGUeB1yKy
- iF5A==
-X-Gm-Message-State: APjAAAV6FdD1b1TRdhTLgAlppKHxYFTJp1aCAojzRhBRETFTbULvyLIh
- Ho5Q2mJTNQoKjDttISSwWeBcOoeIhdU=
-X-Google-Smtp-Source: APXvYqyLnBnl0qQjGR+lCpSI8Rh9Tj0sQQUl92gf35LwP0Rqgf+XxkxFwU0pLzfsfmZmtnGi2bnmRg==
-X-Received: by 2002:a17:90a:9104:: with SMTP id
- k4mr11442805pjo.39.1572411445399; 
- Tue, 29 Oct 2019 21:57:25 -0700 (PDT)
-Received: from localhost (c-67-161-15-180.hsd1.ca.comcast.net. [67.161.15.180])
- by smtp.gmail.com with ESMTPSA id s24sm974473pfm.144.2019.10.29.21.57.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 29 Oct 2019 21:57:24 -0700 (PDT)
-Subject: [PATCH] MAINTAINERS: Change to my personal email address
-Date: Tue, 29 Oct 2019 21:43:41 -0700
-Message-Id: <20191030044341.29179-1-palmer@dabbelt.com>
-X-Mailer: git-send-email 2.21.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=qNLvZ4NW7czofI39JBeLB5pWjDvdXKn28u1jTzVFPBY=;
+ b=rj0RfqqvNxNRE027Bv3M3FyZjp33y5YGkIpZV+Dp0FWqgbBJ8ZJxUbuz7BQyMf8iT/
+ oflGx/DD1jOkrAhQTxIKEVXOWlu/ABmPJ+55Twr5yDxNpVwOIJtshrQBI693SO31hVl4
+ 8wFAbMSJ8+I2tCZ0WiNm7XgJnI1giucc0S3BzHDM0X/f8bVmFUa7rd/2NSefMWOyAIMj
+ KGyufhdBCdUEDIIweWbSvOaMwxnmSZ1yrsP056v0lrPVKtNuL7a2lLjsKVEGAXsUe/WJ
+ WFCBfjJg7H1kQFtNyKJoLyMnCL3aZj+26XkbHDHXsvAElLrpMbpHVbb/L4HLh1v5gFaV
+ xqng==
+X-Gm-Message-State: APjAAAUFBNUy1mgAznNzuHRuVhlmywmFX2hh45iw9WxCXicUb6GDDx7E
+ eZ2Ova1hE9y92koL8Jv+rZ45GrYJyCCcn8G+6Th2hg==
+X-Google-Smtp-Source: APXvYqzEdgHGm6eLzQARVqIy8HRFVHxEtmOIVmf4pq09AYQyTBWRGNXhxefZiaVn/eK7o/lWwj+7JR74vb05zsSfthk=
+X-Received: by 2002:a9d:7cd4:: with SMTP id r20mr4336006otn.91.1572416126935; 
+ Tue, 29 Oct 2019 23:15:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: qemu-riscv@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+References: <20191028163447.18541-1-philmd@redhat.com>
+In-Reply-To: <20191028163447.18541-1-philmd@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 30 Oct 2019 06:15:29 +0000
+Message-ID: <CAFEAcA-9wQMzJN+ZeWDE8k1E9uwUw3NHNJuR2H_hHRNeX1Lf8Q@mail.gmail.com>
+Subject: Re: [PULL 00/20] hw/i386/pc: Split PIIX3 southbridge from i440FX
+ northbridge
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::442
+X-Received-From: 2607:f8b0:4864:20::333
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,45 +89,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- qemu-devel@nongnu.org
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'm leaving SiFive in a bit less than two weeks, which means I'll be
-losing my @sifive email address.  I don't have my new email address yet,
-so I'm switching over to my personal address instead.
+On Mon, 28 Oct 2019 at 17:48, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+>
+> Hi Peter,
+>
+> This is a X86/MIPS pull, Paolo and Aleksandar are OK I send it:
+>
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg04959.html
+>
+> Regards,
+>
+> Phil.
+>
+> The following changes since commit 9bb73502321d46f4d320fa17aa38201445783f=
+c4:
+>
+>   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
+ng (2019-10-28 13:32:40 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/philmd/qemu.git tags/pc_split_i440fx_piix-pull-reque=
+st
+>
+> for you to fetch changes up to d1389352cde824ce8dab7c1a2ded150df6add124:
+>
+>   hw/pci-host/i440fx: Remove the last PIIX3 traces (2019-10-28 16:12:29 +=
+0100)
+>
+> ----------------------------------------------------------------
+> The i440FX northbridge is only used by the PC machine, while the
+> PIIX southbridge is also used by the Malta MIPS machine.
+>
+> Split the PIIX3 southbridge from i440FX northbridge.
+>
+> ----------------------------------------------------------------
 
-Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
----
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I get a link failure on my 'do a make clean and then make' build :
+  LINK    i386-softmmu/qemu-system-i386
+hw/i386/pc_piix.o: In function `pc_init1':
+/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_piix.c:197: undefined
+reference to `i440fx_init'
+/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_piix.c:206: undefined
+reference to `piix3_create'
+collect2: error: ld returned 1 exit status
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 325e67a04eee..20445f353e7a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -259,7 +259,7 @@ F: include/hw/ppc/
- F: disas/ppc.c
- 
- RISC-V TCG CPUs
--M: Palmer Dabbelt <palmer@sifive.com>
-+M: Palmer Dabbelt <palmer@dabbelt.com>
- M: Alistair Francis <Alistair.Francis@wdc.com>
- M: Sagar Karandikar <sagark@eecs.berkeley.edu>
- M: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-@@ -2392,7 +2392,7 @@ F: tcg/ppc/
- F: disas/ppc.c
- 
- RISC-V TCG target
--M: Palmer Dabbelt <palmer@sifive.com>
-+M: Palmer Dabbelt <palmer@dabbelt.com>
- M: Alistair Francis <Alistair.Francis@wdc.com>
- L: qemu-riscv@nongnu.org
- S: Maintained
--- 
-2.21.0
-
+thanks
+-- PMM
 
