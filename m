@@ -2,74 +2,83 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 967BCCA9EAE
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 02:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B59CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 04:58:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61B1B2086A
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 02:20:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61B1B2086A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=h3c.com
+	by mail.kernel.org (Postfix) with ESMTPS id 51DC120874
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 04:58:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="p/socSB8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51DC120874
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPdad-00030U-9m
-	for qemu-devel@archiver.kernel.org; Tue, 29 Oct 2019 22:20:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54181)
+	id 1iPg3p-0004GR-EJ
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 00:58:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57132)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tu.guoyi@h3c.com>) id 1iPdZe-0002O0-Ji
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 22:19:03 -0400
+ (envelope-from <palmer@dabbelt.com>) id 1iPg2y-0003n6-BC
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 00:57:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tu.guoyi@h3c.com>) id 1iPdZc-0001qE-5B
- for qemu-devel@nongnu.org; Tue, 29 Oct 2019 22:19:02 -0400
-Received: from smtp.h3c.com ([60.191.123.50]:2772 helo=h3cspam02-ex.h3c.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tu.guoyi@h3c.com>)
- id 1iPdZb-0001S9-Jb; Tue, 29 Oct 2019 22:19:00 -0400
-Received: from DAG2EX10-IDC.srv.huawei-3com.com ([10.8.0.73])
- by h3cspam02-ex.h3c.com with ESMTPS id x9U2II2n072234
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
- Wed, 30 Oct 2019 10:18:18 +0800 (GMT-8)
- (envelope-from tu.guoyi@h3c.com)
-Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
- DAG2EX10-IDC.srv.huawei-3com.com (10.8.0.73) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 30 Oct 2019 10:18:19 +0800
-Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
- by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%6])
- with mapi id 15.01.1713.004; Wed, 30 Oct 2019 10:18:19 +0800
-From: Tuguoyi <tu.guoyi@h3c.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Max Reitz
- <mreitz@redhat.com>, "kwolf@redhat.com" <kwolf@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Subject: RE: [PATCH v2] qcow2-bitmap: Fix uint64_t left-shift overflow
-Thread-Topic: [PATCH v2] qcow2-bitmap: Fix uint64_t left-shift overflow
-Thread-Index: AdWNWOAJ7czUdZfnT3+PEnECPxQetwArhuYAAAF964AALldNsA==
-Date: Wed, 30 Oct 2019 02:18:19 +0000
-Message-ID: <446f2e5235ac45269d733a169251ddd6@h3c.com>
-References: <494aedb644bf434f8eee0263aa17aa23@h3c.com>
- <8f65c725-68ae-6a9f-d155-cb0dd15c995e@redhat.com>
- <c5c45c60-8d8a-ca0d-4a89-4a5e26176164@virtuozzo.com>
-In-Reply-To: <c5c45c60-8d8a-ca0d-4a89-4a5e26176164@virtuozzo.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.125.108.112]
-x-sender-location: DAG2
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <palmer@dabbelt.com>) id 1iPg2x-0001Bv-9C
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 00:57:28 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42713)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iPg2w-0001BW-Us
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 00:57:27 -0400
+Received: by mail-pf1-x442.google.com with SMTP id 21so665080pfj.9
+ for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 21:57:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dabbelt-com.20150623.gappssmtp.com; s=20150623;
+ h=subject:date:message-id:mime-version:content-transfer-encoding:cc
+ :from:to; bh=QD5lzKum+Qo4vVF6hgbVJbUU4Qh7RzWKO3RZ7H1Bm0A=;
+ b=p/socSB8T1sjyFDkXRmQkZSCZSjjCS+9CUG52wW/nmYHbXtYvK7u4yE5u9dm37Ec9M
+ wMuAZOzCptwbssantO/Vp3DVqKCEZe7gsaqrjpsBs1pXJfm50hRIaTCmO2Gdmn4MffGs
+ 5+VHBrNwWV/+skvMAdRwz9ekDh+H3DtYl2DbWNxbgCJYsDg6nha4d//KFf3ZwDwDQRKl
+ mPwpBg2i/uq7VUMl7/dKN+tokhHUxig1NcIwWDs1vmRCldQUC94OkdMLRDY9PRJ9Nr9N
+ 6XP6CF7aZMR9jThKetWL3rqOjq5lEm4isjHC3f049MKXyt0SmOWO1aiOPybzAZBXa3/U
+ DX5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:date:message-id:mime-version
+ :content-transfer-encoding:cc:from:to;
+ bh=QD5lzKum+Qo4vVF6hgbVJbUU4Qh7RzWKO3RZ7H1Bm0A=;
+ b=Ppz5kmmOfb11itIX6jzjNifo4LAUp2+id2DB9k1rzW7moRmLceMOr23rLQd2tveuKk
+ 1sfl6nrY2MlBO9KxgG3U8OUnQY7Eun+f7ozC1MDLTeeGPrPL4cwM3lIIuwg/BTqU2888
+ FVe5UHrjUyNTo0Z8K8qLfalIr32gQSpavl0ASOeln+rlxrJiA/EtmCs6SorrfRI4y/kg
+ KrTegf2Ss92rxX+2ou11NeSXEfXbJSk1ItIWjGhKnPBr3IrMsZPu5V5JRWPw1pkjwVwp
+ EX23ZfLWpCxzKjmZTzSFiw775M+ta9YzLxwN2S9/DxDEf/YjDHwmDIl6GkbxGUeB1yKy
+ iF5A==
+X-Gm-Message-State: APjAAAV6FdD1b1TRdhTLgAlppKHxYFTJp1aCAojzRhBRETFTbULvyLIh
+ Ho5Q2mJTNQoKjDttISSwWeBcOoeIhdU=
+X-Google-Smtp-Source: APXvYqyLnBnl0qQjGR+lCpSI8Rh9Tj0sQQUl92gf35LwP0Rqgf+XxkxFwU0pLzfsfmZmtnGi2bnmRg==
+X-Received: by 2002:a17:90a:9104:: with SMTP id
+ k4mr11442805pjo.39.1572411445399; 
+ Tue, 29 Oct 2019 21:57:25 -0700 (PDT)
+Received: from localhost (c-67-161-15-180.hsd1.ca.comcast.net. [67.161.15.180])
+ by smtp.gmail.com with ESMTPSA id s24sm974473pfm.144.2019.10.29.21.57.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 29 Oct 2019 21:57:24 -0700 (PDT)
+Subject: [PATCH] MAINTAINERS: Change to my personal email address
+Date: Tue, 29 Oct 2019 21:43:41 -0700
+Message-Id: <20191030044341.29179-1-palmer@dabbelt.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-DNSRBL: 
-X-MAIL: h3cspam02-ex.h3c.com x9U2II2n072234
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 60.191.123.50
+Content-Transfer-Encoding: 8bit
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: qemu-riscv@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,59 +90,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chengchiwen <chengchiwen@h3c.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Wangyongqing <w_yongqing@h3c.com>, Changlimin <changlimin@h3c.com>,
- Gaoliang <liang_gao@h3c.com>, Wangyong <wang.yongD@h3c.com>
+Cc: Palmer Dabbelt <palmer@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-T24gMjkuMTAuMjAxOSAxOTo1NyBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IHdyb3RlOg0K
-PiAyOS4xMC4yMDE5IDE0OjE0LCBNYXggUmVpdHogd3JvdGU6DQo+ID4gT24gMjguMTAuMTkgMDc6
-MzMsIFR1Z3VveWkgd3JvdGU6DQo+ID4+IEluIGNoZWNrX2NvbnN0cmFpbnRzX29uX2JpdG1hcCgp
-LCB0aGUgc2FuaXR5IGNoZWNrIG9uIHRoZSBncmFudWxhcml0eQ0KPiA+PiB3aWxsIGNhdXNlIHVp
-bnQ2NF90IGludGVnZXIgbGVmdC1zaGlmdCBvdmVyZmxvdyB3aGVuIGNsdXN0ZXJfc2l6ZSBpcw0K
-PiA+PiAyTSBhbmQgdGhlIGdyYW51bGFyaXR5IGlzIEJJR0dFUiB0aGFuIDMySy4gQXMgYSByZXN1
-bHQsIGZvciBhIHFjb3cyDQo+ID4+IGRpc2sgd2l0aCBjbHVzdGVyX3NpemUgc2V0IHRvIDJNLCB3
-ZSBjb3VsZCBub3QgZXZlbiBjcmVhdGUgYSBkaXJ0eQ0KPiA+PiBiaXRtYXAgd2l0aCBkZWZhdWx0
-IGdyYW51bGFyaXR5LiBUaGlzIHBhdGNoIGZpeCB0aGUgaXNzdWUgYnkgZGl2aWRpbmcNCj4gPj4g
-QGxlbiBieSBncmFudWxhcml0eSBpbnN0ZWFkLg0KPiA+Pg0KPiA+PiBTaWduZWQtb2ZmLWJ5OiBH
-dW95aSBUdSA8dHUuZ3VveWlAaDNjLmNvbT4NCj4gPj4gLS0tDQo+ID4+ICAgYmxvY2svcWNvdzIt
-Yml0bWFwLmMgfCA0ICsrLS0NCj4gPj4gICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCsp
-LCAyIGRlbGV0aW9ucygtKQ0KPiA+Pg0KPiA+PiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzItYml0
-bWFwLmMgYi9ibG9jay9xY293Mi1iaXRtYXAuYyBpbmRleA0KPiA+PiA5ODI5NGE3Li43MWFjODIy
-IDEwMDY0NA0KPiA+PiAtLS0gYS9ibG9jay9xY293Mi1iaXRtYXAuYw0KPiA+PiArKysgYi9ibG9j
-ay9xY293Mi1iaXRtYXAuYw0KPiA+PiBAQCAtMTcyLDggKzE3Miw4IEBAIHN0YXRpYyBpbnQNCj4g
-Y2hlY2tfY29uc3RyYWludHNfb25fYml0bWFwKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0KPiA+PiAg
-ICAgICB9DQo+ID4+DQo+ID4+ICAgICAgIGlmICgobGVuID4gKHVpbnQ2NF90KUJNRV9NQVhfUEhZ
-U19TSVpFIDw8IGdyYW51bGFyaXR5X2JpdHMpIHx8DQoNCkhlcmUgaXMgdGhlIHNhbWUgcHJvYmxl
-bSwgd2UgbmVlZCBhbHNvIHRvIGNhbGN1bGF0ZSB0aGUgbnVtYmVyIG9mIGJpdHMgaW5zdGVhZCBv
-ZiBieXRlcy4NCg0KPiA+PiAtICAgICAgICAobGVuID4gKHVpbnQ2NF90KUJNRV9NQVhfVEFCTEVf
-U0laRSAqIHMtPmNsdXN0ZXJfc2l6ZSA8PA0KPiA+PiAtICAgICAgICAgICAgICAgZ3JhbnVsYXJp
-dHlfYml0cykpDQo+ID4+ICsgICAgICAgIChESVZfUk9VTkRfVVAobGVuLCBncmFudWxhcml0eSkg
-Pg0KPiAodWludDY0X3QpQk1FX01BWF9UQUJMRV9TSVpFICoNCj4gPj4gKyAgICAgICAgICAgICAg
-ICBzLT5jbHVzdGVyX3NpemUpKQ0KPiA+DQo+ID4gVGhpcyBkaWRu4oCZdCBjaGFuZ2UgYmVjYXVz
-ZSBvZiB0aGlzIHBhdGNoLCBidXQgZG9lc27igJl0IHRoaXMgY29tcGFyaXNvbg0KPiA+IG5lZWQg
-YSBjb252ZXJzaW9uIG9mIGJpdHMgdG8gYnl0ZXMgc29tZXdoZXJlPw0KPiA+DQo+ID4gbGVuIC8g
-Z3JhbnVsYXJpdHkgZ2l2ZXMgdXMgdGhlIG51bWJlciBvZiBiaXRzIG5lZWRlZCBmb3IgdGhlIGJp
-dG1hcC4NCj4gPg0KPiA+IEJNRV9NQVhfVEFCTEVfU0laRSBpcywgYXMgZmFyIGFzIEkgY2FuIHNl
-ZSwgYSBudW1iZXIgb2YgYml0bWFwDQo+ID4gY2x1c3RlcnMsIHNvIG11bHRpcGx5aW5nIGl0IGJ5
-IHRoZSBjbHVzdGVyIHNpemUgZ2l2ZXMgdGhlIG51bWJlciBvZg0KPiA+IGJ5dGVzIGluIHRoZSBi
-aXRtYXAuICBCdXQgdGhlIG51bWJlciBvZiBiaXRzIGlzIGVpZ2h0IHRpbWVzIGhpZ2hlci4NCj4g
-DQo+IEkgdGhpbmsgeW91IGFyZSByaWdodC4gSXQgd291bGQgYmUgYmV0dGVyIHRvIGZpeCBpdCBp
-biB0aGUgc2FtZSBwYXRjaC4uDQo+IA0KDQpJIHRoaW5rIGl0IHdvdWxkIGJlIGJldHRlciB0byBh
-ZGQgYSBpbmxpbmUgZnVuY3Rpb24gdG8gY2FsY3VsYXRlIHRoZSBtYXggYnl0ZXMgDQpvZiBiaXRt
-YXAgd2l0aCBnaXZlbiB2aXJ0dWFsIHNpemUgYW5kIGdyYW51bGFyaXR5Lg0KDQpJJ2xsIHNlbmQg
-YW5vdGhlciBwYXRjaCBsYXRlcg0KDQo+ID4NCj4gPiBBbm90aGVyIHRvcGljOiBJc27igJl0IEJN
-RV9NQVhfVEFCTEVfU0laRSB0b28gYmlnPw0KPiANCj4gTWF5YmUpIFN0aWxsLCBJIGRvbid0IHN1
-cmUgdGhhdCB3ZSBuZWVkIHRvIGNoYW5nZSBpdC4uDQo+IA0KPiA+ICBBcyBpdCBpcywgYml0bWFw
-DQo+ID4gdGFibGVzIGNhbiBoYXZlIGEgc2l6ZSBvZiAxIEdCLCBhbmQgdGhhdOKAmXMgdGhlIHRh
-YmxlIGFsb25lLiAgRGVwZW5kaW5nDQo+ID4gb24gdGhlIGNsdXN0ZXIgc2l6ZSwgdGhlIGJpdG1h
-cCB3b3VsZCB0YWtlIHVwIGF0IGxlYXN0IDY0IEdCIGFuZCBjb3Zlcg0KPiA+IGF0IGxlYXN0IDMy
-IFRCIChhdCBhIGdyYW51bGFyaXR5IG9mIDUxMiBieXRlcykuDQo+ID4NCj4gPiBNYXgNCj4gPg0K
-PiA+PiAgICAgICB7DQo+ID4+ICAgICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJUb28gbXVjaCBz
-cGFjZSB3aWxsIGJlIG9jY3VwaWVkIGJ5IHRoZQ0KPiBiaXRtYXAuICINCj4gPj4gICAgICAgICAg
-ICAgICAgICAgICAgIlVzZSBsYXJnZXIgZ3JhbnVsYXJpdHkiKTsNCj4gPj4NCj4gPg0KPiA+DQo+
-IA0KPiANCj4gLS0NCj4gQmVzdCByZWdhcmRzLA0KPiBWbGFkaW1pcg0K
+I'm leaving SiFive in a bit less than two weeks, which means I'll be
+losing my @sifive email address.  I don't have my new email address yet,
+so I'm switching over to my personal address instead.
+
+Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
+---
+ MAINTAINERS | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 325e67a04eee..20445f353e7a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -259,7 +259,7 @@ F: include/hw/ppc/
+ F: disas/ppc.c
+ 
+ RISC-V TCG CPUs
+-M: Palmer Dabbelt <palmer@sifive.com>
++M: Palmer Dabbelt <palmer@dabbelt.com>
+ M: Alistair Francis <Alistair.Francis@wdc.com>
+ M: Sagar Karandikar <sagark@eecs.berkeley.edu>
+ M: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
+@@ -2392,7 +2392,7 @@ F: tcg/ppc/
+ F: disas/ppc.c
+ 
+ RISC-V TCG target
+-M: Palmer Dabbelt <palmer@sifive.com>
++M: Palmer Dabbelt <palmer@dabbelt.com>
+ M: Alistair Francis <Alistair.Francis@wdc.com>
+ L: qemu-riscv@nongnu.org
+ S: Maintained
+-- 
+2.21.0
+
 
