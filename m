@@ -2,107 +2,110 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B084CA9EC5
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 14:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC90C47E49
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 14:51:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C58782087E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 14:25:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0648020856
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 14:51:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f7ObotMk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C58782087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="ikhTMRyj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0648020856
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPoui-00061a-U9
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 10:25:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58777)
+	id 1iPpKE-00070M-K0
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 10:51:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35209)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iPotb-0004fQ-AM
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:24:27 -0400
+ (envelope-from <alxndr@bu.edu>) id 1iPpIK-0004rh-79
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:49:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iPotY-0004k0-CY
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:24:22 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42345
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iPotX-0004ge-UV
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:24:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572445459;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=plkJY0C/aZf78lmD1aV0GSNuoekGyo1Fnt/0bDkTTEY=;
- b=f7ObotMkVlL5ixeigv59PX6aukYyCWKJVb3TXSzsY6nxMipX81R+Be17EOljut4va7mC5f
- 6Kg0XdFXHK8Iv7i14CDR1flI9HPtcPOGtye1rWBa5m01tJAqj5Rj27Y6StJ7JStoeZIGHJ
- yAOc83h+Mq2+DGgUGWsmqEPjviM2ioo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-TuzqJk3IN3WY6SjDcWbAiQ-1; Wed, 30 Oct 2019 10:24:14 -0400
-X-MC-Unique: TuzqJk3IN3WY6SjDcWbAiQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70D351005509;
- Wed, 30 Oct 2019 14:24:12 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-147.ams2.redhat.com
- [10.36.117.147])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A85BB5D713;
- Wed, 30 Oct 2019 14:24:09 +0000 (UTC)
-Subject: Re: [RFC PATCH v2 03/26] qcow2: Process QCOW2_CLUSTER_ZERO_ALLOC
- clusters in handle_copied()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1572125022.git.berto@igalia.com>
- <fe73f28b44ecaea8a0104e11078f38f563da5925.1572125022.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7daa553e-b74c-3573-5b67-e140436deb7a@redhat.com>
-Date: Wed, 30 Oct 2019 15:24:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <alxndr@bu.edu>) id 1iPpIH-00076v-M0
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:49:55 -0400
+Received: from mail-eopbgr800135.outbound.protection.outlook.com
+ ([40.107.80.135]:59246 helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1iPpIE-0006yI-Kl
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:49:51 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MO1+pZgBIygT8OqG1RlRlrXCP9u4UOb89ngQyNe6brD1TYlxSmQnNrgZryn7GvTfebsQh0vK38Vv+4UaWsJDE3FwFELgC5b8G0Pc2I7khJ+rMZzykGdOHZ/uwubQtFqSVpgKxGtfROlk+YwsqestQipO/M8RrCpNIQL1ot75QwJOllqnqO7QxUPvxVHBiB2ezMSdJT1BG0+NTxaflYOVSOExGh5k/UaAhHu84oASBGRXzCfFPLlkv14RP8zOJGs8IqUH+2tizgKVmp6PpA2l5CJflg6751QMqMPlq5d0NnoMc2YoqV7ty8oWcf5O0lMJVTgfGlz44ErBZUcVcw/4wQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x8AK8yUZ89lchbeOdMHPFKvGEnvxFZCmpnOSAPObFWI=;
+ b=Lu2ByLGNV3hkrr2PhHTEd1S9KDsrF7oyrmyXVyuANmDDsxAhYXZeT97Uf/Wy19O4byFEFPJTLJfH89ILfSmvTALe8MDUmbHgqUW/qKsPHO+DYsullS0m+zh8I3I9+t+oVkXtQkemVQ1LOUI9CMfHQQ4rRAvnT1FXy+e4sjYYX6RJq8Okfs2mQ+zNtxcMGbYbspxKm7N/YGYB/D363yp3VO6qXNa0aVEMX06g/4ZVwjUWG7LJFoVK5vVZMXQBzZyJv43mQpkuWpdEyoGFhH7bjUp2iJGgHhhL3V+3PSv7EBD2dEquwhHsAVNM850k/taPDLLZf/ZmOvMrqlSBxrEciQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
+ header.d=bu.edu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x8AK8yUZ89lchbeOdMHPFKvGEnvxFZCmpnOSAPObFWI=;
+ b=ikhTMRyjqQkSeuIuvENepyZHVYSk8hbCqlRZfqWgah1cATLMQW5hgRu3ZNWKgifmMRWWlQ2pOFfxo2DM6FnZcNj8OHKbsWtNn02SeN+jr3Ej2dC2bS9Pa5NEnmSkMEXxhaB5ccnv/qbCfpkgajpeEcuG+WbudrLZCFGYsyLtBa8=
+Received: from MN2PR03MB4800.namprd03.prod.outlook.com (20.179.82.78) by
+ MN2PR03MB5054.namprd03.prod.outlook.com (52.132.170.200) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2408.17; Wed, 30 Oct 2019 14:49:47 +0000
+Received: from MN2PR03MB4800.namprd03.prod.outlook.com
+ ([fe80::344f:b88:26f0:9f66]) by MN2PR03MB4800.namprd03.prod.outlook.com
+ ([fe80::344f:b88:26f0:9f66%7]) with mapi id 15.20.2387.028; Wed, 30 Oct 2019
+ 14:49:47 +0000
+From: "Oleinik, Alexander" <alxndr@bu.edu>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: [PATCH v4 00/20] Add virtual device fuzzing support
+Thread-Topic: [PATCH v4 00/20] Add virtual device fuzzing support
+Thread-Index: AQHVjzFGwOSarK/JcECCKceiLt7E9A==
+Date: Wed, 30 Oct 2019 14:49:47 +0000
+Message-ID: <20191030144926.11873-1-alxndr@bu.edu>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: git-send-email 2.23.0
+x-originating-ip: [128.197.127.33]
+x-clientproxiedby: DM5PR08CA0048.namprd08.prod.outlook.com
+ (2603:10b6:4:60::37) To MN2PR03MB4800.namprd03.prod.outlook.com
+ (2603:10b6:208:101::14)
+authentication-results: spf=none (sender IP is ) smtp.mailfrom=alxndr@bu.edu; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 35264c41-2167-4d9c-8876-08d75d4868c4
+x-ms-traffictypediagnostic: MN2PR03MB5054:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MN2PR03MB50544139A36D98550BDF710FBA600@MN2PR03MB5054.namprd03.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 02065A9E77
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(366004)(396003)(346002)(136003)(39860400002)(189003)(199004)(2501003)(36756003)(476003)(86362001)(88552002)(386003)(256004)(316002)(14444005)(5640700003)(1076003)(99286004)(6916009)(75432002)(486006)(786003)(6506007)(4326008)(186003)(2906002)(66946007)(26005)(6116002)(14454004)(2616005)(6512007)(305945005)(71200400001)(478600001)(71190400001)(81166006)(102836004)(66556008)(64756008)(50226002)(8676002)(81156014)(66446008)(6436002)(2351001)(25786009)(5660300002)(66066001)(52116002)(66476007)(6486002)(3846002)(8936002)(7736002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MN2PR03MB5054;
+ H:MN2PR03MB4800.namprd03.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: bu.edu does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: EWkMM+q0yT+PY3kouglevsnJJ6CJI793eE/YkYyHBIujTJHku1IKY28aoj6RVdeZxHQu8czWK8bt0HYAVZeP/K92bJsCWAbeNCLecOUtLhAQok5JI4QP3QRUZhkjLXhwhkhqFjzVlc0s9NudBcUwPX733x7tIG2mWzJlZBZGT3ZZot9ndRMf3WdTBlj6tE8w+TxaTnSzCQH+QmjBNL/eUISfubHDcvcqMPsRNghF3jyf9Et29bJ657VJM7tkXOBYRDsZ535VsVziJqJfLQxPO5//zt4g68PO8TZcev5qtM7ztqGp2YCcMWJ9FrS8qNvb072tYlNYtAYvu3qeroZkDuaFhDEhPXt2KBYbvkWlKuUugYyxQnstBNN7JfJ4WKkZAal74tFgVr51e+32/HJfADzoJn9jOJihfmRdn8LCN6Jh3UX6q1xI6ZeaM8LHdGZa
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <fe73f28b44ecaea8a0104e11078f38f563da5925.1572125022.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="aPNGd6XBQxExpsGtHpoyPavmTX05kcMzK"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-OriginatorOrg: bu.edu
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35264c41-2167-4d9c-8876-08d75d4868c4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Oct 2019 14:49:47.5462 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: d57d32cc-c121-488f-b07b-dfe705680c71
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: IBLWHY22mebOGE9hEazsKwlN5ak1MCfoR5scCHLjuUxLjE/QWSP1Vdvq7vhjMD8I
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR03MB5054
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.80.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,471 +117,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: "Oleinik, Alexander" <alxndr@bu.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aPNGd6XBQxExpsGtHpoyPavmTX05kcMzK
-Content-Type: multipart/mixed; boundary="EsCPfOW89gs68CLvtF5utEeum2fIsf16T"
+This series adds a framework for coverage-guided fuzzing of
+virtual-devices. Fuzzing targets are based on qtest and can make use of
+the libqos abstractions.
 
---EsCPfOW89gs68CLvtF5utEeum2fIsf16T
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+V4:
+ * add/transfer license headers to new files
+ * restructure the added QTestClientTransportOps struct
+ * restructure the FuzzTarget struct and fuzzer skeleton
+ * fork-based fuzzer now directly mmaps shm over the coverage bitmaps
+ * fixes to i440 and virtio-net fuzz targets
+ * undo the changes to qtest_memwrite
+ * possible to build /fuzz and /all in the same build-dir
+ * misc fixes to address V3 comments
 
-On 26.10.19 23:25, Alberto Garcia wrote:
-> When writing to a qcow2 file there are two functions that take a
-> virtual offset and return a host offset, possibly allocating new
-> clusters if necessary:
->=20
->    - handle_copied() looks for normal data clusters that are already
->      allocated and have a reference count of 1. In those clusters we
->      can simply write the data and there is no need to perform any
->      copy-on-write.
->=20
->    - handle_alloc() looks for clusters that do need copy-on-write,
->      either because they haven't been allocated yet, because their
->      reference count is !=3D 1 or because they are ZERO_ALLOC clusters.
->=20
-> The ZERO_ALLOC case is a bit special because those are clusters that
-> are already allocated and they could perfectly be dealt with in
-> handle_copied() (as long as copy-on-write is performed when required).
->=20
-> In fact, there is extra code specifically for them in handle_alloc()
-> that tries to reuse the existing allocation if possible and frees them
-> otherwise.
->=20
-> This patch changes the handling of ZERO_ALLOC clusters so the
-> semantics of these two functions are now like this:
->=20
->    - handle_copied() looks for clusters that are already allocated and
->      which we can overwrite (NORMAL and ZERO_ALLOC clusters with a
->      reference count of 1).
->=20
->    - handle_alloc() looks for clusters for which we need a new
->      allocation (all other cases).
->=20
-> One importante difference after this change is that clusters found in
-> handle_copied() may now require copy-on-write, but this will be anyway
-> necessary once we add support for subclusters.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cluster.c | 177 +++++++++++++++++++++++-------------------
->  1 file changed, 96 insertions(+), 81 deletions(-)
->=20
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index aa1010a515..ee6b46f917 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -1021,7 +1021,8 @@ void qcow2_alloc_cluster_abort(BlockDriverState *bs=
-, QCowL2Meta *m)
-> =20
->  /*
->   * For a given write request, create a new QCowL2Meta structure and
-> - * add it to @m.
-> + * add it to @m. If the write request does not need copy-on-write or
-> + * changes to the L2 metadata then this function does nothing.
->   *
->   * @host_offset points to the beginning of the first cluster.
->   *
-> @@ -1034,15 +1035,51 @@ void qcow2_alloc_cluster_abort(BlockDriverState *=
-bs, QCowL2Meta *m)
->   */
->  static void calculate_l2_meta(BlockDriverState *bs, uint64_t host_offset=
-,
->                                uint64_t guest_offset, uint64_t bytes,
-> -                              QCowL2Meta **m, bool keep_old)
-> +                              uint64_t *l2_slice, QCowL2Meta **m, bool k=
-eep_old)
->  {
->      BDRVQcow2State *s =3D bs->opaque;
-> -    unsigned cow_start_from =3D 0;
-> +    int l2_index =3D offset_to_l2_slice_index(s, guest_offset);
-> +    uint64_t l2_entry;
-> +    unsigned cow_start_from, cow_end_to;
->      unsigned cow_start_to =3D offset_into_cluster(s, guest_offset);
->      unsigned cow_end_from =3D cow_start_to + bytes;
-> -    unsigned cow_end_to =3D ROUND_UP(cow_end_from, s->cluster_size);
->      unsigned nb_clusters =3D size_to_clusters(s, cow_end_from);
->      QCowL2Meta *old_m =3D *m;
-> +    QCow2ClusterType type;
-> +
-> +    /* Return if there's no COW (all clusters are normal and we keep the=
-m) */
-> +    if (keep_old) {
-> +        int i;
-> +        for (i =3D 0; i < nb_clusters; i++) {
-> +            l2_entry =3D be64_to_cpu(l2_slice[l2_index + i]);
+V3:
+ * rebased onto v4.1.0+
+ * add the fuzzer as a new build-target type in the build-system
+ * add indirection to qtest client/server communication functions
+ * remove ramfile and snapshot-based fuzzing support
+ * add i440fx fuzz-target as a reference for developers.
+ * add linker-script to assist with fork-based fuzzer
 
-I=E2=80=99d assert somewhere that l2_index + nb_clusters - 1 won=E2=80=99t =
-overflow.
+V2:
+ * split off changes to qos virtio-net and qtest server to other patches
+ * move vl:main initialization into new func: qemu_init
+ * moved useful functions from qos-test.c to a separate object
+ * use struct of function pointers for add_fuzz_target(), instead of
+   arguments
+ * move ramfile to migration/qemu-file
+ * rewrite fork-based fuzzer pending patch to libfuzzer
+ * pass check-patch
 
-> +            if (qcow2_get_cluster_type(bs, l2_entry) !=3D QCOW2_CLUSTER_=
-NORMAL) {
+Alexander Oleinik (20):
+  softmmu: split off vl.c:main() into main.c
+  libqos: Rename i2c_send and i2c_recv
+  fuzz: Add FUZZ_TARGET module type
+  qtest: add qtest_server_send abstraction
+  libqtest: Add a layer of abstraciton to send/recv
+  module: check module wasn't already initialized
+  qtest: add in-process incoming command handler
+  tests: provide test variables to other targets
+  libqos: split qos-test and libqos makefile vars
+  libqos: move useful qos-test funcs to qos_external
+  libqtest: make qtest_bufwrite send "atomic"
+  libqtest: add in-process qtest.c tx/rx handlers
+  fuzz: add configure flag --enable-fuzzing
+  fuzz: Add target/fuzz makefile rules
+  fuzz: add fuzzer skeleton
+  fuzz: add support for fork-based fuzzing.
+  fuzz: add support for qos-assisted fuzz targets
+  fuzz: add i440fx fuzz targets
+  fuzz: add virtio-net fuzz target
+  fuzz: add documentation to docs/devel/
 
-Wouldn=E2=80=99t cluster_needs_cow() be better?
+ Makefile                     |  16 ++-
+ Makefile.objs                |   4 +
+ Makefile.target              |  18 ++-
+ configure                    |  39 ++++++
+ docs/devel/fuzzing.txt       | 119 ++++++++++++++++++
+ exec.c                       |  12 +-
+ include/qemu/module.h        |   4 +-
+ include/sysemu/qtest.h       |   4 +
+ include/sysemu/sysemu.h      |   4 +
+ main.c                       |  52 ++++++++
+ qtest.c                      |  30 ++++-
+ tests/Makefile.include       |  75 +++++------
+ tests/fuzz/Makefile.include  |  11 ++
+ tests/fuzz/fork_fuzz.c       |  51 ++++++++
+ tests/fuzz/fork_fuzz.h       |  23 ++++
+ tests/fuzz/fork_fuzz.ld      |  37 ++++++
+ tests/fuzz/fuzz.c            | 177 ++++++++++++++++++++++++++
+ tests/fuzz/fuzz.h            |  66 ++++++++++
+ tests/fuzz/i440fx_fuzz.c     | 176 ++++++++++++++++++++++++++
+ tests/fuzz/qos_fuzz.c        | 232 +++++++++++++++++++++++++++++++++++
+ tests/fuzz/qos_fuzz.h        |  33 +++++
+ tests/fuzz/virtio_net_fuzz.c | 123 +++++++++++++++++++
+ tests/libqos/i2c-imx.c       |   8 +-
+ tests/libqos/i2c-omap.c      |   8 +-
+ tests/libqos/i2c.c           |  10 +-
+ tests/libqos/i2c.h           |   4 +-
+ tests/libqos/qos_external.c  | 168 +++++++++++++++++++++++++
+ tests/libqos/qos_external.h  |  28 +++++
+ tests/libqtest.c             | 109 ++++++++++++++--
+ tests/libqtest.h             |   4 +
+ tests/pca9552-test.c         |  10 +-
+ tests/qos-test.c             | 140 +--------------------
+ util/module.c                |   7 ++
+ vl.c                         |  36 ++----
+ 34 files changed, 1601 insertions(+), 237 deletions(-)
+ create mode 100644 docs/devel/fuzzing.txt
+ create mode 100644 main.c
+ create mode 100644 tests/fuzz/Makefile.include
+ create mode 100644 tests/fuzz/fork_fuzz.c
+ create mode 100644 tests/fuzz/fork_fuzz.h
+ create mode 100644 tests/fuzz/fork_fuzz.ld
+ create mode 100644 tests/fuzz/fuzz.c
+ create mode 100644 tests/fuzz/fuzz.h
+ create mode 100644 tests/fuzz/i440fx_fuzz.c
+ create mode 100644 tests/fuzz/qos_fuzz.c
+ create mode 100644 tests/fuzz/qos_fuzz.h
+ create mode 100644 tests/fuzz/virtio_net_fuzz.c
+ create mode 100644 tests/libqos/qos_external.c
+ create mode 100644 tests/libqos/qos_external.h
 
-> +                break;
-> +            }
-> +        }
-> +        if (i =3D=3D nb_clusters) {
-> +            return;
-> +        }
-> +    }
-
-So I understand we always need to create an L2Meta structure in all
-other cases because we at least need to turn those clusters into normal
-clusters?  (Even if they=E2=80=99re already allocated, as in the case of
-allocated zero clusters.)
-
-> +
-> +    /* Get the L2 entry from the first cluster */
-> +    l2_entry =3D be64_to_cpu(l2_slice[l2_index]);
-> +    type =3D qcow2_get_cluster_type(bs, l2_entry);
-> +
-> +    if (type =3D=3D QCOW2_CLUSTER_NORMAL && keep_old) {
-> +        cow_start_from =3D cow_start_to;
-> +    } else {
-> +        cow_start_from =3D 0;
-> +    }
-> +
-> +    /* Get the L2 entry from the last cluster */
-> +    l2_entry =3D be64_to_cpu(l2_slice[l2_index + nb_clusters - 1]);
-> +    type =3D qcow2_get_cluster_type(bs, l2_entry);
-> +
-> +    if (type =3D=3D QCOW2_CLUSTER_NORMAL && keep_old) {
-> +        cow_end_to =3D cow_end_from;
-> +    } else {
-> +        cow_end_to =3D ROUND_UP(cow_end_from, s->cluster_size);
-> +    }
-> =20
->      *m =3D g_malloc0(sizeof(**m));
->      **m =3D (QCowL2Meta) {
-> @@ -1068,18 +1105,18 @@ static void calculate_l2_meta(BlockDriverState *b=
-s, uint64_t host_offset,
->      QLIST_INSERT_HEAD(&s->cluster_allocs, *m, next_in_flight);
->  }
-> =20
-> -/* Returns true if writing to a cluster requires COW */
-> +/* Returns true if the cluster is unallocated or has refcount > 1 */
->  static bool cluster_needs_cow(BlockDriverState *bs, uint64_t l2_entry)
->  {
->      switch (qcow2_get_cluster_type(bs, l2_entry)) {
->      case QCOW2_CLUSTER_NORMAL:
-> +    case QCOW2_CLUSTER_ZERO_ALLOC:
->          if (l2_entry & QCOW_OFLAG_COPIED) {
->              return false;
-
-Don=E2=80=99t zero-allocated clusters need COW always?  (Because the at the
-given host offset isn=E2=80=99t guaranteed to be zero.)
-
->          }
->      case QCOW2_CLUSTER_UNALLOCATED:
->      case QCOW2_CLUSTER_COMPRESSED:
->      case QCOW2_CLUSTER_ZERO_PLAIN:
-> -    case QCOW2_CLUSTER_ZERO_ALLOC:
->          return true;
->      default:
->          abort();
-> @@ -1087,20 +1124,34 @@ static bool cluster_needs_cow(BlockDriverState *b=
-s, uint64_t l2_entry)
->  }
-> =20
->  /*
-> - * Returns the number of contiguous clusters that can be used for an all=
-ocating
-> - * write, but require COW to be performed (this includes yet unallocated=
- space,
-> - * which must copy from the backing file)
-> + * Returns the number of contiguous clusters that can be written to
-> + * using one single write request, starting from @l2_index.
-> + * At most @nb_clusters are checked.
-> + *
-> + * If @want_cow is true this counts clusters that are either
-> + * unallocated, or allocated but with refcount > 1.
-
-+(So they need to be newly allocated and COWed)?
-
-(Or is the past participle of COW COWn?  Or maybe CedOW?)
-
-> + *
-> + * If @want_cow is false this counts clusters that are already
-> + * allocated and can be written to using their current locations
-
-s/using their current locations/in-place/?
-
-> + * (including QCOW2_CLUSTER_ZERO_ALLOC).
->   */
->  static int count_cow_clusters(BlockDriverState *bs, int nb_clusters,
-
-Hm, well, it=E2=80=99s not really cow anymore.  Would
-count_single_write_clusters() work?
-
-> -    uint64_t *l2_slice, int l2_index)
-> +                              uint64_t *l2_slice, int l2_index, bool wan=
-t_cow)
->  {
-> +    BDRVQcow2State *s =3D bs->opaque;
-> +    uint64_t l2_entry =3D be64_to_cpu(l2_slice[l2_index]);
-> +    uint64_t expected_offset =3D l2_entry & L2E_OFFSET_MASK;
->      int i;
-> =20
->      for (i =3D 0; i < nb_clusters; i++) {
-> -        uint64_t l2_entry =3D be64_to_cpu(l2_slice[l2_index + i]);
-> -        if (!cluster_needs_cow(bs, l2_entry)) {
-> +        l2_entry =3D be64_to_cpu(l2_slice[l2_index + i]);
-> +        if (cluster_needs_cow(bs, l2_entry) !=3D want_cow) {
->              break;
->          }
-> +        if (!want_cow && expected_offset !=3D (l2_entry & L2E_OFFSET_MAS=
-K)) {
-> +            break;
-> +        }
-> +        expected_offset +=3D s->cluster_size;
->      }
-> =20
->      assert(i <=3D nb_clusters);
-> @@ -1228,18 +1279,17 @@ static int handle_copied(BlockDriverState *bs, ui=
-nt64_t guest_offset,
-> =20
->      cluster_offset =3D be64_to_cpu(l2_slice[l2_index]);
-> =20
-> -    /* Check how many clusters are already allocated and don't need COW =
-*/
-> -    if (qcow2_get_cluster_type(bs, cluster_offset) =3D=3D QCOW2_CLUSTER_=
-NORMAL
-> -        && (cluster_offset & QCOW_OFLAG_COPIED))
-> -    {
-> +    if (!cluster_needs_cow(bs, cluster_offset)) {
->          /* If a specific host_offset is required, check it */
->          bool offset_matches =3D
->              (cluster_offset & L2E_OFFSET_MASK) =3D=3D *host_offset;
-> =20
->          if (offset_into_cluster(s, cluster_offset & L2E_OFFSET_MASK)) {
-> -            qcow2_signal_corruption(bs, true, -1, -1, "Data cluster offs=
-et "
-> +            qcow2_signal_corruption(bs, true, -1, -1, "%s cluster offset=
- "
->                                      "%#llx unaligned (guest offset: %#" =
-PRIx64
-> -                                    ")", cluster_offset & L2E_OFFSET_MAS=
-K,
-> +                                    ")", cluster_offset & QCOW_OFLAG_ZER=
-O ?
-> +                                    "Preallocated zero" : "Data",
-> +                                    cluster_offset & L2E_OFFSET_MASK,
->                                      guest_offset);
->              ret =3D -EIO;
->              goto out;
-> @@ -1252,15 +1302,17 @@ static int handle_copied(BlockDriverState *bs, ui=
-nt64_t guest_offset,
->          }
-> =20
->          /* We keep all QCOW_OFLAG_COPIED clusters */
-> -        keep_clusters =3D
-> -            count_contiguous_clusters(bs, nb_clusters, s->cluster_size,
-> -                                      &l2_slice[l2_index],
-> -                                      QCOW_OFLAG_COPIED | QCOW_OFLAG_ZER=
-O);
-> +        keep_clusters =3D count_cow_clusters(bs, nb_clusters, l2_slice,
-> +                                           l2_index, false);
->          assert(keep_clusters <=3D nb_clusters);
-> =20
->          *bytes =3D MIN(*bytes,
->                   keep_clusters * s->cluster_size
->                   - offset_into_cluster(s, guest_offset));
-> +        assert(*bytes !=3D 0);
-> +
-> +        calculate_l2_meta(bs, cluster_offset & L2E_OFFSET_MASK, guest_of=
-fset,
-> +                          *bytes, l2_slice, m, true);
-
-We wouldn=E2=80=99t need calculate_l2_meta() here if the clusters really al=
-l
-didn=E2=80=99t need COW.
-
-We do need it because cluster_needs_cow() returns false for zero
-clusters, which isn=E2=80=99t what the function name says.
-
-> =20
->          ret =3D 1;
->      } else {
-> @@ -1361,12 +1413,10 @@ static int handle_alloc(BlockDriverState *bs, uin=
-t64_t guest_offset,
->      BDRVQcow2State *s =3D bs->opaque;
->      int l2_index;
->      uint64_t *l2_slice;
-> -    uint64_t entry;
->      uint64_t nb_clusters;
->      int ret;
-> -    bool keep_old_clusters =3D false;
-> =20
-> -    uint64_t alloc_cluster_offset =3D INV_OFFSET;
-> +    uint64_t alloc_cluster_offset;
-> =20
->      trace_qcow2_handle_alloc(qemu_coroutine_self(), guest_offset, *host_=
-offset,
->                               *bytes);
-> @@ -1392,67 +1442,31 @@ static int handle_alloc(BlockDriverState *bs, uin=
-t64_t guest_offset,
->          return ret;
->      }
-> =20
-> -    entry =3D be64_to_cpu(l2_slice[l2_index]);
-> -    nb_clusters =3D count_cow_clusters(bs, nb_clusters, l2_slice, l2_ind=
-ex);
-> +    nb_clusters =3D count_cow_clusters(bs, nb_clusters, l2_slice, l2_ind=
-ex, true);
-> =20
->      /* This function is only called when there were no non-COW clusters,=
- so if
->       * we can't find any unallocated or COW clusters either, something i=
-s
->       * wrong with our code. */
->      assert(nb_clusters > 0);
-> =20
-> -    if (qcow2_get_cluster_type(bs, entry) =3D=3D QCOW2_CLUSTER_ZERO_ALLO=
-C &&
-> -        (entry & QCOW_OFLAG_COPIED) &&
-> -        (*host_offset =3D=3D INV_OFFSET ||
-> -         start_of_cluster(s, *host_offset) =3D=3D (entry & L2E_OFFSET_MA=
-SK)))
-> -    {
-> -        int preallocated_nb_clusters;
-> -
-> -        if (offset_into_cluster(s, entry & L2E_OFFSET_MASK)) {
-> -            qcow2_signal_corruption(bs, true, -1, -1, "Preallocated zero=
- "
-> -                                    "cluster offset %#llx unaligned (gue=
-st "
-> -                                    "offset: %#" PRIx64 ")",
-> -                                    entry & L2E_OFFSET_MASK, guest_offse=
-t);
-> -            ret =3D -EIO;
-> -            goto fail;
-> -        }
-> -
-> -        /* Try to reuse preallocated zero clusters; contiguous normal cl=
-usters
-> -         * would be fine, too, but count_cow_clusters() above has limite=
-d
-> -         * nb_clusters already to a range of COW clusters */
-> -        preallocated_nb_clusters =3D
-> -            count_contiguous_clusters(bs, nb_clusters, s->cluster_size,
-> -                                      &l2_slice[l2_index], QCOW_OFLAG_CO=
-PIED);
-> -        assert(preallocated_nb_clusters > 0);
-> -
-> -        nb_clusters =3D preallocated_nb_clusters;
-> -        alloc_cluster_offset =3D entry & L2E_OFFSET_MASK;
-> -
-> -        /* We want to reuse these clusters, so qcow2_alloc_cluster_link_=
-l2()
-> -         * should not free them. */
-> -        keep_old_clusters =3D true;
-> +    /* Allocate, if necessary at a given offset in the image file */
-
-Well, it=E2=80=99s always necessary now.
-
-> +    alloc_cluster_offset =3D *host_offset =3D=3D INV_OFFSET ? INV_OFFSET=
- :
-> +        start_of_cluster(s, *host_offset);
-> +    ret =3D do_alloc_cluster_offset(bs, guest_offset, &alloc_cluster_off=
-set,
-> +                                  &nb_clusters);
-> +    if (ret < 0) {
-> +        goto out;
->      }
-> =20
-> -    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
-> -
-> -    if (alloc_cluster_offset =3D=3D INV_OFFSET) {
-> -        /* Allocate, if necessary at a given offset in the image file */
-> -        alloc_cluster_offset =3D *host_offset =3D=3D INV_OFFSET ? INV_OF=
-FSET :
-> -                               start_of_cluster(s, *host_offset);
-> -        ret =3D do_alloc_cluster_offset(bs, guest_offset, &alloc_cluster=
-_offset,
-> -                                      &nb_clusters);
-> -        if (ret < 0) {
-> -            goto fail;
-> -        }
-> -
-> -        /* Can't extend contiguous allocation */
-> -        if (nb_clusters =3D=3D 0) {
-> -            *bytes =3D 0;
-> -            return 0;
-> -        }
-> -
-> -        assert(alloc_cluster_offset !=3D INV_OFFSET);
-> +    /* Can't extend contiguous allocation */
-> +    if (nb_clusters =3D=3D 0) {
-> +        *bytes =3D 0;
-> +        ret =3D 0;
-> +        goto out;
->      }
-> =20
-> +    assert(alloc_cluster_offset !=3D INV_OFFSET);
-> +
->      /*
->       * Save info needed for meta data update.
->       *
-> @@ -1475,13 +1489,14 @@ static int handle_alloc(BlockDriverState *bs, uin=
-t64_t guest_offset,
->      *bytes =3D MIN(*bytes, nb_bytes - offset_into_cluster(s, guest_offse=
-t));
->      assert(*bytes !=3D 0);
-> =20
-> -    calculate_l2_meta(bs, alloc_cluster_offset, guest_offset, *bytes,
-> -                      m, keep_old_clusters);
-> +    calculate_l2_meta(bs, alloc_cluster_offset, guest_offset, *bytes, l2=
-_slice,
-> +                      m, false);
-> =20
-> -    return 1;
-> +    ret =3D 1;
-> =20
-> -fail:
-> -    if (*m && (*m)->nb_clusters > 0) {
-> +out:
-> +    qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
-
-Is this a bug fix?
-
-Max
-
-> +    if (ret < 0 && *m && (*m)->nb_clusters > 0) {
->          QLIST_REMOVE(*m, next_in_flight);
->      }
->      return ret;
->=20
-
-
-
---EsCPfOW89gs68CLvtF5utEeum2fIsf16T--
-
---aPNGd6XBQxExpsGtHpoyPavmTX05kcMzK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl25nQgACgkQ9AfbAGHV
-z0ANVQf/T+X4KDUXRc1s6tQ88tFC/BpPUmhjqT4xrKyx79DXQWaHd0xe66T/mVHj
-gUgwvN14sIvuOm0Jq+OGFp9kwIVn57vDuRkqyl9vfgHo4AzgEDjn8PstBXvzhq0D
-/mF2lhukVVAlcI/YsVSNObD0/+3mq2z67i7Qs8vV+wRcLXgRjIOydi0Jxgx28Orh
-YBry6Gzbtx0QcyPnhIt2deOGFH78q7oTBUfluhdm2ayjoTRLdmcVPPdspEDU9Yx5
-/VOnUNI4Hy8pjsjIUYg7UOfrKVVtcBxlJHlhW9WmnHLSWwASvDtdsDIfqNrRYXcp
-n5OTnL5NB1TCtKfcNPWd8xGY4Cb3Ig==
-=xrAN
------END PGP SIGNATURE-----
-
---aPNGd6XBQxExpsGtHpoyPavmTX05kcMzK--
+--=20
+2.23.0
 
 
