@@ -2,68 +2,85 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC04CA9EC5
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 19:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7980ACA9EC5
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 20:42:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 308A0205C9
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 19:42:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 308A0205C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 41677205C9
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 20:42:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TWHVRa35"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41677205C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPtri-00077j-8Z
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 15:42:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42422)
+	id 1iPunF-0007ZD-1c
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 16:42:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47541)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iPtno-0003eT-T7
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 15:38:46 -0400
+ (envelope-from <richard.henderson@linaro.org>) id 1iPsPv-0003ux-91
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 14:10:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iPtnm-0001rw-GE
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 15:38:43 -0400
-Resent-Date: Wed, 30 Oct 2019 15:38:43 -0400
-Resent-Message-Id: <E1iPtnm-0001rw-GE@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21437)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iPtnm-0001hV-72; Wed, 30 Oct 2019 15:38:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1572464302; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=EcwmKOv8PdnW7TId1m/wWiNsa42C/GjvZTZNW0ViNjUF6+tEJcVNqZL6befxqw/Lep70325Qau4se21gZDRJw8jWCCMst8kDa6pD1ChK3GFCFqfuKg/pEr1EcqhmS6SdHfa1GG2we7wjYSzuyNuomb2rd5uI3fwfJRuhlGMe2F4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1572464302;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=Hx99WKGkpJbBfvde4ZLJqSg5oB4vlIZz9wNIN6nRpRc=; 
- b=EK+qcLyrR+DiMY3howGbx0jtzeOCBI7X7x6KLqp80hkjk8OusdIZLQa76uVV3AA878lHUlVJPBJqf2GRv7M1hs1Ho1dF4IwCUH3OKrxMbe/zDLRV+ffPyfCBZ35n+cQBb8UB2fAyNX4QQYUyzblVsZPr1xzNLZGnyPvmCgJACU8=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1572464301052377.1088871142439;
- Wed, 30 Oct 2019 12:38:21 -0700 (PDT)
-In-Reply-To: <20191030163243.10644-1-david@gibson.dropbear.id.au>
-Subject: Re: [PATCH] spapr/kvm: Set default cpu model for all machine classes
-Message-ID: <157246429967.32191.8943981260424940794@37313f22b938>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: david@gibson.dropbear.id.au
-Date: Wed, 30 Oct 2019 12:38:21 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+ (envelope-from <richard.henderson@linaro.org>) id 1iPsPs-0006SY-TW
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 14:09:58 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:42804)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iPsPs-0006Pq-MP
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 14:09:56 -0400
+Received: by mail-wr1-x431.google.com with SMTP id a15so3378359wrf.9
+ for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 11:09:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=xSeZDkLwEVTssoJX+QVCXaZ98b8wT4AcO2nXdLSZxaw=;
+ b=TWHVRa35v4AixZFOiLu4/cO6GeQAwV/NZ2/ajz4MlIjP2dkxbT+dRhOQ68mdvbpwJx
+ Iup+FQc5bw3Lh7BoWtzthHXZm8KrNw9dBxskYgzu3Q42+k2FWY7+m3vsPLLJBy4aFr0L
+ UTgAFUPkMZFy0PZltQ377wrLe13KgW6rjYVSBo8kLp4ORUhH27ttKSJiaj7j9wA/nodU
+ P/bncRi3EouuYhAbjjinHRHQbwwMNpPh44FTOscM0qNwOYVmUiZ0fJA4d7yoazWkx+Ti
+ WjU6a8SzUC/kdfQG9s+qDXQMhpqmi0MgLi7lwG2MXaNTTNwrmZcrndQS4mgqtNJD9C5I
+ KuRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=xSeZDkLwEVTssoJX+QVCXaZ98b8wT4AcO2nXdLSZxaw=;
+ b=K88cb7BEXxhKvHyUJh53qQBet14UVCs7yCveBfxfrZpSW8E1M2ZkbdamUZ6WT5+ojx
+ 9abEnpNHuL1yiS38H4L4bJo2zrrVRFStGHUPpWKomB21taGY8vbD/ZnmPGtACGDk/SKb
+ SmAkMB0mTFdxvOCXnuiorthcFRTjAir/iTOACzysMKbIxX5ec2nke+ays0F5VjX4OD3B
+ XOzM9JlAsXrHb7mrxbk+c05WGH/ib6U64+mXD9p1PiDG7jadDWVMg7zN3BJnA2xTqfsu
+ iGnQHfEoo9JgjAY31ilQ8VYXDCT9SYAFnW6Rwst+GIu9IT0iOfYc9hjyPdHoXr1LvY4h
+ JH7Q==
+X-Gm-Message-State: APjAAAVnSzXTcBdOiMQgRbk3HX/fwVpX/UHXlwAXa2yqyI9NsfgzevvY
+ 9I5Cjv85wo9rJKcFCzN440lDfenB60xYAQ==
+X-Google-Smtp-Source: APXvYqwJ+B6TDXpppKhnSEfb4Nla57J/ixTtejirq+ZfBrJ9DxpficQlTSplA7/RTtiV9KdixK7Ebg==
+X-Received: by 2002:a05:6000:350:: with SMTP id
+ e16mr1201569wre.276.1572458995071; 
+ Wed, 30 Oct 2019 11:09:55 -0700 (PDT)
+Received: from localhost.localdomain (248.42.142.88.rev.sfr.net.
+ [88.142.42.248])
+ by smtp.gmail.com with ESMTPSA id t133sm6931299wmb.1.2019.10.30.11.09.54
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 30 Oct 2019 11:09:54 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL for-4.2 1/1] softfp: Added hardfloat conversion from float32 to
+ float64
+Date: Wed, 30 Oct 2019 19:09:53 +0100
+Message-Id: <20191030180953.24180-2-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191030180953.24180-1-richard.henderson@linaro.org>
+References: <20191030180953.24180-1-richard.henderson@linaro.org>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,38 +92,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: david@redhat.com, groug@kaod.org, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, clg@kaod.org, imammedo@redhat.com, jdenemar@redhat.com,
- david@gibson.dropbear.id.au
+Cc: peter.maydell@linaro.org, Matus Kysel <mkysel@tachyum.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAzMDE2MzI0My4xMDY0
-NC0xLWRhdmlkQGdpYnNvbi5kcm9wYmVhci5pZC5hdS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVt
-cyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZv
-cgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIXSBzcGFwci9rdm06IFNldCBkZWZh
-dWx0IGNwdSBtb2RlbCBmb3IgYWxsIG1hY2hpbmUgY2xhc3NlcwpUeXBlOiBzZXJpZXMKTWVzc2Fn
-ZS1pZDogMjAxOTEwMzAxNjMyNDMuMTA2NDQtMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNl
-ID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1p
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9j
-YWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFp
-bGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMy
-MWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAn
-dGVzdCcKNDU4MWEyYSBzcGFwci9rdm06IFNldCBkZWZhdWx0IGNwdSBtb2RlbCBmb3IgYWxsIG1h
-Y2hpbmUgY2xhc3NlcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IE1pc3NpbmcgU2lnbmVk
-LW9mZi1ieTogbGluZShzKQoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA1MCBsaW5lcyBj
-aGVja2VkCgpDb21taXQgNDU4MWEyYTY3NGY0IChzcGFwci9rdm06IFNldCBkZWZhdWx0IGNwdSBt
-b2RlbCBmb3IgYWxsIG1hY2hpbmUgY2xhc3NlcykgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEw
-MzAxNjMyNDMuMTA2NDQtMS1kYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXUvdGVzdGluZy5jaGVj
-a3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+From: Matus Kysel <mkysel@tachyum.com>
+
+Reintroduce float32_to_float64 that was removed here:
+https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00455.html
+
+ - nbench test it not actually calling this function at all
+ - SPECS 2006 significat number of tests impoved their runtime, just
+   few of them showed small slowdown
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Matus Kysel <mkysel@tachyum.com>
+Message-Id: <20191017142133.59439-1-mkysel@tachyum.com>
+[rth: Add comment about impossible inexact exceptions.]
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ fpu/softfloat.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
+
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 0638c9f4e0..301ce3b537 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -1920,13 +1920,30 @@ float16 float32_to_float16(float32 a, bool ieee, float_status *s)
+     return float16a_round_pack_canonical(pr, s, fmt16);
+ }
+ 
+-float64 float32_to_float64(float32 a, float_status *s)
++static float64 QEMU_SOFTFLOAT_ATTR
++soft_float32_to_float64(float32 a, float_status *s)
+ {
+     FloatParts p = float32_unpack_canonical(a, s);
+     FloatParts pr = float_to_float(p, &float64_params, s);
+     return float64_round_pack_canonical(pr, s);
+ }
+ 
++float64 float32_to_float64(float32 a, float_status *s)
++{
++    if (likely(float32_is_normal(a))) {
++        /* Widening conversion can never produce inexact results.  */
++        union_float32 uf;
++        union_float64 ud;
++        uf.s = a;
++        ud.h = uf.h;
++        return ud.s;
++    } else if (float32_is_zero(a)) {
++        return float64_set_sign(float64_zero, float32_is_neg(a));
++    } else {
++        return soft_float32_to_float64(a, s);
++    }
++}
++
+ float16 float64_to_float16(float64 a, bool ieee, float_status *s)
+ {
+     const FloatFmt *fmt16 = ieee ? &float16_params : &float16_params_ahp;
+-- 
+2.17.1
 
 
