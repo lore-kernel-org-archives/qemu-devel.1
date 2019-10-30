@@ -2,110 +2,73 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E379CA9EC7
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 11:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FFBCA9EC5
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 11:36:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BF0F2054F
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 11:21:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EzLIAHSO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BF0F2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id AFCC72083E
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 11:36:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFCC72083E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPm33-0000Gq-Ae
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 07:21:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50732)
+	id 1iPmHD-00052O-QQ
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 07:36:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53356)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iPm2O-0008Ew-PW
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 07:21:17 -0400
+ (envelope-from <bounces@canonical.com>) id 1iPmGG-0004bL-2M
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 07:35:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iPm2M-000453-84
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 07:21:15 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58130
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iPm2M-00043I-2x
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 07:21:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572434472;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=k5go8S1zOmH+x0PMIjtAIxBfa8etQajo1Hf544O/ASE=;
- b=EzLIAHSOqSW6x2E+wezK2mnt3bUncJnzd4CD7kTFasR5i7p35M3z33e3LykvN3W+8SI1qe
- oMfPWi5mMDTi8QgvbxFRuZ7tRIshGGpEECdM85+PBkw3wEX4C0m7HBdFj85lqA9tOo80MV
- 6sZjhowPpRAcoU0+k8NFrRUTm5xFj08=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-226-1mShDk6GPyeWqtD09y_Wqg-1; Wed, 30 Oct 2019 07:21:10 -0400
-X-MC-Unique: 1mShDk6GPyeWqtD09y_Wqg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 612A680183D;
- Wed, 30 Oct 2019 11:21:09 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-147.ams2.redhat.com
- [10.36.117.147])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EF6FB60872;
- Wed, 30 Oct 2019 11:21:04 +0000 (UTC)
-Subject: Re: [PATCH v3 4/6] iotests: Skip "make check-block" if QEMU does not
- support virtio-blk
-To: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
-References: <20191022072135.11188-1-thuth@redhat.com>
- <20191022072135.11188-5-thuth@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <76688061-c59d-953e-b3db-097e3f46fff0@redhat.com>
-Date: Wed, 30 Oct 2019 12:21:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <bounces@canonical.com>) id 1iPmGE-0008Pl-Mu
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 07:35:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:40930)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iPmGE-0008O0-Gv
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 07:35:34 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iPmGC-0007ln-SQ
+ for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 11:35:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id D45432E80C8
+ for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 11:35:32 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20191022072135.11188-5-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="4JlnWhI8n2icvUtJusrqwGwP2Pzo1wwZQ"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 30 Oct 2019 11:23:04 -0000
+From: Max Reitz <1850000@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: gschafer xanclic
+X-Launchpad-Bug-Reporter: Toolybird (gschafer)
+X-Launchpad-Bug-Modifier: Max Reitz (xanclic)
+References: <157212805514.19102.17568097209992499457.malonedeb@wampee.canonical.com>
+Message-Id: <157243458505.29585.5366642611677793975.malone@soybean.canonical.com>
+Subject: [Bug 1850000] Re: 4.1.0 bogus QCOW2 corruption reported after compress
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 4d409acffe926991015722f6237daaba1eec47dc
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -114,97 +77,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
- qemu-devel@nongnu.org
+Reply-To: Bug 1850000 <1850000@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4JlnWhI8n2icvUtJusrqwGwP2Pzo1wwZQ
-Content-Type: multipart/mixed; boundary="7MNbWIArj50LHoQEQEVUzKJK8j0t6DHes"
+Forgot to say that I sent a patch:
 
---7MNbWIArj50LHoQEQEVUzKJK8j0t6DHes
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 22.10.19 09:21, Thomas Huth wrote:
-> The next patch is going to add some python-based tests to the "auto"
-> group, and these tests require virtio-blk to work properly. Running
-> iotests without virtio-blk likely does not make too much sense anyway,
-> so instead of adding a check for the availability of virtio-blk to each
-> and every test (which does not sound very appealing), let's rather add
-> a check for this at the top level in the check-block.sh script instead
-> (so that it is possible to run "make check" without the "check-block"
-> part for qemu-system-tricore for example).
->=20
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/check-block.sh | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
->=20
-> diff --git a/tests/check-block.sh b/tests/check-block.sh
-> index 679aedec50..e9e2978818 100755
-> --- a/tests/check-block.sh
-> +++ b/tests/check-block.sh
-> @@ -26,10 +26,24 @@ if grep -q "CFLAGS.*-fsanitize" config-host.mak 2>/de=
-v/null ; then
->      exit 0
->  fi
-> =20
-> -if [ -z "$(find . -name 'qemu-system-*' -print)" ]; then
-> +if [ -n "$QEMU_PROG" ]; then
-> +    qemu_prog=3D"$QEMU_PROG"
-> +else
-> +    for binary in *-softmmu/qemu-system-* ; do
-
-Hm, I know I=E2=80=99ve already given my R-b, but looking at this again =E2=
-=80=93 what
-if the user builds qemu for multiple targets?  Then this will just test
-any target, whereas the iotests might test something else, because the
-algorithm there is slightly different:
-
-First, check $QEMU_PROG (same as here).
-
-Second, check $build_iotests/qemu.  I think we can do this here, because
-we know that $build_iotests is $PWD/tests/qemu-iotests (or invoking
-./check below wouldn=E2=80=99t work).
-
-Third, and this is actually important, I think, is that we first look
-for the qemu that matches the host architecture (uname -m, with an
-exception for ppc64).  I think we really should do that here, too.
-
-Fourth, look for any qemu, as is done here.
+https://lists.nongnu.org/archive/html/qemu-block/2019-10/msg01764.html
 
 
-So I think we could do without #2, but it probably doesn=E2=80=99t hurt to =
-check
-that, too.  I don=E2=80=99t think we should do without #3, though.
+Thanks for reporting!
 
 Max
 
+-- =
 
---7MNbWIArj50LHoQEQEVUzKJK8j0t6DHes--
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1850000
 
---4JlnWhI8n2icvUtJusrqwGwP2Pzo1wwZQ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Title:
+  4.1.0 bogus QCOW2 corruption reported after compress
 
------BEGIN PGP SIGNATURE-----
+Status in QEMU:
+  New
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl25ch8ACgkQ9AfbAGHV
-z0BTPwf9F4hUOMqoI22q6HR7hUNXzeeHUwfddwXAFvs0QvU1HdWEE4z9pWgLsLeB
-pPSfZujemfTNFf/VE0lUe+dcRci1etY5pjoyqOBA3Hw1nO6xduhFzbFNdInH8imo
-toIydeF4l75sdDXREAfozQDhrwrzEn2TS/8j5rmbPTjKFAm1ew9MHOkkFv4bj4JV
-ZgaN2J+fABd9HAr/bLiZPp57ckwhuwMfc7ImaMlbuqYTzrPmfnpwdalZ1pzHaor8
-e30O17djjIdsyg9kpl8fyJakdJVH4o0/qcRDOsiQBL/bPXtY4kdBsqXbc3go7e+a
-UMtREVyQVofBwmymy5T2kBUDuC0pgw==
-=09aE
------END PGP SIGNATURE-----
+Bug description:
+  Creating a compressed image then running `qemu-img check <..>.qcow2'
+  on said image seems to report bogus corruption in some (but not all)
+  cases:
 
---4JlnWhI8n2icvUtJusrqwGwP2Pzo1wwZQ--
+  Step 1.
 
+  # qemu-img info win7-base.qcow2
+  image: win7-base.qcow2
+  file format: qcow2
+  virtual size: 20 GiB (21474836480 bytes)
+  disk size: 12.2 GiB
+  cluster_size: 65536
+  Format specific information:
+      compat: 1.1
+      lazy refcounts: true
+      refcount bits: 16
+      corrupt: false
+
+  # qemu-img check win7-base.qcow2
+  No errors were found on the image.
+  327680/327680 =3D 100.00% allocated, 0.00% fragmented, 0.00% compressed c=
+lusters
+  Image end offset: 21478375424
+
+  Step 2.
+
+  # qemu-img convert -f qcow2 -O qcow2 -c win7-base.qcow2 test1-z.qcow2
+
+  Step 3.
+
+  # qemu-img info test1-z.qcow2
+  image: test1-z.qcow2
+  file format: qcow2
+  virtual size: 20 GiB (21474836480 bytes)
+  disk size: 5.78 GiB
+  cluster_size: 65536
+  Format specific information:
+      compat: 1.1
+      lazy refcounts: false
+      refcount bits: 16
+      corrupt: false
+
+  # qemu-img check test1-z.qcow2
+  ERROR cluster 1191 refcount=3D1 reference=3D2
+  ERROR cluster 1194 refcount=3D1 reference=3D4
+  ERROR cluster 1195 refcount=3D1 reference=3D7
+  ERROR cluster 1196 refcount=3D1 reference=3D7
+  ERROR cluster 1197 refcount=3D1 reference=3D6
+  ERROR cluster 1198 refcount=3D1 reference=3D4
+  ERROR cluster 1199 refcount=3D1 reference=3D4
+  ERROR cluster 1200 refcount=3D1 reference=3D5
+  ERROR cluster 1201 refcount=3D1 reference=3D3
+  <...> snip many errors
+  Leaked cluster 94847 refcount=3D3 reference=3D0
+  Leaked cluster 94848 refcount=3D3 reference=3D0
+  Leaked cluster 94849 refcount=3D11 reference=3D0
+  Leaked cluster 94850 refcount=3D14 reference=3D0
+
+  20503 errors were found on the image.
+  Data may be corrupted, or further writes to the image may corrupt it.
+
+  20503 leaked clusters were found on the image.
+  This means waste of disk space, but no harm to data.
+  197000/327680 =3D 60.12% allocated, 89.32% fragmented, 88.50% compressed =
+clusters
+  Image end offset: 6216220672
+
+  =
+
+  The resultant image seems to work fine in a VM when used as a backing fil=
+e.
+
+  Interestingly, if I substitute a qemu-img binary from qemu-4.0 then no
+  errors are reported.
+
+  # /tmp/qemu-img check test1-z.qcow2
+  No errors were found on the image.
+  197000/327680 =3D 60.12% allocated, 89.32% fragmented, 88.50% compressed =
+clusters
+  Image end offset: 6216220672
+
+  Is the image corrupted or not? I'm guessing not.
+
+  Just in case it matters, this is ext4 fs on rotational disk. Latest
+  Arch Linux but self compiled 4.1.0 with recent QCOW2 corruption fixes
+  added.
+
+  I haven't tried latest trunk but might do so if time permits.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1850000/+subscriptions
 
