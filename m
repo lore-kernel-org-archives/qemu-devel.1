@@ -2,75 +2,73 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15164CA9EC5
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 12:12:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55123CA9EC5
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 12:43:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1A4820862
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 12:12:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1A4820862
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 2F8392080F
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 12:43:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F8392080F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPmph-0003Rt-Tz
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 08:12:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32840)
+	id 1iPnJu-0007iX-AZ
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 08:43:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38217)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iPmox-0002sh-BH
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 08:11:29 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iPnIy-0006qs-2X
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 08:42:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iPmov-0004SV-Rh
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 08:11:27 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53052)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iPmov-0004R5-I1
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 08:11:25 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iPmos-0005c3-OW
- for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 12:11:22 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id AD57C2E80CE
- for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 12:11:22 +0000 (UTC)
+ (envelope-from <no-reply@patchew.org>) id 1iPnIw-0000nt-59
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 08:42:27 -0400
+Resent-Date: Wed, 30 Oct 2019 08:42:27 -0400
+Resent-Message-Id: <E1iPnIw-0000nt-59@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21438)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iPnIv-0000mx-Mb
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 08:42:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1572439277; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Qvq8I8oG8am2dQbXr3XvqQWoVHdIhBW9AYUzK4MDVJFKvLGWM/fH+I01gdrZmjxFT9EY4xXb/B3edqpsRHluj1t4hSTyFOM0OIFMiQEULTM6X6NplLnaxO+68lXHmsOmsJfD+SeI3bDb322UI7gWZDTG9FyqCo5qH1DNmD6+1lI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1572439277;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=wdqfLGecx5IYk3uIDwTuQyJyx3JSiKfZsHXzXYTf8ZA=; 
+ b=Uq48SVpcWzvbW4oCW+sjBT3zVKXihwJumH+DzND1aQvVVuPqj9ZwfaN7dbiyX67vhkJ3U+EZMoVYj4+twuRX43+6HhkjivRqXUKhr/5J85nbkYm6kUa5vsQd3xOIclrMVZXJ2JaD09o4dGwfZ6qA1oXqGbF5Pcfhy1cGBIsGIoY=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1572439275162825.7524344416239;
+ Wed, 30 Oct 2019 05:41:15 -0700 (PDT)
+In-Reply-To: <20191026180143.7369-1-philmd@redhat.com>
+Subject: Re: [Xen-devel] [PATCH v3 00/20] hw/i386/pc: Split PIIX3 southbridge
+ from i440FX northbridge
+Message-ID: <157243927314.32191.16877694454505392132@37313f22b938>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 30 Oct 2019 11:56:36 -0000
-From: Matti Hameister <1847793@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: c-paetow dgilbert-h lersek mattihami psyhomb
- sej7278 xanclic
-X-Launchpad-Bug-Reporter: Claus Paetow (c-paetow)
-X-Launchpad-Bug-Modifier: Matti Hameister (mattihami)
-References: <157080798335.681.12255731732435282400.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157243659639.29370.12703072921528821189.malone@soybean.canonical.com>
-Subject: [Bug 1847793] Re: qemu 4.1.0 - Corrupt guest filesystem after new vm
- install
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 0f1b936031251a4626e8f76b890b5922704f5eeb
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: philmd@redhat.com
+Date: Wed, 30 Oct 2019 05:41:15 -0700 (PDT)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,136 +77,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1847793 <1847793@bugs.launchpad.net>
+Reply-To: qemu-devel@nongnu.org
+Cc: sstabellini@kernel.org, ehabkost@redhat.com, paul@xen.org, mst@redhat.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com, hpoussin@reactos.org,
+ amarkovic@wavecomp.com, imammedo@redhat.com, anthony.perard@citrix.com,
+ xen-devel@lists.xenproject.org, aleksandar.rikalo@rt-rk.com, philmd@redhat.com,
+ aurelien@aurel32.net, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I have the same (related?) issue and wanted to add my experience with it. I=
- had 3 qemu qcow2 VM running on ArchLinux. I never used snapshots or someth=
-ing like it. Just normal start&shutdown. 2 of these VMs were also ArchLinux=
- running on ext4. Both of these VMs had a data corruption inside the quest.=
- The data being corrupted were files I had not touched in month (large tar =
-archives). One guest was running on a SSD with discard, the other VM was ru=
-nning on a normal hard drive without any discard.
-The last VM was a Windows 10 VM. While the VM was running fine, after "fixi=
-ng" the image issues with qemu-img -r all hdd.qcow2 the Windows 10 installa=
-tion was unbootable and beyond repair with normal Windows tools.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAyNjE4MDE0My43MzY5
+LTEtcGhpbG1kQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBz
+b21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZv
+cm1hdGlvbjoKClN1YmplY3Q6IFtYZW4tZGV2ZWxdIFtQQVRDSCB2MyAwMC8yMF0gaHcvaTM4Ni9w
+YzogU3BsaXQgUElJWDMgc291dGhicmlkZ2UgZnJvbSBpNDQwRlggbm9ydGhicmlkZ2UKVHlwZTog
+c2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkxMDI2MTgwMTQzLjczNjktMS1waGlsbWRAcmVkaGF0LmNv
+bQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJh
+c2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxp
+bWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1s
+b2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1t
+YWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5
+YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20v
+cGF0Y2hldy1wcm9qZWN0L3FlbXUKICAgMTY4ODQzOS4uODQ0MTc4ZSAgbWFzdGVyICAgICAtPiBt
+YXN0ZXIKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkZmY3ZDAyIGh3L3BjaS1ob3N0
+L2k0NDBmeDogUmVtb3ZlIHRoZSBsYXN0IFBJSVgzIHRyYWNlcwoxODY3YTg1IGh3L3BjaS1ob3N0
+OiBSZW5hbWUgaW5jb3JyZWN0bHkgbmFtZWQgJ3BpaXgnIGFzICdpNDQwZngnCjQ3NGIxMjEgaHcv
+cGNpLWhvc3QvcGlpeDogRXh0cmFjdCBQSUlYMyBmdW5jdGlvbnMgdG8gaHcvaXNhL3BpaXgzLmMK
+MmJlODVlMyBody9wY2ktaG9zdC9waWl4OiBGaXggY29kZSBzdHlsZSBpc3N1ZXMKOGQ0NzgzNiBo
+dy9wY2ktaG9zdC9waWl4OiBNb3ZlIGk0NDBGWCBkZWNsYXJhdGlvbnMgdG8gaHcvcGNpLWhvc3Qv
+aTQ0MGZ4LmgKNDg2YjhjOCBody9wY2ktaG9zdC9waWl4OiBEZWZpbmUgYW5kIHVzZSB0aGUgUElJ
+WCBJUlEgUm91dGUgQ29udHJvbCBSZWdpc3RlcnMKM2I4ZDlhOCBody9wY2ktaG9zdC9waWl4OiBN
+b3ZlIFJDUl9JT1BPUlQgcmVnaXN0ZXIgZGVmaW5pdGlvbgo4MWY5YTI5IGh3L3BjaS1ob3N0L3Bp
+aXg6IEV4dHJhY3QgcGlpeDNfY3JlYXRlKCkKYzUyZjllOCBody9pMzg2OiBSZW1vdmUgb2Jzb2xl
+dGUgTG9hZFN0YXRlSGFuZGxlcjo6bG9hZF9zdGF0ZV9vbGQgaGFuZGxlcnMKZjFmOGNjMSBody9p
+c2EvcGlpeDQ6IE1vdmUgcGlpeDRfY3JlYXRlKCkgdG8gaHcvaXNhL3BpaXg0LmMKYjNlNjdhMiBo
+dy9taXBzL21pcHNfbWFsdGE6IEV4dHJhY3QgdGhlIFBJSVg0IGNyZWF0aW9uIGNvZGUgYXMgcGlp
+eDRfY3JlYXRlKCkKMDEwZmVhOSBody9taXBzL21pcHNfbWFsdGE6IENyZWF0ZSBJREUgaGFyZCBk
+cml2ZSBhcnJheSBkeW5hbWljYWxseQo3ZWI0ZWY0IHBpaXg0OiBBZGQgYSBNQzE0NjgxOCBSVEMg
+Q29udHJvbGxlciBhcyBzcGVjaWZpZWQgaW4gZGF0YXNoZWV0CjA4MTY4MWEgcGlpeDQ6IEFkZCBh
+biBpODI1NCBQSVQgQ29udHJvbGxlciBhcyBzcGVjaWZpZWQgaW4gZGF0YXNoZWV0CjEzMjRlM2Mg
+cGlpeDQ6IEFkZCBhbiBpODI1NyBETUEgQ29udHJvbGxlciBhcyBzcGVjaWZpZWQgaW4gZGF0YXNo
+ZWV0CjE1NzVjMTYgcGlpeDQ6IFJlbmFtZSBQSUlYNCBvYmplY3QgdG8gcGlpeDQtaXNhCjk0ZTFm
+YzYgUmV2ZXJ0ICJpcnE6IGludHJvZHVjZSBxZW11X2lycV9wcm94eSgpIgo5NzM2M2Q1IHBpaXg0
+OiBBZGQgYW4gaTgyNTkgSW50ZXJydXB0IENvbnRyb2xsZXIgYXMgc3BlY2lmaWVkIGluIGRhdGFz
+aGVldAphNGZhZTA3IHBpaXg0OiBBZGQgdGhlIFJlc2V0IENvbnRyb2wgUmVnaXN0ZXIKY2RmMDdj
+YyBNQUlOVEFJTkVSUzogS2VlcCBQSUlYNCBTb3V0aCBCcmlkZ2Ugc2VwYXJhdGUgZnJvbSBQQyBD
+aGlwc2V0cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yMCBDaGVja2luZyBjb21taXQgY2RmMDdj
+YzA2NDQzIChNQUlOVEFJTkVSUzogS2VlcCBQSUlYNCBTb3V0aCBCcmlkZ2Ugc2VwYXJhdGUgZnJv
+bSBQQyBDaGlwc2V0cykKMi8yMCBDaGVja2luZyBjb21taXQgYTRmYWUwNzgxNTkwIChwaWl4NDog
+QWRkIHRoZSBSZXNldCBDb250cm9sIFJlZ2lzdGVyKQozLzIwIENoZWNraW5nIGNvbW1pdCA5NzM2
+M2Q1OGI2OTEgKHBpaXg0OiBBZGQgYW4gaTgyNTkgSW50ZXJydXB0IENvbnRyb2xsZXIgYXMgc3Bl
+Y2lmaWVkIGluIGRhdGFzaGVldCkKNC8yMCBDaGVja2luZyBjb21taXQgOTRlMWZjNjkzOTE4IChS
+ZXZlcnQgImlycTogaW50cm9kdWNlIHFlbXVfaXJxX3Byb3h5KCkiKQo1LzIwIENoZWNraW5nIGNv
+bW1pdCAxNTc1YzE2YTVlMGEgKHBpaXg0OiBSZW5hbWUgUElJWDQgb2JqZWN0IHRvIHBpaXg0LWlz
+YSkKNi8yMCBDaGVja2luZyBjb21taXQgMTMyNGUzYzUyNDVkIChwaWl4NDogQWRkIGFuIGk4MjU3
+IERNQSBDb250cm9sbGVyIGFzIHNwZWNpZmllZCBpbiBkYXRhc2hlZXQpCjcvMjAgQ2hlY2tpbmcg
+Y29tbWl0IDA4MTY4MWE0MmI2OCAocGlpeDQ6IEFkZCBhbiBpODI1NCBQSVQgQ29udHJvbGxlciBh
+cyBzcGVjaWZpZWQgaW4gZGF0YXNoZWV0KQo4LzIwIENoZWNraW5nIGNvbW1pdCA3ZWI0ZWY0ZTAw
+OGMgKHBpaXg0OiBBZGQgYSBNQzE0NjgxOCBSVEMgQ29udHJvbGxlciBhcyBzcGVjaWZpZWQgaW4g
+ZGF0YXNoZWV0KQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
+IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxOTU6IApkZWxldGVkIGZpbGUgbW9kZSAxMDA2
+NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTY2IGxpbmVzIGNoZWNrZWQKClBhdGNo
+IDgvMjAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KOS8yMCBDaGVja2luZyBjb21taXQgMDEw
+ZmVhOTFhOWMwIChody9taXBzL21pcHNfbWFsdGE6IENyZWF0ZSBJREUgaGFyZCBkcml2ZSBhcnJh
+eSBkeW5hbWljYWxseSkKMTAvMjAgQ2hlY2tpbmcgY29tbWl0IGIzZTY3YTJhZWU5MiAoaHcvbWlw
+cy9taXBzX21hbHRhOiBFeHRyYWN0IHRoZSBQSUlYNCBjcmVhdGlvbiBjb2RlIGFzIHBpaXg0X2Ny
+ZWF0ZSgpKQoxMS8yMCBDaGVja2luZyBjb21taXQgZjFmOGNjMTI1YTA4IChody9pc2EvcGlpeDQ6
+IE1vdmUgcGlpeDRfY3JlYXRlKCkgdG8gaHcvaXNhL3BpaXg0LmMpCjEyLzIwIENoZWNraW5nIGNv
+bW1pdCBjNTJmOWU4MmFjZDUgKGh3L2kzODY6IFJlbW92ZSBvYnNvbGV0ZSBMb2FkU3RhdGVIYW5k
+bGVyOjpsb2FkX3N0YXRlX29sZCBoYW5kbGVycykKMTMvMjAgQ2hlY2tpbmcgY29tbWl0IDgxZjlh
+MjlmY2VhZCAoaHcvcGNpLWhvc3QvcGlpeDogRXh0cmFjdCBwaWl4M19jcmVhdGUoKSkKMTQvMjAg
+Q2hlY2tpbmcgY29tbWl0IDNiOGQ5YThkY2FlMCAoaHcvcGNpLWhvc3QvcGlpeDogTW92ZSBSQ1Jf
+SU9QT1JUIHJlZ2lzdGVyIGRlZmluaXRpb24pCjE1LzIwIENoZWNraW5nIGNvbW1pdCA0ODZiOGM4
+YjgwOWUgKGh3L3BjaS1ob3N0L3BpaXg6IERlZmluZSBhbmQgdXNlIHRoZSBQSUlYIElSUSBSb3V0
+ZSBDb250cm9sIFJlZ2lzdGVycykKMTYvMjAgQ2hlY2tpbmcgY29tbWl0IDhkNDc4MzZmNWE3ZSAo
+aHcvcGNpLWhvc3QvcGlpeDogTW92ZSBpNDQwRlggZGVjbGFyYXRpb25zIHRvIGh3L3BjaS1ob3N0
+L2k0NDBmeC5oKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2Vz
+IE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMxMDA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoK
+dG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMDEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTYv
+MjAgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVy
+cm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
+ZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTcvMjAgQ2hlY2tpbmcgY29tbWl0IDJiZTg1
+ZTM5N2QxNCAoaHcvcGNpLWhvc3QvcGlpeDogRml4IGNvZGUgc3R5bGUgaXNzdWVzKQoxOC8yMCBD
+aGVja2luZyBjb21taXQgNDc0YjEyMTY2MmU4IChody9wY2ktaG9zdC9waWl4OiBFeHRyYWN0IFBJ
+SVgzIGZ1bmN0aW9ucyB0byBody9pc2EvcGlpeDMuYykKV0FSTklORzogYWRkZWQsIG1vdmVkIG9y
+IGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNjc6IApu
+ZXcgZmlsZSBtb2RlIDEwMDY0NAoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAn
+KicgKGN0eDpWeFYpCiMzMTY6IEZJTEU6IGh3L2lzYS9waWl4My5jOjI0NToKKyAgICAuc3Vic2Vj
+dGlvbnMgPSAoY29uc3QgVk1TdGF0ZURlc2NyaXB0aW9uKltdKSB7CiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiAxIGVycm9ycywgMSB3YXJuaW5n
+cywgOTM3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDE4LzIwIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCgoxOS8yMCBDaGVja2luZyBjb21taXQgMTg2N2E4NTU4ZDZlIChody9wY2ktaG9zdDogUmVu
+YW1lIGluY29ycmVjdGx5IG5hbWVkICdwaWl4JyBhcyAnaTQ0MGZ4JykKV0FSTklORzogYWRkZWQs
+IG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5n
+PwojNzE6IApyZW5hbWUgZnJvbSBody9wY2ktaG9zdC9waWl4LmMKCnRvdGFsOiAwIGVycm9ycywg
+MSB3YXJuaW5ncywgMzIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTkvMjAgaGFzIHN0eWxlIHByb2Js
+ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
+aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
+QUlOVEFJTkVSUy4KMjAvMjAgQ2hlY2tpbmcgY29tbWl0IGRmZjdkMDJmY2M0MiAoaHcvcGNpLWhv
+c3QvaTQ0MGZ4OiBSZW1vdmUgdGhlIGxhc3QgUElJWDMgdHJhY2VzKQo9PT0gT1VUUFVUIEVORCA9
+PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2
+YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTAyNjE4MDE0My43MzY5LTEt
+cGhpbG1kQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpF
+bWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcu
+b3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQu
+Y29t
 
-While the VMs are running I saw these lines printed by qemu (for all VMs
-in question):
-
-qcow2_free_clusters failed: Invalid argument
-qcow2_free_clusters failed: Invalid argument
-qcow2_free_clusters failed: Invalid argument
-
-I recreated my VMs and I now chose btrfs as a filesystem. No issues yet
-on the image. I also recreated the Windows 10 VM. It worked fine a
-couple of days. Today I checked the image, after I saw the free_clusters
-lines above again:
-
-Many many lines like this:
-Leaked cluster 260703 refcount=3D1 reference=3D0                           =
-                        =
-
-ERROR cluster 260739 refcount=3D0 reference=3D1 =
-
-ERROR OFLAG_COPIED data cluster: l2_entry=3D800000038ec10000 refcount=3D0
-
-638 errors were found on the image.
-Data may be corrupted, or further writes to the image may corrupt it.
-
-339 leaked clusters were found on the image.
-This means waste of disk space, but no harm to data.
-314734/4096000 =3D 7.68% allocated, 26.70% fragmented, 0.00% compressed clu=
-sters
-Image end offset: 21138374656
-
-The installation itself still works but I don't know if there are any
-silently corrupted files in there.
-
-QEMU 4.1.0 from ArchLinux
-Host-Filesystem is ext4
-Start-Parameter (the same on all VMs):
-
-qemu-system-x86_64 -cpu Haswell-noTSX -M q35 -enable-kvm -smp
-4,cores=3D4,threads=3D1,sockets=3D1 -net nic,model=3Dvirtio -net
-user,hostname=3DWindowsKVM.local -drive
-if=3Dnone,id=3Dhd,file=3Dhdd.qcow2,discard=3Dunmap -device virtio-scsi-
-pci,id=3Dscsi --enable-kvm -device scsi-hd,drive=3Dhd -m 4096 -drive
-if=3Dpflash,format=3Draw,readonly,file=3D/usr/share/ovmf/x64/OVMF_CODE.fd
--drive if=3Dpflash,format=3Draw,file=3D./OVMF_VARS.fd -vga std -drive
-file=3DWindows10ISO/Windows.iso,index=3D0,media=3Dcdrom -drive file=3Dvirti=
-o-
-win-0.1.173.iso,index=3D1,media=3Dcdrom -no-quit
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1847793
-
-Title:
-  qemu 4.1.0 - Corrupt guest filesystem after new vm install
-
-Status in QEMU:
-  New
-
-Bug description:
-  When I install a new vm with qemu 4.1.0 all the guest filesystems are
-  corrupt. The first boot from the install dvd iso is ok and the
-  installer work fine. But the guest system hangs after the installer
-  finishes and I reboot the guest. I can see the grub boot menue but the
-  system cannot load the initramfs.
-
-  Testet with:
-  - RedHat Enterprise Linux 7.5, 7.6 and 7.7 (RedHat uses xfs for the /boot=
- and / partition)
-  Guided install with the graphical installer, no lvm selected.
-  - Debian Stable/Buster (Debian uses ext4 for / and /home partition)
-  Guidet install with the graphical installer and default options.
-
-  Used commandline to create the vm disk image:
-  qemu-img create -f qcow2 /volumes/disk2-part2/vmdisks/vmtest10-1.qcow2 20G
-
-  Used qemu commandline for vm installation:
-  #!/bin/sh
-  # vmtest10 Installation
-  #
-  /usr/bin/qemu-system-x86_64  -cpu SandyBridge-IBRS \
-      -soundhw hda \
-      -M q35 \
-      -k de \
-      -vga qxl \
-      -machine accel=3Dkvm \
-      -m 4096 \
-      -display gtk \
-      -drive file=3D/volumes/disk2-part2/images/debian-10.0.0-amd64-DVD-1.i=
-so,if=3Dide,media=3Dcdrom \
-      -drive file=3D/volumes/disk2-part2/images/vmtest10-1.qcow2,if=3Dvirti=
-o,media=3Ddisk,cache=3Dwriteback \
-      -boot once=3Dd,menu=3Doff \
-      -device virtio-net-pci,mac=3D52:54:00:2c:02:6c,netdev=3Dvlan0 \
-      -netdev bridge,br=3Dbr0,id=3Dvlan0 \
-      -rtc base=3Dlocaltime \
-      -name "vmtest10" \
-      -usb -device usb-tablet \
-      -spice disable-ticketing \
-      -device virtio-serial-pci \
-      -device virtserialport,chardev=3Dspicechannel0,name=3Dcom.redhat.spic=
-e.0 \
-      -chardev spicevmc,id=3Dspicechannel0,name=3Dvdagent $*
-
-  Host OS:
-  Archlinux (last updated at 10.10.2019)
-  Linux testing 5.3.5-arch1-1-ARCH #1 SMP PREEMPT Mon Oct 7 19:03:08 UTC 20=
-19 x86_64 GNU/Linux
-  No libvirt in use.
-
-  =
-
-  With qemu 4.0.0 it works fine without any errors.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1847793/+subscriptions
 
