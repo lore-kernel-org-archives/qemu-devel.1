@@ -2,58 +2,69 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D79AACA9EAF
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 07:45:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BC54CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 08:11:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A312920663
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 07:45:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A312920663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id ED2F120874
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 08:11:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="XGUT4VFZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED2F120874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hostfission.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPif6-0002XW-Pw
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 03:45:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59377)
+	id 1iPj4O-0001W7-W7
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 04:11:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36391)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <luwei.kang@intel.com>) id 1iPid9-0001rU-GB
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 03:43:09 -0400
+ (envelope-from <geoff@hostfission.com>) id 1iPj3Z-0000xr-PW
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:10:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <luwei.kang@intel.com>) id 1iPid6-0003uV-BK
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 03:42:57 -0400
-Received: from mga01.intel.com ([192.55.52.88]:61161)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <luwei.kang@intel.com>)
- id 1iPid6-0003Iz-2G
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 03:42:56 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
- by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 30 Oct 2019 00:42:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,246,1569308400"; d="scan'208";a="400056866"
-Received: from icl-2s.bj.intel.com ([10.240.193.48])
- by fmsmga005.fm.intel.com with ESMTP; 30 Oct 2019 00:42:48 -0700
-From: Luwei Kang <luwei.kang@intel.com>
-To: pbonzini@redhat.com,
-	rth@twiddle.net,
-	ehabkost@redhat.com
-Subject: [PATCH v1 Resend] target/i386: set the CPUID level to 0x14 on old
- machine-type
-Date: Wed, 30 Oct 2019 14:28:02 +0800
-Message-Id: <1572416882-41378-1-git-send-email-luwei.kang@intel.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.88
+ (envelope-from <geoff@hostfission.com>) id 1iPj3Y-0004ae-H1
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:10:17 -0400
+Received: from mail1.hostfission.com ([139.99.139.48]:40226)
+ by eggs.gnu.org with esmtp (Exim 4.71)
+ (envelope-from <geoff@hostfission.com>) id 1iPj3X-0004ZC-VJ
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:10:16 -0400
+Received: from www1.hostfission.com (www1.hostfission.com [139.99.139.52])
+ by mail1.hostfission.com (Postfix) with ESMTP id AA96B4BA4C
+ for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 19:10:13 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=hostfission.com;
+ s=mail; t=1572423013;
+ bh=R6arvBKnPbqKU5ZcOWa2cn9Kki7DOeNMPrQuxC1gUVA=;
+ h=To:Subject:Date:From:In-Reply-To:References:From;
+ b=XGUT4VFZM5dDKcL5/tdqgFPJP1uJ0pC5Lv8MPgoso4+f43UljPa01NhSHO/u6ziQi
+ xyVgp/qv0pRlWKEMQwMu0r3L3KL2zuGXFMdjOgHU9yoKtJ9uh4L6u9BJ1nLN5SvrJ0
+ ofiEkCRRAe+hL/JaEoKsEaGPPaWgftTQ8a26X5XE=
+Received: by www1.hostfission.com (Postfix, from userid 1000)
+ id A85CD83F86; Wed, 30 Oct 2019 19:10:13 +1100 (AEDT)
+To: qemu-devel@nongnu.org
+Subject: Re: RFC: New device for zero-copy VM memory access
+X-PHP-Originating-Script: 0:rcube.php
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Wed, 30 Oct 2019 19:10:13 +1100
+From: geoff@hostfission.com
+In-Reply-To: <028c23b219913d1f734d95a05d2b5809@hostfission.com>
+References: <c83fe0e7157562c3c17598917977eb4d@hostfission.com>
+ <028c23b219913d1f734d95a05d2b5809@hostfission.com>
+Message-ID: <7d2b69593ebeff8238e5f642ca58661f@hostfission.com>
+X-Sender: geoff@hostfission.com
+User-Agent: Roundcube Webmail/1.2.3
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 139.99.139.48
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -65,47 +76,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Luwei Kang <luwei.kang@intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The CPUID level need to be set to 0x14 manually on old
-machine-type if Intel PT is enabled in guest. e.g. in Qemu 3.1
--machine pc-i440fx-3.1 -cpu qemu64,+intel-pt
-will be CPUID[0].EAX(level)=7 and CPUID[7].EBX[25](intel-pt)=1.
+The windows driver source is now available also.
 
-Some Intel PT capabilities are exposed by leaf 0x14 and the
-missing capabilities will cause some MSRs access failed.
-This patch add a warning message to inform the user to extend
-the CPUID level.
+https://github.com/gnif/Porthole-Guest-Driver
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
----
- target/i386/cpu.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+I have also opted to rename the device to 'porthole', hopefully this 
+name is
+acceptable.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index a624163..f67c479 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -5440,8 +5440,12 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
- 
-         /* Intel Processor Trace requires CPUID[0x14] */
-         if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
--             kvm_enabled() && cpu->intel_pt_auto_level) {
--            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
-+             kvm_enabled()) {
-+            if (cpu->intel_pt_auto_level)
-+                x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
-+            else
-+                warn_report("Intel PT need CPUID leaf 0x14, please set "
-+                            "by \"-cpu ...,+intel-pt,level=0x14\"");
-         }
- 
-         /* CPU topology with multi-dies support requires CPUID[0x1F] */
--- 
-1.8.3.1
-
+On 2019-10-30 09:53, geoff@hostfission.com wrote:
+> Just to follow this up, here is a sample client application for this 
+> device
+> 
+> https://gist.github.com/gnif/77e7fb54604b42a1a98ecb8bf3d2cf46
+> 
+> -Geoff
+> 
+> On 2019-10-30 01:31, geoff@hostfission.com wrote:
+>> Hi All,
+>> 
+>> Over the past week, I have been working to come up with a solution to 
+>> the
+>> memory transfer performance issues that hinder the Looking Glass 
+>> Project.
+>> 
+>> Currently Looking Glass works by using the IVSHMEM shared memory 
+>> device which
+>> is fed by an application that captures the guest's video output. While 
+>> this
+>> works it is sub-optimal because we first have to perform a CPU copy of 
+>> the
+>> captured frame into shared RAM, and then back out again for display. 
+>> Because
+>> the destination buffers are allocated by closed proprietary code 
+>> (DirectX, or
+>> NVidia NvFBC) there is no way to have the frame placed directly into 
+>> the
+>> IVSHMEM shared ram.
+>> 
+>> This new device, currently named `introspection` (which needs a more 
+>> suitable
+>> name, porthole perhaps?), provides a means of translating guest 
+>> physical
+>> addresses to host virtual addresses, and finally to the host offsets 
+>> in RAM for
+>> file-backed memory guests. It does this by means of a simple protocol 
+>> over a
+>> unix socket (chardev) which is supplied the appropriate fd for the 
+>> VM's system
+>> RAM. The guest (in this case, Windows), when presented with the 
+>> address of a
+>> userspace buffer and size, will mlock the appropriate pages into RAM 
+>> and pass
+>> guest physical addresses to the virtual device.
+>> 
+>> This device and the windows driver have been designed in such a way 
+>> that it's a
+>> utility device for any project and/or application that could make use 
+>> of it.
+>> The PCI subsystem vendor and device ID are used to provide a means of 
+>> device
+>> identification in cases where multiple devices may be in use for 
+>> differing
+>> applications. This also allows one common driver to be used for any 
+>> other
+>> projects wishing to build on this device.
+>> 
+>> My ultimate goal is to get this to a state where it could be accepted 
+>> upstream
+>> into Qemu at which point Looking Glass would be modified to use it 
+>> instead of
+>> the IVSHMEM device.
+>> 
+>> My git repository with the new device can be found at:
+>> https://github.com/gnif/qemu
+>> 
+>> The new device is:
+>> https://github.com/gnif/qemu/blob/master/hw/misc/introspection.c
+>> 
+>> Looking Glass:
+>> https://looking-glass.hostfission.com/
+>> 
+>> The windows driver, while working, needs some cleanup before the 
+>> source is
+>> published. I intend to maintain both this device and the windows 
+>> driver
+>> including producing a signed Windows 10 driver if Redhat are unwilling 
+>> or
+>> unable.
+>> 
+>> Kind Regards,
+>> Geoffrey McRae
+>> 
+>> HostFission
+>> https://hostfission.com
 
