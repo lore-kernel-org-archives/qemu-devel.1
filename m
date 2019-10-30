@@ -2,62 +2,65 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E1F2CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 08:14:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E116CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 08:33:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3855E218DE
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 08:14:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3855E218DE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=zte.com.cn
+	by mail.kernel.org (Postfix) with ESMTPS id 53D6F20679
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 08:33:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="rA+B+ndU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D6F20679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPj7x-0003GP-E8
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 04:14:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37117)
+	id 1iPjQN-0001Z4-HP
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 04:33:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41997)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wang.yi59@zte.com.cn>) id 1iPj7J-0002b0-KR
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:14:10 -0400
+ (envelope-from <svens@stackframe.org>) id 1iPjLW-0008Ms-Lh
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:28:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wang.yi59@zte.com.cn>) id 1iPj7H-00013c-Q3
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:14:09 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:41000 helo=mxct.zte.com.cn)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wang.yi59@zte.com.cn>)
- id 1iPj7H-0000gm-EJ
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:14:07 -0400
-Received: from mse-fl2.zte.com.cn (unknown [10.30.14.239])
- by Forcepoint Email with ESMTPS id AC843CB086ADFCEB0E4D;
- Wed, 30 Oct 2019 16:07:04 +0800 (CST)
-Received: from notes_smtp.zte.com.cn (notessmtp.zte.com.cn [10.30.1.239])
- by mse-fl2.zte.com.cn with ESMTP id x9U86pDr077982;
- Wed, 30 Oct 2019 16:06:51 +0800 (GMT-8)
- (envelope-from wang.yi59@zte.com.cn)
-Received: from fox-host8.localdomain ([10.74.120.8])
- by szsmtp06.zte.com.cn (Lotus Domino Release 8.5.3FP6)
- with ESMTP id 2019103016071191-197903 ;
- Wed, 30 Oct 2019 16:07:11 +0800 
-From: Yi Wang <wang.yi59@zte.com.cn>
-To: mst@redhat.com
-Subject: [PATCH] virtio: add check for inconsistent VQ in virtio_save()
-Date: Wed, 30 Oct 2019 16:09:47 +0800
-Message-Id: <1572422987-19683-1-git-send-email-wang.yi59@zte.com.cn>
-X-Mailer: git-send-email 1.8.3.1
-X-MIMETrack: Itemize by SMTP Server on SZSMTP06/server/zte_ltd(Release
- 8.5.3FP6|November 21, 2013) at 2019-10-30 16:07:11,
- Serialize by Router on notes_smtp/zte_ltd(Release 9.0.1FP7|August  17, 2016) at
- 2019-10-30 16:06:54, Serialize complete at 2019-10-30 16:06:54
-X-MAIL: mse-fl2.zte.com.cn x9U86pDr077982
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 202.103.147.172
+ (envelope-from <svens@stackframe.org>) id 1iPjLV-00060O-8T
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 04:28:50 -0400
+Received: from shroom.duncanthrax.net ([2a01:4f8:121:41fa::169]:44709
+ helo=smtp.duncanthrax.net)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <svens@stackframe.org>)
+ id 1iPjLQ-0005Iv-BE; Wed, 30 Oct 2019 04:28:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=duncanthrax.net; s=dkim; h=Content-Transfer-Encoding:Content-Type:
+ MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+ Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+ :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+ List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=FxnTvCZXRt6WU+6lr2Mu90EkaEkuQ7cWIneN7R0x4Ys=; b=rA+B+ndU1z/IpF7nlULHluCrV1
+ Y18mv0UoxXPEV0FeVKy8X+gwkwEY6H3aodciumBAatqHeR7AdFe+smYYWomxDyPRxG42c10d3It4X
+ bceuQ5CM3vsYXkF8qQ7x2TgPd1d4pVoJ4thztaY8Tb68vluz6lpKb+q8Ozt8FOlf6suA=;
+Received: from [91.217.168.176] (helo=x280.stackframe.org)
+ by smtp.duncanthrax.net with esmtpa (Exim 4.90_1)
+ (envelope-from <svens@stackframe.org>)
+ id 1iPjLE-00041V-Uz; Wed, 30 Oct 2019 09:28:33 +0100
+From: Sven Schnelle <svens@stackframe.org>
+To: John Snow <jsnow@redhat.com>
+Subject: [PATCH v2] fdc/i8257: implement verify transfer mode
+Date: Wed, 30 Oct 2019 09:28:27 +0100
+Message-Id: <20191030082827.10010-1-svens@stackframe.org>
+X-Mailer: git-send-email 2.23.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a01:4f8:121:41fa::169
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,48 +72,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wang.yi59@zte.com.cn, wang.liang82@zte.com.cn,
- Cheng Lin <cheng.lin130@zte.com.cn>, qemu-devel@nongnu.org,
- xue.zhihong@zte.com.cn
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sven Schnelle <svens@stackframe.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cheng Lin <cheng.lin130@zte.com.cn>
+While working on the Tulip driver i tried to write some Teledisk images to
+a floppy image which didn't work. Turned out that Teledisk checks the written
+data by issuing a READ command to the FDC but running the DMA controller
+in VERIFY mode. As we ignored the DMA request in that case, the DMA transfer
+never finished, and Teledisk reported an error.
 
-In a case, we have an not enabled VQ (virtio-net) which desc is NULL
-and get a last_avail_idx is not 0 from dpdk.
+The i8257 spec says about verify transfers:
 
-As a result, it is successed to create a snapshot, but failed to revert it.
-Because in virtio_load(), there is an inconsistent check for VQ.
-(call virtio_load() in revert, and virtio_save() in create.)
+3) DMA verify, which does not actually involve the transfer of data. When an
+8257 channel is in the DMA verify mode, it will respond the same as described
+for transfer operations, except that no memory or I/O read/write control signals
+will be generated.
 
-Correspondly, in virtio_save() should also do this check to find the error
-as early as possible.
+Hervé proposed to remove all the dma_mode_ok stuff from fdc to have a more
+clear boundary between DMA and FDC, so this patch also does that.
 
-Signed-off-by: Cheng Lin <cheng.lin130@zte.com.cn>
+Suggested-by: Hervé Poussineau <hpoussin@reactos.org>
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
 ---
- hw/virtio/virtio.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ hw/block/fdc.c       | 39 +++++++++++++++------------------------
+ hw/dma/i8257.c       | 20 +++++++++++++-------
+ include/hw/isa/isa.h |  1 -
+ 3 files changed, 28 insertions(+), 32 deletions(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 2e91dec..eadbf64 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -2792,6 +2792,12 @@ int virtio_save(VirtIODevice *vdev, QEMUFile *f)
-          * Save desc now, the rest of the ring addresses are saved in
-          * subsections for VIRTIO-1 devices.
-          */
-+        if (!vdev->vq[i].vring.desc && vdev->vq[i].last_avail_idx) {
-+            error_report("VQ %d address 0x0 "
-+                         "inconsistent with Host index 0x%x",
-+                         i, vdev->vq[i].last_avail_idx);
-+            return -1;
-+        }
-         qemu_put_be64(f, vdev->vq[i].vring.desc);
-         qemu_put_be16s(f, &vdev->vq[i].last_avail_idx);
-         if (k->save_queue) {
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index ac5d31e8c1..18fd22bfb7 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -1716,9 +1716,8 @@ static void fdctrl_start_transfer(FDCtrl *fdctrl, int direction)
+     if (fdctrl->dor & FD_DOR_DMAEN) {
+         IsaDmaTransferMode dma_mode;
+         IsaDmaClass *k = ISADMA_GET_CLASS(fdctrl->dma);
+-        bool dma_mode_ok;
++
+         /* DMA transfer are enabled. Check if DMA channel is well programmed */
+-        dma_mode = k->get_transfer_mode(fdctrl->dma, fdctrl->dma_chann);
+         FLOPPY_DPRINTF("dma_mode=%d direction=%d (%d - %d)\n",
+                        dma_mode, direction,
+                        (128 << fdctrl->fifo[5]) *
+@@ -1727,40 +1726,32 @@ static void fdctrl_start_transfer(FDCtrl *fdctrl, int direction)
+         case FD_DIR_SCANE:
+         case FD_DIR_SCANL:
+         case FD_DIR_SCANH:
+-            dma_mode_ok = (dma_mode == ISADMA_TRANSFER_VERIFY);
+             break;
+         case FD_DIR_WRITE:
+-            dma_mode_ok = (dma_mode == ISADMA_TRANSFER_WRITE);
+             break;
+         case FD_DIR_READ:
+-            dma_mode_ok = (dma_mode == ISADMA_TRANSFER_READ);
+             break;
+         case FD_DIR_VERIFY:
+-            dma_mode_ok = true;
+             break;
+         default:
+-            dma_mode_ok = false;
+             break;
+         }
+-        if (dma_mode_ok) {
+-            /* No access is allowed until DMA transfer has completed */
+-            fdctrl->msr &= ~FD_MSR_RQM;
+-            if (direction != FD_DIR_VERIFY) {
+-                /* Now, we just have to wait for the DMA controller to
+-                 * recall us...
+-                 */
+-                k->hold_DREQ(fdctrl->dma, fdctrl->dma_chann);
+-                k->schedule(fdctrl->dma);
+-            } else {
+-                /* Start transfer */
+-                fdctrl_transfer_handler(fdctrl, fdctrl->dma_chann, 0,
+-                                        fdctrl->data_len);
+-            }
+-            return;
++
++        /* No access is allowed until DMA transfer has completed */
++        fdctrl->msr &= ~FD_MSR_RQM;
++        if (direction != FD_DIR_VERIFY) {
++            /*
++             * Now, we just have to wait for the DMA controller to
++             * recall us...
++             */
++            k->hold_DREQ(fdctrl->dma, fdctrl->dma_chann);
++            k->schedule(fdctrl->dma);
+         } else {
+-            FLOPPY_DPRINTF("bad dma_mode=%d direction=%d\n", dma_mode,
+-                           direction);
++            /* Start transfer */
++            fdctrl_transfer_handler(fdctrl, fdctrl->dma_chann, 0,
++                    fdctrl->data_len);
+         }
++        return;
+     }
+     FLOPPY_DPRINTF("start non-DMA transfer\n");
+     fdctrl->msr |= FD_MSR_NONDMA | FD_MSR_RQM;
+diff --git a/hw/dma/i8257.c b/hw/dma/i8257.c
+index 792f617eb4..85dad3d391 100644
+--- a/hw/dma/i8257.c
++++ b/hw/dma/i8257.c
+@@ -292,12 +292,6 @@ static uint64_t i8257_read_cont(void *opaque, hwaddr nport, unsigned size)
+     return val;
+ }
+ 
+-static IsaDmaTransferMode i8257_dma_get_transfer_mode(IsaDma *obj, int nchan)
+-{
+-    I8257State *d = I8257(obj);
+-    return (d->regs[nchan & 3].mode >> 2) & 3;
+-}
+-
+ static bool i8257_dma_has_autoinitialization(IsaDma *obj, int nchan)
+ {
+     I8257State *d = I8257(obj);
+@@ -400,6 +394,11 @@ static void i8257_dma_register_channel(IsaDma *obj, int nchan,
+     r->opaque = opaque;
+ }
+ 
++static bool i8257_is_verify_transfer(I8257Regs *r)
++{
++    return (r->mode & 0x0c) == 0;
++}
++
+ static int i8257_dma_read_memory(IsaDma *obj, int nchan, void *buf, int pos,
+                                  int len)
+ {
+@@ -407,6 +406,10 @@ static int i8257_dma_read_memory(IsaDma *obj, int nchan, void *buf, int pos,
+     I8257Regs *r = &d->regs[nchan & 3];
+     hwaddr addr = ((r->pageh & 0x7f) << 24) | (r->page << 16) | r->now[ADDR];
+ 
++    if (i8257_is_verify_transfer(r)) {
++        return len;
++    }
++
+     if (r->mode & 0x20) {
+         int i;
+         uint8_t *p = buf;
+@@ -431,6 +434,10 @@ static int i8257_dma_write_memory(IsaDma *obj, int nchan, void *buf, int pos,
+     I8257Regs *r = &s->regs[nchan & 3];
+     hwaddr addr = ((r->pageh & 0x7f) << 24) | (r->page << 16) | r->now[ADDR];
+ 
++    if (i8257_is_verify_transfer(r)) {
++        return len;
++    }
++
+     if (r->mode & 0x20) {
+         int i;
+         uint8_t *p = buf;
+@@ -597,7 +604,6 @@ static void i8257_class_init(ObjectClass *klass, void *data)
+     dc->vmsd = &vmstate_i8257;
+     dc->props = i8257_properties;
+ 
+-    idc->get_transfer_mode = i8257_dma_get_transfer_mode;
+     idc->has_autoinitialization = i8257_dma_has_autoinitialization;
+     idc->read_memory = i8257_dma_read_memory;
+     idc->write_memory = i8257_dma_write_memory;
+diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
+index 018ada4f6f..f516e253c5 100644
+--- a/include/hw/isa/isa.h
++++ b/include/hw/isa/isa.h
+@@ -56,7 +56,6 @@ typedef int (*IsaDmaTransferHandler)(void *opaque, int nchan, int pos,
+ typedef struct IsaDmaClass {
+     InterfaceClass parent;
+ 
+-    IsaDmaTransferMode (*get_transfer_mode)(IsaDma *obj, int nchan);
+     bool (*has_autoinitialization)(IsaDma *obj, int nchan);
+     int (*read_memory)(IsaDma *obj, int nchan, void *buf, int pos, int len);
+     int (*write_memory)(IsaDma *obj, int nchan, void *buf, int pos, int len);
 -- 
-2.7.2.windows.1
+2.23.0
 
 
