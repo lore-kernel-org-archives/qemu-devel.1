@@ -2,66 +2,69 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4759CA9EC5
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 16:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD486CA9EC5
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 16:10:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97BDE21835
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 16:08:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="hs0QRuVJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97BDE21835
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8A5DF217F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 16:10:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A5DF217F9
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPqWC-0002VK-Ku
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 12:08:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50863)
+	id 1iPqYW-0004Rp-Md
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 12:10:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52700)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1iPqQJ-0004Yf-Du
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 12:02:16 -0400
+ (envelope-from <no-reply@patchew.org>) id 1iPqXP-0003uI-2e
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 12:09:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1iPqQI-0007FJ-65
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 12:02:15 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:53601)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1iPqQH-0006yc-J4; Wed, 30 Oct 2019 12:02:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=w7DSZUNl5JVfQsIZkENlD4zKfSckHtLnbUeBTSYpV9Q=; 
- b=hs0QRuVJRqDK39vkFZAcBCuitL6kVeKNAgiUanAWQ0jjtL/W6UPWPiCxfEhw4xTxUC8pP6nYUJJMmeOuyK2H4uxG03Vp/B9hoAvBCO+lQFHysr8OW1nmKpfrs2LjArYBoEYyLe6a20d+R4fayB2wYkgb+mtxMcjhGnxxPiJR9vHumLNTJObEnV3NTxMNHbH4UXrQC7yF1W6zHEHujAovrcmgKRXQBfdW6JJ65S7F1CiW5NtUPbfLLQTSJjlEys29g5tXvfcfYMjrHU9ADt1dnysN3QPIzw+kBzOzI75bGJgPBLa9MM8DPouCz4EhPdXu88qxrZmZtKbgn0CH46ahVw==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1iPqQC-0004AS-Pg; Wed, 30 Oct 2019 17:02:08 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1iPqQC-00080K-NN; Wed, 30 Oct 2019 17:02:08 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [RFC PATCH v2 01/26] qcow2: Add calculate_l2_meta()
-In-Reply-To: <49444fb1-d0b2-4325-20ed-91159182ed37@redhat.com>
-References: <cover.1572125022.git.berto@igalia.com>
- <22820af5867124e4fdf3d0cb74b99f31edc1b37f.1572125022.git.berto@igalia.com>
- <49444fb1-d0b2-4325-20ed-91159182ed37@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Wed, 30 Oct 2019 17:02:08 +0100
-Message-ID: <w51y2x2b4sf.fsf@maestria.local.igalia.com>
+ (envelope-from <no-reply@patchew.org>) id 1iPqXN-0004Y0-2P
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 12:09:34 -0400
+Resent-Date: Wed, 30 Oct 2019 12:09:34 -0400
+Resent-Message-Id: <E1iPqXN-0004Y0-2P@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21474)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iPqXM-0004Jp-PV
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 12:09:33 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1572451764; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=BvEqctxODLAyEYAsd9bcw5q7VOZqoIf+EviS1xKy7IHrJfWOwBX8FauLJ4ZA78WYgeO9RNYmGMzR/L+FeBXBv88LGTRGaQ+SGXybIJDpbsDCrtc1nTOqeeDUg3FOLJAgJuDKW90tRe/fOcbg7Ymefjmfy9IwjxQv4mEAWmKuqHc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1572451764;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=dHW4+9Fy9GAXhxouzIOIUmwtwUMrGyMSvje2aw5TWBA=; 
+ b=a8PNItLfQct0IVrFrGSmH21XR+1asz+vJtpCP3gsENUnAS9CGk9GCh/6DS8XirIGB6CM0BtDk1+AdRi//4OhEP10uJuFk89ke97XB+9aVshvK8Q6OgY6aC5j6s+13XXyJKUOEFqm5dU+A5CdpQuQkJyel/XH5ArDqXnistYnGTY=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1572451761420104.27595239659365;
+ Wed, 30 Oct 2019 09:09:21 -0700 (PDT)
+In-Reply-To: <20191030151740.14326-1-berrange@redhat.com>
+Subject: Re: [PATCH] tests: fix conditional for disabling XTS test
+Message-ID: <157245176030.32191.7083139446991981184@37313f22b938>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: berrange@redhat.com
+Date: Wed, 30 Oct 2019 09:09:21 -0700 (PDT)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,52 +76,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, berrange@redhat.com, philmd@redhat.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed 30 Oct 2019 01:04:02 PM CET, Max Reitz wrote:
-> (I intended not to comment on such things on an RFC, but here I am...)
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAzMDE1MTc0MC4xNDMy
+Ni0xLWJlcnJhbmdlQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBk
+b2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBj
+b21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFs
+bGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NS
+SVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBO
+RVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBK
+PTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBURVNUICAgIGlvdGVzdC1x
+Y293MjogMjY4CkZhaWx1cmVzOiAxOTIKRmFpbGVkIDEgb2YgMTA5IGlvdGVzdHMKbWFrZTogKioq
+IFtjaGVjay10ZXN0cy9jaGVjay1ibG9jay5zaF0gRXJyb3IgMQpUcmFjZWJhY2sgKG1vc3QgcmVj
+ZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2
+NjIsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWluKCkpCi0tLQogICAgcmFpc2UgQ2FsbGVk
+UHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6
+IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29t
+LnFlbXUuaW5zdGFuY2UudXVpZD00NDIxYTJlZjQ3NjY0NDlmYWMyMzkzMzFmMzU2YjNkMycsICct
+dScsICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJt
+JywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAn
+LWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9
+MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRj
+aGV3Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12Jywg
+Jy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1zdThicGhwcC9zcmMvZG9ja2VyLXNyYy4yMDE5
+LTEwLTMwLTExLjU3LjIyLjY3NDg6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycs
+ICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4
+aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlk
+PTQ0MjFhMmVmNDc2NjQ0OWZhYzIzOTMzMWYzNTZiM2QzCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1
+bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10
+ZXN0ZXItdG1wLXN1OGJwaHBwL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tA
+Y2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICAxMW01NS44NTlzCnVzZXIgICAgMG04LjA0OXMKCgpU
+aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkx
+MDMwMTUxNzQwLjE0MzI2LTEtYmVycmFuZ2VAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlj
+a0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
+eSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
+ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-No problem with that :-)
-
-> I=E2=80=99d call it host_cluster_offset to make clear that it points to a
-> cluster and isn=E2=80=99t the host offset for @guest_offset.
-
-Sure, why not. We can also accept the exact offset within the cluster
-and then use start_of_cluster(), but I prefer this one.
-
-> And now that I=E2=80=99ve gone this far already, I might as well say that=
- I=E2=80=99d
-> like if it the comment noted that this function not only creates the
-> L2Meta structure but also adds it to the cluster_allocs list.
-
-I'll update the comment.
-
->> + * @guest_offset and @bytes indicate the offset and length of the
->> + * request.
->> + *
->> + * If @keep_old is true it means that the clusters were already
->> + * allocated and will be overwritten. If false then the clusters are
->> + * new and we have to decrease the reference count of the old ones.
->> + */
->> +static void calculate_l2_meta(BlockDriverState *bs, uint64_t host_offse=
-t,
->> +                              uint64_t guest_offset, uint64_t bytes,
->
-> And now I=E2=80=99m so deep into non-RFC-level review territory, I might =
-as
-> well say I=E2=80=99d prefer @bytes to be an unsigned (or maybe even a pla=
-in
-> int), because anything more wouldn=E2=80=99t work.  (Not least because
-> cow_end_to is an unsigned).
-
-True, I'll correct that too.
-
-Thanks!
-
-Berto
 
