@@ -2,82 +2,90 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF5BCA9EC5
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 14:11:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DAACA9EC5
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 14:19:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96DD320856
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 14:11:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cWKed2W4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96DD320856
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 247FA20578
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 14:19:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 247FA20578
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPogn-0002hi-QF
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 10:11:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55700)
+	id 1iPopJ-0008JN-56
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 10:19:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57334)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iPog1-0002Bw-Gq
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:10:22 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iPooR-0007Ye-R0
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:19:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iPog0-0006lj-3d
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:10:21 -0400
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:43765)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iPofz-0006i6-Tq
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:10:20 -0400
-Received: by mail-oi1-x22f.google.com with SMTP id s5so2050192oie.10
- for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 07:10:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=P+ac2kaGpFtES23Xbgh3ARjVQM5MjL5K5fPWMpE0rX4=;
- b=cWKed2W46h+BJNlHNGhnITGPrQbZ23rM+AVwtbReFL0NhfelzMMD/rJdv4s1QsMALj
- q4taMcCZGy06OvOOwwzfUwvYSiHaxXlbc0u8MN6olOMSdXeCpUUeFdik6dHKmYxTnqBT
- B0JrSYW9URmwU+JFgKqCLt1dnz2S6yQesGuuthY1VJpSx+vP6hGpWunV4Sp/iUKSinf4
- 3dkQI5I0cdNUcZTEiYMXy0dlENpMw5PTTZFLFLjB98Dny+aZY40vbdvA7+1pN9BliCn9
- x2ratrhjaf0/FaTsfvEyiXUrzVcuqxVho9DWZ9L1pNV3FDhv2JcgfCfqD6E6N3fD9rPH
- A68w==
+ (envelope-from <pbonzini@redhat.com>) id 1iPooP-0006J9-9Y
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:19:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:63253)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iPooP-0006DO-47
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 10:19:01 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C4E1B37F41
+ for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 14:18:56 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id b4so1396631wrn.8
+ for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 07:18:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=P+ac2kaGpFtES23Xbgh3ARjVQM5MjL5K5fPWMpE0rX4=;
- b=dc/r1DGnseV35BreVMIn5mGSUhqIFKelDcWCLv17hcnlyLGb+NwgEB8Xsa8m/qe059
- 9rNJaYIiE/ybQwRLTx3w2Sqg+1F6CnQmjHLQr6ptTqrdoeeQSMXgNJlsJH+lZh/NgiWF
- sUIwljSeflejdPFoRL6NDI4MYi1m1Xje/08lzUsJZO+/YXTI5OzBF3b8CgHGuzBfu0B+
- aDHbUm2vG4A2h9Pr5nsoXmHmXZHxnTOT7ACMr/nkHwqC0xG8GPsbkRqpQcbMsqnjsomF
- Dak+hcsnvdLyugqAMyDArwwxGznchJMuWQCJhirDlChqhvBoUveUnpGjEJZySrlFSu4r
- J6Og==
-X-Gm-Message-State: APjAAAWu2PtlCmVkGvSuSUdT/5A/gbkUzL4ml7nH/ZQoBOqqLb1fQ+nV
- ttoMooZausJYX+c7JtO0lvBBLbz3ksafiELZFcvJ8g==
-X-Google-Smtp-Source: APXvYqxNXmLVPwsRjCuQAihDPCpWrysSLN+If33z+dP+tXo1577zeEaatusMX42fUFwqH94fupnSYYidhnAwMAX8n8Y=
-X-Received: by 2002:aca:2312:: with SMTP id e18mr9133881oie.98.1572444618697; 
- Wed, 30 Oct 2019 07:10:18 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vc+48eAR2aA8GTU2b/dHjjPIwEqzY7v5699Eeq5U0pA=;
+ b=WfvfGyi7C5dpBvY7NNjIxdZl4zGaDIgjqbKdZgUPBjODsvmaFm+XSOmEjZnV3f/ODc
+ g2Rb9va9d+WcAMpZtp0n3aggFP7VEORGgL0ynRuK2xrcl3iaG2/Ey2BiHf8nlEC/kvI1
+ caT6KlZB8zFDdlOCfbHAuzIpSyMAaZaXIoufshTTHgvHpGO2sIkZ0MnbQqGojFnbXygv
+ bRO/8GEFZh4YoATW6dbx+axWVYzjQN8yOqIniClqMViICdFoyMaJ7Ib+zWcV/8kaaVQZ
+ 7Pb26HLXtwSzFtn3gsxm1SGFd60U2MhKKi7fuRlPxAsmeYl3kmqLuV0432B4T6T4Cp7M
+ CYJA==
+X-Gm-Message-State: APjAAAX2K2PhBKhuhOAtATFoKxqUXMBoO1FvJP28LcLIw/pp17akQdO1
+ JiBOb6gHA164y9fAk49iYkjhuzTKwRw5GsGIyKMYBRlDQluUkR5pSO0iz3C2joRjXei9V+bYP32
+ tr1y4PcaPaXQxx8U=
+X-Received: by 2002:a05:600c:2042:: with SMTP id
+ p2mr9539142wmg.13.1572445135274; 
+ Wed, 30 Oct 2019 07:18:55 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqzX/ZgZl0WpnFRZRsBAQDfBNFFV8WCdpiv6Z+158+FXl7sZ2ITXbNHyYGwO3kWuhVadfDNzvQ==
+X-Received: by 2002:a05:600c:2042:: with SMTP id
+ p2mr9539114wmg.13.1572445134983; 
+ Wed, 30 Oct 2019 07:18:54 -0700 (PDT)
+Received: from [172.20.53.126] ([91.217.168.176])
+ by smtp.gmail.com with ESMTPSA id r15sm366521wro.20.2019.10.30.07.18.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 30 Oct 2019 07:18:54 -0700 (PDT)
+Subject: Re: [PATCH v11 14/15] hw/i386: Introduce the microvm machine type
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Sergio Lopez <slp@redhat.com>, qemu-devel@nongnu.org
+References: <20191018105315.27511-1-slp@redhat.com>
+ <20191018105315.27511-15-slp@redhat.com>
+ <58f50ece-5fc2-dcad-f367-455d5f58e184@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <92c66a5c-b772-d255-21b7-a35617762a7d@redhat.com>
+Date: Wed, 30 Oct 2019 15:18:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20191028235002.17691-1-crosa@redhat.com>
- <CAFEAcA9_ycm2nyJeAR-Y43VT6o6zkrUykNXJPQKYv8os107_wg@mail.gmail.com>
- <20191029215118.GA10535@localhost.localdomain>
- <20191029215804.GA10923@localhost.localdomain>
- <20191029234019.GA16280@localhost.localdomain>
-In-Reply-To: <20191029234019.GA16280@localhost.localdomain>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 30 Oct 2019 14:10:07 +0000
-Message-ID: <CAFEAcA-YEkBXcsRJPF6yAcOAFUN9-_NpaA8UkY_VN0ufrcGTtg@mail.gmail.com>
-Subject: Re: [PULL 0/16] Python (acceptance tests) queue, 2019-10-28
-To: Cleber Rosa <crosa@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22f
+In-Reply-To: <58f50ece-5fc2-dcad-f367-455d5f58e184@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,35 +97,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com, groug@kaod.org,
+ marcandre.lureau@gmail.com, kraxel@redhat.com, imammedo@redhat.com,
+ sgarzare@redhat.com, lersek@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 29 Oct 2019 at 23:40, Cleber Rosa <crosa@redhat.com> wrote:
->
-> I'm now getting the updated key on every single server I've tried.
->
-> Any further feedback/request is highly appreciated.
+On 30/10/19 10:25, Philippe Mathieu-Daud=C3=A9 wrote:
+>> diff --git a/default-configs/i386-softmmu.mak
+>> b/default-configs/i386-softmmu.mak
+>> index 4229900f57..4cc64dafa2 100644
+>> --- a/default-configs/i386-softmmu.mak
+>> +++ b/default-configs/i386-softmmu.mak
+>> @@ -28,3 +28,4 @@
+>> =C2=A0 CONFIG_ISAPC=3Dy
+>> =C2=A0 CONFIG_I440FX=3Dy
+>> =C2=A0 CONFIG_Q35=3Dy
+>> +CONFIG_MICROVM=3Dy
+>=20
+> Do we want to maintain a 32-bit microvm?
+>=20
+> IIUC the main interest in 64-bit.
+>=20
+> Can we restrict it with this change?
 
-Yep, I was able to pull the updated key.
+You would still be able to have 32-bit microvm with "-cpu 486" or even
+"-cpu host,-lm" so it doesn't matter much.
 
-
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
+Paolo
 
