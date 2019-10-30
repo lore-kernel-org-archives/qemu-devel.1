@@ -2,90 +2,106 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65AF4CA9EAF
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 09:06:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E593CA9EAF
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 09:26:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F32B2083E
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 09:06:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED31A205ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 09:26:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k2Ziz6DP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F32B2083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OxxFiTKR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED31A205ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPjwM-00065U-CZ
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 05:06:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50686)
+	id 1iPkEz-0003jO-UV
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 05:26:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54507)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iPjvb-0005bD-IO
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 05:06:08 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iPkDp-0002yo-KK
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 05:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iPjva-0007cq-6w
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 05:06:07 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53961)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iPjvZ-0007bQ-W8
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 05:06:06 -0400
-Received: by mail-wm1-x344.google.com with SMTP id n7so1213618wmc.3
- for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 02:06:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=HK23rcT6kmOggU0GKLRG5nH5BL666BTmwqQypLR4Uz0=;
- b=k2Ziz6DPfBoCzTmNfPph+wMshUqRv6VdSGNx+wRPb0TT3hCcLkAKCODzxsON0qQ4pI
- ND24jPmjsZRlApK0A3a1HsNklcDd9n+MGY+lJ8WEMNqf0NK9zgfyIY+bGLUV/jRIhKZk
- FAZ34AXUX60SHdmW7UOzpdWPwIsw4o/fLDiYnVnWTIRFZGZxLGBpiZ/7N7ahMKqITXmg
- 1C+DMqHWC/1bPMVliHIonWtxMx3fZyXAVno1TZ2uOY9fqOCwC8nY8KA8dlfqC1kxZ4Pc
- lLRRTWakW8ZWzDX+bK57iHL1M1415rqCUcSryLoUjJPEjt75myRWtqu8z2idws6Q7esA
- Vk/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=HK23rcT6kmOggU0GKLRG5nH5BL666BTmwqQypLR4Uz0=;
- b=DywEXaLT4VG30CiyrrxLbcd7BSsysA8HpxpSA4O+/Pz2O7HRGI597K39+Q0zgnqoWL
- 13fspyOrePCvU18Y56/Vflvc5isHCWwCyZlk0fFcuZMdrFbE37A60BQDqeESQWD/Lu2z
- dZeQl8PDxnZdT+ZuMlP9sLPNkdlAV4ewLOsdWxXYPD8Ymqi6r5jHqweczNVtRvIvYpxq
- XShmr6M2+1ZwTGeXtVGT1HFHp4QpXiOKydnrIZHcJMiGpe59liBX9XWnMqYKvvySHFDM
- KDb4Eo9nzHKIHVrZ1t+UMxl/PaUpYea6b6LTj0pLWs5HYBS1kUrQ2bkWPGlOLFPZE3M6
- t+fQ==
-X-Gm-Message-State: APjAAAWLS80GCm/jib+ARP6uqBWzHf+kMfHlZLy47bnsroCG3NNBxQM7
- AX1+JMuLwdfElBQsbjJTFCuXRA==
-X-Google-Smtp-Source: APXvYqyNheX880W539LkCCS8qqDX3Pq7Ue7qu0BZMopU/beZ5yUUTOF1dZm7OVvbnrQwdX2O/oSbNA==
-X-Received: by 2002:a7b:cb0b:: with SMTP id u11mr7840918wmj.125.1572426364215; 
- Wed, 30 Oct 2019 02:06:04 -0700 (PDT)
-Received: from [172.20.33.154] ([91.217.168.176])
- by smtp.gmail.com with ESMTPSA id b186sm1457507wmb.21.2019.10.30.02.06.03
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 30 Oct 2019 02:06:03 -0700 (PDT)
-Subject: Re: [PATCH v2] Added hardfloat conversion from float32 to float64
-To: Matus Kysel <mkysel@tachyum.com>, qemu-devel@nongnu.org
-References: <20191017142133.59439-1-mkysel@tachyum.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <0484cd81-9ac2-b12b-5bd0-d05d40e3fe7a@linaro.org>
-Date: Wed, 30 Oct 2019 10:06:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <mreitz@redhat.com>) id 1iPkDm-0000Zt-Ez
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 05:24:55 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52644
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iPkDm-0000VY-6M
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 05:24:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572427493;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=WT8OdK53ey0b2m2O/FvCCiV1B6qeTsU3fnSgo1vkDK0=;
+ b=OxxFiTKRWAmINOg444BzGKXPcoVSxjNO2USZ4fPoT7G4IWlUPZM6zjyCGHX0BN79GaMOYS
+ sI5gl6WwttczVpDU9s4AfRuoWpVNJEgzvsH6OTmdm90aPwCpxBjUBLn3tzkkAUX0CC3o4h
+ kVh83nFhjuHbIQtFrNwXXor+cKZl8po=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-109-5DdNpr1GMjqpOuqBnfnBng-1; Wed, 30 Oct 2019 05:24:49 -0400
+X-MC-Unique: 5DdNpr1GMjqpOuqBnfnBng-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5F28800686;
+ Wed, 30 Oct 2019 09:24:48 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-147.ams2.redhat.com
+ [10.36.117.147])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B86E4600C8;
+ Wed, 30 Oct 2019 09:24:47 +0000 (UTC)
+Subject: Re: [PATCH] block/block-copy: fix s->copy_size for compressed cluster
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+References: <20191029150934.26416-1-vsementsov@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a30ceb6c-2f39-1bfe-6f2b-6977f60aa161@redhat.com>
+Date: Wed, 30 Oct 2019 10:24:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191017142133.59439-1-mkysel@tachyum.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+In-Reply-To: <20191029150934.26416-1-vsementsov@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="NaK1ATnr6zYyodI0fv2pvwUnvR23mxkfg"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,30 +113,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/17/19 4:21 PM, Matus Kysel wrote:
-> Reintroduce float32_to_float64 that was removed here:
-> https://lists.gnu.org/archive/html/qemu-devel/2018-04/msg00455.html
-> 
->  - nbench test it not actually calling this function at all
->  - SPECS 2006 significat number of tests impoved their runtime, just
->    few of them showed small slowdown
-> 
-> Signed-off-by: Matus Kysel <mkysel@tachyum.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NaK1ATnr6zYyodI0fv2pvwUnvR23mxkfg
+Content-Type: multipart/mixed; boundary="mlHdzKwsCZEP4LBt63tYdOz7KzOAwkDHc"
+
+--mlHdzKwsCZEP4LBt63tYdOz7KzOAwkDHc
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 29.10.19 16:09, Vladimir Sementsov-Ogievskiy wrote:
+> 0e2402452f1f20429 allowed writes larger than cluster, but that's
+> unsupported for compressed write. Fix it.
+>=20
+> Fixes: 0e2402452f1f20429
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  fpu/softfloat.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
+>  block/block-copy.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Thanks, applied to my block branch:
 
-Queued.
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+
+Max
 
 
-r~
+--mlHdzKwsCZEP4LBt63tYdOz7KzOAwkDHc--
+
+--NaK1ATnr6zYyodI0fv2pvwUnvR23mxkfg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl25Vt4ACgkQ9AfbAGHV
+z0CRGwf9EpgwBIj4dq+GQ66X1uAw+BPuepCIKTq/FgNIwAPFzDF3O1UynZ1f94KA
+zdTWi0dRCXg+0SyhVH7zBW2VNWvMuYC/y7b6fo0ok6kZtT5LBHAYZqtIHHQHWKdV
+g/+GDLBCPtMF6HORBTMon7XQd0HfYjQctehyOXvtvg2SU2exlm27oe3RTre2Rpkc
+E69mDtPDgKu/5nTgGrqsIy7T/k0HnmYjLHQHWhKmeD3Ljii9wJIt8EukNbkX//tv
+Jk9qJr2hsa5qsAS4N99qtQwd8+Bv1tj5n1GHx5aghbRalqQMFjmkO9TPqU2b+5su
+mO8cibY5Yx3aDTG7Zfk1uZgQiN+Q7A==
+=l36k
+-----END PGP SIGNATURE-----
+
+--NaK1ATnr6zYyodI0fv2pvwUnvR23mxkfg--
+
 
