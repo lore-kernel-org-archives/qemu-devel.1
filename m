@@ -2,82 +2,58 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7233BCA9EC0
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 06:16:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1380BCA9EAF
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 06:43:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D7D32067D
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 06:16:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n4/4gNNa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D7D32067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id DE3C420874
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 06:43:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE3C420874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPhHJ-0002EX-CC
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 02:16:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42571)
+	id 1iPhhQ-0000of-0Z
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 02:43:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47671)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iPhGY-0001ap-2e
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 02:15:37 -0400
+ (envelope-from <luwei.kang@intel.com>) id 1iPhgM-0000NW-Jw
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 02:42:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iPhGW-00022R-La
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 02:15:33 -0400
-Received: from mail-ot1-x333.google.com ([2607:f8b0:4864:20::333]:38381)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iPhGT-0001y3-Hl
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 02:15:31 -0400
-Received: by mail-ot1-x333.google.com with SMTP id r14so1124700otn.5
- for <qemu-devel@nongnu.org>; Tue, 29 Oct 2019 23:15:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=qNLvZ4NW7czofI39JBeLB5pWjDvdXKn28u1jTzVFPBY=;
- b=n4/4gNNaqBDKUb9Ypa0hUOTwdTOyRmRuOV2zy1Ug/jvlJ+n65y65qZLVhyZGrg4NW5
- ZpAs7X28zhDzy+bgn8ev93qcv+/dIgBMuWYEdUtSE1cD1yL1jEqsgS6lp3V/ET7jrSXM
- DvgaCVP7zXv06YzUhMZs4afOSENyq2VWfYhGYcpnqWQGWNwjgI4l4cUYtLRh6LgJri0r
- sINiakEdOlhFFlsN7IRGb1pP5xWKpGyjhNF3tToo8UKkzCmJRFDxdXfDTSv5yNekcVYg
- 3YDXGx7IxkscAjdU0tQEv7xnO0E8ml24QwuspA/WVn1jQ5alLV4Zw7D6YxbfPp/zHG7B
- fCNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=qNLvZ4NW7czofI39JBeLB5pWjDvdXKn28u1jTzVFPBY=;
- b=rj0RfqqvNxNRE027Bv3M3FyZjp33y5YGkIpZV+Dp0FWqgbBJ8ZJxUbuz7BQyMf8iT/
- oflGx/DD1jOkrAhQTxIKEVXOWlu/ABmPJ+55Twr5yDxNpVwOIJtshrQBI693SO31hVl4
- 8wFAbMSJ8+I2tCZ0WiNm7XgJnI1giucc0S3BzHDM0X/f8bVmFUa7rd/2NSefMWOyAIMj
- KGyufhdBCdUEDIIweWbSvOaMwxnmSZ1yrsP056v0lrPVKtNuL7a2lLjsKVEGAXsUe/WJ
- WFCBfjJg7H1kQFtNyKJoLyMnCL3aZj+26XkbHDHXsvAElLrpMbpHVbb/L4HLh1v5gFaV
- xqng==
-X-Gm-Message-State: APjAAAUFBNUy1mgAznNzuHRuVhlmywmFX2hh45iw9WxCXicUb6GDDx7E
- eZ2Ova1hE9y92koL8Jv+rZ45GrYJyCCcn8G+6Th2hg==
-X-Google-Smtp-Source: APXvYqzEdgHGm6eLzQARVqIy8HRFVHxEtmOIVmf4pq09AYQyTBWRGNXhxefZiaVn/eK7o/lWwj+7JR74vb05zsSfthk=
-X-Received: by 2002:a9d:7cd4:: with SMTP id r20mr4336006otn.91.1572416126935; 
- Tue, 29 Oct 2019 23:15:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191028163447.18541-1-philmd@redhat.com>
-In-Reply-To: <20191028163447.18541-1-philmd@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 30 Oct 2019 06:15:29 +0000
-Message-ID: <CAFEAcA-9wQMzJN+ZeWDE8k1E9uwUw3NHNJuR2H_hHRNeX1Lf8Q@mail.gmail.com>
-Subject: Re: [PULL 00/20] hw/i386/pc: Split PIIX3 southbridge from i440FX
- northbridge
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <luwei.kang@intel.com>) id 1iPhgJ-0002BD-QO
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 02:42:12 -0400
+Received: from mga14.intel.com ([192.55.52.115]:49181)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <luwei.kang@intel.com>)
+ id 1iPhgJ-0001Vo-GP
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 02:42:11 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 29 Oct 2019 23:42:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,246,1569308400"; d="scan'208";a="205704396"
+Received: from icl-2s.bj.intel.com ([10.240.193.48])
+ by FMSMGA003.fm.intel.com with ESMTP; 29 Oct 2019 23:41:58 -0700
+From: Luwei Kang <luwei.kang@intel.com>
+To: pbonzini@redhat.com,
+	rth@twiddle.net,
+	ehabkost@redhat.com
+Subject: [PATCH v1] target/i386: set the CPUID level to 0x14 on old
+ machine-type
+Date: Wed, 30 Oct 2019 13:27:13 +0800
+Message-Id: <1572413233-27015-1-git-send-email-luwei.kang@intel.com>
+X-Mailer: git-send-email 1.8.3.1
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::333
+X-Received-From: 192.55.52.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,60 +65,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Luwei Kang <luwei.kang@intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 28 Oct 2019 at 17:48, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
->
-> Hi Peter,
->
-> This is a X86/MIPS pull, Paolo and Aleksandar are OK I send it:
->
->   https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg04959.html
->
-> Regards,
->
-> Phil.
->
-> The following changes since commit 9bb73502321d46f4d320fa17aa38201445783f=
-c4:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into stagi=
-ng (2019-10-28 13:32:40 +0000)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/philmd/qemu.git tags/pc_split_i440fx_piix-pull-reque=
-st
->
-> for you to fetch changes up to d1389352cde824ce8dab7c1a2ded150df6add124:
->
->   hw/pci-host/i440fx: Remove the last PIIX3 traces (2019-10-28 16:12:29 +=
-0100)
->
-> ----------------------------------------------------------------
-> The i440FX northbridge is only used by the PC machine, while the
-> PIIX southbridge is also used by the Malta MIPS machine.
->
-> Split the PIIX3 southbridge from i440FX northbridge.
->
-> ----------------------------------------------------------------
+The CPUID level need to be set to 0x14 manually on old
+machine-type if Intel PT is enabled in guest. e.g. in Qemu 3.1
+-machine pc-i440fx-3.1 -cpu qemu64,+intel-pt
+will be CPUID[0].EAX(level)=7 and CPUID[7].EBX[25](intel-pt)=1.
 
-I get a link failure on my 'do a make clean and then make' build :
-  LINK    i386-softmmu/qemu-system-i386
-hw/i386/pc_piix.o: In function `pc_init1':
-/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_piix.c:197: undefined
-reference to `i440fx_init'
-/home/petmay01/linaro/qemu-for-merges/hw/i386/pc_piix.c:206: undefined
-reference to `piix3_create'
-collect2: error: ld returned 1 exit status
+Some Intel PT capabilities are exposed by leaf 0x14 and the
+missing capabilities will cause some MSRs access failed.
+This patch add a warning message to inform the user to extend
+the CPUID level.
 
-thanks
--- PMM
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+---
+ target/i386/cpu.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 47200b4..9abbd30 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5393,8 +5393,12 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+ 
+         /* Intel Processor Trace requires CPUID[0x14] */
+         if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
+-             kvm_enabled() && cpu->intel_pt_auto_level) {
+-            x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
++             kvm_enabled()) {
++            if (cpu->intel_pt_auto_level)
++                x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
++            else
++                warn_report("Intel PT need CPUID leaf 0x14, please set "
++                            "by \"-cpu ...,+intel-pt,level=0x14\"\n");
+         }
+ 
+         /* CPU topology with multi-dies support requires CPUID[0x1F] */
+-- 
+1.8.3.1
+
 
