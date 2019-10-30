@@ -2,81 +2,79 @@ Return-Path: <SRS0=68uo=YX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01E27CA9EC5
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 10:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B3F7CA9EC5
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 11:11:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C267520663
-	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 10:48:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3224320874
+	for <qemu-devel@archiver.kernel.org>; Wed, 30 Oct 2019 11:11:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CfevMXwp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C267520663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mSE8Yood"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3224320874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iPlWa-0003ZH-V0
-	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 06:48:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44832)
+	id 1iPlt4-0003n5-9R
+	for qemu-devel@archiver.kernel.org; Wed, 30 Oct 2019 07:11:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49060)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iPlVe-0002F9-4l
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 06:47:27 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iPlsI-0003EL-8V
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 07:10:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iPlVc-0002z5-28
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 06:47:25 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47316
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iPlVb-0002xm-PH
- for qemu-devel@nongnu.org; Wed, 30 Oct 2019 06:47:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572432441;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RmVyt0FWnI2IgNweRYjVmSFbaBxHefK04fV3NVmHImE=;
- b=CfevMXwpDMbIfRZXiT5ODjVBU6w1xTndoGFj7ekzm30oRe60vMvUBJkzOCAo4bmEFG20yB
- FWSgnD0QUQ2IjsEgsm+af7QFU78g70zcf7SjcE2RiN/BllvOrovht1xqdSvGn78dKlH/QB
- SbPOqIEFiwAdDwO3H4fPyZNODUuZ+kM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-48-xkCB351_PpawL6TeehLlSQ-1; Wed, 30 Oct 2019 06:47:14 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23F0D8017DF;
- Wed, 30 Oct 2019 10:47:13 +0000 (UTC)
-Received: from work-vm (ovpn-116-18.ams2.redhat.com [10.36.116.18])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4A2711001B07;
- Wed, 30 Oct 2019 10:47:02 +0000 (UTC)
-Date: Wed, 30 Oct 2019 10:47:00 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH 00/30] virtiofs daemon (base)
-Message-ID: <20191030104700.GA3114@work-vm>
-References: <20191021105832.36574-1-dgilbert@redhat.com>
- <20191029185004-mutt-send-email-mst@kernel.org>
+ (envelope-from <peter.maydell@linaro.org>) id 1iPlsG-0003gg-Lh
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 07:10:49 -0400
+Received: from mail-ot1-x335.google.com ([2607:f8b0:4864:20::335]:33978)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iPlsG-0003g8-GL
+ for qemu-devel@nongnu.org; Wed, 30 Oct 2019 07:10:48 -0400
+Received: by mail-ot1-x335.google.com with SMTP id m19so1756475otp.1
+ for <qemu-devel@nongnu.org>; Wed, 30 Oct 2019 04:10:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=YAFfz/tfoIOdBntZgvV4kIrxmwfRlXL3Jv3bcHpqZak=;
+ b=mSE8YoodJiMZCfn5pmN5OeW5uyKRfZ95bpPG7WX2IvH1s7gpDSXQEO+2/uAGUFkjal
+ MdYcahSFZ+rZH76+/tymL/tZZawcKQ2ndexs8X+ECqsMM320QhjEr6d2pEfEDjJwLQbv
+ we7YFUOP9jIYQpApdFtR9V/RE3TDzy2rVtCmrKwDnFST5fBiEyJhnMhgAVfmoX1GDdD/
+ BhIhLCwXp4QLK3HX1UwqMnV4lu8+e0EVF6wvEXNDtD4YrG3q9NIVrUWJafsDpLesq8PC
+ PW05UgiJHEpTTixSYoRxN9iS1xjiMQ+XysOd457QTGJIeSyDvepoZKL+a3obNu4OGv+/
+ 3v9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=YAFfz/tfoIOdBntZgvV4kIrxmwfRlXL3Jv3bcHpqZak=;
+ b=Ft+Eb+r35TtG7DjOfs7QAaDb1oDJpRKR+0sNHjF5syyAMbquhGpDTGY+cFeFoSn2k2
+ /71gnwLW1lDeuKZwd/0m/1oOxHciapSXesxNkKz36g6zWnSw41vBApN4aaooO1R4rexe
+ IDO9Vo8pbsdwtUWBEO39VdNeM3UsJqpEHfcGIEFUPJ/r6j5xssduHumeN0E2FyMlxcgD
+ D2WPfvueo2VvqLOrx0RbxcVN51N8jaIvs9aUm78zVTEXmWuZlqHixYizK+AI61QQGSRn
+ tp56mdZagPtJej4UntpHJsUkUklIOdYlL/xNyQMMJw7Zg/XDUa7BVr6//aHDpCckGal6
+ Q3PQ==
+X-Gm-Message-State: APjAAAUUX5uxdlSD9/YAGqkulhAxtbKy6niz35wuighW8Ed3NtMnlFJi
+ A1SQqXivwQY5XPCKbIvpLZ8qojLtTL+duLCUfG4ejg==
+X-Google-Smtp-Source: APXvYqwmzGg1kcIvurHkfIPxGFHjZwVhow24Z2ZgFrTN5RRKY8Um3keY556fIJD8+bS3UkrRaqhQrsmzaI9FN0U2zAU=
+X-Received: by 2002:a9d:398a:: with SMTP id y10mr20913064otb.97.1572433847419; 
+ Wed, 30 Oct 2019 04:10:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191029185004-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: xkCB351_PpawL6TeehLlSQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191029225932.14585-1-mst@redhat.com>
+In-Reply-To: <20191029225932.14585-1-mst@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 30 Oct 2019 11:10:36 +0000
+Message-ID: <CAFEAcA9hk4cbDKi2nvDzLtCv+3CtjVuGgv=9GaW-cT39r99ZFg@mail.gmail.com>
+Subject: Re: [PULL 00/14] virtio: features, cleanups
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,168 +86,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, piaojun@huawei.com, stefanha@redhat.com,
- marcandre.lureau@redhat.com, eguan@linux.alibaba.com, vgoyal@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Michael S. Tsirkin (mst@redhat.com) wrote:
-> On Mon, Oct 21, 2019 at 11:58:02AM +0100, Dr. David Alan Gilbert (git) wr=
-ote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >=20
-> > Hi,
-> >   This is the 1st set for the virtiofsd - a daemon
-> > that implements the user space side of virtiofs.
-> >=20
-> >   The kernel and qemu device parts recently went in,
-> > so the daemon is the only thing missing to have a working
-> > set.
->=20
->=20
-> So I went back and forth on this but this is huge
-> and there's not a lot of time for review.
-> So I parked it + the security patches on a next branch in my tree.
-> I will rebase once after rc1 is out, and then stop.
+On Tue, 29 Oct 2019 at 23:00, Michael S. Tsirkin <mst@redhat.com> wrote:
+>
+> The following changes since commit 16884391c750d0c5e863f55ad7aaaa146fc5181e:
+>
+>   Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2019-10-29' into staging (2019-10-29 20:06:08 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+>
+> for you to fetch changes up to b5f53d04a5a567ac70d33ec95628d35583eba600:
+>
+>   virtio: Use auto rcu_read macros (2019-10-29 18:56:45 -0400)
+>
+> ----------------------------------------------------------------
+> virtio: features, cleanups
+>
+> virtio net failover
+> rcu cleanup
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+>
 
-Thanks; I'll work on the extra sets that can go later (the
-threading and cleanups+fixes).
+Applied, thanks.
 
-Dave
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
->=20
-> >   This set is the absolute minimal base set of patches;
-> > it's not yet safe to use (from security or correctness);
-> >=20
-> > I'll follow up with ~3 more series in the next few days
-> > with:
-> >=20
-> >     a) Security patches that add sandboxing and checking
-> >        compared with normal fuse - that makes it safe.
-> >     b) Performance improvements including threading
-> >     c) Other fixes, including correctness.
-> >=20
-> > but, this is a good start and gets things rolling.
-> >=20
-> > The set pulls in a big chunk of the upstream libfuse library
-> > (unmodified so that it's easy to check it really is upstream),
-> > chops all the stuff out we don't need and then adds the
-> > new transport we need.
-> >=20
-> > For new files I've formatted the code according to qemu
-> > standards; for files that are from upstream libfuse
-> > I've kept with their standards for ease of future updating.
-> >=20
-> > We can't just link with libfuse, since we have to make ABI incompatible
-> > changes for the new transport.
-> >=20
-> > Running this daemon is typically done with:
-> >=20
-> >    ./virtiofsd -o vhost_user_socket=3D/path/socket -o source=3D/path/to=
-/fs
-> >=20
-> > connected to a qemu that's then started with:
-> >    -chardev socket,id=3Dchar0,path=3D/path/socket -device vhost-user-fs=
--pci,queue-size=3D1024,chardev=3Dchar0,tag=3Dmyfs
-> >=20
-> > and then in the guest mount with:
-> >    mount -t virtiofs myfs /mnt
-> >=20
-> > Our development branch is: https://gitlab.com/virtio-fs/qemu/tree/virti=
-o-fs-dev
-> >=20
-> > Dave
-> >=20
-> >=20
-> > Dr. David Alan Gilbert (22):
-> >   virtiofsd: Pull in upstream headers
-> >   virtiofsd: Pull in kernel's fuse.h
-> >   virtiofsd: Add auxiliary .c's
-> >   virtiofsd: Add fuse_lowlevel.c
-> >   virtiofsd: Add passthrough_ll
-> >   virtiofsd: Trim down imported files
-> >   virtiofsd: Fix fuse_daemonize ignored return values
-> >   virtiofsd: Fix common header and define for QEMU builds
-> >   virtiofsd: fuse: Make iov_length usable outside fuse_lowlevel.c
-> >   virtiofsd: Add options for virtio
-> >   virtiofsd: Open vhost connection instead of mounting
-> >   virtiofsd: Start wiring up vhost-user
-> >   virtiofsd: Add main virtio loop
-> >   virtiofsd: get/set features callbacks
-> >   virtiofsd: Start queue threads
-> >   virtiofsd: Poll kick_fd for queue
-> >   virtiofsd: Start reading commands from queue
-> >   virtiofsd: Send replies to messages
-> >   virtiofsd: Keep track of replies
-> >   virtiofsd: Add Makefile wiring for virtiofsd contrib
-> >   virtiofsd: Fast path for virtio read
-> >   virtiofs: Add maintainers entry
-> >=20
-> > Stefan Hajnoczi (7):
-> >   virtiofsd: remove mountpoint dummy argument
-> >   virtiofsd: remove unused notify reply support
-> >   virtiofsd: add -o source=3DPATH to help output
-> >   virtiofsd: add --fd=3DFDNUM fd passing option
-> >   virtiofsd: make -f (foreground) the default
-> >   virtiofsd: add vhost-user.json file
-> >   virtiofsd: add --print-capabilities option
-> >=20
-> > Vivek Goyal (1):
-> >   virtiofsd: Make fsync work even if only inode is passed in
-> >=20
-> >  .gitignore                                  |    1 +
-> >  MAINTAINERS                                 |    8 +
-> >  Makefile                                    |    9 +
-> >  Makefile.objs                               |    1 +
-> >  contrib/virtiofsd/50-qemu-virtiofsd.json.in |    5 +
-> >  contrib/virtiofsd/Makefile.objs             |   10 +
-> >  contrib/virtiofsd/buffer.c                  |  318 +++
-> >  contrib/virtiofsd/fuse.h                    | 1268 ++++++++++
-> >  contrib/virtiofsd/fuse_common.h             |  823 +++++++
-> >  contrib/virtiofsd/fuse_i.h                  |  131 ++
-> >  contrib/virtiofsd/fuse_kernel.h             |  858 +++++++
-> >  contrib/virtiofsd/fuse_log.c                |   40 +
-> >  contrib/virtiofsd/fuse_log.h                |   82 +
-> >  contrib/virtiofsd/fuse_loop_mt.c            |   54 +
-> >  contrib/virtiofsd/fuse_lowlevel.c           | 2302 +++++++++++++++++++
-> >  contrib/virtiofsd/fuse_lowlevel.h           | 2024 ++++++++++++++++
-> >  contrib/virtiofsd/fuse_misc.h               |   59 +
-> >  contrib/virtiofsd/fuse_opt.c                |  422 ++++
-> >  contrib/virtiofsd/fuse_opt.h                |  271 +++
-> >  contrib/virtiofsd/fuse_signals.c            |   90 +
-> >  contrib/virtiofsd/fuse_virtio.c             |  717 ++++++
-> >  contrib/virtiofsd/fuse_virtio.h             |   33 +
-> >  contrib/virtiofsd/helper.c                  |  300 +++
-> >  contrib/virtiofsd/passthrough_helpers.h     |   76 +
-> >  contrib/virtiofsd/passthrough_ll.c          | 1341 +++++++++++
-> >  docs/interop/vhost-user.json                |    4 +-
-> >  26 files changed, 11246 insertions(+), 1 deletion(-)
-> >  create mode 100644 contrib/virtiofsd/50-qemu-virtiofsd.json.in
-> >  create mode 100644 contrib/virtiofsd/Makefile.objs
-> >  create mode 100644 contrib/virtiofsd/buffer.c
-> >  create mode 100644 contrib/virtiofsd/fuse.h
-> >  create mode 100644 contrib/virtiofsd/fuse_common.h
-> >  create mode 100644 contrib/virtiofsd/fuse_i.h
-> >  create mode 100644 contrib/virtiofsd/fuse_kernel.h
-> >  create mode 100644 contrib/virtiofsd/fuse_log.c
-> >  create mode 100644 contrib/virtiofsd/fuse_log.h
-> >  create mode 100644 contrib/virtiofsd/fuse_loop_mt.c
-> >  create mode 100644 contrib/virtiofsd/fuse_lowlevel.c
-> >  create mode 100644 contrib/virtiofsd/fuse_lowlevel.h
-> >  create mode 100644 contrib/virtiofsd/fuse_misc.h
-> >  create mode 100644 contrib/virtiofsd/fuse_opt.c
-> >  create mode 100644 contrib/virtiofsd/fuse_opt.h
-> >  create mode 100644 contrib/virtiofsd/fuse_signals.c
-> >  create mode 100644 contrib/virtiofsd/fuse_virtio.c
-> >  create mode 100644 contrib/virtiofsd/fuse_virtio.h
-> >  create mode 100644 contrib/virtiofsd/helper.c
-> >  create mode 100644 contrib/virtiofsd/passthrough_helpers.h
-> >  create mode 100644 contrib/virtiofsd/passthrough_ll.c
-> >=20
-> > --=20
-> > 2.23.0
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+-- PMM
 
