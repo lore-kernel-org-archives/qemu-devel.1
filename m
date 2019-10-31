@@ -2,156 +2,83 @@ Return-Path: <SRS0=5JRQ=YY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE99CA9ECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 567E7CA9ECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:56:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 667812087F
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:54:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20AF3208C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:56:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CLna6Sfn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 667812087F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6rzzbFQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20AF3208C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQCmk-0006eG-8n
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 11:54:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59145)
+	id 1iQCnW-0001ZD-7o
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 11:55:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59530)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iQCeC-0004kd-F4
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:46:05 -0400
+ (envelope-from <vgoyal@redhat.com>) id 1iQCfl-0006V6-Ud
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:47:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iQCe9-00014j-TF
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:46:03 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32642
+ (envelope-from <vgoyal@redhat.com>) id 1iQCfk-0003q6-De
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:47:41 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42970
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iQCe9-00010z-Ia
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:46:01 -0400
+ (Exim 4.71) (envelope-from <vgoyal@redhat.com>) id 1iQCfk-0003po-9a
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:47:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572536760;
+ s=mimecast20190719; t=1572536859;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=/eXsnGxwYaH9WWLSOfy2vGiuWT/hZ0FLZxQ0gbrl8j0=;
- b=CLna6Sfn+WbRX9m1K4umvRYStjM+fbaLaIU8C5PDcNmOZM5g9/F0pETGSswvx/oUgX92pi
- dig8xogRTUiRcOR1MkexdFUN81u+ygef7xeZXSoD1tVF/iWwhWc3rf8JPgPox5XO1bVycb
- wygBcYag7B12GCnVQMCqchdSqpwxGQ4=
+ in-reply-to:in-reply-to:references:references;
+ bh=OU9vwu2FN8vUKMRkapmeJjLmpIj50lC37JoBKr/eSNc=;
+ b=g6rzzbFQkR+dRcXJjV9+oU+p/JC+PN9dD2ONOIF4BXtEcrMaEajamlYrjZG2z6vZU8VRVf
+ mWwS0Zc4PNzi+353NziF/waRdh5YBOYQWy2bTwzM+p1smjbOwUe7T4lZn81GAbC8mCP4PD
+ 5nTU4EXSDpO7OszHzqnxOVh0H+7PHKM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-345-rnqoA7-rMeinKt5sa7A8Ug-1; Thu, 31 Oct 2019 11:45:54 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-80-OZ2wXzinOZ2k7alWa3IyVg-1; Thu, 31 Oct 2019 11:47:37 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DBD2800D49;
- Thu, 31 Oct 2019 15:45:53 +0000 (UTC)
-Received: from [10.10.126.19] (ovpn-126-19.rdu2.redhat.com [10.10.126.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4C3875D9D6;
- Thu, 31 Oct 2019 15:45:31 +0000 (UTC)
-Subject: Re: [PULL 0/9] Ide patches
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191031105904.12194-1-jsnow@redhat.com>
- <CAFEAcA964ibGcb02kTC_bTcX5xLu5r-=NJMz5Kykct0t7CVwnw@mail.gmail.com>
-From: John Snow <jsnow@redhat.com>
-Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <757efddc-43fc-7f5b-c57a-dfdfc0a3e801@redhat.com>
-Date: Thu, 31 Oct 2019 11:45:30 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FD46107ACC0;
+ Thu, 31 Oct 2019 15:47:36 +0000 (UTC)
+Received: from horse.redhat.com (unknown [10.18.25.35])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DA357600CD;
+ Thu, 31 Oct 2019 15:47:32 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id 6E10B2237B5; Thu, 31 Oct 2019 11:47:32 -0400 (EDT)
+Date: Thu, 31 Oct 2019 11:47:32 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Subject: Re: [Virtio-fs] [PATCH] virtiofsd: Fix data corruption with O_APPEND
+ wirte in writeback mode
+Message-ID: <20191031154732.GC7308@redhat.com>
+References: <20191023122523.1816-1-misono.tomohiro@jp.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA964ibGcb02kTC_bTcX5xLu5r-=NJMz5Kykct0t7CVwnw@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: rnqoA7-rMeinKt5sa7A8Ug-1
+In-Reply-To: <20191023122523.1816-1-misono.tomohiro@jp.fujitsu.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: OZ2wXzinOZ2k7alWa3IyVg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -163,53 +90,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Libvirt <libvir-list@redhat.com>,
- Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Max Reitz <mreitz@redhat.com>, "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: virtio-fs@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 10/31/19 11:02 AM, Peter Maydell wrote:
-> On Thu, 31 Oct 2019 at 10:59, John Snow <jsnow@redhat.com> wrote:
->>
->> The following changes since commit 68d8ef4ec540682c3538d4963e836e43a211d=
-d17:
->>
->>   Merge remote-tracking branch 'remotes/stsquad/tags/pull-tcg-plugins-28=
-1019-4' into staging (2019-10-30 14:10:32 +0000)
->>
->> are available in the Git repository at:
->>
->>   https://github.com/jnsnow/qemu.git tags/ide-pull-request
->>
->> for you to fetch changes up to c35564caf20e8d3431786dddf0fa513daa7d7f3c:
->>
->>   hd-geo-test: Add tests for lchs override (2019-10-31 06:11:34 -0400)
->>
->> ----------------------------------------------------------------
->> Pull request
->>
+On Wed, Oct 23, 2019 at 09:25:23PM +0900, Misono Tomohiro wrote:
+> When writeback mode is enabled (-o writeback), O_APPEND handling is
+> done in kernel. Therefore virtiofsd clears O_APPEND flag when open.
+> Otherwise O_APPEND flag takes precedence over pwrite() and write
+> data may corrupt.
 >=20
-> Hi -- this passed the merge tests but it looks like you forgot
-> to add your signed-off by line as the submaintainer to Sam's
-> patches. Could you fix that up and resend, please?
+> Currently clearing O_APPEND flag is done in lo_open(), but we also
+> need the same operation in lo_create(). So, factor out the flag
+> update operation in lo_open() to update_open_flags() and call it
+> in both lo_open() and lo_create().
 >=20
-> thanks
-> -- PMM
+> This fixes the failure of xfstest generic/069 in writeback mode
+> (which tests O_APPEND write data integrity).
 >=20
+> Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
 
-Haha. I re-applied them to grab Phil's SOBs and that dropped mine.
+Reviewed-by: Vivek Goyal <vgoyal@redhat.com>
 
-OK, re-spinning.
+Thanks
+Vivek
 
-(Note to self: add a check to git-publish --pull that looks for my SOB.)
+> ---
+>  contrib/virtiofsd/passthrough_ll.c | 56 +++++++++++++++---------------
+>  1 file changed, 28 insertions(+), 28 deletions(-)
+>=20
+> diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passt=
+hrough_ll.c
+> index e8892c3c32..79fb78ecce 100644
+> --- a/contrib/virtiofsd/passthrough_ll.c
+> +++ b/contrib/virtiofsd/passthrough_ll.c
+> @@ -1733,6 +1733,32 @@ static void lo_releasedir(fuse_req_t req, fuse_ino=
+_t ino, struct fuse_file_info
+>  =09fuse_reply_err(req, 0);
+>  }
+> =20
+> +static void update_open_flags(int writeback, struct fuse_file_info *fi)
+> +{
+> +=09/* With writeback cache, kernel may send read requests even
+> +=09   when userspace opened write-only */
+> +=09if (writeback && (fi->flags & O_ACCMODE) =3D=3D O_WRONLY) {
+> +=09=09fi->flags &=3D ~O_ACCMODE;
+> +=09=09fi->flags |=3D O_RDWR;
+> +=09}
+> +
+> +=09/* With writeback cache, O_APPEND is handled by the kernel.
+> +=09   This breaks atomicity (since the file may change in the
+> +=09   underlying filesystem, so that the kernel's idea of the
+> +=09   end of the file isn't accurate anymore). In this example,
+> +=09   we just accept that. A more rigorous filesystem may want
+> +=09   to return an error here */
+> +=09if (writeback && (fi->flags & O_APPEND))
+> +=09=09fi->flags &=3D ~O_APPEND;
+> +
+> +=09/*
+> +=09 * O_DIRECT in guest should not necessarily mean bypassing page
+> +=09 * cache on host as well. If somebody needs that behavior, it
+> +=09 * probably should be a configuration knob in daemon.
+> +=09 */
+> +=09fi->flags &=3D ~O_DIRECT;
+> +}
+> +
+>  static void lo_create(fuse_req_t req, fuse_ino_t parent, const char *nam=
+e,
+>  =09=09      mode_t mode, struct fuse_file_info *fi)
+>  {
+> @@ -1760,12 +1786,7 @@ static void lo_create(fuse_req_t req, fuse_ino_t p=
+arent, const char *name,
+>  =09if (err)
+>  =09=09goto out;
+> =20
+> -=09/*
+> -=09 * O_DIRECT in guest should not necessarily mean bypassing page
+> -=09 * cache on host as well. If somebody needs that behavior, it
+> -=09 * probably should be a configuration knob in daemon.
+> -=09 */
+> -=09fi->flags &=3D ~O_DIRECT;
+> +=09update_open_flags(lo->writeback, fi);
+> =20
+>  =09fd =3D openat(parent_inode->fd, name,
+>  =09=09    (fi->flags | O_CREAT) & ~O_NOFOLLOW, mode);
+> @@ -1966,28 +1987,7 @@ static void lo_open(fuse_req_t req, fuse_ino_t ino=
+, struct fuse_file_info *fi)
+> =20
+>  =09fuse_log(FUSE_LOG_DEBUG, "lo_open(ino=3D%" PRIu64 ", flags=3D%d)\n", =
+ino, fi->flags);
+> =20
+> -=09/* With writeback cache, kernel may send read requests even
+> -=09   when userspace opened write-only */
+> -=09if (lo->writeback && (fi->flags & O_ACCMODE) =3D=3D O_WRONLY) {
+> -=09=09fi->flags &=3D ~O_ACCMODE;
+> -=09=09fi->flags |=3D O_RDWR;
+> -=09}
+> -
+> -=09/* With writeback cache, O_APPEND is handled by the kernel.
+> -=09   This breaks atomicity (since the file may change in the
+> -=09   underlying filesystem, so that the kernel's idea of the
+> -=09   end of the file isn't accurate anymore). In this example,
+> -=09   we just accept that. A more rigorous filesystem may want
+> -=09   to return an error here */
+> -=09if (lo->writeback && (fi->flags & O_APPEND))
+> -=09=09fi->flags &=3D ~O_APPEND;
+> -
+> -=09/*
+> -=09 * O_DIRECT in guest should not necessarily mean bypassing page
+> -=09 * cache on host as well. If somebody needs that behavior, it
+> -=09 * probably should be a configuration knob in daemon.
+> -=09 */
+> -=09fi->flags &=3D ~O_DIRECT;
+> +=09update_open_flags(lo->writeback, fi);
+> =20
+>  =09sprintf(buf, "%i", lo_fd(req, ino));
+>  =09fd =3D openat(lo->proc_self_fd, buf, fi->flags & ~O_NOFOLLOW);
+> --=20
+> 2.21.0
+>=20
+> _______________________________________________
+> Virtio-fs mailing list
+> Virtio-fs@redhat.com
+> https://www.redhat.com/mailman/listinfo/virtio-fs
 
 
