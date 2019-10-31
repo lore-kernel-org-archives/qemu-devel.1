@@ -2,87 +2,75 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5843CA9ECB
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 00:01:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70AFACA9ECB
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 01:08:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB9812086D
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 00:01:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB9812086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3B32D2083E
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 01:08:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B32D2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQKNi-0001gl-S8
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 20:01:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42112)
+	id 1iQLQ5-000726-82
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 21:08:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48426)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iQKMh-0001AY-6A
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 20:00:33 -0400
+ (envelope-from <bounces@canonical.com>) id 1iQJtp-0002Vg-7W
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 19:30:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iQKMZ-0002US-SA
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 20:00:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57748)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iQKMZ-0002PJ-5G
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 20:00:23 -0400
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1D14385A07
- for <qemu-devel@nongnu.org>; Fri,  1 Nov 2019 00:00:21 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id m17so4462223wrb.20
- for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 17:00:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=yTQrLhRRDKlEcNLTfUQI0lgXMQ6dDnDgFG10jSP8D2E=;
- b=q1V7D4wNbJIc9mstrrPApZOmLv9unlYGgej/RLcMMN/r4C+n0o9Lx6un5dqB1SN28J
- ZhxnkKu0FOa/QKq4xhiJiKYcL2KYRn5h/VQdu6CYMIWZCp+3gYDLk+fuJG0NIYUwn/CK
- 9lkvufo7gikiJ25xYGTVJWeTk6z0Cg4iyFiNCJApJSwveb0T+97I1yTFjX1PauF+gMFu
- WqiDg6IKHVvLsvamtBy8sNtoJx4zo1Vavdsmy2hKzUTXqeCqyS3dMKEfSOD7YqRYfqJQ
- zd0gmelhvfeCpbOtm0JbFMjwSIiyQ03n11ZUHdj7pdHAwb6C5dAo7kdEAchRaDWPyWrH
- wbkg==
-X-Gm-Message-State: APjAAAWI83Cr1M54A3scyHP7mjazcGS0UCGBJuYbGLxwMr0Oymbhm+ZS
- 0JdHRw7w+uhEupRjlGsiLDmX9mIy/2T7bMQ7A9LOeb+2XLOTK7QOmRFMd14wQyE6Rgt0g2mzZma
- 7ffkMfn4ogRpMso8=
-X-Received: by 2002:a1c:544b:: with SMTP id p11mr7829996wmi.46.1572566419843; 
- Thu, 31 Oct 2019 17:00:19 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqwCicbxlS/iKaciaCn09ABRL8p68A80MV5Qv1ETrkSyiUItREWxS5jJGDnU6Sql36SAl19nWA==
-X-Received: by 2002:a1c:544b:: with SMTP id p11mr7829986wmi.46.1572566419628; 
- Thu, 31 Oct 2019 17:00:19 -0700 (PDT)
-Received: from [192.168.20.58] (94.222.26.109.rev.sfr.net. [109.26.222.94])
- by smtp.gmail.com with ESMTPSA id b4sm5221869wrh.87.2019.10.31.17.00.18
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 31 Oct 2019 17:00:19 -0700 (PDT)
-Subject: Re: [RFC] q800: fix I/O memory map
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20191031100341.3827-1-laurent@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <bf1a2cbf-f462-e6df-c7c1-1e2ad26003ad@redhat.com>
-Date: Fri, 1 Nov 2019 01:00:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <bounces@canonical.com>) id 1iQJtn-00018T-Cp
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 19:30:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:41778)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iQJtn-00016a-7E
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 19:30:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iQJtk-0005wL-LL
+ for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 23:30:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 7452F2E802A
+ for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 23:30:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20191031100341.3827-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 31 Oct 2019 23:22:38 -0000
+From: =?utf-8?q?Ernst_Sj=C3=B6strand?= <ernstp@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dos-d ernstp
+X-Launchpad-Bug-Reporter: Sebastian Krzyszkowiak (dos-d)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Ernst_Sj=C3=B6strand_=28ernstp=29?=
+References: <154041310239.24736.3249552536528955636.malonedeb@wampee.canonical.com>
+Message-Id: <157256415823.28040.17245759353436959286.malone@chaenomeles.canonical.com>
+Subject: [Bug 1799792] Re: Broken scaling with gtk,gl=on on a hidpi display
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: aae026b73eea0f59ba821824d344f49f3a6b0582
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 91.189.90.7
+X-Mailman-Approved-At: Thu, 31 Oct 2019 21:07:16 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,114 +79,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Bug 1799792 <1799792@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/31/19 11:03 AM, Laurent Vivier wrote:
-> Linux kernel 5.4 will introduce a new memory map for SWIM device.
-> (aee6bff1c325 ("m68k: mac: Revisit floppy disc controller base addresse=
-s"))
->=20
-> Until this release all MMIO are mapped between 0x50f00000 and 0x50f4000=
-0,
-> but it appears that for real hardware 0x50f00000 is not the base addres=
-s:
-> the MMIO region spans 0x50000000 through 0x60000000, and 0x50040000 thr=
-ough
-> 0x54000000 is repeated images of 0x50000000 to 0x50040000.
->=20
-> Fixed: 04e7ca8d0f ("hw/m68k: define Macintosh Quadra 800")
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->   hw/m68k/q800.c | 33 +++++++++++++++++++++++++--------
->   1 file changed, 25 insertions(+), 8 deletions(-)
->=20
-> diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-> index 2b4842f8c6..8122e7c612 100644
-> --- a/hw/m68k/q800.c
-> +++ b/hw/m68k/q800.c
-> @@ -60,14 +60,14 @@
->   #define MACH_MAC        3
->   #define Q800_MAC_CPU_ID 2
->  =20
-> -#define VIA_BASE              0x50f00000
-> -#define SONIC_PROM_BASE       0x50f08000
-> -#define SONIC_BASE            0x50f0a000
-> -#define SCC_BASE              0x50f0c020
-> -#define ESP_BASE              0x50f10000
-> -#define ESP_PDMA              0x50f10100
-> -#define ASC_BASE              0x50F14000
-> -#define SWIM_BASE             0x50F1E000
-> +#define VIA_BASE              0x50000000
-> +#define SONIC_PROM_BASE       0x50008000
-> +#define SONIC_BASE            0x5000a000
-> +#define SCC_BASE              0x5000c020
-> +#define ESP_BASE              0x50010000
-> +#define ESP_PDMA              0x50010100
-> +#define ASC_BASE              0x50014000
-> +#define SWIM_BASE             0x5001E000
->   #define NUBUS_SUPER_SLOT_BASE 0x60000000
->   #define NUBUS_SLOT_BASE       0xf0000000
->  =20
-> @@ -135,6 +135,7 @@ static void q800_init(MachineState *machine)
->       int32_t initrd_size;
->       MemoryRegion *rom;
->       MemoryRegion *ram;
-> +    int i;
->       ram_addr_t ram_size =3D machine->ram_size;
->       const char *kernel_filename =3D machine->kernel_filename;
->       const char *initrd_filename =3D machine->initrd_filename;
-> @@ -163,10 +164,26 @@ static void q800_init(MachineState *machine)
->       cpu =3D M68K_CPU(cpu_create(machine->cpu_type));
->       qemu_register_reset(main_cpu_reset, cpu);
->  =20
-> +    /* RAM */
->       ram =3D g_malloc(sizeof(*ram));
->       memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &erro=
-r_abort);
->       memory_region_add_subregion(get_system_memory(), 0, ram);
->  =20
-> +    /*
-> +     * Memory from VIA_BASE to VIA_BASE + 0x40000 is repeated
-> +     * from VIA_BASE + 0x40000 to VIA_BASE + 0x4000000
-> +     */
+Also happens on Ubuntu 19.10
 
-Maybe:
+-- =
 
-        const size_t via_aliases_count =3D (0x4000000 / 0x40000) - 1;
-        MemoryRegion *via_alias =3D g_new(MemoryRegion, via_aliases_count=
-);
-        for (size_t i =3D 0; i < via_aliases_count; i++) {
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1799792
 
-            ...
+Title:
+  Broken scaling with gtk,gl=3Don on a hidpi display
 
-            memory_region_add_subregion(get_system_memory(),
-                                        VIA_BASE + (i + 1) * 0x40000,
-                                        via_alias[i]);
-            ...
-        }
+Status in QEMU:
+  New
 
-> +    for (i =3D 1; i < 256; i++) {
-> +        MemoryRegion *io =3D g_malloc(sizeof(*io));
-> +        char *name =3D g_strdup_printf("mac_m68k.io[%d]", i);
-> +
-> +        memory_region_init_alias(io, NULL, name, get_system_memory(),
-> +                                 VIA_BASE, 0x40000);
-> +        memory_region_add_subregion(get_system_memory(),
-> +                                    VIA_BASE + i * 0x40000, io);
-> +        g_free(name);
-> +    }
+Bug description:
+  Tested on QEMU 3.0.0 on Arch Linux.
 
-I'm trying to get ride of this pattern, so I plan to refactor this later=20
-(and will use 256*KiB). Anyway not this patch problem.
+  I'm using a hidpi screen, and therefore use those environment
+  variables in order to have GTK+ apps properly scaled:
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+  GDK_SCALE=3D2
+  GDK_DPI_SCALE=3D0.5
 
-> +
->       /* IRQ Glue */
->  =20
->       irq =3D g_new0(GLUEState, 1);
->=20
+  However, QEMU, when launched with "-display gtk,gl=3Don" option, doesn't
+  scale the window content properly, as seen on the attached screenshot.
+
+  Switching to "-display gtk,gl=3Doff" and "-display sdl,gl=3Don" makes it
+  work fine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1799792/+subscriptions
 
