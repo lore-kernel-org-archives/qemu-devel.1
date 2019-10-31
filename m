@@ -2,91 +2,80 @@ Return-Path: <SRS0=5JRQ=YY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3671CA9ECE
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 08:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1D27CA9EC3
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 08:13:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C20642083E
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 08:08:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83D882083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 08:13:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aBREAAOr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C20642083E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mMpilucc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83D882083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQ5VX-0008Dt-Uq
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 04:08:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54499)
+	id 1iQ5aa-0003CN-8F
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 04:13:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55070)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iQ5Ta-0006rM-G3
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 04:06:39 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iQ5Z3-0002Iw-CI
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 04:12:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iQ5TY-0002i7-EH
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 04:06:38 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33556)
+ (envelope-from <peter.maydell@linaro.org>) id 1iQ5Z2-0007Qp-6e
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 04:12:17 -0400
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:38310)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iQ5TY-0002Va-71
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 04:06:36 -0400
-Received: by mail-wm1-x344.google.com with SMTP id 6so5995034wmf.0
- for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 01:06:35 -0700 (PDT)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iQ5Z1-0007JT-Vl
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 04:12:16 -0400
+Received: by mail-oi1-x235.google.com with SMTP id v186so4415584oie.5
+ for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 01:12:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=BbwrnMX9JtWTbR/3U6krBIhdo19di9JBayZPJctdb4Q=;
- b=aBREAAOrD6RFobSeAaGwhSQ2NS6Yyz1wMY3YqBH4CBWbg8QoZ3GA55dt6bs1z+1wTx
- UCK46ezf5CeafZO7l777DtUWe0nV+sO9sUP/PlJ98Hx53Bn0v8599cYl72vpJ/rSkyYn
- f6Lj/sDZk8KDTKtrIGzNdWQyLR3rdf7e5FPEyc2G4xhzRuXLa9Do+mumLz+ZVf4RzP3h
- qHxF74PpVbQQqo5yOHEywu/VcLfuT7s3VflEx9vHWgMIi6CA0flqU8FZ5+RVOP+xsADF
- P4wqBZZWeIoo4VNB88eLAEwrQnuYt92c6tXvZHipj7ZBlJhlRo7Bij1QP4KkZHxGxQSD
- j07Q==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=iqO/qdTKzyrRFvsCztpbLyq3b2K2QnxtRfolHig/lCM=;
+ b=mMpiluccx8h3ikxO4E36H+Y9RE4KPACNXo48BCCpEE3GdCl+DPwB7j4Kj5F7YhpEjG
+ HA4Yd2WQHTOgk+1c6vvMKuHGlavThPSr+1qE7hSKkPc4ynOsCQFcboByPP1deYgz4MRQ
+ YSZmPqdWd76ogxQ7LNMQIMsanE+ODIWEtB/ll+XRD9/AYpa3Sn+ELyU3JPtDuEw3/6nQ
+ ozuzbs7iOUyUOry/Zww6T1yZnc0MQmjJJrUwPjXJuFcBRjMqs/kQNkQ5PJ5WQqreesi3
+ 7JvhGW8sD+NNryf0uAbkRBNLmrmmzzzBl7J8nKmvwtkWmKlFc0lZacAhychjVL/pUWyk
+ me2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=BbwrnMX9JtWTbR/3U6krBIhdo19di9JBayZPJctdb4Q=;
- b=KSfudmtqFCojfE3s2j9A/CVWFdAiiJ6V4ZfhOvgcVzUBjLuwhDj2PNdLCxUtVouId1
- ziOXcLU3GgAj8YugI6tnX9mvCbxkMi75Pju47qfM7EHarzjxkqQRwZ1u9oHzX4o1VBge
- KHA9Z9rt+sfDakb1cxiei4loWUACJ+PsqgvqDeXNM6V+K0CU0Z5aXtcK6jB+gWRWntN0
- DyfLDQeUqECsHTxuHTDZ7LF7qP5UkD/KfulAkJTN91ooVgo6pCXJ/gGIikKvGuOxQHmM
- IzEepySo7+uJM9iYgcw9UTKuCyIigDagwZ4XhkMAvYsoTKXIVrozUvo7GqwNCWGpknIN
- SE9g==
-X-Gm-Message-State: APjAAAXMb6OeGEyBAtvaoAmXIG/9WmuGw2uV7O5D/KZtphQTjpUx6EBP
- J6Uu5Li2y5zjEAGTdVjuJJRYFA==
-X-Google-Smtp-Source: APXvYqw7Q89oPo0ag7y+YmOD5JKTnySX/IYiLoaZ4EAMl+B2P92Utikf/h2exi0VQs54Dm5yD75Opg==
-X-Received: by 2002:a7b:cf36:: with SMTP id m22mr3574395wmg.98.1572509193230; 
- Thu, 31 Oct 2019 01:06:33 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 6sm3286988wmd.36.2019.10.31.01.06.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 31 Oct 2019 01:06:31 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5A8B01FF87;
- Thu, 31 Oct 2019 08:06:31 +0000 (GMT)
-References: <20191028181643.5143-12-laurent@vivier.eu>
- <20191029232320.12419-1-crosa@redhat.com>
- <20191029232320.12419-3-crosa@redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH 2/2] Acceptance test: update kernel for m68k/q800 test
-In-reply-to: <20191029232320.12419-3-crosa@redhat.com>
-Date: Thu, 31 Oct 2019 08:06:31 +0000
-Message-ID: <87bltx8hko.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=iqO/qdTKzyrRFvsCztpbLyq3b2K2QnxtRfolHig/lCM=;
+ b=BRxlOnY+8g8VoCvfix4uQJJPz8dFsZ/l1TqjhPOgvKKRPGqoR6fSOtCVBCp32TDuRH
+ npI50mmQ41crdQkynXPAWhw+RDaXX5TSTnI9t+ciD3DG8AwKjOIKWzhsQPdbj8lxkvtH
+ ruxnlkCjPPenjdr+yx1nVX4LLUIaIUWfw141qkqNA3JlgrM7nLHgzPv3U5ZHAbLLIDZ4
+ LgMYnf2y71sOwyC1d8MCsSQFh2pgMucfSlvQOqBEz8NBIJYBeyk116UxiP76FvuLw+/V
+ 7H6FnBFlngOyNc1mJkT93pUIT2YlxNw4d2pWoz1kjx6TC7CIZ8Qk9i1D4QmrsqCh8yjT
+ gYPQ==
+X-Gm-Message-State: APjAAAXtnp10N07w/STly+ClyJoOsx7T8Y3k8uOkyGkmA0y/rdEGXGxk
+ 0OvbIVSBHLRvjyiG0AwRkfwkOFiiVEwSCTJOPyXLdA==
+X-Google-Smtp-Source: APXvYqzfy0eidPlPWz6PhfZ9dSN7VPAzehwPanKRjhKAXqBS4QPEjum5nNSzW0Sp5eGyLjmgDF1jgW7a3EoZykJzGnc=
+X-Received: by 2002:a05:6808:2c6:: with SMTP id
+ a6mr2923122oid.48.1572509534537; 
+ Thu, 31 Oct 2019 01:12:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20191025203427.20181-1-ehabkost@redhat.com>
+In-Reply-To: <20191025203427.20181-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 31 Oct 2019 08:12:01 +0000
+Message-ID: <CAFEAcA-F0iB2vzi3Z0J9FPAt6JpuMh+V0wsfXWLuAGX5_d69xw@mail.gmail.com>
+Subject: Re: [PULL 0/1] Require Python >= 3.5 to build QEMU
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::235
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,62 +87,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Cleber Rosa <crosa@redhat.com> writes:
-
-> There's an updated version of the Debian package containing the m68k
-> Kernel.
+On Fri, 25 Oct 2019 at 21:34, Eduardo Habkost <ehabkost@redhat.com> wrote:
 >
-> Now, if the package gets updated again, the test won't fail, but will
-> be canceled.  A more permanent solution is certainly needed.
+> The following changes since commit 03bf012e523ecdf047ac56b2057950247256064d:
 >
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
->  tests/acceptance/boot_linux_console.py | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2019-10-25 14:59:53 +0100)
 >
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index c439fd90fc..8f676d8e92 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -385,14 +385,14 @@ class BootLinuxConsole(Test):
->          :avocado: tags=3Dmachine:q800
->          """
->          deb_url =3D ('http://ftp.ports.debian.org/debian-ports/pool-m68k=
-/main'
-> -                   '/l/linux/kernel-image-5.2.0-2-m68k-di_5.2.9-2_m68k.u=
-deb')
-> -        deb_hash =3D '0797e05129595f22f3c0142db5e199769a723bf9'
-> +                   '/l/linux/kernel-image-5.3.0-1-m68k-di_5.3.7-1_m68k.u=
-deb')
-> +        deb_hash =3D '044954bb9be4160a3ce81f8bc1b5e856b75cccd1'
->          try:
->              deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
->          except OSError as exp:
->              self.cancel(exp)
->          kernel_path =3D self.extract_from_deb(deb_path,
-> -                                            '/boot/vmlinux-5.2.0-2-m68k')
-> +                                            '/boot/vmlinux-5.3.0-1-m68k')
+> are available in the Git repository at:
 >
->          self.vm.set_machine('q800')
->          self.vm.set_console()
+>   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
+>
+> for you to fetch changes up to d24e417866f85229de1b75bc5c0a1d942451a842:
+>
+>   configure: Require Python >= 3.5 (2019-10-25 16:34:57 -0300)
+>
+> ----------------------------------------------------------------
+> Require Python >= 3.5 to build QEMU
+>
+> ----------------------------------------------------------------
 
+I can't apply this until we've fixed the tests/vm netbsd setup to
+not use Python 2.
 
---
-Alex Benn=C3=A9e
+Have you tried a test run with Travis/etc/etc to check that none of
+those CI configs need updating to have python3 available ?
+
+thanks
+-- PMM
 
