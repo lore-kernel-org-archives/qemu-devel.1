@@ -2,68 +2,90 @@ Return-Path: <SRS0=5JRQ=YY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3593DCA9ECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0041ACA9ECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:36:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04B4D20873
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:23:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04B4D20873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 79937208E3
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:36:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YYnpFfVy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79937208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQCIm-0004Kw-HD
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 11:23:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55891)
+	id 1iQCUQ-00065k-BU
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 11:35:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56388)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iQCHA-0002fM-S8
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:22:18 -0400
+ (envelope-from <alex.bennee@linaro.org>) id 1iQCM4-0000rQ-5i
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:27:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iQCH8-0007Iz-VW
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:22:16 -0400
-Resent-Date: Thu, 31 Oct 2019 11:22:16 -0400
-Resent-Message-Id: <E1iQCH8-0007Iz-VW@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21402)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iQCH8-0007He-NH; Thu, 31 Oct 2019 11:22:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1572535316; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=PWMxEuNvsdpnrw97D0R1JO0ninsmfP3+bcaRekvApNybEXorq+tTv9kXu+xJ2smwcq5DuBgaB6Zoyhy/TjRZxio/z+6LsMbHhLPHzw55fC84dwA2AoDgs0VCrpG7+0vDkmyGs2+GHLmG/uGMaePAbW5EEVAB5znoRWk4frtrHiM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1572535316;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=X3O1OS0JrUqhqvd6K512c347eV+loxhfdHFlu9zmiy8=; 
- b=ixatXBGGrXW3BugkzV+Rg45MD08H5DJj7ViEmSaQ4m/m23eEKWY1Hv1w27Z9WE6xSR50jub5JLRHUM5wVHaBjyfVK1R+RWXc6DT3hOAur19menm6vWOekiaOx2tlAtzWRT5WRr+9rjeVqToGeM0mlEkQ4pRcXY0WXxHxoFxoXvc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1572535314801945.0166992561481;
- Thu, 31 Oct 2019 08:21:54 -0700 (PDT)
-In-Reply-To: <20191031142734.8590-1-drjones@redhat.com>
-Subject: Re: [PATCH v8 0/9] target/arm/kvm: enable SVE in guests
-Message-ID: <157253531305.11413.526716657261084490@37313f22b938>
+ (envelope-from <alex.bennee@linaro.org>) id 1iQCM1-0002Rm-Cx
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:27:18 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51037)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iQCLz-0002Qo-Ri
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:27:16 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 11so6390562wmk.0
+ for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 08:27:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=jom4OL7ujMFgl2s8HtwZwKYMiD3VbMFW1UdG7Ehq5Ec=;
+ b=YYnpFfVyAB99nP0RBzALunnGN6zvSbH7vPQRQGBhyDcGJ7RSof5WdZBnj1e8jOlz4W
+ hVp0sT+kYuidEc7F1jiFOnaclV53eqvEOAk860Ff+DnneZnPHv8RaPTnpdKvK8RORiSO
+ nRjQRR17wiKZJZKxkcFNTuE9WpCnkR0wKXiaEHbgYOzZOZDhWtIVRfd+ZaJz322crmi8
+ CTG2e3Qiqst2shqOC3C/YTULMVRqxSyl2Dvdxv8YKx/RS1NUA1OaxkTNF/C4+dXH5Y92
+ XXOOBuosWaTTkNFrCOCM3ewieirtqngozpinavFUy07OXgr/RuKBcxMSIzrAK9LGBOtI
+ pIJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=jom4OL7ujMFgl2s8HtwZwKYMiD3VbMFW1UdG7Ehq5Ec=;
+ b=ZLPsVEU99xilXdhIkClG29JvD0aTByeh7qtFYZhDsp6QbiEEqJox1YSCvC/pRXqK/I
+ 6JcZQeSUNgCmrvIvRI/+vEKJETBl4b7DkTgPmBPS2/3Z2Juglo9WSYaL1x2d+wyb6Xj+
+ vkQ9Jv0RtE7mWTdOtJyyxSkwEW91Amh2TgI2yfBJ+JkoFrlHHpSXsAuoGvAxvhCq25Wb
+ /GfLCiEJ6vKnDxEauv3rxJjv24z5UGINaORKJyxxrZz49kjS85pMY6ICAJ/INqKnS4yF
+ RUcHKFE3+91nTt8cHda8B/g/8aL3/PYyjY0/O/Yx0U5qCPjKMbr83rNRIJMaBzpihdVY
+ 9+Ww==
+X-Gm-Message-State: APjAAAXS5DqL3pRsOSuzXUefnSFgcxpCpXot14+4fpMS80qSkr6SC26u
+ GmfdiIMkgx0KkL0uRGKfXEKyk/6KWG2AGQ==
+X-Google-Smtp-Source: APXvYqwrQJwDmbSEPECQOdf+hUkTlUDhqhvSkwdiCC1xI7A2R169BiQtEQt0k2y28X4r837QNMZl0g==
+X-Received: by 2002:a1c:7d95:: with SMTP id y143mr5980516wmc.143.1572535633144; 
+ Thu, 31 Oct 2019 08:27:13 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id v6sm4852003wru.72.2019.10.31.08.27.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 31 Oct 2019 08:27:12 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 756831FF87;
+ Thu, 31 Oct 2019 15:27:11 +0000 (GMT)
+References: <20191031140152.19769-1-philmd@redhat.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH] tests/boot_linux_console: Fetch assets from Debian
+ snapshot archives
+In-reply-to: <20191031140152.19769-1-philmd@redhat.com>
+Date: Thu, 31 Oct 2019 15:27:11 +0000
+Message-ID: <87v9s56ils.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: drjones@redhat.com
-Date: Thu, 31 Oct 2019 08:21:54 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,48 +97,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: m.mizuma@jp.fujitsu.com, peter.maydell@linaro.org,
- beata.michalska@linaro.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, armbru@redhat.com, eric.auger@redhat.com,
- qemu-arm@nongnu.org, imammedo@redhat.com, alex.bennee@linaro.org,
- Dave.Martin@arm.com
+Cc: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org,
+ Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTAzMTE0MjczNC44NTkw
-LTEtZHJqb25lc0ByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
-NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgVEVTVCAgICBpb3Rlc3QtcWNv
-dzI6IDI2OApGYWlsdXJlczogMTYxCkZhaWxlZCAxIG9mIDEwOCBpb3Rlc3RzCm1ha2U6ICoqKiBb
-Y2hlY2stdGVzdHMvY2hlY2stYmxvY2suc2hdIEVycm9yIDEKVHJhY2ViYWNrIChtb3N0IHJlY2Vu
-dCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5weSIsIGxpbmUgNjYy
-LCBpbiA8bW9kdWxlPgogICAgc3lzLmV4aXQobWFpbigpKQotLS0KICAgIHJhaXNlIENhbGxlZFBy
-b2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBD
-b21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2NvbS5x
-ZW11Lmluc3RhbmNlLnV1aWQ9NmFmZjVlOTBmZDExNGM0YThjYzNkNjJkNzgyNmI4N2YnLCAnLXUn
-LCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1ybScs
-ICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9JywgJy1l
-JywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5WPTEn
-LCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hl
-dzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcv
-dmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtd212cDFmYWIvc3JjL2RvY2tlci1zcmMuMjAxOS0x
-MC0zMS0xMS4wOS41NC4xNDU0ODovdmFyL3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3Jywg
-Jy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhp
-dCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9
-NmFmZjVlOTBmZDExNGM0YThjYzNkNjJkNzgyNmI4N2YKbWFrZVsxXTogKioqIFtkb2NrZXItcnVu
-XSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRl
-c3Rlci10bXAtd212cDFmYWIvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0Bj
-ZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDExbTU5LjQyMXMKdXNlciAgICAwbTguMzg1cwoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEw
-MzExNDI3MzQuODU5MC0xLWRyam9uZXNAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0Bj
-ZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBi
-eSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJh
-Y2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+
+> The kernel packaged was fetched from an unstable repository.
+> Use the stable snapshot archive instead.
+>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+> ---
+>  tests/acceptance/boot_linux_console.py | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
+ot_linux_console.py
+> index 4e9ac0ecc3..f5aa87317c 100644
+> --- a/tests/acceptance/boot_linux_console.py
+> +++ b/tests/acceptance/boot_linux_console.py
+> @@ -479,7 +479,8 @@ class BootLinuxConsole(Test):
+>          :avocado: tags=3Darch:m68k
+>          :avocado: tags=3Dmachine:q800
+>          """
+> -        deb_url =3D ('http://ftp.ports.debian.org/debian-ports/pool-m68k=
+/main'
+> +        deb_url =3D ('https://snapshot.debian.org/archive/debian-ports'
+> +                   '/20190922T090906Z/pool-m68k/main'
+>                     '/l/linux/kernel-image-5.2.0-2-m68k-di_5.2.9-2_m68k.u=
+deb')
+>          deb_hash =3D '0797e05129595f22f3c0142db5e199769a723bf9'
+>          deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
+
+
+--
+Alex Benn=C3=A9e
 
