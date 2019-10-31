@@ -2,78 +2,62 @@ Return-Path: <SRS0=5JRQ=YY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C008CA9ECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 16:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F54BCA9ECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 16:29:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97CCF2086D
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 16:28:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RcNXXXvU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97CCF2086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 077B12086D
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 16:29:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 077B12086D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQDIs-0006PA-1L
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 12:28:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33982)
+	id 1iQDK0-00084Q-Gm
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 12:29:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36736)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iQCqP-0003ci-79
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:58:43 -0400
+ (envelope-from <samuel.thibault@gnu.org>) id 1iQD7G-0002Ps-Rz
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 12:16:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iQCqN-00081S-HH
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:58:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49720
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <samuel.thibault@gnu.org>) id 1iQD7F-0003vt-07
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 12:16:06 -0400
+Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:64163)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iQCqN-00080s-A1
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:58:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572537517;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mNLLd2HIRByWcXLj/ZuynJr2+WKUeU0HeIJX7BIfftY=;
- b=RcNXXXvUcbQGNRTZhSFiQn9McuNQTAOMFlOnQJPi/2NDuUsLTIyDltDSQCGXD7MW1owWhv
- R0gY8dh91VHfEPRVtdpIercQrdyRQ19BcLoQirHTDM9+jAT0Ijh45/4pt5ZeDoJTyrl6AV
- 9XUM2olKI6AYUWr60jO8c0WIzCkT3I4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-pyb8ifptPkK48xm0SYQUhA-1; Thu, 31 Oct 2019 11:58:36 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CBCC31005500;
- Thu, 31 Oct 2019 15:58:34 +0000 (UTC)
-Received: from probe.redhat.com (ovpn-126-19.rdu2.redhat.com [10.10.126.19])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 924B3600CD;
- Thu, 31 Oct 2019 15:58:04 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL v2 4/9] bootdevice: Add interface to gather LCHS
-Date: Thu, 31 Oct 2019 11:56:31 -0400
-Message-Id: <20191031155636.18589-5-jsnow@redhat.com>
-In-Reply-To: <20191031155636.18589-1-jsnow@redhat.com>
-References: <20191031155636.18589-1-jsnow@redhat.com>
+ (Exim 4.71) (envelope-from <samuel.thibault@gnu.org>)
+ id 1iQD7E-0003q0-2R
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 12:16:04 -0400
+X-IronPort-AV: E=Sophos;i="5.68,252,1569276000"; d="scan'208";a="409826328"
+Received: from unknown (HELO function) ([193.50.111.121])
+ by mail2-relais-roc.national.inria.fr with ESMTP/TLS/AES256-GCM-SHA384;
+ 31 Oct 2019 17:15:47 +0100
+Received: from samy by function with local (Exim 4.92.3)
+ (envelope-from <samuel.thibault@gnu.org>)
+ id 1iQD6x-0001oB-HA; Thu, 31 Oct 2019 17:15:47 +0100
+Date: Thu, 31 Oct 2019 17:15:47 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+To: Jordi Pujol <jordipujolp@gmail.com>
+Subject: Re: [PATCH v2] smb daemon get additional command line parameters
+ from env variable
+Message-ID: <20191031161547.pipit5hxzjnf6jmt@function>
+References: <CACTE=gpFbUSxXeTwu6_tzSeoh_9Yp905aMdzCPCUz3h7kcgeyw@mail.gmail.com>
+ <144c1b0a-5cd4-b657-025b-f44d5e812e06@vivier.eu>
+ <CACTE=goN=Nw8b5RN8sWhX9mRNWEU0fhuc=HnD3MJW59BET=hkA@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: pyb8ifptPkK48xm0SYQUhA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACTE=goN=Nw8b5RN8sWhX9mRNWEU0fhuc=HnD3MJW59BET=hkA@mail.gmail.com>
+Organization: I am not organized
+User-Agent: NeoMutt/20170609 (1.8.3)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.134.164.83
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,120 +69,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
- "Michael S. Tsirkin" <mst@redhat.com>, libvir-list@redhat.com,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Arbel Moshe <arbel.moshe@oracle.com>, Laszlo Ersek <lersek@redhat.com>,
- "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
- Sam Eiderman <shmuel.eiderman@oracle.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Sam Eiderman <sameid@google.com>,
- Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>,
- Karl Heubaum <karl.heubaum@oracle.com>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>,
+ qemu-devel qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sam Eiderman <shmuel.eiderman@oracle.com>
+Hello,
 
-Add an interface to provide direct logical CHS values for boot devices.
-We will use this interface in the next commits.
+Jordi Pujol, le jeu. 31 oct. 2019 14:33:00 +0100, a ecrit:
+> The smbd daemon takes additional command line options
+> from environment variable SMBDOPTIONS.
+> Set the environment variable SMBDOPTIONS before executing qemu.
+> 
+> Example:
+> 
+> export SMBDOPTIONS="--option='server min protocol=CORE' -d 4"
+> 
+> Signed-off-by: Jordi Pujol Palomer <jordipujolp@gmail.com>
 
-Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
-Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
-Signed-off-by: Sam Eiderman <shmuel.eiderman@oracle.com>
-Signed-off-by: Sam Eiderman <sameid@google.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- include/sysemu/sysemu.h |  3 +++
- bootdevice.c            | 55 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 58 insertions(+)
+> ---
+> --- qemu-4.1-a/net/slirp.c
+> +++ qemu_4.1-b/net/slirp.c
+> @@ -909,6 +909,12 @@ static int slirp_smb(SlirpState* s, cons
+>               CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
+>      g_free(smb_conf);
+> 
+> +    char *options = g_strdup(g_getenv("SMBDOPTIONS"));
 
-diff --git a/include/sysemu/sysemu.h b/include/sysemu/sysemu.h
-index 44f18eb739..5bc5c79cbc 100644
---- a/include/sysemu/sysemu.h
-+++ b/include/sysemu/sysemu.h
-@@ -103,6 +103,9 @@ void device_add_bootindex_property(Object *obj, int32_t=
- *bootindex,
-                                    DeviceState *dev, Error **errp);
- void restore_boot_order(void *opaque);
- void validate_bootdevices(const char *devices, Error **errp);
-+void add_boot_device_lchs(DeviceState *dev, const char *suffix,
-+                          uint32_t lcyls, uint32_t lheads, uint32_t lsecs)=
-;
-+void del_boot_device_lchs(DeviceState *dev, const char *suffix);
-=20
- /* handler to set the boot_device order for a specific type of MachineClas=
-s */
- typedef void QEMUBootSetHandler(void *opaque, const char *boot_order,
-diff --git a/bootdevice.c b/bootdevice.c
-index 1d225202f9..bc5e1c2de4 100644
---- a/bootdevice.c
-+++ b/bootdevice.c
-@@ -343,3 +343,58 @@ void device_add_bootindex_property(Object *obj, int32_=
-t *bootindex,
-     /* initialize devices' bootindex property to -1 */
-     object_property_set_int(obj, -1, name, NULL);
- }
-+
-+typedef struct FWLCHSEntry FWLCHSEntry;
-+
-+struct FWLCHSEntry {
-+    QTAILQ_ENTRY(FWLCHSEntry) link;
-+    DeviceState *dev;
-+    char *suffix;
-+    uint32_t lcyls;
-+    uint32_t lheads;
-+    uint32_t lsecs;
-+};
-+
-+static QTAILQ_HEAD(, FWLCHSEntry) fw_lchs =3D
-+    QTAILQ_HEAD_INITIALIZER(fw_lchs);
-+
-+void add_boot_device_lchs(DeviceState *dev, const char *suffix,
-+                          uint32_t lcyls, uint32_t lheads, uint32_t lsecs)
-+{
-+    FWLCHSEntry *node;
-+
-+    if (!lcyls && !lheads && !lsecs) {
-+        return;
-+    }
-+
-+    assert(dev !=3D NULL || suffix !=3D NULL);
-+
-+    node =3D g_malloc0(sizeof(FWLCHSEntry));
-+    node->suffix =3D g_strdup(suffix);
-+    node->dev =3D dev;
-+    node->lcyls =3D lcyls;
-+    node->lheads =3D lheads;
-+    node->lsecs =3D lsecs;
-+
-+    QTAILQ_INSERT_TAIL(&fw_lchs, node, link);
-+}
-+
-+void del_boot_device_lchs(DeviceState *dev, const char *suffix)
-+{
-+    FWLCHSEntry *i;
-+
-+    if (dev =3D=3D NULL) {
-+        return;
-+    }
-+
-+    QTAILQ_FOREACH(i, &fw_lchs, link) {
-+        if ((!suffix || !g_strcmp0(i->suffix, suffix)) &&
-+             i->dev =3D=3D dev) {
-+            QTAILQ_REMOVE(&fw_lchs, i, link);
-+            g_free(i->suffix);
-+            g_free(i);
-+
-+            break;
-+        }
-+    }
-+}
---=20
-2.21.0
+Why strduping it? you can just use g_getenv.
 
+> +    if (options) {
+> +        smb_cmdline = g_strdup_printf("%s %s", smb_cmdline, options);
+> +    }
+> +    g_free(options);
+> +
+>      if (slirp_add_exec(s->slirp, smb_cmdline, &vserver_addr, 139) < 0 ||
+>          slirp_add_exec(s->slirp, smb_cmdline, &vserver_addr, 445) < 0) {
+>          slirp_smb_cleanup(s);
+> 
+
+> --- qemu-4.1-a/slirp/src/misc.c 2019-10-29 14:40:15.043120941 +0100
+> +++ qemu-4.1-b/slirp/src/misc.c 2019-10-29 14:41:04.440235684 +0100
+
+Please submit this part to https://gitlab.freedesktop.org/slirp/libslirp/
+
+Make sure to note in the changelog that g_shell_parse_argv does only
+tokenization, and no replacement.
+
+Samuel
+
+> @@ -168,7 +168,9 @@ g_spawn_async_with_fds_slirp(const gchar
+>  int fork_exec(struct socket *so, const char *ex)
+>  {
+>      GError *err = NULL;
+> -    char **argv;
+> +    gint argc = 0;
+> +    gchar **argv = NULL;
+> +    gboolean ret;
+>      int opt, sp[2];
+> 
+>      DEBUG_CALL("fork_exec");
+> @@ -179,7 +181,13 @@ int fork_exec(struct socket *so, const c
+>          return 0;
+>      }
+> 
+> -    argv = g_strsplit(ex, " ", -1);
+> +    ret = g_shell_parse_argv(ex, &argc, &argv, &err);
+> +    if (err) {
+> +        g_critical("fork_exec invalid command: %s", err->message);
+> +        g_error_free(err);
+> +        return 0;
+> +    }
+> +
+>      g_spawn_async_with_fds(NULL /* cwd */, argv, NULL /* env */,
+>                             G_SPAWN_SEARCH_PATH, fork_exec_child_setup,
+>                             NULL /* data */, NULL /* child_pid */, sp[1], sp[1],
+> **************************************************
+> 
+> Thanks,
+> 
+> Jordi Pujol
+> 
 
