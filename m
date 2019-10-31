@@ -2,77 +2,86 @@ Return-Path: <SRS0=5JRQ=YY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45AB0CA9ECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 20:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B154CCA9ECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 22:03:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0BC322086D
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 20:47:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oErNy3+C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BC322086D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8297320862
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 22:03:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8297320862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQHLw-00035k-VC
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 16:47:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47544)
+	id 1iQIXb-00029W-Ja
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 18:03:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37293)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1iQEBN-0002ka-4C
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 13:24:26 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iQIWo-0001Zc-4D
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 18:02:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1iQEBL-0004nu-JC
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 13:24:24 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53903)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1iQEBL-0004nS-9f
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 13:24:23 -0400
-Received: by mail-wm1-x341.google.com with SMTP id n7so6776296wmc.3
- for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 10:24:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:from:date:message-id:subject:to:cc;
- bh=hxY2xvCmHkLxQyEFc1Ne/xSaX0XlHc5GnIQ8lQEupv0=;
- b=oErNy3+C1js4Pj3gfC2nFEf6EZrvVk+ImTajXX2I4Hd6cdaVVsf2pqMKiJU67r0V+C
- boq9oM20nh6sDi4geatjqSMcn3SH9+0FfCD65bjA3iJXMPS3Glaz5nNO5uJyZE4PlEc0
- aVW2A5KgPL+lOu2m0PNez/gztEkKT1nS77Fs39CsNvK7N3GpIkQqNWEOkEbLKNlM4IvS
- qKHHyNq49cLyJcR2jy0Y5a+8SBONLez9w71+g2N1Ka8bPaTQwRvoscE05Gsk+QnYTwDh
- afrtUkJX+YOG4PIsdB/LL69DPYVsIT7YgVrMa5UbJi9s8f2BYUADBeHVqvtTPR+y3E6M
- Nrww==
+ (envelope-from <pbonzini@redhat.com>) id 1iQIWl-0001dE-71
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 18:02:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38228)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iQIWk-0001Yx-U5
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 18:02:47 -0400
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id DEC6C86662
+ for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 22:02:44 +0000 (UTC)
+Received: by mail-wm1-f71.google.com with SMTP id g13so3385394wme.0
+ for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 15:02:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
- bh=hxY2xvCmHkLxQyEFc1Ne/xSaX0XlHc5GnIQ8lQEupv0=;
- b=DDSDnLszED5tq+HdFhkC3UEoQTkimdNUCgzPJw4N3ejR78xgynQqBc6OgJP1EKc6t1
- 9rB7YI3uN01Dz9pob6ZGL401yC4FqNTuW/KVa3k7pnPVOPBznAIeKMi3YTNhfNH7/gSh
- PotS1dpgN2nO2Ig/9SH7BlSoDhJZ05p3nnCiCuD2I1pYigkOX0m6XzSH3jdBhei4UOtg
- wx/dcdjaan6SO12xlggb7Go3keOd+MatAmH0z7a9GFBnjKXy0C6WQ6qGAsJFA50Z37OM
- LCeAuTJshyFPRoEtiyMLugaAkqnEWxhu0DVtBG2gOSzt7RgTK0IJrBZsiZfzlo62cM/t
- pQMg==
-X-Gm-Message-State: APjAAAXngXHhw1jjpI4wcex8xfmWyvvzcHLXDzoyBhafBbtf3XLUsO5u
- 0O+rMjDP91QRYRuJyXCIuaEuFoyN+HgPVgsqMEHSbMdu6Ws=
-X-Google-Smtp-Source: APXvYqzdC3qjqMp85y7gajwXs4h88uwysW6YEJYbZbsgIUuOXFOsNOETaOMEN1NuA4bPLZeUu0nKJvSTyGfj+n8zLiE=
-X-Received: by 2002:a05:600c:292:: with SMTP id
- 18mr2929977wmk.67.1572542661262; 
- Thu, 31 Oct 2019 10:24:21 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=G96KzkBpz20D8yIQuubdOk1zfA8zE1BeMfmMPleZ6r8=;
+ b=n7Sx6Rs2aUlct4WPw+epFr0qPpuscnUvgQI8auu8HzGYGNTPOXtWHQlU8VNHkFi9i0
+ qmDQ7R0oqOGvVNfnEgckWpIIHglezBCJaQJy1522fKeeKMftmUXFadflMgVjUaysrKyc
+ gkRZVf8LXWVMzAkSQ5EjWS7hS4HZyI4wFuwIdFONXDWA9Ejlmi41dcWXX3PbQlz2uKql
+ qpYPyfRmVvicHbmOoqHrnEMqJUeblQqDwmmMfmAZlERS+PlUzzguIEm2zcWAkk7QTwCC
+ fk2ijyww92KVuQExSv+LhP4hGjzaW68+n/HApMiEyC/Kqi2CsbHtFMvJXB13EvkXXATQ
+ f3+w==
+X-Gm-Message-State: APjAAAVJFIQMBikoW3s6z8BF/7NFEFxuk6WJF396ICkShWcefayOqdEj
+ D7p5xwnikHiHmj0wiPuw6a3+0f2D6ws4kTT/BZ5U5ztD6bRZ2CxY1dPKbg6Huk3NZBGxSncQnib
+ 9SZGAls7AcjsEyXs=
+X-Received: by 2002:a5d:448f:: with SMTP id j15mr7441119wrq.70.1572559363405; 
+ Thu, 31 Oct 2019 15:02:43 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqws+A4KJb1Pm2fMt9+tBSZh4O0wmtpSfUmaACc8sZ+xS1hVZawWR36d264AviYJ7sPNZBgbJQ==
+X-Received: by 2002:a5d:448f:: with SMTP id j15mr7441080wrq.70.1572559363028; 
+ Thu, 31 Oct 2019 15:02:43 -0700 (PDT)
+Received: from [192.168.20.72] (94.222.26.109.rev.sfr.net. [109.26.222.94])
+ by smtp.gmail.com with ESMTPSA id w17sm5695064wra.34.2019.10.31.15.02.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 31 Oct 2019 15:02:42 -0700 (PDT)
+Subject: Re: [PULL 1/9] IDE: deprecate ide-drive
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20191031105904.12194-1-jsnow@redhat.com>
+ <20191031105904.12194-2-jsnow@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <c688f160-e10e-52d1-5a54-881dd86987d4@redhat.com>
+Date: Thu, 31 Oct 2019 23:02:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-From: Robert Foley <robert.foley@linaro.org>
-Date: Thu, 31 Oct 2019 13:24:10 -0400
-Message-ID: <CAEyhzFtb6Gn86VkR+BXbUPsHLtfbjDwotwZXDVyLCMjbrTXWrA@mail.gmail.com>
-Subject: logfile issue
-To: qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
-X-Mailman-Approved-At: Thu, 31 Oct 2019 16:44:58 -0400
+In-Reply-To: <20191031105904.12194-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,109 +93,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Peter Puhov <peter.puhov@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Thomas Huth <thuth@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ libvir-list@redhat.com, Laszlo Ersek <lersek@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We hit an issue when trying to change the log file from the monitor
-console.  The root of the issue here is that the qemu_logfile handle
-is not thread safe.  So when we try to close the file, we end up with
-a seg fault.  The full analysis is below along with some possible
-solutions.
-Will plan to post a patch soon, but any comments or opinions on our
-proposed solution would be appreciated.  Thanks.
+On 31/10/19 11:58, John Snow wrote:
+> It's an old compatibility shim that just delegates to ide-cd or ide-hd.
+> I'd like to refactor these some day, and getting rid of the super-object
+> will make that easier.
+> 
+> Either way, we don't need this.
 
-The version of QEMU we are using is: master as of about Oct 15,
-9020e9526cd08c4dc99d54dba48730de2908c970.
+Good idea.  I will prepare a similar patch for scsi-disk, even though
+technically we're already in soft freeze; it makes no sense to deprecate
+only one of the two.
 
-This is what we did to reproduce the issue.
-First we enable logging and select the log file.
-(qemu) log in_asm,out_asm,op
-(qemu) logfile asm.out
+Paolo
 
-Then we start this command in the guest.  This just keeps the guest
-performing operations that result in logging to be constantly
-generated.
-$ for i in {0..1000}; do ls -l; done
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> ACKed-by: Peter Krempa <pkrempa@redhat.com>
+> Message-id: 20191009224303.10232-2-jsnow@redhat.com
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  qemu-deprecated.texi          | 5 +++++
+>  hw/ide/qdev.c                 | 3 +++
+>  tests/qemu-iotests/051.pc.out | 6 ++++--
+>  3 files changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
+> index f727bd3932..296bfc93a3 100644
+> --- a/qemu-deprecated.texi
+> +++ b/qemu-deprecated.texi
+> @@ -254,6 +254,11 @@ quite a bit. It will be removed without replacement unless some users speaks
+>  up at the @email{qemu-devel@@nongnu.org} mailing list with information about
+>  their usecases.
+>  
+> +@subsection ide-drive (since 4.2)
+> +
+> +The 'ide-drive' device is deprecated. Users should use 'ide-hd' or
+> +'ide-cd' as appropriate to get an IDE hard disk or CD-ROM as needed.
+> +
+>  @section System emulator machines
+>  
+>  @subsection pc-0.12, pc-0.13, pc-0.14 and pc-0.15 (since 4.0)
+> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+> index 6fba6b62b8..3666e59721 100644
+> --- a/hw/ide/qdev.c
+> +++ b/hw/ide/qdev.c
+> @@ -279,6 +279,9 @@ static void ide_drive_realize(IDEDevice *dev, Error **errp)
+>  {
+>      DriveInfo *dinfo = NULL;
+>  
+> +    warn_report("'ide-drive' is deprecated, "
+> +                "please use 'ide-hd' or 'ide-cd' instead");
+> +
+>      if (dev->conf.blk) {
+>          dinfo = blk_legacy_dinfo(dev->conf.blk);
+>      }
+> diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
+> index 000557c7c8..34849dd172 100644
+> --- a/tests/qemu-iotests/051.pc.out
+> +++ b/tests/qemu-iotests/051.pc.out
+> @@ -158,7 +158,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+>  
+>  Testing: -drive if=none,id=disk -device ide-drive,drive=disk
+>  QEMU X.Y.Z monitor - type 'help' for more information
+> -(qemu) QEMU_PROG: -device ide-drive,drive=disk: Device needs media, but drive is empty
+> +(qemu) QEMU_PROG: -device ide-drive,drive=disk: warning: 'ide-drive' is deprecated, please use 'ide-hd' or 'ide-cd' instead
+> +QEMU_PROG: -device ide-drive,drive=disk: Device needs media, but drive is empty
+>  
+>  Testing: -drive if=none,id=disk -device ide-hd,drive=disk
+>  QEMU X.Y.Z monitor - type 'help' for more information
+> @@ -228,7 +229,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+>  
+>  Testing: -drive file=TEST_DIR/t.qcow2,if=none,id=disk,readonly=on -device ide-drive,drive=disk
+>  QEMU X.Y.Z monitor - type 'help' for more information
+> -(qemu) QEMU_PROG: -device ide-drive,drive=disk: Block node is read-only
+> +(qemu) QEMU_PROG: -device ide-drive,drive=disk: warning: 'ide-drive' is deprecated, please use 'ide-hd' or 'ide-cd' instead
+> +QEMU_PROG: -device ide-drive,drive=disk: Block node is read-only
+>  
+>  Testing: -drive file=TEST_DIR/t.qcow2,if=none,id=disk,readonly=on -device ide-hd,drive=disk
+>  QEMU X.Y.Z monitor - type 'help' for more information
+> 
 
-Next we switch to the monitor console and change the file.
-(qemu) logfile asm_new.log
-
-This action causes a seg fault.  Please see the stack trace (below).
-
-The code, which changes the log file unconditionally
-(qemu_set_log_filename()), closes the qemu_logfile, sets it to NULL,
-and then opens the new file.
-Since the file handle is still in use, we end up with a seg fault when
-the code which is trying to log ends up using a NULL file handle.
-
-We are considering a few solutions.
-
-A straightforward solution would be to simply prevent the file from
-being changed while logging is enabled.  In other words, force the
-user to first disable logging before changing the log file.
-This solution seems to cover the general case.  However, if a user
-were to disable logging and change the log file in quick succession,
-we would still be subject to a similar race.  A log call could still
-make it through the logging enable check and proceed to use a file
-handle that gets changed to NULL.
-
-Another option is to add a mutex to prevent the qemu_logfile handle
-from being changed while it is in use.  This certainly works and has
-the advantage of being fairly straightforward.  Also we are thinking
-that since the mutex would only be used when logging is enabled it has
-the advantage of not having an effect on the normal case performance.
-Another option is to implement a simple atomic ref count and prevent
-the file from being changed while there are outstanding references.
-
-We are leaning towards the mutex option, and plan to post a patch
-soon, but would appreciate comments or opinions on this solution.
-
-Thanks,
-Rob Foley
-
-stack trace
-==========================================
-Thread 10 "qemu-system-aar" received signal SIGSEGV, Segmentation fault.
-[Switching to Thread 0xffff113f9d90 (LWP 9493)] __flockfile
-(stream=0x0) at ../sysdeps/pthread/flockfile.c:27
-27 ../sysdeps/pthread/flockfile.c: No such file or directory.
-(gdb) bt
-#0  __flockfile (stream=0x0) at ../sysdeps/pthread/flockfile.c:27
-#1  0x0000aaaae0fac8b8 in qemu_flockfile (f=<optimized out>) at
-/home/rob/qemu/qemu_unchanged/include/sysemu/os-posix.h:87
-#2  qemu_log_lock () at /home/rob/qemu/qemu_unchanged/include/qemu/log.h:57
-#3  translator_loop (ops=0xaaaae17f1348 <aarch64_translator_ops>,
-db=0xffff113f9088, db@entry=0xffff113f9098,
-cpu=cpu@entry=0xaaab0a52bc50,
-    tb=tb@entry=0xffff4c92d000 <code_gen_buffer+814927796>,
-max_insns=max_insns@entry=512) at
-/home/rob/qemu/qemu_unchanged/accel/tcg/translator.c:121
-#4  0x0000aaaae10c1c18 in gen_intermediate_code
-(cpu=cpu@entry=0xaaab0a52bc50, tb=tb@entry=0xffff4c92d000
-<code_gen_buffer+814927796>, max_insns=max_insns@entry=512)
-    at /home/rob/qemu/qemu_unchanged/target/arm/translate.c:11320
-#5  0x0000aaaae0fab248 in tb_gen_code (cpu=0xaaab0a52bc50,
-cpu@entry=0xffffabe2a000, pc=187650897458448, cs_base=65536,
-flags=43690, cflags=-16252928, cflags@entry=524288)
-    at /home/rob/qemu/qemu_unchanged/accel/tcg/translate-all.c:1738
-#6  0x0000aaaae0fa8e74 in tb_find (cf_mask=524288, tb_exit=0,
-last_tb=0xffff4c92cc40 <code_gen_buffer+814926836>,
-cpu=0xffffabe2a000)
-    at /home/rob/qemu/qemu_unchanged/accel/tcg/cpu-exec.c:408
-#7  cpu_exec (cpu=0xffffabe2a000, cpu@entry=0xaaab0a52bc50) at
-/home/rob/qemu/qemu_unchanged/accel/tcg/cpu-exec.c:730
-#8  0x0000aaaae0f6de24 in tcg_cpu_exec (cpu=0xaaab0a52bc50) at
-/home/rob/qemu/qemu_unchanged/cpus.c:1454
-#9  0x0000aaaae0f70908 in qemu_tcg_cpu_thread_fn (arg=0xaaab0a52bc50)
-at /home/rob/qemu/qemu_unchanged/cpus.c:1762
-#10 0x0000aaaae145bd38 in qemu_thread_start (args=<optimized out>) at
-/home/rob/qemu/qemu_unchanged/util/qemu-thread-posix.c:519
-#11 0x0000ffffabe0a088 in start_thread (arg=0xffffcc20410f) at
-pthread_create.c:463
-#12 0x0000ffffabd7a4ec in thread_start () at
-../sysdeps/unix/sysv/linux/aarch64/clone.S:78
 
