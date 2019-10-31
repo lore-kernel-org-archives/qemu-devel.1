@@ -2,82 +2,80 @@ Return-Path: <SRS0=5JRQ=YY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B411CA9ECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 14:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4410CA9ECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 14:38:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 601ED20873
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 14:36:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D31320873
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 14:38:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ymyx8Hng"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 601ED20873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R7m/FTsV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D31320873
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQBYX-0002Yl-Sx
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 10:36:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38726)
+	id 1iQBaa-0005r3-6Z
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 10:38:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48167)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jordipujolp@gmail.com>) id 1iQAZf-0000Qk-46
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 09:33:17 -0400
+ (envelope-from <drjones@redhat.com>) id 1iQBUz-0007Tw-RP
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 10:32:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jordipujolp@gmail.com>) id 1iQAZd-0003P3-EM
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 09:33:14 -0400
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39702)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jordipujolp@gmail.com>)
- id 1iQAZd-0003NY-7q
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 09:33:13 -0400
-Received: by mail-ot1-x344.google.com with SMTP id t8so5374819otl.6
- for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 06:33:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=b8WfBtkBYtvhtzdH/YlQo1f41oCGaEAOJrce5DObJnE=;
- b=Ymyx8HngulfzMbl1rJSGHP6J9Z/eFR98WP0bc7PRhElUI4jwl1knWKiGLpDXQVcpVv
- lNN7C4urxvPNbJPd8wQUhbmVlhZJ4W6x27q+Saw10BQQMOFKAvRdzwN4oWje70RYoxQY
- 54ShoWDOFDGXpwb5SVSRNFnVmHEerlAuQmV4nRbBmFL9aBtFXxoQY0ZMW6fREiSYFfg7
- cYvGOvLEPjzewTLfrhS+cZopbR74zQ5qUIU8xV7+aXDl6+c8jQakRyNK9ihl+6R8BF+p
- xUhyFYCcmrlkcdJUAW0COldlZRk0TRS52hZaNdeX2Q+SF3doAQ4OwAlYV20+o9UwL2RF
- nveA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=b8WfBtkBYtvhtzdH/YlQo1f41oCGaEAOJrce5DObJnE=;
- b=HEu89/XrHY0PFZM9uT/HmYjrg6KDNoDUcK+QbpZ7F/PI472QSlkXZQ5dneZDj6j79w
- RtiOYjkjtflgcN5VaZ4o35cq6ZRL93vfXRfbPGlAJl7QtVJKnMHHJNnX/xZjZBBLuCSq
- 2yEZCOnspkpoQGvaeNo60r3BtQ+t8XDrNwp5WQVSM8yvWaQtL+Hg7Wc/FgevajpgcYX3
- YPpE1VrHvt4CwspWt8tTLwVxXMNFi5Y9J6uFiNWR4X7fyayZ3HBnYzHngLnCPKQWBqEE
- aFYzE/I+N2qYkkVskVxbL1L/Dnfb6MKTZkSf4lVTyCfkLxapxzixugU1X1t7CN6+LgET
- Ff6A==
-X-Gm-Message-State: APjAAAX8zxiDbj3BpEyaJzV9cGR7E9Ls5wAKW7s3FwWttGZlZr5bt7xs
- mOCIe/25GkfbwhjAPz0LoITTts4vp9L+zo/lcQw=
-X-Google-Smtp-Source: APXvYqylmvb8E1R4P8eRGlkJjAPvSas9NPaqPsPD2g/kze3rpGCVG353yAdPzqzkmAU38t4GRI28au16npT2v7lovk0=
-X-Received: by 2002:a9d:600b:: with SMTP id h11mr4737614otj.334.1572528791917; 
- Thu, 31 Oct 2019 06:33:11 -0700 (PDT)
+ (envelope-from <drjones@redhat.com>) id 1iQBUt-00035z-Ga
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 10:32:29 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:50653
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <drjones@redhat.com>) id 1iQBUt-00030s-8J
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 10:32:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572532341;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RF3bpFJgksa/o9KaTQGK5jUyGdJviwwTTLfHNgFhIWU=;
+ b=R7m/FTsVpMRe56PqcV2UuxOjdc+8NNDu5goQUmedp7q+Vke16K+NKZs0twtZJQes87x9Jh
+ r0mnb9o/MnAMKYfyWWoQ4S8NOwNbTkPKC0BZcEzvA5Hg9oVsptGBcSsXSDUkDxvQmKP7xQ
+ HckuoswHVNejiG9MLGBPdzHqED2d3u8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-236-1VIaLSlbMl6mVPEFUUtyXg-1; Thu, 31 Oct 2019 10:32:16 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D28191800D6B;
+ Thu, 31 Oct 2019 14:32:14 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (ovpn-117-53.ams2.redhat.com
+ [10.36.117.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7584860872;
+ Thu, 31 Oct 2019 14:30:37 +0000 (UTC)
+From: Andrew Jones <drjones@redhat.com>
+To: qemu-devel@nongnu.org,
+	qemu-arm@nongnu.org,
+	peter.maydell@linaro.org
+Subject: [PATCH v8 2/9] tests: arm: Introduce cpu feature tests
+Date: Thu, 31 Oct 2019 15:27:27 +0100
+Message-Id: <20191031142734.8590-3-drjones@redhat.com>
+In-Reply-To: <20191031142734.8590-1-drjones@redhat.com>
+References: <20191031142734.8590-1-drjones@redhat.com>
 MIME-Version: 1.0
-References: <CACTE=gpFbUSxXeTwu6_tzSeoh_9Yp905aMdzCPCUz3h7kcgeyw@mail.gmail.com>
- <144c1b0a-5cd4-b657-025b-f44d5e812e06@vivier.eu>
-In-Reply-To: <144c1b0a-5cd4-b657-025b-f44d5e812e06@vivier.eu>
-From: Jordi Pujol <jordipujolp@gmail.com>
-Date: Thu, 31 Oct 2019 14:33:00 +0100
-Message-ID: <CACTE=goN=Nw8b5RN8sWhX9mRNWEU0fhuc=HnD3MJW59BET=hkA@mail.gmail.com>
-Subject: Re: [PATCH v2] smb daemon get additional command line parameters from
- env variable
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
-X-Mailman-Approved-At: Thu, 31 Oct 2019 10:28:18 -0400
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: 1VIaLSlbMl6mVPEFUUtyXg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,83 +87,327 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Jason Wang <jasowang@redhat.com>,
- qemu-devel qemu-devel <qemu-devel@nongnu.org>,
- Jan Kiszka <jan.kiszka@siemens.com>
+Cc: m.mizuma@jp.fujitsu.com, beata.michalska@linaro.org,
+ richard.henderson@linaro.org, armbru@redhat.com, eric.auger@redhat.com,
+ imammedo@redhat.com, alex.bennee@linaro.org, Dave.Martin@arm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello,
+Now that Arm CPUs have advertised features lets add tests to ensure
+we maintain their expected availability with and without KVM.
 
-Many thanks Laurent,
-
-This is the version 2 of this patch, has been modified according to
-the qemu guidelines.
-
-**************************************************
-From: Jordi Pujol Palomer <jordipujolp@gmail.com>
-Date: Thu, 31 Oct 2019 14:31:14 +0200
-Subject: [PATCH v2] QEMU samba daemon: additional command line options
-
-The smbd daemon takes additional command line options
-from environment variable SMBDOPTIONS.
-Set the environment variable SMBDOPTIONS before executing qemu.
-
-Example:
-
-export SMBDOPTIONS="--option='server min protocol=CORE' -d 4"
-
-Signed-off-by: Jordi Pujol Palomer <jordipujolp@gmail.com>
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 ---
---- qemu-4.1-a/net/slirp.c
-+++ qemu_4.1-b/net/slirp.c
-@@ -909,6 +909,12 @@ static int slirp_smb(SlirpState* s, cons
-              CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
-     g_free(smb_conf);
+ tests/Makefile.include   |   5 +-
+ tests/arm-cpu-features.c | 253 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 257 insertions(+), 1 deletion(-)
+ create mode 100644 tests/arm-cpu-features.c
 
-+    char *options = g_strdup(g_getenv("SMBDOPTIONS"));
-+    if (options) {
-+        smb_cmdline = g_strdup_printf("%s %s", smb_cmdline, options);
-+    }
-+    g_free(options);
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 7715d8cd63ad..55f7bf9eef7c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -262,6 +262,7 @@ check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) =3D tests/end=
+ianness-test$(EXESUF)
+ check-qtest-sparc64-y +=3D tests/prom-env-test$(EXESUF)
+ check-qtest-sparc64-y +=3D tests/boot-serial-test$(EXESUF)
+=20
++check-qtest-arm-y +=3D tests/arm-cpu-features$(EXESUF)
+ check-qtest-arm-y +=3D tests/microbit-test$(EXESUF)
+ check-qtest-arm-y +=3D tests/m25p80-test$(EXESUF)
+ check-qtest-arm-y +=3D tests/test-arm-mptimer$(EXESUF)
+@@ -269,7 +270,8 @@ check-qtest-arm-y +=3D tests/boot-serial-test$(EXESUF)
+ check-qtest-arm-y +=3D tests/hexloader-test$(EXESUF)
+ check-qtest-arm-$(CONFIG_PFLASH_CFI02) +=3D tests/pflash-cfi02-test$(EXESU=
+F)
+=20
+-check-qtest-aarch64-y =3D tests/numa-test$(EXESUF)
++check-qtest-aarch64-y +=3D tests/arm-cpu-features$(EXESUF)
++check-qtest-aarch64-y +=3D tests/numa-test$(EXESUF)
+ check-qtest-aarch64-y +=3D tests/boot-serial-test$(EXESUF)
+ check-qtest-aarch64-y +=3D tests/migration-test$(EXESUF)
+ # TODO: once aarch64 TCG is fixed on ARM 32 bit host, make test unconditio=
+nal
+@@ -841,6 +843,7 @@ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $=
+(test-util-obj-y)
+ tests/numa-test$(EXESUF): tests/numa-test.o
+ tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o test=
+s/acpi-utils.o
+ tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libqos=
+-obj-y)
++tests/arm-cpu-features$(EXESUF): tests/arm-cpu-features.o
+=20
+ tests/migration/stress$(EXESUF): tests/migration/stress.o
+ =09$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,=
+"LINK","$(TARGET_DIR)$@")
+diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
+new file mode 100644
+index 000000000000..6ebb03d7ad67
+--- /dev/null
++++ b/tests/arm-cpu-features.c
+@@ -0,0 +1,253 @@
++/*
++ * Arm CPU feature test cases
++ *
++ * Copyright (c) 2019 Red Hat Inc.
++ * Authors:
++ *  Andrew Jones <drjones@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or late=
+r.
++ * See the COPYING file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qjson.h"
 +
-     if (slirp_add_exec(s->slirp, smb_cmdline, &vserver_addr, 139) < 0 ||
-         slirp_add_exec(s->slirp, smb_cmdline, &vserver_addr, 445) < 0) {
-         slirp_smb_cleanup(s);
-
---- qemu-4.1-a/slirp/src/misc.c 2019-10-29 14:40:15.043120941 +0100
-+++ qemu-4.1-b/slirp/src/misc.c 2019-10-29 14:41:04.440235684 +0100
-@@ -168,7 +168,9 @@ g_spawn_async_with_fds_slirp(const gchar
- int fork_exec(struct socket *so, const char *ex)
- {
-     GError *err = NULL;
--    char **argv;
-+    gint argc = 0;
-+    gchar **argv = NULL;
-+    gboolean ret;
-     int opt, sp[2];
-
-     DEBUG_CALL("fork_exec");
-@@ -179,7 +181,13 @@ int fork_exec(struct socket *so, const c
-         return 0;
-     }
-
--    argv = g_strsplit(ex, " ", -1);
-+    ret = g_shell_parse_argv(ex, &argc, &argv, &err);
-+    if (err) {
-+        g_critical("fork_exec invalid command: %s", err->message);
-+        g_error_free(err);
-+        return 0;
++#define MACHINE     "-machine virt,gic-version=3Dmax,accel=3Dtcg "
++#define MACHINE_KVM "-machine virt,gic-version=3Dmax,accel=3Dkvm:tcg "
++#define QUERY_HEAD  "{ 'execute': 'query-cpu-model-expansion', " \
++                    "  'arguments': { 'type': 'full', "
++#define QUERY_TAIL  "}}"
++
++static bool kvm_enabled(QTestState *qts)
++{
++    QDict *resp, *qdict;
++    bool enabled;
++
++    resp =3D qtest_qmp(qts, "{ 'execute': 'query-kvm' }");
++    g_assert(qdict_haskey(resp, "return"));
++    qdict =3D qdict_get_qdict(resp, "return");
++    g_assert(qdict_haskey(qdict, "enabled"));
++    enabled =3D qdict_get_bool(qdict, "enabled");
++    qobject_unref(resp);
++
++    return enabled;
++}
++
++static QDict *do_query_no_props(QTestState *qts, const char *cpu_type)
++{
++    return qtest_qmp(qts, QUERY_HEAD "'model': { 'name': %s }"
++                          QUERY_TAIL, cpu_type);
++}
++
++static QDict *do_query(QTestState *qts, const char *cpu_type,
++                       const char *fmt, ...)
++{
++    QDict *resp;
++
++    if (fmt) {
++        QDict *args;
++        va_list ap;
++
++        va_start(ap, fmt);
++        args =3D qdict_from_vjsonf_nofail(fmt, ap);
++        va_end(ap);
++
++        resp =3D qtest_qmp(qts, QUERY_HEAD "'model': { 'name': %s, "
++                                                    "'props': %p }"
++                              QUERY_TAIL, cpu_type, args);
++    } else {
++        resp =3D do_query_no_props(qts, cpu_type);
 +    }
 +
-     g_spawn_async_with_fds(NULL /* cwd */, argv, NULL /* env */,
-                            G_SPAWN_SEARCH_PATH, fork_exec_child_setup,
-                            NULL /* data */, NULL /* child_pid */, sp[1], sp[1],
-**************************************************
++    return resp;
++}
++
++static const char *resp_get_error(QDict *resp)
++{
++    QDict *qdict;
++
++    g_assert(resp);
++
++    qdict =3D qdict_get_qdict(resp, "error");
++    if (qdict) {
++        return qdict_get_str(qdict, "desc");
++    }
++
++    return NULL;
++}
++
++#define assert_error(qts, cpu_type, expected_error, fmt, ...)          \
++({                                                                     \
++    QDict *_resp;                                                      \
++    const char *_error;                                                \
++                                                                       \
++    _resp =3D do_query(qts, cpu_type, fmt, ##__VA_ARGS__);               \
++    g_assert(_resp);                                                   \
++    _error =3D resp_get_error(_resp);                                    \
++    g_assert(_error);                                                  \
++    g_assert(g_str_equal(_error, expected_error));                     \
++    qobject_unref(_resp);                                              \
++})
++
++static bool resp_has_props(QDict *resp)
++{
++    QDict *qdict;
++
++    g_assert(resp);
++
++    if (!qdict_haskey(resp, "return")) {
++        return false;
++    }
++    qdict =3D qdict_get_qdict(resp, "return");
++
++    if (!qdict_haskey(qdict, "model")) {
++        return false;
++    }
++    qdict =3D qdict_get_qdict(qdict, "model");
++
++    return qdict_haskey(qdict, "props");
++}
++
++static QDict *resp_get_props(QDict *resp)
++{
++    QDict *qdict;
++
++    g_assert(resp);
++    g_assert(resp_has_props(resp));
++
++    qdict =3D qdict_get_qdict(resp, "return");
++    qdict =3D qdict_get_qdict(qdict, "model");
++    qdict =3D qdict_get_qdict(qdict, "props");
++
++    return qdict;
++}
++
++#define assert_has_feature(qts, cpu_type, feature)                     \
++({                                                                     \
++    QDict *_resp =3D do_query_no_props(qts, cpu_type);                   \
++    g_assert(_resp);                                                   \
++    g_assert(resp_has_props(_resp));                                   \
++    g_assert(qdict_get(resp_get_props(_resp), feature));               \
++    qobject_unref(_resp);                                              \
++})
++
++#define assert_has_not_feature(qts, cpu_type, feature)                 \
++({                                                                     \
++    QDict *_resp =3D do_query_no_props(qts, cpu_type);                   \
++    g_assert(_resp);                                                   \
++    g_assert(!resp_has_props(_resp) ||                                 \
++             !qdict_get(resp_get_props(_resp), feature));              \
++    qobject_unref(_resp);                                              \
++})
++
++static void assert_type_full(QTestState *qts)
++{
++    const char *error;
++    QDict *resp;
++
++    resp =3D qtest_qmp(qts, "{ 'execute': 'query-cpu-model-expansion', "
++                            "'arguments': { 'type': 'static', "
++                                           "'model': { 'name': 'foo' }}}")=
+;
++    g_assert(resp);
++    error =3D resp_get_error(resp);
++    g_assert(error);
++    g_assert(g_str_equal(error,
++                         "The requested expansion type is not supported"))=
+;
++    qobject_unref(resp);
++}
++
++static void assert_bad_props(QTestState *qts, const char *cpu_type)
++{
++    const char *error;
++    QDict *resp;
++
++    resp =3D qtest_qmp(qts, "{ 'execute': 'query-cpu-model-expansion', "
++                            "'arguments': { 'type': 'full', "
++                                           "'model': { 'name': %s, "
++                                                      "'props': false }}}"=
+,
++                     cpu_type);
++    g_assert(resp);
++    error =3D resp_get_error(resp);
++    g_assert(error);
++    g_assert(g_str_equal(error,
++                         "Invalid parameter type for 'props', expected: di=
+ct"));
++    qobject_unref(resp);
++}
++
++static void test_query_cpu_model_expansion(const void *data)
++{
++    QTestState *qts;
++
++    qts =3D qtest_init(MACHINE "-cpu max");
++
++    /* Test common query-cpu-model-expansion input validation */
++    assert_type_full(qts);
++    assert_bad_props(qts, "max");
++    assert_error(qts, "foo", "The CPU type 'foo' is not a recognized "
++                 "ARM CPU type", NULL);
++    assert_error(qts, "max", "Parameter 'not-a-prop' is unexpected",
++                 "{ 'not-a-prop': false }");
++    assert_error(qts, "host", "The CPU type 'host' requires KVM", NULL);
++
++    /* Test expected feature presence/absence for some cpu types */
++    assert_has_feature(qts, "max", "pmu");
++    assert_has_feature(qts, "cortex-a15", "pmu");
++    assert_has_not_feature(qts, "cortex-a15", "aarch64");
++
++    if (g_str_equal(qtest_get_arch(), "aarch64")) {
++        assert_has_feature(qts, "max", "aarch64");
++        assert_has_feature(qts, "cortex-a57", "pmu");
++        assert_has_feature(qts, "cortex-a57", "aarch64");
++
++        /* Test that features that depend on KVM generate errors without. =
+*/
++        assert_error(qts, "max",
++                     "'aarch64' feature cannot be disabled "
++                     "unless KVM is enabled and 32-bit EL1 "
++                     "is supported",
++                     "{ 'aarch64': false }");
++    }
++
++    qtest_quit(qts);
++}
++
++static void test_query_cpu_model_expansion_kvm(const void *data)
++{
++    QTestState *qts;
++
++    qts =3D qtest_init(MACHINE_KVM "-cpu max");
++
++    /*
++     * These tests target the 'host' CPU type, so KVM must be enabled.
++     */
++    if (!kvm_enabled(qts)) {
++        qtest_quit(qts);
++        return;
++    }
++
++    if (g_str_equal(qtest_get_arch(), "aarch64")) {
++        assert_has_feature(qts, "host", "aarch64");
++        assert_has_feature(qts, "host", "pmu");
++
++        assert_error(qts, "cortex-a15",
++            "We cannot guarantee the CPU type 'cortex-a15' works "
++            "with KVM on this host", NULL);
++    } else {
++        assert_has_not_feature(qts, "host", "aarch64");
++        assert_has_not_feature(qts, "host", "pmu");
++    }
++
++    qtest_quit(qts);
++}
++
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_data_func("/arm/query-cpu-model-expansion",
++                        NULL, test_query_cpu_model_expansion);
++    qtest_add_data_func("/arm/kvm/query-cpu-model-expansion",
++                        NULL, test_query_cpu_model_expansion_kvm);
++
++    return g_test_run();
++}
+--=20
+2.21.0
 
-Thanks,
-
-Jordi Pujol
 
