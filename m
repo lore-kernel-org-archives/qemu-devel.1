@@ -2,90 +2,156 @@ Return-Path: <SRS0=5JRQ=YY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0041ACA9ECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE99CA9ECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:54:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79937208E3
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 667812087F
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:54:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YYnpFfVy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79937208E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CLna6Sfn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 667812087F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51704 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQCUQ-00065k-BU
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 11:35:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56388)
+	id 1iQCmk-0006eG-8n
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 11:54:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59145)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iQCM4-0000rQ-5i
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:27:21 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iQCeC-0004kd-F4
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:46:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iQCM1-0002Rm-Cx
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:27:18 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51037)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iQCLz-0002Qo-Ri
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:27:16 -0400
-Received: by mail-wm1-x343.google.com with SMTP id 11so6390562wmk.0
- for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 08:27:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=jom4OL7ujMFgl2s8HtwZwKYMiD3VbMFW1UdG7Ehq5Ec=;
- b=YYnpFfVyAB99nP0RBzALunnGN6zvSbH7vPQRQGBhyDcGJ7RSof5WdZBnj1e8jOlz4W
- hVp0sT+kYuidEc7F1jiFOnaclV53eqvEOAk860Ff+DnneZnPHv8RaPTnpdKvK8RORiSO
- nRjQRR17wiKZJZKxkcFNTuE9WpCnkR0wKXiaEHbgYOzZOZDhWtIVRfd+ZaJz322crmi8
- CTG2e3Qiqst2shqOC3C/YTULMVRqxSyl2Dvdxv8YKx/RS1NUA1OaxkTNF/C4+dXH5Y92
- XXOOBuosWaTTkNFrCOCM3ewieirtqngozpinavFUy07OXgr/RuKBcxMSIzrAK9LGBOtI
- pIJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=jom4OL7ujMFgl2s8HtwZwKYMiD3VbMFW1UdG7Ehq5Ec=;
- b=ZLPsVEU99xilXdhIkClG29JvD0aTByeh7qtFYZhDsp6QbiEEqJox1YSCvC/pRXqK/I
- 6JcZQeSUNgCmrvIvRI/+vEKJETBl4b7DkTgPmBPS2/3Z2Juglo9WSYaL1x2d+wyb6Xj+
- vkQ9Jv0RtE7mWTdOtJyyxSkwEW91Amh2TgI2yfBJ+JkoFrlHHpSXsAuoGvAxvhCq25Wb
- /GfLCiEJ6vKnDxEauv3rxJjv24z5UGINaORKJyxxrZz49kjS85pMY6ICAJ/INqKnS4yF
- RUcHKFE3+91nTt8cHda8B/g/8aL3/PYyjY0/O/Yx0U5qCPjKMbr83rNRIJMaBzpihdVY
- 9+Ww==
-X-Gm-Message-State: APjAAAXS5DqL3pRsOSuzXUefnSFgcxpCpXot14+4fpMS80qSkr6SC26u
- GmfdiIMkgx0KkL0uRGKfXEKyk/6KWG2AGQ==
-X-Google-Smtp-Source: APXvYqwrQJwDmbSEPECQOdf+hUkTlUDhqhvSkwdiCC1xI7A2R169BiQtEQt0k2y28X4r837QNMZl0g==
-X-Received: by 2002:a1c:7d95:: with SMTP id y143mr5980516wmc.143.1572535633144; 
- Thu, 31 Oct 2019 08:27:13 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v6sm4852003wru.72.2019.10.31.08.27.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 31 Oct 2019 08:27:12 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 756831FF87;
- Thu, 31 Oct 2019 15:27:11 +0000 (GMT)
-References: <20191031140152.19769-1-philmd@redhat.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH] tests/boot_linux_console: Fetch assets from Debian
- snapshot archives
-In-reply-to: <20191031140152.19769-1-philmd@redhat.com>
-Date: Thu, 31 Oct 2019 15:27:11 +0000
-Message-ID: <87v9s56ils.fsf@linaro.org>
+ (envelope-from <jsnow@redhat.com>) id 1iQCe9-00014j-TF
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:46:03 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32642
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iQCe9-00010z-Ia
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:46:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572536760;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=/eXsnGxwYaH9WWLSOfy2vGiuWT/hZ0FLZxQ0gbrl8j0=;
+ b=CLna6Sfn+WbRX9m1K4umvRYStjM+fbaLaIU8C5PDcNmOZM5g9/F0pETGSswvx/oUgX92pi
+ dig8xogRTUiRcOR1MkexdFUN81u+ygef7xeZXSoD1tVF/iWwhWc3rf8JPgPox5XO1bVycb
+ wygBcYag7B12GCnVQMCqchdSqpwxGQ4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-345-rnqoA7-rMeinKt5sa7A8Ug-1; Thu, 31 Oct 2019 11:45:54 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DBD2800D49;
+ Thu, 31 Oct 2019 15:45:53 +0000 (UTC)
+Received: from [10.10.126.19] (ovpn-126-19.rdu2.redhat.com [10.10.126.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4C3875D9D6;
+ Thu, 31 Oct 2019 15:45:31 +0000 (UTC)
+Subject: Re: [PULL 0/9] Ide patches
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191031105904.12194-1-jsnow@redhat.com>
+ <CAFEAcA964ibGcb02kTC_bTcX5xLu5r-=NJMz5Kykct0t7CVwnw@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Autocrypt: addr=jsnow@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <757efddc-43fc-7f5b-c57a-dfdfc0a3e801@redhat.com>
+Date: Thu, 31 Oct 2019 11:45:30 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAFEAcA964ibGcb02kTC_bTcX5xLu5r-=NJMz5Kykct0t7CVwnw@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: rnqoA7-rMeinKt5sa7A8Ug-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,46 +163,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Thomas Huth <thuth@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Libvirt <libvir-list@redhat.com>,
+ Laszlo Ersek <lersek@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, "Gonglei \(Arei\)" <arei.gonglei@huawei.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-> The kernel packaged was fetched from an unstable repository.
-> Use the stable snapshot archive instead.
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 10/31/19 11:02 AM, Peter Maydell wrote:
+> On Thu, 31 Oct 2019 at 10:59, John Snow <jsnow@redhat.com> wrote:
+>>
+>> The following changes since commit 68d8ef4ec540682c3538d4963e836e43a211d=
+d17:
+>>
+>>   Merge remote-tracking branch 'remotes/stsquad/tags/pull-tcg-plugins-28=
+1019-4' into staging (2019-10-30 14:10:32 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://github.com/jnsnow/qemu.git tags/ide-pull-request
+>>
+>> for you to fetch changes up to c35564caf20e8d3431786dddf0fa513daa7d7f3c:
+>>
+>>   hd-geo-test: Add tests for lchs override (2019-10-31 06:11:34 -0400)
+>>
+>> ----------------------------------------------------------------
+>> Pull request
+>>
+>=20
+> Hi -- this passed the merge tests but it looks like you forgot
+> to add your signed-off by line as the submaintainer to Sam's
+> patches. Could you fix that up and resend, please?
+>=20
+> thanks
+> -- PMM
+>=20
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Haha. I re-applied them to grab Phil's SOBs and that dropped mine.
 
-> ---
->  tests/acceptance/boot_linux_console.py | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/bo=
-ot_linux_console.py
-> index 4e9ac0ecc3..f5aa87317c 100644
-> --- a/tests/acceptance/boot_linux_console.py
-> +++ b/tests/acceptance/boot_linux_console.py
-> @@ -479,7 +479,8 @@ class BootLinuxConsole(Test):
->          :avocado: tags=3Darch:m68k
->          :avocado: tags=3Dmachine:q800
->          """
-> -        deb_url =3D ('http://ftp.ports.debian.org/debian-ports/pool-m68k=
-/main'
-> +        deb_url =3D ('https://snapshot.debian.org/archive/debian-ports'
-> +                   '/20190922T090906Z/pool-m68k/main'
->                     '/l/linux/kernel-image-5.2.0-2-m68k-di_5.2.9-2_m68k.u=
-deb')
->          deb_hash =3D '0797e05129595f22f3c0142db5e199769a723bf9'
->          deb_path =3D self.fetch_asset(deb_url, asset_hash=3Ddeb_hash)
+OK, re-spinning.
 
+(Note to self: add a check to git-publish --pull that looks for my SOB.)
 
---
-Alex Benn=C3=A9e
 
