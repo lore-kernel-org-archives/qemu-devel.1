@@ -2,75 +2,83 @@ Return-Path: <SRS0=5JRQ=YY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DE5CA9ECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 17:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B68BCA9ECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 18:31:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82B9E2086D
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 17:23:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBF61216F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 18:31:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fqwoD2Kr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82B9E2086D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ITlgVWVX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBF61216F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQEA8-0001IQ-MQ
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 13:23:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47038)
+	id 1iQFE7-0007ti-U6
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 14:31:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58617)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iQE9L-0000kQ-1L
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 13:22:20 -0400
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iQFBx-0006lB-IF
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 14:29:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iQE9J-0002fN-NO
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 13:22:18 -0400
-Received: from mail-qk1-x731.google.com ([2607:f8b0:4864:20::731]:40784)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iQFBs-0000NB-2z
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 14:29:04 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:34274)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iQE9J-0002eO-J9
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 13:22:17 -0400
-Received: by mail-qk1-x731.google.com with SMTP id y81so7800129qkb.7
- for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 10:22:17 -0700 (PDT)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iQFBr-0000MN-QV
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 14:28:59 -0400
+Received: by mail-wr1-x443.google.com with SMTP id e6so5523008wrw.1
+ for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 11:28:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to:cc;
- bh=DmZMafdUYDDKbYHY707LzRAyyw3AgWEynvM0mDyNavk=;
- b=fqwoD2Kr3WYsiq0KKEwoIZDkmuopZ6Q7Tyj2MXqXZ+dPFVloxKkqDwen9mjO0/7Z2u
- Hn9q4chBRMJjuBgKz0VYWHPmTSACFHnbjkBSxZwUT5s82B/P7/Xo5IlS7bI1g+Im+ITq
- bF7W/nKXjiykoVozOFWAfvktOrcaQH3WJAs13KyJJGQuzd+u62mHp++yXLAsCBTWo/+j
- i0PrL3gLc6gtl0wS4YqTOh2Htt2tWmyZ407ik/sd/PFwbLr40NoehTauxQ65YTkLjiAs
- BasAY3YV+ltWET+QD2h6vhPeTgsrlUQ8vk2ue9CBt2hAyYMTH4TJyQiKnb2NpXWhgkN3
- TMVA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=x+lzxHk+3Ht5CGOZStAjDSfqmq16VF6wAXQE9G4x8zA=;
+ b=ITlgVWVX17pcAhEsg5ORyR1ZCckqO4xH8yEO1LE3HbtUZMLwrJQymlBC+14vBI7tGQ
+ LSE2KRIACJrYpksF0AhSRCaXGt8NSyUkCtittrH3M0d9IQsj86vpNep6j4DSJrVXcqS9
+ e/7Nt//GdRMIpZOi2/AiuYveXVN+ER7o4r56dRvarNkgpSOOkqJ4I6qvu/lUsjSectZ8
+ lF99XHgetjQLMOv7Obxnmiu5mB+p2kN+Y1DGUUBV+kx/Q19sdxQYiRmKEKJECoZMmMTh
+ kmnatNsxwOr1b1JPaWUo68tkLagvVfoVcxwYSLjEYZHamGSuCameo0O9CvzMNVbBFKQH
+ 7YOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
- bh=DmZMafdUYDDKbYHY707LzRAyyw3AgWEynvM0mDyNavk=;
- b=NXCZvklumwnzV1HKW+AZtdV8zGFTO26y5OhokfmmaC4Z0v775k2QhUCuYUQnQRkzHF
- pyjX6yKX3ErWYSirrsl7bVtgn0cCUWitX27yA3e94xMSFAQp8/Pa9hrsaLA7Wtxyj0XO
- M/fc6HS86tph3fNOOF8GgVIDBn+5bbXTqFQeSkKCtYsbWTQbtQcxNNH+L2vLVpYEEIcx
- Z5hn/uJawKaASvhMPzo6/b6BWckKBceqWDWcWUQEr/4Cz+uwpMGsr5DPvRBVIaxhj118
- oYk+tVF/Mh+FQTyPelod2txH1U+nI1W8/426vnibtvR3ZUK9GjYl4pkVLN56Oz3sgKVY
- N72A==
-X-Gm-Message-State: APjAAAVfzRtL6g2OMgu3904YNEF0j2stj0fvpzAINU+vmbuML6Bpa9V4
- RVkdGiGzty8OWUd6ErSEVpZlKSFY1WCA6nfKaZMf1yCwmUA=
-X-Google-Smtp-Source: APXvYqxS/lWIyDt5iUvt/RgNwlUA34KDXCVmT3wA9OoX570AzfQFljusYj74sShZgj1gMoFIEeB6arFWNh5hX9CPYvs=
-X-Received: by 2002:a37:bc3:: with SMTP id 186mr1794452qkl.196.1572542536433; 
- Thu, 31 Oct 2019 10:22:16 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=x+lzxHk+3Ht5CGOZStAjDSfqmq16VF6wAXQE9G4x8zA=;
+ b=J3nNO+7gLx2kux/VWLKG0dwQMAHebw2oR7/p0Mbi0neZk9NHT2ICrptXRdMvW5pwGw
+ yOaWuY7mtjqt3Fom68r8x8hWTB6NWU+hqUO97kwQVfT9CBwXaP/7Ox7zU9LNH6VI3glA
+ V0b9pRpde4UQgnDg26XVDrnaq9FN6hYmrjm0tjczBT7Uf+ewonAPGTUIEbmNHOALmaQS
+ /EXKcM5lMkpVAvHLWW72R/O5onGjm5oHl4W5knJ0R5CwrkkLMp5CmaNlu0eFe/dkKF4z
+ lyVzZ6NzBKoUKBKEzBSjl7W/n7uGPWt1xj5Bu+nQwv+vn8awELUncZ3OfHN4t1uKnfUK
+ S2CQ==
+X-Gm-Message-State: APjAAAXClgY9gTsPA35k95yUBQy0wPrrLHoWa9d1lzXdVj2cQjH6seo2
+ 09HhrOj5lmFtJgH/UzFicLRghsFD084fyQiY4EM=
+X-Google-Smtp-Source: APXvYqyiicgvRjzo997gzkT0Bx8WExHfx1SLhiKDFk8nI4ZYdf5Tv6zUDASczUaDohAaAAO99m9yqJ6v50o5IKxJWtw=
+X-Received: by 2002:a5d:6892:: with SMTP id h18mr6588650wru.370.1572546538007; 
+ Thu, 31 Oct 2019 11:28:58 -0700 (PDT)
 MIME-Version: 1.0
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 31 Oct 2019 18:22:05 +0100
-Message-ID: <CAJSP0QXZNK_uZzC69oGSMiYeFwpv2Pj9O3VjajgJRVhYgOXUQg@mail.gmail.com>
-Subject: [KVM Forum] Upstreaming device fuzzing discussion Fri 1 Nov 2019
-To: qemu-devel <qemu-devel@nongnu.org>
+References: <20191017123438.87703-1-basil@daynix.com>
+ <20191017123438.87703-2-basil@daynix.com>
+In-Reply-To: <20191017123438.87703-2-basil@daynix.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 31 Oct 2019 19:28:46 +0100
+Message-ID: <CAJ+F1C+YLWXubJGaThO1_iZu3EVVqPc5v_NhLFqA6LcE0kfHdg@mail.gmail.com>
+Subject: Re: [PATCH 1/1] qga: Add "guest-get-memory-block-info" to blacklist
+To: Basil Salman <basil@daynix.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::731
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,29 +90,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Oleinik, Alexander" <alxndr@bu.edu>, dstepanov.src@gmail.com
+Cc: Yan Vugenfirer <yan@daynix.com>, QEMU <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
-Following Dima's presentation on virtio device fuzzing[1] and
-Alexander's "[PATCH v4 00/20] Add virtual device fuzzing support"[2]
-series on the mailing list, it's time discuss the roadmap for QEMU
-device fuzzing in qemu.git.
+On Thu, Oct 17, 2019 at 2:35 PM Basil Salman <basil@daynix.com> wrote:
+>
+> From: Basil Salman <bsalman@redhat.com>
+>
+> Memory block commands are only supported for linux with sysfs,
+> "guest-get-memory-block-info" was not in blacklist for other
+> cases.
+>
+> Reported on:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1751431
+>
+> Signed-off-by: Basil Salman <bsalman@redhat.com>
 
-We will meet at 13:45 CET on Fri 1st of November in the Forum 1/2/3
-Foyer with a video conference connection for anyone not attending KVM
-Forum (https://bluejeans.com/6063766077).
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Anyone who currently has a private device fuzzing setup and is
-interested in seeing fuzzing infrastructure upstream in QEMU is
-welcome to participate.  This session is not (primarily) about how to
-fuzz specific devices, so it won't be relevant if you want to start
-device fuzzing and do not have prior experience.
+> ---
+>  qga/commands-posix.c | 3 ++-
+>  qga/commands-win32.c | 2 +-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+> index dfc05f5b8a..1c1a165dae 100644
+> --- a/qga/commands-posix.c
+> +++ b/qga/commands-posix.c
+> @@ -2730,7 +2730,8 @@ GList *ga_command_blacklist_init(GList *blacklist)
+>              "guest-suspend-hybrid", "guest-network-get-interfaces",
+>              "guest-get-vcpus", "guest-set-vcpus",
+>              "guest-get-memory-blocks", "guest-set-memory-blocks",
+> -            "guest-get-memory-block-size", NULL};
+> +            "guest-get-memory-block-size", "guest-get-memory-block-info"=
+,
+> +            NULL};
+>          char **p =3D (char **)list;
+>
+>          while (*p) {
+> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+> index 6b67f16faf..1c9ec9c094 100644
+> --- a/qga/commands-win32.c
+> +++ b/qga/commands-win32.c
+> @@ -1894,7 +1894,7 @@ GList *ga_command_blacklist_init(GList *blacklist)
+>          "guest-suspend-hybrid",
+>          "guest-set-vcpus",
+>          "guest-get-memory-blocks", "guest-set-memory-blocks",
+> -        "guest-get-memory-block-size",
+> +        "guest-get-memory-block-size", "guest-get-memory-block-info",
+>          NULL};
+>      char **p =3D (char **)list_unsupported;
+>
+> --
+> 2.17.2
+>
+>
 
-Stefan
 
-[1] https://static.sched.com/hosted_files/kvmforum2019/76/kvmforum2019_virtio_device_fuzzing.pdf).
-[2] https://patchew.org/QEMU/20191030144926.11873-1-alxndr@bu.edu/
+--=20
+Marc-Andr=C3=A9 Lureau
 
