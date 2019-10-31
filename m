@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67CA7CA9EC3
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 11:11:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37EACCA9EC3
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 11:17:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32D602087F
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 11:11:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 004602083E
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 11:17:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3VWhG8k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32D602087F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gL6OPgAQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 004602083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQ8Mr-00005V-Uc
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 07:11:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46056)
+	id 1iQ8S6-0006Dr-7a
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 07:17:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45961)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jsnow@redhat.com>) id 1iQ8Et-0002XA-Nx
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 07:03:44 -0400
+ (envelope-from <jsnow@redhat.com>) id 1iQ8EC-00011j-CW
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 07:02:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jsnow@redhat.com>) id 1iQ8Es-00089L-44
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 07:03:39 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36778
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <jsnow@redhat.com>) id 1iQ8EA-0006xP-KJ
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 07:02:55 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56080
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iQ8Er-00085z-W0
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 07:03:38 -0400
+ (Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1iQ8EA-0006wm-Gv
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 07:02:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572519813;
+ s=mimecast20190719; t=1572519773;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/Tju7TU7DdycIZrWaJaJsK6suHzcOnHin/MdVKzfp0c=;
- b=S3VWhG8k70lDAbk2DkyTQyvOyymuizRO21PdNP3FE7AjZ199DOnSHaaKuU4EWfXYV7D5DH
- lnLcBkbQrQTYDqkwI8GUCw0alcIO0g+/SKpN36WdOaE62WZt35LS9yV16wfrlr+nqP1cMZ
- x02FgZqrLA4mbCfGKaQq8RuyCjvyvZQ=
+ bh=YFaYgYqoRE/mPMgv2QBpnHLrD9yiGIOjEkSql3P4gPc=;
+ b=gL6OPgAQipXqA+GpQkVbYbEjU8Xn2SuqMd2FV+jcRLhPiGY4TY3ILxQmBL1fW0FQJHMUUZ
+ A5T0ExjELvaYEKDcucxiCjhv5UtBqkUqLKpgNHQVpCoKZ5PFm+kH0Y6o71pyzjZkjFx6YT
+ diJy+9TuR7a1/Vi0YotlI2jRU+jt7hc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-7Hr23RheNFOf7bO_l-ZNhw-1; Thu, 31 Oct 2019 07:03:29 -0400
+ us-mta-388-DhqK7Ng8P7mXh19MQ2B9Yw-1; Thu, 31 Oct 2019 07:02:50 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9DE5800EB4;
- Thu, 31 Oct 2019 11:03:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99A1A800EB4;
+ Thu, 31 Oct 2019 11:02:48 +0000 (UTC)
 Received: from probe.redhat.com (ovpn-121-17.rdu2.redhat.com [10.10.121.17])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6EC8D60BEC;
- Thu, 31 Oct 2019 11:03:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 52F2160C05;
+ Thu, 31 Oct 2019 11:01:54 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 7/9] bootdevice: Refactor get_boot_devices_list
-Date: Thu, 31 Oct 2019 06:59:02 -0400
-Message-Id: <20191031105904.12194-8-jsnow@redhat.com>
+Subject: [PULL 5/9] scsi: Propagate unrealize() callback to scsi-hd
+Date: Thu, 31 Oct 2019 06:59:00 -0400
+Message-Id: <20191031105904.12194-6-jsnow@redhat.com>
 In-Reply-To: <20191031105904.12194-1-jsnow@redhat.com>
 References: <20191031105904.12194-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 7Hr23RheNFOf7bO_l-ZNhw-1
+X-MC-Unique: DhqK7Ng8P7mXh19MQ2B9Yw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,10 +102,8 @@ Sender: "Qemu-devel"
 
 From: Sam Eiderman <shmuel.eiderman@oracle.com>
 
-Move device name construction to a separate function.
-
-We will reuse this function in the following commit to pass logical CHS
-parameters through fw_cfg much like we currently pass bootindex.
+We will need to add LCHS removal logic to scsi-hd's unrealize() in the
+next commit.
 
 Reviewed-by: Karl Heubaum <karl.heubaum@oracle.com>
 Reviewed-by: Arbel Moshe <arbel.moshe@oracle.com>
@@ -115,94 +113,64 @@ Signed-off-by: Sam Eiderman <sameid@google.com>
 Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- bootdevice.c | 61 +++++++++++++++++++++++++++++-----------------------
- 1 file changed, 34 insertions(+), 27 deletions(-)
+ include/hw/scsi/scsi.h |  1 +
+ hw/scsi/scsi-bus.c     | 16 ++++++++++++++++
+ 2 files changed, 17 insertions(+)
 
-diff --git a/bootdevice.c b/bootdevice.c
-index bc5e1c2de4..2cf6b37c57 100644
---- a/bootdevice.c
-+++ b/bootdevice.c
-@@ -202,6 +202,39 @@ DeviceState *get_boot_device(uint32_t position)
-     return res;
+diff --git a/include/hw/scsi/scsi.h b/include/hw/scsi/scsi.h
+index d77a92361b..332ef602f4 100644
+--- a/include/hw/scsi/scsi.h
++++ b/include/hw/scsi/scsi.h
+@@ -59,6 +59,7 @@ struct SCSIRequest {
+ typedef struct SCSIDeviceClass {
+     DeviceClass parent_class;
+     void (*realize)(SCSIDevice *dev, Error **errp);
++    void (*unrealize)(SCSIDevice *dev, Error **errp);
+     int (*parse_cdb)(SCSIDevice *dev, SCSICommand *cmd, uint8_t *buf,
+                      void *hba_private);
+     SCSIRequest *(*alloc_req)(SCSIDevice *s, uint32_t tag, uint32_t lun,
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index bccb7cc4c6..359d50d6d0 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -59,6 +59,14 @@ static void scsi_device_realize(SCSIDevice *s, Error **e=
+rrp)
+     }
  }
 =20
-+static char *get_boot_device_path(DeviceState *dev, bool ignore_suffixes,
-+                                  const char *suffix)
++static void scsi_device_unrealize(SCSIDevice *s, Error **errp)
 +{
-+    char *devpath =3D NULL, *s =3D NULL, *d, *bootpath;
-+
-+    if (dev) {
-+        devpath =3D qdev_get_fw_dev_path(dev);
-+        assert(devpath);
++    SCSIDeviceClass *sc =3D SCSI_DEVICE_GET_CLASS(s);
++    if (sc->unrealize) {
++        sc->unrealize(s, errp);
 +    }
-+
-+    if (!ignore_suffixes) {
-+        if (dev) {
-+            d =3D qdev_get_own_fw_dev_path_from_handler(dev->parent_bus, d=
-ev);
-+            if (d) {
-+                assert(!suffix);
-+                s =3D d;
-+            } else {
-+                s =3D g_strdup(suffix);
-+            }
-+        } else {
-+            s =3D g_strdup(suffix);
-+        }
-+    }
-+
-+    bootpath =3D g_strdup_printf("%s%s",
-+                               devpath ? devpath : "",
-+                               s ? s : "");
-+    g_free(devpath);
-+    g_free(s);
-+
-+    return bootpath;
 +}
 +
- /*
-  * This function returns null terminated string that consist of new line
-  * separated device paths.
-@@ -218,36 +251,10 @@ char *get_boot_devices_list(size_t *size)
-     bool ignore_suffixes =3D mc->ignore_boot_device_suffixes;
+ int scsi_bus_parse_cdb(SCSIDevice *dev, SCSICommand *cmd, uint8_t *buf,
+                        void *hba_private)
+ {
+@@ -217,12 +225,20 @@ static void scsi_qdev_realize(DeviceState *qdev, Erro=
+r **errp)
+ static void scsi_qdev_unrealize(DeviceState *qdev, Error **errp)
+ {
+     SCSIDevice *dev =3D SCSI_DEVICE(qdev);
++    Error *local_err =3D NULL;
 =20
-     QTAILQ_FOREACH(i, &fw_boot_order, link) {
--        char *devpath =3D NULL,  *suffix =3D NULL;
-         char *bootpath;
--        char *d;
-         size_t len;
+     if (dev->vmsentry) {
+         qemu_del_vm_change_state_handler(dev->vmsentry);
+     }
 =20
--        if (i->dev) {
--            devpath =3D qdev_get_fw_dev_path(i->dev);
--            assert(devpath);
--        }
--
--        if (!ignore_suffixes) {
--            if (i->dev) {
--                d =3D qdev_get_own_fw_dev_path_from_handler(i->dev->parent=
-_bus,
--                                                          i->dev);
--                if (d) {
--                    assert(!i->suffix);
--                    suffix =3D d;
--                } else {
--                    suffix =3D g_strdup(i->suffix);
--                }
--            } else {
--                suffix =3D g_strdup(i->suffix);
--            }
--        }
--
--        bootpath =3D g_strdup_printf("%s%s",
--                                   devpath ? devpath : "",
--                                   suffix ? suffix : "");
--        g_free(devpath);
--        g_free(suffix);
-+        bootpath =3D get_boot_device_path(i->dev, ignore_suffixes, i->suff=
-ix);
+     scsi_device_purge_requests(dev, SENSE_CODE(NO_SENSE));
++
++    scsi_device_unrealize(dev, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
++    }
++
+     blockdev_mark_auto_del(dev->conf.blk);
+ }
 =20
-         if (total) {
-             list[total-1] =3D '\n';
 --=20
 2.21.0
 
