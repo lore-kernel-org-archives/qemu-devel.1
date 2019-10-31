@@ -2,86 +2,99 @@ Return-Path: <SRS0=5JRQ=YY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F2BCA9ECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 23:40:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB2DACA9ED4
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 23:49:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C998120862
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 23:40:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C998120862
+	by mail.kernel.org (Postfix) with ESMTPS id B28A92087F
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 23:49:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YSQjYeYU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B28A92087F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQK34-00061j-UN
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 19:40:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53642)
+	id 1iQKC3-0002nn-Rj
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 19:49:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60999)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iQK1a-00051c-HW
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 19:38:44 -0400
+ (envelope-from <pbonzini@redhat.com>) id 1iQKBL-0002OV-7r
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 19:48:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iQK1Y-00008J-0B
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 19:38:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50892)
+ (envelope-from <pbonzini@redhat.com>) id 1iQKBI-0007cm-LD
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 19:48:45 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54880
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iQK1V-0008VU-GF
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 19:38:39 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A63134E83E
- for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 23:38:35 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id r16so1536328wrj.4
- for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 16:38:35 -0700 (PDT)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iQKBI-0007bt-9t
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 19:48:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572565722;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=lEG3f/8chXumNyO/JN8Fm/ikhnF0lFTzbeQAUb+YOYQ=;
+ b=YSQjYeYUtlPffDQOZCPyOYW0YHH93moAXVdQBNVPaJM5dR7OQZZc+jqjrpXiyYVTbGNGLZ
+ UbvcmoEExdWQ4hcnqnomobmjwy/I1+CA09dKbL1wQejxf9mOiKTFygQWSuV3TrK6qk+aaR
+ 8TfIYo0bv3+w6ruTHPoVT4GU0px4GLA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-278-EIv-oF5kPi-04xL722fxLw-1; Thu, 31 Oct 2019 19:48:38 -0400
+Received: by mail-wr1-f71.google.com with SMTP id i10so4466853wrp.7
+ for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 16:48:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=J8bgphd3ygQ74msF+m1sFmeYg6lP0SClY9MLtdmfy28=;
- b=UClNf3gjfIftxdd/etFencEilQW3g/+klDmDy1zpLdluoJx5ibrzh9JEZvK3cxL6Ih
- qoVbl1WmkQNnTY8GJUFP2wDyjxkRdfc1iBafiArlRNJ2Gg900OMD+5sMSi2MDOAJwYdm
- 2Df/ekH1urvB9ZWbS1Qm3JZNrFT3ExWKGYtsM5dtWse/8NbWkFiFcPkBXGSK4AznMmHQ
- vs3y3UJfg10vr17Lt3HFF0Tio5KUDiWrQHl49C7tKk4uQjnBfrxYMbqpotFNftlGdZj9
- HxN3Ju2Nf5DWDO1j2k49ohpuFf3hrC3lCNVusYlqoc5Ur6srCa6tIMR6ugeyAyfqyK46
- a6YA==
-X-Gm-Message-State: APjAAAWIrQisW7Br4F1FYZVOBlq+VXXCJGNLIskB9CQQMxA3ckhnVo5A
- q25O8/FQic0x+P9FFRgiNKNihnJctB7dd5YMMLv5OjQtA6zuMLEgh8UngzSg1f+E3ZTex3aHtHb
- oYBdD+o2c5vmtG3k=
-X-Received: by 2002:a1c:a791:: with SMTP id q139mr7380867wme.155.1572565114396; 
- Thu, 31 Oct 2019 16:38:34 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyMNHQaHsk5dFWxnHcCH0/dvFgB2lbFzbUanOAA/QcOtLRHyZ/ZU2fLnLrtrN6B+JbW5XNoxQ==
-X-Received: by 2002:a1c:a791:: with SMTP id q139mr7380849wme.155.1572565114221; 
- Thu, 31 Oct 2019 16:38:34 -0700 (PDT)
-Received: from [192.168.20.58] (94.222.26.109.rev.sfr.net. [109.26.222.94])
- by smtp.gmail.com with ESMTPSA id b3sm874766wmh.17.2019.10.31.16.38.32
+ bh=5wsDN8B4BCGG9DtljzjtWJTgItzvJ5s3zDhg4UimEXc=;
+ b=Z88cus/hi6R5mi5mp4mWXQfOWb8vpZyaWNwd9INZN1wDkQaeEaZhk9j1sZhCRun+hx
+ 7+ZopRttItTMfMpyUb5wN0Ti0CUqmG9N0gPnfDHCeob+NTeQfDNtn3yQXhK8DCKrzX8j
+ WouFcQkKsHNXyNuYJ2ju7NRBhFFvCvAUx68KqYx52s1d/Ep4Nho2nFLd53cgm1XujYVR
+ Vvj5BYOL8mUplkWN5bi0crv6IqYmGTYtcwBIkwzKMvvYmOPyiBGZmOYhSYMMgrB5P9UC
+ JXbbldScGpaeMBe7A2D4+x3BGWEORC4wigvbVEc4P9YUex4CuoIKKu9UmWVPPxqeT0TE
+ fRPQ==
+X-Gm-Message-State: APjAAAUqGIUoD99/GLz5k9ekRZzcjgFnb7FssnImOr34u0lafeaBM3/t
+ 7/uLPebKuuXsnIIq954jhRZ+DSS+GNCWABd74+Dn+10l6aqWO7XsOI7aSox9fXWGT5LrM7i1Bgp
+ 5OOlJzNbkb14gsgo=
+X-Received: by 2002:a1c:48c4:: with SMTP id v187mr7768375wma.27.1572565716578; 
+ Thu, 31 Oct 2019 16:48:36 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyYw64ORqmQ7x7/xsjJ2f2OcTdmb73eA5ULAKjnD7MqknrqMunYnSCo5YZILzAfqQGrN0YtOw==
+X-Received: by 2002:a1c:48c4:: with SMTP id v187mr7768367wma.27.1572565716304; 
+ Thu, 31 Oct 2019 16:48:36 -0700 (PDT)
+Received: from [192.168.20.72] (94.222.26.109.rev.sfr.net. [109.26.222.94])
+ by smtp.gmail.com with ESMTPSA id v6sm6444427wru.72.2019.10.31.16.48.35
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 31 Oct 2019 16:38:33 -0700 (PDT)
-Subject: Re: [PATCH v5 11/13] hw/s390x/ipl: replace deprecated qdev_reset_all
- registration
-To: Damien Hedde <damien.hedde@greensocs.com>, qemu-devel@nongnu.org
-References: <20191018150630.31099-1-damien.hedde@greensocs.com>
- <20191018150630.31099-12-damien.hedde@greensocs.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <29cfdbcc-3e83-a980-f753-dae8549e5853@redhat.com>
-Date: Fri, 1 Nov 2019 00:38:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thu, 31 Oct 2019 16:48:35 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/6] docs: integrate doc comments with Sphinx build
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191029162248.13383-1-pbonzini@redhat.com>
+ <CAFEAcA9nT0AfDPmQ2_SDec7_z3+wGS=XQJnSiQwrWCydLgv83Q@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <3369940d-5c3c-c72f-7c64-2bff7daf55f2@redhat.com>
+Date: Fri, 1 Nov 2019 00:48:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191018150630.31099-12-damien.hedde@greensocs.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAFEAcA9nT0AfDPmQ2_SDec7_z3+wGS=XQJnSiQwrWCydLgv83Q@mail.gmail.com>
 Content-Language: en-US
+X-MC-Unique: EIv-oF5kPi-04xL722fxLw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,68 +106,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Thomas Huth <thuth@redhat.com>,
- berrange@redhat.com, ehabkost@redhat.com, cohuck@redhat.com,
- mark.burton@greensocs.com, qemu-s390x@nongnu.org,
- Christian Borntraeger <borntraeger@de.ibm.com>, edgari@xilinx.com,
- qemu-arm@nongnu.org, pbonzini@redhat.com, david@gibson.dropbear.id.au
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/18/19 5:06 PM, Damien Hedde wrote:
-> Replace deprecated qdev_reset_all by resettable_cold_reset_fn for
-> the ipl registration in the main reset handlers.
+On 29/10/19 19:21, Peter Maydell wrote:
+> On Tue, 29 Oct 2019 at 16:22, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> Hello,
+>>
+>> this is an attempt at including kernel-doc, with small tweaks (see patch
+>> 2) to support QEMU's doc comment format, in the Sphinx documentation pip=
+eline.
+>>
+>> The ugly part is patch 3, which disables Sphinx's "nitpicking" (warn on
+>> invalid cross-reference) mode.  It would probably be possible to use
+>> the nitpick_ignore configuration entry instead.
+>>
+>> Paolo
+>>
+>> Paolo Bonzini (6):
+>>   docs: import Linux kernel-doc script and extension
+>>   docs: tweak kernel-doc for QEMU coding standards
+>>   docs: disable sphinx warning about missing cross references
+>>   memory: adjust API documentation to (modified) kerneldoc format
+>>   docs: add memory API reference
+>>   memory: include MemoryListener documentation and some missing function
+>>     parameters
 >=20
-> This does not impact the behavior for the following reasons:
-> + at this point resettable just call the old reset methods of devices
->    and buses in the same order than qdev/qbus.
-> + resettable handlers registered with qemu_register_reset are
->    serialized; there is no interleaving.
-> + eventual explicit calls to legacy reset API (device_reset or
->    qdev/qbus_reset) inside this reset handler will not be masked out
->    by resettable mechanism; they do not go through resettable api.
->=20
-> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
-> ---
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: qemu-s390x@nongnu.org
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Thomas Huth <thuth@redhat.com>
-> ---
->   hw/s390x/ipl.c | 10 +++++++++-
->   1 file changed, 9 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-> index ca544d64c5..2689f7a017 100644
-> --- a/hw/s390x/ipl.c
-> +++ b/hw/s390x/ipl.c
-> @@ -237,7 +237,15 @@ static void s390_ipl_realize(DeviceState *dev, Err=
-or **errp)
->        */
->       ipl->compat_start_addr =3D ipl->start_addr;
->       ipl->compat_bios_start_addr =3D ipl->bios_start_addr;
-> -    qemu_register_reset(qdev_reset_all_fn, dev);
-> +    /*
-> +     * Because this Device is not on any bus in the qbus tree (it is
-> +     * not a sysbus device and it's not on some other bus like a PCI
-> +     * bus) it will not be automatically reset by the 'reset the
-> +     * sysbus' hook registered by vl.c like most devices. So we must
-> +     * manually register a reset hook for it.
+> Could you briefly describe the differences between this patchset
+> and the RFC I sent a while back:
+> https://patchew.org/QEMU/20190521122519.12573-1-peter.maydell@linaro.org/
+> please?
 
-:)
+Thanks for the pointer, I didn't remember it; my series is not based on
+your work.  The main difference is in patch 2 ("docs: tweak kernel-doc
+for QEMU coding standards"), which tweaks kernel-doc to recognize camel
+case types and QEMU's usage of "#" to indicate types (inspired by GTKDoc
+and different from the "&" sigil used in the kernel sources).
 
-> +     * TODO: there should be a better way to do this.
+As a result of this, the adjustments to be made to header files are much
+smaller.  In particular there are no hunks such as
 
-:(
 
-> +     */
-> +    qemu_register_reset(resettable_cold_reset_fn, dev);
+ /**
+- * MemoryListener: callbacks structure for updates to the physical
+memory map
++ * struct MemoryListener: callbacks structure for updates to the
+physical memory map
+  *
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+The other difference is that this is based on newer kernel sources,
+therefore I had to import the additional file docs/sphinx/kernellog.py.
+ On the other hand, I forgot to commit docs/sphinx/kerneldoc.py...
 
->   error:
->       error_propagate(errp, err);
->   }
->=20
+If we agree that nitpicking mode is unmaintainable, I can merge your
+work with mine and repost.
+
+Thanks,
+
+Paolo
+
 
