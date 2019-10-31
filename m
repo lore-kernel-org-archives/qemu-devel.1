@@ -2,81 +2,77 @@ Return-Path: <SRS0=5JRQ=YY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C24ACA9ECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 20:28:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45AB0CA9ECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 20:47:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 338B220679
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 20:28:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BC322086D
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 20:47:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFwezrdD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 338B220679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oErNy3+C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BC322086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQH3s-0004K9-Dj
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 16:28:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56086)
+	id 1iQHLw-00035k-VC
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 16:47:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47544)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <waynli329@gmail.com>) id 1iQH1r-0003NZ-Rw
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 16:26:51 -0400
+ (envelope-from <robert.foley@linaro.org>) id 1iQEBN-0002ka-4C
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 13:24:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <waynli329@gmail.com>) id 1iQH1q-0006A1-E0
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 16:26:47 -0400
-Received: from mail-io1-xd31.google.com ([2607:f8b0:4864:20::d31]:37068)
+ (envelope-from <robert.foley@linaro.org>) id 1iQEBL-0004nu-JC
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 13:24:24 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53903)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <waynli329@gmail.com>)
- id 1iQH1p-0005s9-NJ; Thu, 31 Oct 2019 16:26:45 -0400
-Received: by mail-io1-xd31.google.com with SMTP id 1so8312435iou.4;
- Thu, 31 Oct 2019 13:26:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=RCWcNjA6YA1P7K/DuJcVtvfBIJ7JQ3sR/pPwfnQPdEk=;
- b=UFwezrdD9VmGtfk3/lz3Ms8s6D5AxNNodxsHQo++MbhTqkLfMv7QkeNgkLksJmcNpE
- KBCzv4cU/xkLMYTxAxH0ljPanXeRk78xzxzuZSv/vYIw4/Vd1KskjHEIeq4fHhf/PBUy
- hhvD9zEuoBmDGqvb1k2JO97rzMldGBTqrvlY2etbys3toYwvg5/0CP/5obhJYSd713//
- pUk+Y6/CuWtHfxoy9tj2mQkequVyBKI9n/2nJw+YiZGCi0+Zp+tj1EzgOS0j8XtmFcq9
- pmxxqupA+pcSyJW6RCaQqg3LUPgAwIjpkGWZfY+GLf8HxqrPIIhNjveMrCIcgHy79LQD
- NsLQ==
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1iQEBL-0004nS-9f
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 13:24:23 -0400
+Received: by mail-wm1-x341.google.com with SMTP id n7so6776296wmc.3
+ for <qemu-devel@nongnu.org>; Thu, 31 Oct 2019 10:24:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:from:date:message-id:subject:to:cc;
+ bh=hxY2xvCmHkLxQyEFc1Ne/xSaX0XlHc5GnIQ8lQEupv0=;
+ b=oErNy3+C1js4Pj3gfC2nFEf6EZrvVk+ImTajXX2I4Hd6cdaVVsf2pqMKiJU67r0V+C
+ boq9oM20nh6sDi4geatjqSMcn3SH9+0FfCD65bjA3iJXMPS3Glaz5nNO5uJyZE4PlEc0
+ aVW2A5KgPL+lOu2m0PNez/gztEkKT1nS77Fs39CsNvK7N3GpIkQqNWEOkEbLKNlM4IvS
+ qKHHyNq49cLyJcR2jy0Y5a+8SBONLez9w71+g2N1Ka8bPaTQwRvoscE05Gsk+QnYTwDh
+ afrtUkJX+YOG4PIsdB/LL69DPYVsIT7YgVrMa5UbJi9s8f2BYUADBeHVqvtTPR+y3E6M
+ Nrww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=RCWcNjA6YA1P7K/DuJcVtvfBIJ7JQ3sR/pPwfnQPdEk=;
- b=Xc+CghJdTro7ITOaY+iyuFI59u21NG61eaNL8ZZeIg2LR7oNJC7uJAgLkiDW9V5S9d
- JFBDnBMFVl1lFbHvW3t3mD6lf24+6KF+HE4/b5zmq8051hQ/WMToUyWidk78hToFKL/6
- efmZtbP1IGTgqir/0Uv+GEyPrDv7Nqw9CjQsruHHNuGL2HltMQEexizNhvdwak0u5pWL
- oDlKEPBF0mdaGLk9MMflTWpHWJ01166KeQOTOfbXC9h8KgQgekG+iZKCYsKIBI3mz3qD
- FH5DaMsJFXnVXuATfy8bkKibiR5/sq8/0MVzWKXoVw4AdILEpc5iiSvpx2gg+/vZ7Y6A
- X4rQ==
-X-Gm-Message-State: APjAAAVK4XU6xGyPVerpuqNAD2Po5hJeU4rbaTrvYhNrfn886EP7q9c1
- MKyoFZFBw3PNqf4FiGWgUtT2IBwlfyEi8ywoLKs=
-X-Google-Smtp-Source: APXvYqwqQa6VF33CMCt8O0l67vz6RPsv2B0iKfSbPqVTz8CU2gL6QmVvT/bexV2aIPz90w7iljIe5b0/1WPZmU8gSMw=
-X-Received: by 2002:a5e:9741:: with SMTP id h1mr6668699ioq.143.1572553600094; 
- Thu, 31 Oct 2019 13:26:40 -0700 (PDT)
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+ bh=hxY2xvCmHkLxQyEFc1Ne/xSaX0XlHc5GnIQ8lQEupv0=;
+ b=DDSDnLszED5tq+HdFhkC3UEoQTkimdNUCgzPJw4N3ejR78xgynQqBc6OgJP1EKc6t1
+ 9rB7YI3uN01Dz9pob6ZGL401yC4FqNTuW/KVa3k7pnPVOPBznAIeKMi3YTNhfNH7/gSh
+ PotS1dpgN2nO2Ig/9SH7BlSoDhJZ05p3nnCiCuD2I1pYigkOX0m6XzSH3jdBhei4UOtg
+ wx/dcdjaan6SO12xlggb7Go3keOd+MatAmH0z7a9GFBnjKXy0C6WQ6qGAsJFA50Z37OM
+ LCeAuTJshyFPRoEtiyMLugaAkqnEWxhu0DVtBG2gOSzt7RgTK0IJrBZsiZfzlo62cM/t
+ pQMg==
+X-Gm-Message-State: APjAAAXngXHhw1jjpI4wcex8xfmWyvvzcHLXDzoyBhafBbtf3XLUsO5u
+ 0O+rMjDP91QRYRuJyXCIuaEuFoyN+HgPVgsqMEHSbMdu6Ws=
+X-Google-Smtp-Source: APXvYqzdC3qjqMp85y7gajwXs4h88uwysW6YEJYbZbsgIUuOXFOsNOETaOMEN1NuA4bPLZeUu0nKJvSTyGfj+n8zLiE=
+X-Received: by 2002:a05:600c:292:: with SMTP id
+ 18mr2929977wmk.67.1572542661262; 
+ Thu, 31 Oct 2019 10:24:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAM2K0np63wni3G7GNWPxTq40Kb1VeTN7Ocn=E=BqSmd+pDsX9A@mail.gmail.com>
- <7e2a821c-ed6b-ccb1-f517-405359358a26@redhat.com>
- <CAM2K0nox06JcmjfM20G1-p2Vwq5Xb7hRAX0DVBfdCepnqUiZQg@mail.gmail.com>
- <b6ef8a2d-04aa-aa73-a8f3-ef649786a163@redhat.com>
-In-Reply-To: <b6ef8a2d-04aa-aa73-a8f3-ef649786a163@redhat.com>
-From: Wayne Li <waynli329@gmail.com>
-Date: Thu, 31 Oct 2019 15:26:27 -0500
-Message-ID: <CAM2K0nqnfJyp02wjp=krof7QDrARHvFL28om8Dudr4E1ACwB0A@mail.gmail.com>
-Subject: Re: Missing PVR setting capability
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000b9585705963aaaea"
+From: Robert Foley <robert.foley@linaro.org>
+Date: Thu, 31 Oct 2019 13:24:10 -0400
+Message-ID: <CAEyhzFtb6Gn86VkR+BXbUPsHLtfbjDwotwZXDVyLCMjbrTXWrA@mail.gmail.com>
+Subject: logfile issue
+To: qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::d31
+X-Received-From: 2a00:1450:4864:20::341
+X-Mailman-Approved-At: Thu, 31 Oct 2019 16:44:58 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,168 +84,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: KONRAD Frederic <frederic.konrad@adacore.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ Peter Puhov <peter.puhov@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b9585705963aaaea
-Content-Type: text/plain; charset="UTF-8"
+We hit an issue when trying to change the log file from the monitor
+console.  The root of the issue here is that the qemu_logfile handle
+is not thread safe.  So when we try to close the file, we end up with
+a seg fault.  The full analysis is below along with some possible
+solutions.
+Will plan to post a patch soon, but any comments or opinions on our
+proposed solution would be appreciated.  Thanks.
 
-So it's been a little while and I've been trying some different
-approaches.  I think the problem I am having is because I don't have the
-required kernel modules loaded.  When I run lsmod I only see the following
-two modules loaded:
+The version of QEMU we are using is: master as of about Oct 15,
+9020e9526cd08c4dc99d54dba48730de2908c970.
 
-Module                  Size  Used by
-nfsd                  100940  11
-exportfs                6723  1 nfsd
+This is what we did to reproduce the issue.
+First we enable logging and select the log file.
+(qemu) log in_asm,out_asm,op
+(qemu) logfile asm.out
 
-The archlinux website says the following modules need to be running:
+Then we start this command in the guest.  This just keeps the guest
+performing operations that result in logging to be constantly
+generated.
+$ for i in {0..1000}; do ls -l; done
 
-kvm_intel             245760  0
-kvmgt                  28672  0
-mdev                   20480  2 kvmgt,vfio_mdev
-vfio                   32768  3 kvmgt,vfio_mdev,vfio_iommu_type1
-kvm                   737280  2 kvmgt,kvm_intel
-irqbypass              16384  1 kvm
+Next we switch to the monitor console and change the file.
+(qemu) logfile asm_new.log
 
-Granted that I am running on a powerpc processor not an intel processor,
-the modules that I myself to need to load will be a little different from
-that.  But I can't find those modules to load on my device.  For example, I
-can't find a kvm.ko file on the device despite the fact that I was able to
-find the kvm directories I mentioned earlier.  Did I have to compile those
-modules myself?  In the kvm module directory there is C code and a
-makefile, but just running make doesn't work.
+This action causes a seg fault.  Please see the stack trace (below).
 
-Note that I'm using a Yocto Linux system that I myself didn't build.  My
-coworker built the Linux system on SD card and was in the process of trying
-to figure out if kvm was actually enabled on the system or not before he
-left the company.  I'm learning about the system as I go.
+The code, which changes the log file unconditionally
+(qemu_set_log_filename()), closes the qemu_logfile, sets it to NULL,
+and then opens the new file.
+Since the file handle is still in use, we end up with a seg fault when
+the code which is trying to log ends up using a NULL file handle.
 
-On Tue, Oct 22, 2019 at 1:46 PM Thomas Huth <thuth@redhat.com> wrote:
+We are considering a few solutions.
 
-> On 22/10/2019 18.24, Wayne Li wrote:
-> > If I run "lsmod | grep kvm" nothing shows up but if I just do a "find .
-> > -name "kvm"" I get the following:
-> [...]
-> > ./sys/devices/virtual/misc/kvm
-> > ./sys/class/misc/kvm
-> > ./sys/kernel/debug/kvm
-> > ./sys/module/kvm
-> >
-> > I guess this shows my OS does have KVM on it?
->
-> Alright, I guess that means that KVM compiled into the kernel ... should
-> be fine, I think.
->
-> >  I added the two flags you
-> > mentioned when running QEMU (the -cpu and the -machine flags) but the
-> > -cpu flag doesn't seem like it's doing anything as even when I put a
-> > clearly wrong argument after the flag no error related to the cpu is
-> > thrown.  Also it says ppce500 is not a machine type and that the
-> > supported machines are:
-> >
-> > bamboo               bamboo
-> > boeing-machine       Boeing Machine
-> > none                 empty machine
-> > ref405ep             ref405ep
-> > taihu                taihu
-> > virtex-ml507         Xilinx Virtex ML507 reference design
->
-> Oh, are you running qemu-system-ppc instead of qemu-system-ppc64? I
-> thought these e*500 CPUs are 64-bit? Is your host kernel 64-bit or 32-bit?
->
-> Anyway, if you're using a modified version of QEMU, you should
-> definitely ask the people who did the modifications there.
->
->  Thomas
->
->
+A straightforward solution would be to simply prevent the file from
+being changed while logging is enabled.  In other words, force the
+user to first disable logging before changing the log file.
+This solution seems to cover the general case.  However, if a user
+were to disable logging and change the log file in quick succession,
+we would still be subject to a similar race.  A log call could still
+make it through the logging enable check and proceed to use a file
+handle that gets changed to NULL.
 
---000000000000b9585705963aaaea
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Another option is to add a mutex to prevent the qemu_logfile handle
+from being changed while it is in use.  This certainly works and has
+the advantage of being fairly straightforward.  Also we are thinking
+that since the mutex would only be used when logging is enabled it has
+the advantage of not having an effect on the normal case performance.
+Another option is to implement a simple atomic ref count and prevent
+the file from being changed while there are outstanding references.
 
-<div dir=3D"ltr"><div>So it&#39;s been a little while and I&#39;ve been try=
-ing some different approaches.=C2=A0 I think the problem I am having is bec=
-ause I don&#39;t have the required kernel modules loaded.=C2=A0 When I run =
-lsmod I only see the following two modules loaded:</div><div><br>Module =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Size =C2=A0Used =
-by<br>nfsd =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A010=
-0940 =C2=A011<br>exportfs =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A06723 =C2=A01 nfsd</div><div><br></div><div>The archlinux website says=
- the following modules need to be running:</div><div><br></div><div>kvm_int=
-el =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 245760 =C2=A00<br>kvmgt =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A028672 =C2=A00<br>md=
-ev =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 20480 =C2=
-=A02 kvmgt,vfio_mdev<br>vfio =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 32768 =C2=A03 kvmgt,vfio_mdev,vfio_iommu_type1<br>kvm =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 737280 =C2=A02 =
-kvmgt,kvm_intel<br>irqbypass =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A016384 =C2=A01 kvm</div><div><br></div><div>Granted that I am running on =
-a powerpc processor not an intel processor, the modules that I myself to ne=
-ed to load will be a little different from that.=C2=A0 But I can&#39;t find=
- those modules to load on my device.=C2=A0 For example, I can&#39;t find a =
-kvm.ko file on the device despite the fact that I was able to find the kvm =
-directories I mentioned earlier.=C2=A0 Did I have to compile those modules =
-myself?=C2=A0 In the kvm module directory there is C code and a makefile, b=
-ut just running make doesn&#39;t work.</div><div><br></div><div>Note that I=
-&#39;m using a Yocto Linux system that I myself didn&#39;t build.=C2=A0 My =
-coworker built the Linux system on SD card and was in the process of trying=
- to figure out if kvm was actually enabled on the system or not before he l=
-eft the company.=C2=A0 I&#39;m learning about the system as I go.<br></div>=
-</div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">=
-On Tue, Oct 22, 2019 at 1:46 PM Thomas Huth &lt;<a href=3D"mailto:thuth@red=
-hat.com">thuth@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmai=
-l_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,20=
-4,204);padding-left:1ex">On 22/10/2019 18.24, Wayne Li wrote:<br>
-&gt; If I run &quot;lsmod | grep kvm&quot; nothing shows up but if I just d=
-o a &quot;find .<br>
-&gt; -name &quot;kvm&quot;&quot; I get the following:<br>
-[...]<br>
-&gt; ./sys/devices/virtual/misc/kvm<br>
-&gt; ./sys/class/misc/kvm<br>
-&gt; ./sys/kernel/debug/kvm<br>
-&gt; ./sys/module/kvm<br>
-&gt; <br>
-&gt; I guess this shows my OS does have KVM on it?<br>
-<br>
-Alright, I guess that means that KVM compiled into the kernel ... should<br=
->
-be fine, I think.<br>
-<br>
-&gt;=C2=A0 I added the two flags you<br>
-&gt; mentioned when running QEMU (the -cpu and the -machine flags) but the<=
-br>
-&gt; -cpu flag doesn&#39;t seem like it&#39;s doing anything as even when I=
- put a<br>
-&gt; clearly wrong argument after the flag no error related to the cpu is<b=
-r>
-&gt; thrown.=C2=A0 Also it says ppce500 is not a machine type and that the<=
-br>
-&gt; supported machines are:<br>
-&gt; <br>
-&gt; bamboo =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 bamboo<br>
-&gt; boeing-machine =C2=A0 =C2=A0 =C2=A0 Boeing Machine<br>
-&gt; none =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 empty mac=
-hine<br>
-&gt; ref405ep =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ref405ep<br>
-&gt; taihu =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0taihu<br>
-&gt; virtex-ml507 =C2=A0 =C2=A0 =C2=A0 =C2=A0 Xilinx Virtex ML507 reference=
- design<br>
-<br>
-Oh, are you running qemu-system-ppc instead of qemu-system-ppc64? I<br>
-thought these e*500 CPUs are 64-bit? Is your host kernel 64-bit or 32-bit?<=
-br>
-<br>
-Anyway, if you&#39;re using a modified version of QEMU, you should<br>
-definitely ask the people who did the modifications there.<br>
-<br>
-=C2=A0Thomas<br>
-<br>
-</blockquote></div>
+We are leaning towards the mutex option, and plan to post a patch
+soon, but would appreciate comments or opinions on this solution.
 
---000000000000b9585705963aaaea--
+Thanks,
+Rob Foley
+
+stack trace
+==========================================
+Thread 10 "qemu-system-aar" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0xffff113f9d90 (LWP 9493)] __flockfile
+(stream=0x0) at ../sysdeps/pthread/flockfile.c:27
+27 ../sysdeps/pthread/flockfile.c: No such file or directory.
+(gdb) bt
+#0  __flockfile (stream=0x0) at ../sysdeps/pthread/flockfile.c:27
+#1  0x0000aaaae0fac8b8 in qemu_flockfile (f=<optimized out>) at
+/home/rob/qemu/qemu_unchanged/include/sysemu/os-posix.h:87
+#2  qemu_log_lock () at /home/rob/qemu/qemu_unchanged/include/qemu/log.h:57
+#3  translator_loop (ops=0xaaaae17f1348 <aarch64_translator_ops>,
+db=0xffff113f9088, db@entry=0xffff113f9098,
+cpu=cpu@entry=0xaaab0a52bc50,
+    tb=tb@entry=0xffff4c92d000 <code_gen_buffer+814927796>,
+max_insns=max_insns@entry=512) at
+/home/rob/qemu/qemu_unchanged/accel/tcg/translator.c:121
+#4  0x0000aaaae10c1c18 in gen_intermediate_code
+(cpu=cpu@entry=0xaaab0a52bc50, tb=tb@entry=0xffff4c92d000
+<code_gen_buffer+814927796>, max_insns=max_insns@entry=512)
+    at /home/rob/qemu/qemu_unchanged/target/arm/translate.c:11320
+#5  0x0000aaaae0fab248 in tb_gen_code (cpu=0xaaab0a52bc50,
+cpu@entry=0xffffabe2a000, pc=187650897458448, cs_base=65536,
+flags=43690, cflags=-16252928, cflags@entry=524288)
+    at /home/rob/qemu/qemu_unchanged/accel/tcg/translate-all.c:1738
+#6  0x0000aaaae0fa8e74 in tb_find (cf_mask=524288, tb_exit=0,
+last_tb=0xffff4c92cc40 <code_gen_buffer+814926836>,
+cpu=0xffffabe2a000)
+    at /home/rob/qemu/qemu_unchanged/accel/tcg/cpu-exec.c:408
+#7  cpu_exec (cpu=0xffffabe2a000, cpu@entry=0xaaab0a52bc50) at
+/home/rob/qemu/qemu_unchanged/accel/tcg/cpu-exec.c:730
+#8  0x0000aaaae0f6de24 in tcg_cpu_exec (cpu=0xaaab0a52bc50) at
+/home/rob/qemu/qemu_unchanged/cpus.c:1454
+#9  0x0000aaaae0f70908 in qemu_tcg_cpu_thread_fn (arg=0xaaab0a52bc50)
+at /home/rob/qemu/qemu_unchanged/cpus.c:1762
+#10 0x0000aaaae145bd38 in qemu_thread_start (args=<optimized out>) at
+/home/rob/qemu/qemu_unchanged/util/qemu-thread-posix.c:519
+#11 0x0000ffffabe0a088 in start_thread (arg=0xffffcc20410f) at
+pthread_create.c:463
+#12 0x0000ffffabd7a4ec in thread_start () at
+../sysdeps/unix/sysv/linux/aarch64/clone.S:78
 
