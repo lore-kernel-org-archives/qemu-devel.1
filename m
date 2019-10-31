@@ -7,81 +7,83 @@ X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4A03CA9ECB
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:58:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A773CA9ECB
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:59:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C3DC2087F
-	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:58:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7A0820873
+	for <qemu-devel@archiver.kernel.org>; Thu, 31 Oct 2019 15:59:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Scd5hrUF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C3DC2087F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GDs+iWhk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7A0820873
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQCqP-0004m0-Fr
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 11:58:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60768)
+	id 1iQCrQ-0007RV-6c
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 11:59:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59436)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iQCkD-00067d-7P
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:52:18 -0400
+ (envelope-from <vgoyal@redhat.com>) id 1iQCfR-0006Cw-Gl
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:47:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iQCkB-0008Oo-HK
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:52:16 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31172
+ (envelope-from <vgoyal@redhat.com>) id 1iQCfQ-0003QY-2O
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:47:21 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39377
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iQCkB-0008Lk-A6
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:52:15 -0400
+ (Exim 4.71) (envelope-from <vgoyal@redhat.com>) id 1iQCfP-0003OS-TJ
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 11:47:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572537134;
+ s=mimecast20190719; t=1572536837;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/5SVsKScJzxtB1/7M2yHvL15ehF1kCrtK9L+g/fHU74=;
- b=Scd5hrUF6YkRCIwCeBiDJbfvpVZC8eTURmT18NFvzaGzGi6OBAHVL/1ko5JweFKNOd2dEW
- fTqU5pH6gmmOXaDPiBhtV1C7rEFcaD5sf2lQXvXwrcS1Y7fa8+adzc12hl7cBBTEXe7A78
- AeM8Ii/db0EwnP9jcwty23JGQlceKQs=
+ bh=/bN6qjkz7uGyQg2oZJKCbiSXw0CGxYGlLFfHV0Xaupk=;
+ b=GDs+iWhk3tSX5bz6MltpHckNAaTU6xnc4dgHMckVkMvj/c4k4qLnKNQi7Xi6YiE0r5a/9l
+ /divVFzkos9Mc3Z/UK6MM0raDzsrQ9UrjeCfQWjqqdc3fYt8wgIwtrkp0rEarz/uKZABRj
+ mSn+GIHIHCpfDqyLgxJFCQ8r75OiM8U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-256-jbuahQc9Nua-Rwa_QgSjDw-1; Thu, 31 Oct 2019 11:52:09 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-291-BP3QQzgAMZma-0ZmYHCT1Q-1; Thu, 31 Oct 2019 11:47:14 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DCAC1800D56;
- Thu, 31 Oct 2019 15:52:08 +0000 (UTC)
-Received: from work-vm (ovpn-116-247.ams2.redhat.com [10.36.116.247])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 264EE19C7F;
- Thu, 31 Oct 2019 15:52:06 +0000 (UTC)
-Date: Thu, 31 Oct 2019 15:52:04 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: geoff@hostfission.com
-Subject: Re: RFC: New device for zero-copy VM memory access
-Message-ID: <20191031155204.GD3128@work-vm>
-References: <c83fe0e7157562c3c17598917977eb4d@hostfission.com>
- <20191030185248.GC3114@work-vm>
- <88f1c3701740665b0ebe2f24c8ce7ade@hostfission.com>
- <20191031132443.GB3128@work-vm>
- <b36330ecd38ce872982df4d41d3d4695@hostfission.com>
- <CAFEAcA8uWCQY8GwtH4oHU8ybXsvmYaB4Qa5hnxyd+344WFjJ_Q@mail.gmail.com>
- <b87d5b2fb84ac0a3c98a62dcc0c19077@hostfission.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8A97800D49;
+ Thu, 31 Oct 2019 15:47:13 +0000 (UTC)
+Received: from horse.redhat.com (unknown [10.18.25.35])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 092135C1C3;
+ Thu, 31 Oct 2019 15:47:11 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id 9429A2237B5; Thu, 31 Oct 2019 11:47:10 -0400 (EDT)
+Date: Thu, 31 Oct 2019 11:47:10 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: "misono.tomohiro@fujitsu.com" <misono.tomohiro@fujitsu.com>
+Subject: Re: [Virtio-fs] [PATCH] virtiofsd: Fix data corruption with O_APPEND
+ wirte in writeback mode
+Message-ID: <20191031154710.GB7308@redhat.com>
+References: <20191023122523.1816-1-misono.tomohiro@jp.fujitsu.com>
+ <20191023200752.GB6942@redhat.com>
+ <20191024150225.GB6903@redhat.com>
+ <OSBPR01MB3783EBE1BB481BD1B14B8D45E5650@OSBPR01MB3783.jpnprd01.prod.outlook.com>
+ <OSBPR01MB37833C9325AD3D9190108FAEE5610@OSBPR01MB3783.jpnprd01.prod.outlook.com>
+ <OSBPR01MB3783739E4F9545DABEF3E230E5630@OSBPR01MB3783.jpnprd01.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <b87d5b2fb84ac0a3c98a62dcc0c19077@hostfission.com>
+In-Reply-To: <OSBPR01MB3783739E4F9545DABEF3E230E5630@OSBPR01MB3783.jpnprd01.prod.outlook.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: jbuahQc9Nua-Rwa_QgSjDw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: BP3QQzgAMZma-0ZmYHCT1Q-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,50 +95,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: "'virtio-fs@redhat.com'" <virtio-fs@redhat.com>,
+ "'qemu-devel@nongnu.org'" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* geoff@hostfission.com (geoff@hostfission.com) wrote:
->=20
->=20
-> On 2019-11-01 01:52, Peter Maydell wrote:
-> > On Thu, 31 Oct 2019 at 14:26, <geoff@hostfission.com> wrote:
-> > > As the author of Looking Glass, I also have to consider the
-> > > maintenance
-> > > and the complexity of implementing the vhost protocol into the
-> > > project.
-> > > At this time a complete Porthole client can be implemented in 150
-> > > lines
-> > > of C without external dependencies, and most of that is boilerplate
-> > > socket code. This IMO is a major factor in deciding to avoid
-> > > vhost-user.
-> >=20
-> > This is essentially a proposal that we should make our project and
-> > code more complicated so that your project and code can be simpler.
-> > I hope you can see why this isn't necessarily an argument that will hol=
+On Thu, Oct 31, 2019 at 09:39:23AM +0000, misono.tomohiro@fujitsu.com wrote=
+:
+[..]
+> > > > Hi Misono,
+> > > >
+> > > > Have you tried running pjdfstests. Looks like with the patch applie=
 d
-> > very much weight for us :-)
->=20
-> Certainly, I do which is why I am still going to see about using vhost,
-> however, a device that uses vhost is likely more complex then the device
-> as it stands right now and as such more maintenance would be involved on
-> your end also. Or have I missed something in that vhost-user can be used
-> directly as a device?
-
-The basic vhost-user stuff isn't actually that hard;  if you aren't
-actually shuffling commands over the queues you should find it pretty
-simple - so I think your assumption about it being simpler if you avoid
-it might be wrong.  It might be easier if you use it!
-
-Dave
-
+> > > > I see following tests failing which were passing without the patch.
+> > > > Can you please have a look. I ran daemon with options "-o
+> > > cache=3Dalways -o writeback"
 > >=20
-> > thanks
-> > -- PMM
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > I see these errors in both with and without this patch but not always.
+> > Do you always see the failure?
+> >=20
+> > I use:
+> >   Kernel: Fuse's for-next branch
+> >   Qemu: virtio-fs-dev branch
+> >   backend: XFS (relatime)
+> >=20
+> > These tests fail because a/c/m time is not updated as expected.
+> > So it seems this is related to the failure of xfstest generic/003.
+> > I will look into the problem more.
+> >=20
+>=20
+> Hi,
+>=20
+> So I fugured out the problem.=20
+> The failure occurs when guest clock is earlier than host clock in writeba=
+ck mode.
+>=20
+> The failure case checks:
+>  1. get current c/time of file
+>  2. sleep 1 second
+>  3. modify file's metadata/data
+>  4. check if c/mtime is updated
+>=20
+> And the tests fail because:
+>  1. when file is opened, guest inode's time is initialized by host's inod=
+e information
+>  2. In writeback mode, guest clock is used for c/mtime update
+>  3. if guest clock is earlier than host clock, c/mtime could be updated
+>     earlier than current inode time.=20
+>=20
+> I can reproduce the problem reliably by deliberately setting guest clock =
+earlier
+> than host clock. I'm not sure if virtiofs is to be blmaed in this case, b=
+ut should
+> we not update c/mtime in guest if it is earlier then current c/mtime?
+>=20
+> Anyway, I believe this O_APPEND fix patch is irrelevant to the problem,
+> could you please check it again?
+
+Hi Misono,
+
+Thanks for looking into it. I agree that a/c/m time updates with -o writeba=
+ck
+is probably a different issue and not related to your patch. So I am fine
+with your patch.
+
+Thanks
+Vivek
 
 
