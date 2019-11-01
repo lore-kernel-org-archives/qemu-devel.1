@@ -2,110 +2,83 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1380CA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 736A1CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:13:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC326222CB
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:08:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEEEB20656
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:13:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OrG2Ar8P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC326222CB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JOZrrdmK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEEEB20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQZTL-00046V-Jw
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 12:08:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57442)
+	id 1iQZXn-0000aT-UA
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 12:12:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58954)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iQZNp-0007G5-27
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:02:42 -0400
+ (envelope-from <eblake@redhat.com>) id 1iQZW0-00088Q-KV
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iQZNm-0000jy-Ny
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:02:39 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47885
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1iQZVx-00089t-U2
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:11:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48243
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iQZNm-0000QO-C3
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:02:38 -0400
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iQZVx-00085n-PN
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:11:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572624153;
+ s=mimecast20190719; t=1572624664;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=UkS/nkj9XTBNWuex7cpymqsx5t1dyAQuwv0iXFf0l1M=;
- b=OrG2Ar8PIC8+l6rHvLbu2QgOk8YiuStmdx8RBHcbQrz63QRaxsm7r4le7aDmtV/q8mVuvw
- 2VfqOdnEK3j/dcOIHv88maXf5Kn02667oKuEdKOotN/bEYBDqpaP+1Dw3WBiTWOJeyuBGw
- n54zWsDUShzmVqYjsVsItlQQy3O5I48=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7O80s9+2hxAFio1VB/6P/mPwrZ1Z6sjDn8YshcXlTZ8=;
+ b=JOZrrdmKGEh+PnUtEUWGMyHwlJuXZV5+hzHVkzMo5wb/66Vzj96y4MxjMQELLbgBWaLbz/
+ 3nwUmz9IF86B8MUhkRQgbKE47QG5dJ2KOARLhfviOnUe8xCCjEIgj594abZjPrM7yThg0g
+ GpAT9rgMXp9GVQHkbAFGEs5+F+5vZrA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-CBg6zaYiNaSHT6zTqVR8GQ-1; Fri, 01 Nov 2019 12:02:27 -0400
-X-MC-Unique: CBg6zaYiNaSHT6zTqVR8GQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-117-5lquw0-6NL6nqhSv-qos6g-1; Fri, 01 Nov 2019 12:11:00 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B5421800D67;
- Fri,  1 Nov 2019 16:02:26 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-28.ams2.redhat.com
- [10.36.117.28])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C1EF15C297;
- Fri,  1 Nov 2019 16:02:20 +0000 (UTC)
-Subject: Re: [PATCH for-4.2 1/4] Revert "qcow2: skip writing zero buffers to
- empty COW areas"
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20191101100019.9512-1-mreitz@redhat.com>
- <20191101100019.9512-2-mreitz@redhat.com>
- <c4e21028-0321-20ea-21b8-31dec87fac97@redhat.com>
- <e8f8ae20-b036-4330-4851-f099fc534f9b@redhat.com>
- <20191101154241.GA23153@localhost.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d6864a28-ed91-29d4-e4cc-dacc26f1b764@redhat.com>
-Date: Fri, 1 Nov 2019 17:02:19 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C926107ACC0;
+ Fri,  1 Nov 2019 16:10:59 +0000 (UTC)
+Received: from [10.3.116.203] (ovpn-116-203.phx2.redhat.com [10.3.116.203])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 642AF166B8;
+ Fri,  1 Nov 2019 16:10:55 +0000 (UTC)
+Subject: Re: bitmaps -- copying allocation status into dirty bitmaps
+To: "Denis V. Lunev" <den@openvz.org>, John Snow <jsnow@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>
+References: <b9b55376-3d6d-5dc2-2db3-bdced9e2d46a@redhat.com>
+ <c8a31188-ff21-368e-12ca-0481a51c3136@openvz.org>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <686e8a67-06e9-d7f1-037b-cf730de23744@redhat.com>
+Date: Fri, 1 Nov 2019 17:10:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191101154241.GA23153@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <c8a31188-ff21-368e-12ca-0481a51c3136@openvz.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 5lquw0-6NL6nqhSv-qos6g-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="rc09sqFmyXbTOfWoFyNuUnKtMuAzhyDjC"
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -117,93 +90,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rc09sqFmyXbTOfWoFyNuUnKtMuAzhyDjC
-Content-Type: multipart/mixed; boundary="GN5U5G54LsBYoMt53GWKFEiMZhS4xQ6bf"
-
---GN5U5G54LsBYoMt53GWKFEiMZhS4xQ6bf
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 01.11.19 16:42, Kevin Wolf wrote:
-> Am 01.11.2019 um 15:01 hat Max Reitz geschrieben:
->> On 01.11.19 13:40, Eric Blake wrote:
->>> On 11/1/19 11:00 AM, Max Reitz wrote:
->>>> This reverts commit c8bb23cbdbe32f5c326365e0a82e1b0e68cdcd8a.
->>>>
->>>> This commit causes fundamental performance problems on XFS (because
->>>> fallocate() stalls the AIO pipeline), and as such it is not clear that
->>>> we should unconditionally enable this behavior.
->>>>
->>>> We expect subclusters to alleviate the performance penalty of small
->>>> writes to newly allocated clusters, so when we get them, the originall=
-y
->>>> intended performance gain may actually no longer be significant.
->>>>
->>>> If we want to reintroduce something similar to c8bb23cbdbe, it will
->>>> require extensive benchmarking on various systems with subclusters
->>>> enabled.
->>>>
->>>> Cc: qemu-stable@nongnu.org
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>
->>>> +++ b/qapi/block-core.json
->>>> @@ -3304,8 +3304,6 @@
->>>> =C2=A0 #
->>>> =C2=A0 # @cor_write: a write due to copy-on-read (since 2.11)
->>>> =C2=A0 #
->>>> -# @cluster_alloc_space: an allocation of file space for a cluster
->>>> (since 4.1)
->>>> -#
->>>> =C2=A0 # @none: triggers once at creation of the blkdebug node (since =
-4.1)
->>>
->>> Deleting released qapi is not backwards-compatible.
+On 11/1/19 4:49 PM, Denis V. Lunev wrote:
+> On 11/1/19 4:42 PM, John Snow wrote:
+>> Hi, in one of my infamously unreadable and long status emails, I
+>> mentioned possibly wanting to copy allocation data into bitmaps as a way
+>> to enable users to create (external) snapshots from outside of the
+>> libvirt/qemu context.
 >>
->> Right. :-/
+>> (That is: to repair checkpoints in libvirt after a user extended the
+>> backing chain themselves, you want to restore bitmap information for
+>> that node. Conveniently, this information IS the allocation map, so we
+>> can do this.)
 >>
->> I=E2=80=99ll just not make changes to the QAPI schema.  It doesn=E2=80=
-=99t hurt to leave
->> this in.
+>> It came up at KVM Forum that we probably do want this, because oVirt
+>> likes the idea of being able to manipulate these chains from outside of
+>> libvirt/qemu.
+>>
+>> Denis suggested that instead of a new command, we can create a special
+>> name -- maybe "#ALLOCATED" or something similar that can never be
+>> allocated as a user-defined bitmap name -- as a special source for the
+>> merge command.
+>>
+>> You'd issue a merge from "#ALLOCATED" to "myBitmap0" to copy the current
+>> allocation data into "myBitmap0", for instance.
+> original problem was a little bit incorrect. After some thoughts I found
+> that this is NOT enough. We should also add zeroed clusters to the
+> bitmap to merge! They do cover some data clusters from the original
+> image.
 >=20
-> Why would it be incompatible to drop an enum value that is only ever
-> used in output and that QEMU doesn't generate?
+> Thus we should either provide "ALLOCATED" bitmap for other purposes,
+> and we should supply "CHANGED" which contains allocated AND
+> explicitly zeroed clusters.
 
-This isn=E2=80=99t output at all, it=E2=80=99s input for blockdev-add for b=
-lkdebug nodes.
+I'm also wondering if 'nbd-server-add' should add support to expose a=20
+'qemu:allocation:XXX' meta context, in addition to the existing=20
+'qemu:dirty-bitmap:XXX' contexts (would it just be a 0/1 bit for what is=20
+allocated in block layer XXX, or would it be an integer depth 0,1,2,...=20
+based on how deep in the chain a cluster is allocated, or?)
 
-Max
+It may also be interesting to have a way to have 'nbd-server-add' force=20
+EIO errors to reads from an area not covered by a bitmap (whether that=20
+be the dirty bitmap or the #ALLOCATED bitmap), rather than falling back=20
+to a read from the backing chain, to ensure that an NBD client using=20
+such a backup image cannot read any more data than what the bitmap says=20
+is available.
+
+>=20
+> Den
+>> Some thoughts:
+>>
+>> - The only commands where this pseudo-bitmap makes sense is merge.
+>> enable/disable/remove/clear/add don't make sense here.
+>>
+>> - This pseudo bitmap might make sense for backup, but it's not needed;
+>> you can just merge into an empty/enabled bitmap and then use that.
+>>
+>> - Creating an allocation bitmap on-the-fly is probably not possible
+>> directly in the merge command, because the disk status calls might take
+>> too long...
+>>
+>> Hm, actually, I'm not sure how to solve that one. Merge would need to
+>> become a job (or an async QMP command?) or we'd need to keep an
+>> allocation bitmap object around and in-sync. I don't really want to do
+>> either, so maybe I'm missing an obvious/better solution.
+>>
+>> Also, with regards to introspection, if we do create a special reserved
+>> name like #ALLOCATED, we need to make sure that this is available and
+>> obvious via the QAPI schema.
+
+If nothing else, the recent addition of introspectible QMP features=20
+should make this possible.
 
 
---GN5U5G54LsBYoMt53GWKFEiMZhS4xQ6bf--
-
---rc09sqFmyXbTOfWoFyNuUnKtMuAzhyDjC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl28VwsACgkQ9AfbAGHV
-z0CK6QgAhyiqvd/SKKxBGLOPdqM6r4EadRD3Bnv+/+BgUucTVoKLg9Z5Sgeb/AZ+
-jC7ps5YxuJD4Op+aaZgIlAM7HYaWLVKJDAz0Iijv3c8LtfL+35Uj6UgBM8+xI8W9
-THKTUliNxz14Oum/ODoLQEpMuBx0/aPlQhNkQyTqjxYBemcc1rk6n0Ve934UWMJN
-jyDLTfVDtxDdIIl4FSL39KqKAAiTxX/sduWJ17STTbvGEQkPpeQXSPj6sHGRG/CY
-otmCUe2sWbWRrO3JlW+l4e4tTes41cDXvk+z4BKYJHOxn5fRBBv7Mn09CNjVKcvj
-M9qyry9UFbRK4T2C+jqvRbDwy9a74Q==
-=lLUt
------END PGP SIGNATURE-----
-
---rc09sqFmyXbTOfWoFyNuUnKtMuAzhyDjC--
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
