@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC456CA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 15:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2601CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 15:32:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6F2B20656
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 15:28:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B983420650
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 15:32:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DgeFbS/B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6F2B20656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XcGyZKFg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B983420650
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQYr1-0003Ex-Rb
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 11:28:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49986)
+	id 1iQYuv-0006Vj-Nx
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 11:32:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49989)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iQYnz-00017i-O3
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 11:25:41 -0400
+ (envelope-from <mreitz@redhat.com>) id 1iQYo1-00018L-UO
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 11:25:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iQYnx-0006aj-FF
+ (envelope-from <mreitz@redhat.com>) id 1iQYnw-0006Wa-J2
  for qemu-devel@nongnu.org; Fri, 01 Nov 2019 11:25:38 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21205
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26130
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iQYnx-0006ZQ-B7
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 11:25:37 -0400
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iQYnw-0006Q2-Eb
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 11:25:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572621937;
+ s=mimecast20190719; t=1572621935;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=icUeNLBSxyx75ffAXIxpWLaiCSmihYFyORHxaJ+gyyQ=;
- b=DgeFbS/B55U/uEfUUojMr5FwMaHGG+7xn742aCMrzpDxNiq8pgXmWo11JCNpIFZ1JBDIlr
- Ed3UsnfaoQWlV/fBhhdRtGgLUpNYs5hnoIQNh64CaUUaxNfgErvC2Vs4TyNk0yilS6DfR5
- 4cHvmWoU7hHK+J8VsHHuK7+BRBZDREo=
+ bh=dnBtfPanCpkQhB8YXyZbX9l7wtgxl4lx1Ac9A8bX38E=;
+ b=XcGyZKFg3l01q5CgpZ5bnC/MqtciLxcRlDZfwA5di8mdxWKX1/XAzBD66IYzfsnU5YCP18
+ MGgpUAkqUNpRVf1wBfJvxXOYcf/SAppC5dtU//7xNUdTirP2DlVWvw/rQ2MHAZSeKeG/hv
+ LMxmAsm8q7VvxUtyUisJ855LlunUXCs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-M1hTulrCPgG_8SUMBogPhg-1; Fri, 01 Nov 2019 11:25:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-124-ySc46r3WOk-vpWBPCzs-rw-1; Fri, 01 Nov 2019 11:25:22 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 80E051800D67;
- Fri,  1 Nov 2019 15:25:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3ACFD801E7D;
+ Fri,  1 Nov 2019 15:25:21 +0000 (UTC)
 Received: from localhost (ovpn-117-28.ams2.redhat.com [10.36.117.28])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5CBB0600F8;
- Fri,  1 Nov 2019 15:25:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D49205D6A7;
+ Fri,  1 Nov 2019 15:25:17 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH for-4.2 v2 3/3] block/file-posix: Let post-EOF fallocate
- serialize
-Date: Fri,  1 Nov 2019 16:25:10 +0100
-Message-Id: <20191101152510.11719-4-mreitz@redhat.com>
+Subject: [PATCH for-4.2 v2 1/3] block: Make wait/mark serialising requests
+ public
+Date: Fri,  1 Nov 2019 16:25:08 +0100
+Message-Id: <20191101152510.11719-2-mreitz@redhat.com>
 In-Reply-To: <20191101152510.11719-1-mreitz@redhat.com>
 References: <20191101152510.11719-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: M1hTulrCPgG_8SUMBogPhg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: ySc46r3WOk-vpWBPCzs-rw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,65 +96,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The XFS kernel driver has a bug that may cause data corruption for qcow2
-images as of qemu commit c8bb23cbdbe32f.  We can work around it by
-treating post-EOF fallocates as serializing up until infinity (INT64_MAX
-in practice).
+Make both bdrv_mark_request_serialising() and
+bdrv_wait_serialising_requests() public so they can be used from block
+drivers.
 
 Cc: qemu-stable@nongnu.org
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/file-posix.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ include/block/block_int.h |  3 +++
+ block/io.c                | 24 ++++++++++++------------
+ 2 files changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 0b7e904d48..1f0f61a02b 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -2721,6 +2721,42 @@ raw_do_pwrite_zeroes(BlockDriverState *bs, int64_t o=
-ffset, int bytes,
-     RawPosixAIOData acb;
-     ThreadPoolFunc *handler;
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 02dc0034a2..32fa323b63 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -999,6 +999,9 @@ extern unsigned int bdrv_drain_all_count;
+ void bdrv_apply_subtree_drain(BdrvChild *child, BlockDriverState *new_pare=
+nt);
+ void bdrv_unapply_subtree_drain(BdrvChild *child, BlockDriverState *old_pa=
+rent);
 =20
-+#ifdef CONFIG_FALLOCATE
-+    if (offset + bytes > bs->total_sectors * BDRV_SECTOR_SIZE) {
-+        BdrvTrackedRequest *req;
-+        uint64_t end;
++bool coroutine_fn bdrv_wait_serialising_requests(BdrvTrackedRequest *self)=
+;
++void bdrv_mark_request_serialising(BdrvTrackedRequest *req, uint64_t align=
+);
 +
-+        /*
-+         * This is a workaround for a bug in the Linux XFS driver,
-+         * where writes submitted through the AIO interface will be
-+         * discarded if they happen beyond a concurrently running
-+         * fallocate() that increases the file length (i.e., both the
-+         * write and the fallocate() happen beyond the EOF).
-+         *
-+         * To work around it, we extend the tracked request for this
-+         * zero write until INT64_MAX (effectively infinity), and mark
-+         * it as serializing.
-+         *
-+         * We have to enable this workaround for all filesystems and
-+         * AIO modes (not just XFS with aio=3Dnative), because for
-+         * remote filesystems we do not know the host configuration.
-+         */
-+
-+        req =3D bdrv_co_get_self_request(bs);
-+        assert(req);
-+        assert(req->type =3D=3D BDRV_TRACKED_WRITE);
-+        assert(req->offset <=3D offset);
-+        assert(req->offset + req->bytes >=3D offset + bytes);
-+
-+        end =3D INT64_MAX & -(uint64_t)bs->bl.request_alignment;
-+        req->bytes =3D end - req->offset;
-+        req->overlap_bytes =3D req->bytes;
-+
-+        bdrv_mark_request_serialising(req, bs->bl.request_alignment);
+ int get_tmp_filename(char *filename, int size);
+ BlockDriver *bdrv_probe_all(const uint8_t *buf, int buf_size,
+                             const char *filename);
+diff --git a/block/io.c b/block/io.c
+index 02659f994d..039c0d49c9 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -715,7 +715,7 @@ static void tracked_request_begin(BdrvTrackedRequest *r=
+eq,
+     qemu_co_mutex_unlock(&bs->reqs_lock);
+ }
+=20
+-static void mark_request_serialising(BdrvTrackedRequest *req, uint64_t ali=
+gn)
++void bdrv_mark_request_serialising(BdrvTrackedRequest *req, uint64_t align=
+)
+ {
+     int64_t overlap_offset =3D req->offset & ~(align - 1);
+     uint64_t overlap_bytes =3D ROUND_UP(req->offset + req->bytes, align)
+@@ -805,7 +805,7 @@ void bdrv_dec_in_flight(BlockDriverState *bs)
+     bdrv_wakeup(bs);
+ }
+=20
+-static bool coroutine_fn wait_serialising_requests(BdrvTrackedRequest *sel=
+f)
++bool coroutine_fn bdrv_wait_serialising_requests(BdrvTrackedRequest *self)
+ {
+     BlockDriverState *bs =3D self->bs;
+     BdrvTrackedRequest *req;
+@@ -1437,14 +1437,14 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChi=
+ld *child,
+          * with each other for the same cluster.  For example, in copy-on-=
+read
+          * it ensures that the CoR read and write operations are atomic an=
+d
+          * guest writes cannot interleave between them. */
+-        mark_request_serialising(req, bdrv_get_cluster_size(bs));
++        bdrv_mark_request_serialising(req, bdrv_get_cluster_size(bs));
+     }
+=20
+     /* BDRV_REQ_SERIALISING is only for write operation */
+     assert(!(flags & BDRV_REQ_SERIALISING));
+=20
+     if (!(flags & BDRV_REQ_NO_SERIALISING)) {
+-        wait_serialising_requests(req);
 +        bdrv_wait_serialising_requests(req);
-+    }
-+#endif
-+
-     acb =3D (RawPosixAIOData) {
-         .bs             =3D bs,
-         .aio_fildes     =3D s->fd,
+     }
+=20
+     if (flags & BDRV_REQ_COPY_ON_READ) {
+@@ -1841,10 +1841,10 @@ bdrv_co_write_req_prepare(BdrvChild *child, int64_t=
+ offset, uint64_t bytes,
+     assert(!(flags & ~BDRV_REQ_MASK));
+=20
+     if (flags & BDRV_REQ_SERIALISING) {
+-        mark_request_serialising(req, bdrv_get_cluster_size(bs));
++        bdrv_mark_request_serialising(req, bdrv_get_cluster_size(bs));
+     }
+=20
+-    waited =3D wait_serialising_requests(req);
++    waited =3D bdrv_wait_serialising_requests(req);
+=20
+     assert(!waited || !req->serialising ||
+            is_request_serialising_and_aligned(req));
+@@ -2008,8 +2008,8 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvC=
+hild *child,
+=20
+     padding =3D bdrv_init_padding(bs, offset, bytes, &pad);
+     if (padding) {
+-        mark_request_serialising(req, align);
+-        wait_serialising_requests(req);
++        bdrv_mark_request_serialising(req, align);
++        bdrv_wait_serialising_requests(req);
+=20
+         bdrv_padding_rmw_read(child, req, &pad, true);
+=20
+@@ -2111,8 +2111,8 @@ int coroutine_fn bdrv_co_pwritev_part(BdrvChild *chil=
+d,
+     }
+=20
+     if (bdrv_pad_request(bs, &qiov, &qiov_offset, &offset, &bytes, &pad)) =
+{
+-        mark_request_serialising(&req, align);
+-        wait_serialising_requests(&req);
++        bdrv_mark_request_serialising(&req, align);
++        bdrv_wait_serialising_requests(&req);
+         bdrv_padding_rmw_read(child, &req, &pad, false);
+     }
+=20
+@@ -3205,7 +3205,7 @@ static int coroutine_fn bdrv_co_copy_range_internal(
+         /* BDRV_REQ_SERIALISING is only for write operation */
+         assert(!(read_flags & BDRV_REQ_SERIALISING));
+         if (!(read_flags & BDRV_REQ_NO_SERIALISING)) {
+-            wait_serialising_requests(&req);
++            bdrv_wait_serialising_requests(&req);
+         }
+=20
+         ret =3D src->bs->drv->bdrv_co_copy_range_from(src->bs,
+@@ -3336,7 +3336,7 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, i=
+nt64_t offset, bool exact,
+      * new area, we need to make sure that no write requests are made to i=
+t
+      * concurrently or they might be overwritten by preallocation. */
+     if (new_bytes) {
+-        mark_request_serialising(&req, 1);
++        bdrv_mark_request_serialising(&req, 1);
+     }
+     if (bs->read_only) {
+         error_setg(errp, "Image is read-only");
 --=20
 2.21.0
 
