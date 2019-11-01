@@ -2,79 +2,80 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E31F8CA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 09:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B87EACA9ED0
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 09:36:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABDC621734
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 09:33:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8798E218AC
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 09:36:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bEQHY6b3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABDC621734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IRj39rwk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8798E218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQTJ0-0001wt-Q8
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 05:33:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35372)
+	id 1iQTLg-0003Ot-Ct
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 05:36:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35856)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iQTGX-0001IO-LD
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 05:30:46 -0400
+ (envelope-from <berrange@redhat.com>) id 1iQTK2-0002Wx-Dz
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 05:34:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iQTGW-00058Y-7u
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 05:30:45 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:38420)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iQTGO-0004Um-FH
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 05:30:44 -0400
-Received: by mail-ot1-x342.google.com with SMTP id v24so2579093otp.5
- for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 02:30:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=pVbFEXRJPQmFEeUourYiKsiWufSWREg016e0mSXJHmE=;
- b=bEQHY6b3ttHOzk8lyUwW5XFeXUriP2vEzC/2YjpBAecikKKvoMRuk2wgU6F1mBPV28
- Bmruda58Pt8z51NsSOjCdn44qrCwcYokweq1jqNL5sirp46DR9iLDyPZZ6tJAqokmf5T
- 9HD1nCerTvF8Ig2AlO/ojBnsZdp9YmYe9BKT74mxNu3klcMp7uTZ3BvSqSrqMkgwmVLP
- WpGGyLL9AVmoVTlrDc3wwmVBy4PL1OyoEE1v1NIdFlRZI54841PlC99W4NqQ/0i4I6Gb
- T100D2bA1diDQBQJekkTyO4p9KgYo7SIZ45LgTgLmtNthW7ggzdA74sjQTnicRNuCnnG
- wRIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=pVbFEXRJPQmFEeUourYiKsiWufSWREg016e0mSXJHmE=;
- b=gKArMVF0E1gpNKReSdRlAiWK6ybtwNbToqAwfv+O5ouSL2wgWp8wwX2JMSQNUBclvk
- L7pKFgjhvhSpnR3HrfXiYOrQS3b3ziMiMg+D3Ftg1ZDMdKuXFU9GffDxzs2iiCu2Oqhs
- soHPA2Ft7z+XRjYEkubl8eysT2pDe+32BiLDjKfdZllFyWBBWCy9xKx3D5h43V9fo/1p
- DkGxbfuXUKgl/uZg5hqEUPcDXdv5W+WRz6sq3xckq1Xym0AtcgsbL0B4ICrLfrXhpQ0Y
- l5NMxDtnVxyU5e+TyARO177JJuHZPFIZ19lCRqBPz8RTrDhiS4+JYrqqsEbJbMGSgHet
- o3gg==
-X-Gm-Message-State: APjAAAWbBpsKW2pHqyDcVU1KMQwOw55ZU11IOFM0Q/h0JEkOkLckXx2l
- 2hZfX85iC+FiuqHLptAETQBhkUV9XdxqXz1Es1pgrYlq4ofG1wis
-X-Google-Smtp-Source: APXvYqw86Mg6YUvqyvx29I88zGMnj84Fwb941JZSdYbCuJ+GgRdOwaF9OHmTZFkqANTpHt6SvfTr3w3IJEdjF1R4Eak=
-X-Received: by 2002:a05:6830:c3:: with SMTP id x3mr4435003oto.91.1572600632930; 
- Fri, 01 Nov 2019 02:30:32 -0700 (PDT)
+ (envelope-from <berrange@redhat.com>) id 1iQTJy-0002b4-Hl
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 05:34:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31188
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iQTJy-0002Mx-5M
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 05:34:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572600854;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZSsFrCUF0k++AHPqPC9Xue0/dre3Y8SNz6MsQf1dCsY=;
+ b=IRj39rwkkOwU6LBZtbsxHQnTMdzCMawcZADoAcmBxZGfsNs4z1eXqQxGnE+ifKA+OgjvfB
+ dxjPa2JX2U0r1b86zqNL9bWB1dLW+EDobpMP9Hokcwr1zRJVwv68oQtVPVW1X/mrlm11oc
+ LEyCXnonO2zwj/7hypkl7LTdphYbYAo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-370-rj1w2tA2MUigO2ehv5ML7w-1; Fri, 01 Nov 2019 05:34:10 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD047801E7E;
+ Fri,  1 Nov 2019 09:34:09 +0000 (UTC)
+Received: from redhat.com (ovpn-112-45.ams2.redhat.com [10.36.112.45])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9924F1001281;
+ Fri,  1 Nov 2019 09:34:06 +0000 (UTC)
+Date: Fri, 1 Nov 2019 10:34:03 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Subject: Re: Best practices to handle shared objects through qemu upgrades?
+Message-ID: <20191101093403.GE11296@redhat.com>
+References: <CAATJJ0KDOsA=Y+zLBT=PhcU0Q+gqRPSWkK0VaksisVC9_i5M_g@mail.gmail.com>
 MIME-Version: 1.0
-References: <20191101085140.5205-1-peter.maydell@linaro.org>
-In-Reply-To: <20191101085140.5205-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 1 Nov 2019 09:30:21 +0000
-Message-ID: <CAFEAcA-N-Fh7+NCHGPXuK-H6DUTOwjfCU6rmZGz4k8n+tkKdxw@mail.gmail.com>
-Subject: Re: [PULL 00/11] target-arm queue
-To: QEMU Developers <qemu-devel@nongnu.org>, Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+In-Reply-To: <CAATJJ0KDOsA=Y+zLBT=PhcU0Q+gqRPSWkK0VaksisVC9_i5M_g@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: rj1w2tA2MUigO2ehv5ML7w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +87,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 1 Nov 2019 at 08:51, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> target-arm queue: two bug fixes, plus the KVM/SVE patchset,
-> which is a new feature but one which was in my pre-softfreeze
-> pullreq (it just had to be dropped due to an unexpected test failure.)
->
-> thanks
-> -- PMM
->
-> The following changes since commit b7c9a7f353c0e260519bf735ff0d4aa01e72784b:
->
->   Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' into staging (2019-10-31 15:57:30 +0000)
->
-> are available in the Git repository at:
->
->   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20191101-1
->
-> for you to fetch changes up to d9ae7624b659362cb2bb2b04fee53bf50829ca56:
->
->   target/arm: Allow reading flags from FPSCR for M-profile (2019-11-01 08:49:10 +0000)
+On Fri, Nov 01, 2019 at 08:14:08AM +0100, Christian Ehrhardt wrote:
+> Hi everyone,
+> we've got a bug report recently - on handling qemu .so's through
+> upgrades - that got me wondering how to best handle it.
+> After checking with Paolo yesterday that there is no obvious solution
+> that I missed we agreed this should be brought up on the list for
+> wider discussion.
+> Maybe there already is a good best practise out there, or if it
+> doesn't exist we might want to agree upon one going forward.
+> Let me outline the case and the ideas brought up so far.
+>=20
+> Case
+> - You have qemu representing a Guest
+> - Due to other constraints e.g. PT you can't live migrate (which would
+> be preferred)
+> - You haven't used a specific shared object yet - lets say RBD storage
+> driver as example
+> - Qemu gets an update, packaging replaces the .so files on disk
+> - The Qemu process and the .so files on disk now have a mismatch in $buil=
+did
+> - If you hotplug an RBD device it will fail to load the (now new) .so
 
-Drew, this is still failing 'make check' on the aarch32-chroot-on-aarch64 :-(
+What happens when it fails to load ?  Does the user get a graceful
+error message or does QEMU abort ? I'd hope the former.
 
-(armhf)pmaydell@mustang-maydell:~/qemu/build/all-a32$
-QTEST_QEMU_BINARY=arm-softmmu/qemu-system-arm ./tests/arm-cpu-features
-/arm/arm/query-cpu-model-expansion: OK
-/arm/arm/kvm/query-cpu-model-expansion: qemu-system-arm: Failed to
-retrieve host CPU features
-Broken pipe
-/home/peter.maydell/qemu/tests/libqtest.c:140: kill_qemu() tried to
-terminate QEMU process but encountered exit status 1 (expected 0)
-Aborted
+>=20
+> On almost any other service than "qemu representing a VM" the answer
+> is "restart it", some even re-exec in place to keep things up and
+> running.
+>=20
+> Ideas so far:
+> a) Modules are checked by build-id, so keep them in a per build-id dir on=
+ disk
+>   - qemu could be made looking preferred in -$buildid dir first
+>   - do not remove the packages with .so's on upgrades
+>   - needs a not-too-complex way to detect which buildids running qemu pro=
+cesses
+>     have for packaging to be able to "autoclean later"
+>   - Needs some dependency juggling for Distro packaging but IMHO can be m=
+ade
+>     to work if above simple "probing buildid of running qemu" would exist
+
+So this needs a bunch of special QEMU hacks in package mgmt tools
+to prevent the package upgrade & cleanup later. This does not look
+like a viable strategy to me.
+
+>=20
+> b) Preload the modules before upgrade
+>   - One could load the .so files before upgrade
+>   - The open file reference will keep the content around even with the
+> on disk file gone
+>   - lacking a 'load-module' command that would require fake hotplugs
+> which seems wrong
+>   - Required additional upgrade pre-planning
+>   - kills most benefits of modular code without an actual need for it
+> being loaded
+
+Well there's two benefits to modular approach
+
+ - Allow a single build to be selectively installed on a host or container
+   image, such that the install disk footprint is reduced
+ - Allow a faster startup such that huge RBD libraries dont slow down
+   startup of VMs not using RBD disks.
+
+Preloading the modules before upgrade doesn't have to the second benefit.
+We just have to make sure the pre loading doesn't impact the VM startup
+performance.
+
+IOW, register a SIGUSR2 handler which preloads all modules it finds on
+disk. Have a pre-uninstall option on the .so package that sends SIGUSR2
+to all QEMU processes. The challenge of course is that signals are
+async. You might suggest a QMP command, but only 1 process can have the
+QMP monitor open at any time and that's libvirt. Adding a second QMP
+monitor instance is possible but kind of gross for this purpose.
+
+Another option would be to pre-load the modules during startup, but
+do it asynchronously, so that its not blocking overall VM startup.
+eg just before starting the mainloop, spawn a background thread to
+load all remaining modules.
+
+This will potentially degrade performance of the guest CPUs a bit,
+but avoids the latency spike from being synchronous in the startup
+path.
 
 
-thanks
--- PMM
+> c) go back to non modular build
+>   - No :-)
+>=20
+> d) anything else out there?
+
+e) Don't do upgrades on a host with running VMs :-)
+
+   Upgrades can break the running VM even ignoring this particular
+   QEMU module scenario.=20
+
+f) Simply document that if you upgrade with running VMs that some
+   features like hotplug of RBD will become unavialable. Users can
+   then avoid upgrades if that matters to them.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
