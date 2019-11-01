@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0100BCA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF310CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:57:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C13B2204FD
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:57:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A7CE204FD
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:57:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OyqCk5FH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C13B2204FD
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VViZHBHO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A7CE204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQSkV-0007BX-Uo
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 04:57:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56535)
+	id 1iQSkc-00071d-My
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 04:57:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56560)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iQSf0-0001AC-4B
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:52:00 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iQSez-0001Bx-KN
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iQSew-0000W6-PK
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:56 -0400
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:54541)
+ (envelope-from <peter.maydell@linaro.org>) id 1iQSex-0000YM-E0
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:57 -0400
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:52127)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iQSew-0000Ge-IW
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:54 -0400
-Received: by mail-wm1-x336.google.com with SMTP id c12so4039918wml.4
- for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 01:51:53 -0700 (PDT)
+ id 1iQSex-0000Ui-5t
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:55 -0400
+Received: by mail-wm1-x334.google.com with SMTP id q70so8592108wme.1
+ for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 01:51:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=62TpCPLeToJz0pC4qYB0g1aPcp75KDGFrfBiQCUjf5E=;
- b=OyqCk5FHlgxu2t/T8mcCa0D9rXfQQyESK6j8dZu5gI7rHeKAZSjb7gvgzb4lY16vcp
- tOUd3gEVpDd8fjPZ6iPCVdOXNgyR2vHhwEBsslyqcPifV52+H3kahF63oM9kvm/NDrXO
- qmwXn28jVwPAECQPlNoeo2xbRNHBB7P+/424CzH10O9lHVXE6UNUbhkzECjqtqTmNF6y
- FlOkzIrNGcifiQVlGKkdYAwViB0cIM8yWSShruorhHqUuGihC50MNfsykXKCoBbs1G3m
- 0SLd4OU7TM3i7xYK0yVi77GY3Oj81KAmt9vwLx3COEFX0OKjtKI/xG8uWXBuwlxbUw14
- xBOA==
+ bh=GsD3QQxbEUJRJc4Np7QQU7K8ZouwI6xXEaEwME4AcL8=;
+ b=VViZHBHOAXkznGeBpvV3TrDjbhhWy6bTtz5Mto/Ho++Zs4qSI7y53ABT58xIgPUimJ
+ 9yIYS54womdYT70Zhte3kFAhEdbm1yH3H02mviwQGgVNSAGH/4kvW9fRED9fYE14ZXOL
+ M9xC9vNBv2I4sm8Mf/DDoBm2wCZAtWIwOzok/GzxqmY5+t5XWsUGUbcV1OLmk/K9gSvg
+ ShaivVfhQ9K0NcWS9fJHOAKc7PQ6fjQB0gEPsK5Kf7M9J1D1HXwgLlKMhMgnG4KpyDsQ
+ Kir9p/T7zKxwIpG9l6gJgoRB23fJnvm9b6m+Mz5JqNYa756ioxoxE+ba/pubUcKLHEw8
+ obkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=62TpCPLeToJz0pC4qYB0g1aPcp75KDGFrfBiQCUjf5E=;
- b=JneXSkzM9tTqkmJ6Ce4uODfWNwixEaom09neo1C2DnPs4OJjPCBpnoBVlWVWW/JjIC
- F4dGeS2aXEMPNqKCszg/zGwUWmT0utUdn4ijpHK47OZJgj1augwLLLMOTJ1sKrdUxKk9
- 0ZL65rTzg860YYYowSJspjoCCM560uVG3BLTfVjsYJrhY2qXNLgyZJrzN6WxXGPmcjHq
- ZGgd7ndNxoDFvOB5kaHjYfHNCV/vHfx50Q+pCrgYLAw4CbGoo6AHox6x3FL+dZrh/Tso
- qJD+ltlZqo/kOfpH4+UsPRDOussBR1eckULIYxk72mnnQ/luPn0Bon9oaz2JftlWjYBd
- NXWw==
-X-Gm-Message-State: APjAAAV0EfCjoK4x6/3nHsFgYrlYYwW6qJqhAaWDcKWo5C7gLqoK+pJX
- LQoiktXeoMfRdFhjWfgZW4yEiIkdJhPpVZI0
-X-Google-Smtp-Source: APXvYqzRPCxQu90lty6bAbYVWChe/HbVLl4hLyZlWesx/t5ljE91z/51kLvRJi2b06Iy70HGFRZIpA==
-X-Received: by 2002:a05:600c:228b:: with SMTP id
- 11mr9375776wmf.112.1572598311316; 
- Fri, 01 Nov 2019 01:51:51 -0700 (PDT)
+ bh=GsD3QQxbEUJRJc4Np7QQU7K8ZouwI6xXEaEwME4AcL8=;
+ b=SqnT7r0oEOzdX22xht8Xlhbct6g8NuBYmmTuxb8joo9unjSx1/7gIIs2ZQtcM6c0IH
+ bYwbbfxPRjMgT5DcV/SGT0ubnVwtElA/NbA6tM6nYchFZIR77uYgzyeSoYTIENm7o+RL
+ UpcVZwYYMVYZ5ER9dQ4SWkBC9RrIXb18hMNBK3LMdABJcLuIEstVUZi61R1nAhLi8GmY
+ dsIObVpoo5/MrlP8uxMsmFjobULvoGzP2hurV60kpLa+0Um/XbBvqXpoJQreQGwR9/GU
+ IlDsXTz2MlNx5dX1JJfBxd744FqOx5DvXkpnXpesvj6ECmZjSNBfrckETh+sZubvDWjZ
+ cGRg==
+X-Gm-Message-State: APjAAAV0L/QcoUwSCCtWvyxbzO1Ygd6Z59PrQiR7HKge6DflpD3oFEah
+ l9NNTTWHDfRiQkLvcL8QZ1ABlUPNuEWCvP+c
+X-Google-Smtp-Source: APXvYqzCGTTRSRurd3h+rtwzzQmOKopoALJSeeoo6Tf0LUwwXTfoJhUp8UQyu0l20cZRd872dvcPcw==
+X-Received: by 2002:a05:600c:1150:: with SMTP id
+ z16mr9541358wmz.153.1572598313714; 
+ Fri, 01 Nov 2019 01:51:53 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id d20sm8818922wra.4.2019.11.01.01.51.50
+ by smtp.gmail.com with ESMTPSA id d20sm8818922wra.4.2019.11.01.01.51.52
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 01 Nov 2019 01:51:50 -0700 (PDT)
+ Fri, 01 Nov 2019 01:51:53 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/11] target/arm/kvm: scratch vcpu: Preserve input
- kvm_vcpu_init features
-Date: Fri,  1 Nov 2019 08:51:36 +0000
-Message-Id: <20191101085140.5205-8-peter.maydell@linaro.org>
+Subject: [PULL 09/11] target/arm/kvm: host cpu: Add support for sve<N>
+ properties
+Date: Fri,  1 Nov 2019 08:51:38 +0000
+Message-Id: <20191101085140.5205-10-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191101085140.5205-1-peter.maydell@linaro.org>
 References: <20191101085140.5205-1-peter.maydell@linaro.org>
@@ -83,7 +83,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::336
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,114 +101,291 @@ Sender: "Qemu-devel"
 
 From: Andrew Jones <drjones@redhat.com>
 
-kvm_arm_create_scratch_host_vcpu() takes a struct kvm_vcpu_init
-parameter. Rather than just using it as an output parameter to
-pass back the preferred target, use it also as an input parameter,
-allowing a caller to pass a selected target if they wish and to
-also pass cpu features. If the caller doesn't want to select a
-target they can pass -1 for the target which indicates they want
-to use the preferred target and have it passed back like before.
+Allow cpu 'host' to enable SVE when it's available, unless the
+user chooses to disable it with the added 'sve=off' cpu property.
+Also give the user the ability to select vector lengths with the
+sve<N> properties. We don't adopt 'max' cpu's other sve property,
+sve-max-vq, because that property is difficult to use with KVM.
+That property assumes all vector lengths in the range from 1 up
+to and including the specified maximum length are supported, but
+there may be optional lengths not supported by the host in that
+range. With KVM one must be more specific when enabling vector
+lengths.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Tested-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-Reviewed-by: Beata Michalska <beata.michalska@linaro.org>
-Message-id: 20191031142734.8590-8-drjones@redhat.com
+Message-id: 20191031142734.8590-10-drjones@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/kvm.c   | 20 +++++++++++++++-----
- target/arm/kvm32.c |  6 +++++-
- target/arm/kvm64.c |  6 +++++-
- 3 files changed, 25 insertions(+), 7 deletions(-)
+ target/arm/cpu.h          |  2 ++
+ target/arm/cpu.c          |  3 +++
+ target/arm/cpu64.c        | 33 +++++++++++++++++----------------
+ target/arm/kvm64.c        | 14 +++++++++++++-
+ tests/arm-cpu-features.c  | 17 ++++++++---------
+ docs/arm-cpu-features.rst | 19 ++++++++++++-------
+ 6 files changed, 55 insertions(+), 33 deletions(-)
 
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index f07332bbda3..5b82cefef60 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -66,7 +66,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
-                                       int *fdarray,
-                                       struct kvm_vcpu_init *init)
- {
--    int ret, kvmfd = -1, vmfd = -1, cpufd = -1;
-+    int ret = 0, kvmfd = -1, vmfd = -1, cpufd = -1;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index a044d6028b6..e1a66a2d1cc 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -977,11 +977,13 @@ int aarch64_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
+ void aarch64_sve_change_el(CPUARMState *env, int old_el,
+                            int new_el, bool el0_a64);
++void aarch64_add_sve_properties(Object *obj);
+ #else
+ static inline void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq) { }
+ static inline void aarch64_sve_change_el(CPUARMState *env, int o,
+                                          int n, bool a)
+ { }
++static inline void aarch64_add_sve_properties(Object *obj) { }
+ #endif
  
-     kvmfd = qemu_open("/dev/kvm", O_RDWR);
-     if (kvmfd < 0) {
-@@ -86,7 +86,14 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
-         goto finish;
+ #if !defined(CONFIG_TCG)
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 17d1f2b2894..7a4ac9339bf 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -2670,6 +2670,9 @@ static void arm_host_initfn(Object *obj)
+     ARMCPU *cpu = ARM_CPU(obj);
+ 
+     kvm_arm_set_cpu_features_from_host(cpu);
++    if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
++        aarch64_add_sve_properties(obj);
++    }
+     arm_cpu_post_init(obj);
+ }
+ 
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index c161a146ff0..68baf0482ff 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -594,6 +594,21 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v, const char *name,
+     cpu->isar.id_aa64pfr0 = t;
+ }
+ 
++void aarch64_add_sve_properties(Object *obj)
++{
++    uint32_t vq;
++
++    object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
++                        cpu_arm_set_sve, NULL, NULL, &error_fatal);
++
++    for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
++        char name[8];
++        sprintf(name, "sve%d", vq * 128);
++        object_property_add(obj, name, "bool", cpu_arm_get_sve_vq,
++                            cpu_arm_set_sve_vq, NULL, NULL, &error_fatal);
++    }
++}
++
+ /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
+  * otherwise, a CPU with as many features enabled as our emulation supports.
+  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
+@@ -602,17 +617,11 @@ static void cpu_arm_set_sve(Object *obj, Visitor *v, const char *name,
+ static void aarch64_max_initfn(Object *obj)
+ {
+     ARMCPU *cpu = ARM_CPU(obj);
+-    uint32_t vq;
+-    uint64_t t;
+ 
+     if (kvm_enabled()) {
+         kvm_arm_set_cpu_features_from_host(cpu);
+-        if (kvm_arm_sve_supported(CPU(cpu))) {
+-            t = cpu->isar.id_aa64pfr0;
+-            t = FIELD_DP64(t, ID_AA64PFR0, SVE, 1);
+-            cpu->isar.id_aa64pfr0 = t;
+-        }
+     } else {
++        uint64_t t;
+         uint32_t u;
+         aarch64_a57_initfn(obj);
+ 
+@@ -712,17 +721,9 @@ static void aarch64_max_initfn(Object *obj)
+ #endif
      }
  
--    ret = ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, init);
-+    if (init->target == -1) {
-+        struct kvm_vcpu_init preferred;
-+
-+        ret = ioctl(vmfd, KVM_ARM_PREFERRED_TARGET, &preferred);
-+        if (!ret) {
-+            init->target = preferred.target;
-+        }
-+    }
-     if (ret >= 0) {
-         ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, init);
-         if (ret < 0) {
-@@ -98,10 +105,12 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
-          * creating one kind of guest CPU which is its preferred
-          * CPU type.
-          */
-+        struct kvm_vcpu_init try;
-+
-         while (*cpus_to_try != QEMU_KVM_ARM_TARGET_NONE) {
--            init->target = *cpus_to_try++;
--            memset(init->features, 0, sizeof(init->features));
--            ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, init);
-+            try.target = *cpus_to_try++;
-+            memcpy(try.features, init->features, sizeof(init->features));
-+            ret = ioctl(cpufd, KVM_ARM_VCPU_INIT, &try);
-             if (ret >= 0) {
-                 break;
-             }
-@@ -109,6 +118,7 @@ bool kvm_arm_create_scratch_host_vcpu(const uint32_t *cpus_to_try,
-         if (ret < 0) {
-             goto err;
-         }
-+        init->target = try.target;
-     } else {
-         /* Treat a NULL cpus_to_try argument the same as an empty
-          * list, which means we will fail the call since this must
-diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index 2451a2d4bbe..32bf8d6757c 100644
---- a/target/arm/kvm32.c
-+++ b/target/arm/kvm32.c
-@@ -53,7 +53,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-         QEMU_KVM_ARM_TARGET_CORTEX_A15,
-         QEMU_KVM_ARM_TARGET_NONE
-     };
--    struct kvm_vcpu_init init;
-+    /*
-+     * target = -1 informs kvm_arm_create_scratch_host_vcpu()
-+     * to use the preferred target
-+     */
-+    struct kvm_vcpu_init init = { .target = -1, };
+-    object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
+-                        cpu_arm_set_sve, NULL, NULL, &error_fatal);
++    aarch64_add_sve_properties(obj);
+     object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_max_vq,
+                         cpu_max_set_sve_max_vq, NULL, NULL, &error_fatal);
+-
+-    for (vq = 1; vq <= ARM_MAX_VQ; ++vq) {
+-        char name[8];
+-        sprintf(name, "sve%d", vq * 128);
+-        object_property_add(obj, name, "bool", cpu_arm_get_sve_vq,
+-                            cpu_arm_set_sve_vq, NULL, NULL, &error_fatal);
+-    }
+ }
  
-     if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
-         return false;
+ struct ARMCPUInfo {
 diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 850da1b5e6a..c7ecefbed72 100644
+index c93bbee425a..876184b8fe4 100644
 --- a/target/arm/kvm64.c
 +++ b/target/arm/kvm64.c
-@@ -502,7 +502,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-         KVM_ARM_TARGET_CORTEX_A57,
-         QEMU_KVM_ARM_TARGET_NONE
-     };
--    struct kvm_vcpu_init init;
-+    /*
-+     * target = -1 informs kvm_arm_create_scratch_host_vcpu()
-+     * to use the preferred target
-+     */
-+    struct kvm_vcpu_init init = { .target = -1, };
+@@ -488,7 +488,9 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+      * and then query that CPU for the relevant ID registers.
+      */
+     int fdarray[3];
++    bool sve_supported;
+     uint64_t features = 0;
++    uint64_t t;
+     int err;
  
-     if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
+     /* Old kernels may not know about the PREFERRED_TARGET ioctl: however
+@@ -578,13 +580,23 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+                               ARM64_SYS_REG(3, 0, 0, 3, 2));
+     }
+ 
++    sve_supported = ioctl(fdarray[0], KVM_CHECK_EXTENSION, KVM_CAP_ARM_SVE) > 0;
++
+     kvm_arm_destroy_scratch_host_vcpu(fdarray);
+ 
+     if (err < 0) {
          return false;
+     }
+ 
+-   /* We can assume any KVM supporting CPU is at least a v8
++    /* Add feature bits that can't appear until after VCPU init. */
++    if (sve_supported) {
++        t = ahcf->isar.id_aa64pfr0;
++        t = FIELD_DP64(t, ID_AA64PFR0, SVE, 1);
++        ahcf->isar.id_aa64pfr0 = t;
++    }
++
++    /*
++     * We can assume any KVM supporting CPU is at least a v8
+      * with VFPv4+Neon; this in turn implies most of the other
+      * feature bits.
+      */
+diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
+index 40d8395b7f7..b132ed09806 100644
+--- a/tests/arm-cpu-features.c
++++ b/tests/arm-cpu-features.c
+@@ -458,8 +458,8 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+             "We cannot guarantee the CPU type 'cortex-a15' works "
+             "with KVM on this host", NULL);
+ 
+-        assert_has_feature(qts, "max", "sve");
+-        resp = do_query_no_props(qts, "max");
++        assert_has_feature(qts, "host", "sve");
++        resp = do_query_no_props(qts, "host");
+         kvm_supports_sve = resp_get_feature(resp, "sve");
+         vls = resp_get_sve_vls(resp);
+         qobject_unref(resp);
+@@ -470,7 +470,7 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+             sprintf(max_name, "sve%d", max_vq * 128);
+ 
+             /* Enabling a supported length is of course fine. */
+-            assert_sve_vls(qts, "max", vls, "{ %s: true }", max_name);
++            assert_sve_vls(qts, "host", vls, "{ %s: true }", max_name);
+ 
+             /* Get the next supported length smaller than max-vq. */
+             vq = 64 - __builtin_clzll(vls & ~BIT_ULL(max_vq - 1));
+@@ -479,7 +479,7 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+                  * We have at least one length smaller than max-vq,
+                  * so we can disable max-vq.
+                  */
+-                assert_sve_vls(qts, "max", (vls & ~BIT_ULL(max_vq - 1)),
++                assert_sve_vls(qts, "host", (vls & ~BIT_ULL(max_vq - 1)),
+                                "{ %s: false }", max_name);
+ 
+                 /*
+@@ -489,7 +489,7 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+                  */
+                 sprintf(name, "sve%d", vq * 128);
+                 error = g_strdup_printf("cannot disable %s", name);
+-                assert_error(qts, "max", error,
++                assert_error(qts, "host", error,
+                              "{ %s: true, %s: false }",
+                              max_name, name);
+                 g_free(error);
+@@ -502,7 +502,7 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+             vq = __builtin_ffsll(vls);
+             sprintf(name, "sve%d", vq * 128);
+             error = g_strdup_printf("cannot disable %s", name);
+-            assert_error(qts, "max", error, "{ %s: false }", name);
++            assert_error(qts, "host", error, "{ %s: false }", name);
+             g_free(error);
+ 
+             /* Get an unsupported length. */
+@@ -514,7 +514,7 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+             if (vq <= SVE_MAX_VQ) {
+                 sprintf(name, "sve%d", vq * 128);
+                 error = g_strdup_printf("cannot enable %s", name);
+-                assert_error(qts, "max", error, "{ %s: true }", name);
++                assert_error(qts, "host", error, "{ %s: true }", name);
+                 g_free(error);
+             }
+         } else {
+@@ -523,8 +523,7 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
+     } else {
+         assert_has_not_feature(qts, "host", "aarch64");
+         assert_has_not_feature(qts, "host", "pmu");
+-
+-        assert_has_not_feature(qts, "max", "sve");
++        assert_has_not_feature(qts, "host", "sve");
+     }
+ 
+     qtest_quit(qts);
+diff --git a/docs/arm-cpu-features.rst b/docs/arm-cpu-features.rst
+index bed218d4461..1b367e22e16 100644
+--- a/docs/arm-cpu-features.rst
++++ b/docs/arm-cpu-features.rst
+@@ -272,31 +272,36 @@ SVE CPU Property Examples
+ 
+      $ qemu-system-aarch64 -M virt -cpu max
+ 
+-  3) Only enable the 128-bit vector length::
++  3) When KVM is enabled, implicitly enable all host CPU supported vector
++     lengths with the `host` CPU type::
++
++     $ qemu-system-aarch64 -M virt,accel=kvm -cpu host
++
++  4) Only enable the 128-bit vector length::
+ 
+      $ qemu-system-aarch64 -M virt -cpu max,sve128=on
+ 
+-  4) Disable the 512-bit vector length and all larger vector lengths,
++  5) Disable the 512-bit vector length and all larger vector lengths,
+      since 512 is a power-of-two.  This results in all the smaller,
+      uninitialized lengths (128, 256, and 384) defaulting to enabled::
+ 
+      $ qemu-system-aarch64 -M virt -cpu max,sve512=off
+ 
+-  5) Enable the 128-bit, 256-bit, and 512-bit vector lengths::
++  6) Enable the 128-bit, 256-bit, and 512-bit vector lengths::
+ 
+      $ qemu-system-aarch64 -M virt -cpu max,sve128=on,sve256=on,sve512=on
+ 
+-  6) The same as (5), but since the 128-bit and 256-bit vector
++  7) The same as (6), but since the 128-bit and 256-bit vector
+      lengths are required for the 512-bit vector length to be enabled,
+      then allow them to be auto-enabled::
+ 
+      $ qemu-system-aarch64 -M virt -cpu max,sve512=on
+ 
+-  7) Do the same as (6), but by first disabling SVE and then re-enabling it::
++  8) Do the same as (7), but by first disabling SVE and then re-enabling it::
+ 
+      $ qemu-system-aarch64 -M virt -cpu max,sve=off,sve512=on,sve=on
+ 
+-  8) Force errors regarding the last vector length::
++  9) Force errors regarding the last vector length::
+ 
+      $ qemu-system-aarch64 -M virt -cpu max,sve128=off
+      $ qemu-system-aarch64 -M virt -cpu max,sve=off,sve128=off,sve=on
+@@ -308,5 +313,5 @@ The examples in "SVE CPU Property Examples" exhibit many ways to select
+ vector lengths which developers may find useful in order to avoid overly
+ verbose command lines.  However, the recommended way to select vector
+ lengths is to explicitly enable each desired length.  Therefore only
+-example's (1), (3), and (5) exhibit recommended uses of the properties.
++example's (1), (4), and (6) exhibit recommended uses of the properties.
+ 
 -- 
 2.20.1
 
