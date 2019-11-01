@@ -2,80 +2,79 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B35CA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2222CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 18:06:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A17272085B
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:27:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A17272085B
+	by mail.kernel.org (Postfix) with ESMTPS id B0F4D2067D
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 18:06:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0F4D2067D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQahy-00087L-Py
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 13:27:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42902)
+	id 1iQbJt-0003JH-Ng
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 14:06:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48026)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iQahL-0007fQ-Hi
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:26:56 -0400
+ (envelope-from <peterx@redhat.com>) id 1iQbJA-0002Yg-0P
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 14:06:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iQahI-00075d-LX
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:26:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45764)
+ (envelope-from <peterx@redhat.com>) id 1iQbJ7-0002Hg-Cx
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 14:05:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41708)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iQahI-000743-DL
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:26:52 -0400
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iQbJ4-0002EM-PS
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 14:05:56 -0400
 Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
  [209.85.221.71])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 1368D4E83C
- for <qemu-devel@nongnu.org>; Fri,  1 Nov 2019 17:26:51 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id f4so5865548wrj.12
- for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 10:26:51 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 69410C058CBD
+ for <qemu-devel@nongnu.org>; Fri,  1 Nov 2019 18:05:52 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id i10so5908781wrp.7
+ for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 11:05:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=lYshMNMD074lqt0Gg9jN8T6k7Bw9MrDOl7A9NGI200I=;
- b=KmOLXTjvtEknRFldyZ3nRvtX+IqIxkJubG3cc5hytgRbvm5uO46AhIBgkAreB4H/vP
- bNFanoflYsgZHm4akKsr8yo2+muWie9UQw6U7/9kkurKXU9/Q5rYZYm3jc/gS55THQvy
- baSyYqlUcuT3j8CHNJYiz3GumzP26z9i/W1nWwHDN257Z4+8HBIzBXKxJgY0TWVgqKnE
- w79KJSuCY6Q+aB0M7g81fAJquWFd0SD63ZtrWvXmGLQyTHaMtLrIqK3RkyEm+iQ8KAI7
- e30dknqRB5nsl8dIvZnGYNkhp10SMPENFt5DMviZRSnYxRAsZ6k8kC85ZJJvgirozBc7
- hv3A==
-X-Gm-Message-State: APjAAAWF5rfbMqDcBryZBKJnhR/gieosEu4/sqzJGe9tSRyPxXSdOTKv
- 4Q9MvNA6Y7uuWJyUeDXF8zEUp7zARDEf/cNAxJJSO2ld83X+qS3po0SBQqy5d7u6VbWqOz3hMgF
- lVrGSfDJa1TT7Uiw=
-X-Received: by 2002:a5d:490c:: with SMTP id x12mr8551901wrq.301.1572629209786; 
- Fri, 01 Nov 2019 10:26:49 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqyeBQKScOYmEnkCvl0Q4sIZz/ZTgjjIPvlYo17THGClSuijIBO86k+SNVgCfmy98TH4LxZmOA==
-X-Received: by 2002:a5d:490c:: with SMTP id x12mr8551876wrq.301.1572629209566; 
- Fri, 01 Nov 2019 10:26:49 -0700 (PDT)
+ bh=bW4kAMz70wE8mNzhdtEquIUpa40ChbGszqjVepJPu4U=;
+ b=L4Qa4EVKmdRLTGT38vXD/F+9BR+D5Q02HinFoxobpNv6M8nYRkBO2eQoj87tEbzFdx
+ l+hGsx5jtMYOTHrWRHHUfP5LUSBNhVzPx1rCO+N2BXjFniu3pPdoNT7hAb9JX9AIaiHb
+ 9oPid6qGCsqi/30f+gsc8DWJsNdHPNijFCV9D6fcXLPLlEJ2PfSBhQe6OcPpf3X+ewdN
+ 6QcDTOJ0S28iGwZ5Dr6jqciTp4QrytiBpFmHltzDnp0HU7Dyka51WVHFWNgvmKIaPKSW
+ 9jqgw+VHIITK++Gwzo8zwuOpMDEJPXFqIyqYLXbTySUvbs+J7WuZgeSUQ9N3t+riudGe
+ dQpQ==
+X-Gm-Message-State: APjAAAVMdEbCshYDa+qwkyGYM3fHYvlItIz1hra2a/WW4Q3hyWpWxT8i
+ QBC+c+nVt2qntLT5jwWOzluPhsvnPnnqYtWIjLmPFjfrayS1oEcaLs+159pVnv3qpKZ0ppWfWKn
+ 8d8zMzb1pLu09GHw=
+X-Received: by 2002:a1c:49c2:: with SMTP id w185mr10993852wma.16.1572631551114; 
+ Fri, 01 Nov 2019 11:05:51 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxjJm1StaUbWOCA2FKeVNdnigm19E30FnhNyJnO6fb8pFcRPCd3Cx1FIc7nMDW0X28cHg57lw==
+X-Received: by 2002:a1c:49c2:: with SMTP id w185mr10993836wma.16.1572631550870; 
+ Fri, 01 Nov 2019 11:05:50 -0700 (PDT)
 Received: from xz-x1.metropole.lan (94.222.26.109.rev.sfr.net. [109.26.222.94])
- by smtp.gmail.com with ESMTPSA id y2sm8113738wmy.2.2019.11.01.10.26.27
+ by smtp.gmail.com with ESMTPSA id t12sm7612049wrx.93.2019.11.01.11.05.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 01 Nov 2019 10:26:48 -0700 (PDT)
-Date: Fri, 1 Nov 2019 18:26:21 +0100
+ Fri, 01 Nov 2019 11:05:49 -0700 (PDT)
+Date: Fri, 1 Nov 2019 19:05:45 +0100
 From: Peter Xu <peterx@redhat.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid
- alloc/free
-Message-ID: <20191101172349.GE8888@xz-x1.metropole.lan>
+To: Liu Yi L <yi.l.liu@intel.com>
+Subject: Re: [RFC v2 10/22] intel_iommu: add virtual command capability support
+Message-ID: <20191101180544.GF8888@xz-x1.metropole.lan>
 References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-10-git-send-email-yi.l.liu@intel.com>
- <20191029121544.GS3552@umbus.metropole.lan>
+ <1571920483-3382-11-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20191029121544.GS3552@umbus.metropole.lan>
+In-Reply-To: <1571920483-3382-11-git-send-email-yi.l.liu@intel.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -91,50 +90,280 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, Liu Yi L <yi.l.liu@intel.com>,
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
  Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
  jun.j.tian@intel.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
- alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, pbonzini@redhat.com,
- yi.y.sun@intel.com
+ alex.williamson@redhat.com, pbonzini@redhat.com, yi.y.sun@intel.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 29, 2019 at 01:15:44PM +0100, David Gibson wrote:
-> > +union IOMMUCTXPASIDReqDesc {
-> > +    struct {
-> > +        uint32_t min_pasid;
-> > +        uint32_t max_pasid;
-> > +        int32_t alloc_result; /* pasid allocated for the alloc request */
-> > +    };
-> > +    struct {
-> > +        uint32_t pasid; /* pasid to be free */
-> > +        int free_result;
-> > +    };
-> > +};
+On Thu, Oct 24, 2019 at 08:34:31AM -0400, Liu Yi L wrote:
+> This patch adds virtual command support to Intel vIOMMU per
+> Intel VT-d 3.1 spec. And adds two virtual commands: alloc_pasid
+> and free_pasid.
 > 
-> Apart from theproblem with writable fields, using a big union for
-> event data is pretty ugly.  If you need this different information for
-> the different events, it might make more sense to have a separate
-> notifier chain with a separate call interface for each event type,
-> rather than trying to multiplex them together.
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
+> ---
+>  hw/i386/intel_iommu.c          | 162 ++++++++++++++++++++++++++++++++++++++++-
+>  hw/i386/intel_iommu_internal.h |  38 ++++++++++
+>  hw/i386/trace-events           |   1 +
+>  include/hw/i386/intel_iommu.h  |   6 +-
+>  4 files changed, 205 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index e9f8692..88b843f 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -944,6 +944,7 @@ static VTDBus *vtd_find_as_from_bus_num(IntelIOMMUState *s, uint8_t bus_num)
+>                  return vtd_bus;
+>              }
+>          }
+> +        vtd_bus = NULL;
 
-I have no issue on the union definiion, however I do agree that it's a
-bit awkward to register one notifier for each event.
+I feel like I've commented on this..
 
-Instead of introducing even more notifier chains, I'm thinking whether
-we can simply provide a single notifier hook for all the four events.
-After all I don't see in what case we'll only register some of the
-events, like we can't register alloc_pasid() without registering to
-free_pasid() because otherwise it does not make sense..  And also you
-have the wrapper struct ("IOMMUCTXEventData") which contains the event
-type, so the notify() hook will know which message is this.
+Should this be a standalone patch?
 
-A side note is that I think you don't need the
-IOMMUCTXEventData.length.  If you see the code, vtd_bind_guest_pasid()
-does not even initialize length right now, and I think it could still
-work only because none of the vfio notify() hook
-(e.g. vfio_iommu_pasid_bind_notify) checks that length...
+>      }
+>      return vtd_bus;
+>  }
+> @@ -2590,6 +2591,140 @@ static void vtd_handle_iectl_write(IntelIOMMUState *s)
+>      }
+>  }
+>  
+> +static int vtd_request_pasid_alloc(IntelIOMMUState *s)
+> +{
+> +    VTDBus *vtd_bus;
+> +    int bus_n, devfn;
+> +    IOMMUCTXEventData event_data;
+> +    IOMMUCTXPASIDReqDesc req;
+> +    VTDIOMMUContext *vtd_ic;
+> +
+> +    event_data.event = IOMMU_CTX_EVENT_PASID_ALLOC;
+> +    event_data.data = &req;
+> +    req.min_pasid = VTD_MIN_HPASID;
+> +    req.max_pasid = VTD_MAX_HPASID;
+> +    req.alloc_result = 0;
+> +    event_data.length = sizeof(req);
+
+As mentioned in the other thread, do you think we can drop this length
+field?
+
+> +    for (bus_n = 0; bus_n < PCI_BUS_MAX; bus_n++) {
+> +        vtd_bus = vtd_find_as_from_bus_num(s, bus_n);
+> +        if (!vtd_bus) {
+> +            continue;
+> +        }
+> +        for (devfn = 0; devfn < PCI_DEVFN_MAX; devfn++) {
+> +            vtd_ic = vtd_bus->dev_ic[devfn];
+> +            if (!vtd_ic) {
+> +                continue;
+> +            }
+> +            iommu_ctx_event_notify(&vtd_ic->iommu_context, &event_data);
+
+Considering that we'll fill in the result into event_data, it could be
+a bit misleading to still call it "notify" here because normally it
+should only get data from the notifier caller rather than returning a
+meaningful value..  Things like SUCCESS/FAIL would be fine, but here
+we're returning a pasid from the notifier which seems a bit odd.
+
+Maybe rename it to iommu_ctx_event_deliver()?  Then we just rename all
+the references of "notify" thingys into "hook" or something clearer?
+
+> +            if (req.alloc_result > 0) {
+
+I'd suggest we comment on this:
+
+    We'll return the first valid result we got.  It's a bit hackish in
+    that we don't have a good global interface yet to talk to modules
+    like vfio to deliver this allocation request, so we're leveraging
+    this per-device context to do the same thing just to make sure the
+    allocation happens only once.
+
+Same to the pasid_free() below, though you can reference the comment
+here from there to be simple.
+
+> +                return req.alloc_result;
+> +            }
+> +        }
+> +    }
+> +    return -1;
+> +}
+> +
+> +static int vtd_request_pasid_free(IntelIOMMUState *s, uint32_t pasid)
+> +{
+> +    VTDBus *vtd_bus;
+> +    int bus_n, devfn;
+> +    IOMMUCTXEventData event_data;
+> +    IOMMUCTXPASIDReqDesc req;
+> +    VTDIOMMUContext *vtd_ic;
+> +
+> +    event_data.event = IOMMU_CTX_EVENT_PASID_FREE;
+> +    event_data.data = &req;
+> +    req.pasid = pasid;
+> +    req.free_result = 0;
+> +    event_data.length = sizeof(req);
+> +    for (bus_n = 0; bus_n < PCI_BUS_MAX; bus_n++) {
+> +        vtd_bus = vtd_find_as_from_bus_num(s, bus_n);
+> +        if (!vtd_bus) {
+> +            continue;
+> +        }
+> +        for (devfn = 0; devfn < PCI_DEVFN_MAX; devfn++) {
+> +            vtd_ic = vtd_bus->dev_ic[devfn];
+> +            if (!vtd_ic) {
+> +                continue;
+> +            }
+> +            iommu_ctx_event_notify(&vtd_ic->iommu_context, &event_data);
+> +            if (req.free_result == 0) {
+> +                return 0;
+> +            }
+> +        }
+> +    }
+> +    return -1;
+> +}
+> +
+> +/*
+> + * If IP is not set, set it and return 0
+> + * If IP is already set, return -1
+> + */
+> +static int vtd_vcmd_rsp_ip_check(IntelIOMMUState *s)
+> +{
+> +    if (!(s->vccap & VTD_VCCAP_PAS) ||
+> +         (s->vcrsp & 1)) {
+> +        return -1;
+> +    }
+
+VTD_VCCAP_PAS is not a IP check, so maybe simply move these chunk out
+to vtd_handle_vcmd_write?  Then we can rename this function to
+"void vtd_vcmd_ip_set(...)".
+
+> +    s->vcrsp = 1;
+> +    vtd_set_quad_raw(s, DMAR_VCRSP_REG,
+> +                     ((uint64_t) s->vcrsp));
+> +    return 0;
+> +}
+> +
+> +static void vtd_vcmd_clear_ip(IntelIOMMUState *s)
+> +{
+> +    s->vcrsp &= (~((uint64_t)(0x1)));
+> +    vtd_set_quad_raw(s, DMAR_VCRSP_REG,
+> +                     ((uint64_t) s->vcrsp));
+> +}
+> +
+> +/* Handle write to Virtual Command Register */
+> +static int vtd_handle_vcmd_write(IntelIOMMUState *s, uint64_t val)
+> +{
+> +    uint32_t pasid;
+> +    int ret = -1;
+> +
+> +    trace_vtd_reg_write_vcmd(s->vcrsp, val);
+> +
+> +    /*
+> +     * Since vCPU should be blocked when the guest VMCD
+> +     * write was trapped to here. Should be no other vCPUs
+> +     * try to access VCMD if guest software is well written.
+> +     * However, we still emulate the IP bit here in case of
+> +     * bad guest software. Also align with the spec.
+> +     */
+> +    ret = vtd_vcmd_rsp_ip_check(s);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    switch (val & VTD_VCMD_CMD_MASK) {
+> +    case VTD_VCMD_ALLOC_PASID:
+> +        ret = vtd_request_pasid_alloc(s);
+> +        if (ret < 0) {
+> +            s->vcrsp |= VTD_VCRSP_SC(VTD_VCMD_NO_AVAILABLE_PASID);
+> +        } else {
+> +            s->vcrsp |= VTD_VCRSP_RSLT(ret);
+> +        }
+> +        break;
+> +
+> +    case VTD_VCMD_FREE_PASID:
+> +        pasid = VTD_VCMD_PASID_VALUE(val);
+> +        ret = vtd_request_pasid_free(s, pasid);
+> +        if (ret < 0) {
+> +            s->vcrsp |= VTD_VCRSP_SC(VTD_VCMD_FREE_INVALID_PASID);
+> +        }
+> +        break;
+> +
+> +    default:
+> +        s->vcrsp |= VTD_VCRSP_SC(VTD_VCMD_UNDEFINED_CMD);
+> +        printf("Virtual Command: unsupported command!!!\n");
+
+Perhaps error_report_once()?
+
+> +        break;
+> +    }
+> +    vtd_vcmd_clear_ip(s);
+> +    return 0;
+> +}
+> +
+>  static uint64_t vtd_mem_read(void *opaque, hwaddr addr, unsigned size)
+>  {
+>      IntelIOMMUState *s = opaque;
+> @@ -2879,6 +3014,23 @@ static void vtd_mem_write(void *opaque, hwaddr addr,
+>          vtd_set_long(s, addr, val);
+>          break;
+>  
+> +    case DMAR_VCMD_REG:
+> +        if (!vtd_handle_vcmd_write(s, val)) {
+> +            if (size == 4) {
+> +                vtd_set_long(s, addr, val);
+> +            } else {
+> +                vtd_set_quad(s, addr, val);
+> +            }
+> +        }
+> +        break;
+> +
+> +    case DMAR_VCMD_REG_HI:
+> +        assert(size == 4);
+
+This assert() seems scary, but of course not a problem of this patch
+because plenty of that are there in vtd_mem_write..  So we can fix
+that later.
+
+Do you know what should happen on bare-metal from spec-wise that when
+the guest e.g. writes 2 bytes to these mmio regions?
+
+> +        if (!vtd_handle_vcmd_write(s, val)) {
+> +            vtd_set_long(s, addr, val);
+> +        }
+> +        break;
+> +
+>      default:
+>          if (size == 4) {
+>              vtd_set_long(s, addr, val);
+> @@ -3617,7 +3769,8 @@ static void vtd_init(IntelIOMMUState *s)
+>              s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
+>          } else if (!strcmp(s->scalable_mode, "modern")) {
+>              s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID
+> -                       | VTD_ECAP_FLTS | VTD_ECAP_PSS;
+> +                       | VTD_ECAP_FLTS | VTD_ECAP_PSS | VTD_ECAP_VCS;
+> +            s->vccap |= VTD_VCCAP_PAS;
+>          }
+>      }
+>  
+
+[...]
+
+> +#define VTD_VCMD_CMD_MASK           0xffUL
+> +#define VTD_VCMD_PASID_VALUE(val)   (((val) >> 8) & 0xfffff)
+> +
+> +#define VTD_VCRSP_RSLT(val)         ((val) << 8)
+> +#define VTD_VCRSP_SC(val)           (((val) & 0x3) << 1)
+> +
+> +#define VTD_VCMD_UNDEFINED_CMD         1ULL
+> +#define VTD_VCMD_NO_AVAILABLE_PASID    2ULL
+
+According to 10.4.44 - should this be 1?
 
 -- 
 Peter Xu
