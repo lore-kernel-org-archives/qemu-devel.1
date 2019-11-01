@@ -2,82 +2,84 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3ABECA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B35CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:27:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 742A3218AC
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:10:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c9aFcNfr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 742A3218AC
+	by mail.kernel.org (Postfix) with ESMTPS id A17272085B
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:27:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A17272085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQaR6-0002pL-JS
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 13:10:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40517)
+	id 1iQahy-00087L-Py
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 13:27:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42902)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iQaQI-0002Mx-Cz
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:09:19 -0400
+ (envelope-from <peterx@redhat.com>) id 1iQahL-0007fQ-Hi
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:26:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iQaQF-0002YJ-75
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:09:16 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44912
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <peterx@redhat.com>) id 1iQahI-00075d-LX
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:26:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45764)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iQaQE-0002Wf-Ul
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:09:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572628153;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=owFfsAFfbx6xHmd5kz54mM3ND889MjNomTPtv5+jNbo=;
- b=c9aFcNfrw/LxeL4jOrLkHhwjHgbffxGvHQ2FNnSwzPpHjkryqhazA7JVBmj57NhTlZ4GCh
- tku3NZcRPPy7Zbk7rRMOEHhbXcUTsHnSOX1Dr7U2y2IcNq4Q3u2jW2mXqPhCmyeGOXzbDp
- BRl5ugPevQvzbKrrK+saUI5LROtLcH0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-9H84DV5NNGSPGEc7tGhhtg-1; Fri, 01 Nov 2019 13:09:08 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iQahI-000743-DL
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:26:52 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA108107ACC0;
- Fri,  1 Nov 2019 17:09:07 +0000 (UTC)
-Received: from redhat.com (ovpn-112-25.ams2.redhat.com [10.36.112.25])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A479019C58;
- Fri,  1 Nov 2019 17:09:06 +0000 (UTC)
-Date: Fri, 1 Nov 2019 18:09:03 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Subject: Re: Best practices to handle shared objects through qemu upgrades?
-Message-ID: <20191101170903.GA13325@redhat.com>
-References: <CAATJJ0KDOsA=Y+zLBT=PhcU0Q+gqRPSWkK0VaksisVC9_i5M_g@mail.gmail.com>
- <20191101093403.GE11296@redhat.com>
- <CAATJJ0JrJS108ehZ8VkcYvgeNXEqev8C5vf2a+31J1eJdZ92uA@mail.gmail.com>
+ by mx1.redhat.com (Postfix) with ESMTPS id 1368D4E83C
+ for <qemu-devel@nongnu.org>; Fri,  1 Nov 2019 17:26:51 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id f4so5865548wrj.12
+ for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 10:26:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=lYshMNMD074lqt0Gg9jN8T6k7Bw9MrDOl7A9NGI200I=;
+ b=KmOLXTjvtEknRFldyZ3nRvtX+IqIxkJubG3cc5hytgRbvm5uO46AhIBgkAreB4H/vP
+ bNFanoflYsgZHm4akKsr8yo2+muWie9UQw6U7/9kkurKXU9/Q5rYZYm3jc/gS55THQvy
+ baSyYqlUcuT3j8CHNJYiz3GumzP26z9i/W1nWwHDN257Z4+8HBIzBXKxJgY0TWVgqKnE
+ w79KJSuCY6Q+aB0M7g81fAJquWFd0SD63ZtrWvXmGLQyTHaMtLrIqK3RkyEm+iQ8KAI7
+ e30dknqRB5nsl8dIvZnGYNkhp10SMPENFt5DMviZRSnYxRAsZ6k8kC85ZJJvgirozBc7
+ hv3A==
+X-Gm-Message-State: APjAAAWF5rfbMqDcBryZBKJnhR/gieosEu4/sqzJGe9tSRyPxXSdOTKv
+ 4Q9MvNA6Y7uuWJyUeDXF8zEUp7zARDEf/cNAxJJSO2ld83X+qS3po0SBQqy5d7u6VbWqOz3hMgF
+ lVrGSfDJa1TT7Uiw=
+X-Received: by 2002:a5d:490c:: with SMTP id x12mr8551901wrq.301.1572629209786; 
+ Fri, 01 Nov 2019 10:26:49 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqyeBQKScOYmEnkCvl0Q4sIZz/ZTgjjIPvlYo17THGClSuijIBO86k+SNVgCfmy98TH4LxZmOA==
+X-Received: by 2002:a5d:490c:: with SMTP id x12mr8551876wrq.301.1572629209566; 
+ Fri, 01 Nov 2019 10:26:49 -0700 (PDT)
+Received: from xz-x1.metropole.lan (94.222.26.109.rev.sfr.net. [109.26.222.94])
+ by smtp.gmail.com with ESMTPSA id y2sm8113738wmy.2.2019.11.01.10.26.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 01 Nov 2019 10:26:48 -0700 (PDT)
+Date: Fri, 1 Nov 2019 18:26:21 +0100
+From: Peter Xu <peterx@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid
+ alloc/free
+Message-ID: <20191101172349.GE8888@xz-x1.metropole.lan>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-10-git-send-email-yi.l.liu@intel.com>
+ <20191029121544.GS3552@umbus.metropole.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAATJJ0JrJS108ehZ8VkcYvgeNXEqev8C5vf2a+31J1eJdZ92uA@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 9H84DV5NNGSPGEc7tGhhtg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <20191029121544.GS3552@umbus.metropole.lan>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,79 +91,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, Liu Yi L <yi.l.liu@intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
+ alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com, pbonzini@redhat.com,
+ yi.y.sun@intel.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 01, 2019 at 10:55:29AM +0100, Christian Ehrhardt wrote:
-> On Fri, Nov 1, 2019 at 10:34 AM Daniel P. Berrang=C3=A9 <berrange@redhat.=
-com> wrote:
-> >
-> > On Fri, Nov 01, 2019 at 08:14:08AM +0100, Christian Ehrhardt wrote:
-> > > Hi everyone,
-> > > we've got a bug report recently - on handling qemu .so's through
-> > > upgrades - that got me wondering how to best handle it.
-> > > After checking with Paolo yesterday that there is no obvious solution
-> > > that I missed we agreed this should be brought up on the list for
-> > > wider discussion.
-> > > Maybe there already is a good best practise out there, or if it
-> > > doesn't exist we might want to agree upon one going forward.
-> > > Let me outline the case and the ideas brought up so far.
-> > >
-> > > Case
-> > > - You have qemu representing a Guest
-> > > - Due to other constraints e.g. PT you can't live migrate (which woul=
-d
-> > > be preferred)
-> > > - You haven't used a specific shared object yet - lets say RBD storag=
-e
-> > > driver as example
-> > > - Qemu gets an update, packaging replaces the .so files on disk
-> > > - The Qemu process and the .so files on disk now have a mismatch in $=
-buildid
-> > > - If you hotplug an RBD device it will fail to load the (now new) .so
-> >
-> > What happens when it fails to load ?  Does the user get a graceful
-> > error message or does QEMU abort ? I'd hope the former.
-> >
->=20
-> It is fortunately a graceful error message, here an example:
->=20
-> $ virsh attach-device lateload curldisk.xml
-> Reported issue happens on attach:
-> root@b:~# virsh attach-device lateload cdrom-curl.xml
-> error: Failed to attach device from cdrom-curl.xml
-> error: internal error: unable to execute QEMU command 'device_add':
-> Property 'virtio-blk-device.drive' can't find value
-> 'drive-virtio-disk2'
+On Tue, Oct 29, 2019 at 01:15:44PM +0100, David Gibson wrote:
+> > +union IOMMUCTXPASIDReqDesc {
+> > +    struct {
+> > +        uint32_t min_pasid;
+> > +        uint32_t max_pasid;
+> > +        int32_t alloc_result; /* pasid allocated for the alloc request */
+> > +    };
+> > +    struct {
+> > +        uint32_t pasid; /* pasid to be free */
+> > +        int free_result;
+> > +    };
+> > +};
+> 
+> Apart from theproblem with writable fields, using a big union for
+> event data is pretty ugly.  If you need this different information for
+> the different events, it might make more sense to have a separate
+> notifier chain with a separate call interface for each event type,
+> rather than trying to multiplex them together.
 
-Ok, that's graceful, but horrifically useless as an error message :-)
+I have no issue on the union definiion, however I do agree that it's a
+bit awkward to register one notifier for each event.
 
-I'd like to think there would be a way to do better.
+Instead of introducing even more notifier chains, I'm thinking whether
+we can simply provide a single notifier hook for all the four events.
+After all I don't see in what case we'll only register some of the
+events, like we can't register alloc_pasid() without registering to
+free_pasid() because otherwise it does not make sense..  And also you
+have the wrapper struct ("IOMMUCTXEventData") which contains the event
+type, so the notify() hook will know which message is this.
 
-It looks like the 'drive-add' (or whatever we run to add the
-backend) is failing, and then we blindly run device_add anyway.
+A side note is that I think you don't need the
+IOMMUCTXEventData.length.  If you see the code, vtd_bind_guest_pasid()
+does not even initialize length right now, and I think it could still
+work only because none of the vfio notify() hook
+(e.g. vfio_iommu_pasid_bind_notify) checks that length...
 
-This means either there's some error message printed that we
-are missing, or QEMU is not reporting it back to the monitor.
-Either way, I think this can be improved so that libvirt can
-directly report the message you found hidden in the log:
-
->=20
-> In the qemu output log we can see:
-> Failed to initialize module: /usr/lib/x86_64-linux-gnu/qemu/block-curl.so
-> Note: only modules from the same build can be loaded.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+-- 
+Peter Xu
 
