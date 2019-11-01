@@ -2,74 +2,89 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 898C0CA9EC9
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 07:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBCACCA9EC9
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 07:31:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5EF8A2080F
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 07:15:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EF8A2080F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
+	by mail.kernel.org (Postfix) with ESMTPS id A650020862
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 07:31:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EIVV7nqM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A650020862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQR9k-0004Jb-G7
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 03:15:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40877)
+	id 1iQRPZ-00006h-Rq
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 03:31:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43346)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <christian.ehrhardt@canonical.com>)
- id 1iQR8p-0003qk-4f
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 03:14:40 -0400
+ (envelope-from <jasowang@redhat.com>) id 1iQRO9-00080z-Kx
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 03:30:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <christian.ehrhardt@canonical.com>)
- id 1iQR8o-0005tf-4B
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 03:14:39 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:35573)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <christian.ehrhardt@canonical.com>)
- id 1iQR8n-0005tH-Um
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 03:14:38 -0400
-Received: from mail-vs1-f69.google.com ([209.85.217.69])
- by youngberry.canonical.com with esmtps
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.86_2)
- (envelope-from <christian.ehrhardt@canonical.com>)
- id 1iQR8l-0001WG-RG
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 07:14:35 +0000
-Received: by mail-vs1-f69.google.com with SMTP id w22so1503646vsw.17
- for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 00:14:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
- bh=8tABfg5UmnAHSWW2mTQr80n+YWxQ9V8Bxko38FVQH7M=;
- b=tVLcQaxnNbp2HNkkI2fYsd4O8KWj2r8zvlP3qiLHkk1TwPQegKVRmqI7QMO5n53wFd
- 6dXmSeiC7RKvPfzv+Z6CPmnbdy0BtVKWrs/aVezCEJPRDyz3HVktfBHWGTFkai7TbpYZ
- 7j9bvMp2a+R4oWU3otBO/KvGEpWyiN6IQVSKzOjn3BzJtBARUC09At+6wNVltOPuqZMI
- JcpKmtToSytkWXFTCJGwOefBqlfF96vJFNCWVr5fCLRERR/reuUZZZbLg/6dffoMVm5x
- ZumO6uPbsC4pHXbKugX3HnxG2n9Hr5mglsi6M0B55mBrVdJ6NIZI0r3AzoTAVqygtHGY
- Ru/g==
-X-Gm-Message-State: APjAAAVaOWEK8zRpc2r3F+vCB1kCo8U6om6k7nJHKLH8GWNYdFcBh4fi
- pEZX6dD9uPwvSNQsYuJHG9DAEjqQ4Z0mHD7e/lqJk38i8HjY06NewP3rCMl0OvPu7ScTZQHVaN0
- lp5T4UaIvjNf7m3OB3Nyi0/0CSTkktXccmX2om5aIJFcysDbk
-X-Received: by 2002:a1f:8c01:: with SMTP id o1mr4607782vkd.69.1572592474770;
- Fri, 01 Nov 2019 00:14:34 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxB81QbO8B50ngTQtG6pDd6P1/eSE//XVxZBF1Brf6VgMINymshfthb6oj5ClncYVSFrEIo99VjU2HmCIM7m2k=
-X-Received: by 2002:a1f:8c01:: with SMTP id o1mr4607767vkd.69.1572592474322;
- Fri, 01 Nov 2019 00:14:34 -0700 (PDT)
+ (envelope-from <jasowang@redhat.com>) id 1iQRO7-0002Dh-M3
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 03:30:28 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25633
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iQRO7-0002Co-EG
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 03:30:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572593425;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6KsUiQYdyNLyb5aUkASLMu4wDADVn4VnI/FHfv9fstE=;
+ b=EIVV7nqMuyzejWpjFF98aoe5p7di8Q/QVJuP+nV3AkrrX9D3FN7Sjhq3zhtF7lqWmd1hOZ
+ 6PKkYQfdXCidFpk9CXsk30RLdV29mk10Zn84gkD3B0sKHqk6CqaM0v+I02conXeIedTUVg
+ BmRYZ6A5bwsrWKoHegbPjXs9ajVaVLE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-279-ptN-xec8NNGqZ_IpHXCAmA-1; Fri, 01 Nov 2019 03:30:20 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C8931005500;
+ Fri,  1 Nov 2019 07:30:19 +0000 (UTC)
+Received: from [10.72.12.30] (ovpn-12-30.pek2.redhat.com [10.72.12.30])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D851B60852;
+ Fri,  1 Nov 2019 07:29:51 +0000 (UTC)
+Subject: Re: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to VM
+To: "Liu, Yi L" <yi.l.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mst@redhat.com" <mst@redhat.com>, "pbonzini@redhat.com"
+ <pbonzini@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "peterx@redhat.com" <peterx@redhat.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <367adad0-eb05-c950-21d7-755fffacbed6@redhat.com>
+ <AADFC41AFE54684AB9EE6CBC0274A5D19D5D0619@SHSMSX104.ccr.corp.intel.com>
+ <fa994379-a847-0ffe-5043-40a2aefecf43@redhat.com>
+ <A2975661238FB949B60364EF0F2C25743A0EACA6@SHSMSX104.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <960389b5-2ef4-8921-fc28-67c9a6398c43@redhat.com>
+Date: Fri, 1 Nov 2019 15:29:49 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-From: Christian Ehrhardt <christian.ehrhardt@canonical.com>
-Date: Fri, 1 Nov 2019 08:14:08 +0100
-Message-ID: <CAATJJ0KDOsA=Y+zLBT=PhcU0Q+gqRPSWkK0VaksisVC9_i5M_g@mail.gmail.com>
-Subject: Best practices to handle shared objects through qemu upgrades?
-To: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 91.189.89.112
+In-Reply-To: <A2975661238FB949B60364EF0F2C25743A0EACA6@SHSMSX104.ccr.corp.intel.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: ptN-xec8NNGqZ_IpHXCAmA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,60 +96,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "tianyu.lan@intel.com" <tianyu.lan@intel.com>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Tian,
+ Jun J" <jun.j.tian@intel.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "Sun, Yi Y" <yi.y.sun@intel.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi everyone,
-we've got a bug report recently - on handling qemu .so's through
-upgrades - that got me wondering how to best handle it.
-After checking with Paolo yesterday that there is no obvious solution
-that I missed we agreed this should be brought up on the list for
-wider discussion.
-Maybe there already is a good best practise out there, or if it
-doesn't exist we might want to agree upon one going forward.
-Let me outline the case and the ideas brought up so far.
 
-Case
-- You have qemu representing a Guest
-- Due to other constraints e.g. PT you can't live migrate (which would
-be preferred)
-- You haven't used a specific shared object yet - lets say RBD storage
-driver as example
-- Qemu gets an update, packaging replaces the .so files on disk
-- The Qemu process and the .so files on disk now have a mismatch in $buildid
-- If you hotplug an RBD device it will fail to load the (now new) .so
+On 2019/10/31 =E4=B8=8B=E5=8D=8810:07, Liu, Yi L wrote:
+>> From: Jason Wang [mailto:jasowang@redhat.com]
+>> Sent: Thursday, October 31, 2019 5:33 AM
+>> Subject: Re: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressin=
+g to VM
+>>
+>>
+>> On 2019/10/25 =E4=B8=8B=E5=8D=886:12, Tian, Kevin wrote:
+>>>> From: Jason Wang [mailto:jasowang@redhat.com]
+>>>> Sent: Friday, October 25, 2019 5:49 PM
+>>>>
+>>>>
+>>>> On 2019/10/24 =E4=B8=8B=E5=8D=888:34, Liu Yi L wrote:
+>>>>> Shared virtual address (SVA), a.k.a, Shared virtual memory (SVM) on
+>>>>> Intel platforms allow address space sharing between device DMA and
+>>>> applications.
+>>>>
+>>>>
+>>>> Interesting, so the below figure demonstrates the case of VM. I
+>>>> wonder how much differences if we compare it with doing SVM between
+>>>> device and an ordinary process (e.g dpdk)?
+>>>>
+>>>> Thanks
+>>> One difference is that ordinary process requires only stage-1
+>>> translation, while VM requires nested translation.
+>>
+>> A silly question, then I believe there's no need for VFIO DMA API in thi=
+s case consider
+>> the page table is shared between MMU and IOMMU?
+> Echo Kevin's reply. We use nested translation here. For stage-1, yes, no =
+need to use
+> VFIO DMA API. For stage-2, we still use VFIO DMA API to program the GPA->=
+HPA
+> mapping to host. :-)
 
-On almost any other service than "qemu representing a VM" the answer
-is "restart it", some even re-exec in place to keep things up and
-running.
 
-Ideas so far:
-a) Modules are checked by build-id, so keep them in a per build-id dir on disk
-  - qemu could be made looking preferred in -$buildid dir first
-  - do not remove the packages with .so's on upgrades
-  - needs a not-too-complex way to detect which buildids running qemu processes
-    have for packaging to be able to "autoclean later"
-  - Needs some dependency juggling for Distro packaging but IMHO can be made
-    to work if above simple "probing buildid of running qemu" would exist
+Cool, two more questions:
 
-b) Preload the modules before upgrade
-  - One could load the .so files before upgrade
-  - The open file reference will keep the content around even with the
-on disk file gone
-  - lacking a 'load-module' command that would require fake hotplugs
-which seems wrong
-  - Required additional upgrade pre-planning
-  - kills most benefits of modular code without an actual need for it
-being loaded
+- Can EPT shares its page table with IOMMU L2?
 
-c) go back to non modular build
-  - No :-)
+- Similar to EPT, when GPA->HPA (actually HVA->HPA) is modified by mm,=20
+VFIO need to use MMU notifier do modify L2 accordingly besides DMA API?
 
-d) anything else out there?
+Thanks
 
--- 
-Christian Ehrhardt
-Staff Engineer, Ubuntu Server
-Canonical Ltd
+
+>
+> Regards,
+> Yi Liu
+>> Thanks
+>>
+
 
