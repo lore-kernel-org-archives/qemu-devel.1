@@ -4,76 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A9BCA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 18:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF46CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 18:11:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8B06B217F9
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 18:10:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B06B217F9
+	by mail.kernel.org (Postfix) with ESMTPS id 6C672217F9
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 18:11:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C672217F9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQbNA-0004gi-OZ
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 14:10:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48535)
+	id 1iQbOS-0005mk-BD
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 14:11:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48602)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iQbMZ-0004Gu-E1
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 14:09:32 -0400
+ (envelope-from <peterx@redhat.com>) id 1iQbMy-0004d8-9c
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 14:09:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iQbMX-0007Sg-Ox
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 14:09:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:3534)
+ (envelope-from <peterx@redhat.com>) id 1iQbMx-0007vp-A1
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 14:09:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60689)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iQbMX-0007Rv-Ip
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 14:09:29 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iQbMx-0007ui-4V
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 14:09:55 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 259BEA836
- for <qemu-devel@nongnu.org>; Fri,  1 Nov 2019 18:09:28 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id p6so5928353wrs.5
- for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 11:09:28 -0700 (PDT)
+ by mx1.redhat.com (Postfix) with ESMTPS id 4872DC05A1D3
+ for <qemu-devel@nongnu.org>; Fri,  1 Nov 2019 18:09:54 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id o8so4401050wmc.2
+ for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 11:09:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=moDkDlUhxfJhmtHJeueY/UnIk6Z5ALI8m+SrJOHk+eI=;
- b=lqhoDnp1rIjwgm+EP5/hBsSfW+zlv/QBK0RBmMANtxp4Vv0YHyLeD0jUMr3QY8n1mo
- 3KbY8VWLTBIU1LDRoOt1Ygln+voklXJakjXCVnEu4tRh+pWECUMVLdfaX7Mz/F5CrRe5
- ARej8+oLroi5L4H0J35oG61qZT2BTEl9IoJVj+f28p7Eq1EIoWLugqX9WVz/k0Qz30KL
- 3ESWsheTBj1C6HCXMaK8eNNRGOlc3fMYw4g9gckOIbN3Czme69D71Bml/ECSdz27GgHs
- 7K7jj4oSEfKLAXfi5ZwfQg26Q021Y81NyxlsyCE5hfxTGusRCzj/osHqDgM/QsGBPEv6
- xaJA==
-X-Gm-Message-State: APjAAAULx60X18OnDesCN2QZB7BSnQs6ICDtlmH36XdTs0X9jAjYEiYN
- w3KnqttmFUNYu2VS7rz/Uf5NhEvHw5OMC8KdUyprOewvjDKR50zn6kYVdeRkKYkVR0YjC5xQzmx
- 5dtnKX/y3IDBZJ5U=
-X-Received: by 2002:adf:f905:: with SMTP id b5mr11795776wrr.122.1572631766869; 
- Fri, 01 Nov 2019 11:09:26 -0700 (PDT)
-X-Google-Smtp-Source: APXvYqxiDGch/xVNxtqV43qVHrL6TwudUG5rxeu9lr80qXRYAZbkhvjpjLsf7yZBWkwy1mt5fm8TPw==
-X-Received: by 2002:adf:f905:: with SMTP id b5mr11795760wrr.122.1572631766712; 
- Fri, 01 Nov 2019 11:09:26 -0700 (PDT)
+ bh=8jUfco7qh0pcrSjrShTOcaIDt+470HVcOI3AOAmvFn8=;
+ b=g7ud8ykF1QQDNmnqGUKnc1YWgHE7yT3Q4Ja3La+lGNSVisEWXFXIHi8cSb+P3bSSOF
+ 4qrtrmjO4T28rEO3iIEA8XMgjXv2x4qUqURko1A2IIKqW8zGK2LGsFat490Obs7LAZyt
+ jFpTal8cfT6p2n0XlOFWKC4awyin5hFbRPfZjtCh9BkS0rg46d+paetW6OqJMWyDyJEU
+ jXIcJbEOqziDUOdOHx0Sth+CUXdoG42fghW6QAUvh67qgwsregEmJvZSa9PFYX4Rfjw7
+ r3fE8OUmvNXNSpJ+k43NSi0CFJxrZ5zERKt4t6JfLqvBXQ20U1Em3dEXACNZDt3NWAla
+ B3ug==
+X-Gm-Message-State: APjAAAWbyku7uv9QCPulwxsblKjeiri8fu3wqt2OIm+5JtDCtF+oaRly
+ 244wYShhNIN7arPdpB0C0O+9uRNwXfzJ+dnPCPZaStuUIrMO4aIpcCszMuFY6VR3SdIyYjsdAyq
+ Gg5tBMzlJuAdL8YA=
+X-Received: by 2002:a5d:5444:: with SMTP id w4mr10145414wrv.164.1572631792983; 
+ Fri, 01 Nov 2019 11:09:52 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqy4NENz4o79PqRKSRVv5SOg7yKO+WfQ2dEggLZBDl7qe74/tZGua7zuZfCFnPpCCMW320O/gQ==
+X-Received: by 2002:a5d:5444:: with SMTP id w4mr10145398wrv.164.1572631792803; 
+ Fri, 01 Nov 2019 11:09:52 -0700 (PDT)
 Received: from xz-x1.metropole.lan (94.222.26.109.rev.sfr.net. [109.26.222.94])
- by smtp.gmail.com with ESMTPSA id u7sm8313190wre.59.2019.11.01.11.09.25
+ by smtp.gmail.com with ESMTPSA id p15sm8829146wrs.94.2019.11.01.11.09.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 01 Nov 2019 11:09:25 -0700 (PDT)
-Date: Fri, 1 Nov 2019 19:09:23 +0100
+ Fri, 01 Nov 2019 11:09:51 -0700 (PDT)
+Date: Fri, 1 Nov 2019 19:09:49 +0100
 From: Peter Xu <peterx@redhat.com>
 To: Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [RFC v2 06/22] hw/pci: modify pci_setup_iommu() to set PCIIOMMUOps
-Message-ID: <20191101180923.GG8888@xz-x1.metropole.lan>
+Subject: Re: [RFC v2 07/22] hw/pci: introduce pci_device_iommu_context()
+Message-ID: <20191101180949.GH8888@xz-x1.metropole.lan>
 References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-7-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-8-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1571920483-3382-7-git-send-email-yi.l.liu@intel.com>
+In-Reply-To: <1571920483-3382-8-git-send-email-yi.l.liu@intel.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -98,12 +98,14 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 24, 2019 at 08:34:27AM -0400, Liu Yi L wrote:
-> This patch modifies pci_setup_iommu() to set PCIIOMMUOps instead of only
-> setting PCIIOMMUFunc. PCIIOMMUFunc is previously used to get an address
-> space for a device in vendor specific way. The PCIIOMMUOps still offers
-> this functionality. Use PCIIOMMUOps leaves space to add more iommu related
-> vendor specific operations.
+On Thu, Oct 24, 2019 at 08:34:28AM -0400, Liu Yi L wrote:
+> This patch adds pci_device_iommu_context() to get an iommu_context
+> for a given device. A new callback is added in PCIIOMMUOps. Users
+> who wants to listen to events issued by vIOMMU could use this new
+> interface to get an iommu_context and register their own notifiers,
+> then wait for notifications from vIOMMU. e.g. VFIO is the first user
+> of it to listen to the PASID_ALLOC/PASID_BIND/CACHE_INV events and
+> propagate the events to host.
 > 
 > Cc: Kevin Tian <kevin.tian@intel.com>
 > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
