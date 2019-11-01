@@ -2,70 +2,61 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=FROM_WSP_TRAIL,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43C50CA9ECB
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 02:18:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEDEBCA9ECB
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 02:57:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19D532067D
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 02:18:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19D532067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9CCD72086D
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 02:57:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CCD72086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQMWd-0004eT-74
-	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 22:18:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48232)
+	id 1iQN8P-0006ax-Eu
+	for qemu-devel@archiver.kernel.org; Thu, 31 Oct 2019 22:57:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56503)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iQMVz-0004Cv-QH
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 22:18:16 -0400
+ (envelope-from <chen.zhang@intel.com>) id 1iQN6R-0004vs-2V
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 22:55:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iQMVy-0005bp-7o
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 22:18:15 -0400
-Resent-Date: Thu, 31 Oct 2019 22:18:15 -0400
-Resent-Message-Id: <E1iQMVy-0005bp-7o@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21487)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iQMVy-0005DG-07
- for qemu-devel@nongnu.org; Thu, 31 Oct 2019 22:18:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1572574663; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=PQ/WHWMMNvEMVFCCj8LTrpEMj+xFYyuGm4/4ofu8WejTfa/JiCf/3nBt9yzkl/InFJw/LhTJLq85+ei0kpvHz01/0WzwfjmOpRzaukXw9ccbdwaauTcKM9K5ZJcvDItIu9Q4yoFdhgYEQU/8WhEqB1Y80I+CIw5dfmVT+MFRs/o=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1572574663;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=1j4RB9ZKnOIvKMqp2b3hOsucL2go5N9i/3U5GtvA81s=; 
- b=Bn6ptdAjXHp/HS023ILz7WRdfdIhwd8aeEbmQe5ixJKWpfHByYxLHyEMwsQVJXA2lntQJeqIo4XETjlf2cg0YRjLzlQKiV93/gtGaIgQxyo/+GVN/j5pqSGnhTLr6YCu9AfTq4xCPSMQ8E7qwAq6pdRZTUWj1ks3ctekJKihqNI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 157257466237639.411143469050785;
- Thu, 31 Oct 2019 19:17:42 -0700 (PDT)
-In-Reply-To: <20191101014528.14505-1-richardw.yang@linux.intel.com>
-Subject: Re: [PATCH] target/i386: return directly from hyperv_init_vcpu() if
- hyperv not enabled
-Message-ID: <157257466091.11413.1382425269622176860@37313f22b938>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: richardw.yang@linux.intel.com
-Date: Thu, 31 Oct 2019 19:17:42 -0700 (PDT)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+ (envelope-from <chen.zhang@intel.com>) id 1iQN6M-00012f-UC
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 22:55:53 -0400
+Received: from mga09.intel.com ([134.134.136.24]:16106)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1iQN6M-0000ZE-KG
+ for qemu-devel@nongnu.org; Thu, 31 Oct 2019 22:55:50 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 31 Oct 2019 19:55:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,253,1569308400"; d="scan'208";a="199216662"
+Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
+ by fmsmga008.fm.intel.com with ESMTP; 31 Oct 2019 19:55:41 -0700
+From: Zhang Chen <chen.zhang@intel.com >
+To: Jason Wang <jasowang@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-dev <qemu-devel@nongnu.org>
+Subject: [PATCH V2 1/4] net/awd.c: Introduce Advanced Watch Dog module
+ framework
+Date: Fri,  1 Nov 2019 10:48:47 +0800
+Message-Id: <20191101024850.20808-2-chen.zhang@intel.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191101024850.20808-1-chen.zhang@intel.com>
+References: <20191101024850.20808-1-chen.zhang@intel.com>
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,38 +68,368 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
- richardw.yang@linux.intel.com, pbonzini@redhat.com, rth@twiddle.net
+Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwMTAxNDUyOC4xNDUw
-NS0xLXJpY2hhcmR3LnlhbmdAbGludXguaW50ZWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNl
-ZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cg
-Zm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0hdIHRhcmdldC9pMzg2OiByZXR1
-cm4gZGlyZWN0bHkgZnJvbSBoeXBlcnZfaW5pdF92Y3B1KCkgaWYgaHlwZXJ2IG5vdCBlbmFibGVk
-ClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDE5MTEwMTAxNDUyOC4xNDUwNS0xLXJpY2hhcmR3
-LnlhbmdAbGludXguaW50ZWwuY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
-YXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAt
-LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
-IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Njcmlw
-dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
-PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0
-Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmQ3NjUyYjQgdGFyZ2V0L2kzODY6IHJldHVybiBk
-aXJlY3RseSBmcm9tIGh5cGVydl9pbml0X3ZjcHUoKSBpZiBoeXBlcnYgbm90IGVuYWJsZWQKCj09
-PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBNaXNzaW5nIFNpZ25lZC1vZmYtYnk6IGxpbmUocykK
-CnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgOSBsaW5lcyBjaGVja2VkCgpDb21taXQgZDc2
-NTJiNGYyOGZmICh0YXJnZXQvaTM4NjogcmV0dXJuIGRpcmVjdGx5IGZyb20gaHlwZXJ2X2luaXRf
-dmNwdSgpIGlmIGh5cGVydiBub3QgZW5hYmxlZCkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTEx
-MDEwMTQ1MjguMTQ1MDUtMS1yaWNoYXJkdy55YW5nQGxpbnV4LmludGVsLmNvbS90ZXN0aW5nLmNo
-ZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5
-IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVk
-YmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+From: Zhang Chen <chen.zhang@intel.com>
+
+This patch introduce a new module named Advanced Watch Dog,
+and defined the input and output parameter. AWD use standard chardev
+as the way of communicationg with the outside world.
+If you want to use it, please add "--enable-awd" when configure qemu.
+
+Demo command:
+-object advanced-watchdog,id=heart1,server=on,awd_node=h1,notification_node=heartbeat0,opt_script=opt_script_path,iothread=iothread1,pulse_interval=1000,timeout=5000
+
+Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+---
+ configure         |   9 ++
+ net/Makefile.objs |   1 +
+ net/awd.c         | 261 ++++++++++++++++++++++++++++++++++++++++++++++
+ qemu-options.hx   |   6 ++
+ 4 files changed, 277 insertions(+)
+ create mode 100644 net/awd.c
+
+diff --git a/configure b/configure
+index 72553f98ea..a857a8c2d7 100755
+--- a/configure
++++ b/configure
+@@ -383,6 +383,7 @@ vhost_scsi=""
+ vhost_vsock=""
+ vhost_user=""
+ vhost_user_fs=""
++awd="no"
+ kvm="no"
+ hax="no"
+ hvf="no"
+@@ -1303,6 +1304,10 @@ for opt do
+   ;;
+   --enable-vhost-user-fs) vhost_user_fs="yes"
+   ;;
++  --disable-awd) awd="no"
++  ;;
++  --enable-awd) awd="yes"
++  ;;
+   --disable-opengl) opengl="no"
+   ;;
+   --enable-opengl) opengl="yes"
+@@ -1779,6 +1784,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   vhost-crypto    vhost-user-crypto backend support
+   vhost-kernel    vhost kernel backend support
+   vhost-user      vhost-user backend support
++  awd             Advanced Watch Dog support
+   spice           spice
+   rbd             rados block device (rbd)
+   libiscsi        iscsi support
+@@ -7002,6 +7008,9 @@ fi
+ if test "$vhost_user" = "yes" ; then
+   echo "CONFIG_VHOST_USER=y" >> $config_host_mak
+ fi
++if test "$awd" = "yes" ; then
++  echo "CONFIG_AWD=y" >> $config_host_mak
++fi
+ if test "$vhost_user_fs" = "yes" ; then
+   echo "CONFIG_VHOST_USER_FS=y" >> $config_host_mak
+ fi
+diff --git a/net/Makefile.objs b/net/Makefile.objs
+index c5d076d19c..187e655443 100644
+--- a/net/Makefile.objs
++++ b/net/Makefile.objs
+@@ -19,6 +19,7 @@ common-obj-y += colo-compare.o
+ common-obj-y += colo.o
+ common-obj-y += filter-rewriter.o
+ common-obj-y += filter-replay.o
++common-obj-$(CONFIG_AWD) += awd.o
+ 
+ tap-obj-$(CONFIG_LINUX) = tap-linux.o
+ tap-obj-$(CONFIG_BSD) = tap-bsd.o
+diff --git a/net/awd.c b/net/awd.c
+new file mode 100644
+index 0000000000..d42b4a7372
+--- /dev/null
++++ b/net/awd.c
+@@ -0,0 +1,261 @@
++/*
++ * Advanced Watch Dog
++ *
++ * COarse-grain LOck-stepping Virtual Machines for Non-stop Service (COLO)
++ * (a.k.a. Fault Tolerance or Continuous Replication)
++ *
++ * Copyright (c) 2019 Intel Corporation
++ *
++ * Author: Zhang Chen <chen.zhang@intel.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * later.  See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "trace.h"
++#include "qemu-common.h"
++#include "qapi/error.h"
++#include "net/net.h"
++#include "qom/object_interfaces.h"
++#include "qom/object.h"
++#include "chardev/char-fe.h"
++#include "qemu/sockets.h"
++#include "sysemu/iothread.h"
++
++#define TYPE_AWD  "advanced-watchdog"
++#define AWD(obj)  OBJECT_CHECK(AwdState, (obj), TYPE_AWD)
++
++#define AWD_READ_LEN_MAX NET_BUFSIZE
++/* Default advanced watchdog pulse interval */
++#define AWD_PULSE_INTERVAL_DEFAULT 5000
++/* Default advanced watchdog timeout */
++#define AWD_TIMEOUT_DEFAULT 2000
++
++typedef struct AwdState {
++    Object parent;
++
++    bool server;
++    char *awd_node;
++    char *notification_node;
++    char *opt_script;
++    uint32_t pulse_interval;
++    uint32_t timeout;
++    IOThread *iothread;
++} AwdState;
++
++typedef struct AwdClass {
++    ObjectClass parent_class;
++} AwdClass;
++
++static char *awd_get_node(Object *obj, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    return g_strdup(s->awd_node);
++}
++
++static void awd_set_node(Object *obj, const char *value, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    g_free(s->awd_node);
++    s->awd_node = g_strdup(value);
++}
++
++static char *noti_get_node(Object *obj, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    return g_strdup(s->notification_node);
++}
++
++static void noti_set_node(Object *obj, const char *value, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    g_free(s->notification_node);
++    s->notification_node = g_strdup(value);
++}
++
++static char *opt_script_get_node(Object *obj, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    return g_strdup(s->opt_script);
++}
++
++static void opt_script_set_node(Object *obj, const char *value, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    g_free(s->opt_script);
++    s->opt_script = g_strdup(value);
++}
++
++static bool awd_get_server(Object *obj, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    return s->server;
++}
++
++static void awd_set_server(Object *obj, bool value, Error **errp)
++{
++    AwdState *s = AWD(obj);
++
++    s->server = value;
++}
++
++static void awd_get_interval(Object *obj, Visitor *v,
++                                   const char *name, void *opaque,
++                                   Error **errp)
++{
++    AwdState *s = AWD(obj);
++    uint32_t value = s->pulse_interval;
++
++    visit_type_uint32(v, name, &value, errp);
++}
++
++static void awd_set_interval(Object *obj, Visitor *v,
++                                   const char *name, void *opaque,
++                                   Error **errp)
++{
++    AwdState *s = AWD(obj);
++    Error *local_err = NULL;
++    uint32_t value;
++
++    visit_type_uint32(v, name, &value, &local_err);
++    if (local_err) {
++        goto out;
++    }
++    if (!value) {
++        error_setg(&local_err, "Property '%s.%s' requires a positive value",
++                   object_get_typename(obj), name);
++        goto out;
++    }
++    s->pulse_interval = value;
++
++out:
++    error_propagate(errp, local_err);
++}
++
++static void awd_get_timeout(Object *obj, Visitor *v,
++                            const char *name, void *opaque,
++                            Error **errp)
++{
++    AwdState *s = AWD(obj);
++    uint32_t value = s->timeout;
++
++    visit_type_uint32(v, name, &value, errp);
++}
++
++static void awd_set_timeout(Object *obj, Visitor *v,
++                            const char *name, void *opaque,
++                            Error **errp)
++{
++    AwdState *s = AWD(obj);
++    Error *local_err = NULL;
++    uint32_t value;
++
++    visit_type_uint32(v, name, &value, &local_err);
++    if (local_err) {
++        goto out;
++    }
++
++    if (!value) {
++        error_setg(&local_err, "Property '%s.%s' requires a positive value",
++                   object_get_typename(obj), name);
++        goto out;
++    }
++    s->timeout = value;
++
++out:
++    error_propagate(errp, local_err);
++}
++
++static void awd_complete(UserCreatable *uc, Error **errp)
++{
++    AwdState *s = AWD(uc);
++
++    if (!s->awd_node || !s->iothread ||
++        !s->notification_node || !s->opt_script) {
++        error_setg(errp, "advanced-watchdog needs 'awd_node', "
++                   "'notification_node', 'opt_script' "
++                   "and 'server' property set");
++        return;
++    }
++
++    return;
++}
++
++static void awd_class_init(ObjectClass *oc, void *data)
++{
++    UserCreatableClass *ucc = USER_CREATABLE_CLASS(oc);
++
++    ucc->complete = awd_complete;
++}
++
++static void awd_init(Object *obj)
++{
++    AwdState *s = AWD(obj);
++
++    object_property_add_str(obj, "awd_node",
++                            awd_get_node, awd_set_node,
++                            NULL);
++
++    object_property_add_str(obj, "notification_node",
++                            noti_get_node, noti_set_node,
++                            NULL);
++
++    object_property_add_str(obj, "opt_script",
++                            opt_script_get_node, opt_script_set_node,
++                            NULL);
++
++    object_property_add_bool(obj, "server",
++                             awd_get_server,
++                             awd_set_server, NULL);
++
++    object_property_add(obj, "pulse_interval", "uint32",
++                        awd_get_interval,
++                        awd_set_interval, NULL, NULL, NULL);
++
++    object_property_add(obj, "timeout", "uint32",
++                        awd_get_timeout,
++                        awd_set_timeout, NULL, NULL, NULL);
++
++    object_property_add_link(obj, "iothread", TYPE_IOTHREAD,
++                            (Object **)&s->iothread,
++                            object_property_allow_set_link,
++                            OBJ_PROP_LINK_STRONG, NULL);
++}
++
++static void awd_finalize(Object *obj)
++{
++    AwdState *s = AWD(obj);
++
++    g_free(s->awd_node);
++    g_free(s->notification_node);
++}
++
++static const TypeInfo awd_info = {
++    .name = TYPE_AWD,
++    .parent = TYPE_OBJECT,
++    .instance_size = sizeof(AwdState),
++    .instance_init = awd_init,
++    .instance_finalize = awd_finalize,
++    .class_size = sizeof(AwdClass),
++    .class_init = awd_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { TYPE_USER_CREATABLE },
++        { }
++    }
++};
++
++static void register_types(void)
++{
++    type_register_static(&awd_info);
++}
++
++type_init(register_types);
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 1fc2470e2f..032be8372d 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4572,6 +4572,12 @@ Dump the network traffic on netdev @var{dev} to the file specified by
+ The file format is libpcap, so it can be analyzed with tools such as tcpdump
+ or Wireshark.
+ 
++@item -object advanced-watchdog,id=@var{id},awd_node=@var{chardevid},notification_node=@var{chardevid},server=@var{server},iothread=@var{id}[,pulse_interval=@var{time_ms},timeout=@var{time_ms}]
++
++Advanced Watch Dog is an universal monitoring module on VMM side, it can be used to detect network down(VMM to guest, VMM to VMM, VMM to another remote server) and do previously set operation.
++for example: send message to admin, notify another VMM, send qmp command to qemu do some operation like restart the VM, build VMM heartbeat system, etc.
++It make user have basic VM/Host network monitoring tools and basic false tolerance and recovery solution.
++
+ @item -object colo-compare,id=@var{id},primary_in=@var{chardevid},secondary_in=@var{chardevid},outdev=@var{chardevid},iothread=@var{id}[,vnet_hdr_support][,notify_dev=@var{id}]
+ 
+ Colo-compare gets packet from primary_in@var{chardevid} and secondary_in@var{chardevid}, than compare primary packet with
+-- 
+2.17.1
 
 
