@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 612F8CA9ED1
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FDECA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:59:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29EBC217F9
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:58:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C817204FD
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:59:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HgdgYAlC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29EBC217F9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DaQ9rMQ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C817204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQSl0-0007i8-CW
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 04:58:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56507)
+	id 1iQSmh-0001K1-8j
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 04:59:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56459)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iQSex-00018B-DA
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:57 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iQSes-00011Y-40
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iQSes-0000AG-Rd
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:54 -0400
-Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:52748)
+ (envelope-from <peter.maydell@linaro.org>) id 1iQSep-0008JT-3u
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:49 -0400
+Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:32881)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iQSes-00006k-Hn
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:50 -0400
-Received: by mail-wm1-x332.google.com with SMTP id c17so1231115wmk.2
- for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 01:51:50 -0700 (PDT)
+ id 1iQSeo-0008Eu-SQ
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:47 -0400
+Received: by mail-wr1-x436.google.com with SMTP id s1so8974612wro.0
+ for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 01:51:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=J5hD5yYPUwyTUfswMlBAMvVW6dnoBoogw5pUaxy5laQ=;
- b=HgdgYAlChr3DoSybsWHTwoOs/scbz6pLERzKvnOrXD41ERt2VozL5HhAFWdlB4bctX
- 1DI1GwaSCQvbzE8iboXRy9RGie1+XTM2TLEsLRtlprFL037V+HuzdRrGFHhxJsHTgcH8
- KeuRqjcnefB/w+huTSWVuTzTChkOEGJQI6IpHkc8ybn82T5wz1z+HLqSVBVNKANHrozc
- X1Wy50e9DAW0LmLgoeZDlssUxWaG/jOu7kyB5qB3dQD8jdYyCPgs0Tj+gMna71f8v40/
- NhQ5Nl107GDPlybNvU90zUvMOWgKMllOuI1M+nwPmT1rOwq3GHjddH1MZ9F0nzm6bh4S
- H7kg==
+ bh=cpklon7lgXWv3V0ZHDlYJqd8G/58j7vD/Z0D6CafQ/4=;
+ b=DaQ9rMQ4fXPcKskmwk3wJL323XFfODyVR40TiPLuMIYH/eClsJx1LQ5sLz1YdUqTX9
+ zQpsBweKoK8E508eK/vkDQatr07CP0N/q7NOeNdqSoMnXMv2QhVXvcb4h9my6DRgf/nh
+ +jpFMqMzoPbMeJMZGv7o3gvKrZhYdxi6fG/dt41cyEqa0zVWvHygbaWVpfqi9JeAC/HL
+ p1X3HSKicpQ+k4Ms7aCvwlNCRspuYFjTIUTR9/Yh9sC8NFofnVFraEOe1H6fn+zF9LWR
+ ve4m3xzcDXBIatp2xXyXWf3FD6cIj4vwFihL0o8fpOZZo1x+P5ravsWhO4Vb4hBJj3SI
+ WxOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=J5hD5yYPUwyTUfswMlBAMvVW6dnoBoogw5pUaxy5laQ=;
- b=KKrfcEKqRcmE8cZZ5rZX+PkkUQdansCd1kU/QM5+c6FTGMv1DbSoX1NEHiENoStS9R
- cQVM95aRxyPOQJWHCUGsSBEUdlth9V3LrCz5GmHtyyxGsrqsUQp8loF2nNhK9t2K6q91
- 5XhnK4WrGisqt9KIONrtMtXYAdF/hjQN9DdGsn7Cxolq7HMmc9slLTYtjWPYV+Y2vRkb
- JFU3JJ8S+eI1/Zql+8r5m7wdBJOEgVcMA0Fq+whTViI8LQzY+Km/z/82fOfROWRS6mAI
- d/25af/iHQSEVbPrKPqUXXRpVf/rJ2lVANco1/Bj868KE7z2YFU36h1FpzvMydTyADp+
- EZDg==
-X-Gm-Message-State: APjAAAXsSBAvCZJgMq4FstxVZu4B3oxUzhR1OJjLVnxv9VkGcU2TSEVy
- 25I6zg5kCIy8R+zVPOILnSEpEoBX21sTvV8U
-X-Google-Smtp-Source: APXvYqzN/3lqqqjqwzW9nkUwTTmcSA+hncJq+0JYQZqCeijUwsZZCMF6wypWPPrqsQzYjJFGrag73w==
-X-Received: by 2002:a7b:cbc5:: with SMTP id n5mr9391547wmi.65.1572598309236;
- Fri, 01 Nov 2019 01:51:49 -0700 (PDT)
+ bh=cpklon7lgXWv3V0ZHDlYJqd8G/58j7vD/Z0D6CafQ/4=;
+ b=ovAz9VQ6z5X51vHJwflrnubKRJe0BgpVsnNCmCmYQIgMitj6OEuBjd8EPIM/nF795L
+ D/e8T6BLxCkUdRnxefSKLW8mzyuKVqp+t+6lc2Si0n6CFJKiaYTz2PBd4DXd4oXor8/g
+ QojXXxVALNssLemmVCBQlr6PlDN2MiGzodp+KPQai4mWm8JbLsgSaTrwp1g6Hb9MRYrK
+ jWJebh7DeCx+ejjrY3Yauw4ai1lPGfknwVwrv7PSFfG+4CZ37HNAH3dTAQdOQSNkfY0V
+ rnAFNUHmxOqFJ3k4DAY7ZqFnFPbUsT/VU3hDD+RnLz8NaXqY5sXL1BcaDdI3bbRqUAR4
+ O2eQ==
+X-Gm-Message-State: APjAAAXUf/nfgB1RbIbOd6v0FLqy35WE61mEcf1XG/EjlC7u8iGb/zwG
+ wFKM+RgAYy++TCh9/RAxQSY6E80XU2s/Q6iA
+X-Google-Smtp-Source: APXvYqy/IA+qO2ewHyXvCKfZINhBgZqefEGWc1fNnlHtKiyternybSqFDClsfibrfH4lJhlXvZjBzA==
+X-Received: by 2002:adf:ff81:: with SMTP id j1mr607503wrr.98.1572598305514;
+ Fri, 01 Nov 2019 01:51:45 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id d20sm8818922wra.4.2019.11.01.01.51.48
+ by smtp.gmail.com with ESMTPSA id d20sm8818922wra.4.2019.11.01.01.51.44
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 01 Nov 2019 01:51:48 -0700 (PDT)
+ Fri, 01 Nov 2019 01:51:45 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/11] target/arm/kvm64: Add kvm_arch_get/put_sve
-Date: Fri,  1 Nov 2019 08:51:34 +0000
-Message-Id: <20191101085140.5205-6-peter.maydell@linaro.org>
+Subject: [PULL 02/11] tests: arm: Introduce cpu feature tests
+Date: Fri,  1 Nov 2019 08:51:31 +0000
+Message-Id: <20191101085140.5205-3-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191101085140.5205-1-peter.maydell@linaro.org>
 References: <20191101085140.5205-1-peter.maydell@linaro.org>
@@ -81,7 +81,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::332
+X-Received-From: 2a00:1450:4864:20::436
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,288 +99,308 @@ Sender: "Qemu-devel"
 
 From: Andrew Jones <drjones@redhat.com>
 
-These are the SVE equivalents to kvm_arch_get/put_fpsimd. Note, the
-swabbing is different than it is for fpsmid because the vector format
-is a little-endian stream of words.
+Now that Arm CPUs have advertised features lets add tests to ensure
+we maintain their expected availability with and without KVM.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-Message-id: 20191031142734.8590-6-drjones@redhat.com
+Message-id: 20191031142734.8590-3-drjones@redhat.com
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/kvm64.c | 185 ++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 156 insertions(+), 29 deletions(-)
+ tests/Makefile.include   |   5 +-
+ tests/arm-cpu-features.c | 253 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 257 insertions(+), 1 deletion(-)
+ create mode 100644 tests/arm-cpu-features.c
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 28f6db57d5e..4c0b11d105a 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -671,11 +671,12 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
- bool kvm_arm_reg_syncs_via_cpreg_list(uint64_t regidx)
- {
-     /* Return true if the regidx is a register we should synchronize
--     * via the cpreg_tuples array (ie is not a core reg we sync by
--     * hand in kvm_arch_get/put_registers())
-+     * via the cpreg_tuples array (ie is not a core or sve reg that
-+     * we sync by hand in kvm_arch_get/put_registers())
-      */
-     switch (regidx & KVM_REG_ARM_COPROC_MASK) {
-     case KVM_REG_ARM_CORE:
-+    case KVM_REG_ARM64_SVE:
-         return false;
-     default:
-         return true;
-@@ -721,10 +722,8 @@ int kvm_arm_cpreg_level(uint64_t regidx)
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 56f73b46e2a..534ee487436 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -262,6 +262,7 @@ check-qtest-sparc64-$(CONFIG_ISA_TESTDEV) = tests/endianness-test$(EXESUF)
+ check-qtest-sparc64-y += tests/prom-env-test$(EXESUF)
+ check-qtest-sparc64-y += tests/boot-serial-test$(EXESUF)
  
- static int kvm_arch_put_fpsimd(CPUState *cs)
- {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = &ARM_CPU(cs)->env;
-     struct kvm_one_reg reg;
--    uint32_t fpr;
-     int i, ret;
++check-qtest-arm-y += tests/arm-cpu-features$(EXESUF)
+ check-qtest-arm-y += tests/microbit-test$(EXESUF)
+ check-qtest-arm-y += tests/m25p80-test$(EXESUF)
+ check-qtest-arm-y += tests/test-arm-mptimer$(EXESUF)
+@@ -269,7 +270,8 @@ check-qtest-arm-y += tests/boot-serial-test$(EXESUF)
+ check-qtest-arm-y += tests/hexloader-test$(EXESUF)
+ check-qtest-arm-$(CONFIG_PFLASH_CFI02) += tests/pflash-cfi02-test$(EXESUF)
  
-     for (i = 0; i < 32; i++) {
-@@ -742,17 +741,73 @@ static int kvm_arch_put_fpsimd(CPUState *cs)
-         }
-     }
+-check-qtest-aarch64-y = tests/numa-test$(EXESUF)
++check-qtest-aarch64-y += tests/arm-cpu-features$(EXESUF)
++check-qtest-aarch64-y += tests/numa-test$(EXESUF)
+ check-qtest-aarch64-y += tests/boot-serial-test$(EXESUF)
+ check-qtest-aarch64-y += tests/migration-test$(EXESUF)
+ # TODO: once aarch64 TCG is fixed on ARM 32 bit host, make test unconditional
+@@ -841,6 +843,7 @@ tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
+ tests/numa-test$(EXESUF): tests/numa-test.o
+ tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
+ tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libqos-obj-y)
++tests/arm-cpu-features$(EXESUF): tests/arm-cpu-features.o
  
--    reg.addr = (uintptr_t)(&fpr);
--    fpr = vfp_get_fpsr(env);
--    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
--    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
--    if (ret) {
--        return ret;
-+    return 0;
+ tests/migration/stress$(EXESUF): tests/migration/stress.o
+ 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
+diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
+new file mode 100644
+index 00000000000..6ebb03d7ad6
+--- /dev/null
++++ b/tests/arm-cpu-features.c
+@@ -0,0 +1,253 @@
++/*
++ * Arm CPU feature test cases
++ *
++ * Copyright (c) 2019 Red Hat Inc.
++ * Authors:
++ *  Andrew Jones <drjones@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++#include "qemu/osdep.h"
++#include "libqtest.h"
++#include "qapi/qmp/qdict.h"
++#include "qapi/qmp/qjson.h"
++
++#define MACHINE     "-machine virt,gic-version=max,accel=tcg "
++#define MACHINE_KVM "-machine virt,gic-version=max,accel=kvm:tcg "
++#define QUERY_HEAD  "{ 'execute': 'query-cpu-model-expansion', " \
++                    "  'arguments': { 'type': 'full', "
++#define QUERY_TAIL  "}}"
++
++static bool kvm_enabled(QTestState *qts)
++{
++    QDict *resp, *qdict;
++    bool enabled;
++
++    resp = qtest_qmp(qts, "{ 'execute': 'query-kvm' }");
++    g_assert(qdict_haskey(resp, "return"));
++    qdict = qdict_get_qdict(resp, "return");
++    g_assert(qdict_haskey(qdict, "enabled"));
++    enabled = qdict_get_bool(qdict, "enabled");
++    qobject_unref(resp);
++
++    return enabled;
 +}
 +
-+/*
-+ * SVE registers are encoded in KVM's memory in an endianness-invariant format.
-+ * The byte at offset i from the start of the in-memory representation contains
-+ * the bits [(7 + 8 * i) : (8 * i)] of the register value. As this means the
-+ * lowest offsets are stored in the lowest memory addresses, then that nearly
-+ * matches QEMU's representation, which is to use an array of host-endian
-+ * uint64_t's, where the lower offsets are at the lower indices. To complete
-+ * the translation we just need to byte swap the uint64_t's on big-endian hosts.
-+ */
-+static uint64_t *sve_bswap64(uint64_t *dst, uint64_t *src, int nr)
++static QDict *do_query_no_props(QTestState *qts, const char *cpu_type)
 +{
-+#ifdef HOST_WORDS_BIGENDIAN
-+    int i;
-+
-+    for (i = 0; i < nr; ++i) {
-+        dst[i] = bswap64(src[i]);
-     }
- 
--    reg.addr = (uintptr_t)(&fpr);
--    fpr = vfp_get_fpcr(env);
--    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
-+    return dst;
-+#else
-+    return src;
-+#endif
++    return qtest_qmp(qts, QUERY_HEAD "'model': { 'name': %s }"
++                          QUERY_TAIL, cpu_type);
 +}
 +
-+/*
-+ * KVM SVE registers come in slices where ZREGs have a slice size of 2048 bits
-+ * and PREGS and the FFR have a slice size of 256 bits. However we simply hard
-+ * code the slice index to zero for now as it's unlikely we'll need more than
-+ * one slice for quite some time.
-+ */
-+static int kvm_arch_put_sve(CPUState *cs)
++static QDict *do_query(QTestState *qts, const char *cpu_type,
++                       const char *fmt, ...)
 +{
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    CPUARMState *env = &cpu->env;
-+    uint64_t tmp[ARM_MAX_VQ * 2];
-+    uint64_t *r;
-+    struct kvm_one_reg reg;
-+    int n, ret;
++    QDict *resp;
 +
-+    for (n = 0; n < KVM_ARM64_SVE_NUM_ZREGS; ++n) {
-+        r = sve_bswap64(tmp, &env->vfp.zregs[n].d[0], cpu->sve_max_vq * 2);
-+        reg.addr = (uintptr_t)r;
-+        reg.id = KVM_REG_ARM64_SVE_ZREG(n, 0);
-+        ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-+        if (ret) {
-+            return ret;
-+        }
-+    }
++    if (fmt) {
++        QDict *args;
++        va_list ap;
 +
-+    for (n = 0; n < KVM_ARM64_SVE_NUM_PREGS; ++n) {
-+        r = sve_bswap64(tmp, r = &env->vfp.pregs[n].p[0],
-+                        DIV_ROUND_UP(cpu->sve_max_vq * 2, 8));
-+        reg.addr = (uintptr_t)r;
-+        reg.id = KVM_REG_ARM64_SVE_PREG(n, 0);
-+        ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-+        if (ret) {
-+            return ret;
-+        }
-+    }
++        va_start(ap, fmt);
++        args = qdict_from_vjsonf_nofail(fmt, ap);
++        va_end(ap);
 +
-+    r = sve_bswap64(tmp, &env->vfp.pregs[FFR_PRED_NUM].p[0],
-+                    DIV_ROUND_UP(cpu->sve_max_vq * 2, 8));
-+    reg.addr = (uintptr_t)r;
-+    reg.id = KVM_REG_ARM64_SVE_FFR(0);
-     ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-     if (ret) {
-         return ret;
-@@ -765,6 +820,7 @@ int kvm_arch_put_registers(CPUState *cs, int level)
- {
-     struct kvm_one_reg reg;
-     uint64_t val;
-+    uint32_t fpr;
-     int i, ret;
-     unsigned int el;
- 
-@@ -855,7 +911,27 @@ int kvm_arch_put_registers(CPUState *cs, int level)
-         }
-     }
- 
--    ret = kvm_arch_put_fpsimd(cs);
-+    if (cpu_isar_feature(aa64_sve, cpu)) {
-+        ret = kvm_arch_put_sve(cs);
++        resp = qtest_qmp(qts, QUERY_HEAD "'model': { 'name': %s, "
++                                                    "'props': %p }"
++                              QUERY_TAIL, cpu_type, args);
 +    } else {
-+        ret = kvm_arch_put_fpsimd(cs);
-+    }
-+    if (ret) {
-+        return ret;
++        resp = do_query_no_props(qts, cpu_type);
 +    }
 +
-+    reg.addr = (uintptr_t)(&fpr);
-+    fpr = vfp_get_fpsr(env);
-+    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
-+    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-+    if (ret) {
-+        return ret;
-+    }
-+
-+    reg.addr = (uintptr_t)(&fpr);
-+    fpr = vfp_get_fpcr(env);
-+    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
-+    ret = kvm_vcpu_ioctl(cs, KVM_SET_ONE_REG, &reg);
-     if (ret) {
-         return ret;
-     }
-@@ -878,10 +954,8 @@ int kvm_arch_put_registers(CPUState *cs, int level)
- 
- static int kvm_arch_get_fpsimd(CPUState *cs)
- {
--    ARMCPU *cpu = ARM_CPU(cs);
--    CPUARMState *env = &cpu->env;
-+    CPUARMState *env = &ARM_CPU(cs)->env;
-     struct kvm_one_reg reg;
--    uint32_t fpr;
-     int i, ret;
- 
-     for (i = 0; i < 32; i++) {
-@@ -899,21 +973,53 @@ static int kvm_arch_get_fpsimd(CPUState *cs)
-         }
-     }
- 
--    reg.addr = (uintptr_t)(&fpr);
--    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
--    ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
--    if (ret) {
--        return ret;
--    }
--    vfp_set_fpsr(env, fpr);
-+    return 0;
++    return resp;
 +}
- 
--    reg.addr = (uintptr_t)(&fpr);
--    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
-+/*
-+ * KVM SVE registers come in slices where ZREGs have a slice size of 2048 bits
-+ * and PREGS and the FFR have a slice size of 256 bits. However we simply hard
-+ * code the slice index to zero for now as it's unlikely we'll need more than
-+ * one slice for quite some time.
-+ */
-+static int kvm_arch_get_sve(CPUState *cs)
++
++static const char *resp_get_error(QDict *resp)
 +{
-+    ARMCPU *cpu = ARM_CPU(cs);
-+    CPUARMState *env = &cpu->env;
-+    struct kvm_one_reg reg;
-+    uint64_t *r;
-+    int n, ret;
++    QDict *qdict;
 +
-+    for (n = 0; n < KVM_ARM64_SVE_NUM_ZREGS; ++n) {
-+        r = &env->vfp.zregs[n].d[0];
-+        reg.addr = (uintptr_t)r;
-+        reg.id = KVM_REG_ARM64_SVE_ZREG(n, 0);
-+        ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-+        if (ret) {
-+            return ret;
-+        }
-+        sve_bswap64(r, r, cpu->sve_max_vq * 2);
++    g_assert(resp);
++
++    qdict = qdict_get_qdict(resp, "error");
++    if (qdict) {
++        return qdict_get_str(qdict, "desc");
 +    }
 +
-+    for (n = 0; n < KVM_ARM64_SVE_NUM_PREGS; ++n) {
-+        r = &env->vfp.pregs[n].p[0];
-+        reg.addr = (uintptr_t)r;
-+        reg.id = KVM_REG_ARM64_SVE_PREG(n, 0);
-+        ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-+        if (ret) {
-+            return ret;
-+        }
-+        sve_bswap64(r, r, DIV_ROUND_UP(cpu->sve_max_vq * 2, 8));
++    return NULL;
++}
++
++#define assert_error(qts, cpu_type, expected_error, fmt, ...)          \
++({                                                                     \
++    QDict *_resp;                                                      \
++    const char *_error;                                                \
++                                                                       \
++    _resp = do_query(qts, cpu_type, fmt, ##__VA_ARGS__);               \
++    g_assert(_resp);                                                   \
++    _error = resp_get_error(_resp);                                    \
++    g_assert(_error);                                                  \
++    g_assert(g_str_equal(_error, expected_error));                     \
++    qobject_unref(_resp);                                              \
++})
++
++static bool resp_has_props(QDict *resp)
++{
++    QDict *qdict;
++
++    g_assert(resp);
++
++    if (!qdict_haskey(resp, "return")) {
++        return false;
++    }
++    qdict = qdict_get_qdict(resp, "return");
++
++    if (!qdict_haskey(qdict, "model")) {
++        return false;
++    }
++    qdict = qdict_get_qdict(qdict, "model");
++
++    return qdict_haskey(qdict, "props");
++}
++
++static QDict *resp_get_props(QDict *resp)
++{
++    QDict *qdict;
++
++    g_assert(resp);
++    g_assert(resp_has_props(resp));
++
++    qdict = qdict_get_qdict(resp, "return");
++    qdict = qdict_get_qdict(qdict, "model");
++    qdict = qdict_get_qdict(qdict, "props");
++
++    return qdict;
++}
++
++#define assert_has_feature(qts, cpu_type, feature)                     \
++({                                                                     \
++    QDict *_resp = do_query_no_props(qts, cpu_type);                   \
++    g_assert(_resp);                                                   \
++    g_assert(resp_has_props(_resp));                                   \
++    g_assert(qdict_get(resp_get_props(_resp), feature));               \
++    qobject_unref(_resp);                                              \
++})
++
++#define assert_has_not_feature(qts, cpu_type, feature)                 \
++({                                                                     \
++    QDict *_resp = do_query_no_props(qts, cpu_type);                   \
++    g_assert(_resp);                                                   \
++    g_assert(!resp_has_props(_resp) ||                                 \
++             !qdict_get(resp_get_props(_resp), feature));              \
++    qobject_unref(_resp);                                              \
++})
++
++static void assert_type_full(QTestState *qts)
++{
++    const char *error;
++    QDict *resp;
++
++    resp = qtest_qmp(qts, "{ 'execute': 'query-cpu-model-expansion', "
++                            "'arguments': { 'type': 'static', "
++                                           "'model': { 'name': 'foo' }}}");
++    g_assert(resp);
++    error = resp_get_error(resp);
++    g_assert(error);
++    g_assert(g_str_equal(error,
++                         "The requested expansion type is not supported"));
++    qobject_unref(resp);
++}
++
++static void assert_bad_props(QTestState *qts, const char *cpu_type)
++{
++    const char *error;
++    QDict *resp;
++
++    resp = qtest_qmp(qts, "{ 'execute': 'query-cpu-model-expansion', "
++                            "'arguments': { 'type': 'full', "
++                                           "'model': { 'name': %s, "
++                                                      "'props': false }}}",
++                     cpu_type);
++    g_assert(resp);
++    error = resp_get_error(resp);
++    g_assert(error);
++    g_assert(g_str_equal(error,
++                         "Invalid parameter type for 'props', expected: dict"));
++    qobject_unref(resp);
++}
++
++static void test_query_cpu_model_expansion(const void *data)
++{
++    QTestState *qts;
++
++    qts = qtest_init(MACHINE "-cpu max");
++
++    /* Test common query-cpu-model-expansion input validation */
++    assert_type_full(qts);
++    assert_bad_props(qts, "max");
++    assert_error(qts, "foo", "The CPU type 'foo' is not a recognized "
++                 "ARM CPU type", NULL);
++    assert_error(qts, "max", "Parameter 'not-a-prop' is unexpected",
++                 "{ 'not-a-prop': false }");
++    assert_error(qts, "host", "The CPU type 'host' requires KVM", NULL);
++
++    /* Test expected feature presence/absence for some cpu types */
++    assert_has_feature(qts, "max", "pmu");
++    assert_has_feature(qts, "cortex-a15", "pmu");
++    assert_has_not_feature(qts, "cortex-a15", "aarch64");
++
++    if (g_str_equal(qtest_get_arch(), "aarch64")) {
++        assert_has_feature(qts, "max", "aarch64");
++        assert_has_feature(qts, "cortex-a57", "pmu");
++        assert_has_feature(qts, "cortex-a57", "aarch64");
++
++        /* Test that features that depend on KVM generate errors without. */
++        assert_error(qts, "max",
++                     "'aarch64' feature cannot be disabled "
++                     "unless KVM is enabled and 32-bit EL1 "
++                     "is supported",
++                     "{ 'aarch64': false }");
 +    }
 +
-+    r = &env->vfp.pregs[FFR_PRED_NUM].p[0];
-+    reg.addr = (uintptr_t)r;
-+    reg.id = KVM_REG_ARM64_SVE_FFR(0);
-     ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-     if (ret) {
-         return ret;
-     }
--    vfp_set_fpcr(env, fpr);
-+    sve_bswap64(r, r, DIV_ROUND_UP(cpu->sve_max_vq * 2, 8));
- 
-     return 0;
- }
-@@ -923,6 +1029,7 @@ int kvm_arch_get_registers(CPUState *cs)
-     struct kvm_one_reg reg;
-     uint64_t val;
-     unsigned int el;
-+    uint32_t fpr;
-     int i, ret;
- 
-     ARMCPU *cpu = ARM_CPU(cs);
-@@ -1012,11 +1119,31 @@ int kvm_arch_get_registers(CPUState *cs)
-         env->spsr = env->banked_spsr[i];
-     }
- 
--    ret = kvm_arch_get_fpsimd(cs);
-+    if (cpu_isar_feature(aa64_sve, cpu)) {
-+        ret = kvm_arch_get_sve(cs);
++    qtest_quit(qts);
++}
++
++static void test_query_cpu_model_expansion_kvm(const void *data)
++{
++    QTestState *qts;
++
++    qts = qtest_init(MACHINE_KVM "-cpu max");
++
++    /*
++     * These tests target the 'host' CPU type, so KVM must be enabled.
++     */
++    if (!kvm_enabled(qts)) {
++        qtest_quit(qts);
++        return;
++    }
++
++    if (g_str_equal(qtest_get_arch(), "aarch64")) {
++        assert_has_feature(qts, "host", "aarch64");
++        assert_has_feature(qts, "host", "pmu");
++
++        assert_error(qts, "cortex-a15",
++            "We cannot guarantee the CPU type 'cortex-a15' works "
++            "with KVM on this host", NULL);
 +    } else {
-+        ret = kvm_arch_get_fpsimd(cs);
++        assert_has_not_feature(qts, "host", "aarch64");
++        assert_has_not_feature(qts, "host", "pmu");
 +    }
-     if (ret) {
-         return ret;
-     }
- 
-+    reg.addr = (uintptr_t)(&fpr);
-+    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpsr);
-+    ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-+    if (ret) {
-+        return ret;
-+    }
-+    vfp_set_fpsr(env, fpr);
 +
-+    reg.addr = (uintptr_t)(&fpr);
-+    reg.id = AARCH64_SIMD_CTRL_REG(fp_regs.fpcr);
-+    ret = kvm_vcpu_ioctl(cs, KVM_GET_ONE_REG, &reg);
-+    if (ret) {
-+        return ret;
-+    }
-+    vfp_set_fpcr(env, fpr);
++    qtest_quit(qts);
++}
 +
-     ret = kvm_get_vcpu_events(cpu);
-     if (ret) {
-         return ret;
++int main(int argc, char **argv)
++{
++    g_test_init(&argc, &argv, NULL);
++
++    qtest_add_data_func("/arm/query-cpu-model-expansion",
++                        NULL, test_query_cpu_model_expansion);
++    qtest_add_data_func("/arm/kvm/query-cpu-model-expansion",
++                        NULL, test_query_cpu_model_expansion_kvm);
++
++    return g_test_run();
++}
 -- 
 2.20.1
 
