@@ -2,87 +2,85 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A18ECA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC98CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:56:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD40B217D9
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:54:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB31E2080F
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 08:56:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cl2BtAo/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD40B217D9
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CqX7X5nW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB31E2080F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQShZ-0003ZQ-Lt
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 04:54:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56480)
+	id 1iQSjT-0005yD-2R
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 04:56:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56444)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iQSet-00014u-GZ
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:52 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iQSeo-0000xS-RC
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iQSer-0008Tt-4A
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:51 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:32871)
+ (envelope-from <peter.maydell@linaro.org>) id 1iQSen-00087e-6o
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:46 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33722)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iQSeq-0008KI-TJ
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:49 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id s1so8974650wro.0
- for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 01:51:47 -0700 (PDT)
+ id 1iQSem-0007zn-Vd
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 04:51:45 -0400
+Received: by mail-wr1-x441.google.com with SMTP id s1so8974508wro.0
+ for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 01:51:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ h=from:to:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=cU0ztaO6mnX2lbCzssErMqt/BItGWLQpsUe0rwEBjZo=;
- b=Cl2BtAo/vQYAETpF4aag+MiOlQGxfoKfG6BzH3m6ZSl4INfag2u/j52l733IlRQDyN
- B4Ngyy5z4agna0XIJxVI8PRkKPEUsTCh8zNDicucybu9Bai+Hm21ujVGIYlLaPYk0r1R
- ySIram8iJFGiQrd7D3Ty7jMqZ3jz2foOST9OigLlg03ALz1EteGPI3MEhvKmWRcjELSN
- FySbWn1cE8gpoRYf8jz0B6uJ5PfcV58k+u+mdVbAypNaKHvMv1bzsxFTL71dzPIjw8mp
- p7hDXlC5g0CYHQtQtZnzv1HK2fM297FyRHv7zhJxaFFzLmH3QcN/b5Q09cD1N6M9WyPZ
- ot8A==
+ bh=gjSuK4BXouO/T+B7He1WodMOLKKfPRfP+oEPOS2e0Nc=;
+ b=CqX7X5nWuLlde+7tJ3+h4YVhSNP4zU6yWnO/eHCa8+vroE+UCbcCVFczLY3ib5kCwV
+ yOuxzcHtVMm9lHgnnvc/EiyBS0qr8SjXNaYwO3IQgzbcrPm++SaVWIvEtU5ihfv7LY5l
+ FrPRxm6hT/mxT2sE6BRaeyrpuzyAeMRSQJEvSctY9Yrr235uL8cO6JCe3fZu4rGA3COn
+ HsW0zizoJmbwa92Rh2tgF6fbrUnAeg5/DjiuvRzjixflG9w9gWSUgOD5tcPIJF/jbeBj
+ K+eVPvxpMaryoes+H4grA6V2HI+6KGwJ8CsC+yBUwpsZ9k877gzPdnfk11g5sDZs33nH
+ BXPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=cU0ztaO6mnX2lbCzssErMqt/BItGWLQpsUe0rwEBjZo=;
- b=mIu3IAaIqXExCixMq5/2GRS0Y3idm2w2XfxPQX7qlOC1LgipeKn5bZzY27DokkpLji
- uN3T/18eKPd5OtkyTjItowAB+zOl4//IY2m6V3DMY57jP3RSg35a3vRNDG1nsTuFpGZ2
- 2960pzbb63V8Ud1lZMSfnQdR7n0TofE8HeLZsmm8SEBX9npa+wP7GJsuFCvtvyVo6YXl
- qPoj7D+cSiwjRaKPxqpPUDHBeZ++LHxzn6DX+bQgbJ2Pt2aIDaKPPeQU3ynptWvD3UO9
- nbgz479ABOHQwDqpbaBsHIPlHO2mIHZYtzisaiXQLcsfYVbNPT5YdG6MEb6mV5l9qGgZ
- FoNQ==
-X-Gm-Message-State: APjAAAUH9wA8Yl4AmKI8sSxGdbBK065Rx1qhbmSZSnm87RCK7WKTJv3G
- zLjuBDwnLWGECmL5lh+lf3y/JVV6zkvRO8pM
-X-Google-Smtp-Source: APXvYqwtOBoYSRo2/7adod2StOo51HTBaW6kIBNJF7iwc2Gmv9sAXSgfKvLcxf4VTyopI3+3CjyOHw==
-X-Received: by 2002:a05:6000:101:: with SMTP id
- o1mr9805058wrx.394.1572598306553; 
- Fri, 01 Nov 2019 01:51:46 -0700 (PDT)
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=gjSuK4BXouO/T+B7He1WodMOLKKfPRfP+oEPOS2e0Nc=;
+ b=bT8CSoiUNp2yf7uBatSHfSZnHm6C5Hu/JP+J0M4Ice+qUsL19zCWONa/BNxlTIn4S/
+ oy5UggTbsnGKepasxAgssDS0PwhACgHWUWPAg8sflAS6NfStKweSEuvKtissryG3hIKP
+ IHtTx3+rEbx2v/ZM2FHOnG1JyhRO/lXk2gnrKelIdWwRYs38OLGadEDO+G6sg9jd+iVh
+ E3SbUPD5ou127z/lD9NCdD0lIBBeauey+ffUjojsAJADd+pseP9rp8tExVUvOsi+EQpu
+ mgm2b/uQv3j2mgmW91Miv18jeDDt/VMoxoc7UV2iTa8fE7+tBZ/1FzxNTchZGIJe9rgs
+ flMA==
+X-Gm-Message-State: APjAAAUdzet1HL99E8W1KmrgAkWcC+rjOP9FZ13VHdlPT5kd26+gWOFE
+ pgcuhp5FDclce/M8k8G/46H16a9Wc5Dq6g1c
+X-Google-Smtp-Source: APXvYqzuSGlWjUaGcZPm1V6mBrSUv9ql7Ux6ye/NIgOmc+MLc5Ke9wEdKESyDvyQKUt+9xC1+nFQwg==
+X-Received: by 2002:adf:e682:: with SMTP id r2mr9176189wrm.365.1572598303189; 
+ Fri, 01 Nov 2019 01:51:43 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id d20sm8818922wra.4.2019.11.01.01.51.45
+ by smtp.gmail.com with ESMTPSA id d20sm8818922wra.4.2019.11.01.01.51.42
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 01 Nov 2019 01:51:46 -0700 (PDT)
+ Fri, 01 Nov 2019 01:51:42 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/11] target/arm: Allow SVE to be disabled via a CPU property
-Date: Fri,  1 Nov 2019 08:51:32 +0000
-Message-Id: <20191101085140.5205-4-peter.maydell@linaro.org>
+Subject: [PULL 00/11] target-arm queue
+Date: Fri,  1 Nov 2019 08:51:29 +0000
+Message-Id: <20191101085140.5205-1-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191101085140.5205-1-peter.maydell@linaro.org>
-References: <20191101085140.5205-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42b
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,150 +96,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andrew Jones <drjones@redhat.com>
+target-arm queue: two bug fixes, plus the KVM/SVE patchset,
+which is a new feature but one which was in my pre-softfreeze
+pullreq (it just had to be dropped due to an unexpected test failure.)
 
-Since 97a28b0eeac14 ("target/arm: Allow VFP and Neon to be disabled via
-a CPU property") we can disable the 'max' cpu model's VFP and neon
-features, but there's no way to disable SVE. Add the 'sve=on|off'
-property to give it that flexibility. We also rename
-cpu_max_get/set_sve_vq to cpu_max_get/set_sve_max_vq in order for them
-to follow the typical *_get/set_<property-name> pattern.
+thanks
+-- PMM
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Tested-by: Masayoshi Mizuma <m.mizuma@jp.fujitsu.com>
-Reviewed-by: Beata Michalska <beata.michalska@linaro.org>
-Message-id: 20191031142734.8590-4-drjones@redhat.com
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/cpu.c         |  3 ++-
- target/arm/cpu64.c       | 52 ++++++++++++++++++++++++++++++++++------
- target/arm/monitor.c     |  2 +-
- tests/arm-cpu-features.c |  1 +
- 4 files changed, 49 insertions(+), 9 deletions(-)
+The following changes since commit b7c9a7f353c0e260519bf735ff0d4aa01e72784b:
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index ab3e1a03616..72a27ec4b0e 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -200,7 +200,8 @@ static void arm_cpu_reset(CPUState *s)
-         env->cp15.cpacr_el1 = deposit64(env->cp15.cpacr_el1, 16, 2, 3);
-         env->cp15.cptr_el[3] |= CPTR_EZ;
-         /* with maximum vector length */
--        env->vfp.zcr_el[1] = cpu->sve_max_vq - 1;
-+        env->vfp.zcr_el[1] = cpu_isar_feature(aa64_sve, cpu) ?
-+                             cpu->sve_max_vq - 1 : 0;
-         env->vfp.zcr_el[2] = env->vfp.zcr_el[1];
-         env->vfp.zcr_el[3] = env->vfp.zcr_el[1];
-         /*
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index d7f5bf610a7..89a8ae77fe8 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -256,15 +256,23 @@ static void aarch64_a72_initfn(Object *obj)
-     define_arm_cp_regs(cpu, cortex_a72_a57_a53_cp_reginfo);
- }
- 
--static void cpu_max_get_sve_vq(Object *obj, Visitor *v, const char *name,
--                               void *opaque, Error **errp)
-+static void cpu_max_get_sve_max_vq(Object *obj, Visitor *v, const char *name,
-+                                   void *opaque, Error **errp)
- {
-     ARMCPU *cpu = ARM_CPU(obj);
--    visit_type_uint32(v, name, &cpu->sve_max_vq, errp);
-+    uint32_t value;
-+
-+    /* All vector lengths are disabled when SVE is off. */
-+    if (!cpu_isar_feature(aa64_sve, cpu)) {
-+        value = 0;
-+    } else {
-+        value = cpu->sve_max_vq;
-+    }
-+    visit_type_uint32(v, name, &value, errp);
- }
- 
--static void cpu_max_set_sve_vq(Object *obj, Visitor *v, const char *name,
--                               void *opaque, Error **errp)
-+static void cpu_max_set_sve_max_vq(Object *obj, Visitor *v, const char *name,
-+                                   void *opaque, Error **errp)
- {
-     ARMCPU *cpu = ARM_CPU(obj);
-     Error *err = NULL;
-@@ -279,6 +287,34 @@ static void cpu_max_set_sve_vq(Object *obj, Visitor *v, const char *name,
-     error_propagate(errp, err);
- }
- 
-+static void cpu_arm_get_sve(Object *obj, Visitor *v, const char *name,
-+                            void *opaque, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    bool value = cpu_isar_feature(aa64_sve, cpu);
-+
-+    visit_type_bool(v, name, &value, errp);
-+}
-+
-+static void cpu_arm_set_sve(Object *obj, Visitor *v, const char *name,
-+                            void *opaque, Error **errp)
-+{
-+    ARMCPU *cpu = ARM_CPU(obj);
-+    Error *err = NULL;
-+    bool value;
-+    uint64_t t;
-+
-+    visit_type_bool(v, name, &value, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-+
-+    t = cpu->isar.id_aa64pfr0;
-+    t = FIELD_DP64(t, ID_AA64PFR0, SVE, value);
-+    cpu->isar.id_aa64pfr0 = t;
-+}
-+
- /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
-  * otherwise, a CPU with as many features enabled as our emulation supports.
-  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
-@@ -391,8 +427,10 @@ static void aarch64_max_initfn(Object *obj)
- #endif
- 
-         cpu->sve_max_vq = ARM_MAX_VQ;
--        object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_vq,
--                            cpu_max_set_sve_vq, NULL, NULL, &error_fatal);
-+        object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_max_vq,
-+                            cpu_max_set_sve_max_vq, NULL, NULL, &error_fatal);
-+        object_property_add(obj, "sve", "bool", cpu_arm_get_sve,
-+                            cpu_arm_set_sve, NULL, NULL, &error_fatal);
-     }
- }
- 
-diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-index 560970de7f5..2209b27b9a0 100644
---- a/target/arm/monitor.c
-+++ b/target/arm/monitor.c
-@@ -97,7 +97,7 @@ GICCapabilityList *qmp_query_gic_capabilities(Error **errp)
-  * then the order that considers those dependencies must be used.
-  */
- static const char *cpu_model_advertised_features[] = {
--    "aarch64", "pmu",
-+    "aarch64", "pmu", "sve",
-     NULL
- };
- 
-diff --git a/tests/arm-cpu-features.c b/tests/arm-cpu-features.c
-index 6ebb03d7ad6..d5e18eb6662 100644
---- a/tests/arm-cpu-features.c
-+++ b/tests/arm-cpu-features.c
-@@ -197,6 +197,7 @@ static void test_query_cpu_model_expansion(const void *data)
- 
-     if (g_str_equal(qtest_get_arch(), "aarch64")) {
-         assert_has_feature(qts, "max", "aarch64");
-+        assert_has_feature(qts, "max", "sve");
-         assert_has_feature(qts, "cortex-a57", "pmu");
-         assert_has_feature(qts, "cortex-a57", "aarch64");
- 
--- 
-2.20.1
+  Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' into staging (2019-10-31 15:57:30 +0000)
 
+are available in the Git repository at:
+
+  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20191101-1
+
+for you to fetch changes up to d9ae7624b659362cb2bb2b04fee53bf50829ca56:
+
+  target/arm: Allow reading flags from FPSCR for M-profile (2019-11-01 08:49:10 +0000)
+
+----------------------------------------------------------------
+target-arm queue:
+ * Support SVE in KVM guests
+ * Don't UNDEF on M-profile 'vmrs apsr_nzcv, fpscr'
+ * Update hflags after boot.c modifies CPU state
+
+----------------------------------------------------------------
+Andrew Jones (9):
+      target/arm/monitor: Introduce qmp_query_cpu_model_expansion
+      tests: arm: Introduce cpu feature tests
+      target/arm: Allow SVE to be disabled via a CPU property
+      target/arm/cpu64: max cpu: Introduce sve<N> properties
+      target/arm/kvm64: Add kvm_arch_get/put_sve
+      target/arm/kvm64: max cpu: Enable SVE when available
+      target/arm/kvm: scratch vcpu: Preserve input kvm_vcpu_init features
+      target/arm/cpu64: max cpu: Support sve properties with KVM
+      target/arm/kvm: host cpu: Add support for sve<N> properties
+
+Christophe Lyon (1):
+      target/arm: Allow reading flags from FPSCR for M-profile
+
+Edgar E. Iglesias (1):
+      hw/arm/boot: Rebuild hflags when modifying CPUState at boot
+
+ tests/Makefile.include         |   5 +-
+ qapi/machine-target.json       |   6 +-
+ include/qemu/bitops.h          |   1 +
+ target/arm/cpu.h               |  21 ++
+ target/arm/kvm_arm.h           |  39 +++
+ hw/arm/boot.c                  |   1 +
+ target/arm/cpu.c               |  25 +-
+ target/arm/cpu64.c             | 364 +++++++++++++++++++++++++--
+ target/arm/helper.c            |  10 +-
+ target/arm/kvm.c               |  25 +-
+ target/arm/kvm32.c             |   6 +-
+ target/arm/kvm64.c             | 325 +++++++++++++++++++++---
+ target/arm/monitor.c           | 158 ++++++++++++
+ target/arm/translate-vfp.inc.c |   5 +-
+ tests/arm-cpu-features.c       | 551 +++++++++++++++++++++++++++++++++++++++++
+ docs/arm-cpu-features.rst      | 317 ++++++++++++++++++++++++
+ 16 files changed, 1795 insertions(+), 64 deletions(-)
+ create mode 100644 tests/arm-cpu-features.c
+ create mode 100644 docs/arm-cpu-features.rst
 
