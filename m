@@ -2,84 +2,81 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D9BCA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 12:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA25FCA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 12:54:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B6942067D
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 12:41:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74788208E3
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 12:54:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TpX1Wog8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B6942067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bDrJddtZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74788208E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQWFQ-0006KU-Ae
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 08:41:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42046)
+	id 1iQWS7-0006y3-IQ
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 08:54:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46087)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iQWEO-0005Z0-Lu
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:40:45 -0400
+ (envelope-from <peter.maydell@linaro.org>) id 1iQWRB-0006Rl-To
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:53:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iQWEL-0006Lj-QZ
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:40:43 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40300
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iQWEJ-0006De-RX
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:40:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572612034;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zk74v0gC+DNvjMBYuOPhBn7nW4PGZ3x2jINkHxEweO4=;
- b=TpX1Wog8X3A6vLilixjBXKE147Mts3wu4MKg0tJbXbQDuFQZFveykfp/uSbnMyXr0Ek/+I
- utOKcRzBE9OxoqJQF9jPyUFqpduwfZ/LRto2xpq1P0iCSsLmYPVmOHyyxzWZOI3BTuICIC
- xkwsAMKNH7rBjn4LKPJSx5VRnK8vV2M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-DmbTG27MOY2yevXaN8VelA-1; Fri, 01 Nov 2019 08:40:30 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 565CA800C77;
- Fri,  1 Nov 2019 12:40:29 +0000 (UTC)
-Received: from [10.3.116.202] (ovpn-116-202.phx2.redhat.com [10.3.116.202])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9A74F1001B32;
- Fri,  1 Nov 2019 12:40:24 +0000 (UTC)
-Subject: Re: [PATCH for-4.2 1/4] Revert "qcow2: skip writing zero buffers to
- empty COW areas"
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-References: <20191101100019.9512-1-mreitz@redhat.com>
- <20191101100019.9512-2-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <c4e21028-0321-20ea-21b8-31dec87fac97@redhat.com>
-Date: Fri, 1 Nov 2019 13:40:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <peter.maydell@linaro.org>) id 1iQWRA-00026m-LG
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:53:57 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33398)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iQWRA-00026d-Fb
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:53:56 -0400
+Received: by mail-ot1-x343.google.com with SMTP id u13so8285183ote.0
+ for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 05:53:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pRFndJFLOUaqMtfY76Brboh+jZoQQcbPk7lfMACRyWI=;
+ b=bDrJddtZbLF/exz3aqleRzftQACDqhgh6+h31t4QFweHEdpm9o23cb3Ek1ac8yu2wj
+ mxpIFSOg4h/9fhdqW5NjpVT0HVcmTe24kulDAoPB06qwfKyxffUck9ZW9pt1m+Yp944k
+ wNt52Nlmjfw6DnuwsJPly5xIpeCHMa59BBf0za13RF/ZYqr6DvwI6+a4eXHbCc1Mf949
+ 5cO9L58fhUVKSSHRbSWSq4zE6OcpXMmUjacqNQFNy1ilk4rtQdnU8cTrKFwCEWpsrRWg
+ JFBCPJaOvo7td6n3oNlAxOOrv5TS97FVUOaBQA1w0eamWHNzi4MKlVHczZwPtMMsHs0t
+ XyQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pRFndJFLOUaqMtfY76Brboh+jZoQQcbPk7lfMACRyWI=;
+ b=thk6U4uLW3+T/fgACEeAloobW/GUwdeUncEDSO25jifbAfyV6LS6IbPEcq40zFAkHt
+ AppDd+A2y1+FISmnUaojTjFDrEyYbsuG9OvsVef9HPsoyNDlBUyD52Hap0OXuD/0Q1TC
+ b/d+8ergLpyxUcKGo6BmqzjyiC6Si5JQanfn5cypFrfaqXFTBr77yJMDgOgEs9P9l46g
+ xeaTiNKxqKy06QANg2R1Xiz5kqlmvki8FQgqQMddmiFY+7w46CSwkcvsqmR7McrRNL4H
+ 4GDdROdPYaHBtzEIxeA+Fu8sWQpgmFodZ3GCSoc3xE855NP+zBUhy42nnCjQT2EmfRZH
+ ArVw==
+X-Gm-Message-State: APjAAAVNg6no6GWRFoe9Ntlmpv52vrjKFUNVrsbhBQkteD6eQcAp5hjj
+ nUMxabhTJGzXKIMuxO2/Uo2l4pTPb00hq9jsPe6pdQ==
+X-Google-Smtp-Source: APXvYqwfRP0Rgt2pyrICPfTrjII4hEuzgRrwuuFnHcWWa1WgbaGYNyybFTAal2UkQvDhVly/cDC96l348T1XEdMXBdc=
+X-Received: by 2002:a9d:7385:: with SMTP id j5mr8515934otk.135.1572612835377; 
+ Fri, 01 Nov 2019 05:53:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20191101100019.9512-2-mreitz@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: DmbTG27MOY2yevXaN8VelA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191101085140.5205-1-peter.maydell@linaro.org>
+ <CAFEAcA-N-Fh7+NCHGPXuK-H6DUTOwjfCU6rmZGz4k8n+tkKdxw@mail.gmail.com>
+ <20191101095438.a6wd2mal4w75irvg@kamzik.brq.redhat.com>
+ <CAFEAcA9_PMjhEgMn3qnr1xsiGU5YkNr1KeCvez6pFm=93EzTpA@mail.gmail.com>
+In-Reply-To: <CAFEAcA9_PMjhEgMn3qnr1xsiGU5YkNr1KeCvez6pFm=93EzTpA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 1 Nov 2019 12:53:42 +0000
+Message-ID: <CAFEAcA9iTS8SXTFyGPwk+Wn_Aw-2rd9Wb_N3cH8iAxSOzzYyVg@mail.gmail.com>
+Subject: Re: [PULL 00/11] target-arm queue
+To: Andrew Jones <drjones@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,50 +88,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/1/19 11:00 AM, Max Reitz wrote:
-> This reverts commit c8bb23cbdbe32f5c326365e0a82e1b0e68cdcd8a.
->=20
-> This commit causes fundamental performance problems on XFS (because
-> fallocate() stalls the AIO pipeline), and as such it is not clear that
-> we should unconditionally enable this behavior.
->=20
-> We expect subclusters to alleviate the performance penalty of small
-> writes to newly allocated clusters, so when we get them, the originally
-> intended performance gain may actually no longer be significant.
->=20
-> If we want to reintroduce something similar to c8bb23cbdbe, it will
-> require extensive benchmarking on various systems with subclusters
-> enabled.
->=20
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
+On Fri, 1 Nov 2019 at 10:34, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Fri, 1 Nov 2019 at 09:54, Andrew Jones <drjones@redhat.com> wrote:
+> > Darn it. Sorry about that, but if it's still failing then I think QEMU
+> > must believe KVM is enabled, i.e. kvm_enabled() in QEMU must be true.
+> > I can try to confirm that and fix it, but I'll need to set up this
+> > environment first.
+>
+> Yeah, it looks like trying to run with KVM in an aarch32 chroot
+> doesn't work but we don't notice it -- in qemu kvm_init() succeeds
+> but then we fail when we try to actually create CPUs, so:
+> $ ./arm-softmmu/qemu-system-arm -M virt -M accel=kvm:tcg
+> qemu-system-arm: kvm_init_vcpu failed: Invalid argument
+>
+> we barf rather than falling back to tcg the way we ought to.
 
-> +++ b/qapi/block-core.json
-> @@ -3304,8 +3304,6 @@
->   #
->   # @cor_write: a write due to copy-on-read (since 2.11)
->   #
-> -# @cluster_alloc_space: an allocation of file space for a cluster (since=
- 4.1)
-> -#
->   # @none: triggers once at creation of the blkdebug node (since 4.1)
+I spoke to Christoffer and Marc about this, and they reckoned
+this was basically a kernel bug (and ideally a 64-bit kernel
+should just refuse to open /dev/kvm for an aarch32-compat
+userspace process, because it doesn't provide the aarch32 KVM
+interface, only the aarch64 one).
 
-Deleting released qapi is not backwards-compatible.  However, given that=20
-the only known user of this interface is debug testing via iotests, I'm=20
-not too concerned that we would be impacting any external users.
+In the meantime, we should just bodge whatever we need to
+in this test to cause us not to bother to try to run the test,
+in whatever is the most expedient way.
 
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+thanks
+-- PMM
 
