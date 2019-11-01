@@ -2,82 +2,84 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D53ACA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 15:43:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67237CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 15:46:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9BC420650
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 15:43:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 351C021734
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 15:46:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="tVtACwLH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9BC420650
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z3GhV9ve"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 351C021734
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQZ4w-0003ih-Fv
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 11:43:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52866)
+	id 1iQZ7k-0004zo-6F
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 11:46:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53259)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <anup@brainfault.org>) id 1iQZ2X-00038M-74
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 11:40:43 -0400
+ (envelope-from <kwolf@redhat.com>) id 1iQZ4j-0003qg-Pk
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 11:42:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <anup@brainfault.org>) id 1iQZ2W-0002uX-06
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 11:40:41 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:52313)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <anup@brainfault.org>) id 1iQZ2V-0002Ys-QW
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 11:40:39 -0400
-Received: by mail-wm1-x344.google.com with SMTP id c17so2369076wmk.2
- for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 08:40:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=brainfault-org.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PnyrLnNYEiZ0VCSsEhmvl+u74qow2KUegd4JUtRWIWk=;
- b=tVtACwLHj+qxRWiAqXGB2HJXrke2qTLCH3m1EuzS/+AskV3tcFxONlCCziwD9tEh29
- DlYABa8Lxp95Gb6jHa/jC/qajNjykgzOSg54vMpCiN5vbzuBZkUh2n2fYEQrcQEeFE+K
- 7j9sWnSU37ixDQ1f0yE3PbhW54tTyo+ay6bz0P1rPdtBcsR+obWWn9VQ+SxzQvhAt8QL
- d8ncWRjpHleJW8YHoksOOD5jEPbNfHirhslGzmkOcMF2aLItgjiyRS/+fPejt/eEdnD1
- b8WlnUrY0Fl7x650alv7JEqAZvST2rhons4+wx8BRc80RSOCLx296guNcxARHBxlWX7z
- Rn+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=PnyrLnNYEiZ0VCSsEhmvl+u74qow2KUegd4JUtRWIWk=;
- b=R6rlzKSwxzuKKVoskfd/XFAHOVb7yU8TsGXZNOPXWXM/hCbMvVDa8p7OqxiCxOVEBu
- vqeYKEc4Xf/4+p45jITTzgZ4iNX0mIpU7hamZZHaC4Bn2yvqtiq236+WXGDjDd640phR
- HD4YEaeQBMmJH0rEwcnMgqdnSamEnfhk9p7pznv2WzaUXCyU2m/t62R4EnaTPTy/VHTU
- CLmoNEyFmvaCH9zUyZYk6ea/x8kOl818U/doMIbxFzmQo6OGwKkTvefD5KV55sJUgeUg
- sNEl/vqogYbQ6r9LDYYSI+rx7NRUoNn3YuD6yWCOKNeXRNigZF2SZI/QA8OSWAiqd7X5
- 33Ew==
-X-Gm-Message-State: APjAAAWYChQ4gQvI+QaT8WbBGD1TKffYuzp6rhSXRTYKvEm9pgkBU3Rg
- f4ZOHltib8FZewiHjGAx22HdxYX6zVuKoaaaWZWoSg==
-X-Google-Smtp-Source: APXvYqzEpqJU31nE+PcSBF0U/yI/nLRGdJQrnuHDJpPYoq1kBlHWsYFmYMJzGS96gMY68kHNghTRZwwr1rbmbGeH+mA=
-X-Received: by 2002:a05:600c:2112:: with SMTP id
- u18mr10444612wml.177.1572622834966; 
- Fri, 01 Nov 2019 08:40:34 -0700 (PDT)
+ (envelope-from <kwolf@redhat.com>) id 1iQZ4h-0003ut-Mm
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 11:42:57 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42319
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iQZ4h-0003mV-GO
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 11:42:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572622972;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=xOjAHH/CXpv+pe9Z+LiEWwumE2gz00LCoO2U+yc4aME=;
+ b=Z3GhV9vezxiz0GwosqhRfrZbGItoLiUhEIY5Bj0xuMY30+23pt6SJj+zRqzU8tvDszuxAj
+ pLUbowZAnAmqRqahnmp4L3P4R3DUHe2N0/6l21MFrETtP/Y6jFZe8Ho+890dtZRDWQNOGo
+ gJvALfEfxj0ywMcpV121pHBbBg9P3WQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-244-_JoUMd8rPGe3FtmAKwT1BQ-1; Fri, 01 Nov 2019 11:42:48 -0400
+X-MC-Unique: _JoUMd8rPGe3FtmAKwT1BQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CEF3800A1E;
+ Fri,  1 Nov 2019 15:42:47 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-102.ams2.redhat.com
+ [10.36.116.102])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1D6BE5D6B7;
+ Fri,  1 Nov 2019 15:42:42 +0000 (UTC)
+Date: Fri, 1 Nov 2019 16:42:41 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [PATCH for-4.2 1/4] Revert "qcow2: skip writing zero buffers to
+ empty COW areas"
+Message-ID: <20191101154241.GA23153@localhost.localdomain>
+References: <20191101100019.9512-1-mreitz@redhat.com>
+ <20191101100019.9512-2-mreitz@redhat.com>
+ <c4e21028-0321-20ea-21b8-31dec87fac97@redhat.com>
+ <e8f8ae20-b036-4330-4851-f099fc534f9b@redhat.com>
 MIME-Version: 1.0
-References: <20191025042734.69244-1-anup.patel@wdc.com>
- <CAKmqyKMQz-OMFQRTdmpBpGMLiZ_ZM+UL5T5aAWZ5F1fC6vddOQ@mail.gmail.com>
-In-Reply-To: <CAKmqyKMQz-OMFQRTdmpBpGMLiZ_ZM+UL5T5aAWZ5F1fC6vddOQ@mail.gmail.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 1 Nov 2019 21:10:24 +0530
-Message-ID: <CAAhSdy3sUb_r77NBvEQEAQ0EQB99=4jgAbH3ADOqvJ_iX+o8pg@mail.gmail.com>
-Subject: Re: [PATCH v5 0/2] RTC support for QEMU RISC-V virt machine
-To: Peter Maydell <peter.maydell@linaro.org>,
- Palmer Dabbelt <palmer@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+In-Reply-To: <e8f8ae20-b036-4330-4851-f099fc534f9b@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature"; boundary="cWoXeonUoKmBZSoM"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,74 +91,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Anup Patel <Anup.Patel@wdc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Alistair Francis <alistair23@gmail.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 29, 2019 at 6:55 PM Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Fri, Oct 25, 2019 at 6:28 AM Anup Patel <Anup.Patel@wdc.com> wrote:
-> >
-> > This series adds RTC device to QEMU RISC-V virt machine. We have
-> > selected Goldfish RTC device model for this. It's a pretty simple
-> > synthetic device with few MMIO registers and no dependency external
-> > clock. The driver for Goldfish RTC is already available in Linux so
-> > we just need to enable it in Kconfig for RISCV and also update Linux
-> > defconfigs.
-> >
-> > We have tested this series with Linux-5.4-rc4 plus defconfig changes
-> > available in 'goldfish_rtc_v2' branch of:
-> > https://github.com/avpatel/linux.git
->
-> @Peter Maydell this has been reviewed, do you mind taking this in you
-> next PR? I don't see a maintainer for hw/rtc.
+--cWoXeonUoKmBZSoM
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It would be great if this series can be taken for QEMU-4.2
+Am 01.11.2019 um 15:01 hat Max Reitz geschrieben:
+> On 01.11.19 13:40, Eric Blake wrote:
+> > On 11/1/19 11:00 AM, Max Reitz wrote:
+> >> This reverts commit c8bb23cbdbe32f5c326365e0a82e1b0e68cdcd8a.
+> >>
+> >> This commit causes fundamental performance problems on XFS (because
+> >> fallocate() stalls the AIO pipeline), and as such it is not clear that
+> >> we should unconditionally enable this behavior.
+> >>
+> >> We expect subclusters to alleviate the performance penalty of small
+> >> writes to newly allocated clusters, so when we get them, the originall=
+y
+> >> intended performance gain may actually no longer be significant.
+> >>
+> >> If we want to reintroduce something similar to c8bb23cbdbe, it will
+> >> require extensive benchmarking on various systems with subclusters
+> >> enabled.
+> >>
+> >> Cc: qemu-stable@nongnu.org
+> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >> ---
+> >=20
+> >> +++ b/qapi/block-core.json
+> >> @@ -3304,8 +3304,6 @@
+> >> =C2=A0 #
+> >> =C2=A0 # @cor_write: a write due to copy-on-read (since 2.11)
+> >> =C2=A0 #
+> >> -# @cluster_alloc_space: an allocation of file space for a cluster
+> >> (since 4.1)
+> >> -#
+> >> =C2=A0 # @none: triggers once at creation of the blkdebug node (since =
+4.1)
+> >=20
+> > Deleting released qapi is not backwards-compatible.
+>=20
+> Right. :-/
+>=20
+> I=E2=80=99ll just not make changes to the QAPI schema.  It doesn=E2=80=99=
+t hurt to leave
+> this in.
 
-Regards,
-Anup
+Why would it be incompatible to drop an enum value that is only ever
+used in output and that QEMU doesn't generate?
 
->
-> Alistair
->
-> >
-> > Changes since v4:
-> >  - Fixed typo in trace event usage
-> >  - Moved goldfish_rtc.h to correct location
-> >
-> > Changes since v3:
-> >  - Address all nit comments from Alistair
-> >
-> > Changes since v2:
-> >  - Rebased on RTC code refactoring
-> >
-> > Changes since v1:
-> >  - Implemented VMState save/restore callbacks
-> >
-> > Anup Patel (2):
-> >   hw: rtc: Add Goldfish RTC device
-> >   riscv: virt: Use Goldfish RTC device
-> >
-> >  hw/riscv/Kconfig              |   1 +
-> >  hw/riscv/virt.c               |  15 ++
-> >  hw/rtc/Kconfig                |   3 +
-> >  hw/rtc/Makefile.objs          |   1 +
-> >  hw/rtc/goldfish_rtc.c         | 288 ++++++++++++++++++++++++++++++++++
-> >  hw/rtc/trace-events           |   4 +
-> >  include/hw/riscv/virt.h       |   2 +
-> >  include/hw/rtc/goldfish_rtc.h |  46 ++++++
-> >  8 files changed, 360 insertions(+)
-> >  create mode 100644 hw/rtc/goldfish_rtc.c
-> >  create mode 100644 include/hw/rtc/goldfish_rtc.h
-> >
-> > --
-> > 2.17.1
-> >
+Kevin
+
+--cWoXeonUoKmBZSoM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJdvFJxAAoJEH8JsnLIjy/WJXAQAKq2igSusXV5zVvt1kqcDV0t
+imBcsf6C4l0wCwD7PJ5Org5rGPAxCrthahSQzJvqImraKEhmJEL8bExGfz+Ddzam
+ximAFz5gozr26d6clFya4G156eXCY3CRVCbojdXEaPmF7qK0FAilR9n0ol6iB34L
+Zjb+oY56m19dp9ZRfEx8vXiqMWGW7TiPHz7JN4y2trHSPyKYCHPD0yGkFSI+W5qi
+Fg6U2EGCYCFAo47NdKxK564QuPfOVVXlsV8kKOX78b6/DpS8rXIq+rB1002rkt/v
+GOdDIPyx0sMPoDK3QOpm3AF8oiyLDZonn6ZJADeleVkiH/p901V5HPiVWZJEfvDO
+Yr4gOeCEEfxncHQzEZbd+YjG9+Om4te/LdT5sTDFEzG39Gk1SGWQKLD8dV6hyTq/
+KkdIwiWUu9eH+G3ubGLSYHNhNc9QwW68Psk+13Th9FQeMhHKQ4lntR+W5PBFKdWI
+Ii2Zc1f6bWQM+u3n565uByTb98X8xdFd8U/1T0ykmBFrkcERmHalLjp5/VuRpyr8
+G7okmekrCDvkGLmDGOMNzzXH+83Zfv5aSx8rkfPtx01OZ8SIXm3aKVOD08jHiuIJ
+j/13Bdgm+55lw61k78ukyWf1huZokIxi7qvVKqGOcnoWEiHhZUgp1vnMP3gKBPOK
+mTFR9q2xMCyum8wZSKxl
+=E6x3
+-----END PGP SIGNATURE-----
+
+--cWoXeonUoKmBZSoM--
+
 
