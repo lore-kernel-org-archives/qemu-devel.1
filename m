@@ -2,49 +2,66 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA7F4CA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B390CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:59:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E8AB2080F
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:55:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E8AB2080F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id D9F7321734
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:59:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="HLkyojo0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9F7321734
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQaD6-0005KG-LD
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 12:55:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38298)
+	id 1iQaGY-0006dP-Pt
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 12:59:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38456)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iQaCF-0004Xa-H5
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:54:49 -0400
+ (envelope-from <svens@stackframe.org>) id 1iQaDA-0005cI-Jb
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:55:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iQaCD-0001SZ-Ub
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:54:47 -0400
-Received: from relay.sw.ru ([185.231.240.75]:45004)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iQaCD-0001Qh-ND; Fri, 01 Nov 2019 12:54:45 -0400
-Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iQaC9-000771-FX; Fri, 01 Nov 2019 19:54:41 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Subject: [PATCH v3] iotests: Test NBD client reconnection
-Date: Fri,  1 Nov 2019 19:54:32 +0300
-Message-Id: <1572627272-23359-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (envelope-from <svens@stackframe.org>) id 1iQaD9-00038X-0k
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:55:44 -0400
+Received: from shroom.duncanthrax.net ([2a01:4f8:121:41fa::169]:38399
+ helo=smtp.duncanthrax.net)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <svens@stackframe.org>)
+ id 1iQaD5-0002p8-4D; Fri, 01 Nov 2019 12:55:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=duncanthrax.net; s=dkim; h=Content-Transfer-Encoding:Content-Type:
+ MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+ Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+ :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+ List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=Z11+JlJLiMPMZITDK4+JSy7JMRvg3HXx+xrM/qAInK4=; b=HLkyojo04pEKiA7mWfdeUjnshh
+ QRX3uunI5vLu1xAT03mdGBl0JrUvhYAA8yVspZncaouFXydDf2imD6jTAtGOMxH9EWbWxU5lEGmXY
+ TW+8Ydz9sWFR7AzN83k1BRy8SrNHXla6L3Nz0gJVzbnT2RfMhGujCBzA89BdKmNoCVTk=;
+Received: from hsi-kbw-046-005-233-221.hsi8.kabel-badenwuerttemberg.de
+ ([46.5.233.221] helo=x280.stackframe.org)
+ by smtp.duncanthrax.net with esmtpa (Exim 4.90_1)
+ (envelope-from <svens@stackframe.org>)
+ id 1iQaCu-0000ZA-7w; Fri, 01 Nov 2019 17:55:28 +0100
+From: Sven Schnelle <svens@stackframe.org>
+To: John Snow <jsnow@redhat.com>
+Subject: [PATCH v3] fdc/i8257: implement verify transfer mode
+Date: Fri,  1 Nov 2019 17:55:13 +0100
+Message-Id: <20191101165513.14229-1-svens@stackframe.org>
+X-Mailer: git-send-email 2.23.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a01:4f8:121:41fa::169
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -56,189 +73,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
- andrey.shinkevich@virtuozzo.com, den@openvz.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sven Schnelle <svens@stackframe.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The test for an NBD client. The NBD server is disconnected after the
-client write request. The NBD client should reconnect and complete
-the write operation.
+While working on the Tulip driver i tried to write some Teledisk images to
+a floppy image which didn't work. Turned out that Teledisk checks the written
+data by issuing a READ command to the FDC but running the DMA controller
+in VERIFY mode. As we ignored the DMA request in that case, the DMA transfer
+never finished, and Teledisk reported an error.
 
-Suggested-by: Denis V. Lunev <den@openvz.org>
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+The i8257 spec says about verify transfers:
+
+3) DMA verify, which does not actually involve the transfer of data. When an
+8257 channel is in the DMA verify mode, it will respond the same as described
+for transfer operations, except that no memory or I/O read/write control signals
+will be generated.
+
+Hervé proposed to remove all the dma_mode_ok stuff from fdc to have a more
+clear boundary between DMA and FDC, so this patch also does that.
+
+Suggested-by: Hervé Poussineau <hpoussin@reactos.org>
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
 ---
- tests/qemu-iotests/277                   | 102 +++++++++++++++++++++++++++++++
- tests/qemu-iotests/277.out               |   6 ++
- tests/qemu-iotests/group                 |   1 +
- tests/qemu-iotests/iotests.py            |   5 ++
- tests/qemu-iotests/nbd-fault-injector.py |   3 +-
- 5 files changed, 116 insertions(+), 1 deletion(-)
- create mode 100755 tests/qemu-iotests/277
- create mode 100644 tests/qemu-iotests/277.out
+ hw/block/fdc.c       | 61 +++++++++++++-------------------------------
+ hw/dma/i8257.c       | 20 ++++++++++-----
+ include/hw/isa/isa.h |  1 -
+ 3 files changed, 31 insertions(+), 51 deletions(-)
 
-diff --git a/tests/qemu-iotests/277 b/tests/qemu-iotests/277
-new file mode 100755
-index 0000000..e4e6730
---- /dev/null
-+++ b/tests/qemu-iotests/277
-@@ -0,0 +1,102 @@
-+#!/usr/bin/env python
-+#
-+# Test NBD client reconnection
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/hw/block/fdc.c b/hw/block/fdc.c
+index ac5d31e8c1..01812c7553 100644
+--- a/hw/block/fdc.c
++++ b/hw/block/fdc.c
+@@ -1714,53 +1714,28 @@ static void fdctrl_start_transfer(FDCtrl *fdctrl, int direction)
+     }
+     fdctrl->eot = fdctrl->fifo[6];
+     if (fdctrl->dor & FD_DOR_DMAEN) {
+-        IsaDmaTransferMode dma_mode;
++        /* DMA transfer is enabled. */
+         IsaDmaClass *k = ISADMA_GET_CLASS(fdctrl->dma);
+-        bool dma_mode_ok;
+-        /* DMA transfer are enabled. Check if DMA channel is well programmed */
+-        dma_mode = k->get_transfer_mode(fdctrl->dma, fdctrl->dma_chann);
+-        FLOPPY_DPRINTF("dma_mode=%d direction=%d (%d - %d)\n",
+-                       dma_mode, direction,
+-                       (128 << fdctrl->fifo[5]) *
 +
-+import os
-+import subprocess
-+import iotests
-+from iotests import file_path, log
++        FLOPPY_DPRINTF("direction=%d (%d - %d)\n",
++                       direction, (128 << fdctrl->fifo[5]) *
+                        (cur_drv->last_sect - ks + 1), fdctrl->data_len);
+-        switch (direction) {
+-        case FD_DIR_SCANE:
+-        case FD_DIR_SCANL:
+-        case FD_DIR_SCANH:
+-            dma_mode_ok = (dma_mode == ISADMA_TRANSFER_VERIFY);
+-            break;
+-        case FD_DIR_WRITE:
+-            dma_mode_ok = (dma_mode == ISADMA_TRANSFER_WRITE);
+-            break;
+-        case FD_DIR_READ:
+-            dma_mode_ok = (dma_mode == ISADMA_TRANSFER_READ);
+-            break;
+-        case FD_DIR_VERIFY:
+-            dma_mode_ok = true;
+-            break;
+-        default:
+-            dma_mode_ok = false;
+-            break;
+-        }
+-        if (dma_mode_ok) {
+-            /* No access is allowed until DMA transfer has completed */
+-            fdctrl->msr &= ~FD_MSR_RQM;
+-            if (direction != FD_DIR_VERIFY) {
+-                /* Now, we just have to wait for the DMA controller to
+-                 * recall us...
+-                 */
+-                k->hold_DREQ(fdctrl->dma, fdctrl->dma_chann);
+-                k->schedule(fdctrl->dma);
+-            } else {
+-                /* Start transfer */
+-                fdctrl_transfer_handler(fdctrl, fdctrl->dma_chann, 0,
+-                                        fdctrl->data_len);
+-            }
+-            return;
 +
-+
-+def make_conf_file(event):
-+    """
-+    Create configuration file for the nbd-fault-injector.py
-+
-+    :param event: which event the server should close a connection on
-+    """
-+    if os.path.exists(conf_file):
-+        os.remove(conf_file)
-+
-+    with open(conf_file, "w+") as conff:
-+        conff.write("[inject-error]\nevent={}\nwhen=after".format(event))
-+
-+
-+def start_server_NBD(event):
-+    make_conf_file(event)
-+
-+    srv = subprocess.Popen(["nbd-fault-injector.py", "--classic-negotiation",
-+                           nbd_sock, conf_file], stdout=subprocess.PIPE,
-+                           stderr=subprocess.STDOUT, universal_newlines=True)
-+    line = srv.stdout.readline()
-+    if "Listening on " in line:
-+        log('NBD server: started')
-+    else:
-+        log('NBD server: ' + line.rstrip())
-+
-+    return srv
-+
-+
-+def start_client_NBD():
-+    log('NBD client: QEMU-IO write')
-+    args = iotests.qemu_io_args_no_fmt + \
-+        ['-c', 'write -P 0x7 0 3M', '--image-opts',
-+         'driver=nbd,server.type=unix,server.path={},'
-+         'reconnect-delay=7'.format(nbd_sock)]
-+    clt = subprocess.Popen(args, stdout=subprocess.PIPE,
-+                           stderr=subprocess.STDOUT,
-+                           universal_newlines=True)
-+    return clt
-+
-+
-+def check_proc_NBD(proc, connector):
-+    try:
-+        exitcode = proc.wait(timeout=10)
-+
-+        if exitcode < 0:
-+            log('NBD {}: EXIT SIGNAL {}\n'.format(connector, -exitcode))
-+            log(proc.communicate()[0])
-+        else:
-+            line = proc.stdout.readline()
-+            log('NBD {}: {}'.format(connector, line.rstrip()))
-+
-+    except subprocess.TimeoutExpired:
-+        proc.kill()
-+        log('NBD {}: ERROR timeout expired'.format(connector))
-+    finally:
-+        if connector == 'server':
-+            os.remove(nbd_sock)
-+            os.remove(conf_file)
-+
-+
-+conf_file = os.path.join(iotests.test_dir, "nbd-fault-injector.conf")
-+nbd_sock = file_path('nbd-sock')
-+nbd_uri = 'nbd+unix:///?socket=' + nbd_sock
-+if os.path.exists(nbd_sock):
-+    os.remove(nbd_sock)
-+
-+srv = start_server_NBD('data')
-+clt = start_client_NBD()
-+# The server should close the connection after a client write request
-+check_proc_NBD(srv, 'server')
-+# Start the NBD server again
-+srv = start_server_NBD('reply')
-+# The client should reconnect and complete the write operation
-+check_proc_NBD(clt, 'client')
-+# Make it sure that server terminated
-+check_proc_NBD(srv, 'server')
-diff --git a/tests/qemu-iotests/277.out b/tests/qemu-iotests/277.out
-new file mode 100644
-index 0000000..45404b3
---- /dev/null
-+++ b/tests/qemu-iotests/277.out
-@@ -0,0 +1,6 @@
-+NBD server: started
-+NBD client: QEMU-IO write
-+NBD server: Closing connection on rule match inject-error
-+NBD server: started
-+NBD client: wrote 3145728/3145728 bytes at offset 0
-+NBD server: Closing connection on rule match inject-error
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index af322af..22ef1b8 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -282,3 +282,4 @@
- 267 rw auto quick snapshot
- 268 rw auto quick
- 270 rw backing quick
-+277 rw
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 709def4..0d16303 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -47,6 +47,11 @@ qemu_io_args = [os.environ.get('QEMU_IO_PROG', 'qemu-io')]
- if os.environ.get('QEMU_IO_OPTIONS'):
-     qemu_io_args += os.environ['QEMU_IO_OPTIONS'].strip().split(' ')
++        /* No access is allowed until DMA transfer has completed */
++        fdctrl->msr &= ~FD_MSR_RQM;
++        if (direction != FD_DIR_VERIFY) {
++            /*
++             * Now, we just have to wait for the DMA controller to
++             * recall us...
++             */
++            k->hold_DREQ(fdctrl->dma, fdctrl->dma_chann);
++            k->schedule(fdctrl->dma);
+         } else {
+-            FLOPPY_DPRINTF("bad dma_mode=%d direction=%d\n", dma_mode,
+-                           direction);
++            /* Start transfer */
++            fdctrl_transfer_handler(fdctrl, fdctrl->dma_chann, 0,
++                    fdctrl->data_len);
+         }
++        return;
+     }
+     FLOPPY_DPRINTF("start non-DMA transfer\n");
+     fdctrl->msr |= FD_MSR_NONDMA | FD_MSR_RQM;
+diff --git a/hw/dma/i8257.c b/hw/dma/i8257.c
+index 792f617eb4..85dad3d391 100644
+--- a/hw/dma/i8257.c
++++ b/hw/dma/i8257.c
+@@ -292,12 +292,6 @@ static uint64_t i8257_read_cont(void *opaque, hwaddr nport, unsigned size)
+     return val;
+ }
  
-+qemu_io_args_no_fmt = [os.environ.get('QEMU_IO_PROG', 'qemu-io')]
-+if os.environ.get('QEMU_IO_OPTIONS_NO_FMT'):
-+    qemu_io_args_no_fmt += \
-+        os.environ['QEMU_IO_OPTIONS_NO_FMT'].strip().split(' ')
+-static IsaDmaTransferMode i8257_dma_get_transfer_mode(IsaDma *obj, int nchan)
+-{
+-    I8257State *d = I8257(obj);
+-    return (d->regs[nchan & 3].mode >> 2) & 3;
+-}
+-
+ static bool i8257_dma_has_autoinitialization(IsaDma *obj, int nchan)
+ {
+     I8257State *d = I8257(obj);
+@@ -400,6 +394,11 @@ static void i8257_dma_register_channel(IsaDma *obj, int nchan,
+     r->opaque = opaque;
+ }
+ 
++static bool i8257_is_verify_transfer(I8257Regs *r)
++{
++    return (r->mode & 0x0c) == 0;
++}
 +
- qemu_nbd_args = [os.environ.get('QEMU_NBD_PROG', 'qemu-nbd')]
- if os.environ.get('QEMU_NBD_OPTIONS'):
-     qemu_nbd_args += os.environ['QEMU_NBD_OPTIONS'].strip().split(' ')
-diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
-index 6b2d659..7e2dab6 100755
---- a/tests/qemu-iotests/nbd-fault-injector.py
-+++ b/tests/qemu-iotests/nbd-fault-injector.py
-@@ -115,7 +115,8 @@ class FaultInjectionSocket(object):
-             if rule.match(event, io):
-                 if rule.when == 0 or bufsize is None:
-                     print('Closing connection on rule match %s' % rule.name)
--                    self.sock.flush()
-+                    self.sock.close()
-+                    sys.stdout.flush()
-                     sys.exit(0)
-                 if rule.when != -1:
-                     return rule.when
+ static int i8257_dma_read_memory(IsaDma *obj, int nchan, void *buf, int pos,
+                                  int len)
+ {
+@@ -407,6 +406,10 @@ static int i8257_dma_read_memory(IsaDma *obj, int nchan, void *buf, int pos,
+     I8257Regs *r = &d->regs[nchan & 3];
+     hwaddr addr = ((r->pageh & 0x7f) << 24) | (r->page << 16) | r->now[ADDR];
+ 
++    if (i8257_is_verify_transfer(r)) {
++        return len;
++    }
++
+     if (r->mode & 0x20) {
+         int i;
+         uint8_t *p = buf;
+@@ -431,6 +434,10 @@ static int i8257_dma_write_memory(IsaDma *obj, int nchan, void *buf, int pos,
+     I8257Regs *r = &s->regs[nchan & 3];
+     hwaddr addr = ((r->pageh & 0x7f) << 24) | (r->page << 16) | r->now[ADDR];
+ 
++    if (i8257_is_verify_transfer(r)) {
++        return len;
++    }
++
+     if (r->mode & 0x20) {
+         int i;
+         uint8_t *p = buf;
+@@ -597,7 +604,6 @@ static void i8257_class_init(ObjectClass *klass, void *data)
+     dc->vmsd = &vmstate_i8257;
+     dc->props = i8257_properties;
+ 
+-    idc->get_transfer_mode = i8257_dma_get_transfer_mode;
+     idc->has_autoinitialization = i8257_dma_has_autoinitialization;
+     idc->read_memory = i8257_dma_read_memory;
+     idc->write_memory = i8257_dma_write_memory;
+diff --git a/include/hw/isa/isa.h b/include/hw/isa/isa.h
+index 018ada4f6f..f516e253c5 100644
+--- a/include/hw/isa/isa.h
++++ b/include/hw/isa/isa.h
+@@ -56,7 +56,6 @@ typedef int (*IsaDmaTransferHandler)(void *opaque, int nchan, int pos,
+ typedef struct IsaDmaClass {
+     InterfaceClass parent;
+ 
+-    IsaDmaTransferMode (*get_transfer_mode)(IsaDma *obj, int nchan);
+     bool (*has_autoinitialization)(IsaDma *obj, int nchan);
+     int (*read_memory)(IsaDma *obj, int nchan, void *buf, int pos, int len);
+     int (*write_memory)(IsaDma *obj, int nchan, void *buf, int pos, int len);
 -- 
-1.8.3.1
+2.23.0
 
 
