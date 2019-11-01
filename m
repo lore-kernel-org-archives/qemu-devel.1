@@ -2,85 +2,82 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC68CA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:02:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3ABECA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:10:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A5D02085B
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:02:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 742A3218AC
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:10:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="YbXxsXxt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A5D02085B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c9aFcNfr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 742A3218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQaK6-0000ZN-Cz
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 13:02:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38990)
+	id 1iQaR6-0002pL-JS
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 13:10:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40517)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@sifive.com>) id 1iQaFl-0006iu-AJ
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:58:26 -0400
+ (envelope-from <berrange@redhat.com>) id 1iQaQI-0002Mx-Cz
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:09:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@sifive.com>) id 1iQaFj-0006IF-Gm
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:58:25 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:44667)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iQaFj-0006Gw-8Q
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:58:23 -0400
-Received: by mail-pl1-x643.google.com with SMTP id q16so4622178pll.11
- for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 09:58:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
- :content-transfer-encoding;
- bh=uOYrRkDY3khUuAFGTP/r64pedNO6i230ZypmZvuzB8Q=;
- b=YbXxsXxtT+vdgU8BFLLk38sAk7ImEBz6PeG8uEf4TMkFxenpqjJBBpezKrrGcyuwey
- e6xi7U2odY6MtT61Igu8b8iACrPPXaMyj41MMiFVN8VKckCltejmYW9lmY9/SIXEzcVY
- qkGYHKnrF7xxS7P4mmyAAjhIvk90uMIMfNROo1hCclSSwCidhpurJGuEYJmDIbi8Zjv0
- y3PeZ+rSaEpVNPaAb6hM9xdJJcEz2fgVdOiw6cWy3tptEbDP8UveZ4GBCBWnryxxevJX
- OY2ITlU817XkbeCpaFyZ5prcOvNNi75W0lfxY8chn5Tma1IZHh47eNwCogRRt6XxhwIF
- X4wQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=uOYrRkDY3khUuAFGTP/r64pedNO6i230ZypmZvuzB8Q=;
- b=ddnXBRUXFvX8pWTSAFITuRt/Hn8XeRISz3oRNjSe30DgEH/IEAwFH17RARaU4IzQwG
- Kw0fh4eYGTKQb/wWnz5XOH4C36+ZjYnUK4WPaWFgDMJMuSTlodvb8F9gj64ZMVgnnSsK
- wx5pR/UwKflK0J++UDFOzGTcssJG/m84vuGkvyWn3Rztz8dn7oWvkAeAYZkIYQQr6GVY
- J6X2Zzutzqqbz1m25RK1Kuz7HiwoQ8PdUwZMtQGbEWJFnH+f1pQp7AZjIlOZwwBHkcca
- HN92Jir+S41Nscvz5a6kxDyBKDmk4pe+I9VosKpAoJ+o4/WdAyO9idlkN5C7SoKlxto8
- 5V4w==
-X-Gm-Message-State: APjAAAXBuN16g+M3h8Sh5g46RqaNsYhsYdK1c5o1bpgC62pQIV3jJgTj
- ULl1HbHEHcFvKf+FkXKYf35lUQ==
-X-Google-Smtp-Source: APXvYqw6M23hM8bAZvhMisIUBnX4TtXkaV3baYJyuOmsW4aXS51YOoo8TxpGw8LnMOulfA7q0A3vsQ==
-X-Received: by 2002:a17:902:d70b:: with SMTP id
- w11mr13887744ply.128.1572627501931; 
- Fri, 01 Nov 2019 09:58:21 -0700 (PDT)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id r21sm10381321pfc.27.2019.11.01.09.58.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 01 Nov 2019 09:58:20 -0700 (PDT)
-Date: Fri, 01 Nov 2019 09:58:20 -0700 (PDT)
-X-Google-Original-Date: Fri, 01 Nov 2019 09:56:43 PDT (-0700)
-Subject: Re: [PATCH v1 1/1] target/riscv: Remove atomic accesses to MIP CSR
-In-Reply-To: <CAKmqyKP_tv5RTZ00ZEr4jDMy+3+6heWK5LyoTLmnmsbbpCLrqg@mail.gmail.com>
-From: Palmer Dabbelt <palmer@sifive.com>
-To: alistair23@gmail.com
-Message-ID: <mhng-cb5a7a4a-9bbe-4f27-b2f9-3c69812d1037@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::643
+ (envelope-from <berrange@redhat.com>) id 1iQaQF-0002YJ-75
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:09:16 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44912
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iQaQE-0002Wf-Ul
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 13:09:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572628153;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=owFfsAFfbx6xHmd5kz54mM3ND889MjNomTPtv5+jNbo=;
+ b=c9aFcNfrw/LxeL4jOrLkHhwjHgbffxGvHQ2FNnSwzPpHjkryqhazA7JVBmj57NhTlZ4GCh
+ tku3NZcRPPy7Zbk7rRMOEHhbXcUTsHnSOX1Dr7U2y2IcNq4Q3u2jW2mXqPhCmyeGOXzbDp
+ BRl5ugPevQvzbKrrK+saUI5LROtLcH0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-314-9H84DV5NNGSPGEc7tGhhtg-1; Fri, 01 Nov 2019 13:09:08 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA108107ACC0;
+ Fri,  1 Nov 2019 17:09:07 +0000 (UTC)
+Received: from redhat.com (ovpn-112-25.ams2.redhat.com [10.36.112.25])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A479019C58;
+ Fri,  1 Nov 2019 17:09:06 +0000 (UTC)
+Date: Fri, 1 Nov 2019 18:09:03 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Christian Ehrhardt <christian.ehrhardt@canonical.com>
+Subject: Re: Best practices to handle shared objects through qemu upgrades?
+Message-ID: <20191101170903.GA13325@redhat.com>
+References: <CAATJJ0KDOsA=Y+zLBT=PhcU0Q+gqRPSWkK0VaksisVC9_i5M_g@mail.gmail.com>
+ <20191101093403.GE11296@redhat.com>
+ <CAATJJ0JrJS108ehZ8VkcYvgeNXEqev8C5vf2a+31J1eJdZ92uA@mail.gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAATJJ0JrJS108ehZ8VkcYvgeNXEqev8C5vf2a+31J1eJdZ92uA@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 9H84DV5NNGSPGEc7tGhhtg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,214 +89,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
- qemu-devel@nongnu.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 29 Oct 2019 23:54:30 PDT (-0700), alistair23@gmail.com wrote:
-> On Tue, Oct 29, 2019 at 4:14 PM Palmer Dabbelt <palmer@sifive.com> wrote:
->>
->> On Tue, 29 Oct 2019 03:49:23 PDT (-0700), alistair23@gmail.com wrote:
->> > On Fri, Oct 18, 2019 at 7:44 PM Alistair Francis <alistair23@gmail.com> wrote:
->> >>
->> >> On Fri, Oct 18, 2019 at 9:51 AM Palmer Dabbelt <palmer@sifive.com> wrote:
->> >> >
->> >> > On Tue, 08 Oct 2019 15:04:18 PDT (-0700), Alistair Francis wrote:
->> >> > > Instead of relying on atomics to access the MIP register let's update
->> >> > > our helper function to instead just lock the IO mutex thread before
->> >> > > writing. This follows the same concept as used in PPC for handling
->> >> > > interrupts
->> >> > >
->> >> > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
->> >> > > ---
->> >> > >  target/riscv/cpu.c        |  5 ++--
->> >> > >  target/riscv/cpu.h        |  9 --------
->> >> > >  target/riscv/cpu_helper.c | 48 +++++++++++++++------------------------
->> >> > >  target/riscv/csr.c        |  2 +-
->> >> > >  4 files changed, 21 insertions(+), 43 deletions(-)
->> >> > >
->> >> > > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
->> >> > > index f13e298a36..e09dd7aa23 100644
->> >> > > --- a/target/riscv/cpu.c
->> >> > > +++ b/target/riscv/cpu.c
->> >> > > @@ -224,8 +224,7 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
->> >> > >  #ifndef CONFIG_USER_ONLY
->> >> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
->> >> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
->> >> > > -    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ",
->> >> > > -                 (target_ulong)atomic_read(&env->mip));
->> >> > > +    qemu_fprintf(f, " %s 0x%x\n", "mip     ", env->mip);
->> >> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
->> >> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mideleg ", env->mideleg);
->> >> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "medeleg ", env->medeleg);
->> >> > > @@ -275,7 +274,7 @@ static bool riscv_cpu_has_work(CPUState *cs)
->> >> > >       * Definition of the WFI instruction requires it to ignore the privilege
->> >> > >       * mode and delegation registers, but respect individual enables
->> >> > >       */
->> >> > > -    return (atomic_read(&env->mip) & env->mie) != 0;
->> >> > > +    return (env->mip & env->mie) != 0;
->> >> > >  #else
->> >> > >      return true;
->> >> > >  #endif
->> >> > > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
->> >> > > index 124ed33ee4..a71473b243 100644
->> >> > > --- a/target/riscv/cpu.h
->> >> > > +++ b/target/riscv/cpu.h
->> >> > > @@ -121,15 +121,6 @@ struct CPURISCVState {
->> >> > >      target_ulong mhartid;
->> >> > >      target_ulong mstatus;
->> >> > >
->> >> > > -    /*
->> >> > > -     * CAUTION! Unlike the rest of this struct, mip is accessed asynchonously
->> >> > > -     * by I/O threads. It should be read with atomic_read. It should be updated
->> >> > > -     * using riscv_cpu_update_mip with the iothread mutex held. The iothread
->> >> > > -     * mutex must be held because mip must be consistent with the CPU inturrept
->> >> > > -     * state. riscv_cpu_update_mip calls cpu_interrupt or cpu_reset_interrupt
->> >> > > -     * wuth the invariant that CPU_INTERRUPT_HARD is set iff mip is non-zero.
->> >> > > -     * mip is 32-bits to allow atomic_read on 32-bit hosts.
->> >> > > -     */
->> >> > >      uint32_t mip;
->> >> > >      uint32_t miclaim;
->> >> > >
->> >> > > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
->> >> > > index 87dd6a6ece..4334978c2e 100644
->> >> > > --- a/target/riscv/cpu_helper.c
->> >> > > +++ b/target/riscv/cpu_helper.c
->> >> > > @@ -19,6 +19,7 @@
->> >> > >
->> >> > >  #include "qemu/osdep.h"
->> >> > >  #include "qemu/log.h"
->> >> > > +#include "qemu/main-loop.h"
->> >> > >  #include "cpu.h"
->> >> > >  #include "exec/exec-all.h"
->> >> > >  #include "tcg-op.h"
->> >> > > @@ -38,7 +39,7 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
->> >> > >  {
->> >> > >      target_ulong mstatus_mie = get_field(env->mstatus, MSTATUS_MIE);
->> >> > >      target_ulong mstatus_sie = get_field(env->mstatus, MSTATUS_SIE);
->> >> > > -    target_ulong pending = atomic_read(&env->mip) & env->mie;
->> >> > > +    target_ulong pending = env->mip & env->mie;
->> >> > >      target_ulong mie = env->priv < PRV_M || (env->priv == PRV_M && mstatus_mie);
->> >> > >      target_ulong sie = env->priv < PRV_S || (env->priv == PRV_S && mstatus_sie);
->> >> > >      target_ulong irqs = (pending & ~env->mideleg & -mie) |
->> >> > > @@ -92,42 +93,29 @@ int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
->> >> > >      }
->> >> > >  }
->> >> > >
->> >> > > -struct CpuAsyncInfo {
->> >> > > -    uint32_t new_mip;
->> >> > > -};
->> >> > > -
->> >> > > -static void riscv_cpu_update_mip_irqs_async(CPUState *target_cpu_state,
->> >> > > -                                            run_on_cpu_data data)
->> >> > > -{
->> >> > > -    struct CpuAsyncInfo *info = (struct CpuAsyncInfo *) data.host_ptr;
->> >> > > -
->> >> > > -    if (info->new_mip) {
->> >> > > -        cpu_interrupt(target_cpu_state, CPU_INTERRUPT_HARD);
->> >> > > -    } else {
->> >> > > -        cpu_reset_interrupt(target_cpu_state, CPU_INTERRUPT_HARD);
->> >> > > -    }
->> >> > > -
->> >> > > -    g_free(info);
->> >> > > -}
->> >> > > -
->> >> > >  uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
->> >> > >  {
->> >> > >      CPURISCVState *env = &cpu->env;
->> >> > >      CPUState *cs = CPU(cpu);
->> >> > > -    struct CpuAsyncInfo *info;
->> >> > > -    uint32_t old, new, cmp = atomic_read(&env->mip);
->> >> > > +    uint32_t old = env->mip;
->> >> > > +    bool locked = false;
->> >> > > +
->> >> > > +    if (!qemu_mutex_iothread_locked()) {
->> >> > > +        locked = true;
->> >> > > +        qemu_mutex_lock_iothread();
->> >> > > +    }
->> >> >
->> >> > I must be lost here, because I have no idea what this is trying to do.
->> >>
->> >> We lock the QEMU IO Thread before we trigger an interrupt. This way we
->> >> can call it from the PLIC.
->> >
->> > Ping! This missed the latest PR.
->>
->> Sorry, I missed your reply.
->>
->> I really don't think this does that.  For example: if two threads enter this
->> function at the same time, both will see that the lock is not taken and try to
->> take it.  One will succeed and the other will fail, but both will have
->
-> That's not what this is doing. This is ensuring that if we enter this
-> function with the IO thread lock we won't try to lock it again, if it
-> isn't locked we will take the lock. We then also only unlock it if we
-> took the lock. This way when we return from the function we didn't
-> change the lock state.
+On Fri, Nov 01, 2019 at 10:55:29AM +0100, Christian Ehrhardt wrote:
+> On Fri, Nov 1, 2019 at 10:34 AM Daniel P. Berrang=C3=A9 <berrange@redhat.=
+com> wrote:
+> >
+> > On Fri, Nov 01, 2019 at 08:14:08AM +0100, Christian Ehrhardt wrote:
+> > > Hi everyone,
+> > > we've got a bug report recently - on handling qemu .so's through
+> > > upgrades - that got me wondering how to best handle it.
+> > > After checking with Paolo yesterday that there is no obvious solution
+> > > that I missed we agreed this should be brought up on the list for
+> > > wider discussion.
+> > > Maybe there already is a good best practise out there, or if it
+> > > doesn't exist we might want to agree upon one going forward.
+> > > Let me outline the case and the ideas brought up so far.
+> > >
+> > > Case
+> > > - You have qemu representing a Guest
+> > > - Due to other constraints e.g. PT you can't live migrate (which woul=
+d
+> > > be preferred)
+> > > - You haven't used a specific shared object yet - lets say RBD storag=
+e
+> > > driver as example
+> > > - Qemu gets an update, packaging replaces the .so files on disk
+> > > - The Qemu process and the .so files on disk now have a mismatch in $=
+buildid
+> > > - If you hotplug an RBD device it will fail to load the (now new) .so
+> >
+> > What happens when it fails to load ?  Does the user get a graceful
+> > error message or does QEMU abort ? I'd hope the former.
+> >
+>=20
+> It is fortunately a graceful error message, here an example:
+>=20
+> $ virsh attach-device lateload curldisk.xml
+> Reported issue happens on attach:
+> root@b:~# virsh attach-device lateload cdrom-curl.xml
+> error: Failed to attach device from cdrom-curl.xml
+> error: internal error: unable to execute QEMU command 'device_add':
+> Property 'virtio-blk-device.drive' can't find value
+> 'drive-virtio-disk2'
 
-Sorry, I didn't realize that iothread_locked was per-thread.  In that case this 
-should be fine.
+Ok, that's graceful, but horrifically useless as an error message :-)
 
-Reviewed-by: Palmer Dabbelt <palmer@dabbelt.com>
+I'd like to think there would be a way to do better.
 
-I'm happy to take this as part of the soft freeze, as it's meant to be a 
-non-functional change.
+It looks like the 'drive-add' (or whatever we run to add the
+backend) is failing, and then we blindly run device_add anyway.
 
-> QEMU will assert() if you try to lock the locked IO thread, this makes
-> sure that we don't do that.
->
-> Alistair
->
->> 'locked=true' so both will try to unlock.  The first will win, causing the
->> second function to execute for some period without the lock.  Then the second
->> will unlock, possibly defeating another lock somewhere else.
->>
->> It smells kind of like this is trying to be a recursive lock, but those are a
->> whole lot more complicated than this.
->>
->> >
->> > Alistair
->> >
->> >>
->> >> Alistair
->> >>
->> >> >
->> >> > > -    do {
->> >> > > -        old = cmp;
->> >> > > -        new = (old & ~mask) | (value & mask);
->> >> > > -        cmp = atomic_cmpxchg(&env->mip, old, new);
->> >> > > -    } while (old != cmp);
->> >> > > +    env->mip = (env->mip & ~mask) | (value & mask);
->> >> > >
->> >> > > -    info = g_new(struct CpuAsyncInfo, 1);
->> >> > > -    info->new_mip = new;
->> >> > > +    if (env->mip) {
->> >> > > +        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
->> >> > > +    } else {
->> >> > > +        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
->> >> > > +    }
->> >> > >
->> >> > > -    async_run_on_cpu(cs, riscv_cpu_update_mip_irqs_async,
->> >> > > -                     RUN_ON_CPU_HOST_PTR(info));
->> >> > > +    if (locked) {
->> >> > > +        qemu_mutex_unlock_iothread();
->> >> > > +    }
->> >> > >
->> >> > >      return old;
->> >> > >  }
->> >> > > diff --git a/target/riscv/csr.c b/target/riscv/csr.c
->> >> > > index f767ad24be..db0cc6ef55 100644
->> >> > > --- a/target/riscv/csr.c
->> >> > > +++ b/target/riscv/csr.c
->> >> > > @@ -579,7 +579,7 @@ static int rmw_mip(CPURISCVState *env, int csrno, target_ulong *ret_value,
->> >> > >      if (mask) {
->> >> > >          old_mip = riscv_cpu_update_mip(cpu, mask, (new_value & mask));
->> >> > >      } else {
->> >> > > -        old_mip = atomic_read(&env->mip);
->> >> > > +        old_mip = env->mip;
->> >> > >      }
->> >> > >
->> >> > >      if (ret_value) {
+This means either there's some error message printed that we
+are missing, or QEMU is not reporting it back to the monitor.
+Either way, I think this can be improved so that libvirt can
+directly report the message you found hidden in the log:
+
+>=20
+> In the qemu output log we can see:
+> Failed to initialize module: /usr/lib/x86_64-linux-gnu/qemu/block-curl.so
+> Note: only modules from the same build can be loaded.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
