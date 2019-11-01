@@ -2,80 +2,81 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20723CA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 12:19:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CA0CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 12:34:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D12EA21734
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 12:19:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E78252067D
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 12:34:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGzHN44c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D12EA21734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZmobQ3EA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E78252067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQVtR-000324-0C
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 08:19:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34508)
+	id 1iQW8h-0000XI-Mw
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 08:34:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37437)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hsp.cat7@gmail.com>) id 1iQVsl-0002cW-TM
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:18:25 -0400
+ (envelope-from <jdenemar@redhat.com>) id 1iQW6U-0008Rw-R1
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:32:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hsp.cat7@gmail.com>) id 1iQVsk-00074E-18
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:18:23 -0400
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:40786)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hsp.cat7@gmail.com>) id 1iQVsj-00073N-Pu
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:18:21 -0400
-Received: by mail-oi1-x22e.google.com with SMTP id r27so7966480oij.7
- for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 05:18:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=50xHcggga0PZe9GvAMuAVH7UHjbsX9k28TXztwIjnzM=;
- b=QGzHN44ceS2mi8hntpYFBeBgodFPbMfePlAKPIDT5eZm/PFKxpDri19a6Vuu+6gG5e
- 26cK/f2YHv45g3pzXYZD0DPAa1L5fmK9y+p1qs0Ei3yPBT29KvWWvD5SPTKWIC9+eJ/t
- YDClHwuRoXhQC/YHL7R1xS2GCsJFeF3CkiJxpeAZN9psyU7ANYRuvRT+dHsXXhMLYwde
- Vc7Orj3Bfadc9ydZGNmKHWgKbP8qVt4fLRpYwtmErYfQGWjc8R61mFVnzrzQBTVzNjp9
- GKReEuyKDaT/oSEbnFYidEVOjb8CiSAAOdthcPjGDcqpd6JpVcDbOZnNjQ0BxbpC20RG
- iZPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=50xHcggga0PZe9GvAMuAVH7UHjbsX9k28TXztwIjnzM=;
- b=RZ5IRJZS9jowza9piOYCv6gJlICyx25rKDD5cD7+5M/J+2FS6x8U1sYz3dbj6cia2w
- D7Obu6rijLjbT0oBFUh1NUKDI/PNGUJ0HYzM7JGYH1niV+fZUpYDXi5VthRL/KvBvGMH
- z3IvaSEk75YKlr78Ub85cN3Bo5rFLilOBmkhZSXK/i5nR4odE+vx3Lx+bzNRsXmCJ1Oq
- 3yuizVyQC4miejDNdLRTbO/Mm/qCmOFEYZiXjTZzst4ZLtwCt0DflQlDlQcdYXkcaAsX
- 6BfnpRYqM7kv7rm/XEIenJMiKqkUArBuUPcIlAWxDacAedZVsFAnZaCfHG+oOJM6oJEr
- yX/g==
-X-Gm-Message-State: APjAAAUYsXx2INoa0g7Vytaq25VWuWo+DgXIKFHvwLpky9qSPZpXOZxi
- OE0ENxq3XX2rSl3frTTEY3nxl9+vtw6s3JblG5I=
-X-Google-Smtp-Source: APXvYqyU+1J/5yCnT9XgXaLvi+8vjCEvkZ01Lmv9BCmKWOAit9stQq8mDRruSjxeU6xfkHwrkEnEIM/IgokENmSQHWk=
-X-Received: by 2002:aca:3a86:: with SMTP id h128mr8093445oia.131.1572610700564; 
- Fri, 01 Nov 2019 05:18:20 -0700 (PDT)
+ (envelope-from <jdenemar@redhat.com>) id 1iQW6T-0007PO-O6
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:32:34 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45625
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jdenemar@redhat.com>) id 1iQW6T-0007P0-Kc
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 08:32:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572611553;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=t5yGqcBjN0WC8oIIPzuqHTYlo6GMXO14lRxeQz2s6Qg=;
+ b=ZmobQ3EAMmUZLRspGcx0lIe1RENPeGpmg0H1dQS5RvkYA9npD1VjlslLPyGwOKhVpt94Ru
+ /T0qLc25dhONqkMuKYWRKG7pNMBQIAQ4aYAZ8SdNA4Y1M1HInVX850QDjZ5fyQ3YdkzhjY
+ mT1tPn8MTbAmDwaAhdSctMOB/5+TJOI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-aDIjU4RbOFSQh7fla0hhUg-1; Fri, 01 Nov 2019 08:27:53 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E5CB800A1A;
+ Fri,  1 Nov 2019 12:27:52 +0000 (UTC)
+Received: from orkuz.int.mamuti.net (unknown [10.40.205.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 319D15D9CD;
+ Fri,  1 Nov 2019 12:27:48 +0000 (UTC)
+Received: by orkuz.int.mamuti.net (Postfix, from userid 500)
+ id C9E452A7C74; Fri,  1 Nov 2019 13:27:55 +0100 (CET)
+Date: Fri, 1 Nov 2019 13:27:55 +0100
+From: Jiri Denemark <jdenemar@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH] spapr/kvm: Set default cpu model for all machine classes
+Message-ID: <20191101122755.GQ12962@orkuz.int.mamuti.net>
+References: <20191030163243.10644-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-References: <mailman.214.1572564951.13345.qemu-devel@nongnu.org>
- <47A92732-E94E-4DD9-8D47-E8DCF4E364B1@gmail.com>
-In-Reply-To: <47A92732-E94E-4DD9-8D47-E8DCF4E364B1@gmail.com>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Fri, 1 Nov 2019 13:18:07 +0100
-Message-ID: <CABLmASGTRF3OJRh0QvmND8Nr=2OiUQnQcJK+ru1PUc2oW0A_Mw@mail.gmail.com>
-Subject: Re: [Bug 1850570] Re: Cannot use usb-host on Mac OS
-To: Programmingkid <programmingkidx@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000002d5baf059647f6d1"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22e
+In-Reply-To: <20191030163243.10644-1-david@gibson.dropbear.id.au>
+User-Agent: Mutt/1.12.2 (2019-09-21)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: aDIjU4RbOFSQh7fla0hhUg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,238 +88,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: 1850570@bugs.launchpad.net, qemu Developers <qemu-devel@nongnu.org>
+Cc: david@redhat.com, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, clg@kaod.org, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000002d5baf059647f6d1
-Content-Type: text/plain; charset="UTF-8"
+On Wed, Oct 30, 2019 at 17:32:43 +0100, David Gibson wrote:
+> We have to set the default model of all machine classes, not just for the
+> active one. Otherwise, "query-machines" will indicate the wrong CPU model
+> ("qemu-s390x-cpu" instead of "host-s390x-cpu") as "default-cpu-type".
+>=20
+> s390x already fixed this in de60a92e "s390x/kvm: Set default cpu model fo=
+r
+> all machine classes".  This patch applies a similar fix for the pseries-*
+> machine types on ppc64.
+>=20
+> Doing a
+>     {"execute":"query-machines"}
+> under KVM now results in
+>     {
+>       "hotpluggable-cpus": true,
+>       "name": "pseries-4.2",
+>       "numa-mem-supported": true,
+>       "default-cpu-type": "host-powerpc64-cpu",
+>       "is-default": true,
+>       "cpu-max": 1024,
+>       "deprecated": false,
+>       "alias": "pseries"
+>     },
+>     {
+>       "hotpluggable-cpus": true,
+>       "name": "pseries-4.1",
+>       "numa-mem-supported": true,
+>       "default-cpu-type": "host-powerpc64-cpu",
+>       "cpu-max": 1024,
+>       "deprecated": false
+>     },
+>     ...
+>=20
+> Libvirt probes all machines via "-machine none,accel=3Dkvm:tcg" and will
+> currently see the wrong CPU model under KVM.
+>=20
+> Reported-by: Ji=C5=99i Denemark <jdenemar@redhat.com>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
 
-On Fri, Nov 1, 2019 at 11:35 AM Programmingkid <programmingkidx@gmail.com>
-wrote:
+Works as expected now, thanks.
 
->
-> > On Oct 31, 2019, at 7:35 PM, qemu-devel-request@nongnu.org wrote:
-> >
-> > Message: 10
-> > Date: Thu, 31 Oct 2019 18:39:11 -0000
-> > From: John Canada <1850570@bugs.launchpad.net>
-> > To: qemu-devel@nongnu.org
-> > Subject: [Bug 1850570] Re: Cannot use usb-host on Mac OS
-> > Message-ID:
-> >       <157254715118.3076.2379100780378521691.malone@gac.canonical.com>
-> > Content-Type: text/plain; charset="utf-8"
-> >
-> > Yes, I tried running as root.  I also tried it on a different computer
-> > that is running Mac OS 10.13, and it gave the same errors.
-> >
-> > --
-> > You received this bug notification because you are a member of qemu-
-> > devel-ml, which is subscribed to QEMU.
-> > https://bugs.launchpad.net/bugs/1850570
-> >
-> > Title:
-> >  Cannot use usb-host on Mac OS
-> >
-> > Status in QEMU:
-> >  New
-> >
-> > Bug description:
-> >  Usb-host will not work on Mac OS 10.15.  Qemu runs, though it gives
-> >  these errors and the drive does not show up.  Also, when Qemu is
-> >  starting the drive ejects and remounts twice. Qemu built with
-> >  ./configure --target-list=i386-softmmu,x86_64-softmmu --enable-sdl
-> >  --disable-cocoa --enable-sdl-image.
-> >
-> >  qemu-system-i386 image.qcow -usb -device usb-kbd  -device
-> usb-host,vendorid=0x0781,productid=0x5571
-> >  libusb: error [darwin_claim_interface] USBInterfaceOpen: another
-> process has device opened for exclusive access
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] USBInterfaceOpen: another
-> process has device opened for exclusive access
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >  libusb: error [darwin_claim_interface] interface not found
-> >
-> > To manage notifications about this bug go to:
-> > https://bugs.launchpad.net/qemu/+bug/1850570/+subscriptions
->
->
-> Try this. Unplug the USB device. Plug it back in, and as fast as you can
-> start QEMU.
->
-> My theory is another program might be using the device. This could be
-> Spotlight trying to index the drive.
->
-> Another possibility is libusb is not compatible with Mac OS 10.13 yet.
->
-> Do you have another computer that runs Mac OS 10.12 or under that you can
-> test on?
->
->
-I guess the longstanding issue with libusb and OSX is that some kext has
-already claimed the device. A solution would be to unload the kext
-currently claiming the device before starting Qemu. If possible.
-Also see here:
-https://apple.stackexchange.com/questions/363491/how-to-disable-usb-mass-storage-in-mojave-to-free-up-device-for-libusb
-and the links from that page:
-https://github.com/libusb/libusb/wiki/FAQ#How_can_I_run_libusb_applications_under_Mac_OS_X_if_there_is_already_a_kernel_extension_installed_for_the_device
-https://stackoverflow.com/questions/33545656/codeless-kext-for-usb-storage-device
+Tested-by: Jiri Denemark <jdenemar@redhat.com>
 
-Best,
-Howard
-
---0000000000002d5baf059647f6d1
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Nov 1, 2019 at 11:35 AM Progr=
-ammingkid &lt;<a href=3D"mailto:programmingkidx@gmail.com">programmingkidx@=
-gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
--left:1ex"><br>
-&gt; On Oct 31, 2019, at 7:35 PM, <a href=3D"mailto:qemu-devel-request@nong=
-nu.org" target=3D"_blank">qemu-devel-request@nongnu.org</a> wrote:<br>
-&gt; <br>
-&gt; Message: 10<br>
-&gt; Date: Thu, 31 Oct 2019 18:39:11 -0000<br>
-&gt; From: John Canada &lt;<a href=3D"mailto:1850570@bugs.launchpad.net" ta=
-rget=3D"_blank">1850570@bugs.launchpad.net</a>&gt;<br>
-&gt; To: <a href=3D"mailto:qemu-devel@nongnu.org" target=3D"_blank">qemu-de=
-vel@nongnu.org</a><br>
-&gt; Subject: [Bug 1850570] Re: Cannot use usb-host on Mac OS<br>
-&gt; Message-ID:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0&lt;<a href=3D"mailto:157254715118.3076.2379=
-100780378521691.malone@gac.canonical.com" target=3D"_blank">157254715118.30=
-76.2379100780378521691.malone@gac.canonical.com</a>&gt;<br>
-&gt; Content-Type: text/plain; charset=3D&quot;utf-8&quot;<br>
-&gt; <br>
-&gt; Yes, I tried running as root.=C2=A0 I also tried it on a different com=
-puter<br>
-&gt; that is running Mac OS 10.13, and it gave the same errors.<br>
-&gt; <br>
-&gt; -- <br>
-&gt; You received this bug notification because you are a member of qemu-<b=
-r>
-&gt; devel-ml, which is subscribed to QEMU.<br>
-&gt; <a href=3D"https://bugs.launchpad.net/bugs/1850570" rel=3D"noreferrer"=
- target=3D"_blank">https://bugs.launchpad.net/bugs/1850570</a><br>
-&gt; <br>
-&gt; Title:<br>
-&gt;=C2=A0 Cannot use usb-host on Mac OS<br>
-&gt; <br>
-&gt; Status in QEMU:<br>
-&gt;=C2=A0 New<br>
-&gt; <br>
-&gt; Bug description:<br>
-&gt;=C2=A0 Usb-host will not work on Mac OS 10.15.=C2=A0 Qemu runs, though =
-it gives<br>
-&gt;=C2=A0 these errors and the drive does not show up.=C2=A0 Also, when Qe=
-mu is<br>
-&gt;=C2=A0 starting the drive ejects and remounts twice. Qemu built with<br=
->
-&gt;=C2=A0 ./configure --target-list=3Di386-softmmu,x86_64-softmmu --enable=
--sdl<br>
-&gt;=C2=A0 --disable-cocoa --enable-sdl-image.<br>
-&gt; <br>
-&gt;=C2=A0 qemu-system-i386 image.qcow -usb -device usb-kbd=C2=A0 -device u=
-sb-host,vendorid=3D0x0781,productid=3D0x5571<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] USBInterfaceOpen: another=
- process has device opened for exclusive access<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] USBInterfaceOpen: another=
- process has device opened for exclusive access<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt;=C2=A0 libusb: error [darwin_claim_interface] interface not found<br>
-&gt; <br>
-&gt; To manage notifications about this bug go to:<br>
-&gt; <a href=3D"https://bugs.launchpad.net/qemu/+bug/1850570/+subscriptions=
-" rel=3D"noreferrer" target=3D"_blank">https://bugs.launchpad.net/qemu/+bug=
-/1850570/+subscriptions</a><br>
-<br>
-<br>
-Try this. Unplug the USB device. Plug it back in, and as fast as you can st=
-art QEMU. <br>
-<br>
-My theory is another program might be using the device. This could be Spotl=
-ight trying to index the drive.<br>
-<br>
-Another possibility is libusb is not compatible with Mac OS 10.13 yet.<br>
-<br>
-Do you have another computer that runs Mac OS 10.12 or under that you can t=
-est on?<br>
-<br></blockquote><div><br></div><div>I guess the longstanding issue with li=
-busb and OSX is that some kext has already claimed the device. A solution w=
-ould be to unload the kext currently claiming the device before starting Qe=
-mu. If possible.<br></div><div>Also see here: <br></div><div><a href=3D"htt=
-ps://apple.stackexchange.com/questions/363491/how-to-disable-usb-mass-stora=
-ge-in-mojave-to-free-up-device-for-libusb">https://apple.stackexchange.com/=
-questions/363491/how-to-disable-usb-mass-storage-in-mojave-to-free-up-devic=
-e-for-libusb</a></div><div>and the links from that page:</div><div><a href=
-=3D"https://github.com/libusb/libusb/wiki/FAQ#How_can_I_run_libusb_applicat=
-ions_under_Mac_OS_X_if_there_is_already_a_kernel_extension_installed_for_th=
-e_device">https://github.com/libusb/libusb/wiki/FAQ#How_can_I_run_libusb_ap=
-plications_under_Mac_OS_X_if_there_is_already_a_kernel_extension_installed_=
-for_the_device</a></div><div><a href=3D"https://stackoverflow.com/questions=
-/33545656/codeless-kext-for-usb-storage-device">https://stackoverflow.com/q=
-uestions/33545656/codeless-kext-for-usb-storage-device</a></div><div><br></=
-div><div>Best,</div><div>Howard<br></div><div> <br></div></div></div>
-
---0000000000002d5baf059647f6d1--
 
