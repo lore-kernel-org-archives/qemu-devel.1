@@ -7,81 +7,80 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2465CA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:59:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC68CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:02:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DA7D21734
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:59:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A5D02085B
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 17:02:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="s2sKxliX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DA7D21734
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="YbXxsXxt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A5D02085B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQaGn-0007MZ-GU
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 12:59:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38963)
+	id 1iQaK6-0000ZN-Cz
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 13:02:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38990)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1iQaFj-0006gc-Fe
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:58:24 -0400
+ (envelope-from <palmer@sifive.com>) id 1iQaFl-0006iu-AJ
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:58:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1iQaFi-0006Fo-Cp
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:58:23 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38366)
+ (envelope-from <palmer@sifive.com>) id 1iQaFj-0006IF-Gm
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:58:25 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:44667)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iQaFh-00069G-Sm
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:58:22 -0400
-Received: by mail-pl1-x644.google.com with SMTP id w8so4629924plq.5
- for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 09:58:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dabbelt-com.20150623.gappssmtp.com; s=20150623;
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iQaFj-0006Gw-8Q
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:58:23 -0400
+Received: by mail-pl1-x643.google.com with SMTP id q16so4622178pll.11
+ for <qemu-devel@nongnu.org>; Fri, 01 Nov 2019 09:58:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
  h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
  :content-transfer-encoding;
- bh=cgfp8EbdhnJcgO/OyEQ0g/ucBASe54QWB7VlCyACCvA=;
- b=s2sKxliXQzQhZV+a98pY55g3nTGHkiaUM34399+dxoZR7sUEamRTkMHstKQq38qlKi
- JSPbQY5xNdDzUcXtxZQaVw4wchEHnSUsuvfnQU1vxe5/Zm5kMfSvaSlCbQhbOWAVLLMu
- gVJZ3oj8Eiri+DkapftHXO6XxsCtnLJmKVXCxIlc+Y0q5cPcpTBCRlWjyDVS1jIFX+o7
- 3Zi1TkJZjY1U9hAXdussWAVernOFYRQVP99NkVLldCrYLuoUCYnQQYSzdVFvd9uFUFSE
- RwvLs1ppUxSduCxJxzIncjknDwuovE5Wy+c0TlPVswOGD35l5Q/LzfirzUfXmaSXRLAq
- Eb5Q==
+ bh=uOYrRkDY3khUuAFGTP/r64pedNO6i230ZypmZvuzB8Q=;
+ b=YbXxsXxtT+vdgU8BFLLk38sAk7ImEBz6PeG8uEf4TMkFxenpqjJBBpezKrrGcyuwey
+ e6xi7U2odY6MtT61Igu8b8iACrPPXaMyj41MMiFVN8VKckCltejmYW9lmY9/SIXEzcVY
+ qkGYHKnrF7xxS7P4mmyAAjhIvk90uMIMfNROo1hCclSSwCidhpurJGuEYJmDIbi8Zjv0
+ y3PeZ+rSaEpVNPaAb6hM9xdJJcEz2fgVdOiw6cWy3tptEbDP8UveZ4GBCBWnryxxevJX
+ OY2ITlU817XkbeCpaFyZ5prcOvNNi75W0lfxY8chn5Tma1IZHh47eNwCogRRt6XxhwIF
+ X4wQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
  :mime-version:content-transfer-encoding;
- bh=cgfp8EbdhnJcgO/OyEQ0g/ucBASe54QWB7VlCyACCvA=;
- b=WD7xL/ZIxLbIvUEvqDj/59pF86yg7tsE2eiktAeKhKEjze2I8bm1eax3HC1rGGtZvK
- WXdyXB+xFiEqVMgWtBFz/87FEre+iCOHdgoWeBcPQ/n6+Z7ztPqMKthASAE/cJUqU/9p
- KRv5dBLKQFl4KKYKw3SYoSwW/Ql8EJLrjlF6b9TmvblqbXNfeBJ5/UYl9QB2wOVA96ru
- EbbUHX9nXbByzSedgJGkC1gRTWvTr0csagkZokMUnmPuEtPKKX1nJ6eRxw+Z6ndtchGA
- lZ613kCt0WlqcD/qhZD2u6evJvSzgX3zRbkyVI9C+X/LVg5kAAyuhSoPlay4yXlugME9
- T4dg==
-X-Gm-Message-State: APjAAAUXnJdcw+L0izYBwqGu41cXLH2fRcMtj4Gy7OmgNcQ1lzHo+DEC
- jpGWTm0UGRf8yG9XWRfm3qetDyrArFg=
-X-Google-Smtp-Source: APXvYqytIMmUCMsduQIJb0QRAIRM99uiG83GFAeY3oWFZ2TiyrgHXkX9D5cjpokmOWnHZegjJJeU8Q==
-X-Received: by 2002:a17:902:bb8b:: with SMTP id
- m11mr13718438pls.235.1572627499876; 
- Fri, 01 Nov 2019 09:58:19 -0700 (PDT)
+ bh=uOYrRkDY3khUuAFGTP/r64pedNO6i230ZypmZvuzB8Q=;
+ b=ddnXBRUXFvX8pWTSAFITuRt/Hn8XeRISz3oRNjSe30DgEH/IEAwFH17RARaU4IzQwG
+ Kw0fh4eYGTKQb/wWnz5XOH4C36+ZjYnUK4WPaWFgDMJMuSTlodvb8F9gj64ZMVgnnSsK
+ wx5pR/UwKflK0J++UDFOzGTcssJG/m84vuGkvyWn3Rztz8dn7oWvkAeAYZkIYQQr6GVY
+ J6X2Zzutzqqbz1m25RK1Kuz7HiwoQ8PdUwZMtQGbEWJFnH+f1pQp7AZjIlOZwwBHkcca
+ HN92Jir+S41Nscvz5a6kxDyBKDmk4pe+I9VosKpAoJ+o4/WdAyO9idlkN5C7SoKlxto8
+ 5V4w==
+X-Gm-Message-State: APjAAAXBuN16g+M3h8Sh5g46RqaNsYhsYdK1c5o1bpgC62pQIV3jJgTj
+ ULl1HbHEHcFvKf+FkXKYf35lUQ==
+X-Google-Smtp-Source: APXvYqw6M23hM8bAZvhMisIUBnX4TtXkaV3baYJyuOmsW4aXS51YOoo8TxpGw8LnMOulfA7q0A3vsQ==
+X-Received: by 2002:a17:902:d70b:: with SMTP id
+ w11mr13887744ply.128.1572627501931; 
+ Fri, 01 Nov 2019 09:58:21 -0700 (PDT)
 Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id q15sm6844907pff.155.2019.11.01.09.58.19
+ by smtp.gmail.com with ESMTPSA id r21sm10381321pfc.27.2019.11.01.09.58.20
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 01 Nov 2019 09:58:19 -0700 (PDT)
-Date: Fri, 01 Nov 2019 09:58:19 -0700 (PDT)
-X-Google-Original-Date: Fri, 01 Nov 2019 09:39:00 PDT (-0700)
-Subject: Re: [PATCH] remove unnecessary ifdef TARGET_RISCV64
-In-Reply-To: <20191030002318.399-1-hiroyuki.obinata@gmail.com>
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: hiroyuki.obinata@gmail.com
-Message-ID: <mhng-7b7098a1-1195-4532-80ab-2d7c51ebd2ed@palmer-si-x1c4>
+ Fri, 01 Nov 2019 09:58:20 -0700 (PDT)
+Date: Fri, 01 Nov 2019 09:58:20 -0700 (PDT)
+X-Google-Original-Date: Fri, 01 Nov 2019 09:56:43 PDT (-0700)
+Subject: Re: [PATCH v1 1/1] target/riscv: Remove atomic accesses to MIP CSR
+In-Reply-To: <CAKmqyKP_tv5RTZ00ZEr4jDMy+3+6heWK5LyoTLmnmsbbpCLrqg@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: alistair23@gmail.com
+Message-ID: <mhng-cb5a7a4a-9bbe-4f27-b2f9-3c69812d1037@palmer-si-x1c4>
 Mime-Version: 1.0 (MHng)
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::644
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,44 +92,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu, hiroyuki.obinata@gmail.com,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
- Alistair Francis <Alistair.Francis@wdc.com>
+Cc: qemu-riscv@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 29 Oct 2019 17:23:18 PDT (-0700), hiroyuki.obinata@gmail.com wrote:
-> From: "hiroyuki.obinata" <hiroyuki.obinata@gmail.com>
+On Tue, 29 Oct 2019 23:54:30 PDT (-0700), alistair23@gmail.com wrote:
+> On Tue, Oct 29, 2019 at 4:14 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+>>
+>> On Tue, 29 Oct 2019 03:49:23 PDT (-0700), alistair23@gmail.com wrote:
+>> > On Fri, Oct 18, 2019 at 7:44 PM Alistair Francis <alistair23@gmail.com> wrote:
+>> >>
+>> >> On Fri, Oct 18, 2019 at 9:51 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+>> >> >
+>> >> > On Tue, 08 Oct 2019 15:04:18 PDT (-0700), Alistair Francis wrote:
+>> >> > > Instead of relying on atomics to access the MIP register let's update
+>> >> > > our helper function to instead just lock the IO mutex thread before
+>> >> > > writing. This follows the same concept as used in PPC for handling
+>> >> > > interrupts
+>> >> > >
+>> >> > > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>> >> > > ---
+>> >> > >  target/riscv/cpu.c        |  5 ++--
+>> >> > >  target/riscv/cpu.h        |  9 --------
+>> >> > >  target/riscv/cpu_helper.c | 48 +++++++++++++++------------------------
+>> >> > >  target/riscv/csr.c        |  2 +-
+>> >> > >  4 files changed, 21 insertions(+), 43 deletions(-)
+>> >> > >
+>> >> > > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+>> >> > > index f13e298a36..e09dd7aa23 100644
+>> >> > > --- a/target/riscv/cpu.c
+>> >> > > +++ b/target/riscv/cpu.c
+>> >> > > @@ -224,8 +224,7 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+>> >> > >  #ifndef CONFIG_USER_ONLY
+>> >> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
+>> >> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
+>> >> > > -    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ",
+>> >> > > -                 (target_ulong)atomic_read(&env->mip));
+>> >> > > +    qemu_fprintf(f, " %s 0x%x\n", "mip     ", env->mip);
+>> >> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
+>> >> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mideleg ", env->mideleg);
+>> >> > >      qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "medeleg ", env->medeleg);
+>> >> > > @@ -275,7 +274,7 @@ static bool riscv_cpu_has_work(CPUState *cs)
+>> >> > >       * Definition of the WFI instruction requires it to ignore the privilege
+>> >> > >       * mode and delegation registers, but respect individual enables
+>> >> > >       */
+>> >> > > -    return (atomic_read(&env->mip) & env->mie) != 0;
+>> >> > > +    return (env->mip & env->mie) != 0;
+>> >> > >  #else
+>> >> > >      return true;
+>> >> > >  #endif
+>> >> > > diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+>> >> > > index 124ed33ee4..a71473b243 100644
+>> >> > > --- a/target/riscv/cpu.h
+>> >> > > +++ b/target/riscv/cpu.h
+>> >> > > @@ -121,15 +121,6 @@ struct CPURISCVState {
+>> >> > >      target_ulong mhartid;
+>> >> > >      target_ulong mstatus;
+>> >> > >
+>> >> > > -    /*
+>> >> > > -     * CAUTION! Unlike the rest of this struct, mip is accessed asynchonously
+>> >> > > -     * by I/O threads. It should be read with atomic_read. It should be updated
+>> >> > > -     * using riscv_cpu_update_mip with the iothread mutex held. The iothread
+>> >> > > -     * mutex must be held because mip must be consistent with the CPU inturrept
+>> >> > > -     * state. riscv_cpu_update_mip calls cpu_interrupt or cpu_reset_interrupt
+>> >> > > -     * wuth the invariant that CPU_INTERRUPT_HARD is set iff mip is non-zero.
+>> >> > > -     * mip is 32-bits to allow atomic_read on 32-bit hosts.
+>> >> > > -     */
+>> >> > >      uint32_t mip;
+>> >> > >      uint32_t miclaim;
+>> >> > >
+>> >> > > diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+>> >> > > index 87dd6a6ece..4334978c2e 100644
+>> >> > > --- a/target/riscv/cpu_helper.c
+>> >> > > +++ b/target/riscv/cpu_helper.c
+>> >> > > @@ -19,6 +19,7 @@
+>> >> > >
+>> >> > >  #include "qemu/osdep.h"
+>> >> > >  #include "qemu/log.h"
+>> >> > > +#include "qemu/main-loop.h"
+>> >> > >  #include "cpu.h"
+>> >> > >  #include "exec/exec-all.h"
+>> >> > >  #include "tcg-op.h"
+>> >> > > @@ -38,7 +39,7 @@ static int riscv_cpu_local_irq_pending(CPURISCVState *env)
+>> >> > >  {
+>> >> > >      target_ulong mstatus_mie = get_field(env->mstatus, MSTATUS_MIE);
+>> >> > >      target_ulong mstatus_sie = get_field(env->mstatus, MSTATUS_SIE);
+>> >> > > -    target_ulong pending = atomic_read(&env->mip) & env->mie;
+>> >> > > +    target_ulong pending = env->mip & env->mie;
+>> >> > >      target_ulong mie = env->priv < PRV_M || (env->priv == PRV_M && mstatus_mie);
+>> >> > >      target_ulong sie = env->priv < PRV_S || (env->priv == PRV_S && mstatus_sie);
+>> >> > >      target_ulong irqs = (pending & ~env->mideleg & -mie) |
+>> >> > > @@ -92,42 +93,29 @@ int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
+>> >> > >      }
+>> >> > >  }
+>> >> > >
+>> >> > > -struct CpuAsyncInfo {
+>> >> > > -    uint32_t new_mip;
+>> >> > > -};
+>> >> > > -
+>> >> > > -static void riscv_cpu_update_mip_irqs_async(CPUState *target_cpu_state,
+>> >> > > -                                            run_on_cpu_data data)
+>> >> > > -{
+>> >> > > -    struct CpuAsyncInfo *info = (struct CpuAsyncInfo *) data.host_ptr;
+>> >> > > -
+>> >> > > -    if (info->new_mip) {
+>> >> > > -        cpu_interrupt(target_cpu_state, CPU_INTERRUPT_HARD);
+>> >> > > -    } else {
+>> >> > > -        cpu_reset_interrupt(target_cpu_state, CPU_INTERRUPT_HARD);
+>> >> > > -    }
+>> >> > > -
+>> >> > > -    g_free(info);
+>> >> > > -}
+>> >> > > -
+>> >> > >  uint32_t riscv_cpu_update_mip(RISCVCPU *cpu, uint32_t mask, uint32_t value)
+>> >> > >  {
+>> >> > >      CPURISCVState *env = &cpu->env;
+>> >> > >      CPUState *cs = CPU(cpu);
+>> >> > > -    struct CpuAsyncInfo *info;
+>> >> > > -    uint32_t old, new, cmp = atomic_read(&env->mip);
+>> >> > > +    uint32_t old = env->mip;
+>> >> > > +    bool locked = false;
+>> >> > > +
+>> >> > > +    if (!qemu_mutex_iothread_locked()) {
+>> >> > > +        locked = true;
+>> >> > > +        qemu_mutex_lock_iothread();
+>> >> > > +    }
+>> >> >
+>> >> > I must be lost here, because I have no idea what this is trying to do.
+>> >>
+>> >> We lock the QEMU IO Thread before we trigger an interrupt. This way we
+>> >> can call it from the PLIC.
+>> >
+>> > Ping! This missed the latest PR.
+>>
+>> Sorry, I missed your reply.
+>>
+>> I really don't think this does that.  For example: if two threads enter this
+>> function at the same time, both will see that the lock is not taken and try to
+>> take it.  One will succeed and the other will fail, but both will have
 >
-> Signed-off-by: Hiroyuki Obinata <hiroyuki.obinata@gmail.com>
-> ---
->  target/riscv/translate.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->
-> diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> index adeddb85f6..5c4dd21a98 100644
-> --- a/target/riscv/translate.c
-> +++ b/target/riscv/translate.c
-> @@ -64,12 +64,10 @@ static const int tcg_memop_lookup[8] = {
->      [0] = MO_SB,
->      [1] = MO_TESW,
->      [2] = MO_TESL,
-> +    [3] = MO_TEQ,
->      [4] = MO_UB,
->      [5] = MO_TEUW,
-> -#ifdef TARGET_RISCV64
-> -    [3] = MO_TEQ,
->      [6] = MO_TEUL,
-> -#endif
->  };
->  #endif
+> That's not what this is doing. This is ensuring that if we enter this
+> function with the IO thread lock we won't try to lock it again, if it
+> isn't locked we will take the lock. We then also only unlock it if we
+> took the lock. This way when we return from the function we didn't
+> change the lock state.
+
+Sorry, I didn't realize that iothread_locked was per-thread.  In that case this 
+should be fine.
 
 Reviewed-by: Palmer Dabbelt <palmer@dabbelt.com>
 
-This is a non-functional change (the code in question was already wrapped in an 
-"#ifdef TARGET_RISCV64", so this internal one was redundant), so I'm happy to 
-include it during the soft freeze.
+I'm happy to take this as part of the soft freeze, as it's meant to be a 
+non-functional change.
 
-I've added this to the queue for my next PR.
+> QEMU will assert() if you try to lock the locked IO thread, this makes
+> sure that we don't do that.
+>
+> Alistair
+>
+>> 'locked=true' so both will try to unlock.  The first will win, causing the
+>> second function to execute for some period without the lock.  Then the second
+>> will unlock, possibly defeating another lock somewhere else.
+>>
+>> It smells kind of like this is trying to be a recursive lock, but those are a
+>> whole lot more complicated than this.
+>>
+>> >
+>> > Alistair
+>> >
+>> >>
+>> >> Alistair
+>> >>
+>> >> >
+>> >> > > -    do {
+>> >> > > -        old = cmp;
+>> >> > > -        new = (old & ~mask) | (value & mask);
+>> >> > > -        cmp = atomic_cmpxchg(&env->mip, old, new);
+>> >> > > -    } while (old != cmp);
+>> >> > > +    env->mip = (env->mip & ~mask) | (value & mask);
+>> >> > >
+>> >> > > -    info = g_new(struct CpuAsyncInfo, 1);
+>> >> > > -    info->new_mip = new;
+>> >> > > +    if (env->mip) {
+>> >> > > +        cpu_interrupt(cs, CPU_INTERRUPT_HARD);
+>> >> > > +    } else {
+>> >> > > +        cpu_reset_interrupt(cs, CPU_INTERRUPT_HARD);
+>> >> > > +    }
+>> >> > >
+>> >> > > -    async_run_on_cpu(cs, riscv_cpu_update_mip_irqs_async,
+>> >> > > -                     RUN_ON_CPU_HOST_PTR(info));
+>> >> > > +    if (locked) {
+>> >> > > +        qemu_mutex_unlock_iothread();
+>> >> > > +    }
+>> >> > >
+>> >> > >      return old;
+>> >> > >  }
+>> >> > > diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+>> >> > > index f767ad24be..db0cc6ef55 100644
+>> >> > > --- a/target/riscv/csr.c
+>> >> > > +++ b/target/riscv/csr.c
+>> >> > > @@ -579,7 +579,7 @@ static int rmw_mip(CPURISCVState *env, int csrno, target_ulong *ret_value,
+>> >> > >      if (mask) {
+>> >> > >          old_mip = riscv_cpu_update_mip(cpu, mask, (new_value & mask));
+>> >> > >      } else {
+>> >> > > -        old_mip = atomic_read(&env->mip);
+>> >> > > +        old_mip = env->mip;
+>> >> > >      }
+>> >> > >
+>> >> > >      if (ret_value) {
 
