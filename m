@@ -2,114 +2,49 @@ Return-Path: <SRS0=V8KP=YZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 134F6CA9ECF
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA7F4CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:55:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5C6A2080F
-	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:54:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="N/hHqoCn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5C6A2080F
+	by mail.kernel.org (Postfix) with ESMTPS id 7E8AB2080F
+	for <qemu-devel@archiver.kernel.org>; Fri,  1 Nov 2019 16:55:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E8AB2080F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQaBd-0003u7-Vz
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 12:54:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38096)
+	id 1iQaD6-0005KG-LD
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 12:55:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38298)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iQaAj-0003BG-SP
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:53:15 -0400
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iQaCF-0004Xa-H5
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:54:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iQaAi-0007kF-78
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:53:13 -0400
-Received: from mail-eopbgr50125.outbound.protection.outlook.com
- ([40.107.5.125]:65253 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iQaAh-0007gL-KI; Fri, 01 Nov 2019 12:53:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iUbLWCtsZKZmgw3JJk3Q2Va4OKQNUm/xs927rKgjc7XedRAF+3jvgeQ8k1L16G4uYPoeahpavuXLAx2H9xJZfiqgN9f8Yc0P67JBh9WFmt5tSIbu8FDC5/oEMXNpZ+dZF2hDkcNz2+Vpb2MfEZo8ueJSdVRizmsUWn/hewRv96qbKMVNEW9/JWKOQ3mH+NDdT5A8HIQZ7stY1vzoBzWJxLbG+LqxwzT6q9RHqMrL/dRseaERqgk1YfVK3ZGZf54vSVQNz3OqWePuQyLAODIEUcmPRtapFwGXxBvinrUvMSmvECSkagYU7lDjLh8B7ZuTzj0pnWKggzL8ROe/G9opMw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kpNYH/n09XDDVVVQMtwavB39AVHSYCWCMobo2c9TtMM=;
- b=hUIDpoJ+OZMJRQTfyTCjIU8C9SWqtiKwpx26yKVeqbduk+0k4255ABEYBtKb+t+6Rz4FpacE64DrZ8GCltXjtk+HLnRRkk2BebbdDJeRgBpxSFk0iAIrIOiKfJGSLIhfq4D1ZwnPecqzHzyDHLSugAvsE1xd1GcDw6+airWEQomwIKRB93G3JtAu1PcH3kgARPW9/5DWZvYYw04D4V/ky+4FY3Thb+P+h5w/BDMSKRawaxs/Dn7UGybboYotL43xuIyDcn2ak/gT5pzJYEdZq/QH3yIpM24VKAKVcLigOQgOyCQ0ZHftil455iNTlcQfPxV1+1aiQlWXJ9+Wqq9aBw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kpNYH/n09XDDVVVQMtwavB39AVHSYCWCMobo2c9TtMM=;
- b=N/hHqoCnaQ3Z7Q0H9ky4RrSyQtbQKdc6vVy/mD3CMslixP9ri7BJMm4c8/+J9qmmz9+2SygHiLrKNYhn2pnYgbzIs8yYT7O0nFM3s8rVN/yNxSxt19xSxhFmYohkhHCeKcxwgukqKvz3G0Hy9b2luLpFVtmCfgtzV+PkHuQF8Oc=
-Received: from AM0PR08MB4097.eurprd08.prod.outlook.com (20.178.202.217) by
- AM0PR08MB3236.eurprd08.prod.outlook.com (52.134.91.161) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2387.20; Fri, 1 Nov 2019 16:53:09 +0000
-Received: from AM0PR08MB4097.eurprd08.prod.outlook.com
- ([fe80::6844:bb8c:7d2c:b119]) by AM0PR08MB4097.eurprd08.prod.outlook.com
- ([fe80::6844:bb8c:7d2c:b119%6]) with mapi id 15.20.2408.019; Fri, 1 Nov 2019
- 16:53:08 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: John Snow <jsnow@redhat.com>, Qemu-block <qemu-block@nongnu.org>
-Subject: Re: bitmaps -- copying allocation status into dirty bitmaps
-Thread-Topic: bitmaps -- copying allocation status into dirty bitmaps
-Thread-Index: AQHVkMsD74l2GkYcp0KjyQwNU60SGad2iBQA
-Date: Fri, 1 Nov 2019 16:53:08 +0000
-Message-ID: <65e58f06-583c-e62d-3877-a37e01dc50b6@virtuozzo.com>
-References: <b9b55376-3d6d-5dc2-2db3-bdced9e2d46a@redhat.com>
-In-Reply-To: <b9b55376-3d6d-5dc2-2db3-bdced9e2d46a@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR05CA0191.eurprd05.prod.outlook.com
- (2603:10a6:3:f9::15) To AM0PR08MB4097.eurprd08.prod.outlook.com
- (2603:10a6:208:132::25)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191101195306744
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 96aa8cde-43b6-407d-0e74-08d75eebf92b
-x-ms-traffictypediagnostic: AM0PR08MB3236:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR08MB3236259812F9B9E4AC674A88C1620@AM0PR08MB3236.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 020877E0CB
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(376002)(39850400004)(136003)(366004)(396003)(189003)(199004)(99286004)(66946007)(486006)(31686004)(31696002)(8936002)(2616005)(110136005)(86362001)(54906003)(6486002)(52116002)(6246003)(6506007)(76176011)(81156014)(386003)(476003)(446003)(8676002)(4326008)(2906002)(5660300002)(11346002)(66446008)(66476007)(64756008)(66556008)(14444005)(6512007)(26005)(81166006)(316002)(14454004)(25786009)(36756003)(229853002)(102836004)(7736002)(478600001)(6436002)(305945005)(71200400001)(3846002)(66066001)(6116002)(71190400001)(256004)(186003)(14143004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3236;
- H:AM0PR08MB4097.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: U0MGOTHSbwlHitARMdB8xLm9dWTDBxBLhSTUPggbIR+i6VmhCpSuBhG+qH6cPQXYu65EXMPYr0Rtf0cdY3fx7DoNq58/7ZgKyh69sT8FWKDFpU3OaTBaI0HNG3n8oDfhhqG5a9/sTZ1xu4Rl8jsNEcBapUE0bCIptlvaiOw8yLQOEXwicx8lErtS3UN+V8lPyvL5rv56mzxsWbJXf1b/T5hL1gbnzDJb4rYtfmYa7VHVjF/u5BfvzEHNWvgFtugmbrsH1dV/Ugde+DS7pGsD1WomzNdN2I6OPL7amUqs80UX3eKrhxzbJKuPqCHsuowVtlps69l6D2cDwjImvHBdxMh2v3KDSYs4kgzkukXp6TWr/34fCaTf9hQexEPnCWg//7aBbxD/PXlUYoCBPt/gOERtd0c8ftNQQ/DqW3Lu//KiixelukpjIGu9CNG7JdKE
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6DF22CB5DC48DC4588E176C727EE0053@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96aa8cde-43b6-407d-0e74-08d75eebf92b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Nov 2019 16:53:08.8357 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6aR7i/WOLJE/EP3ymDc3//5ZuIj+tA3beZdr6OTclUvSmDIt44ssOfB84bdoJrHXFm+QbURdRKLiwkgTCQotAlHkL9osYn0jNgcg8/udwXo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3236
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.125
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iQaCD-0001SZ-Ub
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 12:54:47 -0400
+Received: from relay.sw.ru ([185.231.240.75]:45004)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iQaCD-0001Qh-ND; Fri, 01 Nov 2019 12:54:45 -0400
+Received: from [172.16.25.136] (helo=dhcp-172-16-25-136.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iQaC9-000771-FX; Fri, 01 Nov 2019 19:54:41 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Subject: [PATCH v3] iotests: Test NBD client reconnection
+Date: Fri,  1 Nov 2019 19:54:32 +0300
+Message-Id: <1572627272-23359-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -121,58 +56,189 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Denis Lunev <den@virtuozzo.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
+ andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MDEuMTEuMjAxOSAxODo0MiwgSm9obiBTbm93IHdyb3RlOg0KPiBIaSwgaW4gb25lIG9mIG15IGlu
-ZmFtb3VzbHkgdW5yZWFkYWJsZSBhbmQgbG9uZyBzdGF0dXMgZW1haWxzLCBJDQo+IG1lbnRpb25l
-ZCBwb3NzaWJseSB3YW50aW5nIHRvIGNvcHkgYWxsb2NhdGlvbiBkYXRhIGludG8gYml0bWFwcyBh
-cyBhIHdheQ0KPiB0byBlbmFibGUgdXNlcnMgdG8gY3JlYXRlIChleHRlcm5hbCkgc25hcHNob3Rz
-IGZyb20gb3V0c2lkZSBvZiB0aGUNCj4gbGlidmlydC9xZW11IGNvbnRleHQuDQo+IA0KPiAoVGhh
-dCBpczogdG8gcmVwYWlyIGNoZWNrcG9pbnRzIGluIGxpYnZpcnQgYWZ0ZXIgYSB1c2VyIGV4dGVu
-ZGVkIHRoZQ0KPiBiYWNraW5nIGNoYWluIHRoZW1zZWx2ZXMsIHlvdSB3YW50IHRvIHJlc3RvcmUg
-Yml0bWFwIGluZm9ybWF0aW9uIGZvcg0KPiB0aGF0IG5vZGUuIENvbnZlbmllbnRseSwgdGhpcyBp
-bmZvcm1hdGlvbiBJUyB0aGUgYWxsb2NhdGlvbiBtYXAsIHNvIHdlDQo+IGNhbiBkbyB0aGlzLikN
-Cj4gDQo+IEl0IGNhbWUgdXAgYXQgS1ZNIEZvcnVtIHRoYXQgd2UgcHJvYmFibHkgZG8gd2FudCB0
-aGlzLCBiZWNhdXNlIG9WaXJ0DQo+IGxpa2VzIHRoZSBpZGVhIG9mIGJlaW5nIGFibGUgdG8gbWFu
-aXB1bGF0ZSB0aGVzZSBjaGFpbnMgZnJvbSBvdXRzaWRlIG9mDQo+IGxpYnZpcnQvcWVtdS4NCj4g
-DQo+IERlbmlzIHN1Z2dlc3RlZCB0aGF0IGluc3RlYWQgb2YgYSBuZXcgY29tbWFuZCwgd2UgY2Fu
-IGNyZWF0ZSBhIHNwZWNpYWwNCj4gbmFtZSAtLSBtYXliZSAiI0FMTE9DQVRFRCIgb3Igc29tZXRo
-aW5nIHNpbWlsYXIgdGhhdCBjYW4gbmV2ZXIgYmUNCj4gYWxsb2NhdGVkIGFzIGEgdXNlci1kZWZp
-bmVkIGJpdG1hcCBuYW1lIC0tIGFzIGEgc3BlY2lhbCBzb3VyY2UgZm9yIHRoZQ0KPiBtZXJnZSBj
-b21tYW5kLg0KPiANCj4gWW91J2QgaXNzdWUgYSBtZXJnZSBmcm9tICIjQUxMT0NBVEVEIiB0byAi
-bXlCaXRtYXAwIiB0byBjb3B5IHRoZSBjdXJyZW50DQo+IGFsbG9jYXRpb24gZGF0YSBpbnRvICJt
-eUJpdG1hcDAiLCBmb3IgaW5zdGFuY2UuDQoNCkkgY2FuIHN1Z2dlc3QgYWxzbyB0aGUgZm9sbG93
-aW5nOg0KDQpXZSBub3cgaGF2ZQ0KDQogICB7ICdhbHRlcm5hdGUnOiAnQmxvY2tEaXJ0eUJpdG1h
-cE1lcmdlU291cmNlJywNCiAgICAgJ2RhdGEnOiB7ICdsb2NhbCc6ICdzdHInLA0KICAgICAgICAg
-ICAgICAgJ2V4dGVybmFsJzogJ0Jsb2NrRGlydHlCaXRtYXAnIH0gfQ0KDQpXZSBtYXkgYWRkIHNl
-cGFyYXRlIHFhcHkgZW51bQ0KDQpCbG9ja1N0YXR1c0JpdG1hcFR5cGUgPSB7J2FsbG9jYXRlZCcs
-IC4uLn0NCg0KYW5kIHN0cnVjdA0KDQpCbG9ja1N0YXR1c0JpdG1hcCA9IHsnbm9kZSc6ICdzdHIn
-LCAndHlwZSc6IEJsb2NrU3RhdHVzQml0bWFwVHlwZX0NCg0KYW5kIHRoZW4gZXh0ZW5kIEJsb2Nr
-RGlydHlCaXRtYXBNZXJnZVNvdXJjZSBsaWtlDQoNCiAgIHsgJ2FsdGVybmF0ZSc6ICdCbG9ja0Rp
-cnR5Qml0bWFwTWVyZ2VTb3VyY2UnLA0KICAgICAnZGF0YSc6IHsgJ2xvY2FsJzogJ3N0cicsDQog
-ICAgICAgICAgICAgICAnZXh0ZXJuYWwnOiAnQmxvY2tEaXJ0eUJpdG1hcCcsDQogICAgICAgICAg
-ICAgICAnc3RhdHVzJzogJ0Jsb2NrU3RhdHVzQml0bWFwJyB9IH0NCg0KU28sIHdlIGNhbiBhdm9p
-ZCBzcGVjaWFsIG5hbWUgIiNBTExPQ0FURUQiLCB3aGljaCB3ZSdsbCBoYXZlIHRvIGRlZmluZQ0K
-aW4gcWNvdzIgc3BlYyBhbmQgbmJkIHNwZWMuDQoNCj4gDQo+IFNvbWUgdGhvdWdodHM6DQo+IA0K
-PiAtIFRoZSBvbmx5IGNvbW1hbmRzIHdoZXJlIHRoaXMgcHNldWRvLWJpdG1hcCBtYWtlcyBzZW5z
-ZSBpcyBtZXJnZS4NCj4gZW5hYmxlL2Rpc2FibGUvcmVtb3ZlL2NsZWFyL2FkZCBkb24ndCBtYWtl
-IHNlbnNlIGhlcmUuDQo+IA0KPiAtIFRoaXMgcHNldWRvIGJpdG1hcCBtaWdodCBtYWtlIHNlbnNl
-IGZvciBiYWNrdXAsIGJ1dCBpdCdzIG5vdCBuZWVkZWQ7DQo+IHlvdSBjYW4ganVzdCBtZXJnZSBp
-bnRvIGFuIGVtcHR5L2VuYWJsZWQgYml0bWFwIGFuZCB0aGVuIHVzZSB0aGF0Lg0KPiANCj4gLSBD
-cmVhdGluZyBhbiBhbGxvY2F0aW9uIGJpdG1hcCBvbi10aGUtZmx5IGlzIHByb2JhYmx5IG5vdCBw
-b3NzaWJsZQ0KPiBkaXJlY3RseSBpbiB0aGUgbWVyZ2UgY29tbWFuZCwgYmVjYXVzZSB0aGUgZGlz
-ayBzdGF0dXMgY2FsbHMgbWlnaHQgdGFrZQ0KPiB0b28gbG9uZy4uLg0KPiANCj4gSG0sIGFjdHVh
-bGx5LCBJJ20gbm90IHN1cmUgaG93IHRvIHNvbHZlIHRoYXQgb25lLiBNZXJnZSB3b3VsZCBuZWVk
-IHRvDQo+IGJlY29tZSBhIGpvYiAob3IgYW4gYXN5bmMgUU1QIGNvbW1hbmQ/KSBvciB3ZSdkIG5l
-ZWQgdG8ga2VlcCBhbg0KPiBhbGxvY2F0aW9uIGJpdG1hcCBvYmplY3QgYXJvdW5kIGFuZCBpbi1z
-eW5jLiBJIGRvbid0IHJlYWxseSB3YW50IHRvIGRvDQo+IGVpdGhlciwgc28gbWF5YmUgSSdtIG1p
-c3NpbmcgYW4gb2J2aW91cy9iZXR0ZXIgc29sdXRpb24uDQo+IA0KPiBBbHNvLCB3aXRoIHJlZ2Fy
-ZHMgdG8gaW50cm9zcGVjdGlvbiwgaWYgd2UgZG8gY3JlYXRlIGEgc3BlY2lhbCByZXNlcnZlZA0K
-PiBuYW1lIGxpa2UgI0FMTE9DQVRFRCwgd2UgbmVlZCB0byBtYWtlIHN1cmUgdGhhdCB0aGlzIGlz
-IGF2YWlsYWJsZSBhbmQNCj4gb2J2aW91cyB2aWEgdGhlIFFBUEkgc2NoZW1hLg0KPiANCj4gLS1q
-cw0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRpbWlyDQo=
+The test for an NBD client. The NBD server is disconnected after the
+client write request. The NBD client should reconnect and complete
+the write operation.
+
+Suggested-by: Denis V. Lunev <den@openvz.org>
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ tests/qemu-iotests/277                   | 102 +++++++++++++++++++++++++++++++
+ tests/qemu-iotests/277.out               |   6 ++
+ tests/qemu-iotests/group                 |   1 +
+ tests/qemu-iotests/iotests.py            |   5 ++
+ tests/qemu-iotests/nbd-fault-injector.py |   3 +-
+ 5 files changed, 116 insertions(+), 1 deletion(-)
+ create mode 100755 tests/qemu-iotests/277
+ create mode 100644 tests/qemu-iotests/277.out
+
+diff --git a/tests/qemu-iotests/277 b/tests/qemu-iotests/277
+new file mode 100755
+index 0000000..e4e6730
+--- /dev/null
++++ b/tests/qemu-iotests/277
+@@ -0,0 +1,102 @@
++#!/usr/bin/env python
++#
++# Test NBD client reconnection
++#
++# Copyright (c) 2019 Virtuozzo International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++import os
++import subprocess
++import iotests
++from iotests import file_path, log
++
++
++def make_conf_file(event):
++    """
++    Create configuration file for the nbd-fault-injector.py
++
++    :param event: which event the server should close a connection on
++    """
++    if os.path.exists(conf_file):
++        os.remove(conf_file)
++
++    with open(conf_file, "w+") as conff:
++        conff.write("[inject-error]\nevent={}\nwhen=after".format(event))
++
++
++def start_server_NBD(event):
++    make_conf_file(event)
++
++    srv = subprocess.Popen(["nbd-fault-injector.py", "--classic-negotiation",
++                           nbd_sock, conf_file], stdout=subprocess.PIPE,
++                           stderr=subprocess.STDOUT, universal_newlines=True)
++    line = srv.stdout.readline()
++    if "Listening on " in line:
++        log('NBD server: started')
++    else:
++        log('NBD server: ' + line.rstrip())
++
++    return srv
++
++
++def start_client_NBD():
++    log('NBD client: QEMU-IO write')
++    args = iotests.qemu_io_args_no_fmt + \
++        ['-c', 'write -P 0x7 0 3M', '--image-opts',
++         'driver=nbd,server.type=unix,server.path={},'
++         'reconnect-delay=7'.format(nbd_sock)]
++    clt = subprocess.Popen(args, stdout=subprocess.PIPE,
++                           stderr=subprocess.STDOUT,
++                           universal_newlines=True)
++    return clt
++
++
++def check_proc_NBD(proc, connector):
++    try:
++        exitcode = proc.wait(timeout=10)
++
++        if exitcode < 0:
++            log('NBD {}: EXIT SIGNAL {}\n'.format(connector, -exitcode))
++            log(proc.communicate()[0])
++        else:
++            line = proc.stdout.readline()
++            log('NBD {}: {}'.format(connector, line.rstrip()))
++
++    except subprocess.TimeoutExpired:
++        proc.kill()
++        log('NBD {}: ERROR timeout expired'.format(connector))
++    finally:
++        if connector == 'server':
++            os.remove(nbd_sock)
++            os.remove(conf_file)
++
++
++conf_file = os.path.join(iotests.test_dir, "nbd-fault-injector.conf")
++nbd_sock = file_path('nbd-sock')
++nbd_uri = 'nbd+unix:///?socket=' + nbd_sock
++if os.path.exists(nbd_sock):
++    os.remove(nbd_sock)
++
++srv = start_server_NBD('data')
++clt = start_client_NBD()
++# The server should close the connection after a client write request
++check_proc_NBD(srv, 'server')
++# Start the NBD server again
++srv = start_server_NBD('reply')
++# The client should reconnect and complete the write operation
++check_proc_NBD(clt, 'client')
++# Make it sure that server terminated
++check_proc_NBD(srv, 'server')
+diff --git a/tests/qemu-iotests/277.out b/tests/qemu-iotests/277.out
+new file mode 100644
+index 0000000..45404b3
+--- /dev/null
++++ b/tests/qemu-iotests/277.out
+@@ -0,0 +1,6 @@
++NBD server: started
++NBD client: QEMU-IO write
++NBD server: Closing connection on rule match inject-error
++NBD server: started
++NBD client: wrote 3145728/3145728 bytes at offset 0
++NBD server: Closing connection on rule match inject-error
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index af322af..22ef1b8 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -282,3 +282,4 @@
+ 267 rw auto quick snapshot
+ 268 rw auto quick
+ 270 rw backing quick
++277 rw
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 709def4..0d16303 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -47,6 +47,11 @@ qemu_io_args = [os.environ.get('QEMU_IO_PROG', 'qemu-io')]
+ if os.environ.get('QEMU_IO_OPTIONS'):
+     qemu_io_args += os.environ['QEMU_IO_OPTIONS'].strip().split(' ')
+ 
++qemu_io_args_no_fmt = [os.environ.get('QEMU_IO_PROG', 'qemu-io')]
++if os.environ.get('QEMU_IO_OPTIONS_NO_FMT'):
++    qemu_io_args_no_fmt += \
++        os.environ['QEMU_IO_OPTIONS_NO_FMT'].strip().split(' ')
++
+ qemu_nbd_args = [os.environ.get('QEMU_NBD_PROG', 'qemu-nbd')]
+ if os.environ.get('QEMU_NBD_OPTIONS'):
+     qemu_nbd_args += os.environ['QEMU_NBD_OPTIONS'].strip().split(' ')
+diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
+index 6b2d659..7e2dab6 100755
+--- a/tests/qemu-iotests/nbd-fault-injector.py
++++ b/tests/qemu-iotests/nbd-fault-injector.py
+@@ -115,7 +115,8 @@ class FaultInjectionSocket(object):
+             if rule.match(event, io):
+                 if rule.when == 0 or bufsize is None:
+                     print('Closing connection on rule match %s' % rule.name)
+-                    self.sock.flush()
++                    self.sock.close()
++                    sys.stdout.flush()
+                     sys.exit(0)
+                 if rule.when != -1:
+                     return rule.when
+-- 
+1.8.3.1
+
 
