@@ -2,80 +2,75 @@ Return-Path: <SRS0=rFyn=Y2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4493CA9ECF
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 01:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BB1BCA9ECF
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 02:28:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD80C21855
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 01:17:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NF5xUSWX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD80C21855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 598B3208CB
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 02:28:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 598B3208CB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=h3c.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQi39-0001Cz-T2
-	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 21:17:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38958)
+	id 1iQj9f-0002bF-DM
+	for qemu-devel@archiver.kernel.org; Fri, 01 Nov 2019 22:28:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36391)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hiroyuki.obinata@gmail.com>) id 1iQi2E-0000Yq-Dg
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 21:16:59 -0400
+ (envelope-from <tu.guoyi@h3c.com>) id 1iQj8T-0001su-4W
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 22:27:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hiroyuki.obinata@gmail.com>) id 1iQi2D-0008OB-1L
- for qemu-devel@nongnu.org; Fri, 01 Nov 2019 21:16:58 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:44607)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <hiroyuki.obinata@gmail.com>)
- id 1iQi2C-0008LW-PC; Fri, 01 Nov 2019 21:16:56 -0400
-Received: by mail-lf1-x142.google.com with SMTP id v4so8425747lfd.11;
- Fri, 01 Nov 2019 18:16:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=eruML1/25dKlqgZ7K3BVzp2Qya68T9UzemSWytJpWk4=;
- b=NF5xUSWXboyFD1NmgUkdleJnB7dxo4VrMHDY9Ovm4MqUeb+dyNb1ea2jWFppiuLcUg
- s/juhSfme5M/NRdy1XcEVCljYCTdRLt9kipXTUycTD4w1cmLjLqYWS42NpSaZUF9iQ2P
- IUQcEmsrFjSudm4VRIY7v4g2EFlXeNxNE2b6LahB8a61IuIMphRxzmY5WTuCFcejTMRV
- /pcGq1t0u/SdkTiW56pbtPSm99msafzcGDbu2RzgcMiHZqS/9x1COPt5TZ/fVoae10uF
- YqZlA1v68xH/SdwHINBEZepsSWD486CM8OpyN4KCBWsxJVWTSK2mL2fI0CFXGBbJ4KTS
- HhdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=eruML1/25dKlqgZ7K3BVzp2Qya68T9UzemSWytJpWk4=;
- b=OY7a6lkNCqPOIKNuR5bs/Y5m/HE5eZSlN+pxl7H30A8RC4YySL9/tZyZ5Jpo6TpNsK
- GA+9O8ji5Cm1/KlK7loUJpdqfdDO0U4mcg+zLpQPZ+TQMmrJte8DQadE+oLxdAugkiGY
- bxg8BVyERCGjh2l6R3zjyKLUN7sR9zJ28YcLXqxWlkTfflZx3d+wo6FL80iihvFFZ5bo
- 9IEai6K7sM5ikMcZwnrISkTAQqY4NzKGhiVosgORaI4Ndpk5HmFp03BqioFW4JG4gau0
- C91TZIyuBGN5zG99np1JMsLJJUqms3sstLcCuNHKXG4UVrQO/D6QnE96GmQzpmdVa1A3
- X8gg==
-X-Gm-Message-State: APjAAAWSJfdMzptkH2+gpzekOlO7woRLrg6SrsW/qBddI8meIpDbPw+5
- RXvpmCVSIBDR1Zb4AwhgCB6z30Scm159AdnKhVA=
-X-Google-Smtp-Source: APXvYqwqkQXpC4IBuXHSmmWS3Eb7zTS3ZjOwUltGPVleMI/LbVh1j5Rq40hD7mg2U5nt5mCUHrXhbuP53EDivEBVbSQ=
-X-Received: by 2002:a19:655b:: with SMTP id c27mr8889812lfj.122.1572657414534; 
- Fri, 01 Nov 2019 18:16:54 -0700 (PDT)
+ (envelope-from <tu.guoyi@h3c.com>) id 1iQj8R-0007NT-U1
+ for qemu-devel@nongnu.org; Fri, 01 Nov 2019 22:27:29 -0400
+Received: from smtp.h3c.com ([60.191.123.50]:50478 helo=h3cspam02-ex.h3c.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tu.guoyi@h3c.com>)
+ id 1iQj8O-0006dS-He; Fri, 01 Nov 2019 22:27:25 -0400
+Received: from DAG2EX05-BASE.srv.huawei-3com.com ([10.8.0.68])
+ by h3cspam02-ex.h3c.com with ESMTPS id xA22RBqd038775
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Sat, 2 Nov 2019 10:27:11 +0800 (GMT-8)
+ (envelope-from tu.guoyi@h3c.com)
+Received: from DAG2EX03-BASE.srv.huawei-3com.com (10.8.0.66) by
+ DAG2EX05-BASE.srv.huawei-3com.com (10.8.0.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Sat, 2 Nov 2019 10:27:12 +0800
+Received: from DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074])
+ by DAG2EX03-BASE.srv.huawei-3com.com ([fe80::5d18:e01c:bbbd:c074%6])
+ with mapi id 15.01.1713.004; Sat, 2 Nov 2019 10:27:12 +0800
+From: Tuguoyi <tu.guoyi@h3c.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "kwolf@redhat.com" <kwolf@redhat.com>, "mreitz@redhat.com"
+ <mreitz@redhat.com>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: RE: [PATCH v4] qcow2-bitmap: Fix uint64_t left-shift overflow
+Thread-Topic: [PATCH v4] qcow2-bitmap: Fix uint64_t left-shift overflow
+Thread-Index: AdWQhrb0bffMwMc6ShSREntjykPuIgADxL+AAAAaQED//4ZggP/+aTZw
+Date: Sat, 2 Nov 2019 02:27:11 +0000
+Message-ID: <6321642b1fcd4bbf817d08c5ddcbf524@h3c.com>
+References: <4ba40cd1e7ee4a708b40899952e49f22@h3c.com>
+ <8b7d3d50-4a29-a8b3-5b6c-cde4af1b1d7a@virtuozzo.com>
+ <7650a7b706d24774b4ea3af23a2b371f@h3c.com>
+ <dcdf7075-45f4-8ba1-69fc-17cd673125ca@virtuozzo.com>
+In-Reply-To: <dcdf7075-45f4-8ba1-69fc-17cd673125ca@virtuozzo.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.125.108.112]
+x-sender-location: DAG2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20191030002318.399-1-hiroyuki.obinata@gmail.com>
- <mhng-7b7098a1-1195-4532-80ab-2d7c51ebd2ed@palmer-si-x1c4>
-In-Reply-To: <mhng-7b7098a1-1195-4532-80ab-2d7c51ebd2ed@palmer-si-x1c4>
-From: Obinata Hiroyuki <hiroyuki.obinata@gmail.com>
-Date: Sat, 2 Nov 2019 10:16:45 +0900
-Message-ID: <CA+0n8CN3YC56nMpZqCQD_kCzFaZN+uign5NGj=SgAW5E+tKQLA@mail.gmail.com>
-Subject: Re: [PATCH] remove unnecessary ifdef TARGET_RISCV64
-To: Palmer Dabbelt <palmer@dabbelt.com>
-Content-Type: multipart/alternative; boundary="0000000000008bfc7b059652d6f6"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::142
+X-DNSRBL: 
+X-MAIL: h3cspam02-ex.h3c.com xA22RBqd038775
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 60.191.123.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,111 +82,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>, qemu-devel@nongnu.org,
- Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Chengchiwen <chengchiwen@h3c.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
+ Wangyongqing <w_yongqing@h3c.com>, Changlimin <changlimin@h3c.com>,
+ Gaoliang <liang_gao@h3c.com>, Wangyong <wang.yongD@h3c.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000008bfc7b059652d6f6
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Thanks!
-
-2019=E5=B9=B411=E6=9C=882=E6=97=A5(=E5=9C=9F) 1:58 Palmer Dabbelt <palmer@d=
-abbelt.com>:
-
-> On Tue, 29 Oct 2019 17:23:18 PDT (-0700), hiroyuki.obinata@gmail.com
-> wrote:
-> > From: "hiroyuki.obinata" <hiroyuki.obinata@gmail.com>
-> >
-> > Signed-off-by: Hiroyuki Obinata <hiroyuki.obinata@gmail.com>
-> > ---
-> >  target/riscv/translate.c | 4 +---
-> >  1 file changed, 1 insertion(+), 3 deletions(-)
-> >
-> > diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-> > index adeddb85f6..5c4dd21a98 100644
-> > --- a/target/riscv/translate.c
-> > +++ b/target/riscv/translate.c
-> > @@ -64,12 +64,10 @@ static const int tcg_memop_lookup[8] =3D {
-> >      [0] =3D MO_SB,
-> >      [1] =3D MO_TESW,
-> >      [2] =3D MO_TESL,
-> > +    [3] =3D MO_TEQ,
-> >      [4] =3D MO_UB,
-> >      [5] =3D MO_TEUW,
-> > -#ifdef TARGET_RISCV64
-> > -    [3] =3D MO_TEQ,
-> >      [6] =3D MO_TEUL,
-> > -#endif
-> >  };
-> >  #endif
->
-> Reviewed-by: Palmer Dabbelt <palmer@dabbelt.com>
->
-> This is a non-functional change (the code in question was already wrapped
-> in an
-> "#ifdef TARGET_RISCV64", so this internal one was redundant), so I'm happ=
-y
-> to
-> include it during the soft freeze.
->
-> I've added this to the queue for my next PR.
->
-
---0000000000008bfc7b059652d6f6
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Thanks!</div><br><div class=3D"gmail_quote"><div dir=3D"lt=
-r" class=3D"gmail_attr">2019=E5=B9=B411=E6=9C=882=E6=97=A5(=E5=9C=9F) 1:58 =
-Palmer Dabbelt &lt;<a href=3D"mailto:palmer@dabbelt.com">palmer@dabbelt.com=
-</a>&gt;:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0p=
-x 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On Tue=
-, 29 Oct 2019 17:23:18 PDT (-0700), <a href=3D"mailto:hiroyuki.obinata@gmai=
-l.com" target=3D"_blank">hiroyuki.obinata@gmail.com</a> wrote:<br>
-&gt; From: &quot;hiroyuki.obinata&quot; &lt;<a href=3D"mailto:hiroyuki.obin=
-ata@gmail.com" target=3D"_blank">hiroyuki.obinata@gmail.com</a>&gt;<br>
-&gt;<br>
-&gt; Signed-off-by: Hiroyuki Obinata &lt;<a href=3D"mailto:hiroyuki.obinata=
-@gmail.com" target=3D"_blank">hiroyuki.obinata@gmail.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 target/riscv/translate.c | 4 +---<br>
-&gt;=C2=A0 1 file changed, 1 insertion(+), 3 deletions(-)<br>
-&gt;<br>
-&gt; diff --git a/target/riscv/translate.c b/target/riscv/translate.c<br>
-&gt; index adeddb85f6..5c4dd21a98 100644<br>
-&gt; --- a/target/riscv/translate.c<br>
-&gt; +++ b/target/riscv/translate.c<br>
-&gt; @@ -64,12 +64,10 @@ static const int tcg_memop_lookup[8] =3D {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 [0] =3D MO_SB,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 [1] =3D MO_TESW,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 [2] =3D MO_TESL,<br>
-&gt; +=C2=A0 =C2=A0 [3] =3D MO_TEQ,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 [4] =3D MO_UB,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 [5] =3D MO_TEUW,<br>
-&gt; -#ifdef TARGET_RISCV64<br>
-&gt; -=C2=A0 =C2=A0 [3] =3D MO_TEQ,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 [6] =3D MO_TEUL,<br>
-&gt; -#endif<br>
-&gt;=C2=A0 };<br>
-&gt;=C2=A0 #endif<br>
-<br>
-Reviewed-by: Palmer Dabbelt &lt;<a href=3D"mailto:palmer@dabbelt.com" targe=
-t=3D"_blank">palmer@dabbelt.com</a>&gt;<br>
-<br>
-This is a non-functional change (the code in question was already wrapped i=
-n an <br>
-&quot;#ifdef TARGET_RISCV64&quot;, so this internal one was redundant), so =
-I&#39;m happy to <br>
-include it during the soft freeze.<br>
-<br>
-I&#39;ve added this to the queue for my next PR.<br>
-</blockquote></div>
-
---0000000000008bfc7b059652d6f6--
+T24gMDEuMTEuMjAxOSAxODowOSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToN
+Cj4gMDEuMTEuMjAxOSAxMjozNCwgVHVndW95aSB3cm90ZToNCj4gPiBPbiAwMS4xMS4yMDE5IDE3
+OjI1IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkgd3JvdGU6DQo+ID4+IDAxLjExLjIwMTkg
+MTA6MzcsIFR1Z3VveWkgd3JvdGU6DQo+ID4+PiBUaGVyZSBhcmUgdHdvIGlzc3VlcyBpbiBJbiBj
+aGVja19jb25zdHJhaW50c19vbl9iaXRtYXAoKSwNCj4gPj4+IDEpIFRoZSBzYW5pdHkgY2hlY2sg
+b24gdGhlIGdyYW51bGFyaXR5IHdpbGwgY2F1c2UgdWludDY0X3QgaW50ZWdlcg0KPiA+Pj4gbGVm
+dC1zaGlmdCBvdmVyZmxvdyB3aGVuIGNsdXN0ZXJfc2l6ZSBpcyAyTSBhbmQgdGhlIGdyYW51bGFy
+aXR5IGlzDQo+ID4+PiBCSUdHRVIgdGhhbiAzMksuDQo+ID4+PiAyKSBUaGUgd2F5IHRvIGNhbGN1
+bGF0ZSBpbWFnZSBzaXplIHRoYXQgdGhlIG1heGltdW0gYml0bWFwIHN1cHBvcnRlZA0KPiA+Pj4g
+Y2FuIG1hcCB0byBpcyBhIGJpdCBpbmNvcnJlY3QuDQo+ID4+PiBUaGlzIHBhdGNoIGZpeCBpdCBi
+eSBhZGQgYSBoZWxwZXIgZnVuY3Rpb24gdG8gY2FsY3VsYXRlIHRoZSBudW1iZXINCj4gPj4+IG9m
+IGJ5dGVzIG5lZWRlZCBieSBhIG5vcm1hbCBiaXRtYXAgaW4gaW1hZ2UgYW5kIGNvbXBhcmUgaXQg
+dG8gdGhlDQo+ID4+PiBtYXhpbXVtIGJpdG1hcCBieXRlcyBzdXBwb3J0ZWQgYnkgcWVtdS4NCj4g
+Pj4+DQo+ID4+PiBGaXhlczogNWY3MjgyNmU3ZmM2MjE2N2NmM2ENCj4gPj4+IFNpZ25lZC1vZmYt
+Ynk6IEd1b3lpIFR1IDx0dS5ndW95aUBoM2MuY29tPg0KPiA+Pg0KPiA+PiBZb3UgZm9yZ2V0IG15
+DQo+ID4+IFJldmlld2VkLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50
+c292QHZpcnR1b3p6by5jb20+DQo+ID4NCj4gPiBTb3JyeSBmb3IgdGhhdCwgaXQncyBteSBmaXJz
+dCB0aW1lIHRvIHN1Ym1pdCBwYXRjaCB0byBxZW11LCBhbmQgc2hvdWxkIEkgc2VuZA0KPiBhbm90
+aGVyIHBhdGNoIG9yIG5vdCA/DQo+IA0KPiBHb29kIHN0YXJ0IQ0KPiANCj4gTm8sIHlvdSBzaG91
+bGRuJ3QuIE1haW50YWluZXIgd2lsbCB0YWtlIHN1Y2ggbWFya3MgKGFuZCBtYXkgYmUgb3RoZXIN
+Cj4gcHJvcG9zZWQgaW1wcm92ZW1lbnRzIGZvciBjb21taXQgbWVzc2FnZSBsaWtlIHRoaXMgIkZp
+eGVzOiAiLCB3aGVuIGFwcGx5aW5nLA0KPiBzbyBubyByZWFzb24gdG8gcmVzZW5kLg0KPiANCj4g
+QWxzbywgd2hlbiBzZW5kaW5nIGEgbmV3IHZlcnNpb24gb2YgcGF0Y2gsIHN1bW1hcml6ZSB3aGF0
+IHdhcyBjaGFuZ2VkDQo+IHNpbmNlIHByZXZpb3VzIHZlcnNpb24gKHlvdSBtYXkgZG8gaXQgdW5k
+ZXIgIi0tLSIgd2hpY2ggZm9sbG93cyBjb21taXQNCj4gbWVzc2FnZSwgb3IgaW4gY292ZXIgbGV0
+dGVyIGlmIGl0J3MgYSBwYXRjaCBzZXQgd2l0aCBzZXZlcmFsIHBhdGNoZXMuDQoNCk9LLCBJIGdv
+dCBpdCwgdGhhbmtzIGEgbG90LiANCg0KPiA+DQo+ID4+IChJIGRvbid0IHNlZSBjaGFuZ2VzIGV4
+Y2VwdCBhZGQgIkZpeGVzOiAiIHRvIGNvbW1pdCBtc2cgYW5kIHB1dA0KPiA+PiBnZXRfYml0bWFw
+X2J5dGVzX25lZWRlZCBkZWZpbml0aW9uIGhlYWRlciBpbnRvIG9uZSBsaW5lLikNCj4gPg0KPiA+
+IFllcywgT25seSBtaW5vciBjaGFuZ2VzIGFyZSBtYWRlLCBpbmNsdWRpbmcgcmVtb3ZpbmcgJ2lu
+bGluZScga2V5d29yZC4NCj4gPg0KPiA+IFRoYW5rcyBmb3IgeW91ciBwYXRpZW5jZSBpbiByZXZp
+ZXdpbmcgPg0KPiA+Pj4gLS0tDQo+ID4+PiAgICBibG9jay9xY293Mi1iaXRtYXAuYyB8IDE0ICsr
+KysrKysrKysrLS0tDQo+ID4+PiAgICAxIGZpbGUgY2hhbmdlZCwgMTEgaW5zZXJ0aW9ucygrKSwg
+MyBkZWxldGlvbnMoLSkNCj4gPj4+DQo+ID4+PiBkaWZmIC0tZ2l0IGEvYmxvY2svcWNvdzItYml0
+bWFwLmMgYi9ibG9jay9xY293Mi1iaXRtYXAuYyBpbmRleA0KPiA+Pj4gOTgyOTRhNy4uZWY5ZWY2
+MiAxMDA2NDQNCj4gPj4+IC0tLSBhL2Jsb2NrL3Fjb3cyLWJpdG1hcC5jDQo+ID4+PiArKysgYi9i
+bG9jay9xY293Mi1iaXRtYXAuYw0KPiA+Pj4gQEAgLTE0Miw2ICsxNDIsMTMgQEAgc3RhdGljIGlu
+dCBjaGVja190YWJsZV9lbnRyeSh1aW50NjRfdCBlbnRyeSwNCj4gPj4+IGludA0KPiA+PiBjbHVz
+dGVyX3NpemUpDQo+ID4+PiAgICAgICAgcmV0dXJuIDA7DQo+ID4+PiAgICB9DQo+ID4+Pg0KPiA+
+Pj4gK3N0YXRpYyBpbnQ2NF90IGdldF9iaXRtYXBfYnl0ZXNfbmVlZGVkKGludDY0X3QgbGVuLCB1
+aW50MzJfdA0KPiA+Pj4gK2dyYW51bGFyaXR5KSB7DQo+ID4+PiArICAgIGludDY0X3QgbnVtX2Jp
+dHMgPSBESVZfUk9VTkRfVVAobGVuLCBncmFudWxhcml0eSk7DQo+ID4+PiArDQo+ID4+PiArICAg
+IHJldHVybiBESVZfUk9VTkRfVVAobnVtX2JpdHMsIDgpOyB9DQo+ID4+PiArDQo+ID4+PiAgICBz
+dGF0aWMgaW50IGNoZWNrX2NvbnN0cmFpbnRzX29uX2JpdG1hcChCbG9ja0RyaXZlclN0YXRlICpi
+cywNCj4gPj4+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0
+IGNoYXIgKm5hbWUsDQo+ID4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICB1aW50MzJfdCBncmFudWxhcml0eSwNCj4gQEANCj4gPj4+IC0xNTAsNiArMTU3LDcgQEAg
+c3RhdGljIGludA0KPiA+Pj4gY2hlY2tfY29uc3RyYWludHNfb25fYml0bWFwKEJsb2NrRHJpdmVy
+U3RhdGUNCj4gPj4gKmJzLA0KPiA+Pj4gICAgICAgIEJEUlZRY293MlN0YXRlICpzID0gYnMtPm9w
+YXF1ZTsNCj4gPj4+ICAgICAgICBpbnQgZ3JhbnVsYXJpdHlfYml0cyA9IGN0ejMyKGdyYW51bGFy
+aXR5KTsNCj4gPj4+ICAgICAgICBpbnQ2NF90IGxlbiA9IGJkcnZfZ2V0bGVuZ3RoKGJzKTsNCj4g
+Pj4+ICsgICAgaW50NjRfdCBiaXRtYXBfYnl0ZXM7DQo+ID4+Pg0KPiA+Pj4gICAgICAgIGFzc2Vy
+dChncmFudWxhcml0eSA+IDApOw0KPiA+Pj4gICAgICAgIGFzc2VydCgoZ3JhbnVsYXJpdHkgJiAo
+Z3JhbnVsYXJpdHkgLSAxKSkgPT0gMCk7IEBAIC0xNzEsOQ0KPiA+Pj4gKzE3OSw5IEBAIHN0YXRp
+YyBpbnQgY2hlY2tfY29uc3RyYWludHNfb25fYml0bWFwKEJsb2NrRHJpdmVyU3RhdGUgKmJzLA0K
+PiA+Pj4gICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gPj4+ICAgICAgICB9DQo+ID4+Pg0K
+PiA+Pj4gLSAgICBpZiAoKGxlbiA+ICh1aW50NjRfdClCTUVfTUFYX1BIWVNfU0laRSA8PCBncmFu
+dWxhcml0eV9iaXRzKSB8fA0KPiA+Pj4gLSAgICAgICAgKGxlbiA+ICh1aW50NjRfdClCTUVfTUFY
+X1RBQkxFX1NJWkUgKiBzLT5jbHVzdGVyX3NpemUgPDwNCj4gPj4+IC0gICAgICAgICAgICAgICBn
+cmFudWxhcml0eV9iaXRzKSkNCj4gPj4+ICsgICAgYml0bWFwX2J5dGVzID0gZ2V0X2JpdG1hcF9i
+eXRlc19uZWVkZWQobGVuLCBncmFudWxhcml0eSk7DQo+ID4+PiArICAgIGlmICgoYml0bWFwX2J5
+dGVzID4gKHVpbnQ2NF90KUJNRV9NQVhfUEhZU19TSVpFKSB8fA0KPiA+Pj4gKyAgICAgICAgKGJp
+dG1hcF9ieXRlcyA+ICh1aW50NjRfdClCTUVfTUFYX1RBQkxFX1NJWkUgKg0KPiA+Pj4gKyBzLT5j
+bHVzdGVyX3NpemUpKQ0KPiA+Pj4gICAgICAgIHsNCj4gPj4+ICAgICAgICAgICAgZXJyb3Jfc2V0
+ZyhlcnJwLCAiVG9vIG11Y2ggc3BhY2Ugd2lsbCBiZSBvY2N1cGllZCBieSB0aGUNCj4gPj4gYml0
+bWFwLiAiDQo+ID4+PiAgICAgICAgICAgICAgICAgICAgICAgIlVzZSBsYXJnZXIgZ3JhbnVsYXJp
+dHkiKTsNCj4gPj4+DQo+ID4+DQo+ID4+DQo+ID4+IC0tDQo+ID4+IEJlc3QgcmVnYXJkcywNCj4g
+Pj4gVmxhZGltaXINCj4gDQo+IA0KPiAtLQ0KPiBCZXN0IHJlZ2FyZHMsDQo+IFZsYWRpbWlyDQo=
 
