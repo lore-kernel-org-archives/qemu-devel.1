@@ -2,68 +2,83 @@ Return-Path: <SRS0=rFyn=Y2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E1C9CA9EC7
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 15:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AACE4CA9EC7
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 16:07:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1958421726
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 15:53:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1958421726
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 7A2E52080F
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 16:07:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A2E52080F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48726 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQvhx-0003iL-CF
-	for qemu-devel@archiver.kernel.org; Sat, 02 Nov 2019 11:52:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33080)
+	id 1iQvwC-00040X-KN
+	for qemu-devel@archiver.kernel.org; Sat, 02 Nov 2019 12:07:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iQvef-0002ok-72
- for qemu-devel@nongnu.org; Sat, 02 Nov 2019 11:49:34 -0400
+ (envelope-from <peterx@redhat.com>) id 1iQvuk-000392-IO
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 12:06:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iQved-0008Tc-Iu
- for qemu-devel@nongnu.org; Sat, 02 Nov 2019 11:49:33 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:44717)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iQved-0008Hu-4S; Sat, 02 Nov 2019 11:49:31 -0400
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1M6EOc-1iKM5E4BbM-006bzy; Sat, 02 Nov 2019 16:49:25 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] mos6522: fix T1 and T2 timers
-Date: Sat,  2 Nov 2019 16:49:19 +0100
-Message-Id: <20191102154919.17775-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <peterx@redhat.com>) id 1iQvug-00021G-EW
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 12:06:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39204)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iQvuf-0001fZ-8d
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 12:06:06 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 98AADC00162C
+ for <qemu-devel@nongnu.org>; Sat,  2 Nov 2019 16:06:00 +0000 (UTC)
+Received: by mail-wm1-f69.google.com with SMTP id k184so5180176wmk.1
+ for <qemu-devel@nongnu.org>; Sat, 02 Nov 2019 09:06:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=UX85l4bNyuN+zmJ6Zy1yw+PnsuGZRhi4PXpCTSxFSo0=;
+ b=C7d26KxgRQH3DD+SZhyshwtv0wtb67j0qui2r0d/NoLX7Zhxpkyi2YquVZdxce3Pzf
+ DKt7O0PwbQFuSjHdSVQSPqqjhHOrdz/2LxYOqEOYsZaMBjealYyqHm5aTNpjqh1nn5tU
+ 9KYFk3DDYKzOxl/8RuIaQd9GDgBrl52qaPrkCO+kcU8FSQ63e3GVu9zqI+X3qsQS1kGS
+ 1Ii1SgNuWawKI3stFCQXOH1Gm1LBy+X+hqIRpC8N18qzJaiPViGuVE9vVamZOfS5jdR4
+ szPHxffF2tMU/p4wPo7pfo97T/hlSD2FZqnVbVfbUVJj0Tuyp7G7njo3gSbtI0+zR1Fy
+ kS1g==
+X-Gm-Message-State: APjAAAVCq/YhtPTBAVXVS7W5khNzf51GoEL/DVgUr4cqTYFRPxicAPn7
+ uvHVyTHNPxvERRbUGLYeRHTIycZKasOh/42papKGgX8n++zTKmrTP++wBTLs4tpM9vzJ3N+9xH3
+ NZEj1bUlPEykGlX0=
+X-Received: by 2002:a1c:610b:: with SMTP id v11mr15203882wmb.156.1572710759324; 
+ Sat, 02 Nov 2019 09:05:59 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxP0t6ot+ZMTCgURYKUCl069ijcL60b0EgeH0yHcaLePEM7EoRypv3WJa/ydpW8t8uoRedJLw==
+X-Received: by 2002:a1c:610b:: with SMTP id v11mr15203866wmb.156.1572710759102; 
+ Sat, 02 Nov 2019 09:05:59 -0700 (PDT)
+Received: from xz-x1.metropole.lan ([213.58.148.146])
+ by smtp.gmail.com with ESMTPSA id b17sm2067953wru.36.2019.11.02.09.05.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 02 Nov 2019 09:05:57 -0700 (PDT)
+Date: Sat, 2 Nov 2019 16:05:47 +0000
+From: Peter Xu <peterx@redhat.com>
+To: Liu Yi L <yi.l.liu@intel.com>
+Subject: Re: [RFC v2 11/22] intel_iommu: process pasid cache invalidation
+Message-ID: <20191102160547.GA26023@xz-x1.metropole.lan>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-12-git-send-email-yi.l.liu@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:lxPM1oApDQFPqGw5T6navl7R8aE6FWEAe0k7kAIw7NMIqKdDgAw
- a+9Fy5nbTCniFYDT92tt1kDs8PgdaLauCypZh0s3a9aKFnpvtfTbuWB9THYs02ikgHgKK4w
- gP/p4ZlOdxEU1MTi82NMmdJGj0+Z50+9BHAWEak1qg/xhcziO2OjsrZyWvHq5z8Eg2cW6g7
- eE55gaaTf5lRmjL3z1Y3g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:CI6paQRWPNg=:DyxWbefO8UQmHSJfTUzUFX
- rHkG+X2mjQbyLRy3CQuK0nW5O4C8s53DHKvfXGqXxxsPT4iIhrXLEbMtkwTX3b/OSlUdv6Pn1
- F7t9+7hnyN8HwX03DxiTXuY5+AZgrTUeitaaXAxYqmjqnPxmFZ1csGhqmCwQOqNYW2wFN1vWb
- mk/h4zNc+X+Vk4ziALah/KnjrDnGRvnwa/TEYwcIKFC734OSqrqLraAy4DvfgVGB+Q8UGV7pa
- zH/opLPAg+jzNEhgKOybi8wv7m3BRfopxcguyMn6PViQv3RvtZmCU11M8WJ4BKuM8hlwgIKSF
- MNldFXZo03Lk5dOsQD3NA4q2uug23SHXa5CoABezBogVf+Ei+IwsAcwNhabDzBiOg18O/0CjQ
- 2RHpPw3t14vNAIO6+viwGyZP4rKEd0JAJg97j8lg4IAUs7X/GsU9SjuQoQrR8CugJrePB8APi
- XeNatJ6O+rX3lIg2lm9xaYZIRVCgNVP4Dl9bL+wIJPHEguyHWHBQJsqyaIsZruGFKdr96Iyk8
- J2wi7CQcasMdtqsB+xBpabbC3HfVfrTTmpwdPJ1jEpXlu1HKgn4PQytpA9y3tUQMsxuMVppRj
- hWHStg8/endyfy045hsayiEk4HzLdO1ZwPZIke9C7a2eohP7wuxR2VRMp7CKcT2UZulqTCiGn
- 0R8h1SDjGCvHJdcTd6IailoJlW6Cw//FyNKtoFcIiQ+vqiBoqNAHnKudFlhDqrsWMERDtXEU7
- 4psF/IkVhRVdRmyamUAfds1zFQdz8aumHXfVizasG11F3AJDsnnuxjjKiJXuTuiu+3N80cRRW
- syJi02eNkB4Clm7qOwJKwcoTjxCWj4pj9HQrS5Xc7ay1btzJyR4mzYSy98cYylJ2x+f82/L5G
- 5egpbUJzwRljpztaFQ4A==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1571920483-3382-12-git-send-email-yi.l.liu@intel.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 217.72.192.75
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,202 +90,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org,
- Laurent Vivier <laurent@vivier.eu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: tianyu.lan@intel.com, kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
+ jun.j.tian@intel.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
+ alex.williamson@redhat.com, pbonzini@redhat.com, yi.y.sun@intel.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With the Quadra 800 emulation, mos6522 timers processing can consume
-until 70% of the host CPU time with an idle guest (I guess the problem
-should also happen with PowerMac emulation).
+On Thu, Oct 24, 2019 at 08:34:32AM -0400, Liu Yi L wrote:
+> This patch adds PASID cache invalidation handling. When guest enabled
+> PASID usages (e.g. SVA), guest software should issue a proper PASID
+> cache invalidation when caching-mode is exposed. This patch only adds
+> the draft handling of pasid cache invalidation. Detailed handling will
+> be added in subsequent patches.
+> 
+> Cc: Kevin Tian <kevin.tian@intel.com>
+> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> ---
+>  hw/i386/intel_iommu.c          | 66 ++++++++++++++++++++++++++++++++++++++----
+>  hw/i386/intel_iommu_internal.h | 12 ++++++++
+>  hw/i386/trace-events           |  3 ++
+>  3 files changed, 76 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 88b843f..84ff6f0 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -2335,6 +2335,63 @@ static bool vtd_process_iotlb_desc(IntelIOMMUState *s, VTDInvDesc *inv_desc)
+>      return true;
+>  }
+>  
+> +static int vtd_pasid_cache_dsi(IntelIOMMUState *s, uint16_t domain_id)
+> +{
+> +    return 0;
+> +}
+> +
+> +static int vtd_pasid_cache_psi(IntelIOMMUState *s,
+> +                               uint16_t domain_id, uint32_t pasid)
+> +{
+> +    return 0;
+> +}
+> +
+> +static int vtd_pasid_cache_gsi(IntelIOMMUState *s)
+> +{
+> +    return 0;
+> +}
+> +
+> +static bool vtd_process_pasid_desc(IntelIOMMUState *s,
+> +                                   VTDInvDesc *inv_desc)
+> +{
+> +    uint16_t domain_id;
+> +    uint32_t pasid;
+> +    int ret = 0;
+> +
+> +    if ((inv_desc->val[0] & VTD_INV_DESC_PASIDC_RSVD_VAL0) ||
+> +        (inv_desc->val[1] & VTD_INV_DESC_PASIDC_RSVD_VAL1) ||
+> +        (inv_desc->val[2] & VTD_INV_DESC_PASIDC_RSVD_VAL2) ||
+> +        (inv_desc->val[3] & VTD_INV_DESC_PASIDC_RSVD_VAL3)) {
+> +        error_report_once("non-zero-field-in-pc_inv_desc hi: 0x%" PRIx64
+> +                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
+> +        return false;
+> +    }
+> +
+> +    domain_id = VTD_INV_DESC_PASIDC_DID(inv_desc->val[0]);
+> +    pasid = VTD_INV_DESC_PASIDC_PASID(inv_desc->val[0]);
+> +
+> +    switch (inv_desc->val[0] & VTD_INV_DESC_PASIDC_G) {
+> +    case VTD_INV_DESC_PASIDC_DSI:
+> +        ret = vtd_pasid_cache_dsi(s, domain_id);
+> +        break;
+> +
+> +    case VTD_INV_DESC_PASIDC_PASID_SI:
+> +        ret = vtd_pasid_cache_psi(s, domain_id, pasid);
+> +        break;
+> +
+> +    case VTD_INV_DESC_PASIDC_GLOBAL:
+> +        ret = vtd_pasid_cache_gsi(s);
+> +        break;
+> +
+> +    default:
+> +        error_report_once("invalid-inv-granu-in-pc_inv_desc hi: 0x%" PRIx64
+> +                  " lo: 0x%" PRIx64, inv_desc->val[1], inv_desc->val[0]);
+> +        return false;
+> +    }
+> +
+> +    return (ret == 0) ? true : false;
+> +}
+> +
+>  static bool vtd_process_inv_iec_desc(IntelIOMMUState *s,
+>                                       VTDInvDesc *inv_desc)
+>  {
+> @@ -2441,12 +2498,11 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
+>          }
+>          break;
+>  
+> -    /*
+> -     * TODO: the entity of below two cases will be implemented in future series.
+> -     * To make guest (which integrates scalable mode support patch set in
+> -     * iommu driver) work, just return true is enough so far.
+> -     */
+>      case VTD_INV_DESC_PC:
+> +        trace_vtd_inv_desc("pasid-cache", inv_desc.val[1], inv_desc.val[0]);
 
-On a recent system, it can be painless (except if you look at top), but
-on an old host like a PowerMac G5 the guest kernel can be terribly slow
-during the boot sequence (for instance, unpacking initramfs can take 15
-seconds rather than only 3 seconds).
+Could be helpful if you dump [2|3] together here...
 
-We can avoid this CPU overload by enabling QEMU internal timers only if
-the mos6522 counter interrupts are enabled. Sometime the guest kernel
-wants to read the counters values, but we don't need the timers to
-update the counters.
+> +        if (!vtd_process_pasid_desc(s, &inv_desc)) {
+> +            return false;
+> +        }
+>          break;
+>  
+>      case VTD_INV_DESC_PIOTLB:
+> diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+> index 8668771..c6cb28b 100644
+> --- a/hw/i386/intel_iommu_internal.h
+> +++ b/hw/i386/intel_iommu_internal.h
+> @@ -445,6 +445,18 @@ typedef union VTDInvDesc VTDInvDesc;
+>  #define VTD_SPTE_LPAGE_L4_RSVD_MASK(aw) \
+>          (0x880ULL | ~(VTD_HAW_MASK(aw) | VTD_SL_IGN_COM))
+>  
+> +#define VTD_INV_DESC_PASIDC_G          (3ULL << 4)
+> +#define VTD_INV_DESC_PASIDC_PASID(val) (((val) >> 32) & 0xfffffULL)
+> +#define VTD_INV_DESC_PASIDC_DID(val)   (((val) >> 16) & VTD_DOMAIN_ID_MASK)
+> +#define VTD_INV_DESC_PASIDC_RSVD_VAL0  0xfff000000000ffc0ULL
 
-With this patch applied, an idle Q800 consumes only 3% of host CPU time
-(and the guest can boot in a decent time).
+Nit: Mind to comment here that bit 9-11 is marked as zero rather than
+reserved?  This seems to work but if bit 9-11 can be non-zero in some
+other descriptors then it would be clearer to define it as
+0xfff000000000f1c0ULL then explicitly check bits 9-11.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- hw/misc/mos6522.c | 67 ++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 52 insertions(+), 15 deletions(-)
+Otherwise looks good to me.
 
-diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
-index 57f13db266..aa3bfe1afd 100644
---- a/hw/misc/mos6522.c
-+++ b/hw/misc/mos6522.c
-@@ -38,8 +38,10 @@
- 
- /* XXX: implement all timer modes */
- 
--static void mos6522_timer_update(MOS6522State *s, MOS6522Timer *ti,
--                                 int64_t current_time);
-+static void mos6522_timer1_update(MOS6522State *s, MOS6522Timer *ti,
-+                                  int64_t current_time);
-+static void mos6522_timer2_update(MOS6522State *s, MOS6522Timer *ti,
-+                                  int64_t current_time);
- 
- static void mos6522_update_irq(MOS6522State *s)
- {
-@@ -98,7 +100,11 @@ static void set_counter(MOS6522State *s, MOS6522Timer *ti, unsigned int val)
-     trace_mos6522_set_counter(1 + ti->index, val);
-     ti->load_time = get_load_time(s, ti);
-     ti->counter_value = val;
--    mos6522_timer_update(s, ti, ti->load_time);
-+    if (ti->index == 0) {
-+        mos6522_timer1_update(s, ti, ti->load_time);
-+    } else {
-+        mos6522_timer2_update(s, ti, ti->load_time);
-+    }
- }
- 
- static int64_t get_next_irq_time(MOS6522State *s, MOS6522Timer *ti,
-@@ -130,19 +136,34 @@ static int64_t get_next_irq_time(MOS6522State *s, MOS6522Timer *ti,
-     trace_mos6522_get_next_irq_time(ti->latch, d, next_time - d);
-     next_time = muldiv64(next_time, NANOSECONDS_PER_SECOND, ti->frequency) +
-                          ti->load_time;
-+
-     if (next_time <= current_time) {
-         next_time = current_time + 1;
-     }
-     return next_time;
- }
- 
--static void mos6522_timer_update(MOS6522State *s, MOS6522Timer *ti,
-+static void mos6522_timer1_update(MOS6522State *s, MOS6522Timer *ti,
-+                                 int64_t current_time)
-+{
-+    if (!ti->timer) {
-+        return;
-+    }
-+    if ((s->ier & T1_INT) == 0 || (s->acr & T1MODE) != T1MODE_CONT) {
-+        timer_del(ti->timer);
-+    } else {
-+        ti->next_irq_time = get_next_irq_time(s, ti, current_time);
-+        timer_mod(ti->timer, ti->next_irq_time);
-+    }
-+}
-+
-+static void mos6522_timer2_update(MOS6522State *s, MOS6522Timer *ti,
-                                  int64_t current_time)
- {
-     if (!ti->timer) {
-         return;
-     }
--    if (ti->index == 0 && (s->acr & T1MODE) != T1MODE_CONT) {
-+    if ((s->ier & T2_INT) == 0) {
-         timer_del(ti->timer);
-     } else {
-         ti->next_irq_time = get_next_irq_time(s, ti, current_time);
-@@ -155,7 +176,7 @@ static void mos6522_timer1(void *opaque)
-     MOS6522State *s = opaque;
-     MOS6522Timer *ti = &s->timers[0];
- 
--    mos6522_timer_update(s, ti, ti->next_irq_time);
-+    mos6522_timer1_update(s, ti, ti->next_irq_time);
-     s->ifr |= T1_INT;
-     mos6522_update_irq(s);
- }
-@@ -165,7 +186,7 @@ static void mos6522_timer2(void *opaque)
-     MOS6522State *s = opaque;
-     MOS6522Timer *ti = &s->timers[1];
- 
--    mos6522_timer_update(s, ti, ti->next_irq_time);
-+    mos6522_timer2_update(s, ti, ti->next_irq_time);
-     s->ifr |= T2_INT;
-     mos6522_update_irq(s);
- }
-@@ -204,7 +225,16 @@ uint64_t mos6522_read(void *opaque, hwaddr addr, unsigned size)
- {
-     MOS6522State *s = opaque;
-     uint32_t val;
-+    int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
- 
-+    if (now >= s->timers[0].next_irq_time) {
-+        mos6522_timer1_update(s, &s->timers[0], now);
-+        s->ifr |= T1_INT;
-+    }
-+    if (now >= s->timers[1].next_irq_time) {
-+        mos6522_timer2_update(s, &s->timers[1], now);
-+        s->ifr |= T2_INT;
-+    }
-     switch (addr) {
-     case VIA_REG_B:
-         val = s->b;
-@@ -299,8 +329,8 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-         break;
-     case VIA_REG_T1CL:
-         s->timers[0].latch = (s->timers[0].latch & 0xff00) | val;
--        mos6522_timer_update(s, &s->timers[0],
--                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-+        mos6522_timer1_update(s, &s->timers[0],
-+                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-         break;
-     case VIA_REG_T1CH:
-         s->timers[0].latch = (s->timers[0].latch & 0xff) | (val << 8);
-@@ -309,14 +339,14 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-         break;
-     case VIA_REG_T1LL:
-         s->timers[0].latch = (s->timers[0].latch & 0xff00) | val;
--        mos6522_timer_update(s, &s->timers[0],
--                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-+        mos6522_timer1_update(s, &s->timers[0],
-+                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-         break;
-     case VIA_REG_T1LH:
-         s->timers[0].latch = (s->timers[0].latch & 0xff) | (val << 8);
-         s->ifr &= ~T1_INT;
--        mos6522_timer_update(s, &s->timers[0],
--                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-+        mos6522_timer1_update(s, &s->timers[0],
-+                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-         break;
-     case VIA_REG_T2CL:
-         s->timers[1].latch = (s->timers[1].latch & 0xff00) | val;
-@@ -334,8 +364,8 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-         break;
-     case VIA_REG_ACR:
-         s->acr = val;
--        mos6522_timer_update(s, &s->timers[0],
--                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-+        mos6522_timer1_update(s, &s->timers[0],
-+                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-         break;
-     case VIA_REG_PCR:
-         s->pcr = val;
-@@ -354,6 +384,11 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
-             s->ier &= ~val;
-         }
-         mos6522_update_irq(s);
-+        /* if IER is modified starts needed timers */
-+        mos6522_timer1_update(s, &s->timers[0],
-+                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-+        mos6522_timer2_update(s, &s->timers[1],
-+                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-         break;
-     default:
-     case VIA_REG_ANH:
-@@ -426,9 +461,11 @@ static void mos6522_reset(DeviceState *dev)
-     s->timers[0].frequency = s->frequency;
-     s->timers[0].latch = 0xffff;
-     set_counter(s, &s->timers[0], 0xffff);
-+    timer_del(s->timers[0].timer);
- 
-     s->timers[1].frequency = s->frequency;
-     s->timers[1].latch = 0xffff;
-+    timer_del(s->timers[1].timer);
- }
- 
- static void mos6522_init(Object *obj)
+> +#define VTD_INV_DESC_PASIDC_RSVD_VAL1  0xffffffffffffffffULL
+> +#define VTD_INV_DESC_PASIDC_RSVD_VAL2  0xffffffffffffffffULL
+> +#define VTD_INV_DESC_PASIDC_RSVD_VAL3  0xffffffffffffffffULL
+> +
+> +#define VTD_INV_DESC_PASIDC_DSI        (0ULL << 4)
+> +#define VTD_INV_DESC_PASIDC_PASID_SI   (1ULL << 4)
+> +#define VTD_INV_DESC_PASIDC_GLOBAL     (3ULL << 4)
+> +
+>  /* Information about page-selective IOTLB invalidate */
+>  struct VTDIOTLBPageInvInfo {
+>      uint16_t domain_id;
+> diff --git a/hw/i386/trace-events b/hw/i386/trace-events
+> index 43c0314..6da8bd2 100644
+> --- a/hw/i386/trace-events
+> +++ b/hw/i386/trace-events
+> @@ -22,6 +22,9 @@ vtd_inv_qi_head(uint16_t head) "read head %d"
+>  vtd_inv_qi_tail(uint16_t head) "write tail %d"
+>  vtd_inv_qi_fetch(void) ""
+>  vtd_context_cache_reset(void) ""
+> +vtd_pasid_cache_gsi(void) ""
+> +vtd_pasid_cache_dsi(uint16_t domain) "Domian slective PC invalidation domain 0x%"PRIx16
+> +vtd_pasid_cache_psi(uint16_t domain, uint32_t pasid) "PASID slective PC invalidation domain 0x%"PRIx16" pasid 0x%"PRIx32
+>  vtd_re_not_present(uint8_t bus) "Root entry bus %"PRIu8" not present"
+>  vtd_ce_not_present(uint8_t bus, uint8_t devfn) "Context entry bus %"PRIu8" devfn %"PRIu8" not present"
+>  vtd_iotlb_page_hit(uint16_t sid, uint64_t addr, uint64_t slpte, uint16_t domain) "IOTLB page hit sid 0x%"PRIx16" iova 0x%"PRIx64" slpte 0x%"PRIx64" domain 0x%"PRIx16
+> -- 
+> 2.7.4
+> 
+
 -- 
-2.21.0
-
+Peter Xu
 
