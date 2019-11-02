@@ -2,118 +2,88 @@ Return-Path: <SRS0=rFyn=Y2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79BA2CA9EC7
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 19:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A998CA9EC7
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 20:29:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FA5B2080F
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 19:59:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FA5B2080F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 6B0D520862
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 20:29:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0D520862
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQzYW-0006EQ-I5
-	for qemu-devel@archiver.kernel.org; Sat, 02 Nov 2019 15:59:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36914)
+	id 1iR01s-0003Pn-L2
+	for qemu-devel@archiver.kernel.org; Sat, 02 Nov 2019 16:29:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iQzXm-0005pn-U6
- for qemu-devel@nongnu.org; Sat, 02 Nov 2019 15:58:43 -0400
+ (envelope-from <philmd@redhat.com>) id 1iR01C-0002yT-0p
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 16:29:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iQzXl-0006Qe-PC
- for qemu-devel@nongnu.org; Sat, 02 Nov 2019 15:58:42 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:56393)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iQzXl-0006P2-FA
- for qemu-devel@nongnu.org; Sat, 02 Nov 2019 15:58:41 -0400
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MIMT4-1iChnE37g4-00EIyg; Sat, 02 Nov 2019 20:58:36 +0100
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191102171511.31881-1-laurent@vivier.eu>
- <20191102171511.31881-3-laurent@vivier.eu>
- <b9f724f7-1bd9-3283-ab20-0038ab278251@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH 2/3] dp8393x: fix dp8393x_receive()
-Message-ID: <ffcb2ea1-3adc-d65f-c707-6b75278d7fec@vivier.eu>
-Date: Sat, 2 Nov 2019 20:58:35 +0100
+ (envelope-from <philmd@redhat.com>) id 1iR019-0002JE-4m
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 16:29:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58228)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iR018-0002E5-SJ
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 16:29:03 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 34CA1C04B940
+ for <qemu-devel@nongnu.org>; Sat,  2 Nov 2019 20:29:01 +0000 (UTC)
+Received: by mail-wr1-f70.google.com with SMTP id u2so1659461wrm.7
+ for <qemu-devel@nongnu.org>; Sat, 02 Nov 2019 13:29:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ItK3NlHdDOhpQQoTTtmXss3y8n28Xy31XU2k9uhJK3Q=;
+ b=OWJ4P5h4NGEFsjB7LJPR/tKGbKwdYTpFsn80imPa1pRLCeH/oPEitcwdFP/Ss2vtbl
+ ooUbMHuz4mQySiUQ5dFbsHYypiettyzb+nxFcghSaFIXExinjbJJiUspdsXLcwAV1LB0
+ 1AQOSr1S2VpsCZsuweMDXcKzPhqxoFUCjD1E0SIJxktAjxLbpMMC0MbxzMeH2zSgTD2L
+ l4+wSK98JJE498D3qTj3wvbc7bqLvhyq7tINBKCfGqB7pHMjd4L+2sHpvfLWSMpHF+gq
+ RvNTvrN4N1zGD0w8wrRfd39uzSeagW/1lcghKIZP7VQLFXEs49ATUJktdFu7QGB+nsLo
+ CGdA==
+X-Gm-Message-State: APjAAAX6FXtaIgOzsGyive7U129kV7TtEI0X9ex7Vq4UDot+G4ZR8+12
+ kV66mHIGX0TCVCSOUOc09iIPGwQIw4Qgf6g1csHlHRslRv5rqg/hd1pxZty9wEmJRL6thCGABsi
+ ZPdMND+OPcN9dt9U=
+X-Received: by 2002:adf:eec9:: with SMTP id a9mr15833784wrp.8.1572726539926;
+ Sat, 02 Nov 2019 13:28:59 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxyk/j35m9fGizIDuOIU/oUEdaw7vghEwWpnjvtRXxq8fIRuDKevjaIvCzEfP79/ujN3kVkEQ==
+X-Received: by 2002:adf:eec9:: with SMTP id a9mr15833769wrp.8.1572726539657;
+ Sat, 02 Nov 2019 13:28:59 -0700 (PDT)
+Received: from [10.34.4.205] ([109.190.253.11])
+ by smtp.gmail.com with ESMTPSA id r5sm10952863wrl.86.2019.11.02.13.28.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 02 Nov 2019 13:28:58 -0700 (PDT)
+Subject: Re: [PULL 00/20] hw/i386/pc: Split PIIX3 southbridge from i440FX
+ northbridge
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20191028163447.18541-1-philmd@redhat.com>
+ <CAFEAcA-9wQMzJN+ZeWDE8k1E9uwUw3NHNJuR2H_hHRNeX1Lf8Q@mail.gmail.com>
+ <ff388170-7ee8-39f2-359b-246571e720a5@redhat.com>
+Message-ID: <78fb8474-5e89-b05e-315b-32b587ca4353@redhat.com>
+Date: Sat, 2 Nov 2019 21:28:56 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <b9f724f7-1bd9-3283-ab20-0038ab278251@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <ff388170-7ee8-39f2-359b-246571e720a5@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:TKxSg8MKidv6pkX6FUqG8qyynbdMChkWG99FPWx75h/zzKdB0vs
- G/26kPDtJoZk073FqHdU6GCxFWQCPORER8HgtuHJXIcXUVc3Go40jp/R0oxmmiRukDKvft+
- VMk1PKjo+e4EnmFkaNjqOk7PIlXhK83Tj/YfH9lFRDEnT80J+maz3aCkNRCjsOTON2eiFS3
- X2NUK75FlTZ9SH6hjtveA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:r5tNS9nvxR8=:tpmaVE3bHTF5HlRcr4t/8p
- qrgnOlWKzqcqWO+enVzU2DoItr5Mu5809S2GYgCdT1DRxBk3pjseuiCRZTBojRs0aRmLhtyFX
- sUANzyElVHlT+HB8UpJCMbzOwWMBj6V90kdg/pAw3nswDoEZFh57d3A+OA/WScKHIFWCfBSy3
- +Afn9XhttSSPfYXk/12eXccIXoWJG9b1cp5eQK22genEa18/0vSMN+Hq+Lu67KlQzrluWA3/H
- ByA3sXDslPTEjWPh6ej51Z55G0zdC4w4dKzJUD3eMluGHdNN0AheXliQKH626tyObAx6vpjun
- 2ADaUse4uKSuieStwsYafctnopELv41sG6Pb1e/L5oiM8OVpUtH/iulrsC7opnKXcIOD8eSvF
- igaEb4UhXPeiiL8HW+4j3S4HxdbHVZpfPlnanMWY58xH3nFSW8tsbKSY2xkndb/Oc/xpgsGNZ
- DzkgPv1aXF3VmvleX/zhOqnqWSk4ySKi738KZE3NOFbXFF0wZTJpKJbCGT4L+5dzai8ee1Eef
- p72Klt0hf4YV+Qa08/W9MfPID0B5dq0Rns7hHsT+1/VpG5FTf1Xce9UTdJhJ9cWnlbOYjH5jX
- LtT7D+JeMLVDk/rEvVfi00nSJHRAYYjGFNxfIEhFaAqwBfwo9XmdpbnSSjiDbTcC0Mx/5lhVh
- oArdhWDt0I/3FvtWAz+tsggv9vOGfGem09+u7r1mL3M5x5pp66h8GGkXTwL1uU9O4v2upwivJ
- oUO0SnGU8OaeCMpuFp+yps3tfnwUhiwkSvyluzOCCrB9M6EV4nB5nrYYN3l8kUJoRSgm8J+dn
- J82rpyN6PsdfDJWczOuQxBLl97AXB/93ck9zggk/F7BsA+klrtBYEzquGOwLBC44N9ogZmbo7
- DgW+s0xn3y0vAHDsom+Zi1B3/m88YLobfxl1QwMzM=
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 217.72.192.73
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,68 +95,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
+Cc: Aleksandar Markovic <amarkovic@wavecomp.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 02/11/2019 à 20:41, Philippe Mathieu-Daudé a écrit :
-> On 11/2/19 6:15 PM, Laurent Vivier wrote:
->> address_space_rw() access size must be multiplied by the width.
+Hi Paolo,
+
+On 10/30/19 10:44 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Peter, Paolo,
+>=20
+> On 10/30/19 7:15 AM, Peter Maydell wrote:
+>> On Mon, 28 Oct 2019 at 17:48, Philippe Mathieu-Daud=C3=A9=20
+>> <philmd@redhat.com> wrote:
+>>>
+>>> ----------------------------------------------------------------
+>>> The i440FX northbridge is only used by the PC machine, while the
+>>> PIIX southbridge is also used by the Malta MIPS machine.
+>>>
+>>> Split the PIIX3 southbridge from i440FX northbridge.
+>>>
+>>> ----------------------------------------------------------------
 >>
->> This fixes DHCP for Q800 guest.
->>
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>   hw/net/dp8393x.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
->> index 85d3f3788e..b8c4473f99 100644
->> --- a/hw/net/dp8393x.c
->> +++ b/hw/net/dp8393x.c
->> @@ -833,7 +833,7 @@ static ssize_t dp8393x_receive(NetClientState *nc,
->> const uint8_t * buf,
->>       } else {
->>           dp8393x_put(s, width, 0, 0); /* in_use */
->>           address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t)
->> * 6 * width,
->> -            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data,
->> sizeof(uint16_t), 1);
->> +            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 1);
-> 
-> Which is following:
-> 
->     if (s->regs[SONIC_LLFA] & 0x1) {
->         size = sizeof(uint16_t) * 1 * width;
+>> I get a link failure on my 'do a make clean and then make' build :
+>> =C2=A0=C2=A0 LINK=C2=A0=C2=A0=C2=A0 i386-softmmu/qemu-system-i386
+>> hw/i386/pc_piix.o: In function `pc_init1':
+>> /home/petmay01/linaro/qemu-for-merges/hw/i386/pc_piix.c:197: undefined
+>> reference to `i440fx_init'
+>> /home/petmay01/linaro/qemu-for-merges/hw/i386/pc_piix.c:206: undefined
+>> reference to `piix3_create'
+>> collect2: error: ld returned 1 exit status
+>=20
+> This is odd, default-configs/i386-softmmu.mak selects CONFIG_I440FX,=20
+> I440FX selects PCI_I440FX, and the Makefile.objs has:
+> common-obj-$(CONFIG_PCI_I440FX) +=3D i440fx.o
+>=20
+> The change is in patch "hw/pci-host: Rename incorrectly named 'piix' as=
+=20
+> 'i440fx'" which is a simple rename:
+>=20
+> -- >8 --
+> diff --git a/hw/i386/Kconfig b/hw/i386/Kconfig
+> index d420b35548..5a494342ea 100644
+> --- a/hw/i386/Kconfig
+> +++ b/hw/i386/Kconfig
+> @@ -60,7 +60,7 @@ config I440FX
+>  =C2=A0=C2=A0=C2=A0=C2=A0 select PC_PCI
+>  =C2=A0=C2=A0=C2=A0=C2=A0 select PC_ACPI
+>  =C2=A0=C2=A0=C2=A0=C2=A0 select ACPI_SMBUS
+> -=C2=A0=C2=A0=C2=A0 select PCI_PIIX
+> +=C2=A0=C2=A0=C2=A0 select PCI_I440FX
+>  =C2=A0=C2=A0=C2=A0=C2=A0 select PIIX3
+>  =C2=A0=C2=A0=C2=A0=C2=A0 select IDE_PIIX
+>  =C2=A0=C2=A0=C2=A0=C2=A0 select DIMM
+> diff --git a/hw/pci-host/Kconfig b/hw/pci-host/Kconfig
+> index 397043b289..b0aa8351c4 100644
+> --- a/hw/pci-host/Kconfig
+> +++ b/hw/pci-host/Kconfig
+> @@ -28,7 +28,7 @@ config PCI_SABRE
+>  =C2=A0=C2=A0=C2=A0=C2=A0 select PCI
+>  =C2=A0=C2=A0=C2=A0=C2=A0 bool
+>=20
+> -config PCI_PIIX
+> +config PCI_I440FX
+>  =C2=A0=C2=A0=C2=A0=C2=A0 bool
+>  =C2=A0=C2=A0=C2=A0=C2=A0 select PCI
+>  =C2=A0=C2=A0=C2=A0=C2=A0 select PAM
+> diff --git a/hw/pci-host/Makefile.objs b/hw/pci-host/Makefile.objs
+> index a9cd3e022d..efd752b766 100644
+> --- a/hw/pci-host/Makefile.objs
+> +++ b/hw/pci-host/Makefile.objs
+> @@ -13,7 +13,7 @@ common-obj-$(CONFIG_VERSATILE_PCI) +=3D versatile.o
+>=20
+>  =C2=A0common-obj-$(CONFIG_PCI_SABRE) +=3D sabre.o
+>  =C2=A0common-obj-$(CONFIG_FULONG) +=3D bonito.o
+> -common-obj-$(CONFIG_PCI_PIIX) +=3D piix.o
+> +common-obj-$(CONFIG_PCI_I440FX) +=3D i440fx.o
+>  =C2=A0common-obj-$(CONFIG_PCI_EXPRESS_Q35) +=3D q35.o
+>  =C2=A0common-obj-$(CONFIG_PCI_EXPRESS_GENERIC_BRIDGE) +=3D gpex.o
+>  =C2=A0common-obj-$(CONFIG_PCI_EXPRESS_XILINX) +=3D xilinx-pcie.o
+> diff --git a/hw/pci-host/piix.c b/hw/pci-host/i440fx.c
+> similarity index 100%
+> rename from hw/pci-host/piix.c
+> rename to hw/pci-host/i440fx.c
+> ---
+>=20
+> I could reproduce and hw/pci-host/ doesn't contains neither piix.o nor=20
+> i440fx.o.
+>=20
+> $ fgrep -ri i440fx i386-softmmu/
+> i386-softmmu/config-devices.h-timestamp:#define CONFIG_I440FX 1
+> i386-softmmu/config-devices.mak.old:CONFIG_I440FX=3Dy
+> Binary file i386-softmmu/hw/i386/pc_piix.o matches
+> i386-softmmu/hw/i386/pc_piix.d:=20
+> /home/phil/source/qemu/include/hw/pci-host/i440fx.h \
+> i386-softmmu/hw/i386/pc_piix.d:/home/phil/source/qemu/include/hw/pci-ho=
+st/i440fx.h:=20
+>=20
+> Binary file i386-softmmu/hw/i386/acpi-build.o matches
+> Binary file i386-softmmu/hw/i386/pc.o matches
+> i386-softmmu/config-devices.mak:CONFIG_I440FX=3Dy
+> i386-softmmu/config-devices.h:#define CONFIG_I440FX 1
+>=20
+> So CONFIG_I440FX is here, but no CONFIG_PCI_I440FX...
+>=20
+> $ fgrep -r PIIX i386-softmmu/
+> i386-softmmu/config-devices.h-timestamp:#define CONFIG_IDE_PIIX 1
+> i386-softmmu/config-devices.h-timestamp:#define CONFIG_PCI_PIIX 1
+> i386-softmmu/config-devices.mak.old:CONFIG_IDE_PIIX=3Dy
+> i386-softmmu/config-devices.mak.old:CONFIG_PCI_PIIX=3Dy
+> Binary file i386-softmmu/hw/i386/pc_piix.o matches
+> Binary file i386-softmmu/hw/i386/acpi-build.o matches
+> Binary file i386-softmmu/hw/i386/pc.o matches
+> i386-softmmu/config-devices.mak:CONFIG_IDE_PIIX=3Dy
+> i386-softmmu/config-devices.mak:CONFIG_PCI_PIIX=3Dy
+> i386-softmmu/config-devices.h:#define CONFIG_IDE_PIIX 1
+> i386-softmmu/config-devices.h:#define CONFIG_PCI_PIIX 1
+>=20
+> And the old CONFIG_PCI_PIIX is still there :(
+>=20
+> Paolo, is some kconfig dependency missing?
 
-but we have "size = sizeof(uint16_t) * width;" later.
+docs/devel/build-system.txt is misleading:
 
-This file needs cleanup...
+   - $TARGET-NAME/config-devices.mak
 
-> So OK (you describe 'width' but use 'size').
->
+   TARGET-NAME is again the name of a system or userspace emulator. The
+   config-devices.mak file is automatically generated by make using the
+   scripts/make_device_config.sh program, feeding it the
+   default-configs/$TARGET-NAME file as input.
 
-I meant the access size "sizeof(uint16_t)" must be adjusted by the width
-of the bus (defined by (s->regs[SONIC_DCR] & SONIC_DCR_DW). [1]
+But this script has been removed in e0e312f3525:
 
-And this is exactly what contains "size".
+   build: switch to Kconfig
 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
+   The make_device_config.sh script is replaced by minikconf, which
+   is modified to support the same command line as its predecessor.
 
-Thanks,
-Laurent
+Anyway, back to my problem. We modified hw/i386/Kconfig and=20
+hw/pci-host/Kconfig. i386-softmmu/config-devices.mak hasn't been rebuilt.
 
-[1] DP83932C-20/25/33 MHz SONIC (tm) Systems-Oriented Network Interface
-Controller
+Here is the make rule matching i386-softmmu/config-devices.mak:
 
-"1.3 DATA WIDTH AND BYTE ORDERING
+$(SUBDIR_DEVICES_MAK): %/config-devices.mak: default-configs/%.mak=20
+$(MINIKCONF_INPUTS) $(BUILD_DIR)/config-host.mak
+	$(call quiet-command, $(MINIKCONF) $(MINIKCONF_ARGS) > $@.tmp, "GEN",=20
+"$@.tmp")
 
-The SONIC can be programmed to operate with either
-32-bit or 16-bit wide memory. The data width is configured
-during initialization by programming the DW bit in the Data
-Configuration Register (DCR, Section 4.3.2). If the 16-bit
-data path is selected, data is driven on pins D15– D0."
+With:
+
+MINIKCONF_INPUTS =3D $(SRC_PATH)/Kconfig.host $(SRC_PATH)/hw/Kconfig
+
+So hw/{i386,pci-host}/Kconfig aren't matched and doesn't trigger the=20
+regeneration of i386-softmmu/config-devices.mak.
+
+I'm not sure how to properly fix this.
+
+Also, is the backslash useful at the end of this line in Makefile?
+
+MINIKCONF =3D $(PYTHON) $(SRC_PATH)/scripts/minikconf.py \
+
+
+Regards,
+
+Phil.
 
