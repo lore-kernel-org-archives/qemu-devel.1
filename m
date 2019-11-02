@@ -2,93 +2,86 @@ Return-Path: <SRS0=rFyn=Y2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE56CA9EC7
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 07:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F05BCA9EC7
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 07:42:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF5222085B
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 07:36:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF5222085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id D707A2085B
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 07:42:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tlBS/4+R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D707A2085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQnxE-0002Bd-3u
-	for qemu-devel@archiver.kernel.org; Sat, 02 Nov 2019 03:36:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45079)
+	id 1iQo3f-0004dG-2j
+	for qemu-devel@archiver.kernel.org; Sat, 02 Nov 2019 03:42:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45980)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kevin.tian@intel.com>) id 1iQnwY-0001fZ-EY
- for qemu-devel@nongnu.org; Sat, 02 Nov 2019 03:35:31 -0400
+ (envelope-from <jordipujolp@gmail.com>) id 1iQo2x-00041p-DB
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 03:42:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kevin.tian@intel.com>) id 1iQnwW-0006K5-Gv
- for qemu-devel@nongnu.org; Sat, 02 Nov 2019 03:35:29 -0400
-Received: from mga05.intel.com ([192.55.52.43]:40417)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
- id 1iQnwW-0006Hc-9Z
- for qemu-devel@nongnu.org; Sat, 02 Nov 2019 03:35:28 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 02 Nov 2019 00:35:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,258,1569308400"; d="scan'208";a="204080629"
-Received: from fmsmsx105.amr.corp.intel.com ([10.18.124.203])
- by orsmga003.jf.intel.com with ESMTP; 02 Nov 2019 00:35:23 -0700
-Received: from fmsmsx153.amr.corp.intel.com (10.18.125.6) by
- FMSMSX105.amr.corp.intel.com (10.18.124.203) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sat, 2 Nov 2019 00:35:23 -0700
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- FMSMSX153.amr.corp.intel.com (10.18.125.6) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Sat, 2 Nov 2019 00:35:22 -0700
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.41]) with mapi id 14.03.0439.000;
- Sat, 2 Nov 2019 15:35:21 +0800
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Jason Wang <jasowang@redhat.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com"
- <mst@redhat.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "peterx@redhat.com" <peterx@redhat.com>
-Subject: RE: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to VM
-Thread-Topic: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing
- to VM
-Thread-Index: AQHVimskKWib+KQlOUaXXMOVBk8bu6dql/6AgACL3iCACInPAIAAoJWAgAEjFoCAAIoK8P//f5WAgAABiYCAAg37kA==
-Date: Sat, 2 Nov 2019 07:35:19 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D5E2309@SHSMSX104.ccr.corp.intel.com>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <367adad0-eb05-c950-21d7-755fffacbed6@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D5D0619@SHSMSX104.ccr.corp.intel.com>
- <fa994379-a847-0ffe-5043-40a2aefecf43@redhat.com>
- <A2975661238FB949B60364EF0F2C25743A0EACA6@SHSMSX104.ccr.corp.intel.com>
- <960389b5-2ef4-8921-fc28-67c9a6398c43@redhat.com>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D5E17C7@SHSMSX104.ccr.corp.intel.com>
- <18534f1b-3488-994b-73e2-17e7d8ccb4c2@redhat.com>
- <4fae7d47-93c6-1278-b55e-ec06fa3ca7f1@redhat.com>
-In-Reply-To: <4fae7d47-93c6-1278-b55e-ec06fa3ca7f1@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTk1MDM1NTItOTQ0Yi00NGQxLTk1NWItMWY3NmRkMTQxNjVhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiYkJLM1ZGZmxDSE9ISDZuXC9SVXFPelc4azh4UnhYU3p2NWRmcld2K1hKZkdmZkdBNlEzaXFuSEF1eXJSRHhvbjEifQ==
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <jordipujolp@gmail.com>) id 1iQo2w-0005kk-24
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 03:42:07 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37305)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <jordipujolp@gmail.com>)
+ id 1iQo2v-0005gX-TI
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 03:42:06 -0400
+Received: by mail-ot1-x343.google.com with SMTP id 53so10324655otv.4
+ for <qemu-devel@nongnu.org>; Sat, 02 Nov 2019 00:42:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=2K/fgGrJ0Fhq68Jt1YEEuMez7LDse87vl9AIAx7ova8=;
+ b=tlBS/4+RndWIoLxMzpd6cbUTWsHK1pgzyrZs6OKS0BOaVu8Y4hIXwgun4AxLciJ7an
+ ao3q1TvaKcN9tRYFI8PAOdKuN0CYLGnNR07pOL+ZIz+fuTVP4mYlPohmwOb9G4Y2n92j
+ RK0Z83As0RwID5Nog3twt/BprAj+wKVYe4zPG3zbJEXoH7Z3kEM68eau+gz7xHJivvzU
+ QKq8uP5KY6C+FFQyIsEF9xp191iXfdKKEoKEC5oTbIQqhGxZB7nvQlmyM/eEHCDKcBWA
+ sbOkSMLjaCkSYjt2aFyq50XV6CNGeDLJvpmxko6B0ar1JnpFM6aL6sZyueKi7RwJYtCh
+ rvDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2K/fgGrJ0Fhq68Jt1YEEuMez7LDse87vl9AIAx7ova8=;
+ b=Ob1DO2112o6Mf/bf9ux1aS4iMDNgTBFyu7V6DweJZE4Ih7OJmEwHkC1PqL81X+bCnc
+ 5KEUulbCwsPYgUKAwLrH2QnUBXbQMmQTm0w5PfH+/ZQydeIBIJkNU5hVg5VytLzfhKtb
+ yd93pG1CfMlNQuYSVwyT6OWmiR19vn/3a8KfJ1SMBmtXJTYxHaSirGBu7wXtupb8FiOq
+ FqVzLTOniSYBa8HO8BCzx0ncGxkCScWyu4nUdmi26KXvgKuMDk0Hr8isMsS0AiDhpTo8
+ xoeU/8zDrm2ePeEqYqVguhzie2qMHbfKYZ1Ru9VqKTXI5X2sEchQbkFdebeLz1kZAURL
+ GPbA==
+X-Gm-Message-State: APjAAAWDp/+mfLMXZL1t5zH5hrXKuQrpoH1I+2M8uy5rnnhxTit72NuH
+ v0AlH2NAA+jyNJylDy+wgcGEt27Yot9lljZdnMU=
+X-Google-Smtp-Source: APXvYqzV0wA7IleFYZ70GLOKIeV+c/nPg8eRHvIxaK21q8daq22knZgGYYUGC+QVnf18wfbKBi/G5PdSaT14hQGUAqQ=
+X-Received: by 2002:a05:6830:1e53:: with SMTP id
+ e19mr4109554otj.161.1572680524001; 
+ Sat, 02 Nov 2019 00:42:04 -0700 (PDT)
 MIME-Version: 1.0
+References: <CACTE=gpFbUSxXeTwu6_tzSeoh_9Yp905aMdzCPCUz3h7kcgeyw@mail.gmail.com>
+ <144c1b0a-5cd4-b657-025b-f44d5e812e06@vivier.eu>
+ <CACTE=goN=Nw8b5RN8sWhX9mRNWEU0fhuc=HnD3MJW59BET=hkA@mail.gmail.com>
+ <20191031161547.pipit5hxzjnf6jmt@function>
+ <CACTE=godCrD7GiPbOnds3uRgrVhrZYBY+Ojsa85EVd31pd6h1A@mail.gmail.com>
+ <20191101145437.tr4gervnn2m5qvci@function>
+In-Reply-To: <20191101145437.tr4gervnn2m5qvci@function>
+From: Jordi Pujol <jordipujolp@gmail.com>
+Date: Sat, 2 Nov 2019 08:41:52 +0100
+Message-ID: <CACTE=grkUZErGiW4=USWPS=Q4kpo1C8QupucnnS8ry3Z00DumQ@mail.gmail.com>
+Subject: Re: [PATCH v4] smb daemon get additional command line parameters from
+ env variable
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.43
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,66 +93,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "tianyu.lan@intel.com" <tianyu.lan@intel.com>,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Tian,
- Jun J" <jun.j.tian@intel.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "Sun, Yi Y" <yi.y.sun@intel.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, Jason Wang <jasowang@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>,
+ qemu-devel qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86amFzb3dhbmdAcmVkaGF0LmNvbV0NCj4gU2VudDog
-RnJpZGF5LCBOb3ZlbWJlciAxLCAyMDE5IDQ6MTAgUE0NCj4gDQo+IA0KPiBPbiAyMDE5LzExLzEg
-5LiL5Y2INDowNCwgSmFzb24gV2FuZyB3cm90ZToNCj4gPg0KPiA+IE9uIDIwMTkvMTEvMSDkuIvl
-jYgzOjQ2LCBUaWFuLCBLZXZpbiB3cm90ZToNCj4gPj4+IEZyb206IEphc29uIFdhbmcgW21haWx0
-bzpqYXNvd2FuZ0ByZWRoYXQuY29tXQ0KPiA+Pj4gU2VudDogRnJpZGF5LCBOb3ZlbWJlciAxLCAy
-MDE5IDM6MzAgUE0NCj4gPj4+DQo+ID4+Pg0KPiA+Pj4gT24gMjAxOS8xMC8zMSDkuIvljYgxMDow
-NywgTGl1LCBZaSBMIHdyb3RlOg0KPiA+Pj4+PiBGcm9tOiBKYXNvbiBXYW5nIFttYWlsdG86amFz
-b3dhbmdAcmVkaGF0LmNvbV0NCj4gPj4+Pj4gU2VudDogVGh1cnNkYXksIE9jdG9iZXIgMzEsIDIw
-MTkgNTozMyBBTQ0KPiA+Pj4+PiBTdWJqZWN0OiBSZTogW1JGQyB2MiAwMC8yMl0gaW50ZWxfaW9t
-bXU6IGV4cG9zZSBTaGFyZWQgVmlydHVhbA0KPiA+Pj4gQWRkcmVzc2luZyB0byBWTQ0KPiA+Pj4+
-Pg0KPiA+Pj4+PiBPbiAyMDE5LzEwLzI1IOS4i+WNiDY6MTIsIFRpYW4sIEtldmluIHdyb3RlOg0K
-PiA+Pj4+Pj4+IEZyb206IEphc29uIFdhbmcgW21haWx0bzpqYXNvd2FuZ0ByZWRoYXQuY29tXQ0K
-PiA+Pj4+Pj4+IFNlbnQ6IEZyaWRheSwgT2N0b2JlciAyNSwgMjAxOSA1OjQ5IFBNDQo+ID4+Pj4+
-Pj4NCj4gPj4+Pj4+Pg0KPiA+Pj4+Pj4+IE9uIDIwMTkvMTAvMjQg5LiL5Y2IODozNCwgTGl1IFlp
-IEwgd3JvdGU6DQo+ID4+Pj4+Pj4+IFNoYXJlZCB2aXJ0dWFsIGFkZHJlc3MgKFNWQSksIGEuay5h
-LCBTaGFyZWQgdmlydHVhbCBtZW1vcnkNCj4gPj4+Pj4+Pj4gKFNWTSkgb24NCj4gPj4+Pj4+Pj4g
-SW50ZWwgcGxhdGZvcm1zIGFsbG93IGFkZHJlc3Mgc3BhY2Ugc2hhcmluZyBiZXR3ZWVuIGRldmlj
-ZSBETUENCj4gPj4+IGFuZA0KPiA+Pj4+Pj4+IGFwcGxpY2F0aW9ucy4NCj4gPj4+Pj4+Pg0KPiA+
-Pj4+Pj4+DQo+ID4+Pj4+Pj4gSW50ZXJlc3RpbmcsIHNvIHRoZSBiZWxvdyBmaWd1cmUgZGVtb25z
-dHJhdGVzIHRoZSBjYXNlIG9mIFZNLiBJDQo+ID4+Pj4+Pj4gd29uZGVyIGhvdyBtdWNoIGRpZmZl
-cmVuY2VzIGlmIHdlIGNvbXBhcmUgaXQgd2l0aCBkb2luZyBTVk0NCj4gPj4+IGJldHdlZW4NCj4g
-Pj4+Pj4+PiBkZXZpY2UgYW5kIGFuIG9yZGluYXJ5IHByb2Nlc3MgKGUuZyBkcGRrKT8NCj4gPj4+
-Pj4+Pg0KPiA+Pj4+Pj4+IFRoYW5rcw0KPiA+Pj4+Pj4gT25lIGRpZmZlcmVuY2UgaXMgdGhhdCBv
-cmRpbmFyeSBwcm9jZXNzIHJlcXVpcmVzIG9ubHkgc3RhZ2UtMQ0KPiA+Pj4+Pj4gdHJhbnNsYXRp
-b24sIHdoaWxlIFZNIHJlcXVpcmVzIG5lc3RlZCB0cmFuc2xhdGlvbi4NCj4gPj4+Pj4gQSBzaWxs
-eSBxdWVzdGlvbiwgdGhlbiBJIGJlbGlldmUgdGhlcmUncyBubyBuZWVkIGZvciBWRklPIERNQSBB
-UEkNCj4gPj4+Pj4gaW4gdGhpcw0KPiA+Pj4gY2FzZSBjb25zaWRlcg0KPiA+Pj4+PiB0aGUgcGFn
-ZSB0YWJsZSBpcyBzaGFyZWQgYmV0d2VlbiBNTVUgYW5kIElPTU1VPw0KPiA+Pj4+IEVjaG8gS2V2
-aW4ncyByZXBseS4gV2UgdXNlIG5lc3RlZCB0cmFuc2xhdGlvbiBoZXJlLiBGb3Igc3RhZ2UtMSwN
-Cj4gPj4+PiB5ZXMsIG5vDQo+ID4+PiBuZWVkIHRvIHVzZQ0KPiA+Pj4+IFZGSU8gRE1BIEFQSS4g
-Rm9yIHN0YWdlLTIsIHdlIHN0aWxsIHVzZSBWRklPIERNQSBBUEkgdG8gcHJvZ3JhbSB0aGUNCj4g
-Pj4+IEdQQS0+SFBBDQo+ID4+Pj4gbWFwcGluZyB0byBob3N0LiA6LSkNCj4gPj4+DQo+ID4+PiBD
-b29sLCB0d28gbW9yZSBxdWVzdGlvbnM6DQo+ID4+Pg0KPiA+Pj4gLSBDYW4gRVBUIHNoYXJlcyBp
-dHMgcGFnZSB0YWJsZSB3aXRoIElPTU1VIEwyPw0KPiA+PiB5ZXMsIHRoZWlyIGZvcm1hdHMgYXJl
-IGNvbXBhdGlibGUuDQo+ID4+DQo+ID4+PiAtIFNpbWlsYXIgdG8gRVBULCB3aGVuIEdQQS0+SFBB
-IChhY3R1YWxseSBIVkEtPkhQQSkgaXMgbW9kaWZpZWQgYnkNCj4gbW0sDQo+ID4+PiBWRklPIG5l
-ZWQgdG8gdXNlIE1NVSBub3RpZmllciBkbyBtb2RpZnkgTDIgYWNjb3JkaW5nbHkgYmVzaWRlcyBE
-TUENCj4gQVBJPw0KPiA+Pj4NCj4gPj4gVkZJTyBkZXZpY2VzIG5lZWQgdG8gcGluLWRvd24gZ3Vl
-c3QgbWVtb3J5IHBhZ2VzIHRoYXQgYXJlIG1hcHBlZA0KPiA+PiBpbiBJT01NVS4gU28gbm90aWZp
-ZXIgaXMgbm90IHJlcXVpcmVkIHNpbmNlIG1tIHdvbid0IGNoYW5nZSB0aGUNCj4gbWFwcGluZw0K
-PiA+PiBmb3IgdGhvc2UgcGFnZXMuDQo+ID4NCj4gPg0KPiA+IFRoZSBHVVAgdGVuZHMgdG8gbGVh
-ZCBhIGxvdCBvZiBpc3N1ZXMsIHdlIG1heSBjb25zaWRlciB0byBhbGxvdw0KPiA+IHVzZXJzcGFj
-ZSB0byBjaG9vc2UgdG8gbm90IHBpbiB0aGVtIGluIHRoZSBmdXR1cmUuDQo+IA0KPiANCj4gQnR3
-LCBJJ20gYXNraW5nIHNpbmNlIEkgc2VlIE1NVSBub3RpZmllciBpcyB1c2VkIGJ5IGludGVsLXN2
-bS5jIHRvIGZsdXNoDQo+IElPVExCLiAoSSBkb24ndCBzZWUgYW55IHVzZXJzIGluIGtlcm5lbCBz
-b3VyY2UgdGhhdCB1c2UgdGhhdCBBUEkgdGhvdWdoDQo+IGUuZyBpbnRlbF9zdm1fYmluZF9tbSgp
-KS4NCj4gDQoNCmludGVsLXN2bS5jIHJlcXVpcmVzIE1NVSBub3RpZmllciB0byBpbnZhbGlkYXRl
-IElPVExCIHVwb24gYW55IGNoYW5nZQ0Kb24gdGhlIENQVSBwYWdlIHRhYmxlLCB3aGVuIHRoZSBs
-YXR0ZXIgaXMgc2hhcmVkIHdpdGggZGV2aWNlIGluIFNWQQ0KY2FzZS4gQnV0IGZvciBWRklPIHVz
-YWdlLCB3aGljaCBpcyBiYXNlZCBvbiBzdGFnZTIsIHRoZSBtYXAvdW5tYXAgDQpyZXF1ZXN0cyBl
-eHBsaWNpdGx5IGNvbWUgZnJvbSB1c2Vyc3BhY2UuIHRoZXJlIGlzIG5vIG5lZWQgdG8gc3luYyB3
-aXRoDQptbS4NCg0KVGhhbmtzDQpLZXZpbg0K
+From: Jordi Pujol Palomer <jordipujolp@gmail.com>
+Date: Sat, 2 Nov 2019 08:54:14 +0200
+Subject: [PATCH v4] QEMU samba daemon: additional command line options
+
+The smbd daemon takes additional command line options
+from environment variable SMBDOPTIONS.
+Set the environment variable SMBDOPTIONS before executing qemu.
+
+Example:
+
+export SMBDOPTIONS="--option='server min protocol=CORE' -d 4"
+
+Signed-off-by: Jordi Pujol Palomer <jordipujolp@gmail.com>
+---
+--- qemu-4.1-a/net/slirp.c
++++ qemu_4.1-b/net/slirp.c
+@@ -834,6 +834,7 @@ static int slirp_smb(SlirpState* s, cons
+     char *smb_cmdline;
+     struct passwd *passwd;
+     FILE *f;
++    char *options;
+
+     passwd = getpwuid(geteuid());
+     if (!passwd) {
+@@ -909,6 +910,12 @@ static int slirp_smb(SlirpState* s, cons
+              CONFIG_SMBD_COMMAND, s->smb_dir, smb_conf);
+     g_free(smb_conf);
+
++    options = g_getenv("SMBDOPTIONS");
++    if (options) {
++        smb_cmdline = g_strdup_printf("%s %s", smb_cmdline, options);
++        g_free(options);
++    }
++
+     if (slirp_add_exec(s->slirp, smb_cmdline, &vserver_addr, 139) < 0 ||
+         slirp_add_exec(s->slirp, smb_cmdline, &vserver_addr, 445) < 0) {
+         slirp_smb_cleanup(s);
 
