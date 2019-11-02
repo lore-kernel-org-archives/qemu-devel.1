@@ -2,44 +2,42 @@ Return-Path: <SRS0=rFyn=Y2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E63CA9EC7
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 18:11:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2D85CA9EC7
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 18:12:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8A9920862
-	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 18:11:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8A9920862
+	by mail.kernel.org (Postfix) with ESMTPS id AE80720862
+	for <qemu-devel@archiver.kernel.org>; Sat,  2 Nov 2019 18:12:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE80720862
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iQxrr-0002MT-VT
-	for qemu-devel@archiver.kernel.org; Sat, 02 Nov 2019 14:11:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51765)
+	id 1iQxt7-00030v-QP
+	for qemu-devel@archiver.kernel.org; Sat, 02 Nov 2019 14:12:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52067)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iQxoR-0007Ub-QG
- for qemu-devel@nongnu.org; Sat, 02 Nov 2019 14:07:48 -0400
+ (envelope-from <laurent@vivier.eu>) id 1iQxrA-0001zA-5b
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 14:10:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iQxoQ-0003q1-63
- for qemu-devel@nongnu.org; Sat, 02 Nov 2019 14:07:47 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:36189)
+ (envelope-from <laurent@vivier.eu>) id 1iQxr9-0004j2-6Q
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 14:10:36 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:58357)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iQxoP-0003lG-SQ
- for qemu-devel@nongnu.org; Sat, 02 Nov 2019 14:07:46 -0400
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iQxr8-0004eH-SV
+ for qemu-devel@nongnu.org; Sat, 02 Nov 2019 14:10:35 -0400
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N5FMB-1hz0pD0UMP-011EIX; Sat, 02 Nov 2019 19:07:38 +0100
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MD9Ox-1iHvRl0OW1-0095vP; Sat, 02 Nov 2019 19:10:28 +0100
 Subject: Re: [RFC] q800: fix I/O memory map
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
 References: <20191031100341.3827-1-laurent@vivier.eu>
- <bf1a2cbf-f462-e6df-c7c1-1e2ad26003ad@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -83,36 +81,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <76f6828d-bfd5-334c-770e-1283dc392b0e@vivier.eu>
-Date: Sat, 2 Nov 2019 19:07:35 +0100
+Message-ID: <f0e03032-0ef1-3c8a-0f8d-9608c5c7a5fb@vivier.eu>
+Date: Sat, 2 Nov 2019 19:10:27 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <bf1a2cbf-f462-e6df-c7c1-1e2ad26003ad@redhat.com>
+In-Reply-To: <20191031100341.3827-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:LwD2bazgYpWyXMCBJGJuiAmB596ePM4KRabJyOc1Gzd8WkNM2r4
- UjoqlifHPC7t4mV35NPEVj0jCFScdoB2kTzEBrSF7c+lY7nHSSy3jAi2H+3YhlDIzU7l63I
- 1AVF0WGtFhASYKSDlc82M/7tjyd9CZ8kyi9kuBT7rmn3kum7/V7BrOXDCqWWd7Nion4UT9s
- 0ot6vkEfktc0bI3O6CpYg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:HhmzRRuTm/4=:qyo3QOZj/OezZi3zsQoUKL
- SdKwDzk79OpozSlvwpHsHkNsx+Zo1Z8WUdEUs2kPyTyX7LqnhXhEAiX2uXwrLAKFIbbZn9Xm4
- Yfz3QiKtTbsPkQKkn1gOjd4W3r7bE6IMdPT16JwE27JzAR9KseC4hp3uINrvtS8xunPg33NL8
- E+r3mwTJ4rBb3I6M3YTGWCZYt7JgxgtGzVjPpNNHV4njiKaA+ns6AcjZQNbR2e9dDkGXdl1o7
- ThJavSSTAuk3esgy6ZyG7whNjOq1H5DHBd7A5rmbRX527IYb/pW6ppIJxmo8RRRpVxFb7oBsG
- IP9+uAeOGHIz4X0GyckFip1smJDboULUrZ75pGX1dHKbpjpdqpKswRH2NcEolXR+sNvvthoEc
- 46Klpe6DOgtQh7qsIZcajB5VeB0M8lBzL0M5eBFelgVTIZh+qMlkbNjkRuavJn0FfZbCYmYUz
- KZ0fmcRwhipX8c7S0Xjf9nCXyWUDadmNChrEZNAj7eXj+Wk3wG2r/+WjYCS81TAEU7j7WWALF
- c5HTskRbPJVnRETmg8KvxTjKKsWJIsT4OZegL25npD8/QC2ZyzQyq3wh6ndSnyITbbujSdQEp
- IlvxD4+eFpSKQHKg3btwgLZzGR5n/VfE48syIOV+LDU78fKkw2Ave9lGkWWDcSr8P156664nR
- D5JF9R6hmAs7CbxuKO46n9nG8+TtB2XqfzvPxGp1m3tWyTkunJ2nekz8BBbVuH01s3dNaVTUU
- FWWSR196pOEDh7tVzNaShwtibK8TfU4znpP2oIxHVTmMD/r0Vhh4n6zttVv7khSG0y2wkw2h9
- OxEtk1vQ+u8159qvgnE+0pCGtaIltzhcmQDPOAs+9rR1TJrk3lbqnY819L+s8rAkJGHEJzKmG
- ye2CEyuv8Hl3z/cfgu5kme/bczmnYKeFfq5PxGB3k=
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:QscQCYPLAKV+G1CCmh1BXiVXFQwTpV0I6M1suHWW2/Ci6kCU7vj
+ k3/Hc76+yGJt0eKsVUwktc7pKNeprghZl4g8/6LizL0fz3/unjd4jCepR46yo4XkOPTKvoI
+ yQL1PvL7USeyfUxVk/tybYljYXVqJKNcFLqv4HHBCoiho4n9KkDq6kjjk6JE9iQDTgEZ41D
+ gQ9XIagP4IuCmFIjGTfaw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gmqSXPmU35w=:tETFZ5xvONKFczff50nWmp
+ mNvDGhvIP7tbmntKtG3RStmAASB5QNRwDCT6T2w4saQ1zymVd+4hA3XCZRkwmPIB2MyN4BK6I
+ AdAfKLQhC7cD+obkSAaUIaUcPltcfANq79rAdinGccDtuIkv4RI9TM/ShsKwaO8lkuGJ2q90U
+ sLSVIUZtpLg2yXy0ISb5t2u2BfrN4Q5i0XaOwb6M71VWHUPjKspdkTVPQMOwS33LLiu4iviGH
+ MITUNFNi6OzepUa5tfRpXJ0O/lh2YAjEN7lCmw+icMe/Q8hRu46hJJ5yX3mLPGUnZJO3Yl3oL
+ J+pPDFBseBxECEJzweQp7Yfumcl9l7k3rGNBl8FREOjsKcjiUF1ooJrj8qpOaiiXw5nFsE3NM
+ d9BOTv61eBvd9MCvnCwdeMMejwS30mX8fcixCWkc2HnskrfzvpwoTtcAQY0rjMFwfNTWRwNuV
+ qmVNlcI91hiNPxtxy6CM3y7KGaoFwyX4nyaRlWA7/5SFj8z77/QzDn1AvN7rDJyL8KQxTT1BM
+ rfWb+nPIkZP8QzlrS5MSuyyiRCxUEvZRRDKK0yNMRtDKwrtwTlAG3kbm62kG7GFjsu7dvOhB+
+ 4Fnt9+WVL2LOwF19AYgEZIP0sTs/lTLH40RRlZ0qlmHbiH9W6WSS1Kci/loqqD0Dx0FNzeuy8
+ IvVW+uQXBHJUGfjZnX5DZ5K9XHAE8eqAH0FpYVrEntqDDMmcgmtW2hOhH251pC4N+cV/QJABj
+ sZ4Tk1huHIyqFgeL9lMOLdPp5YAvgtWnjB+UB4vhGKgcvQwdYbEC8OaBWMzPdN9UdUVpVwlzw
+ jmsX48q4AePovmkMHLBQVCfCPMxXayw6Zof3AuNTM8cr/atvkjpobLlFgcNPGXvqV0QqKGlor
+ 0FJb3HF8NL5bhY3S69307I5x0XzXma2xDfKWmfNFU=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.10
+X-Received-From: 217.72.192.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,117 +122,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 01/11/2019 à 01:00, Philippe Mathieu-Daudé a écrit :
-> On 10/31/19 11:03 AM, Laurent Vivier wrote:
->> Linux kernel 5.4 will introduce a new memory map for SWIM device.
->> (aee6bff1c325 ("m68k: mac: Revisit floppy disc controller base
->> addresses"))
->>
->> Until this release all MMIO are mapped between 0x50f00000 and 0x50f40000,
->> but it appears that for real hardware 0x50f00000 is not the base address:
->> the MMIO region spans 0x50000000 through 0x60000000, and 0x50040000
->> through
->> 0x54000000 is repeated images of 0x50000000 to 0x50040000.
->>
->> Fixed: 04e7ca8d0f ("hw/m68k: define Macintosh Quadra 800")
->> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
->> ---
->>   hw/m68k/q800.c | 33 +++++++++++++++++++++++++--------
->>   1 file changed, 25 insertions(+), 8 deletions(-)
->>
->> diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
->> index 2b4842f8c6..8122e7c612 100644
->> --- a/hw/m68k/q800.c
->> +++ b/hw/m68k/q800.c
->> @@ -60,14 +60,14 @@
->>   #define MACH_MAC        3
->>   #define Q800_MAC_CPU_ID 2
->>   -#define VIA_BASE              0x50f00000
->> -#define SONIC_PROM_BASE       0x50f08000
->> -#define SONIC_BASE            0x50f0a000
->> -#define SCC_BASE              0x50f0c020
->> -#define ESP_BASE              0x50f10000
->> -#define ESP_PDMA              0x50f10100
->> -#define ASC_BASE              0x50F14000
->> -#define SWIM_BASE             0x50F1E000
->> +#define VIA_BASE              0x50000000
->> +#define SONIC_PROM_BASE       0x50008000
->> +#define SONIC_BASE            0x5000a000
->> +#define SCC_BASE              0x5000c020
->> +#define ESP_BASE              0x50010000
->> +#define ESP_PDMA              0x50010100
->> +#define ASC_BASE              0x50014000
->> +#define SWIM_BASE             0x5001E000
->>   #define NUBUS_SUPER_SLOT_BASE 0x60000000
->>   #define NUBUS_SLOT_BASE       0xf0000000
->>   @@ -135,6 +135,7 @@ static void q800_init(MachineState *machine)
->>       int32_t initrd_size;
->>       MemoryRegion *rom;
->>       MemoryRegion *ram;
->> +    int i;
->>       ram_addr_t ram_size = machine->ram_size;
->>       const char *kernel_filename = machine->kernel_filename;
->>       const char *initrd_filename = machine->initrd_filename;
->> @@ -163,10 +164,26 @@ static void q800_init(MachineState *machine)
->>       cpu = M68K_CPU(cpu_create(machine->cpu_type));
->>       qemu_register_reset(main_cpu_reset, cpu);
->>   +    /* RAM */
->>       ram = g_malloc(sizeof(*ram));
->>       memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size,
->> &error_abort);
->>       memory_region_add_subregion(get_system_memory(), 0, ram);
->>   +    /*
->> +     * Memory from VIA_BASE to VIA_BASE + 0x40000 is repeated
->> +     * from VIA_BASE + 0x40000 to VIA_BASE + 0x4000000
->> +     */
-> 
-> Maybe:
-> 
->        const size_t via_aliases_count = (0x4000000 / 0x40000) - 1;
+Paolo,
 
-good idea.
+the RFC was mainly for you:
 
->        MemoryRegion *via_alias = g_new(MemoryRegion, via_aliases_count);
+Is this the good way to replicate 256 times a memory chunk containing a
+bunch of different MMIO spaces?
 
-do we really need to store them?
-We will not reuse them or free them.
-
->        for (size_t i = 0; i < via_aliases_count; i++) {
-> 
->            ...
-> 
->            memory_region_add_subregion(get_system_memory(),
->                                        VIA_BASE + (i + 1) * 0x40000,
->                                        via_alias[i]);
->            ...
->        }
-> 
->> +    for (i = 1; i < 256; i++) {
->> +        MemoryRegion *io = g_malloc(sizeof(*io));
->> +        char *name = g_strdup_printf("mac_m68k.io[%d]", i);
->> +
->> +        memory_region_init_alias(io, NULL, name, get_system_memory(),
->> +                                 VIA_BASE, 0x40000);
->> +        memory_region_add_subregion(get_system_memory(),
->> +                                    VIA_BASE + i * 0x40000, io);
->> +        g_free(name);
->> +    }
-> 
-> I'm trying to get ride of this pattern, so I plan to refactor this later
-> (and will use 256*KiB). Anyway not this patch problem.
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
->> +
->>       /* IRQ Glue */
->>         irq = g_new0(GLUEState, 1);
->>
-
+...
+> +    /*
+> +     * Memory from VIA_BASE to VIA_BASE + 0x40000 is repeated
+> +     * from VIA_BASE + 0x40000 to VIA_BASE + 0x4000000
+> +     */
+> +    for (i = 1; i < 256; i++) {
+> +        MemoryRegion *io = g_malloc(sizeof(*io));
+> +        char *name = g_strdup_printf("mac_m68k.io[%d]", i);
+> +
+> +        memory_region_init_alias(io, NULL, name, get_system_memory(),
+> +                                 VIA_BASE, 0x40000);
+> +        memory_region_add_subregion(get_system_memory(),
+> +                                    VIA_BASE + i * 0x40000, io);
+> +        g_free(name);
+> +    }
+> +
+...
 Thanks,
 Laurent
 
