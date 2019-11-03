@@ -2,80 +2,74 @@ Return-Path: <SRS0=n1BB=Y3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA5ACA9EB0
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 11:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06A24CA9EB0
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 15:31:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49BBA2084D
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 11:04:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hostfission.com header.i=@hostfission.com header.b="W8FEJ5YE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49BBA2084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=hostfission.com
+	by mail.kernel.org (Postfix) with ESMTPS id C83E22067D
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 15:31:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C83E22067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRDgY-0000br-HE
-	for qemu-devel@archiver.kernel.org; Sun, 03 Nov 2019 06:04:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51350)
+	id 1iRHqi-0007hS-Rl
+	for qemu-devel@archiver.kernel.org; Sun, 03 Nov 2019 10:31:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43323)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <geoff@hostfission.com>) id 1iRDfj-00005g-CZ
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 06:03:52 -0500
+ (envelope-from <bounces@canonical.com>) id 1iRHq2-0007HG-PD
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 10:30:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <geoff@hostfission.com>) id 1iRDfi-0003cN-5G
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 06:03:51 -0500
-Received: from mail1.hostfission.com ([139.99.139.48]:40468)
- by eggs.gnu.org with esmtp (Exim 4.71)
- (envelope-from <geoff@hostfission.com>) id 1iRDfh-0003bw-K7
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 06:03:50 -0500
-Received: from www1.hostfission.com (www1.hostfission.com [139.99.139.52])
- by mail1.hostfission.com (Postfix) with ESMTP id D1E704BBD9;
- Sun,  3 Nov 2019 22:03:47 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=hostfission.com;
- s=mail; t=1572779027;
- bh=wLLwT2MRptkCIJ3CqY2xGjkNuA3nvdR8pumBuNtXC8M=;
- h=To:Subject:Date:From:Cc:In-Reply-To:References:From;
- b=W8FEJ5YEAUVTsqPiHDx7prk/tBW4dApCFLkdE0Qz1HjDb4zPiDj220GmotIryBmQL
- 4fWCVjfo9tOe48XNZG8MsI4/8QeYlkXIJPO2rvsJS8/hAesxVPGlmXuJa/gKWY8N0I
- uCpACRpxfWv5GMi2DyyFckmQID6mQoJJKisgbEMA=
-Received: by www1.hostfission.com (Postfix, from userid 1000)
- id C6FA483FAC; Sun,  3 Nov 2019 22:03:47 +1100 (AEDT)
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: RFC: New device for zero-copy VM memory access
-X-PHP-Originating-Script: 0:rcube.php
+ (envelope-from <bounces@canonical.com>) id 1iRHq1-0004Rd-LB
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 10:30:46 -0500
+Received: from indium.canonical.com ([91.189.90.7]:50956)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iRHq1-0004RO-Fq
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 10:30:45 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iRHq0-0002gW-4H
+ for <qemu-devel@nongnu.org>; Sun, 03 Nov 2019 15:30:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1EB0A2E804E
+ for <qemu-devel@nongnu.org>; Sun,  3 Nov 2019 15:30:44 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Sun, 03 Nov 2019 22:03:47 +1100
-From: geoff@hostfission.com
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers
- <qemu-devel@nongnu.org>
-In-Reply-To: <cd00c2ba412361d707ab02575d74aacd@hostfission.com>
-References: <c83fe0e7157562c3c17598917977eb4d@hostfission.com>
- <20191030185248.GC3114@work-vm>
- <88f1c3701740665b0ebe2f24c8ce7ade@hostfission.com>
- <20191031132443.GB3128@work-vm>
- <b36330ecd38ce872982df4d41d3d4695@hostfission.com>
- <CAFEAcA8uWCQY8GwtH4oHU8ybXsvmYaB4Qa5hnxyd+344WFjJ_Q@mail.gmail.com>
- <b87d5b2fb84ac0a3c98a62dcc0c19077@hostfission.com>
- <20191031155204.GD3128@work-vm>
- <cd00c2ba412361d707ab02575d74aacd@hostfission.com>
-Message-ID: <e23eb129dddc5d18bb9f9b15d116f957@hostfission.com>
-X-Sender: geoff@hostfission.com
-User-Agent: Roundcube Webmail/1.2.3
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 03 Nov 2019 15:25:10 -0000
+From: Shawn Landden <1851095@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: pmaydell scientes
+X-Launchpad-Bug-Reporter: Shawn Landden (scientes)
+X-Launchpad-Bug-Modifier: Shawn Landden (scientes)
+References: <157275520880.19702.5640428141206739403.malonedeb@wampee.canonical.com>
+Message-Id: <157279471030.28519.11658134388517975846.malone@chaenomeles.canonical.com>
+Subject: [Bug 1851095] Re: [feature request] awareness of instructions that
+ are well emulated
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 8560919cc258bc1636a4d2ca5b4f8fefded68101
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 139.99.139.48
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,90 +78,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1851095 <1851095@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+ok, here is a double precision exponent implementation that works on
+arm32 hardware, but fails in qemu with the wrong checksum.
+https://github.com/shawnl/zig-libmvec/blob/master/exp.zig
 
+You need to build zig with the above patch-set.
 
-On 2019-11-03 21:10, geoff@hostfission.com wrote:
-> On 2019-11-01 02:52, Dr. David Alan Gilbert wrote:
->> * geoff@hostfission.com (geoff@hostfission.com) wrote:
->>> 
->>> 
->>> On 2019-11-01 01:52, Peter Maydell wrote:
->>> > On Thu, 31 Oct 2019 at 14:26, <geoff@hostfission.com> wrote:
->>> > > As the author of Looking Glass, I also have to consider the
->>> > > maintenance
->>> > > and the complexity of implementing the vhost protocol into the
->>> > > project.
->>> > > At this time a complete Porthole client can be implemented in 150
->>> > > lines
->>> > > of C without external dependencies, and most of that is boilerplate
->>> > > socket code. This IMO is a major factor in deciding to avoid
->>> > > vhost-user.
->>> >
->>> > This is essentially a proposal that we should make our project and
->>> > code more complicated so that your project and code can be simpler.
->>> > I hope you can see why this isn't necessarily an argument that will hold
->>> > very much weight for us :-)
->>> 
->>> Certainly, I do which is why I am still going to see about using 
->>> vhost,
->>> however, a device that uses vhost is likely more complex then the 
->>> device
->>> as it stands right now and as such more maintenance would be involved 
->>> on
->>> your end also. Or have I missed something in that vhost-user can be 
->>> used
->>> directly as a device?
->> 
->> The basic vhost-user stuff isn't actually that hard;  if you aren't
->> actually shuffling commands over the queues you should find it pretty
->> simple - so I think your assumption about it being simpler if you 
->> avoid
->> it might be wrong.  It might be easier if you use it!
-> 
-> I have been looking into this and I am yet to find some decent
-> documentation or a simple device example I can use to understand how to
-> create such a device. Do you know of any reading or examples I can 
-> obtain
-> on how to get an initial do nothing device up and running?
-> 
-> -Geoff
+I guess I am starting from a pessimistic perspective, where I have only
+ever seen SIMD work with arm64 emulation (which is quite new), and am
+sorry for that.
 
-Scratch that, the design just solidified for me and I am now making
-progress, however it seems that vhost-user can't do what we need here:
+-- =
 
-1) I dont see any way to recieve notification of socket disconnection, 
-in
-our use case the client app needs to be able to be (re)connected
-dynamically. It might be possible to get this event by registering it on
-the chardev manually but this seems like it would be a kludge.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1851095
 
-2) I don't see any method of notifying the vhost-user client of the
-removal of a shared memory mapping. Again, these may not be persistently
-mapped in the guest as we have no control over the buffer allocation, 
-and
-as such, we need a method to notify the client that the mapping has 
-become
-invalid.
+Title:
+  [feature request] awareness of instructions that are well emulated
 
-3) VHOST_USER_SET_MEM_TABLE is a one time request, again this breaks our
-usage as we need to change this dynamically at runtime.
+Status in QEMU:
+  New
 
-Unless there are viable solutions to these problems there is no way that
-vhost-user can be used for this kind of a device.
+Bug description:
+  While qemu's scalar emulation tends to be excellent, qemu's SIMD
+  emulation tends to be incorrect (except for arm64 from x86_64)--i have
+  found this both for mipsel and arm32. Until these code paths are
+  audited, which is probably a large job, it would be nice if qemu knew
+  its emulation of this class of instructions was not very good, and
+  thus it would give up on finding these instructions if a "careful"
+  operation is passed.
 
--Geoff
-
-> 
->> 
->> Dave
->> 
->>> >
->>> > thanks
->>> > -- PMM
->> --
->> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1851095/+subscriptions
 
