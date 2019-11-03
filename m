@@ -2,74 +2,83 @@ Return-Path: <SRS0=n1BB=Y3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61EB6CA9ED2
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 04:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B5C7CA9ED0
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 07:13:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B43220663
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 04:42:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B43220663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0A4C420848
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 07:13:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=brainfault-org.20150623.gappssmtp.com header.i=@brainfault-org.20150623.gappssmtp.com header.b="vtAFfr1W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A4C420848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iR7iB-0002Ro-A7
-	for qemu-devel@archiver.kernel.org; Sun, 03 Nov 2019 00:41:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52720)
+	id 1iRA4u-0000zb-6f
+	for qemu-devel@archiver.kernel.org; Sun, 03 Nov 2019 02:13:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iR7h9-0001Wk-5r
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 00:40:56 -0400
+ (envelope-from <anup@brainfault.org>) id 1iRA4E-0000Xp-Uz
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 02:12:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iR7h6-00046L-WF
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 00:40:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39180)
+ (envelope-from <anup@brainfault.org>) id 1iRA4D-00073G-PL
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 02:12:54 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51188)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iR7h6-00045t-OW
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 00:40:52 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iR7h5-0003a9-Ae
- for <qemu-devel@nongnu.org>; Sun, 03 Nov 2019 04:40:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 4783F2E80C8
- for <qemu-devel@nongnu.org>; Sun,  3 Nov 2019 04:40:51 +0000 (UTC)
+ (Exim 4.71) (envelope-from <anup@brainfault.org>) id 1iRA4D-00071o-CA
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 02:12:53 -0500
+Received: by mail-wm1-x342.google.com with SMTP id 11so13387131wmk.0
+ for <qemu-devel@nongnu.org>; Sun, 03 Nov 2019 00:12:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=brainfault-org.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=To4ycopByR2i8bwttYMBs8mMexxs8pgOxnlAHibyyIM=;
+ b=vtAFfr1Wnc+T6BDvgQi9fW/2xRzc9cj3mJ6uZfJmV/Ckyva7ucywGQkzL8q6sUKWwh
+ alVIViumsdfrYZWSpvAExWvOti/XpE9jUeYa/h3QIcQSzkKEVtbJQBJPv3+6gGN7g2mY
+ vCYjrswmknleGRKTwkGiIyT8Sj7zWnO/CrBY7xbNJ3kOgOdxW8wHCuOOMJoDs9cgoD5S
+ 3E8AW03+N+y+MollkgbOWzBuEyZ2psAJgqeuDM8Vg5+n8jgnhlBikvz7T1f7UlYtUWfl
+ VLJVp4Q1IaV4jYfB86kIQ7k0pF36wK7Nd96aoWsuATkNWPmV0J4k9WeHUEQ9Aplyb4Iz
+ 3cpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=To4ycopByR2i8bwttYMBs8mMexxs8pgOxnlAHibyyIM=;
+ b=apSGjYOARCf3ZxJrtRAqogkj4KUlkQeeozaofg5funsf8I/+GxhFtBqsZXZv/P/n2u
+ u7Yfhc0yOL8wTB8sWMMVjx6k29YqozkhiduQ0ghJ4t9XngYhhErQdq/fjUjdxhcmILTx
+ hSd5ydQVK636qTu4GFKrKtu9NISUW4u/5IjOZHXBZhHpIdq5vNvfaF2G/eT+Ft3rP68l
+ AjkUO5SUBzXQoWuU9rjbdKmUlEYUdqB146tK+AbUvqqyQLmI2y7VOhwXciTQmtqApyt/
+ b/bB8DAORNH2lXbtY5XJp3fTIc3uv3zquem82a7+Of2RgJydOV2kIjRPUINyOnONBmq+
+ Nj5A==
+X-Gm-Message-State: APjAAAX3MqAKHu+mvChQS3jgdwAvbPy612seC9sbOoov3bhXbLzGcWr8
+ njPWHCCzRsIS9FR6B6ieHdwKrqsGb95IDoxHcq+Eig==
+X-Google-Smtp-Source: APXvYqxiDSPWTLHOa7H8ENKceesLoxdE5B3embH6pAcFmZdwqSZat4nf1COuJmwpDE71Sz5F0ciQYaIj5IH78DV8N3A=
+X-Received: by 2002:a1c:4c10:: with SMTP id z16mr11885684wmf.24.1572765170534; 
+ Sun, 03 Nov 2019 00:12:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 03 Nov 2019 04:31:46 -0000
-From: Shawn Landden <1851095@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: scientes
-X-Launchpad-Bug-Reporter: Shawn Landden (scientes)
-X-Launchpad-Bug-Modifier: Shawn Landden (scientes)
-References: <157275520880.19702.5640428141206739403.malonedeb@wampee.canonical.com>
-Message-Id: <157275550612.2617.13611918334558950010.malone@gac.canonical.com>
-Subject: [Bug 1851095] Re: [feature request] awareness of instructions that
- are well emulated
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 16fe798ac9a9f0ce66dcf8a7d701564391a28403
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+References: <CAAhSdy3sUb_r77NBvEQEAQ0EQB99=4jgAbH3ADOqvJ_iX+o8pg@mail.gmail.com>
+ <mhng-111ec6b3-0e63-4f94-a1ed-8ddcd354b943@palmer-si-x1c4>
+In-Reply-To: <mhng-111ec6b3-0e63-4f94-a1ed-8ddcd354b943@palmer-si-x1c4>
+From: Anup Patel <anup@brainfault.org>
+Date: Sun, 3 Nov 2019 12:42:38 +0530
+Message-ID: <CAAhSdy1MZPaNhHxR345bu4HOtDndd5eZWJp2eTwJSym+9NjD+w@mail.gmail.com>
+Subject: Re: [PATCH v5 0/2] RTC support for QEMU RISC-V virt machine
+To: Palmer Dabbelt <palmer@dabbelt.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,37 +87,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1851095 <1851095@bugs.launchpad.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Anup Patel <Anup.Patel@wdc.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Here is a pull request for the zig language that runs into this problems
-in qemu https://github.com/ziglang/zig/pull/2945/
+On Sat, Nov 2, 2019 at 4:44 AM Palmer Dabbelt <palmer@dabbelt.com> wrote:
+>
+> On Fri, 01 Nov 2019 08:40:24 PDT (-0700), anup@brainfault.org wrote:
+> > On Tue, Oct 29, 2019 at 6:55 PM Alistair Francis <alistair23@gmail.com> wrote:
+> >>
+> >> On Fri, Oct 25, 2019 at 6:28 AM Anup Patel <Anup.Patel@wdc.com> wrote:
+> >> >
+> >> > This series adds RTC device to QEMU RISC-V virt machine. We have
+> >> > selected Goldfish RTC device model for this. It's a pretty simple
+> >> > synthetic device with few MMIO registers and no dependency external
+> >> > clock. The driver for Goldfish RTC is already available in Linux so
+> >> > we just need to enable it in Kconfig for RISCV and also update Linux
+> >> > defconfigs.
+> >> >
+> >> > We have tested this series with Linux-5.4-rc4 plus defconfig changes
+> >> > available in 'goldfish_rtc_v2' branch of:
+> >> > https://github.com/avpatel/linux.git
+> >>
+> >> @Peter Maydell this has been reviewed, do you mind taking this in you
+> >> next PR? I don't see a maintainer for hw/rtc.
+> >
+> > It would be great if this series can be taken for QEMU-4.2
+>
+> It doesn't look like there's anyone who maintains hw/rtc, so maybe that's why
+> this has been going slowly?  I'd happy to PR it, but I don't really have the
+> bandwidth to sign up to maintain more stuff right now.
 
-I have more code for validation if someone is working on this.
+No problem, I will maintain Goldfish RTC emulation until someone else
+is willing to maintain it.
 
--- =
+Regards,
+Anup
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1851095
-
-Title:
-  [feature request] awareness of instructions that are well emulated
-
-Status in QEMU:
-  New
-
-Bug description:
-  While qemu's scalar emulation tends to be excellent, qemu's SIMD
-  emulation tends to be incorrect (except for arm64 from x86_64)--i have
-  found this both for mipsel and arm32. Until these code paths are
-  audited, which is probably a large job, it would be nice if qemu knew
-  its emulation of this class of instructions was not very good, and
-  thus it would give up on finding these instructions if a "careful"
-  operation is passed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1851095/+subscriptions
+>
+> >
+> > Regards,
+> > Anup
+> >
+> >>
+> >> Alistair
+> >>
+> >> >
+> >> > Changes since v4:
+> >> >  - Fixed typo in trace event usage
+> >> >  - Moved goldfish_rtc.h to correct location
+> >> >
+> >> > Changes since v3:
+> >> >  - Address all nit comments from Alistair
+> >> >
+> >> > Changes since v2:
+> >> >  - Rebased on RTC code refactoring
+> >> >
+> >> > Changes since v1:
+> >> >  - Implemented VMState save/restore callbacks
+> >> >
+> >> > Anup Patel (2):
+> >> >   hw: rtc: Add Goldfish RTC device
+> >> >   riscv: virt: Use Goldfish RTC device
+> >> >
+> >> >  hw/riscv/Kconfig              |   1 +
+> >> >  hw/riscv/virt.c               |  15 ++
+> >> >  hw/rtc/Kconfig                |   3 +
+> >> >  hw/rtc/Makefile.objs          |   1 +
+> >> >  hw/rtc/goldfish_rtc.c         | 288 ++++++++++++++++++++++++++++++++++
+> >> >  hw/rtc/trace-events           |   4 +
+> >> >  include/hw/riscv/virt.h       |   2 +
+> >> >  include/hw/rtc/goldfish_rtc.h |  46 ++++++
+> >> >  8 files changed, 360 insertions(+)
+> >> >  create mode 100644 hw/rtc/goldfish_rtc.c
+> >> >  create mode 100644 include/hw/rtc/goldfish_rtc.h
+> >> >
+> >> > --
+> >> > 2.17.1
+> >> >
 
