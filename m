@@ -2,91 +2,68 @@ Return-Path: <SRS0=n1BB=Y3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D37B2CA9EB0
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 21:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C18C2CA9EB0
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 21:07:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1A092190F
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 21:06:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1A092190F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 8AFA92190F
+	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 21:07:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=duncanthrax.net header.i=@duncanthrax.net header.b="XY8rPd6L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AFA92190F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=stackframe.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56265 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRN4X-0006n3-Rf
-	for qemu-devel@archiver.kernel.org; Sun, 03 Nov 2019 16:06:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51816)
+	id 1iRN5j-0007Oh-Ht
+	for qemu-devel@archiver.kernel.org; Sun, 03 Nov 2019 16:07:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51358)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iRMxt-0002Df-PC
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 15:59:14 -0500
+ (envelope-from <svens@stackframe.org>) id 1iRMv3-0008JG-Du
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 15:56:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1iRMxr-0003M1-TS
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 15:59:13 -0500
-Received: from mail.ilande.co.uk ([46.43.2.167]:43502
- helo=mail.default.ilande.uk0.bigv.io)
+ (envelope-from <svens@stackframe.org>) id 1iRMv2-0002Jl-6g
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 15:56:17 -0500
+Received: from shroom.duncanthrax.net ([2a01:4f8:121:41fa::169]:55757
+ helo=smtp.duncanthrax.net)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iRMxr-0003LH-Mw
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 15:59:11 -0500
-Received: from host86-185-106-131.range86-185.btcentralplus.com
- ([86.185.106.131] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.89)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1iRMyP-0000m1-Tl; Sun, 03 Nov 2019 20:59:46 +0000
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Zainuddin AR <zar1969@gmail.com>, Artyom Tarasenko <atar4qemu@gmail.com>
-References: <CA+gXNfhCRT1kPq4KVumXwRiJvVaXYZZBRhs-QsVNKv+WzeMM+A@mail.gmail.com>
- <54af7410-569e-2b4b-70ed-f09039014bda@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <56403a22-d48e-5bb3-15c5-904e2e7c667d@ilande.co.uk>
-Date: Sun, 3 Nov 2019 20:59:09 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <svens@stackframe.org>)
+ id 1iRMv2-0002IU-04
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 15:56:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=duncanthrax.net; s=dkim; h=Content-Transfer-Encoding:MIME-Version:
+ References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+ Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+ Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+ List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=EefOWIoMev6+YzZY396zyUnHP1z3a3a/9Q1IwlTCpj4=; b=XY8rPd6LlLml8TEuv33NcPFMLP
+ cR3puDKdsaiSL/qFZVbErBq616vSQ7CpRS16AIvDKMYY/BKG6vI/xcgZTEYOQlno70tAxOZrKF7NF
+ zFuslk3PrEGwrciSfaW5EyRRsE6hHVgltw9O6/yMKIHJhLNxWPBhAF9/zW+8Cv6ZdnQI=;
+Received: from hsi-kbw-046-005-233-221.hsi8.kabel-badenwuerttemberg.de
+ ([46.5.233.221] helo=x280.stackframe.org)
+ by smtp.duncanthrax.net with esmtpa (Exim 4.90_1)
+ (envelope-from <svens@stackframe.org>)
+ id 1iRMuz-00059W-EL; Sun, 03 Nov 2019 21:56:13 +0100
+From: Sven Schnelle <svens@stackframe.org>
+To: Richard Henderson <rth@twiddle.net>
+Subject: [PATCH v4 3/6] ps2: accept 'Set Key Make and Break' commands
+Date: Sun,  3 Nov 2019 21:56:04 +0100
+Message-Id: <20191103205607.6590-4-svens@stackframe.org>
+X-Mailer: git-send-email 2.24.0.rc2
+In-Reply-To: <20191103205607.6590-1-svens@stackframe.org>
+References: <20191103205607.6590-1-svens@stackframe.org>
 MIME-Version: 1.0
-In-Reply-To: <54af7410-569e-2b4b-70ed-f09039014bda@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.185.106.131
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: Sparc Solaris 10
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.43.2.167
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a01:4f8:121:41fa::169
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,27 +75,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Helge Deller <deller@gmx.de>, Sven Schnelle <svens@stackframe.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/11/2019 19:56, Philippe Mathieu-Daudé wrote:
+HP-UX sends both the 'Set key make and break (0xfc) and
+'Set all key typematic make and break' (0xfa). QEMU response
+with 'Resend' as it doesn't handle these commands. HP-UX than
+reports an PS/2 max retransmission exceeded error. Add these
+commands and just reply with ACK.
 
-> Cc'ing the SPARC maintainers.
-> 
-> On 11/1/19 4:49 AM, Zainuddin AR wrote:
->> Hi,
->>
->> I like to find to find out if you have a working qemu on solaris 10 or 11. I have
->> tried the qemu-sun4vniagara but without networking. Is the networking support for
->> niagara version available?
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
+---
+ hw/input/ps2.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-I'm not particularly familiar with sun4v, however I'm not aware of any current work
-in this area. Do you know which network driver is typically used with sun4v?
+diff --git a/hw/input/ps2.c b/hw/input/ps2.c
+index 67f92f6112..0b671b6339 100644
+--- a/hw/input/ps2.c
++++ b/hw/input/ps2.c
+@@ -49,6 +49,8 @@
+ #define KBD_CMD_RESET_DISABLE	0xF5	/* reset and disable scanning */
+ #define KBD_CMD_RESET_ENABLE   	0xF6    /* reset and enable scanning */
+ #define KBD_CMD_RESET		0xFF	/* Reset */
++#define KBD_CMD_SET_MAKE_BREAK  0xFC    /* Set Make and Break mode */
++#define KBD_CMD_SET_TYPEMATIC   0xFA    /* Set Typematic Make and Break mode */
+ 
+ /* Keyboard Replies */
+ #define KBD_REPLY_POR		0xAA	/* Power on reset */
+@@ -573,6 +575,7 @@ void ps2_write_keyboard(void *opaque, int val)
+         case KBD_CMD_SCANCODE:
+         case KBD_CMD_SET_LEDS:
+         case KBD_CMD_SET_RATE:
++        case KBD_CMD_SET_MAKE_BREAK:
+             s->common.write_cmd = val;
+             ps2_queue(&s->common, KBD_REPLY_ACK);
+             break;
+@@ -592,11 +595,18 @@ void ps2_write_keyboard(void *opaque, int val)
+                 KBD_REPLY_ACK,
+                 KBD_REPLY_POR);
+             break;
++        case KBD_CMD_SET_TYPEMATIC:
++            ps2_queue(&s->common, KBD_REPLY_ACK);
++            break;
+         default:
+             ps2_queue(&s->common, KBD_REPLY_RESEND);
+             break;
+         }
+         break;
++    case KBD_CMD_SET_MAKE_BREAK:
++        ps2_queue(&s->common, KBD_REPLY_ACK);
++        s->common.write_cmd = -1;
++        break;
+     case KBD_CMD_SCANCODE:
+         if (val == 0) {
+             if (s->common.queue.count <= PS2_QUEUE_SIZE - 2) {
+-- 
+2.24.0.rc2
 
-
-ATB,
-
-Mark.
 
