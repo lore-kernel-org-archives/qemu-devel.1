@@ -2,89 +2,91 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4FCDCA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 18:58:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A21ECA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 19:44:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF5522080F
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 18:58:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF5522080F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4FCD9206BA
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 19:44:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dlhPiLkc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FCD9206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRhYe-0004wv-UN
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 13:58:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48341)
+	id 1iRiGd-0006Qo-9I
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 14:43:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36428)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iRhY0-0004UM-Po
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:57:54 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iRiF6-0005wy-Ab
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 14:42:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iRhXy-0003Xe-SI
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:57:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56012)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iRhXy-0003WM-4A
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:57:50 -0500
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 04D2887638
- for <qemu-devel@nongnu.org>; Mon,  4 Nov 2019 18:57:48 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id y3so3933314wrm.12
- for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 10:57:47 -0800 (PST)
+ (envelope-from <alex.bennee@linaro.org>) id 1iRiF0-00069W-Jg
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 14:42:24 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37865)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iRiF0-000697-CK
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 14:42:18 -0500
+Received: by mail-wm1-x341.google.com with SMTP id q130so17355543wme.2
+ for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 11:42:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=3pdwtpEMuYpNmcJew2XR2Uq4e5PrIRzFboXtLYMH6Fo=;
+ b=dlhPiLkcsEgm+Tu77L3dLxvUlYGn3z44dWIby+DFMACVCGD2T0o5e/+EgjamCaiPK1
+ A3K8etZB678q3dES2EZg6tJlqmHAskVEUhHUFeMkuifQS3zY8oTla0t3lhRux2RDj5pP
+ Tin97hf8CuhUxeTfCM2/GacAVG5ROUqVxCHCE/NrTLcdMWKZ82Ldlho0dvv0JjoKj1QZ
+ aVzfP6GG2zxcDxJOIqyjmPRc5RosbU+sGUX/wQSvc+BOF3qvHi8+efzk0rxHgdwJizkd
+ WAbtdE0zCLn1wEwq+icuqR0OtvEZeIvumHsAAPB8NfZPjlXnExv/DDhnx92vuadwi4Dl
+ NxrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=9f/J3as5YH8+eaHzctuyCRdELM9Hy1KZc7qoW69FGAU=;
- b=o1U3WI1tWr8i3RAwVANuVnC2xHllFfPKRPF7o0NTgYsJ1kSLaElOOC1tfOkQeLT4x4
- ksxD7W5lTF9+OVIcjOF/W8sMn00IKVKRhk2NG8P7vVW9Lj7alQdkBJvVSEoxwAO8b4EH
- JD/P3j8rz+dQsZH4E1q0GdnS6Fe9ENH8l/a6A2t6kXAImst1TUq2g1fYgpWzkH9XN51d
- I+OrAKsca+z6DbTVPtjkeCaHXoWFBqkwqKDLweSzgXDbB2TNmlo99B3zlQHufFfJjXBe
- 6xuOA6Odk0POYtXcplljOlaSzdCFTBJuKjGFOrobTrgm3S44P6TNth5F0hQxL+dAYifw
- iERA==
-X-Gm-Message-State: APjAAAVsRfa0JpgZLlQ9zyYU1H9pdtys18G014SkskjyRi2UF7DdwYxM
- 75t4ZVP0YOSDpYhzKh50l/hakBL0gXqMkzjYQT7+jK8DKmPicCGPQ+7zPIV8XCpQpB/IvnyLxAb
- /VPT//crUjB5O0PQ=
-X-Received: by 2002:a05:600c:22cb:: with SMTP id
- 11mr502104wmg.117.1572893866757; 
- Mon, 04 Nov 2019 10:57:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxGxwBER/GpVouGRHgeFaEvnhJ63M2A8iLyfE8Bu0qN5TJpH+cMY2x22dZtxgQxWjWDJ1FrsQ==
-X-Received: by 2002:a05:600c:22cb:: with SMTP id
- 11mr502070wmg.117.1572893866534; 
- Mon, 04 Nov 2019 10:57:46 -0800 (PST)
-Received: from [192.168.1.24] (lfbn-1-7864-228.w92-167.abo.wanadoo.fr.
- [92.167.33.228])
- by smtp.gmail.com with ESMTPSA id i71sm23941132wri.68.2019.11.04.10.57.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 Nov 2019 10:57:45 -0800 (PST)
-Subject: Re: [PATCH v1 1/6] tests/vm: netbsd autoinstall, using serial console
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=3pdwtpEMuYpNmcJew2XR2Uq4e5PrIRzFboXtLYMH6Fo=;
+ b=KDDqEwjqBSY7w3SqgFBv7m/NqJxcFVcftwL/H5I9rJeQvqrX49LbaIufrsrjfjJum4
+ aaCLnPeK9ORM/Ef0FWsSQEbIpoauM8w4C7C/5wJM5FqrIvECp5EnLk2F8hGtPfnB28+Q
+ mb4wGo/jYWjJ2dH/qm6BqiXCDZTWO5uybMTVzPLHePT2zJ4B+GCqJ9Yc8RzvAXX/kT43
+ 3Lerzux9SSE+ceRSDGnM31D6PbP6KwOUXd9FtRN7WcW0ujzaqtvnN0JMZjiAUMiixQOE
+ TdNecLuUNHdBcGLf8fMZlKXoDD+7bjZMIbfRoYcoQGaug/dk2RxMnh14Hq2OW4TboJHt
+ 2Tyw==
+X-Gm-Message-State: APjAAAVJNuV2cVpvcd9YAephNs08IG92jo6bcJGIZqSUCZav94Qm8GnS
+ phbA8gcwOj84AsqGqfVVF2IVqg==
+X-Google-Smtp-Source: APXvYqwKviqUsy7fpcgZ+7GjBqDEMsCNvP0EnGT8I7D6s+CW4LdCk4DZeriy+dl1fI5P/YaAMjhvgA==
+X-Received: by 2002:a7b:c94f:: with SMTP id i15mr722981wml.8.1572896536892;
+ Mon, 04 Nov 2019 11:42:16 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id i13sm10520856wrp.12.2019.11.04.11.42.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 Nov 2019 11:42:15 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 38DAD1FF87;
+ Mon,  4 Nov 2019 19:42:15 +0000 (GMT)
 References: <20191104173654.30125-1-alex.bennee@linaro.org>
- <20191104173654.30125-2-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <bdfdd76b-464a-eae9-b2de-0f939adf8b24@redhat.com>
-Date: Mon, 4 Nov 2019 19:57:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ <20191104173654.30125-6-alex.bennee@linaro.org>
+ <20191104183632.GO3093@minyard.net>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: cminyard@mvista.com
+Subject: Re: [PATCH  v1 5/6] tests: only run ipmi-bt-test if CONFIG_LINUX
+In-reply-to: <20191104183632.GO3093@minyard.net>
+Date: Mon, 04 Nov 2019 19:42:15 +0000
+Message-ID: <87o8xrjunc.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191104173654.30125-2-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,97 +98,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Thomas Huth <thuth@redhat.com>, berrange@redhat.com,
- Eduardo Habkost <ehabkost@redhat.com>, stefanb@linux.vnet.ibm.com,
- richard.henderson@linaro.org, f4bug@amsat.org,
- Kamil Rytarowski <kamil@netbsd.org>, cota@braap.org,
- Gerd Hoffmann <kraxel@redhat.com>, stefanha@redhat.com,
- marcandre.lureau@redhat.com, pbonzini@redhat.com,
- Kamil Rytarowski <n54@gmx.com>, aurelien@aurel32.net
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, f4bug@amsat.org,
+ Kamil Rytarowski <kamil@netbsd.org>, cota@braap.org, stefanha@redhat.com,
+ marcandre.lureau@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/4/19 6:36 PM, Alex Benn=C3=A9e wrote:
-> From: Gerd Hoffmann <kraxel@redhat.com>
->=20
-> Instead of fetching the prebuilt image from patchew download the instal=
-l
-> iso and prepare the image locally.  Install to disk, using the serial
-> console.  Create qemu user, configure ssh login.  Install packages
-> needed for qemu builds.
 
-It would be nice to be able to mount some host directory as target=20
-ccachedir and use ccache within the VM.
+Corey Minyard <cminyard@mvista.com> writes:
 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> Reviewed-by: Kamil Rytarowski <n54@gmx.com>
-> Tested-by: Thomas Huth <thuth@redhat.com>
-> [ehabkost: rebased to latest qemu.git master]
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> Message-Id: <20191031085306.28888-2-kraxel@redhat.com>
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->   tests/vm/netbsd | 189 +++++++++++++++++++++++++++++++++++++++++++++--=
--
->   1 file changed, 179 insertions(+), 10 deletions(-)
->=20
-> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-> index 18aa56ae826..5e04dcd9b16 100755
-> --- a/tests/vm/netbsd
-> +++ b/tests/vm/netbsd
-> @@ -2,10 +2,11 @@
->   #
->   # NetBSD VM image
->   #
-> -# Copyright 2017 Red Hat Inc.
-> +# Copyright 2017-2019 Red Hat Inc.
->   #
->   # Authors:
->   #  Fam Zheng <famz@redhat.com>
-> +#  Gerd Hoffmann <kraxel@redhat.com>
->   #
->   # This code is licensed under the GPL version 2 or later.  See
->   # the COPYING file in the top-level directory.
-> @@ -13,20 +14,53 @@
->  =20
->   import os
->   import sys
-> +import time
->   import subprocess
->   import basevm
->  =20
->   class NetBSDVM(basevm.BaseVM):
->       name =3D "netbsd"
->       arch =3D "x86_64"
-> +
-> +    link =3D "https://cdn.netbsd.org/pub/NetBSD/NetBSD-8.0/images/NetB=
-SD-8.0-amd64.iso"
-> +    size =3D "20G"
-> +    pkgs =3D [
-> +        # tools
-> +        "git-base",
-> +        "pkgconf",
-> +        "xz",
-> +        "python37",
-> +
-> +        # gnu tools
-> +        "bash",
-> +        "gmake",
-> +        "gsed",
-> +        "flex", "bison",
-> +
-> +        # libs: crypto
-> +        "gnutls",
-> +
-> +        # libs: images
-> +        "jpeg",
-> +        "png",
-> +
-> +	# libs: ui
-> +        "SDL2",
-> +        "gtk3+",
-> +        "libxkbcommon",
-> +    ]
-[...]
+> On Mon, Nov 04, 2019 at 05:36:53PM +0000, Alex Benn=C3=A9e wrote:
+>> This test has been unstable on NetBSD for awhile. It seems the
+>> mechanism used to listen to a random port is a Linux-ism (although a
+>> received wisdom Linux-ism rather than a well documented one). As
+>
+> Hmm.  I got reports of this issue and tried to reproduce, but I was
+> never able to.  I thought I had fixed it via other means, but I had no
+> idea this was the cause of the issue.
+>
+> It's not a Linux-ism, I don't think, Richard Steven's "Unix Network
+> Programming" mentions that is how this works (at least on UDP), and that
+> is pre-Linux.  That's probably where I got this technique.  I've saw
+> some web pages mention that Solaris and Windows do it this way.
+>
+> However, it's not specified, so it's probably a bad idea.  The only way
+> I can think to do it another way is to remove the bind() call, then it
+> should randomly assign the port (per the spec, I think).  The trouble
+> with that is the address will be INADDR_ANY, so it will be bound on
+> other interfaces besides the loopback, which make me slightly worried
+> from a security point of view.
+
+The other option is to keep the bind but seed it ourselves with a random
+port. However then you need to loop until you succeed and avoid locking
+up if something fatal has gone wrong.
+
+> I'm ok with this being linux-only, but I'd like to fix it so it works
+> everywhere.
+
+One option could be to use the glib networking stuff to set this up.
+That has options for creating dynamic ports for incoming connections
+although the docs are a bit light on details.
+g_socket_listener_add_any_inet_port certainly seems to do the retry
+approach (for a weirdly arbitrary 37 times). It leaves the fancy stuff
+to a hopefully well tested library although I note QEMU's own use of
+g_io APIs seems to be pretty sporadic.
+
+
+>
+> -corey
+>
+>> working around would add more hard to test complexity to the test I've
+>> gone for the easier option of making it CONFIG_LINUX only.
+>>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Cc: Corey Minyard <cminyard@mvista.com>
+>> Cc: Kamil Rytarowski <kamil@netbsd.org>
+>> ---
+>>  tests/Makefile.include | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/tests/Makefile.include b/tests/Makefile.include
+>> index 534ee487436..8566f5f119d 100644
+>> --- a/tests/Makefile.include
+>> +++ b/tests/Makefile.include
+>> @@ -177,7 +177,9 @@ check-qtest-i386-$(CONFIG_SGA) +=3D tests/boot-seria=
+l-test$(EXESUF)
+>>  check-qtest-i386-$(CONFIG_SLIRP) +=3D tests/pxe-test$(EXESUF)
+>>  check-qtest-i386-y +=3D tests/rtc-test$(EXESUF)
+>>  check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) +=3D tests/ipmi-kcs-test$(EXESU=
+F)
+>> +ifdef CONFIG_LINUX
+>>  check-qtest-i386-$(CONFIG_ISA_IPMI_BT) +=3D tests/ipmi-bt-test$(EXESUF)
+>> +endif
+>>  check-qtest-i386-y +=3D tests/i440fx-test$(EXESUF)
+>>  check-qtest-i386-y +=3D tests/fw_cfg-test$(EXESUF)
+>>  check-qtest-i386-y +=3D tests/device-plug-test$(EXESUF)
+>> --
+>> 2.20.1
+>>
+
+
+--
+Alex Benn=C3=A9e
 
