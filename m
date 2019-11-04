@@ -2,79 +2,86 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D9ACA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 17:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEBDBCA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 17:31:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1C0F20869
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 17:31:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 901B220869
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 17:31:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ntr+oDjk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C0F20869
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YJtshmSo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 901B220869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRgCd-0003Jl-Q0
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 12:31:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33398)
+	id 1iRgCk-0003SH-Jw
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 12:31:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33430)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <flukshun@gmail.com>) id 1iRgBR-0002WV-Db
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:30:30 -0500
+ (envelope-from <flukshun@gmail.com>) id 1iRgBV-0002Xa-0G
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:30:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <flukshun@gmail.com>) id 1iRgBQ-0006Ip-G4
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:30:29 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:39384)
+ (envelope-from <flukshun@gmail.com>) id 1iRgBT-0006ND-UW
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:30:32 -0500
+Received: from mail-ot1-x334.google.com ([2607:f8b0:4864:20::334]:40131)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1iRgBQ-0006IO-BW
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:30:28 -0500
-Received: by mail-oi1-x241.google.com with SMTP id v138so14823968oif.6
- for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 09:30:27 -0800 (PST)
+ (Exim 4.71) (envelope-from <flukshun@gmail.com>) id 1iRgBT-0006Mf-QE
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:30:31 -0500
+Received: by mail-ot1-x334.google.com with SMTP id m15so6345326otq.7
+ for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 09:30:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id;
- bh=IBXDAzDv4jMVN4HVkExpkj4YJ/RZ0eeoVpdxAwobc54=;
- b=ntr+oDjkL/n5VSgdQhJi5ZMVZe6vd+JZxYP7ZLmUKerFTk/e7EL9HpDFWFKK0J2ZZc
- bt7K2vOmYr79Lejrf9zKTUgPUd03Q1ziOg5QxEGZgaGnN9Iqx9eXyTid38pwe+2RTVIY
- GV/RVvl0zWB0atoIjCeI29s9Y0HR+rE+SRoxJW4kltUZZkQR4+Vru0eqoFB5gxTqTgAh
- r7cOUslGaEGOI0cbJWGx2XYNc3GTZGtsHgJVBkiLzGSE/T0iH2Dp8b4u3NZgqbtEVIbz
- HF+QrMu3bfakOisfBT7lBoxWFIVrKDyq+FwsKZ+gLvXCTUvslFDCvbmejKpolZFXcFBz
- TkSw==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=jNT3t4quzGSS/pxjS5hCboJ6+DmPB/mrE5H6qMsJU9s=;
+ b=YJtshmSoDPLi9X1toaro1EUfnMTXkRB68f+b8OJuCDTtKuLfJtG3uOZxr9LbJAOkJD
+ KQZAWv6xkCjN22/Y17RJk+BGJ7lAWyjIXmkEGLtvO25OFE8PseUzsmmtx/Hca2MnBNsX
+ ZWNub58uhNQf9PU/tbOnAExgHXa3lUY+Wi5/oHQSOh7LODcseQXXNfp1WwMr12k5Tm7Y
+ Sikk3HwudosCcG3S8f/ftQKVmrBkmhrdctb9d0S+iyNco27TM4LfxlmW+gfwznB6ne8x
+ /sReKwqRY0SzYdrenaQNCZTDfors0MjNFo/S45ImKCIQxPp/FeKo6gCjrG6HsQAImvSB
+ HSeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
- bh=IBXDAzDv4jMVN4HVkExpkj4YJ/RZ0eeoVpdxAwobc54=;
- b=rux/2MNQfnLuIDN1nfhLCSJYpJODYpog8Z8h1mNI6e0HhNneJkXQXj46c5STtjlCKF
- H0Rfxkbq8VRmQnxY+RtCfE6kThoBU/RwLkpty1wDfGiVoiFA+NMYVTaYujAxV6ZvNki7
- 5aY6/zjqKpPzBtcvB4Fb3ovwlThyVQ0VWC1QH5YjYqHJno1piwNYrscDi1TvSH6DC5b5
- Q4fArfNjSWHK8VQkaQtV0Lsz4rlDI9qfF84bX9krhpmeGJ+XUZrRSygjaSadCA0qgbdp
- H1PE4kDHyFGPx1sE/LhDbEuHvF8F/AD6SiF2k22pIo1WgCVCrOXwjNNDgfrglC5QZUKU
- VlpQ==
-X-Gm-Message-State: APjAAAXQlJHC51Zf5srPUjD9SZRWdJrd1t9WInVRDoMlW9PPqQp/RzCp
- K9I3z34h8hpNULJqoHbd0nvWliHM2T4=
-X-Google-Smtp-Source: APXvYqxqvbRgFkTipStp5azc6/OPOyXXNQW90nSWNwRec1i8V0/VNcQom+JSBsyqnFGcnO78TtljrA==
-X-Received: by 2002:aca:de84:: with SMTP id v126mr192521oig.46.1572888625991; 
- Mon, 04 Nov 2019 09:30:25 -0800 (PST)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=jNT3t4quzGSS/pxjS5hCboJ6+DmPB/mrE5H6qMsJU9s=;
+ b=aNb1/SKzR5nXRyb2yg1LjpF74MzmhwWHB8zTD6bxASNMtQUrL8yfJAys3wkE/kOSvW
+ ReftbVoIzEPn4Hv+GX02bJvF2FFmQ8JR1e1dMkaZT9zI+/PHdQInEn4W3cf29csYRA40
+ gHw5NtJQkXJXT1nbN0ypX8CzgcqM8xwuLQkTK1pRzLEWirkyIyOdJcrgXgn5irGKD7VZ
+ QJ5YuBHHQZQdRfbWA2rsso2xH7raPrJDyBtsm3LAaX28e5F6n4HoMyPE+Lhc52k95x+S
+ yJmeQFe/adS9GLccMx34CC9/mdVGlkX+vm1FaKkIg5P1HlsuNv0f5u0DLT/7+XK7ES+/
+ YnhA==
+X-Gm-Message-State: APjAAAUQ1kboDHjAvvru3LhCe1x8HxGNX9w1G7jV65L+kGMbuIPVqmvP
+ Y3KRaEOxcGC5C9WM+K4WRlAl0SYfRao=
+X-Google-Smtp-Source: APXvYqyVyRvGNx7H+3wFwu7p7hi7Ei24yOsyxZ3sqW3wf9cHrwq/+1ovRvH0+AOMR787yCbPT29eJg==
+X-Received: by 2002:a9d:5f0f:: with SMTP id f15mr18308402oti.251.1572888630362; 
+ Mon, 04 Nov 2019 09:30:30 -0800 (PST)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id 202sm4912669oii.39.2019.11.04.09.30.24
+ by smtp.gmail.com with ESMTPSA id c83sm3895064oia.54.2019.11.04.09.30.28
  (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 04 Nov 2019 09:30:24 -0800 (PST)
+ Mon, 04 Nov 2019 09:30:29 -0800 (PST)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/2] qemu-ga patch queue for 4.2-rc0
-Date: Mon,  4 Nov 2019 11:30:15 -0600
-Message-Id: <20191104173017.14324-1-mdroth@linux.vnet.ibm.com>
+Subject: [PULL 2/2] qga: Add "guest-get-memory-block-info" to blacklist
+Date: Mon,  4 Nov 2019 11:30:17 -0600
+Message-Id: <20191104173017.14324-3-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191104173017.14324-1-mdroth@linux.vnet.ibm.com>
+References: <20191104173017.14324-1-mdroth@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+X-Received-From: 2607:f8b0:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,41 +93,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, Basil Salman <bsalman@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 36609b4fa36f0ac934874371874416f7533a5408:
+From: Basil Salman <bsalman@redhat.com>
 
-  Merge remote-tracking branch 'remotes/palmer/tags/palmer-for-master-4.2-sf1' into staging (2019-11-02 17:59:03 +0000)
+Memory block commands are only supported for linux with sysfs,
+"guest-get-memory-block-info" was not in blacklist for other
+cases.
 
-are available in the Git repository at:
+Reported on:
+https://bugzilla.redhat.com/show_bug.cgi?id=1751431
 
-  git://github.com/mdroth/qemu.git tags/qga-pull-2019-11-04-tag
+Signed-off-by: Basil Salman <bsalman@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ qga/commands-posix.c | 3 ++-
+ qga/commands-win32.c | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-for you to fetch changes up to 28d8dd355be98da6239bd5569721980c833df6a1:
-
-  qga: Add "guest-get-memory-block-info" to blacklist (2019-11-04 08:50:54 -0600)
-
-----------------------------------------------------------------
-qemu-ga patch queue for hard-freeze
-
-* fix handling of Chinese network device names in
-  guest-network-get-interfaces
-* add missing blacklist entries for guest-get-memory-block-info for
-  w32/non-linux builds
-
-----------------------------------------------------------------
-Basil Salman (1):
-      qga: Add "guest-get-memory-block-info" to blacklist
-
-Bishara AbuHattoum (1):
-      qga-win: network-get-interfaces command name field bug fix
-
- qga/commands-posix.c |  3 ++-
- qga/commands-win32.c | 12 ++++++------
- 2 files changed, 8 insertions(+), 7 deletions(-)
-
+diff --git a/qga/commands-posix.c b/qga/commands-posix.c
+index dfc05f5b8a..1c1a165dae 100644
+--- a/qga/commands-posix.c
++++ b/qga/commands-posix.c
+@@ -2730,7 +2730,8 @@ GList *ga_command_blacklist_init(GList *blacklist)
+             "guest-suspend-hybrid", "guest-network-get-interfaces",
+             "guest-get-vcpus", "guest-set-vcpus",
+             "guest-get-memory-blocks", "guest-set-memory-blocks",
+-            "guest-get-memory-block-size", NULL};
++            "guest-get-memory-block-size", "guest-get-memory-block-info",
++            NULL};
+         char **p = (char **)list;
+ 
+         while (*p) {
+diff --git a/qga/commands-win32.c b/qga/commands-win32.c
+index 64b1c754b0..55ba5b263a 100644
+--- a/qga/commands-win32.c
++++ b/qga/commands-win32.c
+@@ -1894,7 +1894,7 @@ GList *ga_command_blacklist_init(GList *blacklist)
+         "guest-suspend-hybrid",
+         "guest-set-vcpus",
+         "guest-get-memory-blocks", "guest-set-memory-blocks",
+-        "guest-get-memory-block-size",
++        "guest-get-memory-block-size", "guest-get-memory-block-info",
+         NULL};
+     char **p = (char **)list_unsupported;
+ 
+-- 
+2.17.1
 
 
