@@ -4,72 +4,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C706CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1CAECA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:22:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A62320848
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:22:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1C2620663
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:22:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hZ8NaB/t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A62320848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d8R6k3UY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C2620663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iReBD-00045Q-DL
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 10:22:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40539)
+	id 1iReBn-0004tV-Kx
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 10:22:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40528)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iRe3O-0002uy-SW
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:14:04 -0500
+ (envelope-from <crosa@redhat.com>) id 1iRe3O-0002tZ-4H
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:14:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iRe3N-0002lP-6T
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:14:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57636
+ (envelope-from <crosa@redhat.com>) id 1iRe3M-0002kx-RM
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:14:01 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36440
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iRe3N-0002kp-2M
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:14:01 -0500
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iRe3M-0002kY-NE
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:14:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1572880440;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iDcY2gjeR4cwh0kANU2g+fVLtfXZhRrphcqFTasUYVY=;
- b=hZ8NaB/tm4Xs2xJlnRQxSx6w0cIZsTc+VV/11ItBRAHXHsD2kjyDz+Wu8VOZ709E+O/ZZM
- l22Q8INcW5YfhdKKv3WpajTtcXJ+AyDpvmpnm2xkNg/NtqD67c0Qu3s4Qh9PrevQcYf1i3
- /RmY4v9uh1OF7w/18zcLhhJr3DFhhZ0=
+ bh=INfjw1qCk+h2J7ucp9qgPVBHDffQeOkDjh6/dYBD0yo=;
+ b=d8R6k3UYIMpGAlB62GYEc7DWDCtSU7ji2kElOEJ/v5eQNJhnxHEWWS8MqRSMAbskHUFZ4a
+ KchyJ32FFmvKpqRpVZe3IofzVVvGoY+KKFeDzVqOJOlV1lvUE5a609G0b1OLCl0LbgKlft
+ PjbD4YPM3V03+nmtUabxMaQpYLOLZNY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-IkFC0qEBML2v1k4hcynd4w-1; Mon, 04 Nov 2019 10:13:59 -0500
+ us-mta-412-U5cZyhnzMVi6iI2K4jBKCw-1; Mon, 04 Nov 2019 10:13:57 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90AC71800D53;
- Mon,  4 Nov 2019 15:13:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADB418017DD;
+ Mon,  4 Nov 2019 15:13:55 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-123-183.rdu2.redhat.com
  [10.10.123.183])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DA8ED5D6C5;
- Mon,  4 Nov 2019 15:13:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F1D885D6C5;
+ Mon,  4 Nov 2019 15:13:53 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 8/8] Acceptance test: add "boot_linux" tests
-Date: Mon,  4 Nov 2019 10:13:23 -0500
-Message-Id: <20191104151323.9883-9-crosa@redhat.com>
+Subject: [PATCH v7 7/8] Acceptance tests: depend on qemu-img
+Date: Mon,  4 Nov 2019 10:13:22 -0500
+Message-Id: <20191104151323.9883-8-crosa@redhat.com>
 In-Reply-To: <20191104151323.9883-1-crosa@redhat.com>
 References: <20191104151323.9883-1-crosa@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: IkFC0qEBML2v1k4hcynd4w-1
+X-MC-Unique: U5cZyhnzMVi6iI2K4jBKCw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -97,245 +98,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This acceptance test, validates that a full blown Linux guest can
-successfully boot in QEMU.  In this specific case, the guest chosen is
-Fedora version 31.
+Tests using the avocado.utils.vmimage library make use of qemu-img,
+and because it makes sense to use the version matching the rest of the
+source code, let's make sure it gets built.
 
- * x86_64, pc and q35 machine types, with and without kvm as an
-   accellerator
+Its selection, instead of a possible qemu-img binary installed system
+wide, is already dealt with by the change that adds the build dir to
+the PATH during the test execution.
 
- * aarch64 and virt machine type, with and without kvm as an
-   accellerator
+This is based on the same work for qemu-iotests, and suggested by its
+author:
 
- * ppc64 and pseries machine type
+  - https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00951.html
 
- * s390x and s390-ccw-virtio machine type
-
-The method for checking the successful boot is based on "cloudinit"
-and its "phone home" feature.  The guest is given an ISO image
-with the location of the phone home server, and the information to
-post (the instance ID).  Upon receiving the correct information,
-from the guest, the test is considered to have PASSed.
-
-This test is currently limited to user mode networking only, and
-instructs the guest to connect to the "router" address that is hard
-coded in QEMU.
-
-To create the cloudinit ISO image that will be used to configure the
-guest, the pycdlib library is also required and has been added as
-requirement to the virtual environment created by "check-venv".
-
-The console output is read by a separate thread, by means of the
-Avocado datadrainer utility module.
-
+CC: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- tests/acceptance/boot_linux.py | 175 +++++++++++++++++++++++++++++++++
- tests/requirements.txt         |   1 +
- 2 files changed, 176 insertions(+)
- create mode 100644 tests/acceptance/boot_linux.py
+ tests/Makefile.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux.p=
-y
-new file mode 100644
-index 0000000000..882f7dc5df
---- /dev/null
-+++ b/tests/acceptance/boot_linux.py
-@@ -0,0 +1,175 @@
-+# Functional test that boots a complete Linux system via a cloud image
-+#
-+# Copyright (c) 2018-2019 Red Hat, Inc.
-+#
-+# Author:
-+#  Cleber Rosa <crosa@redhat.com>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2 or
-+# later.  See the COPYING file in the top-level directory.
-+
-+import os
-+
-+from avocado_qemu import Test, SRC_ROOT_DIR
-+
-+from qemu import kvm_available
-+
-+from avocado.utils import cloudinit
-+from avocado.utils import network
-+from avocado.utils import vmimage
-+from avocado.utils import datadrainer
-+
-+
-+KVM_NOT_AVAILABLE =3D "KVM accelerator does not seem to be available"
-+
-+
-+class BootLinux(Test):
-+    """
-+    Boots a Linux system, checking for a successful initialization
-+    """
-+
-+    timeout =3D 600
-+    chksum =3D None
-+
-+    def setUp(self):
-+        super(BootLinux, self).setUp()
-+        self.prepare_boot()
-+        self.vm.add_args('-smp', '2')
-+        self.vm.add_args('-m', '2048')
-+        self.vm.add_args('-drive', 'file=3D%s' % self.boot.path)
-+        self.prepare_cloudinit()
-+
-+    def prepare_boot(self):
-+        self.log.info('Downloading/preparing boot image')
-+        # Fedora 31 only provides ppc64le images
-+        image_arch =3D self.arch
-+        if image_arch =3D=3D 'ppc64':
-+            image_arch =3D 'ppc64le'
-+        try:
-+            self.boot =3D vmimage.get(
-+                'fedora', arch=3Dimage_arch, version=3D'31',
-+                checksum=3Dself.chksum,
-+                algorithm=3D'sha256',
-+                cache_dir=3Dself.cache_dirs[0],
-+                snapshot_dir=3Dself.workdir)
-+        except:
-+            self.cancel('Failed to download/prepare boot image')
-+
-+    def prepare_cloudinit(self):
-+        self.log.info('Preparing cloudinit image')
-+        try:
-+            cloudinit_iso =3D os.path.join(self.workdir, 'cloudinit.iso')
-+            self.phone_home_port =3D network.find_free_port()
-+            cloudinit.iso(cloudinit_iso, self.name,
-+                          username=3D'root',
-+                          password=3D'password',
-+                          # QEMU's hard coded usermode router address
-+                          phone_home_host=3D'10.0.2.2',
-+                          phone_home_port=3Dself.phone_home_port)
-+            self.vm.add_args('-drive', 'file=3D%s,format=3Draw' % cloudini=
-t_iso)
-+        except Exception:
-+            self.cancel('Failed to prepared cloudinit image')
-+
-+    def launch_and_wait(self):
-+        self.vm.set_console()
-+        self.vm.launch()
-+        console_drainer =3D datadrainer.LineLogger(self.vm.console_socket.=
-fileno(),
-+                                                 logger=3Dself.log.getChil=
-d('console'))
-+        console_drainer.start()
-+        self.log.info('VM launched, waiting for boot confirmation from gue=
-st')
-+        cloudinit.wait_for_phone_home(('0.0.0.0', self.phone_home_port), s=
-elf.name)
-+
-+
-+class BootLinuxX8664(BootLinux):
-+    """
-+    :avocado: tags=3Darch:x86_64
-+    """
-+
-+    chksum =3D 'e3c1b309d9203604922d6e255c2c5d098a309c2d46215d8fc026954f3c=
-5c27a0'
-+
-+    def test_pc(self):
-+        """
-+        :avocado: tags=3Dmachine:pc
-+        """
-+        self.launch_and_wait()
-+
-+    def test_kvm_pc(self):
-+        """
-+        :avocado: tags=3Dmachine:pc
-+        :avocado: tags=3Daccel:kvm
-+        """
-+        if not kvm_available(self.arch):
-+            self.cancel(KVM_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "kvm")
-+        self.launch_and_wait()
-+
-+    def test_q35(self):
-+        """
-+        :avocado: tags=3Dmachine:q35
-+        """
-+        self.launch_and_wait()
-+
-+    def test_kvm_q35(self):
-+        """
-+        :avocado: tags=3Dmachine:q35
-+        :avocado: tags=3Daccel:kvm
-+        """
-+        if not kvm_available(self.arch):
-+            self.cancel(KVM_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "kvm")
-+        self.launch_and_wait()
-+
-+
-+class BootLinuxAarch64(BootLinux):
-+    """
-+    :avocado: tags=3Darch:aarch64
-+    :avocado: tags=3Dmachine:virt
-+    """
-+
-+    chksum =3D '1e18d9c0cf734940c4b5d5ec592facaed2af0ad0329383d5639c997fdf=
-16fe49'
-+
-+    def test_virt(self):
-+        self.vm.add_args('-cpu', 'cortex-a53')
-+        self.vm.add_args('-bios',
-+                         os.path.join(SRC_ROOT_DIR, 'pc-bios',
-+                                      'edk2-aarch64-code.fd'))
-+        self.vm.add_args('-device', 'virtio-rng-pci,rng=3Drng0')
-+        self.vm.add_args('-object', 'rng-random,id=3Drng0,filename=3D/dev/=
-urandom')
-+        self.launch_and_wait()
-+
-+    def test_kvm_virt(self):
-+        """
-+        :avocado: tags=3Daccel:kvm
-+        """
-+        if not kvm_available(self.arch):
-+            self.cancel(KVM_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "kvm")
-+        self.test_virt()
-+
-+
-+class BootLinuxPPC64(BootLinux):
-+    """
-+    :avocado: tags=3Darch:ppc64
-+    """
-+
-+    chksum =3D '7c3528b85a3df4b2306e892199a9e1e43f991c506f2cc390dc4efa2026=
-ad2f58'
-+
-+    def test_pseries(self):
-+        """
-+        :avocado: tags=3Dmachine:pseries
-+        """
-+        self.launch_and_wait()
-+
-+
-+class BootLinuxS390X(BootLinux):
-+    """
-+    :avocado: tags=3Darch:s390x
-+    """
-+
-+    chksum =3D '4caaab5a434fd4d1079149a072fdc7891e354f834d355069ca982fdcaf=
-5a122d'
-+
-+    def test_s390_ccw_virtio(self):
-+        """
-+        :avocado: tags=3Dmachine:s390-ccw-virtio
-+        """
-+        self.launch_and_wait()
-diff --git a/tests/requirements.txt b/tests/requirements.txt
-index a2a587223a..3893361e0c 100644
---- a/tests/requirements.txt
-+++ b/tests/requirements.txt
-@@ -2,3 +2,4 @@
- # in the tests/venv Python virtual environment. For more info,
- # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
- avocado-framework=3D=3D72.0
-+pycdlib=3D=3D1.8.0
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 65e85f5275..559c3e6375 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -1174,7 +1174,7 @@ $(TESTS_RESULTS_DIR):
+=20
+ check-venv: $(TESTS_VENV_DIR)
+=20
+-check-acceptance: check-venv $(TESTS_RESULTS_DIR)
++check-acceptance: check-venv $(TESTS_RESULTS_DIR) qemu-img$(EXESUF)
+ =09$(call quiet-command, \
+             $(TESTS_VENV_DIR)/bin/python -m avocado \
+             --show=3D$(AVOCADO_SHOW) run --job-results-dir=3D$(TESTS_RESUL=
+TS_DIR) \
 --=20
 2.21.0
 
