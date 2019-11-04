@@ -2,78 +2,57 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C880CA9ECF
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 09:07:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E28CA9ECF
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 09:08:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48D4D222CD
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 09:07:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qj+9rnRj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48D4D222CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B96C4222CF
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 09:08:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B96C4222CF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58646 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRYL8-0004Ei-6c
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 04:07:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34736)
+	id 1iRYLM-0004T1-Kc
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 04:08:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35103)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iRYHJ-0007MT-Px
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 04:04:05 -0500
+ (envelope-from <its@irrelevant.dk>) id 1iRYIK-00005O-JW
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 04:05:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iRYHF-0002y6-AE
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 04:04:01 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25338
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <its@irrelevant.dk>) id 1iRYIJ-00048d-E1
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 04:05:04 -0500
+Received: from charlie.dont.surf ([128.199.63.193]:37726)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iRYHD-0002uu-Dc
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 04:03:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572858233;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hsInyKxAekr/73cu9ypbm4mQK5co9xxqt+ZM3Emg74g=;
- b=Qj+9rnRjuZhZeSTHJ1KTvmEn3anWjE0vMvR51uyVGg2oi3Kwr/Wx1/qBnlUYU6jBtTK7XG
- UCCcDHCcsz88jJUqsKVzNFh3/wrBeeJsmKi+3hArgz5csFXXTXiL1oZzRN1bomDwbxjQgL
- Gp+G/TMT12OqKaQs3pxJNNh8/lZ1qik=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-wC-yCm-TMY-w6f8cdh27DA-1; Mon, 04 Nov 2019 04:03:52 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A9278017E0;
- Mon,  4 Nov 2019 09:03:51 +0000 (UTC)
-Received: from localhost (ovpn-117-85.ams2.redhat.com [10.36.117.85])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F160A60BF1;
- Mon,  4 Nov 2019 09:03:50 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 1/5] nvme: fix NSSRS offset in CAP register
-Date: Mon,  4 Nov 2019 10:03:43 +0100
-Message-Id: <20191104090347.27278-2-mreitz@redhat.com>
-In-Reply-To: <20191104090347.27278-1-mreitz@redhat.com>
-References: <20191104090347.27278-1-mreitz@redhat.com>
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1iRYIB-0003zQ-ME; Mon, 04 Nov 2019 04:04:56 -0500
+Received: from apples.localdomain (unknown [194.62.217.57])
+ by charlie.dont.surf (Postfix) with ESMTPSA id AD5B3BF616;
+ Mon,  4 Nov 2019 09:04:52 +0000 (UTC)
+Date: Mon, 4 Nov 2019 10:04:49 +0100
+From: Klaus Birkelund <its@irrelevant.dk>
+To: Ross Lagerwall <ross.lagerwall@citrix.com>
+Subject: Re: [Qemu-devel] [PATCH 16/16] nvme: support multiple namespaces
+Message-ID: <20191104090449.GA128558@apples.localdomain>
+References: <20190705072333.17171-1-klaus@birkelund.eu>
+ <20190705072333.17171-17-klaus@birkelund.eu>
+ <79fb195f-91dc-869d-f290-40fdcb96eea3@citrix.com>
+ <20190823081022.GA30440@apples.localdomain>
+ <675ecf34-4874-7a10-998a-f85c4aeb9526@citrix.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: wC-yCm-TMY-w6f8cdh27DA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <675ecf34-4874-7a10-998a-f85c4aeb9526@citrix.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,46 +64,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, keith.busch@intel.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Klaus Jensen <its@irrelevant.dk>
+On Mon, Nov 04, 2019 at 08:46:29AM +0000, Ross Lagerwall wrote:
+> On 8/23/19 9:10 AM, Klaus Birkelund wrote:
+> > On Thu, Aug 22, 2019 at 02:18:05PM +0100, Ross Lagerwall wrote:
+> >> On 7/5/19 8:23 AM, Klaus Birkelund Jensen wrote:
+> >>
+> >> I tried this patch series by installing Windows with a single NVME
+> >> controller having two namespaces. QEMU crashed in get_feature /
+> >> NVME_VOLATILE_WRITE_CACHE because req->ns was NULL.
+> >>
+> > 
+> > Hi Ross,
+> > 
+> > Good catch!
+> > 
+> >> nvme_get_feature / nvme_set_feature look wrong to me since I can't see how
+> >> req->ns would have been set. Should they have similar code to nvme_io_cmd to
+> >> set req->ns from cmd->nsid?
+> > 
+> > Definitely. I will fix that for v2.
+> > 
+> >>
+> >> After working around this issue everything else seemed to be working well.
+> >> Thanks for your work on this patch series.
+> >>
+> > 
+> > And thank you for trying out my patches!
+> > 
+> 
+> One more thing... it doesn't handle inactive namespaces properly so if you
+> have two namespaces with e.g. nsid=1 and nsid=3 QEMU ends up crashing in
+> certain situations. The patch below adds support for inactive namespaces.
+> 
+> Still hoping to see a v2 some day :-)
+> 
+ 
+Hi Ross,
 
-Fix the offset of the NSSRS field the CAP register.
+v2[1] is actually out, but only CC'ed Paul. Sorry about that! It fixes
+the support for discontiguous nsid's, but does not handle inactive
+namespaces correctly in identify.
 
-From NVME 1.4, section 3 ("Controller Registers"), subsection 3.1.1
-("Offset 0h: CAP =E2=80=93 Controller Capabilities") CAP_NSSRS_SHIFT is bit=
- 36,
-not 33.
+I'll incorporate that in a v3 along with a couple of other fixes I did.
 
-Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Reported-by: Javier Gonzalez <javier.gonz@samsung.com>
-Message-id: 20191023073315.446534-1-its@irrelevant.dk
-Reviewed-by: John Snow <jsnow@redhat.com>
-[mreitz: Added John's note on the location in the specification where
-         this information can be found]
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- include/block/nvme.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks!
 
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index ab5943b90a..8fb941c653 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -23,7 +23,7 @@ enum NvmeCapShift {
-     CAP_AMS_SHIFT      =3D 17,
-     CAP_TO_SHIFT       =3D 24,
-     CAP_DSTRD_SHIFT    =3D 32,
--    CAP_NSSRS_SHIFT    =3D 33,
-+    CAP_NSSRS_SHIFT    =3D 36,
-     CAP_CSS_SHIFT      =3D 37,
-     CAP_MPSMIN_SHIFT   =3D 48,
-     CAP_MPSMAX_SHIFT   =3D 52,
---=20
-2.21.0
 
+  [1]: https://patchwork.kernel.org/cover/11190045/
 
