@@ -2,89 +2,64 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D25DCA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 12:14:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA6A4CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 12:19:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47A34218BA
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 12:14:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rSf4Wf57"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47A34218BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AF8B82053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 12:19:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF8B82053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRbFq-0006AD-Ft
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 07:14:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39553)
+	id 1iRbK2-0000pY-6k
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 07:19:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40268)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iRbFC-0005ic-6B
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 07:14:03 -0500
+ (envelope-from <zhengxiang9@huawei.com>) id 1iRbHr-00078I-4J
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 07:16:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iRbFA-0003fb-FX
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 07:14:01 -0500
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:34730)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iRbFA-0003e3-4k
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 07:14:00 -0500
-Received: by mail-wm1-x330.google.com with SMTP id v3so13895447wmh.1
- for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 04:13:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=+lr026ViL5pP9sUZ3TRnWegeVegWWlpZ5aPe8Lgdc9E=;
- b=rSf4Wf57I7N0KlsDdCR/nTY9Hz9Nj6h7RG7jSHWiXwOE75y2n/XVXjtgI5PaVbzNI0
- AFtQXUY9XZyICHaOCPbVZlin+0RXuwOEvII3Xaq86ZCFljkl8TcIdjDaaCc+yXD8/kEA
- Meaoh2A22ZQEN7SK9xKShslYAMZAilDrwyAHPUxwjGWK6btn1PKTNE8TYNwGhAeMX1Lo
- r8iJO6KbTWrKFY6MGvHZ4s7NCt7lMJqBVrSk5tAVuxU0Ienq49NoKwpsSWuUstGDMhzm
- 26jZGfRGTgBK1adf0azdmbsn29gifRGNL74Xe+8DDyQfyKeEo3FqhyXu2Cl7xv+8Kmfb
- jlIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=+lr026ViL5pP9sUZ3TRnWegeVegWWlpZ5aPe8Lgdc9E=;
- b=WqBJqPI+Bto2O/XIijXA3u1NmJtJxs+igNTL/g8c1NffuTW39v2KlKT9+lwADDYESe
- k7hyHMG/vaPgze3jrB/UBcSvbkmiUn3hivQrE2TwCCFgsSChsvZWPQakklY0gRO/Kkn6
- tOtgrwLfIknV5ISlW2Hw6RxIE552Pp7J15YuVPGw9nAxF5PvmExtFpBqhDubco1uW3IJ
- q4VHqzFGbyoltUQ7BLxDjuqy7B5EiSfKoFBj9LFCtJ4VqyVAWhQchNhunweTbABOOt2Z
- 3bVs9N2FoLVj0GebWQ3IwmPmtEoAGhsUiyVtFjcVQev6mDgxENE9j2Qh12nZPt7bbZ9K
- YtIw==
-X-Gm-Message-State: APjAAAWGjloS5uR75LZ4I7GJos3G5M0j8GV0pcdjHUWjIMadyG33jLas
- TrHEu+Tq/lJiReapfqvMaxmAjA==
-X-Google-Smtp-Source: APXvYqxCeBGgE4okRWM5P1QAi6cBGxcKUpnqlrNaFHmLV1RsKhdNSJoPVSfqO4Lfh647s7Y/ipZU8Q==
-X-Received: by 2002:a1c:c28a:: with SMTP id
- s132mr22234938wmf.162.1572869638483; 
- Mon, 04 Nov 2019 04:13:58 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 14sm4742136wrc.65.2019.11.04.04.13.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 Nov 2019 04:13:57 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6DBC71FF87;
- Mon,  4 Nov 2019 12:13:56 +0000 (GMT)
-References: <CAEyhzFtb6Gn86VkR+BXbUPsHLtfbjDwotwZXDVyLCMjbrTXWrA@mail.gmail.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: logfile issue
-In-reply-to: <CAEyhzFtb6Gn86VkR+BXbUPsHLtfbjDwotwZXDVyLCMjbrTXWrA@mail.gmail.com>
-Date: Mon, 04 Nov 2019 12:13:56 +0000
-Message-ID: <87tv7jkfej.fsf@linaro.org>
+ (envelope-from <zhengxiang9@huawei.com>) id 1iRbHp-0004zs-Pk
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 07:16:47 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2260 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
+ id 1iRbHi-0004sa-Ov; Mon, 04 Nov 2019 07:16:39 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id A17A11B8C0C441E7636B;
+ Mon,  4 Nov 2019 20:16:35 +0800 (CST)
+Received: from HGHY4Z004218071.china.huawei.com (10.133.224.57) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.439.0; Mon, 4 Nov 2019 20:16:25 +0800
+From: Xiang Zheng <zhengxiang9@huawei.com>
+To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
+ <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>, <lersek@redhat.com>,
+ <james.morse@arm.com>, <gengdongjiu@huawei.com>, <mtosatti@redhat.com>,
+ <rth@twiddle.net>, <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
+ <xuwei5@huawei.com>, <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+ <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+Subject: [PATCH v21 4/6] KVM: Move hwpoison page related functions into
+ kvm-all.c
+Date: Mon, 4 Nov 2019 20:14:56 +0800
+Message-ID: <20191104121458.29208-5-zhengxiang9@huawei.com>
+X-Mailer: git-send-email 2.15.1.windows.2
+In-Reply-To: <20191104121458.29208-1-zhengxiang9@huawei.com>
+References: <20191104121458.29208-1-zhengxiang9@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::330
+Content-Type: text/plain
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,128 +71,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Puhov <peter.puhov@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: wanghaibin.wang@huawei.com, zhengxiang9@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Dongjiu Geng <gengdongjiu@huawei.com>
 
-Robert Foley <robert.foley@linaro.org> writes:
+kvm_hwpoison_page_add() and kvm_unpoison_all() will both be used by X86
+and ARM platforms, so moving them into "accel/kvm/kvm-all.c" to avoid
+duplicate code.
 
-> We hit an issue when trying to change the log file from the monitor
-> console.  The root of the issue here is that the qemu_logfile handle
-> is not thread safe.  So when we try to close the file, we end up with
-> a seg fault.  The full analysis is below along with some possible
-> solutions.
-> Will plan to post a patch soon, but any comments or opinions on our
-> proposed solution would be appreciated.  Thanks.
->
-> The version of QEMU we are using is: master as of about Oct 15,
-> 9020e9526cd08c4dc99d54dba48730de2908c970.
->
-> This is what we did to reproduce the issue.
-> First we enable logging and select the log file.
-> (qemu) log in_asm,out_asm,op
-> (qemu) logfile asm.out
->
-> Then we start this command in the guest.  This just keeps the guest
-> performing operations that result in logging to be constantly
-> generated.
-> $ for i in {0..1000}; do ls -l; done
->
-> Next we switch to the monitor console and change the file.
-> (qemu) logfile asm_new.log
->
-> This action causes a seg fault.  Please see the stack trace (below).
->
-> The code, which changes the log file unconditionally
-> (qemu_set_log_filename()), closes the qemu_logfile, sets it to NULL,
-> and then opens the new file.
-> Since the file handle is still in use, we end up with a seg fault when
-> the code which is trying to log ends up using a NULL file handle.
+For architectures that don't use the poison-list functionality the
+reset handler will harmlessly do nothing, so let's register the
+kvm_unpoison_all() function in the generic kvm_init() function.
 
-Yep, good catch.
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+---
+ accel/kvm/kvm-all.c      | 36 ++++++++++++++++++++++++++++++++++++
+ include/sysemu/kvm_int.h | 12 ++++++++++++
+ target/i386/kvm.c        | 36 ------------------------------------
+ 3 files changed, 48 insertions(+), 36 deletions(-)
 
-> We are considering a few solutions.
->
-> A straightforward solution would be to simply prevent the file from
-> being changed while logging is enabled.  In other words, force the
-> user to first disable logging before changing the log file.
-> This solution seems to cover the general case.  However, if a user
-> were to disable logging and change the log file in quick succession,
-> we would still be subject to a similar race.  A log call could still
-> make it through the logging enable check and proceed to use a file
-> handle that gets changed to NULL.
->
-> Another option is to add a mutex to prevent the qemu_logfile handle
-> from being changed while it is in use.  This certainly works and has
-> the advantage of being fairly straightforward.  Also we are thinking
-> that since the mutex would only be used when logging is enabled it has
-> the advantage of not having an effect on the normal case performance.
-> Another option is to implement a simple atomic ref count and prevent
-> the file from being changed while there are outstanding references.
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 140b0bd8f6..f45096d5a0 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -41,6 +41,7 @@
+ #include "hw/irq.h"
+ #include "sysemu/sev.h"
+ #include "sysemu/balloon.h"
++#include "sysemu/reset.h"
+ 
+ #include "hw/boards.h"
+ 
+@@ -856,6 +857,39 @@ int kvm_vm_check_extension(KVMState *s, unsigned int extension)
+     return ret;
+ }
+ 
++typedef struct HWPoisonPage {
++    ram_addr_t ram_addr;
++    QLIST_ENTRY(HWPoisonPage) list;
++} HWPoisonPage;
++
++static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
++    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
++
++static void kvm_unpoison_all(void *param)
++{
++    HWPoisonPage *page, *next_page;
++
++    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
++        QLIST_REMOVE(page, list);
++        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
++        g_free(page);
++    }
++}
++
++void kvm_hwpoison_page_add(ram_addr_t ram_addr)
++{
++    HWPoisonPage *page;
++
++    QLIST_FOREACH(page, &hwpoison_page_list, list) {
++        if (page->ram_addr == ram_addr) {
++            return;
++        }
++    }
++    page = g_new(HWPoisonPage, 1);
++    page->ram_addr = ram_addr;
++    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
++}
++
+ static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
+ {
+ #if defined(HOST_WORDS_BIGENDIAN) != defined(TARGET_WORDS_BIGENDIAN)
+@@ -2031,6 +2065,8 @@ static int kvm_init(MachineState *ms)
+         goto err;
+     }
+ 
++    qemu_register_reset(kvm_unpoison_all, NULL);
++
+     if (machine_kernel_irqchip_allowed(ms)) {
+         kvm_irqchip_create(ms, s);
+     }
+diff --git a/include/sysemu/kvm_int.h b/include/sysemu/kvm_int.h
+index ac2d1f8b56..c660a70c51 100644
+--- a/include/sysemu/kvm_int.h
++++ b/include/sysemu/kvm_int.h
+@@ -42,4 +42,16 @@ void kvm_memory_listener_register(KVMState *s, KVMMemoryListener *kml,
+                                   AddressSpace *as, int as_id);
+ 
+ void kvm_set_max_memslot_size(hwaddr max_slot_size);
++
++/**
++ * kvm_hwpoison_page_add:
++ *
++ * Parameters:
++ *  @ram_addr: the address in the RAM for the poisoned page
++ *
++ * Add a poisoned page to the list
++ *
++ * Return: None.
++ */
++void kvm_hwpoison_page_add(ram_addr_t ram_addr);
+ #endif
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index bfd09bd441..d8f2507a8d 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -24,7 +24,6 @@
+ #include "sysemu/sysemu.h"
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/kvm_int.h"
+-#include "sysemu/reset.h"
+ #include "sysemu/runstate.h"
+ #include "kvm_i386.h"
+ #include "hyperv.h"
+@@ -521,40 +520,6 @@ uint64_t kvm_arch_get_supported_msr_feature(KVMState *s, uint32_t index)
+     }
+ }
+ 
+-
+-typedef struct HWPoisonPage {
+-    ram_addr_t ram_addr;
+-    QLIST_ENTRY(HWPoisonPage) list;
+-} HWPoisonPage;
+-
+-static QLIST_HEAD(, HWPoisonPage) hwpoison_page_list =
+-    QLIST_HEAD_INITIALIZER(hwpoison_page_list);
+-
+-static void kvm_unpoison_all(void *param)
+-{
+-    HWPoisonPage *page, *next_page;
+-
+-    QLIST_FOREACH_SAFE(page, &hwpoison_page_list, list, next_page) {
+-        QLIST_REMOVE(page, list);
+-        qemu_ram_remap(page->ram_addr, TARGET_PAGE_SIZE);
+-        g_free(page);
+-    }
+-}
+-
+-static void kvm_hwpoison_page_add(ram_addr_t ram_addr)
+-{
+-    HWPoisonPage *page;
+-
+-    QLIST_FOREACH(page, &hwpoison_page_list, list) {
+-        if (page->ram_addr == ram_addr) {
+-            return;
+-        }
+-    }
+-    page = g_new(HWPoisonPage, 1);
+-    page->ram_addr = ram_addr;
+-    QLIST_INSERT_HEAD(&hwpoison_page_list, page, list);
+-}
+-
+ static int kvm_get_mce_cap_supported(KVMState *s, uint64_t *mce_cap,
+                                      int *max_banks)
+ {
+@@ -2157,7 +2122,6 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+         fprintf(stderr, "e820_add_entry() table is full\n");
+         return ret;
+     }
+-    qemu_register_reset(kvm_unpoison_all, NULL);
+ 
+     shadow_mem = machine_kvm_shadow_mem(ms);
+     if (shadow_mem != -1) {
+-- 
+2.19.1
 
-The mutex is the simplest but I wonder if it show up on heavy usage? The
-log file is already doing file locking for the areas that want
-contiguous log statements.
 
-I wonder if using RCU to swap out the new and old FD would make things a
-bit smoother here? You would have to tweak the qemu_log_lock/unlock
-functions to preserve the current FD around the lock and call_rcu a
-freeing function when a new handle is set.
-
-> We are leaning towards the mutex option, and plan to post a patch
-> soon, but would appreciate comments or opinions on this solution.
->
-> Thanks,
-> Rob Foley
->
-> stack trace
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> Thread 10 "qemu-system-aar" received signal SIGSEGV, Segmentation fault.
-> [Switching to Thread 0xffff113f9d90 (LWP 9493)] __flockfile
-> (stream=3D0x0) at ../sysdeps/pthread/flockfile.c:27
-> 27 ../sysdeps/pthread/flockfile.c: No such file or directory.
-> (gdb) bt
-> #0  __flockfile (stream=3D0x0) at ../sysdeps/pthread/flockfile.c:27
-> #1  0x0000aaaae0fac8b8 in qemu_flockfile (f=3D<optimized out>) at
-> /home/rob/qemu/qemu_unchanged/include/sysemu/os-posix.h:87
-> #2  qemu_log_lock () at /home/rob/qemu/qemu_unchanged/include/qemu/log.h:=
-57
-> #3  translator_loop (ops=3D0xaaaae17f1348 <aarch64_translator_ops>,
-> db=3D0xffff113f9088, db@entry=3D0xffff113f9098,
-> cpu=3Dcpu@entry=3D0xaaab0a52bc50,
->     tb=3Dtb@entry=3D0xffff4c92d000 <code_gen_buffer+814927796>,
-> max_insns=3Dmax_insns@entry=3D512) at
-> /home/rob/qemu/qemu_unchanged/accel/tcg/translator.c:121
-> #4  0x0000aaaae10c1c18 in gen_intermediate_code
-> (cpu=3Dcpu@entry=3D0xaaab0a52bc50, tb=3Dtb@entry=3D0xffff4c92d000
-> <code_gen_buffer+814927796>, max_insns=3Dmax_insns@entry=3D512)
->     at /home/rob/qemu/qemu_unchanged/target/arm/translate.c:11320
-> #5  0x0000aaaae0fab248 in tb_gen_code (cpu=3D0xaaab0a52bc50,
-> cpu@entry=3D0xffffabe2a000, pc=3D187650897458448, cs_base=3D65536,
-> flags=3D43690, cflags=3D-16252928, cflags@entry=3D524288)
->     at /home/rob/qemu/qemu_unchanged/accel/tcg/translate-all.c:1738
-> #6  0x0000aaaae0fa8e74 in tb_find (cf_mask=3D524288, tb_exit=3D0,
-> last_tb=3D0xffff4c92cc40 <code_gen_buffer+814926836>,
-> cpu=3D0xffffabe2a000)
->     at /home/rob/qemu/qemu_unchanged/accel/tcg/cpu-exec.c:408
-> #7  cpu_exec (cpu=3D0xffffabe2a000, cpu@entry=3D0xaaab0a52bc50) at
-> /home/rob/qemu/qemu_unchanged/accel/tcg/cpu-exec.c:730
-> #8  0x0000aaaae0f6de24 in tcg_cpu_exec (cpu=3D0xaaab0a52bc50) at
-> /home/rob/qemu/qemu_unchanged/cpus.c:1454
-> #9  0x0000aaaae0f70908 in qemu_tcg_cpu_thread_fn (arg=3D0xaaab0a52bc50)
-> at /home/rob/qemu/qemu_unchanged/cpus.c:1762
-> #10 0x0000aaaae145bd38 in qemu_thread_start (args=3D<optimized out>) at
-> /home/rob/qemu/qemu_unchanged/util/qemu-thread-posix.c:519
-> #11 0x0000ffffabe0a088 in start_thread (arg=3D0xffffcc20410f) at
-> pthread_create.c:463
-> #12 0x0000ffffabd7a4ec in thread_start () at
-> ../sysdeps/unix/sysv/linux/aarch64/clone.S:78
-
-
---
-Alex Benn=C3=A9e
 
