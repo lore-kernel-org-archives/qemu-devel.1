@@ -4,77 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7FDACA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF344CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:19:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8405720848
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:18:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 785AF20663
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:19:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cUQGx9MN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8405720848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="edFrVwlo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 785AF20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRe89-0007fc-JY
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 10:18:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40399)
+	id 1iRe95-0000mJ-Fv
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 10:19:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40423)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iRe38-0002Ue-Vy
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:13:48 -0500
+ (envelope-from <crosa@redhat.com>) id 1iRe3B-0002Zw-UY
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:13:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iRe37-0002cZ-Ub
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:13:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43437
+ (envelope-from <crosa@redhat.com>) id 1iRe3A-0002e1-Ph
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:13:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41235
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iRe37-0002cE-Qx
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:13:45 -0500
+ (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iRe3A-0002dV-ME
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:13:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572880425;
+ s=mimecast20190719; t=1572880427;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sSUELfnrVYtkXpTtuIBRLY6tkamPIObtTgXDiupYXx4=;
- b=cUQGx9MNoTTRSJwhEIi7krGYVpyRAyWWnFdLb4u4nx/rLazKclM2+b8H7NjoMhUl5vQpDm
- 1JplY51u/4aGM/4t0xkA3iHFY3yGuVY0eyAAFfYT9PP9/IAgMHMZMWKmU74Io1PgKgqyqV
- SDNJd2FSL+lmEPP4fQBXjx7Qie04Xfo=
+ bh=UW+Kyz+S6mkxjDRzeRSye6W+beJmVisKQT4ldis/Gso=;
+ b=edFrVwloSF1GgYzudtdGdz3AVq/8xYqShdKD4F9gHacW5lGe/XlSviAuJqUgcmOk079CF8
+ pbZ7e8qa2UCPV15IiieLp6/mdGp1ayC3pDdM+bWbr9Jd4GX/uW9Oy32chIQ4U5hTX6VueM
+ phzklA708CaG/xypZ8uh94iZZozXFrI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-mrASq1UiOoq78_TLnaJJow-1; Mon, 04 Nov 2019 10:13:42 -0500
+ us-mta-129-jrda1f0dOQm11SGtHtUfKQ-1; Mon, 04 Nov 2019 10:13:45 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1812800A02;
- Mon,  4 Nov 2019 15:13:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C8011800D53;
+ Mon,  4 Nov 2019 15:13:44 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-123-183.rdu2.redhat.com
  [10.10.123.183])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E92BC5D6C8;
- Mon,  4 Nov 2019 15:13:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D18A35D6C5;
+ Mon,  4 Nov 2019 15:13:42 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 2/8] Acceptance tests: introduce utility method for tags
- unique vals
-Date: Mon,  4 Nov 2019 10:13:17 -0500
-Message-Id: <20191104151323.9883-3-crosa@redhat.com>
+Subject: [PATCH v7 4/8] Acceptance tests: use relative location for tests
+Date: Mon,  4 Nov 2019 10:13:19 -0500
+Message-Id: <20191104151323.9883-5-crosa@redhat.com>
 In-Reply-To: <20191104151323.9883-1-crosa@redhat.com>
 References: <20191104151323.9883-1-crosa@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: mrASq1UiOoq78_TLnaJJow-1
+X-MC-Unique: jrda1f0dOQm11SGtHtUfKQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,52 +98,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently a test can describe the target architecture binary that it
-should primarily be run with, be setting a single tag value.
+An Avocado Test ID[1] is composed by a number of components, but it
+starts with the Test Name, usually a file system location that was
+given to the loader.
 
-The same approach is expected to be done with other QEMU aspects to be
-tested, for instance, the machine type and accelerator, so let's
-generalize the logic into a utility method.
+Because the source directory is being given as a prefix to the
+"tests/acceptance" directory containing the acceptance tests, the test
+names will needlessly include the directory the user is using to host
+the QEMU sources (and/or build tree).
+
+Let's remove the source dir (or a build dir) from the path given to
+the test loader.  This should give more constant names, and when using
+result servers and databases, it should give the same test names
+across executions from different people or from different directories.
+
+[1] - https://avocado-framework.readthedocs.io/en/69.0/ReferenceGuide.html#=
+test-id
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/acceptance/avocado_qemu/__init__.py | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ tests/Makefile.include | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/a=
-vocado_qemu/__init__.py
-index 9a57c020d8..e676d9c4e7 100644
---- a/tests/acceptance/avocado_qemu/__init__.py
-+++ b/tests/acceptance/avocado_qemu/__init__.py
-@@ -100,14 +100,21 @@ def exec_command_and_wait_for_pattern(test, command,
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 56f73b46e2..65e85f5275 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -1180,7 +1180,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR)
+             --show=3D$(AVOCADO_SHOW) run --job-results-dir=3D$(TESTS_RESUL=
+TS_DIR) \
+             --filter-by-tags-include-empty --filter-by-tags-include-empty-=
+key \
+             $(AVOCADO_TAGS) \
+-            --failfast=3Don $(SRC_PATH)/tests/acceptance, \
++            --failfast=3Don tests/acceptance, \
+             "AVOCADO", "tests/acceptance")
 =20
-=20
- class Test(avocado.Test):
-+    def _get_unique_tag_val(self, tag_name):
-+        """
-+        Gets a tag value, if unique for a key
-+        """
-+        vals =3D self.tags.get(tag_name, [])
-+        if len(vals) =3D=3D 1:
-+            return vals.pop()
-+        return None
-+
-     def setUp(self):
-         self._vms =3D {}
--        arches =3D self.tags.get('arch', [])
--        if len(arches) =3D=3D 1:
--            arch =3D arches.pop()
--        else:
--            arch =3D None
--        self.arch =3D self.params.get('arch', default=3Darch)
-+
-+        self.arch =3D self.params.get('arch',
-+                                    default=3Dself._get_unique_tag_val('ar=
-ch'))
-+
-         default_qemu_bin =3D pick_default_qemu_bin(arch=3Dself.arch)
-         self.qemu_bin =3D self.params.get('qemu_bin',
-                                         default=3Ddefault_qemu_bin)
+ # Consolidated targets
 --=20
 2.21.0
 
