@@ -2,65 +2,89 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B558CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 16:44:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E3BCA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 17:09:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6627D20869
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 16:44:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEF282080F
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 17:09:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jge5uPgN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6627D20869
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vm5EQflm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEF282080F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRfSe-0003je-Ko
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 11:44:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55386)
+	id 1iRfqn-0003w1-UZ
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 12:09:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58706)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iRfPi-0000zQ-FX
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:41:13 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iRfpz-0003Ty-7r
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:08:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iRfPg-000712-EH
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:41:09 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:37967 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iRfPc-0006z4-PV
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:41:07 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 476JT73XkQz9sP6; Tue,  5 Nov 2019 03:40:58 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1572885659;
- bh=vIKMWest0STGnzzRZ9KejAXGHa/cjp9qNzwMlqZWirM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=jge5uPgNcHFezpGI0gRgOENOd8HFtHMkY4rhuRmqgx21fJvMlGhhMcluWhzKRTdOW
- R6Ws/KzI/PmK2mSQps7ZlBOGOAMp0OX+o9AW5H1vRslVVl75yo6hVK/5iY+ZI8kmBB
- FH6O6x4AlmE7aWrmT4gLppg0jHxH/YPmHwUXJPpQ=
-Date: Mon, 4 Nov 2019 17:02:28 +0100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Liu Yi L <yi.l.liu@intel.com>
-Subject: Re: [RFC v2 14/22] vfio/pci: add iommu_context notifier for pasid
- bind/unbind
-Message-ID: <20191104160228.GG3552@umbus.metropole.lan>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-15-git-send-email-yi.l.liu@intel.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iRfpx-0007f6-S7
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:08:18 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33722)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iRfpx-0007ei-L6
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:08:17 -0500
+Received: by mail-wm1-x343.google.com with SMTP id 6so14530281wmf.0
+ for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 09:08:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Gy/Qc35w4nzAwOQQmBrcDp/XldF1FLrN9oQjHngOM0A=;
+ b=vm5EQflm+JF/56/xsKG8zPTkbjbcSwUE8M2kug7nfetFujEboM6ImvFfKMxOKljf70
+ CZFWhRh512ZRSVclkx38/nu04ipPf9nPyXc7pEPVAOGy0NR+NfIXnFYdNjxUeNbFhV3n
+ /KyhLKEWCvO4gl0XPYM+hBWWKiKD4OIFqOUaPRxyebD9rbYfbKwyMoeVF2M5xrdKjOI4
+ 6j6TAPuLTT9muC2A9jTIIp4f0SHtM0YeqoK6JWn+1o3fZO7msjqrA3Mdtkd1NUr3XT6R
+ JSVBnmUIYpbE7vGnGFr1eAE6DsclBRoocoF3yfaPgq1ZMCLb6meE8hcTfYQDChi4BtNV
+ NFJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Gy/Qc35w4nzAwOQQmBrcDp/XldF1FLrN9oQjHngOM0A=;
+ b=PjAEpolhGgtEQ2q+SBcfyH/e86kOQZRLnuzh3THNaATLqRafxdTyuvhlrpTvFGQbI0
+ MYj6hSGBudKVkoJ7o+R2gFroR7lhLGp4N2TGx0eFEOIn3rkvsXZ5EoaGsr11cJfSfOhQ
+ sfe8U2hATnLZF9DEYFUxrHnUtk5gCxLJzTe7K2eJGHjWzBLn09GHiT9EKcAAjMPaBdvR
+ cXOyO4KOJIV0RvoSBRgWubUfYX+8zIDWAB9QWhObboDLQdALnTOhQpujHfiN7+cuZrLd
+ y04Zx5UWfNDm4uS9GBv7/ROuVubsajYcOYyl14Ew12XBR0b+eMgYfxmIpEQ+jCbDjZwP
+ rkAw==
+X-Gm-Message-State: APjAAAWWIQ299hglOk/HGR0zjBXNvaldby91kX7q9yE2kr0Lbjun7i4P
+ 6xY03VZAS3NnW0F5LWz0PzhX/w==
+X-Google-Smtp-Source: APXvYqwAq0HAnWWDHR/JqvNeBNSa85pFUsTMHsqZUsej5Bn2EJUNSKk9vtmvCPdgD/BAg+79bo8u8Q==
+X-Received: by 2002:a7b:cb86:: with SMTP id m6mr133651wmi.124.1572887296108;
+ Mon, 04 Nov 2019 09:08:16 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id m3sm18689868wrb.67.2019.11.04.09.08.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 Nov 2019 09:08:15 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 7F1961FF87;
+ Mon,  4 Nov 2019 17:08:14 +0000 (GMT)
+References: <20191025090841.10299-1-christophe.lyon@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH 1/1] target/arm: Add support for cortex-m7 CPU
+In-reply-to: <20191025090841.10299-1-christophe.lyon@linaro.org>
+Date: Mon, 04 Nov 2019 17:08:14 +0000
+Message-ID: <87r22nk1s1.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="X0vpKvTpCy87tk9a"
-Content-Disposition: inline
-In-Reply-To: <1571920483-3382-15-git-send-email-yi.l.liu@intel.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,163 +96,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: tianyu.lan@intel.com, kevin.tian@intel.com, jacob.jun.pan@linux.intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, qemu-devel@nongnu.org, peterx@redhat.com,
- eric.auger@redhat.com, alex.williamson@redhat.com, pbonzini@redhat.com,
- yi.y.sun@intel.com
+Cc: peter.maydell@linaro.org, Christophe Lyon <christophe.lyon@linaro.org>,
+ richard.henderson@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---X0vpKvTpCy87tk9a
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Christophe Lyon <christophe.lyon@linaro.org> writes:
 
-On Thu, Oct 24, 2019 at 08:34:35AM -0400, Liu Yi L wrote:
-> This patch adds notifier for pasid bind/unbind. VFIO registers this
-> notifier to listen to the dual-stage translation (a.k.a. nested
-> translation) configuration changes and propagate to host. Thus vIOMMU
-> is able to set its translation structures to host.
->=20
-> Cc: Kevin Tian <kevin.tian@intel.com>
-> Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> This is derived from cortex-m4 description, adding DP support and FPv5
+> instructions with the corresponding flags in isar and mvfr2.
+>
+> Checked that it could successfully execute
+> vrinta.f32 s15, s15
+> while cortex-m4 emulation rejects it with "illegal instruction".
+
+I couldn't verify the cpu->midr values as most of the sections seem to
+be IMPDEF but the rest of the feature bits look OK to me:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+>
+> Signed-off-by: Christophe Lyon <christophe.lyon@linaro.org>
 > ---
->  hw/vfio/pci.c            | 39 +++++++++++++++++++++++++++++++++++++++
->  include/hw/iommu/iommu.h | 11 +++++++++++
->  2 files changed, 50 insertions(+)
->=20
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 8721ff6..012b8ed 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2767,6 +2767,41 @@ static void vfio_iommu_pasid_free_notify(IOMMUCTXN=
-otifier *n,
->      pasid_req->free_result =3D ret;
+>  target/arm/cpu.c | 33 +++++++++++++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
+>
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 13813fb..ccae849 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1954,6 +1954,37 @@ static void cortex_m4_initfn(Object *obj)
+>      cpu->isar.id_isar6 =3D 0x00000000;
 >  }
-> =20
-> +static void vfio_iommu_pasid_bind_notify(IOMMUCTXNotifier *n,
-> +                                         IOMMUCTXEventData *event_data)
+>
+> +static void cortex_m7_initfn(Object *obj)
 > +{
-> +#ifdef __linux__
-
-Is hw/vfio/pci.c even built on non-linux hosts?
-
-> +    VFIOIOMMUContext *giommu_ctx =3D container_of(n, VFIOIOMMUContext, n=
-);
-> +    VFIOContainer *container =3D giommu_ctx->container;
-> +    IOMMUCTXPASIDBindData *pasid_bind =3D
-> +                              (IOMMUCTXPASIDBindData *) event_data->data;
-> +    struct vfio_iommu_type1_bind *bind;
-> +    struct iommu_gpasid_bind_data *bind_data;
-> +    unsigned long argsz;
+> +    ARMCPU *cpu =3D ARM_CPU(obj);
 > +
-> +    argsz =3D sizeof(*bind) + sizeof(*bind_data);
-> +    bind =3D g_malloc0(argsz);
-> +    bind->argsz =3D argsz;
-> +    bind->bind_type =3D VFIO_IOMMU_BIND_GUEST_PASID;
-> +    bind_data =3D (struct iommu_gpasid_bind_data *) &bind->data;
-> +    *bind_data =3D *pasid_bind->data;
-> +
-> +    if (pasid_bind->flag & IOMMU_CTX_BIND_PASID) {
-> +        if (ioctl(container->fd, VFIO_IOMMU_BIND, bind) !=3D 0) {
-> +            error_report("%s: pasid (%llu:%llu) bind failed: %d", __func=
-__,
-> +                         bind_data->gpasid, bind_data->hpasid, -errno);
-> +        }
-> +    } else if (pasid_bind->flag & IOMMU_CTX_UNBIND_PASID) {
-> +        if (ioctl(container->fd, VFIO_IOMMU_UNBIND, bind) !=3D 0) {
-> +            error_report("%s: pasid (%llu:%llu) unbind failed: %d", __fu=
-nc__,
-> +                         bind_data->gpasid, bind_data->hpasid, -errno);
-> +        }
-> +    }
-> +
-> +    g_free(bind);
-> +#endif
+> +    set_feature(&cpu->env, ARM_FEATURE_V7);
+> +    set_feature(&cpu->env, ARM_FEATURE_M);
+> +    set_feature(&cpu->env, ARM_FEATURE_M_MAIN);
+> +    set_feature(&cpu->env, ARM_FEATURE_THUMB_DSP);
+> +    set_feature(&cpu->env, ARM_FEATURE_VFP4);
+> +    cpu->midr =3D 0x411fc272; /* r1p2 */
+> +    cpu->pmsav7_dregion =3D 8;
+> +    cpu->isar.mvfr0 =3D 0x10110221;
+> +    cpu->isar.mvfr1 =3D 0x12000011;
+> +    cpu->isar.mvfr2 =3D 0x00000040;
+> +    cpu->id_pfr0 =3D 0x00000030;
+> +    cpu->id_pfr1 =3D 0x00000200;
+> +    cpu->id_dfr0 =3D 0x00100000;
+> +    cpu->id_afr0 =3D 0x00000000;
+> +    cpu->id_mmfr0 =3D 0x00100030;
+> +    cpu->id_mmfr1 =3D 0x00000000;
+> +    cpu->id_mmfr2 =3D 0x01000000;
+> +    cpu->id_mmfr3 =3D 0x00000000;
+> +    cpu->isar.id_isar0 =3D 0x01101110;
+> +    cpu->isar.id_isar1 =3D 0x02112000;
+> +    cpu->isar.id_isar2 =3D 0x20232231;
+> +    cpu->isar.id_isar3 =3D 0x01111131;
+> +    cpu->isar.id_isar4 =3D 0x01310132;
+> +    cpu->isar.id_isar5 =3D 0x00000000;
+> +    cpu->isar.id_isar6 =3D 0x00000000;
 > +}
 > +
->  static void vfio_realize(PCIDevice *pdev, Error **errp)
+>  static void cortex_m33_initfn(Object *obj)
 >  {
->      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
-> @@ -3079,6 +3114,10 @@ static void vfio_realize(PCIDevice *pdev, Error **=
-errp)
->                                           iommu_context,
->                                           vfio_iommu_pasid_free_notify,
->                                           IOMMU_CTX_EVENT_PASID_FREE);
-> +        vfio_register_iommu_ctx_notifier(vdev,
-> +                                         iommu_context,
-> +                                         vfio_iommu_pasid_bind_notify,
-> +                                         IOMMU_CTX_EVENT_PASID_BIND);
->      }
-> =20
->      return;
-> diff --git a/include/hw/iommu/iommu.h b/include/hw/iommu/iommu.h
-> index 4352afd..4f21aa1 100644
-> --- a/include/hw/iommu/iommu.h
-> +++ b/include/hw/iommu/iommu.h
-> @@ -33,6 +33,7 @@ typedef struct IOMMUContext IOMMUContext;
->  enum IOMMUCTXEvent {
->      IOMMU_CTX_EVENT_PASID_ALLOC,
->      IOMMU_CTX_EVENT_PASID_FREE,
-> +    IOMMU_CTX_EVENT_PASID_BIND,
->      IOMMU_CTX_EVENT_NUM,
->  };
->  typedef enum IOMMUCTXEvent IOMMUCTXEvent;
-> @@ -50,6 +51,16 @@ union IOMMUCTXPASIDReqDesc {
->  };
->  typedef union IOMMUCTXPASIDReqDesc IOMMUCTXPASIDReqDesc;
-> =20
-> +struct IOMMUCTXPASIDBindData {
-> +#define IOMMU_CTX_BIND_PASID   (1 << 0)
-> +#define IOMMU_CTX_UNBIND_PASID (1 << 1)
-> +    uint32_t flag;
-> +#ifdef __linux__
-> +    struct iommu_gpasid_bind_data *data;
+>      ARMCPU *cpu =3D ARM_CPU(obj);
+> @@ -2538,6 +2569,8 @@ static const ARMCPUInfo arm_cpus[] =3D {
+>                               .class_init =3D arm_v7m_class_init },
+>      { .name =3D "cortex-m4",   .initfn =3D cortex_m4_initfn,
+>                               .class_init =3D arm_v7m_class_init },
+> +    { .name =3D "cortex-m7",   .initfn =3D cortex_m7_initfn,
+> +                             .class_init =3D arm_v7m_class_init },
+>      { .name =3D "cortex-m33",  .initfn =3D cortex_m33_initfn,
+>                               .class_init =3D arm_v7m_class_init },
+>      { .name =3D "cortex-r5",   .initfn =3D cortex_r5_initfn },
 
-Embedding a linux specific structure in the notification message seems
-dubious to me.
 
-> +#endif
-> +};
-> +typedef struct IOMMUCTXPASIDBindData IOMMUCTXPASIDBindData;
-> +
->  struct IOMMUCTXEventData {
->      IOMMUCTXEvent event;
->      uint64_t length;
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---X0vpKvTpCy87tk9a
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3AS5EACgkQbDjKyiDZ
-s5Kjjg//SUCBaBa2SSgTf/kKJo38JdT5/wTHBsadIfvCkelJq+phiHV0lY2PVy+T
-Uz3CYiuzui10CwhwKy35mKttLUZ9hBiIJkt7edNMPmCvvMnNuD0bp7stgdYXMfh0
-D/WyD0yh7eBNppMqwe7eXUVWLMtD53593Ki1FevulZf9/cvimx6Pyg9/FHBGZy/R
-kexEMOIZzgtAO2LMDb2M80zqb0UYmG52S/7nU/ijP7zUSS3kvLlp6RlBWGZLotxu
-PK7Qn0/RKecENGKkedK35QFpfGkPDCf8llC6XoNUA/QyfNxqZfuaG+3keUfGNE+Y
-bH5ycYAI0mE7g10sDye90BAptmGPdiJg7bs4qzikbFGDDkf4GuHHDiKLKHBBHWaf
-5UVj3erqaILxztjxUWvwVNTaQA29WQ9MCLGIEtDoKyTOBIk1lrl9Y+GJ6tMA7fFk
-gZR+kh6XvUNr6rYLcFLyAPkGVARuyt5fVT7C0+Xxhg/XAA3jyTIRivolynkPBVmY
-9frrH5+MesRJd69ZJL76MS8VCYVENoqGOYM54yum8aY59stZtk4cpStrYNkFnBkV
-9+iAvQcTWifi+Pjy1K0tu2HJJLUBYRSDS8s1oI++985iP0X9r4LQs1j32dDPRDTq
-JJsx/0gjXg6P9O9dwZrd22WSUvhL4Wg58K82j3koJGL5tSrr4Ho=
-=Bqsb
------END PGP SIGNATURE-----
-
---X0vpKvTpCy87tk9a--
+--
+Alex Benn=C3=A9e
 
