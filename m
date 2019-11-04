@@ -2,110 +2,96 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA5FCA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 16:09:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7145CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 16:25:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7544120B7C
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 16:09:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D49020848
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 16:25:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NhDLZ03/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7544120B7C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f2sck0Rl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D49020848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iReul-0003lt-Fo
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 11:09:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49485)
+	id 1iRfA4-0001Bm-K3
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 11:25:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52060)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iRetH-0002uz-IU
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:07:40 -0500
+ (envelope-from <philmd@redhat.com>) id 1iRf8r-0000Kz-Bf
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:23:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iRetF-000801-83
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:07:38 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60606
+ (envelope-from <philmd@redhat.com>) id 1iRf8o-0006bF-Px
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:23:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40811
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iRetF-0007yv-4X
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:07:37 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iRf8o-0006b0-D8
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:23:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572883656;
+ s=mimecast20190719; t=1572884621;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=NPJR68hHe4r6AMvwTHR3gJ/D+6q9Dpd3AOXqunrCS5s=;
- b=NhDLZ03/E9JSoDG2KND/QSJ2R9EQYEbI/sJ7fVqEEUIG78RNk7Zx4CMMaYO5WjZsPPJie2
- Lbjb3sv8wlGmdPTV7w4fxZeBmHgzABgEAN2tcd7ogAomi71KmN4kEzP2quPn3bJxJ5JukV
- opzcE1+zfGGh5lyup9EIQfYdxXOECwc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-OAVMgQWoOmehehRgKlJ_cQ-1; Mon, 04 Nov 2019 11:07:32 -0500
-X-MC-Unique: OAVMgQWoOmehehRgKlJ_cQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC02B1005500;
- Mon,  4 Nov 2019 16:07:31 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5C76660136;
- Mon,  4 Nov 2019 16:07:25 +0000 (UTC)
-Subject: Re: [RFC 0/3] block/file-posix: Work around XFS bug
-To: Alberto Garcia <berto@igalia.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20191025095849.25283-1-mreitz@redhat.com>
- <02291bca-67d2-ed30-ac34-17641afbe397@virtuozzo.com>
- <d1b43c24-a443-dd19-6814-11eec43e943a@virtuozzo.com>
- <0f75cbcf-e6c7-c74c-972b-22e7760a8b5c@redhat.com>
- <w51r22nspqp.fsf@maestria.local.igalia.com>
- <7ed9b8f0-2d8c-7bac-185e-9a1dd68fcce8@redhat.com>
- <w51mudbsmk7.fsf@maestria.local.igalia.com>
- <5b67cf39-0ea1-d205-0e96-7b1148c7df19@redhat.com>
- <w51k18fskul.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <d85f6e4f-c1b4-43a4-18a5-918de81b5ac6@redhat.com>
-Date: Mon, 4 Nov 2019 17:07:23 +0100
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WHGq6HO7beybjRg5GMGyV8Twdmz4Kmli8kxN95dtWao=;
+ b=f2sck0RlIESimbx7rAArXseA46PbZH34X+Fk/pexvQd5kH/Bit84nMz+vdFXLmwnoEBUhO
+ 8a7AwAN75xnkPQDBz674GARxW7Iajluawxki9NsmhwFj9YNSiSZHRcuDgsYLlGL2VlcdQw
+ Whhw/+KNcCvBLkFe7JJ3QefmDnDa5oU=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-yCdIMHImPcCWbbQIwkhtiQ-1; Mon, 04 Nov 2019 11:23:40 -0500
+Received: by mail-wr1-f71.google.com with SMTP id c6so10666513wrp.3
+ for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 08:23:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pNMy+IZVqrbstgOvR+DfLKsxfy1JjwRjzypxgp2ol2o=;
+ b=VbugUMfqHT2SIWZpY4ZdDRgSFxS1DpOefiLQyjYUs0dB2EguoC7+U/1o+iygMKWOo9
+ JBwSrxWaSW/r+Z0EsB6Iq/RhPd7M5YXr2lwKIFJyMCalGA1zo4BozBMilhPXVBfStsyO
+ J6MU/CmJJfwKYQhxKTiuUdFaMVO/LrvD+Nap+w2mLPlg1RZFUkjCeEsPKteOgyzcLsuC
+ wWGxri1Q0ZFbQErezSOTfTU6tMjyrLBy/HMHwJ9n88f4u/PNAmSO/9hDm9SxkHaYnuXX
+ pnZCZg5Zpdw/kqUug1UOR4M0D+RD0/8zK7JhD6PFU+Ljmz7MU+k7QgH1Zt1NQIvHe/Ni
+ LIjg==
+X-Gm-Message-State: APjAAAUj4cSmbLQEVBWKFKsvxnVbSqfAuYioaNli8dhea4sqs2bYHTmn
+ VmSM3XmhX2GTVSXq+4XAz2Z9dQ1JJuw4vzAU3dWBtUdEQw0OJEyX47dX7MRsvcbYoUGc5MW4Ra/
+ ZuTWvXji1itOeGO0=
+X-Received: by 2002:a1c:f210:: with SMTP id s16mr21258932wmc.24.1572884618178; 
+ Mon, 04 Nov 2019 08:23:38 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy3o4dIMDIvVsBRVOc6/5xVcx9Xcb3fgO9QkvZyw8t8EqRhz1nuGGNeHfuywq2G9x70/o4+tA==
+X-Received: by 2002:a1c:f210:: with SMTP id s16mr21258913wmc.24.1572884617926; 
+ Mon, 04 Nov 2019 08:23:37 -0800 (PST)
+Received: from [192.168.1.24] (lfbn-1-7864-228.w92-167.abo.wanadoo.fr.
+ [92.167.33.228])
+ by smtp.gmail.com with ESMTPSA id t1sm21412017wrn.81.2019.11.04.08.23.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 04 Nov 2019 08:23:37 -0800 (PST)
+Subject: Re: [PATCH] tcg plugins: expose an API version concept
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20191104131836.12566-1-alex.bennee@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <3d966b24-ea00-63de-c5a3-b679664590a4@redhat.com>
+Date: Mon, 4 Nov 2019 17:23:17 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <w51k18fskul.fsf@maestria.local.igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20191104131836.12566-1-alex.bennee@linaro.org>
+Content-Language: en-US
+X-MC-Unique: yCdIMHImPcCWbbQIwkhtiQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="4z5yR5VhFYZOwEkgZ3B7nyMxtwzanH96Y"
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -120,89 +106,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: peter.maydell@linaro.org, cota@braap.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4z5yR5VhFYZOwEkgZ3B7nyMxtwzanH96Y
-Content-Type: multipart/mixed; boundary="at2vdsbXzrfERnlCrUQFCXl0SEhWOJOZ3"
-
---at2vdsbXzrfERnlCrUQFCXl0SEhWOJOZ3
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 04.11.19 16:49, Alberto Garcia wrote:
-> On Mon 04 Nov 2019 04:14:56 PM CET, Max Reitz wrote:
+On 11/4/19 2:18 PM, Alex Benn=C3=A9e wrote:
+> This is a very simple versioning API which allows the plugin
+> infrastructure to check the API a plugin was built against. We also
+> expose a min/cur API version to the plugin via the info block in case
+> it wants to avoid using old deprecated APIs in the future.
 >=20
->>>> No, what I meant was that the original problem that led to
->>>> c8bb23cbdbe would go away.
->>>
->>> Ah, right. Not quite, according to my numbers:
->>>
->>> |--------------+----------------+-----------------+-------------|
->>> | Cluster size | subclusters=3Don | subclusters=3Doff | fallocate() |
->>> |--------------+----------------+-----------------+-------------|
->>> |       256 KB |     10182 IOPS |        966 IOPS |  14007 IOPS |
->>> |       512 KB |      7919 IOPS |        563 IOPS |  13442 IOPS |
->>> |      1024 KB |      5050 IOPS |        465 IOPS |  13887 IOPS |
->>> |      2048 KB |      2465 IOPS |        271 IOPS |  13885 IOPS |
->>> |--------------+----------------+-----------------+-------------|
->>>
->>> There's obviously no backing image, and only the last column uses
->>> handle_alloc_space() / fallocate().
->>
->> Thanks for providing some numbers!
->>
->> It was my impression, too, that subclusters wouldn=E2=80=99t solve it.  =
-But it
->> didn=E2=80=99t seem like that big of a difference to me.  Did you run th=
-is
->> with aio=3Dnative?  (Because that=E2=80=99s where we have the XFS proble=
-m)
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>   include/qemu/qemu-plugin.h | 19 +++++++++++++++++++
+>   plugins/loader.c           | 15 +++++++++++++++
+>   plugins/plugin.h           |  2 ++
+>   tests/plugin/bb.c          |  2 ++
+>   tests/plugin/empty.c       |  2 ++
+>   tests/plugin/hotpages.c    |  2 ++
+>   tests/plugin/howvec.c      |  2 ++
+>   tests/plugin/insn.c        |  2 ++
+>   tests/plugin/mem.c         |  2 ++
+>   9 files changed, 48 insertions(+)
 >=20
-> Here's with aio=3Dnative
+> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
+> index a00a7deb461..5502e112c81 100644
+> --- a/include/qemu/qemu-plugin.h
+> +++ b/include/qemu/qemu-plugin.h
+> @@ -38,9 +38,28 @@
+>  =20
+>   typedef uint64_t qemu_plugin_id_t;
+>  =20
+> +/*
+> + * Versioning plugins:
+> + *
+> + * The plugin API will pass a minimum and current API version that
+> + * QEMU currently supports. The minimum API will be incremented if an
+> + * API needs to be deprecated.
+> + *
+> + * The plugins export the API they were built against by exposing the
+> + * symbol qemu_plugin_version which can be checked.
+> + */
+> +
+> +extern QEMU_PLUGIN_EXPORT int qemu_plugin_version;
+> +
+> +#define QEMU_PLUGIN_VERSION 0
+> +
+>   typedef struct {
+>       /* string describing architecture */
+>       const char *target_name;
+> +    struct {
+> +        int min;
+> +        int cur;
+> +    } version;
+>       /* is this a full system emulation? */
+>       bool system_emulation;
+>       union {
+> diff --git a/plugins/loader.c b/plugins/loader.c
+> index ce724ed5839..1bcca909691 100644
+> --- a/plugins/loader.c
+> +++ b/plugins/loader.c
+> @@ -178,6 +178,19 @@ static int plugin_load(struct qemu_plugin_desc *desc=
+, const qemu_info_t *info)
+>           goto err_symbol;
+>       }
+>  =20
+> +    if (!g_module_symbol(ctx->handle, "qemu_plugin_version", &sym)) {
+> +        warn_report("%s: missing version %s", __func__, g_module_error()=
+);
+> +    } else {
+> +        int version =3D *(int *)sym;
+> +        if (version < QEMU_PLUGIN_MIN_VERSION ||
+> +            version > QEMU_PLUGIN_VERSION) {
+> +            error_report("%s: bad plugin version %d vs %d/%d",
+> +                         __func__, version, QEMU_PLUGIN_MIN_VERSION,
+> +                         QEMU_PLUGIN_VERSION);
+> +            goto err_symbol;
+> +        }
+> +    }
+> +
+>       qemu_rec_mutex_lock(&plugin.lock);
+>  =20
+>       /* find an unused random id with &ctx as the seed */
+> @@ -248,6 +261,8 @@ int qemu_plugin_load_list(QemuPluginList *head)
+>       g_autofree qemu_info_t *info =3D g_new0(qemu_info_t, 1);
+>  =20
+>       info->target_name =3D TARGET_NAME;
+> +    info->version.min =3D QEMU_PLUGIN_MIN_VERSION;
+> +    info->version.cur =3D QEMU_PLUGIN_VERSION;
+>   #ifndef CONFIG_USER_ONLY
+>       MachineState *ms =3D MACHINE(qdev_get_machine());
+>       info->system_emulation =3D true;
+> diff --git a/plugins/plugin.h b/plugins/plugin.h
+> index 5482168d797..1aa29dcaddf 100644
+> --- a/plugins/plugin.h
+> +++ b/plugins/plugin.h
+> @@ -14,6 +14,8 @@
+>  =20
+>   #include <gmodule.h>
+>  =20
+> +#define QEMU_PLUGIN_MIN_VERSION 0
+> +
+>   /* global state */
+>   struct qemu_plugin_state {
+>       QTAILQ_HEAD(, qemu_plugin_ctx) ctxs;
+> diff --git a/tests/plugin/bb.c b/tests/plugin/bb.c
+> index 45e1de5bd68..f30bea08dcc 100644
+> --- a/tests/plugin/bb.c
+> +++ b/tests/plugin/bb.c
+> @@ -14,6 +14,8 @@
+>  =20
+>   #include <qemu-plugin.h>
+>  =20
+> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
+> +
+>   static uint64_t bb_count;
+>   static uint64_t insn_count;
+>   static bool do_inline;
+> diff --git a/tests/plugin/empty.c b/tests/plugin/empty.c
+> index 3f60f690278..8fa6bacd93d 100644
+> --- a/tests/plugin/empty.c
+> +++ b/tests/plugin/empty.c
+> @@ -13,6 +13,8 @@
+>  =20
+>   #include <qemu-plugin.h>
+>  =20
+> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
+> +
+>   /*
+>    * Empty TB translation callback.
+>    * This allows us to measure the overhead of injecting and then
+> diff --git a/tests/plugin/hotpages.c b/tests/plugin/hotpages.c
+> index 77df07a3ccf..ecd6c187327 100644
+> --- a/tests/plugin/hotpages.c
+> +++ b/tests/plugin/hotpages.c
+> @@ -18,6 +18,8 @@
+>  =20
+>   #include <qemu-plugin.h>
+>  =20
+> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
+> +
+>   #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+>  =20
+>   static uint64_t page_size =3D 4096;
+> diff --git a/tests/plugin/howvec.c b/tests/plugin/howvec.c
+> index 58fa675e348..4ca555e1239 100644
+> --- a/tests/plugin/howvec.c
+> +++ b/tests/plugin/howvec.c
+> @@ -20,6 +20,8 @@
+>  =20
+>   #include <qemu-plugin.h>
+>  =20
+> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
+> +
+>   #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+>  =20
+>   typedef enum {
+> diff --git a/tests/plugin/insn.c b/tests/plugin/insn.c
+> index e5fd07fb64b..0a8f5a0000e 100644
+> --- a/tests/plugin/insn.c
+> +++ b/tests/plugin/insn.c
+> @@ -14,6 +14,8 @@
+>  =20
+>   #include <qemu-plugin.h>
+>  =20
+> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
+> +
+>   static uint64_t insn_count;
+>   static bool do_inline;
+>  =20
+> diff --git a/tests/plugin/mem.c b/tests/plugin/mem.c
+> index d9673889896..878abf09d19 100644
+> --- a/tests/plugin/mem.c
+> +++ b/tests/plugin/mem.c
+> @@ -14,6 +14,8 @@
+>  =20
+>   #include <qemu-plugin.h>
+>  =20
+> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
+> +
+>   static uint64_t mem_count;
+>   static uint64_t io_count;
+>   static bool do_inline;
 >=20
-> |--------------+----------------+-----------------+-------------|
-> | Cluster size | subclusters=3Don | subclusters=3Doff | fallocate() |
-> |--------------+----------------+-----------------+-------------|
-> |       256 KB |     19897 IOPS |        891 IOPS |  32194 IOPS |
-> |       512 KB |     17881 IOPS |        436 IOPS |  33092 IOPS |
-> |      1024 KB |     17050 IOPS |        341 IOPS |  32768 IOPS |
-> |      2048 KB |      7854 IOPS |        207 IOPS |  30944 IOPS |
-> |--------------+----------------+-----------------+-------------|
 
-OK, thanks again. :-)
-
-So it seems right not to revert the commit and just work around the XFS
-bug in file-posix.
-
-Max
-
-
---at2vdsbXzrfERnlCrUQFCXl0SEhWOJOZ3--
-
---4z5yR5VhFYZOwEkgZ3B7nyMxtwzanH96Y
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3ATLsACgkQ9AfbAGHV
-z0CjdAgAoq373MT6LTDhtJJsA8Q71GTjOzWvj5uAb1EvcpE1kOJiG5yhdLZuD0C5
-Zm3ggzd4PPQ2Ev0Wj+q4A2RsF3opFB6/Txnxay3lAD+npFUHdgb6OkOU/0De2UCI
-nsYCOSSkeQgTVi6s8RQ2kUhz/cX2YSwUz2EeH1TiRm97UTLxFgCusYYnuzhIKEUy
-hF6Snsv3YuYHHFiMg2aA4285PuFFDJNfBzwKrGTdtroBFOVCZSZgfz3vedi/BB7U
-sSWp5rUvayC8wSbP1fDOdpLsdrytqRzwcjc3OAZSneIExrBTIwn6LAmL3k+eqwhR
-CWCnQSdmai8mdw1ohJpuqRQGTUnz0g==
-=V/Yo
------END PGP SIGNATURE-----
-
---4z5yR5VhFYZOwEkgZ3B7nyMxtwzanH96Y--
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
 
