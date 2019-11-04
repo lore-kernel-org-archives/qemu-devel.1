@@ -2,87 +2,76 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0401CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 18:52:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5351CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 18:53:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2C6F2080F
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 18:52:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2C6F2080F
+	by mail.kernel.org (Postfix) with ESMTPS id 77A5F2080F
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 18:53:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J/SARmWT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77A5F2080F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRhSR-0001xT-0C
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 13:52:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47440)
+	id 1iRhTO-00036H-Kh
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 13:53:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47634)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iRhRE-0000yJ-ER
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:50:54 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iRhSa-0002Jw-PT
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:52:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iRhRD-0001HM-5U
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:50:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:41902)
+ (envelope-from <dgilbert@redhat.com>) id 1iRhSZ-0001v1-9g
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:52:16 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:44948)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iRhRC-0001Gy-UE
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:50:51 -0500
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iRhSZ-0001up-6w
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:52:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572893535;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=u9yoCUoQ5IjQ9AYWfHlboVDzOuGLVXErAwJSGIPE5P4=;
+ b=J/SARmWTBkTeKh6ArSae8lQVQyG1bBT3zjD22HfnOBZUPmCMQ4u8o7Vw6Vo6yzy2QQtHY8
+ 1XJ2Dixw6G2DSdJd2nkW3LQiizXW7gqUX6KBiue2dUd0tho4LfexfkOfuoQRfFYnon5AP1
+ V4gUpQ7oNhISzn/k9bRgErnUT/I0BFY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-13-WmY6-rjoOBSsD-AA_T6f_A-1; Mon, 04 Nov 2019 13:52:10 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A187F3DD47
- for <qemu-devel@nongnu.org>; Mon,  4 Nov 2019 18:50:49 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id l3so2361022wrx.21
- for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 10:50:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=KPhQaJQMP8yO1fvKpnP7jGFRAYNO9OB2BOs6o1XzbUY=;
- b=foqPtMx/YtZQehmtB8Fy754WbXr5EDQ+DXq4xoAjh1gykSPqss18UvP0zP1kdHUIcC
- A2EeNndjvgNnBKhWGPNA0HIQnAl1P8KfhkgA++V9tOfBVCEJhR6h418gafjSuRMs0kv5
- HZvzydHc0jtZSLam7Rjsv5x2vd/sPHMPD5sqWWW7E1+P2Pq1ClMde7sOeBSCCoswUjo0
- p+sjP94vnhWq6lwgwuqzrbL08URGQNUNKyEyVaZQGwsQqljW78TWh9NIBbLmeFCjws67
- jLtBPR5sh0XjhSY0pmnQyRrM5lHLC/E8uM2OzQAEAehj9/fY/xnkofs3Xthum2S1XMUp
- oqZw==
-X-Gm-Message-State: APjAAAVqEUQU7HwPnLKYhx1NX6fj/RrDYqlw7v3Z4rskpR6HGC4mVY55
- AtFkBZiD019wp4/of7gCTvk8F4NawKHuR/Kule135wDzYbK2oFXwaUjrcFruLTCClo7t2pjD5GX
- LL/2u9i/Sku5hxZ4=
-X-Received: by 2002:a5d:448a:: with SMTP id j10mr26138615wrq.79.1572893446389; 
- Mon, 04 Nov 2019 10:50:46 -0800 (PST)
-X-Google-Smtp-Source: APXvYqz5CyORBctv2tjo0B2xaWwvCYArmeV3au7HdgUxwGRu4NQuDngGl4WAbB17e3gtkCABnDo0xQ==
-X-Received: by 2002:a5d:448a:: with SMTP id j10mr26138586wrq.79.1572893446207; 
- Mon, 04 Nov 2019 10:50:46 -0800 (PST)
-Received: from [192.168.1.24] (lfbn-1-7864-228.w92-167.abo.wanadoo.fr.
- [92.167.33.228])
- by smtp.gmail.com with ESMTPSA id k125sm9463897wmf.2.2019.11.04.10.50.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 Nov 2019 10:50:45 -0800 (PST)
-Subject: Re: [PATCH v1 6/6] tests/vm: support sites with sha512 checksums
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191104173654.30125-1-alex.bennee@linaro.org>
- <20191104173654.30125-7-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <dd9bbe2b-4e51-30e3-9550-fe4f90f0214e@redhat.com>
-Date: Mon, 4 Nov 2019 19:50:43 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 625808017DD;
+ Mon,  4 Nov 2019 18:52:09 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-117-99.ams2.redhat.com
+ [10.36.117.99])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4A6145D9CD;
+ Mon,  4 Nov 2019 18:52:04 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, mjt@tls.msk.ru,
+ laurent@vivier.eu
+Subject: [PATCH] global: Squash 'the the'
+Date: Mon,  4 Nov 2019 18:52:02 +0000
+Message-Id: <20191104185202.102504-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191104173654.30125-7-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: WmY6-rjoOBSsD-AA_T6f_A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,88 +83,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: peter.maydell@linaro.org, sstabellini@kernel.org,
+ marcandre.lureau@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/4/19 6:36 PM, Alex Benn=C3=A9e wrote:
-> The NetBSD project uses SHA512 for its checksums so lets support that
-> in the download helper.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->   tests/vm/basevm.py | 10 ++++++++--
->   tests/vm/netbsd    |  3 ++-
->   2 files changed, 10 insertions(+), 3 deletions(-)
->=20
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> index 086bfb2c66d..91a9226026d 100755
-> --- a/tests/vm/basevm.py
-> +++ b/tests/vm/basevm.py
-> @@ -95,19 +95,25 @@ class BaseVM(object):
->               logging.info("KVM not available, not using -enable-kvm")
->           self._data_args =3D []
->  =20
-> -    def _download_with_cache(self, url, sha256sum=3DNone):
-> +    def _download_with_cache(self, url, sha256sum=3DNone, sha512sum=3D=
-None):
->           def check_sha256sum(fname):
->               if not sha256sum:
->                   return True
->               checksum =3D subprocess.check_output(["sha256sum", fname]=
-).split()[0]
->               return sha256sum =3D=3D checksum.decode("utf-8")
->  =20
-> +        def check_sha512sum(fname):
-> +            if not sha512sum:
-> +                return True
-> +            checksum =3D subprocess.check_output(["sha512sum", fname])=
-.split()[0]
-> +            return sha512sum =3D=3D checksum.decode("utf-8")
-> +
->           cache_dir =3D os.path.expanduser("~/.cache/qemu-vm/download")
->           if not os.path.exists(cache_dir):
->               os.makedirs(cache_dir)
->           fname =3D os.path.join(cache_dir,
->                                hashlib.sha1(url.encode("utf-8")).hexdig=
-est())
-> -        if os.path.exists(fname) and check_sha256sum(fname):
-> +        if os.path.exists(fname) and check_sha256sum(fname) and check_=
-sha512sum(fname):
->               return fname
->           logging.debug("Downloading %s to %s...", url, fname)
->           subprocess.check_call(["wget", "-c", url, "-O", fname + ".dow=
-nload"],
-> diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-> index 33779402dd1..89390e99fdd 100755
-> --- a/tests/vm/netbsd
-> +++ b/tests/vm/netbsd
-> @@ -23,6 +23,7 @@ class NetBSDVM(basevm.BaseVM):
->       arch =3D "x86_64"
->  =20
->       link =3D "https://cdn.netbsd.org/pub/NetBSD/NetBSD-8.1/images/Net=
-BSD-8.1-amd64.iso"
-> +    csum =3D "718f275b7e0879599bdac95630c5e3f2184700032fdb6cdebf3bdd63=
-687898c48ff3f08f57b89f4437a86cdd8ea07c01a39d432dbb37e1e4b008f4985f98da3f"
->       size =3D "20G"
->       pkgs =3D [
->           # tools
-> @@ -70,7 +71,7 @@ class NetBSDVM(basevm.BaseVM):
->       ipv6 =3D False
->  =20
->       def build_image(self, img):
-> -        cimg =3D self._download_with_cache(self.link)
-> +        cimg =3D self._download_with_cache(self.link, sha512sum=3Dself=
-.csum)
->           img_tmp =3D img + ".tmp"
->           iso =3D img + ".install.iso"
->  =20
->=20
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+'the' has a tendency to double up; squash them back down.
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ disas/libvixl/vixl/invalset.h       | 2 +-
+ docs/interop/pr-helper.rst          | 2 +-
+ docs/specs/ppc-spapr-hotplug.txt    | 2 +-
+ docs/specs/ppc-xive.rst             | 2 +-
+ docs/specs/tpm.txt                  | 2 +-
+ include/hw/xen/interface/io/blkif.h | 2 +-
+ scripts/dump-guest-memory.py        | 2 +-
+ 7 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/disas/libvixl/vixl/invalset.h b/disas/libvixl/vixl/invalset.h
+index ffdc0237b4..ef5e49d6fe 100644
+--- a/disas/libvixl/vixl/invalset.h
++++ b/disas/libvixl/vixl/invalset.h
+@@ -102,7 +102,7 @@ template<TEMPLATE_INVALSET_P_DECL> class InvalSet {
+   size_t size() const;
+=20
+   // Returns true if no elements are stored in the set.
+-  // Note that this does not mean the the backing storage is empty: it can=
+ still
++  // Note that this does not mean the backing storage is empty: it can sti=
+ll
+   // contain invalid elements.
+   bool empty() const;
+=20
+diff --git a/docs/interop/pr-helper.rst b/docs/interop/pr-helper.rst
+index 9f76d5bcf9..e926f0a6c9 100644
+--- a/docs/interop/pr-helper.rst
++++ b/docs/interop/pr-helper.rst
+@@ -10,7 +10,7 @@ can delegate implementation of persistent reservations to=
+ an external
+ restricting access to block devices to specific initiators in a shared
+ storage setup.
+=20
+-For a more detailed reference please refer the the SCSI Primary
++For a more detailed reference please refer to the SCSI Primary
+ Commands standard, specifically the section on Reservations and the
+ "PERSISTENT RESERVE IN" and "PERSISTENT RESERVE OUT" commands.
+=20
+diff --git a/docs/specs/ppc-spapr-hotplug.txt b/docs/specs/ppc-spapr-hotplu=
+g.txt
+index cc7833108e..859d52cce6 100644
+--- a/docs/specs/ppc-spapr-hotplug.txt
++++ b/docs/specs/ppc-spapr-hotplug.txt
+@@ -385,7 +385,7 @@ Each LMB list entry consists of the following elements:
+   is used to retrieve the right associativity list to be used for this
+   LMB.
+ - A 32bit flags word. The bit at bit position 0x00000008 defines whether
+-  the LMB is assigned to the the partition as of boot time.
++  the LMB is assigned to the partition as of boot time.
+=20
+ ibm,dynamic-memory-v2
+=20
+diff --git a/docs/specs/ppc-xive.rst b/docs/specs/ppc-xive.rst
+index 148d57eb6a..83d43f658b 100644
+--- a/docs/specs/ppc-xive.rst
++++ b/docs/specs/ppc-xive.rst
+@@ -163,7 +163,7 @@ Interrupt Priority Register (PIPR) is also updated usin=
+g the IPB. This
+ register represent the priority of the most favored pending
+ notification.
+=20
+-The PIPR is then compared to the the Current Processor Priority
++The PIPR is then compared to the Current Processor Priority
+ Register (CPPR). If it is more favored (numerically less than), the
+ CPU interrupt line is raised and the EO bit of the Notification Source
+ Register (NSR) is updated to notify the presence of an exception for
+diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
+index 5d8c26b1ad..9c8cca042d 100644
+--- a/docs/specs/tpm.txt
++++ b/docs/specs/tpm.txt
+@@ -89,7 +89,7 @@ TPM upon reboot. The PPI specification defines the operat=
+ion requests and the
+ actions the firmware has to take. The system administrator passes the oper=
+ation
+ request number to the firmware through an ACPI interface which writes this
+ number to a memory location that the firmware knows. Upon reboot, the firm=
+ware
+-finds the number and sends commands to the the TPM. The firmware writes th=
+e TPM
++finds the number and sends commands to the TPM. The firmware writes the TP=
+M
+ result code and the operation request number to a memory location that ACP=
+I can
+ read from and pass the result on to the administrator.
+=20
+diff --git a/include/hw/xen/interface/io/blkif.h b/include/hw/xen/interface=
+/io/blkif.h
+index 8b1be50ce8..d07fa1e078 100644
+--- a/include/hw/xen/interface/io/blkif.h
++++ b/include/hw/xen/interface/io/blkif.h
+@@ -341,7 +341,7 @@
+  *      access (even when it should be read-only). If the frontend hits th=
+e
+  *      maximum number of allowed persistently mapped grants, it can fallb=
+ack
+  *      to non persistent mode. This will cause a performance degradation,
+- *      since the the backend driver will still try to map those grants
++ *      since the backend driver will still try to map those grants
+  *      persistently. Since the persistent grants protocol is compatible w=
+ith
+  *      the previous protocol, a frontend driver can choose to work in
+  *      persistent mode even when the backend doesn't support it.
+diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
+index 2c587cbefc..9371e45813 100644
+--- a/scripts/dump-guest-memory.py
++++ b/scripts/dump-guest-memory.py
+@@ -170,7 +170,7 @@ class ELF(object):
+         self.ehdr.e_phnum +=3D 1
+=20
+     def to_file(self, elf_file):
+-        """Writes all ELF structures to the the passed file.
++        """Writes all ELF structures to the passed file.
+=20
+         Structure:
+         Ehdr
+--=20
+2.23.0
+
 
