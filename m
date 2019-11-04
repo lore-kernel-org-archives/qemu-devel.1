@@ -2,88 +2,63 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 020FECA9EA0
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 12:21:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96D66CA9EA0
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 12:21:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD8DF2053B
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 12:20:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="OqeHt0uE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD8DF2053B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A4132053B
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 12:21:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A4132053B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRbLu-0002bg-Cq
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 07:20:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40051)
+	id 1iRbML-00041D-CF
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 07:21:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40295)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1iRbHf-00074R-Me
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 07:16:36 -0500
+ (envelope-from <zhengxiang9@huawei.com>) id 1iRbHs-00078h-8B
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 07:16:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1iRbHe-0004rr-AO
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 07:16:35 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:41754)
+ (envelope-from <zhengxiang9@huawei.com>) id 1iRbHp-00050D-RF
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 07:16:48 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2261 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1iRbHV-0004kD-8P; Mon, 04 Nov 2019 07:16:27 -0500
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 86FDB96EF0;
- Mon,  4 Nov 2019 12:16:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1572869778;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=i6Tpk6AXyDe7PMgxB49odyYmY16dx+pgUnO7RjeK2Fw=;
- b=OqeHt0uEhxkrN7JWB9L6kXvkzTrXnjPyMzBvXANpURMPcHSWjRTet0W5QGrECVhUPhP2JG
- A92fGhkG5KSAoljbfkklBjLmFoWcd9UQIU53ZtmIE/atFeXNEFeECXktMVGoDFfH+ynfDL
- +oxZ04G2c3oJBpfXjpa4+MXviYWrEec=
-Subject: Re: [PATCH v5 02/13] hw/core/qdev: add trace events to help with
- resettable transition
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191018150630.31099-1-damien.hedde@greensocs.com>
- <20191018150630.31099-3-damien.hedde@greensocs.com>
- <f5d78215-ee4d-ae1a-74dc-52b3c179d88c@redhat.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <984a87d7-0430-d777-0fe9-ce5cfea712a1@greensocs.com>
-Date: Mon, 4 Nov 2019 13:16:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.0
+ (Exim 4.71) (envelope-from <zhengxiang9@huawei.com>)
+ id 1iRbHi-0004sc-V2; Mon, 04 Nov 2019 07:16:39 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id AA7C14E3951E66D002F1;
+ Mon,  4 Nov 2019 20:16:35 +0800 (CST)
+Received: from HGHY4Z004218071.china.huawei.com (10.133.224.57) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.439.0; Mon, 4 Nov 2019 20:16:26 +0800
+From: Xiang Zheng <zhengxiang9@huawei.com>
+To: <pbonzini@redhat.com>, <mst@redhat.com>, <imammedo@redhat.com>,
+ <shannon.zhaosl@gmail.com>, <peter.maydell@linaro.org>, <lersek@redhat.com>,
+ <james.morse@arm.com>, <gengdongjiu@huawei.com>, <mtosatti@redhat.com>,
+ <rth@twiddle.net>, <ehabkost@redhat.com>, <jonathan.cameron@huawei.com>,
+ <xuwei5@huawei.com>, <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
+ <qemu-arm@nongnu.org>, <linuxarm@huawei.com>
+Subject: [PATCH v21 5/6] target-arm: kvm64: handle SIGBUS signal from kernel
+ or KVM
+Date: Mon, 4 Nov 2019 20:14:57 +0800
+Message-ID: <20191104121458.29208-6-zhengxiang9@huawei.com>
+X-Mailer: git-send-email 2.15.1.windows.2
+In-Reply-To: <20191104121458.29208-1-zhengxiang9@huawei.com>
+References: <20191104121458.29208-1-zhengxiang9@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <f5d78215-ee4d-ae1a-74dc-52b3c179d88c@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1572869778;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=i6Tpk6AXyDe7PMgxB49odyYmY16dx+pgUnO7RjeK2Fw=;
- b=XiScZxKkrdroCmK5yR7oO1Ut6xkVx0qLNlSNsCwtOc0t5cm7ls+eUUOCO0KesG6b4lY45r
- UziEglRyeWz2Mia6BWw8QSrNlvOzfcN9Xc/kezmm1MB5yWtEgx6hMZdc1hgKnMr7oEWa64
- Lhs2Ji6yuylOOYJRLNl1zpQt7ndg7jg=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1572869778; a=rsa-sha256; cv=none;
- b=2zp18q1d3Hwped1Y2ZE0nOIR4AtHSHTlcbkctL7BySCzpqHwfrb8SSLcpb3fIx39Vmkhth
- BN1ZmUHvRj1l4BuLMMa59+Tc+ZXBOYqK/oXvV1kDkH3/7PQJKSVQgyzMcJdrZNt85zL4YD
- TogY1+SIrs2F/jWv6PL0prAf4HZB+KA=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Originating-IP: [10.133.224.57]
+X-CFilter-Loop: Reflected
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.135.226.135
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,159 +70,578 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
- cohuck@redhat.com, mark.burton@greensocs.com, qemu-s390x@nongnu.org,
- edgari@xilinx.com, qemu-arm@nongnu.org, pbonzini@redhat.com,
- david@gibson.dropbear.id.au
+Cc: wanghaibin.wang@huawei.com, zhengxiang9@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Dongjiu Geng <gengdongjiu@huawei.com>
 
-On 11/1/19 12:23 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 10/18/19 5:06 PM, Damien Hedde wrote:
->> Adds trace events to reset procedure and when updating the parent
->> bus of a device.
->>
->> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
->> ---
->> =C2=A0 hw/core/qdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 27 +++++++=
-+++++++++++++++++---
->> =C2=A0 hw/core/trace-events |=C2=A0 9 +++++++++
->> =C2=A0 2 files changed, 33 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
->> index 60be2f2fef..f230063189 100644
->> --- a/hw/core/qdev.c
->> +++ b/hw/core/qdev.c
->> @@ -38,6 +38,7 @@
->> =C2=A0 #include "hw/boards.h"
->> =C2=A0 #include "hw/sysbus.h"
->> =C2=A0 #include "migration/vmstate.h"
->> +#include "trace.h"
->> =C2=A0 =C2=A0 bool qdev_hotplug =3D false;
->> =C2=A0 static bool qdev_hot_added =3D false;
->> @@ -98,7 +99,9 @@ void qdev_set_parent_bus(DeviceState *dev, BusState
->> *bus)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool replugging =3D dev->parent_bus !=3D=
- NULL;
->> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (replugging) {
->> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Keep a reference to the=
- device while it's not plugged into
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_qdev_update_parent_b=
-us(dev, dev->parent_bus, bus);
->=20
-> Nitpicking, if you respin, can you add object_get_typename(OBJECT(dev))=
-)
-> and object_get_typename(OBJECT(bus)))?
+Add a SIGBUS signal handler. In this handler, it checks the SIGBUS type,
+translates the host VA delivered by host to guest PA, then fills this PA
+to guest APEI GHES memory, then notifies guest according to the SIGBUS
+type.
 
-sure. I was wondering if having some kind of qom object support to trace
-would be feasible. Because it's a bit tedious to add this each time. And
-IMO it would be more useful to have the path, but we can't reasonably
-compute it as a trace_..() arguments.
+When guest accesses the poisoned memory, it will generate a Synchronous
+External Abort(SEA). Then host kernel gets an APEI notification and calls
+memory_failure() to unmapped the affected page in stage 2, finally
+returns to guest.
 
->=20
-> With/without it:
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Keep a reference t=
-o the device while it's not plugged into
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * any bus=
-, to avoid it potentially evaporating when it is
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * dereffe=
-d in bus_remove_child().
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->> @@ -272,6 +275,18 @@ HotplugHandler
->> *qdev_get_hotplug_handler(DeviceState *dev)
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return hotplug_ctrl;
->> =C2=A0 }
->> =C2=A0 +static int qdev_prereset(DeviceState *dev, void *opaque)
->> +{
->> +=C2=A0=C2=A0=C2=A0 trace_qdev_reset_tree(dev, object_get_typename(OBJ=
-ECT(dev)));
->> +=C2=A0=C2=A0=C2=A0 return 0;
->> +}
->> +
->> +static int qbus_prereset(BusState *bus, void *opaque)
->> +{
->> +=C2=A0=C2=A0=C2=A0 trace_qbus_reset_tree(bus, object_get_typename(OBJ=
-ECT(bus)));
->> +=C2=A0=C2=A0=C2=A0 return 0;
->> +}
->> +
->> =C2=A0 static int qdev_reset_one(DeviceState *dev, void *opaque)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 device_legacy_reset(dev);
->> @@ -282,6 +297,7 @@ static int qdev_reset_one(DeviceState *dev, void
->> *opaque)
->> =C2=A0 static int qbus_reset_one(BusState *bus, void *opaque)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BusClass *bc =3D BUS_GET_CLASS(bus);
->> +=C2=A0=C2=A0=C2=A0 trace_qbus_reset(bus, object_get_typename(OBJECT(b=
-us)));
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bc->reset) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bc->reset(bus);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> @@ -290,7 +306,9 @@ static int qbus_reset_one(BusState *bus, void
->> *opaque)
->> =C2=A0 =C2=A0 void qdev_reset_all(DeviceState *dev)
->> =C2=A0 {
->> -=C2=A0=C2=A0=C2=A0 qdev_walk_children(dev, NULL, NULL, qdev_reset_one=
-,
->> qbus_reset_one, NULL);
->> +=C2=A0=C2=A0=C2=A0 trace_qdev_reset_all(dev, object_get_typename(OBJE=
-CT(dev)));
->> +=C2=A0=C2=A0=C2=A0 qdev_walk_children(dev, qdev_prereset, qbus_preres=
-et,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qdev_rese=
-t_one, qbus_reset_one, NULL);
->> =C2=A0 }
->> =C2=A0 =C2=A0 void qdev_reset_all_fn(void *opaque)
->> @@ -300,7 +318,9 @@ void qdev_reset_all_fn(void *opaque)
->> =C2=A0 =C2=A0 void qbus_reset_all(BusState *bus)
->> =C2=A0 {
->> -=C2=A0=C2=A0=C2=A0 qbus_walk_children(bus, NULL, NULL, qdev_reset_one=
-,
->> qbus_reset_one, NULL);
->> +=C2=A0=C2=A0=C2=A0 trace_qbus_reset_all(bus, object_get_typename(OBJE=
-CT(bus)));
->> +=C2=A0=C2=A0=C2=A0 qbus_walk_children(bus, qdev_prereset, qbus_preres=
-et,
->> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qdev_rese=
-t_one, qbus_reset_one, NULL);
->> =C2=A0 }
->> =C2=A0 =C2=A0 void qbus_reset_all_fn(void *opaque)
->> @@ -1108,6 +1128,7 @@ void device_legacy_reset(DeviceState *dev)
->> =C2=A0 {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DeviceClass *klass =3D DEVICE_GET_CLASS=
-(dev);
->> =C2=A0 +=C2=A0=C2=A0=C2=A0 trace_qdev_reset(dev, object_get_typename(O=
-BJECT(dev)));
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (klass->reset) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 klass->reset(de=
-v);
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->> diff --git a/hw/core/trace-events b/hw/core/trace-events
->> index fe47a9c8cb..1a669be0ea 100644
->> --- a/hw/core/trace-events
->> +++ b/hw/core/trace-events
->> @@ -1,2 +1,11 @@
->> =C2=A0 # loader.c
->> =C2=A0 loader_write_rom(const char *name, uint64_t gpa, uint64_t size,=
- bool
->> isrom) "%s: @0x%"PRIx64" size=3D0x%"PRIx64" ROM=3D%d"
->> +
->> +# qdev.c
->> +qdev_reset(void *obj, const char *objtype) "obj=3D%p(%s)"
->> +qdev_reset_all(void *obj, const char *objtype) "obj=3D%p(%s)"
->> +qdev_reset_tree(void *obj, const char *objtype) "obj=3D%p(%s)"
->> +qbus_reset(void *obj, const char *objtype) "obj=3D%p(%s)"
->> +qbus_reset_all(void *obj, const char *objtype) "obj=3D%p(%s)"
->> +qbus_reset_tree(void *obj, const char *objtype) "obj=3D%p(%s)"
->> +qdev_update_parent_bus(void *obj, void *oldp, void *newp) "obj=3D%p
->> old_parent=3D%p new_parent=3D%p"
->>
+Guest continues to access the PG_hwpoison page, it will trap to KVM as
+stage2 fault, then a SIGBUS_MCEERR_AR synchronous signal is delivered to
+Qemu, Qemu records this error address into guest APEI GHES memory and
+notifes guest using Synchronous-External-Abort(SEA).
+
+In order to inject a vSEA, we introduce the kvm_inject_arm_sea() function
+in which we can setup the type of exception and the syndrome information.
+When switching to guest, the target vcpu will jump to the synchronous
+external abort vector table entry.
+
+The ESR_ELx.DFSC is set to synchronous external abort(0x10), and the
+ESR_ELx.FnV is set to not valid(0x1), which will tell guest that FAR is
+not valid and hold an UNKNOWN value. These values will be set to KVM
+register structures through KVM_SET_ONE_REG IOCTL.
+
+Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+Signed-off-by: Xiang Zheng <zhengxiang9@huawei.com>
+---
+ hw/acpi/acpi_ghes.c         | 297 ++++++++++++++++++++++++++++++++++++
+ include/hw/acpi/acpi_ghes.h |   4 +
+ include/sysemu/kvm.h        |   3 +-
+ target/arm/cpu.h            |   4 +
+ target/arm/helper.c         |   2 +-
+ target/arm/internals.h      |   5 +-
+ target/arm/kvm64.c          |  64 ++++++++
+ target/arm/tlb_helper.c     |   2 +-
+ target/i386/cpu.h           |   2 +
+ 9 files changed, 377 insertions(+), 6 deletions(-)
+
+diff --git a/hw/acpi/acpi_ghes.c b/hw/acpi/acpi_ghes.c
+index 42c00ff3d3..f5b54990c0 100644
+--- a/hw/acpi/acpi_ghes.c
++++ b/hw/acpi/acpi_ghes.c
+@@ -39,6 +39,34 @@
+ /* The max size in bytes for one error block */
+ #define ACPI_GHES_MAX_RAW_DATA_LENGTH       0x1000
+ 
++/*
++ * The total size of Generic Error Data Entry
++ * ACPI 6.1/6.2: 18.3.2.7.1 Generic Error Data,
++ * Table 18-343 Generic Error Data Entry
++ */
++#define ACPI_GHES_DATA_LENGTH               72
++
++/*
++ * The memory section CPER size,
++ * UEFI 2.6: N.2.5 Memory Error Section
++ */
++#define ACPI_GHES_MEM_CPER_LENGTH           80
++
++/*
++ * Masks for block_status flags
++ */
++#define ACPI_GEBS_UNCORRECTABLE         1
++
++/*
++ * Values for error_severity field
++ */
++enum AcpiGenericErrorSeverity {
++    ACPI_CPER_SEV_RECOVERABLE,
++    ACPI_CPER_SEV_FATAL,
++    ACPI_CPER_SEV_CORRECTED,
++    ACPI_CPER_SEV_NONE,
++};
++
+ /*
+  * Now only support ARMv8 SEA notification type error source
+  */
+@@ -49,6 +77,16 @@
+  */
+ #define ACPI_GHES_SOURCE_GENERIC_ERROR_V2   10
+ 
++#define UUID_BE(a, b, c, d0, d1, d2, d3, d4, d5, d6, d7)        \
++    {{{ ((a) >> 24) & 0xff, ((a) >> 16) & 0xff, ((a) >> 8) & 0xff, (a) & 0xff, \
++    ((b) >> 8) & 0xff, (b) & 0xff,                   \
++    ((c) >> 8) & 0xff, (c) & 0xff,                    \
++    (d0), (d1), (d2), (d3), (d4), (d5), (d6), (d7) } } }
++
++#define UEFI_CPER_SEC_PLATFORM_MEM                   \
++    UUID_BE(0xA5BC1114, 0x6F64, 0x4EDE, 0xB8, 0x63, 0x3E, 0x83, \
++    0xED, 0x7C, 0x83, 0xB1)
++
+ /*
+  * | +--------------------------+ 0
+  * | |        Header            |
+@@ -77,6 +115,174 @@ typedef struct AcpiGhesState {
+     uint64_t ghes_addr_le;
+ } AcpiGhesState;
+ 
++/*
++ * Total size for Generic Error Status Block
++ * ACPI 6.2: 18.3.2.7.1 Generic Error Data,
++ * Table 18-380 Generic Error Status Block
++ */
++#define ACPI_GHES_GESB_SIZE                 20
++/* The offset of Data Length in Generic Error Status Block */
++#define ACPI_GHES_GESB_DATA_LENGTH_OFFSET   12
++
++/*
++ * Record the value of data length for each error status block to avoid getting
++ * this value from guest.
++ */
++static uint32_t acpi_ghes_data_length[ACPI_GHES_ERROR_SOURCE_COUNT];
++
++/*
++ * Generic Error Data Entry
++ * ACPI 6.1: 18.3.2.7.1 Generic Error Data
++ */
++static void acpi_ghes_generic_error_data(GArray *table, QemuUUID section_type,
++                uint32_t error_severity, uint16_t revision,
++                uint8_t validation_bits, uint8_t flags,
++                uint32_t error_data_length, QemuUUID fru_id,
++                uint8_t *fru_text, uint64_t time_stamp)
++{
++    QemuUUID uuid_le;
++
++    /* Section Type */
++    uuid_le = qemu_uuid_bswap(section_type);
++    g_array_append_vals(table, uuid_le.data, ARRAY_SIZE(uuid_le.data));
++
++    /* Error Severity */
++    build_append_int_noprefix(table, error_severity, 4);
++    /* Revision */
++    build_append_int_noprefix(table, revision, 2);
++    /* Validation Bits */
++    build_append_int_noprefix(table, validation_bits, 1);
++    /* Flags */
++    build_append_int_noprefix(table, flags, 1);
++    /* Error Data Length */
++    build_append_int_noprefix(table, error_data_length, 4);
++
++    /* FRU Id */
++    uuid_le = qemu_uuid_bswap(fru_id);
++    g_array_append_vals(table, uuid_le.data, ARRAY_SIZE(uuid_le.data));
++
++    /* FRU Text */
++    g_array_append_vals(table, fru_text, 20);
++    /* Timestamp */
++    build_append_int_noprefix(table, time_stamp, 8);
++}
++
++/*
++ * Generic Error Status Block
++ * ACPI 6.1: 18.3.2.7.1 Generic Error Data
++ */
++static void acpi_ghes_generic_error_status(GArray *table, uint32_t block_status,
++                uint32_t raw_data_offset, uint32_t raw_data_length,
++                uint32_t data_length, uint32_t error_severity)
++{
++    /* Block Status */
++    build_append_int_noprefix(table, block_status, 4);
++    /* Raw Data Offset */
++    build_append_int_noprefix(table, raw_data_offset, 4);
++    /* Raw Data Length */
++    build_append_int_noprefix(table, raw_data_length, 4);
++    /* Data Length */
++    build_append_int_noprefix(table, data_length, 4);
++    /* Error Severity */
++    build_append_int_noprefix(table, error_severity, 4);
++}
++
++/* UEFI 2.6: N.2.5 Memory Error Section */
++static void acpi_ghes_build_append_mem_cper(GArray *table,
++                                            uint64_t error_physical_addr)
++{
++    /*
++     * Memory Error Record
++     */
++
++    /* Validation Bits */
++    build_append_int_noprefix(table,
++                              (1UL << 14) | /* Type Valid */
++                              (1UL << 1) /* Physical Address Valid */,
++                              8);
++    /* Error Status */
++    build_append_int_noprefix(table, 0, 8);
++    /* Physical Address */
++    build_append_int_noprefix(table, error_physical_addr, 8);
++    /* Skip all the detailed information normally found in such a record */
++    build_append_int_noprefix(table, 0, 48);
++    /* Memory Error Type */
++    build_append_int_noprefix(table, 0 /* Unknown error */, 1);
++    /* Skip all the detailed information normally found in such a record */
++    build_append_int_noprefix(table, 0, 7);
++}
++
++static int acpi_ghes_record_mem_error(uint64_t error_block_address,
++                                      uint64_t error_physical_addr,
++                                      uint32_t data_length)
++{
++    GArray *block;
++    uint64_t current_block_length;
++    /* Memory Error Section Type */
++    QemuUUID mem_section_id_le = UEFI_CPER_SEC_PLATFORM_MEM;
++    QemuUUID fru_id = {};
++    uint8_t fru_text[20] = {};
++
++    /*
++     * Generic Error Status Block
++     * | +---------------------+
++     * | |     block_status    |
++     * | +---------------------+
++     * | |    raw_data_offset  |
++     * | +---------------------+
++     * | |    raw_data_length  |
++     * | +---------------------+
++     * | |     data_length     |
++     * | +---------------------+
++     * | |   error_severity    |
++     * | +---------------------+
++     */
++    block = g_array_new(false, true /* clear */, 1);
++
++    /* The current whole length of the generic error status block */
++    current_block_length = ACPI_GHES_GESB_SIZE + data_length;
++
++    /* This is the length if adding a new generic error data entry*/
++    data_length += ACPI_GHES_DATA_LENGTH;
++    data_length += ACPI_GHES_MEM_CPER_LENGTH;
++
++    /*
++     * Check whether it will run out of the preallocated memory if adding a new
++     * generic error data entry
++     */
++    if ((data_length + ACPI_GHES_GESB_SIZE) > ACPI_GHES_MAX_RAW_DATA_LENGTH) {
++        error_report("Record CPER out of boundary!!!");
++        return ACPI_GHES_CPER_FAIL;
++    }
++
++    /* Build the new generic error status block header */
++    acpi_ghes_generic_error_status(block, cpu_to_le32(ACPI_GEBS_UNCORRECTABLE),
++        0, 0, cpu_to_le32(data_length), cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE));
++
++    /* Write back above generic error status block header to guest memory */
++    cpu_physical_memory_write(error_block_address, block->data,
++                              block->len);
++
++    /* Add a new generic error data entry */
++
++    data_length = block->len;
++    /* Build this new generic error data entry header */
++    acpi_ghes_generic_error_data(block, mem_section_id_le,
++        cpu_to_le32(ACPI_CPER_SEV_RECOVERABLE), cpu_to_le32(0x300), 0, 0,
++        cpu_to_le32(ACPI_GHES_MEM_CPER_LENGTH), fru_id, fru_text, 0);
++
++    /* Build the memory section CPER for above new generic error data entry */
++    acpi_ghes_build_append_mem_cper(block, error_physical_addr);
++
++    /* Write back above this new generic error data entry to guest memory */
++    cpu_physical_memory_write(error_block_address + current_block_length,
++        block->data + data_length, block->len - data_length);
++
++    g_array_free(block, true);
++
++    return ACPI_GHES_CPER_OK;
++}
++
+ /*
+  * Hardware Error Notification
+  * ACPI 4.0: 17.3.2.7 Hardware Error Notification
+@@ -265,3 +471,94 @@ void acpi_ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_error)
+     fw_cfg_add_file_callback(s, ACPI_GHES_DATA_ADDR_FW_CFG_FILE, NULL, NULL,
+         NULL, &ges.ghes_addr_le, sizeof(ges.ghes_addr_le), false);
+ }
++
++bool acpi_ghes_record_errors(uint32_t notify, uint64_t physical_address)
++{
++    uint64_t error_block_addr, read_ack_register_addr, read_ack_register = 0;
++    int loop = 0;
++    uint64_t start_addr = le64_to_cpu(ges.ghes_addr_le);
++    bool ret = ACPI_GHES_CPER_FAIL;
++    uint8_t source_id;
++    const uint8_t error_source_id[] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++                                        0xff, 0xff,    0, 0xff, 0xff, 0xff};
++
++    /*
++     * | +---------------------+ ges.ghes_addr_le
++     * | |error_block_address0 |
++     * | +---------------------+ --+--
++     * | |    .............    | ACPI_GHES_ADDRESS_SIZE
++     * | +---------------------+ --+--
++     * | |error_block_addressN |
++     * | +---------------------+
++     * | | read_ack_register0  |
++     * | +---------------------+ --+--
++     * | |   .............     | ACPI_GHES_ADDRESS_SIZE
++     * | +---------------------+ --+--
++     * | | read_ack_registerN  |
++     * | +---------------------+ --+--
++     * | |      CPER           |   |
++     * | |      ....           | ACPI_GHES_MAX_RAW_DATA_LENGT
++     * | |      CPER           |   |
++     * | +---------------------+ --+--
++     * | |    ..........       |
++     * | +---------------------+
++     * | |      CPER           |
++     * | |      ....           |
++     * | |      CPER           |
++     * | +---------------------+
++     */
++    if (physical_address && notify < ACPI_GHES_NOTIFY_RESERVED) {
++        /* Find and check the source id for this new CPER */
++        source_id = error_source_id[notify];
++        if (source_id != 0xff) {
++            start_addr += source_id * ACPI_GHES_ADDRESS_SIZE;
++        } else {
++            goto out;
++        }
++
++        cpu_physical_memory_read(start_addr, &error_block_addr,
++                                 ACPI_GHES_ADDRESS_SIZE);
++
++        read_ack_register_addr = start_addr +
++            ACPI_GHES_ERROR_SOURCE_COUNT * ACPI_GHES_ADDRESS_SIZE;
++retry:
++        cpu_physical_memory_read(read_ack_register_addr,
++                                 &read_ack_register, ACPI_GHES_ADDRESS_SIZE);
++
++        /* zero means OSPM does not acknowledge the error */
++        if (!read_ack_register) {
++            if (loop < 3) {
++                usleep(100 * 1000);
++                loop++;
++                goto retry;
++            } else {
++                error_report("OSPM does not acknowledge previous error,"
++                    " so can not record CPER for current error, forcibly"
++                    " acknowledge previous error to avoid blocking next time"
++                    " CPER record! Exit");
++                read_ack_register = 1;
++                cpu_physical_memory_write(read_ack_register_addr,
++                    &read_ack_register, ACPI_GHES_ADDRESS_SIZE);
++            }
++        } else {
++            if (error_block_addr) {
++                read_ack_register = 0;
++                /*
++                 * Clear the Read Ack Register, OSPM will write it to 1 when
++                 * acknowledge this error.
++                 */
++                cpu_physical_memory_write(read_ack_register_addr,
++                    &read_ack_register, ACPI_GHES_ADDRESS_SIZE);
++                ret = acpi_ghes_record_mem_error(error_block_addr,
++                          physical_address, acpi_ghes_data_length[source_id]);
++                if (ret == ACPI_GHES_CPER_OK) {
++                    acpi_ghes_data_length[source_id] +=
++                        (ACPI_GHES_DATA_LENGTH + ACPI_GHES_MEM_CPER_LENGTH);
++                }
++            }
++        }
++    }
++
++out:
++    return ret;
++}
+diff --git a/include/hw/acpi/acpi_ghes.h b/include/hw/acpi/acpi_ghes.h
+index cb62ec9c7b..8e3c5b879e 100644
+--- a/include/hw/acpi/acpi_ghes.h
++++ b/include/hw/acpi/acpi_ghes.h
+@@ -24,6 +24,9 @@
+ 
+ #include "hw/acpi/bios-linker-loader.h"
+ 
++#define ACPI_GHES_CPER_OK                   1
++#define ACPI_GHES_CPER_FAIL                 0
++
+ /*
+  * Values for Hardware Error Notification Type field
+  */
+@@ -53,4 +56,5 @@ void acpi_ghes_build_hest(GArray *table_data, GArray *hardware_error,
+ 
+ void acpi_ghes_build_error_table(GArray *hardware_errors, BIOSLinker *linker);
+ void acpi_ghes_add_fw_cfg(FWCfgState *s, GArray *hardware_errors);
++bool acpi_ghes_record_errors(uint32_t notify, uint64_t error_physical_addr);
+ #endif
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index 9d143282bc..321ead8115 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -378,8 +378,7 @@ bool kvm_vcpu_id_is_valid(int vcpu_id);
+ /* Returns VCPU ID to be used on KVM_CREATE_VCPU ioctl() */
+ unsigned long kvm_arch_vcpu_id(CPUState *cpu);
+ 
+-#ifdef TARGET_I386
+-#define KVM_HAVE_MCE_INJECTION 1
++#ifdef KVM_HAVE_MCE_INJECTION
+ void kvm_arch_on_sigbus_vcpu(CPUState *cpu, int code, void *addr);
+ #endif
+ 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index d844ea21d8..c4fe6ccc63 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -28,6 +28,10 @@
+ /* ARM processors have a weak memory model */
+ #define TCG_GUEST_DEFAULT_MO      (0)
+ 
++#ifdef TARGET_AARCH64
++#define KVM_HAVE_MCE_INJECTION 1
++#endif
++
+ #define EXCP_UDEF            1   /* undefined instruction */
+ #define EXCP_SWI             2   /* software interrupt */
+ #define EXCP_PREFETCH_ABORT  3
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 63815fc4cf..a9ce97efb1 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -3005,7 +3005,7 @@ static uint64_t do_ats_write(CPUARMState *env, uint64_t value,
+              * Report exception with ESR indicating a fault due to a
+              * translation table walk for a cache maintenance instruction.
+              */
+-            syn = syn_data_abort_no_iss(current_el == target_el,
++            syn = syn_data_abort_no_iss(current_el == target_el, 0,
+                                         fi.ea, 1, fi.s1ptw, 1, fsc);
+             env->exception.vaddress = value;
+             env->exception.fsr = fsr;
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index f5313dd3d4..28b8451d6d 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -451,13 +451,14 @@ static inline uint32_t syn_insn_abort(int same_el, int ea, int s1ptw, int fsc)
+         | ARM_EL_IL | (ea << 9) | (s1ptw << 7) | fsc;
+ }
+ 
+-static inline uint32_t syn_data_abort_no_iss(int same_el,
++static inline uint32_t syn_data_abort_no_iss(int same_el, int fnv,
+                                              int ea, int cm, int s1ptw,
+                                              int wnr, int fsc)
+ {
+     return (EC_DATAABORT << ARM_EL_EC_SHIFT) | (same_el << ARM_EL_EC_SHIFT)
+            | ARM_EL_IL
+-           | (ea << 9) | (cm << 8) | (s1ptw << 7) | (wnr << 6) | fsc;
++           | (fnv << 10) | (ea << 9) | (cm << 8) | (s1ptw << 7)
++           | (wnr << 6) | fsc;
+ }
+ 
+ static inline uint32_t syn_data_abort_with_iss(int same_el,
+diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+index 28f6db57d5..c7b7653d3f 100644
+--- a/target/arm/kvm64.c
++++ b/target/arm/kvm64.c
+@@ -28,6 +28,8 @@
+ #include "kvm_arm.h"
+ #include "hw/boards.h"
+ #include "internals.h"
++#include "hw/acpi/acpi.h"
++#include "hw/acpi/acpi_ghes.h"
+ 
+ static bool have_guest_debug;
+ 
+@@ -710,6 +712,30 @@ int kvm_arm_cpreg_level(uint64_t regidx)
+     return KVM_PUT_RUNTIME_STATE;
+ }
+ 
++/* Callers must hold the iothread mutex lock */
++static void kvm_inject_arm_sea(CPUState *c)
++{
++    ARMCPU *cpu = ARM_CPU(c);
++    CPUARMState *env = &cpu->env;
++    CPUClass *cc = CPU_GET_CLASS(c);
++    uint32_t esr;
++    bool same_el;
++
++    c->exception_index = EXCP_DATA_ABORT;
++    env->exception.target_el = 1;
++
++    /*
++     * Set the DFSC to synchronous external abort and set FnV to not valid,
++     * this will tell guest the FAR_ELx is UNKNOWN for this abort.
++     */
++    same_el = arm_current_el(env) == env->exception.target_el;
++    esr = syn_data_abort_no_iss(same_el, 1, 0, 0, 0, 0, 0x10);
++
++    env->exception.syndrome = esr;
++
++    cc->do_interrupt(c);
++}
++
+ #define AARCH64_CORE_REG(x)   (KVM_REG_ARM64 | KVM_REG_SIZE_U64 | \
+                  KVM_REG_ARM_CORE | KVM_REG_ARM_CORE_REG(x))
+ 
+@@ -1036,6 +1062,44 @@ int kvm_arch_get_registers(CPUState *cs)
+     return ret;
+ }
+ 
++void kvm_arch_on_sigbus_vcpu(CPUState *c, int code, void *addr)
++{
++    ram_addr_t ram_addr;
++    hwaddr paddr;
++
++    assert(code == BUS_MCEERR_AR || code == BUS_MCEERR_AO);
++
++    if (acpi_enabled && addr &&
++            object_property_get_bool(qdev_get_machine(), "ras", NULL)) {
++        ram_addr = qemu_ram_addr_from_host(addr);
++        if (ram_addr != RAM_ADDR_INVALID &&
++            kvm_physical_memory_addr_from_host(c->kvm_state, addr, &paddr)) {
++            kvm_hwpoison_page_add(ram_addr);
++            /*
++             * Asynchronous signal will be masked by main thread, so
++             * only handle synchronous signal.
++             */
++            if (code == BUS_MCEERR_AR) {
++                kvm_cpu_synchronize_state(c);
++                if (ACPI_GHES_CPER_FAIL !=
++                    acpi_ghes_record_errors(ACPI_GHES_NOTIFY_SEA, paddr)) {
++                    kvm_inject_arm_sea(c);
++                } else {
++                    fprintf(stderr, "failed to record the error\n");
++                }
++            }
++            return;
++        }
++        fprintf(stderr, "Hardware memory error for memory used by "
++                "QEMU itself instead of guest system!\n");
++    }
++
++    if (code == BUS_MCEERR_AR) {
++        fprintf(stderr, "Hardware memory error!\n");
++        exit(1);
++    }
++}
++
+ /* C6.6.29 BRK instruction */
+ static const uint32_t brk_insn = 0xd4200000;
+ 
+diff --git a/target/arm/tlb_helper.c b/target/arm/tlb_helper.c
+index 5feb312941..499672ebbc 100644
+--- a/target/arm/tlb_helper.c
++++ b/target/arm/tlb_helper.c
+@@ -33,7 +33,7 @@ static inline uint32_t merge_syn_data_abort(uint32_t template_syn,
+      * ISV field.
+      */
+     if (!(template_syn & ARM_EL_ISV) || target_el != 2 || s1ptw) {
+-        syn = syn_data_abort_no_iss(same_el,
++        syn = syn_data_abort_no_iss(same_el, 0,
+                                     ea, 0, s1ptw, is_write, fsc);
+     } else {
+         /*
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 5352c9ff55..f75a210f96 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -29,6 +29,8 @@
+ /* The x86 has a strong memory model with some store-after-load re-ordering */
+ #define TCG_GUEST_DEFAULT_MO      (TCG_MO_ALL & ~TCG_MO_ST_LD)
+ 
++#define KVM_HAVE_MCE_INJECTION 1
++
+ /* Maximum instruction code size */
+ #define TARGET_MAX_INSN_SIZE 16
+ 
+-- 
+2.19.1
+
+
 
