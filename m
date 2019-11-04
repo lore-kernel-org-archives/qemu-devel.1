@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A7F1CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 17:39:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A6CCA9ECF
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 17:40:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCD3E20869
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 17:39:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B696420869
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 17:40:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lku22ZuQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCD3E20869
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FDFRqqxa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B696420869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRgK0-0008KS-Nc
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 12:39:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34612)
+	id 1iRgLL-0001wN-UA
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 12:40:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34520)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iRgHv-0006S2-Fc
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:37:16 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iRgHm-0006Cy-6x
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:37:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iRgHo-00011e-0I
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:37:11 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51346)
+ (envelope-from <alex.bennee@linaro.org>) id 1iRgHk-0000zu-2t
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:37:02 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:47007)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iRgHn-00011H-Qu
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:37:03 -0500
-Received: by mail-wm1-x341.google.com with SMTP id q70so17627353wme.1
- for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 09:37:03 -0800 (PST)
+ id 1iRgHj-0000zb-T5
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 12:37:00 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id b3so12334054wrs.13
+ for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 09:36:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=sEHnGi1dpcWkzmcNmi3sg94gf4w8+sRwyHjEqhhS/R4=;
- b=lku22ZuQNs40GznxyzwPrTGZBDLwcQA1GAQb7Y9qMKTkX9G2tLRUjWNg34owoh+P3o
- aE+51fHCfpbRX1/AlH4hiB/+OmSnEv9EafqOa1GTrQ06fNoPQMv5pivxydsCXXzTIvX2
- gHC5z187YWFqvbODxRryAW+Fr4xvuxmkSG7RNexbAUZASKZnt5uzGiI6Ou4y6u7jS7dA
- 5nXm1E1at4TjJQyxNfWz7Wo7gzc0+fTNaWOKP66Y0ZH3S1RopGtRmTETMYfEL5OSYCsm
- /blXaZV6pqtR4VigeEKfpRQj9w+KixuqL6Dth1mtxHaH2hvLlC8PxyXi2l6ucVqCnaiE
- NEWw==
+ bh=FjjmRzG7VpaTW0V21y7CdXVm7zUUzOnKit95Yf46DtY=;
+ b=FDFRqqxasCjbmaqIwl/IhJhKJWFYBlJm/+7Yl83Cj6E77D7BVIl/wzr1NPoLVpnndt
+ 8c6luyAi3l+Jb+XV6pCbfyIkIF+C8R2EP8T+CdGFThTlR/mc48e5Qy9oqsPZY2YopZ3A
+ qhqN4ILhqMbHz5t7s9pFxrQChM2FrvzrszROWLFQhD8NqQQiZNMAS0/4sn1k5mK2o2ip
+ PU8XJRH7+hS53AyhsaBXb8H7xb9Rrzsn0QJK/Neag5aj6URY3yUSeDYDSba6vu/jDkvM
+ FYj3eUVfVW1Mh6w8Q8/8DCwdXHkAILgB/bYPiGTYaCtMGSxcvT+Tz8bxdS4HlnM3P8+O
+ KyPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sEHnGi1dpcWkzmcNmi3sg94gf4w8+sRwyHjEqhhS/R4=;
- b=BwiAZQX3tKZyMyk1hYQGZIIgrr7McF1NbhVCY05xJWrxZHWGxUugfvuleLkbAWzb/s
- 7H2mzI3+P6+PsstjGuwd5J4/wHWzRXVJbY3Lr/f2bowSgDua+WFzMyeLW8P04s6AObfi
- AlVvIwHy/Hl9/HO+O0G8rf3XGVmKA5IxqohfZYH3rawLCQamt7FvwTiOj5RsJH3PyUO6
- XJrWXGyCYzgxAnhZWQPt8Wkkx+bvaswqcLvMxs2kgwiiSj3J8ZACHNuo26RVAv5OJQi7
- nsK8weDriUsNbzTUW2+Sa0gkfaVb/1pzhtNV9vSbL+yHUlhT6U0ZjUJF1oT2jX8VwB10
- LMdw==
-X-Gm-Message-State: APjAAAUy7pnWPYegzMOep5BV3bDmCeUSpwYVXD1N9ik9kPh+pDZbRnnx
- FNdVAHUE06+Jh2MCF+Zp4uQDZg==
-X-Google-Smtp-Source: APXvYqwcszFd93sizY0JiCtQv58ZshV933K7g3rWe6CK0nd7CSw/4xLm90Ac5DhBgmSDnFu5rsOD/w==
-X-Received: by 2002:a1c:5fc4:: with SMTP id t187mr245276wmb.142.1572889022681; 
- Mon, 04 Nov 2019 09:37:02 -0800 (PST)
+ bh=FjjmRzG7VpaTW0V21y7CdXVm7zUUzOnKit95Yf46DtY=;
+ b=Ijxdnu+MXk0MXPY6vmImCtBaFQoeKF0kYa9pGQ7BdZavMTSM/42aaUJ950xzjEE6mR
+ oZDSnEhJYchK/JQ8QmlSFPQcDMLWiG2o/laINhFvOBUzK0v2or/+OUPidD6/yen45/KH
+ UwH+MDXs/Eoiye3RP6C+gMdG9E0/M0SI/V2WuPqLanD8FYyyYs8vdODOVywe+l1GyXGc
+ gEq1/CHwybtmVCqYWOmXJdkQB+lWaYoNg3i/BfwVgRihSnd9NzqJZnyt5qYpkUfYJuQx
+ bstFyXFf7yw1AHzOF4n0BLU3AL0KW72r45ubEQ4/pXFWtXSW1eXra4N03QjgrOpTzMwV
+ KiJg==
+X-Gm-Message-State: APjAAAVzDuJf0puSLcievWzXIkaNzB5XI/VU07UIwgsWtHgoghNCYr5H
+ Ka4/wum6nb5ZNHaUw/Wvx2C1Lw==
+X-Google-Smtp-Source: APXvYqzJGT0WkVRCl/ITdxWAhQ7MZ+84D2rWS/MgiFzveLGDVTsWzofRgiESwOPYlqR5d5jd2cFqSw==
+X-Received: by 2002:a5d:4748:: with SMTP id o8mr25239734wrs.239.1572889018722; 
+ Mon, 04 Nov 2019 09:36:58 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l4sm31953123wrf.46.2019.11.04.09.36.56
+ by smtp.gmail.com with ESMTPSA id v8sm19851770wra.79.2019.11.04.09.36.55
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 04 Nov 2019 09:37:01 -0800 (PST)
+ Mon, 04 Nov 2019 09:36:56 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 35B781FF92;
+ by zen.linaroharston (Postfix) with ESMTP id 13FAA1FF91;
  Mon,  4 Nov 2019 17:36:55 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 5/6] tests: only run ipmi-bt-test if CONFIG_LINUX
-Date: Mon,  4 Nov 2019 17:36:53 +0000
-Message-Id: <20191104173654.30125-6-alex.bennee@linaro.org>
+Subject: [PATCH  v1 4/6] tests/vm: update netbsd to version 8.1
+Date: Mon,  4 Nov 2019 17:36:52 +0000
+Message-Id: <20191104173654.30125-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191104173654.30125-1-alex.bennee@linaro.org>
 References: <20191104173654.30125-1-alex.bennee@linaro.org>
@@ -84,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::42d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,43 +96,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, Corey Minyard <cminyard@mvista.com>, berrange@redhat.com,
- stefanb@linux.vnet.ibm.com,
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  richard.henderson@linaro.org, f4bug@amsat.org,
- Kamil Rytarowski <kamil@netbsd.org>, cota@braap.org, stefanha@redhat.com,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Kamil Rytarowski <kamil@netbsd.org>, cota@braap.org,
+ Gerd Hoffmann <kraxel@redhat.com>, stefanha@redhat.com,
  marcandre.lureau@redhat.com, pbonzini@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test has been unstable on NetBSD for awhile. It seems the
-mechanism used to listen to a random port is a Linux-ism (although a
-received wisdom Linux-ism rather than a well documented one). As
-working around would add more hard to test complexity to the test I've
-gone for the easier option of making it CONFIG_LINUX only.
+From: Gerd Hoffmann <kraxel@redhat.com>
 
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-Id: <20191031085306.28888-5-kraxel@redhat.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Corey Minyard <cminyard@mvista.com>
-Cc: Kamil Rytarowski <kamil@netbsd.org>
 ---
- tests/Makefile.include | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/vm/netbsd | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 534ee487436..8566f5f119d 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -177,7 +177,9 @@ check-qtest-i386-$(CONFIG_SGA) += tests/boot-serial-test$(EXESUF)
- check-qtest-i386-$(CONFIG_SLIRP) += tests/pxe-test$(EXESUF)
- check-qtest-i386-y += tests/rtc-test$(EXESUF)
- check-qtest-i386-$(CONFIG_ISA_IPMI_KCS) += tests/ipmi-kcs-test$(EXESUF)
-+ifdef CONFIG_LINUX
- check-qtest-i386-$(CONFIG_ISA_IPMI_BT) += tests/ipmi-bt-test$(EXESUF)
-+endif
- check-qtest-i386-y += tests/i440fx-test$(EXESUF)
- check-qtest-i386-y += tests/fw_cfg-test$(EXESUF)
- check-qtest-i386-y += tests/device-plug-test$(EXESUF)
+diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+index d1bccccfd01..33779402dd1 100755
+--- a/tests/vm/netbsd
++++ b/tests/vm/netbsd
+@@ -22,7 +22,7 @@ class NetBSDVM(basevm.BaseVM):
+     name = "netbsd"
+     arch = "x86_64"
+ 
+-    link = "https://cdn.netbsd.org/pub/NetBSD/NetBSD-8.0/images/NetBSD-8.0-amd64.iso"
++    link = "https://cdn.netbsd.org/pub/NetBSD/NetBSD-8.1/images/NetBSD-8.1-amd64.iso"
+     size = "20G"
+     pkgs = [
+         # tools
 -- 
 2.20.1
 
