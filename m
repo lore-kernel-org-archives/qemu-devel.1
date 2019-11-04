@@ -1,86 +1,140 @@
-Return-Path: <SRS0=n1BB=Y3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C48CFCA9EB0
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 22:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28C55CA9EBB
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 02:36:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96DAD2067D
-	for <qemu-devel@archiver.kernel.org>; Sun,  3 Nov 2019 22:31:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96DAD2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EAD4E217F5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 02:36:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="KatdbKHZ";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="Pk5aEs+I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAD4E217F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iROPW-0000TV-PV
-	for qemu-devel@archiver.kernel.org; Sun, 03 Nov 2019 17:31:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33136)
+	id 1iRSET-0001Jt-3h
+	for qemu-devel@archiver.kernel.org; Sun, 03 Nov 2019 21:36:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iROOa-0008OU-To
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 17:30:54 -0500
+ (envelope-from <tsimpson@quicinc.com>) id 1iRSDC-0000ex-2Q
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 21:35:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iROOZ-0005ff-Fm
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 17:30:52 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:33436)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iROOZ-0005fD-7W
- for qemu-devel@nongnu.org; Sun, 03 Nov 2019 17:30:51 -0500
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id B91ECC057E9A
- for <qemu-devel@nongnu.org>; Sun,  3 Nov 2019 22:30:49 +0000 (UTC)
-Received: by mail-wr1-f72.google.com with SMTP id b4so9265543wrn.8
- for <qemu-devel@nongnu.org>; Sun, 03 Nov 2019 14:30:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=KQQyKeOCsUoauqsrdi5L6gCkHdjOkpi83Z9x3M99sr8=;
- b=kt6gXpR5erHnUZWKxdPCQmkq/+w6ayb/PhWeJMRzqKbzAinhVr0gP6mnqCAi9nE1HS
- OOv7Djr59edf1CXAGId4zAOwSmdWzPxKOYM8CGjJ2ssq/SrybNAt+IVuNlriG55zmQOw
- tsAsy1OKD6z0LPqcKx5XPgcBkPdHxSkLVtpfyTMPlq1B1jv69Pw+z0UesoIEJp1JJXMV
- ldSbcXSuay6botfZa/47hOv7/hYOpkHtQEUxYxYEGxRct8OjkoUT8XRWC8dEg1VMtsgJ
- pvQg8wOs2hB9gaq7lI4WuTWQ0eQOsyWEqcNnMH5whsx0d5F+HPos84HlfhCkl0JI6eKf
- E0Cw==
-X-Gm-Message-State: APjAAAWhfcfvEMlRUXGrf4+QkZXAkdVLo5SL9Tcy2OgDNJjqYy9bQyW0
- VrwTU7NphhmufbvtbNj20LVSinqB4dyoHs2iHQq+556IulmbYYpjOpZ9zno3oWMRRCaKgz3zRov
- RrMDuFQnv6r1F1PI=
-X-Received: by 2002:a5d:458d:: with SMTP id p13mr5187749wrq.181.1572820248420; 
- Sun, 03 Nov 2019 14:30:48 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx7lEpu3xnnV0lgjgjyUJy+bHbV7e65VgPjIvIUK31XAWmVN+nb29OYbEPDdKTAzPvbYmXVrA==
-X-Received: by 2002:a5d:458d:: with SMTP id p13mr5187737wrq.181.1572820248189; 
- Sun, 03 Nov 2019 14:30:48 -0800 (PST)
-Received: from [192.168.1.24] (lfbn-1-7864-228.w92-167.abo.wanadoo.fr.
- [92.167.33.228])
- by smtp.gmail.com with ESMTPSA id z8sm10349828wrp.49.2019.11.03.14.30.46
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 03 Nov 2019 14:30:47 -0800 (PST)
-Subject: Re: [PATCH v2] q800: fix I/O memory map
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20191102214209.26058-1-laurent@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6a200cd8-bb8f-d2b1-dc1f-247fb0870396@redhat.com>
-Date: Sun, 3 Nov 2019 23:30:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20191102214209.26058-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
+ (envelope-from <tsimpson@quicinc.com>) id 1iRSDA-0005kr-ME
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 21:35:21 -0500
+Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:18238)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
+ id 1iRSDA-0005jx-6y
+ for qemu-devel@nongnu.org; Sun, 03 Nov 2019 21:35:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1572834920; x=1604370920;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=O346F64lE7+yb28eIq9dWsdn7DwEZ5vUZp/KIUwDJik=;
+ b=KatdbKHZh0HIMr70pY0YnZo9Z78Lqn5DKQodgVDbaUhCf3yzlQAci7ap
+ thF7eNhpP2+oSiN9HXEjEXO+QZYLbJAqaD4VMjx06m6aoUpuR/9VFTbk8
+ zN49HJKENQ3mFP66Ew+IpMdO6lnUy9B+d45+t5IXB4Eb+wLkHoGTidJvg s=;
+Received: from unknown (HELO ironmsg04-sd.qualcomm.com) ([10.53.140.144])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 03 Nov 2019 18:35:18 -0800
+IronPort-SDR: 2HF4SDhZNIiPWUPTExzed3yghY6fMg0ijCBocJGQym3JnK0v96b1mTeFuydivHqwYEqmpl0x2g
+ BaiCabueCcgVMrejEmTi8bXN8g231eolZs7lZEJgszFduBNBphZ40wL1UvZP75wzG4Al1FmRWM
+ fIq/TxzaAd/KscgwwV4/DLpjWhm5Y4OPra0pVWvq97kKY2gWHLmi20pnl7LzBeVsWRP7sjkT/C
+ T/8ZkQqhFv2Fy8RsMNSzF+E6UFN2hm5q6VSkp3tSys1ex5S/O8DsRlDN0sMxCfllpW7XnuElC3
+ RvXxeoZZ8qoyXFUCzUMZcYDH
+Received: from nasanexm01e.na.qualcomm.com ([10.85.0.31])
+ by ironmsg04-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 03 Nov 2019 18:35:17 -0800
+Received: from APSANEXR01E.ap.qualcomm.com (10.85.0.38) by
+ NASANEXM01E.na.qualcomm.com (10.85.0.31) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Sun, 3 Nov 2019 18:35:17 -0800
+Received: from nasanexm03c.na.qualcomm.com (10.85.0.106) by
+ APSANEXR01E.ap.qualcomm.com (10.85.0.38) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Sun, 3 Nov 2019 18:35:14 -0800
+Received: from NAM01-BN3-obe.outbound.protection.outlook.com (199.106.107.6)
+ by nasanexm03c.na.qualcomm.com (10.85.0.106) with Microsoft SMTP Server (TLS)
+ id 15.0.1473.3 via Frontend Transport; Sun, 3 Nov 2019 18:35:13 -0800
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com (52.135.234.160) by
+ BYAPR02MB5365.namprd02.prod.outlook.com (20.177.124.138) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2408.24; Mon, 4 Nov 2019 02:35:11 +0000
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::8cc2:1921:4cb1:6cc1]) by BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::8cc2:1921:4cb1:6cc1%7]) with mapi id 15.20.2408.024; Mon, 4 Nov 2019
+ 02:35:10 +0000
+From: Taylor Simpson <tsimpson@quicinc.com>
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: RE: QEMU for Qualcomm Hexagon - KVM Forum talk and code available
+Thread-Topic: QEMU for Qualcomm Hexagon - KVM Forum talk and code available
+Thread-Index: AdWLUOkdof4fsTRrRvOiehGwyV6GSgFkXJqAAG5SBMA=
+Date: Mon, 4 Nov 2019 02:35:10 +0000
+Message-ID: <BYAPR02MB4886C84F08CF4877FA4C276DDE7F0@BYAPR02MB4886.namprd02.prod.outlook.com>
+References: <BYAPR02MB48863165DEE32E5C563E93F4DE650@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <2ae98ce7-7eed-90c5-f29d-5474904ac40c@redhat.com>
+In-Reply-To: <2ae98ce7-7eed-90c5-f29d-5474904ac40c@redhat.com>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=tsimpson@quicinc.com; 
+x-originating-ip: [70.115.140.19]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: cabd9edd-3e34-4bf9-b124-08d760cf9d4b
+x-ms-traffictypediagnostic: BYAPR02MB5365:
+x-ms-exchange-purlcount: 3
+x-microsoft-antispam-prvs: <BYAPR02MB5365C4F30D79E2F8FF2BF2BEDE7F0@BYAPR02MB5365.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 0211965D06
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(346002)(136003)(396003)(376002)(39860400002)(13464003)(189003)(199004)(476003)(99286004)(7696005)(6506007)(102836004)(76176011)(53546011)(26005)(6116002)(3846002)(81156014)(8676002)(8936002)(2501003)(14444005)(66476007)(66556008)(256004)(6246003)(186003)(446003)(11346002)(486006)(229853002)(55016002)(9686003)(6306002)(4326008)(71190400001)(71200400001)(7736002)(966005)(5660300002)(6436002)(66446008)(64756008)(33656002)(76116006)(66946007)(14454004)(54906003)(110136005)(316002)(81166006)(86362001)(52536014)(66066001)(478600001)(305945005)(25786009)(74316002)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB5365;
+ H:BYAPR02MB4886.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: dmzEre3DjPxs659mXLXf7l02gnQlozyXjL0gIwDhbUHDtopTcZZYrS9IMfql/h+b1vhJVgD40KyhnrxUVbjmR3jvsurEreDWJu0Y6tcmiX5zO8CDzZ+LpT8o+8GB/hKDmPnl5klF2PX8pq2TuWxAShbMAABSdM5Nw/SQPiesY75CtxeFmgh7xHhMi9upoZKe3rQhg6ypkj0NwK9GjcfHOBBUaTH9i8ObzMrxkXg+fdM5lqUfxdJA3/zhsPbNFxWIvdja9/Pc5XR+O8Ia84CnPb6Wpjg9GCBXXtuT7Htop7S72opASVNxMlcdMfl9OcWouSRZBHb2ZHL4PezdWkU2voz0DHb7kCfItlihhejPd75a7IwzksRRKWxv1P7iC7gWlDHw15JbuPe8kzq9ZVmXvdhL+oP1+gix/Urg2AzXCrToMgc6tmJsFpgWHPZtUvTSG9UJsCHGjU1Uep4VVwoJiuhy8IEchIkBAtW1uFNc2Gs=
+x-ms-exchange-transport-forked: True
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IigB39vDxG59wq/CxRt0fsCcLdFileo44yya3Ss7FzoQeSuENBkaOTs0U9yIKeV7Ftcnl74tgCkSZmWCWOM2L36EEaCCRsnDbxk6pP6HhAkfAhe0djrPUwCrGU4N8pt856H7nQyWkOxGksua1CFxV+QrQIhJ2VYakbmR7Z+k/Tfx88g1a0Eb5nlygQ0x6u0YGsG1FyfXuWEcPK/KOTbbsmUZoSPXgKg2A8w08wdbMxbs1OFBrGHMrk+7vvO06X+nUR4IsnZJMr8bs1+fI0uevbnfSklql+IPx+cqYIawloZE7hSLKDkKuDjUJI1fcSP5I6HuhOGdLAb5SOzVLAeDuA==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Bmjxflq7d8IKEvRbv7USH1v9URDhxGMm9z65WzBry3Y=;
+ b=mhzzMGfJuP7KvyW8tiw608WOJUiYx9WjlaA2is5CGFlNqXsLPWxehvTgwd48H2PGCwqVC7cos6AMfPUB909mCt7PkMBIxvNnXnlHLtLrpmt1NG+IE+SWk/XrBCRsgBlQuYoywTUGrHwZ22sPNaBHU3U1JvsB8GIk1d105y/43irv2vEz2T09qxA4rvxTxIn3Cv5Cdhzh1jzuVtmyDG654UEZUTzCoNwODbg+HFVaTZ5lxesG1w1+7QU/QXjpwHubByxA7Nsh9uTl1V3cDINDkjkiiyjTm2JT5Uurvk3zBxQ40h8ZahzUTrQ13izIClrg8V/p6X2jYeQllNcTBwFi0A==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector2-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Bmjxflq7d8IKEvRbv7USH1v9URDhxGMm9z65WzBry3Y=;
+ b=Pk5aEs+IIsffnjazRczv8gTpOWkeS2rrDNmZh8qi+bjk6DCYQ76G7jhtKpXfZ79izOxuYgir4spy6GS449QXECYo53CbBSG0SMMl9LXwNoWuaUoOkQebLQ9JQc5aRwlTh03HR1jjBh9WD0JwfLoiFkoXAS+qyKLou5JYgrzwxqQ=
+x-ms-exchange-crosstenant-network-message-id: cabd9edd-3e34-4bf9-b124-08d760cf9d4b
+x-ms-exchange-crosstenant-originalarrivaltime: 04 Nov 2019 02:35:10.7508 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: 0c1RFY9mnl1Vyfwpg0EldK2VfpO+VuiuOizZ8CpJMI4cWTYyJ+vtXkdNxaRqTFQwBjesYAkZ0AobKGEzDu5WuQ==
+x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB5365
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+MIME-Version: 1.0
+X-OriginatorOrg: quicinc.com
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 199.106.114.39
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,113 +146,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alessandro Di Federico <ale@rev.ng>, "nizzo@rev.ng" <nizzo@rev.ng>,
+ =?iso-8859-1?Q?Niccol=F2_Izzo?= <izzoniccolo@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/2/19 10:42 PM, Laurent Vivier wrote:
-> Linux kernel 5.4 will introduce a new memory map for SWIM device.
-> (aee6bff1c325 ("m68k: mac: Revisit floppy disc controller base addresse=
-s"))
->=20
-> Until this release all MMIO are mapped between 0x50f00000 and 0x50f4000=
-0,
-> but it appears that for real hardware 0x50f00000 is not the base addres=
-s:
-> the MMIO region spans 0x50000000 through 0x60000000, and 0x50040000 thr=
-ough
-> 0x54000000 is repeated images of 0x50000000 to 0x50040000.
->=20
-> Fixed: 04e7ca8d0f ("hw/m68k: define Macintosh Quadra 800")
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->=20
-> Notes:
->      v2: add some constant definitions
->          allocate a bloc of memory to stores all I/O MemoryRegion
->=20
->   hw/m68k/q800.c | 40 ++++++++++++++++++++++++++++++++--------
->   1 file changed, 32 insertions(+), 8 deletions(-)
->=20
-> diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-> index 2b4842f8c6..822bd13d36 100644
-> --- a/hw/m68k/q800.c
-> +++ b/hw/m68k/q800.c
-> @@ -60,14 +60,19 @@
->   #define MACH_MAC        3
->   #define Q800_MAC_CPU_ID 2
->  =20
-> -#define VIA_BASE              0x50f00000
-> -#define SONIC_PROM_BASE       0x50f08000
-> -#define SONIC_BASE            0x50f0a000
-> -#define SCC_BASE              0x50f0c020
-> -#define ESP_BASE              0x50f10000
-> -#define ESP_PDMA              0x50f10100
-> -#define ASC_BASE              0x50F14000
-> -#define SWIM_BASE             0x50F1E000
-> +#define IO_BASE               0x50000000
-> +#define IO_SLICE              0x00040000
-> +#define IO_SIZE               0x04000000
-> +
-> +#define VIA_BASE              (IO_BASE + 0x00000)
+That is correct.
 
-Good idea.
+Once you register on developer.qualcomm.com, you can download the Hexagon S=
+DK version 3.4.3.  Note that there are different downloads for Linux and Wi=
+ndows hosts.
 
-> +#define SONIC_PROM_BASE       (IO_BASE + 0x08000)
-> +#define SONIC_BASE            (IO_BASE + 0x0a000)
-> +#define SCC_BASE              (IO_BASE + 0x0c020)
-> +#define ESP_BASE              (IO_BASE + 0x10000)
-> +#define ESP_PDMA              (IO_BASE + 0x10100)
-> +#define ASC_BASE              (IO_BASE + 0x14000)
-> +#define SWIM_BASE             (IO_BASE + 0x1E000)
-> +
->   #define NUBUS_SUPER_SLOT_BASE 0x60000000
->   #define NUBUS_SLOT_BASE       0xf0000000
->  =20
-> @@ -135,6 +140,9 @@ static void q800_init(MachineState *machine)
->       int32_t initrd_size;
->       MemoryRegion *rom;
->       MemoryRegion *ram;
-> +    MemoryRegion *io;
-> +    const int io_slice_nb =3D (IO_SIZE / IO_SLICE) - 1;
-> +    int i;
->       ram_addr_t ram_size =3D machine->ram_size;
->       const char *kernel_filename =3D machine->kernel_filename;
->       const char *initrd_filename =3D machine->initrd_filename;
-> @@ -163,10 +171,26 @@ static void q800_init(MachineState *machine)
->       cpu =3D M68K_CPU(cpu_create(machine->cpu_type));
->       qemu_register_reset(main_cpu_reset, cpu);
->  =20
-> +    /* RAM */
->       ram =3D g_malloc(sizeof(*ram));
->       memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &erro=
-r_abort);
->       memory_region_add_subregion(get_system_memory(), 0, ram);
->  =20
-> +    /*
-> +     * Memory from IO_BASE to IO_BASE + IO_SLICE is repeated
-> +     * from IO_BASE + IO_SLICE to IO_BASE + IO_SIZE
-> +     */
-> +    io =3D g_new(MemoryRegion, io_slice_nb);
-> +    for (i =3D 0; i < io_slice_nb; i++) {
-> +        char *name =3D g_strdup_printf("mac_m68k.io[%d]", i + 1);
-> +
-> +        memory_region_init_alias(io + i, NULL, name, get_system_memory=
-(),
+Once you have installed the SDK, look for the document bundle in the follow=
+ing location
+<INSTALL_DIR>/tools/HEXAGON_Tools/8.3.02/Documents/Hexagon_Document_Bundle.=
+pdf
+That PDF file is a container for a bunch of other documents.  If you want t=
+o read more about the Hexagon architecture, look at the following
+V67 Programmer's Reference Manual
+V66 HVX Programmer's Reference Manual
+The version on the quic github implements these.  Note that HVX stands for =
+Hexagon Vector eXtensions.  It is an optional set of instructions that oper=
+ate on 128-byte vectors.
 
-We usually use &io[i], anyway:
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+IIRC, the revng github implements up to V62.  Alessandro or Niccolo can con=
+firm.
 
-> +                                 IO_BASE, IO_SLICE);
-> +        memory_region_add_subregion(get_system_memory(),
-> +                                    IO_BASE + (i + 1) * IO_SLICE, io +=
- i);
-> +        g_free(name);
-> +    }
-> +
->       /* IRQ Glue */
->  =20
->       irq =3D g_new0(GLUEState, 1);
->=20
+Note that the toolchain in that installation generates code for the standal=
+one runtime or the RTOS, not Linux that the quic qemu generates.  However, =
+they should run on the revng version.  In the coming weeks, we'll work on s=
+etting up a container to build the toolchain that will generate binaries th=
+at will run on the quic version.
+
+If anyone has any more questions, I'm happy to answer them.
+
+Taylor
+
+
+-----Original Message-----
+From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+Sent: Friday, November 1, 2019 1:30 PM
+To: Taylor Simpson <tsimpson@quicinc.com>; qemu-devel@nongnu.org
+Cc: Alessandro Di Federico <ale@rev.ng>; nizzo@rev.ng; Niccol=F2 Izzo <izzo=
+niccolo@gmail.com>
+Subject: Re: QEMU for Qualcomm Hexagon - KVM Forum talk and code available
+
+
+
+Hi Taylor,
+
+On 10/25/19 6:26 PM, Taylor Simpson wrote:
+> We would like inform the you that we will be doing a talk at the KVM
+> Forum next week on QEMU for Qualcomm Hexagon.  Alessandro Di Federico,
+> Niccolo Izzo, and I have been working independently on implementations
+> of the Hexagon target.  We plan to merge the implementations, have a
+> community review, and ultimately have Hexagon be an official target in
+> QEMU.  Our code is available at the links below.
+>
+> _https://github.com/revng/qemu-hexagon_
+>
+> _https://github.com/quic/qemu_
+>
+> If anyone has any feedback on the code as it stands today or guidance
+> on how best to prepare it for review, please let us know.
+
+Is your target the 'Hexagon Series 600', with documentation available here?
+https://developer.qualcomm.com/software/hexagon-dsp-sdk/tools
+
+Regards,
+
+Phil.
+
+
 
