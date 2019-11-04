@@ -2,89 +2,73 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC504CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E4BCA9ED4
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:50:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80C6E20848
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:42:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80C6E20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 55D5A20869
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:50:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="jhLrhjSz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55D5A20869
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34726 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iReVG-0003mj-LA
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 10:42:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45731)
+	id 1iRecE-00060e-BH
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 10:50:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46979)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iReUb-0003DQ-AS
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:42:10 -0500
+ (envelope-from <berto@igalia.com>) id 1iRebW-0005Sy-6F
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:49:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iReUZ-0007qB-B4
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:42:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39432)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iReUZ-0007px-3I
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:42:07 -0500
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id D6287368FF
- for <qemu-devel@nongnu.org>; Mon,  4 Nov 2019 15:42:05 +0000 (UTC)
-Received: by mail-wm1-f70.google.com with SMTP id 2so3988741wmd.3
- for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 07:42:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=vmb5S7csguWiNdq1Hf8Wvz+n2BriON2c3MvOkyrzm+k=;
- b=eD9XoWrwjDsPLbyDIRaDChspCpRRzsFguibHkFr3V3575Ky15nXfbFP84mgKR4f12G
- Zi3EPquERpmeeuu+Q25a3QgdsCYXiI2L99llwrNb6qcozlSosXEhvWw3Xzla75qUNrho
- N/Wbb/7k4MrVJqc11UtUfyqcCqsusOFeWFm+AolS/+BfMl3Xq6Vgl28yBVdQeH9jIQdG
- +hD9T2YW8mPxdeIcRAjDMNtoRM3nDTPJLruPjWs8AXNmyvHT+mkMUEvN79yn4e3wNhHi
- DmvVSfKIhNB48tIFoweXeU4WMCLwiX+H9rzKnPgPAlSR0dC9vNJBuqiktVBND0SttNjK
- 6+nw==
-X-Gm-Message-State: APjAAAX56iQOmUiVqUkD+CanKXCyG15xV4chHDfDUkN/IaA2Pa8OWUdX
- NFfwLvUrbwZQ9W6X8s9GSzhCp6rqCTWJwu+znj/j7ahEYtd5Vq/nsDBfMqD1n13gB72+cFM9Qv0
- A5BhVqitLKGag3yk=
-X-Received: by 2002:a1c:23c1:: with SMTP id j184mr22483092wmj.83.1572882124655; 
- Mon, 04 Nov 2019 07:42:04 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyt12kJfZOouSmsQTvFrScglyJWEq9+lYQrLuG0yFQ4TO94/cYp++u//CTPceUUruRMqrKwyA==
-X-Received: by 2002:a1c:23c1:: with SMTP id j184mr22483073wmj.83.1572882124416; 
- Mon, 04 Nov 2019 07:42:04 -0800 (PST)
-Received: from [192.168.1.24] (lfbn-1-7864-228.w92-167.abo.wanadoo.fr.
- [92.167.33.228])
- by smtp.gmail.com with ESMTPSA id w22sm16429112wmc.16.2019.11.04.07.42.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 Nov 2019 07:42:03 -0800 (PST)
-Subject: Re: [PATCH v5 08/13] hw/core: deprecate old reset functions and
- introduce new ones
-To: Damien Hedde <damien.hedde@greensocs.com>, qemu-devel@nongnu.org
-References: <20191018150630.31099-1-damien.hedde@greensocs.com>
- <20191018150630.31099-9-damien.hedde@greensocs.com>
- <41ee0633-c8c8-10ce-1372-4804f25273d0@redhat.com>
- <b434efd9-490a-85f4-9f22-c40bb0a9ed77@greensocs.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7347207f-9f9e-a86f-ca18-ebca4d9ae0f9@redhat.com>
-Date: Mon, 4 Nov 2019 16:42:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <berto@igalia.com>) id 1iRebV-0005yZ-4m
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:49:18 -0500
+Received: from fanzine.igalia.com ([178.60.130.6]:37212)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1iRebQ-0005vE-UN; Mon, 04 Nov 2019 10:49:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=CGEC2ACnQHkfxir6I+MPs0JpJib6o9PO0Spq7QPYJso=; 
+ b=jhLrhjSzghnwNtnokUrLRCUKN9I9zL2+55lBGWLr6wrrEpr6norOSiKK05RfNlP2syiXWNnQKIFtpZhVfHIVTbAqnSskQL+zOgQt9JU561+caBUo0LGvyJ0lPin+a5fsI5LSn+emLmRCvcCRyI4o9wzAjMJemMqWiSBQ573a1qvax8uqlW3Ge9lPHRhd0Dc/X7BoEb48qtxDl7lT3YK4d1WQsT45LWJ5kD/fOPqLS9Q3t6YUBLpoTJtzGsMF1gVFArhnCeWQRVWf4m0RPJBv38zxB/XFcOI/0JYD2GcbrXaIW3MPE9Fa180jkVu0lyRo2pB4j/YVvcsaS556eYjQtQ==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1iRebK-0007s7-HS; Mon, 04 Nov 2019 16:49:06 +0100
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1iRebK-0001Bi-Ei; Mon, 04 Nov 2019 16:49:06 +0100
+From: Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-block\@nongnu.org" <qemu-block@nongnu.org>
+Subject: Re: [RFC 0/3] block/file-posix: Work around XFS bug
+In-Reply-To: <5b67cf39-0ea1-d205-0e96-7b1148c7df19@redhat.com>
+References: <20191025095849.25283-1-mreitz@redhat.com>
+ <02291bca-67d2-ed30-ac34-17641afbe397@virtuozzo.com>
+ <d1b43c24-a443-dd19-6814-11eec43e943a@virtuozzo.com>
+ <0f75cbcf-e6c7-c74c-972b-22e7760a8b5c@redhat.com>
+ <w51r22nspqp.fsf@maestria.local.igalia.com>
+ <7ed9b8f0-2d8c-7bac-185e-9a1dd68fcce8@redhat.com>
+ <w51mudbsmk7.fsf@maestria.local.igalia.com>
+ <5b67cf39-0ea1-d205-0e96-7b1148c7df19@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Mon, 04 Nov 2019 16:49:06 +0100
+Message-ID: <w51k18fskul.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <b434efd9-490a-85f4-9f22-c40bb0a9ed77@greensocs.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,41 +80,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
- cohuck@redhat.com, mark.burton@greensocs.com, qemu-s390x@nongnu.org,
- edgari@xilinx.com, qemu-arm@nongnu.org, pbonzini@redhat.com,
- david@gibson.dropbear.id.au
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/4/19 1:01 PM, Damien Hedde wrote:
-> On 11/1/19 12:35 AM, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 10/18/19 5:06 PM, Damien Hedde wrote:
->>> Deprecate device_legacy_reset(), qdev_reset_all() and
->>> qbus_reset_all() to be replaced by new functions
->>> device_cold_reset() and bus_cold_reset() which uses resettable API.
->>>
->>> Also introduce resettable_cold_reset_fn() which may be used as a
->>> replacement for qdev_reset_all_fn and qbus_reset_all_fn().
->>>
->>> Following patches will be needed to look at legacy reset call sites
->>> and switch to resettable api. The legacy functions will be removed
->>> when unused.
->>>
->>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
->>> ---
->>> [...]>> =C2=A0 +void resettable_cold_reset_fn(void *opaque)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 resettable_reset((Object *) opaque, RESET_TYPE_CO=
-LD);
->>
->> Why not take a Object* argument?
->=20
-> This function is used to register a reset callback with
-> qemu_register_reset() (path 10 and 11), so we need void* to match the
-> prototype.
+On Mon 04 Nov 2019 04:14:56 PM CET, Max Reitz wrote:
 
-Alright.
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> No, what I meant was that the original problem that led to
+>>> c8bb23cbdbe would go away.
+>>=20
+>> Ah, right. Not quite, according to my numbers:
+>>=20
+>> |--------------+----------------+-----------------+-------------|
+>> | Cluster size | subclusters=3Don | subclusters=3Doff | fallocate() |
+>> |--------------+----------------+-----------------+-------------|
+>> |       256 KB |     10182 IOPS |        966 IOPS |  14007 IOPS |
+>> |       512 KB |      7919 IOPS |        563 IOPS |  13442 IOPS |
+>> |      1024 KB |      5050 IOPS |        465 IOPS |  13887 IOPS |
+>> |      2048 KB |      2465 IOPS |        271 IOPS |  13885 IOPS |
+>> |--------------+----------------+-----------------+-------------|
+>>=20
+>> There's obviously no backing image, and only the last column uses
+>> handle_alloc_space() / fallocate().
+>
+> Thanks for providing some numbers!
+>
+> It was my impression, too, that subclusters wouldn=E2=80=99t solve it.  B=
+ut it
+> didn=E2=80=99t seem like that big of a difference to me.  Did you run this
+> with aio=3Dnative?  (Because that=E2=80=99s where we have the XFS problem)
+
+Here's with aio=3Dnative
+
+|--------------+----------------+-----------------+-------------|
+| Cluster size | subclusters=3Don | subclusters=3Doff | fallocate() |
+|--------------+----------------+-----------------+-------------|
+|       256 KB |     19897 IOPS |        891 IOPS |  32194 IOPS |
+|       512 KB |     17881 IOPS |        436 IOPS |  33092 IOPS |
+|      1024 KB |     17050 IOPS |        341 IOPS |  32768 IOPS |
+|      2048 KB |      7854 IOPS |        207 IOPS |  30944 IOPS |
+|--------------+----------------+-----------------+-------------|
+
+Berto
 
