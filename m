@@ -2,71 +2,75 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4683CA9EC9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 23:24:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68443CA9EC9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 23:27:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B69442080F
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 23:24:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B69442080F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3784F20848
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 23:27:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3784F20848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRlhf-0002jf-Me
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 18:24:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44535)
+	id 1iRlkj-00052T-BX
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 18:27:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47393)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iRlgZ-0002DR-9D
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 18:23:00 -0500
+ (envelope-from <bounces@canonical.com>) id 1iRljt-0004PJ-Jy
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 18:26:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iRlgW-0006UN-TC
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 18:22:58 -0500
-Resent-Date: Mon, 04 Nov 2019 18:22:58 -0500
-Resent-Message-Id: <E1iRlgW-0006UN-TC@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21464)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iRlgV-0006Sp-9K; Mon, 04 Nov 2019 18:22:56 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1572909754; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=hTTN/ZvPkMJwTtyvRgebHTCNfp5TCvhfiifiMiuE5Re1yeLrePi6j6xybO8rlFxI6hU0yrSTyMQltb+Ze8nXpBO24b7ooxd32NOnFcc3CLyu3xiINoFFzamJ/M3PHEc0tQ2Ve0cq8QZ8ipKM4tYdR89TXXrCdI+u/vIRNd6V6IY=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1572909754;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=b0/3qqh5tmRtg2xzpuVA3bIT0K4yPhdj7WeO7sQTCgY=; 
- b=QWzRzyG46GfFl1vANN0vSTFqnf2c1O6Es/hw4Fsre04R4qNkMYEg89JQFXmSzng0KwCdIg+kfZZo7Je3ungqPIinGCbt6iupPOqDVVzjIrVn+zy9SaICM8EgwxCG/grQhLZNPzSDYMjWimTcVQdfcQ2S/TSW5vm++qsiCgMOO2I=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1572909751680440.05171983654077;
- Mon, 4 Nov 2019 15:22:31 -0800 (PST)
-In-Reply-To: <20191104185202.102504-1-dgilbert@redhat.com>
-Subject: Re: [PATCH] global: Squash 'the the'
-Message-ID: <157290975035.27285.3954856965557307495@37313f22b938>
+ (envelope-from <bounces@canonical.com>) id 1iRljs-00026v-DN
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 18:26:25 -0500
+Received: from indium.canonical.com ([91.189.90.7]:41724)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iRljH-0001Z7-Rf
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 18:26:24 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iRljD-00032x-V7
+ for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 23:25:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id E8BC92E80C9
+ for <qemu-devel@nongnu.org>; Mon,  4 Nov 2019 23:25:43 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: dgilbert@redhat.com
-Date: Mon, 4 Nov 2019 15:22:31 -0800 (PST)
-X-ZohoMailClient: External
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 04 Nov 2019 23:20:28 -0000
+From: Aleksandar Markovic <1851095@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ajbennee amarkovic ldesnogu pmaydell scientes
+X-Launchpad-Bug-Reporter: Shawn Landden (scientes)
+X-Launchpad-Bug-Modifier: Aleksandar Markovic (amarkovic)
+References: <157275520880.19702.5640428141206739403.malonedeb@wampee.canonical.com>
+Message-Id: <157290962872.29585.17444842807551060330.malone@soybean.canonical.com>
+Subject: [Bug 1851095] Re: [feature request] awareness of instructions that
+ are well emulated
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 9a647c6df237a35d5777371ac7eee8bdaa765631
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,38 +79,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, sstabellini@kernel.org, qemu-trivial@nongnu.org,
- mjt@tls.msk.ru, qemu-devel@nongnu.org, laurent@vivier.eu,
- marcandre.lureau@redhat.com, david@gibson.dropbear.id.au
+Reply-To: Bug 1851095 <1851095@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwNDE4NTIwMi4xMDI1
-MDQtMS1kZ2lsYmVydEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0hdIGdsb2JhbDogU3F1YXNoICd0aGUgdGhlJwpU
-eXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTExMDQxODUyMDIuMTAyNTA0LTEtZGdpbGJlcnRA
-cmVkaGF0LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2
-LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBj
-b25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0
-Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5n
-IDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0Jwo0MmE2ODUwIGdsb2JhbDogU3F1YXNoICd0aGUgdGhlJwoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMyNDogRklM
-RTogZGlzYXMvbGlidml4bC92aXhsL2ludmFsc2V0Lmg6MTA1OgorICAvLyBOb3RlIHRoYXQgdGhp
-cyBkb2VzIG5vdCBtZWFuIHRoZSBiYWNraW5nIHN0b3JhZ2UgaXMgZW1wdHk6IGl0IGNhbiBzdGls
-bAoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA1NiBsaW5lcyBjaGVja2VkCgpDb21taXQg
-NDJhNjg1MDNjMTFiIChnbG9iYWw6IFNxdWFzaCAndGhlIHRoZScpIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNv
-ZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9s
-b2dzLzIwMTkxMTA0MTg1MjAyLjEwMjUwNC0xLWRnaWxiZXJ0QHJlZGhhdC5jb20vdGVzdGluZy5j
-aGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+Can you provide a clearer repro example of what doesn't wirk on mipsel
+platform?
 
+In last two QEMU releases mips (Wave) developers went to great lenghts
+making sure both mips SIMD and mips FP instructions (in both scalar and
+vector variants) are emulated properly. Some of the unit tests were
+published, but also many were left internal, and there are many
+integration tests devised and run as well. We in mips (Wave) consider
+these two areas well tested. Still, we'll consider seriuosly fixing your
+example, if you prove experimentally that this is a mips-related bug,
+but just provides us with a reasonably convenient repro procedure.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1851095
+
+Title:
+  [feature request] awareness of instructions that are well emulated
+
+Status in QEMU:
+  Invalid
+
+Bug description:
+  While qemu's scalar emulation tends to be excellent, qemu's SIMD
+  emulation tends to be incorrect (except for arm64 from x86_64)--i have
+  found this both for mipsel and arm32. Until these code paths are
+  audited, which is probably a large job, it would be nice if qemu knew
+  its emulation of this class of instructions was not very good, and
+  thus it would give up on finding these instructions if a "careful"
+  operation is passed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1851095/+subscriptions
 
