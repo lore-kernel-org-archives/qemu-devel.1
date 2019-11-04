@@ -2,109 +2,89 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F38CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 14:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 486F1CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 14:34:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E41B721655
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 14:26:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XffIjR+u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E41B721655
+	by mail.kernel.org (Postfix) with ESMTPS id 1C54321D71
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 14:34:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C54321D71
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRdJ5-0002Mf-Vz
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 09:26:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34023)
+	id 1iRdR8-0004bl-8T
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 09:34:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35026)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iRdIM-0001o0-Vb
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 09:25:28 -0500
+ (envelope-from <philmd@redhat.com>) id 1iRdQH-0003k2-3i
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 09:33:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iRdIL-0007hX-Ta
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 09:25:26 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43258
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iRdQF-0002JI-L0
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 09:33:37 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54260)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iRdIL-0007hH-QA
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 09:25:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572877525;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=bYT6qNkwoPgsAgQMzR82q4QACe8jwocOUIR62APUmTM=;
- b=XffIjR+uu3RNO80+ydlYAQHlyrT5O1VlmlCTAGoIKK/8NDR0eKlGKMAby0JiX468OLxsjS
- yyZFSFSz93sOzSK0cJJmOcAU7COpynV9z8G1J4D7Pg21o4p4E9ddRjTiqXI782iDcvKJoL
- N9EMGo9+Lyuy4dkJxNip69P7JK5n7l4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-PGQZoerxPFiCzaghiSN3zQ-1; Mon, 04 Nov 2019 09:25:21 -0500
-X-MC-Unique: PGQZoerxPFiCzaghiSN3zQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iRdQF-0002Iv-CF
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 09:33:35 -0500
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4B43477;
- Mon,  4 Nov 2019 14:25:20 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.36.118.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 905BC5C28C;
- Mon,  4 Nov 2019 14:25:13 +0000 (UTC)
-Subject: Re: [RFC 0/3] block/file-posix: Work around XFS bug
-To: Alberto Garcia <berto@igalia.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <20191025095849.25283-1-mreitz@redhat.com>
- <02291bca-67d2-ed30-ac34-17641afbe397@virtuozzo.com>
- <d1b43c24-a443-dd19-6814-11eec43e943a@virtuozzo.com>
- <0f75cbcf-e6c7-c74c-972b-22e7760a8b5c@redhat.com>
- <w51r22nspqp.fsf@maestria.local.igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7ed9b8f0-2d8c-7bac-185e-9a1dd68fcce8@redhat.com>
-Date: Mon, 4 Nov 2019 15:25:12 +0100
+ by mx1.redhat.com (Postfix) with ESMTPS id F418181E1A
+ for <qemu-devel@nongnu.org>; Mon,  4 Nov 2019 14:33:33 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id v6so1194486wrm.18
+ for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 06:33:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pqd2a+23lsIGqYc0RuIYbYmHJtC1x0ID8yTRwiJDGGw=;
+ b=oWi6TntmMAhc4FrFXy0cJ4S710V8BxfQlX5cg0zyO5DhMXb1ebVVqQJDjspvn7TDbW
+ wwqky2lpdIsd90VEfu7KdYivrtKGuW9/CmvjMgm7BYfVlyYjjLrUyVbx5guRrRyo20Um
+ OJmRROm5Ade/bl2H2Uyn/3z1ESWnE9vfAe3j7J4X31TUcU+2dmA8DRHMH1wVlyc/I/Ez
+ CqJzNscozALotpQAMzqxp3LIRzGxqZyFdsxjByOSUPU2kxqDblciPG85SvHuQsxJmaLq
+ lIVXmFRpjahAhTkPt1VHu/mVYO6nhAuqUsrRL9STAS8WMXtTU39jKpdcXggJ9qSA4TuS
+ O1jQ==
+X-Gm-Message-State: APjAAAXEdX0fpCYSsOz0mJwnbskgc9k9H+VcDEDiZl2pCwhuntz5LplA
+ T63ysEJIyVGfckAk61r5EJDWB4KkeCMw7lzA76FtjHrIMbmkd5TtH1U14ZlzVc6nfe6mr0UTXIw
+ GDgbLrXpVijte+OI=
+X-Received: by 2002:a5d:52c8:: with SMTP id r8mr22997242wrv.347.1572878012692; 
+ Mon, 04 Nov 2019 06:33:32 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxBPWBUqfxnJQhRYY+WxzsZ8NcP9uWsZMSHy4k8o+OHZ1lfzHkaBjkVngh2uxwXMHiBMoTrrw==
+X-Received: by 2002:a5d:52c8:: with SMTP id r8mr22997221wrv.347.1572878012466; 
+ Mon, 04 Nov 2019 06:33:32 -0800 (PST)
+Received: from [192.168.1.24] (lfbn-1-7864-228.w92-167.abo.wanadoo.fr.
+ [92.167.33.228])
+ by smtp.gmail.com with ESMTPSA id y19sm20817315wmd.29.2019.11.04.06.33.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 04 Nov 2019 06:33:31 -0800 (PST)
+Subject: Re: [PATCH v5 02/13] hw/core/qdev: add trace events to help with
+ resettable transition
+To: Damien Hedde <damien.hedde@greensocs.com>, qemu-devel@nongnu.org
+References: <20191018150630.31099-1-damien.hedde@greensocs.com>
+ <20191018150630.31099-3-damien.hedde@greensocs.com>
+ <f5d78215-ee4d-ae1a-74dc-52b3c179d88c@redhat.com>
+ <984a87d7-0430-d777-0fe9-ce5cfea712a1@greensocs.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <e008dc9a-4a04-8183-3610-bbb3361a877c@redhat.com>
+Date: Mon, 4 Nov 2019 15:33:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <w51r22nspqp.fsf@maestria.local.igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="HOgw5gOv6Ix7vsD8Q4aQlDnZLUxcyBffm"
+In-Reply-To: <984a87d7-0430-d777-0fe9-ce5cfea712a1@greensocs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -116,99 +96,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: peter.maydell@linaro.org, berrange@redhat.com, ehabkost@redhat.com,
+ cohuck@redhat.com, mark.burton@greensocs.com, qemu-s390x@nongnu.org,
+ edgari@xilinx.com, qemu-arm@nongnu.org, pbonzini@redhat.com,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HOgw5gOv6Ix7vsD8Q4aQlDnZLUxcyBffm
-Content-Type: multipart/mixed; boundary="goq2BfNGDZfCkuICjyY5FMAC5ENRli7AS"
-
---goq2BfNGDZfCkuICjyY5FMAC5ENRli7AS
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 04.11.19 15:03, Alberto Garcia wrote:
-> On Fri 25 Oct 2019 04:19:30 PM CEST, Max Reitz wrote:
->>>> So, it's obvious that c8bb23cbdbe32f5c326 is significant for 1M
->>>> cluster-size, even on rotational disk, which means that previous
->>>> assumption about calling handle_alloc_space() only for ssd is wrong,
->>>> we need smarter heuristics..
->>>>
->>>> So, I'd prefer (1) or (2).
+On 11/4/19 1:16 PM, Damien Hedde wrote:
+> On 11/1/19 12:23 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> On 10/18/19 5:06 PM, Damien Hedde wrote:
+>>> Adds trace events to reset procedure and when updating the parent
+>>> bus of a device.
+>>>
+>>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>>> ---
+>>>  =C2=A0 hw/core/qdev.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 27 +++++=
++++++++++++++++++++---
+>>>  =C2=A0 hw/core/trace-events |=C2=A0 9 +++++++++
+>>>  =C2=A0 2 files changed, 33 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+>>> index 60be2f2fef..f230063189 100644
+>>> --- a/hw/core/qdev.c
+>>> +++ b/hw/core/qdev.c
+>>> @@ -38,6 +38,7 @@
+>>>  =C2=A0 #include "hw/boards.h"
+>>>  =C2=A0 #include "hw/sysbus.h"
+>>>  =C2=A0 #include "migration/vmstate.h"
+>>> +#include "trace.h"
+>>>  =C2=A0 =C2=A0 bool qdev_hotplug =3D false;
+>>>  =C2=A0 static bool qdev_hot_added =3D false;
+>>> @@ -98,7 +99,9 @@ void qdev_set_parent_bus(DeviceState *dev, BusState
+>>> *bus)
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bool replugging =3D dev->parent_bus !=
+=3D NULL;
+>>>  =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (replugging) {
+>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Keep a reference to th=
+e device while it's not plugged into
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 trace_qdev_update_parent_=
+bus(dev, dev->parent_bus, bus);
 >>
->> OK.  I wonder whether that problem would go away with Berto=E2=80=99s su=
-bcluster
->> series, though.
+>> Nitpicking, if you respin, can you add object_get_typename(OBJECT(dev)=
+))
+>> and object_get_typename(OBJECT(bus)))?
 >=20
-> Catching up with this now. I was told about this last week at the KVM
-> Forum, but if the problems comes with the use of fallocate() and XFS,
-> the I don't think subclusters will solve it.
->=20
-> handle_alloc_space() is used to fill a cluster with zeroes when there's
-> COW, and that happens the same with subclusters, just at the subcluster
-> level instead of course.
->=20
-> What can happen, if the subcluster size matches the filesystem block
-> size, is that there's no need for any COW and therefore the bug is never
-> triggered. But that's not quite the same as a fix :-)
+> sure. I was wondering if having some kind of qom object support to trac=
+e
+> would be feasible. Because it's a bit tedious to add this each time. An=
+d
+> IMO it would be more useful to have the path, but we can't reasonably
+> compute it as a trace_..() arguments.
 
-No, what I meant was that the original problem that led to c8bb23cbdbe
-would go away.
+Meanwhile you can use:
 
-c8bb23cbdbe was added because small writes to new clusters are slow when
-the clusters are large (because you need to do a 2 MB write on the host
-for a 4 kB write from the guest).  So handle_alloc_space() was added to
-alleviate the problem with a zero-write instead of actually writing zeroes.
+   if (trace_event_get_state_backends(TRACE_QDEV_UPDATE_PARENT_BUS)) {
+       ...
 
-The question is whether there is no need for handle_alloc_space() with
-subclusters because a normal write with explicit zeroes being written in
-the COW areas would be sufficiently quick.  (Because the subclusters for
-2 MB clusters are just 64 kB in size.)
-
-If that were so (right now it doesn=E2=80=99t look like it), we could rever=
-t
-c8bb23cbdbe and wouldn=E2=80=99t see the bug anymore.
-
-Max
-
->> Maybe make a decision based both on the ratio of data size to COW area
->> length (only invoke handle_alloc_space() under a certain threshold),
->> and the absolute COW area length (always invoke it above a certain
->> threshold, unless the ratio doesn=E2=80=99t allow it)?
->=20
-> Maybe combining that with the smaller clusters/subclusters can work
-> around the problem. The maximum subcluster size is 64KB (for a 2MB
-> cluster).
->=20
-> Berto
->=20
-
-
-
---goq2BfNGDZfCkuICjyY5FMAC5ENRli7AS--
-
---HOgw5gOv6Ix7vsD8Q4aQlDnZLUxcyBffm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3ANMgACgkQ9AfbAGHV
-z0Csugf/aga9mCP61cERJ12b6eD7alUe2kpRy80fGPxTIMTPsbZQYgIa6z49sFQA
-7yVBHSdz9PXkE89ITFnzgsHc1sywLZhoFVVSRYDj8vrUch8jCV/Tk95obYw2/EMM
-qBjUKZC045VaxV5cAEi2FXhPr+Ef5tIvCjZG59OkhAAEKIhSZ37tEcP/gHIhfrn2
-0GQIbEO9zJmX4CsZ5RIudqRxG02H6o2jodapVTjgWF1L0v3bxFURP1FPQZQKFHdV
-zpSxbZ6t73s0aeCV+25thS7u1j1NHAsLXDaoyvhT7ecQKu2sXJXQhBbgWGVx3EFR
-74/S0qRJXlVHFnAQphky/Q61A3RFEg==
-=t2uW
------END PGP SIGNATURE-----
-
---HOgw5gOv6Ix7vsD8Q4aQlDnZLUxcyBffm--
-
+>>
+>> With/without it:
+>> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Keep a reference =
+to the device while it's not plugged into
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * any b=
+us, to avoid it potentially evaporating when it is
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * deref=
+fed in bus_remove_child().
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+>>> @@ -272,6 +275,18 @@ HotplugHandler
+>>> *qdev_get_hotplug_handler(DeviceState *dev)
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return hotplug_ctrl;
+>>>  =C2=A0 }
+>>>  =C2=A0 +static int qdev_prereset(DeviceState *dev, void *opaque)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 trace_qdev_reset_tree(dev, object_get_typename(OB=
+JECT(dev)));
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>> +static int qbus_prereset(BusState *bus, void *opaque)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 trace_qbus_reset_tree(bus, object_get_typename(OB=
+JECT(bus)));
+>>> +=C2=A0=C2=A0=C2=A0 return 0;
+>>> +}
+>>> +
+>>>  =C2=A0 static int qdev_reset_one(DeviceState *dev, void *opaque)
+>>>  =C2=A0 {
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 device_legacy_reset(dev);
+>>> @@ -282,6 +297,7 @@ static int qdev_reset_one(DeviceState *dev, void
+>>> *opaque)
+>>>  =C2=A0 static int qbus_reset_one(BusState *bus, void *opaque)
+>>>  =C2=A0 {
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BusClass *bc =3D BUS_GET_CLASS(bus);
+>>> +=C2=A0=C2=A0=C2=A0 trace_qbus_reset(bus, object_get_typename(OBJECT(=
+bus)));
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bc->reset) {
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 bc->reset(bus=
+);
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> @@ -290,7 +306,9 @@ static int qbus_reset_one(BusState *bus, void
+>>> *opaque)
+>>>  =C2=A0 =C2=A0 void qdev_reset_all(DeviceState *dev)
+>>>  =C2=A0 {
+>>> -=C2=A0=C2=A0=C2=A0 qdev_walk_children(dev, NULL, NULL, qdev_reset_on=
+e,
+>>> qbus_reset_one, NULL);
+>>> +=C2=A0=C2=A0=C2=A0 trace_qdev_reset_all(dev, object_get_typename(OBJ=
+ECT(dev)));
+>>> +=C2=A0=C2=A0=C2=A0 qdev_walk_children(dev, qdev_prereset, qbus_prere=
+set,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qdev_rese=
+t_one, qbus_reset_one, NULL);
+>>>  =C2=A0 }
+>>>  =C2=A0 =C2=A0 void qdev_reset_all_fn(void *opaque)
+>>> @@ -300,7 +318,9 @@ void qdev_reset_all_fn(void *opaque)
+>>>  =C2=A0 =C2=A0 void qbus_reset_all(BusState *bus)
+>>>  =C2=A0 {
+>>> -=C2=A0=C2=A0=C2=A0 qbus_walk_children(bus, NULL, NULL, qdev_reset_on=
+e,
+>>> qbus_reset_one, NULL);
+>>> +=C2=A0=C2=A0=C2=A0 trace_qbus_reset_all(bus, object_get_typename(OBJ=
+ECT(bus)));
+>>> +=C2=A0=C2=A0=C2=A0 qbus_walk_children(bus, qdev_prereset, qbus_prere=
+set,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qdev_rese=
+t_one, qbus_reset_one, NULL);
+>>>  =C2=A0 }
+>>>  =C2=A0 =C2=A0 void qbus_reset_all_fn(void *opaque)
+>>> @@ -1108,6 +1128,7 @@ void device_legacy_reset(DeviceState *dev)
+>>>  =C2=A0 {
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 DeviceClass *klass =3D DEVICE_GET_CLA=
+SS(dev);
+>>>  =C2=A0 +=C2=A0=C2=A0=C2=A0 trace_qdev_reset(dev, object_get_typename=
+(OBJECT(dev)));
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (klass->reset) {
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 klass->reset(=
+dev);
+>>>  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> diff --git a/hw/core/trace-events b/hw/core/trace-events
+>>> index fe47a9c8cb..1a669be0ea 100644
+>>> --- a/hw/core/trace-events
+>>> +++ b/hw/core/trace-events
+>>> @@ -1,2 +1,11 @@
+>>>  =C2=A0 # loader.c
+>>>  =C2=A0 loader_write_rom(const char *name, uint64_t gpa, uint64_t siz=
+e, bool
+>>> isrom) "%s: @0x%"PRIx64" size=3D0x%"PRIx64" ROM=3D%d"
+>>> +
+>>> +# qdev.c
+>>> +qdev_reset(void *obj, const char *objtype) "obj=3D%p(%s)"
+>>> +qdev_reset_all(void *obj, const char *objtype) "obj=3D%p(%s)"
+>>> +qdev_reset_tree(void *obj, const char *objtype) "obj=3D%p(%s)"
+>>> +qbus_reset(void *obj, const char *objtype) "obj=3D%p(%s)"
+>>> +qbus_reset_all(void *obj, const char *objtype) "obj=3D%p(%s)"
+>>> +qbus_reset_tree(void *obj, const char *objtype) "obj=3D%p(%s)"
+>>> +qdev_update_parent_bus(void *obj, void *oldp, void *newp) "obj=3D%p
+>>> old_parent=3D%p new_parent=3D%p"
+>>>
 
