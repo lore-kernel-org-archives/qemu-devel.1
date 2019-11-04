@@ -2,85 +2,86 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7993CA9EC9
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 21:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D453CA9EC9
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 22:04:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DA7621D7F
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 21:56:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DA7621D7F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 45DE8217F5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 22:04:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=holoplot-com.20150623.gappssmtp.com header.i=@holoplot-com.20150623.gappssmtp.com header.b="CpVDj8d5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45DE8217F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holoplot.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRkKP-0002Ev-OD
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 16:56:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38392)
+	id 1iRkSo-0005K9-Ex
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 17:04:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41150)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iRkJM-0001YB-45
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 16:54:57 -0500
+ (envelope-from <linus.ziegert@holoplot.com>) id 1iRgu4-0008MP-VC
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:16:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iRkJJ-0007N7-VO
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 16:54:55 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49402)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iRkJJ-0007Kr-Mo
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 16:54:53 -0500
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id A38123DD47
- for <qemu-devel@nongnu.org>; Mon,  4 Nov 2019 21:54:51 +0000 (UTC)
-Received: by mail-wr1-f70.google.com with SMTP id m17so10982206wrb.20
- for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 13:54:51 -0800 (PST)
+ (envelope-from <linus.ziegert@holoplot.com>) id 1iRgu3-0006Zg-Oh
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:16:36 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:52452)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <linus.ziegert@holoplot.com>)
+ id 1iRgu3-0006Yv-8l
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 13:16:35 -0500
+Received: by mail-wm1-x342.google.com with SMTP id c17so10418285wmk.2
+ for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 10:16:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=holoplot-com.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=vZlHRNrWzOSLywQj2MWXmHR9NXbEechkL9y1Q+q5kes=;
+ b=CpVDj8d5jarBg9AgbBvLnr6G6Ny10ptuL3kZjzoDBd/JJ1TxIz4daZ3n0jHlAm3BAd
+ Kk/0GLs+FBfikPVkJh6lQuPDV5btsM1aNBVdizVGG5jVU0R1PeLpgfRDBN5heeYQu5mh
+ RGLCtOREljfsAiN3PGj6zcG2IMx0vwpyqlgEQRJNg1sZanVZWopFW71euSuI0UMxbEV7
+ CJfQgjfq2rNCJJgaPzGLEC0vGXCLhlMFxbkGaux7TX5iko/wxEh/rOsMCGRd6cmWqN/l
+ eUIZlRGh2p0ZLSgKQFlildIzK3Tti0xNoHQMXzr4oXy/YzSAW6/wgCHix/KQlMVuJ+aO
+ DxdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=BqaclnhIeRZoAy2jktmnNSt0bRyebT0TfIUREC2+X6A=;
- b=LV9QD2qkvJiU/vdREEBMDn+zkLhCMKTQ0ZTLRCyujvB+03217jcpS63cZAVHvLYbZ+
- KQvhScNWsGLA5EyDo9/XYx2IjT6CthfVQ+L854OQ5p0GVHD0HvvmRGWgBJs0jQC1dB89
- qN5PAwwDYcppg/N5Z/HF1IBnxxFasuP1pfHYWN3mJHTpvk/iaHWbUPsBy+Urdb8KTR1w
- yCNgTsMpCsqAzh3ShDx/9Xb4houJ97jNIyYDv3jUw+pJ3l6D727WMm1S5AMfnpiwxJAe
- KTQ4MRhK7xPNckpkybCgo+SnSuAvA6tu0qiWUHtq5OZjq8qn6ncOxXS7gsRiq2tfZANa
- 1m/A==
-X-Gm-Message-State: APjAAAUYLGQSiawru/eja2nnZGMB+NlGEKeIQuL6DbMOyZ0B558vxFn1
- qNwFsfXMbJpCdiGlGxIZwJdwPUex6+WhvmK46f0fAig+ZT14UhXqVu5n+G8XrjJCXOyFp9YRS/o
- xpCMnkP+aYyTRzhc=
-X-Received: by 2002:a5d:4701:: with SMTP id y1mr26555476wrq.385.1572904490435; 
- Mon, 04 Nov 2019 13:54:50 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx7f2zV4SdY2c+gEBBIJpCpf6DV8UgIFOhKqNLS7hdKEuSAg8vepnEeet1BiaUN2V+cG+9Paw==
-X-Received: by 2002:a5d:4701:: with SMTP id y1mr26555460wrq.385.1572904490148; 
- Mon, 04 Nov 2019 13:54:50 -0800 (PST)
-Received: from [192.168.1.24] (lfbn-1-7864-228.w92-167.abo.wanadoo.fr.
- [92.167.33.228])
- by smtp.gmail.com with ESMTPSA id l5sm16340582wmj.44.2019.11.04.13.54.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 Nov 2019 13:54:49 -0800 (PST)
-Subject: Re: [PATCH] global: Squash 'the the'
-To: qemu-devel@nongnu.org, no-reply@patchew.org, dgilbert@redhat.com
-References: <157290359988.27285.16497763825853147226@37313f22b938>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <86ede4a8-caf7-70b9-367b-9821373aa0f3@redhat.com>
-Date: Mon, 4 Nov 2019 22:54:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=vZlHRNrWzOSLywQj2MWXmHR9NXbEechkL9y1Q+q5kes=;
+ b=icrCh2ETmCGVYTjJTqUetq68LPl9kN8d0rpIVm1ronEk5ZknM8cKvnZvHgqONVLmRv
+ nEOwIzOx43bRQstu1fnW5dvmjW1oAP1/2GawzfM0+ISg+uiDAHzMTNVydFknDVByD8At
+ KLyUeHuipYEC83nXO7GQ/+3TuCxNq7C16Cum38xKlwQvn7BGBxjxm96sUdfoXHuhaJjV
+ RvnOrVaLmf0YNxCvIukiveBpcshlTVskGMICvgUQfko8EZkIsJfbbbhzHBzbSJnFEptf
+ 7oWZ3Awju6B48geF88eCz8gr0cEC/HC7dXUYGOghShbeRDJuTa/YmCb8IxE8+4ueE3LP
+ xpgg==
+X-Gm-Message-State: APjAAAU6Vl3bvDQGH8imrG7aESW4SI7GvlH/XELYk0JQj6HLtWCuklW0
+ pozbPkyBUW24GaUdFLLreV4lYp/Yo3Dhg3Vu
+X-Google-Smtp-Source: APXvYqwBEg4tldsJiHmHURGcHn6YbY28cQeit2IjyAhc+ybQdMfmv/7xH2K7N29EQBRFNPNaGm84qw==
+X-Received: by 2002:a7b:ce12:: with SMTP id m18mr408194wmc.130.1572891393265; 
+ Mon, 04 Nov 2019 10:16:33 -0800 (PST)
+Received: from localhost.localdomain ([194.162.236.226])
+ by smtp.gmail.com with ESMTPSA id q15sm17165703wrr.82.2019.11.04.10.16.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 04 Nov 2019 10:16:32 -0800 (PST)
+From: linus.ziegert@holoplot.com
+X-Google-Original-From: linus.ziegert+qemu@holoplot.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH] net/cadence_gem: Set PHY autonegotiation restart status
+Date: Mon,  4 Nov 2019 19:16:04 +0100
+Message-Id: <20191104181604.21943-1-linus.ziegert+qemu@holoplot.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <157290359988.27285.16497763825853147226@37313f22b938>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
+X-Mailman-Approved-At: Mon, 04 Nov 2019 17:02:21 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,44 +93,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, sstabellini@kernel.org, qemu-trivial@nongnu.org,
- mjt@tls.msk.ru, laurent@vivier.eu, marcandre.lureau@redhat.com,
- david@gibson.dropbear.id.au
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ "open list:Xilinx Zynq" <qemu-arm@nongnu.org>,
+ Linus Ziegert <linus.ziegert+qemu@holoplot.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/4/19 10:40 PM, no-reply@patchew.org wrote:
-> Patchew URL: https://patchew.org/QEMU/20191104185202.102504-1-dgilbert@=
-redhat.com/
->=20
-> Hi,
->=20
-> This series failed the docker-quick@centos7 build test. Please find the=
- testing commands and
-> their output below. If you have Docker installed, you can probably repr=
-oduce it
-> locally.
->=20
-> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> #!/bin/bash
-> make docker-image-centos7 V=3D1 NETWORK=3D1
-> time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=3D1
-> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->=20
->    TEST    iotest-qcow2: 009
->    TEST    iotest-qcow2: 010
-> **
-> ERROR:/tmp/qemu-test/src/tests/migration-test.c:903:wait_for_migration_=
-fail: assertion failed: (!strcmp(status, "setup") || !strcmp(status, "fai=
-led") || (allow_active && !strcmp(status, "active")))
-> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/migration-test.c:903:w=
-ait_for_migration_fail: assertion failed: (!strcmp(status, "setup") || !s=
-trcmp(status, "failed") || (allow_active && !strcmp(status, "active")))
-> make: *** [check-qtest-aarch64] Error 1
-> make: *** Waiting for unfinished jobs....
+From: Linus Ziegert <linus.ziegert+qemu@holoplot.com>
 
-=3D)
+The Linux kernel PHY driver sets AN_RESTART in the BMCR of the
+PHY when autonegotiation is started.
+Recently the kernel started to read back the PHY's AN_RESTART
+bit and now checks whether the autonegotiation is complete and
+the bit was cleared [1]. Otherwise the link status is down.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+The emulated PHY needs to clear AN_RESTART immediately to inform
+the kernel driver about the completion of autonegotiation phase.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c36757eb9dee
+
+Signed-off-by: Linus Ziegert <linus.ziegert+qemu@holoplot.com>
+---
+ hw/net/cadence_gem.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
+index 7f9cb5ab95..b8be73dc55 100644
+--- a/hw/net/cadence_gem.c
++++ b/hw/net/cadence_gem.c
+@@ -271,9 +271,10 @@
+ #define PHY_REG_EXT_PHYSPCFC_ST   27
+ #define PHY_REG_CABLE_DIAG   28
+ 
+-#define PHY_REG_CONTROL_RST  0x8000
+-#define PHY_REG_CONTROL_LOOP 0x4000
+-#define PHY_REG_CONTROL_ANEG 0x1000
++#define PHY_REG_CONTROL_RST       0x8000
++#define PHY_REG_CONTROL_LOOP      0x4000
++#define PHY_REG_CONTROL_ANEG      0x1000
++#define PHY_REG_CONTROL_ANRESTART 0x0200
+ 
+ #define PHY_REG_STATUS_LINK     0x0004
+ #define PHY_REG_STATUS_ANEGCMPL 0x0020
+@@ -1345,7 +1346,7 @@ static void gem_phy_write(CadenceGEMState *s, unsigned reg_num, uint16_t val)
+         }
+         if (val & PHY_REG_CONTROL_ANEG) {
+             /* Complete autonegotiation immediately */
+-            val &= ~PHY_REG_CONTROL_ANEG;
++            val &= ~(PHY_REG_CONTROL_ANEG | PHY_REG_CONTROL_ANRESTART);
+             s->phy_regs[PHY_REG_STATUS] |= PHY_REG_STATUS_ANEGCMPL;
+         }
+         if (val & PHY_REG_CONTROL_LOOP) {
+-- 
+2.21.0
+
 
