@@ -2,67 +2,68 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF650CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:03:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51985CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:05:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8713620659
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:03:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C21021850
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 15:05:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WqilZaBv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8713620659
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Omw97iTt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C21021850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRdt2-00059m-Jf
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 10:03:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38376)
+	id 1iRdvE-0006iE-7Q
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 10:05:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iRdrW-0004cG-9p
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:01:47 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iRduW-00069x-Ap
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:04:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iRdrU-0007I1-4p
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:01:45 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52019
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iRduU-0008T4-UM
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:04:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23217
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iRdrS-0007H3-9D
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:01:43 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iRduU-0008Ss-PB
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 10:04:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572879701;
+ s=mimecast20190719; t=1572879890;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=yD2h/UoyEUVniUqaos8Kk3enCI1cb8xW822YXo4OdV4=;
- b=WqilZaBvrotBiaf6VfgFTiOu/rDA/mLXEtxcK1wLMAFYdzg90Q/mRXpUouxyweJibID1bq
- hZy6DZRLXsAJuKjquRCsR3iCuOK4Ip18w3QZnIk7x8eE4CeIy2/vPgH7giSF1PdqrZBNZr
- zY5inXWkyD5oG4X4v0Yi/mMY6mlYdUA=
+ bh=MECKPpZ6kY7KSUF1VaDTkGkWb9+rWkOJBkPUubwlZrk=;
+ b=Omw97iTtS5gHyFtRUQJW3htzHplG06fcrmAfT+uGrMDjLbZ2Kc8FXEy2RRNTrE4QnOxh2L
+ VFn9t39e9FDRbZsQiT6Vy27JCNL0lHEWN2TggBPSyX+4unCg+YT16m4PAi2MRTljWrHYhM
+ iUZsHjBwBT/1Ua8CbFsjVVQ2VAWvscc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-gnzJs2eyPveLgMXpNgjUCw-1; Mon, 04 Nov 2019 10:01:37 -0500
-X-MC-Unique: gnzJs2eyPveLgMXpNgjUCw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-343-nrP_9RjxMYig1hYLNtRrQg-1; Mon, 04 Nov 2019 10:04:46 -0500
+X-MC-Unique: nrP_9RjxMYig1hYLNtRrQg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEBA7800C73;
- Mon,  4 Nov 2019 15:01:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7556E107ACC2;
+ Mon,  4 Nov 2019 15:04:45 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.36.118.44])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D9B219C68;
- Mon,  4 Nov 2019 15:01:34 +0000 (UTC)
-Subject: Re: [RFC PATCH v2 11/26] qcow2: Add qcow2_get_subcluster_type()
-From: Max Reitz <mreitz@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 912DA60863;
+ Mon,  4 Nov 2019 15:04:42 +0000 (UTC)
+Subject: Re: [RFC PATCH v2 15/26] qcow2: Add subcluster support to
+ zero_in_l2_slice()
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 References: <cover.1572125022.git.berto@igalia.com>
- <b497a6d5d5876f68a7320f58dad56806bab95cde.1572125022.git.berto@igalia.com>
- <7d2238bf-1c8d-5d5d-a0d3-c700725dc44d@redhat.com>
+ <8f366482d2b273c26ff67cba1de898289f613fc7.1572125022.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
  /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
@@ -87,20 +88,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <06567def-1c50-f2f5-4157-edc260a9b353@redhat.com>
-Date: Mon, 4 Nov 2019 16:01:32 +0100
+Message-ID: <94b1434e-3e0f-bbce-0ba0-67309565bfec@redhat.com>
+Date: Mon, 4 Nov 2019 16:04:40 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <7d2238bf-1c8d-5d5d-a0d3-c700725dc44d@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <8f366482d2b273c26ff67cba1de898289f613fc7.1572125022.git.berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="J9ecwNKENCZQuBVYmksQK07xL0ybHKC6g"
+ boundary="e0EZJ9eMNv1KVO55FhJjQ30RVD9jT4Mk5"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,87 +121,92 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---J9ecwNKENCZQuBVYmksQK07xL0ybHKC6g
-Content-Type: multipart/mixed; boundary="4SXzK5BlBeIuGVcVGYyLjPTlEums7ZT83"
+--e0EZJ9eMNv1KVO55FhJjQ30RVD9jT4Mk5
+Content-Type: multipart/mixed; boundary="dvo5KCnT30buJNSH2inun7OojiMU8bZoV"
 
---4SXzK5BlBeIuGVcVGYyLjPTlEums7ZT83
+--dvo5KCnT30buJNSH2inun7OojiMU8bZoV
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 04.11.19 13:35, Max Reitz wrote:
-> On 26.10.19 23:25, Alberto Garcia wrote:
->> This function returns the type of an individual subcluster. If an
->> image does not have subclusters then this returns the exact same value
->> as qcow2_get_cluster_type().
->>
->> The information in standard and extended L2 entries is encoded in a
->> slightly different way, but all existing QCow2ClusterType values are
->> also valid for subclusters and have the same meanings (although they
->> typically only apply to the requested subcluster).
->>
->> There are two important exceptions to this:
->>
->>   a) QCOW2_CLUSTER_COMPRESSED means that the whole cluster is
->>      compressed. We do not support compression at the subcluster
->>      level.
->>
->>   b) QCOW2_CLUSTER_UNALLOCATED means that the cluster is unallocated,
->>      that is, the offset field of the L2 entry does not point to a
->>      host cluster. All subclusters are obviously unallocated too but
->>      any of them could be of type QCOW2_CLUSTER_ZERO_PLAIN.
->>
->> In addition to that, extended L2 entries allow one new scenario where
->> the cluster is normally allocated but an individual subcluster is not.
->> This is very different from (b) and because of that this patch adds a
->> new value called QCOW2_CLUSTER_UNALLOCATED_SUBCLUSTER.
->>
->> As a last thing, this patch adds QCOW2_CLUSTER_INVALID to detect the
->> cases where an L2 entry has a value that violates the spec. The caller
->> is responsible for handling these situations.
->>
->> To prevent compatibility problems with images that have invalid values
->> but are currently being read by QEMU without causing side effects,
->> QCOW2_CLUSTER_INVALID is only returned for images with extended L2
->> entries.
->>
->> Signed-off-by: Alberto Garcia <berto@igalia.com>
->> ---
->>  block/qcow2.h | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 62 insertions(+)
+On 26.10.19 23:25, Alberto Garcia wrote:
+> Setting the QCOW_OFLAG_ZERO bit of the L2 entry is forbidden if an
+> image has subclusters. Instead, the individual 'all zeroes' bits must
+> be used.
 >=20
-> [...]
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cluster.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
 >=20
->> +        case QCOW2_CLUSTER_ZERO_PLAIN:
->> +        case QCOW2_CLUSTER_ZERO_ALLOC:
->> +            return QCOW2_CLUSTER_INVALID;
->=20
-> The spec doesn=E2=80=99t say anything about this, though.
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index e67559152f..3e4ba8d448 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -1852,7 +1852,7 @@ static int zero_in_l2_slice(BlockDriverState *bs, u=
+int64_t offset,
+>      assert(nb_clusters <=3D INT_MAX);
+> =20
+>      for (i =3D 0; i < nb_clusters; i++) {
+> -        uint64_t old_offset;
+> +        uint64_t old_offset, l2_entry =3D 0;
+>          QCow2ClusterType cluster_type;
+> =20
+>          old_offset =3D get_l2_entry(s, l2_slice, l2_index + i);
+> @@ -1869,12 +1869,18 @@ static int zero_in_l2_slice(BlockDriverState *bs,=
+ uint64_t offset,
+> =20
+>          qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+>          if (cluster_type =3D=3D QCOW2_CLUSTER_COMPRESSED || unmap) {
+> -            set_l2_entry(s, l2_slice, l2_index + i, QCOW_OFLAG_ZERO);
+>              qcow2_free_any_clusters(bs, old_offset, 1, QCOW2_DISCARD_REQ=
+UEST);
 
-It does, I just forgot. O:-)
+It feels wrong to me to free the cluster before updating the L2 entry.
 
 Max
 
+>          } else {
+> -            uint64_t entry =3D get_l2_entry(s, l2_slice, l2_index + i);
+> -            set_l2_entry(s, l2_slice, l2_index + i, entry | QCOW_OFLAG_Z=
+ERO);
+> +            l2_entry =3D get_l2_entry(s, l2_slice, l2_index + i);
+>          }
+> +
+> +        if (has_subclusters(s)) {
+> +            set_l2_bitmap(s, l2_slice, l2_index + i, QCOW_L2_BITMAP_ALL_=
+ZEROES);
+> +        } else {
+> +            l2_entry |=3D QCOW_OFLAG_ZERO;
+> +        }
+> +
+> +        set_l2_entry(s, l2_slice, l2_index + i, l2_entry);
+>      }
+> =20
+>      qcow2_cache_put(s->l2_table_cache, (void **) &l2_slice);
+>=20
 
---4SXzK5BlBeIuGVcVGYyLjPTlEums7ZT83--
 
---J9ecwNKENCZQuBVYmksQK07xL0ybHKC6g
+
+--dvo5KCnT30buJNSH2inun7OojiMU8bZoV--
+
+--e0EZJ9eMNv1KVO55FhJjQ30RVD9jT4Mk5
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3APUwACgkQ9AfbAGHV
-z0AZ6Af+PsEBKbcbYskexbsl06SHzi8CKvmvGtu53llzj2WSriMv+4C4Aa6lKf3A
-upwYhMPyVRS2tWudwrz3VhaVVFqukaYDBwAD8nbchXa1+GjhqaAD9GjFPIVKrwOL
-sdX5cruETv7vR8ZTFpYDXNZg1ofV4kusbsdceeh6ElHl/aAKC58bdVAXhtLF/ZK3
-NnVAhosVZaBSEbb3BdceLI85X9xjKJPkjFcqXgG5tIMZcxvL8lUF0JRzpymNCxKy
-LhC630mPIgSOIODtdpl3jXSO9P6eKMu0Z+GkImqKsuyZoS4SqR2YkMhuI3+lUnNo
-XpsFGKOrKMh+KOOjcVoaI6FXH8G2hA==
-=kRNz
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3APgkACgkQ9AfbAGHV
+z0Bw/Qf+MgMLvu5K6YmlI/zcYpSce0RMbjp15vDLSB/x4uAREOpfN0OzvztI1vpO
+jcVipsV+OSrJdVKWmS/JVL1a7dBLDn7Ogsps5uD2dLjEy+a14Ay5CZw7yXuAuniT
+unLZHf+beVyUQ0EMhlEpMGBigr1+tItpNQ4hXi5Ay1huzplFnkhOlvuBFOr0fys3
+CiTsHpOywcXiqVf+klkJnKIvTJ4Td3JL7QUgj0loCt3jxYT/TlFhI4p0c4pj9548
+NLcu4L5VzCDFZdgqrg3delDdt1RPooYvQQwMzSj01GrtOyqDPUAT3Hmdkd8CmUtO
+ZEMukpx72lNFviQVX7ZyE/4V66pF1w==
+=6H/s
 -----END PGP SIGNATURE-----
 
---J9ecwNKENCZQuBVYmksQK07xL0ybHKC6g--
+--e0EZJ9eMNv1KVO55FhJjQ30RVD9jT4Mk5--
 
 
