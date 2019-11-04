@@ -2,96 +2,85 @@ Return-Path: <SRS0=KlJF=Y4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7145CA9EB5
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 16:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C45A7CA9EB5
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 16:37:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D49020848
-	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 16:25:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9000B20663
+	for <qemu-devel@archiver.kernel.org>; Mon,  4 Nov 2019 16:37:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f2sck0Rl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D49020848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HhEQ1Xhs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9000B20663
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRfA4-0001Bm-K3
-	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 11:25:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52060)
+	id 1iRfLp-0007PW-NY
+	for qemu-devel@archiver.kernel.org; Mon, 04 Nov 2019 11:37:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54679)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iRf8r-0000Kz-Bf
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:23:47 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iRfKv-0006yB-SM
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:36:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iRf8o-0006bF-Px
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:23:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40811
+ (envelope-from <dgilbert@redhat.com>) id 1iRfKt-0004iO-NN
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:36:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34745
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iRf8o-0006b0-D8
- for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:23:42 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iRfKt-0004iC-J3
+ for qemu-devel@nongnu.org; Mon, 04 Nov 2019 11:36:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572884621;
+ s=mimecast20190719; t=1572885370;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WHGq6HO7beybjRg5GMGyV8Twdmz4Kmli8kxN95dtWao=;
- b=f2sck0RlIESimbx7rAArXseA46PbZH34X+Fk/pexvQd5kH/Bit84nMz+vdFXLmwnoEBUhO
- 8a7AwAN75xnkPQDBz674GARxW7Iajluawxki9NsmhwFj9YNSiSZHRcuDgsYLlGL2VlcdQw
- Whhw/+KNcCvBLkFe7JJ3QefmDnDa5oU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-yCdIMHImPcCWbbQIwkhtiQ-1; Mon, 04 Nov 2019 11:23:40 -0500
-Received: by mail-wr1-f71.google.com with SMTP id c6so10666513wrp.3
- for <qemu-devel@nongnu.org>; Mon, 04 Nov 2019 08:23:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pNMy+IZVqrbstgOvR+DfLKsxfy1JjwRjzypxgp2ol2o=;
- b=VbugUMfqHT2SIWZpY4ZdDRgSFxS1DpOefiLQyjYUs0dB2EguoC7+U/1o+iygMKWOo9
- JBwSrxWaSW/r+Z0EsB6Iq/RhPd7M5YXr2lwKIFJyMCalGA1zo4BozBMilhPXVBfStsyO
- J6MU/CmJJfwKYQhxKTiuUdFaMVO/LrvD+Nap+w2mLPlg1RZFUkjCeEsPKteOgyzcLsuC
- wWGxri1Q0ZFbQErezSOTfTU6tMjyrLBy/HMHwJ9n88f4u/PNAmSO/9hDm9SxkHaYnuXX
- pnZCZg5Zpdw/kqUug1UOR4M0D+RD0/8zK7JhD6PFU+Ljmz7MU+k7QgH1Zt1NQIvHe/Ni
- LIjg==
-X-Gm-Message-State: APjAAAUj4cSmbLQEVBWKFKsvxnVbSqfAuYioaNli8dhea4sqs2bYHTmn
- VmSM3XmhX2GTVSXq+4XAz2Z9dQ1JJuw4vzAU3dWBtUdEQw0OJEyX47dX7MRsvcbYoUGc5MW4Ra/
- ZuTWvXji1itOeGO0=
-X-Received: by 2002:a1c:f210:: with SMTP id s16mr21258932wmc.24.1572884618178; 
- Mon, 04 Nov 2019 08:23:38 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy3o4dIMDIvVsBRVOc6/5xVcx9Xcb3fgO9QkvZyw8t8EqRhz1nuGGNeHfuywq2G9x70/o4+tA==
-X-Received: by 2002:a1c:f210:: with SMTP id s16mr21258913wmc.24.1572884617926; 
- Mon, 04 Nov 2019 08:23:37 -0800 (PST)
-Received: from [192.168.1.24] (lfbn-1-7864-228.w92-167.abo.wanadoo.fr.
- [92.167.33.228])
- by smtp.gmail.com with ESMTPSA id t1sm21412017wrn.81.2019.11.04.08.23.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 04 Nov 2019 08:23:37 -0800 (PST)
-Subject: Re: [PATCH] tcg plugins: expose an API version concept
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191104131836.12566-1-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <3d966b24-ea00-63de-c5a3-b679664590a4@redhat.com>
-Date: Mon, 4 Nov 2019 17:23:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=57JDcIVaHGwNxgl+VxFNaIB66V1m6c5dml0/RyqUMYw=;
+ b=HhEQ1XhsW4min1FiaBGMy8bKhKMGWlySvNYfekrH+Mz5MfBpJuV3Zi5HJB/HjdiA8sAMFH
+ +QdndU45arEGXgd0uejMA+Pj7cprs0fKVI/B0Y4r2tL49Ng245fzQJgzb0nA4P7Zv5ySFM
+ HqXSBx9UGBF6NsfUo/IQw5oh+qmftZo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-14-o_UwBjCWMgqYUbQh_Ma1EQ-1; Mon, 04 Nov 2019 11:36:07 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6874107ACC3;
+ Mon,  4 Nov 2019 16:36:06 +0000 (UTC)
+Received: from work-vm (ovpn-117-99.ams2.redhat.com [10.36.117.99])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D7E560C88;
+ Mon,  4 Nov 2019 16:35:59 +0000 (UTC)
+Date: Mon, 4 Nov 2019 16:35:56 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: geoff@hostfission.com
+Subject: Re: RFC: New device for zero-copy VM memory access
+Message-ID: <20191104163556.GD3420@work-vm>
+References: <88f1c3701740665b0ebe2f24c8ce7ade@hostfission.com>
+ <20191031132443.GB3128@work-vm>
+ <b36330ecd38ce872982df4d41d3d4695@hostfission.com>
+ <CAFEAcA8uWCQY8GwtH4oHU8ybXsvmYaB4Qa5hnxyd+344WFjJ_Q@mail.gmail.com>
+ <b87d5b2fb84ac0a3c98a62dcc0c19077@hostfission.com>
+ <20191031155204.GD3128@work-vm>
+ <cd00c2ba412361d707ab02575d74aacd@hostfission.com>
+ <e23eb129dddc5d18bb9f9b15d116f957@hostfission.com>
+ <20191104115546.GB3420@work-vm>
+ <9b49de1379825ac1445766f4a8d198dc@hostfission.com>
 MIME-Version: 1.0
-In-Reply-To: <20191104131836.12566-1-alex.bennee@linaro.org>
-Content-Language: en-US
-X-MC-Unique: yCdIMHImPcCWbbQIwkhtiQ-1
+In-Reply-To: <9b49de1379825ac1445766f4a8d198dc@hostfission.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: o_UwBjCWMgqYUbQh_Ma1EQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -106,191 +95,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, cota@braap.org
+Cc: marcandre.lureau@redhat.com, maxime.coquelin@redhat.com,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/4/19 2:18 PM, Alex Benn=C3=A9e wrote:
-> This is a very simple versioning API which allows the plugin
-> infrastructure to check the API a plugin was built against. We also
-> expose a min/cur API version to the plugin via the info block in case
-> it wants to avoid using old deprecated APIs in the future.
+* geoff@hostfission.com (geoff@hostfission.com) wrote:
 >=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->   include/qemu/qemu-plugin.h | 19 +++++++++++++++++++
->   plugins/loader.c           | 15 +++++++++++++++
->   plugins/plugin.h           |  2 ++
->   tests/plugin/bb.c          |  2 ++
->   tests/plugin/empty.c       |  2 ++
->   tests/plugin/hotpages.c    |  2 ++
->   tests/plugin/howvec.c      |  2 ++
->   tests/plugin/insn.c        |  2 ++
->   tests/plugin/mem.c         |  2 ++
->   9 files changed, 48 insertions(+)
 >=20
-> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-> index a00a7deb461..5502e112c81 100644
-> --- a/include/qemu/qemu-plugin.h
-> +++ b/include/qemu/qemu-plugin.h
-> @@ -38,9 +38,28 @@
->  =20
->   typedef uint64_t qemu_plugin_id_t;
->  =20
-> +/*
-> + * Versioning plugins:
-> + *
-> + * The plugin API will pass a minimum and current API version that
-> + * QEMU currently supports. The minimum API will be incremented if an
-> + * API needs to be deprecated.
-> + *
-> + * The plugins export the API they were built against by exposing the
-> + * symbol qemu_plugin_version which can be checked.
-> + */
-> +
-> +extern QEMU_PLUGIN_EXPORT int qemu_plugin_version;
-> +
-> +#define QEMU_PLUGIN_VERSION 0
-> +
->   typedef struct {
->       /* string describing architecture */
->       const char *target_name;
-> +    struct {
-> +        int min;
-> +        int cur;
-> +    } version;
->       /* is this a full system emulation? */
->       bool system_emulation;
->       union {
-> diff --git a/plugins/loader.c b/plugins/loader.c
-> index ce724ed5839..1bcca909691 100644
-> --- a/plugins/loader.c
-> +++ b/plugins/loader.c
-> @@ -178,6 +178,19 @@ static int plugin_load(struct qemu_plugin_desc *desc=
-, const qemu_info_t *info)
->           goto err_symbol;
->       }
->  =20
-> +    if (!g_module_symbol(ctx->handle, "qemu_plugin_version", &sym)) {
-> +        warn_report("%s: missing version %s", __func__, g_module_error()=
-);
-> +    } else {
-> +        int version =3D *(int *)sym;
-> +        if (version < QEMU_PLUGIN_MIN_VERSION ||
-> +            version > QEMU_PLUGIN_VERSION) {
-> +            error_report("%s: bad plugin version %d vs %d/%d",
-> +                         __func__, version, QEMU_PLUGIN_MIN_VERSION,
-> +                         QEMU_PLUGIN_VERSION);
-> +            goto err_symbol;
-> +        }
-> +    }
-> +
->       qemu_rec_mutex_lock(&plugin.lock);
->  =20
->       /* find an unused random id with &ctx as the seed */
-> @@ -248,6 +261,8 @@ int qemu_plugin_load_list(QemuPluginList *head)
->       g_autofree qemu_info_t *info =3D g_new0(qemu_info_t, 1);
->  =20
->       info->target_name =3D TARGET_NAME;
-> +    info->version.min =3D QEMU_PLUGIN_MIN_VERSION;
-> +    info->version.cur =3D QEMU_PLUGIN_VERSION;
->   #ifndef CONFIG_USER_ONLY
->       MachineState *ms =3D MACHINE(qdev_get_machine());
->       info->system_emulation =3D true;
-> diff --git a/plugins/plugin.h b/plugins/plugin.h
-> index 5482168d797..1aa29dcaddf 100644
-> --- a/plugins/plugin.h
-> +++ b/plugins/plugin.h
-> @@ -14,6 +14,8 @@
->  =20
->   #include <gmodule.h>
->  =20
-> +#define QEMU_PLUGIN_MIN_VERSION 0
-> +
->   /* global state */
->   struct qemu_plugin_state {
->       QTAILQ_HEAD(, qemu_plugin_ctx) ctxs;
-> diff --git a/tests/plugin/bb.c b/tests/plugin/bb.c
-> index 45e1de5bd68..f30bea08dcc 100644
-> --- a/tests/plugin/bb.c
-> +++ b/tests/plugin/bb.c
-> @@ -14,6 +14,8 @@
->  =20
->   #include <qemu-plugin.h>
->  =20
-> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
-> +
->   static uint64_t bb_count;
->   static uint64_t insn_count;
->   static bool do_inline;
-> diff --git a/tests/plugin/empty.c b/tests/plugin/empty.c
-> index 3f60f690278..8fa6bacd93d 100644
-> --- a/tests/plugin/empty.c
-> +++ b/tests/plugin/empty.c
-> @@ -13,6 +13,8 @@
->  =20
->   #include <qemu-plugin.h>
->  =20
-> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
-> +
->   /*
->    * Empty TB translation callback.
->    * This allows us to measure the overhead of injecting and then
-> diff --git a/tests/plugin/hotpages.c b/tests/plugin/hotpages.c
-> index 77df07a3ccf..ecd6c187327 100644
-> --- a/tests/plugin/hotpages.c
-> +++ b/tests/plugin/hotpages.c
-> @@ -18,6 +18,8 @@
->  =20
->   #include <qemu-plugin.h>
->  =20
-> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
-> +
->   #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
->  =20
->   static uint64_t page_size =3D 4096;
-> diff --git a/tests/plugin/howvec.c b/tests/plugin/howvec.c
-> index 58fa675e348..4ca555e1239 100644
-> --- a/tests/plugin/howvec.c
-> +++ b/tests/plugin/howvec.c
-> @@ -20,6 +20,8 @@
->  =20
->   #include <qemu-plugin.h>
->  =20
-> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
-> +
->   #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
->  =20
->   typedef enum {
-> diff --git a/tests/plugin/insn.c b/tests/plugin/insn.c
-> index e5fd07fb64b..0a8f5a0000e 100644
-> --- a/tests/plugin/insn.c
-> +++ b/tests/plugin/insn.c
-> @@ -14,6 +14,8 @@
->  =20
->   #include <qemu-plugin.h>
->  =20
-> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
-> +
->   static uint64_t insn_count;
->   static bool do_inline;
->  =20
-> diff --git a/tests/plugin/mem.c b/tests/plugin/mem.c
-> index d9673889896..878abf09d19 100644
-> --- a/tests/plugin/mem.c
-> +++ b/tests/plugin/mem.c
-> @@ -14,6 +14,8 @@
->  =20
->   #include <qemu-plugin.h>
->  =20
-> +QEMU_PLUGIN_EXPORT int qemu_plugin_version =3D QEMU_PLUGIN_VERSION;
-> +
->   static uint64_t mem_count;
->   static uint64_t io_count;
->   static bool do_inline;
+> On 2019-11-04 22:55, Dr. David Alan Gilbert wrote:
+> > * geoff@hostfission.com (geoff@hostfission.com) wrote:
+> > >=20
+> > >=20
+> > > On 2019-11-03 21:10, geoff@hostfission.com wrote:
+> > > > On 2019-11-01 02:52, Dr. David Alan Gilbert wrote:
+> > > > > * geoff@hostfission.com (geoff@hostfission.com) wrote:
+> > > > > >
+> > > > > >
+> > > > > > On 2019-11-01 01:52, Peter Maydell wrote:
+> > > > > > > On Thu, 31 Oct 2019 at 14:26, <geoff@hostfission.com> wrote:
+> > > > > > > > As the author of Looking Glass, I also have to consider the
+> > > > > > > > maintenance
+> > > > > > > > and the complexity of implementing the vhost protocol into =
+the
+> > > > > > > > project.
+> > > > > > > > At this time a complete Porthole client can be implemented =
+in 150
+> > > > > > > > lines
+> > > > > > > > of C without external dependencies, and most of that is boi=
+lerplate
+> > > > > > > > socket code. This IMO is a major factor in deciding to avoi=
+d
+> > > > > > > > vhost-user.
+> > > > > > >
+> > > > > > > This is essentially a proposal that we should make our projec=
+t and
+> > > > > > > code more complicated so that your project and code can be si=
+mpler.
+> > > > > > > I hope you can see why this isn't necessarily an argument tha=
+t will hold
+> > > > > > > very much weight for us :-)
+> > > > > >
+> > > > > > Certainly, I do which is why I am still going to see about usin=
+g
+> > > > > > vhost,
+> > > > > > however, a device that uses vhost is likely more complex then
+> > > > > > the device
+> > > > > > as it stands right now and as such more maintenance would be
+> > > > > > involved on
+> > > > > > your end also. Or have I missed something in that vhost-user ca=
+n
+> > > > > > be used
+> > > > > > directly as a device?
+> > > > >
+> > > > > The basic vhost-user stuff isn't actually that hard;  if you aren=
+'t
+> > > > > actually shuffling commands over the queues you should find it pr=
+etty
+> > > > > simple - so I think your assumption about it being simpler if you
+> > > > > avoid
+> > > > > it might be wrong.  It might be easier if you use it!
+> > > >
+> > > > I have been looking into this and I am yet to find some decent
+> > > > documentation or a simple device example I can use to understand ho=
+w to
+> > > > create such a device. Do you know of any reading or examples I can
+> > > > obtain
+> > > > on how to get an initial do nothing device up and running?
+> > > >
+> > > > -Geoff
+> > >=20
+> > > Scratch that, the design just solidified for me and I am now making
+> > > progress, however it seems that vhost-user can't do what we need here=
+:
+> > >=20
+> > > 1) I dont see any way to recieve notification of socket
+> > > disconnection, in
+> > > our use case the client app needs to be able to be (re)connected
+> > > dynamically. It might be possible to get this event by registering
+> > > it on
+> > > the chardev manually but this seems like it would be a kludge.
+> >=20
+> > My understanding was that someone added support for reconnection of
+> > vhost-user;  I'm not sure of the detail - cc'ing in Maxime and
+> > Marc-Andre.
+> >=20
+> > > 2) I don't see any method of notifying the vhost-user client of the
+> > > removal of a shared memory mapping. Again, these may not be
+> > > persistently
+> > > mapped in the guest as we have no control over the buffer
+> > > allocation, and
+> > > as such, we need a method to notify the client that the mapping has
+> > > become
+> > > invalid.
+> > >=20
+> > > 3) VHOST_USER_SET_MEM_TABLE is a one time request, again this breaks
+> > > our
+> > > usage as we need to change this dynamically at runtime.
+> >=20
+> > I've seen (3) being sent multiple times (It's messy but it happens); so
+> > I think that fixes (2) as well for you.
 >=20
+> Yes, but it's ignored.
+>=20
+>     /*
+>      * For non-vring specific requests, like VHOST_USER_SET_MEM_TABLE,
+>      * we just need send it once in the first time. For later such
+>      * request, we just ignore it.
+>      */
+>     if (vhost_user_one_time_request(msg->hdr.request) && dev->vq_index !=
+=3D 0)
+> {
+>          msg->hdr.flags &=3D ~VHOST_USER_NEED_REPLY_MASK;
+>          return 0;
+>     }
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Curious.  I could swear I'd already dealt with multiple copies of this
+message coming over vhost-user and having to deal with it when it did.
+But now I'm confused, isn't vq_index a unique number per queue, so is
+this really stopping it happening multiple times, or just making sure it
+only happens for the first queue?
+
+Dave
+
+> >=20
+> > Dave
+> >=20
+> > > Unless there are viable solutions to these problems there is no way
+> > > that
+> > > vhost-user can be used for this kind of a device.
+> > >=20
+> > > -Geoff
+> > >=20
+> > > >
+> > > > >
+> > > > > Dave
+> > > > >
+> > > > > > >
+> > > > > > > thanks
+> > > > > > > -- PMM
+> > > > > --
+> > > > > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
