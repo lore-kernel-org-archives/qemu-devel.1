@@ -2,71 +2,70 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AC62C5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 18:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37CF4C5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 18:13:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6723421882
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 18:07:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6723421882
+	by mail.kernel.org (Postfix) with ESMTPS id 164412190F
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 18:13:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 164412190F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS3F8-0004Cm-IK
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 13:07:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50866)
+	id 1iS3KK-0007az-Mz
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 13:13:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51982)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iS3E8-0003ME-So
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:06:50 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iS3Il-0005lr-RP
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:11:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iS3E7-0002WN-M9
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:06:48 -0500
-Received: from mout.kundenserver.de ([212.227.126.131]:43167)
+ (envelope-from <laurent@vivier.eu>) id 1iS3Ik-0004d0-MN
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:11:35 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:45033)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iS3E7-0002W7-D8
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:06:47 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iS3Ik-0004cV-D8
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:11:34 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MEC8L-1ibe8C1Ezl-00AGdq; Tue, 05 Nov 2019 19:06:41 +0100
+ mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1N6bwO-1hsB6m2WAY-0180M3; Tue, 05 Nov 2019 19:11:26 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/1] q800: fix I/O memory map
-Date: Tue,  5 Nov 2019 19:06:37 +0100
-Message-Id: <20191105180637.26020-2-laurent@vivier.eu>
+Subject: [PULL 00/13] Linux user for 4.2 patches
+Date: Tue,  5 Nov 2019 19:11:06 +0100
+Message-Id: <20191105181119.26779-1-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191105180637.26020-1-laurent@vivier.eu>
-References: <20191105180637.26020-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:HCNinvCbx+2Eu0sVlxe84ltpZcLCN9trZg0EMhoUwUpQTyChEzS
- lYzArJr2ASQr0tDy9VQoYCymR8KwwjS6VFOxalaJssVhTbLRMaLplucUAVfUAKczud/ggiM
- QqV3+MogKlc8GjWo8doa4LVNR4FY+ggVYefbq/qPEeGm7emC4ZN358HKq9s1QltfPGzONSa
- rfFphjjwWLmV4TbuSsMnQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:FC/ziqsac3Q=:XfJuYDU1ZIv2D317zCyLWp
- 1h4HHJU5mtRCPn5NGIL3/Kxo79IM/P72u/7PC5r7926OG6Ca9ljZcklrpZMQ89G2S0doXccMP
- v3dq3IWRtTYNope38Fpy655q0nlzAPquNdmnRB2O4jWFCPPW/K4l/f4psvCcREOkonecDOLlW
- p1NMoJfhL2IV2rkx7n2EaYD055FRn9EdQtKN7WbY/39y120tRfmigHA//ulRqYtN+6Ru8eqiE
- mLpBRRqDEXH5fvNGzMAGi5lL4H+CTKIIrhBmYNF/4gWqxp1ToVFg4bjbI6PGVjI6jWpCpk4pq
- JWyeX0kSvidsNyBpQaVBBeg54VZG9qJxd/w98gjPpiP3VgfBv6KvTzL3cxkAet/n4s1ffGnE5
- Jde3iaoIpVB3UfKrbbCU5/LfWO/DBlP/q+LeaH1DIHryJ3adz4ElLlRHRYtkivtwYFix+8oIi
- gqbDIEmvx58OnXV3FnC6rRk2cl+BvF4L+0SUqnAyv77vtM9VGpBVW75YSS10izmC1mbsmaeYb
- PGhsd57BfNlY/rGEif1BqmTP3Y+BZwHM/9yQP/9JQBYmorD0AfBSj6MEhvUPQBEbI2jZjALuK
- Y5kdlfj+hx/Ow6QM0ZLxfUQoi9QDsrY2F415Z1nABKLulo258QzjXqMNYpHza2Vxnd/TTliRm
- p1mcAZN20IuwFI359p+ncVtKdDUBfHDs8WKdxK/fwdDGCzHn4J5cV72Jg0wwoQx4j90xeXEEy
- 8GinB7d1qRzDwfNV3YfrbWa4mh4BQeQ45BeggzBz2aTmenX8O8+IOFc3iRfDXUjGics9oIfuv
- +Jz+VsaXRaeMsBg4t0Gf8Hs8UhyRKjvGR6qUa5NJqqyqNlpANANoWM4fhvWC5gimfGplfnvxA
- 4yc3QAc4zit86W5/Oe+Jtm/z8babWLckjfRt55qAo=
+X-Provags-ID: V03:K1:QKCvYEVXABzYZAZtTYQrsgA/rm3jkTBL6q/9oqkV6b5mv51V9qq
+ 8odkyL1iP3X66v+bYSddjEcST4we2U1neRJG7nJTMArOi6Jh5Prfsnqp0ht+N5gyXvpQwyn
+ CGFh/IPbOdrwCL9jeca0oSUrqWJz9IcaockGWgpQT45OtgkqIM9/y3yocTbB9JrHIp+Vuyp
+ 1Lmup9VTbx1bjBHwc6h4w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NF3bDRb4/Hk=:/s2WpDKdGSVL+ligjfLMQ4
+ 5EzgTCYN2oXS02t8I3L8k3k7x6cj3hnW0o+DkOq+zMmnfwEDGIvIb/D9rGRYqm215TifMsMXT
+ 7rLk7tdMCVauW0OBbvMMWO5lyrptHlgDv9vv7lF/ZwiVhmCoPFd4IiBagA45Edzm4gV4mPw+/
+ W1OjdPNCSHb64E3mq1b/dwDl3AaeIFe/Zyf5D5iQujM6vYR6dZM8yQRNzI9vnWECyu2YE0W3P
+ wcdFvvjkxLTK2wCn5OEpHTCZheWgouu46NDaaH7Lq5ZOn8v5PDciUwkgMDffAjms1b0wMJ999
+ QaFPl2R2hZIOwNTvLDsc533jNKHSLr3RpSf0QxTVVgNPomIZ6gtqiE9d9G68q/lW/DIfXyUp3
+ N/1Xo+ut65ZLXijqMyCzugvV5zNovm2MuXox5UftDKMbWt57Ev0KL8HJPAlAH6YAYYwpo5CRE
+ aeypQdmn5a5E6fD9ONMLRqzqTSfASmBJ745XWGHwm0oYgZHMAX1MU2N9a/R1vSCSUJoGl3/dp
+ /UbmawO/Bk9tpKjGGKK3OI+9VjK8Lakm8VYJkJFRRgtw388rrnZqr04K0QlEUrcEc+FCPWJ1t
+ YBB0uaz97FLi628uPkrOVGzWU27Y3wcW4SfwsNcVz5j3ABUGChyBR/6Uv4kTo0aFP4KhKUJ6Q
+ aIY842LNwZDIeLNY2XBj/abbSST0yvC+0jzbuJMZ9mzN/BAYRWbsv+OMnZuXFu1N9E5IZt3DV
+ zkkfDFO9Q3qFjQkXAzG9bQUedra/80Z3/8sY33NjaJyzTzIGQ6W7TCQjahprPVJP1AjXvTc1G
+ F1mZM0+YAOxUZ7gKH6J18S1P6eqvmjANBELKk/XaRlVwSiGg9/M59jqUu1j9aWWLTWPdzLOr9
+ 7nTUc4RP2GUfsjfUi9iKKSJP2ThKmzbxH5KlmxM0Y=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.131
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,100 +77,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Riku Voipio <riku.voipio@iki.fi>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>, Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Linux kernel 5.4 will introduce a new memory map for SWIM device.
-(aee6bff1c325 ("m68k: mac: Revisit floppy disc controller base addresses"))
+The following changes since commit 36609b4fa36f0ac934874371874416f7533a5408:
 
-Until this release all MMIO are mapped between 0x50f00000 and 0x50f40000,
-but it appears that for real hardware 0x50f00000 is not the base address:
-the MMIO region spans 0x50000000 through 0x60000000, and 0x50040000 through
-0x54000000 is repeated images of 0x50000000 to 0x50040000.
+  Merge remote-tracking branch 'remotes/palmer/tags/palmer-for-master-4.2-sf1' into staging (2019-11-02 17:59:03 +0000)
 
-Fixed: 04e7ca8d0f ("hw/m68k: define Macintosh Quadra 800")
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20191104101513.29518-1-laurent@vivier.eu>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- hw/m68k/q800.c | 40 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 32 insertions(+), 8 deletions(-)
+are available in the Git repository at:
 
-diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-index 2b4842f8c6..4ca8678007 100644
---- a/hw/m68k/q800.c
-+++ b/hw/m68k/q800.c
-@@ -60,14 +60,19 @@
- #define MACH_MAC        3
- #define Q800_MAC_CPU_ID 2
- 
--#define VIA_BASE              0x50f00000
--#define SONIC_PROM_BASE       0x50f08000
--#define SONIC_BASE            0x50f0a000
--#define SCC_BASE              0x50f0c020
--#define ESP_BASE              0x50f10000
--#define ESP_PDMA              0x50f10100
--#define ASC_BASE              0x50F14000
--#define SWIM_BASE             0x50F1E000
-+#define IO_BASE               0x50000000
-+#define IO_SLICE              0x00040000
-+#define IO_SIZE               0x04000000
-+
-+#define VIA_BASE              (IO_BASE + 0x00000)
-+#define SONIC_PROM_BASE       (IO_BASE + 0x08000)
-+#define SONIC_BASE            (IO_BASE + 0x0a000)
-+#define SCC_BASE              (IO_BASE + 0x0c020)
-+#define ESP_BASE              (IO_BASE + 0x10000)
-+#define ESP_PDMA              (IO_BASE + 0x10100)
-+#define ASC_BASE              (IO_BASE + 0x14000)
-+#define SWIM_BASE             (IO_BASE + 0x1E000)
-+
- #define NUBUS_SUPER_SLOT_BASE 0x60000000
- #define NUBUS_SLOT_BASE       0xf0000000
- 
-@@ -135,6 +140,9 @@ static void q800_init(MachineState *machine)
-     int32_t initrd_size;
-     MemoryRegion *rom;
-     MemoryRegion *ram;
-+    MemoryRegion *io;
-+    const int io_slice_nb = (IO_SIZE / IO_SLICE) - 1;
-+    int i;
-     ram_addr_t ram_size = machine->ram_size;
-     const char *kernel_filename = machine->kernel_filename;
-     const char *initrd_filename = machine->initrd_filename;
-@@ -163,10 +171,26 @@ static void q800_init(MachineState *machine)
-     cpu = M68K_CPU(cpu_create(machine->cpu_type));
-     qemu_register_reset(main_cpu_reset, cpu);
- 
-+    /* RAM */
-     ram = g_malloc(sizeof(*ram));
-     memory_region_init_ram(ram, NULL, "m68k_mac.ram", ram_size, &error_abort);
-     memory_region_add_subregion(get_system_memory(), 0, ram);
- 
-+    /*
-+     * Memory from IO_BASE to IO_BASE + IO_SLICE is repeated
-+     * from IO_BASE + IO_SLICE to IO_BASE + IO_SIZE
-+     */
-+    io = g_new(MemoryRegion, io_slice_nb);
-+    for (i = 0; i < io_slice_nb; i++) {
-+        char *name = g_strdup_printf("mac_m68k.io[%d]", i + 1);
-+
-+        memory_region_init_alias(&io[i], NULL, name, get_system_memory(),
-+                                 IO_BASE, IO_SLICE);
-+        memory_region_add_subregion(get_system_memory(),
-+                                    IO_BASE + (i + 1) * IO_SLICE, &io[i]);
-+        g_free(name);
-+    }
-+
-     /* IRQ Glue */
- 
-     irq = g_new0(GLUEState, 1);
+  git://github.com/vivier/qemu.git tags/linux-user-for-4.2-pull-request
+
+for you to fetch changes up to bbba2b13799d3220f1f1d84bbaed3f916215fca5:
+
+  linux-user/alpha: Set r20 secondary return value (2019-11-05 10:53:55 +0100)
+
+----------------------------------------------------------------
+sparc/sparc64 fixes: this doesn't fix debian chroot for me
+but they are a step in the good direction.
+Fix Netlink support.
+Trivial fix for alpha
+
+----------------------------------------------------------------
+
+Josh Kunz (1):
+  linux-user: Support for NETLINK socket options
+
+Richard Henderson (12):
+  scripts/qemu-binfmt-conf: Update for sparc64
+  tests/tcg/multiarch/linux-test: Fix error check for shmat
+  target/sparc: Define an enumeration for accessing env->regwptr
+  linux-user/sparc: Use WREG constants in sparc/target_cpu.h
+  linux-user/sparc: Begin using WREG constants in sparc/signal.c
+  linux-user/sparc: Use WREG_SP constant in sparc/signal.c
+  linux-user/sparc: Fix WREG usage in setup_frame
+  linux-user/sparc64: Fix target_signal_frame
+  linux-user: Rename cpu_clone_regs to cpu_clone_regs_child
+  linux-user: Introduce cpu_clone_regs_parent
+  linux-user/sparc: Fix cpu_clone_regs_*
+  linux-user/alpha: Set r20 secondary return value
+
+ linux-user/aarch64/target_cpu.h    |   7 +-
+ linux-user/alpha/target_cpu.h      |  16 ++++-
+ linux-user/arm/target_cpu.h        |   7 +-
+ linux-user/cris/target_cpu.h       |   7 +-
+ linux-user/hppa/target_cpu.h       |   7 +-
+ linux-user/i386/target_cpu.h       |   7 +-
+ linux-user/m68k/target_cpu.h       |   7 +-
+ linux-user/microblaze/target_cpu.h |   7 +-
+ linux-user/mips/target_cpu.h       |   7 +-
+ linux-user/nios2/target_cpu.h      |   7 +-
+ linux-user/openrisc/target_cpu.h   |   8 ++-
+ linux-user/ppc/target_cpu.h        |   7 +-
+ linux-user/riscv/target_cpu.h      |   7 +-
+ linux-user/s390x/target_cpu.h      |   7 +-
+ linux-user/sh4/target_cpu.h        |   7 +-
+ linux-user/sparc/signal.c          | 102 ++++++++++-----------------
+ linux-user/sparc/target_cpu.h      |  60 +++++++++++-----
+ linux-user/syscall.c               | 107 ++++++++++++++++++++++++++++-
+ linux-user/tilegx/target_cpu.h     |   7 +-
+ linux-user/xtensa/target_cpu.h     |   8 ++-
+ scripts/qemu-binfmt-conf.sh        |   8 ++-
+ target/sparc/cpu.h                 |  33 +++++++++
+ tests/tcg/multiarch/linux-test.c   |   3 +-
+ 23 files changed, 338 insertions(+), 105 deletions(-)
+
 -- 
 2.21.0
 
