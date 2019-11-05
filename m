@@ -2,83 +2,138 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE8D5CA9ED5
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 08:40:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B93F6CA9EDA
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 08:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B77C220717
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 08:40:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8324020717
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 08:41:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EUE7PlpV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B77C220717
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XU6690BQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8324020717
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRuO4-0003I8-R7
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 03:40:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37549)
+	id 1iRuPR-0004P0-Kr
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 03:41:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37824)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iRuNJ-0002qn-VU
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 03:39:43 -0500
+ (envelope-from <lvivier@redhat.com>) id 1iRuOY-0003qw-Hs
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 03:40:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iRuNI-0007SK-Nq
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 03:39:41 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:34916)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iRuNI-0007S2-G4
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 03:39:40 -0500
-Received: by mail-ot1-x343.google.com with SMTP id z6so16954717otb.2
- for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 00:39:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=3Ibht2ZGgmjCZdw8YE+tl1KwUcravJHzspUU9kHAlgQ=;
- b=EUE7PlpVd/UHmJpIglWOX9BjCZZlzFgPQtAptSkFmSZXbfLnyvmmv2AtJ5pOlfBl8/
- Z4de4JxgtwgpCGYhOsRLSKUBe4wlPZFHovCgy91bs1F24q7GT9T3ku6pbnbKbRMbF1CY
- md+lk1XkGbpLmT+TuqrN9QbkrruesKuV6KFK8zaYPf4gsp7sL9VCgL57EkZGU7bEmggr
- EVFPWZYAkow77Y2kk4weMO3/77jrljraQpc9FaXki3Kl91Ow/67kxYB5rTL53akqHllb
- xPFWOYN8CuodPj8pXiMPpdr1Wh+WnUKhT0RTViADnyTNvrrtuLieC3+pG1jNdd6nFd2P
- gvyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=3Ibht2ZGgmjCZdw8YE+tl1KwUcravJHzspUU9kHAlgQ=;
- b=tWjjMXq6K90YK1Nc2KX8I7kRCW0XkLjm11lXsHI1s72eLh7GPIkMHNVjdKJy4fg97y
- cCcXaiC0dVkhAP+hf5oEsUZqZBcTP9tayfgnGayl75entzG377/a2pOhFgRPqu3Bh00z
- GpJa9q2gFwHYyrq/iZWJm5q31Tr+lkW+5CnXHU1BOq98O6A5DZKPDvv6UHk1lTGFKgHE
- 8YimGH/nVyz8kSFpdOJmNqchdEDKYqllPw6Hx9+hzxuZCljyM7wH1EgKSQvKuh46bv9T
- nWTMRZJYfy5IugsSdXCGjV5hoa5f6EXe8I44Gze4OsCI00VEF7PJvdQCZijLgJAaALJm
- 4HdA==
-X-Gm-Message-State: APjAAAUsx8wXYgBdPlmLYKtEJ7Drd5DjoZ9Ay0OZ/IWc3kCM+4G83Hmv
- I+k/iUykV0uk5qNHjNzuv/aRzpdYwR2Xv9LYt1E=
-X-Google-Smtp-Source: APXvYqzHMpBbx+PqB87I6YiTAgj//5njwYJX88Jkqv0zQwnQTIO4yf+gPFpXjBOUABSUWoch0oHhnebrIku8o7uFu4M=
-X-Received: by 2002:a05:6830:81:: with SMTP id a1mr8377719oto.64.1572943179719; 
- Tue, 05 Nov 2019 00:39:39 -0800 (PST)
+ (envelope-from <lvivier@redhat.com>) id 1iRuOW-0008Dy-CG
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 03:40:57 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:53753
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iRuOW-0008DW-0U
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 03:40:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572943254;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=IZE8DCNKmme0ranHzB4/ze9fdkCNNLYm9unWrIBoPTA=;
+ b=XU6690BQS24XNf5HNuJuo7hLXeoyRhSB9WURDm3fQxP7NimZcNkOLnrOcf/UqMjrsDgpie
+ d0O9PvFVYaUIqTeqnv4Bl6HdX2K20kLDPwwcsq88kxVNMzvjIO4In0IniCE8qZaGdIPA8M
+ rdZsmVS9kHYbLm5wgyVgKWCKLkxQHws=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-129-UINoIDLqPcagqppnyXD-MQ-1; Tue, 05 Nov 2019 03:40:51 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E97FE8017DD;
+ Tue,  5 Nov 2019 08:40:48 +0000 (UTC)
+Received: from [10.36.117.83] (ovpn-117-83.ams2.redhat.com [10.36.117.83])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7FEC15C1B0;
+ Tue,  5 Nov 2019 08:40:45 +0000 (UTC)
+Subject: Re: [PATCH] global: Squash 'the the'
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+References: <20191104185202.102504-1-dgilbert@redhat.com>
+ <157290359988.27285.16497763825853147226@37313f22b938>
+ <87ftj2kabe.fsf@linaro.org>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <b0d5498a-1ee3-3bea-43f3-4d4d8397711a@redhat.com>
+Date: Tue, 5 Nov 2019 09:40:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Received: by 2002:a9d:5e89:0:0:0:0:0 with HTTP;
- Tue, 5 Nov 2019 00:39:39 -0800 (PST)
-In-Reply-To: <20191029212430.20617-6-mrolnik@gmail.com>
-References: <20191029212430.20617-1-mrolnik@gmail.com>
- <20191029212430.20617-6-mrolnik@gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 5 Nov 2019 09:39:39 +0100
-Message-ID: <CAL1e-=gKGJC4X9aNtj1SL7+s5UryNtEF81YcG4kvhjPNP247Kw@mail.gmail.com>
-Subject: Re: [PATCH v35 05/13] target/avr: Add instruction translation -
- Arithmetic and Logic Instructions
-To: Michael Rolnik <mrolnik@gmail.com>
-Content-Type: multipart/alternative; boundary="0000000000007aadee0596955f9a"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+In-Reply-To: <87ftj2kabe.fsf@linaro.org>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: UINoIDLqPcagqppnyXD-MQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,131 +145,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "thuth@redhat.com" <thuth@redhat.com>,
- "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>
+Cc: peter.maydell@linaro.org, sstabellini@kernel.org, qemu-trivial@nongnu.org,
+ mjt@tls.msk.ru, dgilbert@redhat.com, laurent@vivier.eu,
+ marcandre.lureau@redhat.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000007aadee0596955f9a
-Content-Type: text/plain; charset="UTF-8"
+On 05/11/2019 09:16, Alex Benn=C3=A9e wrote:
+>=20
+> no-reply@patchew.org writes:
+>=20
+>> Patchew URL: https://patchew.org/QEMU/20191104185202.102504-1-dgilbert@r=
+edhat.com/
+>>
+>>
+>>
+>> Hi,
+>>
+>> This series failed the docker-quick@centos7 build test. Please find the =
+testing commands and
+>> their output below. If you have Docker installed, you can probably repro=
+duce it
+>> locally.
+>>
+>> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+>> #!/bin/bash
+>> make docker-image-centos7 V=3D1 NETWORK=3D1
+>> time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=3D1
+>> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>>
+>>   TEST    iotest-qcow2: 009
+>>   TEST    iotest-qcow2: 010
+>> **
+>> ERROR:/tmp/qemu-test/src/tests/migration-test.c:903:wait_for_migration_f=
+ail: assertion failed: (!strcmp(status, "setup") || !strcmp(status, "failed=
+") || (allow_active && !strcmp(status, "active")))
+>> ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/migration-test.c:903:wa=
+it_for_migration_fail: assertion failed: (!strcmp(status, "setup") || !strc=
+mp(status, "failed") || (allow_active && !strcmp(status, "active")))
+>> make: *** [check-qtest-aarch64] Error 1
+>> make: *** Waiting for unfinished jobs....
+>=20
+> That's one I've been seeing intermittently on Travis since the
+> softfreeze started. It was masked by the other regressions which are now
+> fixed.
 
->
->
-> +
-> +/*
-> + *  This instruction performs 8-bit x 8-bit -> 16-bit signed
-> multiplication
-> + *  and shifts the result one bit left.
-> + */
-> +static bool trans_FMULSU(DisasContext *ctx, arg_FMULSU *a)
-> +{
-> +    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-> +        return true;
-> +    }
-> +
-> +    TCGv R0 = cpu_r[0];
-> +    TCGv R1 = cpu_r[1];
-> +    TCGv Rd = cpu_r[a->rd];
-> +    TCGv Rr = cpu_r[a->rr];
-> +    TCGv R = tcg_temp_new_i32();
-> +    TCGv t0 = tcg_temp_new_i32();
-> +
-> +    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
-> +    tcg_gen_mul_tl(R, t0, Rr); /* R = Rd * Rr */
-> +    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
-> +
-> +    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(15) */
-> +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-> +
-> +    tcg_gen_shli_tl(R, R, 1);
-> +
-> +    tcg_gen_andi_tl(R0, R, 0xff);
-> +    tcg_gen_shri_tl(R1, R, 8);
-> +    tcg_gen_andi_tl(R1, R1, 0xff);
-> +
-> +    tcg_temp_free_i32(t0);
-> +    tcg_temp_free_i32(R);
-> +
-> +    return true;
-> +}
-> +
+Could it be related with my patch?
 
+1bd71dce4bf2 runstate: ignore exit request in finish migrate state
 
-Hi, Michael.
+Thanks,
+Laurent
 
-The way I understand the spec is that a->rd and a->rd must be between 16
-and 23:
-
-https://www.microchip.com/webdoc/avrassembler/avrassembler.wb_FMULSU.html
-
-Is my interpretation right? If yes, where is the corresponding part in the
-implementation?
-
-Yours, Aleksandar
-
-
->
-
---0000000000007aadee0596955f9a
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex"><br>
-+<br>
-+/*<br>
-+ *=C2=A0 This instruction performs 8-bit x 8-bit -&gt; 16-bit signed multi=
-plication<br>
-+ *=C2=A0 and shifts the result one bit left.<br>
-+ */<br>
-+static bool trans_FMULSU(DisasContext *ctx, arg_FMULSU *a)<br>
-+{<br>
-+=C2=A0 =C2=A0 if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return true;<br>
-+=C2=A0 =C2=A0 }<br>
-+<br>
-+=C2=A0 =C2=A0 TCGv R0 =3D cpu_r[0];<br>
-+=C2=A0 =C2=A0 TCGv R1 =3D cpu_r[1];<br>
-+=C2=A0 =C2=A0 TCGv Rd =3D cpu_r[a-&gt;rd];<br>
-+=C2=A0 =C2=A0 TCGv Rr =3D cpu_r[a-&gt;rr];<br>
-+=C2=A0 =C2=A0 TCGv R =3D tcg_temp_new_i32();<br>
-+=C2=A0 =C2=A0 TCGv t0 =3D tcg_temp_new_i32();<br>
-+<br>
-+=C2=A0 =C2=A0 tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */<b=
-r>
-+=C2=A0 =C2=A0 tcg_gen_mul_tl(R, t0, Rr); /* R =3D Rd * Rr */<br>
-+=C2=A0 =C2=A0 tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */<br>
-+<br>
-+=C2=A0 =C2=A0 tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf =3D R(15) */<br>
-+=C2=A0 =C2=A0 tcg_gen_setcondi_tl(TCG_COND_<wbr>EQ, cpu_Zf, R, 0); /* Zf =
-=3D R =3D=3D 0 */<br>
-+<br>
-+=C2=A0 =C2=A0 tcg_gen_shli_tl(R, R, 1);<br>
-+<br>
-+=C2=A0 =C2=A0 tcg_gen_andi_tl(R0, R, 0xff);<br>
-+=C2=A0 =C2=A0 tcg_gen_shri_tl(R1, R, 8);<br>
-+=C2=A0 =C2=A0 tcg_gen_andi_tl(R1, R1, 0xff);<br>
-+<br>
-+=C2=A0 =C2=A0 tcg_temp_free_i32(t0);<br>
-+=C2=A0 =C2=A0 tcg_temp_free_i32(R);<br>
-+<br>
-+=C2=A0 =C2=A0 return true;<br>
-+}<br>
-+</blockquote><div><br></div><div>Hi, Michael.</div><div><br></div><div>The=
- way I understand the spec is that a-&gt;rd and a-&gt;rd must be between 16=
- and 23:</div><div><br></div><div><a href=3D"https://www.microchip.com/webd=
-oc/avrassembler/avrassembler.wb_FMULSU.html">https://www.microchip.com/webd=
-oc/avrassembler/avrassembler.wb_FMULSU.html</a><br></div><div><br></div><di=
-v>Is my interpretation right? If yes, where is the corresponding part in th=
-e implementation?</div><div><br></div><div>Yours, Aleksandar</div><div><br>=
-</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-l=
-eft:1px #ccc solid;padding-left:1ex"><br>
-</blockquote>
-
---0000000000007aadee0596955f9a--
 
