@@ -6,77 +6,77 @@ X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26F20C49EAA
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:05:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10B9DC49EAB
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:10:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBB2A20869
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:05:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBB2A20869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D91FD20869
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:10:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D91FD20869
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRumI-0001ZM-1J
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 04:05:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41119)
+	id 1iRur6-0003s6-OZ
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 04:10:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42351)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iRul1-0000v7-09
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:04:12 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1iRuqK-0003GX-I4
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:09:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iRuku-0004Df-2R
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:04:09 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:58036)
+ (envelope-from <yi.l.liu@intel.com>) id 1iRuqI-0006SK-Lv
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:09:39 -0500
+Received: from mga09.intel.com ([134.134.136.24]:52936)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iRukt-0004Cj-PU
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:04:04 -0500
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 2292537F75
- for <qemu-devel@nongnu.org>; Tue,  5 Nov 2019 09:04:01 +0000 (UTC)
-Received: by mail-qk1-f200.google.com with SMTP id d144so20530600qke.16
- for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 01:04:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=lSTUawn9pzlzND92vhb4XquSuXQivwtASgCgnap9X/w=;
- b=Xl+Plx+jcC77sBywkaXO/Imn1kC3OBnGJyOj9z0UOPKRp+ssHO5lEBoDqGWjztHTBf
- xJMKuD+gj54YujOAjlGCI9cHaYkoSZNhU8JANXkBoZNg9BP+mjpeNMXY/9Q5XZhY8lEO
- dnVHuESRevnLTY99Pzcs/BW8Q0lVlj4VF9aIF05hBfM+WjEVbKTDNIWEJztdwUH69xPW
- 6HjJF2eL9njxXZCg+AwQYS9wleOaW/U4laA43H1PvCgC23sU825vNeI+w2Fa4Wpi/Suf
- JlExjK6ieOqjPimxnozG0Om67odkcJbGgk3HSaNbHyB0bJ6toIDC6XiqmO4sRzvs28Hw
- /new==
-X-Gm-Message-State: APjAAAW8TI+IoIH7ZO5vWvGw4yCMdPeZNbjLeMvXnPjLVoAvIP09zU+1
- XWr92OPbsCcnfDXcmQM+BMWqoHSJudBJ9rTJ1T6+1DG9kgfDEya2EYhpkXFc7Zf1YbDU9bPHF4j
- H7V37W+FKKsYzQEI=
-X-Received: by 2002:ac8:6f7c:: with SMTP id u28mr5231087qtv.273.1572944640418; 
- Tue, 05 Nov 2019 01:04:00 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw8QEtpdX8KmVsuKwEb89JpfQd2ELtZpZqxvkDrLtm3XFi2NBHdtSjyuTfc6ZW3vmi0qG5CMg==
-X-Received: by 2002:ac8:6f7c:: with SMTP id u28mr5231074qtv.273.1572944640228; 
- Tue, 05 Nov 2019 01:04:00 -0800 (PST)
-Received: from redhat.com (bzq-79-178-12-128.red.bezeqint.net. [79.178.12.128])
- by smtp.gmail.com with ESMTPSA id y27sm10883929qtj.49.2019.11.05.01.03.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 05 Nov 2019 01:03:59 -0800 (PST)
-Date: Tue, 5 Nov 2019 04:03:55 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [RESEND PATCH 0/2] PCI DMA alias support
-Message-ID: <20191105040254-mutt-send-email-mst@kernel.org>
-References: <157187055395.5439.6693401317571144578.stgit@gimli.home>
- <20191104150353.0a694812@x1.home>
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iRuqI-0006QJ-C4
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:09:38 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 05 Nov 2019 01:09:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,270,1569308400"; d="scan'208";a="227032956"
+Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
+ by fmsmga004.fm.intel.com with ESMTP; 05 Nov 2019 01:09:28 -0800
+Received: from fmsmsx124.amr.corp.intel.com (10.18.125.39) by
+ fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 5 Nov 2019 01:09:28 -0800
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ fmsmsx124.amr.corp.intel.com (10.18.125.39) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 5 Nov 2019 01:09:28 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.41]) with mapi id 14.03.0439.000;
+ Tue, 5 Nov 2019 17:09:26 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to VM
+Thread-Topic: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing
+ to VM
+Thread-Index: AQHVimsks8KvEm+7BkaEbflXH8cdg6d6zfsAgAGOP8A=
+Date: Tue, 5 Nov 2019 09:09:26 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A0EE2B5@SHSMSX104.ccr.corp.intel.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <20191104172242.GD26023@xz-x1.metropole.lan>
+In-Reply-To: <20191104172242.GD26023@xz-x1.metropole.lan>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYTAyNTUyN2EtYTA0MS00YjgxLTg0ZDktZjY2NWI1MDc0YTUwIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNUpyMjZOeVBsa2gxSitKVllpSHltZ3dvRUZ6ZWFITXhHTGNmOUpKSnJiajRnNmJmZk5cL1pBN3FqQXl2UGVMQ0YifQ==
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191104150353.0a694812@x1.home>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,52 +88,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com
+Cc: "tianyu.lan@intel.com" <tianyu.lan@intel.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 04, 2019 at 03:03:53PM -0700, Alex Williamson wrote:
-> On Wed, 23 Oct 2019 16:47:02 -0600
-> Alex Williamson <alex.williamson@redhat.com> wrote:
-> 
-> > Previous posting:
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg06182.html
-> > 
-> > Rebased (no change) and added Peter's R-b.  Please apply for QEMU 4.2.
-> 
-> Anyone?  I suppose this has missed another release despite pings from
-> me, Peter, and a resend :-(
-> 
-> Alex
-
-Yes but I put it in the tree for the next release, will merge
-right after the release.
-
-
-> > Previous cover letter:
-> > 
-> > Please see patch 1/ for the motivation and utility of this series.
-> > This v1 submission improves on the previous RFC with revised commit
-> > logs, comments, and more testing, and the missing IVRS support for DMA
-> > alias ranges is now included.  Testing has been done with Linux guests
-> > with both SeaBIOS and OVMF with configurations of intel-iommu and
-> > amd-iommu.  Intel-iommu testing includes device assignment, amd-iommu
-> > is necessarily limited to emulated devices with interrupt remapping
-> > disabled and iommu=pt in the guest (enabling interrupt remapping or
-> > disabling guest passthrough mode fails to work regardless of this
-> > series).  This series is NOT intended for QEMU v4.1.  Thanks,
-> > 
-> > Alex
-> > 
-> > ---
-> > 
-> > Alex Williamson (2):
-> >       pci: Use PCI aliases when determining device IOMMU address space
-> >       hw/i386: AMD-Vi IVRS DMA alias support
-> > 
-> > 
-> >  hw/i386/acpi-build.c |  127 +++++++++++++++++++++++++++++++++++++++++++++++---
-> >  hw/pci/pci.c         |   43 ++++++++++++++++-
-> >  2 files changed, 160 insertions(+), 10 deletions(-)
+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBUdWVz
+ZGF5LCBOb3ZlbWJlciA1LCAyMDE5IDE6MjMgQU0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVA
+aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JGQyB2MiAwMC8yMl0gaW50ZWxfaW9tbXU6IGV4
+cG9zZSBTaGFyZWQgVmlydHVhbCBBZGRyZXNzaW5nIHRvIFZNDQo+IA0KPiBPbiBUaHUsIE9jdCAy
+NCwgMjAxOSBhdCAwODozNDoyMUFNIC0wNDAwLCBMaXUgWWkgTCB3cm90ZToNCj4gPiBTaGFyZWQg
+dmlydHVhbCBhZGRyZXNzIChTVkEpLCBhLmsuYSwgU2hhcmVkIHZpcnR1YWwgbWVtb3J5IChTVk0p
+IG9uDQo+ID4gSW50ZWwgcGxhdGZvcm1zIGFsbG93IGFkZHJlc3Mgc3BhY2Ugc2hhcmluZyBiZXR3
+ZWVuIGRldmljZSBETUEgYW5kIGFwcGxpY2F0aW9ucy4NCj4gPiBTVkEgY2FuIHJlZHVjZSBwcm9n
+cmFtbWluZyBjb21wbGV4aXR5IGFuZCBlbmhhbmNlIHNlY3VyaXR5Lg0KPiA+IFRoaXMgc2VyaWVz
+IGlzIGludGVuZGVkIHRvIGV4cG9zZSBTVkEgY2FwYWJpbGl0eSB0byBWTXMuIGkuZS4gc2hhcmVk
+DQo+ID4gZ3Vlc3QgYXBwbGljYXRpb24gYWRkcmVzcyBzcGFjZSB3aXRoIHBhc3N0aHJ1IGRldmlj
+ZXMuIFRoZSB3aG9sZSBTVkENCj4gPiB2aXJ0dWFsaXphdGlvbiByZXF1aXJlcyBRRU1VL1ZGSU8v
+SU9NTVUgY2hhbmdlcy4gVGhpcyBzZXJpZXMgaW5jbHVkZXMNCj4gPiB0aGUgUUVNVSBjaGFuZ2Vz
+LCBmb3IgVkZJTyBhbmQgSU9NTVUgY2hhbmdlcywgdGhleSBhcmUgaW4gc2VwYXJhdGUNCj4gPiBz
+ZXJpZXMgKGxpc3RlZCBpbiB0aGUgIlJlbGF0ZWQgc2VyaWVzIikuDQo+ID4NClsuLi5dDQo+DQo+
+IFlpLA0KPiANCj4gV291bGQgeW91IG1pbmQgdG8gYWx3YXlzIG1lbnRpb24gd2hhdCB0ZXN0cyB5
+b3UgaGF2ZSBiZWVuIGRvbmUgd2l0aCB0aGUNCj4gcGF0Y2hzZXQgaW4gdGhlIGNvdmVyIGxldHRl
+cj8gIEl0J2xsIGJlIGZpbmUgdG8gc2F5IHRoYXQgeW91J3JlIHJ1bm5pbmcgdGhpcyBhZ2FpbnN0
+IEZQR0FzDQo+IHNvIG5vIG9uZSBjb3VsZCByZWFsbHkgcmV0ZXN0IGl0LCBidXQgc3RpbGwgaXQg
+d291bGQgYmUgZ29vZCB0byBrbm93IHRoYXQgYXMgd2VsbC4gIEl0J2xsDQo+IGV2ZW4gYmUgYmV0
+dGVyIHRvIG1lbnRpb24gdGhhdCB3aGljaCBwYXJ0IG9mIHRoZSBzZXJpZXMgaXMgdG90YWxseSB1
+bnRlc3RlZCBpZiB5b3UgYXJlDQo+IGF3YXJlIG9mLg0KDQpTdXJlLCBJIHNob3VsZCBoYXZlIGlu
+Y2x1ZGVkIHRoZSB0ZXN0IHBhcnRzLiBXaWxsIGRvIGluIG5leHQgdmVyc2lvbi4NCg0KVGhhbmtz
+LA0KWWkgTGl1DQo=
 
