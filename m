@@ -2,71 +2,82 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B496C17498
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B70CC17460
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:56:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F7F2217F5
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:50:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F7F2217F5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id E90A221D6C
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:56:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z4SHkOTg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E90A221D6C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS0A2-0006cx-Ar
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 09:50:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54814)
+	id 1iS0Fa-0000va-4l
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 09:56:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iS03O-0008UY-04
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:43:31 -0500
+ (envelope-from <berrange@redhat.com>) id 1iS0Ew-0000PC-5i
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:55:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iS03M-0002kR-Ie
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:43:29 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:57135)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iS03D-0002f7-Vy; Tue, 05 Nov 2019 09:43:20 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MqZE0-1i5upG2BIu-00mbPo; Tue, 05 Nov 2019 15:42:58 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/4] hw/misc/grlib_ahb_apb_pnp: Fix 8-bit accesses
-Date: Tue,  5 Nov 2019 15:42:45 +0100
-Message-Id: <20191105144247.10301-3-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191105144247.10301-1-laurent@vivier.eu>
-References: <20191105144247.10301-1-laurent@vivier.eu>
+ (envelope-from <berrange@redhat.com>) id 1iS0Et-00085Z-4C
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:55:24 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60589
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iS0Es-00084j-WA
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:55:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572965721;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7UdZG6IFkrI1ioyNoi+m3sm1fA5C97/+mk5JqyaHzBg=;
+ b=Z4SHkOTgC8JwvdLfTPFuaRlIEQ40/ZE09J9h95I9TPPT+RKAVH7b7y0UpzAbzZxXNCiJQg
+ /PD3BNXYL59DlESBzUdDU0fyfcMorwh8usBjmoYu42v+YKJXsgpbdDhmrGCnYjqa8pbjRr
+ uIed7c9/uoNz3tAevIhcj7EM+HMg+9Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-408-LQ4I26OzOKuyk1PZ7BfWJg-1; Tue, 05 Nov 2019 09:55:17 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7D8E1005500;
+ Tue,  5 Nov 2019 14:55:15 +0000 (UTC)
+Received: from redhat.com (ovpn-112-59.ams2.redhat.com [10.36.112.59])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 602C946;
+ Tue,  5 Nov 2019 14:55:06 +0000 (UTC)
+Date: Tue, 5 Nov 2019 14:55:03 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH] Makefile: Fix config-devices.mak not regenerated when
+ Kconfig updated
+Message-ID: <20191105145503.GE42501@redhat.com>
+References: <20191104095530.22091-1-philmd@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <20191104095530.22091-1-philmd@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: LQ4I26OzOKuyk1PZ7BfWJg-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:L0D96drAblJ0e5CYodG0S9iuT59onHnJ0Slrv+hqH6rKd5o+myY
- mmZ4AB9u/hybpbbZ2Ui1BvYZaGmkHHRYBjFF//4qqaI/qpxjt4w1bMwDK3anqiXodn8epC6
- j+saVzYmrd4wPfoElBBOiTRuP4dIA/vJMIvF0Mv0Go4JTNym5GyH8fnWYgtYzA1H7fd69+J
- cVRaRWixqbsaw5ieGlf5g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:K08tChYLLIg=:38M25GKpRoC1OrLY/QzTVf
- UueeHNpRByJqajENf/AkFYd1n5DA6UZgyq0efhC0T2q0rlbcjrvJYCFp/IWpImifpMVamJqQO
- oL0heUITSvF3XbfNrx6W8AHVcV6mdls5eFR6fnfGyuRInk5Q+vL4AkEH9eW27qgs1w6kb2qO8
- MyuHTFWPQmFGMfmM1SF29ep8RMakYptJFnybUwcp2JH9PwEJoFuOfxFRbcBo607K3fRqsNltJ
- +f3SgwUN94AqAoBmoF5ZfJlOvZONGdRcc2sUjW16Dg5ewtKXqNYYEhxy4CUVvlygnv/jmVCwu
- l5ynhoADTlMtQiLyD6Yt3t5RXnvC5ZLHdZXLQrbSJFklUmwoloe2K+oauhYWwnEn051Fed/l4
- g1ezK1/d6FGpiPvcTaoPKSvO268khCULfcMQ11maybdp7kfn2cxy2WezOAE6XzlIgtWqacSwR
- 736/bwyNvNiJMOB4+L+T3PXT8BksGAWQHAT1X9+x1hWwDphfCuddY7Y/U1TyzHw6GjVsBAVL+
- hTQqCX4BuHidsJU5sfjs304RpJACYm5LWTQuUNEZTH72L4wcgLSe733/o9N5tG0aSY6hny6xW
- tTyk2Nxz3ubxIX0l6vrd9JUhAqnpW63QaotnJmb0D/FlDOPGa24akh3GsKUzzrsJqzObHFsoM
- 2uMBbsrAErbO1vaQniD2xUv9QzqhuvU2UOYhjvnefSS3GvwVazVLeZ+R2eMHxiWYK+cpE5zAe
- 87tuOBo1ejLYN3PRS9ZS9PTfF6v6Gmz0a9V9thYO4wWFvhW7BSUSwGWKC2eZiWvEj9vL5X4Sx
- zgON+iu1SdKsNHF/IBgjW3DSHLwL6qK65CsZBdIq0//NLe89vvlDH3D69k9SmTZB4f3bvpvB1
- oyrCOw7D2x1G4Km4z4PTVzH56hxX5qVzEsv2S8qBY=
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.133
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,70 +89,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Paul Durrant <paul@xen.org>,
- Michael Tokarev <mjt@tls.msk.ru>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Stefano Stabellini <sstabellini@kernel.org>, xen-devel@lists.xenproject.org,
- qemu-trivial@nongnu.org, Anthony Perard <anthony.perard@citrix.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Jiri Gaisler <jiri@gaisler.se>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Cleber Rosa <crosa@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Claudio Fontana <claudio.fontana@huawei.com>,
- Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+On Mon, Nov 04, 2019 at 10:55:30AM +0100, Philippe Mathieu-Daud=C3=A9 wrote=
+:
+> When hw/$DIR/Kconfig is changed, the corresponding generated
+> hw/$DIR/config-devices.mak is not being updated.
+> Fix this by including all the hw/*/Kconfig files to the prerequisite
+> names of the rule generating the config-devices.mak files.
+>=20
+> Fixes: e0e312f3525a (build: switch to Kconfig)
+> Reported-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> If OK, I plan to include this fix in the "hw/i386/pc: Split PIIX3
+> southbridge from i440FX northbridge" pull request.
+> ---
+>  Makefile | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/Makefile b/Makefile
+> index 0e994a275d..c1461b21e8 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -384,7 +384,10 @@ MINIKCONF_ARGS =3D \
+>      CONFIG_LINUX=3D$(CONFIG_LINUX) \
+>      CONFIG_PVRDMA=3D$(CONFIG_PVRDMA)
+> =20
+> -MINIKCONF_INPUTS =3D $(SRC_PATH)/Kconfig.host $(SRC_PATH)/hw/Kconfig
+> +MINIKCONF_INPUTS =3D $(SRC_PATH)/Kconfig.host $(SRC_PATH)/hw/Kconfig \
+> +                   $(patsubst %,$(SRC_PATH)/hw/%,$(shell sed -ne \
+> +                                                    's/source \(.*\)/\1/=
+p' \
+> +                                                    < $(SRC_PATH)/hw/Kco=
+nfig))
 
-The Plug & Play region of the AHB/APB bridge can be accessed
-by various word size, however the implementation is clearly
-restricted to 32-bit:
+Why can't we use the simpler wildcard statement:
 
-  static uint64_t grlib_apb_pnp_read(void *opaque, hwaddr offset, unsigned size)
-  {
-      APBPnp *apb_pnp = GRLIB_APB_PNP(opaque);
+   $(wildcard $(SRC_PATH)/hw/*/Kconfig)
 
-      return apb_pnp->regs[offset >> 2];
-  }
+instead of reading the file names from the hw/Kconfig file ?
 
-Set the MemoryRegionOps::impl min/max fields to 32-bit, so
-memory.c::access_with_adjusted_size() can adjust when the
-access is not 32-bit.
-
-This is required to run RTEMS on leon3, the grlib scanning
-functions do byte accesses.
-
-Reported-by: Jiri Gaisler <jiri@gaisler.se>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
-Message-Id: <20191025110114.27091-3-philmd@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- hw/misc/grlib_ahb_apb_pnp.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/hw/misc/grlib_ahb_apb_pnp.c b/hw/misc/grlib_ahb_apb_pnp.c
-index f3c015d2c35f..e230e2536361 100644
---- a/hw/misc/grlib_ahb_apb_pnp.c
-+++ b/hw/misc/grlib_ahb_apb_pnp.c
-@@ -242,6 +242,10 @@ static const MemoryRegionOps grlib_apb_pnp_ops = {
-     .read       = grlib_apb_pnp_read,
-     .write      = grlib_apb_pnp_write,
-     .endianness = DEVICE_BIG_ENDIAN,
-+    .impl = {
-+        .min_access_size = 4,
-+        .max_access_size = 4,
-+    },
- };
- 
- static void grlib_apb_pnp_realize(DeviceState *dev, Error **errp)
--- 
-2.21.0
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
 
