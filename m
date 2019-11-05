@@ -6,43 +6,38 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DBBC1747C
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8EDC17460
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:06:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ADE821D6C
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:04:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ADE821D6C
+	by mail.kernel.org (Postfix) with ESMTPS id 67B2821882
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:06:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67B2821882
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRzRO-0005CZ-Ey
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 09:04:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45962)
+	id 1iRzTH-0006aA-GD
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 09:06:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46364)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iRzQM-00049y-Lc
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:03:11 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iRzSY-0005tL-6T
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:05:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iRzQH-0001w9-L9
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:03:10 -0500
-Received: from mout.kundenserver.de ([212.227.126.133]:35087)
+ (envelope-from <laurent@vivier.eu>) id 1iRzST-0004HQ-9i
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:05:26 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:47791)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iRzQE-0001uR-Go; Tue, 05 Nov 2019 09:03:02 -0500
+ id 1iRzSP-0004FR-6w; Tue, 05 Nov 2019 09:05:17 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1M42zo-1iRzQ70aIK-00075N; Tue, 05 Nov 2019 15:02:55 +0100
-Subject: Re: [PATCH 2/2] hw/misc/grlib_ahb_apb_pnp: Fix 8-bit accesses
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Fabien Chouteau <chouteau@adacore.com>,
- Artyom Tarasenko <atar4qemu@gmail.com>, qemu-devel@nongnu.org,
- KONRAD Frederic <frederic.konrad@adacore.com>
-References: <20191025110114.27091-1-philmd@redhat.com>
- <20191025110114.27091-3-philmd@redhat.com>
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N9L64-1hpTnO36KS-015EUV; Tue, 05 Nov 2019 15:05:10 +0100
+Subject: Re: [PATCH] qom: Fix error message in object_class_property_add()
+To: Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
+References: <157287383591.234942.311840593519058490.stgit@bahia.tlslab.ibm.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -86,36 +81,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <f8b41f57-17d5-4467-f65d-61c13f20e19a@vivier.eu>
-Date: Tue, 5 Nov 2019 15:02:52 +0100
+Message-ID: <4edf8200-ec7a-65f7-844c-63735ac67b54@vivier.eu>
+Date: Tue, 5 Nov 2019 15:05:09 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191025110114.27091-3-philmd@redhat.com>
+In-Reply-To: <157287383591.234942.311840593519058490.stgit@bahia.tlslab.ibm.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:zkcBTjksaZCmMcWQCRttq3+eAaPp/QprnYtSPcS/oh9Ba02MbfP
- PHh1ycbU8ma+VWelQeQ0tG9tISnrV4xzfWEQ/09EswYWHnjrO4T1EezpTCCMjGrGgwPk7aV
- lxwOwO5wGyTaY7KF6OPQRjX/KBNFsiuEJrouF+OcSjiA2VQNPEiimOL7U5T3iVj6sLuW29n
- /8TBQKhkc3Pe4eP2QwnxQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:4K6C/i7n1kM=:u//vF2jufWXOSemDcsaOP+
- 7lBbE2hLbARz8HtH9BpChs3Q7IJqV4Xjng5AwCTaS4dXV3xx3fZqJVOnqOH1qalEl+lxKz9se
- w9ZM9EGRHW1sPvnrgGNX1KDuqMlmikxZLvQMSfDXIYMCpgIIu0NzUdmIjgAtAqxtP2TI/ZyG6
- MKtfQJ6V56LZeNRUV/8oALhkm0fpnaTDw8FwrKK3jEYU+0MVGGoclbJMYiWA7ssxarWluq9eD
- Esfy7i9J1fdGvaKlTOf2fvGhKeJCIaC/MErQqU7R0zBXx5u8nFuLVksJMkaYm9Nfvgqn7qOg3
- pmYMKhqB0ubfNdzOcdqQfG4n+plez5d4tPLwmCxUq3vA2ojy0wpNyC/d5231hofUPKqrfOb7S
- SmfrLtXe7uxYWkbUuySyPRjzp9klNUWs3PSk3SE+S3SJyYrwU8g3epMqZSrTdwsIx2DnnN2bg
- BPUEBkecMUcOFosybuwjPMO48HwKtjj5L/zYWYE/TLKc7ZcZ/WIeQ7K6dL/S4o1Py9PgdzZ1u
- 9HFe3Y5mDjHVZM1feI1h+dtS37mZ8pIfpvaQydFBINoCUJDeO/2qGxz111Zg4TFa4V4LrRXHt
- P9Ms/qpJEZUCyBXo/Ehvq04YFyDddpgo7RX8YP00Vt5xmdajQxysiM8zu+srLQ+6rLHC7ivZt
- xOW5PWpcLKOk9DDeWJG/HPc1BU5qztX77BLWA3I3a26LmHhpwRrUekADxSzsVpM+8OEOYKpb5
- O47trEdqSj23eANB2nFs044qrhDy9sjPGYCk05XeUPJ3rUJb8VFU7HLLdmyvcKtLBDPyS78t9
- xm5QtCntCzdXD7RcJoMtb7HFMmCQ88mQvBBhKkcUghZkTQhI4ZRFXWnF6a0T4Mcu6aWnKS5Kc
- mc8A642b5y4wU1Lqs86A==
+X-Provags-ID: V03:K1:GTQl79ss4YskL4SGgsp6DMV6tzIpK9E2s+I9NFmKyZuWjTmDwKw
+ KaCkGFEH8vSDHcRFxyjhoEn/3Tr5FB/NZ37hCe+qYs8HnjTCb4x2oJ6SdGuTrm60Cp6iriK
+ s+bpiqguXueSDmAzg9Hmz0+hlDdcwTB2tWi81VVTCJlEtaYcsF7JGbj+/IijiZWRKDBtxvx
+ 7sZCp56SH6aeBOde1Dwnw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NT4DEOJnkG8=:jXQvmOVyuTR2heOOwiTx5j
+ Hzxur6RKLx0T7tCmsf78LtQVS4UQoprsDjvqsJdd/RkVX8HTno4IGiXAjdPhHd/mHE93h4jDT
+ A+tH3fHGQZwE6icikbGhTdVgJo6H2KcdnhsHJWWJZPPP4Ppvh7i3bAkBnhqBs1jAh7/dIQucK
+ AdX8h1uZfbt+CSe6jUtV4slXPzd7MOVjutkifjlYF9H/tjnCCliR9WgxIuStiT6TynkZaV0tA
+ crbKfyg3RKT+KlTEQbMP0Sub0kOlMMASjtrjPxEdkEBhE+LVsWdYVKbZCKwUAl6PK/re7NU69
+ kIzPW/xJdel/Lv1q3b4W6odOE+jng7aXXPG4Wytexn6V2BZFew+96xeyR4dldrOdrnJbQg2l9
+ /ZWyA9oNaeWCRcUSmT3YcWu2AkOGUavuamDfGyWeMLF8eHSmEk7pdBx3snWhnVJ0McgPKCsT1
+ bICr6rbrzo3DEVHh+U6cSjoYgF0b03DcIQpknbWJXpJRVrApIJ36+VoD4KdD6yWCO0LVAfRAC
+ 3Edv+tZSLE7ZYroOJR96zOmg+MWvVSyIiEyJ3QhyJ4hEepILbUFT0fNW3R8WWtuMOMpda8L0E
+ 1JK6Fhfh8QxxiVxCZnfxNuY5bVWkzRBYwbFcjLzf+nO+7igHDYCbYO27l5PrCSMjKhyHY/kW8
+ ABOVROJwFagnAsaCKj+FZLRNCsaL3fgV7pXgwPMEV36i6hApXdOmZepODJbMQOXaNq481HRtA
+ AAnzRl8DwUgGYsqNe/bA5FqMG3O7IGlRy4NGJkM5sg+2BY+uRuS3P/33whSW8l5r3vBiUvim+
+ 9y5AmVa9qdxOystQXPwXEdofdUGNqBW+WUK4CGdfUQSaDZJkYo/ZwifLzbvrU93vKdcd1Ce+r
+ 5Fqxmnw44O1fmNkK/+iaRfiWeIDKgi6NIvM1wGtbo=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.133
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,51 +122,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Jiri Gaisler <jiri@gaisler.se>
+Cc: qemu-trivial@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 25/10/2019 à 13:01, Philippe Mathieu-Daudé a écrit :
-> The Plug & Play region of the AHB/APB bridge can be accessed
-> by various word size, however the implementation is clearly
-> restricted to 32-bit:
+Le 04/11/2019 à 14:23, Greg Kurz a écrit :
+> The error message in object_class_property_add() was copied from
+> object_property_add() in commit 16bf7f522a2ff. Clarify that it is
+> about a class, not an object.
 > 
->   static uint64_t grlib_apb_pnp_read(void *opaque, hwaddr offset, unsigned size)
->   {
->       APBPnp *apb_pnp = GRLIB_APB_PNP(opaque);
+> While here, have the format string in both functions to fit in a
+> single line for better grep-ability, despite the checkpatch warning.
 > 
->       return apb_pnp->regs[offset >> 2];
->   }
-> 
-> Set the MemoryRegionOps::impl min/max fields to 32-bit, so
-> memory.c::access_with_adjusted_size() can adjust when the
-> access is not 32-bit.
-> 
-> This is required to run RTEMS on leon3, the grlib scanning
-> functions do byte accesses.
-> 
-> Reported-by: Jiri Gaisler <jiri@gaisler.se>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/misc/grlib_ahb_apb_pnp.c | 4 ++++
->  1 file changed, 4 insertions(+)
+>  qom/object.c |   10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
 > 
-> diff --git a/hw/misc/grlib_ahb_apb_pnp.c b/hw/misc/grlib_ahb_apb_pnp.c
-> index f3c015d2c3..e230e25363 100644
-> --- a/hw/misc/grlib_ahb_apb_pnp.c
-> +++ b/hw/misc/grlib_ahb_apb_pnp.c
-> @@ -242,6 +242,10 @@ static const MemoryRegionOps grlib_apb_pnp_ops = {
->      .read       = grlib_apb_pnp_read,
->      .write      = grlib_apb_pnp_write,
->      .endianness = DEVICE_BIG_ENDIAN,
-> +    .impl = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +    },
->  };
+> diff --git a/qom/object.c b/qom/object.c
+> index 6fa9c619fac4..d51b57fba11e 100644
+> --- a/qom/object.c
+> +++ b/qom/object.c
+> @@ -1106,9 +1106,8 @@ object_property_add(Object *obj, const char *name, const char *type,
+>      }
 >  
->  static void grlib_apb_pnp_realize(DeviceState *dev, Error **errp)
+>      if (object_property_find(obj, name, NULL) != NULL) {
+> -        error_setg(errp, "attempt to add duplicate property '%s'"
+> -                   " to object (type '%s')", name,
+> -                   object_get_typename(obj));
+> +        error_setg(errp, "attempt to add duplicate property '%s' to object (type '%s')",
+> +                   name, object_get_typename(obj));
+>          return NULL;
+>      }
+>  
+> @@ -1139,9 +1138,8 @@ object_class_property_add(ObjectClass *klass,
+>      ObjectProperty *prop;
+>  
+>      if (object_class_property_find(klass, name, NULL) != NULL) {
+> -        error_setg(errp, "attempt to add duplicate property '%s'"
+> -                   " to object (type '%s')", name,
+> -                   object_class_get_name(klass));
+> +        error_setg(errp, "attempt to add duplicate property '%s' to class (type '%s')",
+> +                   name, object_class_get_name(klass));
+>          return NULL;
+>      }
+>  
+> 
 > 
 
 Applied to my trivial-patches branch.
