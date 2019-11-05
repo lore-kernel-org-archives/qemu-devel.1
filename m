@@ -2,117 +2,85 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6942C49EAB
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFD3C49EAB
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:48:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F4DF20869
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:47:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F4DF20869
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 48C3120869
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:48:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jTNnP1JQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48C3120869
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRvQu-0001Jy-GM
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 04:47:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49753)
+	id 1iRvRu-0002M4-Gd
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 04:48:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49898)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iRvPN-0000KO-8W
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:45:54 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iRvQJ-00018m-GC
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:46:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iRvPM-0005cC-3X
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:45:53 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:53087)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iRvPL-0005bk-Qk
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:45:52 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Mj8a5-1hy6RD3p3d-00fF0f; Tue, 05 Nov 2019 10:45:47 +0100
-Subject: Re: [PATCH v2 03/12] target/sparc: Define an enumeration for
- accessing env->regwptr
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20191025113921.9412-1-richard.henderson@linaro.org>
- <20191025113921.9412-4-richard.henderson@linaro.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <551d9156-0217-9468-3c9c-9ade78ebe872@vivier.eu>
-Date: Tue, 5 Nov 2019 10:45:45 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iRvQH-0006DV-Rf
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:46:51 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:44194)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iRvQH-0006D4-GS
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:46:49 -0500
+Received: by mail-ot1-x342.google.com with SMTP id c19so970169otr.11
+ for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 01:46:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=xOaqK2lR5/e5h6h7xhh7IO++8GmJUgjamw2Cs7Orwgo=;
+ b=jTNnP1JQ0IJliPMFL406lRmotwfPslOuCAeCtCcI48lgXxaRCT0ceo4vmo5MVarT36
+ x0E5rWeWTw7evz/fdv3FAc/yMNKxUKG8TA+lkI5ltDdaezq+B279vs1CQc1fYU7CEi0/
+ ZwURFsmgmg5cnsN778Og7Ya7/YAK8OOMv5TTEtvymMlSrs1k9ngBN+O8tOVzlDgKN1Sa
+ oe0k2nuS1HrjlPhQOdvEnEZ/9+0HIVVpqXViRaY81zD0VTfZAOa9BoqDXUey1F4t/7TM
+ Oe6jGj6wg67xd3lYfCi4TZDr4fdTzzurNrkkFG6e/wz1A/csa7ZR5vS8HwbgsH1b47gK
+ oK1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=xOaqK2lR5/e5h6h7xhh7IO++8GmJUgjamw2Cs7Orwgo=;
+ b=OVrjnU/IhQS3UTSwo25HVCLV8ZIynA0f0YXdilkF9Xfz4ELACCaEmDrJQ0bNWOTa0s
+ 8cZ6Fjgzi4BR0blQRH+igWI/c64LmmnGDGyUDYXczx20VQL75wEo3YHS6t4hSysthe3I
+ 9KGYPGPZM9dGNRAHqc0aj6uGtGgTpn3ZcgiUP9BoTbJ8qNZRWevCMOzvo2uzEz9Qq7au
+ I1L2pnNQV0kuakNqyAGWk1c3NptBklJ2n454OocmAJplseDQR592l8MFhuV+72Z2naRg
+ xEUe2P3Vcd7MFAfEkdZQL9GWwRZrq7jf37Eatv0+oVSZTLw9Ro8wjgfDr/48jnvEHaBU
+ MGIg==
+X-Gm-Message-State: APjAAAUstHzAHkTyp9EmUOdAA4bQgHTlujudEMipl1iNRDBk4rK9vnVk
+ 3VcXa4GldfCiEXsbVbh6m6RfGmEkQHK0TyaUTXI=
+X-Google-Smtp-Source: APXvYqxaHFPKmbx9RJt8rz6rpNxTiItnMk39bD1n2FTibgppF5LAlmYQmBremM0hfDb7kvVWN3RkS9FiSUPO2tqAl7U=
+X-Received: by 2002:a05:6830:2151:: with SMTP id
+ r17mr23116351otd.341.1572947208202; 
+ Tue, 05 Nov 2019 01:46:48 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191025113921.9412-4-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ZetPxgALX13+OwsFvNzKPvbI9kxocjcf7cqTTPENtjqdd+6k7uA
- yN3h41JuWVYO5jG6rOr0mgRz72YMEKsk2V7lE25/KdYZKEiNBWhoYcSnYe8wPGCOpweb2ZG
- 9EkWHTyQTGyGnsyV7d9BnUwh4IhgwkSwaUVoh/IAdni8YwpgvYO04WhU8+N2Mv5myT+e2Vt
- qAnp0BOiBe8Jg0Xazj47Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:eK6evf3PSeM=:lM5FYv5hreMhaANwwWNRo6
- cwOWcfi9Uv5NMM4iJxtm/zzXEvR3KoJ+Ohj0dpIP3cDHAKfmDO8BhSL4QpmGCpUajK/jsZ4H4
- PLCBOTOqSOPR7dX2U825ucHbXkrA4joj7SedoFgdlKmvmvj8aBNIEgaR0n/oU6R1qUZL/Qr9l
- wTbVlRRjpVtL+MHA7UNG5Zeh8QiyTWW83IsovctNC8i/X1023D+ARS2mKFMyKxFVpc5oT3SJe
- mk167X6g/IN0LVj+b+xe1M4eYR5ex71uSFGbwCQsqVU/l+1fFs3jPSZgKEfhTs/RU1Oa2cKbS
- lgLtWu6Cz2dBccNLg/LCAUvN2ahF3+GAjqZ4AFaIoFdzFM3nu9Kz323cK9i7CCeEIuNlftXlR
- Ckc4k8NxHwh8nhffwhbwU8F9q7IqNVdbzQx5hiGE/DbkNl1uac2j42vXMQkK9Zd8aw4L3Sben
- wQy0rNMou0G4Fb1Y2fUzrejRaNtG/5/iNZNP/zjtaRqw1OI1QnNjYjm88uVCn18ybEhyxRhtz
- Osb6IChs7HDZMsj55+Pckak3LGybvGcrbT4WWC/4O9Hu7H3gJK8hrBA3bjoFkTMDhGQMzfgkt
- 1liSHixwXAtaQiL2X83paDLDng9szBrarqHdwRWXdiB5hpyFN1JzJTTF3DNogVuGv16QPdkJ1
- pi5GSic379gkGStJJqyTd3pWALXJACqLeBK9ECBnktIhPMi11PNUlvW6n7HnGk3A8r7ukVTMI
- 9KBePsRZzv833jgxgHWyXHE6+6pjypHi47XIFkKHYhJxcoJY3iy5zpZ5hfNBh+buwn0uUFCCF
- vCWTQSyngyjApE688Wy7/s2lhjFjWib7OzuKQHbg6pcrhns5g41GOdDI2kNCfUOnzQD7pnZk4
- Ya4yXB8rzlEqLjIT1vbR8lHBpQ73SOLAdb66DvcbA=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.126.135
+Received: by 2002:a9d:5e89:0:0:0:0:0 with HTTP;
+ Tue, 5 Nov 2019 01:46:47 -0800 (PST)
+In-Reply-To: <CAL1e-=gKGJC4X9aNtj1SL7+s5UryNtEF81YcG4kvhjPNP247Kw@mail.gmail.com>
+References: <20191029212430.20617-1-mrolnik@gmail.com>
+ <20191029212430.20617-6-mrolnik@gmail.com>
+ <CAL1e-=gKGJC4X9aNtj1SL7+s5UryNtEF81YcG4kvhjPNP247Kw@mail.gmail.com>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 5 Nov 2019 10:46:47 +0100
+Message-ID: <CAL1e-=gXr5KJ7W3_bnuBaupuz6jYr0LnAX7FXJ8+F8rJ=ARKxw@mail.gmail.com>
+Subject: Re: [PATCH v35 05/13] target/avr: Add instruction translation -
+ Arithmetic and Logic Instructions
+To: Michael Rolnik <mrolnik@gmail.com>
+Content-Type: multipart/alternative; boundary="000000000000986c170596964f22"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,65 +92,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org
+Cc: "thuth@redhat.com" <thuth@redhat.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 25/10/2019 à 13:39, Richard Henderson a écrit :
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/sparc/cpu.h | 33 +++++++++++++++++++++++++++++++++
->  1 file changed, 33 insertions(+)
-> 
-> diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-> index 778aa8e073..ae97c7d9f7 100644
-> --- a/target/sparc/cpu.h
-> +++ b/target/sparc/cpu.h
-> @@ -13,6 +13,39 @@
->  
->  /*#define EXCP_INTERRUPT 0x100*/
->  
-> +/* Windowed register indexes.  */
-> +enum {
-> +    WREG_O0,
-> +    WREG_O1,
-> +    WREG_O2,
-> +    WREG_O3,
-> +    WREG_O4,
-> +    WREG_O5,
-> +    WREG_O6,
-> +    WREG_O7,
-> +
-> +    WREG_L0,
-> +    WREG_L1,
-> +    WREG_L2,
-> +    WREG_L3,
-> +    WREG_L4,
-> +    WREG_L5,
-> +    WREG_L6,
-> +    WREG_L7,
-> +
-> +    WREG_I0,
-> +    WREG_I1,
-> +    WREG_I2,
-> +    WREG_I3,
-> +    WREG_I4,
-> +    WREG_I5,
-> +    WREG_I6,
-> +    WREG_I7,
-> +
-> +    WREG_SP = WREG_O6,
-> +    WREG_FP = WREG_I6,
-> +};
-> +
->  /* trap definitions */
->  #ifndef TARGET_SPARC64
->  #define TT_TFAULT   0x01
-> 
+--000000000000986c170596964f22
+Content-Type: text/plain; charset="UTF-8"
 
-Applied to my linux-user branch.
+On Tuesday, November 5, 2019, Aleksandar Markovic <
+aleksandar.m.mail@gmail.com> wrote:
 
-Thanks,
-Laurent
+>
+>> +
+>> +/*
+>> + *  This instruction performs 8-bit x 8-bit -> 16-bit signed
+>> multiplication
+>> + *  and shifts the result one bit left.
+>> + */
+>> +static bool trans_FMULSU(DisasContext *ctx, arg_FMULSU *a)
+>> +{
+>> +    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
+>> +        return true;
+>> +    }
+>> +
+>> +    TCGv R0 = cpu_r[0];
+>> +    TCGv R1 = cpu_r[1];
+>> +    TCGv Rd = cpu_r[a->rd];
+>> +    TCGv Rr = cpu_r[a->rr];
+>> +    TCGv R = tcg_temp_new_i32();
+>> +    TCGv t0 = tcg_temp_new_i32();
+>> +
+>> +    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
+>> +    tcg_gen_mul_tl(R, t0, Rr); /* R = Rd * Rr */
+>> +    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
+>> +
+>> +    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(15) */
+>> +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
+>> +
+>> +    tcg_gen_shli_tl(R, R, 1);
+>> +
+>> +    tcg_gen_andi_tl(R0, R, 0xff);
+>> +    tcg_gen_shri_tl(R1, R, 8);
+>> +    tcg_gen_andi_tl(R1, R1, 0xff);
+>> +
+>> +    tcg_temp_free_i32(t0);
+>> +    tcg_temp_free_i32(R);
+>> +
+>> +    return true;
+>> +}
+>> +
+>
+>
+> Hi, Michael.
+>
+> The way I understand the spec is that a->rd and a->rd must be between 16
+> and 23:
+>
+> https://www.microchip.com/webdoc/avrassembler/avrassembler.wb_FMULSU.html
+>
+> Is my interpretation right? If yes, where is the corresponding part in the
+> implementation?
+>
+>
+Or, perhaps,
+
+TCGv Rd = cpu_r[a->rd];
+
+should be
+
+TCGv Rd = cpu_r[a->rd + 16];
+
+(and the same for rs)
+
+?
+
+
+Yours, Aleksandar
+>
+>
+>>
+
+--000000000000986c170596964f22
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Tuesday, November 5, 2019, Aleksandar Markovic &lt;<a href=3D"ma=
+ilto:aleksandar.m.mail@gmail.com">aleksandar.m.mail@gmail.com</a>&gt; wrote=
+:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-le=
+ft:1px #ccc solid;padding-left:1ex"><blockquote class=3D"gmail_quote" style=
+=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><br>
++<br>
++/*<br>
++ *=C2=A0 This instruction performs 8-bit x 8-bit -&gt; 16-bit signed multi=
+plication<br>
++ *=C2=A0 and shifts the result one bit left.<br>
++ */<br>
++static bool trans_FMULSU(DisasContext *ctx, arg_FMULSU *a)<br>
++{<br>
++=C2=A0 =C2=A0 if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 return true;<br>
++=C2=A0 =C2=A0 }<br>
++<br>
++=C2=A0 =C2=A0 TCGv R0 =3D cpu_r[0];<br>
++=C2=A0 =C2=A0 TCGv R1 =3D cpu_r[1];<br>
++=C2=A0 =C2=A0 TCGv Rd =3D cpu_r[a-&gt;rd];<br>
++=C2=A0 =C2=A0 TCGv Rr =3D cpu_r[a-&gt;rr];<br>
++=C2=A0 =C2=A0 TCGv R =3D tcg_temp_new_i32();<br>
++=C2=A0 =C2=A0 TCGv t0 =3D tcg_temp_new_i32();<br>
++<br>
++=C2=A0 =C2=A0 tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */<b=
+r>
++=C2=A0 =C2=A0 tcg_gen_mul_tl(R, t0, Rr); /* R =3D Rd * Rr */<br>
++=C2=A0 =C2=A0 tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */<br>
++<br>
++=C2=A0 =C2=A0 tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf =3D R(15) */<br>
++=C2=A0 =C2=A0 tcg_gen_setcondi_tl(TCG_COND_E<wbr>Q, cpu_Zf, R, 0); /* Zf =
+=3D R =3D=3D 0 */<br>
++<br>
++=C2=A0 =C2=A0 tcg_gen_shli_tl(R, R, 1);<br>
++<br>
++=C2=A0 =C2=A0 tcg_gen_andi_tl(R0, R, 0xff);<br>
++=C2=A0 =C2=A0 tcg_gen_shri_tl(R1, R, 8);<br>
++=C2=A0 =C2=A0 tcg_gen_andi_tl(R1, R1, 0xff);<br>
++<br>
++=C2=A0 =C2=A0 tcg_temp_free_i32(t0);<br>
++=C2=A0 =C2=A0 tcg_temp_free_i32(R);<br>
++<br>
++=C2=A0 =C2=A0 return true;<br>
++}<br>
++</blockquote><div><br></div><div>Hi, Michael.</div><div><br></div><div>The=
+ way I understand the spec is that a-&gt;rd and a-&gt;rd must be between 16=
+ and 23:</div><div><br></div><div><a href=3D"https://www.microchip.com/webd=
+oc/avrassembler/avrassembler.wb_FMULSU.html" target=3D"_blank">https://www.=
+microchip.com/<wbr>webdoc/avrassembler/<wbr>avrassembler.wb_FMULSU.html</a>=
+<br></div><div><br></div><div>Is my interpretation right? If yes, where is =
+the corresponding part in the implementation?</div><div><br></div></blockqu=
+ote><div><br></div><div>Or, perhaps,</div><div><br></div><div><span style=
+=3D"color:rgb(0,123,53);font-size:14px;line-height:22.1200008392334px">TCGv=
+ Rd =3D cpu_r[a-&gt;rd];</span><br></div><div><span style=3D"color:rgb(0,12=
+3,53);font-size:14px;line-height:22.1200008392334px"><br></span></div><div>=
+should be</div><div><br></div><div><span style=3D"color:rgb(0,123,53);font-=
+size:14px;line-height:22.1200008392334px">TCGv Rd =3D cpu_r[a-&gt;rd + 16];=
+</span><br></div><div>=C2=A0</div><div>(and the same for rs)</div><div><br>=
+</div><div>?</div><div><br></div><div><br></div><blockquote class=3D"gmail_=
+quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1=
+ex"><div>Yours, Aleksandar</div><div><br></div><blockquote class=3D"gmail_q=
+uote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1e=
+x"><br>
+</blockquote>
+</blockquote>
+
+--000000000000986c170596964f22--
 
