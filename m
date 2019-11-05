@@ -2,76 +2,104 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC625C010B4
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 10:55:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F0EC010A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 11:06:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB7A82190F
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 10:55:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9474620869
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 11:06:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DRiSBYA3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB7A82190F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iyt6fYkl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9474620869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRwV3-0002xG-Qa
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 05:55:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38271)
+	id 1iRwfB-00059D-PR
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 06:06:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40054)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iRwUM-0002RY-Ma
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 05:55:08 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iRweF-0004Zw-Ez
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:05:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iRwUJ-0002E6-Sv
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 05:55:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23311
+ (envelope-from <mreitz@redhat.com>) id 1iRweD-0003jg-IU
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:05:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32041
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iRwUJ-0002DM-Ha
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 05:55:03 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iRweD-0003de-CO
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:05:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572951302;
+ s=mimecast20190719; t=1572951915;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=sIQ1jZwoR2tUq12TbfN95oJSdxSRsIhx/PvNCM2nGQQ=;
- b=DRiSBYA3lXoj5RPHYc15/Be7Av5BHbKx8j1334nqsL+15uFn8MzhD2Z8BdZ9+FYDVd3PlP
- Omfuevo+xxZgI5JnXfi82iSOwc7cNcYqx8+7xKjIQYkROfGNJeTadJ67gXquP7dZGJ6ftb
- Ju547oOhIyrkkLzFsAmHex/Xz81xtyo=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=QwZHpT2dn3/wY0xq+71Rk3yzxorESyHpnocHcB2gNLM=;
+ b=iyt6fYklqJphv8rMjs+YAXgFcRgm6Ni06b/IXsLwQ/xTs33taIZi8J/0inI3cl56q/cZ35
+ et4T7pAj1Bnm8rp/bFUffrs3Cw0DPmmFxihuWgLEi2Ei1fnSxtcXWYIkHDHHWoYyX5Da3h
+ CWsy9SFsHrO77eFFv4igVUG2Zi3iBJ0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-220-q3y6bil_Nw-sp9D_30H07Q-1; Tue, 05 Nov 2019 05:55:00 -0500
+ us-mta-212-ma9NEhypNUuTUtoI3tpdkA-1; Tue, 05 Nov 2019 06:05:13 -0500
+X-MC-Unique: ma9NEhypNUuTUtoI3tpdkA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45A818017DD;
- Tue,  5 Nov 2019 10:54:58 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-69.ams2.redhat.com
- [10.36.116.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9130F46;
- Tue,  5 Nov 2019 10:54:57 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id AB9F317535; Tue,  5 Nov 2019 11:54:56 +0100 (CET)
-Date: Tue, 5 Nov 2019 11:54:56 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Keiichi Watanabe <keiichiw@chromium.org>
-Subject: guest / host buffer sharing ...
-Message-ID: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A0711005500;
+ Tue,  5 Nov 2019 11:05:12 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-89.ams2.redhat.com
+ [10.36.117.89])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D1E9E26FD1;
+ Tue,  5 Nov 2019 11:05:04 +0000 (UTC)
+Subject: Re: [RFC PATCH v2 18/26] qcow2: Add subcluster support to
+ expand_zero_clusters_in_l1()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1572125022.git.berto@igalia.com>
+ <f99f051139f84a4d34bc52696aa2c2b125d5c3fd.1572125022.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <23b7a28a-22e2-25f5-3b08-438bf86e48ba@redhat.com>
+Date: Tue, 5 Nov 2019 12:05:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-User-Agent: NeoMutt/20180716
+In-Reply-To: <f99f051139f84a4d34bc52696aa2c2b125d5c3fd.1572125022.git.berto@igalia.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: q3y6bil_Nw-sp9D_30H07Q-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="55qIbn5vyiX9Ss1vaAIzN6g28A2KsvfA8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -86,77 +114,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
- Alex Lau <alexlau@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
- qemu-devel@nongnu.org, Tomasz Figa <tfiga@chromium.org>,
- Hans Verkuil <hverkuil@xs4all.nl>, David Stevens <stevensd@chromium.org>,
- Daniel Vetter <daniel@ffwll.ch>,
- =?utf-8?B?U3TDqXBoYW5l?= Marchesin <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Dmitry Morozov <dmitry.morozov@opensynergy.com>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi folks,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--55qIbn5vyiX9Ss1vaAIzN6g28A2KsvfA8
+Content-Type: multipart/mixed; boundary="W8iVnrhicyyoImRdjNDoZClAZxvlxtVDH"
 
-The issue of sharing buffers between guests and hosts keeps poping
-up again and again in different contexts.  Most recently here:
+--W8iVnrhicyyoImRdjNDoZClAZxvlxtVDH
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg656685.html
+On 26.10.19 23:25, Alberto Garcia wrote:
+> Two changes are needed in order to add subcluster support to this
+> function: deallocated clusters must have their bitmaps cleared, and
+> expanded clusters must have all the "subcluster allocated" bits set.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> ---
+>  block/qcow2-cluster.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index aa3eb727a5..62f2a9fcc0 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -2036,6 +2036,7 @@ static int expand_zero_clusters_in_l1(BlockDriverSt=
+ate *bs, uint64_t *l1_table,
+>                          /* not backed; therefore we can simply deallocat=
+e the
+>                           * cluster */
+>                          set_l2_entry(s, l2_slice, j, 0);
+> +                        set_l2_bitmap(s, l2_slice, j, 0);
+>                          l2_dirty =3D true;
+>                          continue;
+>                      }
+> @@ -2102,6 +2103,7 @@ static int expand_zero_clusters_in_l1(BlockDriverSt=
+ate *bs, uint64_t *l1_table,
+>                  } else {
+>                      set_l2_entry(s, l2_slice, j, offset);
+>                  }
+> +                set_l2_bitmap(s, l2_slice, j, QCOW_L2_BITMAP_ALL_ALLOC);
+>                  l2_dirty =3D true;
+>              }
 
-So, I'm grabbing the recipient list of the virtio-vdec thread and some
-more people I know might be interested in this, hoping to have everyone
-included.
+Technically this isn=E2=80=99t needed because this function is only called =
+when
+downgrading v3 to v2 images (which can=E2=80=99t have subclusters), but of
+course it won=E2=80=99t hurt.
 
-Reason is:  Meanwhile I'm wondering whenever "just use virtio-gpu
-resources" is really a good answer for all the different use cases
-we have collected over time.  Maybe it is better to have a dedicated
-buffer sharing virtio device?  Here is the rough idea:
-
-
-(1) The virtio device
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Has a single virtio queue, so the guest can send commands to register
-and unregister buffers.  Buffers are allocated in guest ram.  Each buffer
-has a list of memory ranges for the data.  Each buffer also has some
-properties to carry metadata, some fixed (id, size, application), but
-also allow free form (name =3D value, framebuffers would have
-width/height/stride/format for example).
-
-
-(2) The linux guest implementation
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-I guess I'd try to make it a drm driver, so we can re-use drm
-infrastructure (shmem helpers for example).  Buffers are dumb drm
-buffers.  dma-buf import and export is supported (shmem helpers
-get us that for free).  Some device-specific ioctls to get/set
-properties and to register/unregister the buffers on the host.
-
-
-(3) The qemu host implementation
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D
-
-qemu (likewise other vmms) can use the udmabuf driver to create
-host-side dma-bufs for the buffers.  The dma-bufs can be passed to
-anyone interested, inside and outside qemu.  We'll need some protocol
-for communication between qemu and external users interested in those
-buffers, to receive dma-bufs (via unix file descriptor passing) and
-update notifications.  Dispatching updates could be done based on the
-application property, which could be "virtio-vdec" or "wayland-proxy"
-for example.
+Max
 
 
-commments?
+--W8iVnrhicyyoImRdjNDoZClAZxvlxtVDH--
 
-cheers,
-  Gerd
+--55qIbn5vyiX9Ss1vaAIzN6g28A2KsvfA8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3BV14ACgkQ9AfbAGHV
+z0B6Fwf/cQ3Dzl27xToE6wQR4FM1VLFYG2dxvY9dsPuKHvzLat6IMvFlynt+WIJn
+LLq+9MqDYL6dn1r8ZaKxjs6MDVOtabWAFAh5zPn2IsyuTCubDMIWLhNesRqSYYJV
+/lks4NQiJmCDTIke+nTq4Ordw93bw8LKh4w4FRTh/ZsRIsQblhM4m5e2jJqcIvb6
+376utJjRVGWKN8fXZ31KB+bELSPlkw82L9+XHaM6vQgOoPinMyYQPeepAlxHi3J2
+MZYBYTQKMBfiIk8N5PUilSoWbULIpSNf6cm+rhJgm4G+lHI8yZFD44NcfhTXRRST
+KHbkFpb3EloOJ18Y4ma3RPrYPuUpWg==
+=rJZx
+-----END PGP SIGNATURE-----
+
+--55qIbn5vyiX9Ss1vaAIzN6g28A2KsvfA8--
 
 
