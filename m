@@ -2,79 +2,77 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F883C5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 23:43:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EFAEC5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 23:43:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EE5222087E
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 23:43:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0927F2087E
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 23:43:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AuSe0hVB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE5222087E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lk7ZPi/s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0927F2087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS8U1-00070U-84
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 18:43:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37970)
+	id 1iS8Tn-0006gG-Mw
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 18:43:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37752)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <beata.michalska@linaro.org>) id 1iS8SA-0005UU-QE
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 18:41:39 -0500
+ (envelope-from <beata.michalska@linaro.org>) id 1iS8Rz-0005Jx-Kk
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 18:41:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <beata.michalska@linaro.org>) id 1iS8S9-0004d2-Oj
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 18:41:38 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37421)
+ (envelope-from <beata.michalska@linaro.org>) id 1iS8Ry-0004Ns-2l
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 18:41:27 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:46953)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <beata.michalska@linaro.org>)
- id 1iS8S9-0004bm-HA
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 18:41:37 -0500
-Received: by mail-wr1-x443.google.com with SMTP id t1so17626746wrv.4
- for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 15:41:37 -0800 (PST)
+ id 1iS8Rx-0004Ll-R3
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 18:41:26 -0500
+Received: by mail-wr1-x443.google.com with SMTP id b3so17795934wrs.13
+ for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 15:41:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=RzXz801WN8Wx2siaVGOD6DywcY9lAErvVsKc+KJI/kM=;
- b=AuSe0hVBeklV+RVM2hnDJCbwpAIF4Z34BL4zM7yMYZKcHOZxyxaNgfQrW8ZV8e2e++
- mU6fdzUZqxpe6oeiDXzA9uCIoSJgVAhr7b/1QtNaRVNHvUBIUY6Bxm7G53FA5K4NPGBP
- GJ9CZ3oqTM9W9cQI1PIcE25klx96XF5SI8Gl7A9qc0jz4/DEbFLlCrTcO9BvbruNLsSK
- tmOKG1nUQiVkFT2dRCSVlZfCqlryUNsXrx6ZJlbnHlgsnfZP6qlzw28VHIwg5NpK3UBz
- rRNpgLBG/ZYSofRzRYBaA+B/CL5/wezGWuTonyTcxRinVMLyG161MlWQ/nUg3xsn/S5X
- s/Kg==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=3G6n6Zl5Ml5xiNIOzQAAwJRvPoWHJs+oXuob89eeLPI=;
+ b=Lk7ZPi/sETD/d31zTJ/vC793sX4S0YjuWhqcFhBTsdKrnYpqIC60AacfL5l1zNyasT
+ hN53PQo6yI9MywpnPr9bZIeEkqceyNOn1bQHrdutmqok5u+92jKS6YI1SBXGdWWEXAPI
+ fJSR9qpxiCGipXRPhPuhV9Wzpd+nG0reJJzDnbc/KpFHbRvMdE01xuTzSuZ6xlEcElUX
+ Mia7r4OLP/nyUG8WygLry3Azl1k+semlQvQlNDtGCnBFWCW3tgOS8lW/yzus0X+cQqYP
+ PnPsqxvFezn1xeVx7XBF7hDsORzCwmHHWqL3mNLXr/WhFTYZOIph9vMJqYCC52FwkzTX
+ EUqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=RzXz801WN8Wx2siaVGOD6DywcY9lAErvVsKc+KJI/kM=;
- b=otWejV2qNYlX0mUM+nsDf8OrZfK6gkJAr8get2rQaQoOf8oL+XvhHJqaNBMYIuC5SE
- NTSGuov/tG/ip8WY1o8JHzow0UnZaVh9mqH4r0idk0PITxf0FOw3/8Q8FVKSFncRP4/k
- dvDyGrAEHyhNNNMhcallHhDZeZTnaC0kCKWilosyvRyHh4ldHxvAUwCQpGUiWQrEMEa4
- 1YT9jbJcdiMlM4U5CLY/ktQorjOi47pnsBqgzhbcEXWKsVTgadWuL3qgxQv7ezc+jXqr
- AFQ87vc/2PvHos3NgMViVUGoUgi/OPVn18SpyUX05JCB4/zocpiU+ZuFKeeXj1Fh/PXd
- CdUQ==
-X-Gm-Message-State: APjAAAWkRkr3QFpSbFjQzYGLPLsZSszH4bIBNCvxWzpK7D7CMkUPMuyu
- Vn1jh8edVnOtLKqvcUHFXDTvkBdynL9urQ==
-X-Google-Smtp-Source: APXvYqyJwJv+kQe8FbjKTbzUGqNNcZWRvqFVq0poixXXwRZvPFUTVnAURAYcejKoEutFVdFYJQErCw==
-X-Received: by 2002:adf:d850:: with SMTP id k16mr25717671wrl.204.1572997296466; 
- Tue, 05 Nov 2019 15:41:36 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=3G6n6Zl5Ml5xiNIOzQAAwJRvPoWHJs+oXuob89eeLPI=;
+ b=cKBjoLvANK0b6hzDqSLJSeGWnD3r5eFZB63MbJn8jilEZy/B1rL45DO/8ZAh+9k6EH
+ 9KT0RZ5RZgk6ImFbMSPODAX/aIgCTOo92Tl7ecZPrBNGPmIL78TNVlznnoWwq9MHep5C
+ Iio3dunU88KgAdKMf+OFxKUhds0r7sg0VRv2b5VnXlqoY6VmvZ2hkp3OcBuV/izIQ5JN
+ by6OEZhOfGdppmzmmlHcgNhHirWBvsBY2tuK8kURhNxdNBsuYm2CaBof945PjYOO5P98
+ uneVdKF9vcv5JC+NJiA3JOrVrGSxYeLTcyqh9Lo3cvWIQXzgAkLjfEuYXdXtRosihSwd
+ tp+w==
+X-Gm-Message-State: APjAAAUAFTBDsDhXfzpBlWEnnONLEqg0MflkM/rlIRHNyGkQ5j0nXex0
+ cBIXFmgl7T7XikEWVipn7KtU3JYgEjXI8g==
+X-Google-Smtp-Source: APXvYqzR1CB7JCYrDPVqOliBqDOtwPa+A221ANbOtGPtaF6iLq7ksr2cTBp6yd6j/Rrn5JAlx0vOjg==
+X-Received: by 2002:adf:e886:: with SMTP id d6mr9080066wrm.188.1572997284024; 
+ Tue, 05 Nov 2019 15:41:24 -0800 (PST)
 Received: from moi-limbo-9350.home
  (host86-144-13-94.range86-144.btcentralplus.com. [86.144.13.94])
- by smtp.gmail.com with ESMTPSA id q25sm27295010wra.3.2019.11.05.15.41.35
+ by smtp.gmail.com with ESMTPSA id q25sm27295010wra.3.2019.11.05.15.41.22
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 05 Nov 2019 15:41:36 -0800 (PST)
+ Tue, 05 Nov 2019 15:41:23 -0800 (PST)
 From: Beata Michalska <beata.michalska@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/4] tcg: cputlb: Add probe_read
-Date: Tue,  5 Nov 2019 23:40:57 +0000
-Message-Id: <20191105234100.22052-2-beata.michalska@linaro.org>
-In-Reply-To: <20191105234100.22052-1-beata.michalska@linaro.org>
-References: <20191105234100.22052-1-beata.michalska@linaro.org>
+Subject: [PATCH v2 0/4] target/arm: Support for Data Cache Clean up to PoP
+Date: Tue,  5 Nov 2019 23:40:56 +0000
+Message-Id: <20191105234100.22052-1-beata.michalska@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -100,31 +98,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add probe_read alongside the write probing equivalent.
+ARMv8.2 introduced support for Data Cache Clean instructions to PoP
+(point-of-persistence) and PoDP (point-of-deep-persistence):
+ARMv8.2-DCCVAP &  ARMv8.2-DCCVADP respectively.
+This patch set adds support for emulating both, though there is no
+distinction between the two points: the PoDP is assumed to represent
+the same point of persistence as PoP. Case there is no such point specified
+for the considered memory system both will fall back to the DV CVAC inst
+(clean up to the point of coherency).
+The changes introduced include adding probe_read for validating read memory
+access to allow verification for mandatory read access for both cache
+clean instructions, along with support for writeback for requested memory
+regions through msync, if one is available, based otherwise on fsyncdata.
 
-Signed-off-by: Beata Michalska <beata.michalska@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
----
- include/exec/exec-all.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+As currently the virt platform is missing support for NVDIMM,
+the changes have been tested  with [1] & [2]
 
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index d85e610..350c4b4 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -339,6 +339,12 @@ static inline void *probe_write(CPUArchState *env, target_ulong addr, int size,
-     return probe_access(env, addr, size, MMU_DATA_STORE, mmu_idx, retaddr);
- }
- 
-+static inline void *probe_read(CPUArchState *env, target_ulong addr, int size,
-+                               int mmu_idx, uintptr_t retaddr)
-+{
-+    return probe_access(env, addr, size, MMU_DATA_LOAD, mmu_idx, retaddr);
-+}
-+
- #define CODE_GEN_ALIGN           16 /* must be >= of the size of a icache line */
- 
- /* Estimated block size for TB allocation.  */
+
+[1] https://patchwork.kernel.org/cover/10830237/
+[2] https://patchwork.kernel.org/project/qemu-devel/list/?series=159441
+
+v2:
+    - Moved the msync into a qemu wrapper with
+      CONFIG_POSIX switch + additional comments
+    - Fixed length alignment
+    - Dropped treating the DC CVAP/CVADP as special case
+      and moved those to conditional registration
+    - Dropped needless locking for grabbing mem region
+
+
+Beata Michalska (4):
+  tcg: cputlb: Add probe_read
+  Memory: Enable writeback for given memory region
+  migration: ram: Switch to ram block writeback
+  target/arm: Add support for DC CVAP & DC CVADP ins
+
+ exec.c                  | 43 +++++++++++++++++++++++++++++++++++++
+ include/exec/exec-all.h |  6 ++++++
+ include/exec/memory.h   |  6 ++++++
+ include/exec/ram_addr.h |  8 +++++++
+ include/qemu/cutils.h   |  1 +
+ linux-user/elfload.c    |  2 ++
+ memory.c                | 12 +++++++++++
+ migration/ram.c         |  5 +----
+ target/arm/cpu.h        | 10 +++++++++
+ target/arm/cpu64.c      |  1 +
+ target/arm/helper.c     | 56 +++++++++++++++++++++++++++++++++++++++++++++++++
+ util/cutils.c           | 47 +++++++++++++++++++++++++++++++++++++++++
+ 12 files changed, 193 insertions(+), 4 deletions(-)
+
 -- 
 2.7.4
 
