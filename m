@@ -2,75 +2,84 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D844C17460
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:10:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9759C1747C
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:39:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 392F721882
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:10:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A446E21928
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 14:39:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ATfHv0ZN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 392F721882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ru0dZVQe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A446E21928
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRzXe-0000fr-FI
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 09:10:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47133)
+	id 1iRzzD-0006Ve-QE
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 09:39:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iRzWz-00008a-Re
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:10:03 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iRzy6-00064m-3w
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:38:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iRzWx-0008Mg-AQ
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:10:00 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39677
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iRzWx-0008MO-6f
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:09:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572962998;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=PPk5PU/MXJtWhLIacHYViiR+P8CJ0g8IEgAqzENJaGc=;
- b=ATfHv0ZN1XTK14vT+MlwRriOrjeNpy3HaGXCttjtTcrbvGUY6HJbLdTrIQ9IHdn853rmOU
- xUj4edKO/SiHnaCO4JHZ3b6HEG6SyCZnA3rlljE8GiO1dgG42Frj81lJrORRPD92ApwdRk
- jIT8sWwjc+XSWS2PKAMB6NjEenlM5BM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-RCbRuumqPwuyiM-Sn37ZhA-1; Tue, 05 Nov 2019 09:09:55 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20AE98017DE;
- Tue,  5 Nov 2019 14:09:54 +0000 (UTC)
-Received: from localhost (ovpn-116-232.ams2.redhat.com [10.36.116.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B60AC5D70D;
- Tue,  5 Nov 2019 14:09:47 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] virtio: notify virtqueue via host notifier when available
-Date: Tue,  5 Nov 2019 15:09:46 +0100
-Message-Id: <20191105140946.165584-1-stefanha@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iRzy4-0000QT-Qe
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:38:02 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:36126)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iRzy4-0000QB-M1
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 09:38:00 -0500
+Received: by mail-ot1-x344.google.com with SMTP id s3so10198111otk.3
+ for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 06:38:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=QAoOhB3KV4Sec+eLe7JvBaFHkM0Yy6BuduPLpvzs8+M=;
+ b=ru0dZVQeqyFJafnMAM0yw7Pf0W4yUR78z4QYPAEsaM1mHTkoTreYyS+n/33dC0FmlN
+ ZEvjNHT9YITBF6WGyez28aDxOoGsagtek6b7CXJL7iAPCI/PIouQpE5lBe6iGohva0Zj
+ AM4+MH3vdH4IRp8nKWRwg+MFoV/gJERHq0E3Nd1ZXS+S1Vu8jtkxCaQ7Gz1gMx1gwqD4
+ c92hJHINi/eaHM4UnER5bzlnuWJoUiWxAoC9vollVKc9WAwKlDbMuB/Q+O7gMvpKUwDA
+ rZaYVMe3OFXrsF0fwRJzMMg/jxOHMWjRmjLJd5nX6lF0etSQNkmf3nG2GkBVLgQUunby
+ T8RQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=QAoOhB3KV4Sec+eLe7JvBaFHkM0Yy6BuduPLpvzs8+M=;
+ b=tPW/zOe4j5Utz+ryZlJlVifIr59DGwTQs+V6kMQ4Fn2u41MePTKSfEH9RPWZFi+xAF
+ BXSl6viKjyb6YtfrzdAIrt/KvWRChgYz4E6YUX5f+6X80dU5UMUAXXTGNy6I6wev2h+h
+ 5BTCCJrgv9UxfVs7CGeytSlA1M4LVcKbT1Qwb9hvEn6ziKAwlK9ee/rDfW1VLjJz6RR0
+ UKOeicaBJQPyZ8tDmpPmJ7F6SCd3L6bdSkRYHzMlWbO+0ekuPPn9QgmDYe217c3H7rDW
+ OWrVJisxIxvAxg3p1UAeJdXvnczC2Hwin1AanKhNL20BuaYHaXrYKL3FOCW+OPCtIJoi
+ Mgog==
+X-Gm-Message-State: APjAAAV5In1xz+YCgm3nPIkUXt9hYRsK66nwJlhIRZe890CGwCcoUTZ6
+ kDgQwLnf4xz8+kR65IGYA5uCLbqledW3Std/DKQ=
+X-Google-Smtp-Source: APXvYqyZ0EcJYNs9sXwf4dZJ1XBkuFp76h2VFKRd9uXeVGXT9mnhcSL8/sU0S8B4MgsgpXAFqqWjXpExhQqYpinxbo8=
+X-Received: by 2002:a9d:68da:: with SMTP id i26mr7553931oto.295.1572964679707; 
+ Tue, 05 Nov 2019 06:37:59 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: RCbRuumqPwuyiM-Sn37ZhA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <20191029212430.20617-1-mrolnik@gmail.com>
+ <20191029212430.20617-6-mrolnik@gmail.com>
+ <CAL1e-=gKGJC4X9aNtj1SL7+s5UryNtEF81YcG4kvhjPNP247Kw@mail.gmail.com>
+ <CAL1e-=gXr5KJ7W3_bnuBaupuz6jYr0LnAX7FXJ8+F8rJ=ARKxw@mail.gmail.com>
+ <14d51697-9415-14b9-8f92-3ae3de2fca58@linaro.org>
+In-Reply-To: <14d51697-9415-14b9-8f92-3ae3de2fca58@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 5 Nov 2019 15:37:48 +0100
+Message-ID: <CAL1e-=g6ctnzUSgq3eRn98nOMPJ88ucUNX7xc5MxCr6J=k4YMg@mail.gmail.com>
+Subject: Re: [PATCH v35 05/13] target/avr: Add instruction translation -
+ Arithmetic and Logic Instructions
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,123 +91,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yongji Xie <elohimes@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, felipe@nutanix.com
+Cc: "thuth@redhat.com" <thuth@redhat.com>,
+ "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Michael Rolnik <mrolnik@gmail.com>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Host notifiers are used in several cases:
-1. Traditional ioeventfd where virtqueue notifications are handled in
-   the main loop thread.
-2. IOThreads (aio_handle_output) where virtqueue notifications are
-   handled in an IOThread AioContext.
-3. vhost where virtqueue notifications are handled by kernel vhost or
-   a vhost-user device backend.
+On Tue, Nov 5, 2019 at 2:23 PM Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 11/5/19 10:46 AM, Aleksandar Markovic wrote:
+> >
+> >
+> > On Tuesday, November 5, 2019, Aleksandar Markovic <aleksandar.m.mail@gmail.com
+> > <mailto:aleksandar.m.mail@gmail.com>> wrote:
+> >
+> >
+> >         +
+> >         +/*
+> >         + *  This instruction performs 8-bit x 8-bit -> 16-bit signed
+> >         multiplication
+> >         + *  and shifts the result one bit left.
+> >         + */
+> >         +static bool trans_FMULSU(DisasContext *ctx, arg_FMULSU *a)
+> >         +{
+> >         +    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
+> >         +        return true;
+> >         +    }
+> >         +
+> >         +    TCGv R0 = cpu_r[0];
+> >         +    TCGv R1 = cpu_r[1];
+> >         +    TCGv Rd = cpu_r[a->rd];
+> >         +    TCGv Rr = cpu_r[a->rr];
+> >         +    TCGv R = tcg_temp_new_i32();
+> >         +    TCGv t0 = tcg_temp_new_i32();
+> >         +
+> >         +    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
+> >         +    tcg_gen_mul_tl(R, t0, Rr); /* R = Rd * Rr */
+> >         +    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
+> >         +
+> >         +    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(15) */
+> >         +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
+> >         +
+> >         +    tcg_gen_shli_tl(R, R, 1);
+> >         +
+> >         +    tcg_gen_andi_tl(R0, R, 0xff);
+> >         +    tcg_gen_shri_tl(R1, R, 8);
+> >         +    tcg_gen_andi_tl(R1, R1, 0xff);
+> >         +
+> >         +    tcg_temp_free_i32(t0);
+> >         +    tcg_temp_free_i32(R);
+> >         +
+> >         +    return true;
+> >         +}
+> >         +
+> >
+> >
+> >     Hi, Michael.
+> >
+> >     The way I understand the spec is that a->rd and a->rd must be between 16
+> >     and 23:
+> >
+> >     https://www.microchip.com/webdoc/avrassembler/avrassembler.wb_FMULSU.html
+> >     <https://www.microchip.com/webdoc/avrassembler/avrassembler.wb_FMULSU.html>
+> >
+> >     Is my interpretation right? If yes, where is the corresponding part in the
+> >     implementation?
+> >
+> >
+> > Or, perhaps,
+> >
+> > TCGv Rd = cpu_r[a->rd];
+> >
+> > should be
+> >
+> > TCGv Rd = cpu_r[a->rd + 16];
+> >
+> > (and the same for rs)
+>
+> This happens during decode:
+>
+> +%rd_b           4:3                         !function=to_B
+> +%rr_b           0:3                         !function=to_B
+> +@fmul           .... .... . ... . ...       &rd_rr      rd=%rd_b rr=%rr_b
+> +FMUL            0000 0011 0 ... 1 ...       @fmul
+> +FMULS           0000 0011 1 ... 0 ...       @fmul
+> +FMULSU          0000 0011 1 ... 1 ...       @fmul
+>
+> This means that a->rd = to_B(extract32(insn, 4, 3)), and
+>
+> > +static int to_B(DisasContext *ctx, int indx) { return 16 + (indx % 8); }
+>
+> et voila.
+>
 
-Most virtqueue notifications from the guest use the ioeventfd mechanism,
-but there are corner cases where QEMU code calls virtio_queue_notify().
-This currently honors the host notifier for the IOThreads
-aio_handle_output case, but not for the vhost case.  The result is that
-vhost does not receive virtqueue notifications from QEMU when
-virtio_queue_notify() is called.
+OK. Thanks for clarification.
 
-This patch extends virtio_queue_notify() to set the host notifier
-whenever it is enabled instead of calling the vq->(aio_)handle_output()
-function directly.  We track the host notifier state for each virtqueue
-separately since some devices may use it only for certain virtqueues.
-
-This fixes the vhost case although it does add a trip through the
-eventfd for the traditional ioeventfd case.  I don't think it's worth
-adding a fast path for the traditional ioeventfd case because calling
-virtio_queue_notify() is rare when ioeventfd is enabled.
-
-Reported-by: Felipe Franciosi <felipe@nutanix.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-v2:
- * Track host notifier enabled/disabled state per virtqueue [Yongji Xie]
- * Tested with contrib/vhost-user-blk and contrib/vhost-user-scsi
-
- hw/virtio/virtio-bus.c     | 4 ++++
- hw/virtio/virtio.c         | 9 ++++++++-
- include/hw/virtio/virtio.h | 1 +
- 3 files changed, 13 insertions(+), 1 deletion(-)
-
-diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
-index b2c804292e..d6332d45c3 100644
---- a/hw/virtio/virtio-bus.c
-+++ b/hw/virtio/virtio-bus.c
-@@ -288,6 +288,10 @@ int virtio_bus_set_host_notifier(VirtioBusState *bus, =
-int n, bool assign)
-         k->ioeventfd_assign(proxy, notifier, n, false);
-     }
-=20
-+    if (r =3D=3D 0) {
-+        virtio_queue_set_host_notifier_enabled(vq, assign);
-+    }
-+
-     return r;
- }
-=20
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 762df12f4c..04716b5f6c 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -128,6 +128,7 @@ struct VirtQueue
-     VirtIODevice *vdev;
-     EventNotifier guest_notifier;
-     EventNotifier host_notifier;
-+    bool host_notifier_enabled;
-     QLIST_ENTRY(VirtQueue) node;
- };
-=20
-@@ -2271,7 +2272,7 @@ void virtio_queue_notify(VirtIODevice *vdev, int n)
-     }
-=20
-     trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
--    if (vq->handle_aio_output) {
-+    if (vq->host_notifier_enabled) {
-         event_notifier_set(&vq->host_notifier);
-     } else if (vq->handle_output) {
-         vq->handle_output(vdev, vq);
-@@ -3145,6 +3146,7 @@ void virtio_init(VirtIODevice *vdev, const char *name=
-,
-         vdev->vq[i].vector =3D VIRTIO_NO_VECTOR;
-         vdev->vq[i].vdev =3D vdev;
-         vdev->vq[i].queue_index =3D i;
-+        vdev->vq[i].host_notifier_enabled =3D false;
-     }
-=20
-     vdev->name =3D name;
-@@ -3436,6 +3438,11 @@ EventNotifier *virtio_queue_get_host_notifier(VirtQu=
-eue *vq)
-     return &vq->host_notifier;
- }
-=20
-+void virtio_queue_set_host_notifier_enabled(VirtQueue *vq, bool enabled)
-+{
-+    vq->host_notifier_enabled =3D enabled;
-+}
-+
- int virtio_queue_set_host_notifier_mr(VirtIODevice *vdev, int n,
-                                       MemoryRegion *mr, bool assign)
- {
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 3448d67d2a..c32a815303 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -312,6 +312,7 @@ int virtio_device_grab_ioeventfd(VirtIODevice *vdev);
- void virtio_device_release_ioeventfd(VirtIODevice *vdev);
- bool virtio_device_ioeventfd_enabled(VirtIODevice *vdev);
- EventNotifier *virtio_queue_get_host_notifier(VirtQueue *vq);
-+void virtio_queue_set_host_notifier_enabled(VirtQueue *vq, bool enabled);
- void virtio_queue_host_notifier_read(EventNotifier *n);
- void virtio_queue_aio_set_host_notifier_handler(VirtQueue *vq, AioContext =
-*ctx,
-                                                 VirtIOHandleAIOOutput hand=
-le_output);
---=20
-2.23.0
-
+>
+> r~
 
