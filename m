@@ -2,69 +2,79 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20D7CC5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 22:13:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 439ABC5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 22:20:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5872217F4
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 22:13:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5872217F4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id F20292087E
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 22:20:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cx/xZJxm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F20292087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS74Y-0001UB-UL
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 17:13:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33447)
+	id 1iS7Bf-0008S5-4S
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 17:20:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49246)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iS6yt-0004m7-A2
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 17:07:20 -0500
+ (envelope-from <ehabkost@redhat.com>) id 1iS6fi-0001jt-NO
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 16:47:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iS6yq-00060r-Ve
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 17:07:18 -0500
-Resent-Date: Tue, 05 Nov 2019 17:07:18 -0500
-Resent-Message-Id: <E1iS6yq-00060r-Ve@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21427)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iS6yp-0005yB-1r
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 17:07:16 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1572991604; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=VIK5cykr0fr5vvraWIYKJHlflGtPj7omNtrnKhP3nT7piJBwVs97VLB/6eO34HWzciLP8c5cExqmuxEjUfdsM32rAPqAo535AI+qDtbxpDAgn/kVAIR9fy0ec45pnJZSrfw5vQ6t+m89eTt6u/lEWcJRSBDe6/gmyHY+4OrtJTk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1572991604;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=ww9Pn+TDWQ8dEVQ9UGglpG+oKi9pWelA9D66ZIxSGgE=; 
- b=fo9DuMp4rcaYmCsb85FieQJiGbLPKEgdp3gX6M7pQCoLZD32qiKaeqaUgJ7P9ArcnMfC1fjB2TSDUfBE3uj8AiURe5QOBaeWRsMvApPTrrIuPjeGX5x1lf9To1dAJui8iRSi+tjw/iwIMTaEhErigN8eFSrC9txKtGkT2DGcox4=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1572991601732808.8740265250677;
- Tue, 5 Nov 2019 14:06:41 -0800 (PST)
-In-Reply-To: <20191105181119.26779-1-laurent@vivier.eu>
-Subject: Re: [PULL 00/13] Linux user for 4.2 patches
-Message-ID: <157299160056.27285.4050632174467978305@37313f22b938>
+ (envelope-from <ehabkost@redhat.com>) id 1iS6ff-00045G-LG
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 16:47:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60664
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iS6fb-000434-0A
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 16:47:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1572990440;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=GNJYztu9V2q35xzvpCvzlxbCf4MquV3oufWVlEETdrI=;
+ b=cx/xZJxmEyn6VZj4GIYxQprkTerInGyMR+E6KZXMr77+7NydduIDuM9/DzvLl6Gm6kuMBu
+ iqBzTMrAls5ItpHu9TIwstnI/PmjqBD18oNuqNTlRCeTbNbauiMm197Lne0Djgxpzzoxos
+ yoC1dii3joeUAl17n03dWmaUlAm9pzA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-241-lM_n4WMxOi2nFkgOt1Osww-1; Tue, 05 Nov 2019 16:43:32 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53C458017DE;
+ Tue,  5 Nov 2019 21:43:30 +0000 (UTC)
+Received: from localhost (ovpn-116-57.gru2.redhat.com [10.97.116.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6F12E5C296;
+ Tue,  5 Nov 2019 21:43:27 +0000 (UTC)
+Date: Tue, 5 Nov 2019 18:43:25 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: "Moger, Babu" <Babu.Moger@amd.com>
+Subject: Re: [PATCH 1/2] i386: Add missing cpu feature bits in EPYC model
+Message-ID: <20191105214325.GL3812@habkost.net>
+References: <157298859935.17394.17194072829278152009.stgit@naples-babu.amd.com>
+ <157298864859.17394.12763030347823834590.stgit@naples-babu.amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: laurent@vivier.eu
-Date: Tue, 5 Nov 2019 14:06:41 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <157298864859.17394.12763030347823834590.stgit@naples-babu.amd.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: lM_n4WMxOi2nFkgOt1Osww-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,99 +86,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, mark.cave-ayland@ilande.co.uk, qemu-devel@nongnu.org,
- laurent@vivier.eu, alex.bennee@linaro.org, atar4qemu@gmail.com
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwNTE4MTExOS4yNjc3
-OS0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
-c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
-b3JtYXRpb246CgpTdWJqZWN0OiBbUFVMTCAwMC8xM10gTGludXggdXNlciBmb3IgNC4yIHBhdGNo
-ZXMKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkxMTA1MTgxMTE5LjI2Nzc5LTEtbGF1cmVu
-dEB2aXZpZXIuZXUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJl
-di1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
-Zi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQg
-Y29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3Bh
-dGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGlu
-ZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9n
-aXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAgIDM2NjA5YjQuLjQxMmZiZWYgIG1hc3Rl
-ciAgICAgLT4gbWFzdGVyClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOTY1Zjg0MiBs
-aW51eC11c2VyL2FscGhhOiBTZXQgcjIwIHNlY29uZGFyeSByZXR1cm4gdmFsdWUKYTU5Y2EzYiBs
-aW51eC11c2VyL3NwYXJjOiBGaXggY3B1X2Nsb25lX3JlZ3NfKgowNDZiYTBkIGxpbnV4LXVzZXI6
-IEludHJvZHVjZSBjcHVfY2xvbmVfcmVnc19wYXJlbnQKMWFmZTFiYyBsaW51eC11c2VyOiBSZW5h
-bWUgY3B1X2Nsb25lX3JlZ3MgdG8gY3B1X2Nsb25lX3JlZ3NfY2hpbGQKNzQ4ZGIxZSBsaW51eC11
-c2VyL3NwYXJjNjQ6IEZpeCB0YXJnZXRfc2lnbmFsX2ZyYW1lCjJlOTBjYzggbGludXgtdXNlci9z
-cGFyYzogRml4IFdSRUcgdXNhZ2UgaW4gc2V0dXBfZnJhbWUKNjA4Zjk5NyBsaW51eC11c2VyL3Nw
-YXJjOiBVc2UgV1JFR19TUCBjb25zdGFudCBpbiBzcGFyYy9zaWduYWwuYwoyNzk1MzBiIGxpbnV4
-LXVzZXIvc3BhcmM6IEJlZ2luIHVzaW5nIFdSRUcgY29uc3RhbnRzIGluIHNwYXJjL3NpZ25hbC5j
-CjNkMjc4MzcgbGludXgtdXNlci9zcGFyYzogVXNlIFdSRUcgY29uc3RhbnRzIGluIHNwYXJjL3Rh
-cmdldF9jcHUuaApiMzA0MzdjIHRhcmdldC9zcGFyYzogRGVmaW5lIGFuIGVudW1lcmF0aW9uIGZv
-ciBhY2Nlc3NpbmcgZW52LT5yZWd3cHRyCjEyOGI1MmQgdGVzdHMvdGNnL211bHRpYXJjaC9saW51
-eC10ZXN0OiBGaXggZXJyb3IgY2hlY2sgZm9yIHNobWF0CmU3OGI1ZWMgc2NyaXB0cy9xZW11LWJp
-bmZtdC1jb25mOiBVcGRhdGUgZm9yIHNwYXJjNjQKNWE2YjBmNCBsaW51eC11c2VyOiBTdXBwb3J0
-IGZvciBORVRMSU5LIHNvY2tldCBvcHRpb25zCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEzIENo
-ZWNraW5nIGNvbW1pdCA1YTZiMGY0NmM2NzAgKGxpbnV4LXVzZXI6IFN1cHBvcnQgZm9yIE5FVExJ
-Tksgc29ja2V0IG9wdGlvbnMpCjIvMTMgQ2hlY2tpbmcgY29tbWl0IGU3OGI1ZWMyODY3ZSAoc2Ny
-aXB0cy9xZW11LWJpbmZtdC1jb25mOiBVcGRhdGUgZm9yIHNwYXJjNjQpCldBUk5JTkc6IGxpbmUg
-b3ZlciA4MCBjaGFyYWN0ZXJzCiMzNjogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1jb25mLnNo
-OjQxOgorc3BhcmM2NF9tYWdpYz0nXHg3ZkVMRlx4MDJceDAyXHgwMVx4MDBceDAwXHgwMFx4MDBc
-eDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAyXHgwMFx4MmInCgpFUlJPUjogbGluZSBvdmVyIDkw
-IGNoYXJhY3RlcnMKIzM3OiBGSUxFOiBzY3JpcHRzL3FlbXUtYmluZm10LWNvbmYuc2g6NDI6Citz
-cGFyYzY0X21hc2s9J1x4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceDAwXHhmZlx4ZmZceGZm
-XHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZVx4ZmZceGZmJwoKdG90YWw6IDEgZXJyb3JzLCAx
-IHdhcm5pbmdzLCAyMCBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzEzIGhhcyBzdHlsZSBwcm9ibGVt
-cywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0
-aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJ
-TlRBSU5FUlMuCgozLzEzIENoZWNraW5nIGNvbW1pdCAxMjhiNTJkODE2NDUgKHRlc3RzL3RjZy9t
-dWx0aWFyY2gvbGludXgtdGVzdDogRml4IGVycm9yIGNoZWNrIGZvciBzaG1hdCkKNC8xMyBDaGVj
-a2luZyBjb21taXQgYjMwNDM3YzFiNTFmICh0YXJnZXQvc3BhcmM6IERlZmluZSBhbiBlbnVtZXJh
-dGlvbiBmb3IgYWNjZXNzaW5nIGVudi0+cmVnd3B0cikKNS8xMyBDaGVja2luZyBjb21taXQgM2Qy
-NzgzNzEzOWYwIChsaW51eC11c2VyL3NwYXJjOiBVc2UgV1JFRyBjb25zdGFudHMgaW4gc3BhcmMv
-dGFyZ2V0X2NwdS5oKQo2LzEzIENoZWNraW5nIGNvbW1pdCAyNzk1MzBiOWNhZWIgKGxpbnV4LXVz
-ZXIvc3BhcmM6IEJlZ2luIHVzaW5nIFdSRUcgY29uc3RhbnRzIGluIHNwYXJjL3NpZ25hbC5jKQpF
-UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcrJyAoY3R4OlZ4VikKIzUyOiBGSUxF
-OiBsaW51eC11c2VyL3NwYXJjL3NpZ25hbC5jOjE1MToKKyAgICAgICAgX19wdXRfdXNlcihlbnYt
-PnJlZ3dwdHJbV1JFR19PMCArIGldLCAmc2ktPnNpX3JlZ3MudV9yZWdzW2krOF0pOwogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJysnIChjdHg6VnhWKQoj
-MTI0OiBGSUxFOiBsaW51eC11c2VyL3NwYXJjL3NpZ25hbC5jOjI5MDoKKyAgICAgICAgX19nZXRf
-dXNlcihlbnYtPnJlZ3dwdHJbaSArIFdSRUdfTzBdLCAmc2YtPmluZm8uc2lfcmVncy51X3JlZ3Nb
-aSs4XSk7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0
-aGF0ICcrJyAoY3R4OlZ4VikKIzE3MTogRklMRTogbGludXgtdXNlci9zcGFyYy9zaWduYWwuYzo0
-NjA6CisgICAgd19hZGRyID0gVEFSR0VUX1NUQUNLX0JJQVMrZW52LT5yZWd3cHRyW1dSRUdfTzZd
-OwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJl
-ZCBhcm91bmQgdGhhdCAnKycgKGN0eDpWeFYpCiMyMDY6IEZJTEU6IGxpbnV4LXVzZXIvc3BhcmMv
-c2lnbmFsLmM6NTYzOgorICAgIHdfYWRkciA9IFRBUkdFVF9TVEFDS19CSUFTK2Vudi0+cmVnd3B0
-cltXUkVHX082XTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiA0IGVy
-cm9ycywgMCB3YXJuaW5ncywgMTc1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMTMgaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCjcvMTMgQ2hlY2tpbmcgY29tbWl0IDYwOGY5OTcyNWVhNiAobGlu
-dXgtdXNlci9zcGFyYzogVXNlIFdSRUdfU1AgY29uc3RhbnQgaW4gc3BhcmMvc2lnbmFsLmMpCjgv
-MTMgQ2hlY2tpbmcgY29tbWl0IDJlOTBjYzg4OWY1YSAobGludXgtdXNlci9zcGFyYzogRml4IFdS
-RUcgdXNhZ2UgaW4gc2V0dXBfZnJhbWUpCjkvMTMgQ2hlY2tpbmcgY29tbWl0IDc0OGRiMWU4ODU2
-YiAobGludXgtdXNlci9zcGFyYzY0OiBGaXggdGFyZ2V0X3NpZ25hbF9mcmFtZSkKRVJST1I6IHNw
-YWNlIHByb2hpYml0ZWQgYmV0d2VlbiBmdW5jdGlvbiBuYW1lIGFuZCBvcGVuIHBhcmVudGhlc2lz
-ICcoJwojMjQ6IEZJTEU6IGxpbnV4LXVzZXIvc3BhcmMvc2lnbmFsLmM6OTA6CisgICAgdWludDMy
-X3QgICAgICAgICAgICBpbnNuc1syXSBfX2F0dHJpYnV0ZV9fICgoYWxpZ25lZCAoOCkpKTsKCnRv
-dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgMTYgbGluZXMgY2hlY2tlZAoKUGF0Y2ggOS8xMyBo
-YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
-CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
-SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKMTAvMTMgQ2hlY2tpbmcgY29tbWl0IDFhZmUxYmNl
-MDkxOSAobGludXgtdXNlcjogUmVuYW1lIGNwdV9jbG9uZV9yZWdzIHRvIGNwdV9jbG9uZV9yZWdz
-X2NoaWxkKQoxMS8xMyBDaGVja2luZyBjb21taXQgMDQ2YmEwZDYyODY2IChsaW51eC11c2VyOiBJ
-bnRyb2R1Y2UgY3B1X2Nsb25lX3JlZ3NfcGFyZW50KQoxMi8xMyBDaGVja2luZyBjb21taXQgYTU5
-Y2EzYjg1MzgxIChsaW51eC11c2VyL3NwYXJjOiBGaXggY3B1X2Nsb25lX3JlZ3NfKikKMTMvMTMg
-Q2hlY2tpbmcgY29tbWl0IDk2NWY4NDJmNTdmNiAobGludXgtdXNlci9hbHBoYTogU2V0IHIyMCBz
-ZWNvbmRhcnkgcmV0dXJuIHZhbHVlKQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
-eGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8v
-cGF0Y2hldy5vcmcvbG9ncy8yMDE5MTEwNTE4MTExOS4yNjc3OS0xLWxhdXJlbnRAdml2aWVyLmV1
-L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1
-dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2Vu
-ZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+On Tue, Nov 05, 2019 at 09:17:30PM +0000, Moger, Babu wrote:
+> Adds the following missing CPUID bits:
+> perfctr-core : core performance counter extensions support. Enables the V=
+M
+>                to use extended performance counter support. It enables si=
+x
+>                programmable counters instead of 4 counters.
+> clzero       : instruction zeroes out the 64 byte cache line specified in=
+ RAX.
+> xsaveerptr   : XSAVE, XSAVE, FXSAVEOPT, XSAVEC, XSAVES always save error
+>                pointers and FXRSTOR, XRSTOR, XRSTORS always restore error
+>                pointers.
+> ibpb         : Indirect Branch Prediction Barrie.
+> xsaves       : XSAVES, XRSTORS and IA32_XSS supported.
+>=20
+> Depends on:
+> 40bc47b08b6e ("kvm: x86: Enumerate support for CLZERO instruction")
+> 504ce1954fba ("KVM: x86: Expose XSAVEERPTR to the guest")
+> 52297436199d ("kvm: svm: Update svm_xsaves_supported")
+>=20
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
+> ---
+>  hw/i386/pc.c      |    8 +++++++-
+>  target/i386/cpu.c |   11 +++++------
+>  2 files changed, 12 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 51b72439b4..a72fe1db31 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -105,7 +105,13 @@ struct hpet_fw_config hpet_cfg =3D {.count =3D UINT8=
+_MAX};
+>  /* Physical Address of PVH entry point read from kernel ELF NOTE */
+>  static size_t pvh_start_addr;
+> =20
+> -GlobalProperty pc_compat_4_1[] =3D {};
+> +GlobalProperty pc_compat_4_1[] =3D {
+> +    { "EPYC" "-" TYPE_X86_CPU, "perfctr-core", "off" },
+> +    { "EPYC" "-" TYPE_X86_CPU, "clzero", "off" },
+> +    { "EPYC" "-" TYPE_X86_CPU, "xsaveerptr", "off" },
+> +    { "EPYC" "-" TYPE_X86_CPU, "ibpb", "off" },
+> +    { "EPYC" "-" TYPE_X86_CPU, "xsaves", "off" },
+> +};
+
+machine-type-based CPU compatibility was now replaced by
+versioned CPU models.  Please use the X86CPUDefinition.versions
+field to add a new version of EPYC instead.
+
+>  const size_t pc_compat_4_1_len =3D G_N_ELEMENTS(pc_compat_4_1);
+> =20
+>  GlobalProperty pc_compat_4_0[] =3D {};
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 07cf562d89..71233e6310 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -3110,19 +3110,18 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
+>              CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
+>              CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
+>              CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
+> -            CPUID_EXT3_TOPOEXT,
+> +            CPUID_EXT3_TOPOEXT | CPUID_EXT3_PERFCORE,
+> +        .features[FEAT_8000_0008_EBX] =3D
+> +            CPUID_8000_0008_EBX_CLZERO | CPUID_8000_0008_EBX_XSAVEERPTR =
+|
+> +            CPUID_8000_0008_EBX_IBPB,
+>          .features[FEAT_7_0_EBX] =3D
+>              CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_=
+AVX2 |
+>              CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_RDSE=
+ED |
+>              CPUID_7_0_EBX_ADX | CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_CLFLU=
+SHOPT |
+>              CPUID_7_0_EBX_SHA_NI,
+> -        /* Missing: XSAVES (not supported by some Linux versions,
+> -         * including v4.1 to v4.12).
+> -         * KVM doesn't yet expose any XSAVES state save component.
+> -         */
+>          .features[FEAT_XSAVE] =3D
+>              CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+> -            CPUID_XSAVE_XGETBV1,
+> +            CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES,
+>          .features[FEAT_6_EAX] =3D
+>              CPUID_6_EAX_ARAT,
+>          .features[FEAT_SVM] =3D
+>=20
+
+--=20
+Eduardo
 
 
