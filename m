@@ -6,44 +6,43 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75906C49EAA
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFAB6C49EAB
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:21:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B41D20717
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:20:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B41D20717
+	by mail.kernel.org (Postfix) with ESMTPS id A574020717
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:21:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A574020717
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRv1B-0006Vs-AR
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 04:20:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43160)
+	id 1iRv1L-0006mn-Cr
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 04:21:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43179)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1iRusz-00055N-Qy
+ (envelope-from <guoheyi@huawei.com>) id 1iRut0-000568-5p
  for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:12:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1iRusy-0007ol-9S
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:12:25 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:52082 helo=huawei.com)
+ (envelope-from <guoheyi@huawei.com>) id 1iRusz-0007pP-0s
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:12:26 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:52116 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1iRusv-0007j4-1U; Tue, 05 Nov 2019 04:12:21 -0500
+ id 1iRusv-0007j8-79; Tue, 05 Nov 2019 04:12:21 -0500
 Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 2C00798C75144E635ABB;
+ by Forcepoint Email with ESMTP id 3294EB169FFE9A49559A;
  Tue,  5 Nov 2019 17:12:18 +0800 (CST)
 Received: from linux-OtBuvb.huawei.com (10.175.104.212) by
  DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 5 Nov 2019 17:12:08 +0800
+ 14.3.439.0; Tue, 5 Nov 2019 17:12:10 +0800
 From: Heyi Guo <guoheyi@huawei.com>
 To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>
-Subject: [RFC v2 10/14] arm/sdei: add support to register interrupt bind
- notifier
-Date: Tue, 5 Nov 2019 17:10:52 +0800
-Message-ID: <20191105091056.9541-11-guoheyi@huawei.com>
+Subject: [RFC v2 13/14] arm/kvm: handle guest exit of hypercall
+Date: Tue, 5 Nov 2019 17:10:55 +0800
+Message-ID: <20191105091056.9541-14-guoheyi@huawei.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20191105091056.9541-1-guoheyi@huawei.com>
 References: <20191105091056.9541-1-guoheyi@huawei.com>
@@ -74,9 +73,8 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Other qemu modules related with the interrupt bind operation may want
-to be notified when guest requests to bind interrupt to sdei event, so
-we add register and unregister interfaces.
+Add support to handle guest exit of hypercall, and forward to SDEI
+dispatcher if SDEI is enabled and it is an SDEI request.
 
 Signed-off-by: Heyi Guo <guoheyi@huawei.com>
 Cc: Peter Maydell <peter.maydell@linaro.org>
@@ -85,115 +83,53 @@ Cc: Marc Zyngier <marc.zyngier@arm.com>
 Cc: Mark Rutland <mark.rutland@arm.com>
 Cc: James Morse <james.morse@arm.com>
 ---
- target/arm/sdei.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++
- target/arm/sdei.h | 17 +++++++++++++++++
- 2 files changed, 65 insertions(+)
+ target/arm/kvm.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/target/arm/sdei.c b/target/arm/sdei.c
-index 529a06c1f6..4cc68e4acf 100644
---- a/target/arm/sdei.c
-+++ b/target/arm/sdei.c
-@@ -48,6 +48,52 @@
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index b473c63edb..035a39e49f 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -30,6 +30,7 @@
+ #include "hw/boards.h"
+ #include "hw/irq.h"
+ #include "qemu/log.h"
++#include "sdei.h"
 =20
- static QemuSDEState *sde_state;
+ const KVMCapabilityInfo kvm_arch_required_capabilities[] =3D {
+     KVM_CAP_LAST_INFO
+@@ -676,6 +677,19 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kv=
+m_run *run)
+ }
 =20
-+typedef struct QemuSDEIBindNotifyEntry {
-+    QTAILQ_ENTRY(QemuSDEIBindNotifyEntry) entry;
-+    QemuSDEIBindNotify *func;
-+    void *opaque;
-+    int irq;
-+} QemuSDEIBindNotifyEntry;
-+
-+static QTAILQ_HEAD(, QemuSDEIBindNotifyEntry) bind_notifiers =3D
-+    QTAILQ_HEAD_INITIALIZER(bind_notifiers);
-+
-+void qemu_register_sdei_bind_notifier(QemuSDEIBindNotify *func,
-+                                      void *opaque, int irq)
+=20
++static void kvm_arm_handle_hypercall(CPUState *cs, struct kvm_run *run)
 +{
-+    QemuSDEIBindNotifyEntry *be =3D g_new0(QemuSDEIBindNotifyEntry, 1);
++    uint32_t func_id =3D run->hypercall.args[0];
 +
-+    be->func =3D func;
-+    be->opaque =3D opaque;
-+    be->irq =3D irq;
-+    QTAILQ_INSERT_TAIL(&bind_notifiers, be, entry);
-+}
-+
-+void qemu_unregister_sdei_bind_notifier(QemuSDEIBindNotify *func,
-+                                        void *opaque, int irq)
-+{
-+    QemuSDEIBindNotifyEntry *be;
-+
-+    QTAILQ_FOREACH(be, &bind_notifiers, entry) {
-+        if (be->func =3D=3D func && be->opaque =3D=3D opaque && be->irq =
-=3D=3D irq) {
-+            QTAILQ_REMOVE(&bind_notifiers, be, entry);
-+            g_free(be);
-+            return;
-+        }
++    if (sdei_enabled &&
++        func_id >=3D SDEI_1_0_FN_BASE && func_id <=3D SDEI_MAX_REQ) {
++        sdei_handle_request(cs, run);
++        return;
 +    }
++
++    run->hypercall.args[0] =3D -1;
 +}
 +
-+static void sdei_notify_bind(int irq, int32_t event, bool bind)
-+{
-+    QemuSDEIBindNotifyEntry *be, *nbe;
-+
-+    QTAILQ_FOREACH_SAFE(be, &bind_notifiers, entry, nbe) {
-+        if (be->irq =3D=3D irq) {
-+            be->func(be->opaque, irq, event, bind);
-+        }
-+    }
-+}
-+
- static void qemu_sde_prop_init(QemuSDEState *s)
+ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
  {
-     QemuSDEProp *sde_props =3D s->sde_props_state;
-@@ -529,6 +575,7 @@ static int32_t sdei_alloc_event_num(QemuSDEState *s, =
-bool is_critical,
-             sde_props[index].interrupt =3D intid;
-             sde_props[index].is_shared =3D is_shared;
-             sde_props[index].is_critical =3D is_critical;
-+            sdei_notify_bind(intid, event, true);
-             override_qemu_irq(s, event, intid);
-             s->irq_map[intid] =3D event;
-             qemu_mutex_unlock(&sde_props[index].lock);
-@@ -547,6 +594,7 @@ static int32_t sdei_free_event_num_locked(QemuSDEStat=
-e *s, QemuSDEProp *prop)
-         return SDEI_DENIED;
-     }
-=20
-+    sdei_notify_bind(prop->interrupt, prop->event_id, false);
-     restore_qemu_irq(s, prop->event_id, prop->interrupt);
-     s->irq_map[prop->interrupt] =3D SDEI_INVALID_EVENT_ID;
-     prop->event_id =3D SDEI_INVALID_EVENT_ID;
-diff --git a/target/arm/sdei.h b/target/arm/sdei.h
-index 5ecc32d667..9c15cf3186 100644
---- a/target/arm/sdei.h
-+++ b/target/arm/sdei.h
-@@ -38,4 +38,21 @@ void sdei_handle_request(CPUState *cs, struct kvm_run =
-*run);
-  */
- bool trigger_sdei_by_irq(int cpu, int irq);
-=20
-+/*
-+ * Notify callback prototype; the argument "bind" tells whether it is a =
-bind
-+ * operation or unbind one.
-+ */
-+typedef void QemuSDEIBindNotify(void *opaque, int irq,
-+                                int32_t event, bool bind);
-+/*
-+ * Register a notify callback for a specific interrupt bind operation; t=
-he
-+ * client will be both notified by bind and unbind operation.
-+ */
-+void qemu_register_sdei_bind_notifier(QemuSDEIBindNotify *func,
-+                                      void *opaque, int irq);
-+/*
-+ * Unregister a notify callback for a specific interrupt bind operation.
-+ */
-+void qemu_unregister_sdei_bind_notifier(QemuSDEIBindNotify *func,
-+                                        void *opaque, int irq);
- #endif
+     int ret =3D 0;
+@@ -686,6 +700,9 @@ int kvm_arch_handle_exit(CPUState *cs, struct kvm_run=
+ *run)
+             ret =3D EXCP_DEBUG;
+         } /* otherwise return to guest */
+         break;
++    case KVM_EXIT_HYPERCALL:
++        kvm_arm_handle_hypercall(cs, run);
++        break;
+     default:
+         qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
+                       __func__, run->exit_reason);
 --=20
 2.19.1
 
