@@ -2,92 +2,82 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5699C5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 878F4C5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:06:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96B0F2087E
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:06:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96B0F2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 481BA21882
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:06:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 481BA21882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS61a-00077I-IL
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 16:06:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58386)
+	id 1iS61o-0007S4-1B
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 16:06:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58210)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5p6-0000SU-NN
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:10 -0500
+ (envelope-from <mst@redhat.com>) id 1iS5p2-0000Kp-Dt
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5p4-00020P-VH
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:08 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:24870)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iS5p4-0001zd-M5; Tue, 05 Nov 2019 15:53:06 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- xA5KpZMD027593; Tue, 5 Nov 2019 15:53:05 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2w3g6dgk8e-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 15:53:05 -0500
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id xA5KpqEP028586;
- Tue, 5 Nov 2019 15:53:04 -0500
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.27])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2w3g6dgk7n-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 15:53:04 -0500
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
- by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xA5KnwPe017465;
- Tue, 5 Nov 2019 20:53:03 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
- [9.57.198.25]) by ppma05wdc.us.ibm.com with ESMTP id 2w11e7185s-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 20:53:03 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
- [9.57.199.107])
- by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xA5Kr3WN48562638
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 5 Nov 2019 20:53:03 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id DF15012405C;
- Tue,  5 Nov 2019 20:53:02 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CBC1112405B;
- Tue,  5 Nov 2019 20:53:02 +0000 (GMT)
-Received: from localhost (unknown [9.53.179.218])
- by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  5 Nov 2019 20:53:02 +0000 (GMT)
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 28/55] curl: Handle success in multi_check_completion
-Date: Tue,  5 Nov 2019 14:52:16 -0600
-Message-Id: <20191105205243.3766-29-mdroth@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191105205243.3766-1-mdroth@linux.vnet.ibm.com>
-References: <20191105205243.3766-1-mdroth@linux.vnet.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-11-05_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1911050170
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+ (envelope-from <mst@redhat.com>) id 1iS5p0-0001wV-GU
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56856)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iS5p0-0001vr-65
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:02 -0500
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 44EEF369AF
+ for <qemu-devel@nongnu.org>; Tue,  5 Nov 2019 20:53:01 +0000 (UTC)
+Received: by mail-qt1-f200.google.com with SMTP id c32so23782407qtb.14
+ for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 12:53:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=csPHTzvEF6p0v4SejEaaXBZN7WwPJe9AL1C9qikcaYo=;
+ b=qdPl22e+tuV/3uRFY7sunn1Kp4C+VKdZNMk269TwF1ZkVpCRtKcFz4rsx3XWrYP2gu
+ gVYjS7XUD3oeBUNbuiuLbbnx0rHRST8WP7qkBSKoyBugBQ5RQb5VXLhQc+VEk8Z/T1cW
+ M8RIczLj+aqmGw7XWoj/JwvzVN2M/sa1RwlADZe6yBIjAcXRS0eqgIbSNutxoVHGRAKx
+ V+O0nZQBAdS1fX+TTRykuj6rrlDb3u1zRUFf57objWA4+jQsjD1XTJdBVqdYhkygpR/0
+ 3eKzx0HAKLX8Jt9t/tvTejoJpSOqsH7v/Sn3yEqijSaCoHoRuosPoWbyySOj+zSLBDQG
+ UxNQ==
+X-Gm-Message-State: APjAAAV1bU0LwWnS3o1N/VrtNQb7pp4OMIul6hXt2CdXqL7PxFknSHJ1
+ s+wFpyPGtO4QJYmvzXqK8f62ZW7Y4Ogf7rlhKFN8rqWiIc8VJtSjBdJbxfRWUFrvzZkpLkXDv/h
+ kmM8Rk1oI4JF8tqo=
+X-Received: by 2002:a37:ad8:: with SMTP id 207mr8309381qkk.492.1572987180351; 
+ Tue, 05 Nov 2019 12:53:00 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxyT4Wm+DIPwheuSWTIWaHSByHOomyhKKaJQ/PZJcMjMPCQt0b3wDqVVGoFXXbVMRvFFZ2aYw==
+X-Received: by 2002:a37:ad8:: with SMTP id 207mr8309369qkk.492.1572987180012; 
+ Tue, 05 Nov 2019 12:53:00 -0800 (PST)
+Received: from redhat.com (bzq-79-178-12-128.red.bezeqint.net. [79.178.12.128])
+ by smtp.gmail.com with ESMTPSA id g126sm11062375qkb.133.2019.11.05.12.52.56
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 05 Nov 2019 12:52:59 -0800 (PST)
+Date: Tue, 5 Nov 2019 15:52:53 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Denis Plotnikov <dplotnikov@virtuozzo.com>
+Subject: Re: [PATCH v1 3/4] virtio: increase virtuqueue sizes in new machine
+ types
+Message-ID: <20191105155224-mutt-send-email-mst@kernel.org>
+References: <20191105161105.19016-1-dplotnikov@virtuozzo.com>
+ <20191105161105.19016-4-dplotnikov@virtuozzo.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191105161105.19016-4-dplotnikov@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,155 +89,200 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: fam@euphon.net, kwolf@redhat.com, stefanha@redhat.com,
+ qemu-block@nongnu.org, den@virtuozzo.com, qemu-devel@nongnu.org,
+ mreitz@redhat.com, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+On Tue, Nov 05, 2019 at 07:11:04PM +0300, Denis Plotnikov wrote:
+> Linux guests submit IO requests no longer than PAGE_SIZE * max_seg
+> field reported by SCSI controler. Thus typical sequential read with
+> 1 MB size results in the following pattern of the IO from the guest:
+>   8,16   1    15754     2.766095122  2071  D   R 2095104 + 1008 [dd]
+>   8,16   1    15755     2.766108785  2071  D   R 2096112 + 1008 [dd]
+>   8,16   1    15756     2.766113486  2071  D   R 2097120 + 32 [dd]
+>   8,16   1    15757     2.767668961     0  C   R 2095104 + 1008 [0]
+>   8,16   1    15758     2.768534315     0  C   R 2096112 + 1008 [0]
+>   8,16   1    15759     2.768539782     0  C   R 2097120 + 32 [0]
+> The IO was generated by
+>   dd if=/dev/sda of=/dev/null bs=1024 iflag=direct
+> 
+> This effectively means that on rotational disks we will observe 3 IOPS
+> for each 2 MBs processed. This definitely negatively affects both
+> guest and host IO performance.
+> 
+> The cure is relatively simple - we should report lengthy scatter-gather
+> ability of the SCSI controller. Fortunately the situation here is very
+> good. VirtIO transport layer can accomodate 1024 items in one request
+> while we are using only 128. This situation is present since almost
+> very beginning. 2 items are dedicated for request metadata thus we
+> should publish VIRTQUEUE_MAX_SIZE - 2 as max_seg.
+> 
+> The following pattern is observed after the patch:
+>   8,16   1     9921     2.662721340  2063  D   R 2095104 + 1024 [dd]
+>   8,16   1     9922     2.662737585  2063  D   R 2096128 + 1024 [dd]
+>   8,16   1     9923     2.665188167     0  C   R 2095104 + 1024 [0]
+>   8,16   1     9924     2.665198777     0  C   R 2096128 + 1024 [0]
+> which is much better.
+> 
+> To fix this particular case, the patch adds new machine types with
+> extended virtqueue sizes to 256 which also increases max_seg to 254
+> implicitly.
+> 
+> Suggested-by: Denis V. Lunev <den@openvz.org>
+> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+> ---
 
-Background: As of cURL 7.59.0, it verifies that several functions are
-not called from within a callback.  Among these functions is
-curl_multi_add_handle().
 
-curl_read_cb() is a callback from cURL and not a coroutine.  Waking up
-acb->co will lead to entering it then and there, which means the current
-request will settle and the caller (if it runs in the same coroutine)
-may then issue the next request.  In such a case, we will enter
-curl_setup_preadv() effectively from within curl_read_cb().
 
-Calling curl_multi_add_handle() will then fail and the new request will
-not be processed.
+the way we normally do this is change the defaults to 256.
+what is wrong with doing that?
 
-Fix this by not letting curl_read_cb() wake up acb->co.  Instead, leave
-the whole business of settling the AIOCB objects to
-curl_multi_check_completion() (which is called from our timer callback
-and our FD handler, so not from any cURL callbacks).
 
-Reported-by: Natalie Gavrielov <ngavrilo@redhat.com>
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1740193
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-id: 20190910124136.10565-7-mreitz@redhat.com
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit bfb23b480a49114315877aacf700b49453e0f9d9)
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- block/curl.c | 69 ++++++++++++++++++++++------------------------------
- 1 file changed, 29 insertions(+), 40 deletions(-)
-
-diff --git a/block/curl.c b/block/curl.c
-index fd70f1ebc4..c343c7ed3d 100644
---- a/block/curl.c
-+++ b/block/curl.c
-@@ -229,7 +229,6 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
- {
-     CURLState *s = ((CURLState*)opaque);
-     size_t realsize = size * nmemb;
--    int i;
- 
-     trace_curl_read_cb(realsize);
- 
-@@ -245,32 +244,6 @@ static size_t curl_read_cb(void *ptr, size_t size, size_t nmemb, void *opaque)
-     memcpy(s->orig_buf + s->buf_off, ptr, realsize);
-     s->buf_off += realsize;
- 
--    for(i=0; i<CURL_NUM_ACB; i++) {
--        CURLAIOCB *acb = s->acb[i];
--
--        if (!acb)
--            continue;
--
--        if ((s->buf_off >= acb->end)) {
--            size_t request_length = acb->bytes;
--
--            qemu_iovec_from_buf(acb->qiov, 0, s->orig_buf + acb->start,
--                                acb->end - acb->start);
--
--            if (acb->end - acb->start < request_length) {
--                size_t offset = acb->end - acb->start;
--                qemu_iovec_memset(acb->qiov, offset, 0,
--                                  request_length - offset);
--            }
--
--            acb->ret = 0;
--            s->acb[i] = NULL;
--            qemu_mutex_unlock(&s->s->mutex);
--            aio_co_wake(acb->co);
--            qemu_mutex_lock(&s->s->mutex);
--        }
--    }
--
- read_end:
-     /* curl will error out if we do not return this value */
-     return size * nmemb;
-@@ -351,13 +324,14 @@ static void curl_multi_check_completion(BDRVCURLState *s)
-             break;
- 
-         if (msg->msg == CURLMSG_DONE) {
-+            int i;
-             CURLState *state = NULL;
-+            bool error = msg->data.result != CURLE_OK;
-+
-             curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE,
-                               (char **)&state);
- 
--            /* ACBs for successful messages get completed in curl_read_cb */
--            if (msg->data.result != CURLE_OK) {
--                int i;
-+            if (error) {
-                 static int errcount = 100;
- 
-                 /* Don't lose the original error message from curl, since
-@@ -369,20 +343,35 @@ static void curl_multi_check_completion(BDRVCURLState *s)
-                         error_report("curl: further errors suppressed");
-                     }
-                 }
-+            }
- 
--                for (i = 0; i < CURL_NUM_ACB; i++) {
--                    CURLAIOCB *acb = state->acb[i];
-+            for (i = 0; i < CURL_NUM_ACB; i++) {
-+                CURLAIOCB *acb = state->acb[i];
- 
--                    if (acb == NULL) {
--                        continue;
--                    }
-+                if (acb == NULL) {
-+                    continue;
-+                }
-+
-+                if (!error) {
-+                    /* Assert that we have read all data */
-+                    assert(state->buf_off >= acb->end);
-+
-+                    qemu_iovec_from_buf(acb->qiov, 0,
-+                                        state->orig_buf + acb->start,
-+                                        acb->end - acb->start);
- 
--                    acb->ret = -EIO;
--                    state->acb[i] = NULL;
--                    qemu_mutex_unlock(&s->mutex);
--                    aio_co_wake(acb->co);
--                    qemu_mutex_lock(&s->mutex);
-+                    if (acb->end - acb->start < acb->bytes) {
-+                        size_t offset = acb->end - acb->start;
-+                        qemu_iovec_memset(acb->qiov, offset, 0,
-+                                          acb->bytes - offset);
-+                    }
-                 }
-+
-+                acb->ret = error ? -EIO : 0;
-+                state->acb[i] = NULL;
-+                qemu_mutex_unlock(&s->mutex);
-+                aio_co_wake(acb->co);
-+                qemu_mutex_lock(&s->mutex);
-             }
- 
-             curl_clean_state(state);
--- 
-2.17.1
-
+>  hw/core/machine.c   | 14 ++++++++++++++
+>  hw/i386/pc_piix.c   | 16 +++++++++++++---
+>  hw/i386/pc_q35.c    | 14 ++++++++++++--
+>  include/hw/boards.h |  6 ++++++
+>  4 files changed, 45 insertions(+), 5 deletions(-)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 55b08f1466..28013a0e3f 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -24,6 +24,13 @@
+>  #include "hw/pci/pci.h"
+>  #include "hw/mem/nvdimm.h"
+>  
+> +GlobalProperty hw_compat_4_0_1[] = {
+> +    { "virtio-blk-device", "queue-size", "128" },
+> +    { "virtio-scsi-device", "virtqueue_size", "128" },
+> +    { "vhost-scsi-device", "virtqueue_size", "128" },
+> +};
+> +const size_t hw_compat_4_0_1_len = G_N_ELEMENTS(hw_compat_4_0_1);
+> +
+>  GlobalProperty hw_compat_4_0[] = {
+>      { "virtio-balloon-device", "qemu-4-0-config-size", "true" },
+>  };
+> @@ -157,6 +164,13 @@ GlobalProperty hw_compat_2_1[] = {
+>  };
+>  const size_t hw_compat_2_1_len = G_N_ELEMENTS(hw_compat_2_1);
+>  
+> +GlobalProperty hw_compat[] = {
+> +    { "virtio-blk-device", "queue-size", "256" },
+> +    { "virtio-scsi-device", "virtqueue_size", "256" },
+> +    { "vhost-scsi-device", "virtqueue_size", "256" },
+> +};
+> +const size_t hw_compat_len = G_N_ELEMENTS(hw_compat);
+> +
+>  static char *machine_get_accel(Object *obj, Error **errp)
+>  {
+>      MachineState *ms = MACHINE(obj);
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 8ad8e885c6..2260a61b1b 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -426,15 +426,27 @@ static void pc_i440fx_machine_options(MachineClass *m)
+>      m->default_machine_opts = "firmware=bios-256k.bin";
+>      m->default_display = "std";
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+> +    compat_props_add(m->compat_props, hw_compat, hw_compat_len);
+>  }
+>  
+> -static void pc_i440fx_4_0_machine_options(MachineClass *m)
+> +static void pc_i440fx_4_0_2_machine_options(MachineClass *m)
+>  {
+>      pc_i440fx_machine_options(m);
+>      m->alias = "pc";
+>      m->is_default = 1;
+>  }
+>  
+> +DEFINE_I440FX_MACHINE(v4_0_2, "pc-i440fx-4.0.2", NULL,
+> +                      pc_i440fx_4_0_2_machine_options);
+> +
+> +static void pc_i440fx_4_0_machine_options(MachineClass *m)
+> +{
+> +    pc_i440fx_4_0_2_machine_options(m);
+> +    m->alias = NULL;
+> +    m->is_default = 0;
+> +    compat_props_add(m->compat_props, hw_compat_4_0_1, hw_compat_4_0_1_len);
+> +}
+> +
+>  DEFINE_I440FX_MACHINE(v4_0, "pc-i440fx-4.0", NULL,
+>                        pc_i440fx_4_0_machine_options);
+>  
+> @@ -443,9 +455,7 @@ static void pc_i440fx_3_1_machine_options(MachineClass *m)
+>      PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+>  
+>      pc_i440fx_4_0_machine_options(m);
+> -    m->is_default = 0;
+>      m->smbus_no_migration_support = true;
+> -    m->alias = NULL;
+>      pcmc->pvh_enabled = false;
+>      compat_props_add(m->compat_props, hw_compat_3_1, hw_compat_3_1_len);
+>      compat_props_add(m->compat_props, pc_compat_3_1, pc_compat_3_1_len);
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 45cc29d1ad..50ccd9ebcf 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -363,14 +363,25 @@ static void pc_q35_machine_options(MachineClass *m)
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_INTEL_IOMMU_DEVICE);
+>      machine_class_allow_dynamic_sysbus_dev(m, TYPE_RAMFB_DEVICE);
+>      m->max_cpus = 288;
+> +    compat_props_add(m->compat_props, hw_compat, hw_compat_len);
+>  }
+>  
+> -static void pc_q35_4_0_1_machine_options(MachineClass *m)
+> +static void pc_q35_4_0_2_machine_options(MachineClass *m)
+>  {
+>      pc_q35_machine_options(m);
+>      m->alias = "q35";
+>  }
+>  
+> +DEFINE_Q35_MACHINE(v4_0_2, "pc-q35-4.0.2", NULL,
+> +                   pc_q35_4_0_2_machine_options);
+> +
+> +static void pc_q35_4_0_1_machine_options(MachineClass *m)
+> +{
+> +    pc_q35_4_0_2_machine_options(m);
+> +    m->alias = NULL;
+> +    compat_props_add(m->compat_props, hw_compat_4_0_1, hw_compat_4_0_1_len);
+> +}
+> +
+>  DEFINE_Q35_MACHINE(v4_0_1, "pc-q35-4.0.1", NULL,
+>                     pc_q35_4_0_1_machine_options);
+>  
+> @@ -378,7 +389,6 @@ static void pc_q35_4_0_machine_options(MachineClass *m)
+>  {
+>      pc_q35_4_0_1_machine_options(m);
+>      m->default_kernel_irqchip_split = true;
+> -    m->alias = NULL;
+>      compat_props_add(m->compat_props, hw_compat_4_0, hw_compat_4_0_len);
+>      compat_props_add(m->compat_props, pc_compat_4_0, pc_compat_4_0_len);
+>  }
+> diff --git a/include/hw/boards.h b/include/hw/boards.h
+> index fe1885cbff..cf10632dac 100644
+> --- a/include/hw/boards.h
+> +++ b/include/hw/boards.h
+> @@ -293,6 +293,9 @@ struct MachineState {
+>      } \
+>      type_init(machine_initfn##_register_types)
+>  
+> +extern GlobalProperty hw_compat_4_0_1[];
+> +extern const size_t hw_compat_4_0_1_len;
+> +
+>  extern GlobalProperty hw_compat_4_0[];
+>  extern const size_t hw_compat_4_0_len;
+>  
+> @@ -338,4 +341,7 @@ extern const size_t hw_compat_2_2_len;
+>  extern GlobalProperty hw_compat_2_1[];
+>  extern const size_t hw_compat_2_1_len;
+>  
+> +extern GlobalProperty hw_compat[];
+> +extern const size_t hw_compat_len;
+> +
+>  #endif
+> -- 
+> 2.17.0
 
