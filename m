@@ -2,108 +2,61 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.5 required=3.0 tests=HK_RANDOM_FROM,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DAEC5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:26:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D7B4C5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:30:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0CAC2087E
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:26:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L+FpeCIr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0CAC2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 70F11217F5
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:30:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70F11217F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS1el-0006BN-1j
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 11:26:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56611)
+	id 1iS1jN-0008Pp-J9
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 11:30:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58027)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iS1dX-0005QY-O4
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:24:57 -0500
+ (envelope-from <alxndr@bu.edu>) id 1iS1iS-0007Pv-0Z
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:30:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iS1dT-0004AW-Pp
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:24:54 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34445
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <alxndr@bu.edu>) id 1iS1iP-000375-DI
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:29:59 -0500
+Received: from relay68.bu.edu ([128.197.228.73]:48387)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iS1dT-00049u-EC
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:24:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572971090;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=IxiHw2JCILLkQqEpKeEgb0kARpK4d4xZ7uvZoywTrgA=;
- b=L+FpeCIrJcmYtYRO6sMH9DskwFSpOIxOlJnicJ66+jhaP8rNjkfOB2ZwvwTnncmJ4POHBj
- /5c4zJdvyGOUkyCZx0oZECrSR60XvsOkbSyBWhRy46LJcWUVGpS+f5VFuaTRYCxkv3ekIv
- w2gIUJe+8jBULk3zdYc0frRzNdZzcFI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-RFvyEzBNPROMOciTmcd1Nw-1; Tue, 05 Nov 2019 11:24:45 -0500
-X-MC-Unique: RFvyEzBNPROMOciTmcd1Nw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6672A1800D53;
- Tue,  5 Nov 2019 16:24:43 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-89.ams2.redhat.com
- [10.36.117.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 00E485D713;
- Tue,  5 Nov 2019 16:24:39 +0000 (UTC)
-Subject: Re: [PATCH v4] qcow2-bitmap: Fix uint64_t left-shift overflow
-To: Tuguoyi <tu.guoyi@h3c.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "kwolf@redhat.com" <kwolf@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-References: <4ba40cd1e7ee4a708b40899952e49f22@h3c.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <47cf7ed6-e2ad-251a-8fcd-8049ced04108@redhat.com>
-Date: Tue, 5 Nov 2019 17:24:37 +0100
+ (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1iS1iP-00031N-93
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:29:57 -0500
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: 144.121.20.162.lightower.net [144.121.20.162] (may be forged)
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id xA5GSx6v029357
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES128-SHA bits=128 verify=NO);
+ Tue, 5 Nov 2019 11:29:00 -0500
+Subject: Re: [PATCH v4 00/20] Add virtual device fuzzing support
+To: Darren Kenny <darren.kenny@oracle.com>
+References: <20191030144926.11873-1-alxndr@bu.edu>
+ <20191105135711.lld344zgbin2tz72@starbug-mbp>
+From: Alexander Oleinik <alxndr@bu.edu>
+Message-ID: <6b127ec9-e9aa-ac27-5db9-bb731ae0eec0@bu.edu>
+Date: Tue, 5 Nov 2019 11:28:59 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-In-Reply-To: <4ba40cd1e7ee4a708b40899952e49f22@h3c.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="QbnIXk3fPryRpRpTcuCeb9ljKzxYHVnz8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <20191105135711.lld344zgbin2tz72@starbug-mbp>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by relay68.bu.edu id
+ xA5GSx6v029357
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.6.x [fuzzy]
+X-Received-From: 128.197.228.73
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -115,67 +68,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chengchiwen <chengchiwen@h3c.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-stable@nongnu.org" <qemu-stable@nongnu.org>,
- Wangyongqing <w_yongqing@h3c.com>, Changlimin <changlimin@h3c.com>,
- Gaoliang <liang_gao@h3c.com>, Wangyong <wang.yongD@h3c.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QbnIXk3fPryRpRpTcuCeb9ljKzxYHVnz8
-Content-Type: multipart/mixed; boundary="Duktvpx9ypwmxAFCH5hwLzUB6LowSk6jf"
-
---Duktvpx9ypwmxAFCH5hwLzUB6LowSk6jf
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 01.11.19 08:37, Tuguoyi wrote:
-> There are two issues in In check_constraints_on_bitmap(),
-> 1) The sanity check on the granularity will cause uint64_t
-> integer left-shift overflow when cluster_size is 2M and the
-> granularity is BIGGER than 32K.
-> 2) The way to calculate image size that the maximum bitmap
-> supported can map to is a bit incorrect.
-> This patch fix it by add a helper function to calculate the
-> number of bytes needed by a normal bitmap in image and compare
-> it to the maximum bitmap bytes supported by qemu.
+On 11/5/19 8:57 AM, Darren Kenny wrote:
+> Hi Alexander,
 >=20
-> Fixes: 5f72826e7fc62167cf3a
-> Signed-off-by: Guoyi Tu <tu.guoyi@h3c.com>
-> ---
->  block/qcow2-bitmap.c | 14 +++++++++++---
->  1 file changed, 11 insertions(+), 3 deletions(-)
+> I've been trying out these patches, and I'm seeing a high volume of
+> crashes - where for v3, there were none in a run of over 3 weeks -
+> so it was a bit of a surprise :)
+>=20
+> The question is what may have changed that is causing that level of
+> crashes - are you seeing this for the virtio-net-fork-fuzz tests?
+Good question - my guess is that it may have to do with the change in=20
+how we run the main loop. I have not looked into it in much detail, but=20
+the crash below is likely triggered only after running the main_loop=20
+several times (the events handled in the first loop, schedule additional=20
+BHs). In v3, I believe the main_loop only ran once before the forked=20
+process exited. There are also changes to the linker-script used to=20
+facilitate communication between the forked process and the parent, but=20
+I think that would only impact the coverage information passed back to=20
+the parent.
 
-Thanks, applied to my block branch:
+> But also, I've been trying to debug some of these crashes - and the
+> expectation is that you pass the crash-XXXX file as an argument to
+> the qemu-fuzz-* binary - and when I do, I see the crash - but when I
+> try to debug it, it ends up running through and exiting
+> My assumption is that because of the fork in the test, the crash is
+> in one of the children.
+Right! Seems you are already using the follow-fork-mode option.
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+> (ASIDE: I think it might be worth adding a debugging/analysing
+> section to the documentation you've added to help people debug such
+> crashes)
+Will do. Although it did not make it into v4, I am also working on an=20
+option to dump a trace of the qtest commands leading to a crashing=20
+input, which can then be replayed with a standard qtest program=20
+"replay.c". This seems like a good way to provide a reproducer to the=20
+device developers who may not be familiar with the fuzzer, or have time=20
+to build it.
 
-Max
+> Setting follow-fork-mode to child does get me there, and each crash
+> seems, at least in the samples that I've taken, to be in iov_copy:
+Yes - this is what I have been using as well.
 
+>  =C2=A0#0=C2=A0 0x00007ffff4cff377 in raise () from /lib64/libc.so.6
+>  =C2=A0#1=C2=A0 0x00007ffff4d00a68 in abort () from /lib64/libc.so.6
+>  =C2=A0#2=C2=A0 0x00007ffff4cf8196 in __assert_fail_base () from
+>  =C2=A0/lib64/libc.so.6
+>  =C2=A0#3=C2=A0 0x00007ffff4cf8242 in __assert_fail () from /lib64/libc=
+.so.6
+>  =C2=A0#4=C2=A0 0x00005555574d4026 in iov_copy ()
+>  =C2=A0#5=C2=A0 0x000055555640dbd8 in virtio_net_flush_tx ()
+>  =C2=A0#6=C2=A0 0x000055555640c8ef in virtio_net_tx_bh ()
+>  =C2=A0#7=C2=A0 0x00005555574a05bb in aio_bh_call ()
+>  =C2=A0#8=C2=A0 0x00005555574a0a34 in aio_bh_poll ()
+>  =C2=A0#9=C2=A0 0x00005555574b1687 in aio_dispatch ()
+>  =C2=A0#10 0x00005555574a35f9 in aio_ctx_dispatch ()
+>  =C2=A0#11 0x00007ffff5e5d099 in g_main_context_dispatch () from
+>  =C2=A0/lib64/libglib-2.0.so.0
+>  =C2=A0#12 0x00005555574ae9fd in glib_pollfds_poll ()
+>  =C2=A0#13 0x00005555574ad972 in os_host_main_loop_wait ()
+>  =C2=A0#14 0x00005555574ad62c in main_loop_wait ()
+>  =C2=A0#15 0x000055555736c653 in flush_events ()
+>  =C2=A0#16 0x00005555573710a4 in virtio_net_fork_fuzz ()
+>  =C2=A0#17 0x000055555736cb85 in LLVMFuzzerTestOneInput ()
+>  =C2=A0...
+>=20
+> Have you seen these kind of crashes, or is this just me?
+Not just you :) I posted a fix for this, but it may have not been=20
+complete. I think the fuzzer found it before we added forking, just by=20
+doing reboots in between runs:
+https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg04882.html
 
---Duktvpx9ypwmxAFCH5hwLzUB6LowSk6jf--
+> Just wondering if I should dig into it as a real issue, or some
+> mis-merge I've done (not all the patches were cleanly applied for
+> me when I cloned from master).
 
---QbnIXk3fPryRpRpTcuCeb9ljKzxYHVnz8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3BokUACgkQ9AfbAGHV
-z0BYcAgAgmGePfLGkQASWOUubh0Y2EnDplu6AdHAIw9239G9+ecow18LjMEhCCK2
-l/6PmL2zmS0QM1SHUHdCOphYKsXQQc9zZVIpiGj2QbcwDERCBvRavwgXtf0ib40A
-xSxpjuXFCkEKSqJnSW41M+eQ0JTUAdvX5bVMmoP/KYMMQlheJoc1qqAJSPiRuRgs
-wRv7sNUNczWuqOIBmK0JwTtQWe6W2NKCBKHQKeeY2Xs7Eh3S8ZfMV4I+OwkCxuyf
-9Jj2ZCFpresqIxpxkkzjC1AWNVX853Ejx5+TDnKoWKyaxkWHC/Icid2X99oqP9ZW
-JI2i9evy0A92vpLcQXJWT8OXuvmHxg==
-=b7Nw
------END PGP SIGNATURE-----
-
---QbnIXk3fPryRpRpTcuCeb9ljKzxYHVnz8--
+> Thanks,
+>=20
+> Darren.
+>=20
+> On Wed, Oct 30, 2019 at 02:49:47PM +0000, Oleinik, Alexander wrote:
+>> This series adds a framework for coverage-guided fuzzing of
+>> virtual-devices. Fuzzing targets are based on qtest and can make use o=
+f
+>> the libqos abstractions.
+>>
+>> V4:
+>> * add/transfer license headers to new files
+>> * restructure the added QTestClientTransportOps struct
+>> * restructure the FuzzTarget struct and fuzzer skeleton
+>> * fork-based fuzzer now directly mmaps shm over the coverage bitmaps
+>> * fixes to i440 and virtio-net fuzz targets
+>> * undo the changes to qtest_memwrite
+>> * possible to build /fuzz and /all in the same build-dir
+>> * misc fixes to address V3 comments
+>>
+>> V3:
+>> * rebased onto v4.1.0+
+>> * add the fuzzer as a new build-target type in the build-system
+>> * add indirection to qtest client/server communication functions
+>> * remove ramfile and snapshot-based fuzzing support
+>> * add i440fx fuzz-target as a reference for developers.
+>> * add linker-script to assist with fork-based fuzzer
+>>
+>> V2:
+>> * split off changes to qos virtio-net and qtest server to other patche=
+s
+>> * move vl:main initialization into new func: qemu_init
+>> * moved useful functions from qos-test.c to a separate object
+>> * use struct of function pointers for add_fuzz_target(), instead of
+>> =C2=A0 arguments
+>> * move ramfile to migration/qemu-file
+>> * rewrite fork-based fuzzer pending patch to libfuzzer
+>> * pass check-patch
+>>
+>> Alexander Oleinik (20):
+>> =C2=A0softmmu: split off vl.c:main() into main.c
+>> =C2=A0libqos: Rename i2c_send and i2c_recv
+>> =C2=A0fuzz: Add FUZZ_TARGET module type
+>> =C2=A0qtest: add qtest_server_send abstraction
+>> =C2=A0libqtest: Add a layer of abstraciton to send/recv
+>> =C2=A0module: check module wasn't already initialized
+>> =C2=A0qtest: add in-process incoming command handler
+>> =C2=A0tests: provide test variables to other targets
+>> =C2=A0libqos: split qos-test and libqos makefile vars
+>> =C2=A0libqos: move useful qos-test funcs to qos_external
+>> =C2=A0libqtest: make qtest_bufwrite send "atomic"
+>> =C2=A0libqtest: add in-process qtest.c tx/rx handlers
+>> =C2=A0fuzz: add configure flag --enable-fuzzing
+>> =C2=A0fuzz: Add target/fuzz makefile rules
+>> =C2=A0fuzz: add fuzzer skeleton
+>> =C2=A0fuzz: add support for fork-based fuzzing.
+>> =C2=A0fuzz: add support for qos-assisted fuzz targets
+>> =C2=A0fuzz: add i440fx fuzz targets
+>> =C2=A0fuzz: add virtio-net fuzz target
+>> =C2=A0fuzz: add documentation to docs/devel/
+>>
+>> Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 16 ++-
+>> Makefile.objs=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 4 +
+>> Makefile.target=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 18 ++-
+>> configure=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 39 ++++++
+>> docs/devel/fuzzing.txt=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 119 +++++=
++++++++++++++
+>> exec.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+ 12 +-
+>> include/qemu/module.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+=C2=A0 4 +-
+>> include/sysemu/qtest.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=
+ 4 +
+>> include/sysemu/sysemu.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 4 =
++
+>> main.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+ 52 ++++++++
+>> qtest.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 3=
+0 ++++-
+>> tests/Makefile.include=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 75 =
++++++------
+>> tests/fuzz/Makefile.include=C2=A0 |=C2=A0 11 ++
+>> tests/fuzz/fork_fuzz.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 51 =
+++++++++
+>> tests/fuzz/fork_fuzz.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 23 =
+++++
+>> tests/fuzz/fork_fuzz.ld=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 37 +++++=
++
+>> tests/fuzz/fuzz.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | 177 ++++++++++++++++++++++++++
+>> tests/fuzz/fuzz.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 |=C2=A0 66 ++++++++++
+>> tests/fuzz/i440fx_fuzz.c=C2=A0=C2=A0=C2=A0=C2=A0 | 176 +++++++++++++++=
++++++++++++
+>> tests/fuzz/qos_fuzz.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 232 =
++++++++++++++++++++++++++++++++++++
+>> tests/fuzz/qos_fuzz.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+ 33 +++++
+>> tests/fuzz/virtio_net_fuzz.c | 123 +++++++++++++++++++
+>> tests/libqos/i2c-imx.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=
+ 8 +-
+>> tests/libqos/i2c-omap.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 8 =
++-
+>> tests/libqos/i2c.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0 10 +-
+>> tests/libqos/i2c.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 |=C2=A0=C2=A0 4 +-
+>> tests/libqos/qos_external.c=C2=A0 | 168 +++++++++++++++++++++++++
+>> tests/libqos/qos_external.h=C2=A0 |=C2=A0 28 +++++
+>> tests/libqtest.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 | 109 ++++++++++++++--
+>> tests/libqtest.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 4 +
+>> tests/pca9552-test.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=
+=C2=A0 10 +-
+>> tests/qos-test.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 | 140 +--------------------
+>> util/module.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 7 ++
+>> vl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 |=C2=A0 36 ++----
+>> 34 files changed, 1601 insertions(+), 237 deletions(-)
+>> create mode 100644 docs/devel/fuzzing.txt
+>> create mode 100644 main.c
+>> create mode 100644 tests/fuzz/Makefile.include
+>> create mode 100644 tests/fuzz/fork_fuzz.c
+>> create mode 100644 tests/fuzz/fork_fuzz.h
+>> create mode 100644 tests/fuzz/fork_fuzz.ld
+>> create mode 100644 tests/fuzz/fuzz.c
+>> create mode 100644 tests/fuzz/fuzz.h
+>> create mode 100644 tests/fuzz/i440fx_fuzz.c
+>> create mode 100644 tests/fuzz/qos_fuzz.c
+>> create mode 100644 tests/fuzz/qos_fuzz.h
+>> create mode 100644 tests/fuzz/virtio_net_fuzz.c
+>> create mode 100644 tests/libqos/qos_external.c
+>> create mode 100644 tests/libqos/qos_external.h
+>>
+>> --=20
+>> 2.23.0
+>>
+>>
 
 
