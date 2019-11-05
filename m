@@ -2,104 +2,81 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E896EC17460
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 13:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2417CC1747C
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 13:45:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5B122190F
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 13:33:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D419D2190F
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 13:45:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ibqG9qQI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B122190F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="azitTy8W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D419D2190F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRyxr-00037y-Us
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 08:33:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40076)
+	id 1iRz9N-0007IJ-WD
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 08:45:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42754)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iRywz-0002dO-Cx
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:32:50 -0500
+ (envelope-from <liq3ea@gmail.com>) id 1iRz8c-0006r3-I7
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:44:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iRyww-0002yw-Qr
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:32:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22317
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iRyww-0002ye-Lt
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:32:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572960766;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=sgF7RD/vMNoKWpFeEGTdHTZkU+w8r9zlMxOnhlR5eDw=;
- b=ibqG9qQIKmDICY8u8R4XDOnKw8uPop9gjHCZFWgzDMZEik99Xq28Sir34o7i7fQtCBYiCf
- HKq1fje5xwpKy9oboe/MqG/nDaPwQVcos9AFDAZec8u79Dohs1fl64hP1FSgDfkHZ3Pkyj
- +quZCeuZBQdsxbr3u9QpgHZTbIokib8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-pEM1YL3YMFCPqE756Khx9A-1; Tue, 05 Nov 2019 08:32:42 -0500
-X-MC-Unique: pEM1YL3YMFCPqE756Khx9A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 644D68017DD;
- Tue,  5 Nov 2019 13:32:41 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-89.ams2.redhat.com
- [10.36.117.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B911E5C1B2;
- Tue,  5 Nov 2019 13:32:38 +0000 (UTC)
-Subject: Re: [RFC PATCH v2 00/26] Add subcluster allocation to qcow2
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1572125022.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <7ff9d343-9148-6276-e068-f29d49f47fdc@redhat.com>
-Date: Tue, 5 Nov 2019 14:32:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <liq3ea@gmail.com>) id 1iRz8a-0001Xk-HX
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:44:50 -0500
+Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:39691)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1iRz8a-0001XY-9b
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:44:48 -0500
+Received: by mail-oi1-x22a.google.com with SMTP id v138so17525679oif.6
+ for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 05:44:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/ts4WNIWc3gjpfUlq4ngqbZ8UpwHaH5X+jpdJ8J99E0=;
+ b=azitTy8WSuzVcMsj0pmPUblsusrepwE5DOZcCy4nJj2oC+IYBIIYlGmQs2YQViE6Th
+ sR4Yl7j9CwpJqkpdjswVraqTEa3bpHjw1dcyUVvzPF9C6D8JjmmL2P+1XaxjrJv9N8YB
+ AlGPYydJvlPQFa1lSddiuTHr4WKjesz5w4h9RoVAyxMqfOHOUI1H9ODuKBalpvU5htmg
+ 4U7lnAme46cP/xDoP4ZJKIjq0cc7u8BcrM0RpecfFNDlPXkXh99r8GWrDd3ugYYHvyq0
+ iZS+9c78ukp0AYwcSNScSRLfOqWtDT7JlOemI1R8DrywCtnw8ALlLYxIfmZoYpbAbznl
+ MwJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/ts4WNIWc3gjpfUlq4ngqbZ8UpwHaH5X+jpdJ8J99E0=;
+ b=NPk5h+PWwYZDqsfapakjy3kjloVmpuRtWJCk9jQKWq+h2/LaG3AzTV5FChwYDPbbp7
+ ZezPOFLz/OaixCHbVEgUtc4B5wWjyb6O5XJmQkRyWeraeHD/NokvfOm4eINlVLhgRv7j
+ /Tm/ChzqTX+9rgMpisH1s53tW7JlcKwjtSMjZNqmV5PIJv+95hxp328KrTsrF0HbySTC
+ CXkCsOkxPy+P/UOBc0V6zQjNDK1XgfjtAzVVbuAQ0nPTFjjC+DW5hEnxvfqVpdiauY1h
+ wZu4P7aheaqIv8mR5E0limikfT/QIcbC2rMSzywq6F22wlNzGcLVkItbKRnpBq8tDwNp
+ ktvQ==
+X-Gm-Message-State: APjAAAX6GuG1h7pPL2sOhf5ZCp57w0k3Z1nH0S9ph180V2/3W2Hungda
+ 7gg2aWgXXQi2ABl5RSDpH+L9BbxKKGpNUDjNWI0=
+X-Google-Smtp-Source: APXvYqxvq2eKrXOuDhyEvipIF4O0psDfTawtCg+J43d650H61DXEbhgoijKAkttUZhjqNNGl+gnivHi/i3K+rbbCh0w=
+X-Received: by 2002:aca:42d7:: with SMTP id p206mr4064701oia.129.1572961487351; 
+ Tue, 05 Nov 2019 05:44:47 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <cover.1572125022.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="MI90STtfn1QZQE5EYhZVLlkKLuyk0nnfs"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <5DC05485.008EAA.00665@m12-12.163.com>
+ <20191104114857.74fe9222@x1.home>
+ <CAKXe6SJKP94eKw+7w4ucFsDQW0GZ7E4SLNekECyJXm0rZa6GHQ@mail.gmail.com>
+ <60808bdc-9b0e-3cf3-df6c-fd9f71ff58c7@redhat.com>
+In-Reply-To: <60808bdc-9b0e-3cf3-df6c-fd9f71ff58c7@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 5 Nov 2019 21:44:10 +0800
+Message-ID: <CAKXe6SLz6h4=ME4Y96b-5JTu29ec+Oyioui8kTFcayy34juWiQ@mail.gmail.com>
+Subject: Re: Questions about the VFIO BAR region
+To: Auger Eric <eric.auger@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000b2f5a7059699a2e0"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,113 +88,332 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>, Li Qiang <liq3ea@163.com>,
+ Alex Williamson <alex.l.williamson@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---MI90STtfn1QZQE5EYhZVLlkKLuyk0nnfs
-Content-Type: multipart/mixed; boundary="3mmPrL4bINaAMev8dlgGCEePA9XL45CD9"
-
---3mmPrL4bINaAMev8dlgGCEePA9XL45CD9
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--000000000000b2f5a7059699a2e0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 26.10.19 23:25, Alberto Garcia wrote:
-> Hi,
->=20
-> here's the new version of the patches to add subcluster allocation
-> support to qcow2.
->=20
-> Please refer to the cover letter of the first version for a full
-> description of the patches:
->=20
->    https://lists.gnu.org/archive/html/qemu-block/2019-10/msg00983.html
->=20
-> This version includes a few tests, but I'm planning to add more for
-> the next revision.
+Auger Eric <eric.auger@redhat.com> =E4=BA=8E2019=E5=B9=B411=E6=9C=885=E6=97=
+=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:17=E5=86=99=E9=81=93=EF=BC=9A
 
-I think what would help most with testing is if it were possible to
-simply run the iotests with -o extended_l2=3Don.
+> Hi Li,
+>
+> On 11/5/19 2:16 AM, Li Qiang wrote:
+> >
+> >
+> > Alex Williamson <alex.williamson@redhat.com
+> > <mailto:alex.williamson@redhat.com>> =E4=BA=8E2019=E5=B9=B411=E6=9C=885=
+=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=882:49=E5=86=99=E9=81=93=EF=BC=
+=9A
+> >
+> >     On Tue, 5 Nov 2019 00:40:39 +0800
+> >     Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>> wrote:
+> >
+> >     > Hello Alex, Auger and all,
+> >     >
+> >     > I have a question about the VFIO virtual device BAR.
+> >     >
+> >     > In vfio_region_setup, it initialize a =E2=80=98region->mem=E2=80=
+=99 MR and set its
+> >     ops to =E2=80=98vfio_regions_ops=E2=80=99.
+> >     > In =E2=80=98vfio_region_mmap=E2=80=99, it maps the physical devic=
+e=E2=80=99s MMIO to
+> >     QEMU=E2=80=99s virtual address space
+> >     > as a raw MR =E2=80=98region->mmaps[i].mem=E2=80=99.
+> >     > And also it set the latter MR as a subregion of the first one.
+> >     >
+> >     > So when the guest accesses the BAR, it will direct go to the
+> >     physical device=E2=80=99s BAR.
+> >     > My question is here:
+> >     > When the qemu will use the =E2=80=98vfio_regions_ops=E2=80=99 to =
+read/write the
+> BAR?
+> >     > Also whey in the last of =E2=80=98vfio_region_write/read=E2=80=99=
+ we need to call
+> >     =E2=80=98vbasedev->ops->vfio_eoi(vbasedev);=E2=80=99?
+> >
+> >     We support:
+> >
+> >      a) sparse mmaps where the entire BAR is not covered by an mmap
+> >
+> >
+> > Got.
+> >
+> >
+> >
+> >      b) quirks, which layer on top of the mmaps to provide virtualized
+> >         access
+> >
+> >
+> > Do you mean like in 'vfio_probe_ati_bar4_quirk', register a high
+> > priority subregion of VFIORegion.mem.
+> > So when the guest write the BAR, vfio_regions_ops will be used. Here
+> > 'quirks' do you mean such things?
+> >
+> > static void vfio_probe_ati_bar4_quirk(VFIOPCIDevice *vdev, int nr)
+> > {
+> >     VFIOQuirk *quirk;
+> >     VFIOConfigWindowQuirk *window;
+> >
+> >     ...
+> >     memory_region_init_io(window->addr_mem, OBJECT(vdev),
+> >                           &vfio_generic_window_address_quirk, window,
+> >                           "vfio-ati-bar4-window-address-quirk", 4);
+> >     memory_region_add_subregion_overlap(vdev->bars[nr].region.mem,
+> >                                         window->address_offset,
+> >                                         window->addr_mem, 1);
+> >    ...
+> > }
+> Yes that's it. In that case vfio_generic_window_address_quirk ops get
+> called when attempting to access this overlapping region.
+> >
+> >
+> >
+> >      c) INTx emulation which disables mmaps MRs in order to detect devi=
+ce
+> >         access as a generic mechanism for inferring interrupt
+> >         acknowledgment.
+> >
+> >
+> > In the above two cases, in 'vfio_region_write/read' we always access th=
+e
+> > physical device's BAR.
+> > So as far as I can understand, the physical device(sometimes) will
+> > trigger interrupts. And the responsible of clear it
+> > will be by the 'guest'. So I can't understand why there calls
+> > 'vbasedev->ops->vfio_eoi'. Could you please give me an
+> > example.
+> When a physical level sensitive IRQ hits it is signaled through an
+> eventfd. The eventfd can be handled by QEMU. In this case,
+> vfio_intx_interrupt gets called, for PCI. It turns the mmap off (slow
+> path on) and injects the corresponding virtual IRQ into the guest. The
+> reason why we turn the mmap off is we need to trap the guest end of
+> interrupt to eventually deactivate the IRQ at physical level and unmask
+> it (it was auto-masked by the vfio driver). The first access into the
+> region is assumed to correspond to the servicing of the pending
+> interrupt by the guest handler (pending status clear) and at this point
+> we deactivate the physical IRQ. So .vfio_eoi gets called on the first
+> read/write BAR access after an INTx gets pending. Note the mmapping
+> (fast path) is not immediatly turned on after deactivating the physical
+> INTx. See comment before vfio_intx_mmap_enable.
+>
+> When an irqfd/resamplefd is used we do not need that trick as the guest
+> EOI is trapped at KVM level through the virtual interrupt controller.
+> when the guest EOI is trapped KVM deactivates the associated physical
+> IRQ and notifies the userspace through the resamplefd for this latter to
+> unmask the physical IRQ.
+>
+> Hope this helps.
+>
 
-In general, the RFC looks OK to me.  The one thing I dislike is that I
-feel that it is a bit, well, uncourageous.  Now, after looking at the
-series, I don=E2=80=99t know whether you really changed everything that nee=
-ds to
-be changed so it can deal with subclusters.
 
-To me it feels like this is because you tried to keep everything as it
-is and only do minimal changes.  That is usually a good thing, but here
-I don=E2=80=99t know, because this way we can=E2=80=99t simply grep for pla=
-ces that need
-fixing (because they use /\<cluster/ instead of /subcluster/).
+Thank you Auger, very detailed information.
 
-To me it feels like with subclusters, the whole design should be
-different.  Note that the following is just a very na=C3=AFve idea, but
-anyway: I feel like what we need to separate isn=E2=80=99t L2 entries vs.
-clusters vs. subclusters (so a separation based on, well, syntax?) but a
-separation based on offset vs. allocation status (so a separation based
-on semantics).
-
-So I imagine there would be one function that sets a whole cluster=E2=80=99=
-s
-(i.e., a group of subclusters) allocation offset; and another function
-that sets individual subclusters=E2=80=99 allocation status.
-
-Reversely, there should be a function to query a cluster=E2=80=99s/subclust=
-er=E2=80=99s
-allocation offset, and another to query a subcluster=E2=80=99s type.
-
-To me it looks like the places where
-QCOW2_CLUSTER_UNALLOCATED_SUBCLUSTER is handled separately from
-QCOW2_CLUSTER_UNALLOCATED are places where we=E2=80=99re really not interes=
-ted
-in the subcluster=E2=80=99s type at all, but just whether there=E2=80=99s a=
-n allocation
-or not.  This is the case in qcow2_get_cluster_offset(),
-calculate_l2_meta(), and qcow2_co_block_status().
-
-(These places should then use the function to query the allocation
-offset and evaluate the result instead of querying the subcluster type.)
+Thanks,
+Li Qiang
 
 
-Does that sound in any way acceptable to you?  You have more insight
-into this now and so maybe you know already that it can=E2=80=99t work.
-(Or maybe it=E2=80=99s just too invasive.)
 
+>
+> Thanks
+>
+> Eric
+>
+>
+>
+>
+> >
+> >
+> > Thanks,
+> > Li Qiang
+> >
+> >
+> >
+> >
+> >     The latter being the reason we call vfio_eoi.  Thanks,
+> >
+> >     Alex
+> >
+>
+>
 
-Right now, all I can do is grep for QCOW2_CLUSTER_ and set_l2_entry().
-And all of those places look OK to me.  But I just can=E2=80=99t shake off =
-the
-uneasy feeling of not being able to really know whether this series
-really got to all the places that need adjustment.
+--000000000000b2f5a7059699a2e0
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Max
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">Auger Eric &lt;<a href=3D"mailto:eric=
+.auger@redhat.com">eric.auger@redhat.com</a>&gt; =E4=BA=8E2019=E5=B9=B411=
+=E6=9C=885=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:17=E5=86=99=E9=81=
+=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
+ 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Hi =
+Li,<br>
+<br>
+On 11/5/19 2:16 AM, Li Qiang wrote:<br>
+&gt; <br>
+&gt; <br>
+&gt; Alex Williamson &lt;<a href=3D"mailto:alex.williamson@redhat.com" targ=
+et=3D"_blank">alex.williamson@redhat.com</a><br>
+&gt; &lt;mailto:<a href=3D"mailto:alex.williamson@redhat.com" target=3D"_bl=
+ank">alex.williamson@redhat.com</a>&gt;&gt; =E4=BA=8E2019=E5=B9=B411=E6=9C=
+=885=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=882:49=E5=86=99=E9=81=93=EF=
+=BC=9A<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0On Tue, 5 Nov 2019 00:40:39 +0800<br>
+&gt;=C2=A0 =C2=A0 =C2=A0Li Qiang &lt;<a href=3D"mailto:liq3ea@163.com" targ=
+et=3D"_blank">liq3ea@163.com</a> &lt;mailto:<a href=3D"mailto:liq3ea@163.co=
+m" target=3D"_blank">liq3ea@163.com</a>&gt;&gt; wrote:<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt; Hello Alex, Auger and all,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt; I have a question about the VFIO virtual devic=
+e BAR.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt; In vfio_region_setup, it initialize a =E2=80=
+=98region-&gt;mem=E2=80=99 MR and set its<br>
+&gt;=C2=A0 =C2=A0 =C2=A0ops to =E2=80=98vfio_regions_ops=E2=80=99.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt; In =E2=80=98vfio_region_mmap=E2=80=99, it maps=
+ the physical device=E2=80=99s MMIO to<br>
+&gt;=C2=A0 =C2=A0 =C2=A0QEMU=E2=80=99s virtual address space<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt; as a raw MR =E2=80=98region-&gt;mmaps[i].mem=
+=E2=80=99.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt; And also it set the latter MR as a subregion o=
+f the first one.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt; So when the guest accesses the BAR, it will di=
+rect go to the<br>
+&gt;=C2=A0 =C2=A0 =C2=A0physical device=E2=80=99s BAR.<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt; My question is here:<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt; When the qemu will use the =E2=80=98vfio_regio=
+ns_ops=E2=80=99 to read/write the BAR?<br>
+&gt;=C2=A0 =C2=A0 =C2=A0&gt; Also whey in the last of =E2=80=98vfio_region_=
+write/read=E2=80=99 we need to call<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=E2=80=98vbasedev-&gt;ops-&gt;vfio_eoi(vbasedev);=
+=E2=80=99?<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0We support:<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0a) sparse mmaps where the entire BAR is not c=
+overed by an mmap<br>
+&gt; <br>
+&gt; <br>
+&gt; Got.<br>
+&gt; <br>
+&gt; =C2=A0<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0b) quirks, which layer on top of the mmaps to=
+ provide virtualized<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 access<br>
+&gt; <br>
+&gt; <br>
+&gt; Do you mean like in &#39;vfio_probe_ati_bar4_quirk&#39;, register a hi=
+gh<br>
+&gt; priority subregion of VFIORegion.mem.<br>
+&gt; So when the guest write the BAR, vfio_regions_ops will be used. Here<b=
+r>
+&gt; &#39;quirks&#39; do you mean such things?<br>
+&gt; <br>
+&gt; static void vfio_probe_ati_bar4_quirk(VFIOPCIDevice *vdev, int nr)<br>
+&gt; {<br>
+&gt; =C2=A0 =C2=A0 VFIOQuirk *quirk;<br>
+&gt; =C2=A0 =C2=A0 VFIOConfigWindowQuirk *window;<br>
+&gt; <br>
+&gt; =C2=A0 =C2=A0 ...<br>
+&gt; =C2=A0 =C2=A0 memory_region_init_io(window-&gt;addr_mem, OBJECT(vdev),=
+<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 &amp;vfio_generic_window_address_quirk, window,<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 &quot;vfio-ati-bar4-window-address-quirk&quot;, 4);<br=
+>
+&gt; =C2=A0 =C2=A0 memory_region_add_subregion_overlap(vdev-&gt;bars[nr].re=
+gion.mem,<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 windo=
+w-&gt;address_offset,<br>
+&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 windo=
+w-&gt;addr_mem, 1);<br>
+&gt; =C2=A0 =C2=A0...<br>
+&gt; }<br>
+Yes that&#39;s it. In that case vfio_generic_window_address_quirk ops get<b=
+r>
+called when attempting to access this overlapping region.<br>
+&gt; <br>
+&gt; =C2=A0<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0c) INTx emulation which disables mmaps MRs in=
+ order to detect device<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 access as a generic mechanism for inf=
+erring interrupt<br>
+&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 acknowledgment.<br>
+&gt; <br>
+&gt; <br>
+&gt; In the above two cases, in &#39;vfio_region_write/read&#39; we always =
+access the<br>
+&gt; physical device&#39;s BAR.<br>
+&gt; So as far as I can understand, the physical device(sometimes) will<br>
+&gt; trigger interrupts. And the responsible of clear it=C2=A0<br>
+&gt; will be by the &#39;guest&#39;. So I can&#39;t understand why there ca=
+lls<br>
+&gt; &#39;vbasedev-&gt;ops-&gt;vfio_eoi&#39;. Could you please give me an<b=
+r>
+&gt; example.<br>
+When a physical level sensitive IRQ hits it is signaled through an<br>
+eventfd. The eventfd can be handled by QEMU. In this case,<br>
+vfio_intx_interrupt gets called, for PCI. It turns the mmap off (slow<br>
+path on) and injects the corresponding virtual IRQ into the guest. The<br>
+reason why we turn the mmap off is we need to trap the guest end of<br>
+interrupt to eventually deactivate the IRQ at physical level and unmask<br>
+it (it was auto-masked by the vfio driver). The first access into the<br>
+region is assumed to correspond to the servicing of the pending<br>
+interrupt by the guest handler (pending status clear) and at this point<br>
+we deactivate the physical IRQ. So .vfio_eoi gets called on the first<br>
+read/write BAR access after an INTx gets pending. Note the mmapping<br>
+(fast path) is not immediatly turned on after deactivating the physical<br>
+INTx. See comment before vfio_intx_mmap_enable.<br>
+<br>
+When an irqfd/resamplefd is used we do not need that trick as the guest<br>
+EOI is trapped at KVM level through the virtual interrupt controller.<br>
+when the guest EOI is trapped KVM deactivates the associated physical<br>
+IRQ and notifies the userspace through the resamplefd for this latter to<br=
+>
+unmask the physical IRQ.<br>
+<br>
+Hope this helps.<br></blockquote><div><br></div><div><br></div><div>Thank y=
+ou Auger, very detailed information.</div><div><br></div><div>Thanks,</div>=
+<div>Li Qiang</div><div><br></div><div>=C2=A0</div><blockquote class=3D"gma=
+il_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,2=
+04,204);padding-left:1ex">
+<br>
+Thanks<br>
+<br>
+Eric<br>
+<br>
+<br>
+<br>
+<br>
+&gt; <br>
+&gt; <br>
+&gt; Thanks,<br>
+&gt; Li Qiang<br>
+&gt; <br>
+&gt; =C2=A0<br>
+&gt; <br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0The latter being the reason we call vfio_eoi.=C2=A0=
+ Thanks,<br>
+&gt; <br>
+&gt;=C2=A0 =C2=A0 =C2=A0Alex<br>
+&gt; <br>
+<br>
+</blockquote></div></div>
 
-
---3mmPrL4bINaAMev8dlgGCEePA9XL45CD9--
-
---MI90STtfn1QZQE5EYhZVLlkKLuyk0nnfs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3BefQACgkQ9AfbAGHV
-z0AGbQf/WDJSJPpTzGpGnWq49Ra1xt7lAn+pa6hFmh1DGSQoaOaBeryMJ2+yz0D+
-HRm5S37dvWgjUAX8gLXog/oDmd9hFOQOzHjSml75CTzA0AMUU4uUyXuWQSkjb+PW
-PnGKGJI3y50IexfGo3dupuJKELYJ1bQ+xo126gY6ze7VIbcbRiKPcwRROKu1jdX6
-ADX7Nv9QWsqxi+I+zvDN8XT4LNDLTHCLK5adiKzBSocwN9eOIooZnepHSBG6PnIg
-YHvU3JRqIeDurUAWBZeftlWvxbf1Rm3pj2F2RRfZGFwApO3iC5FgaHtWe59D+sND
-EF/U2Lkh7Ly9hFLv0ntxuRnwtSt2nw==
-=ygyZ
------END PGP SIGNATURE-----
-
---MI90STtfn1QZQE5EYhZVLlkKLuyk0nnfs--
-
+--000000000000b2f5a7059699a2e0--
 
