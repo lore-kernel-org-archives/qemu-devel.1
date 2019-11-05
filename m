@@ -2,79 +2,78 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52F7CC5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 20:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EB2BC5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 20:54:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 175A421A49
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 20:54:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 175A421A49
+	by mail.kernel.org (Postfix) with ESMTPS id 1058D21D6C
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 20:54:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1058D21D6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS5qi-0002KD-T7
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 15:54:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58001)
+	id 1iS5qk-0002Oa-Pn
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 15:54:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58071)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5ov-0000DW-Pu
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:52:59 -0500
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5oy-0000EW-MT
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5ou-0001re-BM
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:52:57 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1100
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5ox-0001uZ-I8
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:00 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:17850)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iS5ou-0001ql-6Z; Tue, 05 Nov 2019 15:52:56 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- xA5KpXDZ133229; Tue, 5 Nov 2019 15:52:54 -0500
+ id 1iS5ox-0001tn-8r; Tue, 05 Nov 2019 15:52:59 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ xA5KpYln138492; Tue, 5 Nov 2019 15:52:58 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2w3engv3h8-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2w3dqspb98-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 15:52:53 -0500
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id xA5Kpafs133476;
- Tue, 5 Nov 2019 15:52:53 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
- [169.55.91.170])
- by mx0b-001b2d01.pphosted.com with ESMTP id 2w3engv3gy-1
+ Tue, 05 Nov 2019 15:52:58 -0500
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id xA5Kpfpi138904;
+ Tue, 5 Nov 2019 15:52:57 -0500
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2w3dqspb8w-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 15:52:52 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
- by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xA5KnuYR025651;
- Tue, 5 Nov 2019 20:52:52 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma02wdc.us.ibm.com with ESMTP id 2w11e797w2-1
+ Tue, 05 Nov 2019 15:52:57 -0500
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xA5KnujF006011;
+ Tue, 5 Nov 2019 20:52:56 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
+ [9.57.198.25]) by ppma02dal.us.ibm.com with ESMTP id 2w11e7hgbf-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 20:52:52 +0000
+ Tue, 05 Nov 2019 20:52:56 +0000
 Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
  [9.57.199.107])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xA5Kqppt10945384
+ by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xA5Kqu5M52953448
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 5 Nov 2019 20:52:51 GMT
+ Tue, 5 Nov 2019 20:52:56 GMT
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C5C63124052;
- Tue,  5 Nov 2019 20:52:51 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 07F7312405E;
+ Tue,  5 Nov 2019 20:52:56 +0000 (GMT)
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id A877A124058;
- Tue,  5 Nov 2019 20:52:51 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id E9A94124058;
+ Tue,  5 Nov 2019 20:52:55 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.218])
  by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  5 Nov 2019 20:52:51 +0000 (GMT)
+ Tue,  5 Nov 2019 20:52:55 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 09/55] iotests: Test reverse sub-cluster qcow2 writes
-Date: Tue,  5 Nov 2019 14:51:57 -0600
-Message-Id: <20191105205243.3766-10-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 16/55] iotests: Restrict nbd Python tests to nbd
+Date: Tue,  5 Nov 2019 14:52:04 -0600
+Message-Id: <20191105205243.3766-17-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191105205243.3766-1-mdroth@linux.vnet.ibm.com>
 References: <20191105205243.3766-1-mdroth@linux.vnet.ibm.com>
@@ -88,7 +87,7 @@ X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1908290000 definitions=main-1911050170
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,124 +107,49 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
-This exercises the regression introduced in commit
-50ba5b2d994853b38fed10e0841b119da0f8b8e5.  On my machine, it has close
-to a 50 % false-negative rate, but that should still be sufficient to
-test the fix.
+We have two Python unittest-style tests that test NBD.  As such, they
+should specify supported_protocols=['nbd'] so they are skipped when the
+user wants to test some other protocol.
+
+Furthermore, we should restrict their choice of formats to 'raw'.  The
+idea of a protocol/format combination is to use some format over some
+protocol; but we always use the raw format over NBD.  It does not really
+matter what the NBD server uses on its end, and it is not a useful test
+of the respective format driver anyway.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Tested-by: Stefano Garzarella <sgarzare@redhat.com>
-Tested-by: John Snow <jsnow@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-(cherry picked from commit ae6ef0190981a21f2d4bc8dcee7253688f14fae7)
- Conflicts:
-	tests/qemu-iotests/group
-*fix context deps on tests not in 4.1.0
+(cherry picked from commit 7c932a1d69a6d6ac5c0b615c11d191da3bbe9aa8)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qemu-iotests/265     | 67 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/265.out |  6 ++++
- tests/qemu-iotests/group   |  1 +
- 3 files changed, 74 insertions(+)
- create mode 100755 tests/qemu-iotests/265
- create mode 100644 tests/qemu-iotests/265.out
+ tests/qemu-iotests/147 | 5 ++---
+ tests/qemu-iotests/205 | 3 ++-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tests/qemu-iotests/265 b/tests/qemu-iotests/265
-new file mode 100755
-index 0000000000..dce6f77be3
---- /dev/null
-+++ b/tests/qemu-iotests/265
-@@ -0,0 +1,67 @@
-+#!/usr/bin/env bash
-+#
-+# Test reverse-ordered qcow2 writes on a sub-cluster level
-+#
-+# Copyright (C) 2019 Red Hat, Inc.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+seq=$(basename $0)
-+echo "QA output created by $seq"
-+
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+# qcow2-specific test
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+echo '--- Writing to the image ---'
-+
-+# Reduce cluster size so we get more and quicker I/O
-+IMGOPTS='cluster_size=4096' _make_test_img 1M
-+(for ((kb = 1024 - 4; kb >= 0; kb -= 4)); do \
-+     echo "aio_write -P 42 $((kb + 1))k 2k"; \
-+ done) \
-+ | $QEMU_IO "$TEST_IMG" > /dev/null
-+
-+echo '--- Verifying its content ---'
-+
-+(for ((kb = 0; kb < 1024; kb += 4)); do \
-+    echo "read -P 0 ${kb}k 1k"; \
-+    echo "read -P 42 $((kb + 1))k 2k"; \
-+    echo "read -P 0 $((kb + 3))k 1k"; \
-+ done) \
-+ | $QEMU_IO "$TEST_IMG" | _filter_qemu_io | grep 'verification'
-+
-+# Status of qemu-io
-+if [ ${PIPESTATUS[1]} = 0 ]; then
-+    echo 'Content verified.'
-+fi
-+
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/265.out b/tests/qemu-iotests/265.out
-new file mode 100644
-index 0000000000..6eac620f25
---- /dev/null
-+++ b/tests/qemu-iotests/265.out
-@@ -0,0 +1,6 @@
-+QA output created by 265
-+--- Writing to the image ---
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576
-+--- Verifying its content ---
-+Content verified.
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index f13e5f2e23..468458efb1 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -271,3 +271,4 @@
- 254 rw backing quick
- 255 rw quick
- 256 rw quick
-+265 rw auto quick
+diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
+index 2d84fddb01..ab8480b9a4 100755
+--- a/tests/qemu-iotests/147
++++ b/tests/qemu-iotests/147
+@@ -287,6 +287,5 @@ class BuiltinNBD(NBDBlockdevAddBase):
+ 
+ 
+ if __name__ == '__main__':
+-    # Need to support image creation
+-    iotests.main(supported_fmts=['vpc', 'parallels', 'qcow', 'vdi', 'qcow2',
+-                                 'vmdk', 'raw', 'vhdx', 'qed'])
++    iotests.main(supported_fmts=['raw'],
++                 supported_protocols=['nbd'])
+diff --git a/tests/qemu-iotests/205 b/tests/qemu-iotests/205
+index b8a86c446e..76f6c5fa2b 100755
+--- a/tests/qemu-iotests/205
++++ b/tests/qemu-iotests/205
+@@ -153,4 +153,5 @@ class TestNbdServerRemove(iotests.QMPTestCase):
+ 
+ 
+ if __name__ == '__main__':
+-    iotests.main(supported_fmts=['generic'])
++    iotests.main(supported_fmts=['raw'],
++                 supported_protocols=['nbd'])
 -- 
 2.17.1
 
