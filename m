@@ -2,49 +2,46 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA47C5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA24C5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:14:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDAE3214B2
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:14:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDAE3214B2
+	by mail.kernel.org (Postfix) with ESMTPS id 7EE05214B2
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:14:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EE05214B2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS1T9-00076P-U1
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 11:14:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52787)
+	id 1iS1TG-00079l-GG
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 11:14:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52804)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iS1QJ-0005Y7-NF
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:11:17 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iS1QL-0005YA-LG
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:11:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iS1QI-0002uz-DU
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iS1QI-0002us-Cb
  for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:11:15 -0500
-Received: from relay.sw.ru ([185.231.240.75]:43440)
+Received: from relay.sw.ru ([185.231.240.75]:43448)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iS1QI-0002os-5z; Tue, 05 Nov 2019 11:11:14 -0500
+ id 1iS1QI-0002ou-5S; Tue, 05 Nov 2019 11:11:14 -0500
 Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iS1Q9-0000Xh-PU; Tue, 05 Nov 2019 19:11:05 +0300
+ id 1iS1Q9-0000Xh-EN; Tue, 05 Nov 2019 19:11:05 +0300
 From: Denis Plotnikov <dplotnikov@virtuozzo.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 1/4] virtio: protect non-modern devices from too big
- virtqueue size setting
-Date: Tue,  5 Nov 2019 19:11:02 +0300
-Message-Id: <20191105161105.19016-2-dplotnikov@virtuozzo.com>
+Subject: [PATCH v1 0/4] virtio: fix IO request length in virtio SCSI/block
+Date: Tue,  5 Nov 2019 19:11:01 +0300
+Message-Id: <20191105161105.19016-1-dplotnikov@virtuozzo.com>
 X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20191105161105.19016-1-dplotnikov@virtuozzo.com>
-References: <20191105161105.19016-1-dplotnikov@virtuozzo.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
 X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
@@ -65,63 +62,86 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The patch protects from creating illegal virtio device configuration
-via direct virtqueue size property setting.
-
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
+v1:
+  * make seg_max size dependent on virtuqueue size
+  * don't expose seg_max as property
+  * add new machine types with increased queue size
+  * add test to check the new machine types
+  * check queue size for non-modern virtio devices
 ---
- hw/virtio/virtio-blk-pci.c  |  9 +++++++++
- hw/virtio/virtio-scsi-pci.c | 10 ++++++++++
- 2 files changed, 19 insertions(+)
+From: "Denis V. Lunev" <den@openvz.org>
 
-diff --git a/hw/virtio/virtio-blk-pci.c b/hw/virtio/virtio-blk-pci.c
-index 60c9185c39..6177ff1df8 100644
---- a/hw/virtio/virtio-blk-pci.c
-+++ b/hw/virtio/virtio-blk-pci.c
-@@ -48,6 +48,15 @@ static void virtio_blk_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
- {
-     VirtIOBlkPCI *dev = VIRTIO_BLK_PCI(vpci_dev);
-     DeviceState *vdev = DEVICE(&dev->vdev);
-+    bool modern = virtio_pci_modern(vpci_dev);
-+    uint32_t queue_size = dev->vdev.conf.queue_size;
-+
-+    if (!modern && queue_size > 128) {
-+        error_setg(errp,
-+                   "too big queue size (%u, max: 128) "
-+                   "for non-modern virtio device", queue_size);
-+        return;
-+    }
- 
-     if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
-         vpci_dev->nvectors = dev->vdev.conf.num_queues + 1;
-diff --git a/hw/virtio/virtio-scsi-pci.c b/hw/virtio/virtio-scsi-pci.c
-index 2830849729..6e6790fda5 100644
---- a/hw/virtio/virtio-scsi-pci.c
-+++ b/hw/virtio/virtio-scsi-pci.c
-@@ -17,6 +17,7 @@
- 
- #include "hw/virtio/virtio-scsi.h"
- #include "virtio-pci.h"
-+#include "qapi/error.h"
- 
- typedef struct VirtIOSCSIPCI VirtIOSCSIPCI;
- 
-@@ -47,6 +48,15 @@ static void virtio_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
-     VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
-     DeviceState *proxy = DEVICE(vpci_dev);
-     char *bus_name;
-+    bool modern = virtio_pci_modern(vpci_dev);
-+    uint32_t virtqueue_size = vs->conf.virtqueue_size;
-+
-+    if (!modern && virtqueue_size > 128) {
-+        error_setg(errp,
-+                   "too big virtqueue size (%u, max: 128) "
-+                   "for non-modern virtio device", virtqueue_size);
-+        return;
-+    }
- 
-     if (vpci_dev->nvectors == DEV_NVECTORS_UNSPECIFIED) {
-         vpci_dev->nvectors = vs->conf.num_queues + 3;
+Linux guests submit IO requests no longer than PAGE_SIZE * max_seg
+field reported by SCSI controler. Thus typical sequential read with
+1 MB size results in the following pattern of the IO from the guest:
+  8,16   1    15754     2.766095122  2071  D   R 2095104 + 1008 [dd]
+  8,16   1    15755     2.766108785  2071  D   R 2096112 + 1008 [dd]
+  8,16   1    15756     2.766113486  2071  D   R 2097120 + 32 [dd]
+  8,16   1    15757     2.767668961     0  C   R 2095104 + 1008 [0]
+  8,16   1    15758     2.768534315     0  C   R 2096112 + 1008 [0]
+  8,16   1    15759     2.768539782     0  C   R 2097120 + 32 [0]
+The IO was generated by
+  dd if=/dev/sda of=/dev/null bs=1024 iflag=direct
+
+This effectively means that on rotational disks we will observe 3 IOPS
+for each 2 MBs processed. This definitely negatively affects both
+guest and host IO performance.
+
+The cure is relatively simple - we should report lengthy scatter-gather
+ability of the SCSI controller. Fortunately the situation here is very
+good. VirtIO transport layer can accomodate 1024 items in one request
+while we are using only 128. This situation is present since almost
+very beginning. 2 items are dedicated for request metadata thus we
+should publish VIRTQUEUE_MAX_SIZE - 2 as max_seg.
+
+The following pattern is observed after the patch:
+  8,16   1     9921     2.662721340  2063  D   R 2095104 + 1024 [dd]
+  8,16   1     9922     2.662737585  2063  D   R 2096128 + 1024 [dd]
+  8,16   1     9923     2.665188167     0  C   R 2095104 + 1024 [0]
+  8,16   1     9924     2.665198777     0  C   R 2096128 + 1024 [0]
+which is much better.
+
+The dark side of this patch is that we are tweaking guest visible
+parameter, though this should be relatively safe as above transport
+layer support is present in QEMU/host Linux for a very long time.
+The patch adds configurable property for VirtIO SCSI with a new default
+and hardcode option for VirtBlock which does not provide good
+configurable framework.
+
+Unfortunately the commit can not be applied as is. For the real cure we
+need guest to be fixed to accomodate that queue length, which is done
+only in the latest 4.14 kernel. Thus we are going to expose the property
+and tweak it on machine type level.
+
+The problem with the old kernels is that they have
+max_segments <= virtqueue_size restriction which cause the guest
+crashing in the case of violation.
+To fix the case described above in the old kernels we can increase
+virtqueue_size to 256 and max_segments to 254. The pitfall here is
+that seabios allows the virtqueue_size-s < 128, however, the seabios
+patch extending that value to 256 is pending.
+
+Denis Plotnikov (4):
+  virtio: protect non-modern devices from too big virtqueue size setting
+  virtio: make seg_max virtqueue size dependent
+  virtio: increase virtuqueue sizes in new machine types
+  iotests: add test for virtio-scsi and virtio-blk machine type settings
+
+ hw/block/virtio-blk.c       |   2 +-
+ hw/core/machine.c           |  14 ++++
+ hw/i386/pc_piix.c           |  16 +++-
+ hw/i386/pc_q35.c            |  14 +++-
+ hw/scsi/virtio-scsi.c       |   2 +-
+ hw/virtio/virtio-blk-pci.c  |   9 +++
+ hw/virtio/virtio-scsi-pci.c |  10 +++
+ include/hw/boards.h         |   6 ++
+ tests/qemu-iotests/267      | 154 ++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/267.out  |   1 +
+ tests/qemu-iotests/group    |   1 +
+ 11 files changed, 222 insertions(+), 7 deletions(-)
+ create mode 100755 tests/qemu-iotests/267
+ create mode 100644 tests/qemu-iotests/267.out
+
 -- 
 2.17.0
 
