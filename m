@@ -2,51 +2,117 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F22CC5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9FCFC5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:20:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D5902087E
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:18:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D5902087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id AB6482087E
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 16:20:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB6482087E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS1Wx-0002La-UI
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 11:18:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52828)
+	id 1iS1Yo-0003sM-Lh
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 11:20:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55266)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iS1QN-0005YP-34
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:11:21 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iS1Xr-0002zp-Ov
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:19:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iS1QJ-0002vY-Av
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:11:19 -0500
-Received: from relay.sw.ru ([185.231.240.75]:43446)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iS1QI-0002ot-9u; Tue, 05 Nov 2019 11:11:14 -0500
-Received: from [10.94.4.71] (helo=dptest2.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iS1QA-0000Xh-61; Tue, 05 Nov 2019 19:11:06 +0300
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 4/4] iotests: add test for virtio-scsi and virtio-blk
- machine type settings
-Date: Tue,  5 Nov 2019 19:11:05 +0300
-Message-Id: <20191105161105.19016-5-dplotnikov@virtuozzo.com>
-X-Mailer: git-send-email 2.17.0
-In-Reply-To: <20191105161105.19016-1-dplotnikov@virtuozzo.com>
-References: <20191105161105.19016-1-dplotnikov@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (envelope-from <laurent@vivier.eu>) id 1iS1Xq-0008Oy-Bi
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 11:19:03 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:33729)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>)
+ id 1iS1Xg-00087C-E8; Tue, 05 Nov 2019 11:18:52 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Mg6mG-1i0yBE2gX8-00hgHY; Tue, 05 Nov 2019 17:18:30 +0100
+Subject: Re: [PULL 0/4] Trivial branch patches
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+References: <157296887817.27285.13935693519835086344@37313f22b938>
+ <41caef0b-3db3-3fcf-a0b4-329e8e88ff0f@vivier.eu>
+ <20191105160345.GB2781@work-vm>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <03e06992-c72c-c7ab-7553-5804dbdf5cf3@vivier.eu>
+Date: Tue, 5 Nov 2019 17:18:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20191105160345.GB2781@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:lMkQVh7xGc8+nadLHkeSmGELI7w53PQxSSktQ/A2fIs0TqH97BW
+ C5jPCbs4Nx/N+X7Q6B3pyKk38TJAuHbfJ/t56bWKWOoAaRHpsXH7CosWg9LXucx0vRginzN
+ QXqGXI/HTwXzqfD+CHBZo3rtU3Z2Vh22MzsEsTPmzB5p7FG9WrHMWXuckXKDhdiif+ULo29
+ 6fb9Rqqpxd2I3ZaXZz7hQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:fzF2xgGrYGs=:GC1jA5lcB+NpVBHnYlbJHH
+ jKgbXv0SKUBFxDEFWtiNrhrRUCxLD5aEZETqv0BC75rxnfDTQPwkUXsOKabNMcTEZfwBzt8o2
+ jcmlI/hRQKEQolDnhkbYkbN0IsTN6nk/zCHAwVtFe8VoevbRodGlYpXI584s/+1l0iSOQHkOv
+ ZVsffxX4BE+ogPTL0wwTjlTLqtLogy2Nc2wZz7b14EETNC6jx6lMbvt7hk0+zhe7RXePTBBSt
+ 0lAk+NmQbJe5eE2Z6pzIba4NJWNw7ODRi8zPuOzkH0SqWkp3doth21YvIsGco0GtwzCL1hE+E
+ peQ2Bk7sJkl755fAozJ7j+b+sojmYhzhVQmx1FrNsWbX6gz8Lnm1lzaJVggO7SGuvj/gai6EU
+ CPYcGYhfHbmCIshk52epyz1R5gjPMLzxBo7mES0PMwYmfZPBwLsnN2of2ls/Iu76FldzAA8Tq
+ tFaYuOsOR+zFchJxz4voYKGOw6SGUAVfJqn2MVnCwAuhkW4ADvTbsUh8flxyvi+7FwhTXYSmw
+ gtSBtFvrpdvXyUyJUcdDMQ9vUxNjsaXNKZECQDZloQQg0uSNjp3HGrJjxMzRmQzo9rpxzu+kN
+ lIbHP9rLrXEYUbN3eqV7TnKypbpNK0opj64+FLai5hFeA3t7ecY7crIKBqg+czRPjNZ7qoeNh
+ D8A29xFyeSGjvs5rE1+vEYKLF0tbGbEyT/yt8mnnW2B9XGr41WUjThP9G/13wgytzYEyEFvGg
+ j7CFcTA87A8YfLD8Q5EJ8WSUnFQz8NwP3l4Ij1+Azq7ue8CHwKEF8cR7xoi1govgAOlmjihjV
+ KTciA8sFZH0aCOgZsEy95zzR6PiviYOKfqz0BdcoEofoO/xoFK+I+B+0SiWT2XPIySi0o7RaZ
+ v34ZKtb5XB81unlS1jxprBBbizZH8CfXxy/jwOGP0=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.17.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -58,201 +124,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, ehabkost@redhat.com,
- qemu-block@nongnu.org, mst@redhat.com, stefanha@redhat.com, mreitz@redhat.com,
- den@virtuozzo.com
+Cc: peter.maydell@linaro.org, sstabellini@kernel.org, berrange@redhat.com,
+ ehabkost@redhat.com, paul@xen.org, qemu-trivial@nongnu.org, mjt@tls.msk.ru,
+ claudio.fontana@huawei.com, qemu-devel@nongnu.org, chouteau@adacore.com,
+ Greg Kurz <groug@kaod.org>, marcandre.lureau@redhat.com,
+ frederic.konrad@adacore.com, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ clg@kaod.org, crosa@redhat.com, anthony.perard@citrix.com, pbonzini@redhat.com,
+ david@gibson.dropbear.id.au, xen-devel@lists.xenproject.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It tests proper queue size settings for all available machine types.
+Le 05/11/2019 à 17:03, Dr. David Alan Gilbert a écrit :
+> * Laurent Vivier (laurent@vivier.eu) wrote:
+>> Greg, Dave,
+>>
+>> could you fix that?
+>>
+>> Thanks,
+>> Laurent
+>>
+>> Le 05/11/2019 à 16:48, no-reply@patchew.org a écrit :
+>>> Patchew URL: https://patchew.org/QEMU/20191105144247.10301-1-laurent@vivier.eu/
+>>>
+>>>
+>>>
+>>> Hi,
+>>>
+>>> This series seems to have some coding style problems. See output below for
+>>> more information:
+>>>
+>>> Subject: [PULL 0/4] Trivial branch patches
+>>> Type: series
+>>> Message-id: 20191105144247.10301-1-laurent@vivier.eu
+>>>
+>>> === TEST SCRIPT BEGIN ===
+>>> #!/bin/bash
+>>> git rev-parse base > /dev/null || exit 0
+>>> git config --local diff.renamelimit 0
+>>> git config --local diff.renames True
+>>> git config --local diff.algorithm histogram
+>>> ./scripts/checkpatch.pl --mailback base..
+>>> === TEST SCRIPT END ===
+>>>
+>>> Switched to a new branch 'test'
+>>> 85ac453 global: Squash 'the the'
+>>> 9dd7da4 qom: Fix error message in object_class_property_add()
+>>> 2b76b45 hw/misc/grlib_ahb_apb_pnp: Fix 8-bit accesses
+>>> bddcfd9 hw/misc/grlib_ahb_apb_pnp: Avoid crash when writing to PnP registers
+>>>
+>>> === OUTPUT BEGIN ===
+>>> 1/4 Checking commit bddcfd9b6b24 (hw/misc/grlib_ahb_apb_pnp: Avoid crash when writing to PnP registers)
+>>> 2/4 Checking commit 2b76b451f9b7 (hw/misc/grlib_ahb_apb_pnp: Fix 8-bit accesses)
+>>> 3/4 Checking commit 9dd7da421bfb (qom: Fix error message in object_class_property_add())
+>>> WARNING: line over 80 characters
+>>> #31: FILE: qom/object.c:1109:
+>>> +        error_setg(errp, "attempt to add duplicate property '%s' to object (type '%s')",
+>>>
+>>> WARNING: line over 80 characters
+>>> #43: FILE: qom/object.c:1141:
+>>> +        error_setg(errp, "attempt to add duplicate property '%s' to class (type '%s')",
+>>>
+>>> total: 0 errors, 2 warnings, 22 lines checked
+>>>
+>>> Patch 3/4 has style problems, please review.  If any of these errors
+>>> are false positives report them to the maintainer, see
+>>> CHECKPATCH in MAINTAINERS.
+>>> 4/4 Checking commit 85ac453d1520 (global: Squash 'the the')
+>>> ERROR: do not use C99 // comments
+>>> #26: FILE: disas/libvixl/vixl/invalset.h:105:
+>>> +  // Note that this does not mean the backing storage is empty: it can still
+> 
+> That one is a false positive; libvixl is written in C++ !
 
-Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
----
- tests/qemu-iotests/267     | 154 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/267.out |   1 +
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 156 insertions(+)
- create mode 100755 tests/qemu-iotests/267
- create mode 100644 tests/qemu-iotests/267.out
+OK, thank you.
 
-diff --git a/tests/qemu-iotests/267 b/tests/qemu-iotests/267
-new file mode 100755
-index 0000000000..6d3cc574b3
---- /dev/null
-+++ b/tests/qemu-iotests/267
-@@ -0,0 +1,154 @@
-+#!/usr/bin/env python
-+#
-+# Test virtio-scsi and virtio-blk queue settings for all machine types
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import sys
-+import os
-+import re
-+import iotests
-+
-+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'scripts'))
-+import qemu
-+
-+# list of device types and virtqueue properties to test
-+# this is a generalized approach
-+# for now we just check queue length
-+# more properties can be added in each list
-+virtio_scsi_props = {'vq_size': 'virtqueue_size'}
-+virtio_blk_props = {'vq_size': 'queue-size'}
-+
-+dev_types = {'virtio-scsi-pci': virtio_scsi_props,
-+             'virtio-blk-pci': virtio_blk_props}
-+
-+vm_dev_params = {'virtio-scsi-pci': ['-device', 'virtio-scsi-pci,id=scsi0'],
-+                 'virtio-blk-pci': ['-device',
-+                                    'virtio-blk-pci,id=scsi0,drive=drive0',
-+                                    '-drive',
-+                                    'driver=null-co,id=drive0,if=none']}
-+
-+def make_pattern(props):
-+     pattern_items = ['{0} = \d+'.format(prop) for prop in props]
-+     return '|'.join(pattern_items)
-+
-+
-+def query_virtqueue_props(vm, dev_type_name):
-+    output = vm.qmp('human-monitor-command', command_line='info qtree')
-+    output = output['return']
-+
-+    props_list = dev_types[dev_type_name].values();
-+
-+    pattern = make_pattern(props_list)
-+
-+    res = re.findall(pattern, output)
-+
-+    if len(res) != len(props_list):
-+        not_found = props_list.difference(set(res))
-+
-+        ret = (0, '({0}): The following properties not found: {1}'
-+                  .format(dev_type_name, ', '.join(not_found)))
-+    else:
-+        props = dict()
-+        for prop in res:
-+            p = prop.split(' = ')
-+            props[p[0]] = int(p[1])
-+        ret = (1, props)
-+
-+    return ret
-+
-+
-+def check_mt(mt, dev_type_name):
-+    vm_params = ['-machine', mt['name']] + vm_dev_params[dev_type_name]
-+
-+    vm = qemu.QEMUMachine(iotests.qemu_prog, vm_params)
-+    vm.launch()
-+    ret = query_virtqueue_props(vm, dev_type_name)
-+    vm.shutdown()
-+
-+    if ret[0] == 0:
-+        print('Error ({0}): {1}'.format(mt['name'], ret[1]))
-+        return 1
-+
-+    errors = 0
-+    props = ret[1]
-+
-+    for prop_name, prop_val in props.items():
-+        if mt[prop_name] != prop_val:
-+            print('Error [{0}, {1}]: {2}={3} (expected {4})'.
-+                  format(mt['name'], dev_type_name, prop_name, prop_val,
-+                         mt[prop_name]))
-+            errors += 1
-+
-+    return errors
-+
-+def is_256_virtqueue_size_mt(mt):
-+    mt = mt.split("-")
-+
-+    # machine types like pc-x.x
-+    if len(mt) == 2:
-+        return False
-+
-+    # machine types like pc-<chip_name>-x.x[.x]
-+    ver = mt[2]
-+
-+    ver = ver.split(".");
-+
-+    # all versions greater than 4.0.1 goes with 256 queue size
-+    if int(ver[0]) >= 4:
-+        major = int(ver[1])
-+        minor = 0
-+        if len(ver) > 2:
-+            minor = int(ver[2])
-+
-+        if major > 0 or minor > 1:
-+             return True
-+
-+    return False
-+
-+
-+# collect all machine types except 'none'
-+vm = iotests.VM()
-+vm.launch()
-+machines = [m['name'] for m in vm.qmp('query-machines')['return']]
-+vm.shutdown()
-+machines.remove('none')
-+machines.remove('isapc')
-+
-+failed = 0
-+
-+for dev_type in dev_types:
-+    # create a list of machine types and their parameters
-+    # machine types vz8.X.X must have virtqueue_length=256
-+    # others must have virtqueue_length=128
-+    mtypes = list()
-+    for m in machines:
-+        if is_256_virtqueue_size_mt(m):
-+            vq_size = 256
-+        else:
-+            vq_size = 128
-+
-+        mtypes.append({'name': m, dev_types[dev_type]['vq_size']: vq_size})
-+
-+    # test each machine type
-+    for mt in mtypes:
-+        failed += check_mt(mt, dev_type)
-+
-+if failed > 0:
-+    print('Failed')
-+else:
-+    print('Success')
-diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
-new file mode 100644
-index 0000000000..35821117c8
---- /dev/null
-+++ b/tests/qemu-iotests/267.out
-@@ -0,0 +1 @@
-+Success
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 3605796bb2..ab8523ad60 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -252,3 +252,4 @@
- 255 rw auto quick
- 256 rw auto quick
- 266 rw quick
-+267 auto quick
--- 
-2.17.0
+Laurent
 
 
