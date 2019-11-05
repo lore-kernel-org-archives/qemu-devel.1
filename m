@@ -2,107 +2,93 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F0EC010A2
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 11:06:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F300C010A2
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 11:21:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9474620869
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 11:06:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6AF42206BA
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 11:21:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iyt6fYkl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9474620869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mmOHbfQ0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF42206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRwfB-00059D-PR
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 06:06:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40054)
+	id 1iRwth-0000nO-HA
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 06:21:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42673)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iRweF-0004Zw-Ez
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:05:20 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iRwsj-0000Cg-Iw
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:20:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iRweD-0003jg-IU
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:05:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32041
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iRweD-0003de-CO
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:05:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572951915;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=QwZHpT2dn3/wY0xq+71Rk3yzxorESyHpnocHcB2gNLM=;
- b=iyt6fYklqJphv8rMjs+YAXgFcRgm6Ni06b/IXsLwQ/xTs33taIZi8J/0inI3cl56q/cZ35
- et4T7pAj1Bnm8rp/bFUffrs3Cw0DPmmFxihuWgLEi2Ei1fnSxtcXWYIkHDHHWoYyX5Da3h
- CWsy9SFsHrO77eFFv4igVUG2Zi3iBJ0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-ma9NEhypNUuTUtoI3tpdkA-1; Tue, 05 Nov 2019 06:05:13 -0500
-X-MC-Unique: ma9NEhypNUuTUtoI3tpdkA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A0711005500;
- Tue,  5 Nov 2019 11:05:12 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-89.ams2.redhat.com
- [10.36.117.89])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D1E9E26FD1;
- Tue,  5 Nov 2019 11:05:04 +0000 (UTC)
-Subject: Re: [RFC PATCH v2 18/26] qcow2: Add subcluster support to
- expand_zero_clusters_in_l1()
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-References: <cover.1572125022.git.berto@igalia.com>
- <f99f051139f84a4d34bc52696aa2c2b125d5c3fd.1572125022.git.berto@igalia.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <23b7a28a-22e2-25f5-3b08-438bf86e48ba@redhat.com>
-Date: Tue, 5 Nov 2019 12:05:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <richard.henderson@linaro.org>) id 1iRwsi-0000Gv-85
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:20:17 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45843)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iRwsi-0000D7-16
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:20:16 -0500
+Received: by mail-wr1-x444.google.com with SMTP id q13so20890375wrs.12
+ for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 03:20:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ilgO7SfmihSmTh5BQJrg1fDf0Z9tdYBptuuIxp/vml0=;
+ b=mmOHbfQ0tYi/Cxp5cWQ75UuwQKOk/K9YmlBacKYhwlap7L9Xev74XLI7GIJ/GLZkv3
+ DhR5qcrfRW0lzFFeVFnnWXlolahuUDi2+nuUKf6O+DJz3BSYV4hH9oX0QBbojm9/N7jg
+ KEsk0KyUlk9hMSIiNoPtLbEIha1ETqvl/MNbpP8eLsqZCH7lY4HLPBGrmyWB3MgoZ7qk
+ vw0nmA3EURzlDFET5aMMgfkC730QNk5g5pAIxxXLrFMYx3SEnQtIrWnJw8+J3wffasJ/
+ z2zVtUyEtC94L7m+LOlWpNTZUGhpFpQESfsVmVulvAjRqmnbL9TsLQIbSJyDctCY255z
+ Vr6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ilgO7SfmihSmTh5BQJrg1fDf0Z9tdYBptuuIxp/vml0=;
+ b=aoUlsNw6ovLtHleCByOr5dmBR+1MNQIm3323VtA2tKFtroaPS92eyghGkagUONJr7j
+ p8ilwR5ImyZTPdVBMJvrJRmR2xwdvvl4wTjeLbtM1dEWsmGTfaT+cuoxBKWCLFpha/v8
+ epe7b2Y5SZFuIA/T8Xmd62alj5EcEwCINvmRs9xm0JwfffvrZsjIUTpBQ/H7dVhOfnPk
+ PKIvUULEfIBwv/tVKGkJo9vqvlH47yMnL5EanrPCbkI9dRZoB9zDoKmBtx+iCPuvKHC0
+ rN9AhSRJqw748+g+G+mqFjEhAGYCzZhuB3bkjX85MLdxYlgw6JYTunbetRQrm2LWu5cP
+ Uc7g==
+X-Gm-Message-State: APjAAAVFIrWFkuCgsWclJhhF0TDi/JUYHbYD43DVpvma7yNNCEz2ZOu/
+ 24jwRxqahrYWHHWWpgEkX+G+BWMXEE9lJQ==
+X-Google-Smtp-Source: APXvYqyXzbn21kN9R042Uz6h/18pqxBW7E44VD9AnS3f6e1s9yYNU9dztMucrvZv0yabDQswlA160A==
+X-Received: by 2002:a5d:6706:: with SMTP id o6mr28212692wru.54.1572952814601; 
+ Tue, 05 Nov 2019 03:20:14 -0800 (PST)
+Received: from [192.168.8.102] (228.red-2-141-116.dynamicip.rima-tde.net.
+ [2.141.116.228])
+ by smtp.gmail.com with ESMTPSA id t10sm21683653wrw.23.2019.11.05.03.20.12
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 05 Nov 2019 03:20:13 -0800 (PST)
+Subject: Re: [PATCH] hw/arm/pxa2xx: rebuild hflags cache when modifying CPU
+ state
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Luc Michel <luc.michel@greensocs.com>
+References: <20191101103232.3692818-1-luc.michel@greensocs.com>
+ <CAFEAcA96tfJNVrnQzKyzooy7sJ__WKWWHXdAy_TNy=hSB_DOQQ@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <aff8e672-e0c7-a0f5-9c53-403a2e57524d@linaro.org>
+Date: Tue, 5 Nov 2019 12:20:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <f99f051139f84a4d34bc52696aa2c2b125d5c3fd.1572125022.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="55qIbn5vyiX9Ss1vaAIzN6g28A2KsvfA8"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+In-Reply-To: <CAFEAcA96tfJNVrnQzKyzooy7sJ__WKWWHXdAy_TNy=hSB_DOQQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,82 +100,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Denis V . Lunev" <den@openvz.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---55qIbn5vyiX9Ss1vaAIzN6g28A2KsvfA8
-Content-Type: multipart/mixed; boundary="W8iVnrhicyyoImRdjNDoZClAZxvlxtVDH"
+On 11/1/19 11:42 AM, Peter Maydell wrote:
+> The other place that might need checking is the PSCI/etc
+> code for doing CPU power on/off (and other callers to the
+> power up/down functions like the imx6 power control regs).
+> Richard, did you look at that code to see if it needed hflags updates?
 
---W8iVnrhicyyoImRdjNDoZClAZxvlxtVDH
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 26.10.19 23:25, Alberto Garcia wrote:
-> Two changes are needed in order to add subcluster support to this
-> function: deallocated clusters must have their bitmaps cleared, and
-> expanded clusters must have all the "subcluster allocated" bits set.
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cluster.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index aa3eb727a5..62f2a9fcc0 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -2036,6 +2036,7 @@ static int expand_zero_clusters_in_l1(BlockDriverSt=
-ate *bs, uint64_t *l1_table,
->                          /* not backed; therefore we can simply deallocat=
-e the
->                           * cluster */
->                          set_l2_entry(s, l2_slice, j, 0);
-> +                        set_l2_bitmap(s, l2_slice, j, 0);
->                          l2_dirty =3D true;
->                          continue;
->                      }
-> @@ -2102,6 +2103,7 @@ static int expand_zero_clusters_in_l1(BlockDriverSt=
-ate *bs, uint64_t *l1_table,
->                  } else {
->                      set_l2_entry(s, l2_slice, j, offset);
->                  }
-> +                set_l2_bitmap(s, l2_slice, j, QCOW_L2_BITMAP_ALL_ALLOC);
->                  l2_dirty =3D true;
->              }
-
-Technically this isn=E2=80=99t needed because this function is only called =
-when
-downgrading v3 to v2 images (which can=E2=80=99t have subclusters), but of
-course it won=E2=80=99t hurt.
-
-Max
+I had a quick grovel through hw/misc/imx6_src.c and didn't see anything; was
+there something more specific you were thinking of?
 
 
---W8iVnrhicyyoImRdjNDoZClAZxvlxtVDH--
-
---55qIbn5vyiX9Ss1vaAIzN6g28A2KsvfA8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3BV14ACgkQ9AfbAGHV
-z0B6Fwf/cQ3Dzl27xToE6wQR4FM1VLFYG2dxvY9dsPuKHvzLat6IMvFlynt+WIJn
-LLq+9MqDYL6dn1r8ZaKxjs6MDVOtabWAFAh5zPn2IsyuTCubDMIWLhNesRqSYYJV
-/lks4NQiJmCDTIke+nTq4Ordw93bw8LKh4w4FRTh/ZsRIsQblhM4m5e2jJqcIvb6
-376utJjRVGWKN8fXZ31KB+bELSPlkw82L9+XHaM6vQgOoPinMyYQPeepAlxHi3J2
-MZYBYTQKMBfiIk8N5PUilSoWbULIpSNf6cm+rhJgm4G+lHI8yZFD44NcfhTXRRST
-KHbkFpb3EloOJ18Y4ma3RPrYPuUpWg==
-=rJZx
------END PGP SIGNATURE-----
-
---55qIbn5vyiX9Ss1vaAIzN6g28A2KsvfA8--
-
+r~
 
