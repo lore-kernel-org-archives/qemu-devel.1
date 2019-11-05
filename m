@@ -2,81 +2,92 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0C8C010A3
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 11:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE5DC010A3
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 11:33:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A8C23206BA
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 11:33:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9496206BA
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 11:33:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=holoplot-com.20150623.gappssmtp.com header.i=@holoplot-com.20150623.gappssmtp.com header.b="YJHJK3PT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8C23206BA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holoplot.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="py/7Uo+E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9496206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRx57-0004lH-Pl
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 06:33:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45389)
+	id 1iRx5m-0005bB-UG
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 06:33:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45481)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <linus.ziegert@holoplot.com>) id 1iRx4F-0004D8-SZ
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:32:13 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iRx4z-0004r8-US
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:32:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <linus.ziegert@holoplot.com>) id 1iRx4A-0001R9-8k
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:32:08 -0500
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:36837)
+ (envelope-from <alex.bennee@linaro.org>) id 1iRx4y-0003gP-7y
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:32:57 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38922)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <linus.ziegert@holoplot.com>)
- id 1iRx48-0000ix-1I
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:32:04 -0500
-Received: by mail-il1-x143.google.com with SMTP id s75so17899610ilc.3
- for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 03:31:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=holoplot-com.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=W7mjdv/Lb2qS2Sc8H5RNZYF+HROjMlbSou5W7A6L6Qg=;
- b=YJHJK3PTuSWhg4SgKNAU1lb65c4WwoTFIPCSg4NbJ96dQhP/z5hZeXcjDS5SUr9fGu
- SYpFvI2BMxPQbBkUOzHIyWQSqFACEuXfEg4Zi/uK6OOdOMbJ6LOMZM5kP31QLOokSVM/
- I7cNhBk0K4zjEgKJ+omkLyWs2FefJnfeIf9b7r/I9Y9uo48Vmy1gjcZ3k1yeVSe4jegv
- Gdd52BcEFrrYNyLF1Mu1QFrBgylROPkgTqxx68TjFbMylNB1hJSdbP3d0AWS6KlWjsaf
- 7gasw2bjdkbmsYyzDnBYG8NZVArWbh7XT11kdXey89AFSNfzLUG9I5uNAEdGIhFmVZrc
- fbjA==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iRx4x-0003ZW-VA
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 06:32:56 -0500
+Received: by mail-wm1-x342.google.com with SMTP id t26so15630229wmi.4
+ for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 03:32:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:subject:in-reply-to:date:message-id
+ :mime-version; bh=wsIkqMSmVRI8x2Quhoekaz9JlLEnreCitrWAnERuauU=;
+ b=py/7Uo+ERWk/M+sya6RM/jlRdN7XCrolNoXsoH+Zo1AqdOrBaOV82zULmUAxdqAATX
+ FR6Szc4g66xgSL2ZKFF4H2PIKpUnidvDSWmeqEN/NcBabb70hnEKBXV5Po8j0Zsf8+FI
+ TcfU1K2X1Ksd17ZXIsjjuxOdZG2BS+ZhM9SgeEQ0FfCvKS0B6Fawo2Vas+KzhhQippnA
+ CdHZafElsQY6jF3UlKHiWMrAjrfwlYvVmWKYFAvACyp/KFLZyRCwNUPYE111U9lt94ro
+ xnU3QBx7FnbixdPjustuvPGh2mBgSX60KZyD/vbmF22n3iFxLguetp+zvHj3icIRabVE
+ SKpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=W7mjdv/Lb2qS2Sc8H5RNZYF+HROjMlbSou5W7A6L6Qg=;
- b=jrdw9/Bxf9YsKbQpMTmLo6E/cas50KbaMpZPPz4GvUQ3Xj7xDBeIZS5SPrzzdQ4jJt
- LTWJCO/TRl5UA39sp4XLu1dPWE9x1Lnfqhq4icdZnE0Ja4BzHwaxWmzh3TSbdT6G6IRL
- GE0rtdUjTB3DZ3hZuRX4Y5a9SLS1IDGXEGG1wgOZwlf9EpGx+XIrK4+g1udeEU3ny/Mh
- qDqRjHQfoCDlRc8bcFm3De0WUUq5D/E/qcuzmPS2XrenbX1wWJ37aNQj4PU5v9y2lQ0O
- Buhliw2bRdPYE6PIeLihVtfY+uA2p+kb/alT1sONG6fzodaeiihdyFDGJwpRowxiqTrp
- VhSg==
-X-Gm-Message-State: APjAAAW5amwTXnNNcqDw5zkzVy9GWndiYreFmcc5h1iJThev7dqYCU6o
- +mGKHyHAKxzWTDaVcAKfC06dbB5TsMBnKhp+pq4kcg==
-X-Google-Smtp-Source: APXvYqyLWSbXQmtlhKwTYBPUxxk3hgQ6X+UVHvSIuclkd2NUTl9KBAAQD+ohj/I58pt1nn3ztWzVITmgBQv5hjuKYOA=
-X-Received: by 2002:a92:c504:: with SMTP id r4mr30264541ilg.132.1572953518544; 
- Tue, 05 Nov 2019 03:31:58 -0800 (PST)
+ h=x-gm-message-state:references:user-agent:from:to:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=wsIkqMSmVRI8x2Quhoekaz9JlLEnreCitrWAnERuauU=;
+ b=D0KgLahxnPYUkSsPKNvpeYgfDMOaoPDuraPTvf94QiNp0d4+bKo0ohE7pdMwSv0Qvf
+ SS5qZ78A2UmnqwOKWF0116gRQpnMTyTjMj63e9f/vz3o3IVNksO348r9YbEIllDOrljA
+ xcpbVZghvfkKu20A8tSJPu/erfyAYe95q32YC7VhKSrfY8XwSapsguxNOdLRmlwAcuOG
+ xFaG/yuHcgmse7wC5rsLcxl4SzrojX/0jrQsmV/QQ5nQJgollwh2ZXSuYp9cm79rmV+3
+ FC52Xlh0P39ykuG0gRP6dR32u+tdEsACuJWnVQ/6NfgIk3ouoOnTEDNtIMBickT2oATC
+ /ifw==
+X-Gm-Message-State: APjAAAX9BMWu6QhGmGzwE+aUbiw/ETH51u5nGuGcbT5PK1ze27hPNjRn
+ MlnXeQ1zJ5ZvlbET8I/wlsVuKpbvV7Q=
+X-Google-Smtp-Source: APXvYqyF2EKIjdPyEW6CerxMBw2WdJFV3XJoRvD5qBcXdCaSwgR+aXEkUveINRjCgxmVEPNMSaJqSg==
+X-Received: by 2002:a1c:f305:: with SMTP id q5mr3704469wmq.137.1572953573384; 
+ Tue, 05 Nov 2019 03:32:53 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j14sm15180404wrp.16.2019.11.05.03.32.52
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 05 Nov 2019 03:32:52 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id A10EF1FF87
+ for <qemu-devel@nongnu.org>; Tue,  5 Nov 2019 11:32:51 +0000 (GMT)
+References: <ed421291-7178-d7bc-5ed3-9863d28ceba9@fnarfbargle.com>
+ <dd33a398-3c1f-0c92-2318-00ad144e1e5d@fnarfbargle.com>
+ <b1782119-abbc-9678-8217-ef576dbf8c93@fnarfbargle.com>
+ <7da75f0a-aa48-a9db-d2f8-fe74031ecf58@fnarfbargle.com>
+ <49b5d60f-b0cd-8d47-5e0f-75fc76b3ee47@fnarfbargle.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: Re: [Qemu-devel] Cross-posted : Odd QXL/KVM performance issue with
+ a Windows 7 Guest
+In-reply-to: <49b5d60f-b0cd-8d47-5e0f-75fc76b3ee47@fnarfbargle.com>
+Date: Tue, 05 Nov 2019 11:32:51 +0000
+Message-ID: <871rumk17g.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20191104181604.21943-1-linus.ziegert+qemu@holoplot.com>
- <CAKmqyKMWS18ssBUhDgYSnGiFRwCkSJPBRui4Op50Tq_Z-OUakA@mail.gmail.com>
-In-Reply-To: <CAKmqyKMWS18ssBUhDgYSnGiFRwCkSJPBRui4Op50Tq_Z-OUakA@mail.gmail.com>
-From: Linus Ziegert <linus.ziegert@holoplot.com>
-Date: Tue, 5 Nov 2019 12:31:22 +0100
-Message-ID: <CAPm2bJ_mfVepKP9hj-PQBnESsCi6t+9zj-m_KWQYx6m-S5ddAg@mail.gmail.com>
-Subject: Re: [PATCH] net/cadence_gem: Set PHY autonegotiation restart status
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000b8b2ce059697c714"
+Content-Type: text/plain
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::143
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,139 +99,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- "open list:Xilinx Zynq" <qemu-arm@nongnu.org>,
- Linus Ziegert <linus.ziegert+qemu@holoplot.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b8b2ce059697c714
-Content-Type: text/plain; charset="UTF-8"
 
-Am Mo., 4. Nov. 2019 um 23:50 Uhr schrieb Alistair Francis <
-alistair23@gmail.com>:
+Brad Campbell <lists2009@fnarfbargle.com> writes:
+
+> On 6/9/19 21:38, Brad Campbell wrote:
+>> 7022@1567775824.002106:kvm_vm_ioctl type 0xc008ae67, arg 0x7ffe13b0c970
+>> 7022@1567775824.002115:kvm_vm_ioctl type 0xc008ae67, arg 0x7ffe13b0c980
+>> 7022@1567775824.003122:kvm_vm_ioctl type 0xc008ae67, arg 0x7ffe13b0c970
 >
-> On Mon, Nov 4, 2019 at 2:02 PM <linus.ziegert@holoplot.com> wrote:
-> >
-> > From: Linus Ziegert <linus.ziegert+qemu@holoplot.com>
-> >
-> > The Linux kernel PHY driver sets AN_RESTART in the BMCR of the
-> > PHY when autonegotiation is started.
-> > Recently the kernel started to read back the PHY's AN_RESTART
-> > bit and now checks whether the autonegotiation is complete and
-> > the bit was cleared [1]. Otherwise the link status is down.
-> >
-> > The emulated PHY needs to clear AN_RESTART immediately to inform
-> > the kernel driver about the completion of autonegotiation phase.
-> >
-> > [1]
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c36757eb9dee
-> >
-> > Signed-off-by: Linus Ziegert <linus.ziegert+qemu@holoplot.com>
+>> Does this look familiar to anyone?
 >
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-
-I consider this stable material. Applies cleanly to all versions starting
-from v1.5.0.
-Thanks
-
+> Ugh. System timer.
 >
-> Alistair
+> So with the timer interrupt removed and an added trace on IRQ > 0:
 >
-> > ---
-> >  hw/net/cadence_gem.c | 9 +++++----
-> >  1 file changed, 5 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/hw/net/cadence_gem.c b/hw/net/cadence_gem.c
-> > index 7f9cb5ab95..b8be73dc55 100644
-> > --- a/hw/net/cadence_gem.c
-> > +++ b/hw/net/cadence_gem.c
-> > @@ -271,9 +271,10 @@
-> >  #define PHY_REG_EXT_PHYSPCFC_ST   27
-> >  #define PHY_REG_CABLE_DIAG   28
-> >
-> > -#define PHY_REG_CONTROL_RST  0x8000
-> > -#define PHY_REG_CONTROL_LOOP 0x4000
-> > -#define PHY_REG_CONTROL_ANEG 0x1000
-> > +#define PHY_REG_CONTROL_RST       0x8000
-> > +#define PHY_REG_CONTROL_LOOP      0x4000
-> > +#define PHY_REG_CONTROL_ANEG      0x1000
-> > +#define PHY_REG_CONTROL_ANRESTART 0x0200
-> >
-> >  #define PHY_REG_STATUS_LINK     0x0004
-> >  #define PHY_REG_STATUS_ANEGCMPL 0x0020
-> > @@ -1345,7 +1346,7 @@ static void gem_phy_write(CadenceGEMState *s,
-unsigned reg_num, uint16_t val)
-> >          }
-> >          if (val & PHY_REG_CONTROL_ANEG) {
-> >              /* Complete autonegotiation immediately */
-> > -            val &= ~PHY_REG_CONTROL_ANEG;
-> > +            val &= ~(PHY_REG_CONTROL_ANEG | PHY_REG_CONTROL_ANRESTART);
-> >              s->phy_regs[PHY_REG_STATUS] |= PHY_REG_STATUS_ANEGCMPL;
-> >          }
-> >          if (val & PHY_REG_CONTROL_LOOP) {
-> > --
-> > 2.21.0
-> >
-> >
+> qxl/guest-0: 79096403248: qxldd: DrvCopyBits
+> 14955@1567780063.149527:kvm_vcpu_ioctl cpu_index 2, type 0xae80, arg (nil)
+> 14956@1567780063.150291:qxl_ring_res_put 0 #res=1
+> 14955@1567780063.163672:kvm_run_exit cpu_index 2, reason 2
+> 14955@1567780063.163688:qxl_io_write 0 native addr=4 (QXL_IO_NOTIFY_OOM) val=0 size=1 async=0
+> 14955@1567780063.163704:qxl_spice_oom 0
+> 14955@1567780063.163720:kvm_vcpu_ioctl cpu_index 2, type 0xae80, arg (nil)
+> 14956@1567780063.163755:qxl_ring_command_check 0 native
+> 14956@1567780063.163779:qxl_ring_res_push 0 native s#=0 res#=1 last=0x7f3c0d44b6e0 notify=yes
+> 14956@1567780063.163816:qxl_ring_res_push_rest 0 ring 1/8 [326,325]
+> 14956@1567780063.163841:qxl_send_events 0 1
+> 14956@1567780063.163868:qxl_ring_cursor_check 0 native
+> 14956@1567780063.163888:qxl_ring_command_check 0 native
+> 14924@1567780063.163879:kvm_set_irq irq 11, level 1, status 1
+> 14954@1567780063.163895:kvm_run_exit cpu_index 1, reason 2
+> 14954@1567780063.163965:qxl_io_write 0 native addr=3 (QXL_IO_UPDATE_IRQ) val=0 size=1 async=0
+> 14954@1567780063.164006:kvm_set_irq irq 11, level 0, status 1
+> 14954@1567780063.164029:kvm_vcpu_ioctl cpu_index 1, type 0xae80, arg (nil)
+> 14954@1567780063.164065:kvm_run_exit cpu_index 1, reason 2
+> 14954@1567780063.164080:qxl_io_write 0 native addr=3 (QXL_IO_UPDATE_IRQ) val=0 size=1 async=0
+> 14954@1567780063.164104:kvm_vcpu_ioctl cpu_index 1, type 0xae80, arg (nil)
+> 14955@1567780063.266778:kvm_run_exit cpu_index 2, reason 2
+> 14955@1567780063.266790:qxl_io_write 0 native addr=0 (QXL_IO_NOTIFY_CMD) val=0 size=1 async=0
+> 14955@1567780063.266809:kvm_vcpu_ioctl cpu_index 2, type 0xae80, arg (nil)
+> 14956@1567780063.266822:qxl_ring_cursor_check 0 native
+> 14956@1567780063.266842:qxl_ring_command_check 0 native
+> 79213750625 qxl-0/cmd: cmd @ 0x10000000104b598 draw: surface_id 0 type copy effect opaque src 100000001fecbf8 (id 9fe0870780 type 0 flags 0 width 1920 height 1080, fmt 8 flags 0 x 1920 y 1080 stride 7680 palette 0 data 100000001fecc28) area 1920x1080+0+0 rop 8
+> 14956@1567780063.266983:qxl_ring_command_get 0 native
+> 14956@1567780063.267044:qxl_ring_command_check 0 native
+> 14956@1567780063.267070:qxl_ring_cursor_check 0 native
+> 14956@1567780063.267087:qxl_ring_command_check 0 native
+> 14956@1567780063.267109:qxl_ring_command_req_notification 0
+> 14955@1567780063.267967:kvm_run_exit cpu_index 2, reason 2
+> 14955@1567780063.267987:qxl_io_write 0 native addr=7 (QXL_IO_LOG) val=0 size=1 async=0
+> 14955@1567780063.268015:qxl_io_log 0 qxldd: DrvCopyBits
+>
+> So if I'm not mistaken (for the nth time), we have KVM_RUN on cpu index 2 here:
+>
+> 14955@1567780063.163720:kvm_vcpu_ioctl cpu_index 2, type 0xae80, arg (nil)
+>
+> And it returns here :
+>
+> 14955@1567780063.266778:kvm_run_exit cpu_index 2, reason 2
+>
+> Does that imply guest code is running for ~100ms on that vcpu?
 
---000000000000b8b2ce059697c714
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Yes. In the KVM game vmexits is what kills performance. If QEMU is
+involved in doing the emulation you have to exit the guest, go through
+the kernel, exit the ioctl and then QEMU does it's thing before you
+restart.
 
-<div dir=3D"ltr"><div><div><br><br>Am Mo., 4. Nov. 2019 um 23:50 Uhr schrie=
-b Alistair Francis &lt;<a href=3D"mailto:alistair23@gmail.com">alistair23@g=
-mail.com</a>&gt;:<br>&gt;<br>&gt; On Mon, Nov 4, 2019 at 2:02 PM &lt;<a hre=
-f=3D"mailto:linus.ziegert@holoplot.com">linus.ziegert@holoplot.com</a>&gt; =
-wrote:<br>&gt; &gt;<br>&gt; &gt; From: Linus Ziegert &lt;<a href=3D"mailto:=
-linus.ziegert%2Bqemu@holoplot.com">linus.ziegert+qemu@holoplot.com</a>&gt;<=
-br>&gt; &gt;<br>&gt; &gt; The Linux kernel PHY driver sets AN_RESTART in th=
-e BMCR of the<br>&gt; &gt; PHY when autonegotiation is started.<br>&gt; &gt=
-; Recently the kernel started to read back the PHY&#39;s AN_RESTART<br>&gt;=
- &gt; bit and now checks whether the autonegotiation is complete and<br>&gt=
-; &gt; the bit was cleared [1]. Otherwise the link status is down.<br>&gt; =
-&gt;<br>&gt; &gt; The emulated PHY needs to clear AN_RESTART immediately to=
- inform<br>&gt; &gt; the kernel driver about the completion of autonegotiat=
-ion phase.<br>&gt; &gt;<br>&gt; &gt; [1] <a href=3D"https://git.kernel.org/=
-pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3Dc36757eb9dee">http=
-s://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=
-=3Dc36757eb9dee</a><br>&gt; &gt;<br>&gt; &gt; Signed-off-by: Linus Ziegert =
-&lt;<a href=3D"mailto:linus.ziegert%2Bqemu@holoplot.com">linus.ziegert+qemu=
-@holoplot.com</a>&gt;<br>&gt;<br>&gt; Reviewed-by: Alistair Francis &lt;<a =
-href=3D"mailto:alistair.francis@wdc.com">alistair.francis@wdc.com</a>&gt;<b=
-r><br></div>I consider this stable material. Applies cleanly to all version=
-s starting from v1.5.0.<br></div>Thanks<br><div><div>=C2=A0<br>&gt;<br>&gt;=
- Alistair<br>&gt;<br>&gt; &gt; ---<br>&gt; &gt; =C2=A0hw/net/cadence_gem.c =
-| 9 +++++----<br>&gt; &gt; =C2=A01 file changed, 5 insertions(+), 4 deletio=
-ns(-)<br>&gt; &gt;<br>&gt; &gt; diff --git a/hw/net/cadence_gem.c b/hw/net/=
-cadence_gem.c<br>&gt; &gt; index 7f9cb5ab95..b8be73dc55 100644<br>&gt; &gt;=
- --- a/hw/net/cadence_gem.c<br>&gt; &gt; +++ b/hw/net/cadence_gem.c<br>&gt;=
- &gt; @@ -271,9 +271,10 @@<br>&gt; &gt; =C2=A0#define PHY_REG_EXT_PHYSPCFC_=
-ST =C2=A0 27<br>&gt; &gt; =C2=A0#define PHY_REG_CABLE_DIAG =C2=A0 28<br>&gt=
-; &gt;<br>&gt; &gt; -#define PHY_REG_CONTROL_RST =C2=A00x8000<br>&gt; &gt; =
--#define PHY_REG_CONTROL_LOOP 0x4000<br>&gt; &gt; -#define PHY_REG_CONTROL_=
-ANEG 0x1000<br>&gt; &gt; +#define PHY_REG_CONTROL_RST =C2=A0 =C2=A0 =C2=A0 =
-0x8000<br>&gt; &gt; +#define PHY_REG_CONTROL_LOOP =C2=A0 =C2=A0 =C2=A00x400=
-0<br>&gt; &gt; +#define PHY_REG_CONTROL_ANEG =C2=A0 =C2=A0 =C2=A00x1000<br>=
-&gt; &gt; +#define PHY_REG_CONTROL_ANRESTART 0x0200<br>&gt; &gt;<br>&gt; &g=
-t; =C2=A0#define PHY_REG_STATUS_LINK =C2=A0 =C2=A0 0x0004<br>&gt; &gt; =C2=
-=A0#define PHY_REG_STATUS_ANEGCMPL 0x0020<br>&gt; &gt; @@ -1345,7 +1346,7 @=
-@ static void gem_phy_write(CadenceGEMState *s, unsigned reg_num, uint16_t =
-val)<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>&gt; &gt; =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0if (val &amp; PHY_REG_CONTROL_ANEG) {<br>&gt; &g=
-t; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Complete autonegotiat=
-ion immediately */<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
-val &amp;=3D ~PHY_REG_CONTROL_ANEG;<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0val &amp;=3D ~(PHY_REG_CONTROL_ANEG | PHY_REG_CONTROL_ANRE=
-START);<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0s-&gt;=
-phy_regs[PHY_REG_STATUS] |=3D PHY_REG_STATUS_ANEGCMPL;<br>&gt; &gt; =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0if (val &amp; PHY_REG_CONTROL_LOOP) {<br>&gt; &gt; --<br>&gt; &gt; 2.21.=
-0<br>&gt; &gt;<br>&gt; &gt;<br></div></div></div>
+You can't avoid all exits - indeed VIRTIO is designed to limit the exits
+to a single exit per transmission. However if you are emulating a legacy
+device in QEMU every access to a memory mapped register will involve an
+exit.
 
---000000000000b8b2ce059697c714--
+If you monitor QEMU with "perf record" and then look at the result
+("perf report") see what QEMU is doing all that time. It's likely there
+is a legacy device somewhere which the guest kernel is hammering.
+
+--
+Alex.
 
