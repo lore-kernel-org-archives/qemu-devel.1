@@ -2,70 +2,68 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A94AC5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 17:53:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F2DBC5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 17:54:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56EB521882
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 17:53:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56EB521882
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 297BA217F5
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 17:54:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 297BA217F5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS31e-0006Ri-7A
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 12:53:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47156)
+	id 1iS321-00073C-RT
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 12:54:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47922)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iS2yb-0002M8-JU
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 12:50:46 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iS30x-0005m1-OJ
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 12:53:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iS2ya-0004XO-IB
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 12:50:45 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:46591)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iS2ya-0004Wq-8i; Tue, 05 Nov 2019 12:50:44 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MdeOl-1hsREj3xdx-00Zj7B; Tue, 05 Nov 2019 18:50:21 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL v2 0/3] Trivial branch patches
-Date: Tue,  5 Nov 2019 18:50:07 +0100
-Message-Id: <20191105175010.2591-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <no-reply@patchew.org>) id 1iS30v-0005Vo-Vb
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 12:53:11 -0500
+Resent-Date: Tue, 05 Nov 2019 12:53:11 -0500
+Resent-Message-Id: <E1iS30v-0005Vo-Vb@eggs.gnu.org>
+Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21853)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iS30v-0005UG-O3; Tue, 05 Nov 2019 12:53:09 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1572976333; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=W41LKsmhNK3Xgp4NAkMoYbigzyT4xnAW6PDiNaLDHoks/gUKlkFlXU3ouwTFRlfP8CSY3iQgC9l3e1XXLz1BNFIpNRzkYsrt0A1Ia5i3/nwkfeBw3wxoaekX+EU/ZjQ/k6qC/0Zc8/Eibqsvw2btKQCNdG8csARElgVxZaju1zA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1572976333;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=5vdIBxF8T/xgMrXsQHlZ0gLCxvaKH/eFWvu3KUlj7nM=; 
+ b=kTcuRDFtJXMo/UZHiV4AdwPPu+uT+CnhG0mXM/OyzwWdWdhNwqrfDZB2Aft30JMCMpYT3YVRHW7rVsFxiO/TPD29yYPZ2D1AEGQmrt5ghklwHNjmHH1xmwtSW9yWarw2K0JghYozGirYX8UcV5gKubHxySWLLJMdv32YyWrHO2U=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1572976332869468.6086744975937;
+ Tue, 5 Nov 2019 09:52:12 -0800 (PST)
+In-Reply-To: <20191105144247.10301-1-laurent@vivier.eu>
+Subject: Re: [PULL 0/4] Trivial branch patches
+Message-ID: <157297633037.27285.18020124194406333059@37313f22b938>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:bVlXh+qfacMYAJz0JYhOyV/CyLXAoaePIt05Vn/XxD8LtGnM1tr
- GXXn06EiHaloQjwhDdOWzFLEfaOUmFNry8lZMGSIvXXQY/AvH/MOpXkIPZTpoD8ZWKbZoPT
- AlrpUTkZ2yTxn/w8RnJof5KISGUZwN8ctqeco5tBWFnYqxWmaut/OixibWFpfqCzugpOgUN
- AYjerAX25MByQ9tiRIp9w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:FDAFY9f0SXI=:JhUvsvMKENvKfD/dRw9zBJ
- ttvXeWgWtQ0G3bGac4B0To/qcFALz5sKpcxEWnHS29A6okPGDzapmAd/IShQY40J0eMEICMdY
- Hhzf9Hv/Ar5WdBr4nPDRIaV4oXFzDj11D1kGeinxlLF8ATqRqqqj74PKDOkRlbxpWtHB/ZkT9
- h0l6BM+7TbeMhlPykRA9n7cBN85XmNhUbItIeBUQ1dBxKHb3PXojjC/5Nd52kLo3cuiDG+qwW
- i0yUuL0LyLSmCVL1Phv2oJWmDkJmYpOd30QrCrLfBegwku/pYcPkGVmvOlQoDqtCBTPuH2Vdc
- avbzYzExQuGDPlqelThcukrRhp1Lf7nRAJ5I397SctfYy90gJ/+JtN/O6rICOOJFxv4Mw0t/w
- /IYZBfO+J9luFhU349T/KwemXsHRilcrTAi4HuXIZSPY9DRifvYs5MC3XQ3HPhYW+mBNYHSz7
- b12PjhLdPJNuVEX1fvuYCi4H4YTsGEJGrMEfqrcuceKOfKtcORLa2YXltU2buGnPX1TSj2ucy
- JByAjDcbOJWiOpjuMwC4M7q6e6pOvehyJnKnkwno1Kg7d4layedaxjcKRBM7WnF12bGxHRVmW
- 1dCHl+goyPjFvWKp85s5wItlIJgeQkPL54xcsKV8kS8cH9i2eZoaoFqzXiy5xgYvi7/4Mir35
- Cd0FJuQPGz6Q0Ec0lmnPkQPoR1+oJr+MMbGx9QNhuDXOzk1W1sXb8XaZrGceyWRfIktYY0mTx
- IKPhbskzE9rR0Rh/mSIF+t6LfpMcmBLSxazfbvNWxQk7F65vUHflTE5Za7e5hoaUV+g2YTSwD
- nyT5Pf5CoiVM0EwhDU/DfgpcBn2lUtSjaRXZyY/LGv71R2E2jhgL/AnOkDtII8BQd5A6X1oS2
- Nm4tEFD373kW4k8ERvB9jzTREmeslEmIZmwsqqXr0=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: laurent@vivier.eu
+Date: Tue, 5 Nov 2019 09:52:12 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 217.72.192.73
+X-Received-From: 136.143.188.58
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,57 +75,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Stefano Stabellini <sstabellini@kernel.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Paul Durrant <paul@xen.org>,
- qemu-trivial@nongnu.org, Claudio Fontana <claudio.fontana@huawei.com>,
- Cleber Rosa <crosa@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>, Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, sstabellini@kernel.org, berrange@redhat.com,
+ ehabkost@redhat.com, paul@xen.org, qemu-trivial@nongnu.org, mjt@tls.msk.ru,
+ claudio.fontana@huawei.com, qemu-devel@nongnu.org, chouteau@adacore.com,
+ laurent@vivier.eu, marcandre.lureau@redhat.com, frederic.konrad@adacore.com,
+ qemu-arm@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org, crosa@redhat.com,
+ anthony.perard@citrix.com, pbonzini@redhat.com, david@gibson.dropbear.id.au,
+ xen-devel@lists.xenproject.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 36609b4fa36f0ac934874371874416f7533a5408:
-
-  Merge remote-tracking branch 'remotes/palmer/tags/palmer-for-master-4.2-sf1' into staging (2019-11-02 17:59:03 +0000)
-
-are available in the Git repository at:
-
-  git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
-
-for you to fetch changes up to e187e55ec65039ed6bd982debee632450ace3bae:
-
-  global: Squash 'the the' (2019-11-05 18:39:14 +0100)
-
-----------------------------------------------------------------
-Trivial fixes (20191105-v2)
-
-----------------------------------------------------------------
-
-Dr. David Alan Gilbert (1):
-  global: Squash 'the the'
-
-Philippe Mathieu-Daudé (2):
-  hw/misc/grlib_ahb_apb_pnp: Avoid crash when writing to PnP registers
-  hw/misc/grlib_ahb_apb_pnp: Fix 8-bit accesses
-
- disas/libvixl/vixl/invalset.h       |  2 +-
- docs/interop/pr-helper.rst          |  2 +-
- docs/specs/ppc-spapr-hotplug.txt    |  2 +-
- docs/specs/ppc-xive.rst             |  2 +-
- docs/specs/tpm.txt                  |  2 +-
- hw/misc/grlib_ahb_apb_pnp.c         | 12 ++++++++++++
- include/hw/xen/interface/io/blkif.h |  2 +-
- scripts/dump-guest-memory.py        |  2 +-
- 8 files changed, 19 insertions(+), 7 deletions(-)
-
--- 
-v2: remove patch from Greg that has lines with more than 80 columns
-2.21.0
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwNTE0NDI0Ny4xMDMw
+MS0xLWxhdXJlbnRAdml2aWVyLmV1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpTdWJqZWN0OiBbUFVMTCAwLzRdIFRyaXZpYWwgYnJhbmNoIHBhdGNoZXMKVHlw
+ZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkxMTA1MTQ0MjQ3LjEwMzAxLTEtbGF1cmVudEB2aXZp
+ZXIuZXUKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJz
+ZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
+ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJy
+YW5jaCAndGVzdCcKMDEwMmM3OSBnbG9iYWw6IFNxdWFzaCAndGhlIHRoZScKOWM1ODNiMCBxb206
+IEZpeCBlcnJvciBtZXNzYWdlIGluIG9iamVjdF9jbGFzc19wcm9wZXJ0eV9hZGQoKQoyOTllZWZk
+IGh3L21pc2MvZ3JsaWJfYWhiX2FwYl9wbnA6IEZpeCA4LWJpdCBhY2Nlc3NlcwpjOTMxMjMxIGh3
+L21pc2MvZ3JsaWJfYWhiX2FwYl9wbnA6IEF2b2lkIGNyYXNoIHdoZW4gd3JpdGluZyB0byBQblAg
+cmVnaXN0ZXJzCgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzQgQ2hlY2tpbmcgY29tbWl0IGM5MzEy
+MzE4N2RmMiAoaHcvbWlzYy9ncmxpYl9haGJfYXBiX3BucDogQXZvaWQgY3Jhc2ggd2hlbiB3cml0
+aW5nIHRvIFBuUCByZWdpc3RlcnMpCjIvNCBDaGVja2luZyBjb21taXQgMjk5ZWVmZDM3NTIyICho
+dy9taXNjL2dybGliX2FoYl9hcGJfcG5wOiBGaXggOC1iaXQgYWNjZXNzZXMpCjMvNCBDaGVja2lu
+ZyBjb21taXQgOWM1ODNiMDRmZGIxIChxb206IEZpeCBlcnJvciBtZXNzYWdlIGluIG9iamVjdF9j
+bGFzc19wcm9wZXJ0eV9hZGQoKSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzMx
+OiBGSUxFOiBxb20vb2JqZWN0LmM6MTEwOToKKyAgICAgICAgZXJyb3Jfc2V0ZyhlcnJwLCAiYXR0
+ZW1wdCB0byBhZGQgZHVwbGljYXRlIHByb3BlcnR5ICclcycgdG8gb2JqZWN0ICh0eXBlICclcycp
+IiwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM0MzogRklMRTogcW9tL29iamVj
+dC5jOjExNDE6CisgICAgICAgIGVycm9yX3NldGcoZXJycCwgImF0dGVtcHQgdG8gYWRkIGR1cGxp
+Y2F0ZSBwcm9wZXJ0eSAnJXMnIHRvIGNsYXNzICh0eXBlICclcycpIiwKCnRvdGFsOiAwIGVycm9y
+cywgMiB3YXJuaW5ncywgMjIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy80IGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBv
+c2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4g
+TUFJTlRBSU5FUlMuCjQvNCBDaGVja2luZyBjb21taXQgMDEwMmM3OWEzMDY4IChnbG9iYWw6IFNx
+dWFzaCAndGhlIHRoZScpCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMjY6IEZJ
+TEU6IGRpc2FzL2xpYnZpeGwvdml4bC9pbnZhbHNldC5oOjEwNToKKyAgLy8gTm90ZSB0aGF0IHRo
+aXMgZG9lcyBub3QgbWVhbiB0aGUgYmFja2luZyBzdG9yYWdlIGlzIGVtcHR5OiBpdCBjYW4gc3Rp
+bGwKCnRvdGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgNTYgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+NC80IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
+cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
+c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3Qg
+Y29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
+dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTEwNTE0NDI0Ny4xMDMwMS0xLWxhdXJlbnRA
+dml2aWVyLmV1L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
+ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQ
+bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
