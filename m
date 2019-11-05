@@ -2,81 +2,103 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2417CC1747C
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 13:45:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AE80C1747C
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 13:58:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D419D2190F
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 13:45:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 546A421928
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 13:58:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="azitTy8W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D419D2190F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="BxR9bJD/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 546A421928
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44340 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRz9N-0007IJ-WD
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 08:45:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42754)
+	id 1iRzLT-0002He-E8
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 08:58:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liq3ea@gmail.com>) id 1iRz8c-0006r3-I7
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:44:52 -0500
+ (envelope-from <darren.kenny@oracle.com>) id 1iRzKk-0001cd-Im
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:57:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liq3ea@gmail.com>) id 1iRz8a-0001Xk-HX
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:44:50 -0500
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:39691)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <liq3ea@gmail.com>) id 1iRz8a-0001XY-9b
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:44:48 -0500
-Received: by mail-oi1-x22a.google.com with SMTP id v138so17525679oif.6
- for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 05:44:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/ts4WNIWc3gjpfUlq4ngqbZ8UpwHaH5X+jpdJ8J99E0=;
- b=azitTy8WSuzVcMsj0pmPUblsusrepwE5DOZcCy4nJj2oC+IYBIIYlGmQs2YQViE6Th
- sR4Yl7j9CwpJqkpdjswVraqTEa3bpHjw1dcyUVvzPF9C6D8JjmmL2P+1XaxjrJv9N8YB
- AlGPYydJvlPQFa1lSddiuTHr4WKjesz5w4h9RoVAyxMqfOHOUI1H9ODuKBalpvU5htmg
- 4U7lnAme46cP/xDoP4ZJKIjq0cc7u8BcrM0RpecfFNDlPXkXh99r8GWrDd3ugYYHvyq0
- iZS+9c78ukp0AYwcSNScSRLfOqWtDT7JlOemI1R8DrywCtnw8ALlLYxIfmZoYpbAbznl
- MwJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=/ts4WNIWc3gjpfUlq4ngqbZ8UpwHaH5X+jpdJ8J99E0=;
- b=NPk5h+PWwYZDqsfapakjy3kjloVmpuRtWJCk9jQKWq+h2/LaG3AzTV5FChwYDPbbp7
- ZezPOFLz/OaixCHbVEgUtc4B5wWjyb6O5XJmQkRyWeraeHD/NokvfOm4eINlVLhgRv7j
- /Tm/ChzqTX+9rgMpisH1s53tW7JlcKwjtSMjZNqmV5PIJv+95hxp328KrTsrF0HbySTC
- CXkCsOkxPy+P/UOBc0V6zQjNDK1XgfjtAzVVbuAQ0nPTFjjC+DW5hEnxvfqVpdiauY1h
- wZu4P7aheaqIv8mR5E0limikfT/QIcbC2rMSzywq6F22wlNzGcLVkItbKRnpBq8tDwNp
- ktvQ==
-X-Gm-Message-State: APjAAAX6GuG1h7pPL2sOhf5ZCp57w0k3Z1nH0S9ph180V2/3W2Hungda
- 7gg2aWgXXQi2ABl5RSDpH+L9BbxKKGpNUDjNWI0=
-X-Google-Smtp-Source: APXvYqxvq2eKrXOuDhyEvipIF4O0psDfTawtCg+J43d650H61DXEbhgoijKAkttUZhjqNNGl+gnivHi/i3K+rbbCh0w=
-X-Received: by 2002:aca:42d7:: with SMTP id p206mr4064701oia.129.1572961487351; 
- Tue, 05 Nov 2019 05:44:47 -0800 (PST)
+ (envelope-from <darren.kenny@oracle.com>) id 1iRzKh-0004M1-MW
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:57:22 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:49788)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+ id 1iRzKh-0004Jn-D6
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 08:57:19 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA5DsP0I151403;
+ Tue, 5 Nov 2019 13:57:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=oAqK6I15l/l+8k5sOGeuSz29Iy9S+FoV4KjOd0QtTR8=;
+ b=BxR9bJD/YFpv8yXEJPcr3NVluuiiSOVH6IcmxyN6Ws4mCkf5kKgwfzP76OoEM5AbPIy0
+ d5PaEsCl1b4a/JIXpiPUXSuOSomwysq+faR/XUXPm0GfnuV5RWF6GDZDJbp7E3gl1Nqb
+ MEcfV8l1eG2TBOar2n3frOkW/g1SnuUBwMDZFf8GUfonVxJiL86a0oupMEw9MvVkeB7E
+ dvPrMNZpxqMekKgfXlxjXbId93dr1mAxjQi9heg7fg1UQ1GzWA0xcCLa8mxJQ6W1kVAR
+ cqpJDBrcCyek4wsu5233JGZh2boKqVFBKfgRCcmMxgq5ApmpeiDJx0LBB7bvkbtvuUrx Xg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2w117txe2d-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 05 Nov 2019 13:57:15 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA5Ds7XQ086379;
+ Tue, 5 Nov 2019 13:57:15 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3020.oracle.com with ESMTP id 2w3161bsqk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 05 Nov 2019 13:57:15 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA5DvEgS026347;
+ Tue, 5 Nov 2019 13:57:14 GMT
+Received: from starbug-mbp.localdomain (/10.169.111.121)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Tue, 05 Nov 2019 05:57:14 -0800
+Received: from starbug-mbp (localhost [127.0.0.1])
+ by starbug-mbp.localdomain (Postfix) with SMTP id 362AB4AA202C;
+ Tue,  5 Nov 2019 13:57:12 +0000 (GMT)
+Date: Tue, 5 Nov 2019 13:57:12 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Subject: Re: [PATCH v4 00/20] Add virtual device fuzzing support
+Message-ID: <20191105135711.lld344zgbin2tz72@starbug-mbp>
+Mail-Followup-To: "Oleinik, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20191030144926.11873-1-alxndr@bu.edu>
 MIME-Version: 1.0
-References: <5DC05485.008EAA.00665@m12-12.163.com>
- <20191104114857.74fe9222@x1.home>
- <CAKXe6SJKP94eKw+7w4ucFsDQW0GZ7E4SLNekECyJXm0rZa6GHQ@mail.gmail.com>
- <60808bdc-9b0e-3cf3-df6c-fd9f71ff58c7@redhat.com>
-In-Reply-To: <60808bdc-9b0e-3cf3-df6c-fd9f71ff58c7@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 5 Nov 2019 21:44:10 +0800
-Message-ID: <CAKXe6SLz6h4=ME4Y96b-5JTu29ec+Oyioui8kTFcayy34juWiQ@mail.gmail.com>
-Subject: Re: Questions about the VFIO BAR region
-To: Auger Eric <eric.auger@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000b2f5a7059699a2e0"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22a
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20191030144926.11873-1-alxndr@bu.edu>
+User-Agent: NeoMutt/20180716
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9431
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1908290000 definitions=main-1911050116
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9431
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1911050116
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,332 +110,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex Williamson <alex.williamson@redhat.com>, Li Qiang <liq3ea@163.com>,
- Alex Williamson <alex.l.williamson@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000b2f5a7059699a2e0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Alexander,
 
-Auger Eric <eric.auger@redhat.com> =E4=BA=8E2019=E5=B9=B411=E6=9C=885=E6=97=
-=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:17=E5=86=99=E9=81=93=EF=BC=9A
+I've been trying out these patches, and I'm seeing a high volume of
+crashes - where for v3, there were none in a run of over 3 weeks -
+so it was a bit of a surprise :)
 
-> Hi Li,
->
-> On 11/5/19 2:16 AM, Li Qiang wrote:
-> >
-> >
-> > Alex Williamson <alex.williamson@redhat.com
-> > <mailto:alex.williamson@redhat.com>> =E4=BA=8E2019=E5=B9=B411=E6=9C=885=
-=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=882:49=E5=86=99=E9=81=93=EF=BC=
-=9A
-> >
-> >     On Tue, 5 Nov 2019 00:40:39 +0800
-> >     Li Qiang <liq3ea@163.com <mailto:liq3ea@163.com>> wrote:
-> >
-> >     > Hello Alex, Auger and all,
-> >     >
-> >     > I have a question about the VFIO virtual device BAR.
-> >     >
-> >     > In vfio_region_setup, it initialize a =E2=80=98region->mem=E2=80=
-=99 MR and set its
-> >     ops to =E2=80=98vfio_regions_ops=E2=80=99.
-> >     > In =E2=80=98vfio_region_mmap=E2=80=99, it maps the physical devic=
-e=E2=80=99s MMIO to
-> >     QEMU=E2=80=99s virtual address space
-> >     > as a raw MR =E2=80=98region->mmaps[i].mem=E2=80=99.
-> >     > And also it set the latter MR as a subregion of the first one.
-> >     >
-> >     > So when the guest accesses the BAR, it will direct go to the
-> >     physical device=E2=80=99s BAR.
-> >     > My question is here:
-> >     > When the qemu will use the =E2=80=98vfio_regions_ops=E2=80=99 to =
-read/write the
-> BAR?
-> >     > Also whey in the last of =E2=80=98vfio_region_write/read=E2=80=99=
- we need to call
-> >     =E2=80=98vbasedev->ops->vfio_eoi(vbasedev);=E2=80=99?
-> >
-> >     We support:
-> >
-> >      a) sparse mmaps where the entire BAR is not covered by an mmap
-> >
-> >
-> > Got.
-> >
-> >
-> >
-> >      b) quirks, which layer on top of the mmaps to provide virtualized
-> >         access
-> >
-> >
-> > Do you mean like in 'vfio_probe_ati_bar4_quirk', register a high
-> > priority subregion of VFIORegion.mem.
-> > So when the guest write the BAR, vfio_regions_ops will be used. Here
-> > 'quirks' do you mean such things?
-> >
-> > static void vfio_probe_ati_bar4_quirk(VFIOPCIDevice *vdev, int nr)
-> > {
-> >     VFIOQuirk *quirk;
-> >     VFIOConfigWindowQuirk *window;
-> >
-> >     ...
-> >     memory_region_init_io(window->addr_mem, OBJECT(vdev),
-> >                           &vfio_generic_window_address_quirk, window,
-> >                           "vfio-ati-bar4-window-address-quirk", 4);
-> >     memory_region_add_subregion_overlap(vdev->bars[nr].region.mem,
-> >                                         window->address_offset,
-> >                                         window->addr_mem, 1);
-> >    ...
-> > }
-> Yes that's it. In that case vfio_generic_window_address_quirk ops get
-> called when attempting to access this overlapping region.
-> >
-> >
-> >
-> >      c) INTx emulation which disables mmaps MRs in order to detect devi=
-ce
-> >         access as a generic mechanism for inferring interrupt
-> >         acknowledgment.
-> >
-> >
-> > In the above two cases, in 'vfio_region_write/read' we always access th=
-e
-> > physical device's BAR.
-> > So as far as I can understand, the physical device(sometimes) will
-> > trigger interrupts. And the responsible of clear it
-> > will be by the 'guest'. So I can't understand why there calls
-> > 'vbasedev->ops->vfio_eoi'. Could you please give me an
-> > example.
-> When a physical level sensitive IRQ hits it is signaled through an
-> eventfd. The eventfd can be handled by QEMU. In this case,
-> vfio_intx_interrupt gets called, for PCI. It turns the mmap off (slow
-> path on) and injects the corresponding virtual IRQ into the guest. The
-> reason why we turn the mmap off is we need to trap the guest end of
-> interrupt to eventually deactivate the IRQ at physical level and unmask
-> it (it was auto-masked by the vfio driver). The first access into the
-> region is assumed to correspond to the servicing of the pending
-> interrupt by the guest handler (pending status clear) and at this point
-> we deactivate the physical IRQ. So .vfio_eoi gets called on the first
-> read/write BAR access after an INTx gets pending. Note the mmapping
-> (fast path) is not immediatly turned on after deactivating the physical
-> INTx. See comment before vfio_intx_mmap_enable.
->
-> When an irqfd/resamplefd is used we do not need that trick as the guest
-> EOI is trapped at KVM level through the virtual interrupt controller.
-> when the guest EOI is trapped KVM deactivates the associated physical
-> IRQ and notifies the userspace through the resamplefd for this latter to
-> unmask the physical IRQ.
->
-> Hope this helps.
->
+The question is what may have changed that is causing that level of
+crashes - are you seeing this for the virtio-net-fork-fuzz tests?
 
+But also, I've been trying to debug some of these crashes - and the
+expectation is that you pass the crash-XXXX file as an argument to
+the qemu-fuzz-* binary - and when I do, I see the crash - but when I
+try to debug it, it ends up running through and exiting.
 
-Thank you Auger, very detailed information.
+My assumption is that because of the fork in the test, the crash is
+in one of the children.
+
+(ASIDE: I think it might be worth adding a debugging/analysing
+section to the documentation you've added to help people debug such
+crashes)
+
+Setting follow-fork-mode to child does get me there, and each crash
+seems, at least in the samples that I've taken, to be in iov_copy:
+
+  #0  0x00007ffff4cff377 in raise () from /lib64/libc.so.6
+  #1  0x00007ffff4d00a68 in abort () from /lib64/libc.so.6
+  #2  0x00007ffff4cf8196 in __assert_fail_base () from
+  /lib64/libc.so.6
+  #3  0x00007ffff4cf8242 in __assert_fail () from /lib64/libc.so.6
+  #4  0x00005555574d4026 in iov_copy ()
+  #5  0x000055555640dbd8 in virtio_net_flush_tx ()
+  #6  0x000055555640c8ef in virtio_net_tx_bh ()
+  #7  0x00005555574a05bb in aio_bh_call ()
+  #8  0x00005555574a0a34 in aio_bh_poll ()
+  #9  0x00005555574b1687 in aio_dispatch ()
+  #10 0x00005555574a35f9 in aio_ctx_dispatch ()
+  #11 0x00007ffff5e5d099 in g_main_context_dispatch () from
+  /lib64/libglib-2.0.so.0
+  #12 0x00005555574ae9fd in glib_pollfds_poll ()
+  #13 0x00005555574ad972 in os_host_main_loop_wait ()
+  #14 0x00005555574ad62c in main_loop_wait ()
+  #15 0x000055555736c653 in flush_events ()
+  #16 0x00005555573710a4 in virtio_net_fork_fuzz ()
+  #17 0x000055555736cb85 in LLVMFuzzerTestOneInput ()
+  ...
+
+Have you seen these kind of crashes, or is this just me?
+
+Just wondering if I should dig into it as a real issue, or some
+mis-merge I've done (not all the patches were cleanly applied for
+me when I cloned from master).
 
 Thanks,
-Li Qiang
 
+Darren.
 
-
+On Wed, Oct 30, 2019 at 02:49:47PM +0000, Oleinik, Alexander wrote:
+>This series adds a framework for coverage-guided fuzzing of
+>virtual-devices. Fuzzing targets are based on qtest and can make use of
+>the libqos abstractions.
 >
-> Thanks
+>V4:
+> * add/transfer license headers to new files
+> * restructure the added QTestClientTransportOps struct
+> * restructure the FuzzTarget struct and fuzzer skeleton
+> * fork-based fuzzer now directly mmaps shm over the coverage bitmaps
+> * fixes to i440 and virtio-net fuzz targets
+> * undo the changes to qtest_memwrite
+> * possible to build /fuzz and /all in the same build-dir
+> * misc fixes to address V3 comments
 >
-> Eric
+>V3:
+> * rebased onto v4.1.0+
+> * add the fuzzer as a new build-target type in the build-system
+> * add indirection to qtest client/server communication functions
+> * remove ramfile and snapshot-based fuzzing support
+> * add i440fx fuzz-target as a reference for developers.
+> * add linker-script to assist with fork-based fuzzer
+>
+>V2:
+> * split off changes to qos virtio-net and qtest server to other patches
+> * move vl:main initialization into new func: qemu_init
+> * moved useful functions from qos-test.c to a separate object
+> * use struct of function pointers for add_fuzz_target(), instead of
+>   arguments
+> * move ramfile to migration/qemu-file
+> * rewrite fork-based fuzzer pending patch to libfuzzer
+> * pass check-patch
+>
+>Alexander Oleinik (20):
+>  softmmu: split off vl.c:main() into main.c
+>  libqos: Rename i2c_send and i2c_recv
+>  fuzz: Add FUZZ_TARGET module type
+>  qtest: add qtest_server_send abstraction
+>  libqtest: Add a layer of abstraciton to send/recv
+>  module: check module wasn't already initialized
+>  qtest: add in-process incoming command handler
+>  tests: provide test variables to other targets
+>  libqos: split qos-test and libqos makefile vars
+>  libqos: move useful qos-test funcs to qos_external
+>  libqtest: make qtest_bufwrite send "atomic"
+>  libqtest: add in-process qtest.c tx/rx handlers
+>  fuzz: add configure flag --enable-fuzzing
+>  fuzz: Add target/fuzz makefile rules
+>  fuzz: add fuzzer skeleton
+>  fuzz: add support for fork-based fuzzing.
+>  fuzz: add support for qos-assisted fuzz targets
+>  fuzz: add i440fx fuzz targets
+>  fuzz: add virtio-net fuzz target
+>  fuzz: add documentation to docs/devel/
+>
+> Makefile                     |  16 ++-
+> Makefile.objs                |   4 +
+> Makefile.target              |  18 ++-
+> configure                    |  39 ++++++
+> docs/devel/fuzzing.txt       | 119 ++++++++++++++++++
+> exec.c                       |  12 +-
+> include/qemu/module.h        |   4 +-
+> include/sysemu/qtest.h       |   4 +
+> include/sysemu/sysemu.h      |   4 +
+> main.c                       |  52 ++++++++
+> qtest.c                      |  30 ++++-
+> tests/Makefile.include       |  75 +++++------
+> tests/fuzz/Makefile.include  |  11 ++
+> tests/fuzz/fork_fuzz.c       |  51 ++++++++
+> tests/fuzz/fork_fuzz.h       |  23 ++++
+> tests/fuzz/fork_fuzz.ld      |  37 ++++++
+> tests/fuzz/fuzz.c            | 177 ++++++++++++++++++++++++++
+> tests/fuzz/fuzz.h            |  66 ++++++++++
+> tests/fuzz/i440fx_fuzz.c     | 176 ++++++++++++++++++++++++++
+> tests/fuzz/qos_fuzz.c        | 232 +++++++++++++++++++++++++++++++++++
+> tests/fuzz/qos_fuzz.h        |  33 +++++
+> tests/fuzz/virtio_net_fuzz.c | 123 +++++++++++++++++++
+> tests/libqos/i2c-imx.c       |   8 +-
+> tests/libqos/i2c-omap.c      |   8 +-
+> tests/libqos/i2c.c           |  10 +-
+> tests/libqos/i2c.h           |   4 +-
+> tests/libqos/qos_external.c  | 168 +++++++++++++++++++++++++
+> tests/libqos/qos_external.h  |  28 +++++
+> tests/libqtest.c             | 109 ++++++++++++++--
+> tests/libqtest.h             |   4 +
+> tests/pca9552-test.c         |  10 +-
+> tests/qos-test.c             | 140 +--------------------
+> util/module.c                |   7 ++
+> vl.c                         |  36 ++----
+> 34 files changed, 1601 insertions(+), 237 deletions(-)
+> create mode 100644 docs/devel/fuzzing.txt
+> create mode 100644 main.c
+> create mode 100644 tests/fuzz/Makefile.include
+> create mode 100644 tests/fuzz/fork_fuzz.c
+> create mode 100644 tests/fuzz/fork_fuzz.h
+> create mode 100644 tests/fuzz/fork_fuzz.ld
+> create mode 100644 tests/fuzz/fuzz.c
+> create mode 100644 tests/fuzz/fuzz.h
+> create mode 100644 tests/fuzz/i440fx_fuzz.c
+> create mode 100644 tests/fuzz/qos_fuzz.c
+> create mode 100644 tests/fuzz/qos_fuzz.h
+> create mode 100644 tests/fuzz/virtio_net_fuzz.c
+> create mode 100644 tests/libqos/qos_external.c
+> create mode 100644 tests/libqos/qos_external.h
+>
+>-- 
+>2.23.0
 >
 >
->
->
-> >
-> >
-> > Thanks,
-> > Li Qiang
-> >
-> >
-> >
-> >
-> >     The latter being the reason we call vfio_eoi.  Thanks,
-> >
-> >     Alex
-> >
->
->
-
---000000000000b2f5a7059699a2e0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">Auger Eric &lt;<a href=3D"mailto:eric=
-.auger@redhat.com">eric.auger@redhat.com</a>&gt; =E4=BA=8E2019=E5=B9=B411=
-=E6=9C=885=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8B=E5=8D=889:17=E5=86=99=E9=81=
-=93=EF=BC=9A<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
- 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Hi =
-Li,<br>
-<br>
-On 11/5/19 2:16 AM, Li Qiang wrote:<br>
-&gt; <br>
-&gt; <br>
-&gt; Alex Williamson &lt;<a href=3D"mailto:alex.williamson@redhat.com" targ=
-et=3D"_blank">alex.williamson@redhat.com</a><br>
-&gt; &lt;mailto:<a href=3D"mailto:alex.williamson@redhat.com" target=3D"_bl=
-ank">alex.williamson@redhat.com</a>&gt;&gt; =E4=BA=8E2019=E5=B9=B411=E6=9C=
-=885=E6=97=A5=E5=91=A8=E4=BA=8C =E4=B8=8A=E5=8D=882:49=E5=86=99=E9=81=93=EF=
-=BC=9A<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0On Tue, 5 Nov 2019 00:40:39 +0800<br>
-&gt;=C2=A0 =C2=A0 =C2=A0Li Qiang &lt;<a href=3D"mailto:liq3ea@163.com" targ=
-et=3D"_blank">liq3ea@163.com</a> &lt;mailto:<a href=3D"mailto:liq3ea@163.co=
-m" target=3D"_blank">liq3ea@163.com</a>&gt;&gt; wrote:<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; Hello Alex, Auger and all,<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; I have a question about the VFIO virtual devic=
-e BAR.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; In vfio_region_setup, it initialize a =E2=80=
-=98region-&gt;mem=E2=80=99 MR and set its<br>
-&gt;=C2=A0 =C2=A0 =C2=A0ops to =E2=80=98vfio_regions_ops=E2=80=99.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; In =E2=80=98vfio_region_mmap=E2=80=99, it maps=
- the physical device=E2=80=99s MMIO to<br>
-&gt;=C2=A0 =C2=A0 =C2=A0QEMU=E2=80=99s virtual address space<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; as a raw MR =E2=80=98region-&gt;mmaps[i].mem=
-=E2=80=99.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; And also it set the latter MR as a subregion o=
-f the first one.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; So when the guest accesses the BAR, it will di=
-rect go to the<br>
-&gt;=C2=A0 =C2=A0 =C2=A0physical device=E2=80=99s BAR.<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; My question is here:<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; When the qemu will use the =E2=80=98vfio_regio=
-ns_ops=E2=80=99 to read/write the BAR?<br>
-&gt;=C2=A0 =C2=A0 =C2=A0&gt; Also whey in the last of =E2=80=98vfio_region_=
-write/read=E2=80=99 we need to call<br>
-&gt;=C2=A0 =C2=A0 =C2=A0=E2=80=98vbasedev-&gt;ops-&gt;vfio_eoi(vbasedev);=
-=E2=80=99?<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0We support:<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0a) sparse mmaps where the entire BAR is not c=
-overed by an mmap<br>
-&gt; <br>
-&gt; <br>
-&gt; Got.<br>
-&gt; <br>
-&gt; =C2=A0<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0b) quirks, which layer on top of the mmaps to=
- provide virtualized<br>
-&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 access<br>
-&gt; <br>
-&gt; <br>
-&gt; Do you mean like in &#39;vfio_probe_ati_bar4_quirk&#39;, register a hi=
-gh<br>
-&gt; priority subregion of VFIORegion.mem.<br>
-&gt; So when the guest write the BAR, vfio_regions_ops will be used. Here<b=
-r>
-&gt; &#39;quirks&#39; do you mean such things?<br>
-&gt; <br>
-&gt; static void vfio_probe_ati_bar4_quirk(VFIOPCIDevice *vdev, int nr)<br>
-&gt; {<br>
-&gt; =C2=A0 =C2=A0 VFIOQuirk *quirk;<br>
-&gt; =C2=A0 =C2=A0 VFIOConfigWindowQuirk *window;<br>
-&gt; <br>
-&gt; =C2=A0 =C2=A0 ...<br>
-&gt; =C2=A0 =C2=A0 memory_region_init_io(window-&gt;addr_mem, OBJECT(vdev),=
-<br>
-&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 &amp;vfio_generic_window_address_quirk, window,<br>
-&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 &quot;vfio-ati-bar4-window-address-quirk&quot;, 4);<br=
->
-&gt; =C2=A0 =C2=A0 memory_region_add_subregion_overlap(vdev-&gt;bars[nr].re=
-gion.mem,<br>
-&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 windo=
-w-&gt;address_offset,<br>
-&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 windo=
-w-&gt;addr_mem, 1);<br>
-&gt; =C2=A0 =C2=A0...<br>
-&gt; }<br>
-Yes that&#39;s it. In that case vfio_generic_window_address_quirk ops get<b=
-r>
-called when attempting to access this overlapping region.<br>
-&gt; <br>
-&gt; =C2=A0<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0c) INTx emulation which disables mmaps MRs in=
- order to detect device<br>
-&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 access as a generic mechanism for inf=
-erring interrupt<br>
-&gt;=C2=A0 =C2=A0 =C2=A0=C2=A0 =C2=A0 acknowledgment.<br>
-&gt; <br>
-&gt; <br>
-&gt; In the above two cases, in &#39;vfio_region_write/read&#39; we always =
-access the<br>
-&gt; physical device&#39;s BAR.<br>
-&gt; So as far as I can understand, the physical device(sometimes) will<br>
-&gt; trigger interrupts. And the responsible of clear it=C2=A0<br>
-&gt; will be by the &#39;guest&#39;. So I can&#39;t understand why there ca=
-lls<br>
-&gt; &#39;vbasedev-&gt;ops-&gt;vfio_eoi&#39;. Could you please give me an<b=
-r>
-&gt; example.<br>
-When a physical level sensitive IRQ hits it is signaled through an<br>
-eventfd. The eventfd can be handled by QEMU. In this case,<br>
-vfio_intx_interrupt gets called, for PCI. It turns the mmap off (slow<br>
-path on) and injects the corresponding virtual IRQ into the guest. The<br>
-reason why we turn the mmap off is we need to trap the guest end of<br>
-interrupt to eventually deactivate the IRQ at physical level and unmask<br>
-it (it was auto-masked by the vfio driver). The first access into the<br>
-region is assumed to correspond to the servicing of the pending<br>
-interrupt by the guest handler (pending status clear) and at this point<br>
-we deactivate the physical IRQ. So .vfio_eoi gets called on the first<br>
-read/write BAR access after an INTx gets pending. Note the mmapping<br>
-(fast path) is not immediatly turned on after deactivating the physical<br>
-INTx. See comment before vfio_intx_mmap_enable.<br>
-<br>
-When an irqfd/resamplefd is used we do not need that trick as the guest<br>
-EOI is trapped at KVM level through the virtual interrupt controller.<br>
-when the guest EOI is trapped KVM deactivates the associated physical<br>
-IRQ and notifies the userspace through the resamplefd for this latter to<br=
->
-unmask the physical IRQ.<br>
-<br>
-Hope this helps.<br></blockquote><div><br></div><div><br></div><div>Thank y=
-ou Auger, very detailed information.</div><div><br></div><div>Thanks,</div>=
-<div>Li Qiang</div><div><br></div><div>=C2=A0</div><blockquote class=3D"gma=
-il_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,2=
-04,204);padding-left:1ex">
-<br>
-Thanks<br>
-<br>
-Eric<br>
-<br>
-<br>
-<br>
-<br>
-&gt; <br>
-&gt; <br>
-&gt; Thanks,<br>
-&gt; Li Qiang<br>
-&gt; <br>
-&gt; =C2=A0<br>
-&gt; <br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0The latter being the reason we call vfio_eoi.=C2=A0=
- Thanks,<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0 =C2=A0Alex<br>
-&gt; <br>
-<br>
-</blockquote></div></div>
-
---000000000000b2f5a7059699a2e0--
 
