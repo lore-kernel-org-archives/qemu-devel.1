@@ -2,81 +2,59 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10B9DC49EAB
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12F0BC49EAB
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:14:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D91FD20869
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:10:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D91FD20869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id DCCF0217F4
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:14:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCCF0217F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRur6-0003s6-OZ
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 04:10:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42351)
+	id 1iRuuW-0006w0-Id
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 04:14:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43039)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1iRuqK-0003GX-I4
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:09:41 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1iRusx-00051t-AF
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:12:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1iRuqI-0006SK-Lv
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:09:39 -0500
-Received: from mga09.intel.com ([134.134.136.24]:52936)
+ (envelope-from <guoheyi@huawei.com>) id 1iRusw-0007mn-35
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:12:23 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2192 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iRuqI-0006QJ-C4
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:09:38 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 05 Nov 2019 01:09:29 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,270,1569308400"; d="scan'208";a="227032956"
-Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
- by fmsmga004.fm.intel.com with ESMTP; 05 Nov 2019 01:09:28 -0800
-Received: from fmsmsx124.amr.corp.intel.com (10.18.125.39) by
- fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 5 Nov 2019 01:09:28 -0800
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- fmsmsx124.amr.corp.intel.com (10.18.125.39) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 5 Nov 2019 01:09:28 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.41]) with mapi id 14.03.0439.000;
- Tue, 5 Nov 2019 17:09:26 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: RE: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing to VM
-Thread-Topic: [RFC v2 00/22] intel_iommu: expose Shared Virtual Addressing
- to VM
-Thread-Index: AQHVimsks8KvEm+7BkaEbflXH8cdg6d6zfsAgAGOP8A=
-Date: Tue, 5 Nov 2019 09:09:26 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A0EE2B5@SHSMSX104.ccr.corp.intel.com>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <20191104172242.GD26023@xz-x1.metropole.lan>
-In-Reply-To: <20191104172242.GD26023@xz-x1.metropole.lan>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYTAyNTUyN2EtYTA0MS00YjgxLTg0ZDktZjY2NWI1MDc0YTUwIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiNUpyMjZOeVBsa2gxSitKVllpSHltZ3dvRUZ6ZWFITXhHTGNmOUpKSnJiajRnNmJmZk5cL1pBN3FqQXl2UGVMQ0YifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1iRuss-0007hm-V6; Tue, 05 Nov 2019 04:12:19 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 2B7146A7B79F7F75ACDF;
+ Tue,  5 Nov 2019 17:12:13 +0800 (CST)
+Received: from linux-OtBuvb.huawei.com (10.175.104.212) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.439.0; Tue, 5 Nov 2019 17:12:06 +0800
+From: Heyi Guo <guoheyi@huawei.com>
+To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>
+Subject: [RFC v2 07/14] arm/sdei: add support to trigger event by GIC
+ interrupt ID
+Date: Tue, 5 Nov 2019 17:10:49 +0800
+Message-ID: <20191105091056.9541-8-guoheyi@huawei.com>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20191105091056.9541-1-guoheyi@huawei.com>
+References: <20191105091056.9541-1-guoheyi@huawei.com>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.24
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.212]
+X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.190
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,42 +66,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "tianyu.lan@intel.com" <tianyu.lan@intel.com>, "Tian,
- Kevin" <kevin.tian@intel.com>,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>,
+ James Morse <james.morse@arm.com>, Heyi Guo <guoheyi@huawei.com>,
+ wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBUdWVz
-ZGF5LCBOb3ZlbWJlciA1LCAyMDE5IDE6MjMgQU0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVA
-aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JGQyB2MiAwMC8yMl0gaW50ZWxfaW9tbXU6IGV4
-cG9zZSBTaGFyZWQgVmlydHVhbCBBZGRyZXNzaW5nIHRvIFZNDQo+IA0KPiBPbiBUaHUsIE9jdCAy
-NCwgMjAxOSBhdCAwODozNDoyMUFNIC0wNDAwLCBMaXUgWWkgTCB3cm90ZToNCj4gPiBTaGFyZWQg
-dmlydHVhbCBhZGRyZXNzIChTVkEpLCBhLmsuYSwgU2hhcmVkIHZpcnR1YWwgbWVtb3J5IChTVk0p
-IG9uDQo+ID4gSW50ZWwgcGxhdGZvcm1zIGFsbG93IGFkZHJlc3Mgc3BhY2Ugc2hhcmluZyBiZXR3
-ZWVuIGRldmljZSBETUEgYW5kIGFwcGxpY2F0aW9ucy4NCj4gPiBTVkEgY2FuIHJlZHVjZSBwcm9n
-cmFtbWluZyBjb21wbGV4aXR5IGFuZCBlbmhhbmNlIHNlY3VyaXR5Lg0KPiA+IFRoaXMgc2VyaWVz
-IGlzIGludGVuZGVkIHRvIGV4cG9zZSBTVkEgY2FwYWJpbGl0eSB0byBWTXMuIGkuZS4gc2hhcmVk
-DQo+ID4gZ3Vlc3QgYXBwbGljYXRpb24gYWRkcmVzcyBzcGFjZSB3aXRoIHBhc3N0aHJ1IGRldmlj
-ZXMuIFRoZSB3aG9sZSBTVkENCj4gPiB2aXJ0dWFsaXphdGlvbiByZXF1aXJlcyBRRU1VL1ZGSU8v
-SU9NTVUgY2hhbmdlcy4gVGhpcyBzZXJpZXMgaW5jbHVkZXMNCj4gPiB0aGUgUUVNVSBjaGFuZ2Vz
-LCBmb3IgVkZJTyBhbmQgSU9NTVUgY2hhbmdlcywgdGhleSBhcmUgaW4gc2VwYXJhdGUNCj4gPiBz
-ZXJpZXMgKGxpc3RlZCBpbiB0aGUgIlJlbGF0ZWQgc2VyaWVzIikuDQo+ID4NClsuLi5dDQo+DQo+
-IFlpLA0KPiANCj4gV291bGQgeW91IG1pbmQgdG8gYWx3YXlzIG1lbnRpb24gd2hhdCB0ZXN0cyB5
-b3UgaGF2ZSBiZWVuIGRvbmUgd2l0aCB0aGUNCj4gcGF0Y2hzZXQgaW4gdGhlIGNvdmVyIGxldHRl
-cj8gIEl0J2xsIGJlIGZpbmUgdG8gc2F5IHRoYXQgeW91J3JlIHJ1bm5pbmcgdGhpcyBhZ2FpbnN0
-IEZQR0FzDQo+IHNvIG5vIG9uZSBjb3VsZCByZWFsbHkgcmV0ZXN0IGl0LCBidXQgc3RpbGwgaXQg
-d291bGQgYmUgZ29vZCB0byBrbm93IHRoYXQgYXMgd2VsbC4gIEl0J2xsDQo+IGV2ZW4gYmUgYmV0
-dGVyIHRvIG1lbnRpb24gdGhhdCB3aGljaCBwYXJ0IG9mIHRoZSBzZXJpZXMgaXMgdG90YWxseSB1
-bnRlc3RlZCBpZiB5b3UgYXJlDQo+IGF3YXJlIG9mLg0KDQpTdXJlLCBJIHNob3VsZCBoYXZlIGlu
-Y2x1ZGVkIHRoZSB0ZXN0IHBhcnRzLiBXaWxsIGRvIGluIG5leHQgdmVyc2lvbi4NCg0KVGhhbmtz
-LA0KWWkgTGl1DQo=
+Add an external interface to trigger an SDEI event bound to an
+interrupt by providing GIC interrupt ID.
+
+Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Dave Martin <Dave.Martin@arm.com>
+Cc: Marc Zyngier <marc.zyngier@arm.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: James Morse <james.morse@arm.com>
+---
+ target/arm/sdei.c | 37 +++++++++++++++++++++++++++++++++++++
+ target/arm/sdei.h |  7 +++++++
+ 2 files changed, 44 insertions(+)
+
+diff --git a/target/arm/sdei.c b/target/arm/sdei.c
+index 6af4a9044b..713ac97775 100644
+--- a/target/arm/sdei.c
++++ b/target/arm/sdei.c
+@@ -476,6 +476,28 @@ static int64_t sdei_version(QemuSDEState *s, CPUStat=
+e *cs, struct kvm_run *run)
+            (0ULL << SDEI_VERSION_MINOR_SHIFT);
+ }
+=20
++static bool inject_event(QemuSDEState *s, CPUState *cs, int32_t event, i=
+nt irq)
++{
++    QemuSDE *sde;
++
++    if (event < 0) {
++        return false;
++    }
++    sde =3D get_sde_no_check(s, event, cs);
++    if (sde->event_id =3D=3D SDEI_INVALID_EVENT_ID) {
++        put_sde(sde, cs);
++        return false;
++    }
++    if (irq > 0 && sde->prop->interrupt !=3D irq) {
++        /* Someone unbinds the interrupt! */
++        put_sde(sde, cs);
++        return false;
++    }
++    sde->pending =3D true;
++    dispatch_single(s, sde, cs);
++    return true;
++}
++
+ static int64_t unregister_single_sde(QemuSDEState *s, int32_t event,
+                                      CPUState *cs, bool force)
+ {
+@@ -1104,6 +1126,21 @@ void sdei_handle_request(CPUState *cs, struct kvm_=
+run *run)
+     }
+ }
+=20
++bool trigger_sdei_by_irq(int cpu, int irq)
++{
++    QemuSDEState *s =3D sde_state;
++
++    if (!s || irq >=3D ARRAY_SIZE(s->irq_map)) {
++        return false;
++    }
++
++    if (s->irq_map[irq] =3D=3D SDEI_INVALID_EVENT_ID) {
++        return false;
++    }
++
++    return inject_event(s, qemu_get_cpu(cpu), s->irq_map[irq], irq);
++}
++
+ static void sde_array_init(QemuSDE **array, int count)
+ {
+     int i;
+diff --git a/target/arm/sdei.h b/target/arm/sdei.h
+index 828f70bbf1..5ecc32d667 100644
+--- a/target/arm/sdei.h
++++ b/target/arm/sdei.h
+@@ -31,4 +31,11 @@
+=20
+ void sdei_handle_request(CPUState *cs, struct kvm_run *run);
+=20
++/*
++ * Trigger an SDEI event bound to an interrupt.
++ * Return true if event has been triggered successfully.
++ * Return false if event has not been triggered for some reason.
++ */
++bool trigger_sdei_by_irq(int cpu, int irq);
++
+ #endif
+--=20
+2.19.1
+
 
