@@ -2,81 +2,84 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 898CDC5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 18:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 039E8C5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 18:44:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57E2220656
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 18:25:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C63BB206BA
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 18:44:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hb6+nHN3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57E2220656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="BGYrjsyq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C63BB206BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS3W3-0004Lz-GX
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 13:25:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55039)
+	id 1iS3ou-0003f1-0h
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 13:44:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59612)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jkz@google.com>) id 1iS3SJ-0000YL-Rs
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:21:28 -0500
+ (envelope-from <palmer@sifive.com>) id 1iS3o8-00038i-33
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:44:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jkz@google.com>) id 1iS3SI-0001hm-MU
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:21:27 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:44535)
+ (envelope-from <palmer@sifive.com>) id 1iS3o6-0002f0-Ru
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:43:59 -0500
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:40070)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <jkz@google.com>) id 1iS3SH-0001ey-N1
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:21:26 -0500
-Received: by mail-pl1-x641.google.com with SMTP id q16so9875806pll.11
- for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 10:21:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QZSSnmANKuYNNfeFA4kh0cvKnd7/E6AYhiSQDUOzoQk=;
- b=Hb6+nHN3IOdtgYa5RsJyvTDxs0sIAFxGdtY9Ip7o5ZC9T8YAOTJG26w652HbknAEo7
- CgRPJR5P9I//Ckhf2CqGB7KqevY5R9cr3deT+0WF+e5AEMuPBEltQWxy589+LzWH6R2m
- 4BouNlxbEhenWzY9omlkNeWVa6zz/yt936DYeVjFkFH9DsW4ed+xJEmOYhaMD2kEBUc6
- w0g8s6kQ58RfOIkzK97PRZ4wubbrXOo4HEmnIp4tYbRTkv3o+cmK6BHMoVFYFJmWpeb6
- G3zhAwUQET7uKTIm5y90xdJP47IMKTuyTR3WrL5qhPtPmH0ZKWOyJuDi7Iv43plpegmy
- CYyg==
+ (Exim 4.71) (envelope-from <palmer@sifive.com>) id 1iS3o6-0002e2-KO
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 13:43:58 -0500
+Received: by mail-pf1-x441.google.com with SMTP id r4so16251927pfl.7
+ for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 10:43:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+ :content-transfer-encoding;
+ bh=yLuvCFUddkI93gzOEAO/dpXNHzKVU9aKgXyUMMSp0FU=;
+ b=BGYrjsyqrvdn+VslzPYr2pvkZ/b8G5obbm34MELxakZEdkYrh7KQeS5CyeKiQxsC7f
+ RxxSbW0tahVx4dYOsQgbvBNUokUul1MbAWIA1ESB/cWccC74mWGY/A91hZGH1erti+7h
+ dSmfk7Fruf6kAbn/ObOzKlKjdYDLyybzCDXHf2Y2Q//rqtPzKH01Sa5zWT1PsIX4hwUi
+ sof/mIAFNZ7m8vtqXiArgpfz83sSzsGr2i9ayewpCzlHB5bNCr6N0XxsnwgH3wz9Mr/6
+ TomZLiTwYMLdPGLNr0hnycn7jOkKVuSg70ezTHZJXs5JKX7c5Z9CO1JEUnBVg3B/KFJJ
+ 7JhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=QZSSnmANKuYNNfeFA4kh0cvKnd7/E6AYhiSQDUOzoQk=;
- b=WdG/rb7mBpvHZos0RadDCW1EQjH6TcV9ZYHF59JGSG0A8QREcXFLJoPEhkmFpDhnFt
- CE6JJ5F3BTAoyISWT1g7S485wyZ5WTFIzujJcpdQ9Bz33KJ2g3fyRki9pTgBgSIKaKGE
- l2BOtxh5rbDuGnvAxt8i/Syl6C2XbGTY2pdFhweEAcZk+rEERYEEP+oM5BqpyfpaM9WR
- 0THk87bABN6rfn2mztoJSE6OP0XIvehSYrfPcDJI+cfqDgHT9qO4Gfp1G0ou5u49RBa3
- F6I8PXcAutsRH86lftKOoZfTnHJoY9BHSvxbBC8/P9+G4z9SRquzYDhC49TZhw63lfDF
- v/1g==
-X-Gm-Message-State: APjAAAWcnMWAfOpNEV/9XY+BdZZExTyGUswi7yaoODGx7VC0VI5DVqZe
- /JtdO6FJLhAEFFxg1GywMVablE1gPLUTTCvNFD8FMQ==
-X-Google-Smtp-Source: APXvYqzwq1c/f3iU/6McN47sanbfs6+K94D3u3y+MZc1uqHfhbbVlYWEzEqgWrb0ovdCbl7YbI2lzGbphBs7d4xr8Z4=
-X-Received: by 2002:a17:902:a403:: with SMTP id
- p3mr9818877plq.275.1572978081687; 
- Tue, 05 Nov 2019 10:21:21 -0800 (PST)
-MIME-Version: 1.0
-References: <20191029224310.164025-1-jkz@google.com>
- <6653ca74-bbad-c63e-860c-161911c16f98@vivier.eu>
-In-Reply-To: <6653ca74-bbad-c63e-860c-161911c16f98@vivier.eu>
-From: Josh Kunz <jkz@google.com>
-Date: Tue, 5 Nov 2019 10:21:10 -0800
-Message-ID: <CADgy-2uszA+cmstV3K9sDdRwZX5mvDHoOeiqRaJ1KRRF5DRgCw@mail.gmail.com>
-Subject: Re: [PATCH] linux-user: Support for NETLINK socket options
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, Riku Voipio <riku.voipio@iki.fi>
-Content-Type: multipart/alternative; boundary="000000000000ccee8305969d7f77"
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+ :mime-version:content-transfer-encoding;
+ bh=yLuvCFUddkI93gzOEAO/dpXNHzKVU9aKgXyUMMSp0FU=;
+ b=pDG8WA+iSaWTXlx7seVpoK0Aktx+l+4gyTTZrjqk65IoW3d6yx2njNVQETfBQ24J7A
+ RzMm2+rHRCu9hC5RVLOkevn1KYnJcc9aWhaVJtso2gSEf0r8G0DPQwPe7mC5VPZ1SjiH
+ /KwUUOhT+9+JN6Ra1rKyXrRP6amMKtLZ25EHnMvWG+iNVrPpm3cmJW4XDHr2kygvdL3n
+ 0bD4/SowmpyKq2bEAoz0wUYmq3Ud9RRU9DjPUBcqaORbDSLQEzUK1zPdqbrYUclvK8iM
+ TpcJ4iVoB+NByapZiWQTNOG+/L5TvgFCetZ/5WozPsBkhhk3GJaaj2b4w/9UNCYPDsly
+ n6/g==
+X-Gm-Message-State: APjAAAXG1UdqqGB087hHFNcCsfPmYl9AGbYIw1bqTDxlVP7+UzrtER0r
+ 4GxRxmkk/qfkIRy+OFTSIAohYw==
+X-Google-Smtp-Source: APXvYqwwVSyc1BNCkUH8jVCJIy57luLQ9fBdiuv0M+0O522m28hcpsI+mAj5e6808AUf7h3XXBTZJg==
+X-Received: by 2002:a63:8249:: with SMTP id w70mr2438075pgd.54.1572979436636; 
+ Tue, 05 Nov 2019 10:43:56 -0800 (PST)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id f33sm19836274pgl.33.2019.11.05.10.43.55
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 05 Nov 2019 10:43:55 -0800 (PST)
+Date: Tue, 05 Nov 2019 10:43:55 -0800 (PST)
+X-Google-Original-Date: Tue, 05 Nov 2019 09:42:18 PST (-0800)
+Subject: Re: [PATCH v5 0/2] RTC support for QEMU RISC-V virt machine
+In-Reply-To: <CAFEAcA9bV=-t0+ro6rxu7Atodj6J78aT1aMnz9bjaqyfLDV3_w@mail.gmail.com>
+From: Palmer Dabbelt <palmer@sifive.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <mhng-2b88a4a2-0027-4ec8-947d-1515e5b05f39@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+X-Received-From: 2607:f8b0:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,89 +91,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Anup Patel <Anup.Patel@wdc.com>, qemu-devel@nongnu.org,
+ Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ anup@brainfault.org, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ccee8305969d7f77
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Thanks for the fixes Laurent, sorry for the delay.
-
-Josh
-
-On Tue, Nov 5, 2019 at 1:25 AM Laurent Vivier <laurent@vivier.eu> wrote:
-
-> Le 29/10/2019 =C3=A0 23:43, Josh Kunz a =C3=A9crit :
-> > This change includes support for all AF_NETLINK socket options up to
-> about
-> > kernel version 5.4 (5.4 is not formally released at the time of writing=
-).
-> > Socket options that were introduced in kernel versions before the oldes=
-t
-> > currently stable kernel version are guarded by kernel version macros.
-> >
-> > This change has been built under gcc 8.3, and clang 9.0, and it passes
-> > `make check`. The netlink options have been tested by emulating some
-> > non-trival software that uses NETLINK socket options, but they have
-> > not been exaustively verified.
-> >
-> > Signed-off-by: Josh Kunz <jkz@google.com>
-> > ---
-> >  linux-user/syscall.c | 98 ++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 98 insertions(+)
-> >
+On Sat, 02 Nov 2019 03:37:42 PDT (-0700), Peter Maydell wrote:
+> On Tue, 29 Oct 2019 at 13:25, Alistair Francis <alistair23@gmail.com> wrote:
+>>
+>> On Fri, Oct 25, 2019 at 6:28 AM Anup Patel <Anup.Patel@wdc.com> wrote:
+>> >
+>> > This series adds RTC device to QEMU RISC-V virt machine. We have
+>> > selected Goldfish RTC device model for this. It's a pretty simple
+>> > synthetic device with few MMIO registers and no dependency external
+>> > clock. The driver for Goldfish RTC is already available in Linux so
+>> > we just need to enable it in Kconfig for RISCV and also update Linux
+>> > defconfigs.
+>> >
+>> > We have tested this series with Linux-5.4-rc4 plus defconfig changes
+>> > available in 'goldfish_rtc_v2' branch of:
+>> > https://github.com/avpatel/linux.git
+>>
+>> @Peter Maydell this has been reviewed, do you mind taking this in you
+>> next PR? I don't see a maintainer for hw/rtc.
 >
-> I've updated the coding style and applied to my linux-user branch.
->
-> Thanks,
-> Laurent
->
->
+> Generally devices used by a single architecture should
+> go via the tree of the maintainer who handles that
+> architecture -- in this case that's riscv. (The reason
+> is that it's only riscv folks who can test whether the
+> device works in the machine model, and only riscv
+> folks who can reasonably review whether the device
+> is the right way of implementing the functionality for
+> them.)
 
---000000000000ccee8305969d7f77
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Thanks for the fixes Laurent, sorry for the delay.<div><br=
-></div><div>Josh</div></div><br><div class=3D"gmail_quote"><div dir=3D"ltr"=
- class=3D"gmail_attr">On Tue, Nov 5, 2019 at 1:25 AM Laurent Vivier &lt;<a =
-href=3D"mailto:laurent@vivier.eu">laurent@vivier.eu</a>&gt; wrote:<br></div=
-><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border=
--left:1px solid rgb(204,204,204);padding-left:1ex">Le 29/10/2019 =C3=A0 23:=
-43, Josh Kunz a =C3=A9crit=C2=A0:<br>
-&gt; This change includes support for all AF_NETLINK socket options up to a=
-bout<br>
-&gt; kernel version 5.4 (5.4 is not formally released at the time of writin=
-g).<br>
-&gt; Socket options that were introduced in kernel versions before the olde=
-st<br>
-&gt; currently stable kernel version are guarded by kernel version macros.<=
-br>
-&gt; <br>
-&gt; This change has been built under gcc 8.3, and clang 9.0, and it passes=
-<br>
-&gt; `make check`. The netlink options have been tested by emulating some<b=
-r>
-&gt; non-trival software that uses NETLINK socket options, but they have<br=
->
-&gt; not been exaustively verified.<br>
-&gt; <br>
-&gt; Signed-off-by: Josh Kunz &lt;<a href=3D"mailto:jkz@google.com" target=
-=3D"_blank">jkz@google.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 linux-user/syscall.c | 98 ++++++++++++++++++++++++++++++++++++++=
-++++++<br>
-&gt;=C2=A0 1 file changed, 98 insertions(+)<br>
-&gt; <br>
-<br>
-I&#39;ve updated the coding style and applied to my linux-user branch.<br>
-<br>
-Thanks,<br>
-Laurent<br>
-<br>
-</blockquote></div>
-
---000000000000ccee8305969d7f77--
+OK, I'm taking it via the RISC-V tree.  I'll send the PR for 4.3.
 
