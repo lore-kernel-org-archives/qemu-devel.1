@@ -2,71 +2,80 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45145C5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 20:47:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C2F3C5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 20:47:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA93F206DF
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 20:47:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1BAC214B2
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 20:47:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=reactos.org header.i=@reactos.org header.b="FOKmuQRI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA93F206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=reactos.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="eEo2iZzv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1BAC214B2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49806 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS5jI-0004Q1-RW
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 15:47:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56866)
+	id 1iS5jj-00056e-UJ
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 15:47:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56954)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <hpoussin@reactos.org>) id 1iS5hv-0003gI-96
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:45:44 -0500
+ (envelope-from <palmer@dabbelt.com>) id 1iS5if-000418-2T
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:46:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <hpoussin@reactos.org>) id 1iS5ht-0007Po-Qb
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:45:43 -0500
-Received: from iserv.reactos.org ([2a01:4f8:1c17:5ae1::1]:33302)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <hpoussin@reactos.org>)
- id 1iS5ht-0007PX-8k
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:45:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=reactos.org
- ; s=25047;
- h=Content-Transfer-Encoding:Content-Type:In-Reply-To:MIME-Version:
- Date:Message-ID:From:References:Cc:To:Subject:Sender:Reply-To:Content-ID:
- Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
- :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
- List-Post:List-Owner:List-Archive;
- bh=yc+g3s++QzbkOgwI5Yq+qHpCQdqGnZaz+TB41bk9DGs=; b=FOKmuQRIPvycgHu0JwdWMMU2LP
- dN63j+j8nmkFcfxFRbEg7PyUaxhPHfdJsiakDqXsGjLuzsluS3LRw0bejO+oyy61WC+4Ylzb/w1nv
- /a6VJnwuogvA/6kgpeORZCr0H1xnA95Sz/gzzMmEpWNfeJHM0G26FciSs6QaKyOG7Z0I=;
-Received: from [2a01:e35:2e3e:3c40:810c:5dc0:a5b7:d589]
- by iserv.reactos.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.89) (envelope-from <hpoussin@reactos.org>)
- id 1iS5hp-0003vT-Tl; Tue, 05 Nov 2019 20:45:39 +0000
-Subject: Re: [PATCH 3/3] dp8393x: fix receiving buffer exhaustion
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20191102171511.31881-1-laurent@vivier.eu>
- <20191102171511.31881-4-laurent@vivier.eu>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <c98e5cee-ee05-3b2b-894b-f0c9c829f644@reactos.org>
-Date: Tue, 5 Nov 2019 21:45:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20191102171511.31881-4-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+ (envelope-from <palmer@dabbelt.com>) id 1iS5ic-0007bj-Ur
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:46:28 -0500
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42529)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iS5ic-0007bU-Jn
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:46:26 -0500
+Received: by mail-pf1-x442.google.com with SMTP id s5so8506359pfh.9
+ for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 12:46:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dabbelt-com.20150623.gappssmtp.com; s=20150623;
+ h=date:subject:in-reply-to:cc:from:to:message-id;
+ bh=20/y1HUrwfZgRolOUpWZx8/eN/1UEDZzRi0/Qf3bZXw=;
+ b=eEo2iZzvGn4tYzHjur+UVSJrmoTnAK9IERUZONqPROeGkUEVKVbdNv7yS/wK9BQLDd
+ yQwa8fW/KNg4uO8XD5dNjcPNIEAfhIWHQyUXCJkWFRQLytE4T1sxKZTBP4bBfiMK7/4+
+ Mfpo0tIcs4LEzWVoUZ9wbL7ljzcjFgwFB6q+EoREbvJY7SrQYPEKVr2mAWf4JLIgD6Cg
+ EN2OCjdTzlJm9byRZilURzdCb8n9zGMyX+pbDqYcKTxz2N2Im8frtcaNeDH6/NURaDkG
+ 1a7aqN7FJHxDJk3qLoWoHJsx0k3wXvQGgXKgC25ITbz2Qt0oHneNmlkyOz0Gnr0RQ1Bt
+ wQOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id;
+ bh=20/y1HUrwfZgRolOUpWZx8/eN/1UEDZzRi0/Qf3bZXw=;
+ b=KYKq1lauqCCGBqSP5pbVU4LGpGaPXlytK0A1VRED5WsVcEeWINChuNijfyS/ZvZWzZ
+ +xz4IXO63qIOhfLVKU9npkPte0e7aPNd3hAozanmOQgXTrTxRFV0bGVrLdT7ndJ1Ycoy
+ al0XFqXUm7uDCWbx65BQT6y5/4XVQ2X7kv2Cp14i/scpSLfmSlwhW962i9zajgnSxda/
+ v0lJQF/26oqjGphr3ASy6p17XhD+rktc8ChmtTEhcPqCz4LiqVD/BCiODs1F+G52gCyo
+ 25hsuQsdBafGGQWCFj8YTTM/JtfhH48a4ETluPmTAsba6HLTlQZ3qzHqprlcsPqsiX5y
+ QAng==
+X-Gm-Message-State: APjAAAXXLrhouI3Ccgt3tZNDQEz1vSp4a8pfpN56WkI9gNbzb8BeYLXU
+ 5CTyCDNg231nI/ZNrge+pKRRGA==
+X-Google-Smtp-Source: APXvYqwZuV7iQBTafFXCLyASYRPdTFc+in0U0FU4xW8UBHmPGP5BIWASAer6H/B/Ip3umOFQ5YfnUw==
+X-Received: by 2002:a62:6044:: with SMTP id u65mr40254034pfb.227.1572986783857; 
+ Tue, 05 Nov 2019 12:46:23 -0800 (PST)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id f8sm10678623pgd.64.2019.11.05.12.46.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 05 Nov 2019 12:46:23 -0800 (PST)
+Date: Tue, 05 Nov 2019 12:46:23 -0800 (PST)
+X-Google-Original-Date: Tue, 05 Nov 2019 12:46:20 PST (-0800)
+Subject: Re: [PATCH v1 1/1] opensbi: Upgrade from v0.4 to v0.5
+In-Reply-To: <CAKmqyKONh4tZ+DfBk2GVDt+k807ncKyrdL-qb1NnTsbyjztFkQ@mail.gmail.com>
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: alistair23@gmail.com
+Message-ID: <mhng-cc6999f1-fa87-4884-bf87-fac682d32f45@palmer-si-x1c4>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a01:4f8:1c17:5ae1::1
+X-Received-From: 2607:f8b0:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,111 +87,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>
+Cc: philmd@redhat.com, palmer@sifive.com,
+ Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 02/11/2019 à 18:15, Laurent Vivier a écrit :
-> The card is not able to exit from exhaustion state, because
-> while the drive consumes the buffers, the RRP is incremented
-> (when the driver clears the ISR RBE bit), so it stays equal
-> to RWP, and while RRP == RWP, the card thinks it is always
-> in exhaustion state. So the driver consumes all the buffers,
-> but the card cannot receive new ones.
-> 
-> This patch fixes the problem by not incrementing RRP when
-> the driver clears the ISR RBE bit.
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->   hw/net/dp8393x.c | 31 ++++++++++++++++---------------
->   1 file changed, 16 insertions(+), 15 deletions(-)
+On Tue, 05 Nov 2019 11:23:39 PST (-0800), alistair23@gmail.com wrote:
+> On Tue, Oct 29, 2019 at 3:33 AM Alistair Francis <alistair23@gmail.com> wrote:
+>>
+>> On Mon, Oct 28, 2019 at 5:56 PM Palmer Dabbelt <palmer@sifive.com> wrote:
+>> >
+>> > On Sat, 26 Oct 2019 01:46:45 PDT (-0700), philmd@redhat.com wrote:
+>> > > On Sat, Oct 26, 2019 at 10:45 AM Philippe Mathieu-Daudé
+>> > > <philmd@redhat.com> wrote:
+>> > >>
+>> > >> Hi Alistair,
+>> > >>
+>> > >> On 10/26/19 1:15 AM, Alistair Francis wrote:
+>> > >> > This release has:
+>> > >> >      Lot of critical fixes
+>> > >> >      Hypervisor extension support
+>> > >> >      SBI v0.2 base extension support
+>> > >> >      Debug prints support
+>> > >> >      Handle traps when doing unpriv load/store
+>> > >> >      Allow compiling without FP support
+>> > >> >      Use git describe to generate boot-time banner
+>> > >> >      Andes AE350 platform support
+>> > >>
+>> > >> Do you mind amending the output of 'git shortlog v0.4..v0.5'?
+>> > >
+>> > > Err this comment is for Palmer, if Alistair agree (no need to repost).
+>> >
+>> > Works for me.  I've included the shortlog as part of the patch on my for-master
+>> > branch, unless there's any opposition I'll include this in my next PR.
+>>
+>> Sounds good!
+>
+> Ping! Just want to make sure this makes it into 4.2.
 
-I checked the DP83932C specification, available at
-https://www.eit.lth.se/fileadmin/eit/courses/datablad/Periphery/Communication/DP83932C.pdf
+Thanks, I must have somehow dropped this after fixing up the commit message -- 
+I'm up to three active laptops during the transition, so everything's a bit of 
+a mess on my end.  The commit (with the updated message) is back:.
 
-In the Buffer Resources Exhausted section (page 20):
-"To continue reception after the last RBA is used, the system must supply
-additional RRA descriptor(s), update the RWP register, and clear the RBE
-bit in the ISR. The SONIC rereads the RRA after this bit is cleared."
-
-If I understand correctly, if the OS updates first the RWP and then clear the RBE bit,
-then RRP should be different of RWP in dp8393x_do_read_rra() ? Or did I miss something?
-
-> 
-> diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-> index b8c4473f99..21deb32456 100644
-> --- a/hw/net/dp8393x.c
-> +++ b/hw/net/dp8393x.c
-> @@ -304,7 +304,7 @@ static void dp8393x_do_load_cam(dp8393xState *s)
->       dp8393x_update_irq(s);
->   }
->   
-> -static void dp8393x_do_read_rra(dp8393xState *s)
-> +static void dp8393x_do_read_rra(dp8393xState *s, int next)
->   {
->       int width, size;
->   
-> @@ -323,19 +323,20 @@ static void dp8393x_do_read_rra(dp8393xState *s)
->           s->regs[SONIC_CRBA0], s->regs[SONIC_CRBA1],
->           s->regs[SONIC_RBWC0], s->regs[SONIC_RBWC1]);
->   
-> -    /* Go to next entry */
-> -    s->regs[SONIC_RRP] += size;
-> +    if (next) {
-> +        /* Go to next entry */
-> +        s->regs[SONIC_RRP] += size;
->   
-> -    /* Handle wrap */
-> -    if (s->regs[SONIC_RRP] == s->regs[SONIC_REA]) {
-> -        s->regs[SONIC_RRP] = s->regs[SONIC_RSA];
-> -    }
-> +        /* Handle wrap */
-> +        if (s->regs[SONIC_RRP] == s->regs[SONIC_REA]) {
-> +            s->regs[SONIC_RRP] = s->regs[SONIC_RSA];
-> +        }
->   
-> -    /* Check resource exhaustion */
-> -    if (s->regs[SONIC_RRP] == s->regs[SONIC_RWP])
-> -    {
-> -        s->regs[SONIC_ISR] |= SONIC_ISR_RBE;
-> -        dp8393x_update_irq(s);
-> +        /* Check resource exhaustion */
-> +        if (s->regs[SONIC_RRP] == s->regs[SONIC_RWP]) {
-> +            s->regs[SONIC_ISR] |= SONIC_ISR_RBE;
-> +            dp8393x_update_irq(s);
-> +        }
->       }
->   
->       /* Done */
-> @@ -549,7 +550,7 @@ static void dp8393x_do_command(dp8393xState *s, uint16_t command)
->       if (command & SONIC_CR_RST)
->           dp8393x_do_software_reset(s);
->       if (command & SONIC_CR_RRRA)
-> -        dp8393x_do_read_rra(s);
-> +        dp8393x_do_read_rra(s, 1);
->       if (command & SONIC_CR_LCAM)
->           dp8393x_do_load_cam(s);
->   }
-> @@ -640,7 +641,7 @@ static void dp8393x_write(void *opaque, hwaddr addr, uint64_t data,
->               data &= s->regs[reg];
->               s->regs[reg] &= ~data;
->               if (data & SONIC_ISR_RBE) {
-> -                dp8393x_do_read_rra(s);
-> +                dp8393x_do_read_rra(s, 0);
->               }
->               dp8393x_update_irq(s);
->               if (dp8393x_can_receive(s->nic->ncs)) {
-> @@ -840,7 +841,7 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
->   
->           if (s->regs[SONIC_RCR] & SONIC_RCR_LPKT) {
->               /* Read next RRA */
-> -            dp8393x_do_read_rra(s);
-> +            dp8393x_do_read_rra(s, 1);
->           }
->       }
->   
-> 
-
+>
+> Alistair
+>
+>>
+>> Alistair
+>>
+>> >
+>> > >
+>> > >> >
+>> > >> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+>> > >> > ---
+>> > >> > You can get the branch from here if the binaries are causing issues:
+>> > >> > https://github.com/alistair23/qemu/tree/mainline/alistair/opensbi.next
+>> > >>
+>> > >> You can use 'git format-patch --no-binary'.
+>> > >>
+>> > >> >
+>> > >> >   pc-bios/opensbi-riscv32-virt-fw_jump.bin     | Bin 36888 -> 40984 bytes
+>> > >> >   pc-bios/opensbi-riscv64-sifive_u-fw_jump.bin | Bin 45064 -> 49160 bytes
+>> > >> >   pc-bios/opensbi-riscv64-virt-fw_jump.bin     | Bin 40968 -> 45064 bytes
+>> > >> >   roms/opensbi                                 |   2 +-
+>> > >> >   4 files changed, 1 insertion(+), 1 deletion(-)
+>> > >> [...]
+>> > >> > diff --git a/roms/opensbi b/roms/opensbi
+>> > >> > index ce228ee091..be92da280d 160000
+>> > >> > --- a/roms/opensbi
+>> > >> > +++ b/roms/opensbi
+>> > >> > @@ -1 +1 @@
+>> > >> > -Subproject commit ce228ee0919deb9957192d723eecc8aaae2697c6
+>> > >> > +Subproject commit be92da280d87c38a2e0adc5d3f43bab7b5468f09
+>> > >> >
 
