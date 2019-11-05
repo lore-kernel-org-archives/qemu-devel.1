@@ -2,92 +2,79 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA5AC5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C92FAC5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:36:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70BBE21882
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:36:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70BBE21882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 813B921882
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:36:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U3qpgrDv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 813B921882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS6Uv-000516-8J
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 16:36:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58924)
+	id 1iS6VF-0005Rh-9f
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 16:36:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59760)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5pe-0001OP-1p
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:43 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iS5rW-0003ym-V4
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:55:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5pc-0002TS-CC
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:41 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:64124)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iS5pa-00026s-MR; Tue, 05 Nov 2019 15:53:40 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- xA5KpWjh144523; Tue, 5 Nov 2019 15:53:17 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2w3fuuhad8-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 15:53:17 -0500
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id xA5KrH1j001572;
- Tue, 5 Nov 2019 15:53:17 -0500
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2w3fuuhacr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 15:53:17 -0500
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xA5KnxqA018309;
- Tue, 5 Nov 2019 20:53:19 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
- [9.57.198.23]) by ppma01wdc.us.ibm.com with ESMTP id 2w11e7177r-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 20:53:19 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
- [9.57.199.107])
- by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xA5KrF2s51052800
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 5 Nov 2019 20:53:15 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8705D124064;
- Tue,  5 Nov 2019 20:53:15 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7333112405E;
- Tue,  5 Nov 2019 20:53:15 +0000 (GMT)
-Received: from localhost (unknown [9.53.179.218])
- by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  5 Nov 2019 20:53:15 +0000 (GMT)
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 50/55] util/hbitmap: strict hbitmap_reset
-Date: Tue,  5 Nov 2019 14:52:38 -0600
-Message-Id: <20191105205243.3766-51-mdroth@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191105205243.3766-1-mdroth@linux.vnet.ibm.com>
-References: <20191105205243.3766-1-mdroth@linux.vnet.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-11-05_07:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=944 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1911050170
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+ (envelope-from <peter.maydell@linaro.org>) id 1iS5rT-00044m-B9
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:55:36 -0500
+Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:43520)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iS5rT-00043t-5h
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:55:35 -0500
+Received: by mail-oi1-x22e.google.com with SMTP id l20so6800721oie.10
+ for <qemu-devel@nongnu.org>; Tue, 05 Nov 2019 12:55:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=5XvPHb0liGDSyzqWfyodYaHwqMy3DUUzWQ17uAiVI3I=;
+ b=U3qpgrDvNWy873Do62C7Q+R8ejze+6Ip06g/TJ9RrK0CXyVhDdiPwmIXdTX6vDUQcg
+ nShxYKSOJVM+1TC+MNdQYe2IPlZxwY3xhL2PT+KES145KgN7wZv22DBdEMkP54viHCGI
+ bBNTA8uE2OHJvljzkO36A8qaByrMqw4hoCaJfznffqdVWMtxJ3YJDH+5+evH5ggDfazi
+ C/zlDGXNTjYgoz//fEHKv/lJepMu64neRKw2fci+UAF9Jl1xHSlBBnsZkveI0xYSft/4
+ 1lcaBsE1DQg1LDnCFXhXsNNRzwdlqi5SYwL4qw20R04dXrapWEc8RSBktxnpCIyxG8Dm
+ 5EKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=5XvPHb0liGDSyzqWfyodYaHwqMy3DUUzWQ17uAiVI3I=;
+ b=qbs64iBVlSr9xo4g9wigASVCGreNxCj0O9gh14+NMSpmDJ6TFkhtcHSsI+kJJXgrBa
+ hQ1yhaHibr1uFblE2FQQE9mVs11h0MF6BGYAyUjFi1LiNQPuTTUz8R4iS+H+bi5+W8wO
+ m0l7MA2oH5XlTN6wPHtfe1bZpChdjE9V5zCrgRVLljtnO41Blcg5yj91lnwHb7VYZUzP
+ asVrZbfuWDCpvjOTlLw/xfrVueRO+x/qp+kE9Q7y2vPyJQ/SODpnVltp8F/6/h7H8nDq
+ 7oqIvdUgS79gAx+Vu9nJ5KbVxjvg3nAfMywAMum/lOdEAmP2UXVJJxNFvrVAyB3CiuJO
+ CZiQ==
+X-Gm-Message-State: APjAAAV/OTW6eTQ4GVgWnbIdhav+a4WRpNR5gMaJLBmT8mmmngEHeyC3
+ 8nTY8lKRdIfQkhcCxgTGZl80fBub91RGmt1PJQcDAg==
+X-Google-Smtp-Source: APXvYqwxE6BXvUoNdnKW8wviK6OLmSqbfck8rAFPw0Ngp6PDCdFX3lYAjcZ2EqaKaCMW0xMqrYmxMPXlhj1SYDUctYs=
+X-Received: by 2002:aca:451:: with SMTP id 78mr889263oie.170.1572987334000;
+ Tue, 05 Nov 2019 12:55:34 -0800 (PST)
+MIME-Version: 1.0
+References: <1572911399018.17766@sandia.gov>
+ <20191105164253.GJ166646@stefanha-x1.localdomain>
+In-Reply-To: <20191105164253.GJ166646@stefanha-x1.localdomain>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Nov 2019 20:55:21 +0000
+Message-ID: <CAFEAcA_5ZS=4gHW8yph_o7Z4XrO5r2YMbGTB0oNtQKriv-qS=A@mail.gmail.com>
+Subject: Re: Adding New, Unsupported ISA to Qemu
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,85 +86,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- John Snow <jsnow@redhat.com>, qemu-stable@nongnu.org
+Cc: "Hanson, Seth" <shanson@sandia.gov>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On Tue, 5 Nov 2019 at 16:44, Stefan Hajnoczi <stefanha@gmail.com> wrote
+> The general advice I've seen is:
+>
+> 1. Look at existing TCG targets to learn how to implement aspects of
+>    your ISA.
 
-hbitmap_reset has an unobvious property: it rounds requested region up.
-It may provoke bugs, like in recently fixed write-blocking mode of
-mirror: user calls reset on unaligned region, not keeping in mind that
-there are possible unrelated dirty bytes, covered by rounded-up region
-and information of this unrelated "dirtiness" will be lost.
+...and *don't* look at older/less maintained targets (including
+x86), as they have a lot of bad habits you don't want to copy.
+Using 'decodetree' is probably a good idea.
 
-Make hbitmap_reset strict: assert that arguments are aligned, allowing
-only one exception when @start + @count == hb->orig_size. It's needed
-to comfort users of hbitmap_next_dirty_area, which cares about
-hb->orig_size.
+> 2. If you are unfamiliar with emulation, CPU ISA, or just-in-time
+>    compiler concepts, try to read up on them and then look back at the
+>    QEMU code.  Things will be clearer.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20190806152611.280389-1-vsementsov@virtuozzo.com>
-[Maintainer edit: Max's suggestions from on-list. --js]
-[Maintainer edit: Eric's suggestion for aligned macro. --js]
-Signed-off-by: John Snow <jsnow@redhat.com>
-(cherry picked from commit 48557b138383aaf69c2617ca9a88bfb394fc50ec)
-*prereq for fed33bd175f663cc8c13f8a490a4f35a19756cfe
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- include/qemu/hbitmap.h | 5 +++++
- tests/test-hbitmap.c   | 2 +-
- util/hbitmap.c         | 4 ++++
- 3 files changed, 10 insertions(+), 1 deletion(-)
+I would also add
+3.  Don't expect getting this implemented and upstream to be easy.
 
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index 4afbe6292e..1bf944ca3d 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -132,6 +132,11 @@ void hbitmap_set(HBitmap *hb, uint64_t start, uint64_t count);
-  * @count: Number of bits to reset.
-  *
-  * Reset a consecutive range of bits in an HBitmap.
-+ * @start and @count must be aligned to bitmap granularity. The only exception
-+ * is resetting the tail of the bitmap: @count may be equal to hb->orig_size -
-+ * @start, in this case @count may be not aligned. The sum of @start + @count is
-+ * allowed to be greater than hb->orig_size, but only if @start < hb->orig_size
-+ * and @start + @count = ALIGN_UP(hb->orig_size, granularity).
-  */
- void hbitmap_reset(HBitmap *hb, uint64_t start, uint64_t count);
- 
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index 592d8219db..2be56d1597 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -423,7 +423,7 @@ static void test_hbitmap_granularity(TestHBitmapData *data,
-     hbitmap_test_check(data, 0);
-     hbitmap_test_set(data, 0, 3);
-     g_assert_cmpint(hbitmap_count(data->hb), ==, 4);
--    hbitmap_test_reset(data, 0, 1);
-+    hbitmap_test_reset(data, 0, 2);
-     g_assert_cmpint(hbitmap_count(data->hb), ==, 2);
- }
- 
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index bcc0acdc6a..71c6ba2c52 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -476,6 +476,10 @@ void hbitmap_reset(HBitmap *hb, uint64_t start, uint64_t count)
-     /* Compute range in the last layer.  */
-     uint64_t first;
-     uint64_t last = start + count - 1;
-+    uint64_t gran = 1ULL << hb->granularity;
-+
-+    assert(QEMU_IS_ALIGNED(start, gran));
-+    assert(QEMU_IS_ALIGNED(count, gran) || (start + count == hb->orig_size));
- 
-     trace_hbitmap_reset(hb, start, count,
-                         start >> hb->granularity, last >> hb->granularity);
--- 
-2.17.1
+(Apologies if the following sounds pessimistic and off-putting;
+but I would prefer people to have a clear understanding of
+what they're getting into and not assume the chances of
+success are higher than they might actually be.)
 
+"New TCG target" is an unlucky combination of:
+ (1) it's quite a lot of work in pure amount-of-code terms
+ (2) because it is a big feature it is not a good choice as a "first
+   contribution to the project", but new targets often are proposed
+   and written by people who don't have any previous history of
+   writing QEMU code
+ (3) we already have targets for the common CPU ISAs, so
+   anything new is likely to be obscure and not have many people
+   who care about it either in our userbase or in our dev community.
+   (riscv is the obvious recent exception here, as it is clearly relevant
+   as a new architecture and has attracted multiple people to work
+   on it and contribute both code and reviews)
+
+1 and 2 mean that code review of a new TCG target is a lot
+of work, and 3 means it's not clear how much return the project
+gets for that investment :-(
+
+There is not a large community of upstream developers who are
+interested in maintaining a lot of obscure guest architectures:
+we essentially rely on the goodwill and not-entirely-work-time
+of just a few people when it comes to reviewing new TCG targets.
+That means that patchsets often hang around on list for a long
+time without getting attention.
+
+Our past historical experience has often been that when people
+contribute TCG targets, we do a lot of work on our end with
+code review and helping to get the code into upstream QEMU, and
+then these people more or less disappear, leaving us with the
+burden of something we have to support and no help doing it.
+If in general people submitting new TCG targets were all
+*helping each other*, passing on what they learned to the
+next person along, contributing code review, updating older
+code as QEMU APIs improve/churn, etc, then I think I'd feel
+differently about this. But to be honest mostly I find myself
+thinking "oh dear, not another one".
+
+We already have two new TCG ports with patches on list
+which are kind of stalled due to not having enough existing
+upstream QEMU devs who can/will code review them (and
+another which hasn't had patches posted but might do soon).
+The odds for your new port having a happier future don't seem
+too great to me :-(
+
+thanks
+-- PMM
 
