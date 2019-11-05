@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD3EC49EAD
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:58:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E9FC49EAB
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:58:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3192F20869
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:58:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3192F20869
+	by mail.kernel.org (Postfix) with ESMTPS id D090220869
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 09:58:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D090220869
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iRvbJ-0003pg-C6
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 04:58:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51610)
+	id 1iRvc1-0004ox-2y
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 04:58:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51124)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iRvXx-0007yJ-QT
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:54:47 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iRvWC-0006sG-UR
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:52:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iRvXv-0004L8-7I
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:54:44 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:57347)
+ (envelope-from <laurent@vivier.eu>) id 1iRvWA-0002cs-S1
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:52:56 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:46683)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iRvXu-0004Jz-UI
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:54:43 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iRvWA-0002Y9-Gf
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 04:52:54 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MKbPg-1iDYzD2Krs-00KwDi; Tue, 05 Nov 2019 10:54:39 +0100
-Subject: Re: [PATCH v2 11/12] linux-user/sparc: Fix cpu_clone_regs_*
+ (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MIxJq-1iD1023ceQ-00KSWA; Tue, 05 Nov 2019 10:52:53 +0100
+Subject: Re: [PATCH v2 10/12] linux-user: Introduce cpu_clone_regs_parent
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20191025113921.9412-1-richard.henderson@linaro.org>
- <20191025113921.9412-12-richard.henderson@linaro.org>
+ <20191025113921.9412-11-richard.henderson@linaro.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,36 +82,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <ee7b5006-a8bd-f626-bb2a-5f36104b45d3@vivier.eu>
-Date: Tue, 5 Nov 2019 10:54:38 +0100
+Message-ID: <58a009e6-d0c6-7a99-72fa-86b087efb4ad@vivier.eu>
+Date: Tue, 5 Nov 2019 10:52:52 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191025113921.9412-12-richard.henderson@linaro.org>
+In-Reply-To: <20191025113921.9412-11-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ZxG2K+7iO5AdHjeFG3/7830dYJ9TLscigU8mwTTosLLw8K3Iwf3
- j9TplnsA0umUXC2gTMyMd0yxrD9vm/3gKMaZHe0qROf6U1LyNrhOHy2/INdB5vpRFl2GPan
- y+t87vrKavszu2+/M+TuKnMIvs/06PAhnMXwLZzi0rHQWosMR8lgyWkKfYZnxKWjGlv96d8
- K7v0cEh6GNy+EufBYJXyA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:MB+BsBCoG2I=:rmbLckVElNCE2uXi+dRzYE
- lkDAsHJMWcmrz3CCw3m78Wm5Ji9vz0tqjtIJW6ToHqJYU5jFbhvMneZRJqFyhuXreQt3DOklq
- vFQlcJOfeJCpPB+X6kEJhpD88C0xCVdqEWdMW2POU7XHxReRTpn8wd0CuKpSrGknP/iNa19VY
- irSoIKKqLJhIxFhkzHLYOiZkmhvl4vp0etgjwDJjdfOpaZEIXoQWipFzz/KU8iy835vD3Mw6z
- sNN8IxH9c+5GZYvvZgRFqx8gQT6lnegq7U0ilaNoJI2YJVD8TH1E/y27YOLSoaC8XS0mX6Meb
- b7lVLLU1n27RpictRcGgdI3iDFIY1037Jjv/ui1UQNFW7isD63RxwDhmG3+rrgW61avVgWrGs
- 46vNml23OmVfINOJ1uMaU/QAPv04fgyV7EZ7X9AbOqf6nfW4Sr8jbqABNnrrNtPcXnIz2BhBs
- UqUg09SfwOhHv1UveFgsq2TSPJWK2c4o1PTE9qI/Jz2VKRAIVd/uu/Df6WrxkJ2yb++N5lie/
- N5KaHjMC4Ydj+8S0I7MbNYqK0P2gtiSi1Dp1pz6Uk/T7i2kgBQ94VGFjHE89tGucchOV+pABN
- bbkTE/g3MoLtMlGW/7o2oMpOco8wbwJd5dFbTUPrErPfScTOqlEwq0/irA8akhdpLXlgXOwkF
- LBXKLxO+qb14Opzb52I4LlETXOqkZ0egLFRbDxROvGpG1SxJLk4Uipqp70P455+vbNF2/zbs1
- XHrwM7Ihb3IV1W+zW1C6JTlPnIqw2uD1q8sy/123p5KBHs/UGDr2kuKeJvWvUADFEmpT7v9A3
- TB4mMrtJ4v50U8Ooej2RS4R/4YwNX+9hqFeUx+kjADPUeKns3CmUDATat+AHL4THnlsZ6uy/v
- ZWZnsNPpordsfnxbqvhXI799Nnl3AkutU+Vb4wmkY=
+X-Provags-ID: V03:K1:T7Dj6O9js0NUGy/+JWLAQ1A2kPIUS6JVeubFEllAtC4xdFAeD8t
+ A+Dzxutz9j+SdfD+JPd8GsVcYr7fdGHgUO2zHm54hsUUAnVDV+E0ibLh3QLIzlQiNon4KyG
+ sY6ldD+2h+1G/R5ecYJfKwxt/xtpsulxi0VK3h0EQhE+yTU/W7oCYu4cHu1MxXKLkbeFv+Y
+ fRmd6ewUbsepZYBxX9VVw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:nVLqCoKy6K0=:v3/4fWJaDcBD34fKgbFXeC
+ X0NdeDHu4+8PPY9uK3ZHyP5LGULo/VwEz4AW6HbPECSxejg2sDGnqP1zW5/4pn5S5dXceQAtA
+ BD3JRRLBYDbz913C9qqc7GP9/f6ydEWjMii9h74vkH0PvK5AB69sl4agj/LTSl0TITQ6iXEqR
+ KRkVjv7k6kJ5bzCZ8clflvA2B8Ta4QrAA5HQZzMhbUb6nTFNBwS+8vNT9HQhwWqqRd/r73dUy
+ bXOro95HWGlQPPQr4uHoqRfrs97jH8OShz020MXRSxl/3KVfjsQEq5j5ZVFpsC53k3U7qgmAP
+ 3D3zNPfb9FYpOgiDxLzbwgAl7Jv5Fb9XziDjuB3cv0xo/DYKaULOvI81lUSQncjyYjKE1EMQU
+ TFcOsIdhN+xTKB4tkEjz9tzFpgZBR8fB12Q1R75mRtSDmz9pxJqWnH3t9mrkYJEKQE62Qw+C4
+ e/lUcTlx72Z1yvGtbb2TX8xecn1St4ZTgudWgB1bWXt2pC2ysdCtdj1Er7XlMNjZg9ruWorNT
+ Af3iu+H9slvPj4iPPdWSqOiXGCa1s/FvPRD4qV0fKJoyIVALuu2vzwVJ4o4bvPymed8KfaU7O
+ Rx8ntHE22OfA+vaqHi/v4ctvvrJGTRFVV5bvFoS+0IfalT8DxxUtVahG4g4fDJQBQnT5Pzkpg
+ tcSp9QFtrrTXIGmxJrt4HDqjMwkzoRbQ8dET7WrgYMFgYJvgU4SFcTBJrLbLB6dcZXReS7KXf
+ 84usITD6wP+6nUagBRMloX3/w6CiP/q8i4ywOc5AyBU53WbJi3h/yerNDc4HQih2/eZjk/mSB
+ 5lJEjWyIt2lDGoib9DeTLV9R4tXkztEpLuDUPc+qObCv9DFmIaN+vE1rn3MClr2cXuZfItPBJ
+ LmS190ulDkp00mdCF1hubwLBZNdqQMppzOQOU9bmo=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.187
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -129,83 +129,324 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 25/10/2019 à 13:39, Richard Henderson a écrit :
-> We failed to set the secondary return value in %o1
-> we failed to advance the PC past the syscall,
-> we failed to adjust regwptr into the new structure,
-> we stored the stack pointer into the wrong register.
+> We will need a target-specific hook for adjusting registers
+> in the parent during clone.  Add an empty inline function for
+> each target, and invoke it from the proper places.
 > 
+> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
-> v2: Take CLONE_VM into account when performing syscall return.
-> ---
->  linux-user/sparc/target_cpu.h | 47 ++++++++++++++++++++++++++++-------
->  1 file changed, 38 insertions(+), 9 deletions(-)
+>  linux-user/aarch64/target_cpu.h    | 4 ++++
+>  linux-user/alpha/target_cpu.h      | 4 ++++
+>  linux-user/arm/target_cpu.h        | 4 ++++
+>  linux-user/cris/target_cpu.h       | 4 ++++
+>  linux-user/hppa/target_cpu.h       | 4 ++++
+>  linux-user/i386/target_cpu.h       | 4 ++++
+>  linux-user/m68k/target_cpu.h       | 4 ++++
+>  linux-user/microblaze/target_cpu.h | 4 ++++
+>  linux-user/mips/target_cpu.h       | 4 ++++
+>  linux-user/nios2/target_cpu.h      | 4 ++++
+>  linux-user/openrisc/target_cpu.h   | 4 ++++
+>  linux-user/ppc/target_cpu.h        | 4 ++++
+>  linux-user/riscv/target_cpu.h      | 4 ++++
+>  linux-user/s390x/target_cpu.h      | 4 ++++
+>  linux-user/sh4/target_cpu.h        | 4 ++++
+>  linux-user/sparc/target_cpu.h      | 4 ++++
+>  linux-user/tilegx/target_cpu.h     | 4 ++++
+>  linux-user/xtensa/target_cpu.h     | 4 ++++
+>  linux-user/syscall.c               | 2 ++
+>  19 files changed, 74 insertions(+)
 > 
+> diff --git a/linux-user/aarch64/target_cpu.h b/linux-user/aarch64/target_cpu.h
+> index cd012e0dc1..6cc02e7dcd 100644
+> --- a/linux-user/aarch64/target_cpu.h
+> +++ b/linux-user/aarch64/target_cpu.h
+> @@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUARMState *env, target_ulong newsp,
+>      env->xregs[0] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUARMState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUARMState *env, target_ulong newtls)
+>  {
+>      /* Note that AArch64 Linux keeps the TLS pointer in TPIDR; this is
+> diff --git a/linux-user/alpha/target_cpu.h b/linux-user/alpha/target_cpu.h
+> index 37ba00cf41..dd25e18f47 100644
+> --- a/linux-user/alpha/target_cpu.h
+> +++ b/linux-user/alpha/target_cpu.h
+> @@ -29,6 +29,10 @@ static inline void cpu_clone_regs_child(CPUAlphaState *env, target_ulong newsp,
+>      env->ir[IR_A3] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUAlphaState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUAlphaState *env, target_ulong newtls)
+>  {
+>      env->unique = newtls;
+> diff --git a/linux-user/arm/target_cpu.h b/linux-user/arm/target_cpu.h
+> index 6e2ba8ad4b..2747211b24 100644
+> --- a/linux-user/arm/target_cpu.h
+> +++ b/linux-user/arm/target_cpu.h
+> @@ -50,6 +50,10 @@ static inline void cpu_clone_regs_child(CPUARMState *env, target_ulong newsp,
+>      env->regs[0] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUARMState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUARMState *env, target_ulong newtls)
+>  {
+>      if (access_secure_reg(env)) {
+> diff --git a/linux-user/cris/target_cpu.h b/linux-user/cris/target_cpu.h
+> index eacc4d8d13..74ead55c81 100644
+> --- a/linux-user/cris/target_cpu.h
+> +++ b/linux-user/cris/target_cpu.h
+> @@ -29,6 +29,10 @@ static inline void cpu_clone_regs_child(CPUCRISState *env, target_ulong newsp,
+>      env->regs[10] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUCRISState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUCRISState *env, target_ulong newtls)
+>  {
+>      env->pregs[PR_PID] = (env->pregs[PR_PID] & 0xff) | newtls;
+> diff --git a/linux-user/hppa/target_cpu.h b/linux-user/hppa/target_cpu.h
+> index f250770790..71654b3cd4 100644
+> --- a/linux-user/hppa/target_cpu.h
+> +++ b/linux-user/hppa/target_cpu.h
+> @@ -32,6 +32,10 @@ static inline void cpu_clone_regs_child(CPUHPPAState *env, target_ulong newsp,
+>      env->iaoq_b = env->gr[31] + 4;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUHPPAState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUHPPAState *env, target_ulong newtls)
+>  {
+>      env->cr[27] = newtls;
+> diff --git a/linux-user/i386/target_cpu.h b/linux-user/i386/target_cpu.h
+> index 1fadbf57c3..0b44530854 100644
+> --- a/linux-user/i386/target_cpu.h
+> +++ b/linux-user/i386/target_cpu.h
+> @@ -29,6 +29,10 @@ static inline void cpu_clone_regs_child(CPUX86State *env, target_ulong newsp,
+>      env->regs[R_EAX] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUX86State *env, unsigned flags)
+> +{
+> +}
+> +
+>  #if defined(TARGET_ABI32)
+>  abi_long do_set_thread_area(CPUX86State *env, abi_ulong ptr);
+>  
+> diff --git a/linux-user/m68k/target_cpu.h b/linux-user/m68k/target_cpu.h
+> index 57b647bc07..c3f288dfe8 100644
+> --- a/linux-user/m68k/target_cpu.h
+> +++ b/linux-user/m68k/target_cpu.h
+> @@ -30,6 +30,10 @@ static inline void cpu_clone_regs_child(CPUM68KState *env, target_ulong newsp,
+>      env->dregs[0] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUM68KState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUM68KState *env, target_ulong newtls)
+>  {
+>      CPUState *cs = env_cpu(env);
+> diff --git a/linux-user/microblaze/target_cpu.h b/linux-user/microblaze/target_cpu.h
+> index e9bc0fce65..ce7b22ece7 100644
+> --- a/linux-user/microblaze/target_cpu.h
+> +++ b/linux-user/microblaze/target_cpu.h
+> @@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUMBState *env, target_ulong newsp,
+>      env->regs[3] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUMBState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUMBState *env, target_ulong newtls)
+>  {
+>      env->regs[21] = newtls;
+> diff --git a/linux-user/mips/target_cpu.h b/linux-user/mips/target_cpu.h
+> index 8601f712e0..758ae4d933 100644
+> --- a/linux-user/mips/target_cpu.h
+> +++ b/linux-user/mips/target_cpu.h
+> @@ -29,6 +29,10 @@ static inline void cpu_clone_regs_child(CPUMIPSState *env, target_ulong newsp,
+>      env->active_tc.gpr[2] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUMIPSState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUMIPSState *env, target_ulong newtls)
+>  {
+>      env->active_tc.CP0_UserLocal = newtls;
+> diff --git a/linux-user/nios2/target_cpu.h b/linux-user/nios2/target_cpu.h
+> index fe5de7a9e3..50f0381067 100644
+> --- a/linux-user/nios2/target_cpu.h
+> +++ b/linux-user/nios2/target_cpu.h
+> @@ -29,6 +29,10 @@ static inline void cpu_clone_regs_child(CPUNios2State *env, target_ulong newsp,
+>      env->regs[R_RET0] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUNios2State *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUNios2State *env, target_ulong newtls)
+>  {
+>      /*
+> diff --git a/linux-user/openrisc/target_cpu.h b/linux-user/openrisc/target_cpu.h
+> index 309cf3eeb7..74370d67c4 100644
+> --- a/linux-user/openrisc/target_cpu.h
+> +++ b/linux-user/openrisc/target_cpu.h
+> @@ -30,6 +30,10 @@ static inline void cpu_clone_regs_child(CPUOpenRISCState *env,
+>      cpu_set_gpr(env, 11, 0);
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUOpenRISCState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUOpenRISCState *env, target_ulong newtls)
+>  {
+>      cpu_set_gpr(env, 10, newtls);
+> diff --git a/linux-user/ppc/target_cpu.h b/linux-user/ppc/target_cpu.h
+> index 028b28312c..76b67d2882 100644
+> --- a/linux-user/ppc/target_cpu.h
+> +++ b/linux-user/ppc/target_cpu.h
+> @@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUPPCState *env, target_ulong newsp,
+>      env->gpr[3] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUPPCState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUPPCState *env, target_ulong newtls)
+>  {
+>  #if defined(TARGET_PPC64)
+> diff --git a/linux-user/riscv/target_cpu.h b/linux-user/riscv/target_cpu.h
+> index 26dcafab1c..9c642367a3 100644
+> --- a/linux-user/riscv/target_cpu.h
+> +++ b/linux-user/riscv/target_cpu.h
+> @@ -11,6 +11,10 @@ static inline void cpu_clone_regs_child(CPURISCVState *env, target_ulong newsp,
+>      env->gpr[xA0] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPURISCVState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPURISCVState *env, target_ulong newtls)
+>  {
+>      env->gpr[xTP] = newtls;
+> diff --git a/linux-user/s390x/target_cpu.h b/linux-user/s390x/target_cpu.h
+> index 0b19e42f75..7cd71e2dba 100644
+> --- a/linux-user/s390x/target_cpu.h
+> +++ b/linux-user/s390x/target_cpu.h
+> @@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUS390XState *env, target_ulong newsp,
+>      env->regs[2] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUS390XState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUS390XState *env, target_ulong newtls)
+>  {
+>      env->aregs[0] = newtls >> 32;
+> diff --git a/linux-user/sh4/target_cpu.h b/linux-user/sh4/target_cpu.h
+> index 857af43ee3..5114f19424 100644
+> --- a/linux-user/sh4/target_cpu.h
+> +++ b/linux-user/sh4/target_cpu.h
+> @@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUSH4State *env, target_ulong newsp,
+>      env->gregs[0] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUSH4State *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUSH4State *env, target_ulong newtls)
+>  {
+>    env->gbr = newtls;
 > diff --git a/linux-user/sparc/target_cpu.h b/linux-user/sparc/target_cpu.h
-> index 8ff706adce..14b2158969 100644
+> index 029b0fc547..8ff706adce 100644
 > --- a/linux-user/sparc/target_cpu.h
 > +++ b/linux-user/sparc/target_cpu.h
-> @@ -23,22 +23,51 @@
->  static inline void cpu_clone_regs_child(CPUSPARCState *env, target_ulong newsp,
->                                          unsigned flags)
->  {
-> -    if (newsp) {
-> -        env->regwptr[22] = newsp;
-> -    }
-> -    /* syscall return for clone child: 0, and clear CF since
-> -     * this counts as a success return value.
-> +    /*
-> +     * After cpu_copy, env->regwptr is pointing into the old env.
-> +     * Update the new cpu to use its own register window.
->       */
-> -    env->regwptr[0] = 0;
-> -#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
-> -    env->xcc &= ~PSR_CARRY;
-> +    env->regwptr = env->regbase + (env->cwp * 16);
-> +
-> +    if (newsp) {
-> +        /* When changing stacks, do it with clean register windows.  */
-> +#ifdef TARGET_SPARC64
-> +        env->cansave = env->nwindows - 2;
-> +        env->cleanwin = env->nwindows - 2;
-> +        env->canrestore = 0;
->  #else
-> -    env->psr &= ~PSR_CARRY;
-> +        env->wim = 1 << env->cwp;
+> @@ -37,6 +37,10 @@ static inline void cpu_clone_regs_child(CPUSPARCState *env, target_ulong newsp,
 >  #endif
-> +        /* ??? The kernel appears to copy one stack frame to the new stack. */
-> +        /* ??? The kernel force aligns the new stack. */
-> +        env->regwptr[WREG_SP] = newsp;
-> +    }
-> +
-> +    if (flags & CLONE_VM) {
-> +        /*
-> +         * Syscall return for clone child: %o0 = 0 and clear CF since this
-> +         * counts as a success return value.  Advance the PC past the syscall.
-> +         * For fork child, all of this happens in cpu_loop, and we must not
-> +         * do the pc advance twice.
-> +         */
-> +        env->regwptr[WREG_O0] = 0;
-> +#if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
-> +        env->xcc &= ~PSR_CARRY;
-> +#else
-> +        env->psr &= ~PSR_CARRY;
-> +#endif
-> +        env->pc = env->npc;
-> +        env->npc = env->npc + 4;
-> +    }
-> +
-> +    /* Set the second return value for the child: %o1 = 1.  */
-> +    env->regwptr[WREG_O1] = 1;
 >  }
 >  
->  static inline void cpu_clone_regs_parent(CPUSPARCState *env, unsigned flags)
->  {
-> +    /* Set the second return value for the parent: %o1 = 0.  */
-> +    env->regwptr[WREG_O1] = 0;
->  }
->  
+> +static inline void cpu_clone_regs_parent(CPUSPARCState *env, unsigned flags)
+> +{
+> +}
+> +
 >  static inline void cpu_set_tls(CPUSPARCState *env, target_ulong newtls)
+>  {
+>      env->gregs[7] = newtls;
+> diff --git a/linux-user/tilegx/target_cpu.h b/linux-user/tilegx/target_cpu.h
+> index 0523dc414c..316b7a639c 100644
+> --- a/linux-user/tilegx/target_cpu.h
+> +++ b/linux-user/tilegx/target_cpu.h
+> @@ -28,6 +28,10 @@ static inline void cpu_clone_regs_child(CPUTLGState *env, target_ulong newsp,
+>      env->regs[TILEGX_R_RE] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUTLGState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUTLGState *env, target_ulong newtls)
+>  {
+>      env->regs[TILEGX_R_TP] = newtls;
+> diff --git a/linux-user/xtensa/target_cpu.h b/linux-user/xtensa/target_cpu.h
+> index 84f67d469e..0c77bafd66 100644
+> --- a/linux-user/xtensa/target_cpu.h
+> +++ b/linux-user/xtensa/target_cpu.h
+> @@ -16,6 +16,10 @@ static inline void cpu_clone_regs_child(CPUXtensaState *env,
+>      env->regs[2] = 0;
+>  }
+>  
+> +static inline void cpu_clone_regs_parent(CPUXtensaState *env, unsigned flags)
+> +{
+> +}
+> +
+>  static inline void cpu_set_tls(CPUXtensaState *env, target_ulong newtls)
+>  {
+>      env->uregs[THREADPTR] = newtls;
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index a07d4b4774..ed18bcc825 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -5719,6 +5719,7 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
+>          new_env = cpu_copy(env);
+>          /* Init regs that differ from the parent.  */
+>          cpu_clone_regs_child(new_env, newsp, flags);
+> +        cpu_clone_regs_parent(env, flags);
+>          new_cpu = env_cpu(new_env);
+>          new_cpu->opaque = ts;
+>          ts->bprm = parent_ts->bprm;
+> @@ -5815,6 +5816,7 @@ static int do_fork(CPUArchState *env, unsigned int flags, abi_ulong newsp,
+>              if (flags & CLONE_CHILD_CLEARTID)
+>                  ts->child_tidptr = child_tidptr;
+>          } else {
+> +            cpu_clone_regs_parent(env, flags);
+>              fork_end(0);
+>          }
+>      }
 > 
 
 Applied to my linux-user branch.
