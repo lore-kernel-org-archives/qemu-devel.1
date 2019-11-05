@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1925CC5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 15:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B86C5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 15:46:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA424214D8
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 15:45:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CF19217F5
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 15:46:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hC/k02Zt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA424214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JlF85fh0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CF19217F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS11k-0005ty-GF
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 10:45:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42109)
+	id 1iS12f-0006om-50
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 10:46:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42166)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iS0zr-00049Y-Qe
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:43:56 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iS0zx-0004EI-VY
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:44:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iS0zq-0002Kr-5p
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:43:55 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40945
+ (envelope-from <stefanha@redhat.com>) id 1iS0zw-0002PE-NR
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:44:01 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33541
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iS0zp-0002FQ-NC
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:43:53 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iS0zv-0002Nv-Uu
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:44:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572968633;
+ s=mimecast20190719; t=1572968638;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FaBWrX7aOOP5YexwWB+qHmz9YQZs0OVGYtkJ7dC5MZ8=;
- b=hC/k02ZtQkJhkuMdAsvahIx4BhfD+ffxmDicqouQO+hSkDuYFseWVTQ5jM2lX1UAhm/2oe
- 8frYFuMQSM0LwWwW1uHU4A32YMAGXz/PwLhZPblgqTCzwNvohfYkxOSuDqT7cC00xTyrF/
- 3Gu3PBPN8WXM50OMssyJSm41mnhLKmE=
+ bh=ghXHSt2wQDU1/F9XO6CyAfwFu9GIMkCeh9USSijcSwU=;
+ b=JlF85fh00bWgJRQ9Xo+YTeDFR3y9stFdk5JkZxORK+8+vb5L4MHgJugFx22UPk5QB2l17Y
+ kBcC7ve7QCD0UoPWNeUFb5tnyj2g98OysIG7wUIwu0pB9qcjVTXqCH/X9kUi7ADXcZhYFS
+ V4qKIVJIesRk+YGaXHrpTCfarYLJSIo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-89-JgGW_7NXMtOXmWnHlKIKkA-1; Tue, 05 Nov 2019 10:43:51 -0500
+ us-mta-296-38V1Nny6MxOh_N1xbFCLmA-1; Tue, 05 Nov 2019 10:43:54 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E50A1800D4A;
- Tue,  5 Nov 2019 15:43:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D84B477;
+ Tue,  5 Nov 2019 15:43:53 +0000 (UTC)
 Received: from localhost (ovpn-116-232.ams2.redhat.com [10.36.116.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B7181608AC;
- Tue,  5 Nov 2019 15:43:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6DAE4608AC;
+ Tue,  5 Nov 2019 15:43:52 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/11] image-fuzzer: Open image files in binary mode
-Date: Tue,  5 Nov 2019 16:43:22 +0100
-Message-Id: <20191105154332.181417-2-stefanha@redhat.com>
+Subject: [PULL 02/11] image-fuzzer: Write bytes instead of string to image file
+Date: Tue,  5 Nov 2019 16:43:23 +0100
+Message-Id: <20191105154332.181417-3-stefanha@redhat.com>
 In-Reply-To: <20191105154332.181417-1-stefanha@redhat.com>
 References: <20191105154332.181417-1-stefanha@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: JgGW_7NXMtOXmWnHlKIKkA-1
+X-MC-Unique: 38V1Nny6MxOh_N1xbFCLmA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,16 +95,13 @@ Sender: "Qemu-devel"
 
 From: Eduardo Habkost <ehabkost@redhat.com>
 
-This probably never caused problems because on Linux there's no
-actual newline conversion happening, but on Python 3 the
-binary/text distinction is stronger and we must explicitly open
-the image file in binary mode.
+This is necessary for Python 3 compatibility.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20191016192430.25098-2-ehabkost@redhat.com
-Message-Id: <20191016192430.25098-2-ehabkost@redhat.com>
+Message-id: 20191016192430.25098-3-ehabkost@redhat.com
+Message-Id: <20191016192430.25098-3-ehabkost@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
  tests/image-fuzzer/qcow2/layout.py | 2 +-
@@ -112,18 +109,19 @@ Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
 diff --git a/tests/image-fuzzer/qcow2/layout.py b/tests/image-fuzzer/qcow2/=
 layout.py
-index 675877da96..c57418fa15 100644
+index c57418fa15..fe273d4143 100644
 --- a/tests/image-fuzzer/qcow2/layout.py
 +++ b/tests/image-fuzzer/qcow2/layout.py
-@@ -503,7 +503,7 @@ class Image(object):
+@@ -518,7 +518,7 @@ class Image(object):
+         rounded =3D (size + self.cluster_size - 1) & ~(self.cluster_size -=
+ 1)
+         if rounded > size:
+             image_file.seek(rounded - 1)
+-            image_file.write("\0")
++            image_file.write(b'\x00')
+         image_file.close()
 =20
-     def write(self, filename):
-         """Write an entire image to the file."""
--        image_file =3D open(filename, 'w')
-+        image_file =3D open(filename, 'wb')
-         for field in self:
-             image_file.seek(field.offset)
-             image_file.write(struct.pack(field.fmt, field.value))
+     @staticmethod
 --=20
 2.23.0
 
