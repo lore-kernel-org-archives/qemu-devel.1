@@ -2,78 +2,78 @@ Return-Path: <SRS0=HxLX=Y5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 081CAC5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BBC0C5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:13:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8E002087E
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:13:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8E002087E
+	by mail.kernel.org (Postfix) with ESMTPS id 3ECC321882
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 21:13:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ECC321882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS68K-0000Tp-I7
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 16:13:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58602)
+	id 1iS697-0001h5-3Y
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 16:13:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58398)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5pS-00015N-QG
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:31 -0500
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5p7-0000TT-7L
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5pR-0002NJ-Le
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:30 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47676)
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iS5p5-000219-R3
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 15:53:09 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31948)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iS5pR-00021o-Dj; Tue, 05 Nov 2019 15:53:29 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+ id 1iS5p5-00020H-ID; Tue, 05 Nov 2019 15:53:07 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- xA5KpbNb028364; Tue, 5 Nov 2019 15:53:08 -0500
+ xA5KpWJB144499; Tue, 5 Nov 2019 15:53:06 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2w3dd0xv1w-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2w3fuuha8m-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 15:53:08 -0500
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id xA5KpiQk028727;
- Tue, 5 Nov 2019 15:53:07 -0500
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2w3dd0xv1k-1
+ Tue, 05 Nov 2019 15:53:06 -0500
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id xA5KqOdN146630;
+ Tue, 5 Nov 2019 15:53:06 -0500
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2w3fuuha82-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 15:53:07 -0500
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xA5KnuZx000943;
- Tue, 5 Nov 2019 20:53:06 GMT
-Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
- [9.57.198.27]) by ppma04dal.us.ibm.com with ESMTP id 2w11e79fh0-1
+ Tue, 05 Nov 2019 15:53:06 -0500
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xA5KnwpQ017684;
+ Tue, 5 Nov 2019 20:53:05 GMT
+Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com
+ [9.57.198.29]) by ppma03wdc.us.ibm.com with ESMTP id 2w11e7h8tn-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 05 Nov 2019 20:53:06 +0000
+ Tue, 05 Nov 2019 20:53:04 +0000
 Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com
  [9.57.199.107])
- by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xA5Kr6CM47907222
+ by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xA5Kr4R453871016
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 5 Nov 2019 20:53:06 GMT
+ Tue, 5 Nov 2019 20:53:04 GMT
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1077012405E;
- Tue,  5 Nov 2019 20:53:06 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 78BFE124058;
+ Tue,  5 Nov 2019 20:53:04 +0000 (GMT)
 Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id F1E0B124058;
- Tue,  5 Nov 2019 20:53:05 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 65FC2124052;
+ Tue,  5 Nov 2019 20:53:04 +0000 (GMT)
 Received: from localhost (unknown [9.53.179.218])
  by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
- Tue,  5 Nov 2019 20:53:05 +0000 (GMT)
+ Tue,  5 Nov 2019 20:53:04 +0000 (GMT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 33/55] block/backup: fix max_transfer handling for copy_range
-Date: Tue,  5 Nov 2019 14:52:21 -0600
-Message-Id: <20191105205243.3766-34-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 02/55] Revert "ide/ahci: Check for -ECANCELED in aio callbacks"
+Date: Tue,  5 Nov 2019 14:51:50 -0600
+Message-Id: <20191105205243.3766-3-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191105205243.3766-1-mdroth@linux.vnet.ibm.com>
 References: <20191105205243.3766-1-mdroth@linux.vnet.ibm.com>
@@ -99,57 +99,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-stable@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
 
-Of course, QEMU_ALIGN_UP is a typo, it should be QEMU_ALIGN_DOWN, as we
-are trying to find aligned size which satisfy both source and target.
-Also, don't ignore too small max_transfer. In this case seems safer to
-disable copy_range.
+This reverts commit 0d910cfeaf2076b116b4517166d5deb0fea76394.
 
-Fixes: 9ded4a0114968e
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-id: 20190920142056.12778-2-vsementsov@virtuozzo.com
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-(cherry picked from commit 981fb5810aa3f68797ee6e261db338bd78857614)
+It's not correct to just ignore an error code in a callback; we need to
+handle that error and possible report failure to the guest so that they
+don't wait indefinitely for an operation that will now never finish.
+
+This ought to help cases reported by Nutanix where iSCSI returns a
+legitimate -ECANCELED for certain operations which should be propagated
+normally.
+
+Reported-by: Shaju Abraham <shaju.abraham@nutanix.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
+Message-id: 20190729223605.7163-1-jsnow@redhat.com
+Signed-off-by: John Snow <jsnow@redhat.com>
+(cherry picked from commit 8ec41c4265714255d5a138f8b538faf3583dcff6)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- block/backup.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ hw/ide/ahci.c |  3 ---
+ hw/ide/core.c | 14 --------------
+ 2 files changed, 17 deletions(-)
 
-diff --git a/block/backup.c b/block/backup.c
-index b26c22c4b8..7067d1d1ad 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -657,12 +657,19 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     job->cluster_size = cluster_size;
-     job->copy_bitmap = copy_bitmap;
-     copy_bitmap = NULL;
--    job->use_copy_range = !compress; /* compression isn't supported for it */
-     job->copy_range_size = MIN_NON_ZERO(blk_get_max_transfer(job->common.blk),
-                                         blk_get_max_transfer(job->target));
--    job->copy_range_size = MAX(job->cluster_size,
--                               QEMU_ALIGN_UP(job->copy_range_size,
--                                             job->cluster_size));
-+    job->copy_range_size = QEMU_ALIGN_DOWN(job->copy_range_size,
-+                                           job->cluster_size);
-+    /*
-+     * Set use_copy_range, consider the following:
-+     * 1. Compression is not supported for copy_range.
-+     * 2. copy_range does not respect max_transfer (it's a TODO), so we factor
-+     *    that in here. If max_transfer is smaller than the job->cluster_size,
-+     *    we do not use copy_range (in that case it's zero after aligning down
-+     *    above).
-+     */
-+    job->use_copy_range = !compress && job->copy_range_size > 0;
+diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+index 00ba422a48..6aaf66534a 100644
+--- a/hw/ide/ahci.c
++++ b/hw/ide/ahci.c
+@@ -1023,9 +1023,6 @@ static void ncq_cb(void *opaque, int ret)
+     IDEState *ide_state = &ncq_tfs->drive->port.ifs[0];
  
-     /* Required permissions are already taken with target's blk_new() */
-     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
+     ncq_tfs->aiocb = NULL;
+-    if (ret == -ECANCELED) {
+-        return;
+-    }
+ 
+     if (ret < 0) {
+         bool is_read = ncq_tfs->cmd == READ_FPDMA_QUEUED;
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 6afadf894f..8e1624f7ce 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -722,9 +722,6 @@ static void ide_sector_read_cb(void *opaque, int ret)
+     s->pio_aiocb = NULL;
+     s->status &= ~BUSY_STAT;
+ 
+-    if (ret == -ECANCELED) {
+-        return;
+-    }
+     if (ret != 0) {
+         if (ide_handle_rw_error(s, -ret, IDE_RETRY_PIO |
+                                 IDE_RETRY_READ)) {
+@@ -840,10 +837,6 @@ static void ide_dma_cb(void *opaque, int ret)
+     uint64_t offset;
+     bool stay_active = false;
+ 
+-    if (ret == -ECANCELED) {
+-        return;
+-    }
+-
+     if (ret == -EINVAL) {
+         ide_dma_error(s);
+         return;
+@@ -975,10 +968,6 @@ static void ide_sector_write_cb(void *opaque, int ret)
+     IDEState *s = opaque;
+     int n;
+ 
+-    if (ret == -ECANCELED) {
+-        return;
+-    }
+-
+     s->pio_aiocb = NULL;
+     s->status &= ~BUSY_STAT;
+ 
+@@ -1058,9 +1047,6 @@ static void ide_flush_cb(void *opaque, int ret)
+ 
+     s->pio_aiocb = NULL;
+ 
+-    if (ret == -ECANCELED) {
+-        return;
+-    }
+     if (ret < 0) {
+         /* XXX: What sector number to set here? */
+         if (ide_handle_rw_error(s, -ret, IDE_RETRY_FLUSH)) {
 -- 
 2.17.1
 
