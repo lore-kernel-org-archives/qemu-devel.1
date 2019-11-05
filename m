@@ -4,75 +4,75 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F24C5DF60
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 15:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2E28C5DF60
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 15:52:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71A37217F5
-	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 15:51:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E07B217F5
+	for <qemu-devel@archiver.kernel.org>; Tue,  5 Nov 2019 15:52:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xd61tXUR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71A37217F5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vx+k2dBl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E07B217F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iS17e-0003x5-IA
-	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 10:51:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42331)
+	id 1iS17j-00045A-Gx
+	for qemu-devel@archiver.kernel.org; Tue, 05 Nov 2019 10:52:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42538)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iS106-0004QE-Tp
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:44:11 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iS10i-0005F1-93
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:44:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iS105-0002ZM-Qk
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:44:10 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22972
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1iS10g-00030G-6k
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:44:48 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45073)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iS105-0002Yv-Mj
- for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:44:09 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iS10g-00030A-3v
+ for qemu-devel@nongnu.org; Tue, 05 Nov 2019 10:44:46 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1572968649;
+ s=mimecast20190719; t=1572968685;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xqVtcEw030cWBKi4G/oHb1MwhDbny8Z9CDgObjufLLo=;
- b=Xd61tXURkuXPiEbbf9FXTjB/mkNIMBB5IF3XM+reVfAF4QQ+90FyLo878djr3vYa7V3t5l
- y9JvwBhn2IQVFEyqlOPOS/tv9PBdebwsesvhO38Wkz0i+3mcFjZszrrsYdtQDs3sa9TAgB
- fE8uUGP0U1RrC/+yVATZ+qj5TWH9jw4=
+ bh=cydLyk85Sj0wvc752K2r6gUg4BKM93PS+YG8bQ6GRsw=;
+ b=Vx+k2dBlQ3oV/pf6KJJC99IHbi5CP064hfAOj/ZyRiBxeOv0m6WwdIF5vUJCCKS1R/mn6y
+ IUcLrEeIBLbHF90jAa2BKFoiYWulms69CSQR/ZirIoGo9nsaP1rJw7XJsWW9D42Zfyupkq
+ Wq6nBaPZg+3ni0cSz6xDSTDrHoI0qHo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338--CFLquhaO-6qMugWq-lGQA-1; Tue, 05 Nov 2019 10:44:07 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-17-NQCZm5i7OUCbbnV_Gjb65g-1; Tue, 05 Nov 2019 10:44:40 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 06A048017DE;
- Tue,  5 Nov 2019 15:44:06 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B96491005500;
+ Tue,  5 Nov 2019 15:44:39 +0000 (UTC)
 Received: from localhost (ovpn-116-232.ams2.redhat.com [10.36.116.232])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D82C53C1D;
- Tue,  5 Nov 2019 15:43:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A96F010018FF;
+ Tue,  5 Nov 2019 15:44:28 +0000 (UTC)
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/11] image-fuzzer: Use io.StringIO
-Date: Tue,  5 Nov 2019 16:43:25 +0100
-Message-Id: <20191105154332.181417-5-stefanha@redhat.com>
+Subject: [PULL 07/11] image-fuzzer: Use bytes constant for field values
+Date: Tue,  5 Nov 2019 16:43:28 +0100
+Message-Id: <20191105154332.181417-8-stefanha@redhat.com>
 In-Reply-To: <20191105154332.181417-1-stefanha@redhat.com>
 References: <20191105154332.181417-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: -CFLquhaO-6qMugWq-lGQA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: NQCZm5i7OUCbbnV_Gjb65g-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,70 +94,42 @@ Sender: "Qemu-devel"
 
 From: Eduardo Habkost <ehabkost@redhat.com>
 
-StringIO.StringIO is not available on Python 3, but io.StringIO
-is available on both Python 2 and 3.  io.StringIO is slightly
-different from the Python 2 StringIO module, though, so we need
-bytes coming from subprocess.Popen() to be explicitly decoded.
+Field values are supposed to be bytes objects, not unicode
+strings.  Change two constants that were declared as strings.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20191016192430.25098-5-ehabkost@redhat.com
-Message-Id: <20191016192430.25098-5-ehabkost@redhat.com>
+Message-id: 20191016192430.25098-8-ehabkost@redhat.com
+Message-Id: <20191016192430.25098-8-ehabkost@redhat.com>
 Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- tests/image-fuzzer/runner.py | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ tests/image-fuzzer/qcow2/layout.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/image-fuzzer/runner.py b/tests/image-fuzzer/runner.py
-index 95d84f38f3..94cab5bd93 100755
---- a/tests/image-fuzzer/runner.py
-+++ b/tests/image-fuzzer/runner.py
-@@ -28,7 +28,7 @@ import shutil
- from itertools import count
- import time
- import getopt
--import StringIO
-+import io
- import resource
-=20
- try:
-@@ -84,8 +84,12 @@ def run_app(fd, q_args):
-     try:
-         out, err =3D process.communicate()
-         signal.alarm(0)
--        fd.write(out)
--        fd.write(err)
-+        # fd is a text file, so we need to decode the process output befor=
-e
-+        # writing to it.
-+        # We could be simply using the `errors` parameter of subprocess.Po=
-pen(),
-+        # but this will be possible only after migrating to Python 3
-+        fd.write(out.decode(errors=3D'replace'))
-+        fd.write(err.decode(errors=3D'replace'))
-         fd.flush()
-         return process.returncode
-=20
-@@ -183,7 +187,7 @@ class TestEnv(object):
-                                            MAX_BACKING_FILE_SIZE) * (1 << =
-20)
-         cmd =3D self.qemu_img + ['create', '-f', backing_file_fmt,
-                                backing_file_name, str(backing_file_size)]
--        temp_log =3D StringIO.StringIO()
-+        temp_log =3D io.StringIO()
-         retcode =3D run_app(temp_log, cmd)
-         if retcode =3D=3D 0:
-             temp_log.close()
-@@ -240,7 +244,7 @@ class TestEnv(object):
-                            "Backing file: %s\n" \
-                            % (self.seed, " ".join(current_cmd),
-                               self.current_dir, backing_file_name)
--            temp_log =3D StringIO.StringIO()
-+            temp_log =3D io.StringIO()
-             try:
-                 retcode =3D run_app(temp_log, current_cmd)
-             except OSError as e:
+diff --git a/tests/image-fuzzer/qcow2/layout.py b/tests/image-fuzzer/qcow2/=
+layout.py
+index 0adcbd448d..a0fd53c7ad 100644
+--- a/tests/image-fuzzer/qcow2/layout.py
++++ b/tests/image-fuzzer/qcow2/layout.py
+@@ -122,7 +122,7 @@ class Image(object):
+     def create_header(self, cluster_bits, backing_file_name=3DNone):
+         """Generate a random valid header."""
+         meta_header =3D [
+-            ['>4s', 0, "QFI\xfb", 'magic'],
++            ['>4s', 0, b"QFI\xfb", 'magic'],
+             ['>I', 4, random.randint(2, 3), 'version'],
+             ['>Q', 8, 0, 'backing_file_offset'],
+             ['>I', 16, 0, 'backing_file_size'],
+@@ -231,7 +231,7 @@ class Image(object):
+             feature_tables =3D []
+             feature_ids =3D []
+             inner_offset =3D self.ext_offset + ext_header_len
+-            feat_name =3D 'some cool feature'
++            feat_name =3D b'some cool feature'
+             while len(feature_tables) < num_fnt_entries * 3:
+                 feat_type, feat_bit =3D gen_feat_ids()
+                 # Remove duplicates
 --=20
 2.23.0
 
