@@ -8,74 +8,74 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34365C5DF63
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:18:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C34DC5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:18:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F099C2173E
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:18:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 011612173E
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:18:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q/Ndh+XF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F099C2173E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EZb5bGDg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 011612173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSM8P-00016m-6T
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 09:18:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55688)
+	id 1iSM8U-0001Ev-1F
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 09:18:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55712)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iSM53-00064U-Pw
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:14:42 -0500
+ (envelope-from <edgar.iglesias@gmail.com>) id 1iSM57-0006Dh-Ud
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:14:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iSM52-0001ap-Mv
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:14:41 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:32916)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1iSM57-0001kr-1B
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:14:45 -0500
+Received: from mail-wm1-x32d.google.com ([2a00:1450:4864:20::32d]:39236)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
- id 1iSM52-0001aF-Gq
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:14:40 -0500
-Received: by mail-wr1-x442.google.com with SMTP id w30so3278451wra.0
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 06:14:40 -0800 (PST)
+ id 1iSM56-0001hh-RK
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:14:44 -0500
+Received: by mail-wm1-x32d.google.com with SMTP id t26so3528666wmi.4
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 06:14:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8PzveeQufMPdtS1Xqw/uA0eI9Y+6gGVjzLa9fBNFKzk=;
- b=q/Ndh+XFwEOV1AfNmeVt+oCNAmwTS4ARmfoX4VIBuTqX0GMP9bKkHu3uVmdfw3CxP5
- v8Yzdj8FbiZ6ZXlHwZlhSsjIxtBmDno9YfvfpkjB0Cr5/bFwMwGoY5WkWBLhp+15kwH6
- BYNmtV8URiUoZz63wnA22/+5xc54syKmtDm1XsfPYrQ1GHlh9f22BRTDen1QXPtkRH6P
- qRjRV3L+VQBL/AywY/M3MWayZJZ8QdvUjMrstlzDD2xz2KsKsI0GYt7IF0NSnu2lvk5k
- RFoJF+BEd/EAha4JQM4lTYnjv+LDQtzyJmjqjzgHvsq19a48S1zEn/H0C1q7HcgqHT1k
- SEUA==
+ bh=Ppajx2TsUCnTlh9u4c0p57YVNOfV7vxJaOxn+KJ6Rg8=;
+ b=EZb5bGDgfWY0MD1PeF7OBDaYA5L8zkY/poZFBtPF4hGlbBYpn3BrOPmHSYIRpDZY3B
+ rqCnZIjIJ3yfbjLa+cXh5imH3OiQoRXuwSHJ3/z8Pov35QViGBkiidoMa5Am1qP6IFOi
+ ACvAjzV45fq45uZtf/Gb5rAlPN4BTQG7fw7axKKu9rp+70nvzwomrjnf5YO1gNdnNw6C
+ 8LrUC64RphaYmjCXyjQbzmSnHh+ccJj2afytNmf3nZpRvSj2ywXRoGxZ1kpW1iSzaQFc
+ ZUmKGLIRmquLcNxAmttHdwi2TRT6Czy9WHLjN3y50XHHKcE2CkHePrf5Te/5cUGR7Z8Q
+ 9LjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8PzveeQufMPdtS1Xqw/uA0eI9Y+6gGVjzLa9fBNFKzk=;
- b=C8bTnyx/qdoozF826H01VY1HtSI3rSGs7b2armKHarpYJJ5UwX6pgJylPQHZ9FsQHI
- owUDx1gtTEwbO1lEG6kG9ivqu2pAg8/jPFvxIZMgqRGfiejukCj2Ssmpd14kuiXHf3Qv
- JAGI4H2IUuSUWaDWQTQyI9wjliQyLvKi34GHk8mwn6QNN6DcOvVrG+P2Sc/W2rduS9Qw
- vu1jK53060+7tTIJl4dntCET5zG5ro10/lJPq+WrtOcsZiIL/xTg3Q33Rgv4WgZbET42
- gnLyaw6fjJb1kI3tORgkjzE86UH+G0jnxik0GiyreSPlmg2r43ntjxKxxFEOiuEOrhHz
- OTfA==
-X-Gm-Message-State: APjAAAUWZryF8Vwha77HlXtGdBXkWIi+QLo9rhiuJesffzXLJBJiamOn
- JS+OXwEkVxU3qagAGIjg6nKwxOB0j/Q=
-X-Google-Smtp-Source: APXvYqymy9f/4LcrewPw8N1yrf3Y/9nR0Oa/g5cPPXyChNbNz1XAKiXujkIj3FrXxVzbFtS4R+Y7Nw==
-X-Received: by 2002:adf:b608:: with SMTP id f8mr2743381wre.99.1573049679085;
- Wed, 06 Nov 2019 06:14:39 -0800 (PST)
+ bh=Ppajx2TsUCnTlh9u4c0p57YVNOfV7vxJaOxn+KJ6Rg8=;
+ b=CPxdnovZV/lV8BbKFwf3ZZZabCjVzsO3p8Stwe9j/rPOUmRnIpE8EojCSU+GCJqVo1
+ rM3Go3sNYvCm3efrexV2lV8w64hHuX9AMe8ZsTVDaXhIoi2sbOB1qKSmEsx1hGOknfxl
+ ny94LI5PLfUOJGWqU4XNtDK6IC0FB9AOB5glsRd4vgnz2DBP0rnmSQrFwSOPqIyW7tEE
+ JguVjyhISb5H2mQ4Ku1HYjWnKO1vPFu0d5OhBxGfBmKvpRJrKIVy1J9WaaEdtK7+D3Md
+ bhuLHtbkUz3on+K0THBkubTY5DQUsTyxJjevZFm6fU4dfe9g1BkROVARbrewEpLKm9uL
+ LlsA==
+X-Gm-Message-State: APjAAAVhXnRmDh0GGApQQijrXbZMCUyu4RZd4d/aa84B/U5aGwG47Jc8
+ D42XAppaTzBa4CTuADpFdotIr/w8uiA=
+X-Google-Smtp-Source: APXvYqwF06MiAv8XtLviYlZqEhH/LU0GJRUG7iI3CXjVBdjZnyjr2Sck5xSAgy23AqCFhKT1zT+xAQ==
+X-Received: by 2002:a7b:c3d6:: with SMTP id t22mr2820176wmj.13.1573049683552; 
+ Wed, 06 Nov 2019 06:14:43 -0800 (PST)
 Received: from localhost (ec2-34-244-242-0.eu-west-1.compute.amazonaws.com.
  [34.244.242.0])
- by smtp.gmail.com with ESMTPSA id j3sm16558763wrs.70.2019.11.06.06.14.37
+ by smtp.gmail.com with ESMTPSA id y2sm3376243wmy.2.2019.11.06.06.14.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 Nov 2019 06:14:38 -0800 (PST)
+ Wed, 06 Nov 2019 06:14:42 -0800 (PST)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 2/3] target/microblaze: Plug temp leaks with delay slot
- setup
-Date: Wed,  6 Nov 2019 15:14:23 +0100
-Message-Id: <20191106141424.27244-3-edgar.iglesias@gmail.com>
+Subject: [PATCH v1 3/3] target/microblaze: Plug temp leak around
+ eval_cond_jmp()
+Date: Wed,  6 Nov 2019 15:14:24 +0100
+Message-Id: <20191106141424.27244-4-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191106141424.27244-1-edgar.iglesias@gmail.com>
 References: <20191106141424.27244-1-edgar.iglesias@gmail.com>
@@ -83,7 +83,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::32d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,71 +106,29 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Plug temp leaks with delay slot setup.
+Plug temp leak around eval_cond_jmp().
 
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ target/microblaze/translate.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index ba143ede5f..e9ff9e650d 100644
+index e9ff9e650d..93e22a89ac 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -1201,6 +1201,17 @@ static void eval_cond_jmp(DisasContext *dc, TCGv_i64 pc_true, TCGv_i64 pc_false)
-     tcg_temp_free_i64(tmp_zero);
- }
- 
-+static void dec_setup_dslot(DisasContext *dc)
-+{
-+        TCGv_i32 tmp = tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG));
+@@ -1705,7 +1705,10 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+                 dc->tb_flags &= ~D_FLAG;
+                 /* If it is a direct jump, try direct chaining.  */
+                 if (dc->jmp == JMP_INDIRECT) {
+-                    eval_cond_jmp(dc, env_btarget, tcg_const_i64(dc->pc));
++                    TCGv_i64 tmp_pc = tcg_const_i64(dc->pc);
++                    eval_cond_jmp(dc, env_btarget, tmp_pc);
++                    tcg_temp_free_i64(tmp_pc);
 +
-+        dc->delayed_branch = 2;
-+        dc->tb_flags |= D_FLAG;
-+
-+        tcg_gen_st_i32(tmp, cpu_env, offsetof(CPUMBState, bimm));
-+        tcg_temp_free_i32(tmp);
-+}
-+
- static void dec_bcc(DisasContext *dc)
- {
-     unsigned int cc;
-@@ -1212,10 +1223,7 @@ static void dec_bcc(DisasContext *dc)
- 
-     dc->delayed_branch = 1;
-     if (dslot) {
--        dc->delayed_branch = 2;
--        dc->tb_flags |= D_FLAG;
--        tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
--                      cpu_env, offsetof(CPUMBState, bimm));
-+        dec_setup_dslot(dc);
-     }
- 
-     if (dec_alu_op_b_is_small_imm(dc)) {
-@@ -1274,10 +1282,7 @@ static void dec_br(DisasContext *dc)
- 
-     dc->delayed_branch = 1;
-     if (dslot) {
--        dc->delayed_branch = 2;
--        dc->tb_flags |= D_FLAG;
--        tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
--                      cpu_env, offsetof(CPUMBState, bimm));
-+        dec_setup_dslot(dc);
-     }
-     if (link && dc->rd)
-         tcg_gen_movi_i32(cpu_R[dc->rd], dc->pc);
-@@ -1379,10 +1384,7 @@ static void dec_rts(DisasContext *dc)
-         return;
-     }
- 
--    dc->delayed_branch = 2;
--    dc->tb_flags |= D_FLAG;
--    tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
--                  cpu_env, offsetof(CPUMBState, bimm));
-+    dec_setup_dslot(dc);
- 
-     if (i_bit) {
-         LOG_DIS("rtid ir=%x\n", dc->ir);
+                     dc->is_jmp = DISAS_JUMP;
+                 } else if (dc->jmp == JMP_DIRECT) {
+                     t_sync_flags(dc);
 -- 
 2.20.1
 
