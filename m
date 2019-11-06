@@ -6,67 +6,66 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC74C5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24806C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:13:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86EC0217F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:13:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86EC0217F4
+	by mail.kernel.org (Postfix) with ESMTPS id CCB68217F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:13:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCB68217F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSL7v-0006Tj-A4
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 08:13:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36553)
+	id 1iSL87-0006yw-J9
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 08:13:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36497)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iSL01-0003hv-Md
+ (envelope-from <laurent@vivier.eu>) id 1iSKzx-0003Yq-D8
  for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iSL00-00032u-Io
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:25 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:52297)
+ (envelope-from <laurent@vivier.eu>) id 1iSKzv-0002ys-Qy
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:21 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:57175)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSL00-00031m-8Q
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:24 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSKzv-0002y3-HF
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:19 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MLi4W-1iAfcW0fNA-00Hj6j; Wed, 06 Nov 2019 14:05:12 +0100
+ id 1N4i3j-1hkzWM2Av1-011kB0; Wed, 06 Nov 2019 14:05:17 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 07/13] linux-user/sparc: Use WREG_SP constant in
- sparc/signal.c
-Date: Wed,  6 Nov 2019 14:04:50 +0100
-Message-Id: <20191106130456.6176-8-laurent@vivier.eu>
+Subject: [PULL v2 13/13] linux-user/alpha: Set r20 secondary return value
+Date: Wed,  6 Nov 2019 14:04:56 +0100
+Message-Id: <20191106130456.6176-14-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191106130456.6176-1-laurent@vivier.eu>
 References: <20191106130456.6176-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:F93e5yo2DqTObT6L78NjVj8t1cit52FlwUIZxym5DRzQHRL3uwU
- Cf4foVC6eKSHJOe5z4GecDZyArENAjnWmNHPJm5NH66AoGzYBFviAC0EP5ii+VieL/yIYVU
- vvynRKbd9EgUttwqlf6RCRqRcl4017FMM3/ImJjBQM1fHjYsn+9iG8PdJMZfKotrYbWCXWO
- GFJfi8Jz7j3qe3x2ZA2DA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:vRZ2ozsTQoE=:Xr3bffh2H56nYZNHwYjnTZ
- /hipQrfP0yE957VAG9XZdCG/2F6+3LPbNwcQnFK/vNN4jBOGkQtMxmNTQl0AgSfB/DhxAGc0y
- MxzITP2nlwkmX5FZXQLZuDNI/6w4iSkgdDsQ4GTa1aOqcij5nRCtndX9wl6zZUHPs8eeBTw13
- GXqPcz+XojdJ1tdVGpybl9HdUYifLK9+7v+Srcxn5WKQYLCC1Vp5vO8woDliuVktTol++1j3I
- xVEV0wFXFVEFP/ExKOCBbQPjxfnhg6gKw59yM+bOMBSe7B8L9yTgdB+nMk2ty1ohGwNryFnaE
- 4+ZBQZeGgWYhqN+TPWqpdpqr7uXPlHlimlPd3JfwB3mxKu1OX/NeaWNwIxSC4CElb1ESP6lkT
- hrg7gI9OU9UU1ApRG9VTvPkANe3fs51SGefu9pBXYeYWegqo2NYofmwFcPzI/U82dw5pz5rcS
- elSPtAwfBeh7HhbG+KSNviNdyI60A6op8M06dkNv4eTNmuPOqhXl94sesvJK8oYAwfwgs4V5C
- qVKUwmJVVJhZjk7iA2h0FvBglSzw8jqX2tsUZz7RuKlNhC18cGQmVNYXHzPx9PluMZZ0ricnC
- wDLDKnh77yMS2bWPe7ZPw03bA6GOvOluzqvoZRHoepVXHgwoYhKMhVN1BRkKHI8T7VTzG/H9f
- VnnsUnaXSiOKhFxo4c3IPinWuGpXTx9HLCLjg8q04GoK2EPhxZKkA8wVbyMRNmRd8C84dAhxP
- +lUa1vWht7IMNxhoc1/sA6vAoGydqz3hjs7tw5TzxluK7zM2taDQfoosNKVi4ki1GbOnUaCu4
- ZVBrUeZZWZmLNo0IbbDCucyJwCfJPn8FPZvTEZrfc9uu9NP8MploLjl65V0pnR/MHdI8Fl83c
- gBMdiOkE2+MUlz3CiXiA==
+X-Provags-ID: V03:K1:sT58QnB+9d3LffVxpnM5Qac7Rc7XxNgy+jbm6hcpvpCOZtG5bCa
+ Xk0r88/fTxQXxtQGImnrI0Juy3vZimxPwTHS2X5Rbj7FeZr39RLaLdNrHDZTBrDJOzlF1lz
+ f7lExXIb919ZyTBKXsjAAF1GGgU3+Zr3qX5SQxbrzdiekbxo9c2unQUCI9r2JHgIVNZ08NM
+ TIgV+ouom55nFs9eoodMA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:85v3dB7Rzso=:aRwOqgolEVh7fzd222PCJ7
+ 4ZIEFhuVbHwj9aaaRbm8O3+49AsBoVe3NbWBl5CtG+DWT0sCEyiyT+pueSh8JnmGvM+qR4MlH
+ VwU8hTPhYpIoLhPyhrSgZjnO25cAbS5tEZPhf1ZtDZereh7XNaBwQ3ntozyiZU/P7nOQSvTjh
+ fQhFhQ2uWZ2I76etvxlzmtlyaEaxbYTZiznS5IOidiksU3gnG9oul2FmC84zqyxKrW8jT5Prq
+ c/A5hbnqwDpu4Q5u1PtEwrlJvSJDdci8WExzIo2+6FtoFtSPaH3l89mJCjOsIxCAUUN9zIXIp
+ JhMrsKug9xRm78/HCE+diyTewdT9WTyjoSgAdO4uHCtnhn6+8zQ+vfgT8HdhqQVN7NzBOQkEf
+ ok6ydOkFYlBs+sJVT6s3OG2Atjt3Pnf34r+a5AvHFgvl4R0hzJ0VcI6n45ZgEpFSZ0X2+eYJR
+ NnED1yu1c28dDBkqEHdl+1z4OYD68MG5rsHZqVQa5f3zyuDPYg9dxbOSoY4IT+Pr2ADq+6rq2
+ /fiYfbkdAGYk80HCGt9X2keG2wIr7ZTK3Ur7L/LcBu2es7GM2LuhhGTlE4u12NZF5SP3D3zZU
+ 4ssejeP30UeYRfKZ3W07hbWXSspYdsSiq/BIYXBtCKs9H5+WNnQlA3RC5LGHcnOia15CfdrTc
+ Lov7WUmRgjfErsfbcK8TDGtNefGkdb7eyIGr2PVkMLYOlANQWujgepK0t58xnDwIpxid/+xKQ
+ KcusbiSYUh80Ex/1q75PHrT9BLNcmJ538cBbc3Q5Tq20N5nq+mrCZyB/Bz8KcwFkvRJnS6yiw
+ fvJoe5Dvr8nRLXCwiGjoK92X9jCsJY+E7kAT4TbcM+72t+lDn0rKwewEjt0Nsm67swAPi1ggA
+ pGVyAlJyMW9a25Srebqw==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.134
+X-Received-From: 212.227.126.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,55 +89,41 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-s/UREG_FP/WREG_SP/g
-
-This is non-obvious because the UREG_FP constant is fact wrong.
-However, the previous search-and-replace patch made it clear that
-UREG_FP expands to WREG_O6, and we can see from the enumeration in
-target/sparc/cpu.h that WREG_O6 is in fact WREG_SP, the stack pointer.
-
-The UREG_SP define is unused; remove it.
+This value is not, as far as I know, used by any linux software,
+but it is set by the kernel and is part of the ABI.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20191106113318.10226-7-richard.henderson@linaro.org>
+Message-Id: <20191106113318.10226-13-richard.henderson@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/sparc/signal.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ linux-user/alpha/target_cpu.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
-index aac37da239c1..e05693f20432 100644
---- a/linux-user/sparc/signal.c
-+++ b/linux-user/sparc/signal.c
-@@ -104,9 +104,6 @@ struct target_rt_signal_frame {
-     qemu_siginfo_fpu_t  fpu_state;
- };
+diff --git a/linux-user/alpha/target_cpu.h b/linux-user/alpha/target_cpu.h
+index dd25e18f47fb..ad408ab5cc8e 100644
+--- a/linux-user/alpha/target_cpu.h
++++ b/linux-user/alpha/target_cpu.h
+@@ -27,10 +27,19 @@ static inline void cpu_clone_regs_child(CPUAlphaState *env, target_ulong newsp,
+     }
+     env->ir[IR_V0] = 0;
+     env->ir[IR_A3] = 0;
++    env->ir[IR_A4] = 1;  /* OSF/1 secondary return: child */
+ }
  
--#define UREG_FP        WREG_O6
--#define UREG_SP        WREG_I6
--
- static inline abi_ulong get_sigframe(struct target_sigaction *sa, 
-                                      CPUSPARCState *env,
-                                      unsigned long framesize)
-@@ -201,7 +198,7 @@ void setup_frame(int sig, struct target_sigaction *ka,
-         goto sigsegv;
+ static inline void cpu_clone_regs_parent(CPUAlphaState *env, unsigned flags)
+ {
++    /*
++     * OSF/1 secondary return: parent
++     * Note that the kernel does not do this if SETTLS, because the
++     * settls argument register is still live after copy_thread.
++     */
++    if (!(flags & CLONE_SETTLS)) {
++        env->ir[IR_A4] = 0;
++    }
+ }
  
-     /* 3. signal handler back-trampoline and parameters */
--    env->regwptr[UREG_FP] = sf_addr;
-+    env->regwptr[WREG_SP] = sf_addr;
-     env->regwptr[WREG_O0] = sig;
-     env->regwptr[WREG_O1] = sf_addr +
-             offsetof(struct target_signal_frame, info);
-@@ -255,7 +252,7 @@ long do_sigreturn(CPUSPARCState *env)
-     sigset_t host_set;
-     int i;
- 
--    sf_addr = env->regwptr[UREG_FP];
-+    sf_addr = env->regwptr[WREG_SP];
-     trace_user_do_sigreturn(env, sf_addr);
-     if (!lock_user_struct(VERIFY_READ, sf, sf_addr, 1)) {
-         goto segv_and_exit;
+ static inline void cpu_set_tls(CPUAlphaState *env, target_ulong newtls)
 -- 
 2.21.0
 
