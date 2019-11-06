@@ -2,83 +2,82 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D176C5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3399CC5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:55:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4F69217F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:52:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E40CC217F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:55:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hKBNrMws"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4F69217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tb0NUDzT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E40CC217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSHzE-0007Rh-Vy
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 04:52:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34234)
+	id 1iSI2N-0000gr-4B
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 04:55:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34854)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iSHyO-0006E9-1S
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:51:33 -0500
+ (envelope-from <zar1969@gmail.com>) id 1iSI1f-00009n-6N
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:54:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iSHyM-00044O-KE
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:51:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29879
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iSHyM-00044K-GR
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:51:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573033890;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=H07O5MhifX+SyOo7deyM1HCJTFRz437wQNK/NQ47qqU=;
- b=hKBNrMws6ij8TnN6C9Ma1mICMPd+8bJ5zXVLTzfeCQkAgouX2vab15YOd5Zih6B/2muCQX
- N6Z2xeq6LCvAV3x4uAzJ7fxdMzCH38H75929DvG4gkuLWxaW2C8pjXpE7X2R7Jaa+o4Peb
- tr12v5vY+REVH26Mex6vBDZnfLziKxI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-D2z0XxgJPDqcbsTxn64f0Q-1; Wed, 06 Nov 2019 04:51:26 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D64A107ACC3;
- Wed,  6 Nov 2019 09:51:24 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-69.ams2.redhat.com
- [10.36.116.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C049627064;
- Wed,  6 Nov 2019 09:51:23 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id CEB7E17535; Wed,  6 Nov 2019 10:51:22 +0100 (CET)
-Date: Wed, 6 Nov 2019 10:51:22 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: guest / host buffer sharing ...
-Message-ID: <20191106095122.jju7eo57scfoat6a@sirius.home.kraxel.org>
-References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
- <20191106084344.GB189998@stefanha-x1.localdomain>
+ (envelope-from <zar1969@gmail.com>) id 1iSI1e-0005Os-0Y
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:54:55 -0500
+Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:36107)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <zar1969@gmail.com>) id 1iSI1d-0005O3-PN
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:54:53 -0500
+Received: by mail-oi1-x22e.google.com with SMTP id j7so20438365oib.3
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 01:54:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=n+bfa+XBueXq4eeI7ppl29nUcPWN7ZhId27AyQG4iBs=;
+ b=Tb0NUDzTeIeqjSDU4cAUvl6BDsEFOm193LI1Y6spQlYlWbM0hKD6WvT2IqYjAiHens
+ 7BXQO3s0Yj0sDU7Pd3QcksiDdM/KCxmBkl9Z4LEE1R3ofWeFHOjvb4H4xH3wMJw9ooKw
+ rlQZ1YguP8enniqh/8dgeP+cEVpqWUbqc07HLgOalWGZ4emtvMM2aiD2zcq53Df+J19X
+ fq6522nhcMJULCuwIa3Q3ZDZWtUostNcoX1pbaaCxhy0vCMaWWVzABCib6ZqpWC57pJR
+ gKMe4VNdMrlkYDBr6o8Rbrfn+F7kRnRwIfAx49r1WvF9GqeWIpTRY2+GdrWKqKXKL5UV
+ GvTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=n+bfa+XBueXq4eeI7ppl29nUcPWN7ZhId27AyQG4iBs=;
+ b=Iiic7J2kVc9iXxXMlU8M6ivarVpG7H+1aBlvXR4B0Q0aoQcZQaZSID/IrMBSR8Nj5j
+ Z+4XUjAKZK7hGUWU7303yW0rp9YPJreuYhZgxg91eQ3cl/v27e8XUxxrs6Y3w/s+lIfH
+ DXFklwfS3iynEoEFF4iACHAtTt3y2cvd174io3ZTD+bsU6wRRUkNvhg7c40QcNOZ3b46
+ 13UXFcOWL63Aez+msX5h0kXXtGT+LKM+LG1lhUL96OMrOkdnvZKQpDSA/wV16k37rSPr
+ xf237tCIx1og7aqe02yyBEMawXK6G6c2MGa0jLdIqtYz4eaYOvao0Im80eVLVVAx+H8A
+ hkdA==
+X-Gm-Message-State: APjAAAXLDUPhC1rvYNODXK2Tct0Veb0WYu9q9TI+xCnOUON16NXfQIIk
+ kOebE52WSuYQ9Zx29/ZI6fXVW0aP83kIe5f+hKU=
+X-Google-Smtp-Source: APXvYqyQStgcBCR3lBe3j2qkQbCRUWRLmfOK3YHpPaTHYJJk9KDY8eqrIkWVimMZAiNZ0TCAkT/EOMsrrCfl2UGtidc=
+X-Received: by 2002:a05:6808:6c5:: with SMTP id
+ m5mr1492937oih.16.1573034091877; 
+ Wed, 06 Nov 2019 01:54:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191106084344.GB189998@stefanha-x1.localdomain>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: D2z0XxgJPDqcbsTxn64f0Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <CA+gXNfhCRT1kPq4KVumXwRiJvVaXYZZBRhs-QsVNKv+WzeMM+A@mail.gmail.com>
+ <54af7410-569e-2b4b-70ed-f09039014bda@redhat.com>
+ <56403a22-d48e-5bb3-15c5-904e2e7c667d@ilande.co.uk>
+ <CACXAS8CVEbSGu7v4fLyGb-w95CZbw-1foM5=Mvs=yu7QsxspOA@mail.gmail.com>
+In-Reply-To: <CACXAS8CVEbSGu7v4fLyGb-w95CZbw-1foM5=Mvs=yu7QsxspOA@mail.gmail.com>
+From: Zainuddin AR <zar1969@gmail.com>
+Date: Wed, 6 Nov 2019 17:54:38 +0800
+Message-ID: <CA+gXNfiRPZOvViv4LBJKtayAvx4W4d8Vnn_dstKzqEcKW27hfg@mail.gmail.com>
+Subject: Re: Sparc Solaris 10
+To: Artyom Tarasenko <atar4qemu@gmail.com>
+Content-Type: multipart/alternative; boundary="000000000000441d0b0596aa8abf"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,85 +89,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
- Alex Lau <alexlau@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
- qemu-devel@nongnu.org, Tomasz Figa <tfiga@chromium.org>,
- Keiichi Watanabe <keiichiw@chromium.org>,
- David Stevens <stevensd@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
- =?utf-8?B?U3TDqXBoYW5l?= Marchesin <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Hans Verkuil <hverkuil@xs4all.nl>,
- Dmitry Morozov <dmitry.morozov@opensynergy.com>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+--000000000000441d0b0596aa8abf
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > Reason is:  Meanwhile I'm wondering whenever "just use virtio-gpu
-> > resources" is really a good answer for all the different use cases
-> > we have collected over time.  Maybe it is better to have a dedicated
-> > buffer sharing virtio device?  Here is the rough idea:
->=20
-> My concern is that buffer sharing isn't a "device".  It's a primitive
-> used in building other devices.  When someone asks for just buffer
-> sharing it's often because they do not intend to upstream a
-> specification for their device.
+Thank you very much for the reply and information.  Will check it out.
 
-Well, "vsock" isn't a classic device (aka nic/storage/gpu/...) either.
-It is more a service to allow communication between host and guest
+On Mon, Nov 4, 2019, 17:17 Artyom Tarasenko <atar4qemu@gmail.com> wrote:
 
-That buffer sharing device falls into the same category.  Maybe it even
-makes sense to build that as virtio-vsock extension.  Not sure how well
-that would work with the multi-transport architecture of vsock though.
+> On Sun, Nov 3, 2019 at 10:01 PM Mark Cave-Ayland
+> <mark.cave-ayland@ilande.co.uk> wrote:
+> >
+> > On 02/11/2019 19:56, Philippe Mathieu-Daud=C3=A9 wrote:
+> >
+> > > Cc'ing the SPARC maintainers.
+> > >
+> > > On 11/1/19 4:49 AM, Zainuddin AR wrote:
+> > >> Hi,
+> > >>
+> > >> I like to find to find out if you have a working qemu on solaris 10
+> or 11. I have
+> > >> tried the qemu-sun4vniagara but without networking. Is the networkin=
+g
+> support for
+> > >> niagara version available?
+> >
+> > I'm not particularly familiar with sun4v, however I'm not aware of any
+> current work
+> > in this area. Do you know which network driver is typically used with
+> sun4v?
+>
+> The sun4v NIC is currently not implemented. It's well documented in
+> the opensparc documentation though, so if anyone has time for that,
+> adding it to QEMU is doable.
+>
+> At the moment there is just a serial line which can probably be used
+> for ppp or slip, but I haven't tried it yet.
+>
+> --
+> Regards,
+> Artyom Tarasenko
+>
+> SPARC and PPC PReP under qemu blog:
+> http://tyom.blogspot.com/search/label/qemu
+>
 
-> If this buffer sharing device's main purpose is for building proprietary
-> devices without contributing to VIRTIO, then I don't think it makes
-> sense for the VIRTIO community to assist in its development.
+--000000000000441d0b0596aa8abf
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-One possible use case would be building a wayland proxy, using vsock for
-the wayland protocol messages and virtio-buffers for the shared buffers
-(wayland client window content).
+<div dir=3D"auto"><div>Thank you very much for the reply and information.=
+=C2=A0 Will check=C2=A0it out.</div><div dir=3D"auto"><br><div class=3D"gma=
+il_quote" dir=3D"auto"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Nov 4,=
+ 2019, 17:17 Artyom Tarasenko &lt;<a href=3D"mailto:atar4qemu@gmail.com">at=
+ar4qemu@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote"=
+ style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">On=
+ Sun, Nov 3, 2019 at 10:01 PM Mark Cave-Ayland<br>
+&lt;<a href=3D"mailto:mark.cave-ayland@ilande.co.uk" target=3D"_blank" rel=
+=3D"noreferrer">mark.cave-ayland@ilande.co.uk</a>&gt; wrote:<br>
+&gt;<br>
+&gt; On 02/11/2019 19:56, Philippe Mathieu-Daud=C3=A9 wrote:<br>
+&gt;<br>
+&gt; &gt; Cc&#39;ing the SPARC maintainers.<br>
+&gt; &gt;<br>
+&gt; &gt; On 11/1/19 4:49 AM, Zainuddin AR wrote:<br>
+&gt; &gt;&gt; Hi,<br>
+&gt; &gt;&gt;<br>
+&gt; &gt;&gt; I like to find to find out if you have a working qemu on sola=
+ris 10 or 11. I have<br>
+&gt; &gt;&gt; tried the qemu-sun4vniagara but without networking. Is the ne=
+tworking support for<br>
+&gt; &gt;&gt; niagara version available?<br>
+&gt;<br>
+&gt; I&#39;m not particularly familiar with sun4v, however I&#39;m not awar=
+e of any current work<br>
+&gt; in this area. Do you know which network driver is typically used with =
+sun4v?<br>
+<br>
+The sun4v NIC is currently not implemented. It&#39;s well documented in<br>
+the opensparc documentation though, so if anyone has time for that,<br>
+adding it to QEMU is doable.<br>
+<br>
+At the moment there is just a serial line which can probably be used<br>
+for ppp or slip, but I haven&#39;t tried it yet.<br>
+<br>
+-- <br>
+Regards,<br>
+Artyom Tarasenko<br>
+<br>
+SPARC and PPC PReP under qemu blog: <a href=3D"http://tyom.blogspot.com/sea=
+rch/label/qemu" rel=3D"noreferrer noreferrer" target=3D"_blank">http://tyom=
+.blogspot.com/search/label/qemu</a><br>
+</blockquote></div></div></div>
 
-It could also simplify buffer sharing between devices (feed decoded
-video frames from decoder to gpu), although in that case it is less
-clear that it'll actually simplify things because virtio-gpu is
-involved anyway.
-
-We can't prevent people from using that for proprietary stuff (same goes
-for vsock).
-
-There is the option to use virtio-gpu instead, i.e. add support to qemu
-to export dma-buf handles for virtio-gpu resources to other processes
-(such as a wayland proxy).  That would provide very similar
-functionality (and thereby create the same loophole).
-
-> VIRTIO recently gained a shared memory resource concept for access to
-> host memory.  It is being used in virtio-pmem and virtio-fs (and
-> virtio-gpu?).
-
-virtio-gpu is in progress still unfortunately (all kinds of fixes for
-the qemu drm drivers and virtio-gpu guest driver refactoring kept me
-busy for quite a while ...).
-
-> If another flavor of shared memory is required it can be
-> added to the spec and new VIRTIO device types can use it.  But it's not
-> clear why this should be its own device.
-
-This is not about host memory, buffers are in guest ram, everything else
-would make sharing those buffers between drivers inside the guest (as
-dma-buf) quite difficult.
-
-> My question would be "what is the actual problem you are trying to
-> solve?".
-
-Typical use cases center around sharing graphics data between guest
-and host.
-
-cheers,
-  Gerd
-
+--000000000000441d0b0596aa8abf--
 
