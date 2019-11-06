@@ -2,85 +2,106 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87C11C5DF63
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89D55C5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:33:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56A4F217F5
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:28:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56A4F217F5
+	by mail.kernel.org (Postfix) with ESMTPS id 5236C21848
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:33:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hg8NVKwp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5236C21848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSMIj-0000zn-Hk
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 09:28:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58919)
+	id 1iSMNI-0002n6-CB
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 09:33:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59870)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iSMHz-0000RN-GL
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:28:04 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iSMMF-0001uM-Od
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:32:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iSMHy-00024g-2z
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:28:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:21197)
+ (envelope-from <mreitz@redhat.com>) id 1iSMMA-0004im-Q5
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:32:27 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59692
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iSMHw-000225-0p
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:28:00 -0500
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iSMMA-0004iX-M5
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:32:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573050742;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=5AsTdsPewgzZ2I/NmcNx7qiTK/Fez4r2xJ8kPn2Yod0=;
+ b=Hg8NVKwpkY/zy8uppeVOlYDhOSjsSvIwo8xFNHrH4X3p1lnm6qe6MQDALcT831JxNh61vp
+ GIEhm36/sU9jbKtTl0RbxM7UfXur0+niKt9a4wodHwSmBHZrxXRaFuHUwUNFUPZehebj0C
+ hb/OnrhriqyVTjbxwyNbfVlEtwYPC3Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-302-9ae2zYetNxK9oZvQsdzzOg-1; Wed, 06 Nov 2019 09:32:18 -0500
+X-MC-Unique: 9ae2zYetNxK9oZvQsdzzOg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id C8D548665A
- for <qemu-devel@nongnu.org>; Wed,  6 Nov 2019 14:27:57 +0000 (UTC)
-Received: by mail-qt1-f198.google.com with SMTP id i9so15877406qtq.11
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 06:27:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=F+Qn6CyJx76tnRGRBhaBq2PcYvQUuntn1zr+y079x5g=;
- b=avowM1V70+2uwSHyHe159CsBvzfImVcG0ph2bzOXYFGTeT2aHlJMOyLPDnAIoECnyo
- Tmdkvsj++NBAmrq8jkGzCChlANA+bv+fNWYpJIn1OrrFh9PJmTuwavzxDX+yJ1N30N8i
- wvPj1RqjDGf6919TQhPTiNeikIBE91CsmvgRRhgRZf2Ol5skEJYmyegUKQe43IFvb7hQ
- fEY6a4k8RP7yvmEwXGTs2xWy3udMVGU3jKdSNVSQYr2jMAMqPFA8oFa7TBoVu1bLQT7g
- /Xmg5otDNYaTzWgz32TPhRkIkd+kFOLEodkJ9g1amOGNRJwPQ7abUT2x3lWK0udfOZLG
- g8OQ==
-X-Gm-Message-State: APjAAAVXvM4oxibN7w/x7ujc0Ldx/1uWjNblnFO/Mn6E1VyDXfD8Uum8
- 7Nj1J0mGVAGQjwbWlpC5ELzw9eDLobxCyqct2zWP9e1ASoHzhJZETMQKZ4p4mSJ6VtMf5LCj5EA
- sIu9NcMjljbQoo2c=
-X-Received: by 2002:a0c:d2b4:: with SMTP id q49mr2357995qvh.135.1573050477044; 
- Wed, 06 Nov 2019 06:27:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzdQX5lZeTrvzfdffsUSxXAyNg6fbC9M02lk8p46D67QyqunBvsXiuXwOTv/GXYGGtTABIjRA==
-X-Received: by 2002:a0c:d2b4:: with SMTP id q49mr2357970qvh.135.1573050476749; 
- Wed, 06 Nov 2019 06:27:56 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
- by smtp.gmail.com with ESMTPSA id z3sm13464408qtu.83.2019.11.06.06.27.55
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 Nov 2019 06:27:56 -0800 (PST)
-Date: Wed, 6 Nov 2019 09:27:54 -0500
-From: Peter Xu <peterx@redhat.com>
-To: "Liu, Yi L" <yi.l.liu@intel.com>
-Subject: Re: [RFC v2 15/22] intel_iommu: bind/unbind guest page table to host
-Message-ID: <20191106142754.GC29717@xz-x1>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-16-git-send-email-yi.l.liu@intel.com>
- <20191104202559.GA12619@xz-x1>
- <A2975661238FB949B60364EF0F2C25743A0EEF4D@SHSMSX104.ccr.corp.intel.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD1051005500;
+ Wed,  6 Nov 2019 14:32:17 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-212.ams2.redhat.com
+ [10.36.117.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 630015D9CD;
+ Wed,  6 Nov 2019 14:32:15 +0000 (UTC)
+Subject: Re: [RFC PATCH 18/18] qemu-storage-daemon: Add --monitor option
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20191017130204.16131-1-kwolf@redhat.com>
+ <20191017130204.16131-19-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <64d79019-711d-8eb1-da72-a9b95f999ff5@redhat.com>
+Date: Wed, 6 Nov 2019 15:32:13 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <A2975661238FB949B60364EF0F2C25743A0EEF4D@SHSMSX104.ccr.corp.intel.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+In-Reply-To: <20191017130204.16131-19-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="e5r2awgTosFFLSTnuUOwnQ5gRohdP1xw8"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,186 +113,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: pkrempa@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 06, 2019 at 08:10:59AM +0000, Liu, Yi L wrote:
-> > From: Peter Xu [mailto:peterx@redhat.com]
-> > Sent: Tuesday, November 5, 2019 4:26 AM
-> > To: Liu, Yi L <yi.l.liu@intel.com>
-> > Subject: Re: [RFC v2 15/22] intel_iommu: bind/unbind guest page table to host
-> > 
-> > On Thu, Oct 24, 2019 at 08:34:36AM -0400, Liu Yi L wrote:
-> > > This patch captures the guest PASID table entry modifications and
-> > > propagates the changes to host to setup nested translation. The
-> > > guest page table is configured as 1st level page table (GVA->GPA)
-> > > whose translation result would further go through host VT-d 2nd
-> > > level page table(GPA->HPA) under nested translation mode. This is
-> > > a key part of vSVA support.
-> > >
-> > > Cc: Kevin Tian <kevin.tian@intel.com>
-> > > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > Cc: Peter Xu <peterx@redhat.com>
-> > > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > > ---
-> > >  hw/i386/intel_iommu.c          | 81
-> > ++++++++++++++++++++++++++++++++++++++++++
-> > >  hw/i386/intel_iommu_internal.h | 20 +++++++++++
-> > >  2 files changed, 101 insertions(+)
-> > >
-> > > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > > index d8827c9..793b0de 100644
-> > > --- a/hw/i386/intel_iommu.c
-> > > +++ b/hw/i386/intel_iommu.c
-> > > @@ -41,6 +41,7 @@
-> > >  #include "migration/vmstate.h"
-> > >  #include "trace.h"
-> > >  #include "qemu/jhash.h"
-> > > +#include <linux/iommu.h>
-> > >
-> > >  /* context entry operations */
-> > >  #define VTD_CE_GET_RID2PASID(ce) \
-> > > @@ -695,6 +696,16 @@ static inline uint16_t
-> > vtd_pe_get_domain_id(VTDPASIDEntry *pe)
-> > >      return VTD_SM_PASID_ENTRY_DID((pe)->val[1]);
-> > >  }
-> > >
-> > > +static inline uint32_t vtd_pe_get_fl_aw(VTDPASIDEntry *pe)
-> > > +{
-> > > +    return 48 + ((pe->val[2] >> 2) & VTD_SM_PASID_ENTRY_FLPM) * 9;
-> > > +}
-> > > +
-> > > +static inline dma_addr_t vtd_pe_get_flpt_base(VTDPASIDEntry *pe)
-> > > +{
-> > > +    return pe->val[2] & VTD_SM_PASID_ENTRY_FLPTPTR;
-> > > +}
-> > > +
-> > >  static inline bool vtd_pdire_present(VTDPASIDDirEntry *pdire)
-> > >  {
-> > >      return pdire->val & 1;
-> > > @@ -1850,6 +1861,67 @@ static void
-> > vtd_context_global_invalidate(IntelIOMMUState *s)
-> > >      vtd_iommu_replay_all(s);
-> > >  }
-> > >
-> > > +static void vtd_bind_guest_pasid(IntelIOMMUState *s, VTDBus *vtd_bus,
-> > > +            int devfn, int pasid, VTDPASIDEntry *pe, VTDPASIDOp op)
-> > > +{
-> > > +#ifdef __linux__
-> > > +    VTDIOMMUContext *vtd_ic;
-> > > +    IOMMUCTXEventData event_data;
-> > > +    IOMMUCTXPASIDBindData bind;
-> > > +    struct iommu_gpasid_bind_data *g_bind_data;
-> > > +
-> > > +    vtd_ic = vtd_bus->dev_ic[devfn];
-> > > +    if (!vtd_ic) {
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    g_bind_data = g_malloc0(sizeof(*g_bind_data));
-> > > +    bind.flag = 0;
-> > > +    g_bind_data->flags = 0;
-> > > +    g_bind_data->vtd.flags = 0;
-> > > +    switch (op) {
-> > > +    case VTD_PASID_BIND:
-> > > +    case VTD_PASID_UPDATE:
-> > > +        g_bind_data->version = IOMMU_GPASID_BIND_VERSION_1;
-> > > +        g_bind_data->format = IOMMU_PASID_FORMAT_INTEL_VTD;
-> > > +        g_bind_data->gpgd = vtd_pe_get_flpt_base(pe);
-> > > +        g_bind_data->addr_width = vtd_pe_get_fl_aw(pe);
-> > > +        g_bind_data->hpasid = pasid;
-> > > +        g_bind_data->gpasid = pasid;
-> > > +        g_bind_data->flags |= IOMMU_SVA_GPASID_VAL;
-> > > +        g_bind_data->vtd.flags =
-> > > +                             (VTD_SM_PASID_ENTRY_SRE_BIT(pe->val[2]) ? 1 : 0)
-> > > +                           | (VTD_SM_PASID_ENTRY_EAFE_BIT(pe->val[2]) ? 1 : 0)
-> > > +                           | (VTD_SM_PASID_ENTRY_PCD_BIT(pe->val[1]) ? 1 : 0)
-> > > +                           | (VTD_SM_PASID_ENTRY_PWT_BIT(pe->val[1]) ? 1 : 0)
-> > > +                           | (VTD_SM_PASID_ENTRY_EMTE_BIT(pe->val[1]) ? 1 : 0)
-> > > +                           | (VTD_SM_PASID_ENTRY_CD_BIT(pe->val[1]) ? 1 : 0);
-> > > +        g_bind_data->vtd.pat = VTD_SM_PASID_ENTRY_PAT(pe->val[1]);
-> > > +        g_bind_data->vtd.emt = VTD_SM_PASID_ENTRY_EMT(pe->val[1]);
-> > > +        bind.flag |= IOMMU_CTX_BIND_PASID;
-> > > +        break;
-> > > +
-> > > +    case VTD_PASID_UNBIND:
-> > > +        g_bind_data->gpgd = 0;
-> > > +        g_bind_data->addr_width = 0;
-> > > +        g_bind_data->hpasid = pasid;
-> > > +        bind.flag |= IOMMU_CTX_UNBIND_PASID;
-> > > +        break;
-> > > +
-> > > +    default:
-> > > +        printf("Unknown VTDPASIDOp!!\n");
-> > 
-> > Please don't use printf()..  Here assert() suits.
-> 
-> Will correct it. Thanks.
-> 
-> > 
-> > > +        break;
-> > > +    }
-> > > +    if (bind.flag) {
-> > 
-> > Will this be untrue?  If not, assert() works too.
-> 
-> yes, it is possible. If an unknown VTDPASIDOp, then no switch case
-> will initiate bind.flag.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--e5r2awgTosFFLSTnuUOwnQ5gRohdP1xw8
+Content-Type: multipart/mixed; boundary="P3JgiCIcJuwf7KuEY38QKsc3pqMhhFq8x"
 
-Then should it be a programming error?  If so we should still use
-assert(), I think...
+--P3JgiCIcJuwf7KuEY38QKsc3pqMhhFq8x
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> > > +        event_data.event = IOMMU_CTX_EVENT_PASID_BIND;
-> > > +        bind.data = g_bind_data;
-> > > +        event_data.data = &bind;
-> > > +        iommu_ctx_event_notify(&vtd_ic->iommu_context, &event_data);
-> > > +    }
-> > > +    g_free(g_bind_data);
-> > > +#endif
-> > > +}
-> > > +
-> > >  /* Do a context-cache device-selective invalidation.
-> > >   * @func_mask: FM field after shifting
-> > >   */
-> > > @@ -2528,12 +2600,17 @@ static gboolean vtd_flush_pasid(gpointer key,
-> > gpointer value,
-> > >                  pc_entry->pasid_cache_gen = s->pasid_cache_gen;
-> > >                  if (!vtd_pasid_entry_compare(&pe, &pc_entry->pasid_entry)) {
-> > >                      pc_entry->pasid_entry = pe;
-> > > +                    vtd_bind_guest_pasid(s, vtd_bus, devfn,
-> > > +                                     pasid, &pe, VTD_PASID_UPDATE);
-> > >                      /*
-> > >                       * TODO: when pasid-base-iotlb(piotlb) infrastructure is
-> > >                       * ready, should invalidate QEMU piotlb togehter with this
-> > >                       * change.
-> > >                       */
-> > >                  }
-> > > +            } else {
-> > > +                vtd_bind_guest_pasid(s, vtd_bus, devfn,
-> > > +                                  pasid, NULL, VTD_PASID_UNBIND);
-> > 
-> > Please see the reply in the other thread on vtd_flush_pasid().  I've
-> > filled in where I feel like this UNBIND should exist, I feel like your
-> > current code could miss some places where you should unbind but didn't.
-> 
-> I've replied in that thread regards to your comments. May you
-> reconsider it here. Hope, it suits what you thought. If still
-> something missed, pls feel free to point out.
+On 17.10.19 15:02, Kevin Wolf wrote:
+> This adds and parses the --monitor option, so that a QMP monitor can be
+> used in the storage daemon. The monitor offers commands defined in the
+> QAPI schema at storage-daemon/qapi/qapi-schema.json.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  storage-daemon/qapi/qapi-schema.json | 15 ++++++++++++
+>  qemu-storage-daemon.c                | 34 ++++++++++++++++++++++++++++
+>  Makefile                             | 30 ++++++++++++++++++++++++
+>  Makefile.objs                        |  4 ++--
+>  monitor/Makefile.objs                |  2 ++
+>  qapi/Makefile.objs                   |  5 ++++
+>  qom/Makefile.objs                    |  1 +
+>  scripts/qapi/gen.py                  |  5 ++++
+>  storage-daemon/Makefile.objs         |  1 +
+>  storage-daemon/qapi/Makefile.objs    |  1 +
+>  10 files changed, 96 insertions(+), 2 deletions(-)
+>  create mode 100644 storage-daemon/qapi/qapi-schema.json
+>  create mode 100644 storage-daemon/Makefile.objs
+>  create mode 100644 storage-daemon/qapi/Makefile.objs
 
-Ok let's wait to see your next version.  Thanks,
+[...]
 
--- 
-Peter Xu
+> diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+> index 3e04e299ed..03d256f0a4 100644
+> --- a/qapi/Makefile.objs
+> +++ b/qapi/Makefile.objs
+> @@ -30,3 +30,8 @@ obj-y +=3D $(QAPI_TARGET_MODULES:%=3Dqapi-events-%.o)
+>  obj-y +=3D qapi-events.o
+>  obj-y +=3D $(QAPI_TARGET_MODULES:%=3Dqapi-commands-%.o)
+>  obj-y +=3D qapi-commands.o
+> +
+> +QAPI_MODULES_STORAGE_DAEMON =3D block block-core char common crypto intr=
+ospect
+> +QAPI_MODULES_STORAGE_DAEMON +=3D job monitor qom sockets pragma transact=
+ion
+
+I took a look into the rest, and I wonder whether query-iothreads from
+misc.json would be useful, too.
+
+> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+> index 796c17c38a..c25634f673 100644
+> --- a/scripts/qapi/gen.py
+> +++ b/scripts/qapi/gen.py
+> @@ -44,6 +44,11 @@ class QAPIGen(object):
+>          return ''
+> =20
+>      def write(self, output_dir):
+> +        # Include paths starting with ../ are used to reuse modules of t=
+he main
+> +        # schema in specialised schemas. Don't overwrite the files that =
+are
+> +        # already generated for the main schema.
+> +        if self.fname.startswith('../'):
+> +            return
+
+Sorry, but I=E2=80=99m about to ask a clueless question: How do we ensure t=
+hat
+the main schema is generated before something else could make sure of
+the specialized schemas?
+
+Max
+
+>          pathname =3D os.path.join(output_dir, self.fname)
+>          dir =3D os.path.dirname(pathname)
+>          if dir:
+
+
+--P3JgiCIcJuwf7KuEY38QKsc3pqMhhFq8x--
+
+--e5r2awgTosFFLSTnuUOwnQ5gRohdP1xw8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3C2W0ACgkQ9AfbAGHV
+z0C0PAgAr5vlMMKMtnddSYpOKcOwHZKOOqFKHSJiUnsuH5/NELlqZiBe12zs6gep
+r4VGRUJi7uWbo/lP/BLqMwOtns6wCH5dA9axXxJiwenUKPHInCkHz0MyELTCjTii
+whSrTFUxK8f8VengmbRSnDhfOcc58+aG0DM5aII+8mLjJDSU/vxljcVn1cjPvOiF
+VcvGj6J4TQdAde4Eql+kqWCFIJmqHJXwMFUO1ioDAvmSoqM37Lf4RomOLs4rsf2s
+Z3k8BwIeuoQsUYZczd5+6T7heWYJ5E0PWODyeGV1+3Ca42EAAnRWHuQNkaVf1wVF
+mCci7bCJInbzLyfAvxOhc/OnukBTXg==
+=WTsP
+-----END PGP SIGNATURE-----
+
+--e5r2awgTosFFLSTnuUOwnQ5gRohdP1xw8--
+
 
