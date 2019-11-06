@@ -2,81 +2,122 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A85CCC5DF63
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 22:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F20FC5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 22:04:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F0642173E
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 22:04:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WEwh94m/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F0642173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id E41E92173E
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 22:04:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E41E92173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linux.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSTPT-0007P2-QJ
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 17:04:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58623)
+	id 1iSTPw-0007qd-TZ
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 17:04:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58689)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iSTMf-0005pQ-42
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 17:01:22 -0500
+ (envelope-from <a13xp0p0v88@gmail.com>) id 1iSTNC-0006CO-0h
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 17:01:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iSTMc-0000UP-KA
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 17:01:21 -0500
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:32957)
+ (envelope-from <a13xp0p0v88@gmail.com>) id 1iSTN9-0000ym-NW
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 17:01:53 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:46934)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iSTMb-0000RU-1Z
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 17:01:17 -0500
-Received: by mail-lf1-x142.google.com with SMTP id y9so3192457lfy.0
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 14:01:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=b2mWrlL2otSiwxS3oiF589so9+hzkcrfqSVnDK9V6w8=;
- b=WEwh94m/d+0chz+BvQ0TQ9HBOhDLIX0zuOT8MK3CEW3HMxX8P0ccqIAcdRGPVo5YEi
- p8kuBZ0ZKLzTd3PY8rBucz1oQqBc643Ut6tFYzgTn+xyOy54Xu3m7U+8xpyWiE5+MKsu
- LpHRGQfFJrkoMIdR86ATVoRVR/xJCXuswgAxj5opM1REgwotMBNd5GYfxbLeOMJyRy7i
- hUoHxDbzN+bvN/bHYAUIgBGZAeHl9r8Nfq4qzQQAbKkOLPkJ75ZwPAz1a32zy+kXnVn7
- 1OeWc2ymdt0IlluBFkS1T4RODcs4hrrit743RNCPuZRaYjPSlWF453tNFDs1J+C67sqI
- 1keQ==
+ (Exim 4.71) (envelope-from <a13xp0p0v88@gmail.com>)
+ id 1iSTN5-0000r0-Jp; Wed, 06 Nov 2019 17:01:49 -0500
+Received: by mail-lj1-f196.google.com with SMTP id e9so14632386ljp.13;
+ Wed, 06 Nov 2019 14:01:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=b2mWrlL2otSiwxS3oiF589so9+hzkcrfqSVnDK9V6w8=;
- b=Ddct3bdRpwSIQkvcwwHe5sTIK1A10z1d115myvrBvwezmK74uiYY5PDyXK8FYG7wPf
- /+VX7iNXCRz58v8zllLeHzAOH2/tFlDqHMt4YrTGl0baSvoAFoMwFWyQJyI4Sqi+/N20
- 6eP9sQ44/7e2/6B/y28Pxfk71QKjTRO0p911H4qGHakmVpAP0qL9L3M7N39etEAfwhyT
- 8x7tdXpwDEDLE+3zzL8huQ6/m0hSJDt3jhJuf9zya97cgFfacuoUpXaBTy9yMtYfbBCM
- oB1KTeNVBcyeng0yy369qk81jwqbBNgpv6KfzekJqFX+LStnFCawaBv4yLbCuzaKxRIQ
- IRGg==
-X-Gm-Message-State: APjAAAWwDA5A6IEZjZNJkJMRvq8JfZdjUrU6OcMN9lN6y9OYuLcXyl93
- nLuxFnYB5uE2abhTHAXydDkXOwHfr8Ld4NeQa4Y=
-X-Google-Smtp-Source: APXvYqwNSeNNdqr2npUnAh5cDie5vJcRJQsI/KWyQ7WHgBpk9SkRoNhSqaSmHKAwpexgyJLZSbxxQTTDleulw5f9n1I=
-X-Received: by 2002:ac2:4a8f:: with SMTP id l15mr25679731lfp.5.1573077673702; 
- Wed, 06 Nov 2019 14:01:13 -0800 (PST)
+ h=x-gm-message-state:reply-to:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=10Ig8AwXMLBYpUHj1k4mvqSlSkrplfJnIascRvTVn0Y=;
+ b=fz+6VHPxgeNIo4wGhXASbyPhjSM0vWvTLP1u5ntPBgBE/rPnGh8uYx6ef5aicuPbu4
+ c1QXCm6V0Kmnsx2HnqpJHqT4ivFwfSDf8GM7uDvOz8Fau4E8ZSnCzuY1CBL4pf1qab4V
+ jTGOnqXxEkaqP28v2Zw2f7wk5VC5QsEfKEyt0qpHLA6IrFQz+W3PIpgtui3GRQDdTr98
+ MjqHpxXW4GGwYEYHYjwTCZuZW1a9NlMjaQdRifXkyCPjmfyRfaUYfjfLFLzGO2PRHU4R
+ QYWhPufNFE+w5JSrTQMXqN6C9t4gpWocp9B+zy0S3ihraxLsNL6Ph/qUJ/J/SOIRg4wj
+ 55Ug==
+X-Gm-Message-State: APjAAAXndSlVzePhvgiuDjRPbbLhVqQEkqSl8ebI0zM+QBWFuMmTa9KE
+ Mh2OfePx5hts5KaU13vI9l8=
+X-Google-Smtp-Source: APXvYqwELuqykBMNTwHn+q968z02vn3Rt3FQKLaKJqRCnd/kv7mmPSmFQSmqKhS2Bn7UcEF+oq96dQ==
+X-Received: by 2002:a2e:3016:: with SMTP id w22mr3600747ljw.117.1573077705065; 
+ Wed, 06 Nov 2019 14:01:45 -0800 (PST)
+Received: from [10.9.0.22] ([46.166.128.205])
+ by smtp.gmail.com with ESMTPSA id q26sm23660lfo.65.2019.11.06.14.01.41
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 06 Nov 2019 14:01:43 -0800 (PST)
+Subject: Re: [QEMU-SECURITY] ide: fix assertion in ide_dma_cb() to prevent
+ qemu DoS from quest
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <1562335669-10127-1-git-send-email-alex.popov@linux.com>
+ <d748c840-56b7-6dcd-c82d-fea0a4949e8d@linux.com>
+ <20191106070530-mutt-send-email-mst@kernel.org>
+From: Alexander Popov <alex.popov@linux.com>
+Autocrypt: addr=alex.popov@linux.com; prefer-encrypt=mutual; keydata=
+ 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
+ j3lCqPk=
+Message-ID: <0de2309d-a913-b962-f6aa-1b03ee16dc03@linux.com>
+Date: Thu, 7 Nov 2019 01:01:40 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20191106141424.27244-1-edgar.iglesias@gmail.com>
- <20191106141424.27244-2-edgar.iglesias@gmail.com>
-In-Reply-To: <20191106141424.27244-2-edgar.iglesias@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 6 Nov 2019 13:55:31 -0800
-Message-ID: <CAKmqyKM1K9O++2rRK7Pj3PdQ6YZ53NQ_WxEkZFori=9Q0-_jkg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/3] target/microblaze: Plug temp leaks for loads/stores
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::142
+In-Reply-To: <20191106070530-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.85.208.196
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,120 +129,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
- Edgar Iglesias <edgar.iglesias@xilinx.com>,
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Francisco Iglesias <frasse.iglesias@gmail.com>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Stefano Stabellini <sstabellini@kernel.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+Reply-To: alex.popov@linux.com
+Cc: Andrea Arcangeli <aarcange@redhat.com>, sstabellini@kernel.org,
+ pmatouse@redhat.com, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, qemu-stable@nongnu.org,
+ Kashyap Chamarthy <kashyap.cv@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>, pjp@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 6, 2019 at 6:14 AM Edgar E. Iglesias
-<edgar.iglesias@gmail.com> wrote:
->
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
->
-> Plug TCG temp leaks for loads/stores.
->
-> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+On 06.11.2019 15:08, Michael S. Tsirkin wrote:
+> On Wed, Nov 06, 2019 at 01:17:51PM +0300, Alexander Popov wrote:
+>> On 27.07.2019 00:09, Alexander Popov wrote:
+>>> On 26.07.2019 2:25:03 GMT+02:00, John Snow <jsnow@redhat.com> wrote:
+>>>> Oh, this is fun.
+>>> ...
+>>>> I can worry about a proper fix for 4.2+.
+>>>
+>>> Hello John,
+>>>
+>>> Thanks for your letter.
+>>>
+>>> I double-checked the git history and mailing list, I'm still sure
+>>> that my fix for this assertion is correct.
+>>
+>> Hello!
+>>
+>> I'm pointing politely to this issue again.
+>>
+>> It crashes qemu during syzkaller fuzzing.
+>>
+>> It's really annoying to manually apply the fix against it to qemu.
+> 
+> I understand. Maybe the fuzzer can be taught to skip the
+> specific issue for now?
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Michael, thanks for your reply.
 
-Alistair
+Yes, of course. You just forbid the fuzzer to use /dev/sg in the guest.
+But I would rather fix the issue.
 
-> ---
->  target/microblaze/translate.c | 30 ++++++++++++++++++++++++------
->  1 file changed, 24 insertions(+), 6 deletions(-)
->
-> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-> index 761f535357..ba143ede5f 100644
-> --- a/target/microblaze/translate.c
-> +++ b/target/microblaze/translate.c
-> @@ -967,12 +967,14 @@ static void dec_load(DisasContext *dc)
->                     10 -> 10
->                     11 -> 00 */
->                  TCGv low = tcg_temp_new();
-> +                TCGv t3 = tcg_const_tl(3);
->
->                  tcg_gen_andi_tl(low, addr, 3);
-> -                tcg_gen_sub_tl(low, tcg_const_tl(3), low);
-> +                tcg_gen_sub_tl(low, t3, low);
->                  tcg_gen_andi_tl(addr, addr, ~3);
->                  tcg_gen_or_tl(addr, addr, low);
->                  tcg_temp_free(low);
-> +                tcg_temp_free(t3);
->                  break;
->              }
->
-> @@ -1006,9 +1008,16 @@ static void dec_load(DisasContext *dc)
->      tcg_gen_qemu_ld_i32(v, addr, mem_index, mop);
->
->      if ((dc->cpu->env.pvr.regs[2] & PVR2_UNALIGNED_EXC_MASK) && size > 1) {
-> +        TCGv_i32 t0 = tcg_const_i32(0);
-> +        TCGv_i32 treg = tcg_const_i32(dc->rd);
-> +        TCGv_i32 tsize = tcg_const_i32(size - 1);
-> +
->          tcg_gen_movi_i64(cpu_SR[SR_PC], dc->pc);
-> -        gen_helper_memalign(cpu_env, addr, tcg_const_i32(dc->rd),
-> -                            tcg_const_i32(0), tcg_const_i32(size - 1));
-> +        gen_helper_memalign(cpu_env, addr, treg, t0, tsize);
-> +
-> +        tcg_temp_free_i32(t0);
-> +        tcg_temp_free_i32(treg);
-> +        tcg_temp_free_i32(tsize);
->      }
->
->      if (ex) {
-> @@ -1100,12 +1109,14 @@ static void dec_store(DisasContext *dc)
->                     10 -> 10
->                     11 -> 00 */
->                  TCGv low = tcg_temp_new();
-> +                TCGv t3 = tcg_const_tl(3);
->
->                  tcg_gen_andi_tl(low, addr, 3);
-> -                tcg_gen_sub_tl(low, tcg_const_tl(3), low);
-> +                tcg_gen_sub_tl(low, t3, low);
->                  tcg_gen_andi_tl(addr, addr, ~3);
->                  tcg_gen_or_tl(addr, addr, low);
->                  tcg_temp_free(low);
-> +                tcg_temp_free(t3);
->                  break;
->              }
->
-> @@ -1124,6 +1135,10 @@ static void dec_store(DisasContext *dc)
->
->      /* Verify alignment if needed.  */
->      if ((dc->cpu->env.pvr.regs[2] & PVR2_UNALIGNED_EXC_MASK) && size > 1) {
-> +        TCGv_i32 t1 = tcg_const_i32(1);
-> +        TCGv_i32 treg = tcg_const_i32(dc->rd);
-> +        TCGv_i32 tsize = tcg_const_i32(size - 1);
-> +
->          tcg_gen_movi_i64(cpu_SR[SR_PC], dc->pc);
->          /* FIXME: if the alignment is wrong, we should restore the value
->           *        in memory. One possible way to achieve this is to probe
-> @@ -1131,8 +1146,11 @@ static void dec_store(DisasContext *dc)
->           *        the alignment checks in between the probe and the mem
->           *        access.
->           */
-> -        gen_helper_memalign(cpu_env, addr, tcg_const_i32(dc->rd),
-> -                            tcg_const_i32(1), tcg_const_i32(size - 1));
-> +        gen_helper_memalign(cpu_env, addr, treg, t1, tsize);
-> +
-> +        tcg_temp_free_i32(t1);
-> +        tcg_temp_free_i32(treg);
-> +        tcg_temp_free_i32(tsize);
->      }
->
->      if (ex) {
-> --
-> 2.20.1
->
->
+--
+Best regards,
+Alexander
+
 
