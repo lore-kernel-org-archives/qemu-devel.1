@@ -2,81 +2,104 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A27C5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:21:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC345C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:22:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 145CB2067B
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:21:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 145CB2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9E4B420650
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:22:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U6gKIeH+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E4B420650
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56124 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSJN8-0005Fr-9z
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 06:21:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33551)
+	id 1iSJO3-00069Q-Se
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 06:22:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33809)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1iSJKu-0002tH-5C
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:18:54 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iSJLU-0003oo-H9
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:19:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1iSJKs-0001mp-4L
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:18:51 -0500
-Received: from mga18.intel.com ([134.134.136.126]:56977)
+ (envelope-from <mreitz@redhat.com>) id 1iSJLT-0002a6-8X
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:19:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37470
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iSJKr-0001mI-Se
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:18:50 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 06 Nov 2019 03:18:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,274,1569308400"; d="scan'208";a="403695178"
-Received: from fmsmsx107.amr.corp.intel.com ([10.18.124.205])
- by fmsmga006.fm.intel.com with ESMTP; 06 Nov 2019 03:18:48 -0800
-Received: from fmsmsx113.amr.corp.intel.com (10.18.116.7) by
- fmsmsx107.amr.corp.intel.com (10.18.124.205) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 6 Nov 2019 03:18:47 -0800
-Received: from shsmsx152.ccr.corp.intel.com (10.239.6.52) by
- FMSMSX113.amr.corp.intel.com (10.18.116.7) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 6 Nov 2019 03:18:46 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX152.ccr.corp.intel.com ([169.254.6.2]) with mapi id 14.03.0439.000;
- Wed, 6 Nov 2019 19:18:43 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: RE: [RFC v2 04/22] hw/iommu: introduce IOMMUContext
-Thread-Topic: [RFC v2 04/22] hw/iommu: introduce IOMMUContext
-Thread-Index: AQHVimsnFZ9HHzIneEOC2B5kT89EDqduQAWAgA/RzpA=
-Date: Wed, 6 Nov 2019 11:18:42 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A0EF1B3@SHSMSX104.ccr.corp.intel.com>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-5-git-send-email-yi.l.liu@intel.com>
- <20191027173929.GK3552@umbus.metropole.lan>
-In-Reply-To: <20191027173929.GK3552@umbus.metropole.lan>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYzllYzgxNjYtOWRhZS00NDEwLTk2NTctZmMxYTMwMmNjYTQyIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoia0FrVllqaUNUVlwvc2p0aHI2ZU1LdnlBanZ3cTJjdEpwNlwvMGVhbXdQa1lPdngya0VDd1d5Nm5uM2VJWVBrMXdLIn0=
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iSJLT-0002Zq-4U
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:19:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573039166;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=6i8DcCgQAYfnM+Fal9rqBDiLybMZJzTnRQ0O9DvtOV4=;
+ b=U6gKIeH+88/jptdPsz+1M+rzwvA0SSxKP18IFs4x5bwu2tXfp7cyyonEQMJw9HZzy8zBOG
+ d7SOYLfwwVD7sMdoycyxu/jQqYhdeN9k7D6q5+dOpj5hoPz/L5ukGRrfrJvqjOz7ONg5J+
+ dAsoV2WoQpW6AN9Rmtl1z9vpS97cGRY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-KV_D30hKM5awPYT076auAw-1; Wed, 06 Nov 2019 06:19:22 -0500
+X-MC-Unique: KV_D30hKM5awPYT076auAw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95873800C72;
+ Wed,  6 Nov 2019 11:19:21 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-212.ams2.redhat.com
+ [10.36.117.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3303E1001B11;
+ Wed,  6 Nov 2019 11:19:19 +0000 (UTC)
+Subject: Re: [PATCH for-4.2 0/2] qcow2: Fix QCOW2_COMPRESSED_SECTOR_MASK
+To: qemu-block@nongnu.org
+References: <20191028161841.1198-1-mreitz@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <dc66ebe6-8e33-ce74-c408-7a57ee4f8331@redhat.com>
+Date: Wed, 6 Nov 2019 12:19:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.126
+In-Reply-To: <20191028161841.1198-1-mreitz@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="bxPw3VamvcoNZg45dteOUcMzszIDWExZj"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,267 +111,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: David Gibson [mailto:david@gibson.dropbear.id.au]
-> Sent: Monday, October 28, 2019 1:39 AM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [RFC v2 04/22] hw/iommu: introduce IOMMUContext
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--bxPw3VamvcoNZg45dteOUcMzszIDWExZj
+Content-Type: multipart/mixed; boundary="C7YEtU5woa5YU36Ww0XM5Xc0R7y57A1Fe"
+
+--C7YEtU5woa5YU36Ww0XM5Xc0R7y57A1Fe
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 28.10.19 17:18, Max Reitz wrote:
+> This fixes a bug reported on
+> https://bugs.launchpad.net/qemu/+bug/1850000.  The problem is that
+> QCOW2_COMPRESSED_SECTOR_MASK is a 32-bit mask when it really needs to be
+> a 64-bit mask.
 >=20
-> On Thu, Oct 24, 2019 at 08:34:25AM -0400, Liu Yi L wrote:
-> > From: Peter Xu <peterx@redhat.com>
-> >
-> > This patch adds IOMMUContext as an abstract layer of IOMMU related
-> > operations. The current usage of this abstract layer is setup dual-
-> > stage IOMMU translation (vSVA) for vIOMMU.
-> >
-> > To setup dual-stage IOMMU translation, vIOMMU needs to propagate
-> > guest changes to host via passthru channels (e.g. VFIO). To have
-> > a better abstraction, it is better to avoid direct calling between
-> > vIOMMU and VFIO. So we have this new structure to act as abstract
-> > layer between VFIO and vIOMMU. So far, it is proposed to provide a
-> > notifier mechanism, which registered by VFIO and fired by vIOMMU.
-> >
-> > For more background, may refer to the discussion below:
-> >
-> > https://lists.gnu.org/archive/html/qemu-devel/2019-07/msg05022.html
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > Cc: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  hw/Makefile.objs         |  1 +
-> >  hw/iommu/Makefile.objs   |  1 +
-> >  hw/iommu/iommu.c         | 66 ++++++++++++++++++++++++++++++++++++++++
-> >  include/hw/iommu/iommu.h | 79
-> ++++++++++++++++++++++++++++++++++++++++++++++++
-> >  4 files changed, 147 insertions(+)
-> >  create mode 100644 hw/iommu/Makefile.objs
-> >  create mode 100644 hw/iommu/iommu.c
-> >  create mode 100644 include/hw/iommu/iommu.h
-> >
-> > diff --git a/hw/Makefile.objs b/hw/Makefile.objs
-> > index ece6cc3..ac19f9c 100644
-> > --- a/hw/Makefile.objs
-> > +++ b/hw/Makefile.objs
-> > @@ -39,6 +39,7 @@ devices-dirs-y +=3D xen/
-> >  devices-dirs-$(CONFIG_MEM_DEVICE) +=3D mem/
-> >  devices-dirs-y +=3D semihosting/
-> >  devices-dirs-y +=3D smbios/
-> > +devices-dirs-y +=3D iommu/
-> >  endif
-> >
-> >  common-obj-y +=3D $(devices-dirs-y)
-> > diff --git a/hw/iommu/Makefile.objs b/hw/iommu/Makefile.objs
-> > new file mode 100644
-> > index 0000000..0484b79
-> > --- /dev/null
-> > +++ b/hw/iommu/Makefile.objs
-> > @@ -0,0 +1 @@
-> > +obj-y +=3D iommu.o
-> > diff --git a/hw/iommu/iommu.c b/hw/iommu/iommu.c
-> > new file mode 100644
-> > index 0000000..2391b0d
-> > --- /dev/null
-> > +++ b/hw/iommu/iommu.c
-> > @@ -0,0 +1,66 @@
-> > +/*
-> > + * QEMU abstract of IOMMU context
-> > + *
-> > + * Copyright (C) 2019 Red Hat Inc.
-> > + *
-> > + * Authors: Peter Xu <peterx@redhat.com>,
-> > + *          Liu Yi L <yi.l.liu@intel.com>
-> > + *
-> > + * This program is free software; you can redistribute it and/or modif=
-y
-> > + * it under the terms of the GNU General Public License as published b=
-y
-> > + * the Free Software Foundation; either version 2 of the License, or
-> > + * (at your option) any later version.
-> > +
-> > + * This program is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > + * GNU General Public License for more details.
-> > +
-> > + * You should have received a copy of the GNU General Public License a=
-long
-> > + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> > + */
-> > +
-> > +#include "qemu/osdep.h"
-> > +#include "hw/iommu/iommu.h"
-> > +
-> > +void iommu_ctx_notifier_register(IOMMUContext *iommu_ctx,
-> > +                                 IOMMUCTXNotifier *n,
-> > +                                 IOMMUCTXNotifyFn fn,
-> > +                                 IOMMUCTXEvent event)
-> > +{
-> > +    n->event =3D event;
-> > +    n->iommu_ctx_event_notify =3D fn;
-> > +    QLIST_INSERT_HEAD(&iommu_ctx->iommu_ctx_notifiers, n, node);
+> The launchpad report mentions only problems with qemu-img check on large
+> compressed images, but I think it might extend further than that:
+> - I suppose qcow2_free_any_clusters() would free every compressed offset
+>   modulo 4G, which isn=E2=80=99t good
+> - qcow2_update_snapshot_refcount() will probably update compressed
+>   cluster=E2=80=99s refcounts (in snapshots) modulo 4G, which also isn=E2=
+=80=99t good
+> - And then we have check_refcount_l2() which updates the wrong clusters
+>   for qemu-img check (as demonstrated in the bug report)
 >=20
-> Having this both modify the IOMMUCTXNotifier structure and insert it
-> in the list seems confusing to me - and gratuitously different from
-> the interface for both IOMMUNotifier and Notifier.
+> - (qcow2_co_preadv_compressed() is safe because it uses the inverted
+>   mask, which of course is again just 32 bit)
 >=20
-> Separating out a iommu_ctx_notifier_init() as a helper and having
-> register take a fully initialized structure seems better to me.
-
-Thanks, will do it in next version.
-
-> > +    return;
 >=20
-> Using an explicit return at the end of a function returning void is an
-> odd style.
-
-got it, will fix it in next version.
-
+> But I haven=E2=80=99t tested those other cases.
 >=20
-> > +}
-> > +
-> > +void iommu_ctx_notifier_unregister(IOMMUContext *iommu_ctx,
-> > +                                   IOMMUCTXNotifier *notifier)
-> > +{
-> > +    IOMMUCTXNotifier *cur, *next;
-> > +
-> > +    QLIST_FOREACH_SAFE(cur, &iommu_ctx->iommu_ctx_notifiers, node, nex=
-t) {
-> > +        if (cur =3D=3D notifier) {
-> > +            QLIST_REMOVE(cur, node);
-> > +            break;
-> > +        }
-> > +    }
-> > +}
-> > +
-> > +void iommu_ctx_event_notify(IOMMUContext *iommu_ctx,
-> > +                            IOMMUCTXEventData *event_data)
-> > +{
-> > +    IOMMUCTXNotifier *cur;
-> > +
-> > +    QLIST_FOREACH(cur, &iommu_ctx->iommu_ctx_notifiers, node) {
-> > +        if ((cur->event =3D=3D event_data->event) &&
-> > +                                 cur->iommu_ctx_event_notify) {
 >=20
-> Do you actually need the test on iommu_ctx_event_notify?  I can't see
-> any reason to register a notifier with a NULL function pointer.
-
-sure, let me remove the check. I may have been too careful here. :-)
-
-> > +            cur->iommu_ctx_event_notify(cur, event_data);
-> > +        }
-> > +    }
-> > +}
-> > +
-> > +void iommu_context_init(IOMMUContext *iommu_ctx)
-> > +{
-> > +    QLIST_INIT(&iommu_ctx->iommu_ctx_notifiers);
-> > +}
-> > diff --git a/include/hw/iommu/iommu.h b/include/hw/iommu/iommu.h
-> > new file mode 100644
-> > index 0000000..c22c442
-> > --- /dev/null
-> > +++ b/include/hw/iommu/iommu.h
-> > @@ -0,0 +1,79 @@
-> > +/*
-> > + * QEMU abstraction of IOMMU Context
-> > + *
-> > + * Copyright (C) 2019 Red Hat Inc.
-> > + *
-> > + * Authors: Peter Xu <peterx@redhat.com>,
-> > + *          Liu, Yi L <yi.l.liu@intel.com>
-> > + *
-> > + * This program is free software; you can redistribute it and/or modif=
-y
-> > + * it under the terms of the GNU General Public License as published b=
-y
-> > + * the Free Software Foundation; either version 2 of the License, or
-> > + * (at your option) any later version.
-> > +
-> > + * This program is distributed in the hope that it will be useful,
-> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> > + * GNU General Public License for more details.
-> > +
-> > + * You should have received a copy of the GNU General Public License a=
-long
-> > + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> > + */
-> > +
-> > +#ifndef HW_PCI_PASID_H
-> > +#define HW_PCI_PASID_H
+> Max Reitz (2):
+>   qcow2: Fix QCOW2_COMPRESSED_SECTOR_MASK
+>   iotests: Add test for 4G+ compressed qcow2 write
 >=20
-> These guards need to be updated for the new header name.
+>  block/qcow2.h              |  2 +-
+>  tests/qemu-iotests/272     | 79 ++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/272.out | 10 +++++
+>  tests/qemu-iotests/group   |  1 +
+>  4 files changed, 91 insertions(+), 1 deletion(-)
+>  create mode 100755 tests/qemu-iotests/272
+>  create mode 100644 tests/qemu-iotests/272.out
 
-Oops, thanks for spotting it out.
+Thanks for the review, applied to my block branch:
 
-> > +
-> > +#include "qemu/queue.h"
-> > +#ifndef CONFIG_USER_ONLY
-> > +#include "exec/hwaddr.h"
-> > +#endif
-> > +
-> > +typedef struct IOMMUContext IOMMUContext;
-> > +
-> > +enum IOMMUCTXEvent {
-> > +    IOMMU_CTX_EVENT_NUM,
-> > +};
-> > +typedef enum IOMMUCTXEvent IOMMUCTXEvent;
-> > +
-> > +struct IOMMUCTXEventData {
-> > +    IOMMUCTXEvent event;
-> > +    uint64_t length;
-> > +    void *data;
-> > +};
-> > +typedef struct IOMMUCTXEventData IOMMUCTXEventData;
-> > +
-> > +typedef struct IOMMUCTXNotifier IOMMUCTXNotifier;
-> > +
-> > +typedef void (*IOMMUCTXNotifyFn)(IOMMUCTXNotifier *notifier,
-> > +                                 IOMMUCTXEventData *event_data);
-> > +
-> > +struct IOMMUCTXNotifier {
-> > +    IOMMUCTXNotifyFn iommu_ctx_event_notify;
-> > +    /*
-> > +     * What events we are listening to. Let's allow multiple event
-> > +     * registrations from beginning.
-> > +     */
-> > +    IOMMUCTXEvent event;
-> > +    QLIST_ENTRY(IOMMUCTXNotifier) node;
-> > +};
-> > +
-> > +/*
-> > + * This is an abstraction of IOMMU context.
-> > + */
-> > +struct IOMMUContext {
-> > +    uint32_t pasid;
->=20
-> This confuses me a bit.  I thought the idea was that IOMMUContext with
-> SVM would represent all the PASIDs in use, but here we have a specific
-> pasid stored in the structure.
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-It's added by mistake. Should not be included. No patch will use this field=
-.
-Will remove it. Thanks for the careful review.
+Max
 
-Thanks,
-Yi Liu
+
+--C7YEtU5woa5YU36Ww0XM5Xc0R7y57A1Fe--
+
+--bxPw3VamvcoNZg45dteOUcMzszIDWExZj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3CrDUACgkQ9AfbAGHV
+z0CI5ggAkFpusBNDyh3ZWTfWQNBNRtMNwhIigKP9JJzxpsQQgCa44NDRLiCqrMfH
+EKQWXoJRUF0EnYSQpLXNCRAQfZgDiuEP+3Oc5r/zw43rVuS+t/ZgOyiRiQfK/5iS
+WAkaOSGgQLQS20J3BD394WRIufSNMtgeqw9/wU0Bwpwz+UG7qhQkR+cW6r1dLhHs
+YlBvbVcWq0dkv9/xuPmVIR+gVrg2Z6lTefRsRUrXFns/rLW5hCbvy/lVUZKIkIWb
++4vVOq+TIZCbc0KRXJALe5GiHobFwSQw+JGwG2TvUB4GVGxE8KCUGKYAsPl0+FQ4
+PVh8wa/DEn6DL7SdP35lYFdVOFSYKQ==
+=q/On
+-----END PGP SIGNATURE-----
+
+--bxPw3VamvcoNZg45dteOUcMzszIDWExZj--
 
 
