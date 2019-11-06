@@ -2,85 +2,83 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DEBCC5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D176C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:52:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CD93217F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:51:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CD93217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id C4F69217F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:52:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hKBNrMws"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4F69217F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSHyo-0006mq-Ga
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 04:51:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34106)
+	id 1iSHzE-0007Rh-Vy
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 04:52:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34234)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1iSHxl-0005vg-VS
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:50:54 -0500
+ (envelope-from <kraxel@redhat.com>) id 1iSHyO-0006E9-1S
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:51:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1iSHxk-0003rK-7O
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:50:53 -0500
-Received: from mga14.intel.com ([192.55.52.115]:21604)
+ (envelope-from <kraxel@redhat.com>) id 1iSHyM-00044O-KE
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:51:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29879
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iSHxj-0003kZ-IP
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:50:52 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 06 Nov 2019 01:50:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,274,1569308400"; d="scan'208";a="212731022"
-Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
- by fmsmga001.fm.intel.com with ESMTP; 06 Nov 2019 01:50:43 -0800
-Received: from fmsmsx118.amr.corp.intel.com (10.18.116.18) by
- FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 6 Nov 2019 01:50:43 -0800
-Received: from shsmsx105.ccr.corp.intel.com (10.239.4.158) by
- fmsmsx118.amr.corp.intel.com (10.18.116.18) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 6 Nov 2019 01:50:42 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX105.ccr.corp.intel.com ([169.254.11.225]) with mapi id 14.03.0439.000;
- Wed, 6 Nov 2019 17:50:39 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: Peter Xu <peterx@redhat.com>
-Subject: RE: [RFC v2 03/22] intel_iommu: modify x-scalable-mode to be string
- option
-Thread-Topic: [RFC v2 03/22] intel_iommu: modify x-scalable-mode to be
- string option
-Thread-Index: AQHVimsn7SVAI/DYekGpKA287OuKO6d17oaAgAZs2aD//7jAAIAB5aQQ
-Date: Wed, 6 Nov 2019 09:50:38 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A0EF0E9@SHSMSX104.ccr.corp.intel.com>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-4-git-send-email-yi.l.liu@intel.com>
- <20191101145753.GC8888@xz-x1.metropole.lan>
- <A2975661238FB949B60364EF0F2C25743A0EE30A@SHSMSX104.ccr.corp.intel.com>
- <20191105125000.GE12619@xz-x1>
-In-Reply-To: <20191105125000.GE12619@xz-x1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiM2RiMTg0YzMtZjU3Ni00NmFkLWI1NWItMmM5NGVmODIyMWM5IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiajZSc1ZOMHRxXC95ZWJrQURyMG04UCtjZGs3KzBsQmJwTGZhRGFOeEZrSFwvVVJTaWw3bXVrRVN4ZW8wbVI4aFQ1In0=
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iSHyM-00044K-GR
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:51:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573033890;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=H07O5MhifX+SyOo7deyM1HCJTFRz437wQNK/NQ47qqU=;
+ b=hKBNrMws6ij8TnN6C9Ma1mICMPd+8bJ5zXVLTzfeCQkAgouX2vab15YOd5Zih6B/2muCQX
+ N6Z2xeq6LCvAV3x4uAzJ7fxdMzCH38H75929DvG4gkuLWxaW2C8pjXpE7X2R7Jaa+o4Peb
+ tr12v5vY+REVH26Mex6vBDZnfLziKxI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-D2z0XxgJPDqcbsTxn64f0Q-1; Wed, 06 Nov 2019 04:51:26 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D64A107ACC3;
+ Wed,  6 Nov 2019 09:51:24 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-69.ams2.redhat.com
+ [10.36.116.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C049627064;
+ Wed,  6 Nov 2019 09:51:23 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id CEB7E17535; Wed,  6 Nov 2019 10:51:22 +0100 (CET)
+Date: Wed, 6 Nov 2019 10:51:22 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Subject: Re: guest / host buffer sharing ...
+Message-ID: <20191106095122.jju7eo57scfoat6a@sirius.home.kraxel.org>
+References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
+ <20191106084344.GB189998@stefanha-x1.localdomain>
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.115
+In-Reply-To: <20191106084344.GB189998@stefanha-x1.localdomain>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: D2z0XxgJPDqcbsTxn64f0Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,31 +90,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
- "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
+Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
+ Alex Lau <alexlau@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
+ qemu-devel@nongnu.org, Tomasz Figa <tfiga@chromium.org>,
+ Keiichi Watanabe <keiichiw@chromium.org>,
+ David Stevens <stevensd@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
+ =?utf-8?B?U3TDqXBoYW5l?= Marchesin <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Hans Verkuil <hverkuil@xs4all.nl>,
+ Dmitry Morozov <dmitry.morozov@opensynergy.com>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBUdWVz
-ZGF5LCBOb3ZlbWJlciA1LCAyMDE5IDg6NTAgUE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVA
-aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JGQyB2MiAwMy8yMl0gaW50ZWxfaW9tbXU6IG1v
-ZGlmeSB4LXNjYWxhYmxlLW1vZGUgdG8gYmUgc3RyaW5nIG9wdGlvbg0KPiANCj4gT24gVHVlLCBO
-b3YgMDUsIDIwMTkgYXQgMDk6MTQ6MDhBTSArMDAwMCwgTGl1LCBZaSBMIHdyb3RlOg0KPiA+ID4g
-U29tZXRoaW5nIGxpa2U6DQo+ID4gPg0KPiA+ID4gICAtIHMtPnNjYWxhYmxlX21vZGVfc3RyIHRv
-IGtlZXAgdGhlIHN0cmluZw0KPiA+ID4gICAtIHMtPnNjYWxhYmxlX21vZGUgc3RpbGwgYXMgYSBi
-b29sIHRvIGNhY2hlIHRoZSBnbG9iYWwgZW5hYmxlbWVudA0KPiA+ID4gICAtIHMtPnNjYWxhYmxl
-X21vZGVybiBhcyBhIGJvb2wgdG8ga2VlcCB0aGUgbW9kZQ0KPiA+ID4NCj4gPiA+ID8NCj4gPg0K
-PiA+IFNvIHgtc2NhbGFibGUtbW9kZSBpcyBzdGlsbCBhIHN0cmluZyBvcHRpb24sIGp1c3QgdG8g
-aGF2ZSBhIG5ldyBmaWVsZCB0byBzdG9yZSBpdD8NCj4gDQo+IFllcC4gIEknZCBzYXkgbWF5YmUg
-d2Ugc2hvdWxkIHN0YXJ0IHRvIGFsbG93IHRvIGRlZmluZSBzb21lIHVuaW9uLWlzaCBwcm9wZXJ0
-aWVzLCBidXQNCj4gZm9yIG5vdyBJIHRoaW5rIHN0cmluZyBpcyBvay4NCg0Kb2ssIGxldCBtZSBt
-YWtlIGl0IGluIG5leHQgdmVyc2lvbi4NCg0KVGhhbmtzLA0KWWkgTGl1DQo=
+  Hi,
+
+> > Reason is:  Meanwhile I'm wondering whenever "just use virtio-gpu
+> > resources" is really a good answer for all the different use cases
+> > we have collected over time.  Maybe it is better to have a dedicated
+> > buffer sharing virtio device?  Here is the rough idea:
+>=20
+> My concern is that buffer sharing isn't a "device".  It's a primitive
+> used in building other devices.  When someone asks for just buffer
+> sharing it's often because they do not intend to upstream a
+> specification for their device.
+
+Well, "vsock" isn't a classic device (aka nic/storage/gpu/...) either.
+It is more a service to allow communication between host and guest
+
+That buffer sharing device falls into the same category.  Maybe it even
+makes sense to build that as virtio-vsock extension.  Not sure how well
+that would work with the multi-transport architecture of vsock though.
+
+> If this buffer sharing device's main purpose is for building proprietary
+> devices without contributing to VIRTIO, then I don't think it makes
+> sense for the VIRTIO community to assist in its development.
+
+One possible use case would be building a wayland proxy, using vsock for
+the wayland protocol messages and virtio-buffers for the shared buffers
+(wayland client window content).
+
+It could also simplify buffer sharing between devices (feed decoded
+video frames from decoder to gpu), although in that case it is less
+clear that it'll actually simplify things because virtio-gpu is
+involved anyway.
+
+We can't prevent people from using that for proprietary stuff (same goes
+for vsock).
+
+There is the option to use virtio-gpu instead, i.e. add support to qemu
+to export dma-buf handles for virtio-gpu resources to other processes
+(such as a wayland proxy).  That would provide very similar
+functionality (and thereby create the same loophole).
+
+> VIRTIO recently gained a shared memory resource concept for access to
+> host memory.  It is being used in virtio-pmem and virtio-fs (and
+> virtio-gpu?).
+
+virtio-gpu is in progress still unfortunately (all kinds of fixes for
+the qemu drm drivers and virtio-gpu guest driver refactoring kept me
+busy for quite a while ...).
+
+> If another flavor of shared memory is required it can be
+> added to the spec and new VIRTIO device types can use it.  But it's not
+> clear why this should be its own device.
+
+This is not about host memory, buffers are in guest ram, everything else
+would make sharing those buffers between drivers inside the guest (as
+dma-buf) quite difficult.
+
+> My question would be "what is the actual problem you are trying to
+> solve?".
+
+Typical use cases center around sharing graphics data between guest
+and host.
+
+cheers,
+  Gerd
+
 
