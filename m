@@ -6,66 +6,68 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3B8AC5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 702F2C5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:07:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D782217F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:07:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D782217F4
+	by mail.kernel.org (Postfix) with ESMTPS id 38CA921882
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:07:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38CA921882
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSL1o-0005MA-4y
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 08:07:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36486)
+	id 1iSL1p-0005LW-0X
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 08:07:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36449)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iSKzw-0003Xi-FJ
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:21 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iSKzt-0003S2-HD
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iSKzv-0002yV-8E
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:20 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:57321)
+ (envelope-from <laurent@vivier.eu>) id 1iSKzs-0002wU-Dv
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:17 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:43641)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSKzu-0002xk-VR
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:19 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSKzs-0002vZ-4L
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:16 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1N79q8-1hrtHE3bZ6-017Vs9; Wed, 06 Nov 2019 14:05:17 +0100
+ id 1N63NQ-1hqnLo2u8u-016Pwb; Wed, 06 Nov 2019 14:05:08 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 12/13] linux-user/sparc: Fix cpu_clone_regs_*
-Date: Wed,  6 Nov 2019 14:04:55 +0100
-Message-Id: <20191106130456.6176-13-laurent@vivier.eu>
+Subject: [PULL v2 03/13] tests/tcg/multiarch/linux-test: Fix error check for
+ shmat
+Date: Wed,  6 Nov 2019 14:04:46 +0100
+Message-Id: <20191106130456.6176-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191106130456.6176-1-laurent@vivier.eu>
 References: <20191106130456.6176-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SZJtkQFvalXdI41SeIQoMMrB0GUeVbZcriSYjspiLcEPONjOKc0
- 4PhKd5249RuZ/k5GjTmVj2q0Sf7IhHTkJYwTHThaH1fyYaoxK6+m2YADd46d+1WLPb8VOKz
- Q/CIaxNv81mAgDNhb3I2xwMYVqqe0QPudhZ51sQ6yUICnizwgCY6Sx3K+e2kx68GwmoA5OM
- T5J758/yldGMjXSjYuzvA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:UZSje5P6C2M=:9QIQB95eNWbVC/706ZRgYY
- qDFsYCwalhcYdDszOb85COLpSwcBbMnl5P2apBnX9u96L4oGtlhK6J+JQ4YkOXsPdOmwJ3zhk
- AeHVZAGzccLhwKKvsw9a5/hcEYtELGGekQDtsLgHKK2RdtH+lqIgkTkhZbyIdB8Lf8NVQVPxW
- vSY2h3Dzg+oWwu0/+65MYVLBNMxqKTSTwGk4UXHNB1UD7aIGoJRAQqZRsQ6FDOqRYeKi6W/7N
- i3bGWvQ3pW9FNu93apTtK9FwkqpxE4d6XHWEFKlI+dCZJhJtauMvxt64iIeHkaMnWH+y37j+N
- NsIkf6DOPaemnaAxjnJsReEUKU9NFTd2iDBK9f4Au0HNTLH/ASwah9ZPoMrUVi/YgHScuGvVn
- OlbMmVtmc+adooX2yyB1ofPbk9VVkFDTU/2l0pyFXKP1QPkiKZnh+mx9p37pWk7rOxwLcd1Jm
- QwkzGaP0tCcYkYaUW9hveifubeop81ySfsvC5RFtpnizC/qe/Se8/BONVKe4jReRaXMI5zCPv
- YfAhV+uwWTd6AgQcYTj6DfQgfWJsW9SDCAUyaYBL3kOgb5+j6nwLz8DR0uJQ9Km1UX06WTEZJ
- 4r047lJN5jZi6OBM4QulpqgmS3+W3M+JV2nV6yimVOOVIBvdoJ0mgBSu4tROv0jZl1SxXBNCU
- Qi5PkmgMTBF5cSsfvLnIXRu37gqafSwDwBRxsw4EKxg5crgxk9Y76D8BFnTQHKHOS8wdYbQDp
- LyfLG7OK2hEARjcgtjMSveqjZfEz/QarvEysB/zHJ2Qzex3gRHG7ReKE7EDjN5xf5ELtEumnM
- jNQ3bB9HdvfwFsBvEra5y1ArQEQsahFcFetDAPmK+j1YyYyF1Cpsb5zy0lKmA+8AV0b9Nbg+j
- ZJBdG9pp0Yn6AzK385eg==
+X-Provags-ID: V03:K1:Vu1BYmduwVjJTm9simsfiMGEKoqN9w6waqLssuklMSO6JIBEGVU
+ 9EeL0wEnC5U4DUjrnHPoocjRh3N4mKrdkynjbqqV7i3Orom2/BvPyfmOQ5vqCV3P/vG0jAx
+ UDJJzkliQ2XEw7La3Ac0XAaAf5SeFxxLxG0PoageV1T/TwWa+zRAU1XBqtDcGcpekxcVVHZ
+ IyTtU4J+13UVQsSKoRrvQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:xROpSsYcRq8=:7mHkMJ+n9Ny8JVJpwk4VwW
+ fsVRVxbvzqdQyPXu1WDM/B2zkWyGNbyjM53mr/x5lC2OImt0+tGEjqaNtagvXo4uoHn7xfyLB
+ vNHOZU2jn7f45inIZdR4cHrRofVU+ZGioCjTbjcAEmeN5FD5O8/D4DKu54bNaYhgO6lD/I20k
+ 880f7Sfs3zx/1tZWbBoy/yMuZlKpEFzFMDw5hqopomWFj7+TDPeWons4yva1Zf7Kf96BACA0P
+ CXpxdUvmW5tTKHKhPKLkZKstEHTNjSF4eXX53SSsMO0MM59ylzCMdFdN8h5zNAxW1H2glTPL6
+ NJaJ8hdT6phqTnnCzw2NdTGzBUEgq4YI5aepBnU0Q9+W6XfZm8xkR6MJ5nAQ3OkVtIB4vnwj3
+ dqpz8fnV2SlCbevGx5xEdNkkixBWpgUQI+GaIDIk/JqwRyZA95GmtmAKwsGJ6WKMfAsioV4h+
+ wYM1gq2OBkOeROQIzuW0LV+ho+DIlQEb2D+EVJ9cvL7JczLrw3Kx0aAcgiDISDczFrl4zUI8b
+ Q0V4XHBDiR1wPXlqXxmMDehl4iDi425yIC+FTDwOuoEHXtxAvDM2xDFH68gZuko+ZMusP27YH
+ ATWt7ewG7sYwEVnmL1ncDrBl/Y2dsf7cuAX1PbeastECVVu6TXl79u+7fy+0c5QbHOM/UWcMX
+ Gw1qWgUeNF7TVXzn/o3t622LaK4+B6ee5Z/09U8NxxaYHDD6PetDciDIhnUcDD1FBrF2+QJjS
+ 7ekJ4oEQIlqRSAxRgoXgMKsDGPB8p6OzPr24zOsRlWIbkJJTAJol0k1hc0uo2k9fd9Y3orYTF
+ rREHohLKSpyeI9ML7CJq2jM4iyb4mcDEue07EMewFoWFpQ7f4hjHQSEbt9ME2452PgQ+AYwRM
+ ocMhAFrjy61HvbxUAIkA==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.134
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,6 +83,7 @@ Cc: Richard Henderson <richard.henderson@linaro.org>,
  Riku Voipio <riku.voipio@iki.fi>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -89,81 +92,33 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-We failed to set the secondary return value in %o1
-we failed to advance the PC past the syscall,
-we failed to adjust regwptr into the new structure,
-we stored the stack pointer into the wrong register.
+The error indicator for this syscall is -1, not 0.
 
+Fixes: e374bfa35bfb ("shm tests - disabled clone test")
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20191106113318.10226-12-richard.henderson@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20191106113318.10226-3-richard.henderson@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/sparc/target_cpu.h | 43 +++++++++++++++++++++++++++++------
- 1 file changed, 36 insertions(+), 7 deletions(-)
+ tests/tcg/multiarch/linux-test.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/linux-user/sparc/target_cpu.h b/linux-user/sparc/target_cpu.h
-index 8ff706adcef7..14b21589699b 100644
---- a/linux-user/sparc/target_cpu.h
-+++ b/linux-user/sparc/target_cpu.h
-@@ -23,22 +23,51 @@
- static inline void cpu_clone_regs_child(CPUSPARCState *env, target_ulong newsp,
-                                         unsigned flags)
- {
-+    /*
-+     * After cpu_copy, env->regwptr is pointing into the old env.
-+     * Update the new cpu to use its own register window.
-+     */
-+    env->regwptr = env->regbase + (env->cwp * 16);
-+
-     if (newsp) {
--        env->regwptr[22] = newsp;
-+        /* When changing stacks, do it with clean register windows.  */
-+#ifdef TARGET_SPARC64
-+        env->cansave = env->nwindows - 2;
-+        env->cleanwin = env->nwindows - 2;
-+        env->canrestore = 0;
-+#else
-+        env->wim = 1 << env->cwp;
-+#endif
-+        /* ??? The kernel appears to copy one stack frame to the new stack. */
-+        /* ??? The kernel force aligns the new stack. */
-+        env->regwptr[WREG_SP] = newsp;
-     }
--    /* syscall return for clone child: 0, and clear CF since
--     * this counts as a success return value.
--     */
--    env->regwptr[0] = 0;
-+
-+    if (flags & CLONE_VM) {
-+        /*
-+         * Syscall return for clone child: %o0 = 0 and clear CF since this
-+         * counts as a success return value.  Advance the PC past the syscall.
-+         * For fork child, all of this happens in cpu_loop, and we must not
-+         * do the pc advance twice.
-+         */
-+        env->regwptr[WREG_O0] = 0;
- #if defined(TARGET_SPARC64) && !defined(TARGET_ABI32)
--    env->xcc &= ~PSR_CARRY;
-+        env->xcc &= ~PSR_CARRY;
- #else
--    env->psr &= ~PSR_CARRY;
-+        env->psr &= ~PSR_CARRY;
- #endif
-+        env->pc = env->npc;
-+        env->npc = env->npc + 4;
+diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
+index fa4243fc0426..673d7c8a1c25 100644
+--- a/tests/tcg/multiarch/linux-test.c
++++ b/tests/tcg/multiarch/linux-test.c
+@@ -503,8 +503,9 @@ static void test_shm(void)
+ 
+     shmid = chk_error(shmget(IPC_PRIVATE, SHM_SIZE, IPC_CREAT | 0777));
+     ptr = shmat(shmid, NULL, 0);
+-    if (!ptr)
++    if (ptr == (void *)-1) {
+         error("shmat");
 +    }
-+
-+    /* Set the second return value for the child: %o1 = 1.  */
-+    env->regwptr[WREG_O1] = 1;
- }
  
- static inline void cpu_clone_regs_parent(CPUSPARCState *env, unsigned flags)
- {
-+    /* Set the second return value for the parent: %o1 = 0.  */
-+    env->regwptr[WREG_O1] = 0;
- }
+     memset(ptr, 0, SHM_SIZE);
  
- static inline void cpu_set_tls(CPUSPARCState *env, target_ulong newtls)
 -- 
 2.21.0
 
