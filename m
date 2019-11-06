@@ -2,104 +2,113 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70A9FC5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:21:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C070C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:21:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 301C721882
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:21:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E4AC2084C
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:21:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aftR30xH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 301C721882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E7CiShad"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E4AC2084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSLFG-00073O-Cs
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 08:21:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39647)
+	id 1iSLFr-00081v-Fk
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 08:21:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39592)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <darren.kenny@oracle.com>) id 1iSLBt-0003dp-LG
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:17:42 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iSLBi-0003aG-21
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:17:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <darren.kenny@oracle.com>) id 1iSLBs-0004IC-8s
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:17:41 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:58318)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
- id 1iSLBq-0004Gb-Cw
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:17:40 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6D92YK100499;
- Wed, 6 Nov 2019 13:17:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=xFQhJhHW1u+i10pBwVfYTh20v02HRhjAF92zcheUlG4=;
- b=aftR30xHsLmFcWOo9g6p+dBS8Ja8ahHSVeLaWRvVMVc2LGWaPVq0unoc6asmqd6Lb1Dm
- PHdoc/6kKKPNCtc9iKqj99YqkhCBl93VrG1X4Uh9lVzwNfjTV8XVd7mj9x7XC0x17B4I
- imwyMUvTqR2a38rUu9k/3O7eC5WSeatVKP6taTNW6VJ+1+RJQZy8FinylwQOzTQuYDaG
- 4Al419C/1gnUsKSC3tZcJDgmq/5aBFTncnWeIKkghD8n4Yo1K5vQMEfzV+zLOMZavZw7
- zGRaEQqv3+rGGenL02XJylJkU4lIONEotlZnfmNBS/yWA7QU0fqHWRh7+Zx5+3XltHiC Bg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 2w12erdywm-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 06 Nov 2019 13:17:35 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA6DEdO4107327;
- Wed, 6 Nov 2019 13:17:34 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3030.oracle.com with ESMTP id 2w35pqy7eg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 06 Nov 2019 13:17:34 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA6DHYXl005342;
- Wed, 6 Nov 2019 13:17:34 GMT
-Received: from starbug-mbp.localdomain (/10.175.184.49)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 06 Nov 2019 05:17:33 -0800
-Received: from starbug-mbp (localhost [127.0.0.1])
- by starbug-mbp.localdomain (Postfix) with SMTP id E17C54AC78BC;
- Wed,  6 Nov 2019 13:17:31 +0000 (GMT)
-Date: Wed, 6 Nov 2019 13:17:31 +0000
-From: Darren Kenny <darren.kenny@oracle.com>
-To: "Oleinik, Alexander" <alxndr@bu.edu>
-Subject: Re: [PATCH v4 03/20] fuzz: Add FUZZ_TARGET module type
-Message-ID: <20191106131731.ishadb4tlbscysab@starbug-mbp>
-Mail-Followup-To: "Oleinik, Alexander" <alxndr@bu.edu>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20191030144926.11873-1-alxndr@bu.edu>
- <20191030144926.11873-4-alxndr@bu.edu>
+ (envelope-from <mreitz@redhat.com>) id 1iSLBf-0004CJ-VM
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:17:29 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33250
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iSLBf-0004Bv-PE
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:17:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573046247;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=8RcVF9GT/HQz7TxttFm6r3q1yurOdVMmBkH3g0JczOM=;
+ b=E7CiShad6QVKQCvq/COrMLB9UR5Ga2B/rUfW4uDyuVxTUvu/fZL6jsWuGP97yTbBXYCVr8
+ gwoY7tHEJ40uqIuGZYdrUeL7Sqcd/Ry0yIhqq6fHfjQNfviTPxd/D9yVbSeDpqHhsZZS3Z
+ fNxy7fvGgmND0bVEYG7JmxjAclV0SsQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-171-oVqFT5gdM5S28C2ETyAvpA-1; Wed, 06 Nov 2019 08:17:25 -0500
+X-MC-Unique: oVqFT5gdM5S28C2ETyAvpA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9BCF9477;
+ Wed,  6 Nov 2019 13:17:24 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-212.ams2.redhat.com
+ [10.36.117.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 86D8E5C240;
+ Wed,  6 Nov 2019 13:17:22 +0000 (UTC)
+Subject: Re: backup_calculate_cluster_size does not consider source
+To: Dietmar Maurer <dietmar@proxmox.com>,
+ Wolfgang Bumiller <w.bumiller@proxmox.com>
+References: <1767781109.66.1572948164492@webmail.proxmox.com>
+ <20191106083222.GA189998@stefanha-x1.localdomain>
+ <ac30110f-6abe-a144-2aa5-b1cc140d7e8c@redhat.com>
+ <20191106103450.cafwk7m5xd5eulxo@olga.proxmox.com>
+ <37f72cb7-7085-3c40-7728-e41d59137b3b@redhat.com>
+ <1868807950.27.1573039080274@webmail.proxmox.com>
+ <eb3a232d-6567-1816-b7fc-121770aa42b4@redhat.com>
+ <6684852e-da7d-13b2-f226-1c0074e4ab3b@redhat.com>
+ <396057714.35.1573045777293@webmail.proxmox.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <2bd155fe-af04-05f2-0bd4-28e844564fc4@redhat.com>
+Date: Wed, 6 Nov 2019 14:17:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20191030144926.11873-4-alxndr@bu.edu>
-User-Agent: NeoMutt/20180716
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9432
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1908290000 definitions=main-1911060131
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9432
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1911060130
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+In-Reply-To: <396057714.35.1573045777293@webmail.proxmox.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="xBS0geUUVH9C7WUKt373MpYX0Z2qVPdMV"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,46 +120,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 30, 2019 at 02:49:50PM +0000, Oleinik, Alexander wrote:
->From: Alexander Oleinik <alxndr@bu.edu>
->
->Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xBS0geUUVH9C7WUKt373MpYX0Z2qVPdMV
+Content-Type: multipart/mixed; boundary="3cDU4mMoT5fZ7s8WAlkF9QAhwxjY6qxfx"
 
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+--3cDU4mMoT5fZ7s8WAlkF9QAhwxjY6qxfx
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
->---
-> include/qemu/module.h | 4 +++-
-> 1 file changed, 3 insertions(+), 1 deletion(-)
->
->diff --git a/include/qemu/module.h b/include/qemu/module.h
->index 65ba596e46..684753d808 100644
->--- a/include/qemu/module.h
->+++ b/include/qemu/module.h
->@@ -46,6 +46,7 @@ typedef enum {
->     MODULE_INIT_TRACE,
->     MODULE_INIT_XEN_BACKEND,
->     MODULE_INIT_LIBQOS,
->+    MODULE_INIT_FUZZ_TARGET,
->     MODULE_INIT_MAX
-> } module_init_type;
->
->@@ -56,7 +57,8 @@ typedef enum {
-> #define xen_backend_init(function) module_init(function, \
->                                                MODULE_INIT_XEN_BACKEND)
-> #define libqos_init(function) module_init(function, MODULE_INIT_LIBQOS)
->-
->+#define fuzz_target_init(function) module_init(function, \
->+                                               MODULE_INIT_FUZZ_TARGET)
-> #define block_module_load_one(lib) module_load_one("block-", lib)
-> #define ui_module_load_one(lib) module_load_one("ui-", lib)
-> #define audio_module_load_one(lib) module_load_one("audio-", lib)
->-- 
->2.23.0
->
->
+On 06.11.19 14:09, Dietmar Maurer wrote:
+>> Let me elaborate: Yes, a cluster size generally means that it is most
+>> =E2=80=9Cefficient=E2=80=9D to access the storage at that size.  But the=
+re=E2=80=99s a tradeoff.
+>>  At some point, reading the data takes sufficiently long that reading a
+>> bit of metadata doesn=E2=80=99t matter anymore (usually, that is).
+>=20
+> Any network storage suffers from long network latencies, so it always
+> matters if you do more IOs than necessary.
+
+Yes, exactly, that=E2=80=99s why I=E2=80=99m saying it makes sense to me to=
+ increase the
+buffer size from the measly 64 kB that we currently have.  I just don=E2=80=
+=99t
+see the point of increasing it exactly to the source cluster size.
+
+>> There is a bit of a problem with making the backup copy size rather
+>> large, and that is the fact that backup=E2=80=99s copy-before-write caus=
+es guest
+>> writes to stall. So if the guest just writes a bit of data, a 4 MB
+>> buffer size may mean that in the background it will have to wait for 4
+>> MB of data to be copied.[1]
+>=20
+> We use this for several years now in production, and it is not a problem.
+> (Ceph storage is mostly on 10G (or faster) network equipment).
+
+So you mean for cases where backup already chooses a 4 MB buffer size
+because the target has that cluster size?
+
+>> Hm.  OTOH, we have the same problem already with the target=E2=80=99s cl=
+uster
+>> size, which can of course be 4 MB as well.  But I can imagine it to
+>> actually be important for the target, because otherwise there might be
+>> read-modify-write cycles.
+>>
+>> But for the source, I still don=E2=80=99t quite understand why rbd has s=
+uch a
+>> problem with small read requests.  I don=E2=80=99t doubt that it has (as=
+ you
+>> explained), but again, how is it then even possible to use rbd as the
+>> backend for a guest that has no idea of this requirement?  Does Linux
+>> really prefill the page cache with 4 MB of data for each read?
+>=20
+> No idea. I just observed that upstream qemu backups with ceph are=20
+> quite unusable this way.
+
+Hm, OK.
+
+Max
+
+
+--3cDU4mMoT5fZ7s8WAlkF9QAhwxjY6qxfx--
+
+--xBS0geUUVH9C7WUKt373MpYX0Z2qVPdMV
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3Cx+AACgkQ9AfbAGHV
+z0AGAgf/f8kqrfinNvyCcJmGQBfyKVEDet1zy/5cyqVb8ysgw/CFMiEMdJuzXU+c
+Q/Sg78wtEpzu1DkEVIVyc0gb6LGxdGpnwahj9DwgSWWsv7VrP98312i8i234LwoS
+z5t2S8D6OgEFxygSOSevs13ZYhq7vEeLqcmtz2TWQXm8Zyh7wbYT6RyjmVbzijmd
+LrsYcVn7aAJWAfkw64rjc/OiSI5Do8TqicjHGFuqmgBNHP1q5qc8spKkVtSVfVuv
+ITZPh4VApkgXuJfL5+dcZlcLzZcRhK2t25wxJBogIa67N154yxGCldPfWzNjpe8u
+U3FT0w1kjCyytEtOmMI4z8rUnHl9Ng==
+=et8x
+-----END PGP SIGNATURE-----
+
+--xBS0geUUVH9C7WUKt373MpYX0Z2qVPdMV--
+
 
