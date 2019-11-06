@@ -2,81 +2,79 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A6EC5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:36:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D8BAC5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:37:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFBFC2077C
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:36:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3FF321882
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:37:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EQrAX0A5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFBFC2077C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gVkAO9EZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3FF321882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58819 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSLTh-0006ZV-Va
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 08:36:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46404)
+	id 1iSLV2-00081X-58
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 08:37:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46654)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iSLSp-0005Vt-Jv
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:35:12 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iSLU5-0007R4-N7
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:36:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iSLSk-0007m4-Mp
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:35:11 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:35298
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iSLSk-0007lN-JB
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:35:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573047305;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=s+lN5Y1N27oJvllwM8VJJoOu1WcjpJtS/y8WMFymCkY=;
- b=EQrAX0A5sMEbVqTtNefgFoOAem1iUqze9jupeRgpjSPLrIFeIfDI4Mr4kgXTGncI4z+r+e
- o+wBTEDqU265UiTaz/j+hqrX/Zl3kMBUxNoELg8GdvIB5MnaRBuBTFr9sGf4gPPbzjmezE
- KGiU57VHMs9vX6Tax8Zpj/PGPEmnv+Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-AxWyntuBOleWLSrqW1Z13g-1; Wed, 06 Nov 2019 08:35:02 -0500
-X-MC-Unique: AxWyntuBOleWLSrqW1Z13g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6BD061005500;
- Wed,  6 Nov 2019 13:35:01 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3BAC319756;
- Wed,  6 Nov 2019 13:35:00 +0000 (UTC)
-Date: Wed, 6 Nov 2019 14:34:58 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [RFC PATCH 08/18] qemu-storage-daemon: Add --export option
-Message-ID: <20191106133458.GB7548@dhcp-200-226.str.redhat.com>
-References: <20191017130204.16131-1-kwolf@redhat.com>
- <20191017130204.16131-9-kwolf@redhat.com>
- <5d920618-219a-6dd2-5823-3fc3f09e6a61@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iSLU4-0000Xa-Ag
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:36:29 -0500
+Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:43961)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iSLU4-0000X5-50
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:36:28 -0500
+Received: by mail-io1-xd41.google.com with SMTP id c11so26952890iom.10
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 05:36:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=o+/gcmf8XPazkthWJaoh2pwFyoejLH7moNkFrL2XzrQ=;
+ b=gVkAO9EZ8ez1N4klYB3WDHnRzN7UdUE3XgBKKaO2mJWsxgw8qZ0Z49M/G69ee2t2Jm
+ yJfAfMMQFD07+vQ+0rLtB6+4xAoo/+1GfwsPhmHWV6QlXFoWLe5ivrGA1JewP3nVHBUv
+ /SYot9bAo/ZUA2/mcOpXtGLst1Hg6UvHpt1EeKcJsFih2A+0n2hxJl7t2wKpWliPfAu4
+ opLHGsBhAdwTE5rTBM4mUkpQJTikLlfI3RuNWT7C/mWgZxmsIq3x4i3QjWdCr+cBDMEv
+ 48MQFWRAuIF8GMNi5NikQcrMEgmNZlOFvzJ+wPH/wgVnKU3KG1vqj1Ra/UqSA8f/ABcE
+ 9HXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=o+/gcmf8XPazkthWJaoh2pwFyoejLH7moNkFrL2XzrQ=;
+ b=jydg2iVxdhwFAz6DiTqQzNZ53JzXaxginCEO5HD+xticC1ZcpjSmNqt7oZbjY27gCU
+ 82Onzdcn06iRIGI4+uphAsdXq4pRKkYn9Ho6vpptheFOf+1T/WiNg6NZsC/q4xwgovAI
+ 2ae4GsNnQg2mrkHHLCOgFU6hiCPrg8e+zPz5/RDNWAQohFjo62NUHbd9n3dcchqOczNJ
+ 8D9eRd/syIqFfQIy8S8NV4NKs6s6lfvECnJFaxoZ29PUFu4m6/sZ87DxXGJLxBnTvNIy
+ JphU8eEUIRw9a8fEQ2aRqVdqraXUFxo6pDma2UJ8gvV4IvSWkk/FzJKoGwOcOxBS1jaO
+ YQOw==
+X-Gm-Message-State: APjAAAXgTm3/lu6mMeDK5NYSJuK1HKEvKkCsr8BMxJ3/b08QO0hUu6oh
+ tpJiGsXmdt0ad/mlWZ1BIqdHSJ4eKrjzTbBIpN4gag==
+X-Google-Smtp-Source: APXvYqwrGAs2kH0bCXKlui9AR6FkAY8Inti7G3n0cwKCWq8j5919ZAgyDE7l1+q07GNHoMPw1PxePKiHv7mU58G0nvQ=
+X-Received: by 2002:a5d:93d9:: with SMTP id j25mr5437652ioo.93.1573047387187; 
+ Wed, 06 Nov 2019 05:36:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <5d920618-219a-6dd2-5823-3fc3f09e6a61@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="xXmbgvnjoT4axfJE"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191104173017.14324-1-mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20191104173017.14324-1-mdroth@linux.vnet.ibm.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 6 Nov 2019 13:36:15 +0000
+Message-ID: <CAFEAcA-K=PEuHqryo+n=qkLzjBMH5HwL9YcAdWhhW7R7VYWrAg@mail.gmail.com>
+Subject: Re: [PULL 0/2] qemu-ga patch queue for 4.2-rc0
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::d41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,80 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, armbru@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---xXmbgvnjoT4axfJE
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, 4 Nov 2019 at 17:30, Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+>
+> The following changes since commit 36609b4fa36f0ac934874371874416f7533a5408:
+>
+>   Merge remote-tracking branch 'remotes/palmer/tags/palmer-for-master-4.2-sf1' into staging (2019-11-02 17:59:03 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/mdroth/qemu.git tags/qga-pull-2019-11-04-tag
+>
+> for you to fetch changes up to 28d8dd355be98da6239bd5569721980c833df6a1:
+>
+>   qga: Add "guest-get-memory-block-info" to blacklist (2019-11-04 08:50:54 -0600)
+>
+> ----------------------------------------------------------------
+> qemu-ga patch queue for hard-freeze
+>
+> * fix handling of Chinese network device names in
+>   guest-network-get-interfaces
+> * add missing blacklist entries for guest-get-memory-block-info for
+>   w32/non-linux builds
+>
+> ----------------------------------------------------------------
 
-Am 06.11.2019 um 14:11 hat Max Reitz geschrieben:
-> On 17.10.19 15:01, Kevin Wolf wrote:
-> > Add a --export option to qemu-storage-daemon to export a block node. Fo=
-r
-> > now, only NBD exports are implemented. Apart from the 'type' option
-> > (which is the implied key), it maps the arguments for nbd-server-add to
-> > the command line. Example:
-> >=20
-> >     --export nbd,device=3Ddisk,name=3Dtest-export,writable=3Don
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  qapi/block.json       | 27 +++++++++++++++++++++++++++
-> >  qemu-storage-daemon.c | 31 +++++++++++++++++++++++++++++++
-> >  2 files changed, 58 insertions(+)
->=20
-> Would it be better to collect the BlockExports in a list and work on it
-> after all arguments have been parsed?  As it is, it=E2=80=99s important t=
-hat
-> users define block devices and things like NBD servers before --export.
->  Yes, I know, that=E2=80=99s exactly how it works with qemu, but is that =
-really
-> the best way?
 
-It's actually not how QEMU works generally. QEMU collects things in
-QemuOptsLists and then tries to interpret them in the right order. Of
-course, we never get the order actually right, which results in constant
-reshuffling of the order of initialisations in vl.c.
+Applied, thanks.
 
-It also means that vl.c (!) has a list of -object types that need to be
-created early so that other backends can make use of them, and of those
-types that actually depend on a backend already being present (see
-object_create_initial() for details).
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
-I think it's much cleaner to simply use the order in the command line
-instead of adding magic that tries to resolve (and fails at actually
-resolving) all the dependencies. I seem to remember that this was in
-fact one of the things Markus keeps mentioning he would change if he
-were to rewrite the QEMU command line parser from scratch without
-compatibility requirements.
-
-Kevin
-
---xXmbgvnjoT4axfJE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdwswCAAoJEH8JsnLIjy/WetcQAIJGxwlPYRSBvD+DiYJLizMj
-v52UH/05GvQRr0M6pW8Jwmo+xAVHUPBceCZ8Iy6/qJuGv6jczPnIYQsXx6P214LI
-T8YV1mB10m7/PZI6MKWZIy2AI6E4n/g4neEsP5Fi2HFqQaEMUkrAuBg4pYk7v3n+
-TsumYGET49MaWhONW8fsstsPXi7g+ADIFYoR+c1kLbQn9QK11ik+KRr65CGzsVTy
-TklyTCIHV5310lbauztHivDTWLMHxzn/mBe6lOnbA7phbVFGnFCn6+SuQB++s4xl
-121tDMvt6MvZYCC0qi380sEMSvL+PnFHHHEtOE5q3/2By9+I1+Gon18r4UxbQW/H
-HN8ID4yrad78LDiSC3vCvbAPDxp1ERV4ylmN/tMV8aPnVvOQpo58ALdoxi7UFlkl
-vYIO4miFhBK22AVOxVOw9X/KqLHDrYsuSPqbvyTmW5FDbsosGM99Z2z8L2R+1a+5
-EE/X71Sol88jIuiHozML/hHyOxVLQzSs7KuBWA7QM0RF7qwlpuR8+BLIfTa6GS5G
-/GFCN6dbgd4uVDtRJc0VJcd2T44NWHW+jD2LDTh+PwkhJGqSTg8AcWLHGEim2inD
-9dTlIPUag0DeXfO7wKvLJ/ZEn6cJnVhl0u3pF/q64UYu7cnvYsfvXLKRNtn3iMxa
-s9TeiGjf/C0JRwkn63TS
-=uCEm
------END PGP SIGNATURE-----
-
---xXmbgvnjoT4axfJE--
-
+-- PMM
 
