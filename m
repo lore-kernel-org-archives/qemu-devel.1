@@ -6,67 +6,66 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03FBCC5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:10:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC5CC5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:11:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C42E0217F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:10:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C42E0217F4
+	by mail.kernel.org (Postfix) with ESMTPS id E0967217F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 13:11:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0967217F4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSL5M-0001hR-U4
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 08:10:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36536)
+	id 1iSL5h-0002C2-JI
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 08:11:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36498)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iSL00-0003fm-Lb
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:25 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iSKzx-0003Yr-Cx
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iSKzz-00031f-Em
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:24 -0500
-Received: from mout.kundenserver.de ([212.227.126.187]:46979)
+ (envelope-from <laurent@vivier.eu>) id 1iSKzs-0002wO-8b
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:21 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:59479)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSKzz-000310-5O
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:23 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSKzr-0002vV-Vv
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 08:05:16 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MkpjD-1i4rov2Kcx-00mHgo; Wed, 06 Nov 2019 14:05:10 +0100
+ id 1McpW6-1hsSHT3VCs-00ZwPn; Wed, 06 Nov 2019 14:05:14 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 05/13] linux-user/sparc: Use WREG constants in
- sparc/target_cpu.h
-Date: Wed,  6 Nov 2019 14:04:48 +0100
-Message-Id: <20191106130456.6176-6-laurent@vivier.eu>
+Subject: [PULL v2 09/13] linux-user/sparc64: Fix target_signal_frame
+Date: Wed,  6 Nov 2019 14:04:52 +0100
+Message-Id: <20191106130456.6176-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191106130456.6176-1-laurent@vivier.eu>
 References: <20191106130456.6176-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:MhlD5dVVZ7dtnCdYUPRmKP25QXNwXDN6lyKD4g0G1XO5VAFwss4
- cWAz8NkDxJqW8m/c8QpLJLT1JM/ro7c/zd6ai9TJGR3iYwQYmE+T/YgE3KOAHT4QdtKaPLg
- 37doHcSjGhD3XI+KL9IPwasUjOMlmOAWzJHtjOESsIs7h4IxQdMa6T+3AI+Fxqnrx2eXoK3
- bZoSXnm4cOHANj/9ZMrOw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:xkGsBVyoy+4=:bOXgfNrSiZ9CadHSqeQCxd
- e8WqA9Dixy24nCBYaqXpPBNJNEi6LCFzfsYkaDT1CFF8W+fbQLsGMd2iggOmMNJdBN4WgXZlk
- S9FlzDIbgvTsatt/VmeSbv5gJ2PiwDgmbWOjTPp6vtizRX+y/oiaSHiP650KKwO8k9ZVpN+Le
- gfinaToEDVBzulmOHCH493Lpu5NZ2czailDKelT3gTGXyVkuglv5a6NQJTivz34HTPX4o32ep
- xhUrrJbYWk9at04w3C5ag4CwaPbHiiVA50SrOhyqIiKhu4t/66J5w3aOWB7NcEooy5ptUw9zL
- qNohoH25iGMAMtuE2U8b5zruSS+eISFtMpKDWE5JRHjGJgk/sCDgXLuXcpp8J80+LX7TKLjaH
- jwuhN6KbR6UTHRmG4iTwKAlfgMTrBquZRglleH2Su4W9r4ywJ6Rx/mC6EVFoF9IJagK0yGfR6
- p4VaKL1WbhjpwIk9Ex7Ot/1bjxcp210cP5Xi7/I4GHUpqzoVze0lm6CSQ9WU+6nCxzSOCQ7Vj
- h0u2H7UTYVi3a0beVC3u/egh+o9+7w+2Cq0v1x9J6sgH2CMvl2LD49JcZeAZfXpdEMwhynikV
- oJ6U4FAFK2G1q+qiGULfzX2A7LWIZ5Nb5XENa9NrhcgWuXF3yBXEp+KwEzpm3t3K1NAXORP5w
- ahrQqDSaFY08l+pI+SJxvk0KF/tTGbtcVfWg3+2yvKbScvV/1ZDK8HYEJaZjQsCsptlsqFN0q
- ZLsJW7lcScUVm6nb4oHXN3kf2JZ5qLAWO00K2A9ki1UT7NNJUye7aiLPBJAMIjEGoVK72/bHG
- EanAPDGfOkCuKjTYF35skvtGtaT98lFOiTOlO9JRw5QJpkOL1AJeKQ5LOEtvBH2Oi4UepqxaG
- amB8GK/53Py3rPnLaOFA==
+X-Provags-ID: V03:K1:jGMMA1r2VMxaPACeECkS6P/IgU0zBlIlnzfV6a8cXosdPtWUyQg
+ x4N/+z1UmJKOW+9Ih48yCw89ez/P55xgQOo/pMISXowX7QrRIesal/Np5jqR1b+VSVM2emn
+ ZFdaPwNiIe5vSqZGcV+7rVaUZCHXVg3KG0AHbj/+TLIA0iCm9jv1zA2R40I3Sxoe+Gmcut8
+ GlLp/a9VjNpdcXLF5RzTg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:E5EdphPDIO8=:6KRUEnGVIV54DmFbbhVujy
+ alMHql5ziQlqAl2XrPtQ1Civ+4NkSlfoqRTEifEsPpMltDpNpDEuZy44cugLP0HZAN1ggTEfE
+ 7VCvThP7jyWFcr17JLK32BbOGVotybSK3PBlduGcazkX7cgcSz0aueV6TSPYR8wJ4XFMiksDG
+ lgPueqB85cyyHsyij7ntdJOI7E9zJFTqEGSRJg1Uy9dw5LARHwYt8IneyzFReisEeAUkOh/Rn
+ aLs8AcAT2349uPRogGmtAGlgaj8drBCOOGiEpUFSj4jGQJ8cXtbwAzEP648wgW++XE5EIVs/F
+ Qc3QY2ogeEBHVXe3UK84NYBbq6PYq6qDJHXDlQKAufUuEeK03r8tEo6A9rMb5F7K5hsr3Nu4l
+ 3akdXVmzjXlH5YPhTL6N6+CNj75OnebngUCx6PQAoRUxQ/c3DAH6z45w3ekaBolOZz6AhEngu
+ FLR5aBlv8YiF81Ji8Cj00W4HzIEHCSns/r/cLF8duDUXt1tD4sEg7eXq0+vX8uQmquEApMyVc
+ PLQxxt9SnVmkMmzaajj46z4q9icgaCtnrDkrrKuTygZ5ihWQuP22MaHoZES9W9YClrHMP+LSj
+ HhKpr1gOKrEFKaE73tnUoALcZeu+B36BxO5oX4vLmWS3sFo6478hXV0/q6o8cZwI0JoOhXO+N
+ 6nK0x8fNTQWa/w/MydExi7y7JKB24feaKLW4zEuPYytfb6BLwPiE/6mFgFamVbg1GLr/lsHbk
+ DC/XbulzsTQn6KPHdiDmnrH+KoyqYD5Q+ozCdDogLKJC3gQBj54nM3g2x3mqf47gnxE5KxCCT
+ JrV29VSJUtOmpP22lt1Zr3u/YmvPbSv89H8xH2qRqL3P8KHBljpsuadVVjBgZkWmoqYP+eQw/
+ STNlKHryzgQiZ4VvCf/w==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.187
+X-Received-From: 212.227.126.131
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,43 +89,38 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-This fixes a naming bug wherein we used "UREG_FP" to access the
-stack pointer.  OTOH, the "UREG_FP" constant was also defined
-incorrectly such that it *did* reference the stack pointer.
-
-Note that the kernel legitimately uses the name "FP", because it
-utilizes the rolled stack window in processing the system call.
+Instructions are always 4 bytes; use uint32_t not abi_ulong.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20191106113318.10226-5-richard.henderson@linaro.org>
+Message-Id: <20191106113318.10226-9-richard.henderson@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/sparc/target_cpu.h | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ linux-user/sparc/signal.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/linux-user/sparc/target_cpu.h b/linux-user/sparc/target_cpu.h
-index 1ffc0ae9f2ec..b30fbc72c43b 100644
---- a/linux-user/sparc/target_cpu.h
-+++ b/linux-user/sparc/target_cpu.h
-@@ -41,15 +41,9 @@ static inline void cpu_set_tls(CPUSPARCState *env, target_ulong newtls)
-     env->gregs[7] = newtls;
- }
- 
--#ifndef UREG_I6
--#define UREG_I6        6
--#endif
--#ifndef UREG_FP
--#define UREG_FP        UREG_I6
--#endif
--
- static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
- {
--    return state->regwptr[UREG_FP];
-+    return state->regwptr[WREG_SP];
- }
-+
- #endif
+diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
+index 238d0ba00c89..d796f50f665b 100644
+--- a/linux-user/sparc/signal.c
++++ b/linux-user/sparc/signal.c
+@@ -87,7 +87,7 @@ struct target_signal_frame {
+     struct sparc_stackf ss;
+     __siginfo_t         info;
+     abi_ulong           fpu_save;
+-    abi_ulong           insns[2] __attribute__ ((aligned (8)));
++    uint32_t            insns[2] QEMU_ALIGNED(8);
+     abi_ulong           extramask[TARGET_NSIG_WORDS - 1];
+     abi_ulong           extra_size; /* Should be 0 */
+     qemu_siginfo_fpu_t fpu_state;
+@@ -98,7 +98,7 @@ struct target_rt_signal_frame {
+     abi_ulong           regs[20];
+     sigset_t            mask;
+     abi_ulong           fpu_save;
+-    unsigned int        insns[2];
++    uint32_t            insns[2];
+     stack_t             stack;
+     unsigned int        extra_size; /* Should be 0 */
+     qemu_siginfo_fpu_t  fpu_state;
 -- 
 2.21.0
 
