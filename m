@@ -8,71 +8,71 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC52EC5DF63
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 22:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF3F0C5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 22:08:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFB842173E
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 22:06:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B33A2173E
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 22:08:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KPCSgXYj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFB842173E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hzgNhzzU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B33A2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSTR9-0000WA-9C
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 17:05:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58865)
+	id 1iSTT5-0003Iu-Bx
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 17:07:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59182)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iSTNu-0006nI-O9
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 17:02:39 -0500
+ (envelope-from <alistair23@gmail.com>) id 1iSTOw-0007Xl-8j
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 17:03:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iSTNt-0001aZ-Mg
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 17:02:38 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:46276)
+ (envelope-from <alistair23@gmail.com>) id 1iSTOv-0002Yg-5Z
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 17:03:42 -0500
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:33453)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iSTNt-0001Xz-Ee
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 17:02:37 -0500
-Received: by mail-lj1-x242.google.com with SMTP id e9so14634700ljp.13
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 14:02:37 -0800 (PST)
+ id 1iSTOu-0002XN-UU
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 17:03:41 -0500
+Received: by mail-lj1-x242.google.com with SMTP id t5so27967837ljk.0
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 14:03:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HkmNPtodl9kIuKaHmLdvJQrAHABZUCv5g1TIeZKwH0A=;
- b=KPCSgXYjUVC2EoEbRoxoxrpoRborzIf+QSyrjcfk9RCRSOFSEdBXr3HqvpHHVgRK0l
- yXnUF/R6fcVBVZmPWBblkrLjgcuuDleCKZEJ8TszeCqRekwAvqCrJF7FxLHSFVwlkken
- A/T7L58TCyWDn0kPYupsXkD69gGuBZZzAWuPmQCgwZ47gSsQU6EgCf5JzZOCNQkN6aGH
- 3FcveGydguAPOiYqzmW8jEXDrYtOPrFXgwlqVqseSsXBByBg8AdCGmpb+zH7e47msf5o
- Okj4Dlv0Jbl804jZbQfXj2/thqSxOWspJmsZgukNMwtA9rO+s+yWAt9Uyk2V8JgeIhIT
- DI/A==
+ :cc; bh=1EhDd1V18IdhIH3D8wncLZlO5OnMjk0B/mA92do25dI=;
+ b=hzgNhzzUXp7P5MI2Pv+OLOttSY0WKSBjH9grMqAD4nUfTEOTMqvqoSAtldjahqFv4k
+ nx42/y4laYrWjhW5lUI1WrT4toXDZ4k7jS/nL6YImNd+tCaxh8zTSV012Z6leLdyC6bR
+ ktwnxk9s7yDtwfjDyT/OOd7nBIHvhZm1w7iOI6Luv4xcTIMCs2m68aFSAr6QFOTwWeOU
+ VZ7AwwipGZuexT0D9LT05LdXCFOrk2FzOc2Q5qdywWPBBAC76zbyPMieoMhU1PR0T2SB
+ YCD9bjjN9fzJkW4Xf/1SWdfHAWPoR34/FU9yGM/MmAsaHH4zRCxC8l5e3jDAAiW9XQ6A
+ 4sbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=HkmNPtodl9kIuKaHmLdvJQrAHABZUCv5g1TIeZKwH0A=;
- b=POh8DCOpXBMp5f3zzcnc2AxC4OOVAlb2vgUd2qK+dVi/IZXVo7ukZDt7S81HhsiiFW
- JYul3etW+PTA12EEVZ0HH94wR2NibVNggziNAHpU8JQPgmEAkNOyy1UnHw+pL/3asQqF
- 3z9yjuNuwt7jGjrdyr1CG1FqGe/4WzpV6+4yYipTeCRSN2RmhmNKyZmgFrHVcFoCTiyS
- +76FF5x+S8aZjzHeACjTNn56vNqmiR1TBLB1haIJQNARmLzPxbweRQlWZ0raBr10xdwW
- mwcVRZE2DAubXqX9Pyos0PBuqqgg+vNxUapzv+pnBi6ZkTcKpPAhz1XF93KqtSS3lqpS
- 5tkQ==
-X-Gm-Message-State: APjAAAV4M+QAycqFCOwgxfPDqkOqMp98hWaCz/feZfk8cM8nnciBbsx4
- HCIJJZMyMWHUcsxLAT9REa7zT0OvMNf1RgVh8Ac=
-X-Google-Smtp-Source: APXvYqxASuFsltOFJm+fJcPh2wW14oDU9vcZ7OlviMed0O1NckquZecTao8ImkFH0FRWXQHdmFAksQzIImyCy7MM+nc=
-X-Received: by 2002:a2e:94d6:: with SMTP id r22mr3251678ljh.7.1573077754331;
- Wed, 06 Nov 2019 14:02:34 -0800 (PST)
+ bh=1EhDd1V18IdhIH3D8wncLZlO5OnMjk0B/mA92do25dI=;
+ b=glOtcKKp7REjeGLH2Blu9kgTNgGVHvedAAwUezbGNhFw0f0nSvvJDtM9XVuOYDqptS
+ HixU0WWZhrsMjK5qKz5kB++GR316AIkq4O/LWOQ5PrN2ChCBPdy8BUAjKbiyluGfl12s
+ FRmPb6b1KHl1yyvILXUq2cBDKAJqwmivgk6gB+f9Hb3NvGd3GSIO+zIeIqHxEoCX1EOX
+ jVToo4cotHjrZZv6B0jrZA8Ro6Uqxa0VrWJUDPttMOwg5P+JlnKBy1aRqZ/j7YEUtRhU
+ V7RCqiHgIUnKKYOpX/uhP5LhgduEOca2XOQeP8/+OkWDGUVHECXicOB9M2hkLToOMnJf
+ LqMA==
+X-Gm-Message-State: APjAAAXIJ+G5QTO80VPUKjjMlRunn8PpLauNuEQFHUiE5GAYoRxqRtGm
+ OWFoP3BUgvAVYo4h9lADdkwJH+lpf0N6FrxqtRg=
+X-Google-Smtp-Source: APXvYqwcA5RpvK3ZGQAH9N7JPGxBN+yriZhQr+WkoXdSXKyKRMGNbOd67ZZ0WCDvtvsdyzQgfJ5UeKNXD08X1UfUKFE=
+X-Received: by 2002:a2e:b54d:: with SMTP id a13mr3625562ljn.4.1573077819839;
+ Wed, 06 Nov 2019 14:03:39 -0800 (PST)
 MIME-Version: 1.0
 References: <20191106141424.27244-1-edgar.iglesias@gmail.com>
- <20191106141424.27244-3-edgar.iglesias@gmail.com>
-In-Reply-To: <20191106141424.27244-3-edgar.iglesias@gmail.com>
+ <20191106141424.27244-4-edgar.iglesias@gmail.com>
+In-Reply-To: <20191106141424.27244-4-edgar.iglesias@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Wed, 6 Nov 2019 13:56:53 -0800
-Message-ID: <CAKmqyKPypCij5EKvyxDJcasn8tibqoCt_ovn2C52kUskmC=C5g@mail.gmail.com>
-Subject: Re: [PATCH v1 2/3] target/microblaze: Plug temp leaks with delay slot
- setup
+Date: Wed, 6 Nov 2019 13:57:59 -0800
+Message-ID: <CAKmqyKM5kyRJ+A8BO-5-71mxm64vYP7HvyD7tDe+cJu-L8_xDQ@mail.gmail.com>
+Subject: Re: [PATCH v1 3/3] target/microblaze: Plug temp leak around
+ eval_cond_jmp()
 To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
@@ -109,7 +109,7 @@ On Wed, Nov 6, 2019 at 6:17 AM Edgar E. Iglesias
 >
 > From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Plug temp leaks with delay slot setup.
+> Plug temp leak around eval_cond_jmp().
 >
 > Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
@@ -118,67 +118,25 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  target/microblaze/translate.c | 26 ++++++++++++++------------
->  1 file changed, 14 insertions(+), 12 deletions(-)
+>  target/microblaze/translate.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 >
 > diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-> index ba143ede5f..e9ff9e650d 100644
+> index e9ff9e650d..93e22a89ac 100644
 > --- a/target/microblaze/translate.c
 > +++ b/target/microblaze/translate.c
-> @@ -1201,6 +1201,17 @@ static void eval_cond_jmp(DisasContext *dc, TCGv_i64 pc_true, TCGv_i64 pc_false)
->      tcg_temp_free_i64(tmp_zero);
->  }
->
-> +static void dec_setup_dslot(DisasContext *dc)
-> +{
-> +        TCGv_i32 tmp = tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG));
+> @@ -1705,7 +1705,10 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+>                  dc->tb_flags &= ~D_FLAG;
+>                  /* If it is a direct jump, try direct chaining.  */
+>                  if (dc->jmp == JMP_INDIRECT) {
+> -                    eval_cond_jmp(dc, env_btarget, tcg_const_i64(dc->pc));
+> +                    TCGv_i64 tmp_pc = tcg_const_i64(dc->pc);
+> +                    eval_cond_jmp(dc, env_btarget, tmp_pc);
+> +                    tcg_temp_free_i64(tmp_pc);
 > +
-> +        dc->delayed_branch = 2;
-> +        dc->tb_flags |= D_FLAG;
-> +
-> +        tcg_gen_st_i32(tmp, cpu_env, offsetof(CPUMBState, bimm));
-> +        tcg_temp_free_i32(tmp);
-> +}
-> +
->  static void dec_bcc(DisasContext *dc)
->  {
->      unsigned int cc;
-> @@ -1212,10 +1223,7 @@ static void dec_bcc(DisasContext *dc)
->
->      dc->delayed_branch = 1;
->      if (dslot) {
-> -        dc->delayed_branch = 2;
-> -        dc->tb_flags |= D_FLAG;
-> -        tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
-> -                      cpu_env, offsetof(CPUMBState, bimm));
-> +        dec_setup_dslot(dc);
->      }
->
->      if (dec_alu_op_b_is_small_imm(dc)) {
-> @@ -1274,10 +1282,7 @@ static void dec_br(DisasContext *dc)
->
->      dc->delayed_branch = 1;
->      if (dslot) {
-> -        dc->delayed_branch = 2;
-> -        dc->tb_flags |= D_FLAG;
-> -        tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
-> -                      cpu_env, offsetof(CPUMBState, bimm));
-> +        dec_setup_dslot(dc);
->      }
->      if (link && dc->rd)
->          tcg_gen_movi_i32(cpu_R[dc->rd], dc->pc);
-> @@ -1379,10 +1384,7 @@ static void dec_rts(DisasContext *dc)
->          return;
->      }
->
-> -    dc->delayed_branch = 2;
-> -    dc->tb_flags |= D_FLAG;
-> -    tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
-> -                  cpu_env, offsetof(CPUMBState, bimm));
-> +    dec_setup_dslot(dc);
->
->      if (i_bit) {
->          LOG_DIS("rtid ir=%x\n", dc->ir);
+>                      dc->is_jmp = DISAS_JUMP;
+>                  } else if (dc->jmp == JMP_DIRECT) {
+>                      t_sync_flags(dc);
 > --
 > 2.20.1
 >
