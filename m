@@ -2,80 +2,79 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F07DC5DF63
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 17:53:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5AE4C5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 17:54:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 070BD217D7
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 17:53:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2964217D7
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 17:54:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EaXSAhSA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 070BD217D7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A7Y5HVeB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2964217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33843 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSPUY-0001yW-3H
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 12:53:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50487)
+	id 1iSPVu-00031C-SC
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 12:54:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50662)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iSPTK-0001WU-Pr
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 12:51:59 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iSPUG-000228-RM
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 12:52:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iSPTJ-0006u1-ER
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 12:51:58 -0500
-Received: from mail-oi1-x22c.google.com ([2607:f8b0:4864:20::22c]:46182)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iSPTJ-0006s1-9m
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 12:51:57 -0500
-Received: by mail-oi1-x22c.google.com with SMTP id n14so6072191oie.13
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 09:51:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NqEUsH2EcrZErMGMTxFXMXIeTn+clFhmzG0Xt1/EcjY=;
- b=EaXSAhSAAes7sm5ssS0zKqaQDbMzV96iTB+V3ocp2oYRqqvAyUBfmK/+qUhk0QtvYb
- tR2yGEIaUkjaILjpzKfcVytV65YPq8ICtqebNVwbURgfLtGLwksY5GeMCJYvAKjOlRIh
- N8BzQzYhngOF2sczdKtq+jmttH9LWxQCtKbzWmL2ERHgRhb53bIX/pgCcRNnMm47D7+0
- QavfuWFkijmxEppF/jD4VMpYF6Q8G4doXtO9n3IQzQJIjtH01DvSFbZIBZOL0RrKUH9b
- WbJIkRui14A3PtcxTgKZMUsKlsip6b47gxqpABA8sj+Be/4zBd9z2cB9MrT8LhrntcDA
- q3iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NqEUsH2EcrZErMGMTxFXMXIeTn+clFhmzG0Xt1/EcjY=;
- b=dxNu14II9frT92wnlM6laWxdYC0A3/BjHLUCi/gh//IwfD5qjqFsN+p5kyggOze5TG
- c63SQ/NEJGaYCpsy/GEwvcu4nZznRHKr/GjuUA00DU31R+j5xi30EXJTzR48p+sRoCFl
- iRYqZyAnzcv3RSehtuJpOJKZP6fX+hluW9Y+2MxdWdkDOBB2cMQNUJ+nZAFzSwG/g9B2
- j9MLWP8JWNhiqWgJ7Lnzn+n5emlqYwUacc1re8IiK/9M8KhLktRTDnt6EPvFE75U1BY8
- VyluwA4wbME0PgxkyI0hAeqJel52ybRAudua4sDxIxYbjx0j5++N1/3x15920WRBrwgc
- wwrA==
-X-Gm-Message-State: APjAAAVSUM5Q8ZIrZ3K7tJHD9hJzRgPtYyObN7btSRZJD1yTPtNSKUAf
- tqcpCpyGedzaP08lepLf15JHKhRaGT0q+WyQRh3KQA==
-X-Google-Smtp-Source: APXvYqx/Q1LhxF3vSxGNq28Bb/vm3ODx1nnNWkVQ+CpMxQ/LVDzTXs+NFsEUyuSXuWOQzkDMMmm64UhjX5qg2I7oATM=
-X-Received: by 2002:a05:6808:7d1:: with SMTP id
- f17mr3427570oij.163.1573062716286; 
- Wed, 06 Nov 2019 09:51:56 -0800 (PST)
+ (envelope-from <cohuck@redhat.com>) id 1iSPUF-0000Qc-5o
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 12:52:56 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37460
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iSPUF-0000MM-2Z
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 12:52:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573062773;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kxccAulp2H9KiGiCKasLaPzlUz0orGJjTHDfwzfUEpc=;
+ b=A7Y5HVeB1vVMdLnJEKeZX+sfIWuEMgwy+vANT8KymbfBY5cKUrQqMaWok/xanrbOuvMhKT
+ z8vq5VTg/kute508U10PQtMJULgscXNFpVj83qs7BU0FfQtB/o9zU9GgmItnsA8P0gz0le
+ +/0ZKUIV2CmPR7HfvcJtyfwAikYxV54=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-JRI6_7IxOMG1E4HRWFxCmA-1; Wed, 06 Nov 2019 12:52:49 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1C148017E0;
+ Wed,  6 Nov 2019 17:52:47 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B22A5D9D6;
+ Wed,  6 Nov 2019 17:52:42 +0000 (UTC)
+Date: Wed, 6 Nov 2019 18:52:40 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: [RFC v2 02/14] standard-headers: import arm_sdei.h
+Message-ID: <20191106185240.3f5e2c2a.cohuck@redhat.com>
+In-Reply-To: <20191105091056.9541-3-guoheyi@huawei.com>
+References: <20191105091056.9541-1-guoheyi@huawei.com>
+ <20191105091056.9541-3-guoheyi@huawei.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20191105180637.26020-1-laurent@vivier.eu>
-In-Reply-To: <20191105180637.26020-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 6 Nov 2019 17:51:44 +0000
-Message-ID: <CAFEAcA_BvknTAbdqS7X6gL3PKd56n_hAJ33_dwCJo1G-EJ8DYw@mail.gmail.com>
-Subject: Re: [PULL 0/1] Q800 branch patches
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22c
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: JRI6_7IxOMG1E4HRWFxCmA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,36 +86,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, James Morse <james.morse@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, wanghaibin.wang@huawei.com,
+ Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 5 Nov 2019 at 18:07, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> The following changes since commit b7c9a7f353c0e260519bf735ff0d4aa01e72784b:
->
->   Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' into staging (2019-10-31 15:57:30 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu-m68k.git tags/q800-branch-pull-request
->
-> for you to fetch changes up to 653901ca2be30299a224677a8203ff3361dbd5c5:
->
->   q800: fix I/O memory map (2019-11-05 18:52:29 +0100)
->
-> ----------------------------------------------------------------
-> Fix q800 memory map
->
-> ----------------------------------------------------------------
->
+On Tue, 5 Nov 2019 17:10:44 +0800
+Heyi Guo <guoheyi@huawei.com> wrote:
 
+> Import Linux header file include/uapi/linux/arm_sdei.h from kernel v5.4-r=
+c5.
+>=20
+> This is to prepare for qemu SDEI emulation.
+>=20
+> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Dave Martin <Dave.Martin@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>=20
+> Notes:
+>     v2:
+>     - Import arm_sdei.h by running update-linux-headers.sh
+>=20
+>  include/standard-headers/linux/arm_sdei.h | 73 +++++++++++++++++++++++
+>  1 file changed, 73 insertions(+)
+>  create mode 100644 include/standard-headers/linux/arm_sdei.h
 
-Applied, thanks.
+Just a remark that I find it a bit odd that that a header that looks
+arm-specific is in the generic linux/ directory (already in the kernel,
+I know.) Is this for sharing between arm and arm64, maybe?
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
 
