@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7776C5DF64
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:41:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84631C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:41:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 690F02077C
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:41:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4AD2B2077C
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:41:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vizkZqci"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 690F02077C
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rhp4LYJm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AD2B2077C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSJgo-0004vX-G0
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 06:41:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37922)
+	id 1iSJgu-00054k-3A
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 06:41:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37857)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iSJZH-0003vL-9G
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:44 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iSJZD-0003nQ-DZ
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iSJZG-0007Xt-5v
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:43 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42881)
+ (envelope-from <richard.henderson@linaro.org>) id 1iSJZC-0007NS-9w
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:39 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35645)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iSJZF-0007XZ-WB
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:42 -0500
-Received: by mail-wr1-x442.google.com with SMTP id a15so25308657wrf.9
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 03:33:41 -0800 (PST)
+ id 1iSJZC-0007HH-3l
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:38 -0500
+Received: by mail-wm1-x344.google.com with SMTP id 8so2953669wmo.0
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 03:33:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=y3Wn+08sAN9VokvpvlBwbpJiSQsLtcSXLgAihEQXJkk=;
- b=vizkZqciyORoUPekFYkVrRLuEtCWJoBGDpDvfORmyh2xOd52JUWYURK1ffc2mBqRl+
- mJiB7fNIpSoch6xjSY55tFFN7Bu4sc+gZVxt0dHkECRaqLvojqKtJwKYRwzST9EbndPM
- z8efbz4nfKqMYLoub1Mu0+XA+RYKsznbiUtrAPNxngrWxfcSD3a63QeWDAE8Osg/QG6W
- XjT72QRlXHYVvtv5cJIIhFmbG4XgzxtSJNWYo6fbFNbY1QXiUVrKU4+JxXjvHEQWBO59
- nw98OPqHOp3NiEMHu8ihME3jcmuR+A74beGCwvDDDcuulXWsj9ZMnsaKqUt0uNOf4a41
- pJSQ==
+ bh=s3dwTlrDDpUYfBm35ZTmNP1iU/J47qcplhioQiqvjIo=;
+ b=Rhp4LYJmaMgM95v343vixf0U4RAGvipb82Hwie/A42J68lE0AwWTrx43EaHhPXyvmV
+ MApd5eoLvFk6GGMzZIb9zB7ebsGZGQBlFnf06cQDr+G6KNu2m6GF3OUnWD1+2fbA5awx
+ K2S/h76WzLHPqGgslcjnjeeuHWWpWXZxvP7zsc1PzCCNwYsP8ain60dpSXjhZrLLQDnG
+ ZTesOZWwUxKIIsXOeiHW75OfpLdavoUkhj1tz0i0h3oX0ZOznuYeP68Bg6vyr2oOGv+G
+ cl1h0beY1DxQ+XAfl8X30AqkqrEkNlfeZqC2FK3X5AHTjXvupaAmkd752IeOzD4VME6c
+ 54SA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=y3Wn+08sAN9VokvpvlBwbpJiSQsLtcSXLgAihEQXJkk=;
- b=l6Aq74mZqxEhG+kiKnO+G76W9PcDA/N/STOcwwwNuiGGxOD5h+7bY0uvbCz3QnUpgG
- d0CoHHYuWP45uVPTaR/Ob0f00bbEKMUTPQc8oJUCBH3dyVFCeu9D6R3hzGsi/oPudLYZ
- i8u04E85icXycQZtP6oThDTfEWOD497u74R9jNt4ADOvZ5mviOKfhKAKUTAbiSj4zcnL
- 2kfx7wQs0sn+kl81bD8JbWMmivjkMOpZNivFrlRBaft4XxbKejjv0Fzji/UxWzOM45h/
- KxakQ4q4LJ0+rphiFbW2OzHhufKURgvBLw+HAU7EG2MseF38ubrOXE1DVs568qH8NZGa
- 4bMA==
-X-Gm-Message-State: APjAAAXLGAyIR+NhD178cESYkJ0Yx3c7sBXAJqtp1TlkIIc5sJsMC9X9
- iXnokIhqeBltTSxgfgTjFdF9pdwelS2qtQ==
-X-Google-Smtp-Source: APXvYqxBQpCyV1vgZemRU9LBPK2RaetAt52fHULjZ6nPY1rUOcNfxiSlgVuMNrYbD7oKqSBzrTttww==
-X-Received: by 2002:a5d:674d:: with SMTP id l13mr2287358wrw.170.1573040020767; 
- Wed, 06 Nov 2019 03:33:40 -0800 (PST)
+ bh=s3dwTlrDDpUYfBm35ZTmNP1iU/J47qcplhioQiqvjIo=;
+ b=PaG0cJO7zC5IS2PWSQLiB5XeGXHrU5EpXNDaKocnAKC6cKUWvHQGai9+cYlHEv5R56
+ UuZs4s5v1TdbTzyUKFACFXbDmp11OPVxXfWAbQCkSzXpT2hii+JD18DRQQKZIffCsHg4
+ gSodBxCM5ZYHuXtdeqMzfCm12BX/w2M6sRrr3JwRfiAQAuV6D+GFAwzw20sdYMxJ2AUs
+ lS6McM4R2ScSJwLFMnFxcJvn6VbDReRVpX+oXC4QMlWjeCyOWDFyZjjyXmpKLtyHBcpe
+ rpeY4HB4aIqWyLxDsltBTMETnK/bhA5DJaywI2mzrzwmqFaxy5YVBKbvMKlyRtAju4RT
+ EPuw==
+X-Gm-Message-State: APjAAAX+gxW6m6q6iq05XzSoBPwkd5/atI3pV4So72EaGsdgUICxsEAO
+ 6eB83v/xTXeLYybdA05NMYf2EJ81pym4tw==
+X-Google-Smtp-Source: APXvYqw/FywvKYpNtgAE+XOG6ioL+hMw90o7f0MWMcMF+L25nuUYIHoR2kqfM6IJ0A7psh18L2t1Vw==
+X-Received: by 2002:a7b:c858:: with SMTP id c24mr2135270wml.174.1573040015600; 
+ Wed, 06 Nov 2019 03:33:35 -0800 (PST)
 Received: from localhost.localdomain
  (31.red-176-87-122.dynamicip.rima-tde.net. [176.87.122.31])
- by smtp.gmail.com with ESMTPSA id q124sm1776907wme.13.2019.11.06.03.33.39
+ by smtp.gmail.com with ESMTPSA id q124sm1776907wme.13.2019.11.06.03.33.34
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 Nov 2019 03:33:40 -0800 (PST)
+ Wed, 06 Nov 2019 03:33:35 -0800 (PST)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 08/12] linux-user/sparc64: Fix target_signal_frame
-Date: Wed,  6 Nov 2019 12:33:14 +0100
-Message-Id: <20191106113318.10226-9-richard.henderson@linaro.org>
+Subject: [PATCH v3 04/12] linux-user/sparc: Use WREG constants in
+ sparc/target_cpu.h
+Date: Wed,  6 Nov 2019 12:33:10 +0100
+Message-Id: <20191106113318.10226-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191106113318.10226-1-richard.henderson@linaro.org>
 References: <20191106113318.10226-1-richard.henderson@linaro.org>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,38 +96,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instructions are always 4 bytes; use uint32_t not abi_ulong.
+This fixes a naming bug wherein we used "UREG_FP" to access the
+stack pointer.  OTOH, the "UREG_FP" constant was also defined
+incorrectly such that it *did* reference the stack pointer.
+
+Note that the kernel legitimately uses the name "FP", because it
+utilizes the rolled stack window in processing the system call.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20191025113921.9412-9-richard.henderson@linaro.org>
+Message-Id: <20191025113921.9412-5-richard.henderson@linaro.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/sparc/signal.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ linux-user/sparc/target_cpu.h | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/linux-user/sparc/signal.c b/linux-user/sparc/signal.c
-index 238d0ba00c..d796f50f66 100644
---- a/linux-user/sparc/signal.c
-+++ b/linux-user/sparc/signal.c
-@@ -87,7 +87,7 @@ struct target_signal_frame {
-     struct sparc_stackf ss;
-     __siginfo_t         info;
-     abi_ulong           fpu_save;
--    abi_ulong           insns[2] __attribute__ ((aligned (8)));
-+    uint32_t            insns[2] QEMU_ALIGNED(8);
-     abi_ulong           extramask[TARGET_NSIG_WORDS - 1];
-     abi_ulong           extra_size; /* Should be 0 */
-     qemu_siginfo_fpu_t fpu_state;
-@@ -98,7 +98,7 @@ struct target_rt_signal_frame {
-     abi_ulong           regs[20];
-     sigset_t            mask;
-     abi_ulong           fpu_save;
--    unsigned int        insns[2];
-+    uint32_t            insns[2];
-     stack_t             stack;
-     unsigned int        extra_size; /* Should be 0 */
-     qemu_siginfo_fpu_t  fpu_state;
+diff --git a/linux-user/sparc/target_cpu.h b/linux-user/sparc/target_cpu.h
+index 1ffc0ae9f2..b30fbc72c4 100644
+--- a/linux-user/sparc/target_cpu.h
++++ b/linux-user/sparc/target_cpu.h
+@@ -41,15 +41,9 @@ static inline void cpu_set_tls(CPUSPARCState *env, target_ulong newtls)
+     env->gregs[7] = newtls;
+ }
+ 
+-#ifndef UREG_I6
+-#define UREG_I6        6
+-#endif
+-#ifndef UREG_FP
+-#define UREG_FP        UREG_I6
+-#endif
+-
+ static inline abi_ulong get_sp_from_cpustate(CPUSPARCState *state)
+ {
+-    return state->regwptr[UREG_FP];
++    return state->regwptr[WREG_SP];
+ }
++
+ #endif
 -- 
 2.17.1
 
