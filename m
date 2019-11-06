@@ -2,69 +2,81 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30460C5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38A46C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:19:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDF752178F
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:11:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDF752178F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id F07062173E
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 09:19:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NGKv2U6m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F07062173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSHLc-000142-1l
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 04:11:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52925)
+	id 1iSHTS-0004lS-5b
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 04:19:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54525)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iSHKi-0000Yo-BC
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:10:33 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iSHSL-00045R-8B
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:18:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iSHKg-0004lV-R1
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:10:31 -0500
-Resent-Date: Wed, 06 Nov 2019 04:10:31 -0500
-Resent-Message-Id: <E1iSHKg-0004lV-R1@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21414)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iSHKg-0004lG-J9
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:10:30 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1573031421; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=JXnZ6WwrHfkV3Tk4U1bS26eB26zsHF+Yuj2/zELFLtbwq7dhT5jdQ/H03nm+AyJFkgPj97kOnXD7WpslS9ZjsluOg7ygsWHemvKxlFpAyL0aGQY8NblFo0iU03YXYsYxv0incTv2+KaZe5TOvYP7+uVdem6WxASozzFLcc26k6U=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1573031421;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=rxVJsOIoIYq6RkjPa8AZOoI2jiEiriVYznhSmxwn9Ag=; 
- b=IQo2l+y5/KafIgR8C3RVMIISsOYPSBgSPrbOq8hTa7nr+d1+nYg4/g7A0KzV1TUTaSlhD/ProJZ4euythoyqWd26jYglqaEwwc13KyrirKnQTChyctbDy7Eqw9Mgx4I1BeFQSddsFl/N6oiFyzUclYzO31DxnlloJXYWCZ1n8iA=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1573031418926467.8655153135511;
- Wed, 6 Nov 2019 01:10:18 -0800 (PST)
-In-Reply-To: <20191106082604.9548-1-kraxel@redhat.com>
-Subject: Re: [PULL 0/1] Audio 20191106 patches
-Message-ID: <157303141800.21358.12660972527449509434@37313f22b938>
+ (envelope-from <stefanha@redhat.com>) id 1iSHSI-0000IP-Tm
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:18:23 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35136
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iSHSI-0000I4-Pa
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 04:18:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573031902;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=5pzd7bfSTuES3d+YiyhdBv6SGqbp/gPMHy01nDBqsQ0=;
+ b=NGKv2U6mwF9Ouz8lhmc12uUsMGsl5VQsOMd+fDq4KNc9N1fKbtV99VjxI7zjN7nKDCsc2b
+ NvHayRLqB3r634l4EnZJm8/XLwYsisR59cU9H5UbEnc8KOe6mcbx/R/ChyfhA3sRVmUOUO
+ ED4X/q9NSAsOPoPNhluNILN9li61MNA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-55-S7ZsHgHIM7-FHRPFsbCt7g-1; Wed, 06 Nov 2019 04:18:18 -0500
+X-MC-Unique: S7ZsHgHIM7-FHRPFsbCt7g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D75A1005500;
+ Wed,  6 Nov 2019 09:18:17 +0000 (UTC)
+Received: from localhost (ovpn-116-171.ams2.redhat.com [10.36.116.171])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 421E85D713;
+ Wed,  6 Nov 2019 09:18:13 +0000 (UTC)
+Date: Wed, 6 Nov 2019 10:18:12 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH v1 1/4] virtio: protect non-modern devices from too big
+ virtqueue size setting
+Message-ID: <20191106091812.GF189998@stefanha-x1.localdomain>
+References: <20191105161105.19016-1-dplotnikov@virtuozzo.com>
+ <20191105161105.19016-2-dplotnikov@virtuozzo.com>
+ <20191105155357-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: kraxel@redhat.com
-Date: Wed, 6 Nov 2019 01:10:18 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20191105155357-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="MZf7D3rAEoQgPanC"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,51 +88,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+Cc: fam@euphon.net, kwolf@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwNjA4MjYwNC45NTQ4
-LTEta3JheGVsQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
-ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
-YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
-LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
-IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
-T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
-IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBURVNUICAgIGNoZWNrLXVuaXQ6
-IHRlc3RzL3Rlc3QtdGhyb3R0bGUKICBURVNUICAgIGNoZWNrLXVuaXQ6IHRlc3RzL3Rlc3QtdGhy
-ZWFkLXBvb2wKKioKRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL21pZ3JhdGlvbi10ZXN0
-LmM6OTAzOndhaXRfZm9yX21pZ3JhdGlvbl9mYWlsOiBhc3NlcnRpb24gZmFpbGVkOiAoIXN0cmNt
-cChzdGF0dXMsICJzZXR1cCIpIHx8ICFzdHJjbXAoc3RhdHVzLCAiZmFpbGVkIikgfHwgKGFsbG93
-X2FjdGl2ZSAmJiAhc3RyY21wKHN0YXR1cywgImFjdGl2ZSIpKSkKRVJST1IgLSBCYWlsIG91dCEg
-RVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL21pZ3JhdGlvbi10ZXN0LmM6OTAzOndhaXRf
-Zm9yX21pZ3JhdGlvbl9mYWlsOiBhc3NlcnRpb24gZmFpbGVkOiAoIXN0cmNtcChzdGF0dXMsICJz
-ZXR1cCIpIHx8ICFzdHJjbXAoc3RhdHVzLCAiZmFpbGVkIikgfHwgKGFsbG93X2FjdGl2ZSAmJiAh
-c3RyY21wKHN0YXR1cywgImFjdGl2ZSIpKSkKbWFrZTogKioqIFtjaGVjay1xdGVzdC1hYXJjaDY0
-XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgVEVT
-VCAgICBpb3Rlc3QtcWNvdzI6IDAxMwogIFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMvdGVzdC1o
-Yml0bWFwCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3Vi
-cHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2Nr
-ZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD1mMjBhYjVmMDA4
-ZjQ0OGIxYTVjMzdkZGVhY2YxYTZjMCcsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0Jywg
-J3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScs
-ICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScs
-ICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScsICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1w
-L2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6
-L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWg5
-X2Vuc3hrL3NyYy9kb2NrZXItc3JjLjIwMTktMTEtMDYtMDQuMDAuNDcuMjYzNDY6L3Zhci90bXAv
-cWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1
-aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1s
-YWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWYyMGFiNWYwMDhmNDQ4YjFhNWMzN2RkZWFjZjFh
-NmMwCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRp
-cmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWg5X2Vuc3hrL3NyYycKbWFrZTog
-KioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVhbCAgICA5bTI5
-LjEwOXMKdXNlciAgICAwbTguMjg4cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0
-cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTExMDYwODI2MDQuOTU0OC0xLWtyYXhlbEByZWRoYXQu
-Y29tL3Rlc3RpbmcuZG9ja2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
-IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+--MZf7D3rAEoQgPanC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Nov 05, 2019 at 03:56:43PM -0500, Michael S. Tsirkin wrote:
+> On Tue, Nov 05, 2019 at 07:11:02PM +0300, Denis Plotnikov wrote:
+> > @@ -47,6 +48,15 @@ static void virtio_scsi_pci_realize(VirtIOPCIProxy *=
+vpci_dev, Error **errp)
+> >      VirtIOSCSICommon *vs =3D VIRTIO_SCSI_COMMON(vdev);
+> >      DeviceState *proxy =3D DEVICE(vpci_dev);
+> >      char *bus_name;
+> > +    bool modern =3D virtio_pci_modern(vpci_dev);
+> > +    uint32_t virtqueue_size =3D vs->conf.virtqueue_size;
+> > +
+> > +    if (!modern && virtqueue_size > 128) {
+> > +        error_setg(errp,
+> > +                   "too big virtqueue size (%u, max: 128) "
+> > +                   "for non-modern virtio device", virtqueue_size);
+> > +        return;
+> > +    }
+>=20
+> why? what is illegal about 256 for legacy?
+
+I think it was mentioned that this limit is specific to SeaBIOS
+src/hw/virtio-pci.c:vp_find_vq():
+
+  #define MAX_QUEUE_NUM      (128)
+  ...
+  if (num > MAX_QUEUE_NUM) {
+      dprintf(1, "ERROR: queue size %d > %d\n", num, MAX_QUEUE_NUM);
+      goto fail;
+  }
+
+I'm not sure there is anything we can do in QEMU.  Either you can let
+SeaBIOS fail, or if you want something more user-friendly, then the
+management tool can implement a check based on the SeaBIOS version and
+the -device virtio-blk-pci,queue-size=3DSIZE property value.
+
+Stefan
+
+--MZf7D3rAEoQgPanC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3Cj9QACgkQnKSrs4Gr
+c8jTewf+P8ghBu3WuhGm8QwpRrvaRkwewlW1ZtAnbb06aerST7P0XXgdJNAbh5ub
++bPv36Cpdyaq83cHDGkl8zHwpcazvZRZzJ3vdV/UpCARdD0Fap0y5iIhU3yvxbnk
+hyk0qwASV2N8XHmT5EMDQLdrVKWbxmKLeQMx/c+qxBeg2Q26Efi/OU92z99SNxNv
+DMraC+6uQEEf5NQZEP6nSwarf7iDRtJAOUdI3QGqXeeHBYZGL7yW6XCi9g9hTs7X
+iJbVNqbpwPS5l5NDWtXhG1S3Uc+IkOm/C5f2ySQm3PNlfQ5a7tipZH+e58VntV8U
+H1d1Z5ep+xKau5pTxig3SER49C9BjA==
+=B/Lw
+-----END PGP SIGNATURE-----
+
+--MZf7D3rAEoQgPanC--
 
 
