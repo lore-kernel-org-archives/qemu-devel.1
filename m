@@ -2,80 +2,69 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF9DC5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 08:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30622C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 08:30:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DD872178F
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 08:28:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YXU4DMj1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DD872178F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F06942178F
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 08:30:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F06942178F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSGgR-0003QB-1u
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 03:28:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41801)
+	id 1iSGhW-0004Oj-6i
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 03:30:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42075)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iSGdy-0001op-8m
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:26:23 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iSGfK-0002p3-2M
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:27:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iSGdu-0007kU-Ll
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:26:20 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33523
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iSGdt-0007hJ-6R
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:26:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573028775;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4NGlYDEMqwNmSmxG8/CKN6VZ1rCxY9lp6aRSrD53fbE=;
- b=YXU4DMj16zJK3Otibis47ERCPWK2uGHp9RA+3EGNg32nOqqs3kC6khCQqx9o/m66+Z7hyn
- kPIVafSqkIh0LiLSMLpefelFygUxGd29YB5gB4f1JcJdY6La3cuxzvAmbFRM6HpaW55Y1/
- rF+YSV0bRE9VE32RWrCQVhzYfTrF42I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-f1S6S0CIPHujnTgEmX2LCA-1; Wed, 06 Nov 2019 03:26:14 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DE04477
- for <qemu-devel@nongnu.org>; Wed,  6 Nov 2019 08:26:13 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-69.ams2.redhat.com
- [10.36.116.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D5AD75C298;
- Wed,  6 Nov 2019 08:26:05 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id DF4109D23; Wed,  6 Nov 2019 09:26:04 +0100 (CET)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/1] audio: add -audiodev pa,in|out.latency= to documentation
-Date: Wed,  6 Nov 2019 09:26:04 +0100
-Message-Id: <20191106082604.9548-2-kraxel@redhat.com>
-In-Reply-To: <20191106082604.9548-1-kraxel@redhat.com>
-References: <20191106082604.9548-1-kraxel@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1iSGfE-0008WT-MH
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:27:45 -0500
+Resent-Date: Wed, 06 Nov 2019 03:27:45 -0500
+Resent-Message-Id: <E1iSGfE-0008WT-MH@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21436)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iSGfE-0008VS-Eg
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:27:40 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1573028851; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=FTcPQYK/0vU39XcMgqVYO9Os+hfGVvJ6TD1qhEEt0LbvzXr//+vWx5smG5d/jQJ0ilOeLY6Jysgnv2LBPWu83IKXdiwtYd6ZIBIBrp9SvZhNGOOaJZIQb+NAL/OwFYs3lJRnRDV3y6cyWdwb1TrTAaXVVZx36Sjoe5SjkFmDXgM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1573028851;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=pFRD+RJGajdidoeJvLJ+Xh7u0AHEeMheB60yYAKHxaM=; 
+ b=klKGnrYjSahs/gp9ER99rQADNlBxxiOUC56YGV2kWqh57y0jBUUNl5mjvuDwiGnrSGzsXZS1ZuJmJ0ShvhxvW9bynJr4i0MZqdHLzTcO7hISEqv/X1+aNJhbjiTzgKfPWahP7GD/5A4tdqU9eJrx7n0DpLlusG5oEigWi54Dq3k=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1573028849398598.290101807603;
+ Wed, 6 Nov 2019 00:27:29 -0800 (PST)
+In-Reply-To: <1572477125-25344-2-git-send-email-raphael.norwitz@nutanix.com>
+Subject: Re: [PATCH] vhost-user: Refractor vhost_user_set_mem_table Functions
+Message-ID: <157302884819.21358.14919608537832624226@37313f22b938>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: f1S6S0CIPHujnTgEmX2LCA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: raphael.norwitz@nutanix.com
+Date: Wed, 6 Nov 2019 00:27:29 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,48 +76,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: raphael.norwitz@nutanix.com, qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefan Hajnoczi <stefanha@redhat.com>
-
-The "latency" parameter wasn't covered by the documentation.
-
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Message-id: 20191004125641.24383-1-stefanha@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- qemu-options.hx | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 1fc2470e2fd4..ee4a099e252f 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -471,6 +471,7 @@ DEF("audiodev", HAS_ARG, QEMU_OPTION_audiodev,
-     "-audiodev pa,id=3Did[,prop[=3Dvalue][,...]]\n"
-     "                server=3D PulseAudio server address\n"
-     "                in|out.name=3D source/sink device name\n"
-+    "                in|out.latency=3D desired latency in microseconds\n"
- #endif
- #ifdef CONFIG_AUDIO_SDL
-     "-audiodev sdl,id=3Did[,prop[=3Dvalue][,...]]\n"
-@@ -645,6 +646,10 @@ Sets the PulseAudio @var{server} to connect to.
- @item in|out.name=3D@var{sink}
- Use the specified source/sink for recording/playback.
-=20
-+@item in|out.latency=3D@var{usecs}
-+Desired latency in microseconds.  The PulseAudio server will try to honor =
-this
-+value but actual latencies may be lower or higher.
-+
- @end table
-=20
- @item -audiodev sdl,id=3D@var{id}[,@var{prop}[=3D@var{value}][,...]]
---=20
-2.18.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTcyNDc3MTI1LTI1MzQ0LTIt
+Z2l0LXNlbmQtZW1haWwtcmFwaGFlbC5ub3J3aXR6QG51dGFuaXguY29tLwoKCgpIaSwKClRoaXMg
+c2VyaWVzIHNlZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRw
+dXQgYmVsb3cgZm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0hdIHZob3N0LXVz
+ZXI6IFJlZnJhY3RvciB2aG9zdF91c2VyX3NldF9tZW1fdGFibGUgRnVuY3Rpb25zClR5cGU6IHNl
+cmllcwpNZXNzYWdlLWlkOiAxNTcyNDc3MTI1LTI1MzQ0LTItZ2l0LXNlbmQtZW1haWwtcmFwaGFl
+bC5ub3J3aXR6QG51dGFuaXguY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVz
+IFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3Njcmlw
+dHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09
+PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwozY2Q5ZWVlIHZob3N0LXVzZXI6IFJl
+ZnJhY3RvciB2aG9zdF91c2VyX3NldF9tZW1fdGFibGUgRnVuY3Rpb25zCgo9PT0gT1VUUFVUIEJF
+R0lOID09PQpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNTM6IEZJTEU6IGh3L3Zp
+cnRpby92aG9zdC11c2VyLmM6NDMzOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgcmVnLT51c2Vyc3BhY2VfYWRkciwgb2Zmc2V0KTsKCldBUk5J
+Tkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM2MjogRklMRTogaHcvdmlydGlvL3Zob3N0LXVz
+ZXIuYzo0NDI6CisgICAgICAgICAgICBtc2ctPnBheWxvYWQubWVtb3J5LnJlZ2lvbnNbKmZkX251
+bV0ubWVtb3J5X3NpemUgID0gcmVnLT5tZW1vcnlfc2l6ZTsKCkVSUk9SOiB0cmFpbGluZyB3aGl0
+ZXNwYWNlCiMxNDU6IEZJTEU6IGh3L3ZpcnRpby92aG9zdC11c2VyLmM6NDkzOgorICQKCnRvdGFs
+OiAxIGVycm9ycywgMiB3YXJuaW5ncywgMTkwIGxpbmVzIGNoZWNrZWQKCkNvbW1pdCAzY2Q5ZWVl
+Njc2NWYgKHZob3N0LXVzZXI6IFJlZnJhY3RvciB2aG9zdF91c2VyX3NldF9tZW1fdGFibGUgRnVu
+Y3Rpb25zKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
+c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
+ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRl
+c3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJs
+ZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTcyNDc3MTI1LTI1MzQ0LTItZ2l0LXNlbmQt
+ZW1haWwtcmFwaGFlbC5ub3J3aXR6QG51dGFuaXguY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlw
+ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
+ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
