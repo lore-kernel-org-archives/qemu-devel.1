@@ -2,83 +2,80 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0743C5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B76BCC5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:48:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91FFA2173E
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:46:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78C562173E
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:48:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RRii2qO0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91FFA2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R3Y5/K4F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C562173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSJlf-0002PY-6G
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 06:46:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38000)
+	id 1iSJo1-0004sg-4R
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 06:48:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42373)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iSJZP-000458-31
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:56 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iSJlX-0002p2-LD
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:46:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iSJZM-0007aY-Pj
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:50 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37956)
+ (envelope-from <stefanha@gmail.com>) id 1iSJlV-0007g6-Il
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:46:23 -0500
+Received: from mail-qv1-xf34.google.com ([2607:f8b0:4864:20::f34]:40476)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iSJZM-0007Zi-JP
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:48 -0500
-Received: by mail-wr1-x441.google.com with SMTP id j15so4669808wrw.5
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 03:33:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=YkY1QSHXx8tcEh42Bbj6ykJYD8SvmEqcbVRa0x3ucZs=;
- b=RRii2qO01P4d996eFNKftljSnF0hFDrKtvwW8xabNlr1GvNP1cUEVVoUP1f39hQbHx
- QRV+o4q2pkap50DTD7Mvml4q72Di7afet65XytMpvbZUl25pnbq2TtdniJq8EqXMORpJ
- JImXVr0SMJB7NZZa1yxunrK4jNXFIku7QIOMricijBVSjQa/5IUZim21vovapFH42W8q
- 9esCUGG0lVu+SVwXTAnpdyZx1wa3adk9NJ4fJu1YogIfH8NxvvNQzivkJzds1TV71+mU
- 1dsmgw8qzC2+lxhLCpHcer5XnMgOpft/XaZy05OggRxrQWFT14WQkGGDqgPNydemeWO6
- 7fFQ==
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iSJlT-0007f9-PT
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:46:21 -0500
+Received: by mail-qv1-xf34.google.com with SMTP id r8so1249505qvq.7
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 03:46:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=Ff4rTf71EaaA6mDalMOvcUyB0YnCYPZvyXrWDdkjzLY=;
+ b=R3Y5/K4FpSGl/JBDa6luAfZN1wJEVODtQQYIXXVMud/7MFhzUyi1wNTd4CXXvspyXA
+ Np1QSYFRTIpakGlS3B+TXTCXmFzGhj3QgyTrhSU19TPOsWeKjjhHhLJQlMmwWjQvg/Oa
+ NlA+bQe2LTa4aSuBh+VFONS721EwkfA8b+4NJMCDozfMGD+hPkt+O6kOmiKlOio9ZrdC
+ 31TD57/2Qk4hA5cQxf/QaM6Csg9rP49Godm2fe+CwynOD17JK7eEigA0QrFowsgQvLgx
+ DiRNcH6M7viFHn93SlGe4ireJbhRDBjy37FSiqLOoN/S8Qo40w/Puia7T+lfX/atu72z
+ u1pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=YkY1QSHXx8tcEh42Bbj6ykJYD8SvmEqcbVRa0x3ucZs=;
- b=cZoAuM7A3qPhe+n/IQyYMur0bUt9S9TlceEODM0pGnOAjJkbd4FYAuBL6sxThRqFxE
- 95Bgdr1YdWX6NsQwimuaNraJJbAwyjoFZx28iA3vGB9bOeuDdCaGu0DHXxHhAO50amnh
- +ZsIdvogHuQBqp+a9rApc+X/pbUdnRYa7WwZpRcyBijrIta0j9j241RACkKqVSdij9tW
- dFahjXdERQY1ETA99NsnlUTx6f0i4RW7EwY2euykNA5Xw54HrHL9FMnsGzLRSRv1bkAg
- gQPD/kWsFDM+WtcQdNWDVuFPH8SB2MRDrPbInDFhD0A/2VeE5DCWczHBddMvjFlGmfft
- +RCA==
-X-Gm-Message-State: APjAAAVlcf73SkMMC7unWwpLPR1fgVo7VvIrZE8Xjk9jmRCO4zG88t/K
- WwUTQN9YHpEL8Or3FK7yoSczGQJrGkYaFA==
-X-Google-Smtp-Source: APXvYqzgD/s1gdInRtGdc+W1FrH6TKTKxzV7y49BmgqOXB3P33d6qDQhC/IEpRdAWPjpKrUdloa7qQ==
-X-Received: by 2002:adf:ee10:: with SMTP id y16mr2158630wrn.67.1573040025980; 
- Wed, 06 Nov 2019 03:33:45 -0800 (PST)
-Received: from localhost.localdomain
- (31.red-176-87-122.dynamicip.rima-tde.net. [176.87.122.31])
- by smtp.gmail.com with ESMTPSA id q124sm1776907wme.13.2019.11.06.03.33.44
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 Nov 2019 03:33:45 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 12/12] linux-user/alpha: Set r20 secondary return value
-Date: Wed,  6 Nov 2019 12:33:18 +0100
-Message-Id: <20191106113318.10226-13-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191106113318.10226-1-richard.henderson@linaro.org>
-References: <20191106113318.10226-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=Ff4rTf71EaaA6mDalMOvcUyB0YnCYPZvyXrWDdkjzLY=;
+ b=PhECZuFRoSWw+Z6rlFnd18cKM5saPSCsTFe7NJkwyW6t4OJ3FHVKdt2srDIl+it7Zw
+ KSvGxRhPs5tnDDUcDc5Ywo9RtkL0AYuYjtPCwaCPdSR/YSWZ7JbX7SiKiqZebYcpB9Tv
+ mDRER1fyFBt97/NXOK3uwr5exdg2KG7hk/HAyW1a1w1BeWuoQEbvr0qLjcmADZKl71pc
+ 3sPwKkyBwDAx93It9SYv1q6DTPMMONDqdURIplXhNbUD4VUsttRwPNhn/qwqpf9kblZe
+ nqxnfLe8YhzMwdXbq6JSEm/rmKwGOGfqb5NabBMDU9QF7lloxQmxjuWWylbYjOlq46cE
+ rArw==
+X-Gm-Message-State: APjAAAUOYHF0ByWF0nr6jeLYgwjXP7sY07dV8pS5Fw0J5AoBkl141tSo
+ PyVKI29IfK8hZ2tTr2Ley2sdHDXSTjZNGxug978=
+X-Google-Smtp-Source: APXvYqxiW7m5BcPoYQedl9pTBVFzRV+opTQ9XBEb+aAhdBe/1UuZKWWxX6FmvT5qwm+9kfhdgNYpP1vfa3BNI+Y7U6I=
+X-Received: by 2002:a0c:c70a:: with SMTP id w10mr1805353qvi.218.1573040779005; 
+ Wed, 06 Nov 2019 03:46:19 -0800 (PST)
+MIME-Version: 1.0
+References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
+ <20191106084344.GB189998@stefanha-x1.localdomain>
+ <20191106095122.jju7eo57scfoat6a@sirius.home.kraxel.org>
+In-Reply-To: <20191106095122.jju7eo57scfoat6a@sirius.home.kraxel.org>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Wed, 6 Nov 2019 12:46:07 +0100
+Message-ID: <CAJSP0QUJBkqtVJq17tfX5O-JuvEGcZQviP0C3tv9qSDy-P-hcg@mail.gmail.com>
+Subject: Re: guest / host buffer sharing ...
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2607:f8b0:4864:20::f34
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,47 +87,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu
+Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
+ Alex Lau <alexlau@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
+ qemu-devel <qemu-devel@nongnu.org>, Tomasz Figa <tfiga@chromium.org>,
+ Keiichi Watanabe <keiichiw@chromium.org>,
+ David Stevens <stevensd@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
+ =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Hans Verkuil <hverkuil@xs4all.nl>,
+ Dmitry Morozov <dmitry.morozov@opensynergy.com>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This value is not, as far as I know, used by any linux software,
-but it is set by the kernel and is part of the ABI.
+On Wed, Nov 6, 2019 at 10:51 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > > Reason is:  Meanwhile I'm wondering whenever "just use virtio-gpu
+> > > resources" is really a good answer for all the different use cases
+> > > we have collected over time.  Maybe it is better to have a dedicated
+> > > buffer sharing virtio device?  Here is the rough idea:
+> >
+> > My concern is that buffer sharing isn't a "device".  It's a primitive
+> > used in building other devices.  When someone asks for just buffer
+> > sharing it's often because they do not intend to upstream a
+> > specification for their device.
+>
+> Well, "vsock" isn't a classic device (aka nic/storage/gpu/...) either.
+> It is more a service to allow communication between host and guest
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20191025113921.9412-13-richard.henderson@linaro.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/alpha/target_cpu.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
+There are existing applications and network protocols that can be
+easily run over virtio-vsock, virtio-net, and virtio-serial to do
+useful things.
 
-diff --git a/linux-user/alpha/target_cpu.h b/linux-user/alpha/target_cpu.h
-index dd25e18f47..ad408ab5cc 100644
---- a/linux-user/alpha/target_cpu.h
-+++ b/linux-user/alpha/target_cpu.h
-@@ -27,10 +27,19 @@ static inline void cpu_clone_regs_child(CPUAlphaState *env, target_ulong newsp,
-     }
-     env->ir[IR_V0] = 0;
-     env->ir[IR_A3] = 0;
-+    env->ir[IR_A4] = 1;  /* OSF/1 secondary return: child */
- }
- 
- static inline void cpu_clone_regs_parent(CPUAlphaState *env, unsigned flags)
- {
-+    /*
-+     * OSF/1 secondary return: parent
-+     * Note that the kernel does not do this if SETTLS, because the
-+     * settls argument register is still live after copy_thread.
-+     */
-+    if (!(flags & CLONE_SETTLS)) {
-+        env->ir[IR_A4] = 0;
-+    }
- }
- 
- static inline void cpu_set_tls(CPUAlphaState *env, target_ulong newtls)
--- 
-2.17.1
+If a new device has no use except for writing a custom code, then it's
+a clue that we're missing the actual use case.
 
+In the graphics buffer sharing use case, how does the other side
+determine how to interpret this data?  Shouldn't there be a VIRTIO
+device spec for the messaging so compatible implementations can be
+written by others?
+
+Stefan
 
