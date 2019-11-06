@@ -6,67 +6,67 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04879C5DF63
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78913C5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:28:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0B3A2067B
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:26:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0B3A2067B
+	by mail.kernel.org (Postfix) with ESMTPS id 4CF982067B
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:28:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CF982067B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSO8G-0004ST-TR
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 11:26:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33785)
+	id 1iSOAR-00066r-Fy
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 11:28:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33803)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iSO6T-0002au-2N
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:24:18 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iSO6U-0002eX-LD
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:24:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iSO6R-0000I6-NL
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:24:16 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:50377)
+ (envelope-from <laurent@vivier.eu>) id 1iSO6T-0000LF-Gh
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:24:18 -0500
+Received: from mout.kundenserver.de ([212.227.126.187]:55159)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSO6R-0000HI-Da
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:24:15 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSO6T-0000KH-7o
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:24:17 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1M8yU2-1iXK3Q30g2-0069Yt; Wed, 06 Nov 2019 17:24:10 +0100
+ id 1Md6dH-1hsm2D0fvH-00aHic; Wed, 06 Nov 2019 17:24:10 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL v3 3/3] global: Squash 'the the'
-Date: Wed,  6 Nov 2019 17:24:06 +0100
-Message-Id: <20191106162406.27030-4-laurent@vivier.eu>
+Subject: [PULL v3 2/3] hw/misc/grlib_ahb_apb_pnp: Fix 8-bit accesses
+Date: Wed,  6 Nov 2019 17:24:05 +0100
+Message-Id: <20191106162406.27030-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191106162406.27030-1-laurent@vivier.eu>
 References: <20191106162406.27030-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:XEdVWtA5HY1feE8iQtxEShbY8h+fghhbUFGdd51gkZIq/jb0DeN
- IOPxCF+fOBcuIPQ899MQBeAoOFf3Qu6HutgatHBeKQ2GuAou9HYESk1ZJ7Ke0jgxZc8JHZk
- RgPfeXM8886nkQYYPTIRKKy2VpKsFwc3w3AFDmrf6R1JUNoySFZSmBWczuF/CdgX/BYQidC
- +9Zdj5RFEssn9nE9yA+Ig==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:V3vcKe5r2Ak=:22Ni7v0Qp5XGnhS1wvXh+6
- 9pTGI/ffrCEB2nAOFyu8LEbUVWMvUpRjrv+ddBxBgd78EGXCZ/reYM4+iC5uv4DhuoDBvrwUT
- CDlV3abGIe6UZabJyktM0zcFsOXZAZALdzY+RX4m4ybmlyX5KA467uIN2FM57uVd1nM1DaJKs
- DkHcEVnXH0oBkP3HjBTsByGt5Fjx1waSw6eFLSsaYZQlH6ZzbWmHNjnhix15x3FyA+/JNk5Z0
- C+OuVlzrPH4t7xBQ109yET1STUXpgTORwCzM5/rG7rB4XFR4hxB8VMjj8RkDi5zZ+PwRVi3OU
- IFf0SkicBlWA17aEtVXUOtxvqHdooai3/5cEI38vivMHHe7a1AToW9qJY1GR8BcpYkYgpD+oq
- draqBV5yW9QYr3dcK3AAXsezYM48yawpWxigvs2U7hp6LhkxnMDoffytWSR6oanFEXl5jns5y
- oAKKyQKeDK75vdBZi9tz0LPiqAMsgJXzf8VADIZxqfPs8973USEYopHjtjv11na5zaW147OOl
- 0As5gyX6sg53Nkn3D7Z7l+XZdwYZjgNOzk+d/EJxf/kNMn0uO1E0orsCuekEhL0Sx72NESSLk
- 1t+yO7FETuLubGIvrv9Dwf2sNVUs5bVKiOZ5THjhvhxp1BXk6iIcKbxgwtFpitRmy2qq19ja6
- UpyxNDiH04hrSpDeGkRX2if8J6cLvGhccW/scd2jN2amo9hRLz/sR4qJxcN8DZ1zRKhu3EinP
- yXcqjFA3nH0J9fkekCtGY/Ok3JJgK7QeOdZPqcCcsig7SJ8rzSrUbhhjLvbMdeYzUvpbmv+aQ
- MPWz/abgiPp4nRBkQWIAj3gr4oVD5LdVBUEWH0wsM0q4nHlpecH4PGbZyQCk+E482L8alnUfi
- soW366m+QqCgL6xboDavHpPMxw9fgxpFS8Syoa0II=
+X-Provags-ID: V03:K1:8H19g5k0tZ5IS5wAvLOztZOlZfVwgHdxyki+sekE5FPdVJ7EBSP
+ De5aqro8pcUaqxGlE29PoAbTCJzFz38j3u8EdAKz+A4l8YFehKD34OXiqKNTTjBBM/v4XKz
+ MES7BHvVfhoTOypHczoCh8JVLqcTKWyY8A+tGwQ4KSgcExcPf/SC71YnWmGj32a6PTKimKd
+ c4t2z31Xo8II/L1Lb0Jwg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:4fZm/hmD2b8=:hfm8+RpWPB01q0cpvF6UY4
+ 0MXf0xSpT9nkF4rbPdOhGirpbN8l/60eXU/wg5jJgw+Obw+rNR4TpqdnZEMa1V+9LGmh62Jmy
+ Zrr2+NApVtGATGNm5D/AofbS9ToNM/UL48/Sg10zzRZuV1iIASjKUyrkIZguEats9YlKaWM+n
+ peoEWAEcFjP2WKO9jMhEee8swT6dChOVj38eIaC0XN08nnQMKhUOfJwAJ25DTPs+uo2R3QRsX
+ 0AAPYh8/qMJXxvfAUDu/DFtB8auIbOW98Va4XFDzuC9IbwvHjJ2QXtTEgU4jN4MN0EP7JG0kT
+ pgaKtD50pKSBM+mrASk8gdpdPq8obOlpXhw5sNNZ3j9qrXVoWdeZFuYidbURYdwAjYMSqCfvn
+ j/k1LfGPj3Z0SG5dsvDlgdzZf22UrBWDVgz7ttBseW6Ae67QcOzo/1G88yFsnN7Bex8loll5M
+ KbYhfs80+yozd/2BWiX+XkXqDo4asium3XfQqHUlgtqyR0WEA5uRF1k3mdPruP65+qk9LB4ND
+ xxbcTR5o9VznFVduIaQw68+mLLRY/Wl5E7UQTJ70uexfOGre7yAeoc3//TR5qKMQkiC+PZXRK
+ 35ex6+xg8/04JlcYGF3JTFQsb0hdYGR55wEQY3UcqwvsVb6ivnutUKnrFWWh8tbaZstdu/30f
+ gSbW0rwvP42Q10DVHcZARVr4PnHNx0viaAx5Un0dl/cjHoxVqrpSvElRaO2Jrui14OE3Dsf45
+ 2EIBQ1DiMCcSWE4mgzHMzdXEI3CzMm6LV+CLBEVX6vQSRmW7P01sCsI0Qg7WbTla8ipBhCOfm
+ sv/BSmjbrSqfOW51uaeYAHWyOMj5sG4nHijNOj9k652YK8zNChs67UDwOF2pDjMzehBNxC72G
+ 5VVRo95W5QJpEp8fOnn3Z4yfO84UCd3mGnSy5Tk34=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.126.135
+X-Received-From: 212.227.126.187
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,112 +78,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: KONRAD Frederic <frederic.konrad@adacore.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, Jiri Gaisler <jiri@gaisler.se>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-'the' has a tendency to double up; squash them back down.
+The Plug & Play region of the AHB/APB bridge can be accessed
+by various word size, however the implementation is clearly
+restricted to 32-bit:
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20191104185202.102504-1-dgilbert@redhat.com>
-[lv: removed disas/libvixl/vixl/invalset.h change]
+  static uint64_t grlib_apb_pnp_read(void *opaque, hwaddr offset, unsigned size)
+  {
+      APBPnp *apb_pnp = GRLIB_APB_PNP(opaque);
+
+      return apb_pnp->regs[offset >> 2];
+  }
+
+Set the MemoryRegionOps::impl min/max fields to 32-bit, so
+memory.c::access_with_adjusted_size() can adjust when the
+access is not 32-bit.
+
+This is required to run RTEMS on leon3, the grlib scanning
+functions do byte accesses.
+
+Reported-by: Jiri Gaisler <jiri@gaisler.se>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: KONRAD Frederic <frederic.konrad@adacore.com>
+Message-Id: <20191025110114.27091-3-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- docs/interop/pr-helper.rst          | 2 +-
- docs/specs/ppc-spapr-hotplug.txt    | 2 +-
- docs/specs/ppc-xive.rst             | 2 +-
- docs/specs/tpm.txt                  | 2 +-
- include/hw/xen/interface/io/blkif.h | 2 +-
- scripts/dump-guest-memory.py        | 2 +-
- 6 files changed, 6 insertions(+), 6 deletions(-)
+ hw/misc/grlib_ahb_apb_pnp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/docs/interop/pr-helper.rst b/docs/interop/pr-helper.rst
-index 9f76d5bcf98f..e926f0a6c9cb 100644
---- a/docs/interop/pr-helper.rst
-+++ b/docs/interop/pr-helper.rst
-@@ -10,7 +10,7 @@ can delegate implementation of persistent reservations to an external
- restricting access to block devices to specific initiators in a shared
- storage setup.
+diff --git a/hw/misc/grlib_ahb_apb_pnp.c b/hw/misc/grlib_ahb_apb_pnp.c
+index f3c015d2c35f..e230e2536361 100644
+--- a/hw/misc/grlib_ahb_apb_pnp.c
++++ b/hw/misc/grlib_ahb_apb_pnp.c
+@@ -242,6 +242,10 @@ static const MemoryRegionOps grlib_apb_pnp_ops = {
+     .read       = grlib_apb_pnp_read,
+     .write      = grlib_apb_pnp_write,
+     .endianness = DEVICE_BIG_ENDIAN,
++    .impl = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
+ };
  
--For a more detailed reference please refer the the SCSI Primary
-+For a more detailed reference please refer to the SCSI Primary
- Commands standard, specifically the section on Reservations and the
- "PERSISTENT RESERVE IN" and "PERSISTENT RESERVE OUT" commands.
- 
-diff --git a/docs/specs/ppc-spapr-hotplug.txt b/docs/specs/ppc-spapr-hotplug.txt
-index cc7833108e12..859d52cce6c8 100644
---- a/docs/specs/ppc-spapr-hotplug.txt
-+++ b/docs/specs/ppc-spapr-hotplug.txt
-@@ -385,7 +385,7 @@ Each LMB list entry consists of the following elements:
-   is used to retrieve the right associativity list to be used for this
-   LMB.
- - A 32bit flags word. The bit at bit position 0x00000008 defines whether
--  the LMB is assigned to the the partition as of boot time.
-+  the LMB is assigned to the partition as of boot time.
- 
- ibm,dynamic-memory-v2
- 
-diff --git a/docs/specs/ppc-xive.rst b/docs/specs/ppc-xive.rst
-index 148d57eb6ab2..83d43f658b90 100644
---- a/docs/specs/ppc-xive.rst
-+++ b/docs/specs/ppc-xive.rst
-@@ -163,7 +163,7 @@ Interrupt Priority Register (PIPR) is also updated using the IPB. This
- register represent the priority of the most favored pending
- notification.
- 
--The PIPR is then compared to the the Current Processor Priority
-+The PIPR is then compared to the Current Processor Priority
- Register (CPPR). If it is more favored (numerically less than), the
- CPU interrupt line is raised and the EO bit of the Notification Source
- Register (NSR) is updated to notify the presence of an exception for
-diff --git a/docs/specs/tpm.txt b/docs/specs/tpm.txt
-index 5d8c26b1adba..9c8cca042da8 100644
---- a/docs/specs/tpm.txt
-+++ b/docs/specs/tpm.txt
-@@ -89,7 +89,7 @@ TPM upon reboot. The PPI specification defines the operation requests and the
- actions the firmware has to take. The system administrator passes the operation
- request number to the firmware through an ACPI interface which writes this
- number to a memory location that the firmware knows. Upon reboot, the firmware
--finds the number and sends commands to the the TPM. The firmware writes the TPM
-+finds the number and sends commands to the TPM. The firmware writes the TPM
- result code and the operation request number to a memory location that ACPI can
- read from and pass the result on to the administrator.
- 
-diff --git a/include/hw/xen/interface/io/blkif.h b/include/hw/xen/interface/io/blkif.h
-index 8b1be50ce81e..d07fa1e07822 100644
---- a/include/hw/xen/interface/io/blkif.h
-+++ b/include/hw/xen/interface/io/blkif.h
-@@ -341,7 +341,7 @@
-  *      access (even when it should be read-only). If the frontend hits the
-  *      maximum number of allowed persistently mapped grants, it can fallback
-  *      to non persistent mode. This will cause a performance degradation,
-- *      since the the backend driver will still try to map those grants
-+ *      since the backend driver will still try to map those grants
-  *      persistently. Since the persistent grants protocol is compatible with
-  *      the previous protocol, a frontend driver can choose to work in
-  *      persistent mode even when the backend doesn't support it.
-diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
-index 2c587cbefc57..9371e4581308 100644
---- a/scripts/dump-guest-memory.py
-+++ b/scripts/dump-guest-memory.py
-@@ -170,7 +170,7 @@ class ELF(object):
-         self.ehdr.e_phnum += 1
- 
-     def to_file(self, elf_file):
--        """Writes all ELF structures to the the passed file.
-+        """Writes all ELF structures to the passed file.
- 
-         Structure:
-         Ehdr
+ static void grlib_apb_pnp_realize(DeviceState *dev, Error **errp)
 -- 
 2.21.0
 
