@@ -2,78 +2,93 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-16.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E41EC5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7BE5C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:36:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51192217D7
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:26:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 879E02187F
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:36:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q6DvA4Nd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51192217D7
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iDqptGLC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 879E02187F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSKOR-00068b-Iz
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 07:26:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54538)
+	id 1iSKY2-0000WY-5o
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 07:36:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57049)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iSKNT-0005fN-Hr
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:25:36 -0500
+ (envelope-from <mst@redhat.com>) id 1iSKWu-0007qG-Sr
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:35:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iSKNR-00066m-9a
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:25:34 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50581
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iSKWt-0005Ir-8b
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:35:20 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52532
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iSKNQ-00066X-TX
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:25:33 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iSKWs-0005I3-KK
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:35:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573043132;
+ s=mimecast20190719; t=1573043716;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding;
- bh=rB9nY9matD1IgGtwpJ0jTojOvo4bm5x33ZK8z+QWors=;
- b=Q6DvA4Nd16UALrKeWuYlm7hx/LZw6sYV038lVCn5l0loODqPKnLo4d50DNQEgI22Gtpa0r
- FwlaaxkpsAJfHOlkZ0NUX8gbKGHdCQiNofpYAs0eDH2me0UjlcXypRgp/74jkEMc5tq/wf
- XfQhNBRPUpN2aOs2qz/lLQ0D0317s+w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-38-whnwNZjyPku5PZoiZlgvmA-1; Wed, 06 Nov 2019 07:25:29 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE179477
- for <qemu-devel@nongnu.org>; Wed,  6 Nov 2019 12:25:28 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-69.ams2.redhat.com
- [10.36.116.69])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E32111001B34;
- Wed,  6 Nov 2019 12:25:25 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 0DEAE11AAA; Wed,  6 Nov 2019 13:25:24 +0100 (CET)
-From: Gerd Hoffmann <kraxel@redhat.com>
+ bh=ab4cN5/fEhTk+ajkcROTzLT0+SROZYLl7PsWqUJHIO8=;
+ b=iDqptGLCAIpB6jG8w/I/KgIZsrdWU2/HJBMHjGRzzOoqM9iVlCWQY4jzKPsE0lcVbxxJg6
+ D41fPEka1NyqnuBHFJ2PB9k9oV65cHoC8aVQmYj+n7SFURTRCM0tXmg+lMy+yqiEOvLKaG
+ NQX/jLr5LfoE2VOhwif2+cMu2jfDTrU=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-jvrlg7e8P82McyGDmyY8ZQ-1; Wed, 06 Nov 2019 07:35:14 -0500
+Received: by mail-qk1-f199.google.com with SMTP id 64so24646646qkm.5
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 04:35:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition;
+ bh=xD+iWxTC9VHBeXGnAofJDTh5dB7FcQPIYf1LT+g1i48=;
+ b=m3htOpsynyp426P7YfNEtbh9NhS4Btw8uBSMUgjETCW5rWSVf7T4aA5nxa869D8Am+
+ gbpcNY8+qZObcKreHIcoTylrkDi0laAZiCXsUidx6MAVlDwpzda7HVA7PeLgNNO0m69c
+ PR2orK143MrqsCHOdW/1297PdijC6MCQAmAU0AnMGIV51ROdf1CUPFKiG1M8zTD3jVVV
+ 1BbMzGftoxP7CdRil0BOKq5sNPX93JlSVv96EvIEXffBbuJ/NRY7UKBFZakwkWuCzYu4
+ arGiNQ8g8RQ/897R2q/WF0kCtA0eK0MgWiKtQJlrRW3SN0Fvgb/Ni9jYINjT/XEOUEHP
+ Ec0Q==
+X-Gm-Message-State: APjAAAXa+uCYkjDRlHpFBUJfJ0aKZKBmGEV0mQ6/N4Z0r5R3H1srZK8u
+ ArPW3ax3xfrxmc0yX2vxT554oCW6Os5TtIdTYAa6omJw9t9ChXmcNDQYQa0SHjlYf+3QICMOtf5
+ L7qlduLmiKvMLCgE=
+X-Received: by 2002:a37:a5d3:: with SMTP id o202mr1597509qke.283.1573043713714; 
+ Wed, 06 Nov 2019 04:35:13 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwmRl3Nd24w3wRstrLReAF8hd+yrmXk4aFzKsTKBm8zYzAegWYRbo2p25KGi7U4WTIZ2EfOWw==
+X-Received: by 2002:a37:a5d3:: with SMTP id o202mr1597297qke.283.1573043710368; 
+ Wed, 06 Nov 2019 04:35:10 -0800 (PST)
+Received: from redhat.com (bzq-79-178-12-128.red.bezeqint.net. [79.178.12.128])
+ by smtp.gmail.com with ESMTPSA id p145sm6206496qke.37.2019.11.06.04.35.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 06 Nov 2019 04:35:09 -0800 (PST)
+Date: Wed, 6 Nov 2019 07:35:06 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/1] Seabios 20191106 patches
-Date: Wed,  6 Nov 2019 13:25:23 +0100
-Message-Id: <20191106122524.5537-1-kraxel@redhat.com>
+Subject: [PULL 0/3] virtio, pci: fixes
+Message-ID: <20191106123407.20997-1-mst@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: whnwNZjyPku5PZoiZlgvmA-1
+X-Mailer: git-send-email 2.22.0.678.g13338e74b8
+X-Mutt-Fcc: =sent
+X-MC-Unique: jvrlg7e8P82McyGDmyY8ZQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,7 +100,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -98,36 +113,34 @@ f1' into staging (2019-11-02 17:59:03 +0000)
 
 are available in the Git repository at:
 
-  git://git.kraxel.org/qemu tags/seabios-20191106-pull-request
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-for you to fetch changes up to 58b16e57ded751e2e8be626124aad1d46a408a33:
+for you to fetch changes up to fcccb271e0894bc04078ababb29d3d5e06b79892:
 
-  seabios: update to pre-1.13 snapshot (2019-11-06 13:23:02 +0100)
-
-----------------------------------------------------------------
-seabios: update to pre-1.13 snapshot
+  virtio: notify virtqueue via host notifier when available (2019-11-06 06:=
+35:00 -0500)
 
 ----------------------------------------------------------------
+virtio, pci: fixes
 
-Gerd Hoffmann (1):
-  seabios: update to pre-1.13 snapshot
+A couple of bugfixes.
 
- pc-bios/bios-256k.bin             | Bin 262144 -> 262144 bytes
- pc-bios/bios.bin                  | Bin 131072 -> 131072 bytes
- pc-bios/vgabios-ati.bin           | Bin 38912 -> 39424 bytes
- pc-bios/vgabios-bochs-display.bin | Bin 27648 -> 28160 bytes
- pc-bios/vgabios-cirrus.bin        | Bin 38400 -> 39424 bytes
- pc-bios/vgabios-qxl.bin           | Bin 38912 -> 39424 bytes
- pc-bios/vgabios-ramfb.bin         | Bin 28160 -> 28672 bytes
- pc-bios/vgabios-stdvga.bin        | Bin 38912 -> 39424 bytes
- pc-bios/vgabios-virtio.bin        | Bin 38912 -> 39424 bytes
- pc-bios/vgabios-vmware.bin        | Bin 38912 -> 39424 bytes
- pc-bios/vgabios.bin               | Bin 38400 -> 38912 bytes
- roms/Makefile                     |   2 +-
- roms/seabios                      |   2 +-
- 13 files changed, 2 insertions(+), 2 deletions(-)
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
---=20
-2.18.1
+----------------------------------------------------------------
+Alex Williamson (2):
+      pci: Use PCI aliases when determining device IOMMU address space
+      hw/i386: AMD-Vi IVRS DMA alias support
+
+Stefan Hajnoczi (1):
+      virtio: notify virtqueue via host notifier when available
+
+ include/hw/virtio/virtio.h |   1 +
+ hw/i386/acpi-build.c       | 127 +++++++++++++++++++++++++++++++++++++++++=
++---
+ hw/pci/pci.c               |  43 +++++++++++++--
+ hw/virtio/virtio-bus.c     |   4 ++
+ hw/virtio/virtio.c         |   9 +++-
+ 5 files changed, 173 insertions(+), 11 deletions(-)
 
 
