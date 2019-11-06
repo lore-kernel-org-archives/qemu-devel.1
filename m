@@ -2,89 +2,70 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA64C5DF63
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D4F8C5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:26:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A92F2067B
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:24:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JLFBCofd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A92F2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0139C2067B
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:26:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0139C2067B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSO6m-0002co-Ls
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 11:24:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33447)
+	id 1iSO8C-0004I8-4X
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 11:26:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33765)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iSO4W-0000Ru-E5
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:22:17 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iSO6O-0002U7-0p
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:24:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iSO4V-0007FR-9D
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:22:16 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35976)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iSO4V-0007Ex-0p
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:22:15 -0500
-Received: by mail-wm1-x341.google.com with SMTP id c22so4114296wmd.1
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 08:22:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=7BTQBnDX4onCg4KGh0b/HmtpKP3H7NS6TBv8ecrWTHU=;
- b=JLFBCofd56i8edVn7D1xStuiAHMLtq0dYcxEIczRfFJ1/qbVLpvdmP+CPSSzYWezzi
- ueK+IwDIMoqvD+LmsjSzDAHs6trBAl4bS3nCrfRgd1cX/NlsHxozcmxe12Y67y0CUlmF
- E6itxrxKVk8WbXU9/eC0f4r+0eU7P8hYWNhxz3zS2QHBYGmGbZC5/ZW9THkl1ubuJGRg
- LYa6qiSsAuGXA5xls3mB9s3QjW2v9vF3JKWuy6gG0uJIvcx7k5vlHFK2cDGMcdOoSwQH
- XihYeAHZLKL12HQQlebugMdK/IINu7AcUduNscOAyOU3PwG5WKEZ6WUjsT9CxZvqtDwV
- WY6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=7BTQBnDX4onCg4KGh0b/HmtpKP3H7NS6TBv8ecrWTHU=;
- b=BKl+w3Eky6NX3T/7g5YSrUGA/chEJFIpwBbYODK/+quDMZa1t1mQjFTWIPh/DJTgrH
- 2W0Ibm4CZkiDjyUZ6fjIhmBwYdIxJBmSMmBZudLnqhngBMYUPDKP5/O5nCLZkFE/7Bwe
- x7bkJ0VxgePKsKBvKsiwxPAUvyVt1+iscQQr7b2FP3r2QeVVmza9JmOaw+UfdVeTatTc
- J4b2V3PngRNE05hrno43NDnvLqjw7ihus5yJUnpDrUgcjEnE/sJ24SHk7oi+D0/aDT1z
- PVGylAXXz8AtiQq3o3rBCswKrQR5ZaT9WbFo3VG51KiYV1eOjzIC0wLiT+O53VX4T8eR
- 7L0A==
-X-Gm-Message-State: APjAAAX6lBQP5s79q+0O880RsyE4m6VK+YRmjtF1IrOqUmzdmhLfvpf5
- 1ja3FcEj6ByJe+1+P7bS6Ow=
-X-Google-Smtp-Source: APXvYqxydsMpIuM3+1JysFQ+qj37vst9O1ERU2NwLBd1SVOwVfjCysQ4ZMJv3KUy8z5y9gsKAT7Syw==
-X-Received: by 2002:a05:600c:294e:: with SMTP id
- n14mr3238930wmd.18.1573057333875; 
- Wed, 06 Nov 2019 08:22:13 -0800 (PST)
-Received: from localhost (178.165.129.116.wireless.dyn.drei.com.
- [178.165.129.116])
- by smtp.gmail.com with ESMTPSA id l2sm23356699wrt.15.2019.11.06.08.22.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 Nov 2019 08:22:13 -0800 (PST)
-Date: Wed, 6 Nov 2019 17:22:11 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: "Oleinik, Alexander" <alxndr@bu.edu>
-Subject: Re: [PATCH v4 05/20] libqtest: Add a layer of abstraciton to send/recv
-Message-ID: <20191106162211.GG340561@stefanha-x1.localdomain>
-References: <20191030144926.11873-1-alxndr@bu.edu>
- <20191030144926.11873-6-alxndr@bu.edu>
+ (envelope-from <laurent@vivier.eu>) id 1iSO6M-0000Az-Px
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:24:11 -0500
+Received: from mout.kundenserver.de ([212.227.126.133]:38955)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSO6M-000092-HJ
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:24:10 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MlfL0-1i1GTi1g02-00imA7; Wed, 06 Nov 2019 17:24:08 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL v3 0/3] Trivial branch patches
+Date: Wed,  6 Nov 2019 17:24:03 +0100
+Message-Id: <20191106162406.27030-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="4eRLI4hEmsdu6Npr"
-Content-Disposition: inline
-In-Reply-To: <20191030144926.11873-6-alxndr@bu.edu>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:nn7iGZcVWaznC0z5/IRk7AkwzAmSrs+dW1z0vRugzsVA39EklR1
+ FWwIzYZaOz1RPsT9yG0Ivt6gHGoHuYG3huGzSOsfViGJOOFq6h2nq8iv2rNX6aZ7fgCNbCb
+ OEZRm9Hlb5EuECDCXAGNWtGIj7CNVhqC7pR9Hb05I/Cmq+7qmmQDtGPyNWaAa42oiUJlBQl
+ 6gKSO8ShsS2HTgbKg/0eQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:c6vaZTse9Z8=:78xjFxQteOJ2FgrM/qitpr
+ Hvgu/yqajvEGSY6w8txWNcXcd+K6sfI/CnVadU2etba/Q9hZLOpGF8ISZH3LDjR4xKokGuBdc
+ oVyCwPjRk+wx3CyYpOucbAGTbVpyKzChWXF2NQX8JszwNos94EYsedqCzLSMYJzOvTC/BTcOd
+ qSNwP/6FyHR5tvGE/1hXC0GNaSIqYhZUiBTfeDBC9dP0oD5R82IFMvVxeR2TxABSLEhdZ3y+C
+ PrzpQ1X1OMyXQpuJ+Rv7elGUkB3Nn4564k5/AVj4469e7x5V0GFI9r6pkq571zoB1rSGbitkK
+ AeOEpGTudVBCkNTj/D/nBYZAtq4V+G7knn38Ch3mmsuO7f998GWCboXX1qyrtnWMeTm5iEIlz
+ WXL3m5kLEBH2A96BVjbd8zZ4LWeuhtDFj3hLNDbpVRLYTOomFKBqwg09NgrfM7U420PIl0hnk
+ H2PtwBVEvWMFFEtyQmPBEw2MviQrPO4tHTqRzkVXQ4ZayQQCgt16ubSF7JV3Hi/dqHQx6OXDf
+ j7rmsJIsyIg+14N5AP/e6WVzXrA4MusfbtF8sinnPekfGZPtZXqx11NImfEEeQaWL+MtzBOaA
+ Wca4a12+OXft3RnFki8Qx10vu/RGkc7aKBxcNZINdbeL2hAbK1h5Fb2Yd3UQYwAf8W9xJzNu4
+ BLLKX/cGMrraO++RDbNi9R9/KLGS49oMaKU3Fat5PVjbZvRDkYF0T7Dh0LQJYACfdKh6Han0Z
+ tXIpeCtlxYGyxgvRhwvu5wJERrBJRSwULpLlhSSDqgmPsVt/H2rIR2X/QHTkKq4HtJHwXNMYj
+ UhcCMGi5eSXtpiEwIaS2jUupTd3rebYN2O61dfnQwBDOTH0p5Kfbp3u+FOvGAXpUSpjx+2o3O
+ IS7/PPiUNBFsLVnFThx8fXAs2qQNpp/MikQ30qdg8=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.126.133
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,60 +77,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The following changes since commit 36609b4fa36f0ac934874371874416f7533a5408:
 
---4eRLI4hEmsdu6Npr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Merge remote-tracking branch 'remotes/palmer/tags/palmer-for-master-4.2-sf1' into staging (2019-11-02 17:59:03 +0000)
 
-On Wed, Oct 30, 2019 at 02:49:52PM +0000, Oleinik, Alexander wrote:
-> @@ -360,6 +383,7 @@ void qtest_quit(QTestState *s)
->      g_free(s);
->  }
-> =20
-> +
->  static void socket_send(int fd, const char *buf, size_t size)
->  {
->      size_t offset;
-[...]
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index c9e21e05b3..31267fc915 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -728,5 +728,4 @@ bool qtest_probe_child(QTestState *s);
->   * Set expected exit status of the child.
->   */
->  void qtest_set_expected_status(QTestState *s, int status);
-> -
->  #endif
+are available in the Git repository at:
 
-Please avoid whitespace changes.
+  git://github.com/vivier/qemu.git tags/trivial-branch-pull-request
 
-Otherwise:
+for you to fetch changes up to df59feb197cda31a8b807c13bf509259db9e018f:
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+  global: Squash 'the the' (2019-11-06 17:19:40 +0100)
 
---4eRLI4hEmsdu6Npr
-Content-Type: application/pgp-signature; name="signature.asc"
+----------------------------------------------------------------
+Trivial fixes (20191105-v3)
 
------BEGIN PGP SIGNATURE-----
+v3: remove disas/libvixl/vixl/invalset.h changes
+v2: remove patch from Greg that has lines with more than 80 columns
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3C8zMACgkQnKSrs4Gr
-c8hFIgf7BkDJTGFkYqKYoSdG4jZsff7jkEJGBUsAs3izPAKlMIJlHbC28gXD2X1t
-zfltoj7MKxySxLlLIvr+z23c7Jt9WQhwN7R3GRuBnZMZFJsgTT576MaLzdh3SShY
-rCT+8C3JpseHLicC0ggHeKPA97X8DfOIYrFyFMUP+b3oFJLt0eWeq0ZY6/T/zVCO
-s4TNTIDymv0sm+sGUXQxD16cYPcMXTLU89eK5NegpEUrHMDakx6gVWt0QN2i/uUi
-Dr0heDbO1JKuzMzLmZKwQysJXQ4d7g84H/Tvc5nimN/SO+jDrqAhGCHfhcuXqwsp
-9WNETdVB5omvrLHAe6Cih7zr2I6R1A==
-=T3hN
------END PGP SIGNATURE-----
+----------------------------------------------------------------
 
---4eRLI4hEmsdu6Npr--
+Dr. David Alan Gilbert (1):
+  global: Squash 'the the'
+
+Philippe Mathieu-Daudé (2):
+  hw/misc/grlib_ahb_apb_pnp: Avoid crash when writing to PnP registers
+  hw/misc/grlib_ahb_apb_pnp: Fix 8-bit accesses
+
+ docs/interop/pr-helper.rst          |  2 +-
+ docs/specs/ppc-spapr-hotplug.txt    |  2 +-
+ docs/specs/ppc-xive.rst             |  2 +-
+ docs/specs/tpm.txt                  |  2 +-
+ hw/misc/grlib_ahb_apb_pnp.c         | 12 ++++++++++++
+ include/hw/xen/interface/io/blkif.h |  2 +-
+ scripts/dump-guest-memory.py        |  2 +-
+ 7 files changed, 18 insertions(+), 6 deletions(-)
+
+-- 
+2.21.0
+
 
