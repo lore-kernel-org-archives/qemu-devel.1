@@ -2,84 +2,89 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DDB7C5DF65
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:56:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13E19C5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:57:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07DB32187F
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:56:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CFAB021882
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:57:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dUeIJMFm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07DB32187F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="um/UiFpf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFAB021882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSObe-0006m9-5z
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 11:56:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39680)
+	id 1iSOcM-0007jg-TT
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 11:57:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39849)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iSOaq-00065V-36
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:55:41 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iSObb-0006tR-SQ
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:56:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iSOao-00060F-Tq
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:55:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52139
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iSOao-0005zF-Qj
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:55:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573059338;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9dylhWcoxyv77J3MhchLo5iYDxE7fIHdTxz3lad+Pwg=;
- b=dUeIJMFmEjde45C1qQdc+YVTJQNs0de6T3MutcQdIQAyp+XaLNB43lYHqCnDZY5/Y3F3+Z
- Ck/HdupW22nb85Kdy3nomNqaVdpSBrrrKIaCzL7TBUH+RL7XQUqzCfSGLDtF4qchFfKssO
- 0KpLegofDlBZaEtRFHwRrWGWMvD1q/w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-DIo13hcnP9WIwsW3W4ktgw-1; Wed, 06 Nov 2019 11:55:35 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F23C8017DD;
- Wed,  6 Nov 2019 16:55:34 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AAD9F60BE0;
- Wed,  6 Nov 2019 16:55:33 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 0CA2211385C9; Wed,  6 Nov 2019 17:55:32 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] numa: Add missing \n to error message
-References: <157304440026.351774.14607704217028190097.stgit@bahia.lan>
- <bb828956-28b3-9fe7-1d57-ceb723a32997@vivier.eu>
- <20191106151246.2bf44314@bahia.lan>
-Date: Wed, 06 Nov 2019 17:55:32 +0100
-In-Reply-To: <20191106151246.2bf44314@bahia.lan> (Greg Kurz's message of "Wed, 
- 6 Nov 2019 15:12:46 +0100")
-Message-ID: <875zjxosfv.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <stefanha@gmail.com>) id 1iSOba-0006cg-QH
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:56:27 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34505)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iSOba-0006cA-IB
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:56:26 -0500
+Received: by mail-wr1-x441.google.com with SMTP id e6so24896292wrw.1
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 08:56:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=wPwSJ3A0S11gM80lsjpfWMNt34Fn9Ala6RfI0dE9g44=;
+ b=um/UiFpfFy0DvbOtIXl80KcllbN6WYx8mGD7m/kA0LatfuCRq+Mg2YVG/pZ8xWqEmo
+ PkmX+LyyslPcRXZicL5Ry+lKU7wCLaEC7QXbDi3CSGxuMhnhyK2h9QXvcFnkFvrvPqpS
+ 6nba6Z3semMUPEH4CHerFjtYPRtAInTZfhmG2+vISdxL+6QNgIyApGoCDIb2VdrISO75
+ DBcrRzz39FgEg7gGrcniTWX4jtlao/EFEqrO/GFdeUd/JjQd18bdKt9ar+Yow8PkeixN
+ xzYA6F1/MMt61tmwOt1COhPfdd2H2u4pwhIxZKa21dClwrExOKziDquidTfd2Hz/I3no
+ RHjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=wPwSJ3A0S11gM80lsjpfWMNt34Fn9Ala6RfI0dE9g44=;
+ b=OiNLZx3sjgz4KvqJEuFD3VTM6n5XliWDdnRleb92TEIs7MvSs8+XWPijOv+42wHmyr
+ 0ZyZ7ssvS9qwhtIDhYLzkDtXZp+7GIqdzGnAsJ9fRA5KCWMhgjwNbprAtp9kqzph6bf8
+ VC7tg3nERqfpz9zDQbWjSaeyROTTm6AhahIDq9P34/vQik2ZfjGcBt7G26bfB1cE8PQ5
+ EJeD1f0wmb0qtT5NjHNWVGlc68ZKS8cMFhk2G0M2QnLN021o22EBs1CzsinoQ78gG5XS
+ RJdYhsLDZNE0jU8O7ogw399KoUa4/JPsFMcxyMnhaXEWikBI6OluZyibfCbhqeKuXCY0
+ psZg==
+X-Gm-Message-State: APjAAAXG2siQYMo0PFdBU4Pjrwsg4Iu5q6fwmS0jbAzbsEQ9BuyXP/wf
+ J8PZM0WBDoeLW3187uMOlsk=
+X-Google-Smtp-Source: APXvYqw5YoJGbp06tdeMcjADKd8sn3ReGXXyxJperjpmMYHvfqutITKobhN74wFbTeqWLdmL+akL6g==
+X-Received: by 2002:a5d:5227:: with SMTP id i7mr3524183wra.39.1573059385248;
+ Wed, 06 Nov 2019 08:56:25 -0800 (PST)
+Received: from localhost (178.165.129.116.wireless.dyn.drei.com.
+ [178.165.129.116])
+ by smtp.gmail.com with ESMTPSA id x16sm23080477wrp.91.2019.11.06.08.56.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 06 Nov 2019 08:56:24 -0800 (PST)
+Date: Wed, 6 Nov 2019 17:56:22 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Subject: Re: [PATCH v4 12/20] libqtest: add in-process qtest.c tx/rx handlers
+Message-ID: <20191106165622.GK340561@stefanha-x1.localdomain>
+References: <20191030144926.11873-1-alxndr@bu.edu>
+ <20191030144926.11873-13-alxndr@bu.edu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: DIo13hcnP9WIwsW3W4ktgw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="vk/v8fjDPiDepTtA"
+Content-Disposition: inline
+In-Reply-To: <20191030144926.11873-13-alxndr@bu.edu>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,88 +96,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
- qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Greg Kurz <groug@kaod.org> writes:
 
-> On Wed, 6 Nov 2019 14:01:01 +0100
-> Laurent Vivier <laurent@vivier.eu> wrote:
->
->> Le 06/11/2019 =C3=A0 13:46, Greg Kurz a =C3=A9crit=C2=A0:
->> > If memory allocation fails when using -mem-path, QEMU is supposed to p=
-rint
->> > out a message to indicate that fallback to anonymous RAM is deprecated=
-. This
->> > is done with error_printf() which does output buffering. As a conseque=
-nce,
->> > the message is only printed at the next flush, eg. when quiting QEMU, =
-and
->> > it also lacks a trailing newline:
->> >=20
->> > qemu-system-ppc64: unable to map backing store for guest RAM: Cannot a=
-llocate memory
->> > qemu-system-ppc64: warning: falling back to regular RAM allocation
->> > QEMU 4.1.50 monitor - type 'help' for more information
->> > (qemu) q
->> > This is deprecated. Make sure that -mem-path  specified path has suffi=
-cient resources to allocate -m specified RAM amountgreg@boss02:~/Work/qemu/=
-qemu-spapr$
->> >=20
->> > Add the missing \n to fix both issues.
->> >=20
->> > Fixes: cb79224b7e4b "deprecate -mem-path fallback to anonymous RAM"
->> > Signed-off-by: Greg Kurz <groug@kaod.org>
->> > ---
->> >  hw/core/numa.c |    2 +-
->> >  1 file changed, 1 insertion(+), 1 deletion(-)
->> >=20
->> > diff --git a/hw/core/numa.c b/hw/core/numa.c
->> > index 038c96d4abc6..e3332a984f7c 100644
->> > --- a/hw/core/numa.c
->> > +++ b/hw/core/numa.c
->> > @@ -503,7 +503,7 @@ static void allocate_system_memory_nonnuma(MemoryR=
-egion *mr, Object *owner,
->> >              warn_report("falling back to regular RAM allocation");
->> >              error_printf("This is deprecated. Make sure that -mem-pat=
-h "
->> >                           " specified path has sufficient resources to=
- allocate"
->> > -                         " -m specified RAM amount");
->> > +                         " -m specified RAM amount\n");
->> >              /* Legacy behavior: if allocation failed, fall back to
->> >               * regular RAM allocation.
->> >               */
->> >=20
->> >=20
->>=20
->> Why is this an error_printf() and not an error_report()?
->>=20
->
-> Because CODING_STYLE suggests to do so I guess:
->
-> Reporting errors to the human user
-> ----------------------------------
->
-> Do not use printf(), fprintf() or monitor_printf().  Instead, use
-> error_report() or error_vreport() from error-report.h.  This ensures the
-> error is reported in the right place (current monitor or stderr), and in
-> a uniform format.
->
-> Use error_printf() & friends to print additional information. <=3D=3D=3D
+--vk/v8fjDPiDepTtA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-You're right.
+On Wed, Oct 30, 2019 at 02:49:58PM +0000, Oleinik, Alexander wrote:
+> From: Alexander Oleinik <alxndr@bu.edu>
+>=20
+> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+> ---
+> There's a particularily ugly line here:
+> qtest_client_set_tx_handler(qts,
+>         (void (*)(QTestState *s, const char*, size_t)) send);
 
-Since I have nothing queued up right now, I'd prefer to have this go via
-qemu-trivial.
+Please typedef the function pointer to avoid repetition:
 
-> error_report() prints the current location.  In certain common cases
-> like command line parsing, the current location is tracked
-> automatically.  To manipulate it manually, use the loc_``*``() from
-> error-report.h.
+  typedef void (*QTestSendFn)(QTestState *s, const char *buf, size_t len);
 
+And then introduce a wrapper function for type-safety:
+
+  /* A type-safe wrapper for s->send() */
+  static void send_wrapper(QTestState *s, const char *buf, size_t len)
+  {
+      s->send(s, buf, len);
+  }
+
+  ...
+
+  qts->send =3D send;
+  qtest_client_set_tx_handler(qts, send_wrapper);
+
+Does this solve the issue?
+
+By the way, I also wonder whether the size_t len arguments are necessary
+since const char *buf is a NUL-terminated C string.  The string should
+be enough since the length can be calculated from it.
+
+> diff --git a/qtest.c b/qtest.c
+> index 9fbfa0f08f..f817a5d789 100644
+> --- a/qtest.c
+> +++ b/qtest.c
+> @@ -812,6 +812,6 @@ void qtest_server_inproc_recv(void *dummy, const char=
+ *buf, size_t size)
+>      g_string_append(gstr, buf);
+>      if (gstr->str[gstr->len - 1] =3D=3D '\n') {
+>          qtest_process_inbuf(NULL, gstr);
+> -        g_string_free(gstr, true);
+> +        g_string_truncate(gstr, 0);
+
+Ah, a fix for the bug in an earlier commit.  Please squash it.
+
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index ff3153daf2..6143af33da 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -71,6 +71,7 @@ static void qtest_client_set_tx_handler(QTestState *s,
+>  static void qtest_client_set_rx_handler(QTestState *s,
+>          GString * (*recv)(QTestState *));
+> =20
+> +static GString *recv_str;
+
+Can this be a QTestState field?
+
+--vk/v8fjDPiDepTtA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3C+zYACgkQnKSrs4Gr
+c8jUYAf/dpewcKExYTcAO18p2owcn7lzMPMgBkkeZJfj/dk7AiwUa7xktR2hcqP1
+rCsm9ADWrtLLaMBKISRScRD9YCrbRxlBsrvodWYgnTGeGNHACuTYuwxEKyXGo6bt
+pz40NcJPEkwt5Lwc0TC0vrm08M62G1w6Zv26xoniY2UJf26DrtVK/Q48nmrZ1Xb2
+zr0+LwqkYPkB15rV8Sb6Gz1Kb8j6hIb6iFlslGDW9TTyABpev+HszsUFUWd+gEgd
++S8j+RXpxXPlKc4wkOzpcmeek8fHBvcy7BqOS20npJX2omHQ0MHCuhzUWn4yMtb9
+owo6gicXpsHZ33QMX4nPeUtIXvYGUg==
+=cl2Z
+-----END PGP SIGNATURE-----
+
+--vk/v8fjDPiDepTtA--
 
