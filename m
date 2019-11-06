@@ -2,92 +2,84 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 862FDC5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:51:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7DF0C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:52:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4926D2173E
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:51:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p2aRHxCL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4926D2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 84AFA2075C
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:52:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84AFA2075C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSJqg-0008LM-3P
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 06:51:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43151)
+	id 1iSJrt-0001Wb-QF
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 06:52:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44097)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iSJng-0005Eo-NP
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:48:38 -0500
+ (envelope-from <mst@redhat.com>) id 1iSJqa-00005M-6i
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:51:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iSJnf-0000Sq-Br
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:48:36 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45336)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iSJnf-0000SZ-3S
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:48:35 -0500
-Received: by mail-wr1-x443.google.com with SMTP id q13so25396706wrs.12
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 03:48:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=TLarDIijmpBjLdygBTLpnER/Gx2aEyb/IRnKgHGgsSs=;
- b=p2aRHxCLIQ/beSQLBsLamzvrUkWJd0EYQqBCsMxNTm8EcqeKtkWTZf7cxJg4iRIbPZ
- wOOm3Q2Akk51jLl9D11mcyBZ9iSKQ38mLWKg0vtDhImsYqivV9sAO6Nni/pmLDpHuhCD
- eHqliOlm4A+TvOl1Vh1oNzLH4TqopZyFrXHWYVyfrMqz9bkMECLl0tv37XSlvRzpc6nj
- 2Hy5TAaB59Szd3Jlwx9r7b+PkLmy4UBz8gW0PrATTOVQnO/jGxLZ4VnQHKOkbpTfdpT8
- ZLMRmg/MyzIACdhRr6hfOT4jXFMlkpgsP02i0bot3IhHPK3OVG5f0SMIXSDu73uUlagW
- NoIw==
+ (envelope-from <mst@redhat.com>) id 1iSJqY-00033Q-Ab
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:51:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50254)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iSJqY-00032v-1j
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:51:34 -0500
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id 3D8AF7F415
+ for <qemu-devel@nongnu.org>; Wed,  6 Nov 2019 11:51:33 +0000 (UTC)
+Received: by mail-qk1-f199.google.com with SMTP id l21so7568662qke.21
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 03:51:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=TLarDIijmpBjLdygBTLpnER/Gx2aEyb/IRnKgHGgsSs=;
- b=PtJOW8FYa9F12vO/E59sO4PKyrt54l5EXNf02jBs19i6KMvwT9HiEl+1EaExkLFU42
- kDBoAmcTxyoWPC3L9OJfEZXS4v1T2Y2SYWskAuX10zlhzG7EaeE56eiYBEN7SQsim5X4
- QzBE/TRhB/u7H7srwWjP3LtWjGetpRzJumu55iuhfd2fSzq6RAuHuyL/twefTQoQnNdZ
- xShxHX8VrH9icGYUsKgCM8EyVDYcFxMH0A2vli8ZLUiH71Z7zXMC8iz7A348mXv3xmF+
- OtTCHiTYD92gDJQhsqU3irILV9lX4QaHAxbAigif2CiSNyZ+FZwNNw7U7qlQALhn3ZGg
- AIlw==
-X-Gm-Message-State: APjAAAVhXC882oupu/TtyJKAjYvsXL031SmBY3ddAhUcrlnk9/Mq1Zwo
- QnEiuU1liB0AdQ0NvX2g4h3VCQ==
-X-Google-Smtp-Source: APXvYqyABjp71MPJENd3D5hA9JQplTR+oSuOy0R+WIw751nLbhWkEp2vcXyZsJB6B2/IE2tIe2aSYg==
-X-Received: by 2002:a5d:570a:: with SMTP id a10mr2190144wrv.107.1573040913688; 
- Wed, 06 Nov 2019 03:48:33 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y8sm2114535wmi.9.2019.11.06.03.48.32
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=CY2IedL+lNc5rwcYVLJS8R40/Ase0LJv1JoWmQMiCVs=;
+ b=aA+2dkdzK2TbDGFe3paEzVNdpawsJEG4kq+uTgJA8LUul+T0kJ6ITTJPyQ9rRh14x9
+ 9h+eM5R/91RioMLe1KyrYYYrprU1KABTB3mFiupu0CtP5IfGIe5y/XO2aC11hIzeCAkX
+ CI5ayx5eQWhIpZrT7KEQCNMpZbzHQWOWWqPmdVUaS5XltxLw4Fo9tZhkU8NXEqJRH3Mi
+ cjJyuyY8fqrHS8L7PcWdrAmMnGFent9mno6qaAMay35BiYUvIxSizHcEfrwSAki/plyh
+ ucu/oTCrERsU9HYa9Og+17Hx3Vs5+JVnOEvXxOzte1g6GeWv11weD1psoF4Gob28heZu
+ c+/A==
+X-Gm-Message-State: APjAAAX/LIiktDvq7zevOJEBZqArvLWMgqfGDWqPvo9YT7u8Gs7uaM61
+ Vhl0PCQ4sw/8Bky4fJxxv4VCedP39g3ZlL1DfnDx10JOb9Mw4J1yQhhUw38eM4G2k3ECIaOj/Rf
+ +8esCXWY6qCRJTvg=
+X-Received: by 2002:ac8:7085:: with SMTP id y5mr1903467qto.76.1573041092557;
+ Wed, 06 Nov 2019 03:51:32 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxo5+8ys2fcnEB7eZyWS6yXIiGculHPGut7N9fYjy+ldWJrVbMv6+Mo8Cth1OOWAP//r70/YQ==
+X-Received: by 2002:ac8:7085:: with SMTP id y5mr1903455qto.76.1573041092277;
+ Wed, 06 Nov 2019 03:51:32 -0800 (PST)
+Received: from redhat.com (bzq-79-178-12-128.red.bezeqint.net. [79.178.12.128])
+ by smtp.gmail.com with ESMTPSA id r80sm5134496qke.121.2019.11.06.03.51.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 Nov 2019 03:48:32 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id A4BCA1FF87;
- Wed,  6 Nov 2019 11:48:31 +0000 (GMT)
-References: <20191025203427.20181-1-ehabkost@redhat.com>
- <CAFEAcA-F0iB2vzi3Z0J9FPAt6JpuMh+V0wsfXWLuAGX5_d69xw@mail.gmail.com>
- <20191105195748.GG3812@habkost.net> <87y2wuhy00.fsf@linaro.org>
- <20191106103633.GE91675@redhat.com>
- <CAFEAcA9LqhboQH5_NAJF5XbE+PbX16dYuRd60Tz_R_Y215QhMw@mail.gmail.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 0/1] Require Python >= 3.5 to build QEMU
-In-reply-to: <CAFEAcA9LqhboQH5_NAJF5XbE+PbX16dYuRd60Tz_R_Y215QhMw@mail.gmail.com>
-Date: Wed, 06 Nov 2019 11:48:31 +0000
-Message-ID: <87v9rxi5tc.fsf@linaro.org>
+ Wed, 06 Nov 2019 03:51:31 -0800 (PST)
+Date: Wed, 6 Nov 2019 06:51:25 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v1 1/4] virtio: protect non-modern devices from too big
+ virtqueue size setting
+Message-ID: <20191106064157-mutt-send-email-mst@kernel.org>
+References: <20191105161105.19016-1-dplotnikov@virtuozzo.com>
+ <20191105161105.19016-2-dplotnikov@virtuozzo.com>
+ <20191105155357-mutt-send-email-mst@kernel.org>
+ <20191106091812.GF189998@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191106091812.GF189998@stefanha-x1.localdomain>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,51 +91,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- Ed Maste <emaste@freebsd.org>, Eduardo Habkost <ehabkost@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Cleber Rosa <crosa@redhat.com>,
- =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: fam@euphon.net, kwolf@redhat.com, den@virtuozzo.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com,
+ Denis Plotnikov <dplotnikov@virtuozzo.com>, ehabkost@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Nov 06, 2019 at 10:18:12AM +0100, Stefan Hajnoczi wrote:
+> On Tue, Nov 05, 2019 at 03:56:43PM -0500, Michael S. Tsirkin wrote:
+> > On Tue, Nov 05, 2019 at 07:11:02PM +0300, Denis Plotnikov wrote:
+> > > @@ -47,6 +48,15 @@ static void virtio_scsi_pci_realize(VirtIOPCIProxy *vpci_dev, Error **errp)
+> > >      VirtIOSCSICommon *vs = VIRTIO_SCSI_COMMON(vdev);
+> > >      DeviceState *proxy = DEVICE(vpci_dev);
+> > >      char *bus_name;
+> > > +    bool modern = virtio_pci_modern(vpci_dev);
+> > > +    uint32_t virtqueue_size = vs->conf.virtqueue_size;
+> > > +
+> > > +    if (!modern && virtqueue_size > 128) {
+> > > +        error_setg(errp,
+> > > +                   "too big virtqueue size (%u, max: 128) "
+> > > +                   "for non-modern virtio device", virtqueue_size);
+> > > +        return;
+> > > +    }
+> > 
+> > why? what is illegal about 256 for legacy?
+> 
+> I think it was mentioned that this limit is specific to SeaBIOS
+> src/hw/virtio-pci.c:vp_find_vq():
+> 
+>   #define MAX_QUEUE_NUM      (128)
+>   ...
+>   if (num > MAX_QUEUE_NUM) {
+>       dprintf(1, "ERROR: queue size %d > %d\n", num, MAX_QUEUE_NUM);
+>       goto fail;
+>   }
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+OK I see. It's worth documenting this (with version of seabios
+that has the issue).
+And yes virtio_pci_modern will not do the right thing.
+This checks whether device has the modern interface, but
+an old seabios will not use the modern interface even
+if it's there.
 
-> On Wed, 6 Nov 2019 at 10:36, Daniel P. Berrang=C3=A9 <berrange@redhat.com=
-> wrote:
->> At what point do we declare that NetBSD CI is broken and is no longer
->> considered a supported platform from POV of blocking the merging of
->> PULL requests ? It has been preventing the dropping of python2 for
->> quite a while now. It isn't the end of the world in this particular
->> case, as dropping py2 is mostly just a cleanup, but I feel like we
->> might benefit from setting expectations for ongoing platform maintenance,
->> otherwise these kind of issues could drag on indefinitely.
->
-> It works fine for me, and it means we have coverage of a host
-> OS we otherwise would not. To me that is definitely more important
-> than being able to drop Python 2 support. Also, AIUI the problem
-> that's blocking updating the NetBSD image isn't related to
-> NetBSD at all but is a bug in some combination of QEMU itself
-> and our test framework
-
-These have been addressed in:
-
-  Subject: [PATCH  v1 0/6] testing/next (netbsd stuff)
-  Date: Mon,  4 Nov 2019 17:36:48 +0000
-  Message-Id: <20191104173654.30125-1-alex.bennee@linaro.org>
-
-but I have a non-trivial failure rate running tests (~20% of runs fail)
-
-> -- both of those are things we need to
-> fix anyway.
->
-> thanks
-> -- PMM
+You want to start with small queues and then check after features have
+been negotiated with firmware, and make them bigger.
 
 
---
-Alex Benn=C3=A9e
+But even then I am not so sure we should just block
+bigger queues by default. kernel can use bigger queues fine,
+and not all disks are necessarily used by seabios.
+
+
+If you want a user friendly option, we can add a flag that tells
+qemu to adjust the size to a known safe value.
+Then we'd start small and make it bigger if guest is a modern one.
+
+
+
+
+> I'm not sure there is anything we can do in QEMU.  Either you can let
+> SeaBIOS fail, or if you want something more user-friendly, then the
+> management tool can implement a check based on the SeaBIOS version and
+> the -device virtio-blk-pci,queue-size=SIZE property value.
+> 
+> Stefan
+
+
 
