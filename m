@@ -2,80 +2,80 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E04C5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 08:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9EA3C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 08:59:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8675621882
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 08:54:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A79EE217F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 08:59:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cW1oTQyr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8675621882
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZLHmy4Bb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A79EE217F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSH5V-0001Lr-O6
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 03:54:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48122)
+	id 1iSHAE-0003l9-L5
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 03:59:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49368)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iSH4r-0000iM-EN
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:54:10 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iSH9U-0003Gq-2d
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:58:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iSH4o-0006DZ-Su
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:54:08 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44906
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <stefanha@redhat.com>) id 1iSH9S-00088G-Qj
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:58:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37488
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iSH4o-0006DF-Mc
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:54:06 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iSH9S-00087m-Ma
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 03:58:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573030445;
+ s=mimecast20190719; t=1573030733;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=9p3o9ys2XcUigXvL0nvaBZ5arsEs/o4himDduX6JKKg=;
- b=cW1oTQyrMzotmC4uASxyzMAaqdCZiRiUK5kKrQNIgUF5DYjMpnDO2CFO5fEhjV0HQ+GYan
- Bdq+vdSwapdGoQy+88R2EjdCrtehKelVzqfAysa2Xlzv0GI+UIAC65DGsyYVTd/khncZtE
- UyAdl58hWsCw+vADssMTb99APr745NY=
+ bh=IMRPZAP7xoJvUhnu19LytPAqzn70+qmL1AMQVFgqTyw=;
+ b=ZLHmy4BbhAs8FHPOUT5MayEOHrCrQ/47pgyvHQDwMdKbW6eH16U7Mozv08yFPQeicHGMdU
+ 6HQrVdOkT6rdRjRWZOdiAh1+vb4jvBrfWm6Ts9eLGkajRed18rSx1X3ye4sTyCuyZy6y+f
+ thX31MLt25114KKiAq9T296UPQ3IeMk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-_wdTstc1N1OnBGq_PEkAdA-1; Wed, 06 Nov 2019 03:54:02 -0500
-X-MC-Unique: _wdTstc1N1OnBGq_PEkAdA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-58-CiKUFwDsPtS5NO851EK4yw-1; Wed, 06 Nov 2019 03:58:50 -0500
+X-MC-Unique: CiKUFwDsPtS5NO851EK4yw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 426F01005500;
- Wed,  6 Nov 2019 08:54:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5350D477;
+ Wed,  6 Nov 2019 08:58:49 +0000 (UTC)
 Received: from localhost (ovpn-116-171.ams2.redhat.com [10.36.116.171])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 72F64608B6;
- Wed,  6 Nov 2019 08:53:54 +0000 (UTC)
-Date: Wed, 6 Nov 2019 09:53:53 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C45335D9CD;
+ Wed,  6 Nov 2019 08:58:43 +0000 (UTC)
+Date: Wed, 6 Nov 2019 09:58:42 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v2] virtio: notify virtqueue via host notifier when
- available
-Message-ID: <20191106085353.GC189998@stefanha-x1.localdomain>
-References: <20191105140946.165584-1-stefanha@redhat.com>
+To: Evgeny Yakovlev <wrfsh@yandex-team.ru>
+Subject: Re: [PATCH] virtio-blk: advertise F_WCE (F_FLUSH) if F_CONFIG_WCE is
+ advertised
+Message-ID: <20191106085842.GD189998@stefanha-x1.localdomain>
+References: <1572978137-189218-1-git-send-email-wrfsh@yandex-team.ru>
 MIME-Version: 1.0
-In-Reply-To: <20191105140946.165584-1-stefanha@redhat.com>
+In-Reply-To: <1572978137-189218-1-git-send-email-wrfsh@yandex-team.ru>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="6zdv2QT/q3FMhpsV"
+ protocol="application/pgp-signature"; boundary="a2FkP9tdjPU2nyhF"
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,157 +87,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yongji Xie <elohimes@gmail.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, felipe@nutanix.com
+Cc: yc-core@yandex-team.ru, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---6zdv2QT/q3FMhpsV
+--a2FkP9tdjPU2nyhF
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 05, 2019 at 03:09:46PM +0100, Stefan Hajnoczi wrote:
-> Host notifiers are used in several cases:
-> 1. Traditional ioeventfd where virtqueue notifications are handled in
->    the main loop thread.
-> 2. IOThreads (aio_handle_output) where virtqueue notifications are
->    handled in an IOThread AioContext.
-> 3. vhost where virtqueue notifications are handled by kernel vhost or
->    a vhost-user device backend.
+On Tue, Nov 05, 2019 at 09:22:17PM +0300, Evgeny Yakovlev wrote:
+> Virtio spec 1.1 (and earlier), 5.2.5.2 Driver Requirements: Device
+> Initialization:
 >=20
-> Most virtqueue notifications from the guest use the ioeventfd mechanism,
-> but there are corner cases where QEMU code calls virtio_queue_notify().
-> This currently honors the host notifier for the IOThreads
-> aio_handle_output case, but not for the vhost case.  The result is that
-> vhost does not receive virtqueue notifications from QEMU when
-> virtio_queue_notify() is called.
+> "Devices SHOULD always offer VIRTIO_BLK_F_FLUSH, and MUST offer it if
+> they offer VIRTIO_BLK_F_CONFIG_WCE"
 >=20
-> This patch extends virtio_queue_notify() to set the host notifier
-> whenever it is enabled instead of calling the vq->(aio_)handle_output()
-> function directly.  We track the host notifier state for each virtqueue
-> separately since some devices may use it only for certain virtqueues.
+> Currently F_CONFIG_WCE and F_WCE are not connected to each other.
+> Qemu will advertise F_CONFIG_WCE if config-wce argument is
+> set for virtio-blk device. And F_WCE is advertised only if
+> underlying block backend actually has it's caching enabled.
 >=20
-> This fixes the vhost case although it does add a trip through the
-> eventfd for the traditional ioeventfd case.  I don't think it's worth
-> adding a fast path for the traditional ioeventfd case because calling
-> virtio_queue_notify() is rare when ioeventfd is enabled.
+> Fix this by advertising F_WCE if F_CONFIG_WCE is also advertised.
 >=20
-> Reported-by: Felipe Franciosi <felipe@nutanix.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> To preserve backwards compatibility with newer machine types make this
+> behaviour governed by "x-enable-wce-if-config-wce" virtio-blk-device
+> property and introduce hw_compat_4_2 with new property being off by
+> default for all machine types <=3D 4.2 (but don't introduce 4.3
+> machine type itself yet).
+>=20
+> Signed-off-by: Evgeny Yakovlev <wrfsh@yandex-team.ru>
 > ---
-> v2:
->  * Track host notifier enabled/disabled state per virtqueue [Yongji Xie]
->  * Tested with contrib/vhost-user-blk and contrib/vhost-user-scsi
+>  hw/arm/virt.c                  | 1 +
+>  hw/block/virtio-blk.c          | 6 +++++-
+>  hw/core/machine.c              | 5 +++++
+>  hw/i386/pc_piix.c              | 1 +
+>  hw/i386/pc_q35.c               | 1 +
+>  hw/ppc/spapr.c                 | 2 +-
+>  hw/s390x/s390-virtio-ccw.c     | 1 +
+>  include/hw/boards.h            | 3 +++
+>  include/hw/virtio/virtio-blk.h | 1 +
+>  9 files changed, 19 insertions(+), 2 deletions(-)
 
-Hi Michael,
-Please consider this for QEMU 4.2 so that SeaBIOS works even when it
-selects the VP_ACCESS_PCICFG access mode.
-
-Felipe tested this successfully yesterday.
+Thanks, applied to my block tree:
+https://github.com/stefanha/qemu/commits/block
 
 Stefan
 
->  hw/virtio/virtio-bus.c     | 4 ++++
->  hw/virtio/virtio.c         | 9 ++++++++-
->  include/hw/virtio/virtio.h | 1 +
->  3 files changed, 13 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/virtio/virtio-bus.c b/hw/virtio/virtio-bus.c
-> index b2c804292e..d6332d45c3 100644
-> --- a/hw/virtio/virtio-bus.c
-> +++ b/hw/virtio/virtio-bus.c
-> @@ -288,6 +288,10 @@ int virtio_bus_set_host_notifier(VirtioBusState *bus=
-, int n, bool assign)
->          k->ioeventfd_assign(proxy, notifier, n, false);
->      }
-> =20
-> +    if (r =3D=3D 0) {
-> +        virtio_queue_set_host_notifier_enabled(vq, assign);
-> +    }
-> +
->      return r;
->  }
-> =20
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 762df12f4c..04716b5f6c 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -128,6 +128,7 @@ struct VirtQueue
->      VirtIODevice *vdev;
->      EventNotifier guest_notifier;
->      EventNotifier host_notifier;
-> +    bool host_notifier_enabled;
->      QLIST_ENTRY(VirtQueue) node;
->  };
-> =20
-> @@ -2271,7 +2272,7 @@ void virtio_queue_notify(VirtIODevice *vdev, int n)
->      }
-> =20
->      trace_virtio_queue_notify(vdev, vq - vdev->vq, vq);
-> -    if (vq->handle_aio_output) {
-> +    if (vq->host_notifier_enabled) {
->          event_notifier_set(&vq->host_notifier);
->      } else if (vq->handle_output) {
->          vq->handle_output(vdev, vq);
-> @@ -3145,6 +3146,7 @@ void virtio_init(VirtIODevice *vdev, const char *na=
-me,
->          vdev->vq[i].vector =3D VIRTIO_NO_VECTOR;
->          vdev->vq[i].vdev =3D vdev;
->          vdev->vq[i].queue_index =3D i;
-> +        vdev->vq[i].host_notifier_enabled =3D false;
->      }
-> =20
->      vdev->name =3D name;
-> @@ -3436,6 +3438,11 @@ EventNotifier *virtio_queue_get_host_notifier(Virt=
-Queue *vq)
->      return &vq->host_notifier;
->  }
-> =20
-> +void virtio_queue_set_host_notifier_enabled(VirtQueue *vq, bool enabled)
-> +{
-> +    vq->host_notifier_enabled =3D enabled;
-> +}
-> +
->  int virtio_queue_set_host_notifier_mr(VirtIODevice *vdev, int n,
->                                        MemoryRegion *mr, bool assign)
->  {
-> diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-> index 3448d67d2a..c32a815303 100644
-> --- a/include/hw/virtio/virtio.h
-> +++ b/include/hw/virtio/virtio.h
-> @@ -312,6 +312,7 @@ int virtio_device_grab_ioeventfd(VirtIODevice *vdev);
->  void virtio_device_release_ioeventfd(VirtIODevice *vdev);
->  bool virtio_device_ioeventfd_enabled(VirtIODevice *vdev);
->  EventNotifier *virtio_queue_get_host_notifier(VirtQueue *vq);
-> +void virtio_queue_set_host_notifier_enabled(VirtQueue *vq, bool enabled)=
-;
->  void virtio_queue_host_notifier_read(EventNotifier *n);
->  void virtio_queue_aio_set_host_notifier_handler(VirtQueue *vq, AioContex=
-t *ctx,
->                                                  VirtIOHandleAIOOutput ha=
-ndle_output);
-> --=20
-> 2.23.0
->=20
->=20
-
---6zdv2QT/q3FMhpsV
+--a2FkP9tdjPU2nyhF
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3CiiEACgkQnKSrs4Gr
-c8jJYAf+NG0G6HfKRFAAte2ryK+cMnN7xSgWD6D26x35waWpluAc0qZDiS/bnLJr
-Yhy4wlQduXZbDZ7fC3wvrKYRPfzVWIXIY8uOea9v6TVAxpVj4R5nIiE0CnkLKDSi
-Tux5rvxuwKUMe/nfLi3GuaECjioRwst/j8ncmmENOS9xPAcTRSOzTptt/HyQGMr7
-ONcV+EU2YHNKJGlAwxubIeLmmwiY4Kf1qlZ7vPgxOzyWDysyl9Xy3g8K9Gz0Pfcr
-xSOV+dVGapmWD8VkpTIa/8vtJ0G6Y+xIcsSHYs0ubwq8Xi5AAcVtTvduZv5KQWxk
-ZURivmazfmmXO73FaDcjvfZmS2brKQ==
-=jolD
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3Ci0IACgkQnKSrs4Gr
+c8hnhwf+LPSnn1rp+aPohz6qdZyXxdT68QkQa4mj4PXh1oHJbTlHwkca9A7apZRX
+BXv/rFLXG14NimhjCFSgRY5S69k7QhODFfdBXf7DfKzeNCNS9d1EtKTH9XhhEqyV
+zfoBENya3GsxYnTZZbN8a4woN4LRJGv3IfSZ2M2MUj9FRUXCGv1YElEwBH4Ls6+i
+C1y7a5UQIBU7EW6ZoK4y35x7CaidEXRn8lAv43EOyECTCJ5zsc1k6SCw6JTLyaPH
+toymGI+k8xN8F7VWYyKyX1aHj4EVvDofxIjmKJW41O56kJHPXi/F/Eum6YlUFYOO
+ymKXrrlggkxk5atMOCZat3OTd8m5rA==
+=q/jW
 -----END PGP SIGNATURE-----
 
---6zdv2QT/q3FMhpsV--
+--a2FkP9tdjPU2nyhF--
 
 
