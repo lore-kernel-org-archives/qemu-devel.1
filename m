@@ -2,81 +2,79 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50232C5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:06:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D99C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:09:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C9CE214D8
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:06:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C9CE214D8
+	by mail.kernel.org (Postfix) with ESMTPS id 01DEA214D8
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:09:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01DEA214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSK4t-0005AJ-3K
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 07:06:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48427)
+	id 1iSK8J-0006xk-1U
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 07:09:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49624)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iSK41-0004Hq-9r
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:05:30 -0500
+ (envelope-from <mst@redhat.com>) id 1iSK7Y-0006Mb-FY
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:09:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iSK3w-0002T7-6F
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:05:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:32478)
+ (envelope-from <mst@redhat.com>) id 1iSK7T-0004B8-7b
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:09:08 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56000)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iSK3v-0002SA-TG
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:05:24 -0500
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200])
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iSK7S-0004Al-VP
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:09:03 -0500
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id F303C85539
- for <qemu-devel@nongnu.org>; Wed,  6 Nov 2019 12:05:22 +0000 (UTC)
-Received: by mail-qt1-f200.google.com with SMTP id q54so25862037qtk.15
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 04:05:22 -0800 (PST)
+ by mx1.redhat.com (Postfix) with ESMTPS id 1C8F03688E
+ for <qemu-devel@nongnu.org>; Wed,  6 Nov 2019 12:09:02 +0000 (UTC)
+Received: by mail-qk1-f200.google.com with SMTP id a13so24495508qkc.17
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 04:09:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=fmixPB33/xbidsPZje7dwYDGidqowmS1Z6e576cmcmM=;
- b=Bsfa//MyNs61JpMdzyLAr7VdsJqic7v84biR0LWpGpiKXYta/Mw3W8gbaMTbrpCLF8
- oZ7ktTvazaR7PT6UrOs64KRpsGzQ84K0RwUUAIAy7Z0zGa4xyj0f8DvKrxrEm7FZxlI8
- 2Uv7Z9pzIdMkomAVW2XftPH6DCzmRL/A1FJE15OWvqTF+EUpPQTehZU4WVTgOyfQMgY+
- GQ7XOOerUqCSgoPCG2fW2hn8X9Tsxlumxb9JJGwCKyO5GcGnMrdgkOwBFb+Swod4B1i4
- g2+Sw/IgbtbJM4fcaqqJkAymDXF2Lmv//Safd1exuNDO35FRLyqM1IAZP2S+hJr/v9qp
- egQQ==
-X-Gm-Message-State: APjAAAXwtns0GIiQmig9+m6uMzObISdPXDnLscwHImom6Rd4qGyRH/vF
- 2Z2LD/2sghnPSfpSAIxG3Zxv4eg7gC8ET+Kdp0QxWiIPjuZE5WfpjUSFzSSk23mjs3Yos0qGPdY
- Fh48JIb+Cm6jisSQ=
-X-Received: by 2002:a05:620a:634:: with SMTP id
- 20mr1637542qkv.330.1573041921905; 
- Wed, 06 Nov 2019 04:05:21 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyrEsasZIXJMiXRLMT5sQngK4X9p1w7GpSj0LInBOSfipyX7uAuC/Yf94BVi7oqfl+0HQ/jPQ==
-X-Received: by 2002:a05:620a:634:: with SMTP id
- 20mr1637511qkv.330.1573041921616; 
- Wed, 06 Nov 2019 04:05:21 -0800 (PST)
+ bh=NSUGRbN07qF8QVDKv/I16ptdRkvQljL4bI9AfD5Wjyo=;
+ b=JRzW3CsiHQdi+fnDGu8JcxhskOxnll9bfx5PxOgMqqJsO1Y4Tkr6fjBY53ZUy9qyMB
+ mOctquH1yd0w2YOX0sOPxorxYmzmOY9zgJaz+v9BAUnCv/gDhwuCDCL91iTpDQkYnmqx
+ 7/KFxvPrThdgmsJ1B7pIzXzHZBAhUmEM5AnT2yV/MOVNuKAEh+bzIIXSra+oH0dk7PXT
+ 7iMffluLU5LvLNaXBpDnrfGPTZSW2sTXfTp/O4iTUk+gdkETcag3dyvXJ7kbdw0mROFX
+ cRfnUVgMBRu7cG7cawQzwjl8qrM4THpNj2jtXkBedgSDeC+xBoulGFECXOzu/QtGkED0
+ D0lg==
+X-Gm-Message-State: APjAAAVmnJx4MiVMB+A+o1B7qjd6S+yNdjCQGL43IJGvSCIa+gnnecrd
+ 4rZxaHBGcK/9v9cGLBB52EhkVFgRyV6hKkZtxFifA/HB/nBsxZG4Z1BU664uiugIAbNiD72v0sU
+ ofHS4+0tUJAQF2YI=
+X-Received: by 2002:ad4:55ce:: with SMTP id bt14mr1812198qvb.131.1573042141364; 
+ Wed, 06 Nov 2019 04:09:01 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx6px298bkLUgvZqHDXCxGbHptgNHSqO9f83kkfBHh0eRCowJIxM4KBitanoRAFY3/2af8b0A==
+X-Received: by 2002:ad4:55ce:: with SMTP id bt14mr1812180qvb.131.1573042141074; 
+ Wed, 06 Nov 2019 04:09:01 -0800 (PST)
 Received: from redhat.com (bzq-79-178-12-128.red.bezeqint.net. [79.178.12.128])
- by smtp.gmail.com with ESMTPSA id n49sm7581732qtk.94.2019.11.06.04.05.18
+ by smtp.gmail.com with ESMTPSA id e11sm9963859qtj.29.2019.11.06.04.08.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 06 Nov 2019 04:05:20 -0800 (PST)
-Date: Wed, 6 Nov 2019 07:05:15 -0500
+ Wed, 06 Nov 2019 04:09:00 -0800 (PST)
+Date: Wed, 6 Nov 2019 07:08:54 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: John Snow <jsnow@redhat.com>
+To: Alexander Popov <alex.popov@linux.com>
 Subject: Re: [QEMU-SECURITY] ide: fix assertion in ide_dma_cb() to prevent
  qemu DoS from quest
-Message-ID: <20191106070433-mutt-send-email-mst@kernel.org>
+Message-ID: <20191106070530-mutt-send-email-mst@kernel.org>
 References: <1562335669-10127-1-git-send-email-alex.popov@linux.com>
- <76881947-141b-0a16-c52d-a315203c32eb@redhat.com>
+ <d748c840-56b7-6dcd-c82d-fea0a4949e8d@linux.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <76881947-141b-0a16-c52d-a315203c32eb@redhat.com>
+In-Reply-To: <d748c840-56b7-6dcd-c82d-fea0a4949e8d@linux.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -91,17 +89,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: sstabellini@kernel.org, pmatouse@redhat.com, mdroth@linux.vnet.ibm.com,
- qemu-block@nongnu.org, qemu-stable@nongnu.org, qemu-devel@nongnu.org,
- pjp@redhat.com, Alexander Popov <alex.popov@linux.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>, sstabellini@kernel.org,
+ pmatouse@redhat.com, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, qemu-stable@nongnu.org,
+ Kashyap Chamarthy <kashyap.cv@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ John Snow <jsnow@redhat.com>, pjp@redhat.com,
+ David Woodhouse <David.Woodhouse@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Jul 25, 2019 at 08:25:03PM -0400, John Snow wrote:
+On Wed, Nov 06, 2019 at 01:17:51PM +0300, Alexander Popov wrote:
+> On 27.07.2019 00:09, Alexander Popov wrote:
+> > On 26.07.2019 2:25:03 GMT+02:00, John Snow <jsnow@redhat.com> wrote:
+> >> Oh, this is fun.
+> > ...
+> >> I can worry about a proper fix for 4.2+.
+> >
+> > Hello John,
+> >
+> > Thanks for your letter.
+> >
+> > I double-checked the git history and mailing list, I'm still sure
+> > that my fix for this assertion is correct.
 > 
+> Hello!
 > 
-> On 7/5/19 10:07 AM, Alexander Popov wrote:
+> I'm pointing politely to this issue again.
+> 
+> It crashes qemu during syzkaller fuzzing.
+> 
+> It's really annoying to manually apply the fix against it to qemu.
+
+I understand. Maybe the fuzzer can be taught to skip the
+specific issue for now?
+
+> I'm quoting my patch from July that _correctly_ fixes the wrong assertion
+> introduced in the commit a718978ed58a.
+> 
+> Why don't you apply my commit and then do the refactoring later when you want?
+> 
+> Best regards,
+> Alexander
+> 
+> On 05.07.2019 17:07, Alexander Popov wrote:
 > > This assertion was introduced in the commit a718978ed58a in July 2015.
 > > It implies that the size of successful DMA transfers handled in
 > > ide_dma_cb() should be multiple of 512 (the size of a sector).
@@ -183,42 +214,4 @@ On Thu, Jul 25, 2019 at 08:25:03PM -0400, John Snow wrote:
 > >          dma_buf_commit(s, s->sg.size);
 > >          sector_num += n;
 > >          ide_set_sector(s, sector_num);
-> > 
-> 
-> Oh, this is fun.
-> 
-> So you're actually requesting 131072 bytes (256 sectors) but you're
-> giving it far too short of a PRDT.
-> 
-> But ... the prepare_buf callback got anything at all, so it was happy to
-> proceed, but the callback chokes over the idea that the SGlist wasn't
-> formatted correctly -- it can't deal with partial tails.
-> 
-> I think it might be the case that the sglist needs to be allowed to have
-> an unaligned tail, and then the second trip to the dma_cb when there
-> isn't any more regions in the PRDT to add to the SGList to transfer at
-> least a single sector -- but the IDE state machine still has sectors to
-> transfer -- we need to trigger the short PRD clause.
-> 
-> Papering over it by truncating the tail I think isn't sufficient; there
-> are other problems this exposes.
-> 
-> As an emergency patch, it might be better to just do this whenever we
-> see partial tails:
-> 
-> prepared = ...prepare_buf(s->bus->dma, s->io_buffer_size);
-> if (prepared % 512) {
->     ide_dma_error(s);
->     return;
-> }
-
-Do you want to cook up a patch like this then?
-
-
-> I think that prepare_buf does not give unaligned results if you provided
-> *too many* bytes, so the unaligned return only happens when you starve it.
-> 
-> I can worry about a proper fix for 4.2+.
-> 
-> --js
 
