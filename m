@@ -2,81 +2,89 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F5EC5DF63
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:44:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E201C5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:45:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20A1C2087E
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:44:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 570AF207FA
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:45:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KOPZKzjG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20A1C2087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YUilFn+T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 570AF207FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSOPl-0000sd-6T
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 11:44:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37898)
+	id 1iSOQc-0001th-Gr
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 11:45:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37976)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iSOOy-0008V9-LL
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:43:25 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iSOPg-0000yT-EU
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:44:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iSOOw-0007Rn-Hq
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:43:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47309
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iSOOw-0007Qr-AB
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:43:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573058601;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iwocsOP5rhvMkkxppm42laPpCF3KdEWYxiboPm4oDbg=;
- b=KOPZKzjGf5rEABRkbrHKbyN1rEsahL3kPEvc5bUYWdCwQjNvNdm9gSKl4Mt29Wfq2ygHBT
- cxChzYJNuax49ugBat1o/aIkuoJpudbpos4Bgb9eJzA3Yg279H0sIAOG9b2O7CI7XwAG/K
- H/h9AaPY4m+QuV/Hh5CYu4Rutt4cZ40=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-H5mdFFipPv28r_ugv2-lDA-1; Wed, 06 Nov 2019 11:43:13 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 606FE2A3;
- Wed,  6 Nov 2019 16:43:12 +0000 (UTC)
-Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 37AA55D70D;
- Wed,  6 Nov 2019 16:43:08 +0000 (UTC)
-Message-ID: <3a91aed3b2145167e649c0b85f97c394a9c16434.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/11] RFC crypto/luks: encryption key
- managment using amend interface
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Date: Wed, 06 Nov 2019 18:43:06 +0200
-In-Reply-To: <871rvpj7z0.fsf@dusky.pond.sub.org>
-References: <20190912223028.18496-1-mlevitsk@redhat.com>
- <632e3a8b-ee54-50e0-83a2-ea82ad8e061f@redhat.com>
- <d371336cfe6b8428ebc9a68a9787c19082e9f0de.camel@redhat.com>
- <871rvpj7z0.fsf@dusky.pond.sub.org>
-Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: H5mdFFipPv28r_ugv2-lDA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+ (envelope-from <stefanha@gmail.com>) id 1iSOPf-0007mv-8a
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:44:08 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51229)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iSOPf-0007mK-23
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 11:44:07 -0500
+Received: by mail-wm1-x344.google.com with SMTP id q70so4367018wme.1
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 08:44:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=NyC4YhDqBGVzKpMdPw4ZFmmAjIsIidtjmxF0U/8C+5U=;
+ b=YUilFn+TVqVvQmB99D0cptUFdS5VHH8DBpiwOJROEE5RgmrBaJW9eRHni90nz2x3S7
+ RtFIbjQ29k2Zlc0ShqtOF2kEln2VqdnrxOlLMLJv7XH/h1SSh03UTF6SZIZg5c8ydoS/
+ H0lwitOOIqoY06lZZsMMy7fxvJBJC9xzeCg9qBcS5i6eTWCFQ2Jau94jH7X+oJ3H8F47
+ GrjSzHQh5/FAf2HFfAWQgMIBrHxW0OJpA7eXc92fe3C5Rz8o6kwazydq5nh47xxAcsR3
+ VuARtRaT9d7jcsOm4vDWywTqF0xz2KAnHAuGIAhv6LtqZFC6fJ+hYbjSv6MpUC/fjxGj
+ RvwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=NyC4YhDqBGVzKpMdPw4ZFmmAjIsIidtjmxF0U/8C+5U=;
+ b=bwYR5fly9nMCyHga46F0957b6IIuw6GJxlB1pex9M2pGxccISqu6fB7eXj9jBs/EqM
+ gDvLbbUIIEtsJaLJlTm0FnTL9YKau0UyBsY3oln4NxqKbFXTXAACfn5/xrjp6joO/kWB
+ MsQ3Xt5TO/Apzj6ICe2lxjfXxrHYyynhlbBcNPwNHw3u+btvh36bC7lgavnAqgkllSMW
+ RJGGKLxwfDkde03QscJoJ2W6WMYZ0nQjpTC/grVxXx+1ZxQ4TnujyJhfS0x/L06Z50k0
+ zqjlF2yIvy/2Dxmd9hQym6E4W5ZGr8FX+JzFNHxPUsYGRuF75whRkZhBKmiH1m5fodM6
+ SmDg==
+X-Gm-Message-State: APjAAAU0HedmTWVRKd69gHiSdx/0tygDGeJPyLgI2BwFCsduNPMDV3i0
+ zQZEUbKgCllo8IUPO+plKfk=
+X-Google-Smtp-Source: APXvYqwJNYFiy0j+wnxA80TY1vzPfOAtZ9aWRY9ip9ZmxnysTep+mJEdATdL//8FO+rTz8ZcAzxOSw==
+X-Received: by 2002:a7b:c341:: with SMTP id l1mr3315774wmj.140.1573058645656; 
+ Wed, 06 Nov 2019 08:44:05 -0800 (PST)
+Received: from localhost (178.165.129.116.wireless.dyn.drei.com.
+ [178.165.129.116])
+ by smtp.gmail.com with ESMTPSA id y16sm14993742wro.25.2019.11.06.08.44.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 06 Nov 2019 08:44:04 -0800 (PST)
+Date: Wed, 6 Nov 2019 17:44:03 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Subject: Re: [PATCH v4 11/20] libqtest: make qtest_bufwrite send "atomic"
+Message-ID: <20191106164403.GJ340561@stefanha-x1.localdomain>
+References: <20191030144926.11873-1-alxndr@bu.edu>
+ <20191030144926.11873-12-alxndr@bu.edu>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="/qIPZgKzMPM+y5U5"
+Content-Disposition: inline
+In-Reply-To: <20191030144926.11873-12-alxndr@bu.edu>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,57 +96,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 2019-10-07 at 10:05 +0200, Markus Armbruster wrote:
-> Maxim Levitsky <mlevitsk@redhat.com> writes:
->=20
-> > On Fri, 2019-09-20 at 17:14 -0400, John Snow wrote:
-> > >=20
-> > > On 9/12/19 6:30 PM, Maxim Levitsky wrote:
-> > > > This patch series is continuation of my work to add encryption
-> > > > key managment to luks/qcow2 with luks.
-> > > >=20
-> > > > This is second version of this patch set.
-> > > > The changes are mostly addressing the review feedback,
-> > > > plus I tested (and fixed sadly) the somewhat ugly code
-> > > > that allows to still write share a raw luks device,
-> > > > while preveting the key managment from happening in this case,
-> > > > as it is unsafe.
-> > > > I added a new iotest dedicated to that as well.
-> > > >=20
-> > > > Best regards,
-> > > > =09Maxim Levitsky
-> > > >=20
-> > >=20
-> > > What branch is this based on?
-> > > It doesn't seem to apply to origin/master.
-> > >=20
-> > > --js
-> >=20
-> > It is based on refactoring patch series I send before,
-> > which is also under review:
-> > "[PATCH v2 00/13] RFC crypto/luks: preparation for encryption key manag=
-ment"
->=20
-> Recommend to note such dependencies in the cover letter as
->=20
-> Based-on: <message-id>
-I'll take a note!
-Note that now all these patches are merged thus,
-this patch series should more or less apply on
-top of master branch.
-I'll probably resend a V3 after I finish going
-over the review of this series.
 
+--/qIPZgKzMPM+y5U5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Best regards,
-=09Maxim Levitsky
+On Wed, Oct 30, 2019 at 02:49:57PM +0000, Oleinik, Alexander wrote:
+> From: Alexander Oleinik <alxndr@bu.edu>
+>=20
+> When using qtest "in-process" communication, qtest_sendf directly calls
+> a function in the server (qtest.c). Combining the contents of the
+> subsequent socket_sends into the qtest_sendf, makes it so the server can
+> immediately handle the command, without building a local buffer and
+> waiting for a newline.
+>=20
+> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+> ---
+>  tests/libqtest.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 822bfe208b..ff3153daf2 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -1083,8 +1083,8 @@ void qtest_bufwrite(QTestState *s, uint64_t addr, c=
+onst void *data, size_t size)
+> =20
+>      bdata =3D g_base64_encode(data, size);
+>      qtest_sendf(s, "b64write 0x%" PRIx64 " 0x%zx ", addr, size);
+> -    socket_send(s->fd, bdata, strlen(bdata));
+> -    socket_send(s->fd, "\n", 1);
+> +    s->ops.send(s, bdata, strlen(bdata));
+> +    s->ops.send(s, "\n", 1);
+>      qtest_rsp(s, 0);
+>      g_free(bdata);
+>  }
 
+Please update the commit message and description - they no longer seem
+to match what the patch is doing.  The qtest_sendf() is not atomic, it
+is still split into 3 send operations.
+
+Stefan
+
+--/qIPZgKzMPM+y5U5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3C+FIACgkQnKSrs4Gr
+c8iPjwf/dOoufUX79aqT+n/aZkt0x/A+mnMeFuGZmf82N1qBIpM3sJBr/zKJ/0he
+KZcjwoM35T2+debWJ8YVGAtF09gFjiermG/1BckCGXEFHi6QbCMU/4QKfecphRwH
+IZxtz0JPdDH0kWlPhTloFhN+/gUJNaKu229HFIkMAh6gxczRYrl57N9gqpI6PmKm
+jpyWZQL5i4pWHZatXgL1k0XgyXb1hkKmGBCwDj71a5GUiDz8/byCZ3G3yYY8AmIt
+jhBNA/Bne5M91R0MQnwOkpDmJD/8Kb7G06hVXItFAqCkMJ6ezyrtcYx4zBVjSWMY
+msgKzN7Yg2NFVhUZ/yi+oIiNePuBeQ==
+=hKKj
+-----END PGP SIGNATURE-----
+
+--/qIPZgKzMPM+y5U5--
 
