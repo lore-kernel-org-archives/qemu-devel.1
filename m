@@ -2,91 +2,81 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFDDC5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B8F1C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:23:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F88F20869
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:20:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="htqJc+6b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F88F20869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0826D217D7
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:23:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0826D217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSKIp-0003ry-CD
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 07:20:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52938)
+	id 1iSKLX-0004yF-93
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 07:23:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iSKIB-0003Mu-T5
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:20:09 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1iSKKt-0004Z1-9w
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:22:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iSKIA-0003af-Bm
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:20:07 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37739)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iSKI9-0003Yw-4p
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:20:06 -0500
-Received: by mail-wm1-x343.google.com with SMTP id q130so3080990wme.2
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 04:20:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=RpgoQPK/LIDerO7lJEQ4U9SYduXiB2Zh7dzR1O0Iln0=;
- b=htqJc+6bldWKqzELJgsZtN7whFCVs7FF1pQeQgQkxhD9vhr41lA0i92w5eXrHyDX0v
- UgXIKW/pB0ma+i6/ZlDj51IKIAj1jUguoL7r7xqBpkBtdr7ZhoKgYVnLsNVsw///wwac
- kqfCIhG63FPxt6EEplOqzaTD/8H30JC/5TVdEH1/agwDwzXVJHnUU9W2KdiV29x9YXP/
- RC74yd5Tb+G5DzViPKv3htYVsPOvqF5wRxLLcgul8xss2iJ1eS+9VX5eYoEOXzE2q/VZ
- 3vQVL53+uPcakZkyhtlf7iHa9R5YpPjvOx+g1TSBMI6DJXt5nngH3NKadLYRRkyNcj9s
- Y92g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=RpgoQPK/LIDerO7lJEQ4U9SYduXiB2Zh7dzR1O0Iln0=;
- b=V08pEoUo5pY5kQ4HAEY7AMx5rthtcyR+76Z45EMpm3oGmLsSYZj9IBh/bSay/8dgI9
- InOeE6yR2kgBixy3HGQGIXpJzFil4LgcY0jCDj5a01DgvQJQOqMuAnw7B7ev0zJ2d2Pm
- xswUVc/5kRtOSs0qMl8bjfGSL6Rn1jXrUBIC/8jqEuIg37o0Xp40xjhJkxG/osseZLKr
- VxxeMWQDenTlmTapHEfIA18U0J04uRKbzqboKNaw8FClv8ZTiAD0JNaLPTzPHo5eTTn7
- 4s2pWNyMLe8uv2wDQaQb8busujwZ1TKcjloKB7GsdVzJ+O0nPO2kQgHFx2ZKH1XV0S7P
- Uxsw==
-X-Gm-Message-State: APjAAAUEEM4vSWWq0iBgCGfaKrR7vJpJJfk/RkJY4zya1DThYMSGUnU7
- MjtCmakOXZUKxYC3XvOwOWzicA==
-X-Google-Smtp-Source: APXvYqzroIhHkQSdGLo6acutV3vLksrRmQeHFLbXl0uC87zPIgBoz3VIDgdpv2lCs7HFkt2fKb+D7Q==
-X-Received: by 2002:a1c:9ccd:: with SMTP id f196mr2247964wme.152.1573042803847; 
- Wed, 06 Nov 2019 04:20:03 -0800 (PST)
-Received: from [192.168.8.102] (31.red-176-87-122.dynamicip.rima-tde.net.
- [176.87.122.31])
- by smtp.gmail.com with ESMTPSA id i3sm24118569wrw.69.2019.11.06.04.20.01
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 06 Nov 2019 04:20:03 -0800 (PST)
-Subject: Re: [PATCH v2 2/4] Memory: Enable writeback for given memory region
-To: Beata Michalska <beata.michalska@linaro.org>, qemu-devel@nongnu.org
-References: <20191105234100.22052-1-beata.michalska@linaro.org>
- <20191105234100.22052-3-beata.michalska@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <5c75bd31-213f-88a4-2eee-0046f99f65fe@linaro.org>
-Date: Wed, 6 Nov 2019 13:19:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20191105234100.22052-3-beata.michalska@linaro.org>
-Content-Type: text/plain; charset=utf-8
+ (envelope-from <yi.l.liu@intel.com>) id 1iSKKr-0005BW-UI
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:22:55 -0500
+Received: from mga18.intel.com ([134.134.136.126]:61597)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iSKKr-0005Ak-La
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:22:53 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 06 Nov 2019 04:22:48 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,274,1569308400"; d="scan'208";a="402339407"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by fmsmga005.fm.intel.com with ESMTP; 06 Nov 2019 04:22:48 -0800
+Received: from shsmsx154.ccr.corp.intel.com (10.239.6.54) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 6 Nov 2019 04:22:47 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
+ SHSMSX154.ccr.corp.intel.com ([169.254.7.200]) with mapi id 14.03.0439.000;
+ Wed, 6 Nov 2019 20:22:46 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: David Gibson <david@gibson.dropbear.id.au>, "eric.auger@redhat.com"
+ <eric.auger@redhat.com>
+Subject: RE: [RFC v2 14/22] vfio/pci: add iommu_context notifier for pasid
+ bind/unbind
+Thread-Topic: [RFC v2 14/22] vfio/pci: add iommu_context notifier for pasid
+ bind/unbind
+Thread-Index: AQHVims1OZV2XVCCuEyc7KnxOKt2Oqd6t5AAgANrjkA=
+Date: Wed, 6 Nov 2019 12:22:46 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A0EF2F1@SHSMSX104.ccr.corp.intel.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-15-git-send-email-yi.l.liu@intel.com>
+ <20191104160228.GG3552@umbus.metropole.lan>
+In-Reply-To: <20191104160228.GG3552@umbus.metropole.lan>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiOGU5ZTIzNWYtNmY5My00NDlhLWI0ZjYtZTNkY2QyYjFlYzA3IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiN0VWdlJUYVA1T2lIZ21oeUd2Ykt2Y0JtbjV5VXk1ZVJrOVlTemRkXC82TFZNbWhjblU2ZFJyXC96eUpIWGtWcW1HIn0=
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,96 +88,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, quintela@redhat.com, dgilbert@redhat.com,
- shameerali.kolothum.thodi@huawei.com, eric.auger@redhat.com,
- qemu-arm@nongnu.org, pbonzini@redhat.com, alex.bennee@linaro.org
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "peterx@redhat.com" <peterx@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/6/19 12:40 AM, Beata Michalska wrote:
-> +void qemu_ram_writeback(RAMBlock *block, ram_addr_t start, ram_addr_t length)
-> +{
-> +    void *addr = ramblock_ptr(block, start);
-> +
-> +    /*
-> +     * The requested range might spread up to the very end of the block
-> +     */
-> +    if ((start + length) > block->used_length) {
-> +        qemu_log("%s: sync range outside the block boundaries: "
-> +                     "start: " RAM_ADDR_FMT " length: " RAM_ADDR_FMT
-> +                     " block length: " RAM_ADDR_FMT " Narrowing down ..." ,
-> +                     __func__, start, length, block->used_length);
-> +        length = block->used_length - start;
-> +    }
+> From: David Gibson
+> Sent: Tuesday, November 5, 2019 12:02 AM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [RFC v2 14/22] vfio/pci: add iommu_context notifier for pasi=
+d
+> bind/unbind
+>=20
+> On Thu, Oct 24, 2019 at 08:34:35AM -0400, Liu Yi L wrote:
+> > This patch adds notifier for pasid bind/unbind. VFIO registers this
+> > notifier to listen to the dual-stage translation (a.k.a. nested
+> > translation) configuration changes and propagate to host. Thus vIOMMU
+> > is able to set its translation structures to host.
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Cc: Peter Xu <peterx@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > ---
+> >  hw/vfio/pci.c            | 39 +++++++++++++++++++++++++++++++++++++++
+> >  include/hw/iommu/iommu.h | 11 +++++++++++
+> >  2 files changed, 50 insertions(+)
+> >
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index 8721ff6..012b8ed 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -2767,6 +2767,41 @@ static void
+> vfio_iommu_pasid_free_notify(IOMMUCTXNotifier *n,
+> >      pasid_req->free_result =3D ret;
+> >  }
+> >
+> > +static void vfio_iommu_pasid_bind_notify(IOMMUCTXNotifier *n,
+> > +                                         IOMMUCTXEventData *event_data=
+)
+> > +{
+> > +#ifdef __linux__
+>=20
+> Is hw/vfio/pci.c even built on non-linux hosts?
 
-qemu_log_mask w/ GUEST_ERROR?  How do we expect the length to overflow?
+I'm not quite sure. It's based a comment from RFC v1. I think it could some=
+how
+prevent compiling issue when doing code porting. So I added it. If it's imp=
+ossible
+to build on non-linux hosts per your experience, I can remove it to make th=
+ings
+simple.
 
-> +#ifdef CONFIG_LIBPMEM
-> +    /* The lack of support for pmem should not block the sync */
-> +    if (ramblock_is_pmem(block)) {
-> +        pmem_persist(addr, length);
-> +    } else
-> +#endif
+> > +    VFIOIOMMUContext *giommu_ctx =3D container_of(n, VFIOIOMMUContext,=
+ n);
+> > +    VFIOContainer *container =3D giommu_ctx->container;
+> > +    IOMMUCTXPASIDBindData *pasid_bind =3D
+> > +                              (IOMMUCTXPASIDBindData *) event_data->da=
+ta;
+> > +    struct vfio_iommu_type1_bind *bind;
+> > +    struct iommu_gpasid_bind_data *bind_data;
+> > +    unsigned long argsz;
+> > +
+> > +    argsz =3D sizeof(*bind) + sizeof(*bind_data);
+> > +    bind =3D g_malloc0(argsz);
+> > +    bind->argsz =3D argsz;
+> > +    bind->bind_type =3D VFIO_IOMMU_BIND_GUEST_PASID;
+> > +    bind_data =3D (struct iommu_gpasid_bind_data *) &bind->data;
+> > +    *bind_data =3D *pasid_bind->data;
+> > +
+> > +    if (pasid_bind->flag & IOMMU_CTX_BIND_PASID) {
+> > +        if (ioctl(container->fd, VFIO_IOMMU_BIND, bind) !=3D 0) {
+> > +            error_report("%s: pasid (%llu:%llu) bind failed: %d", __fu=
+nc__,
+> > +                         bind_data->gpasid, bind_data->hpasid, -errno)=
+;
+> > +        }
+> > +    } else if (pasid_bind->flag & IOMMU_CTX_UNBIND_PASID) {
+> > +        if (ioctl(container->fd, VFIO_IOMMU_UNBIND, bind) !=3D 0) {
+> > +            error_report("%s: pasid (%llu:%llu) unbind failed: %d", __=
+func__,
+> > +                         bind_data->gpasid, bind_data->hpasid, -errno)=
+;
+> > +        }
+> > +    }
+> > +
+> > +    g_free(bind);
+> > +#endif
+> > +}
+> > +
+> >  static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >  {
+> >      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
+> > @@ -3079,6 +3114,10 @@ static void vfio_realize(PCIDevice *pdev, Error =
+**errp)
+> >                                           iommu_context,
+> >                                           vfio_iommu_pasid_free_notify,
+> >                                           IOMMU_CTX_EVENT_PASID_FREE);
+> > +        vfio_register_iommu_ctx_notifier(vdev,
+> > +                                         iommu_context,
+> > +                                         vfio_iommu_pasid_bind_notify,
+> > +                                         IOMMU_CTX_EVENT_PASID_BIND);
+> >      }
+> >
+> >      return;
+> > diff --git a/include/hw/iommu/iommu.h b/include/hw/iommu/iommu.h
+> > index 4352afd..4f21aa1 100644
+> > --- a/include/hw/iommu/iommu.h
+> > +++ b/include/hw/iommu/iommu.h
+> > @@ -33,6 +33,7 @@ typedef struct IOMMUContext IOMMUContext;
+> >  enum IOMMUCTXEvent {
+> >      IOMMU_CTX_EVENT_PASID_ALLOC,
+> >      IOMMU_CTX_EVENT_PASID_FREE,
+> > +    IOMMU_CTX_EVENT_PASID_BIND,
+> >      IOMMU_CTX_EVENT_NUM,
+> >  };
+> >  typedef enum IOMMUCTXEvent IOMMUCTXEvent;
+> > @@ -50,6 +51,16 @@ union IOMMUCTXPASIDReqDesc {
+> >  };
+> >  typedef union IOMMUCTXPASIDReqDesc IOMMUCTXPASIDReqDesc;
+> >
+> > +struct IOMMUCTXPASIDBindData {
+> > +#define IOMMU_CTX_BIND_PASID   (1 << 0)
+> > +#define IOMMU_CTX_UNBIND_PASID (1 << 1)
+> > +    uint32_t flag;
+> > +#ifdef __linux__
+> > +    struct iommu_gpasid_bind_data *data;
+>=20
+> Embedding a linux specific structure in the notification message seems
+> dubious to me.
 
-Perhaps better to return out of that if block than have the dangling else.
+Just similar as your above comment in this thread. If we don't want to add
+it there, then here it is also unnecessary.
 
-> +/**
-> + * Sync changes made to the memory mapped file back to the backing
-> + * storage. For POSIX compliant systems this will simply fallback
-> + * to regular msync call (thus the required alignment). Otherwise
-> + * it will trigger whole file sync (including the metadata case
-> + * there is no support to skip that otherwise)
-> + *
-> + * @addr   - start of the memory area to be synced
-> + * @length - length of the are to be synced
-> + * @align  - alignment (expected to be PAGE_SIZE)
-> + * @fd     - file descriptor for the file to be synced
-> + *           (mandatory only for POSIX non-compliant systems)
-> + */
-> +int qemu_msync(void *addr, size_t length, size_t align, int fd)
-> +{
-> +#ifdef CONFIG_POSIX
-> +    size_t align_mask;
-> +
-> +    /* Bare minimum of sanity checks on the alignment */
-> +    /* The start address needs to be a multiple of PAGE_SIZE */
-> +    align = MAX(align, qemu_real_host_page_size);
-> +    align_mask = ~(qemu_real_host_page_size - 1);
-> +    align = (align + ~align_mask) & align_mask;
-> +
-> +    align_mask = ~(align - 1);
+@Eric, do you think it is still necessary to add the __linux__ marco here?
 
-I don't understand what you're trying to do with align.
-
-You pass in qemu_host_page_size from the one caller, and then adjust it for
-qemu_real_host_page_size?
-
-Why pass in anything at all, and just use qemu_real_host_page_mask?
-
-> +    /**
-> +     * There are no strict reqs as per the length of mapping
-> +     * to be synced. Still the length needs to follow the address
-> +     * alignment changes. Additionally - round the size to the multiple
-> +     * of requested alignment (expected as PAGE_SIZE)
-> +     */
-> +    length += ((uintptr_t)addr & (align - 1));
-> +    length = (length + ~align_mask) & align_mask;
-> +
-> +    addr = (void *)((uintptr_t)addr & align_mask);
-> +
-> +    return msync(addr, length, MS_SYNC);
-> +#else /* CONFIG_POSIX */
-> +    /**
-> +     * Perform the sync based on the file descriptor
-> +     * The sync range will most probably be wider than the one
-> +     * requested - but it will still get the job done
-> +     */
-> +    return qemu_fdatasync(fd);
-> +#endif /* CONFIG_POSIX */
-> +}
-
-
-r~
-
+Thanks,
+Yi Liu
 
