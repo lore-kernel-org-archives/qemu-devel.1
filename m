@@ -2,80 +2,69 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C853AC5DF63
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9539EC5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:59:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F218217F4
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:59:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JV3/gcqo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F218217F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 65C10217F4
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 14:59:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65C10217F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSMm5-0004lJ-4g
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 09:59:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37506)
+	id 1iSMmk-0005N8-Hp
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 09:59:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37661)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iSMlH-0003wk-MF
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:58:21 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iSMlj-0004Xy-4w
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:58:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iSMlE-0008OC-VE
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:58:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27205
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iSMlE-0008KY-M3
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:58:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573052295;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ICgj0CgVMdb6xHe7XDcADkrIFoubx/ymuu7DycFH5m8=;
- b=JV3/gcqoUXtXWkVSglUMevgmQHQtSuiJdCFp9Sgibu08VGN4q3J3dn1Qm47Wfv0LgmQCEc
- fv7odhKdYsHuWtiQjlS97PdU8LPe5amOdy0YtpoSJGVOOe98lHCxTO4AdrQ8bb4GkMWj3t
- OD7G+ZnCPIVvlFNAsZSY4WkPrpmkSy4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-396-NpcRUwodPCmVXLYRQeiRfQ-1; Wed, 06 Nov 2019 09:58:14 -0500
-X-MC-Unique: NpcRUwodPCmVXLYRQeiRfQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 792A28017DD;
- Wed,  6 Nov 2019 14:58:13 +0000 (UTC)
-Received: from dhcp-200-226.str.redhat.com (dhcp-200-226.str.redhat.com
- [10.33.200.226])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0E3676106F;
- Wed,  6 Nov 2019 14:58:01 +0000 (UTC)
-Date: Wed, 6 Nov 2019 15:58:00 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [RFC PATCH 00/18] Add qemu-storage-daemon
-Message-ID: <20191106145800.GC7548@dhcp-200-226.str.redhat.com>
-References: <20191017130204.16131-1-kwolf@redhat.com>
- <8a9a5eae-d388-867b-f4a1-080e876389b3@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1iSMlh-0000sA-8Y
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:58:46 -0500
+Resent-Date: Wed, 06 Nov 2019 09:58:46 -0500
+Resent-Message-Id: <E1iSMlh-0000sA-8Y@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21406)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iSMlh-0000ra-0K
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 09:58:45 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1573052316; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=hnMs0ySWso8+CaXKGSarKpJQvd243v2gnRMZLH2k7Eg1kdD1qY1FIyBGMZA4I3Zs84Sct5Xd8l1GqPvEUbLyi5rybTDbRK++afWv1e2ejPdp9dF4/G/WV61G4pDjYtLkcPaKHT3eeB39EIf6+rNlzUESX04HscoHv1joEHUDotk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1573052316;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=sBgNKr0xAJ+2d+Aq3TtSEybSYG/Bvo4t/z6YBbko7e0=; 
+ b=YZDnQCeNawPjjn77uhZl/T9nlTJRT5k2eGpVEiaobLikZ/cnNI/FU4poWJiIKtr51ar7SFfKeRxk4G/th/mbq2iuNikYPqvqFGru8yII0dwVdckxUVvf/nkmiRC5zaZQqRssuVYATGQx1wKE3VAhToxsibtmR5/kfT4fz1argTw=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1573052313197958.1567331719982;
+ Wed, 6 Nov 2019 06:58:33 -0800 (PST)
+In-Reply-To: <20191106113318.10226-1-richard.henderson@linaro.org>
+Subject: Re: [PATCH v3 00/12] linux-user sparc fixes
+Message-ID: <157305231198.21358.3677677989885907371@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <8a9a5eae-d388-867b-f4a1-080e876389b3@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="p2kqVDKq5asng8Dg"
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: richard.henderson@linaro.org
+Date: Wed, 6 Nov 2019 06:58:33 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,84 +76,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, armbru@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---p2kqVDKq5asng8Dg
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 06.11.2019 um 15:37 hat Max Reitz geschrieben:
-> On 17.10.19 15:01, Kevin Wolf wrote:
-> > This series adds a new tool 'qemu-storage-daemon', which can be used to
-> > export and perform operations on block devices.
->=20
-> Looks good to me.
->=20
-> I remember a discussion at some KVM Forum a couple of years ago where
-> someone (Berto?) was asking about adding QMP to qemu-nbd.  I found it a
-> pragmatic solution, but I remember that Markus was against it, based on
-> the fact that we wanted qemu -M none.
-
-Yes, but it turned out that qemu -M none is a bit too heavyweight in
-practice and fixing that would involve a lot of work. As I understand it
-(mostly what I took from discussions on the list), even if someone were
-interested in doing that and started now, it's the kind of thing that
-would take multiple years.
-
-As long as we keep the code simple and the interesting parts are just
-reused and shared with the system emulator and other tools, it shouldn't
-be hard to maintain.
-
-> Well, but anyway.  Just as I didn=E2=80=99t have anything against adding =
-QMP to
-> qemu-nbd, I don=E2=80=99t have anything against adding a new application =
-that
-> kind of fulfills the same purpose.  And I think introducing a new
-> application instead of reusing qemu-nbd that focuses on all-around QAPI
-> compatibility (which qemu-nbd decidedly does not have) makes sense.
-
-Yes, QAPI is one big reason for creating a new tool that doesn't need to
-support the old qemu-nbd command line. Another is that we can add other
-types of exports that are not NBD.
-
-> The only thing I don=E2=80=99t like is the name, but that=E2=80=99s what =
-<Tab> is for.
-> :-)
-
-I'm open for suggestions, but I thought 'qsd' was a bit too terse. :-)
-
-(Actually, maybe we could even pick something that doesn't mention
-storage or block? After all, it can do all kinds of QEMU backends in
-theory. Not sure if there's any standalone use for them, but who
-knows...)
-
-Kevin
-
---p2kqVDKq5asng8Dg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdwt94AAoJEH8JsnLIjy/WRgQQAKbuuPi0DOlZNa73bBu3ChdL
-GffBKc+up8nuRUBliHYX3R6c1jSaeV5Er0WIdi+KJChNpbXrkF7atV+l9Usva6js
-T9z+WJ9EArxvromE7fJstWEvrossOWp7dhuDMDRRCOWp2UBSAkePDRmm592O3TGz
-Qxkiw9xWGADycxHUphsl0CWj7M8cVVlFfZCnJRZWPMXDDQp74xVucGStPjjZgvFj
-Alp8GsaaVbaQid+RCdzoHHAFV+ZbE7vJnv5/CL3rZmAjnvQ7Y532k6KCmlCElSS2
-udbAFEFF4T218YdOmwImkKra7wnSruz1AVkE3dWPmkiwbzb8dRZxnMgkPYEw6DYI
-1MfztBc0UdFNeug2IIOhQhAiBBOn4/eDBaYwVM5Cst2qw5qXrGw+C8G7P6dCzyJN
-fSg7TgIsknCivuz7qsavPnCTPXz5p24CJdoe1a7k46+wotiA7u/F84xPLe4550am
-N4s6F/OwU527Uih3sxTGu6Ap1WJjZ2tnVsRvjuaXpU6am+NggbeGMkqZiqe78RGV
-uilyws7OSx/yEFfdJEeaXEShulNOW/bab0Rv2M+x2yua5uX1V8S3pzUJvoXz6J+5
-fJTkhiO9nznxJoWENPPeORKHr5Pc1lsZe5aRtT3pm0ZpASmjFNTBwOxsD0iIU0ds
-d9WUdIVlN4pe7itJOIAy
-=gE6C
------END PGP SIGNATURE-----
-
---p2kqVDKq5asng8Dg--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwNjExMzMxOC4xMDIy
+Ni0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2Vl
+bXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBm
+b3IKbW9yZSBpbmZvcm1hdGlvbjoKClN1YmplY3Q6IFtQQVRDSCB2MyAwMC8xMl0gbGludXgtdXNl
+ciBzcGFyYyBmaXhlcwpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAxOTExMDYxMTMzMTguMTAy
+MjYtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAK
+Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3Rv
+Z3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBb
+dGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMTkxMTA2MTMwMzA5LjY3MzctMS1qYW5kcnl1a0Bn
+bWFpbC5jb20gLT4gcGF0Y2hldy8yMDE5MTEwNjEzMDMwOS42NzM3LTEtamFuZHJ5dWtAZ21haWwu
+Y29tCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAxOTExMDYxNDE0MjQuMjcyNDQtMS1l
+ZGdhci5pZ2xlc2lhc0BnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDE5MTEwNjE0MTQyNC4yNzI0NC0x
+LWVkZ2FyLmlnbGVzaWFzQGdtYWlsLmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIw
+MTkxMTA2MTQ1MTI3LjIzNzAwLTEtbWFyY2VsLmFwZmVsYmF1bUBnbWFpbC5jb20gLT4gcGF0Y2hl
+dy8yMDE5MTEwNjE0NTEyNy4yMzcwMC0xLW1hcmNlbC5hcGZlbGJhdW1AZ21haWwuY29tClN3aXRj
+aGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMzM0ODZlZSBsaW51eC11c2VyL2FscGhhOiBTZXQg
+cjIwIHNlY29uZGFyeSByZXR1cm4gdmFsdWUKNGM1Zjk3MCBsaW51eC11c2VyL3NwYXJjOiBGaXgg
+Y3B1X2Nsb25lX3JlZ3NfKgozOGMwNjQyIGxpbnV4LXVzZXI6IEludHJvZHVjZSBjcHVfY2xvbmVf
+cmVnc19wYXJlbnQKOGZkMTBiMiBsaW51eC11c2VyOiBSZW5hbWUgY3B1X2Nsb25lX3JlZ3MgdG8g
+Y3B1X2Nsb25lX3JlZ3NfY2hpbGQKMWM2ZWJjYiBsaW51eC11c2VyL3NwYXJjNjQ6IEZpeCB0YXJn
+ZXRfc2lnbmFsX2ZyYW1lCmIxMjU3ZWYgbGludXgtdXNlci9zcGFyYzogRml4IFdSRUcgdXNhZ2Ug
+aW4gc2V0dXBfZnJhbWUKNWY0MDI1MiBsaW51eC11c2VyL3NwYXJjOiBVc2UgV1JFR19TUCBjb25z
+dGFudCBpbiBzcGFyYy9zaWduYWwuYwoyZTdmZmU2IGxpbnV4LXVzZXIvc3BhcmM6IEJlZ2luIHVz
+aW5nIFdSRUcgY29uc3RhbnRzIGluIHNwYXJjL3NpZ25hbC5jCmI4N2YzMWRiIGxpbnV4LXVzZXIv
+c3BhcmM6IFVzZSBXUkVHIGNvbnN0YW50cyBpbiBzcGFyYy90YXJnZXRfY3B1LmgKMDhmZGI0MyB0
+YXJnZXQvc3BhcmM6IERlZmluZSBhbiBlbnVtZXJhdGlvbiBmb3IgYWNjZXNzaW5nIGVudi0+cmVn
+d3B0cgo3ZTg3NmRkIHRlc3RzL3RjZy9tdWx0aWFyY2gvbGludXgtdGVzdDogRml4IGVycm9yIGNo
+ZWNrIGZvciBzaG1hdAo0ZGFlNTRkIHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZjogVXBkYXRlIGZv
+ciBzcGFyYzY0Cgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzEyIENoZWNraW5nIGNvbW1pdCA0ZGFl
+NTRkNmFmYjMgKHNjcmlwdHMvcWVtdS1iaW5mbXQtY29uZjogVXBkYXRlIGZvciBzcGFyYzY0KQpX
+QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzY6IEZJTEU6IHNjcmlwdHMvcWVtdS1i
+aW5mbXQtY29uZi5zaDo0MToKK3NwYXJjNjRfbWFnaWM9J1x4N2ZFTEZceDAyXHgwMlx4MDFceDAw
+XHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMFx4MDBceDAwXHgwMlx4MDBceDJiJwoKRVJST1I6
+IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMzNzogRklMRTogc2NyaXB0cy9xZW11LWJpbmZtdC1j
+b25mLnNoOjQyOgorc3BhcmM2NF9tYXNrPSdceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHgw
+MFx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmZceGZmXHhmZlx4ZmVceGZmXHhmZicKCnRvdGFs
+OiAxIGVycm9ycywgMSB3YXJuaW5ncywgMjAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMS8xMiBoYXMg
+c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFy
+ZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVD
+S1BBVENIIGluIE1BSU5UQUlORVJTLgoKMi8xMiBDaGVja2luZyBjb21taXQgN2U4NzZkZDkxY2I1
+ICh0ZXN0cy90Y2cvbXVsdGlhcmNoL2xpbnV4LXRlc3Q6IEZpeCBlcnJvciBjaGVjayBmb3Igc2ht
+YXQpCjMvMTIgQ2hlY2tpbmcgY29tbWl0IDA4ZmRiNDM5NTIzMSAodGFyZ2V0L3NwYXJjOiBEZWZp
+bmUgYW4gZW51bWVyYXRpb24gZm9yIGFjY2Vzc2luZyBlbnYtPnJlZ3dwdHIpCjQvMTIgQ2hlY2tp
+bmcgY29tbWl0IGI4N2YzMWRiODMxYSAobGludXgtdXNlci9zcGFyYzogVXNlIFdSRUcgY29uc3Rh
+bnRzIGluIHNwYXJjL3RhcmdldF9jcHUuaCkKNS8xMiBDaGVja2luZyBjb21taXQgMmU3ZmZlNjFj
+NTEyIChsaW51eC11c2VyL3NwYXJjOiBCZWdpbiB1c2luZyBXUkVHIGNvbnN0YW50cyBpbiBzcGFy
+Yy9zaWduYWwuYykKNi8xMiBDaGVja2luZyBjb21taXQgNWY0MDI1Mjg2ZTJjIChsaW51eC11c2Vy
+L3NwYXJjOiBVc2UgV1JFR19TUCBjb25zdGFudCBpbiBzcGFyYy9zaWduYWwuYykKNy8xMiBDaGVj
+a2luZyBjb21taXQgYjEyNTdlZmM3YzZkIChsaW51eC11c2VyL3NwYXJjOiBGaXggV1JFRyB1c2Fn
+ZSBpbiBzZXR1cF9mcmFtZSkKOC8xMiBDaGVja2luZyBjb21taXQgMWM2ZWJjYjk2NTRiIChsaW51
+eC11c2VyL3NwYXJjNjQ6IEZpeCB0YXJnZXRfc2lnbmFsX2ZyYW1lKQo5LzEyIENoZWNraW5nIGNv
+bW1pdCA4ZmQxMGIyNzIzMjIgKGxpbnV4LXVzZXI6IFJlbmFtZSBjcHVfY2xvbmVfcmVncyB0byBj
+cHVfY2xvbmVfcmVnc19jaGlsZCkKMTAvMTIgQ2hlY2tpbmcgY29tbWl0IDM4YzA2NDI5ZmIxZSAo
+bGludXgtdXNlcjogSW50cm9kdWNlIGNwdV9jbG9uZV9yZWdzX3BhcmVudCkKMTEvMTIgQ2hlY2tp
+bmcgY29tbWl0IDRjNWY5NzBhM2M3YSAobGludXgtdXNlci9zcGFyYzogRml4IGNwdV9jbG9uZV9y
+ZWdzXyopCjEyLzEyIENoZWNraW5nIGNvbW1pdCAzMzQ4NmVlMjRlNWMgKGxpbnV4LXVzZXIvYWxw
+aGE6IFNldCByMjAgc2Vjb25kYXJ5IHJldHVybiB2YWx1ZSkKPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
+bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTExMDYxMTMzMTguMTAyMjYtMS1yaWNo
+YXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdl
+LgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9w
+YXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxA
+cmVkaGF0LmNvbQ==
 
 
