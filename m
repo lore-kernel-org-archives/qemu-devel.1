@@ -2,106 +2,83 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1380BC5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:12:14 +0000 (UTC)
-Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C73C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:17:02 +0000 (UTC)
+Received: from lists.gnu.org (unknown [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7813214D8
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:12:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JEKfEQaU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7813214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E212920869
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:17:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E212920869
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSKAX-0000Xg-0G
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 07:12:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50480)
+	id 1iSKFB-0002Bd-1x
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 07:17:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51497)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iSK9h-00087s-TA
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:11:23 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1iSKDU-0001Fn-O1
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:15:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iSK9g-0005if-Gr
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:11:21 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41700
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <yi.l.liu@intel.com>) id 1iSKDO-00089i-Ha
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:15:15 -0500
+Received: from mga01.intel.com ([192.55.52.88]:42095)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iSK9g-0005iN-Cr
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:11:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573042280;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=fyIEqTKPmuoFvUnOIDq3SpMtI2lgVwsPtHHovXhbV6Y=;
- b=JEKfEQaUaVEV1MMGq3NPQ+bTsIKMezXNkIRzagGOL23H/AUXfggKJbroYpBRmz6Q8y99SC
- M89oxVuZMNEyr1eX4Upc6mLnchmvJHm4t97/tJNXE0bt5p+Zkxu6v3+SLvMYSLqavP/u3g
- TIMrhXe3d9Z+C6Qxo9GPM6H0L/e4hn4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-iBzZO-aIMFyvKPZT-MxKIQ-1; Wed, 06 Nov 2019 07:11:16 -0500
-X-MC-Unique: iBzZO-aIMFyvKPZT-MxKIQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 000211800D53;
- Wed,  6 Nov 2019 12:11:15 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-212.ams2.redhat.com
- [10.36.117.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D80B560C88;
- Wed,  6 Nov 2019 12:11:13 +0000 (UTC)
-Subject: Re: [RFC PATCH 01/18] qemu-storage-daemon: Add barebone tool
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20191017130204.16131-1-kwolf@redhat.com>
- <20191017130204.16131-2-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <5fef0891-3081-d9f3-56db-22eb4ab663a0@redhat.com>
-Date: Wed, 6 Nov 2019 13:11:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iSKDO-00088Y-7V
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:15:10 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 06 Nov 2019 04:15:05 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,274,1569308400"; d="scan'208";a="214226967"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+ by orsmga002.jf.intel.com with ESMTP; 06 Nov 2019 04:15:03 -0800
+Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 6 Nov 2019 04:15:03 -0800
+Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
+ FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 6 Nov 2019 04:14:55 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
+ SHSMSX106.ccr.corp.intel.com ([169.254.10.248]) with mapi id 14.03.0439.000;
+ Wed, 6 Nov 2019 20:14:50 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: RE: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid
+ alloc/free
+Thread-Topic: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid
+ alloc/free
+Thread-Index: AQHVimsw6XlsA5+cTkCxXGelXmRQYKdxCjoAgA0JSAA=
+Date: Wed, 6 Nov 2019 12:14:50 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A0EF2CE@SHSMSX104.ccr.corp.intel.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-10-git-send-email-yi.l.liu@intel.com>
+ <20191029121544.GS3552@umbus.metropole.lan>
+In-Reply-To: <20191029121544.GS3552@umbus.metropole.lan>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDk5OWNhMzAtNjA3Mi00Y2U4LWE3NWItNTU5NDM1MWMyYmRmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoib3d1cEpFa1NObE9rU0JQMHdXcm1lNDhDeE94VW5QMXY2ZkdGaVlDaTBrVHZMdXNcL3p2NnNBSWREYVJhK1d2T3MifQ==
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20191017130204.16131-2-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="ES4dZDw0zoUOZ6p5uk9Ldf9QvDcKQXhUu"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.88
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,181 +90,248 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org
+Cc: "Tian, Kevin" <kevin.tian@intel.com>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "peterx@redhat.com" <peterx@redhat.com>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ES4dZDw0zoUOZ6p5uk9Ldf9QvDcKQXhUu
-Content-Type: multipart/mixed; boundary="CTnbbBGncbNhBdWbfu0aL0pWmOO4z2Ee6"
-
---CTnbbBGncbNhBdWbfu0aL0pWmOO4z2Ee6
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 17.10.19 15:01, Kevin Wolf wrote:
-> This adds a new binary qemu-storage-daemon that doesn't yet do more than
-> some typical initialisation for tools and parsing the basic command
-> options --version, --help and --trace.
+> From: David Gibson [mailto:david@gibson.dropbear.id.au]
+> Sent: Tuesday, October 29, 2019 8:16 PM
+> To: Liu, Yi L <yi.l.liu@intel.com>
+> Subject: Re: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasi=
+d alloc/free
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  configure             |   2 +-
->  qemu-storage-daemon.c | 141 ++++++++++++++++++++++++++++++++++++++++++
->  Makefile              |   1 +
->  3 files changed, 143 insertions(+), 1 deletion(-)
->  create mode 100644 qemu-storage-daemon.c
+> On Thu, Oct 24, 2019 at 08:34:30AM -0400, Liu Yi L wrote:
+> > This patch adds pasid alloc/free notifiers for vfio-pci. It is
+> > supposed to be fired by vIOMMU. VFIO then sends PASID allocation
+> > or free request to host.
+> >
+> > Cc: Kevin Tian <kevin.tian@intel.com>
+> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Cc: Peter Xu <peterx@redhat.com>
+> > Cc: Eric Auger <eric.auger@redhat.com>
+> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
+> > Cc: David Gibson <david@gibson.dropbear.id.au>
+> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> > ---
+> >  hw/vfio/common.c         |  9 ++++++
+> >  hw/vfio/pci.c            | 81
+> ++++++++++++++++++++++++++++++++++++++++++++++++
+> >  include/hw/iommu/iommu.h | 15 +++++++++
+> >  3 files changed, 105 insertions(+)
+> >
+> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> > index d418527..e6ad21c 100644
+> > --- a/hw/vfio/common.c
+> > +++ b/hw/vfio/common.c
+> > @@ -1436,6 +1436,7 @@ static void vfio_disconnect_container(VFIOGroup
+> *group)
+> >      if (QLIST_EMPTY(&container->group_list)) {
+> >          VFIOAddressSpace *space =3D container->space;
+> >          VFIOGuestIOMMU *giommu, *tmp;
+> > +        VFIOIOMMUContext *giommu_ctx, *ctx;
+> >
+> >          QLIST_REMOVE(container, next);
+> >
+> > @@ -1446,6 +1447,14 @@ static void vfio_disconnect_container(VFIOGroup
+> *group)
+> >              g_free(giommu);
+> >          }
+> >
+> > +        QLIST_FOREACH_SAFE(giommu_ctx, &container->iommu_ctx_list,
+> > +                                                   iommu_ctx_next, ctx=
+) {
+> > +            iommu_ctx_notifier_unregister(giommu_ctx->iommu_ctx,
+> > +                                                      &giommu_ctx->n);
+> > +            QLIST_REMOVE(giommu_ctx, iommu_ctx_next);
+> > +            g_free(giommu_ctx);
+> > +        }
+> > +
+> >          trace_vfio_disconnect_container(container->fd);
+> >          close(container->fd);
+> >          g_free(container);
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index 12fac39..8721ff6 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -2699,11 +2699,80 @@ static void
+> vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+> >      vdev->req_enabled =3D false;
+> >  }
+> >
+> > +static void vfio_register_iommu_ctx_notifier(VFIOPCIDevice *vdev,
+> > +                                             IOMMUContext *iommu_ctx,
+> > +                                             IOMMUCTXNotifyFn fn,
+> > +                                             IOMMUCTXEvent event)
+> > +{
+> > +    VFIOContainer *container =3D vdev->vbasedev.group->container;
+> > +    VFIOIOMMUContext *giommu_ctx;
+> > +
+> > +    giommu_ctx =3D g_malloc0(sizeof(*giommu_ctx));
+> > +    giommu_ctx->container =3D container;
+> > +    giommu_ctx->iommu_ctx =3D iommu_ctx;
+> > +    QLIST_INSERT_HEAD(&container->iommu_ctx_list,
+> > +                      giommu_ctx,
+> > +                      iommu_ctx_next);
+> > +    iommu_ctx_notifier_register(iommu_ctx,
+> > +                                &giommu_ctx->n,
+> > +                                fn,
+> > +                                event);
+> > +}
+> > +
+> > +static void vfio_iommu_pasid_alloc_notify(IOMMUCTXNotifier *n,
+> > +                                          IOMMUCTXEventData *event_dat=
+a)
+> > +{
+> > +    VFIOIOMMUContext *giommu_ctx =3D container_of(n, VFIOIOMMUContext,=
+ n);
+> > +    VFIOContainer *container =3D giommu_ctx->container;
+> > +    IOMMUCTXPASIDReqDesc *pasid_req =3D
+> > +                              (IOMMUCTXPASIDReqDesc *) event_data->dat=
+a;
+> > +    struct vfio_iommu_type1_pasid_request req;
+> > +    unsigned long argsz;
+> > +    int pasid;
+> > +
+> > +    argsz =3D sizeof(req);
+> > +    req.argsz =3D argsz;
+> > +    req.flag =3D VFIO_IOMMU_PASID_ALLOC;
+> > +    req.min_pasid =3D pasid_req->min_pasid;
+> > +    req.max_pasid =3D pasid_req->max_pasid;
+> > +
+> > +    pasid =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> > +    if (pasid < 0) {
+> > +        error_report("%s: %d, alloc failed", __func__, -errno);
+> > +    }
+> > +    pasid_req->alloc_result =3D pasid;
 >=20
-> diff --git a/configure b/configure
-> index 08ca4bcb46..bb3d55fb25 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6034,7 +6034,7 @@ tools=3D""
->  if test "$want_tools" =3D "yes" ; then
->    tools=3D"qemu-img\$(EXESUF) qemu-io\$(EXESUF) qemu-edid\$(EXESUF) $too=
-ls"
->    if [ "$linux" =3D "yes" -o "$bsd" =3D "yes" -o "$solaris" =3D "yes" ] =
-; then
-> -    tools=3D"qemu-nbd\$(EXESUF) $tools"
-> +    tools=3D"qemu-nbd\$(EXESUF) qemu-storage-daemon\$(EXESUF) $tools"
->    fi
->    if [ "$ivshmem" =3D "yes" ]; then
->      tools=3D"ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
-> diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
-> new file mode 100644
-> index 0000000000..a251dc255c
-> --- /dev/null
-> +++ b/qemu-storage-daemon.c
-> @@ -0,0 +1,141 @@
-> +/*
-> + * QEMU storage daemon
-> + *
-> + * Copyright (c) 2019 Kevin Wolf <kwolf@redhat.com>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-> + * of this software and associated documentation files (the "Software"),=
- to deal
-> + * in the Software without restriction, including without limitation the=
- rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be includ=
-ed in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +
-> +#include "block/block.h"
-> +#include "crypto/init.h"
-> +
-> +#include "qapi/error.h"
-> +#include "qemu-common.h"
-> +#include "qemu-version.h"
-> +#include "qemu/config-file.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/log.h"
-> +#include "qemu/main-loop.h"
-> +#include "qemu/module.h"
-> +
-> +#include "trace/control.h"
-> +
-> +#include <getopt.h>
-> +
-> +static void help(void)
-> +{
-> +    printf(
-> +"Usage: %s [options]\n"
-> +"QEMU storage daemon\n"
-> +"\n"
-> +"  -h, --help             display this help and exit\n"
-> +"  -T, --trace [[enable=3D]<pattern>][,events=3D<file>][,file=3D<file>]\=
-n"
-> +"                         specify tracing options\n"
-> +"  -V, --version          output version information and exit\n"
-> +"\n"
-> +QEMU_HELP_BOTTOM "\n",
-> +    error_get_progname());
-> +}
-> +
-> +static int process_options(int argc, char *argv[], Error **errp)
-> +{
-> +    int c;
-> +    char *trace_file =3D NULL;
-> +    int ret =3D -EINVAL;
-> +
-> +    static const struct option long_options[] =3D {
-> +        {"help", no_argument, 0, 'h'},
-> +        {"version", no_argument, 0, 'V'},
-> +        {"trace", required_argument, NULL, 'T'},
-> +        {0, 0, 0, 0}
-> +    };
-> +
-> +    while ((c =3D getopt_long(argc, argv, ":hT:V", long_options, NULL)) =
-!=3D -1) {
-> +        switch (c) {
-> +        case '?':
-> +            error_setg(errp, "Unknown option '%s'", argv[optind - 1]);
-> +            goto out;
+> Altering the event data from the notifier doesn't make sense.  By
+> definition there can be multiple notifiers on the chain, so in that
+> case which one is responsible for updating the writable field?
 
-Am I doing something wrong or is optind really not updated when '?' is
-returned?
+I guess you mean multiple pasid_alloc nofitiers. right?
 
-Because I=E2=80=99m getting this:
+It works for VT-d now, as Intel vIOMMU maintains the IOMMUContext
+per-bdf. And there will be only 1 pasid_alloc notifier in the chain. But, I
+agree it is not good if other module just share an IOMMUConext across
+devices. Definitely, it would have multiple pasid_alloc notifiers.
 
-$ ./qemu-storage-daemon -42
-qemu-storage-daemon: Unknown option './qemu-storage-daemon'
+How about enforcing IOMMUContext layer to only invoke one successful
+pasid_alloc/free notifier if PASID_ALLOC/FREE event comes? pasid
+alloc/free are really special as it requires feedback. And a potential
+benefit is that the pasid_alloc/free will not be affected by hot plug
+scenario. There will be always a notifier to work for pasid_alloc/free
+work unless all passthru devices are hot plugged. How do you think? Or
+if any other idea?
 
-But OTOH I also get:
+> > +}
+> > +
+> > +static void vfio_iommu_pasid_free_notify(IOMMUCTXNotifier *n,
+> > +                                          IOMMUCTXEventData *event_dat=
+a)
+> > +{
+> > +    VFIOIOMMUContext *giommu_ctx =3D container_of(n, VFIOIOMMUContext,=
+ n);
+> > +    VFIOContainer *container =3D giommu_ctx->container;
+> > +    IOMMUCTXPASIDReqDesc *pasid_req =3D
+> > +                              (IOMMUCTXPASIDReqDesc *) event_data->dat=
+a;
+> > +    struct vfio_iommu_type1_pasid_request req;
+> > +    unsigned long argsz;
+> > +    int ret =3D 0;
+> > +
+> > +    argsz =3D sizeof(req);
+> > +    req.argsz =3D argsz;
+> > +    req.flag =3D VFIO_IOMMU_PASID_FREE;
+> > +    req.pasid =3D pasid_req->pasid;
+> > +
+> > +    ret =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
+> > +    if (ret !=3D 0) {
+> > +        error_report("%s: %d, pasid %u free failed",
+> > +                   __func__, -errno, (unsigned) pasid_req->pasid);
+> > +    }
+> > +    pasid_req->free_result =3D ret;
+>=20
+> Same problem here.
 
-$ ./qemu-img create -42
-qemu-img: unrecognized option 'create'
-Try 'qemu-img --help' for more information
+yep, as above proposal.
 
-So, uh, well.
+> > +}
+> > +
+> >  static void vfio_realize(PCIDevice *pdev, Error **errp)
+> >  {
+> >      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
+> >      VFIODevice *vbasedev_iter;
+> >      VFIOGroup *group;
+> > +    IOMMUContext *iommu_context;
+> >      char *tmp, *subsys, group_path[PATH_MAX], *group_name;
+> >      Error *err =3D NULL;
+> >      ssize_t len;
+> > @@ -3000,6 +3069,18 @@ static void vfio_realize(PCIDevice *pdev, Error =
+**errp)
+> >      vfio_register_req_notifier(vdev);
+> >      vfio_setup_resetfn_quirk(vdev);
+> >
+> > +    iommu_context =3D pci_device_iommu_context(pdev);
+> > +    if (iommu_context) {
+> > +        vfio_register_iommu_ctx_notifier(vdev,
+> > +                                         iommu_context,
+> > +                                         vfio_iommu_pasid_alloc_notify=
+,
+> > +                                         IOMMU_CTX_EVENT_PASID_ALLOC);
+> > +        vfio_register_iommu_ctx_notifier(vdev,
+> > +                                         iommu_context,
+> > +                                         vfio_iommu_pasid_free_notify,
+> > +                                         IOMMU_CTX_EVENT_PASID_FREE);
+> > +    }
+> > +
+> >      return;
+> >
+> >  out_teardown:
+> > diff --git a/include/hw/iommu/iommu.h b/include/hw/iommu/iommu.h
+> > index c22c442..4352afd 100644
+> > --- a/include/hw/iommu/iommu.h
+> > +++ b/include/hw/iommu/iommu.h
+> > @@ -31,10 +31,25 @@
+> >  typedef struct IOMMUContext IOMMUContext;
+> >
+> >  enum IOMMUCTXEvent {
+> > +    IOMMU_CTX_EVENT_PASID_ALLOC,
+> > +    IOMMU_CTX_EVENT_PASID_FREE,
+> >      IOMMU_CTX_EVENT_NUM,
+> >  };
+> >  typedef enum IOMMUCTXEvent IOMMUCTXEvent;
+> >
+> > +union IOMMUCTXPASIDReqDesc {
+> > +    struct {
+> > +        uint32_t min_pasid;
+> > +        uint32_t max_pasid;
+> > +        int32_t alloc_result; /* pasid allocated for the alloc request=
+ */
+> > +    };
+> > +    struct {
+> > +        uint32_t pasid; /* pasid to be free */
+> > +        int free_result;
+> > +    };
+> > +};
+>=20
+> Apart from theproblem with writable fields, using a big union for
+> event data is pretty ugly.  If you need this different information for
+> the different events, it might make more sense to have a separate
+> notifier chain with a separate call interface for each event type,
+> rather than trying to multiplex them together.
 
-Max
+sure, I'll de-couple them. Nice catch.
 
-
---CTnbbBGncbNhBdWbfu0aL0pWmOO4z2Ee6--
-
---ES4dZDw0zoUOZ6p5uk9Ldf9QvDcKQXhUu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3CuF8ACgkQ9AfbAGHV
-z0CCPgf/X9Rmv7DCoueSNKQfwEJfV1vLUw7AJpvtDoB0VyM2Fp4CsREHpvgmhXUt
-Et3kO5m6RUCUp60QwOT4o4fp9ChtHzQHYPGViOQpGImRkxyST+cnd7wCAUy3l0/K
-aNE+F9KAQM9xZol9TiIB1Ocu6KCI4r0Z5eRkbVoeZNv0vBK89VuMsYvTMcAWJvGH
-FX9ixmkUEi4DCg6qpAEw9KOSGL6gLRPd2gzBsnqZYX6cBNYQYRaotT34wJYCXl7C
-PyOL23hxDTZLxI0bSgHOmW6R+Rne+L5Da88tbUMmxRojCe3Lc3m9ilfgFJH4aJke
-48GrLQjEwoNr+t4hA2OTahCkq/jIcA==
-=iHU7
------END PGP SIGNATURE-----
-
---ES4dZDw0zoUOZ6p5uk9Ldf9QvDcKQXhUu--
+Thanks,
+Yi Liu
 
 
