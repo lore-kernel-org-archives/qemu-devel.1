@@ -2,77 +2,81 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D2BFC5DF64
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 15:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC27EC5DF63
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 15:11:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B0A0217F5
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 15:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 892E9217F5
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 15:11:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QmP8uoun"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B0A0217F5
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VS6iIwPP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 892E9217F5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59870 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSMs6-0008N2-Bx
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 10:05:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38922)
+	id 1iSMyM-0002BD-KJ
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 10:11:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40149)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <estebanbosse@gmail.com>) id 1iSMrP-0007v7-79
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:04:40 -0500
+ (envelope-from <jandryuk@gmail.com>) id 1iSMxc-0001ku-Nv
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:11:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <estebanbosse@gmail.com>) id 1iSMrN-0008LH-SO
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:04:39 -0500
-Received: from mail-ed1-x52b.google.com ([2a00:1450:4864:20::52b]:39728)
+ (envelope-from <jandryuk@gmail.com>) id 1iSMxb-0004Rl-OV
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:11:04 -0500
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:40973)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <estebanbosse@gmail.com>)
- id 1iSMrN-0008KX-L2
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:04:37 -0500
-Received: by mail-ed1-x52b.google.com with SMTP id l25so19611334edt.6
- for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 07:04:37 -0800 (PST)
+ (Exim 4.71) (envelope-from <jandryuk@gmail.com>) id 1iSMxb-0004RK-HI
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:11:03 -0500
+Received: by mail-lj1-x241.google.com with SMTP id m9so26487329ljh.8
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 07:11:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:from:date:message-id:subject:to:cc;
- bh=sw3Rn1QToG67jTwiMuD4WHwAA7lbRqg4P4dqhJRqmvo=;
- b=QmP8uounFTplMnZxKeiUFFLpPC7cm43sZc516ywUDChWAoV8puBJiMN6dJFMNrP72x
- Ohmz1gzgJVK7vjpaDj9FhvZoXN5mdlbBxZDQDkOx+s3FIk0tp9qbcmHgUf1+tjfzztU7
- k8/ojmy153uECxNF0FtAZUQxPhNGRFyIWG7jocThHHBv/OBCUu89pgp40p8GD7ovzH24
- 6BHp4QoRstbzquKoHurJ+X4nRQRU+ciSokS5ukf9eUMZAzk5mAd8IjeJeHkrDHRXjHJq
- 9jq/Mkwdh4f02nd9oo6JiX0HXYXYvsmJM7m1rHhbv62nqiQJcivbRMAhTlaX9nXWlNbr
- YuBQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=0bIbbQ4C2sb3ptLfIGkCO37EbzkdBtG7VUHRPJsrHck=;
+ b=VS6iIwPPmviUrI4dhvLN5lGDVR5sN7PfMWrWlgxxCIPXWgb60564X4gD4i4yUUxOnJ
+ Q1z1s6yPkQe6yJ+rJ/LT7GWlboYg5xdLdmfc5t/B0c8BmFN1seCgSbT45qrSVWfXQqIi
+ TgQYdf2r5jRa4LlRqBhDFnvLnsMm+mXCubeq658+aSMgCGASow8F7slFa0U33S8Ytxgg
+ f+1q+QLS9jm/NtCXwdCmRpZGEx/on8hxyfzHvauxCe1V0LuhdMmEkKNiyYbr1VDudOsm
+ IRkOsEfkAaMyh0+fmFxmD9AwbbJYuthn/jDtSBkDfE6SRVwIYUoC6E75QMeTpWvXc0uy
+ QNug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
- bh=sw3Rn1QToG67jTwiMuD4WHwAA7lbRqg4P4dqhJRqmvo=;
- b=c11vJk7LCgegQ74dgWwlyxUfeD2KvFzmdxtvmYi37fLe7jb+VMEoEFvXjg31dTk4nw
- N7CUpHKR+VBxkLCSRqqY1CX9u06dCjSB1a9Ib9Voo5Njf1puw+a87MVkc9BTn1bDtWgI
- 4PyYjPgIec+C72d/L0ZNIto2d+FFdHEDZ1gHnHVi7xrGSvyBPahiQo68cP0VWXDr1Dg6
- 6ST0KfPHjbbT7Rs35h/LdR+UJjCTU3vg/oCx8AhmkqbqtAIIL9IVTN1MZVi6Y0PqmT3W
- TmdMstme4IaFigKByAUHjoy4Mh/ZvcIOlWDDKnhH4h7pwyiWoOnlB35bo774GHK/aq2G
- y3XQ==
-X-Gm-Message-State: APjAAAX+f6V3ee5Z0EyT5fTYNn1yN+EcF3lcjny4zkC67JWUdfs/ceJ1
- N778L1VYpGYY1eIurZoKI1wwRImOg4cjmotGgVIXWkDU
-X-Google-Smtp-Source: APXvYqyf0UG/emeMIhmXqecPg8xjmMcWWf85pIhi/bP35Lwev+q8UqbGBWNSi6v/S+qolMZYFaA4H8pVggxuotsfOUY=
-X-Received: by 2002:a17:907:36e:: with SMTP id
- rs14mr30501177ejb.330.1573052675736; 
- Wed, 06 Nov 2019 07:04:35 -0800 (PST)
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=0bIbbQ4C2sb3ptLfIGkCO37EbzkdBtG7VUHRPJsrHck=;
+ b=d5F42zWHKSZXUQi+d/zNxBa0houN91Sb/WvNSS4WdJ1Kd8BeXtSolhg/Sc4rmT3hdj
+ iOgrAzZ29O+5DwoyKXyg4QsDLVrvtnx67fcbpyUXnnN9ndqNEENIxROYHSaa8M3m/tmw
+ jiuE2jTcQB4sjjRdcQfhu7sd2Q4+O0XzNKAAf2n5rbatEO9gISMnDa5VQETPJ4T5cwzH
+ 9rJuCj7HjZI8SVyGuE0p4xz+8FTOfloHWvnofSf5vstKmUp75HYVIN4WHx9CNSnt0PBS
+ Hddl7wxB/bSLr4Ihaqvld0mSqqGUvqczy4kZfbLcKl3wGPygVhXKN9tE/tvG2j4mZFsk
+ YFsQ==
+X-Gm-Message-State: APjAAAV9IyeppVeZr7NDfomtfHfQrMx29C2+lHGtvOycIMVfeTcTsZpw
+ zFQEHW86VcRMZprtH3kkz0dqrSYFBxOsov4slJo=
+X-Google-Smtp-Source: APXvYqwzBWm3ywrp9FmsGwYiMZFXzOTeUoqbMfO7fj3HJ+9kl9Q0RNZlRcWpiI9Xhktksa6FqsdnB/8CEE4mJegnb+0=
+X-Received: by 2002:a2e:b537:: with SMTP id z23mr2365918ljm.129.1573053062151; 
+ Wed, 06 Nov 2019 07:11:02 -0800 (PST)
 MIME-Version: 1.0
-From: Esteban Bosse <estebanbosse@gmail.com>
-Date: Wed, 6 Nov 2019 16:04:24 +0100
-Message-ID: <CAGbAg_CAh-U-xRh+d6wNLQVWoHXEA0xcW6021Qd4WsMJBGfgOg@mail.gmail.com>
-Subject: BeagleBone support, omap1, omap2, omap3, etc.
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: multipart/alternative; boundary="000000000000f349fd0596aedd3b"
+References: <20191106130309.6737-1-jandryuk@gmail.com>
+ <CAJ+F1CJLffYST5eVXBrOarYxRhkNvgGF0J3wGJ50xny7pLE2NA@mail.gmail.com>
+In-Reply-To: <CAJ+F1CJLffYST5eVXBrOarYxRhkNvgGF0J3wGJ50xny7pLE2NA@mail.gmail.com>
+From: Jason Andryuk <jandryuk@gmail.com>
+Date: Wed, 6 Nov 2019 10:10:51 -0500
+Message-ID: <CAKf6xpt+0P8MgpBRPx2p-wtsd1YSW-m2WEjyGQ=QNu7J-CdkTQ@mail.gmail.com>
+Subject: Re: [PATCH] qmp: Reset mon->commands on CHR_EVENT_CLOSED
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::52b
+X-Received-From: 2a00:1450:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,87 +88,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f349fd0596aedd3b
-Content-Type: text/plain; charset="UTF-8"
+On Wed, Nov 6, 2019 at 9:53 AM Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@gmail.com> wrote:
+>
+> Hi
+>
+> On Wed, Nov 6, 2019 at 5:04 PM Jason Andryuk <jandryuk@gmail.com> wrote:
+> >
+> > Currently, mon->commands is uninitialized until CHR_EVENT_OPENED where
+> > it is set to &qmp_cap_negotiation_commands.  After capability
+> > negotiation, it is set to &qmp_commands.  If the chardev is closed,
+> > CHR_EVENT_CLOSED, mon->commands remains as &qmp_commands.  Only once th=
+e
+> > chardev is re-opened with CHR_EVENT_OPENED, is it reset to
+> > &qmp_cap_negotiation_commands.
+> >
+> > monitor_qapi_event_emit compares mon->commands to
+> > &qmp_cap_negotiation_commands, and skips sending events when they are
+> > equal.  In the case of a closed chardev, QMP events are still sent down
+> > to the closed chardev which needs to drop them.
+>
+> This is a minor improvement, not really a bug fix or do I read that incor=
+rectly?
 
-Hello!
+Yes, it is more of a minor improvement since disconnected chardevs
+already drop the QMP events.  This will just stop generating them in
+the first place.
 
-Some months ago I started to work trying to port the Beaglebone support
-from the old qemu-linaro fork to the new QEMU mainstream.
+> >
+> > Set mon->commands to &qmp_cap_negotiation_commands for CHR_EVENT_CLOSED
+> > to stop sending events.  Setting for the CHR_EVENT_OPENED case remains
+> > since that is how mon->commands is set for a newly opened connections.
+> >
+> > Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
+> > ---
+> >  monitor/qmp.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/monitor/qmp.c b/monitor/qmp.c
+> > index 9d9e5d8b27..5e2073c5eb 100644
+> > --- a/monitor/qmp.c
+> > +++ b/monitor/qmp.c
+> > @@ -333,6 +333,7 @@ static void monitor_qmp_event(void *opaque, int eve=
+nt)
+> >           * is closed.
+> >           */
+> >          monitor_qmp_cleanup_queues(mon);
+> > +        mon->commands =3D &qmp_cap_negotiation_commands;
+> >          json_message_parser_destroy(&mon->parser);
+> >          json_message_parser_init(&mon->parser, handle_qmp_command,
+> >                                   mon, NULL);
+> > --
+> > 2.21.0
+> >
+> >
+>
+> Looks good to me,
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-During my work I found that the Beaglebone have an OMAP3 mpu this mpu has
-very strong relation with the OMAP2 and OMAP1 in qemu, they implement a lot
-of functions in common.
+Thank you.
 
-Then I understood that the omap1 and omap2 don't implement things like QOM
-and needs a lot of work to upgrade it, at the same time they are some
-boards like: omap1_sx, palm, nseries that implement this mpus.
-
-Looking the datasheet of the omap1 I realized that it's an very old device
-and some questions like "make sense work with this old device?" comes to my
-mind.
-
-When I went to the KVM Forum the last week I talked with some of you, and
-you help my with different ideas and proposal to make this task, but I
-can't see the right way to make this work because it is a lot of work.
-
-My motivation is learn more about embedded devices, architecture, kernel,
-etc. and of course contribute to the community.
-
-I would love to hear your opinions about this 3 related devices with they
-respected boards.
-
-Maybe someone is interested to work with me.
-I dream to make this work beautiful (like the musca board with the armsse
-and armv7m modules) with a good variety of tests. And in the same time I
-would like to write some documentation about the process with the final
-idea to "make an easier way for new contributors".
-
-If someone want to work with me in this task, should know that I don't have
-to much experience and I'm doing this job in my free time (this means that
-I work only in my free time).
-
-I appreciate any kind of comment or advice.
-
-Thanks for your time ;)
-EstebanB
-
---000000000000f349fd0596aedd3b
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">Hello!<br><br>Some months ago I started to work trying to =
-port the Beaglebone support from the old qemu-linaro fork to the new QEMU m=
-ainstream.<br><br>During my work I found that the Beaglebone have an OMAP3 =
-mpu this mpu has very strong relation with the OMAP2 and OMAP1 in qemu, the=
-y implement a lot of functions in common.<br><br>Then I understood that the=
- omap1 and omap2 don&#39;t implement things like QOM and needs a lot of wor=
-k to upgrade it, at the same time they are some boards like: omap1_sx, palm=
-, nseries that implement this mpus.<br><br>Looking the datasheet of the oma=
-p1 I realized that it&#39;s an very old device and some questions like &quo=
-t;make sense work with this old device?&quot; comes to my mind.<br><br>When=
- I went to the KVM Forum the last week I talked with some of you, and you h=
-elp my with different ideas and proposal to make this task, but I can&#39;t=
- see the right way to make this work because it is a lot of work.<br><br>My=
- motivation is learn more about embedded devices, architecture, kernel, etc=
-. and of course contribute to the community.=C2=A0<br><br>I would love to h=
-ear your opinions about this 3 related devices with they respected boards.<=
-br><br>Maybe someone is interested to work with me. <br>I=C2=A0dream to mak=
-e this work beautiful (like the musca board with the armsse and armv7m modu=
-les) with a good variety of tests. And in the same time I would like to wri=
-te some documentation about the process with the final idea to &quot;make a=
-n easier way for new contributors&quot;.<br><br>If someone want to work wit=
-h me in this task, should know that I don&#39;t have to much experience and=
- I&#39;m doing this job in my free time (this means that I work only in my =
-free time).<br><br>I appreciate any kind of comment or advice.<div><br>Than=
-ks for your time ;)<br><div>EstebanB</div></div></div>
-
---000000000000f349fd0596aedd3b--
+-Jason
 
