@@ -2,71 +2,85 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B8D0C5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B38E2C5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:35:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFF2420659
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:27:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFF2420659
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 74E7A2077C
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:35:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Mvy5YVon"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74E7A2077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSJTR-0002Xm-4b
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 06:27:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35277)
+	id 1iSJay-0005gc-4Z
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 06:35:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37787)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iSJPn-0007zu-Bd
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:23:57 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iSJZA-0003m2-7V
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iSJPl-0000as-G4
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:23:55 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:39173)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSJPl-0000X2-5o
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:23:53 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N49d1-1hkUCW3Spl-0105wm; Wed, 06 Nov 2019 12:23:46 +0100
-From: Laurent Vivier <laurent@vivier.eu>
+ (envelope-from <richard.henderson@linaro.org>) id 1iSJZ8-0007Er-8h
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:35 -0500
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:33080)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iSJZ8-00079K-0A
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:33:34 -0500
+Received: by mail-wm1-x332.google.com with SMTP id a17so1364253wmb.0
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 03:33:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=mhrOzofaCWIJFCVDwPiLXME5UaZdBlhyAX2UwDZp+B4=;
+ b=Mvy5YVonUvB51+vNyUtkeTre4gws2fGfhO0Ypc0X+k66nP34FWk47sB8E5CeKBZ0zT
+ gYRin7BD6OYoSKxrYxy4I/F9w7Y+ayZCPpaqYUj0VUC8ZxY1iHsUhM5hy7x1lMUniXeP
+ e7+82v2KEyjmWrLyQmBgR7O9dNUIOqB7HCVBsaxdMONaScMKl7B9jffOV+ONle5l6A9k
+ 1ToC51VVgx01BQdPQqaYRLlno0VJ9UdbRXGA9eC/h39LMGFcv5L4KhhQIL2iZwBB2l5b
+ bvL/VqR2SBuDnQdF5PpYiukv/xNFcPdXyeuqNEt6rlmQsnz0FSRQ/rtBgYTUcYguztyo
+ 4iew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=mhrOzofaCWIJFCVDwPiLXME5UaZdBlhyAX2UwDZp+B4=;
+ b=gdETegZ+SnzYoCN9N7WPZFt2dLOVMCEQr8ZrXZOEUp9fU5WEKorGmThmW5AYNP45NS
+ o1pqqcHVpu4ALpE9zGNWaVVg0P+/rlTzI904TnFB5vzHSRrbAIiT84UC3hjp5vsmnMU3
+ 5M2IU6BrUJDuzLxlh0OcL8fqpTG7ctGOrkED57CUhPaLyvLPZLbxDDrkNptO+atLpyH5
+ Q2r9H+KJ/xCC2PTew0AxdJ4LR0abiEesjodh+Cv7Pel7WnrzvdgdpKrUa/p6cQfR+IP+
+ jdwk51Zi4buSunYG4sGVbXiBe0oVVZcMHZ5zQExWS9XxVc+jlWKo9Z8IcZ18spNebaPO
+ zzvg==
+X-Gm-Message-State: APjAAAXVAyQpnnSPEr9VnybmiiM24AIV6CKZSncfqqXvhFHe2xRgteSE
+ af/JBJ/XyNDubi3kDiR2yYi3fSa/fntZJQ==
+X-Google-Smtp-Source: APXvYqx+GmIE4mDj9wTS7ur98bIGqPsTOHYaLsEE7juY0WlwnCo33inLc8VW6pBDUuIKKbjZwel9pg==
+X-Received: by 2002:a7b:c408:: with SMTP id k8mr2131605wmi.67.1573040010564;
+ Wed, 06 Nov 2019 03:33:30 -0800 (PST)
+Received: from localhost.localdomain
+ (31.red-176-87-122.dynamicip.rima-tde.net. [176.87.122.31])
+ by smtp.gmail.com with ESMTPSA id q124sm1776907wme.13.2019.11.06.03.33.29
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 06 Nov 2019 03:33:30 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/2] dp8393x: put the DMA buffer in the state structure
-Date: Wed,  6 Nov 2019 12:23:40 +0100
-Message-Id: <20191106112341.23735-2-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191106112341.23735-1-laurent@vivier.eu>
-References: <20191106112341.23735-1-laurent@vivier.eu>
+Subject: [PATCH v3 00/12] linux-user sparc fixes
+Date: Wed,  6 Nov 2019 12:33:06 +0100
+Message-Id: <20191106113318.10226-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Ph0vUdpbQKMk9zryzaiBGsmREIV/etHPXOiTtByPQA85xQyyenV
- hHBmw+cvBqFC7GxPn9g/1DdCpQWfLPMM35FWmdCQgPlnLARiy546vNLP3qwMScD7VGS3+aP
- 9Oa64wl+Z7JBmgyqElX2VEAkiEWop/mg+LViKukW5KcxE5q9eVRJ4jE1zTLmP6BtY5rVyaR
- gMld9qUGtH73rRowsrpvQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:y5GFsLTs9dk=:QMSvxEnXql/i7ICvF6sDgt
- A6sqtEMdBnpcPwT67ABcr6gdG4eXzCsjmf4FNjitP9e50TE9HgcXwV0zo1MODNxTX54PEDeXL
- HzbEwVFQSDJW1jPUzfVa9/NkdLi3qYbWGFhUWAfSYNPTU6aq5GypvDmFTeN9Xy4goLLdt0Y9S
- 6xplWg4YVj2ViIkmXrS8m4Whr7JYIvIkPh4yI4NA3+o7wzGMsZmQuSbcjwwTXc0a4XAPbq6s6
- 4S5tC51IQXQGeGdaMU9kydfQ6EPWHWHry0bOCXNo61Kgqryd5NlomR2tgwxQW4wlSoEtohztI
- QBQF3HSmtluZ35DvCiWoSmtdtdqcai2yjUUc5vuXQEcY+LTq1IXjr48QDyFIEhtGD9GeP9tyE
- WTKminHWd7OGCjyjCl2mBCPyNfTu6dljGui9rueKlDLH4ml6tprvgOtdo5cXIQzZc/tAiWHyR
- A5QS3HMjqZAwUGTJagwTePNJlb9/L0oO8Js08PFPzBLVmh+pneZYOK/ITcAO4iwgrZhj36h2S
- aUwmZiBXJlMHynttsJWm0H7u1ML3wqva4BBzHFVRZPiSvkFXNsNQS6YjVHruA8JdjXduwuUCB
- Y3LGC0fCYzzVGeun5u53xo8ozjVYc2tU0MPUlOrSmUAoTwtiVXj5SfBh8oOsXPTEWK3KSJlpz
- DJQCk/E1xkV1ivhvdudzTqeGNUluf0LVZKfceHRBSiL3X8F4lVITtPPSyxzp60ll88Ng9t9zm
- bS7UPxjsP2r4nSWdaYdGmnu+F0oUIZdNb31kCZwOpZde0sT7YOhc9jinqwyqSw2W3TOo7YGF+
- OP06QHrpSi/DMYwb2UILhQAk76UC3ErpTIyH4DA0a0tWnl9dE+//y4g/YgImlKtLdifF4urYi
- h+nHhh3uTL96ZkXiUiVw==
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 217.72.192.73
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::332
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,271 +92,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move it from the stack.
+Changes in v3:
+  * Fix checkpatch errors in patches 5 and 8.
+    There's lots more style errors left to clean up in
+    these files, but this is enough for now.
 
-It's only 24 bytes, and this simplifies the dp8393x_get()/
-dp8393x_put() interface.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
----
- hw/net/dp8393x.c | 105 ++++++++++++++++++++++-------------------------
- 1 file changed, 50 insertions(+), 55 deletions(-)
+r~
 
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index 693e244ce6..85d3f3788e 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -171,6 +171,7 @@ typedef struct dp8393xState {
- 
-     /* Temporaries */
-     uint8_t tx_buffer[0x10000];
-+    uint16_t data[12];
-     int loopback_packet;
- 
-     /* Memory access */
-@@ -224,26 +225,25 @@ static uint32_t dp8393x_wt(dp8393xState *s)
-     return s->regs[SONIC_WT1] << 16 | s->regs[SONIC_WT0];
- }
- 
--static uint16_t dp8393x_get(dp8393xState *s, int width, uint16_t *base,
--                            int offset)
-+static uint16_t dp8393x_get(dp8393xState *s, int width, int offset)
- {
-     uint16_t val;
- 
-     if (s->big_endian) {
--        val = be16_to_cpu(base[offset * width + width - 1]);
-+        val = be16_to_cpu(s->data[offset * width + width - 1]);
-     } else {
--        val = le16_to_cpu(base[offset * width]);
-+        val = le16_to_cpu(s->data[offset * width]);
-     }
-     return val;
- }
- 
--static void dp8393x_put(dp8393xState *s, int width, uint16_t *base, int offset,
-+static void dp8393x_put(dp8393xState *s, int width, int offset,
-                         uint16_t val)
- {
-     if (s->big_endian) {
--        base[offset * width + width - 1] = cpu_to_be16(val);
-+        s->data[offset * width + width - 1] = cpu_to_be16(val);
-     } else {
--        base[offset * width] = cpu_to_le16(val);
-+        s->data[offset * width] = cpu_to_le16(val);
-     }
- }
- 
-@@ -267,7 +267,6 @@ static void dp8393x_update_irq(dp8393xState *s)
- 
- static void dp8393x_do_load_cam(dp8393xState *s)
- {
--    uint16_t data[8];
-     int width, size;
-     uint16_t index = 0;
- 
-@@ -277,13 +276,13 @@ static void dp8393x_do_load_cam(dp8393xState *s)
-     while (s->regs[SONIC_CDC] & 0x1f) {
-         /* Fill current entry */
-         address_space_rw(&s->as, dp8393x_cdp(s),
--            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--        s->cam[index][0] = dp8393x_get(s, width, data, 1) & 0xff;
--        s->cam[index][1] = dp8393x_get(s, width, data, 1) >> 8;
--        s->cam[index][2] = dp8393x_get(s, width, data, 2) & 0xff;
--        s->cam[index][3] = dp8393x_get(s, width, data, 2) >> 8;
--        s->cam[index][4] = dp8393x_get(s, width, data, 3) & 0xff;
--        s->cam[index][5] = dp8393x_get(s, width, data, 3) >> 8;
-+            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-+        s->cam[index][0] = dp8393x_get(s, width, 1) & 0xff;
-+        s->cam[index][1] = dp8393x_get(s, width, 1) >> 8;
-+        s->cam[index][2] = dp8393x_get(s, width, 2) & 0xff;
-+        s->cam[index][3] = dp8393x_get(s, width, 2) >> 8;
-+        s->cam[index][4] = dp8393x_get(s, width, 3) & 0xff;
-+        s->cam[index][5] = dp8393x_get(s, width, 3) >> 8;
-         DPRINTF("load cam[%d] with %02x%02x%02x%02x%02x%02x\n", index,
-             s->cam[index][0], s->cam[index][1], s->cam[index][2],
-             s->cam[index][3], s->cam[index][4], s->cam[index][5]);
-@@ -295,8 +294,8 @@ static void dp8393x_do_load_cam(dp8393xState *s)
- 
-     /* Read CAM enable */
-     address_space_rw(&s->as, dp8393x_cdp(s),
--        MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--    s->regs[SONIC_CE] = dp8393x_get(s, width, data, 0);
-+        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-+    s->regs[SONIC_CE] = dp8393x_get(s, width, 0);
-     DPRINTF("load cam done. cam enable mask 0x%04x\n", s->regs[SONIC_CE]);
- 
-     /* Done */
-@@ -307,20 +306,19 @@ static void dp8393x_do_load_cam(dp8393xState *s)
- 
- static void dp8393x_do_read_rra(dp8393xState *s)
- {
--    uint16_t data[8];
-     int width, size;
- 
-     /* Read memory */
-     width = (s->regs[SONIC_DCR] & SONIC_DCR_DW) ? 2 : 1;
-     size = sizeof(uint16_t) * 4 * width;
-     address_space_rw(&s->as, dp8393x_rrp(s),
--        MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-+        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
- 
-     /* Update SONIC registers */
--    s->regs[SONIC_CRBA0] = dp8393x_get(s, width, data, 0);
--    s->regs[SONIC_CRBA1] = dp8393x_get(s, width, data, 1);
--    s->regs[SONIC_RBWC0] = dp8393x_get(s, width, data, 2);
--    s->regs[SONIC_RBWC1] = dp8393x_get(s, width, data, 3);
-+    s->regs[SONIC_CRBA0] = dp8393x_get(s, width, 0);
-+    s->regs[SONIC_CRBA1] = dp8393x_get(s, width, 1);
-+    s->regs[SONIC_RBWC0] = dp8393x_get(s, width, 2);
-+    s->regs[SONIC_RBWC1] = dp8393x_get(s, width, 3);
-     DPRINTF("CRBA0/1: 0x%04x/0x%04x, RBWC0/1: 0x%04x/0x%04x\n",
-         s->regs[SONIC_CRBA0], s->regs[SONIC_CRBA1],
-         s->regs[SONIC_RBWC0], s->regs[SONIC_RBWC1]);
-@@ -417,7 +415,6 @@ static void dp8393x_do_receiver_disable(dp8393xState *s)
- static void dp8393x_do_transmit_packets(dp8393xState *s)
- {
-     NetClientState *nc = qemu_get_queue(s->nic);
--    uint16_t data[12];
-     int width, size;
-     int tx_len, len;
-     uint16_t i;
-@@ -429,18 +426,17 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         size = sizeof(uint16_t) * 6 * width;
-         s->regs[SONIC_TTDA] = s->regs[SONIC_CTDA];
-         DPRINTF("Transmit packet at %08x\n", dp8393x_ttda(s));
--        address_space_rw(&s->as,
--            dp8393x_ttda(s) + sizeof(uint16_t) * width,
--            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
-+        address_space_rw(&s->as, dp8393x_ttda(s) + sizeof(uint16_t) * width,
-+            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-         tx_len = 0;
- 
-         /* Update registers */
--        s->regs[SONIC_TCR] = dp8393x_get(s, width, data, 0) & 0xf000;
--        s->regs[SONIC_TPS] = dp8393x_get(s, width, data, 1);
--        s->regs[SONIC_TFC] = dp8393x_get(s, width, data, 2);
--        s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 3);
--        s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 4);
--        s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 5);
-+        s->regs[SONIC_TCR] = dp8393x_get(s, width, 0) & 0xf000;
-+        s->regs[SONIC_TPS] = dp8393x_get(s, width, 1);
-+        s->regs[SONIC_TFC] = dp8393x_get(s, width, 2);
-+        s->regs[SONIC_TSA0] = dp8393x_get(s, width, 3);
-+        s->regs[SONIC_TSA1] = dp8393x_get(s, width, 4);
-+        s->regs[SONIC_TFS] = dp8393x_get(s, width, 5);
- 
-         /* Handle programmable interrupt */
-         if (s->regs[SONIC_TCR] & SONIC_TCR_PINT) {
-@@ -465,10 +461,10 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                 size = sizeof(uint16_t) * 3 * width;
-                 address_space_rw(&s->as,
-                     dp8393x_ttda(s) + sizeof(uint16_t) * (4 + 3 * i) * width,
--                    MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--                s->regs[SONIC_TSA0] = dp8393x_get(s, width, data, 0);
--                s->regs[SONIC_TSA1] = dp8393x_get(s, width, data, 1);
--                s->regs[SONIC_TFS] = dp8393x_get(s, width, data, 2);
-+                    MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-+                s->regs[SONIC_TSA0] = dp8393x_get(s, width, 0);
-+                s->regs[SONIC_TSA1] = dp8393x_get(s, width, 1);
-+                s->regs[SONIC_TFS] = dp8393x_get(s, width, 2);
-             }
-         }
- 
-@@ -495,12 +491,12 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-         s->regs[SONIC_TCR] |= SONIC_TCR_PTX;
- 
-         /* Write status */
--        dp8393x_put(s, width, data, 0,
-+        dp8393x_put(s, width, 0,
-                     s->regs[SONIC_TCR] & 0x0fff); /* status */
-         size = sizeof(uint16_t) * width;
-         address_space_rw(&s->as,
-             dp8393x_ttda(s),
--            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
-+            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 1);
- 
-         if (!(s->regs[SONIC_CR] & SONIC_CR_HTX)) {
-             /* Read footer of packet */
-@@ -509,9 +505,9 @@ static void dp8393x_do_transmit_packets(dp8393xState *s)
-                 dp8393x_ttda(s) +
-                              sizeof(uint16_t) *
-                              (4 + 3 * s->regs[SONIC_TFC]) * width,
--                MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--            s->regs[SONIC_CTDA] = dp8393x_get(s, width, data, 0) & ~0x1;
--            if (dp8393x_get(s, width, data, 0) & 0x1) {
-+                MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-+            s->regs[SONIC_CTDA] = dp8393x_get(s, width, 0) & ~0x1;
-+            if (dp8393x_get(s, width, 0) & 0x1) {
-                 /* EOL detected */
-                 break;
-             }
-@@ -748,7 +744,6 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-                                size_t size)
- {
-     dp8393xState *s = qemu_get_nic_opaque(nc);
--    uint16_t data[10];
-     int packet_type;
-     uint32_t available, address;
-     int width, rx_len = size;
-@@ -773,8 +768,8 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
-         size = sizeof(uint16_t) * 1 * width;
-         address = dp8393x_crda(s) + sizeof(uint16_t) * 5 * width;
-         address_space_rw(&s->as, address, MEMTXATTRS_UNSPECIFIED,
--                         (uint8_t *)data, size, 0);
--        if (dp8393x_get(s, width, data, 0) & 0x1) {
-+                         (uint8_t *)s->data, size, 0);
-+        if (dp8393x_get(s, width, 0) & 0x1) {
-             /* Still EOL ; stop reception */
-             return -1;
-         } else {
-@@ -818,27 +813,27 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
- 
-     /* Write status to memory */
-     DPRINTF("Write status at %08x\n", dp8393x_crda(s));
--    dp8393x_put(s, width, data, 0, s->regs[SONIC_RCR]); /* status */
--    dp8393x_put(s, width, data, 1, rx_len); /* byte count */
--    dp8393x_put(s, width, data, 2, s->regs[SONIC_TRBA0]); /* pkt_ptr0 */
--    dp8393x_put(s, width, data, 3, s->regs[SONIC_TRBA1]); /* pkt_ptr1 */
--    dp8393x_put(s, width, data, 4, s->regs[SONIC_RSC]); /* seq_no */
-+    dp8393x_put(s, width, 0, s->regs[SONIC_RCR]); /* status */
-+    dp8393x_put(s, width, 1, rx_len); /* byte count */
-+    dp8393x_put(s, width, 2, s->regs[SONIC_TRBA0]); /* pkt_ptr0 */
-+    dp8393x_put(s, width, 3, s->regs[SONIC_TRBA1]); /* pkt_ptr1 */
-+    dp8393x_put(s, width, 4, s->regs[SONIC_RSC]); /* seq_no */
-     size = sizeof(uint16_t) * 5 * width;
-     address_space_rw(&s->as, dp8393x_crda(s),
--        MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 1);
-+        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 1);
- 
-     /* Move to next descriptor */
-     size = sizeof(uint16_t) * width;
-     address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 5 * width,
--        MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, size, 0);
--    s->regs[SONIC_LLFA] = dp8393x_get(s, width, data, 0);
-+        MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, size, 0);
-+    s->regs[SONIC_LLFA] = dp8393x_get(s, width, 0);
-     if (s->regs[SONIC_LLFA] & 0x1) {
-         /* EOL detected */
-         s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
-     } else {
--        dp8393x_put(s, width, data, 0, 0); /* in_use */
-+        dp8393x_put(s, width, 0, 0); /* in_use */
-         address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
--            MEMTXATTRS_UNSPECIFIED, (uint8_t *)data, sizeof(uint16_t), 1);
-+            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, sizeof(uint16_t), 1);
-         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
-         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
-         s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) | (((s->regs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
+
+Richard Henderson (12):
+  scripts/qemu-binfmt-conf: Update for sparc64
+  tests/tcg/multiarch/linux-test: Fix error check for shmat
+  target/sparc: Define an enumeration for accessing env->regwptr
+  linux-user/sparc: Use WREG constants in sparc/target_cpu.h
+  linux-user/sparc: Begin using WREG constants in sparc/signal.c
+  linux-user/sparc: Use WREG_SP constant in sparc/signal.c
+  linux-user/sparc: Fix WREG usage in setup_frame
+  linux-user/sparc64: Fix target_signal_frame
+  linux-user: Rename cpu_clone_regs to cpu_clone_regs_child
+  linux-user: Introduce cpu_clone_regs_parent
+  linux-user/sparc: Fix cpu_clone_regs_*
+  linux-user/alpha: Set r20 secondary return value
+
+ linux-user/aarch64/target_cpu.h    |   7 +-
+ linux-user/alpha/target_cpu.h      |  16 ++++-
+ linux-user/arm/target_cpu.h        |   7 +-
+ linux-user/cris/target_cpu.h       |   7 +-
+ linux-user/hppa/target_cpu.h       |   7 +-
+ linux-user/i386/target_cpu.h       |   7 +-
+ linux-user/m68k/target_cpu.h       |   7 +-
+ linux-user/microblaze/target_cpu.h |   7 +-
+ linux-user/mips/target_cpu.h       |   7 +-
+ linux-user/nios2/target_cpu.h      |   7 +-
+ linux-user/openrisc/target_cpu.h   |   8 ++-
+ linux-user/ppc/target_cpu.h        |   7 +-
+ linux-user/riscv/target_cpu.h      |   7 +-
+ linux-user/s390x/target_cpu.h      |   7 +-
+ linux-user/sh4/target_cpu.h        |   7 +-
+ linux-user/sparc/target_cpu.h      |  64 ++++++++++++------
+ linux-user/tilegx/target_cpu.h     |   7 +-
+ linux-user/xtensa/target_cpu.h     |   8 ++-
+ target/sparc/cpu.h                 |  33 ++++++++++
+ linux-user/sparc/signal.c          | 100 ++++++++++-------------------
+ linux-user/syscall.c               |   6 +-
+ tests/tcg/multiarch/linux-test.c   |   3 +-
+ scripts/qemu-binfmt-conf.sh        |   8 ++-
+ 23 files changed, 238 insertions(+), 106 deletions(-)
+
 -- 
-2.21.0
+2.17.1
 
 
