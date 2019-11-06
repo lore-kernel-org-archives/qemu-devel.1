@@ -2,107 +2,81 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E4B8C5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 10:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2690EC5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:08:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4E6D20869
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 10:43:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OAH1g35V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4E6D20869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E6601217D7
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 11:08:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6601217D7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55952 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSImh-00063b-37
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 05:43:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48292)
+	id 1iSJAt-0005YL-WF
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 06:08:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iSIlg-00059M-1X
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 05:42:29 -0500
+ (envelope-from <yi.l.liu@intel.com>) id 1iSJ9n-0004gq-VK
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:07:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iSIle-0002GI-BF
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 05:42:27 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:54813
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <yi.l.liu@intel.com>) id 1iSJ9l-000150-Qf
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:07:23 -0500
+Received: from mga18.intel.com ([134.134.136.126]:56249)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iSIle-0002Fj-6g
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 05:42:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573036945;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=7A68pZLArymcLe5VR+5PPG+Z7wN7ManaY7HINQnl28c=;
- b=OAH1g35VseqeYnBonlq1S4XtP/CEiTBYJTqH2dmYeE12+Dt4RPJA1IBpYVtq9R0BNJUDsL
- YBI2uTGB429po0vksgYezPWJO7OBjYkxCxSenEMfVrxYeOrzD95vlzdVohRJcJ+h3T7RvW
- OcoqMOa7fmzXCBeABsnbBPMGwsQ7pnM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-iYrJ70KMNAms_ejrG6Qsxg-1; Wed, 06 Nov 2019 05:42:21 -0500
-X-MC-Unique: iYrJ70KMNAms_ejrG6Qsxg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 774FA8017E0;
- Wed,  6 Nov 2019 10:42:20 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-212.ams2.redhat.com
- [10.36.117.212])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 83AEF600CE;
- Wed,  6 Nov 2019 10:42:18 +0000 (UTC)
-Subject: Re: backup_calculate_cluster_size does not consider source
-To: Wolfgang Bumiller <w.bumiller@proxmox.com>
-References: <1767781109.66.1572948164492@webmail.proxmox.com>
- <20191106083222.GA189998@stefanha-x1.localdomain>
- <ac30110f-6abe-a144-2aa5-b1cc140d7e8c@redhat.com>
- <20191106103450.cafwk7m5xd5eulxo@olga.proxmox.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <37f72cb7-7085-3c40-7728-e41d59137b3b@redhat.com>
-Date: Wed, 6 Nov 2019 11:42:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iSJ9l-0000wR-JB
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 06:07:21 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 06 Nov 2019 03:07:16 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,274,1569308400"; d="scan'208";a="353447111"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by orsmga004.jf.intel.com with ESMTP; 06 Nov 2019 03:07:16 -0800
+Received: from fmsmsx115.amr.corp.intel.com (10.18.116.19) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 6 Nov 2019 03:07:16 -0800
+Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
+ fmsmsx115.amr.corp.intel.com (10.18.116.19) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Wed, 6 Nov 2019 03:07:14 -0800
+Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
+ SHSMSX108.ccr.corp.intel.com ([169.254.8.41]) with mapi id 14.03.0439.000;
+ Wed, 6 Nov 2019 19:07:12 +0800
+From: "Liu, Yi L" <yi.l.liu@intel.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: RE: [RFC v2 08/22] intel_iommu: provide get_iommu_context() callback
+Thread-Topic: [RFC v2 08/22] intel_iommu: provide get_iommu_context() callback
+Thread-Index: AQHVimstnV/JKooOkkKRXFjjp88wQKd17buAgAggrFA=
+Date: Wed, 6 Nov 2019 11:07:11 +0000
+Message-ID: <A2975661238FB949B60364EF0F2C25743A0EF168@SHSMSX104.ccr.corp.intel.com>
+References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
+ <1571920483-3382-9-git-send-email-yi.l.liu@intel.com>
+ <20191101145503.GB8888@xz-x1.metropole.lan>
+In-Reply-To: <20191101145503.GB8888@xz-x1.metropole.lan>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDY0MGVlZDktOWQ1Ni00ZWJiLWIyZDgtMGZmZjU0ZDBhZDA3IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiaVdVT0xHQXZ3ZXZRak9oZUdOTE44d3ljS0ptVzBNUVJEb2crbHpaakRnV21ON1NUOUhlUm5jNjhqUjlITFRpcSJ9
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20191106103450.cafwk7m5xd5eulxo@olga.proxmox.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="4WUFlIvCILDa1hntVXD9Wah032jjTXo0m"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,116 +88,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- Dietmar Maurer <dietmar@proxmox.com>, qemu-block@nongnu.org,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: "tianyu.lan@intel.com" <tianyu.lan@intel.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>,
+ "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+ Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>,
+ "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4WUFlIvCILDa1hntVXD9Wah032jjTXo0m
-Content-Type: multipart/mixed; boundary="3uvqPsTGOgaJ3kXEty3XxkZv2Nn9NFX1W"
-
---3uvqPsTGOgaJ3kXEty3XxkZv2Nn9NFX1W
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 06.11.19 11:34, Wolfgang Bumiller wrote:
-> On Wed, Nov 06, 2019 at 10:37:04AM +0100, Max Reitz wrote:
->> On 06.11.19 09:32, Stefan Hajnoczi wrote:
->>> On Tue, Nov 05, 2019 at 11:02:44AM +0100, Dietmar Maurer wrote:
->>>> Example: Backup from ceph disk (rbd_cache=3Dfalse) to local disk:
->>>>
->>>> backup_calculate_cluster_size returns 64K (correct for my local .raw i=
-mage)
->>>>
->>>> Then the backup job starts to read 64K blocks from ceph.
->>>>
->>>> But ceph always reads 4M block, so this is incredibly slow and produce=
-s
->>>> way too much network traffic.
->>>>
->>>> Why does backup_calculate_cluster_size does not consider the block siz=
-e from
->>>> the source disk?=20
->>>>
->>>> cluster_size =3D MAX(block_size_source, block_size_target)
->>
->> So Ceph always transmits 4 MB over the network, no matter what is
->> actually needed?  That sounds, well, interesting.
->=20
-> Or at least it generates that much I/O - in the end, it can slow down
-> the backup by up to a multi-digit factor...
-
-Oh, so I understand ceph internally resolves the 4 MB block and then
-transmits the subcluster range.  That makes sense.
-
->> backup_calculate_cluster_size() doesn=E2=80=99t consider the source size=
- because
->> to my knowledge there is no other medium that behaves this way.  So I
->> suppose the assumption was always that the block size of the source
->> doesn=E2=80=99t matter, because a partial read is always possible (witho=
-ut
->> having to read everything).
->=20
-> Unless you enable qemu-side caching this only works until the
-> block/cluster size of the source exceeds the one of the target.
->=20
->> What would make sense to me is to increase the buffer size in general.
->> I don=E2=80=99t think we need to copy clusters at a time, and
->> 0e2402452f1f2042923a5 has indeed increased the copy size to 1 MB for
->> backup writes that are triggered by guest writes.  We haven=E2=80=99t ye=
-t
->> increased the copy size for background writes, though.  We can do that,
->> of course.  (And probably should.)
->>
->> The thing is, it just seems unnecessary to me to take the source cluster
->> size into account in general.  It seems weird that a medium only allows
->> 4 MB reads, because, well, guests aren=E2=80=99t going to take that into=
- account.
->=20
-> But guests usually have a page cache, which is why in many setups qemu
-> (and thereby the backup process) often doesn't.
-
-But this still doesn=E2=80=99t make sense to me.  Linux doesn=E2=80=99t iss=
-ue 4 MB
-requests to pre-fill the page cache, does it?
-
-And if it issues a smaller request, there is no way for a guest device
-to tell it =E2=80=9COK, here=E2=80=99s your data, but note we have a whole =
-4 MB chunk
-around it, maybe you=E2=80=99d like to take that as well...?=E2=80=9D
-
-I understand wanting to increase the backup buffer size, but I don=E2=80=99=
-t
-quite understand why we=E2=80=99d want it to increase to the source cluster=
- size
-when the guest also has no idea what the source cluster size is.
-
-Max
-
-
---3uvqPsTGOgaJ3kXEty3XxkZv2Nn9NFX1W--
-
---4WUFlIvCILDa1hntVXD9Wah032jjTXo0m
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3Co4gACgkQ9AfbAGHV
-z0BR3wgAnrBp2BK6LLcD9pbhcgZx+h97cw/Wo5VRKUl54z8lmgO74wo3qCgBhj4z
-BZApSXPUbGjrzLUmuRYDoT87qLYTfcVOA8ITg2B133zTC4MUIOtkHKbKUIya+NPA
-1sTL7v378kgOnfrQweOso5qZEEl4Z8hKDEGi4X1VVyB7H9OE7ts21TK1UsJYMXbO
-z8dZo4wKZptT/w2ZQEQN2h4t7ss9pE52ieGrEsgwKjkAV3eBcWzRuUZhcqzb8hEg
-wvpfdzN06kPV7nGxgyU4UgD/Qy0Xufk0WXRzTSxDG/8D8iNOO8Y5fbw/T5sjCfnF
-+1aqTS5rLCkZspORSK1TChfkMnGLjQ==
-=q9rf
------END PGP SIGNATURE-----
-
---4WUFlIvCILDa1hntVXD9Wah032jjTXo0m--
-
+PiBGcm9tOiBQZXRlciBYdSBbbWFpbHRvOnBldGVyeEByZWRoYXQuY29tXQ0KPiBTZW50OiBGcmlk
+YXksIE5vdmVtYmVyIDEsIDIwMTkgMTA6NTUgUE0NCj4gVG86IExpdSwgWWkgTCA8eWkubC5saXVA
+aW50ZWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1JGQyB2MiAwOC8yMl0gaW50ZWxfaW9tbXU6IHBy
+b3ZpZGUgZ2V0X2lvbW11X2NvbnRleHQoKSBjYWxsYmFjaw0KPiANCj4gT24gVGh1LCBPY3QgMjQs
+IDIwMTkgYXQgMDg6MzQ6MjlBTSAtMDQwMCwgTGl1IFlpIEwgd3JvdGU6DQo+ID4gVGhpcyBwYXRj
+aCBhZGRzIGdldF9pb21tdV9jb250ZXh0KCkgY2FsbGJhY2sgdG8gcmV0dXJuIGFuIGlvbW11X2Nv
+bnRleHQNCj4gPiBJbnRlbCBWVC1kIHBsYXRmb3JtLg0KPiA+DQo+ID4gQ2M6IEtldmluIFRpYW4g
+PGtldmluLnRpYW5AaW50ZWwuY29tPg0KPiA+IENjOiBKYWNvYiBQYW4gPGphY29iLmp1bi5wYW5A
+bGludXguaW50ZWwuY29tPg0KPiA+IENjOiBQZXRlciBYdSA8cGV0ZXJ4QHJlZGhhdC5jb20+DQo+
+ID4gQ2M6IFlpIFN1biA8eWkueS5zdW5AbGludXguaW50ZWwuY29tPg0KPiA+IFNpZ25lZC1vZmYt
+Ynk6IExpdSBZaSBMIDx5aS5sLmxpdUBpbnRlbC5jb20+DQo+ID4gLS0tDQo+ID4gIGh3L2kzODYv
+aW50ZWxfaW9tbXUuYyAgICAgICAgIHwgNTcgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKystLS0NCj4gLS0NCj4gPiAgaW5jbHVkZS9ody9pMzg2L2ludGVsX2lvbW11LmggfCAx
+NCArKysrKysrKysrLQ0KPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDY0IGluc2VydGlvbnMoKyksIDcg
+ZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaHcvaTM4Ni9pbnRlbF9pb21tdS5j
+IGIvaHcvaTM4Ni9pbnRlbF9pb21tdS5jDQo+ID4gaW5kZXggNjdhNzgzNi4uZTlmODY5MiAxMDA2
+NDQNCj4gPiAtLS0gYS9ody9pMzg2L2ludGVsX2lvbW11LmMNCj4gPiArKysgYi9ody9pMzg2L2lu
+dGVsX2lvbW11LmMNCj4gPiBAQCAtMzI4OCwyMiArMzI4OCwzMyBAQCBzdGF0aWMgY29uc3QgTWVt
+b3J5UmVnaW9uT3BzIHZ0ZF9tZW1faXJfb3BzID0gew0KPiA+ICAgICAgfSwNCj4gPiAgfTsNCj4g
+Pg0KPiA+IC1WVERBZGRyZXNzU3BhY2UgKnZ0ZF9maW5kX2FkZF9hcyhJbnRlbElPTU1VU3RhdGUg
+KnMsIFBDSUJ1cyAqYnVzLCBpbnQgZGV2Zm4pDQo+ID4gK3N0YXRpYyBWVERCdXMgKnZ0ZF9maW5k
+X2FkZF9idXMoSW50ZWxJT01NVVN0YXRlICpzLCBQQ0lCdXMgKmJ1cykNCj4gPiAgew0KPiA+ICAg
+ICAgdWludHB0cl90IGtleSA9ICh1aW50cHRyX3QpYnVzOw0KPiA+IC0gICAgVlREQnVzICp2dGRf
+YnVzID0gZ19oYXNoX3RhYmxlX2xvb2t1cChzLT52dGRfYXNfYnlfYnVzcHRyLCAma2V5KTsNCj4g
+PiAtICAgIFZUREFkZHJlc3NTcGFjZSAqdnRkX2Rldl9hczsNCj4gPiAtICAgIGNoYXIgbmFtZVsx
+MjhdOw0KPiA+ICsgICAgVlREQnVzICp2dGRfYnVzOw0KPiA+DQo+ID4gKyAgICB2dGRfaW9tbXVf
+bG9jayhzKTsNCj4gDQo+IFdoeSBleHBsaWNpdGx5IHRha2UgdGhlIElPTU1VIGxvY2sgaGVyZT8g
+IEkgbWVhbiwgaXQncyBmaW5lIHRvIHRha2UNCj4gaXQsIGJ1dCBpZiBzbyB3aHkgbm90IHRha2Ug
+aXQgdG8gY292ZXIgdGhlIHdob2xlIHZ0ZF9maW5kX2FkZF9hcygpPw0KDQpKdXN0IHdhbnRlZCB0
+byBtYWtlIHRoZSBwcm90ZWN0ZWQgc25pcHBldCBzbWFsbGVyLiBCdXQgSSdtIGZpbmUgdG8gbW92
+ZSBpdA0KdG8gdnRkX2ZpbmRfYWRkX2FzKCkgaWYgdGhlcmUgaXMgbm8gbXVjaCB2YWx1ZSBmb3Ig
+cHV0dGluZyBpdCBoZXJlLg0KDQo+IEZvciBub3cgaXQnbGwgYmUgZmluZSBpbiBlaXRoZXIgd2F5
+IGJlY2F1c2UgSSBiZWxpZXZlIGlvbW11X2xvY2sgaXMNCj4gbm90IHJlYWxseSBmdW5jdGlvbmlu
+ZyB3aGVuIHdlJ3JlIHN0aWxsIHdpdGggQlFMIGhlcmUsIGhvd2V2ZXIgaWYgeW91DQo+IGFkZCB0
+aGF0IGV4cGxpY2l0bHkgdGhlbiBJIGRvbid0IHNlZSB3aHkgaXQncyBub3QgY292ZXJpbmcgdGhh
+dC4NCg0KR290IGl0LiBJdCBmdW5jdGlvbnMgaWYgeW91IG1pc3NlZCB0byBwdXQgYSBtaXJyb3Jl
+ZCB1bmxvY2sgYWZ0ZXIgYSBsb2NrLiAoam9rZSkNCg0KPiANCj4gPiArICAgIHZ0ZF9idXMgPSBn
+X2hhc2hfdGFibGVfbG9va3VwKHMtPnZ0ZF9hc19ieV9idXNwdHIsICZrZXkpOw0KPiA+ICAgICAg
+aWYgKCF2dGRfYnVzKSB7DQo+ID4gICAgICAgICAgdWludHB0cl90ICpuZXdfa2V5ID0gZ19tYWxs
+b2Moc2l6ZW9mKCpuZXdfa2V5KSk7DQo+ID4gICAgICAgICAgKm5ld19rZXkgPSAodWludHB0cl90
+KWJ1czsNCj4gPiAgICAgICAgICAvKiBObyBjb3JyZXNwb25kaW5nIGZyZWUoKSAqLw0KPiA+IC0g
+ICAgICAgIHZ0ZF9idXMgPSBnX21hbGxvYzAoc2l6ZW9mKFZUREJ1cykgKyBzaXplb2YoVlREQWRk
+cmVzc1NwYWNlICopICogXA0KPiA+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgUENJX0RF
+VkZOX01BWCk7DQo+ID4gKyAgICAgICAgdnRkX2J1cyA9IGdfbWFsbG9jMChzaXplb2YoVlREQnVz
+KSArIFBDSV9ERVZGTl9NQVggKiBcDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgKHNpemVvZihW
+VERBZGRyZXNzU3BhY2UgKikgKyBzaXplb2YoVlRESU9NTVVDb250ZXh0ICopKSk7DQo+IA0KPiBT
+aG91bGQgdGhpcyBiZSBhcyBzaW1wbGUgYXMgZ19tYWxsb2MwKHNpemVvZihWVERCdXMpIHNpbmNl
+IFsxXT8NCg0KeWVzLCBpdCdzIG9sZCB3cml0aW5nLiBXaWxsIG1vZGlmeSBpdC4NCg0KPiBPdGhl
+cndpc2UgdGhlIHBhdGNoIGxvb2tzIHNhbmUgdG8gbWUuDQo+IA0KPiA+ICAgICAgICAgIHZ0ZF9i
+dXMtPmJ1cyA9IGJ1czsNCj4gPiAgICAgICAgICBnX2hhc2hfdGFibGVfaW5zZXJ0KHMtPnZ0ZF9h
+c19ieV9idXNwdHIsIG5ld19rZXksIHZ0ZF9idXMpOw0KPiA+ICAgICAgfQ0KPiA+ICsgICAgdnRk
+X2lvbW11X3VubG9jayhzKTsNCj4gPiArICAgIHJldHVybiB2dGRfYnVzOw0KPiA+ICt9DQo+IA0K
+PiBbLi4uXQ0KPiANCj4gPiAgc3RydWN0IFZUREJ1cyB7DQo+ID4gICAgICBQQ0lCdXMqIGJ1czsJ
+CS8qIEEgcmVmZXJlbmNlIHRvIHRoZSBidXMgdG8gcHJvdmlkZSB0cmFuc2xhdGlvbiBmb3INCj4g
+Ki8NCj4gPiAtICAgIFZUREFkZHJlc3NTcGFjZSAqZGV2X2FzWzBdOwkvKiBBIHRhYmxlIG9mIFZU
+REFkZHJlc3NTcGFjZSBvYmplY3RzDQo+IGluZGV4ZWQgYnkgZGV2Zm4gKi8NCj4gPiArICAgIC8q
+IEEgdGFibGUgb2YgVlREQWRkcmVzc1NwYWNlIG9iamVjdHMgaW5kZXhlZCBieSBkZXZmbiAqLw0K
+PiA+ICsgICAgVlREQWRkcmVzc1NwYWNlICpkZXZfYXNbUENJX0RFVkZOX01BWF07DQo+ID4gKyAg
+ICAvKiBBIHRhYmxlIG9mIFZURElPTU1VQ29udGV4dCBvYmplY3RzIGluZGV4ZWQgYnkgZGV2Zm4g
+Ki8NCj4gPiArICAgIFZURElPTU1VQ29udGV4dCAqZGV2X2ljW1BDSV9ERVZGTl9NQVhdOw0KPiAN
+Cj4gWzFdDQoNCmV4YWN0bHkuDQoNCj4gDQo+ID4gIH07DQo+ID4NCj4gPiAgc3RydWN0IFZURElP
+VExCRW50cnkgew0KPiA+IEBAIC0yODIsNSArMjkzLDYgQEAgc3RydWN0IEludGVsSU9NTVVTdGF0
+ZSB7DQo+ID4gICAqIGNyZWF0ZSBhIG5ldyBvbmUgaWYgbm9uZSBleGlzdHMNCj4gPiAgICovDQo+
+ID4gIFZUREFkZHJlc3NTcGFjZSAqdnRkX2ZpbmRfYWRkX2FzKEludGVsSU9NTVVTdGF0ZSAqcywg
+UENJQnVzICpidXMsIGludCBkZXZmbik7DQo+ID4gK1ZURElPTU1VQ29udGV4dCAqdnRkX2ZpbmRf
+YWRkX2ljKEludGVsSU9NTVVTdGF0ZSAqcywgUENJQnVzICpidXMsIGludA0KPiBkZXZmbik7DQo+
+ID4NCj4gPiAgI2VuZGlmDQo+ID4gLS0NCj4gPiAyLjcuNA0KPiA+DQoNClRoYW5rcywNCllpIExp
+dQ0K
 
