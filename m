@@ -2,83 +2,91 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C73C5DF62
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:17:02 +0000 (UTC)
-Received: from lists.gnu.org (unknown [209.51.188.17])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFDDC5DF62
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:20:48 +0000 (UTC)
+Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E212920869
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:17:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E212920869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1F88F20869
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 12:20:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="htqJc+6b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F88F20869
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSKFB-0002Bd-1x
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 07:17:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51497)
+	id 1iSKIp-0003ry-CD
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 07:20:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52938)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yi.l.liu@intel.com>) id 1iSKDU-0001Fn-O1
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:15:18 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iSKIB-0003Mu-T5
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:20:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yi.l.liu@intel.com>) id 1iSKDO-00089i-Ha
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:15:15 -0500
-Received: from mga01.intel.com ([192.55.52.88]:42095)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yi.l.liu@intel.com>) id 1iSKDO-00088Y-7V
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:15:10 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 06 Nov 2019 04:15:05 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,274,1569308400"; d="scan'208";a="214226967"
-Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
- by orsmga002.jf.intel.com with ESMTP; 06 Nov 2019 04:15:03 -0800
-Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
- FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 6 Nov 2019 04:15:03 -0800
-Received: from shsmsx106.ccr.corp.intel.com (10.239.4.159) by
- FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Wed, 6 Nov 2019 04:14:55 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX106.ccr.corp.intel.com ([169.254.10.248]) with mapi id 14.03.0439.000;
- Wed, 6 Nov 2019 20:14:50 +0800
-From: "Liu, Yi L" <yi.l.liu@intel.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: RE: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid
- alloc/free
-Thread-Topic: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasid
- alloc/free
-Thread-Index: AQHVimsw6XlsA5+cTkCxXGelXmRQYKdxCjoAgA0JSAA=
-Date: Wed, 6 Nov 2019 12:14:50 +0000
-Message-ID: <A2975661238FB949B60364EF0F2C25743A0EF2CE@SHSMSX104.ccr.corp.intel.com>
-References: <1571920483-3382-1-git-send-email-yi.l.liu@intel.com>
- <1571920483-3382-10-git-send-email-yi.l.liu@intel.com>
- <20191029121544.GS3552@umbus.metropole.lan>
-In-Reply-To: <20191029121544.GS3552@umbus.metropole.lan>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.2.0.6
-dlp-reaction: no-action
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNDk5OWNhMzAtNjA3Mi00Y2U4LWE3NWItNTU5NDM1MWMyYmRmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoib3d1cEpFa1NObE9rU0JQMHdXcm1lNDhDeE94VW5QMXY2ZkdGaVlDaTBrVHZMdXNcL3p2NnNBSWREYVJhK1d2T3MifQ==
-x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <richard.henderson@linaro.org>) id 1iSKIA-0003af-Bm
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:20:07 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37739)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iSKI9-0003Yw-4p
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 07:20:06 -0500
+Received: by mail-wm1-x343.google.com with SMTP id q130so3080990wme.2
+ for <qemu-devel@nongnu.org>; Wed, 06 Nov 2019 04:20:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=RpgoQPK/LIDerO7lJEQ4U9SYduXiB2Zh7dzR1O0Iln0=;
+ b=htqJc+6bldWKqzELJgsZtN7whFCVs7FF1pQeQgQkxhD9vhr41lA0i92w5eXrHyDX0v
+ UgXIKW/pB0ma+i6/ZlDj51IKIAj1jUguoL7r7xqBpkBtdr7ZhoKgYVnLsNVsw///wwac
+ kqfCIhG63FPxt6EEplOqzaTD/8H30JC/5TVdEH1/agwDwzXVJHnUU9W2KdiV29x9YXP/
+ RC74yd5Tb+G5DzViPKv3htYVsPOvqF5wRxLLcgul8xss2iJ1eS+9VX5eYoEOXzE2q/VZ
+ 3vQVL53+uPcakZkyhtlf7iHa9R5YpPjvOx+g1TSBMI6DJXt5nngH3NKadLYRRkyNcj9s
+ Y92g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=RpgoQPK/LIDerO7lJEQ4U9SYduXiB2Zh7dzR1O0Iln0=;
+ b=V08pEoUo5pY5kQ4HAEY7AMx5rthtcyR+76Z45EMpm3oGmLsSYZj9IBh/bSay/8dgI9
+ InOeE6yR2kgBixy3HGQGIXpJzFil4LgcY0jCDj5a01DgvQJQOqMuAnw7B7ev0zJ2d2Pm
+ xswUVc/5kRtOSs0qMl8bjfGSL6Rn1jXrUBIC/8jqEuIg37o0Xp40xjhJkxG/osseZLKr
+ VxxeMWQDenTlmTapHEfIA18U0J04uRKbzqboKNaw8FClv8ZTiAD0JNaLPTzPHo5eTTn7
+ 4s2pWNyMLe8uv2wDQaQb8busujwZ1TKcjloKB7GsdVzJ+O0nPO2kQgHFx2ZKH1XV0S7P
+ Uxsw==
+X-Gm-Message-State: APjAAAUEEM4vSWWq0iBgCGfaKrR7vJpJJfk/RkJY4zya1DThYMSGUnU7
+ MjtCmakOXZUKxYC3XvOwOWzicA==
+X-Google-Smtp-Source: APXvYqzroIhHkQSdGLo6acutV3vLksrRmQeHFLbXl0uC87zPIgBoz3VIDgdpv2lCs7HFkt2fKb+D7Q==
+X-Received: by 2002:a1c:9ccd:: with SMTP id f196mr2247964wme.152.1573042803847; 
+ Wed, 06 Nov 2019 04:20:03 -0800 (PST)
+Received: from [192.168.8.102] (31.red-176-87-122.dynamicip.rima-tde.net.
+ [176.87.122.31])
+ by smtp.gmail.com with ESMTPSA id i3sm24118569wrw.69.2019.11.06.04.20.01
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 06 Nov 2019 04:20:03 -0800 (PST)
+Subject: Re: [PATCH v2 2/4] Memory: Enable writeback for given memory region
+To: Beata Michalska <beata.michalska@linaro.org>, qemu-devel@nongnu.org
+References: <20191105234100.22052-1-beata.michalska@linaro.org>
+ <20191105234100.22052-3-beata.michalska@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <5c75bd31-213f-88a4-2eee-0046f99f65fe@linaro.org>
+Date: Wed, 6 Nov 2019 13:19:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
+In-Reply-To: <20191105234100.22052-3-beata.michalska@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.88
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,248 +98,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>,
- "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
- Yi Sun <yi.y.sun@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>, "Tian, Jun J" <jun.j.tian@intel.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "peterx@redhat.com" <peterx@redhat.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "Sun, Yi Y" <yi.y.sun@intel.com>
+Cc: peter.maydell@linaro.org, quintela@redhat.com, dgilbert@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, eric.auger@redhat.com,
+ qemu-arm@nongnu.org, pbonzini@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: David Gibson [mailto:david@gibson.dropbear.id.au]
-> Sent: Tuesday, October 29, 2019 8:16 PM
-> To: Liu, Yi L <yi.l.liu@intel.com>
-> Subject: Re: [RFC v2 09/22] vfio/pci: add iommu_context notifier for pasi=
-d alloc/free
->=20
-> On Thu, Oct 24, 2019 at 08:34:30AM -0400, Liu Yi L wrote:
-> > This patch adds pasid alloc/free notifiers for vfio-pci. It is
-> > supposed to be fired by vIOMMU. VFIO then sends PASID allocation
-> > or free request to host.
-> >
-> > Cc: Kevin Tian <kevin.tian@intel.com>
-> > Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > Cc: Peter Xu <peterx@redhat.com>
-> > Cc: Eric Auger <eric.auger@redhat.com>
-> > Cc: Yi Sun <yi.y.sun@linux.intel.com>
-> > Cc: David Gibson <david@gibson.dropbear.id.au>
-> > Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
-> > ---
-> >  hw/vfio/common.c         |  9 ++++++
-> >  hw/vfio/pci.c            | 81
-> ++++++++++++++++++++++++++++++++++++++++++++++++
-> >  include/hw/iommu/iommu.h | 15 +++++++++
-> >  3 files changed, 105 insertions(+)
-> >
-> > diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> > index d418527..e6ad21c 100644
-> > --- a/hw/vfio/common.c
-> > +++ b/hw/vfio/common.c
-> > @@ -1436,6 +1436,7 @@ static void vfio_disconnect_container(VFIOGroup
-> *group)
-> >      if (QLIST_EMPTY(&container->group_list)) {
-> >          VFIOAddressSpace *space =3D container->space;
-> >          VFIOGuestIOMMU *giommu, *tmp;
-> > +        VFIOIOMMUContext *giommu_ctx, *ctx;
-> >
-> >          QLIST_REMOVE(container, next);
-> >
-> > @@ -1446,6 +1447,14 @@ static void vfio_disconnect_container(VFIOGroup
-> *group)
-> >              g_free(giommu);
-> >          }
-> >
-> > +        QLIST_FOREACH_SAFE(giommu_ctx, &container->iommu_ctx_list,
-> > +                                                   iommu_ctx_next, ctx=
-) {
-> > +            iommu_ctx_notifier_unregister(giommu_ctx->iommu_ctx,
-> > +                                                      &giommu_ctx->n);
-> > +            QLIST_REMOVE(giommu_ctx, iommu_ctx_next);
-> > +            g_free(giommu_ctx);
-> > +        }
-> > +
-> >          trace_vfio_disconnect_container(container->fd);
-> >          close(container->fd);
-> >          g_free(container);
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > index 12fac39..8721ff6 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -2699,11 +2699,80 @@ static void
-> vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
-> >      vdev->req_enabled =3D false;
-> >  }
-> >
-> > +static void vfio_register_iommu_ctx_notifier(VFIOPCIDevice *vdev,
-> > +                                             IOMMUContext *iommu_ctx,
-> > +                                             IOMMUCTXNotifyFn fn,
-> > +                                             IOMMUCTXEvent event)
-> > +{
-> > +    VFIOContainer *container =3D vdev->vbasedev.group->container;
-> > +    VFIOIOMMUContext *giommu_ctx;
-> > +
-> > +    giommu_ctx =3D g_malloc0(sizeof(*giommu_ctx));
-> > +    giommu_ctx->container =3D container;
-> > +    giommu_ctx->iommu_ctx =3D iommu_ctx;
-> > +    QLIST_INSERT_HEAD(&container->iommu_ctx_list,
-> > +                      giommu_ctx,
-> > +                      iommu_ctx_next);
-> > +    iommu_ctx_notifier_register(iommu_ctx,
-> > +                                &giommu_ctx->n,
-> > +                                fn,
-> > +                                event);
-> > +}
-> > +
-> > +static void vfio_iommu_pasid_alloc_notify(IOMMUCTXNotifier *n,
-> > +                                          IOMMUCTXEventData *event_dat=
-a)
-> > +{
-> > +    VFIOIOMMUContext *giommu_ctx =3D container_of(n, VFIOIOMMUContext,=
- n);
-> > +    VFIOContainer *container =3D giommu_ctx->container;
-> > +    IOMMUCTXPASIDReqDesc *pasid_req =3D
-> > +                              (IOMMUCTXPASIDReqDesc *) event_data->dat=
-a;
-> > +    struct vfio_iommu_type1_pasid_request req;
-> > +    unsigned long argsz;
-> > +    int pasid;
-> > +
-> > +    argsz =3D sizeof(req);
-> > +    req.argsz =3D argsz;
-> > +    req.flag =3D VFIO_IOMMU_PASID_ALLOC;
-> > +    req.min_pasid =3D pasid_req->min_pasid;
-> > +    req.max_pasid =3D pasid_req->max_pasid;
-> > +
-> > +    pasid =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
-> > +    if (pasid < 0) {
-> > +        error_report("%s: %d, alloc failed", __func__, -errno);
-> > +    }
-> > +    pasid_req->alloc_result =3D pasid;
->=20
-> Altering the event data from the notifier doesn't make sense.  By
-> definition there can be multiple notifiers on the chain, so in that
-> case which one is responsible for updating the writable field?
+On 11/6/19 12:40 AM, Beata Michalska wrote:
+> +void qemu_ram_writeback(RAMBlock *block, ram_addr_t start, ram_addr_t length)
+> +{
+> +    void *addr = ramblock_ptr(block, start);
+> +
+> +    /*
+> +     * The requested range might spread up to the very end of the block
+> +     */
+> +    if ((start + length) > block->used_length) {
+> +        qemu_log("%s: sync range outside the block boundaries: "
+> +                     "start: " RAM_ADDR_FMT " length: " RAM_ADDR_FMT
+> +                     " block length: " RAM_ADDR_FMT " Narrowing down ..." ,
+> +                     __func__, start, length, block->used_length);
+> +        length = block->used_length - start;
+> +    }
 
-I guess you mean multiple pasid_alloc nofitiers. right?
+qemu_log_mask w/ GUEST_ERROR?  How do we expect the length to overflow?
 
-It works for VT-d now, as Intel vIOMMU maintains the IOMMUContext
-per-bdf. And there will be only 1 pasid_alloc notifier in the chain. But, I
-agree it is not good if other module just share an IOMMUConext across
-devices. Definitely, it would have multiple pasid_alloc notifiers.
+> +#ifdef CONFIG_LIBPMEM
+> +    /* The lack of support for pmem should not block the sync */
+> +    if (ramblock_is_pmem(block)) {
+> +        pmem_persist(addr, length);
+> +    } else
+> +#endif
 
-How about enforcing IOMMUContext layer to only invoke one successful
-pasid_alloc/free notifier if PASID_ALLOC/FREE event comes? pasid
-alloc/free are really special as it requires feedback. And a potential
-benefit is that the pasid_alloc/free will not be affected by hot plug
-scenario. There will be always a notifier to work for pasid_alloc/free
-work unless all passthru devices are hot plugged. How do you think? Or
-if any other idea?
+Perhaps better to return out of that if block than have the dangling else.
 
-> > +}
-> > +
-> > +static void vfio_iommu_pasid_free_notify(IOMMUCTXNotifier *n,
-> > +                                          IOMMUCTXEventData *event_dat=
-a)
-> > +{
-> > +    VFIOIOMMUContext *giommu_ctx =3D container_of(n, VFIOIOMMUContext,=
- n);
-> > +    VFIOContainer *container =3D giommu_ctx->container;
-> > +    IOMMUCTXPASIDReqDesc *pasid_req =3D
-> > +                              (IOMMUCTXPASIDReqDesc *) event_data->dat=
-a;
-> > +    struct vfio_iommu_type1_pasid_request req;
-> > +    unsigned long argsz;
-> > +    int ret =3D 0;
-> > +
-> > +    argsz =3D sizeof(req);
-> > +    req.argsz =3D argsz;
-> > +    req.flag =3D VFIO_IOMMU_PASID_FREE;
-> > +    req.pasid =3D pasid_req->pasid;
-> > +
-> > +    ret =3D ioctl(container->fd, VFIO_IOMMU_PASID_REQUEST, &req);
-> > +    if (ret !=3D 0) {
-> > +        error_report("%s: %d, pasid %u free failed",
-> > +                   __func__, -errno, (unsigned) pasid_req->pasid);
-> > +    }
-> > +    pasid_req->free_result =3D ret;
->=20
-> Same problem here.
+> +/**
+> + * Sync changes made to the memory mapped file back to the backing
+> + * storage. For POSIX compliant systems this will simply fallback
+> + * to regular msync call (thus the required alignment). Otherwise
+> + * it will trigger whole file sync (including the metadata case
+> + * there is no support to skip that otherwise)
+> + *
+> + * @addr   - start of the memory area to be synced
+> + * @length - length of the are to be synced
+> + * @align  - alignment (expected to be PAGE_SIZE)
+> + * @fd     - file descriptor for the file to be synced
+> + *           (mandatory only for POSIX non-compliant systems)
+> + */
+> +int qemu_msync(void *addr, size_t length, size_t align, int fd)
+> +{
+> +#ifdef CONFIG_POSIX
+> +    size_t align_mask;
+> +
+> +    /* Bare minimum of sanity checks on the alignment */
+> +    /* The start address needs to be a multiple of PAGE_SIZE */
+> +    align = MAX(align, qemu_real_host_page_size);
+> +    align_mask = ~(qemu_real_host_page_size - 1);
+> +    align = (align + ~align_mask) & align_mask;
+> +
+> +    align_mask = ~(align - 1);
 
-yep, as above proposal.
+I don't understand what you're trying to do with align.
 
-> > +}
-> > +
-> >  static void vfio_realize(PCIDevice *pdev, Error **errp)
-> >  {
-> >      VFIOPCIDevice *vdev =3D PCI_VFIO(pdev);
-> >      VFIODevice *vbasedev_iter;
-> >      VFIOGroup *group;
-> > +    IOMMUContext *iommu_context;
-> >      char *tmp, *subsys, group_path[PATH_MAX], *group_name;
-> >      Error *err =3D NULL;
-> >      ssize_t len;
-> > @@ -3000,6 +3069,18 @@ static void vfio_realize(PCIDevice *pdev, Error =
-**errp)
-> >      vfio_register_req_notifier(vdev);
-> >      vfio_setup_resetfn_quirk(vdev);
-> >
-> > +    iommu_context =3D pci_device_iommu_context(pdev);
-> > +    if (iommu_context) {
-> > +        vfio_register_iommu_ctx_notifier(vdev,
-> > +                                         iommu_context,
-> > +                                         vfio_iommu_pasid_alloc_notify=
-,
-> > +                                         IOMMU_CTX_EVENT_PASID_ALLOC);
-> > +        vfio_register_iommu_ctx_notifier(vdev,
-> > +                                         iommu_context,
-> > +                                         vfio_iommu_pasid_free_notify,
-> > +                                         IOMMU_CTX_EVENT_PASID_FREE);
-> > +    }
-> > +
-> >      return;
-> >
-> >  out_teardown:
-> > diff --git a/include/hw/iommu/iommu.h b/include/hw/iommu/iommu.h
-> > index c22c442..4352afd 100644
-> > --- a/include/hw/iommu/iommu.h
-> > +++ b/include/hw/iommu/iommu.h
-> > @@ -31,10 +31,25 @@
-> >  typedef struct IOMMUContext IOMMUContext;
-> >
-> >  enum IOMMUCTXEvent {
-> > +    IOMMU_CTX_EVENT_PASID_ALLOC,
-> > +    IOMMU_CTX_EVENT_PASID_FREE,
-> >      IOMMU_CTX_EVENT_NUM,
-> >  };
-> >  typedef enum IOMMUCTXEvent IOMMUCTXEvent;
-> >
-> > +union IOMMUCTXPASIDReqDesc {
-> > +    struct {
-> > +        uint32_t min_pasid;
-> > +        uint32_t max_pasid;
-> > +        int32_t alloc_result; /* pasid allocated for the alloc request=
- */
-> > +    };
-> > +    struct {
-> > +        uint32_t pasid; /* pasid to be free */
-> > +        int free_result;
-> > +    };
-> > +};
->=20
-> Apart from theproblem with writable fields, using a big union for
-> event data is pretty ugly.  If you need this different information for
-> the different events, it might make more sense to have a separate
-> notifier chain with a separate call interface for each event type,
-> rather than trying to multiplex them together.
+You pass in qemu_host_page_size from the one caller, and then adjust it for
+qemu_real_host_page_size?
 
-sure, I'll de-couple them. Nice catch.
+Why pass in anything at all, and just use qemu_real_host_page_mask?
 
-Thanks,
-Yi Liu
+> +    /**
+> +     * There are no strict reqs as per the length of mapping
+> +     * to be synced. Still the length needs to follow the address
+> +     * alignment changes. Additionally - round the size to the multiple
+> +     * of requested alignment (expected as PAGE_SIZE)
+> +     */
+> +    length += ((uintptr_t)addr & (align - 1));
+> +    length = (length + ~align_mask) & align_mask;
+> +
+> +    addr = (void *)((uintptr_t)addr & align_mask);
+> +
+> +    return msync(addr, length, MS_SYNC);
+> +#else /* CONFIG_POSIX */
+> +    /**
+> +     * Perform the sync based on the file descriptor
+> +     * The sync range will most probably be wider than the one
+> +     * requested - but it will still get the job done
+> +     */
+> +    return qemu_fdatasync(fd);
+> +#endif /* CONFIG_POSIX */
+> +}
+
+
+r~
 
 
