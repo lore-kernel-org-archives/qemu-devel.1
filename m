@@ -2,72 +2,71 @@ Return-Path: <SRS0=EylP=Y6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D73CEC5DF63
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3003C5DF64
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:07:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A219E20650
-	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:04:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C164C2178F
+	for <qemu-devel@archiver.kernel.org>; Wed,  6 Nov 2019 16:07:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pru59rde"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A219E20650
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJzqxVRc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C164C2178F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSNn8-0008FT-Ub
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 11:04:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50658)
+	id 1iSNqg-0003e8-Aw
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 11:07:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50801)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iSNbw-0005S6-6Z
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:52:46 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iSNcH-0005mm-M1
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:53:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iSNbt-0006Vb-4d
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:52:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44946
+ (envelope-from <mlevitsk@redhat.com>) id 1iSNcG-0006xQ-Bb
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:53:05 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59654
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iSNbs-0006UU-VT
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:52:41 -0500
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iSNcF-0006w1-NW
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 10:53:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573055560;
+ s=mimecast20190719; t=1573055582;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kjbZZYgtnQ7GjQvsvvD6Awt3fSHHSqwfwpB/LRa2+x4=;
- b=Pru59rdeFZqamOcMaVH8YQwG1RPXbP3dOP38ZpQGm+LXOtoaRaRALq/UsIgTLeYjpdu562
- BKj0RiF56vlNQK1tIt3XBC2ssFM7H7C0LBPx22KAVraxCdxY+84ZuhGLNlHTdweTgjgiGc
- 4c84Xl19Zk9zBZolgc6lMuhO1xtgoPA=
+ bh=5rQzrnK48RUhOxfRkhJa3UVUNO+Rh2kD/SliXmztdUw=;
+ b=BJzqxVRcrDcr9KopASwslP0hfY17awS7RwpyRaEieKyeqGnMI21R/Yl6FzlKjdP1H5t8T7
+ LDUQloWg4gCYN/Ml35yUy7MSoChxY4ku3poNuPHnwBAr8NWsQvpmeljnMBaL31Si91/cZD
+ x0WP4tCZ0cANBd8PzBZisCPWunN523w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-W1ASQOM2Pi6AC0DWfpmssQ-1; Wed, 06 Nov 2019 10:52:39 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-204-U2nBE5vDOO6lC0nN3dPgjQ-1; Wed, 06 Nov 2019 10:53:01 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1673A477;
- Wed,  6 Nov 2019 15:52:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65CEA8017DD;
+ Wed,  6 Nov 2019 15:53:00 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D414E5DA7C;
- Wed,  6 Nov 2019 15:52:34 +0000 (UTC)
-Message-ID: <ad34d3acd88953e49f79b7beb3ebb64922b5529e.camel@redhat.com>
-Subject: Re: [PATCH v2 21/21] iotests: Allow check -o data_file
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 069121001DE1;
+ Wed,  6 Nov 2019 15:52:53 +0000 (UTC)
+Message-ID: <55b7664c4766ec05423d76dba0712b438f4b5e6c.camel@redhat.com>
+Subject: Re: [PATCH v2 00/21] iotests: Allow ./check -o data_file
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Date: Wed, 06 Nov 2019 17:52:33 +0200
-In-Reply-To: <20191015142729.18123-22-mreitz@redhat.com>
+Date: Wed, 06 Nov 2019 17:52:52 +0200
+In-Reply-To: <20191015142729.18123-1-mreitz@redhat.com>
 References: <20191015142729.18123-1-mreitz@redhat.com>
- <20191015142729.18123-22-mreitz@redhat.com>
 Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: W1ASQOM2Pi6AC0DWfpmssQ-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: U2nBE5vDOO6lC0nN3dPgjQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -91,117 +90,34 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On Tue, 2019-10-15 at 16:27 +0200, Max Reitz wrote:
-> The problem with allowing the data_file option is that you want to use a
-> different data file per image used in the test.  Therefore, we need to
-> allow patterns like -o data_file=3D'$TEST_IMG.data_file'.
+> Hi,
 >=20
-> Then, we need to filter it out from qemu-img map, qemu-img create, and
-> remove the data file in _rm_test_img.
+> The cover letter from v1 (explaining the motivation behind this series
+> and the general structure) is here:
 >=20
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/common.filter | 23 +++++++++++++++++++++--
->  tests/qemu-iotests/common.rc     | 22 +++++++++++++++++++++-
->  2 files changed, 42 insertions(+), 3 deletions(-)
+> https://lists.nongnu.org/archive/html/qemu-block/2019-09/msg01323.html
 >=20
-> diff --git a/tests/qemu-iotests/common.filter b/tests/qemu-iotests/common=
-.filter
-> index 63bc6f6f26..9dd05689d1 100644
-> --- a/tests/qemu-iotests/common.filter
-> +++ b/tests/qemu-iotests/common.filter
-> @@ -121,7 +121,13 @@ _filter_actual_image_size()
->  # replace driver-specific options in the "Formatting..." line
->  _filter_img_create()
->  {
-> -    $SED -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
-> +    data_file_filter=3D()
-> +    if data_file=3D$(_get_data_file "$TEST_IMG"); then
-> +        data_file_filter=3D(-e "s# data_file=3D$data_file##")
-> +    fi
-> +
-> +    $SED "${data_file_filter[@]}" \
-> +        -e "s#$REMOTE_TEST_DIR#TEST_DIR#g" \
->          -e "s#$IMGPROTO:$TEST_DIR#TEST_DIR#g" \
->          -e "s#$TEST_DIR#TEST_DIR#g" \
->          -e "s#$IMGFMT#IMGFMT#g" \
-> @@ -204,9 +210,22 @@ _filter_img_info()
->  # human and json output
->  _filter_qemu_img_map()
->  {
-> +    # Assuming the data_file value in $IMGOPTS contains a '$TEST_IMG',
-> +    # create a filter that replaces the data file name by $TEST_IMG.
-> +    # Example:
-> +    #   In $IMGOPTS: 'data_file=3D$TEST_IMG.data_file'
-> +    #   Then data_file_pattern =3D=3D '\(.*\).data_file'
-> +    #   And  data_file_filter  =3D=3D -e 's#\(.*\).data_file#\1#
-> +    data_file_filter=3D()
-> +    if data_file_pattern=3D$(_get_data_file '\\(.*\\)'); then
-> +        data_file_filter=3D(-e "s#$data_file_pattern#\\1#")
-> +    fi
-> +
->      $SED -e 's/\([0-9a-fx]* *[0-9a-fx]* *\)[0-9a-fx]* */\1/g' \
->          -e 's/"offset": [0-9]\+/"offset": OFFSET/g' \
-> -        -e 's/Mapped to *//' | _filter_testdir | _filter_imgfmt
-> +        -e 's/Mapped to *//' \
-> +        "${data_file_filter[@]}" \
-> +        | _filter_testdir | _filter_imgfmt
->  }
-> =20
->  _filter_nbd()
-> diff --git a/tests/qemu-iotests/common.rc b/tests/qemu-iotests/common.rc
-> index f3784077de..bed789a691 100644
-> --- a/tests/qemu-iotests/common.rc
-> +++ b/tests/qemu-iotests/common.rc
-> @@ -277,6 +277,20 @@ _stop_nbd_server()
->      fi
->  }
-> =20
-> +# Gets the data_file value from IMGOPTS and replaces the '$TEST_IMG'
-> +# pattern by '$1'
-> +# Caution: The replacement is done with sed, so $1 must be escaped
-> +#          properly.  (The delimiter is '#'.)
-> +_get_data_file()
-> +{
-> +    if ! echo "$IMGOPTS" | grep -q 'data_file=3D'; then
-> +        return 1
-> +    fi
-> +
-> +    echo "$IMGOPTS" | sed -e 's/.*data_file=3D\([^,]*\).*/\1/' \
-> +                    | sed -e "s#\\\$TEST_IMG#$1#"
-> +}
-> +
->  _make_test_img()
->  {
->      # extra qemu-img options can be added by tests
-> @@ -297,7 +311,8 @@ _make_test_img()
->      fi
-> =20
->      if [ -n "$IMGOPTS" ]; then
-> -        optstr=3D$(_optstr_add "$optstr" "$IMGOPTS")
-> +        imgopts_expanded=3D$(echo "$IMGOPTS" | sed -e "s#\\\$TEST_IMG#$i=
-mg_name#")
-> +        optstr=3D$(_optstr_add "$optstr" "$imgopts_expanded")
->      fi
->      if [ -n "$IMGKEYSECRET" ]; then
->          object_options=3D"--object secret,id=3Dkeysec0,data=3D$IMGKEYSEC=
-RET"
-> @@ -376,6 +391,11 @@ _rm_test_img()
->          # Remove all the extents for vmdk
->          "$QEMU_IMG" info "$img" 2>/dev/null | grep 'filename:' | cut -f =
-2 -d: \
->              | xargs -I {} rm -f "{}"
-> +    elif [ "$IMGFMT" =3D "qcow2" ]; then
-> +        # Remove external data file
-> +        if data_file=3D$(_get_data_file "$img"); then
-> +            rm -f "$data_file"
-> +        fi
->      fi
->      rm -f "$img"
->  }
+>=20
+> For v2, I=E2=80=99ve tried to address Maxim=E2=80=99s comments:
+> - Patch 1 through 3: New
+> - Patch 4: Only print feature bits instead of blacklisting stuff that we
+>            don=E2=80=99t need
+> - Patch 5:
+>   - Fix typo
+>   - Add comment why 098 needs compat=3D1.1
+> - Patch 16: Use _check_test_img
+> - Patch 17: Use the new _filter_json_filename
+> - Patch 18: Rethink the incompatible feature filter approach: Instead of
+>             filtering out the data_file bit, just check whether the
+>             dirty bit is present (because that is all we want to know)
+> - Patch 19: Use the new _filter_json_filename
+> - Patch 20: Rebase conflicts due to the changes to patch 5
+> - Patch 21:
+>   - Add and use _get_data_file
+>   - Add a comment how the data_file_filter in _filter_qemu_img_map works
+>=20
 
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
+Thank you! I reviewed the series, and it looks fine now.
 Best regards,
 =09Maxim Levitsky
 
