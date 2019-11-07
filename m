@@ -2,121 +2,82 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB296C5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 18:32:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3981AC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 18:50:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C522721D6C
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 18:32:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C522721D6C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id E82B22084C
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 18:50:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FuJNR7Km"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E82B22084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSmZw-00089u-Q8
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 13:32:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34406)
+	id 1iSmhP-00058y-3j
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 13:40:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36734)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iSmTn-0002yt-LH
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:26:01 -0500
+ (envelope-from <wainersm@redhat.com>) id 1iSmgT-0004Iq-G5
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:39:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iSmTm-0006fc-9h
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:25:59 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:38753)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSmTk-0006e5-JZ
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:25:58 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M3UhQ-1iTKhv468Q-000coX; Thu, 07 Nov 2019 19:25:46 +0100
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Eric Blake <eblake@redhat.com>
-References: <20191028181643.5143-12-laurent@vivier.eu>
- <20191029232320.12419-1-crosa@redhat.com>
- <19097f6f-28a8-12ee-6761-da0f34735910@redhat.com>
- <1209928652.10986630.1573144690743.JavaMail.zimbra@redhat.com>
- <bb0c5db0-899e-c5a6-caa3-add8bf64f780@vivier.eu>
- <77a6200c-7f53-4305-1aad-4574f0faa904@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH 0/2] Acceptance test: update kernel used on m68k/q800 test
-Message-ID: <bd03703f-26f9-0d3c-fc8b-ba3c5773606c@vivier.eu>
-Date: Thu, 7 Nov 2019 19:25:42 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <wainersm@redhat.com>) id 1iSmgO-0005Pv-Nb
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:39:04 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28652
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iSmgO-0005Pl-8l
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:39:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573151939;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8ShcuqzX8vALqh+8xjjPju43wBWrl/40Bg0x7Ew/6e8=;
+ b=FuJNR7KmRc2oYTIss/6lOONrfh3djRW3GmNhIypKOJ7wnI8Plx+VVQAbzEVhm1ZJ1S4Zfb
+ tq8cqkL6vRWMFWi+pQ0TOztkAG8IusahLQqpF11toVwjJwIMh3r9hhu8lqpCntxTsKT+Lr
+ GK/bBIrdiK/eyXzUew86MTyYhLuxBBA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-Eu_i4BaRNquWNeA8b9RDvA-1; Thu, 07 Nov 2019 13:38:55 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5361107ACC3;
+ Thu,  7 Nov 2019 18:38:53 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-91.gru2.redhat.com
+ [10.97.116.91])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5BBD65DA70;
+ Thu,  7 Nov 2019 18:38:43 +0000 (UTC)
+Subject: Re: [PATCH v7 0/8] Acceptance test: Add "boot_linux" acceptance test
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+References: <20191104151323.9883-1-crosa@redhat.com>
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Message-ID: <f179e15e-6701-4e1a-4151-bb7f7051f99d@redhat.com>
+Date: Thu, 7 Nov 2019 16:38:42 -0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <77a6200c-7f53-4305-1aad-4574f0faa904@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:93JZH9HuGJe9P+jp/FqK0B7c8r+3IJkv21WUEWJFOh4LHyRadPu
- Si0r8tcOGUjLKoJx9jojHvk20jUs9jDWslBlW0hU1ZHTHDJPSqBFAsde8KL1GoMnKui9oqV
- /D25LqbPhjEK/xS8xxLhN+idkeTcEqlANlzbUKF8ZQCmxBeTchCX60Of5wdUUsoY6pp/2Zj
- RfjHsRoAugREQhMF2PQ6A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:M0OxjSNz80A=:gH345uEmf+rYRdUySrmcha
- iCz/TEVH93NiamtJqiG3v43yxTeAOGBa5PY7EpDxq+nE8BWYRpnPGd62cjv8YmqqI+ASp1djX
- fx9r+/5+SPcVeuYdnL8bToUHwgKEmNZYvavA0OkHfDu0pLbrE+h8POrUgZqPZtwBDTMA7KlID
- USK6WjxGz1r65s+8b4AlG8qgPCZIng94S7TwrjFu4vHPgUEj5rJED92u+qou0G1Zz9IEvWMr3
- 3HnrtjcySY20Ppj7LRIPBCQahm5XVhDm23kaabSquCK7Ir/MPy21AFHfxcyNed5XYfn3zokMt
- /l4q0ISbAJ6+ILTkCEs1/PvckxpLzIKFALe75HRyqqNMU0qFKeStj5/2JHX774EqHouJWfaZv
- dc66+tRALB9KlkFQ7s6Egv4kltEVoUpFGGDh/sdtDBHsujhCWUdCrYAL+DkVdyFT50BPT5C0q
- FA5mAsSLyvRlguJB65NO6ONKnM4GhDqliVpmgTwh1KAWbQD5v0YgUbTSA618Wa6rbPUnWX3OF
- 1eNz8/zGYX4bas8xPz8PKt1OCViWC7WmqhkGmVoKhQTPC/HA/CbaEld2THU9yPsvCRqikDpgP
- 4a9YbV3+Srn7DI9lwEqvdBBGnlgaPj6clfngatJM7wRraww6T2XYmwmk+AjZTmKROLCKwu3FQ
- RM/BANcaJtRCDP6nTFXzbxBzwM/Gcs/c5c6zEE2OFPKu3UCH+Ue2bphjrquMG7shVvcJtFvbZ
- ov75BDq+IfEHFVU++XCzXd0L4bcfXb4bASQnuVS9XnUMCvwkEcr+DijewnNu9qgu+MqdleBUw
- U1uBkJ9iRE6C8b2oKi/70PYqNnU9CJSqyjzksYaAxvMsH2WgJDL30/iVmATzivfJAvgcmBq6z
- o0tv86H+gjfGWhqRbq5kl34a6D/D6fJFIYIa3cMfU=
+In-Reply-To: <20191104151323.9883-1-crosa@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: Eu_i4BaRNquWNeA8b9RDvA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 212.227.17.10
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -128,74 +89,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Willian Rampazzo <wrampazz@redhat.com>
+Cc: Beraldo Leal <bleal@redhat.com>, Fabien Chouteau <chouteau@adacore.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Willian Rampazzo <wrampazz@redhat.com>, qemu-ppc@nongnu.org,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 07/11/2019 à 19:00, Philippe Mathieu-Daudé a écrit :
-> On 11/7/19 6:18 PM, Laurent Vivier wrote:
->> Le 07/11/2019 à 17:38, Cleber Rosa a écrit :
->>> ----- Original Message -----
->>>> From: "Eric Blake" <eblake@redhat.com>
->>>> To: "Cleber Rosa" <crosa@redhat.com>, qemu-devel@nongnu.org
->>>> Cc: "Peter Maydell" <peter.maydell@linaro.org>, "Eduardo Habkost"
->>>> <ehabkost@redhat.com>, "Philippe Mathieu-Daudé"
->>>> <f4bug@amsat.org>, "Wainer dos Santos Moschetta"
->>>> <wainersm@redhat.com>, "Laurent Vivier" <laurent@vivier.eu>,
->>>> "Willian Rampazzo" <wrampazz@redhat.com>, "Philippe Mathieu-Daudé"
->>>> <philmd@redhat.com>
->>>> Sent: Thursday, November 7, 2019 10:43:08 AM
->>>> Subject: Re: [PATCH 0/2] Acceptance test: update kernel used on
->>>> m68k/q800 test
->>>>
->>>> On 10/29/19 6:23 PM, Cleber Rosa wrote:
->>>>> The boot_linux_console.py:BootLinuxConsole.test_m68k_q800 was very
->>>>> recently merged, but between its last review and now, the Kernel
->>>>> package used went missing.
->>>>>
->>>>
->>>> meta-question: Why was this series posted in-reply-to the pull request,
->>>> rather than as a new top-level thread? I nearly missed it because I
->>>> don't expect to see unreviewed patches buried in threading like that.
->>>> My workflow would have been to post the series in isolation, then
->>>> manually reply to the pull request to mention the message-id of the
->>>> related series proposed as a followup.
->>>>
->>>
->>> Hi Eric,
->>>
->>> That was my attempt to signal that it was a fix to something which
->>> had *just*
->>> being merged as part of that pull request (though now caused by it).
->>>
->>> I basically did not know how to act properly, so I thank you for the
->>> workflow
->>> suggestion.  I'll certainly follow it next time.
->>
->> IMHO, you should send your series and then replies to the pull request
->> to tell you have sent your series that fixes the patch in the pull
->> request, or vice-versa.
->>
->> But your series has been queued by Alex, so there is no problem...
-> 
-> I prepared a different fix around the same time, but closed my laptop
-> before the patch was sent and noticed the next day:
-> https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg08120.html
-> 
-> Laurent, are you OK with the new kernel being tested?
-> 
+Hi Cleber,
 
-I'm fine. We could have problems with 5.4 because the address mapping
-has been changed for SWIM (aee6bff1c325 "m68k: mac: Revisit floppy disc
-controller base addresses), but this has been fixed by my patch that has
-been merged today in QEMU (653901ca2b  "q800: fix I/O memory map").
+On 11/4/19 1:13 PM, Cleber Rosa wrote:
+> This acceptance test, validates that a full blown Linux guest can
+> successfully boot in QEMU.  In this specific case, the guest chosen is
+> Fedora version 31.
+>
+>   * x86_64, pc and q35 machine types, with and without kvm as an
+>     accellerator
+>
+>   * aarch64 and virt machine type, with and without kvm as an
+>     accellerator
+>
+>   * ppc64 and pseries machine type
+>
+>   * s390x and s390-ccw-virtio machine type
+>
+> This has been tested on x86_64 and ppc64le hosts and has been running
+> reliably (in my experience) on Travis CI.
+>
+> Some hopefully useful pointers for reviewers:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> Git Info:
+>    - URI: https://github.com/clebergnu/qemu/tree/test_boot_linux_v7
+>    - Remote: https://github.com/clebergnu/qemu
+>    - Branch: test_boot_linux_v7
+>
+> Travis CI Info:
+>    - Build: https://travis-ci.org/clebergnu/qemu/builds/606191094
+>    - Job: https://travis-ci.org/clebergnu/qemu/jobs/606191120
+>
+> Previous version:
+>    - v6: https://lists.gnu.org/archive/html/qemu-devel/2019-06/msg01202.h=
+tml
+>    - v5: https://lists.gnu.org/archive/html/qemu-devel/2019-03/msg04652.h=
+tml
+>    - v4: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg02032.h=
+tml
+>    - v3: https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01677.h=
+tml
+>    - v2: https://lists.gnu.org/archive/html/qemu-devel/2018-11/msg04318.h=
+tml
+>    - v1: http://lists.nongnu.org/archive/html/qemu-devel/2018-09/msg02530=
+.html
+>
+> Changes from v6:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>   * Bumped Fedora to most recently released version (31).
+>
+>   * Included new architectures (ppc64 and s390x), consolidating all
+>     tests into the same commit.
+>
+>   * New commit: "Acceptance tests: use avocado tags for machine type"
+>
+>   * New commit: "Acceptance tests: introduce utility method for tags
+>     unique vals"
 
-Thanks,
-Laurent
+It seems 02 and 03 are re-sending of patches originally sent in the=20
+series with Message-Id: 20190924194501.9303-1-crosa@redhat.com. On the=20
+original thread you can find my reviews.
+
+- Wainer
+
+
+>
+>   * New commit: "Acceptance test x86_cpu_model_versions: use default
+>     vm", needed to normalize the use of the machine type tags
+>
+>   * Added a lot of leniency to the test setup (and reliability to the
+>     test/job), canceling the test if there are any failures while
+>     downloading/preparing the boot images.
+>
+>   * Made use of Avocado's data drainer a regular feature (dropped the
+>     commit with RFC) and squashed it.
+>
+>   * Bumped pycdlib version to 1.8.0
+>
+>   * Dropped explicit "--enable-slirp=3Dgit" (added on v5) to Travis CI
+>     configure line, as the default configuration on Travis CI now
+>     results in user networking capabilities.
+>
+> Changes from v5:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>   * Added explicit "--enable-slirp=3Dgit" to Travis CI configure line, as
+>     these tests depend on "-netdev user" like networking.
+>
+>   * Bumped Fedora to most recently released version (30).
+>
+>   * Changed "checksum" parameter to 'sha256' and use the same hashes as
+>     provided by the Fedora project (instead of using Avocado's default
+>     sha1 and compute and use a different hash value).
+>
+>   * New commit: Add "boot_linux" test for aarch64 and virt machine type
+>
+>   * New commit: [RFC]: use Avocado data drainer for console logging
+>
+> Changes from v4:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>   * New commit "Acceptance tests: use relative location for tests"
+>
+>   * New commit "Acceptance tests: keep a stable reference to the QEMU bui=
+ld dir"
+>
+>   * Pinned the Fedora 29 image by adding a checksum.  The goal is to
+>     never allow more than one component to change at a time (the one
+>     allowed to change is QEMU itself).  Updates to the image should be
+>     manual. (Based on comments from Cornelia)
+>
+>   * Moved the downloading of the Fedora 29 cloud image to the test
+>     setUp() method, canceling the test if the image can not be
+>     downloaded.
+>
+>   * Removed the ":avocado: enable" tag, given that Avocado versions
+>     68.0 and later operate on a "recursive by default" manner, that
+>     is able to correctly identify this as an Avocado test.
+>
+> Changes from v3:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>   * New patch "Acceptance tests: depend on qemu-img"
+>
+> Known Issues on v3 (no longer applicable):
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>   * A recent TCG performance regression[1] affects this test in a
+>     number of ways:
+>     - The test execution may timeout by itself
+>     - The generation of SSH host keys in the guest's first boot is also
+>       affected (possibly also a timeout)
+>     - The cloud-init "phone home" feature attempts to read the host keys
+>       and fails, causing the test to timeout and fail
+>
+>     These are not observed anymore once the fix[2] is applied.
+>
+> [1] - https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00338.html
+> [2] - https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg01129.html
+>
+> Changes from v2:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>   * Updated the tag to include the "arch:" key, in a similar fashion as t=
+o
+>     the tests in the "Acceptance Tests: target architecture support":
+>     - https://lists.gnu.org/archive/html/qemu-devel/2019-02/msg00369.html
+>
+>   * Renamed the test method name to test_x86_64_pc, again, similarly to t=
+he
+>     boot_linux_console.py tests in the series mentioned before.
+>
+>   * Set the machine type explicitly, again similarly to the
+>     boot_linux_console.py tests in the series mentioned before.
+>
+>   * Added messages after the launch of the VM, to let test runners know
+>     the test know waits for a boot confirmation from the the guest (Eduar=
+do).
+>
+>   * Updated commit message to reflect the fact that this version does
+>     not allow for parameterization of the guest OS, version, etc.
+>
+>   * Dropped the RFC prefix on patch "RFC: Acceptance tests: add the
+>     build directory to the system PATH"
+>
+>   * Changed the comments on "RFC: Acceptance tests: add the build
+>     directory to the system PATH" to make it clear the addition of a
+>     the build directory to the PATH may influence other utility code.
+>
+> Changes from v1:
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>   * The commit message was adjusted, removing the reference to the
+>     avocado.utils.vmimage encoding issue on previous Avocado versions
+>     (<=3D 64.0) and the fix that would (and was) included in Avocado
+>     version 65.0.
+>
+>   * Effectively added pycdlib=3D=3D1.6.0 to the requirements.txt file,
+>     added on a56931eef3, and adjusted the commit message was also
+>     to reflect that.
+>
+>   * Updated the default version of the guest OS, from Fedora 28 to 29.
+>     Besides possible improvements in the (virtual) hardware coverage,
+>     it brings a performance improvement in the order of 20% to the
+>     test.
+>
+>   * Removed all direct parameters usage.  Because some parameters and
+>     its default values implemented in the test would prevent it from
+>     running on some environments.  Example: the "accel" parameter had a
+>     default value of "kvm", which would prevent this test, that boots a
+>     x86_64 OS, from running on a host arch different than x86_64.  I
+>     recognize that it's desirable to make tests reusable and
+>     parameterized (that was the reason for the first version doing so),
+>     but the mechanism to be used to define the architectures that a
+>     given test should support is still an open issue, and has been
+>     discussed in other threads.  I'll follow up those discussions with
+>     a proposal, and until then, removing those aspects from this test
+>     implementation seemed to be the best option.  A caveat: this test
+>     currently adds the same tag (x86_64) and follows other assumptions
+>     made on "boot_linux_console.py", that is, that a x86_64 target
+>     binary will be used to run it.  If a user is in an environment that
+>     does not have a x86_64 target binary, it could filter those tests
+>     out with: "avocado run --filter-by-tags=3D'-x86_64' tests/acceptance"=
+.
+>
+>   * Removed most arguments to the QEMU command line for pretty much the
+>     same reasons described above, and by following the general
+>     perception that I could grasp from other discussions that QEMU
+>     defaults should preferrably be used.  This test, as well as others,
+>     can and should be extended later to allow for different test
+>     scenarios by passing well documented parameter values.  That is,
+>     they should respect well-known parameters such as "accel" mentioned
+>     above, so that the same test can run with KVM or TCG.
+>
+>   * Changed the value of the memory argument to 1024, which based on
+>     my experimentations and observations is the minimum amount of RAM
+>     for the Fedora 29 cloud image to sucessfully boot on QEMU.  I know
+>     there's no such thing as a "one size fits all", specially for QEMU,
+>     but this makes me wonder wether a x86_64 machine type shouldn't
+>     have its default_ram_size bumped to a number practical enough to
+>     run modern operating systems.
+>
+>   * Added a new patch "RFC: Acceptance tests: add the build directory
+>     to the system PATH", which is supposed to gather feedback on how to
+>     enable the use of built binaries, such as qemu-img, to code used by
+>     the test code.  The specific situation here is that the vmimage,
+>     part of the avocado.utils libraries, makes use of qemu-img to create
+>     snapshot files.  Even though we could require qemu-img to be installe=
+d
+>     as a dependency of tests, system wide, it actually goes against the
+>     goal of testing all QEMU things from the source/build tree.  This
+>     became aparent with tests running on environments such as Travis CI,
+>     which don't necessarily have qemu-img available elsewhere.
+>
+> Cleber Rosa (8):
+>    Acceptance test x86_cpu_model_versions: use default vm
+>    Acceptance tests: introduce utility method for tags unique vals
+>    Acceptance tests: use avocado tags for machine type
+>    Acceptance tests: use relative location for tests
+>    Acceptance tests: keep a stable reference to the QEMU build dir
+>    Acceptance tests: add the build directory to the system PATH
+>    Acceptance tests: depend on qemu-img
+>    Acceptance test: add "boot_linux" tests
+>
+>   docs/devel/testing.rst                     |  18 +++
+>   tests/Makefile.include                     |   4 +-
+>   tests/acceptance/avocado_qemu/__init__.py  |  32 +++-
+>   tests/acceptance/boot_linux.py             | 175 +++++++++++++++++++++
+>   tests/acceptance/boot_linux_console.py     |  19 +--
+>   tests/acceptance/cpu_queries.py            |   2 +-
+>   tests/acceptance/linux_initrd.py           |   2 +-
+>   tests/acceptance/linux_ssh_mips_malta.py   |   5 -
+>   tests/acceptance/machine_m68k_nextcube.py  |  21 +--
+>   tests/acceptance/machine_sparc_leon3.py    |   3 +-
+>   tests/acceptance/ppc_prep_40p.py           |   3 -
+>   tests/acceptance/x86_cpu_model_versions.py | 137 +++++++++-------
+>   tests/requirements.txt                     |   1 +
+>   13 files changed, 308 insertions(+), 114 deletions(-)
+>   create mode 100644 tests/acceptance/boot_linux.py
+>
 
 
