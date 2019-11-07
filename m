@@ -2,77 +2,75 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6220FC5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F71C5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:19:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 315EE214D8
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33EC5214D8
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:19:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gzX80yAn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 315EE214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sk6m4aa7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33EC5214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSend-000663-B2
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:13:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34554)
+	id 1iSetE-0007rj-CF
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:19:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35581)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iSemQ-0005ar-Vc
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:12:44 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iSesP-0007EI-Vw
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:18:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iSemP-0005Ol-MA
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:12:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:49467
+ (envelope-from <dgilbert@redhat.com>) id 1iSesN-0003Ii-Ej
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:18:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28644
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iSemP-0005Mw-HF
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:12:41 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iSesN-0003GX-Am
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:18:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573121561;
+ s=mimecast20190719; t=1573121930;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tHwhlVhZUKtew0i7vISTKXP4xot1Ro3llNz+lcALFiA=;
- b=gzX80yAnuDr559bgE8JpAIPrEh5IBDlypzRF+WwFDcACZgOsqrzXcdmcZsT8m8U+EN05o4
- VYzKC26uzfjETtdQUDXHKxwXBrNsoBhoweMl8arw1FlMqtXpOPjt4kqMAEhCGWjI+Y8zOs
- D2vYV8mv01YxTr0cTZ09wFa6wOqB6LE=
+ bh=HdIlwKJ69Zm1SPluhXRNdHJgWpBRL21+6VS5JEbmEgo=;
+ b=Sk6m4aa7PvZfIAFdjhZ1b/yd0WnLMXiuQesI/5TJwZYNaC8gMDXWAQOjU+2PK5pQVbsW37
+ q1iIbk4GTYkt3wJfPYCG5OqAQjD3CH25i/XABGY44Qaw178pVkugU90swIq5cW/781HIRi
+ 0W/GKu1RtrVsUVlZh9KWELn3BZ4rt0s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-284-ZrASH7GAPRCNWn8ikBHl6A-1; Thu, 07 Nov 2019 05:12:39 -0500
-X-MC-Unique: ZrASH7GAPRCNWn8ikBHl6A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-190-WFJMf6aENoCoX-z6HZetcQ-1; Thu, 07 Nov 2019 05:18:41 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA0FC1005500;
- Thu,  7 Nov 2019 10:12:38 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-214.ams2.redhat.com [10.36.116.214])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 781A119757;
- Thu,  7 Nov 2019 10:12:37 +0000 (UTC)
-Date: Thu, 7 Nov 2019 11:12:35 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [RFC PATCH 18/18] qemu-storage-daemon: Add --monitor option
-Message-ID: <20191107101235.GB5007@linux.fritz.box>
-References: <20191017130204.16131-1-kwolf@redhat.com>
- <20191017130204.16131-19-kwolf@redhat.com>
- <64d79019-711d-8eb1-da72-a9b95f999ff5@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B73801005500;
+ Thu,  7 Nov 2019 10:18:39 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.14])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AB94A5D6D8;
+ Thu,  7 Nov 2019 10:18:34 +0000 (UTC)
+Date: Thu, 7 Nov 2019 10:18:32 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: privileged entropy sources in QEMU/KVM guests
+Message-ID: <20191107101832.GA2817@work-vm>
+References: <03e769cf-a5ad-99ce-cd28-690e0a72a310@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <64d79019-711d-8eb1-da72-a9b95f999ff5@redhat.com>
+In-Reply-To: <03e769cf-a5ad-99ce-cd28-690e0a72a310@redhat.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: WFJMf6aENoCoX-z6HZetcQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="KsGdsel6WgEHnImy"
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -88,121 +86,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, armbru@redhat.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+ Jian J Wang <jian.j.wang@intel.com>,
+ edk2-devel-groups-io <devel@edk2.groups.io>,
+ Bret Barkelew <Bret.Barkelew@microsoft.com>,
+ qemu devel list <qemu-devel@nongnu.org>, Erik Bjorge <erik.c.bjorge@intel.com>,
+ Sean Brogan <sean.brogan@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---KsGdsel6WgEHnImy
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 06.11.2019 um 15:32 hat Max Reitz geschrieben:
-> On 17.10.19 15:02, Kevin Wolf wrote:
-> > This adds and parses the --monitor option, so that a QMP monitor can be
-> > used in the storage daemon. The monitor offers commands defined in the
-> > QAPI schema at storage-daemon/qapi/qapi-schema.json.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  storage-daemon/qapi/qapi-schema.json | 15 ++++++++++++
-> >  qemu-storage-daemon.c                | 34 ++++++++++++++++++++++++++++
-> >  Makefile                             | 30 ++++++++++++++++++++++++
-> >  Makefile.objs                        |  4 ++--
-> >  monitor/Makefile.objs                |  2 ++
-> >  qapi/Makefile.objs                   |  5 ++++
-> >  qom/Makefile.objs                    |  1 +
-> >  scripts/qapi/gen.py                  |  5 ++++
-> >  storage-daemon/Makefile.objs         |  1 +
-> >  storage-daemon/qapi/Makefile.objs    |  1 +
-> >  10 files changed, 96 insertions(+), 2 deletions(-)
-> >  create mode 100644 storage-daemon/qapi/qapi-schema.json
-> >  create mode 100644 storage-daemon/Makefile.objs
-> >  create mode 100644 storage-daemon/qapi/Makefile.objs
+* Laszlo Ersek (lersek@redhat.com) wrote:
+> Hi,
 >=20
-> [...]
+> related TianoCore BZ:
 >=20
-> > diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
-> > index 3e04e299ed..03d256f0a4 100644
-> > --- a/qapi/Makefile.objs
-> > +++ b/qapi/Makefile.objs
-> > @@ -30,3 +30,8 @@ obj-y +=3D $(QAPI_TARGET_MODULES:%=3Dqapi-events-%.o)
-> >  obj-y +=3D qapi-events.o
-> >  obj-y +=3D $(QAPI_TARGET_MODULES:%=3Dqapi-commands-%.o)
-> >  obj-y +=3D qapi-commands.o
-> > +
-> > +QAPI_MODULES_STORAGE_DAEMON =3D block block-core char common crypto in=
-trospect
-> > +QAPI_MODULES_STORAGE_DAEMON +=3D job monitor qom sockets pragma transa=
-ction
+>   https://bugzilla.tianocore.org/show_bug.cgi?id=3D1871
 >=20
-> I took a look into the rest, and I wonder whether query-iothreads from
-> misc.json would be useful, too.
-
-Possibly. It would be a separate patch, but I can add it.
-
-The question is just where to move query-iothreads. Do we have a good
-place, or do I need to separate misc.json and a new misc-sysemu.json?
-
-> > diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
-> > index 796c17c38a..c25634f673 100644
-> > --- a/scripts/qapi/gen.py
-> > +++ b/scripts/qapi/gen.py
-> > @@ -44,6 +44,11 @@ class QAPIGen(object):
-> >          return ''
-> > =20
-> >      def write(self, output_dir):
-> > +        # Include paths starting with ../ are used to reuse modules of=
- the main
-> > +        # schema in specialised schemas. Don't overwrite the files tha=
-t are
-> > +        # already generated for the main schema.
-> > +        if self.fname.startswith('../'):
-> > +            return
+> (I'm starting this thread separately because at least some of the topics
+> are specific to QEMU, and I didn't want to litter the BZ with a
+> discussion that may not be interesting to all participants CC'd on the
+> BZ. I am keeping people CC'd on this initial posting; please speak up if
+> you'd like to be dropped from the email thread.)
 >=20
-> Sorry, but I=E2=80=99m about to ask a clueless question: How do we ensure=
- that
-> the main schema is generated before something else could make sure of
-> the specialized schemas?
+> QEMU provides guests with the virtio-rng device, and the OVMF and
+> ArmVirtQemu* edk2 platforms build EFI_RNG_PROTOCOL on top of that
+> device. But, that doesn't seem enough for all edk2 use cases.
+>=20
+> Also, virtio-rng (hence EFI_RNG_PROTOCOL too) is optional, and its
+> absence may affect some other use cases.
+>=20
+>=20
+> (1) For UEFI HTTPS boot, TLS would likely benefit from good quality
+> entropy. If the VM config includes virtio-rng (hence the guest firmware
+> has EFI_RNG_PROTOCOL), then it should be used as a part of HTTPS boot.
+>=20
+> However, what if virtio-rng (hence EFI_RNG_PROTOCOL) are absent? Should
+> UEFI HTTPS boot be disabled completely (or prevented / rejected
+> somehow), blaming lack of good entropy? Or should TLS silently fall back
+> to "mixing some counters [such as TSC] together and applying a
+> deterministic cryptographic transformation"?
+>=20
+> IOW, knowing that the TLS setup may not be based on good quality
+> entropy, should we allow related firmware services to "degrade silently"
+> (not functionally, but potentially in security), or should we deny the
+> services altogether?
 
-"Make sure"?
+I don't see a downside to insisting that if you want to use https then
+you must provide an entropy source; they're easy enough to add using
+virtio-rng if the CPU doesn't provide it.
 
-I think the order of the generation doesn't matter because generating
-the storage daemon files doesn't actually access the main ones.
-Generated C files shouldn't be a problem either because if we link an
-object file into a binary, we have a make dependency for it.
+>=20
+> (2) It looks like the SMM driver implementing the privileged part of the
+> UEFI variable runtime service could need access to good quality entropy,
+> while running in SMM; in the future.
+>=20
+> This looks problematic on QEMU. Entropy is a valuable resource, and
+> whatever resource SMM drivers depend on, should not be possible for e.g.
+> a 3rd party UEFI driver (or even for the runtime OS) to exhaust.
+> Therefore, it's not *only* the case that SMM drivers must not consume
+> EFI_RNG_PROTOCOL (which exists at a less critical privilege level, i.e.
+> outside of SMM/SMRAM), but also that SMM drivers must not depend on the
+> same piece of *hardware* that feeds EFI_RNG_PROTOCOL.
+>=20
+> Furthermore, assuming we dedicate a hardware entropy device specifically
+> to SMM drivers, such a device cannot be PCI(e). It would have to be a
+> platform device at a fixed location (IO port or MMIO) that is only
+> accessible to such guest code that executes in SMM. IOW, device access
+> would have to be restricted similarly to pflash. (In fact the variable
+> SMM driver will need, AIUI, the entropy for encrypting various variable
+> contents, which are then written into pflash.)
 
-Maybe the only a bit trickier question is whether we have the
-dependencies right so that qemu-storage-daemon.c is only built after the
-header files of both the main schema and the specific one have been
-generated. If I understand the Makefile correctly, generated-files-y
-takes care of this, and this patch adds all new header files to it if I
-didn't miss any.
+Ewww.  I guess a virtio-rng instance wired to virtio-mmio could do that.
+It's a bit grim though.
 
-Kevin
+Dave
 
---KsGdsel6WgEHnImy
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJdw+4TAAoJEH8JsnLIjy/WRcAQAKdnWaaR9LumipHwGyiJTT+t
-oQFRsZgWkLKSmtvvyZu7XGzDz0iR3ppCdVh0U2U/c9Y8M5vJ65s9pHntOYvzhF5M
-dFA70nHRBE/2RoM4Gwxp9zv+RSq+7iWdg5KjIH3bIHTIr5ut5vK4ZZVlEecXb1d8
-IL04kQb34J/u6rmSG0nVpe2CvYgLU86wwLRm60cpTwv/ViPdVgA2zy8I+KLk4eZo
-IYfRJ8wvqu2EJGjOIBqSDmW35B2GYcHAxlEfWpu4c3lHqtaNzokaHvbMRQkGdcuB
-Un/imeGlu95UxH+VDYhxCtUHk5vSqmnHoguS5hBxHBxiKhdw1xI8S7wTuVOig13C
-hNGouiLd7UQRb+tSbfZdCqPrSum0gEGGjmZjtqfyz/BNkOM+gWC/f7Ob/itt/87/
-ciCM/CX5JmwwvdnKSlNHh+0LEVTXA6WrN/FAglkjMIRDfiKaTUbwC5EWYXr8CuWI
-fW6c8efkMhMN8jcjm7OEydU3Bwi6IBOq5C+gy0cVzWiZc9rpF3BnvjARDjlOT0Tm
-y1DvBzuOENS6U+k9+kDGFnxOa7x22G2PuVL1tFW4WJ25olEWvf1zDiSctRXQh2Kr
-ewMpuosXprP2XBZtrjRfQTDxlypafeRxx8wCVZtXkYB/y630F8gkBxAq6DznC4Ya
-+7aFwZIZl0XQAn8Y0FTX
-=xaGJ
------END PGP SIGNATURE-----
-
---KsGdsel6WgEHnImy--
+> Alternatively, CPU instructions could exist that return entropy, and are
+> executable only inside SMM. It seems that e.g. RDRAND can be trapped in
+> guests ("A VMEXIT due to RDRAND will have exit reason 57 (decimal)").
+> Then KVM / QEMU could provide any particular implementation we wanted --
+> for example an exception could be injected unless RDRAND had been
+> executed from within SMM. Unfortunately, such an arbitrary restriction
+> (of RDRAND to SMM) would diverge from the Intel SDM, and would likely
+> break other (non-SMM) guest code.
+>=20
+> Does a platform device that is dynamically detectable and usable in SMM
+> only seem like an acceptable design for QEMU?
+>=20
+> Thanks,
+> Laszlo
+>=20
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
