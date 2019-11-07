@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED36C5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 07:51:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 567EDC5DF61
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 07:51:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04017207FA
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 07:51:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04017207FA
+	by mail.kernel.org (Postfix) with ESMTPS id 2ACF0207FA
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 07:51:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ACF0207FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSca9-0006gW-NN
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 02:51:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45432)
+	id 1iScaD-0006fF-97
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 02:51:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45447)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iScTx-0001Id-Mb
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:31 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1iScU0-0001Iy-1d
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iScTv-0004Ya-33
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:28 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1iScTw-0004iH-Jc
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:30 -0500
 Received: from mga02.intel.com ([134.134.136.20]:5076)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iScTu-0004DB-Nu
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:27 -0500
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iScTw-0004DB-BI
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:28 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 06 Nov 2019 23:45:23 -0800
+ 06 Nov 2019 23:45:26 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,277,1569308400"; d="scan'208";a="404016840"
+X-IronPort-AV: E=Sophos;i="5.68,277,1569308400"; d="scan'208";a="404016846"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga006.fm.intel.com with ESMTP; 06 Nov 2019 23:45:21 -0800
+ by fmsmga006.fm.intel.com with ESMTP; 06 Nov 2019 23:45:23 -0800
 From: Tao Xu <tao3.xu@intel.com>
 To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
  ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
  mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
-Subject: [PATCH v15 02/12] util/cutils: Add qemu_strtotime_ns()
-Date: Thu,  7 Nov 2019 15:45:01 +0800
-Message-Id: <20191107074511.14304-3-tao3.xu@intel.com>
+Subject: [PATCH v15 03/12] qapi: Add builtin type time
+Date: Thu,  7 Nov 2019 15:45:02 +0800
+Message-Id: <20191107074511.14304-4-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191107074511.14304-1-tao3.xu@intel.com>
 References: <20191107074511.14304-1-tao3.xu@intel.com>
@@ -73,287 +73,183 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To convert strings with time suffixes to numbers, support time unit are
-"ns" for nanosecond, "us" for microsecond, "ms" for millisecond or "s"
-for second. Add test for qemu_strtotime_ns, test the input of basic,
-time suffixes, float, invaild, trailing and overflow.
+Add optional builtin type time, fallback is uint64. This type use
+qemu_strtotime_ns() for pre-converting time suffix to numbers.
 
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
-Changes in v15:
-    - Add a new patch to refactor do_strtosz() (Eduardo)
-    - use ARRAY_SIZE(suffixes) instead of hardcoding the
-      suffixes number (Eduardo)
+No changes in v15.
 
 Changes in v14:
-    - Reuse the codes of do_strtosz to build qemu_strtotime_ns
-      (Eduardo)
-    - Squash patch v13 01/12 and 02/12 together (Daniel and Eduardo)
     - Drop time unit picosecond (Eric)
 ---
- include/qemu/cutils.h |   1 +
- tests/test-cutils.c   | 204 ++++++++++++++++++++++++++++++++++++++++++
- util/cutils.c         |  14 +++
- 3 files changed, 219 insertions(+)
+ include/qapi/visitor-impl.h  |  4 ++++
+ include/qapi/visitor.h       |  8 ++++++++
+ qapi/opts-visitor.c          | 22 ++++++++++++++++++++++
+ qapi/qapi-visit-core.c       | 12 ++++++++++++
+ qapi/qobject-input-visitor.c | 18 ++++++++++++++++++
+ qapi/trace-events            |  1 +
+ scripts/qapi/schema.py       |  1 +
+ 7 files changed, 66 insertions(+)
 
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index b54c847e0f..ff2b3f4614 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -182,5 +182,6 @@ int uleb128_decode_small(const uint8_t *in, uint32_t *n);
-  * *str1 is <, == or > than *str2.
-  */
- int qemu_pstrcmp0(const char **str1, const char **str2);
-+int qemu_strtotime_ns(const char *nptr, const char **end, uint64_t *result);
+diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
+index 8ccb3b6c20..e0979563c7 100644
+--- a/include/qapi/visitor-impl.h
++++ b/include/qapi/visitor-impl.h
+@@ -88,6 +88,10 @@ struct Visitor
+     void (*type_size)(Visitor *v, const char *name, uint64_t *obj,
+                       Error **errp);
  
- #endif
-diff --git a/tests/test-cutils.c b/tests/test-cutils.c
-index 1aa8351520..d6a0824efd 100644
---- a/tests/test-cutils.c
-+++ b/tests/test-cutils.c
-@@ -2179,6 +2179,198 @@ static void test_qemu_strtosz_metric(void)
-     g_assert(endptr == str + 6);
- }
++    /* Optional; fallback is type_uint64() */
++    void (*type_time)(Visitor *v, const char *name, uint64_t *obj,
++                      Error **errp);
++
+     /* Must be set */
+     void (*type_bool)(Visitor *v, const char *name, bool *obj, Error **errp);
  
-+static void test_qemu_strtotime_ns_simple(void)
-+{
-+    const char *str;
-+    const char *endptr;
-+    int err;
-+    uint64_t res = 0xbaadf00d;
-+
-+    str = "0";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 0);
-+    g_assert(endptr == str + 1);
-+
-+    str = "56789";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 56789);
-+    g_assert(endptr == str + 5);
-+
-+    err = qemu_strtotime_ns(str, NULL, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 56789);
-+
-+    /* Note: precision is 53 bits since we're parsing with strtod() */
-+
-+    str = "9007199254740991"; /* 2^53-1 */
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 0x1fffffffffffff);
-+    g_assert(endptr == str + 16);
-+
-+    str = "9007199254740992"; /* 2^53 */
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 0x20000000000000);
-+    g_assert(endptr == str + 16);
-+
-+    str = "9007199254740993"; /* 2^53+1 */
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 0x20000000000000); /* rounded to 53 bits */
-+    g_assert(endptr == str + 16);
-+
-+    str = "18446744073709549568"; /* 0xfffffffffffff800 (53 msbs set) */
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 0xfffffffffffff800);
-+    g_assert(endptr == str + 20);
-+
-+    str = "18446744073709550591"; /* 0xfffffffffffffbff */
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 0xfffffffffffff800); /* rounded to 53 bits */
-+    g_assert(endptr == str + 20);
-+
-+    /* 0x7ffffffffffffe00..0x7fffffffffffffff get rounded to
-+     * 0x8000000000000000, thus -ERANGE; see test_qemu_strtosz_erange() */
-+}
-+
-+static void test_qemu_strtotime_ns_units(void)
-+{
-+    const char *ns = "1ns";
-+    const char *us = "1us";
-+    const char *ms = "1ms";
-+    const char *s = "1s";
-+    int err;
-+    const char *endptr;
-+    uint64_t res = 0xbaadf00d;
-+
-+    /* default time unit is ns */
-+    err = qemu_strtotime_ns(ns, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 1);
-+    g_assert(endptr == ns + 3);
-+
-+    err = qemu_strtotime_ns(us, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 1000);
-+    g_assert(endptr == us + 3);
-+
-+    err = qemu_strtotime_ns(ms, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 1000000);
-+    g_assert(endptr == ms + 3);
-+
-+    err = qemu_strtotime_ns(s, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 1000000000LL);
-+    g_assert(endptr == s + 2);
-+}
-+
-+static void test_qemu_strtotime_ns_float(void)
-+{
-+    const char *str = "56.789us";
-+    int err;
-+    const char *endptr;
-+    uint64_t res = 0xbaadf00d;
-+
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 56.789 * 1000);
-+    g_assert(endptr == str + 8);
-+}
-+
-+static void test_qemu_strtotime_ns_invalid(void)
-+{
-+    const char *str;
-+    const char *endptr;
-+    int err;
-+    uint64_t res = 0xbaadf00d;
-+
-+    str = "";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
-+
-+    str = " \t ";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
-+
-+    str = "crap";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
-+
-+    str = "inf";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
-+
-+    str = "NaN";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
-+}
-+
-+static void test_qemu_strtotime_ns_trailing(void)
-+{
-+    const char *str;
-+    const char *endptr;
-+    int err;
-+    uint64_t res = 0xbaadf00d;
-+
-+    str = "123xxx";
-+
-+    err = qemu_strtotime_ns(str, NULL, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+
-+    str = "1msxxx";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 1000000);
-+    g_assert(endptr == str + 3);
-+
-+    err = qemu_strtotime_ns(str, NULL, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+}
-+
-+static void test_qemu_strtotime_ns_erange(void)
-+{
-+    const char *str;
-+    const char *endptr;
-+    int err;
-+    uint64_t res = 0xbaadf00d;
-+
-+    str = "-1";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -ERANGE);
-+    g_assert(endptr == str + 2);
-+
-+    str = "18446744073709550592"; /* 0xfffffffffffffc00 */
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -ERANGE);
-+    g_assert(endptr == str + 20);
-+
-+    str = "18446744073709551615"; /* 2^64-1 */
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -ERANGE);
-+    g_assert(endptr == str + 20);
-+
-+    str = "18446744073709551616"; /* 2^64 */
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -ERANGE);
-+    g_assert(endptr == str + 20);
-+
-+    str = "200000000000000ms";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -ERANGE);
-+    g_assert(endptr == str + 17);
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -2456,5 +2648,17 @@ int main(int argc, char **argv)
-     g_test_add_func("/cutils/strtosz/metric",
-                     test_qemu_strtosz_metric);
- 
-+    g_test_add_func("/cutils/strtotime/simple",
-+                    test_qemu_strtotime_ns_simple);
-+    g_test_add_func("/cutils/strtotime/units",
-+                    test_qemu_strtotime_ns_units);
-+    g_test_add_func("/cutils/strtotime/float",
-+                    test_qemu_strtotime_ns_float);
-+    g_test_add_func("/cutils/strtotime/invalid",
-+                    test_qemu_strtotime_ns_invalid);
-+    g_test_add_func("/cutils/strtotime/trailing",
-+                    test_qemu_strtotime_ns_trailing);
-+    g_test_add_func("/cutils/strtotime/erange",
-+                    test_qemu_strtotime_ns_erange);
-     return g_test_run();
- }
-diff --git a/util/cutils.c b/util/cutils.c
-index 86d6e271fa..699f2b3300 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -286,6 +286,20 @@ int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result)
-     return do_strtosz(nptr, end, "B", 1000, result);
- }
+diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
+index c5b23851a1..22242e706f 100644
+--- a/include/qapi/visitor.h
++++ b/include/qapi/visitor.h
+@@ -554,6 +554,14 @@ void visit_type_int64(Visitor *v, const char *name, int64_t *obj,
+ void visit_type_size(Visitor *v, const char *name, uint64_t *obj,
+                      Error **errp);
  
 +/*
-+ * Convert string to time, support time unit are ns for nanosecond, us for
-+ * microsecond, ms for millisecond and s for second. End pointer will be
-+ * returned in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on
-+ * other error.
++ * Visit a uint64_t value.
++ * Like visit_type_uint64(), except that some visitors may choose to
++ * recognize numbers with timeunit suffix, such as "ns", "us" "ms" and "s".
 + */
-+int qemu_strtotime_ns(const char *nptr, const char **end, uint64_t *result)
-+{
-+    static const char *suffixes[] = { "ns", "us", "ms", "s" };
++void visit_type_time(Visitor *v, const char *name, uint64_t *obj,
++                     Error **errp);
 +
-+    return do_strtomul(nptr, end, suffixes, ARRAY_SIZE(suffixes), "ns", 1000,
-+                       result);
+ /*
+  * Visit a boolean value.
+  *
+diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
+index 5fe0276c1c..59b575f0fc 100644
+--- a/qapi/opts-visitor.c
++++ b/qapi/opts-visitor.c
+@@ -526,6 +526,27 @@ opts_type_size(Visitor *v, const char *name, uint64_t *obj, Error **errp)
+     processed(ov, name);
+ }
+ 
++static void
++opts_type_time(Visitor *v, const char *name, uint64_t *obj, Error **errp)
++{
++    OptsVisitor *ov = to_ov(v);
++    const QemuOpt *opt;
++    int err;
++
++    opt = lookup_scalar(ov, name, errp);
++    if (!opt) {
++        return;
++    }
++
++    err = qemu_strtotime_ns(opt->str ? opt->str : "", NULL, obj);
++    if (err < 0) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
++                   "a time value");
++        return;
++    }
++
++    processed(ov, name);
++}
+ 
+ static void
+ opts_optional(Visitor *v, const char *name, bool *present)
+@@ -573,6 +594,7 @@ opts_visitor_new(const QemuOpts *opts)
+     ov->visitor.type_int64  = &opts_type_int64;
+     ov->visitor.type_uint64 = &opts_type_uint64;
+     ov->visitor.type_size   = &opts_type_size;
++    ov->visitor.type_time   = &opts_type_time;
+     ov->visitor.type_bool   = &opts_type_bool;
+     ov->visitor.type_str    = &opts_type_str;
+ 
+diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
+index 5365561b07..ac8896455c 100644
+--- a/qapi/qapi-visit-core.c
++++ b/qapi/qapi-visit-core.c
+@@ -277,6 +277,18 @@ void visit_type_size(Visitor *v, const char *name, uint64_t *obj,
+     }
+ }
+ 
++void visit_type_time(Visitor *v, const char *name, uint64_t *obj,
++                     Error **errp)
++{
++    assert(obj);
++    trace_visit_type_time(v, name, obj);
++    if (v->type_time) {
++        v->type_time(v, name, obj, errp);
++    } else {
++        v->type_uint64(v, name, obj, errp);
++    }
 +}
 +
- /**
-  * Helper function for error checking after strtol() and the like
-  */
+ void visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+ {
+     assert(obj);
+diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
+index 32236cbcb1..e476fe0d16 100644
+--- a/qapi/qobject-input-visitor.c
++++ b/qapi/qobject-input-visitor.c
+@@ -627,6 +627,23 @@ static void qobject_input_type_size_keyval(Visitor *v, const char *name,
+     }
+ }
+ 
++static void qobject_input_type_time_keyval(Visitor *v, const char *name,
++                                           uint64_t *obj, Error **errp)
++{
++    QObjectInputVisitor *qiv = to_qiv(v);
++    const char *str = qobject_input_get_keyval(qiv, name, errp);
++
++    if (!str) {
++        return;
++    }
++
++    if (qemu_strtotime_ns(str, NULL, obj) < 0) {
++        /* TODO report -ERANGE more nicely */
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++                   full_name(qiv, name), "time");
++    }
++}
++
+ static void qobject_input_optional(Visitor *v, const char *name, bool *present)
+ {
+     QObjectInputVisitor *qiv = to_qiv(v);
+@@ -708,6 +725,7 @@ Visitor *qobject_input_visitor_new_keyval(QObject *obj)
+     v->visitor.type_any = qobject_input_type_any;
+     v->visitor.type_null = qobject_input_type_null;
+     v->visitor.type_size = qobject_input_type_size_keyval;
++    v->visitor.type_time = qobject_input_type_time_keyval;
+     v->keyval = true;
+ 
+     return &v->visitor;
+diff --git a/qapi/trace-events b/qapi/trace-events
+index 5eb4afa110..c4605a7ccc 100644
+--- a/qapi/trace-events
++++ b/qapi/trace-events
+@@ -29,6 +29,7 @@ visit_type_int16(void *v, const char *name, int16_t *obj) "v=%p name=%s obj=%p"
+ visit_type_int32(void *v, const char *name, int32_t *obj) "v=%p name=%s obj=%p"
+ visit_type_int64(void *v, const char *name, int64_t *obj) "v=%p name=%s obj=%p"
+ visit_type_size(void *v, const char *name, uint64_t *obj) "v=%p name=%s obj=%p"
++visit_type_time(void *v, const char *name, uint64_t *obj) "v=%p name=%s obj=%p"
+ visit_type_bool(void *v, const char *name, bool *obj) "v=%p name=%s obj=%p"
+ visit_type_str(void *v, const char *name, char **obj) "v=%p name=%s obj=%p"
+ visit_type_number(void *v, const char *name, void *obj) "v=%p name=%s obj=%p"
+diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
+index cf0045f34e..210be64909 100644
+--- a/scripts/qapi/schema.py
++++ b/scripts/qapi/schema.py
+@@ -855,6 +855,7 @@ class QAPISchema(object):
+                   ('uint32', 'int',     'uint32_t'),
+                   ('uint64', 'int',     'uint64_t'),
+                   ('size',   'int',     'uint64_t'),
++                  ('time',   'int',     'uint64_t'),
+                   ('bool',   'boolean', 'bool'),
+                   ('any',    'value',   'QObject' + pointer_suffix),
+                   ('null',   'null',    'QNull' + pointer_suffix)]:
 -- 
 2.20.1
 
