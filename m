@@ -2,79 +2,78 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0287AC5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9EB8C5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:33:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEFD72166E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:24:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3FDE214D8
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:33:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bRGMLwIQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEFD72166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jN2WBAYE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3FDE214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSe1J-0001Dr-Uh
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 04:24:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56430)
+	id 1iSeA8-0004hm-LA
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 04:33:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57494)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iSdyi-0000Dk-B0
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:21:21 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iSe6y-0003dW-MX
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:29:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iSdyB-0003DZ-1z
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:20:48 -0500
-Received: from mail-oi1-x22f.google.com ([2607:f8b0:4864:20::22f]:43923)
+ (envelope-from <stefanha@gmail.com>) id 1iSe6w-0004yX-E3
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:29:51 -0500
+Received: from mail-qv1-xf35.google.com ([2607:f8b0:4864:20::f35]:46813)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iSdyA-0002xj-S4
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:20:47 -0500
-Received: by mail-oi1-x22f.google.com with SMTP id l20so1328486oie.10
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 01:20:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iSe6w-0004uy-7H
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:29:50 -0500
+Received: by mail-qv1-xf35.google.com with SMTP id w11so504854qvu.13
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 01:29:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=kpVnmwX1mi1PjRF1p2++ZxJlBDEtICEshq2+RL2FkxM=;
- b=bRGMLwIQlYPeoa+/B82c6Al4HYxJT0ufVIRnm2snpAx49X9tioXcl4PtLlV4Wtb6RZ
- +ia4+EnN8V3Rq+pIR6UVtGi1reAr8NPXbD7oiyemjB/SIOFeZMN5oTJRUz21x5vtDEha
- owG8gf3Uaya3LNPXEAF9bJch60UxSlxDW2S/5hUHKCdVzIfMnjOlv5L7vp7VN1QKlUIL
- t8+YjV+JS2k7TSxcEtoGNicfRZ4nAz3sBEqpjqKPi0NxBs+J2HcatYMbyeVUaV5fwDZU
- ois2b5diMrJivU0RZB78v/NB5jtix5E2MiW7rc7zzl9BHkAZCR+sxG5VRHwVgSKtGZvn
- x5wg==
+ :cc; bh=39sHpw1HN+5zZYhHZdcUopcedYurqjCiIUqV6NdmuWU=;
+ b=jN2WBAYE+OFrO1BC/dIx2IdD5Dsyf+nIXiivNHkyMYulbIrC7dq+hC7AFkN58qTExa
+ QNfooYKDGo2r88pJZ2O6x6bL1vsERVDOUyYIh+02Y0A0bYEVikcKnsBKP/OO6uCl65xR
+ bt0lCcOzj5MLDhTZgnHE91oR38bHqmFcqDSk6eXnaadU+n++3AfRG7HPjL9UOAly7L3T
+ chlUMUN/Lp3KgjZ/kbmWfA3q0jMlZaNAMSaaKrVagEWxX7NiHU3La9nQZf/GLOm8W14h
+ Of3VasS/gANO2YRPpC/2lo4JUtdNfpkHit7zTS8nd7vRMDOQHH3P+rHYy4HTswj1EbdL
+ 2CEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=kpVnmwX1mi1PjRF1p2++ZxJlBDEtICEshq2+RL2FkxM=;
- b=rEgoHt5NXX8s6raM/hxPk+CMXcbfak7HYr6Dc55NcnP4egIvexgkC+UtZIxqskvol8
- oMoprK7vYdBXwMXlOY2LdP/xdmYJeo74u+SJzINJuUYAGPTmcw/l8/RDPwLEOwYIpZ9Q
- MVBX5mMLqV0oFEyM0sVAGwIGkWvdmuu7CLIV3UcboFcN2nYXobE6iYq7WrMgUKAfebi1
- vhIbCPyVEvpJciNT4eQfgYT2G3VepiE3ByPLIzOtAY3+3XRefjmkNbL8SH+rwx17VlTw
- VHxkFIAozKN2dAqJfrdsd8Dbza6LFkaeZISv454dGjLJJ4KNB5/xKu7ITwdah+ydJCQx
- PGqg==
-X-Gm-Message-State: APjAAAVWbcDTdoViLewgL67KN/iW+sdI2pTGN7F1YKRsTLEBqbWjDNd5
- axf5k3swydq9HYkMUU/2iO/PE8UJG9pdtI5+qL6TQA==
-X-Google-Smtp-Source: APXvYqz0yoB14iiRdVV8KvXpbfbW0AIIG+hVaACo07JmLDi/6XEdJ/5YSC+sIkqSRRibmuiGQHUCHMr9PjQcyFTuFGY=
-X-Received: by 2002:aca:cf12:: with SMTP id f18mr2401925oig.48.1573118443696; 
- Thu, 07 Nov 2019 01:20:43 -0800 (PST)
+ bh=39sHpw1HN+5zZYhHZdcUopcedYurqjCiIUqV6NdmuWU=;
+ b=o1iHQas4pyEOxthQ8Q7u/6Dhu67JU6Xw5qQvSK8RGGkDut2bnHoQoahO+hOG48CeFH
+ P9t6QfM6crYM86zhbIR7NYONZ1zBl+OMuwCoh+LQMtWHFRlAp84Uh4dSg+tG09vH6lBU
+ oK/zMWDm++bEWh/CPjl0ZPVZqX147mJ6zOlxYXbWwVWs8J1oURh1G5HSAW4js4y7z/9l
+ 7+UIyfL7FjACC9memjOWYMDlGP+xAkXUfHJnEmpjt7gQWhWIy3e0KPK/aU9/DXuojMFn
+ 4ZaPGgCYHhH88plnD5oY+cnGhjU0soTq5j24PHkhg9HV8YaGjgluitwzNAw+UwpQ5DpI
+ nHKA==
+X-Gm-Message-State: APjAAAXZqSUac2gwW8lsgyrJbzBPpdMX8a2RrsRpkCFQPfiqksfBAdv8
+ 5GfLpmjilV5h59Z+YSjoB107QWhgV9KkXvtwqZ4=
+X-Google-Smtp-Source: APXvYqyoY7QdjlbhQdrCWiwCPfWYeCMxUNq3fHXnQz/vfamgtu+73dZAWxk58E6mxdEABwK9mWIBWKUIa2T7q6pMOcU=
+X-Received: by 2002:a0c:87b5:: with SMTP id 50mr2434691qvj.143.1573118989467; 
+ Thu, 07 Nov 2019 01:29:49 -0800 (PST)
 MIME-Version: 1.0
-References: <20191106070712.2679-1-kraxel@redhat.com>
-In-Reply-To: <20191106070712.2679-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Nov 2019 09:20:33 +0000
-Message-ID: <CAFEAcA_tGLyAqYmEhOUdoeccdULkJv60j_Mh2CTmVQAi2BvGyA@mail.gmail.com>
-Subject: Re: [PULL 0/1] Ui 20191106 patches
-To: Gerd Hoffmann <kraxel@redhat.com>
+References: <20191106161928.GA353373@stefanha-x1.localdomain>
+In-Reply-To: <20191106161928.GA353373@stefanha-x1.localdomain>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 7 Nov 2019 10:29:38 +0100
+Message-ID: <CAJSP0QURDvW1Loj=KLWD6icNoXDo3W-u6Dm4_dVX+r0iwxE8BQ@mail.gmail.com>
+Subject: Re: QEMU HTML documentation now on qemu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::22f
+X-Received-From: 2607:f8b0:4864:20::f35
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,35 +85,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 6 Nov 2019 at 07:08, Gerd Hoffmann <kraxel@redhat.com> wrote:
+On Wed, Nov 6, 2019 at 5:21 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> Hi,
+> You can now access the latest QEMU HTML documentation built from
+> qemu.git/master nightly at:
 >
-> The following changes since commit 36609b4fa36f0ac934874371874416f7533a5408:
+>   https://wiki.qemu.org/docs/qemu-doc.html
+>   https://wiki.qemu.org/docs/qemu-qmp-ref.html
+>   https://wiki.qemu.org/docs/qemu-ga-ref.html
+>   ...as well as interop/ and specs/
 >
->   Merge remote-tracking branch 'remotes/palmer/tags/palmer-for-master-4.2-sf1' into staging (2019-11-02 17:59:03 +0000)
+> Feel free to link to the documentation from the QEMU website and/or
+> wiki!
 >
-> are available in the Git repository at:
+> The container image that builds the docs is here:
 >
->   git://git.kraxel.org/qemu tags/ui-20191106-pull-request
+>   https://github.com/stefanha/qemu-docs
 >
-> for you to fetch changes up to 88b40c683fda6fa00639de01d4274e94bd4f1cdd:
->
->   qemu-options: Rework the help text of the '-display' option (2019-11-05 12:10:42 +0100)
->
-> ----------------------------------------------------------------
-> ui: rework -display help text
->
-> ----------------------------------------------------------------
->
+> It is hosted on QEMU's Rackspace cloud account.
 
-Applied, thanks.
+I forgot to add Markus.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+I hope this helps the QEMU documentation effort.  I currently do not
+have plans to work on this further.  You are welcome to send pull
+requests to the qemu-docs container image repo or just ask me and I'll
+make changes.
 
--- PMM
+Stefan
 
