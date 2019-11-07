@@ -2,79 +2,82 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC4BC5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 12:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D5C1C5DF61
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 12:14:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4A372166E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 12:13:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6623C2166E
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 12:14:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="equvkdjR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4A372166E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mu4MxBqe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6623C2166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSgex-0004N6-0u
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 07:13:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55247)
+	id 1iSggD-0005mR-Gl
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 07:14:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55386)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iSgdZ-0003NX-2i
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:11:43 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iSgeJ-0004Pm-KA
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:12:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iSgdX-0007Hl-8c
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:11:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44298
+ (envelope-from <cohuck@redhat.com>) id 1iSgeH-00083j-Tw
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:12:27 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22867
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iSgdX-0007Gu-3p
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:11:39 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iSgeH-0007xK-HK
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:12:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573128693;
+ s=mimecast20190719; t=1573128744;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=O37KNe058FRW/xYbyj9Ui7LgdAoReAFGIHly4bLVUqs=;
- b=equvkdjRdhU1IDlwykIQw57VRes6kXcdRgUo7Y1/ocoFC65ZmtCRsiF/UbcGGZNN82+HJd
- OUDH9ir9KpcurnMm7xeu2v+j2jdUHYM7b1y6j/EDQ0I6k76wgZXwt+VY3/sqozfOXCBPAa
- enNAQVgPPMmpyaJLWN3sY1NFcT9SglU=
+ bh=It6V3UM/dbrCXbVlN6LCxs/ovMmz5vJ2AooEt0KlmFw=;
+ b=Mu4MxBqePUiJwsI21ZdP6VPSR6aXbvIEKwcOwa9tVyuXYRFh5zgP2aZ3dVJUfwhl6rLE16
+ sHia+wZvfxujwjH/NxfXbz6sTqN8ttfS7VL68T/Snw7FYdUuibp6untNIDMBDR7Mrj/tX1
+ rcesQQ+YGIZluOMoEm1+YmOa0UAsBdY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-JJGui4duOgWM60d1eWyXcg-1; Thu, 07 Nov 2019 07:11:29 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-432-IIwgu445NTusestkhKdMeg-1; Thu, 07 Nov 2019 07:12:20 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4B071800D7A;
- Thu,  7 Nov 2019 12:11:28 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.14])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0FEDC19C6A;
- Thu,  7 Nov 2019 12:11:27 +0000 (UTC)
-Date: Thu, 7 Nov 2019 12:11:25 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Subject: Re: [PATCH 2/2] migration/compress: disable compress if failed to
- setup
-Message-ID: <20191107121125.GI2816@work-vm>
-References: <20191012023932.1863-1-richardw.yang@linux.intel.com>
- <20191012023932.1863-3-richardw.yang@linux.intel.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 17FBE107ACC3;
+ Thu,  7 Nov 2019 12:12:19 +0000 (UTC)
+Received: from gondolin (ovpn-117-222.ams2.redhat.com [10.36.117.222])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A32A75D6D8;
+ Thu,  7 Nov 2019 12:12:13 +0000 (UTC)
+Date: Thu, 7 Nov 2019 13:12:10 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Guoheyi <guoheyi@huawei.com>
+Subject: Re: [RFC v2 11/14] linux-headers/kvm.h: add capability to forward
+ hypercall
+Message-ID: <20191107131210.26acf011.cohuck@redhat.com>
+In-Reply-To: <da720295-2a84-e38b-9828-5287daefcfa2@huawei.com>
+References: <20191105091056.9541-1-guoheyi@huawei.com>
+ <20191105091056.9541-12-guoheyi@huawei.com>
+ <20191106185524.0fe51c50.cohuck@redhat.com>
+ <4dbcbd18-0e6c-f985-c36d-96df65331d11@huawei.com>
+ <20191107035624-mutt-send-email-mst@kernel.org>
+ <da720295-2a84-e38b-9828-5287daefcfa2@huawei.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20191012023932.1863-3-richardw.yang@linux.intel.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: JJGui4duOgWM60d1eWyXcg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: IIwgu445NTusestkhKdMeg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -89,114 +92,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, James Morse <james.morse@arm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, wanghaibin.wang@huawei.com,
+ Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Wei Yang (richardw.yang@linux.intel.com) wrote:
-> In current logic, if compress_threads_save_setup() returns -1 the whole
-> migration would fail, while we could handle it gracefully by disable
-> compress.
+On Thu, 7 Nov 2019 19:57:22 +0800
+Guoheyi <guoheyi@huawei.com> wrote:
 
-I think it's fine for migration to fail here; the user askd for
-compression - if it doesn't work then it's OK to fail and they can
-switch it off; since it fails right at the start there's nothing lost.
+> On 2019/11/7 16:57, Michael S. Tsirkin wrote:
+> > On Thu, Nov 07, 2019 at 09:44:36AM +0800, Guoheyi wrote: =20
+> >>
+> >> On 2019/11/7 1:55, Cornelia Huck wrote: =20
+> >>> On Tue, 5 Nov 2019 17:10:53 +0800
+> >>> Heyi Guo <guoheyi@huawei.com> wrote:
+> >>> =20
+> >>>> To keep backward compatibility, we add new KVM capability
+> >>>> "KVM_CAP_FORWARD_HYPERCALL" to probe whether KVM supports forwarding
+> >>>> hypercall to userspace.
+> >>>>
+> >>>> The capability should be enabled explicitly, for we don't want user
+> >>>> space application to deal with unexpected hypercall exits. After
+> >>>> enabling this cap, all HVC calls unhandled by kvm will be forwarded =
+to
+> >>>> user space.
+> >>>>
+> >>>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+> >>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+> >>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> >>>> Cc: Cornelia Huck <cohuck@redhat.com>
+> >>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> >>>> Cc: Dave Martin <Dave.Martin@arm.com>
+> >>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> >>>> Cc: Mark Rutland <mark.rutland@arm.com>
+> >>>> Cc: James Morse <james.morse@arm.com>
+> >>>> ---
+> >>>>    linux-headers/linux/kvm.h |  1 +
+> >>>>    target/arm/sdei.c         | 16 ++++++++++++++++
+> >>>>    target/arm/sdei.h         |  2 ++
+> >>>>    3 files changed, 19 insertions(+)
+> >>>>
+> >>>> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> >>>> index 3d9b18f7f8..36c9b3859f 100644
+> >>>> --- a/linux-headers/linux/kvm.h
+> >>>> +++ b/linux-headers/linux/kvm.h
+> >>>> @@ -1000,6 +1000,7 @@ struct kvm_ppc_resize_hpt {
+> >>>>    #define KVM_CAP_PMU_EVENT_FILTER 173
+> >>>>    #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
+> >>>>    #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
+> >>>> +#define KVM_CAP_FORWARD_HYPERCALL 176
+> >>>>    #ifdef KVM_CAP_IRQ_ROUTING =20
+> >>> Is this cap upstream already? I would have thought your header sync
+> >>> would have brought it in, then. (Saying this, that header sync looks
+> >>> awfully small.)
+> >>>
+> >>> If it is not upstream yet, please split off this hunk into a separate
+> >>> patch -- it's a bit annoying, but makes life easier for merging. =20
+> >> No, it is not upstream yet. The whole framework and interfaces between=
+ KVM
+> >> and qemu are still under discussion. I'll keep in mind of this when mo=
+ving
+> >> forward to next steps...
+> >>
+> >> Thanks,
+> >> HG =20
+> > It's best to add it in some other place meanwhile. =20
+> Do you mean to split this patch from the whole patch set and send it=20
+> separately? Sorry I'm not clear about maintainers' work and may bring=20
+> you some trouble...
 
-Dave
+My preferred approach:
 
-> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
-> ---
->  migration/migration.c |  9 +++++++++
->  migration/migration.h |  1 +
->  migration/ram.c       | 15 ++++++++-------
->  3 files changed, 18 insertions(+), 7 deletions(-)
->=20
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 5f7e4d15e9..02b95f4223 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -2093,6 +2093,15 @@ bool migrate_use_compression(void)
->      return s->enabled_capabilities[MIGRATION_CAPABILITY_COMPRESS];
->  }
-> =20
-> +void migrate_disable_compression(void)
-> +{
-> +    MigrationState *s;
-> +
-> +    s =3D migrate_get_current();
-> +
-> +    s->enabled_capabilities[MIGRATION_CAPABILITY_COMPRESS] =3D false;
-> +}
-> +
->  int migrate_compress_level(void)
->  {
->      MigrationState *s;
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 4f2fe193dc..51368d3a6e 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -309,6 +309,7 @@ bool migrate_use_return_path(void);
->  uint64_t ram_get_total_transferred_pages(void);
-> =20
->  bool migrate_use_compression(void);
-> +void migrate_disable_compression(void);
->  int migrate_compress_level(void);
->  int migrate_compress_threads(void);
->  int migrate_compress_wait_thread(void);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 96c9b16402..39279161a8 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -533,12 +533,12 @@ static void compress_threads_save_cleanup(void)
->      comp_param =3D NULL;
->  }
-> =20
-> -static int compress_threads_save_setup(void)
-> +static void compress_threads_save_setup(void)
->  {
->      int i, thread_count;
-> =20
->      if (!migrate_use_compression()) {
-> -        return 0;
-> +        return;
->      }
->      thread_count =3D migrate_compress_threads();
->      compress_threads =3D g_new0(QemuThread, thread_count);
-> @@ -569,11 +569,14 @@ static int compress_threads_save_setup(void)
->                             do_data_compress, comp_param + i,
->                             QEMU_THREAD_JOINABLE);
->      }
-> -    return 0;
-> +    return;
-> =20
->  exit:
->      compress_threads_save_cleanup();
-> -    return -1;
-> +    migrate_disable_compression();
-> +    error_report("%s: failed to setup compress threads, compress disable=
-d",
-> +                 __func__);
-> +    return;
->  }
-> =20
->  /* Multiple fd's */
-> @@ -3338,9 +3341,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque=
-)
->      RAMState **rsp =3D opaque;
->      RAMBlock *block;
-> =20
-> -    if (compress_threads_save_setup()) {
-> -        return -1;
-> -    }
-> +    compress_threads_save_setup();
-> =20
->      /* migration has already setup the bitmap, reuse it. */
->      if (!migration_in_colo_state()) {
-> --=20
-> 2.17.1
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+- add a commit entitled "placeholder for headers update" that contains
+  the not-yet-upstream changes in the header files you need
+- base the rest of your work on that
+...
+<review happens, series looks good>
+...
+- if kernel changes are upstream: replace the placeholder patch with a
+  real update (may include separate patches, if you need an additional
+  header); maintainer merges
+- if kernel changes are not yet upstream: maintainer merges with
+  placeholder to a feature branch, replaces with real update and merges
+  once kernel patches hit upstream
+(not every maintainer does the second approach; they may ask you
+instead to resend with a proper headers update once the kernel changes
+are upstream)
 
 
