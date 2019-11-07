@@ -2,78 +2,80 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22401C5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:26:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB657C5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:36:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF4592084D
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:26:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 752452085B
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:36:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EiwVPdHx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF4592084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RxsYAwsE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 752452085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSezp-0002Xx-2K
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:26:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37134)
+	id 1iSf90-0006LR-I1
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:36:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39635)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ard.biesheuvel@linaro.org>) id 1iSeyn-0001td-EI
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:25:31 -0500
+ (envelope-from <berrange@redhat.com>) id 1iSf7K-0005bD-7o
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:34:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ard.biesheuvel@linaro.org>) id 1iSeyj-0001Hj-9I
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:25:29 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:52110)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
- id 1iSeyi-00015I-MV
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:25:25 -0500
-Received: by mail-wm1-x336.google.com with SMTP id q70so1860494wme.1
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 02:25:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=qAdGETN6AixEqw+ThOSssQbz6q56ocX/c6J8cAihWig=;
- b=EiwVPdHxSxG04If6SrQjC03OgSWjUnB9hiG0bwTKeoH7Z8sTsKsneDW86ZtZIMp41w
- nVaQConMSHp94cgKobmgpfsqvYTaP/3XB4vYS0Lphq8cH1deKqEMMyXlsSGe2pyFsBfh
- shvA1T6bzI6T7nNoeKPO7f48dzXqFLXJ4ZEkJnaYcWusF8ZC9lzpT8ccB5oqCb9sQdOq
- 6EKyGFBtputXZVP5yS16zv5skRqeEl1JauhufcAogR/VEqcVt+jyef+Aelhd4NU9BgMM
- iKQhJtcjb2BEidKE4iqFRPT/adGdHpU3KrebMytX/QQQELMbndT9ivIiOkrc4GOJyyzQ
- elsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=qAdGETN6AixEqw+ThOSssQbz6q56ocX/c6J8cAihWig=;
- b=lcf7qhEbw/pTF4MGQrsjeVfjGuiSQSZDrvvNIOQ3WGU3K7keXPoWWVUwHvPJYHAy7n
- EQErQ/lxdUsNTaryK00KpVzIs0FgTUwHPG0VlbJK1u8GK9HDN6Ses5fN7uyYI/CkAhf4
- ILL3h9RF7J1hsQx8fj4rEYOAuCZCfBE2v7uWYFHXWM5IuqVM0PEMJ67HPOp4+xbx9r0Y
- NA+2OWk3X3GBq5d0czBkm2y0+BG6wp6KVx46879Rr1JC/HkqjmWEb6aoZ0q2pEl/tOYw
- ACJIsQEJzy6d9hq+YPutaW7isNhsV+iAwtmk9MiiL/A8/NcjfWdOukiQ99DlIt/tnPDx
- VowA==
-X-Gm-Message-State: APjAAAWmkakzuE+/KVnj+lgrRTF55LV72aXn1yFLQDGLkiOZP2PbeIr+
- xnO8+mXHVg3aJp9z4Ic5a+hhu4vz4k0LHLuEumu1Mg==
-X-Google-Smtp-Source: APXvYqy3QX1Gh2dO9py3eFifZjoRwObsWWYZcYFqejsGOV3ObuHly0OTAWUTrRrnWnadTzer6aWiSfKShJghuXaIqz4=
-X-Received: by 2002:a1c:b1c3:: with SMTP id a186mr2181483wmf.10.1573122321759; 
- Thu, 07 Nov 2019 02:25:21 -0800 (PST)
+ (envelope-from <berrange@redhat.com>) id 1iSf7I-00047a-GY
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:34:18 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31502
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iSf7I-00043j-Cg
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:34:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573122855;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vJnX6daviaLSWKOQAWeTsdo/NmIC1/8gt5xIkGpYGZU=;
+ b=RxsYAwsEabW9edCTwZ52GvDRLdWzjW2pZfnEPLnO8PJ2MvVjdZGD4iSX/KRQAu2qyRsUTl
+ 5lwl6RbKDF+6cDWWWI+lc7xYCo4eBGm52ysj7goik1XOL8ks+WB50ILv3NsYw6dO+PvcOW
+ bMvzaJpkyTKjwxqqMnji/2rVcf9iILA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-88-VG8srFWMOoa0IzWrLdDrEw-1; Thu, 07 Nov 2019 05:34:08 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5F41800C61;
+ Thu,  7 Nov 2019 10:34:07 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.16.105])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E02D5D6D8;
+ Thu,  7 Nov 2019 10:33:59 +0000 (UTC)
+Date: Thu, 7 Nov 2019 10:33:57 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [RFC PATCH 00/18] Add qemu-storage-daemon
+Message-ID: <20191107103357.GB120292@redhat.com>
+References: <20191017130204.16131-1-kwolf@redhat.com>
 MIME-Version: 1.0
-References: <03e769cf-a5ad-99ce-cd28-690e0a72a310@redhat.com>
-In-Reply-To: <03e769cf-a5ad-99ce-cd28-690e0a72a310@redhat.com>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Thu, 7 Nov 2019 11:25:10 +0100
-Message-ID: <CAKv+Gu8gqfu_mOm2zK64dmj5CkVaPvix3gEMEFQScyk1CnOv6w@mail.gmail.com>
-Subject: Re: privileged entropy sources in QEMU/KVM guests
-To: Laszlo Ersek <lersek@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::336
+In-Reply-To: <20191017130204.16131-1-kwolf@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: VG8srFWMOoa0IzWrLdDrEw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,115 +87,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Jian J Wang <jian.j.wang@intel.com>,
- edk2-devel-groups-io <devel@edk2.groups.io>,
- Bret Barkelew <Bret.Barkelew@microsoft.com>,
- qemu devel list <qemu-devel@nongnu.org>, Erik Bjorge <erik.c.bjorge@intel.com>,
- Sean Brogan <sean.brogan@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Laszlo,
+On Thu, Oct 17, 2019 at 03:01:46PM +0200, Kevin Wolf wrote:
+> This series adds a new tool 'qemu-storage-daemon', which can be used to
+> export and perform operations on block devices. There is some overlap
+> between qemu-img/qemu-nbd and the new qemu-storage-daemon, but there are
+> a few important differences:
+>=20
+> * The qemu-storage-daemon has QMP support. The command set is obviously
+>   restricted compared to the system emulator because there is no guest,
+>   but all of the block operations are present.
+>=20
+>   This means that it can access advanced options or operations that the
+>   qemu-img command line doesn't expose. For example, blockdev-create is
+>   a lot more powerful than 'qemu-img create', and qemu-storage-daemon
+>   allows to execute it without starting a guest.
+>=20
+>   Compared to qemu-nbd it means that, for example, block jobs can now be
+>   executed on the server side, and backing chains shared by multiple VMs
+>   can be modified this way.
+>=20
+> * The existing tools all have a separately invented one-off syntax for
+>   the job at hand, which usually comes with restrictions compared to the
+>   system emulator. qemu-storage-daemon shares the same syntax with the
+>   system emulator for most options and prefers QAPI based interfaces
+>   where possible (such as --blockdev), so it should be easy to make use
+>   of in libvirt.
+>=20
+> * While this series implements only NBD exports, the storage daemon is
+>   intended to serve multiple protocols and its syntax reflects this. In
+>   the past, we had proposals to add new one-off tools for exporting over
+>   new protocols like FUSE or TCMU.
+>=20
+>   With a generic storage daemon, additional export methods have a home
+>   without adding a new tool for each of them.
+>=20
+> I'm posting this as an RFC mainly for two reasons:
+>=20
+> 1. The monitor integration, which could be argued to be a little hackish
+>    (some generated QAPI source files are built from a separate QAPI
+>    schema, but the per-module ones are taken from the system emulator)
+>    and Markus will want to have a closer look there. But from the IRC
+>    discussions we had, we seem to agree on the general approach here.
+>=20
+> 2. I'm not completely sure if the command line syntax is the final
+>    version that we want to support long-term. Many options directly use
+>    QAPI visitors (--blockdev, --export, --nbd-server) and should be
+>    fine. However, others use QemuOpts (--chardev, --monitor, --object).
+>=20
+>    This is the same as in the system emulator, so we wouldn't be adding
+>    a new problem, but as there was talk about QAPIfying the command
+>    line, and I wouldn't want later syntax changes or adding lots of
+>    compatibility code to a new tool, I thought we should probably
+>    discuss whether QAPIfying from the start would be an option.
 
-Thanks for starting this thread.
+I think that following what the QEMU emulators currently do for
+CLI args should be an explicit anti-goal, because we know that it is
+a long standing source of pain.  Fixing it in the emulator binaries
+is hard due to backward compatibility, but for this new binary we
+have a clean slate.
+
+This feels like a good opportunity to implement & demonstrate what
+we think QEMU configuration ought to look like. Work done for this
+in the qemu-storage-daemon may well help us understand how we'll
+be able to move the QEMU emulators into a new scheme later.
+
+My personal wish would be to have no use of QemuOpts at all.
+
+Use GOptionContext *only* for parsing command line arguments
+related to execution of the daemon - ie things like --help,
+--version, --daemon, --pid-file.
+
+The use a "--config /path/to/json/file" arg to point to the config
+file for everything else using QAPI schema to describe it fully.
+
+When loading the config file, things should be created in order
+in which they are specified. ie don't try and group things,
+otherwise we end up back with the horrific hacks for objects
+where some are created early & some late.
 
 
-On Thu, 7 Nov 2019 at 11:11, Laszlo Ersek <lersek@redhat.com> wrote:
->
-> Hi,
->
-> related TianoCore BZ:
->
->   https://bugzilla.tianocore.org/show_bug.cgi?id=1871
->
-> (I'm starting this thread separately because at least some of the topics
-> are specific to QEMU, and I didn't want to litter the BZ with a
-> discussion that may not be interesting to all participants CC'd on the
-> BZ. I am keeping people CC'd on this initial posting; please speak up if
-> you'd like to be dropped from the email thread.)
->
-> QEMU provides guests with the virtio-rng device, and the OVMF and
-> ArmVirtQemu* edk2 platforms build EFI_RNG_PROTOCOL on top of that
-> device. But, that doesn't seem enough for all edk2 use cases.
->
-> Also, virtio-rng (hence EFI_RNG_PROTOCOL too) is optional, and its
-> absence may affect some other use cases.
->
->
-> (1) For UEFI HTTPS boot, TLS would likely benefit from good quality
-> entropy. If the VM config includes virtio-rng (hence the guest firmware
-> has EFI_RNG_PROTOCOL), then it should be used as a part of HTTPS boot.
->
-> However, what if virtio-rng (hence EFI_RNG_PROTOCOL) are absent? Should
-> UEFI HTTPS boot be disabled completely (or prevented / rejected
-> somehow), blaming lack of good entropy? Or should TLS silently fall back
-> to "mixing some counters [such as TSC] together and applying a
-> deterministic cryptographic transformation"?
->
-> IOW, knowing that the TLS setup may not be based on good quality
-> entropy, should we allow related firmware services to "degrade silently"
-> (not functionally, but potentially in security), or should we deny the
-> services altogether?
->
 
-TLS uses a source of randomness to establish symmetric session keys
-for encryption. So it really depends on the use case whether HTTPS is
-used for authentication or for confidentiality, and it seems to me
-that it would typically be the former. So disabling HTTPS boot in this
-case seems counterproductive to me.
+For an ambitious stretch goal, I think we should seriously consider
+whether our use of chardevs is appropriate in all cases that exist,
+and whether we can avoid the trap of over-using chardev in the new
+storage daemon since it is a clean slate in terms of user facing
+CLI config.
 
->
-> (2) It looks like the SMM driver implementing the privileged part of the
-> UEFI variable runtime service could need access to good quality entropy,
-> while running in SMM; in the future.
->
-> This looks problematic on QEMU. Entropy is a valuable resource, and
-> whatever resource SMM drivers depend on, should not be possible for e.g.
-> a 3rd party UEFI driver (or even for the runtime OS) to exhaust.
-> Therefore, it's not *only* the case that SMM drivers must not consume
-> EFI_RNG_PROTOCOL (which exists at a less critical privilege level, i.e.
-> outside of SMM/SMRAM), but also that SMM drivers must not depend on the
-> same piece of *hardware* that feeds EFI_RNG_PROTOCOL.
->
+chardevs are designed for & reasonably well suited to attaching to
+devices like serial ports, parallel ports, etc. You have a 1:1
+remote:local peer relationship. The transport is a dumb byte
+stream, nothing special needed on top & the user can cope with
+any type of chardev.
 
-The typical model is to seed a DRBG [deterministic pseudorandom
-sequence generator] using a sufficient amount of high quality entropy.
-Once you have done that, it is rather hard to exhaust a DRBG - it is a
-mathematical construction that is designed to last for a long time (<=
-2^48 invocations [not bytes] according to the NIST spec), after which
-it does not degrade although it may have generated so much output that
-its internal state may be inferred if you have captured enough of it
-(which is a rather theoretical issue IMHO)
+Many cases where we've used chardevs as a backend in QEMU are a
+poor fit. We just used chardevs as an "easy" way to configure a
+UNIX or TCP socket from the CLI, and don't care about, nor work
+with, any othuer chardev backends. As a result of this misuse
+we've had to put in an increasing number of hacks in the chardev
+code to deal with fact that callers want to know about  & use
+socket semantics. eg FD passing, the chardev reconnection polling
+code.
 
-The problem is that using the output of a DRBG as a seed is
-non-trivial - the spec describes ways to do this, but wiring
-virtio-rng to a DRBG in the host and using its output to seed a DRBG
-in the guest is slighly problematic.
+The monitor is a prime example of a bad fit - it would be better
+suited by simply referencing a SocketAddress QAPI type, instead
+of having the chardev indirection. It would then directly use
+the QIOChannelSocket APIs and avoid the inconvenient chardev
+abstractions which are a source of complexity & instability for
+no net gain.  vhostuser is another prime example, responsible
+for much of the complexity & bugs recently added to chardevs
+to expose socket semantics
 
-So it seems to me that the correct way to model this is to make the
-host's true entropy source a shared resource like any other.
 
-> Furthermore, assuming we dedicate a hardware entropy device specifically
-> to SMM drivers, such a device cannot be PCI(e). It would have to be a
-> platform device at a fixed location (IO port or MMIO) that is only
-> accessible to such guest code that executes in SMM. IOW, device access
-> would have to be restricted similarly to pflash. (In fact the variable
-> SMM driver will need, AIUI, the entropy for encrypting various variable
-> contents, which are then written into pflash.)
->
-> Alternatively, CPU instructions could exist that return entropy, and are
-> executable only inside SMM. It seems that e.g. RDRAND can be trapped in
-> guests ("A VMEXIT due to RDRAND will have exit reason 57 (decimal)").
-> Then KVM / QEMU could provide any particular implementation we wanted --
-> for example an exception could be injected unless RDRAND had been
-> executed from within SMM. Unfortunately, such an arbitrary restriction
-> (of RDRAND to SMM) would diverge from the Intel SDM, and would likely
-> break other (non-SMM) guest code.
->
-> Does a platform device that is dynamically detectable and usable in SMM
-> only seem like an acceptable design for QEMU?
->
+This is a long winded way of saying that we should consider what
+syntax we expose for the monitor socket configuration with the
+new daemon. Even if the internal code still uses a chardev for
+the forseeable future, we have the option to hide this from the
+user facing configuration. Let the user specify a SocketAddress,
+which we use to secretly instantiate a chardev. Eventually we can
+convert the monitor code to stop using a chardev internally too,
+with a suitable deprecation period for main QEMU binarijes.
+
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
