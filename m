@@ -2,64 +2,81 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F03C5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51250C5DF61
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:59:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6769C2166E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:58:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6769C2166E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15D68218AE
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:59:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DfXe+F0O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15D68218AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41315 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSgQf-00044x-Lb
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 06:58:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53245)
+	id 1iSgRx-00055i-4u
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 06:59:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53351)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1iSgQ3-0003aD-AK
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:57:44 -0500
+ (envelope-from <lersek@redhat.com>) id 1iSgR1-0004bn-Cs
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:58:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1iSgQ2-0001F5-3C
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:57:43 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:48724 helo=huawei.com)
+ (envelope-from <lersek@redhat.com>) id 1iSgR0-000231-3t
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:58:43 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54090
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1iSgPy-000178-2k; Thu, 07 Nov 2019 06:57:38 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id E310182D411826A41F90;
- Thu,  7 Nov 2019 19:57:31 +0800 (CST)
-Received: from [127.0.0.1] (10.133.216.73) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Thu, 7 Nov 2019
- 19:57:23 +0800
-Subject: Re: [RFC v2 11/14] linux-headers/kvm.h: add capability to forward
- hypercall
-To: "Michael S. Tsirkin" <mst@redhat.com>
-References: <20191105091056.9541-1-guoheyi@huawei.com>
- <20191105091056.9541-12-guoheyi@huawei.com>
- <20191106185524.0fe51c50.cohuck@redhat.com>
- <4dbcbd18-0e6c-f985-c36d-96df65331d11@huawei.com>
- <20191107035624-mutt-send-email-mst@kernel.org>
-From: Guoheyi <guoheyi@huawei.com>
-Message-ID: <da720295-2a84-e38b-9828-5287daefcfa2@huawei.com>
-Date: Thu, 7 Nov 2019 19:57:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iSgR0-00022n-02
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:58:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573127921;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=viHoCAThrSI4JRu4Bv6Nl9KQyIv4AUk+4YwSLgRs/N0=;
+ b=DfXe+F0ONokukNyN4pCVVHDCS86429XD7aL8bMwTcATzfVCffzk0KS3PbAPov/LcgEPvVa
+ zIqLh0xfj28lVpMz0r8xFeJXVFfQBIHR/UrVXN0WhMqBgtOV4VpzH/AWevySJzCrs8KONn
+ OuMv45wBgC789VdeOk698PUp/f4kfJo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-Fo3Z1EELOp-aQmpAAUS4Vw-1; Thu, 07 Nov 2019 06:58:39 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E7651005500;
+ Thu,  7 Nov 2019 11:58:38 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (unknown [10.36.118.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5318E5C290;
+ Thu,  7 Nov 2019 11:58:32 +0000 (UTC)
+Subject: Re: privileged entropy sources in QEMU/KVM guests
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+References: <03e769cf-a5ad-99ce-cd28-690e0a72a310@redhat.com>
+ <CAKv+Gu8gqfu_mOm2zK64dmj5CkVaPvix3gEMEFQScyk1CnOv6w@mail.gmail.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <2a8ac02c-e934-3474-5d40-01b8308d1fa9@redhat.com>
+Date: Thu, 7 Nov 2019 12:58:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20191107035624-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.216.73]
-X-CFilter-Loop: Reflected
+In-Reply-To: <CAKv+Gu8gqfu_mOm2zK64dmj5CkVaPvix3gEMEFQScyk1CnOv6w@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: Fo3Z1EELOp-aQmpAAUS4Vw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 45.249.212.32
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,86 +88,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Jian J Wang <jian.j.wang@intel.com>,
+ edk2-devel-groups-io <devel@edk2.groups.io>,
+ Bret Barkelew <Bret.Barkelew@microsoft.com>,
+ qemu devel list <qemu-devel@nongnu.org>, Erik Bjorge <erik.c.bjorge@intel.com>,
+ Sean Brogan <sean.brogan@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 11/07/19 11:25, Ard Biesheuvel wrote:
+> On Thu, 7 Nov 2019 at 11:11, Laszlo Ersek <lersek@redhat.com> wrote:
 
-
-On 2019/11/7 16:57, Michael S. Tsirkin wrote:
-> On Thu, Nov 07, 2019 at 09:44:36AM +0800, Guoheyi wrote:
+>> (1) For UEFI HTTPS boot, TLS would likely benefit from good quality
+>> entropy. If the VM config includes virtio-rng (hence the guest firmware
+>> has EFI_RNG_PROTOCOL), then it should be used as a part of HTTPS boot.
 >>
->> On 2019/11/7 1:55, Cornelia Huck wrote:
->>> On Tue, 5 Nov 2019 17:10:53 +0800
->>> Heyi Guo <guoheyi@huawei.com> wrote:
->>>
->>>> To keep backward compatibility, we add new KVM capability
->>>> "KVM_CAP_FORWARD_HYPERCALL" to probe whether KVM supports forwarding
->>>> hypercall to userspace.
->>>>
->>>> The capability should be enabled explicitly, for we don't want user
->>>> space application to deal with unexpected hypercall exits. After
->>>> enabling this cap, all HVC calls unhandled by kvm will be forwarded to
->>>> user space.
->>>>
->>>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
->>>> Cc: Peter Maydell <peter.maydell@linaro.org>
->>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->>>> Cc: Cornelia Huck <cohuck@redhat.com>
->>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>>> Cc: Dave Martin <Dave.Martin@arm.com>
->>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
->>>> Cc: Mark Rutland <mark.rutland@arm.com>
->>>> Cc: James Morse <james.morse@arm.com>
->>>> ---
->>>>    linux-headers/linux/kvm.h |  1 +
->>>>    target/arm/sdei.c         | 16 ++++++++++++++++
->>>>    target/arm/sdei.h         |  2 ++
->>>>    3 files changed, 19 insertions(+)
->>>>
->>>> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
->>>> index 3d9b18f7f8..36c9b3859f 100644
->>>> --- a/linux-headers/linux/kvm.h
->>>> +++ b/linux-headers/linux/kvm.h
->>>> @@ -1000,6 +1000,7 @@ struct kvm_ppc_resize_hpt {
->>>>    #define KVM_CAP_PMU_EVENT_FILTER 173
->>>>    #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
->>>>    #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
->>>> +#define KVM_CAP_FORWARD_HYPERCALL 176
->>>>    #ifdef KVM_CAP_IRQ_ROUTING
->>> Is this cap upstream already? I would have thought your header sync
->>> would have brought it in, then. (Saying this, that header sync looks
->>> awfully small.)
->>>
->>> If it is not upstream yet, please split off this hunk into a separate
->>> patch -- it's a bit annoying, but makes life easier for merging.
->> No, it is not upstream yet. The whole framework and interfaces between KVM
->> and qemu are still under discussion. I'll keep in mind of this when moving
->> forward to next steps...
+>> However, what if virtio-rng (hence EFI_RNG_PROTOCOL) are absent? Should
+>> UEFI HTTPS boot be disabled completely (or prevented / rejected
+>> somehow), blaming lack of good entropy? Or should TLS silently fall back
+>> to "mixing some counters [such as TSC] together and applying a
+>> deterministic cryptographic transformation"?
 >>
->> Thanks,
->> HG
-> It's best to add it in some other place meanwhile.
-Do you mean to split this patch from the whole patch set and send it 
-separately? Sorry I'm not clear about maintainers' work and may bring 
-you some trouble...
+>> IOW, knowing that the TLS setup may not be based on good quality
+>> entropy, should we allow related firmware services to "degrade silently"
+>> (not functionally, but potentially in security), or should we deny the
+>> services altogether?
+>>
+>=20
+> TLS uses a source of randomness to establish symmetric session keys
+> for encryption. So it really depends on the use case whether HTTPS is
+> used for authentication or for confidentiality, and it seems to me
+> that it would typically be the former. So disabling HTTPS boot in this
+> case seems counterproductive to me.
 
-Thanks,
-HG
+OK. So this might be an argument for an RngLib instance that tries to
+consume EFI_RNG_PROTOCOL, and if the protocol is absent, the lib
+instance falls back to a TSC-seeded PRNG.
 
-> Then we can drop it when it's in an upstream header.
->
->
->>>
->>> .
->>>
-> .
->
+We'd have to make sure (or prove) that the protocol lookup in the lib
+occurs *after* BDS made an attempt to connect the virtio-rng device(s).
 
+>> (2) It looks like the SMM driver implementing the privileged part of the
+>> UEFI variable runtime service could need access to good quality entropy,
+>> while running in SMM; in the future.
+>>
+>> This looks problematic on QEMU. Entropy is a valuable resource, and
+>> whatever resource SMM drivers depend on, should not be possible for e.g.
+>> a 3rd party UEFI driver (or even for the runtime OS) to exhaust.
+>> Therefore, it's not *only* the case that SMM drivers must not consume
+>> EFI_RNG_PROTOCOL (which exists at a less critical privilege level, i.e.
+>> outside of SMM/SMRAM), but also that SMM drivers must not depend on the
+>> same piece of *hardware* that feeds EFI_RNG_PROTOCOL.
+>>
+>=20
+> The typical model is to seed a DRBG [deterministic pseudorandom
+> sequence generator] using a sufficient amount of high quality entropy.
+> Once you have done that, it is rather hard to exhaust a DRBG - it is a
+> mathematical construction that is designed to last for a long time (<=3D
+> 2^48 invocations [not bytes] according to the NIST spec), after which
+> it does not degrade although it may have generated so much output that
+> its internal state may be inferred if you have captured enough of it
+> (which is a rather theoretical issue IMHO)
+
+Thanks! I think this helps.
+
+Because then the guest SMM code could read the seed from (for example) a
+well-known PCI BDF (such as 0/0/0), at either a fixed config space
+offset, or from a vendor capability. This doesn't depend on PCI
+enumeration, and it also cannot be interfered with by 3rd party UEFI
+code or OS code, because the only such reads would occur in the subject
+SMM drivers' entry point functions.
+
+On the Q35 board in QEMU, we already use some config space registers
+that are left unspecified in Intel datasheet 316966-002, Table 5-1 "DRAM
+Controller Register Address Map (D0:F0)", for various paravirt purposes.
+We haven't run out of such "free for the taking" config space registers
+yet, and for this particular purpose we only need a single byte
+register. (The first read would expose whether the feature were
+supported, the other reads would provide bytes for the seed.)
+
+>=20
+> The problem is that using the output of a DRBG as a seed is
+> non-trivial - the spec describes ways to do this, but wiring
+> virtio-rng to a DRBG in the host and using its output to seed a DRBG
+> in the guest is slighly problematic.
+
+Can we forward /dev/urandom from the host to the guest through an
+interface like described above? (Single byte config space register.)
+
+> So it seems to me that the correct way to model this is to make the
+> host's true entropy source a shared resource like any other.
+
+I don't know enough to agree or disagree. I guess this might require
+additional permission management on the host side.
+
+(NB my only purpose with this thread is to ensure that the internal edk2
+interfaces, such as lib class APIs and possible SMM protocols, will
+offer the dynamism that's necessary when running on QEMU.)
+
+Thanks!
+Laszlo
 
 
