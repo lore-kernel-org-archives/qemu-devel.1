@@ -2,84 +2,111 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5B4C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 19:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B04B7C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 19:49:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97ED42166E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 19:48:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31FA92178F
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 19:49:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IhsnZw18"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97ED42166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="MV2rLVAd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31FA92178F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSnlA-00042e-Qa
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 14:48:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35640)
+	id 1iSnn0-0005FJ-0p
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 14:49:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37030)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1iSnjo-0003Q2-Vf
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 14:46:38 -0500
+ (envelope-from <sunilmut@microsoft.com>) id 1iSnlm-0004ax-Hx
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 14:48:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1iSnjn-0002PM-JP
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 14:46:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34673
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iSnjg-0002FY-Be
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 14:46:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573155987;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/wM6ugIMOkqHWn2UncXelZY1lnOwkwSgWC4PvgFY0SU=;
- b=IhsnZw18bbK2Ijx0Q4sXCkEp78VG3dplhLy9HWZa7ynrziPR2pG1vZXOFNL755+/4eOWj1
- c3EZy7RCPA75LLrEFdVRtFd+GywSTfO3ZTjOZjrMEyAZIcmThyxO7n/Sw8MNL9S24i4pPi
- ze6sJqioLJ/9+eDV6XL2e3DIcuAooyw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-B2W4YtXxNgq9G51Nz42JAQ-1; Thu, 07 Nov 2019 14:46:23 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9CF11800D6B;
- Thu,  7 Nov 2019 19:46:21 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-91.gru2.redhat.com
- [10.97.116.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B4DC05DA76;
- Thu,  7 Nov 2019 19:46:14 +0000 (UTC)
-Subject: Re: [PATCH v7 6/8] Acceptance tests: add the build directory to the
- system PATH
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-References: <20191104151323.9883-1-crosa@redhat.com>
- <20191104151323.9883-7-crosa@redhat.com>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <0660a16e-2ffc-fd3f-bfc7-cb0c43f1aef9@redhat.com>
-Date: Thu, 7 Nov 2019 17:46:13 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20191104151323.9883-7-crosa@redhat.com>
+ (envelope-from <sunilmut@microsoft.com>) id 1iSnlj-0005T9-6Q
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 14:48:36 -0500
+Received: from mail-eopbgr740109.outbound.protection.outlook.com
+ ([40.107.74.109]:38599 helo=NAM01-BN3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sunilmut@microsoft.com>)
+ id 1iSnli-0005RG-OM
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 14:48:35 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PYT8qkr3n4X5BUcKQKSchZW6u2zuavcc2q+7ODfnMNABrFfRU0CiE/9qD3p6Flu0Intpyut1r8wmjwgsc/WJZ+AcQ+ibCXIQWJrnnUu88sNRAjvgetywwuPNfgJcG/nvxrW5WGPw+BmvJME8i2K6oI8NTsy6DVq0KZBtgMQ80ElAeehZf9ib5I1LTnAoXwb0DaU9yXzBnNNJTEUsolEJoPJgz7Jqy3xKtyOYyi+JWE9GVJzTIavf55ztdLP4BF64dh432heY1Udkxozjohd5tGVPL/4ZqO4SWVXMBAHk3QaiJnO//eZRTqb8d1IyrJTk44+47Our4FVqSK8jZGlDcA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Aqw5pGGHdyKCmVWb5AIGEicfRMBW+tnOZmW+SXYNL7g=;
+ b=bYOOWkq6mCjboCUMI1zaxVIulaBrdayDpbx76Pjjz18FWt6LYrgxCLwnRXxZmzQormTj85dWy18mc3A+I0odIPjzxlipO4W18g+KQfLOY+vDlbgDdVIxEEfkSmtEQ/BcV463rMeWEZiZ6EFcQEJbuoMGet62h+WMifzU2f+mNG1sIlk73bGtze5+iU+yx50YxAra4lAap9au9cJEe456C51VSYOuokumGeC9XeSH0aVWFgGrymh+zasz76JQNiO/xNKuecowze5MBdL6g/wqSuG9MAq/QxDRyZvQOKOoH71kzcy3nmgkE7crjVrLTEh9SgQ83qGQ1/iSfR2ja0q2Ew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Aqw5pGGHdyKCmVWb5AIGEicfRMBW+tnOZmW+SXYNL7g=;
+ b=MV2rLVAdROu8WMkT2XTYjFHzD41ofGqEHhGuqEH2yiMc/RKLBxMoRT1Ugya4CBN7L3OOL05XbXMSQLiBidIgT/83WqhYgnlZL1O02nKPxysuheNNco3Uy1jjI5cSvl1mqwccZEAvoMwDfSNm4THia2mLpOfC9smX2F7LGuwx4FU=
+Received: from MW2PR2101MB1116.namprd21.prod.outlook.com (52.132.149.33) by
+ MW2PR2101MB1017.namprd21.prod.outlook.com (52.132.146.30) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.11; Thu, 7 Nov 2019 19:48:33 +0000
+Received: from MW2PR2101MB1116.namprd21.prod.outlook.com
+ ([fe80::121:8a4f:76a8:fd9]) by MW2PR2101MB1116.namprd21.prod.outlook.com
+ ([fe80::121:8a4f:76a8:fd9%7]) with mapi id 15.20.2430.023; Thu, 7 Nov 2019
+ 19:48:33 +0000
+From: Sunil Muthuswamy <sunilmut@microsoft.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
+ Eduardo Habkost <ehabkost@redhat.com>
+CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: [PATCH v2] WHPX: support for xcr0
+Thread-Topic: [PATCH v2] WHPX: support for xcr0
+Thread-Index: AdWVpCACQMQiiI0KR2iuY0/EuyLlQQ==
+Date: Thu, 7 Nov 2019 19:48:32 +0000
+Message-ID: <MW2PR2101MB1116F07C07A26FD7A7ED8DCFC0780@MW2PR2101MB1116.namprd21.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: B2W4YtXxNgq9G51Nz42JAQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=sunilmut@microsoft.com; 
+x-originating-ip: [2001:4898:80e8:3:fdd2:fbfa:b235:c4a3]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 23d5f970-3029-4140-7514-08d763bb78af
+x-ms-traffictypediagnostic: MW2PR2101MB1017:
+x-microsoft-antispam-prvs: <MW2PR2101MB1017DF603B422FB6C96A92DEC0780@MW2PR2101MB1017.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0214EB3F68
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(39860400002)(396003)(376002)(136003)(366004)(189003)(199004)(8990500004)(10290500003)(81166006)(25786009)(76116006)(305945005)(74316002)(22452003)(5660300002)(52536014)(10090500001)(478600001)(316002)(110136005)(7736002)(8936002)(9686003)(256004)(99286004)(7696005)(186003)(14454004)(86362001)(486006)(55016002)(33656002)(6506007)(102836004)(6436002)(81156014)(476003)(71190400001)(4326008)(66556008)(2906002)(71200400001)(66476007)(46003)(64756008)(6116002)(8676002)(66446008)(66946007);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MW2PR2101MB1017;
+ H:MW2PR2101MB1116.namprd21.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: dVvwzy6nk6LwbAY6PfdJW14dz27K7R7nW2cuBofsLbq7U51+JhVp8P4FCs2ncHt3CbX6/NiSaUXwiE7Mq2IHhJQBlF2RJJTzlfdWXkR2k0Bwp0r4YvT1G6UTX8ThVnrkLDMU9G9W/wuSjCuHztgjmDV9SVUWdg0vj3+DERVawS5Y+9FPg8P9T9uMVvv3uH1A/qEz16nGCBnNia8KvBgtrKNQ3c6iXx21OPtte8tMJW3NEkN0iCyw2DNbm2XbZ1tSj5eq/ZNrMIlKgMZTFOOIr2dPiSbpbLVrAbcnYT0bTDgKc994oHeNZzNyuAJNxf+SeU4EHzqeoNaRghPKGl5cOaeKdy61SQ08GigdORCxBpybSmyUQwljGgED1lRPWj2VQ85lkvYycPYn6G0T424/039qZbjccApz0zLmPjnlp6kikdLDpa2PhhpDOnfTHvRM
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+MIME-Version: 1.0
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 23d5f970-3029-4140-7514-08d763bb78af
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Nov 2019 19:48:32.9024 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: nn7F1uODtTfUJQjQst87fUyMJeEVI0RrGhQ9HaE4gXKm/qthj+cHkJKEj8OjSDkov20fXXNydKqkXTgp8pDfxWcMhJqbqwSkvVK4zU85n/U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR2101MB1017
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.74.109
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,62 +118,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beraldo Leal <bleal@redhat.com>, Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Willian Rampazzo <wrampazz@redhat.com>, qemu-ppc@nongnu.org,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Support for xcr0 to be able to enable xsave/xrstor. This by itself
+is not sufficient to enable xsave/xrstor. WHPX XSAVE API's also
+needs to be hooked up.
 
-On 11/4/19 1:13 PM, Cleber Rosa wrote:
-> So that when binaries such as qemu-img are searched for, those in the
-> build tree will be favored.  As a clarification, SRC_ROOT_DIR is
-> dependent on the location from where tests are executed, so they are
-> equal to the build directory if one is being used.
->
-> The original motivation is that Avocado libraries such as
-> avocado.utils.vmimage.get() may use the matching binaries, but it may
-> also apply to any other binary that test code may eventually attempt
-> to execute.
->
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->   tests/acceptance/avocado_qemu/__init__.py | 6 ++++++
->   1 file changed, 6 insertions(+)
->
-> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
-/avocado_qemu/__init__.py
-> index 17ce583c87..a4bb796a47 100644
-> --- a/tests/acceptance/avocado_qemu/__init__.py
-> +++ b/tests/acceptance/avocado_qemu/__init__.py
-> @@ -110,6 +110,12 @@ class Test(avocado.Test):
->           return None
->  =20
->       def setUp(self):
-> +        # Some utility code uses binaries from the system's PATH.  For
-> +        # instance, avocado.utils.vmimage.get() uses qemu-img, to
-> +        # create a snapshot image.  This is a transparent way of
+Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
+---
+You will need the Windows 10 SDK for RS5 (build 17763) or above to
+to be able to compile this patch because of the definition of the
+XCR0 register.
 
-Because PATH is changed in a transparent way, wouldn't be better to also=20
-self.log.info() that fact?
+Changes since v1:
+- Added a sign-off line in the patch.
 
-> +        # making sure those utilities find and use binaries on the
-> +        # build tree by default.
-> +        os.environ['PATH'] =3D '%s:%s' % (SRC_ROOT_DIR, os.environ['PATH=
-'])
+ target/i386/whp-dispatch.h |  3 ++
+ target/i386/whpx-all.c     | 88 ++++++++++++++++++++++++++++++++++++++++++=
+++++
+ 2 files changed, 91 insertions(+)
 
-I think PATH should be set only once at class initialization. Perhaps in=20
-setUpClass()?
-
-- Wainer
-
->           self._vms =3D {}
->  =20
->           self.arch =3D self.params.get('arch',
+diff --git a/target/i386/whp-dispatch.h b/target/i386/whp-dispatch.h
+index 23791fbb47..b5d56b22a3 100644
+--- a/target/i386/whp-dispatch.h
++++ b/target/i386/whp-dispatch.h
+@@ -6,6 +6,9 @@
+ #include <WinHvPlatform.h>
+ #include <WinHvEmulation.h>
+=20
++/* This should eventually come from the Windows SDK */
++#define WHV_E_UNKNOWN_PROPERTY 0x80370302
++
+ #define LIST_WINHVPLATFORM_FUNCTIONS(X) \
+   X(HRESULT, WHvGetCapability, (WHV_CAPABILITY_CODE CapabilityCode, VOID* =
+CapabilityBuffer, UINT32 CapabilityBufferSizeInBytes, UINT32* WrittenSizeIn=
+Bytes)) \
+   X(HRESULT, WHvCreatePartition, (WHV_PARTITION_HANDLE* Partition)) \
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index ed95105eae..1abaac70db 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -161,10 +161,15 @@ struct whpx_vcpu {
+ static bool whpx_allowed;
+ static bool whp_dispatch_initialized;
+ static HMODULE hWinHvPlatform, hWinHvEmulation;
++static WHV_PROCESSOR_XSAVE_FEATURES whpx_xsave_cap;
+=20
+ struct whpx_state whpx_global;
+ struct WHPDispatch whp_dispatch;
+=20
++static bool whpx_has_xsave(void)
++{
++    return whpx_xsave_cap.XsaveSupport;
++}
+=20
+ /*
+  * VP support
+@@ -216,6 +221,28 @@ static SegmentCache whpx_seg_h2q(const WHV_X64_SEGMENT=
+_REGISTER *hs)
+     return qs;
+ }
+=20
++/* X64 Extended Control Registers */
++static void whpx_set_xcrs(CPUState *cpu)
++{
++    struct CPUX86State *env =3D (CPUArchState *)(cpu->env_ptr);
++    HRESULT hr;
++    struct whpx_state *whpx =3D &whpx_global;
++    WHV_REGISTER_VALUE xcr0;
++    WHV_REGISTER_NAME xcr0_name =3D WHvX64RegisterXCr0;
++
++    if (!whpx_has_xsave()) {
++        return;
++    }
++
++    /* Only xcr0 is supported by the hypervisor currently */
++    xcr0.Reg64 =3D env->xcr0;
++    hr =3D whp_dispatch.WHvSetVirtualProcessorRegisters(
++        whpx->partition, cpu->cpu_index, &xcr0_name, 1, &xcr0);
++    if (FAILED(hr)) {
++        error_report("WHPX: Failed to set register xcr0, hr=3D%08lx", hr);
++    }
++}
++
+ static void whpx_set_registers(CPUState *cpu)
+ {
+     struct whpx_state *whpx =3D &whpx_global;
+@@ -291,6 +318,12 @@ static void whpx_set_registers(CPUState *cpu)
+=20
+     /* 8 Debug Registers - Skipped */
+=20
++    /*
++     * Extended control registers needs to be handled separately depending
++     * on whether xsave is supported/enabled or not.
++     */
++    whpx_set_xcrs(cpu);
++
+     /* 16 XMM registers */
+     assert(whpx_register_names[idx] =3D=3D WHvX64RegisterXmm0);
+     idx_next =3D idx + 16;
+@@ -380,6 +413,30 @@ static void whpx_set_registers(CPUState *cpu)
+     return;
+ }
+=20
++/* X64 Extended Control Registers */
++static void whpx_get_xcrs(CPUState *cpu)
++{
++    struct CPUX86State *env =3D (CPUArchState *)(cpu->env_ptr);
++    HRESULT hr;
++    struct whpx_state *whpx =3D &whpx_global;
++    WHV_REGISTER_VALUE xcr0;
++    WHV_REGISTER_NAME xcr0_name =3D WHvX64RegisterXCr0;
++
++    if (!whpx_has_xsave()) {
++        return;
++    }
++
++    /* Only xcr0 is supported by the hypervisor currently */
++    hr =3D whp_dispatch.WHvGetVirtualProcessorRegisters(
++        whpx->partition, cpu->cpu_index, &xcr0_name, 1, &xcr0);
++    if (FAILED(hr)) {
++        error_report("WHPX: Failed to get register xcr0, hr=3D%08lx", hr);
++        return;
++    }
++
++    env->xcr0 =3D xcr0.Reg64;
++}
++
+ static void whpx_get_registers(CPUState *cpu)
+ {
+     struct whpx_state *whpx =3D &whpx_global;
+@@ -457,6 +514,12 @@ static void whpx_get_registers(CPUState *cpu)
+=20
+     /* 8 Debug Registers - Skipped */
+=20
++    /*
++     * Extended control registers needs to be handled separately depending
++     * on whether xsave is supported/enabled or not.
++     */
++    whpx_get_xcrs(cpu);
++
+     /* 16 XMM registers */
+     assert(whpx_register_names[idx] =3D=3D WHvX64RegisterXmm0);
+     idx_next =3D idx + 16;
+@@ -1395,6 +1458,31 @@ static int whpx_accel_init(MachineState *ms)
+         goto error;
+     }
+=20
++    /*
++     * Query the XSAVE capability of the partition. Any error here is not
++     * considered fatal.
++     */
++    hr =3D whp_dispatch.WHvGetPartitionProperty(
++        whpx->partition,
++        WHvPartitionPropertyCodeProcessorXsaveFeatures,
++        &whpx_xsave_cap,
++        sizeof(whpx_xsave_cap),
++        &whpx_cap_size);
++
++    /*
++     * Windows version which don't support this property will return with =
+the
++     * specific error code.
++     */
++    if (FAILED(hr) && hr !=3D WHV_E_UNKNOWN_PROPERTY) {
++        error_report("WHPX: Failed to query XSAVE capability, hr=3D%08lx",=
+ hr);
++    }
++
++    if (whpx_has_xsave()) {
++        printf("WHPX: Partition XSAVE capable\n");
++    } else {
++        printf("WHPX: Partition is not XSAVE capable\n");
++    }
++
+     memset(&prop, 0, sizeof(WHV_PARTITION_PROPERTY));
+     prop.ProcessorCount =3D ms->smp.cpus;
+     hr =3D whp_dispatch.WHvSetPartitionProperty(
+--=20
+2.16.4
 
 
