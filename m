@@ -6,48 +6,49 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 567EDC5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 07:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CBC6C5DF61
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 07:52:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2ACF0207FA
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 07:51:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ACF0207FA
+	by mail.kernel.org (Postfix) with ESMTPS id D443D207FA
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 07:52:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D443D207FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iScaD-0006fF-97
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 02:51:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45447)
+	id 1iScaH-0006pq-NK
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 02:52:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45498)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iScU0-0001Iy-1d
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:33 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1iScUC-0001Tc-61
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iScTw-0004iH-Jc
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:30 -0500
-Received: from mga02.intel.com ([134.134.136.20]:5076)
+ (envelope-from <tao3.xu@intel.com>) id 1iScU8-0005ly-Sr
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:41 -0500
+Received: from mga02.intel.com ([134.134.136.20]:5092)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iScTw-0004DB-BI
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:28 -0500
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iScU8-0005Xf-Ks
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 02:45:40 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 06 Nov 2019 23:45:26 -0800
+ 06 Nov 2019 23:45:37 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,277,1569308400"; d="scan'208";a="404016846"
+X-IronPort-AV: E=Sophos;i="5.68,277,1569308400"; d="scan'208";a="404016888"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga006.fm.intel.com with ESMTP; 06 Nov 2019 23:45:23 -0800
+ by fmsmga006.fm.intel.com with ESMTP; 06 Nov 2019 23:45:35 -0800
 From: Tao Xu <tao3.xu@intel.com>
 To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
  ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
  mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
-Subject: [PATCH v15 03/12] qapi: Add builtin type time
-Date: Thu,  7 Nov 2019 15:45:02 +0800
-Message-Id: <20191107074511.14304-4-tao3.xu@intel.com>
+Subject: [PATCH v15 07/12] numa: Calculate hmat latency and bandwidth entry
+ list
+Date: Thu,  7 Nov 2019 15:45:06 +0800
+Message-Id: <20191107074511.14304-8-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191107074511.14304-1-tao3.xu@intel.com>
 References: <20191107074511.14304-1-tao3.xu@intel.com>
@@ -73,183 +74,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add optional builtin type time, fallback is uint64. This type use
-qemu_strtotime_ns() for pre-converting time suffix to numbers.
+Compress HMAT latency and bandwidth raw data into uint16_t data,
+which can be stored in HMAT table.
 
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
 No changes in v15.
 
 Changes in v14:
-    - Drop time unit picosecond (Eric)
+    - Convert latency from ns to ps, because ACPI 6.3 HMAT table use
+      ps as minimum unit
 ---
- include/qapi/visitor-impl.h  |  4 ++++
- include/qapi/visitor.h       |  8 ++++++++
- qapi/opts-visitor.c          | 22 ++++++++++++++++++++++
- qapi/qapi-visit-core.c       | 12 ++++++++++++
- qapi/qobject-input-visitor.c | 18 ++++++++++++++++++
- qapi/trace-events            |  1 +
- scripts/qapi/schema.py       |  1 +
- 7 files changed, 66 insertions(+)
+ hw/core/numa.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 58 insertions(+), 1 deletion(-)
 
-diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
-index 8ccb3b6c20..e0979563c7 100644
---- a/include/qapi/visitor-impl.h
-+++ b/include/qapi/visitor-impl.h
-@@ -88,6 +88,10 @@ struct Visitor
-     void (*type_size)(Visitor *v, const char *name, uint64_t *obj,
-                       Error **errp);
- 
-+    /* Optional; fallback is type_uint64() */
-+    void (*type_time)(Visitor *v, const char *name, uint64_t *obj,
-+                      Error **errp);
-+
-     /* Must be set */
-     void (*type_bool)(Visitor *v, const char *name, bool *obj, Error **errp);
- 
-diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-index c5b23851a1..22242e706f 100644
---- a/include/qapi/visitor.h
-+++ b/include/qapi/visitor.h
-@@ -554,6 +554,14 @@ void visit_type_int64(Visitor *v, const char *name, int64_t *obj,
- void visit_type_size(Visitor *v, const char *name, uint64_t *obj,
-                      Error **errp);
- 
-+/*
-+ * Visit a uint64_t value.
-+ * Like visit_type_uint64(), except that some visitors may choose to
-+ * recognize numbers with timeunit suffix, such as "ns", "us" "ms" and "s".
-+ */
-+void visit_type_time(Visitor *v, const char *name, uint64_t *obj,
-+                     Error **errp);
-+
- /*
-  * Visit a boolean value.
-  *
-diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-index 5fe0276c1c..59b575f0fc 100644
---- a/qapi/opts-visitor.c
-+++ b/qapi/opts-visitor.c
-@@ -526,6 +526,27 @@ opts_type_size(Visitor *v, const char *name, uint64_t *obj, Error **errp)
-     processed(ov, name);
- }
- 
-+static void
-+opts_type_time(Visitor *v, const char *name, uint64_t *obj, Error **errp)
-+{
-+    OptsVisitor *ov = to_ov(v);
-+    const QemuOpt *opt;
-+    int err;
-+
-+    opt = lookup_scalar(ov, name, errp);
-+    if (!opt) {
-+        return;
-+    }
-+
-+    err = qemu_strtotime_ns(opt->str ? opt->str : "", NULL, obj);
-+    if (err < 0) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
-+                   "a time value");
-+        return;
-+    }
-+
-+    processed(ov, name);
-+}
- 
- static void
- opts_optional(Visitor *v, const char *name, bool *present)
-@@ -573,6 +594,7 @@ opts_visitor_new(const QemuOpts *opts)
-     ov->visitor.type_int64  = &opts_type_int64;
-     ov->visitor.type_uint64 = &opts_type_uint64;
-     ov->visitor.type_size   = &opts_type_size;
-+    ov->visitor.type_time   = &opts_type_time;
-     ov->visitor.type_bool   = &opts_type_bool;
-     ov->visitor.type_str    = &opts_type_str;
- 
-diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-index 5365561b07..ac8896455c 100644
---- a/qapi/qapi-visit-core.c
-+++ b/qapi/qapi-visit-core.c
-@@ -277,6 +277,18 @@ void visit_type_size(Visitor *v, const char *name, uint64_t *obj,
+diff --git a/hw/core/numa.c b/hw/core/numa.c
+index f391760c20..523dd80822 100644
+--- a/hw/core/numa.c
++++ b/hw/core/numa.c
+@@ -483,6 +483,47 @@ static void complete_init_numa_distance(MachineState *ms)
      }
  }
  
-+void visit_type_time(Visitor *v, const char *name, uint64_t *obj,
-+                     Error **errp)
++static void calculate_hmat_entry_list(HMAT_LB_Info *hmat_lb, int num_nodes)
 +{
-+    assert(obj);
-+    trace_visit_type_time(v, name, obj);
-+    if (v->type_time) {
-+        v->type_time(v, name, obj, errp);
++    int i, index;
++    uint16_t *entry_list;
++    uint64_t base;
++    GArray *lb_data_list;
++    HMAT_LB_Data *lb_data;
++
++    if (hmat_lb->data_type <= HMAT_LB_DATA_WRITE_LATENCY) {
++        base = hmat_lb->base_latency;
++        lb_data_list = hmat_lb->latency;
 +    } else {
-+        v->type_uint64(v, name, obj, errp);
++        base = hmat_lb->base_bandwidth;
++        lb_data_list = hmat_lb->bandwidth;
++    }
++
++    entry_list = g_malloc0(lb_data_list->len * sizeof(uint16_t));
++    for (i = 0; i < lb_data_list->len; i++) {
++        lb_data = &g_array_index(lb_data_list, HMAT_LB_Data, i);
++        index = lb_data->initiator * num_nodes + lb_data->target;
++        if (entry_list[index]) {
++            error_report("Duplicate configuration of the latency for "
++                "initiator=%d and target=%d.", lb_data->initiator,
++                lb_data->target);
++            exit(1);
++        }
++
++        entry_list[index] = (uint16_t)(lb_data->rawdata / base);
++    }
++
++    if (hmat_lb->data_type <= HMAT_LB_DATA_WRITE_LATENCY) {
++        /* Convert latency base from nanoseconds to picosecond */
++        hmat_lb->base_latency = base * 1000;
++        hmat_lb->entry_latency = entry_list;
++    } else {
++        /* Convert bandwidth base from Byte to Megabyte */
++        hmat_lb->base_bandwidth = base / MiB;
++        hmat_lb->entry_bandwidth = entry_list;
 +    }
 +}
 +
- void visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
+ void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+                                  int nb_nodes, ram_addr_t size)
  {
-     assert(obj);
-diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index 32236cbcb1..e476fe0d16 100644
---- a/qapi/qobject-input-visitor.c
-+++ b/qapi/qobject-input-visitor.c
-@@ -627,6 +627,23 @@ static void qobject_input_type_size_keyval(Visitor *v, const char *name,
+@@ -521,9 +562,10 @@ void numa_default_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
+ 
+ void numa_complete_configuration(MachineState *ms)
+ {
+-    int i;
++    int i, hierarchy, type;
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+     NodeInfo *numa_info = ms->numa_state->nodes;
++    HMAT_LB_Info *numa_hmat_lb;
+ 
+     /*
+      * If memory hotplug is enabled (slots > 0) but without '-numa'
+@@ -620,6 +662,21 @@ void numa_complete_configuration(MachineState *ms)
+             /* Validation succeeded, now fill in any missing distances. */
+             complete_init_numa_distance(ms);
+         }
++
++        if (ms->numa_state->hmat_enabled) {
++            for (hierarchy = HMAT_LB_MEM_MEMORY;
++                 hierarchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hierarchy++) {
++                for (type = HMAT_LB_DATA_ACCESS_LATENCY;
++                    type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
++                    numa_hmat_lb = ms->numa_state->hmat_lb[hierarchy][type];
++
++                    if (numa_hmat_lb) {
++                        calculate_hmat_entry_list(numa_hmat_lb,
++                                                  ms->numa_state->num_nodes);
++                    }
++                }
++            }
++        }
      }
  }
  
-+static void qobject_input_type_time_keyval(Visitor *v, const char *name,
-+                                           uint64_t *obj, Error **errp)
-+{
-+    QObjectInputVisitor *qiv = to_qiv(v);
-+    const char *str = qobject_input_get_keyval(qiv, name, errp);
-+
-+    if (!str) {
-+        return;
-+    }
-+
-+    if (qemu_strtotime_ns(str, NULL, obj) < 0) {
-+        /* TODO report -ERANGE more nicely */
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   full_name(qiv, name), "time");
-+    }
-+}
-+
- static void qobject_input_optional(Visitor *v, const char *name, bool *present)
- {
-     QObjectInputVisitor *qiv = to_qiv(v);
-@@ -708,6 +725,7 @@ Visitor *qobject_input_visitor_new_keyval(QObject *obj)
-     v->visitor.type_any = qobject_input_type_any;
-     v->visitor.type_null = qobject_input_type_null;
-     v->visitor.type_size = qobject_input_type_size_keyval;
-+    v->visitor.type_time = qobject_input_type_time_keyval;
-     v->keyval = true;
- 
-     return &v->visitor;
-diff --git a/qapi/trace-events b/qapi/trace-events
-index 5eb4afa110..c4605a7ccc 100644
---- a/qapi/trace-events
-+++ b/qapi/trace-events
-@@ -29,6 +29,7 @@ visit_type_int16(void *v, const char *name, int16_t *obj) "v=%p name=%s obj=%p"
- visit_type_int32(void *v, const char *name, int32_t *obj) "v=%p name=%s obj=%p"
- visit_type_int64(void *v, const char *name, int64_t *obj) "v=%p name=%s obj=%p"
- visit_type_size(void *v, const char *name, uint64_t *obj) "v=%p name=%s obj=%p"
-+visit_type_time(void *v, const char *name, uint64_t *obj) "v=%p name=%s obj=%p"
- visit_type_bool(void *v, const char *name, bool *obj) "v=%p name=%s obj=%p"
- visit_type_str(void *v, const char *name, char **obj) "v=%p name=%s obj=%p"
- visit_type_number(void *v, const char *name, void *obj) "v=%p name=%s obj=%p"
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index cf0045f34e..210be64909 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -855,6 +855,7 @@ class QAPISchema(object):
-                   ('uint32', 'int',     'uint32_t'),
-                   ('uint64', 'int',     'uint64_t'),
-                   ('size',   'int',     'uint64_t'),
-+                  ('time',   'int',     'uint64_t'),
-                   ('bool',   'boolean', 'bool'),
-                   ('any',    'value',   'QObject' + pointer_suffix),
-                   ('null',   'null',    'QNull' + pointer_suffix)]:
 -- 
 2.20.1
 
