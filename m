@@ -2,83 +2,82 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E72C5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:03:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4B85C5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:07:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 992DF206C3
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:03:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 992DF206C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9C92B2077C
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:07:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iWuhGMCn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C92B2077C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSedP-0007WZ-Cy
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:03:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33206)
+	id 1iSeh3-0001BX-Pe
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:07:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33756)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iSeba-0006K2-Dw
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:01:31 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iSefx-0000VB-AO
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:06:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iSebY-00081Z-TT
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:01:30 -0500
-Received: from indium.canonical.com ([91.189.90.7]:36608)
+ (envelope-from <peter.maydell@linaro.org>) id 1iSefu-0004r2-Qf
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:05:59 -0500
+Received: from mail-oi1-x22b.google.com ([2607:f8b0:4864:20::22b]:44487)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iSebY-0007vr-Mz
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:01:28 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iSebW-0004ij-Ms
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 10:01:26 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A8D4B2E80C0
- for <qemu-devel@nongnu.org>; Thu,  7 Nov 2019 10:01:26 +0000 (UTC)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iSefu-0004i5-JD
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:05:58 -0500
+Received: by mail-oi1-x22b.google.com with SMTP id s71so1422932oih.11
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 02:05:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=7meEMlOTHXolmzWAKrPY8sgNjLk/GhIq+JaSuU2WCZM=;
+ b=iWuhGMCnSb8uLYVDzLkygu+1tZlfpaagsrHsoe+wyntQO1HnFFsVtua5zYqPaXrgIP
+ pOYuQ03LSlJ1SU3VKWtXgrgaOrOm3GUIxV2GwtZiAlakD1CGt3byE6iW3SkmFgAnEPMk
+ 0MnfwRQA1tSgUed1AAkYx8SzpYgnBhCoDxD79QcVr2qVXjnLxLoouUOdrFkuVR0fXx42
+ QX1kNa6Ne5IFNXqalf95FK032KPyaFnLDMvtAVlHP2h5mVEAIrEUl+74VJGI4A+dyoeU
+ vA3haOuH4N80h8N/e4X5fgt8uD5suPFb1cTXe+Hlaf+4XQun38MbXgrHfgewH/Q1xT9J
+ M01Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=7meEMlOTHXolmzWAKrPY8sgNjLk/GhIq+JaSuU2WCZM=;
+ b=rr5sMco5U/KWpKBlnI/F1E5way9KADwCCFcA53+TlK1IzzNX7ZjJjVG2RrRXaUgKrc
+ KVs2cWxz+f2vJG5QGJ3yA6YPRLOUuFQPa8sBsYKVU+Rv1f2qSFQkQdB6LPer/cSOm24S
+ MP+RHRxpdC3NU5IeyD4qukLoI2VQ7KvluvKF107RgA/oyTgmTbsJ7s2NiZvCqjlTJZOQ
+ jriPaATfFW5ZEG1RI43psFg6VfL3h4czmygNdwcopyncFw1tYPCous/EoLQZwKqOPygK
+ /mL/Tr6USm1595c9GQt814KblryKY/L9kXG2aspVLnlypeIAd0zhcAqMaUwLUl023QnX
+ nW/g==
+X-Gm-Message-State: APjAAAVIiICpzqIlJ+RxPWtXxwXrkPLmXSgb7q13cEGixyLL3sbO25gD
+ nhroY1CzaB0/xp0CCMIlIpD7mQyvT4/ACRUD+p6z3Q==
+X-Google-Smtp-Source: APXvYqyt7NOazgn1fO9IpxQcSFzpb3I4wo2o0ZF3U9PSzgcM0MTji6zf86Mbn/SiqywBGJjLDIP5Q2FlUzhpXkY/EvE=
+X-Received: by 2002:aca:3e8a:: with SMTP id l132mr2545921oia.146.1573121156286; 
+ Thu, 07 Nov 2019 02:05:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Nov 2019 09:54:33 -0000
-From: Launchpad Bug Tracker <1848556@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Medium;
- assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=Triaged; importance=Medium;
- assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Fix Released; importance=Medium;
- assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor paelzer rodsmith xanclic
-X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
-X-Launchpad-Bug-Modifier: Launchpad Janitor (janitor)
-References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
-Message-Id: <157312048029.31705.7329267531921707082.malone@ackee.canonical.com>
-Subject: [Bug 1848556] Re: qemu-img check failing on remote image in Eoan
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6f390754f7ff34ed334e6555d2e3a7aebb321359
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+References: <20191106082604.9548-1-kraxel@redhat.com>
+In-Reply-To: <20191106082604.9548-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Nov 2019 10:05:44 +0000
+Message-ID: <CAFEAcA-FjrXQS8y9XKtYQxf9ywrf-Wc9mr2_vBeObnm9F486jw@mail.gmail.com>
+Subject: Re: [PULL 0/1] Audio 20191106 patches
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,110 +86,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1848556 <1848556@bugs.launchpad.net>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This bug was fixed in the package qemu - 1:4.0+dfsg-0ubuntu10
+On Wed, 6 Nov 2019 at 08:27, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit 36609b4fa36f0ac934874371874416f7533a5408:
+>
+>   Merge remote-tracking branch 'remotes/palmer/tags/palmer-for-master-4.2-sf1' into staging (2019-11-02 17:59:03 +0000)
+>
+> are available in the Git repository at:
+>
+>   git://git.kraxel.org/qemu tags/audio-20191106-pull-request
+>
+> for you to fetch changes up to 14d4f01191354e9520c47c692007344c30ab358b:
+>
+>   audio: add -audiodev pa,in|out.latency= to documentation (2019-11-06 08:08:10 +0100)
+>
+> ----------------------------------------------------------------
+> audio: documentation update
+>
+> ----------------------------------------------------------------
 
----------------
-qemu (1:4.0+dfsg-0ubuntu10) focal; urgency=3Dmedium
 
-  * d/p/ubuntu/lp-1848556-curl-Handle-success-in-multi_check_completion.pat=
-ch:
-    fix a potential hang when qemu or qemu-img where accessing http backed
-    disks via libcurl (LP: #1848556)
-  * d/p/u/lp-1848497-virtio-balloon-fix-QEMU-4.0-config-size-migration-in.p=
-atch:
-    fix migration issue from qemu <4.0 when using virtio-balloon (LP: #1848=
-497)
+Applied, thanks.
 
- -- Christian Ehrhardt <christian.ehrhardt@canonical.com>  Mon, 21 Oct
-2019 14:51:45 +0200
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
-** Changed in: qemu (Ubuntu Focal)
-       Status: Triaged =3D> Fix Released
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1848556
-
-Title:
-  qemu-img check failing on remote image in Eoan
-
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Eoan:
-  Triaged
-Status in qemu source package in Focal:
-  Fix Released
-
-Bug description:
-  Ubuntu SRU Template:
-
-  [Impact]
-
-   * There is fallout due to changes in libcurl that affect qemu and might =
-
-     lead to a hang.
-
-   * Fix by backporting the upstream fix
-
-  [Test Case]
-
-   * If you have network just run
-     $ qemu-img check http://10.193.37.117/cloud/eoan-server-cloudimg-amd64=
-.img
-
-   * Without network, install apache2, and get a complex qemu file (like a =
-
-     cloud image) onto the system. Then access the file via apache http but =
-
-     not localhost (that would work)
-
-  [Regression Potential]
-
-   * The change is local to the libcurl usage of qemu, so that could be =
-
-     affected. But then this is what has been found to not work here, so I'=
-d =
-
-     expect not too much trouble. But if so then in the curl usage (which =
-
-     means disks on http)
-
-  [Other Info]
-   =
-
-   * n/a
-
-  ---
-
-  The "qemu-img check" function is failing on remote (HTTP-hosted)
-  images, beginning with Ubuntu 19.10 (qemu-utils version 1:4.0+dfsg-
-  0ubuntu9). With previous versions, through Ubuntu 19.04/qemu-utils
-  version 1:3.1+dfsg-2ubuntu3.5, the following worked:
-
-  $ /usr/bin/qemu-img check  http://10.193.37.117/cloud/eoan-server-cloudim=
-g-amd64.img
-  No errors were found on the image.
-  19778/36032 =3D 54.89% allocated, 90.34% fragmented, 89.90% compressed cl=
-usters
-  Image end offset: 514064384
-
-  The 10.193.37.117 server holds an Apache server that hosts the cloud
-  images on a LAN. Beginning with Ubuntu 19.10/qemu-utils 1:4.0+dfsg-
-  0ubuntu9, the same command never returns. (I've left it for up to an
-  hour with no change.) I'm able to wget the image from the same server
-  and installation on which qemu-img check fails. I've tried several
-  .img files on the server, ranging from Bionic to Eoan, with the same
-  results with all of them.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1848556/+subscriptions
+-- PMM
 
