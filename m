@@ -2,80 +2,83 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB657C5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1483C5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:38:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 752452085B
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EA25218AE
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:38:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RxsYAwsE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 752452085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V45JiLhq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EA25218AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSf90-0006LR-I1
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:36:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39635)
+	id 1iSfBS-0007h4-Jg
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:38:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40004)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iSf7K-0005bD-7o
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:34:20 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iSfAL-0007AM-OF
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:37:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iSf7I-00047a-GY
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:34:18 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31502
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iSf7I-00043j-Cg
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:34:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573122855;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vJnX6daviaLSWKOQAWeTsdo/NmIC1/8gt5xIkGpYGZU=;
- b=RxsYAwsEabW9edCTwZ52GvDRLdWzjW2pZfnEPLnO8PJ2MvVjdZGD4iSX/KRQAu2qyRsUTl
- 5lwl6RbKDF+6cDWWWI+lc7xYCo4eBGm52ysj7goik1XOL8ks+WB50ILv3NsYw6dO+PvcOW
- bMvzaJpkyTKjwxqqMnji/2rVcf9iILA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-88-VG8srFWMOoa0IzWrLdDrEw-1; Thu, 07 Nov 2019 05:34:08 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5F41800C61;
- Thu,  7 Nov 2019 10:34:07 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8E02D5D6D8;
- Thu,  7 Nov 2019 10:33:59 +0000 (UTC)
-Date: Thu, 7 Nov 2019 10:33:57 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [RFC PATCH 00/18] Add qemu-storage-daemon
-Message-ID: <20191107103357.GB120292@redhat.com>
-References: <20191017130204.16131-1-kwolf@redhat.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iSfAK-0002w8-61
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:37:25 -0500
+Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:36553)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iSfAH-0002mV-N2
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:37:22 -0500
+Received: by mail-oi1-x22a.google.com with SMTP id j7so1535733oib.3
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 02:37:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=SF55EwY0cbAJy4hZ8ZsKKrWvstgFCdY1KUBVJWsYL80=;
+ b=V45JiLhqsWemvcutuk4hshcBwuAM1QxFro21unsY0OKH5jhRtZgaJE6b5YGk7uvZRQ
+ RKTKxvZR7HoQC1MRmO8KFTW9R6ihcLE95u7BP7/gFMlWEyAxqXQ7OIAXODOMysAXP1RP
+ Ek6F4DG01aXf5+KcId9+gYB7OVrKkWu/FITfHY78VBetcyM+ludUSmhoPd8/+4cZFS7x
+ xfCl6/H3E6Kjk+hEj8RtqCkFfamnQ3lyk32qTZ4DVm3yHAF1KkXNgb5G7LqmrkoMZSQr
+ PvSbq0ThBoPpUqPIrXf0tjuJnX0WuYu98MjpUyJBALpLrmRTCQCJy3Ax3zPUwtGtM+t5
+ TwVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=SF55EwY0cbAJy4hZ8ZsKKrWvstgFCdY1KUBVJWsYL80=;
+ b=ifsDcZFwlZTBfgF0J6Dj8xef4QcnZ2bMT20XA9WUOp/uZnreAoQZgQnFLbUBhO4be4
+ CBHFYFwk0NbTmmbmH8Dt+FiIRAI/fCZeXFtkL5QP6YbgSElltioPESrWCsaKMNQ3kBWB
+ 9051LUmLm8HJzugmWEJSxEvHF2P+2XcLZmUN4OZF/aHCuvB1FjWLeQrzuupK5CS3LVXf
+ EKfGLPp+xHRWkI/7dgHOBSNkbqYQzaYF0I0W2XqWSvtwRmLP2J1/NlCUKHp0J/sJDQJu
+ ygTOtf3813+5DgkRtCZkiBgx1tH8R4ifntU+Oh5Iznfj2BVcZCvV4igzFSCDVtx/NziA
+ or8Q==
+X-Gm-Message-State: APjAAAW8eANJyZBYFFq8g0b9PVfBoaWUak91HzcZ74IgsiC7sVIF/JhR
+ vYDgoE5uC+hPunjOyqKHo4HbBD9fpWx2EKRId6MHuw==
+X-Google-Smtp-Source: APXvYqw1RhfNM1gIdWAZTjJsAM0k2BArvz/NIBbc8BNoPVFXCgMzztIhIXjF2f2AKsOcbjw0N06wRbSSxh9nu2GXpME=
+X-Received: by 2002:a05:6808:90:: with SMTP id
+ s16mr2861790oic.62.1573123038411; 
+ Thu, 07 Nov 2019 02:37:18 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191017130204.16131-1-kwolf@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: VG8srFWMOoa0IzWrLdDrEw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Received: by 2002:a9d:5e89:0:0:0:0:0 with HTTP;
+ Thu, 7 Nov 2019 02:37:17 -0800 (PST)
+In-Reply-To: <f5a16b3c-2c17-60e4-e80b-dd20b3c088cc@cs.utexas.edu>
+References: <f5a16b3c-2c17-60e4-e80b-dd20b3c088cc@cs.utexas.edu>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Thu, 7 Nov 2019 11:37:17 +0100
+Message-ID: <CAL1e-=g8c=QJiMm1AvBCNmsTyVWoUAjL0na2HWodHCQPiLdWJw@mail.gmail.com>
+Subject: Re: Looking for issues/features for my first contribution
+To: Rajath Shashidhara <rajaths@cs.utexas.edu>
+Content-Type: multipart/alternative; boundary="000000000000e47fc80596bf3ff7"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,142 +90,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, armbru@redhat.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 17, 2019 at 03:01:46PM +0200, Kevin Wolf wrote:
-> This series adds a new tool 'qemu-storage-daemon', which can be used to
-> export and perform operations on block devices. There is some overlap
-> between qemu-img/qemu-nbd and the new qemu-storage-daemon, but there are
-> a few important differences:
->=20
-> * The qemu-storage-daemon has QMP support. The command set is obviously
->   restricted compared to the system emulator because there is no guest,
->   but all of the block operations are present.
->=20
->   This means that it can access advanced options or operations that the
->   qemu-img command line doesn't expose. For example, blockdev-create is
->   a lot more powerful than 'qemu-img create', and qemu-storage-daemon
->   allows to execute it without starting a guest.
->=20
->   Compared to qemu-nbd it means that, for example, block jobs can now be
->   executed on the server side, and backing chains shared by multiple VMs
->   can be modified this way.
->=20
-> * The existing tools all have a separately invented one-off syntax for
->   the job at hand, which usually comes with restrictions compared to the
->   system emulator. qemu-storage-daemon shares the same syntax with the
->   system emulator for most options and prefers QAPI based interfaces
->   where possible (such as --blockdev), so it should be easy to make use
->   of in libvirt.
->=20
-> * While this series implements only NBD exports, the storage daemon is
->   intended to serve multiple protocols and its syntax reflects this. In
->   the past, we had proposals to add new one-off tools for exporting over
->   new protocols like FUSE or TCMU.
->=20
->   With a generic storage daemon, additional export methods have a home
->   without adding a new tool for each of them.
->=20
-> I'm posting this as an RFC mainly for two reasons:
->=20
-> 1. The monitor integration, which could be argued to be a little hackish
->    (some generated QAPI source files are built from a separate QAPI
->    schema, but the per-module ones are taken from the system emulator)
->    and Markus will want to have a closer look there. But from the IRC
->    discussions we had, we seem to agree on the general approach here.
->=20
-> 2. I'm not completely sure if the command line syntax is the final
->    version that we want to support long-term. Many options directly use
->    QAPI visitors (--blockdev, --export, --nbd-server) and should be
->    fine. However, others use QemuOpts (--chardev, --monitor, --object).
->=20
->    This is the same as in the system emulator, so we wouldn't be adding
->    a new problem, but as there was talk about QAPIfying the command
->    line, and I wouldn't want later syntax changes or adding lots of
->    compatibility code to a new tool, I thought we should probably
->    discuss whether QAPIfying from the start would be an option.
+--000000000000e47fc80596bf3ff7
+Content-Type: text/plain; charset="UTF-8"
 
-I think that following what the QEMU emulators currently do for
-CLI args should be an explicit anti-goal, because we know that it is
-a long standing source of pain.  Fixing it in the emulator binaries
-is hard due to backward compatibility, but for this new binary we
-have a clean slate.
+On Thursday, November 7, 2019, Rajath Shashidhara <rajaths@cs.utexas.edu>
+wrote:
 
-This feels like a good opportunity to implement & demonstrate what
-we think QEMU configuration ought to look like. Work done for this
-in the qemu-storage-daemon may well help us understand how we'll
-be able to move the QEMU emulators into a new scheme later.
+> Hi all,
+>
+> I am a Computer Science graduate student at The University of Texas at
+> Austin (UT, Austin). I am looking forward to contributing to qemu !
+>
+> This semester, I am taking a class in Virtualization (
+> https://github.com/vijay03/cs378-f19) and contributing to a
+> virtualization related open-source project is a significant part of the
+> course.
+> I would be interested in contributing a patchset to qemu - possibly a
+> self-contained feature or a reasonably complex bug fix that can be
+> completed in under a month's time. I did look at both the bugtracker and
+> the QEMU Google Summer of Code 2019 page [https://wiki.qemu.org/Google_
+> Summer_of_Code_2019] for ideas. However, I would be interested in hearing
+> from the community and I would be delighted if somebody can be suggest a
+> suitable project !
+>
+>
+Hello, Rajath!
 
-My personal wish would be to have no use of QemuOpts at all.
+Thank you for expressing interest in QEMU open source project.
 
-Use GOptionContext *only* for parsing command line arguments
-related to execution of the daemon - ie things like --help,
---version, --daemon, --pid-file.
+There is certainly a place for you and your contributions in QEMU, and you
+are very welcomed!
 
-The use a "--config /path/to/json/file" arg to point to the config
-file for everything else using QAPI schema to describe it fully.
+It looks to me the following project would fit your description:
 
-When loading the config file, things should be created in order
-in which they are specified. ie don't try and group things,
-otherwise we end up back with the horrific hacks for objects
-where some are created early & some late.
+'Implement emulation of DS3231 real time clock in QEMU'
+
+Datasheet:
+
+https://datasheets.maximintegrated.com/en/ds/DS3231.pdf
+
+The steps needed to complete it (in my opinion):
+
+- collect datasheets of as many as possible RTC chips already emulated in
+QEMU (there are around of dozen of them, see folder hw/rtc)
+
+- do a comparative analysis of selected RTC implementations in QEMU
+
+- get to know general QEMU device model
+
+- design and implement DS3231 emulation
+
+I can give you (unfortunately constrained by tight time limits) some help
+and guidance. But there are other people in community too (more
+knowledgable in the area than me).
+
+I salute your initiative!
+
+Yours,
+Aleksandar
 
 
 
-For an ambitious stretch goal, I think we should seriously consider
-whether our use of chardevs is appropriate in all cases that exist,
-and whether we can avoid the trap of over-using chardev in the new
-storage daemon since it is a clean slate in terms of user facing
-CLI config.
 
-chardevs are designed for & reasonably well suited to attaching to
-devices like serial ports, parallel ports, etc. You have a 1:1
-remote:local peer relationship. The transport is a dumb byte
-stream, nothing special needed on top & the user can cope with
-any type of chardev.
+> I am an advanced C programmer with both professional and academic
+> background in systems design & implementation - especially OS & Networks.
+> Given my background, I feel fairly confident that I can pickup the QEMU
+> codebase quickly.
+>
+> Eagerly looking forward to hearing from the community !
+>
+> Thanks,
+> Rajath Shashidhara
+>
+>
+>
 
-Many cases where we've used chardevs as a backend in QEMU are a
-poor fit. We just used chardevs as an "easy" way to configure a
-UNIX or TCP socket from the CLI, and don't care about, nor work
-with, any othuer chardev backends. As a result of this misuse
-we've had to put in an increasing number of hacks in the chardev
-code to deal with fact that callers want to know about  & use
-socket semantics. eg FD passing, the chardev reconnection polling
-code.
+--000000000000e47fc80596bf3ff7
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The monitor is a prime example of a bad fit - it would be better
-suited by simply referencing a SocketAddress QAPI type, instead
-of having the chardev indirection. It would then directly use
-the QIOChannelSocket APIs and avoid the inconvenient chardev
-abstractions which are a source of complexity & instability for
-no net gain.  vhostuser is another prime example, responsible
-for much of the complexity & bugs recently added to chardevs
-to expose socket semantics
+<br><br>On Thursday, November 7, 2019, Rajath Shashidhara &lt;<a href=3D"ma=
+ilto:rajaths@cs.utexas.edu">rajaths@cs.utexas.edu</a>&gt; wrote:<br><blockq=
+uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
+solid;padding-left:1ex">Hi all,<br>
+<br>
+I am a Computer Science graduate student at The University of Texas at Aust=
+in (UT, Austin). I am looking forward to contributing to qemu !<br>
+<br>
+This semester, I am taking a class in Virtualization (<a href=3D"https://gi=
+thub.com/vijay03/cs378-f19" target=3D"_blank">https://github.com/vijay03/cs=
+<wbr>378-f19</a>) and contributing to a virtualization related open-source =
+project is a significant part of the course.<br>
+I would be interested in contributing a patchset to qemu - possibly a self-=
+contained feature or a reasonably complex bug fix that can be completed in =
+under a month&#39;s time. I did look at both the bugtracker and the QEMU Go=
+ogle Summer of Code 2019 page [<a href=3D"https://wiki.qemu.org/Google_Summ=
+er_of_Code_2019" target=3D"_blank">https://wiki.qemu.org/Google_<wbr>Summer=
+_of_Code_2019</a>] for ideas. However, I would be interested in hearing fro=
+m the community and I would be delighted if somebody can be suggest a suita=
+ble project !<br>
+<br></blockquote><div><br></div><div>Hello, Rajath!</div><div><br></div><di=
+v>Thank you for expressing interest in QEMU open source project.</div><div>=
+<br></div><div>There is certainly a place for you and your contributions in=
+ QEMU, and you are very welcomed!</div><div><br></div><div>It looks to me t=
+he following project would fit your description:</div><div><br></div><div>&=
+#39;Implement emulation of DS3231 real time clock in QEMU&#39;</div><div><b=
+r></div><div>Datasheet:</div><div><br></div><div><a href=3D"https://datashe=
+ets.maximintegrated.com/en/ds/DS3231.pdf">https://datasheets.maximintegrate=
+d.com/en/ds/DS3231.pdf</a><br></div><div><br></div><div>The steps needed to=
+ complete it (in my opinion):</div><div><br></div><div>- collect datasheets=
+ of as many as possible RTC chips already emulated in QEMU (there are aroun=
+d of dozen of them, see folder hw/rtc)</div><div><br></div><div>- do a comp=
+arative analysis of selected RTC implementations in QEMU</div><div><br></di=
+v><div>- get to know general QEMU device model</div><div><br></div><div>- d=
+esign and implement DS3231 emulation</div><div><br></div><div>I can give yo=
+u (unfortunately constrained by tight time limits) some help and guidance. =
+But there are other people in community too (more knowledgable in the area =
+than me).</div><div><br></div><div>I salute your initiative!</div><div><br>=
+</div><div>Yours,</div><div>Aleksandar</div><div><br></div><div><br></div><=
+div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8e=
+x;border-left:1px #ccc solid;padding-left:1ex">
+I am an advanced C programmer with both professional and academic backgroun=
+d in systems design &amp; implementation - especially OS &amp; Networks. Gi=
+ven my background, I feel fairly confident that I can pickup the QEMU codeb=
+ase quickly.<br>
+<br>
+Eagerly looking forward to hearing from the community !<br>
+<br>
+Thanks,<br>
+Rajath Shashidhara<br>
+<br>
+<br>
+</blockquote>
 
-
-This is a long winded way of saying that we should consider what
-syntax we expose for the monitor socket configuration with the
-new daemon. Even if the internal code still uses a chardev for
-the forseeable future, we have the option to hide this from the
-user facing configuration. Let the user specify a SocketAddress,
-which we use to secretly instantiate a chardev. Eventually we can
-convert the monitor code to stop using a chardev internally too,
-with a suitable deprecation period for main QEMU binarijes.
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+--000000000000e47fc80596bf3ff7--
 
