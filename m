@@ -2,69 +2,64 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 569D7FA372C
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 01:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 531D4FA372C
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 01:40:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 273ED21848
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 01:09:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 273ED21848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1FA1F217F5
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 01:40:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FA1F217F5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSWIy-00041K-9d
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 20:09:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60596)
+	id 1iSWmj-0004sy-24
+	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 20:40:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35818)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iSWIJ-0003bs-1P
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 20:09:04 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1iSWky-0003lw-1F
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 20:38:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iSWIH-0004Ha-3w
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 20:09:02 -0500
-Resent-Date: Wed, 06 Nov 2019 20:09:02 -0500
-Resent-Message-Id: <E1iSWIH-0004Ha-3w@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21453)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iSWIG-0004HI-SZ
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 20:09:01 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1573088931; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=C6Vz8yk/WKZo9rUv8Ho7m8pX3xdpyxrfMB+Ece3pXCktYVTBtpLgu+p1VKWH10kGw4diOETrNqz2HI4qY5b9AQLFKXWtFhdXgHG4nMSrFWLVnt8vb8jMtUybsoi1F3ho4MFv1ylN1uZjX/iTnBhbdTEGahAZuBBTuZKdtHsWBLo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1573088931;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=qkhc35mD2vparqPYp/Z4EI05HhTn09K9Q9/oFyQFdVw=; 
- b=UBnruHFrDOy99yM5FbR/JB9Dr7vj1t8HocPFMtpFiNVKbOcuKl+fZn5UyFLq331n2SZcVOigQPT6O26ql0Gs4D+toDmVefrVwNg868XzQ/P2swnONYJhfifU24T2rAWn2zbrDOefRTY/1IXC5iP1LLkWibEvLYBc3+eFsUGnLUU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1573088929237537.1079416749777;
- Wed, 6 Nov 2019 17:08:49 -0800 (PST)
-In-Reply-To: <20191106130309.6737-1-jandryuk@gmail.com>
-Subject: Re: [PATCH] qmp: Reset mon->commands on CHR_EVENT_CLOSED
-Message-ID: <157308892815.21358.10901801479118764429@37313f22b938>
+ (envelope-from <tao3.xu@intel.com>) id 1iSWkv-0002NE-E5
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 20:38:39 -0500
+Received: from mga03.intel.com ([134.134.136.65]:27083)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iSWkv-0002Mh-4x
+ for qemu-devel@nongnu.org; Wed, 06 Nov 2019 20:38:37 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+ by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 06 Nov 2019 17:38:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,276,1569308400"; d="scan'208";a="206015622"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.161])
+ ([10.239.196.161])
+ by orsmga006.jf.intel.com with ESMTP; 06 Nov 2019 17:38:30 -0800
+Subject: Re: [PATCH v14 01/11] util/cutils: Add qemu_strtotime_ns()
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20191028075220.25673-1-tao3.xu@intel.com>
+ <20191028075220.25673-2-tao3.xu@intel.com>
+ <20191106195645.GQ3812@habkost.net>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <abc99a22-5784-4287-f114-a8339a6b81ee@intel.com>
+Date: Thu, 7 Nov 2019 09:38:29 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: jandryuk@gmail.com
-Date: Wed, 6 Nov 2019 17:08:49 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+In-Reply-To: <20191106195645.GQ3812@habkost.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,44 +71,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: jandryuk@gmail.com, qemu-devel@nongnu.org, armbru@redhat.com
+Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
+ "thuth@redhat.com" <thuth@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
+ Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
+ "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
+ "imammedo@redhat.com" <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwNjEzMDMwOS42NzM3
-LTEtamFuZHJ5dWtAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
-a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
-bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
-ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
-VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
-V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
-NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgVEVTVCAgICBpb3Rlc3QtcWNv
-dzI6IDI2OApGYWlsdXJlczogMDYwIDA3MSAxNzYgMTg0CkZhaWxlZCA0IG9mIDEwOCBpb3Rlc3Rz
-Cm1ha2U6ICoqKiBbY2hlY2stdGVzdHMvY2hlY2stYmxvY2suc2hdIEVycm9yIDEKVHJhY2ViYWNr
-IChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgogIEZpbGUgIi4vdGVzdHMvZG9ja2VyL2RvY2tlci5w
-eSIsIGxpbmUgNjYyLCBpbiA8bW9kdWxlPgogICAgc3lzLmV4aXQobWFpbigpKQotLS0KICAgIHJh
-aXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJv
-Y2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxh
-YmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9Y2I3MDdiY2UwYzNjNDU2ZDhlY2VjNzBhZWIw
-OGZkZGMnLCAnLXUnLCAnMTAwMycsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmlu
-ZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJF
-X09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywg
-J1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAn
-L2hvbWUvcGF0Y2hldzIvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9jY2FjaGU6
-eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbXhsNV9qZWMvc3JjL2RvY2tl
-ci1zcmMuMjAxOS0xMS0wNi0xOS41NS40Ny4yMDczNjovdmFyL3RtcC9xZW11Onoscm8nLCAncWVt
-dTpjZW50b3M3JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rlc3QtcXVpY2snXScgcmV0dXJuZWQg
-bm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmlsdGVyPWxhYmVsPWNvbS5xZW11Lmlu
-c3RhbmNlLnV1aWQ9Y2I3MDdiY2UwYzNjNDU2ZDhlY2VjNzBhZWIwOGZkZGMKbWFrZVsxXTogKioq
-IFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZpbmcgZGlyZWN0b3J5IGAvdmFyL3Rt
-cC9wYXRjaGV3LXRlc3Rlci10bXAtbXhsNV9qZWMvc3JjJwptYWtlOiAqKiogW2RvY2tlci1ydW4t
-dGVzdC1xdWlja0BjZW50b3M3XSBFcnJvciAyCgpyZWFsICAgIDEzbTEuODEwcwp1c2VyICAgIDBt
-OC4zNzFzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcv
-bG9ncy8yMDE5MTEwNjEzMDMwOS42NzM3LTEtamFuZHJ5dWtAZ21haWwuY29tL3Rlc3RpbmcuZG9j
-a2VyLXF1aWNrQGNlbnRvczcvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 11/7/2019 3:56 AM, Eduardo Habkost wrote:
+> On Mon, Oct 28, 2019 at 03:52:10PM +0800, Tao Xu wrote:
+>> To convert strings with time suffixes to numbers, support time unit are
+>> "ns" for nanosecond, "us" for microsecond, "ms" for millisecond or "s"
+>> for second. Add test for qemu_strtotime_ns, test the input of basic,
+>> time suffixes, float, invaild, trailing and overflow.
+>>
+>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>> ---
+>>
+>> Changes in v14:
+>>      - Reuse the codes of do_strtosz to build qemu_strtotime_ns
+>>        (Eduardo)
+>>      - Squash patch v13 01/12 and 02/12 together (Daniel and Eduardo)
+>>      - Drop time unit picosecond (Eric)
+> 
+> Suggestion for the next version: if you are refactoring existing
+> do_strtosz() code, please refactor it in one patch, and add new
+> functionality in another patch.
+> 
+Thank you for your suggestions and comments blew. I will improve in next 
+version.
+
+>> ---
+>>   include/qemu/cutils.h |   1 +
+>>   tests/test-cutils.c   | 204 ++++++++++++++++++++++++++++++++++++++++++
+>>   util/cutils.c         |  89 +++++++++++-------
+>>   3 files changed, 262 insertions(+), 32 deletions(-)
+>>
+>> diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
+>> index b54c847e0f..ff2b3f4614 100644
+>> --- a/include/qemu/cutils.h
+>> +++ b/include/qemu/cutils.h
+>> @@ -182,5 +182,6 @@ int uleb128_decode_small(const uint8_t *in, uint32_t *n);
+>>    * *str1 is <, == or > than *str2.
+>>    */
+>>   int qemu_pstrcmp0(const char **str1, const char **str2);
+>> +int qemu_strtotime_ns(const char *nptr, const char **end, uint64_t *result);
+>>   
+>>   #endif
+>> diff --git a/tests/test-cutils.c b/tests/test-cutils.c
+>> index 1aa8351520..d6a0824efd 100644
+>> --- a/tests/test-cutils.c
+>> +++ b/tests/test-cutils.c
+> [...]
+>> +static void test_qemu_strtotime_ns_trailing(void)
+>> +{
+>> +    const char *str;
+>> +    const char *endptr;
+>> +    int err;
+>> +    uint64_t res = 0xbaadf00d;
+>> +
+>> +    str = "123xxx";
+>> +
+>> +    err = qemu_strtotime_ns(str, NULL, &res);
+>> +    g_assert_cmpint(err, ==, -EINVAL);
+>> +
+>> +    str = "1msxxx";
+>> +    err = qemu_strtotime_ns(str, &endptr, &res);
+>> +    g_assert_cmpint(err, ==, 0);
+>> +    g_assert_cmpint(res, ==, 1000000);
+>> +    g_assert(endptr == str + 3);
+>> +
+>> +    err = qemu_strtotime_ns(str, NULL, &res);
+>> +    g_assert_cmpint(err, ==, -EINVAL);
+>> +}
+> 
+> This is better than the test case in v13, where trailing strings
+> were not handled consistently.  Good.
+> 
+> [...]
+>> diff --git a/util/cutils.c b/util/cutils.c
+>> index fd591cadf0..d83825f8b4 100644
+>> --- a/util/cutils.c
+>> +++ b/util/cutils.c
+>> @@ -181,41 +181,38 @@ int fcntl_setfl(int fd, int flag)
+>>   }
+>>   #endif
+>>   
+>> -static int64_t suffix_mul(char suffix, int64_t unit)
+>> -{
+>> -    switch (qemu_toupper(suffix)) {
+>> -    case 'B':
+>> -        return 1;
+>> -    case 'K':
+>> -        return unit;
+>> -    case 'M':
+>> -        return unit * unit;
+>> -    case 'G':
+>> -        return unit * unit * unit;
+>> -    case 'T':
+>> -        return unit * unit * unit * unit;
+>> -    case 'P':
+>> -        return unit * unit * unit * unit * unit;
+>> -    case 'E':
+>> -        return unit * unit * unit * unit * unit * unit;
+>> +static int64_t suffix_mul(const char *suffixes[], int num_suffix,
+>> +                          const char *endptr, int *offset, int64_t unit)
+>> +{
+>> +    int i, suffix_len;
+>> +    int64_t mul = 1;
+>> +
+>> +    for (i = 0; i < num_suffix; i++) {
+>> +        suffix_len = strlen(suffixes[i]);
+>> +        if (strlen(endptr) >= suffix_len &&
+> 
+> Is the strlen(endptr) check here really necessary?
+> 
+> 
+>> +            g_ascii_strncasecmp(suffixes[i], endptr, suffix_len) == 0) {
+>> +            *offset = suffix_len;
+>> +            return mul;
+>> +        }
+>> +        mul *= unit;
+>>       }
+>> +
+>>       return -1;
+>>   }
+>>   
+>>   /*
+>> - * Convert string to bytes, allowing either B/b for bytes, K/k for KB,
+>> - * M/m for MB, G/g for GB or T/t for TB. End pointer will be returned
+>> - * in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on
+>> - * other error.
+>> + * Convert string according to different suffixes. End pointer will be returned
+>> + * in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on other error.
+>>    */
+>> -static int do_strtosz(const char *nptr, const char **end,
+>> -                      const char default_suffix, int64_t unit,
+>> -                      uint64_t *result)
+>> +static int do_strtomul(const char *nptr, const char **end,
+>> +                       const char *suffixes[], int num_suffix,
+>> +                       const char *default_suffix, int64_t unit,
+>> +                       uint64_t *result)
+>>   {
+>>       int retval;
+>>       const char *endptr;
+>> -    unsigned char c;
+>>       int mul_required = 0;
+>> +    int offset = 0;
+>>       double val, mul, integral, fraction;
+>>   
+>>       retval = qemu_strtod_finite(nptr, &endptr, &val);
+>> @@ -226,12 +223,12 @@ static int do_strtosz(const char *nptr, const char **end,
+>>       if (fraction != 0) {
+>>           mul_required = 1;
+>>       }
+>> -    c = *endptr;
+>> -    mul = suffix_mul(c, unit);
+>> +
+>> +    mul = suffix_mul(suffixes, num_suffix, endptr, &offset, unit);
+>>       if (mul >= 0) {
+>> -        endptr++;
+>> +        endptr += offset;
+>>       } else {
+>> -        mul = suffix_mul(default_suffix, unit);
+>> +        mul = suffix_mul(suffixes, num_suffix, default_suffix, &offset, unit);
+>>           assert(mul >= 0);
+>>       }
+>>       if (mul == 1 && mul_required) {
+>> @@ -259,19 +256,47 @@ out:
+>>       return retval;
+>>   }
+>>   
+>> +/*
+>> + * Convert string to bytes, allowing either B/b for bytes, K/k for KB,
+>> + * M/m for MB, G/g for GB or T/t for TB. End pointer will be returned
+>> + * in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on
+>> + * other error.
+>> + */
+>> +static int do_strtosz(const char *nptr, const char **end,
+>> +                      const char *default_suffix, int64_t unit,
+>> +                      uint64_t *result)
+>> +{
+>> +    static const char *suffixes[] = { "B", "K", "M", "G", "T", "P", "E" };
+>> +
+>> +    return do_strtomul(nptr, end, suffixes, 7, default_suffix, unit, result);
+> 
+> [1] You can use ARRAY_SIZE(suffixes) instead of hardcoding the
+> array size.
+> 
+>> +}
+>> +
+>>   int qemu_strtosz(const char *nptr, const char **end, uint64_t *result)
+>>   {
+>> -    return do_strtosz(nptr, end, 'B', 1024, result);
+>> +    return do_strtosz(nptr, end, "B", 1024, result);
+>>   }
+>>   
+>>   int qemu_strtosz_MiB(const char *nptr, const char **end, uint64_t *result)
+>>   {
+>> -    return do_strtosz(nptr, end, 'M', 1024, result);
+>> +    return do_strtosz(nptr, end, "M", 1024, result);
+>>   }
+>>   
+>>   int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result)
+>>   {
+>> -    return do_strtosz(nptr, end, 'B', 1000, result);
+>> +    return do_strtosz(nptr, end, "B", 1000, result);
+>> +}
+>> +
+>> +/*
+>> + * Convert string to time, support time unit are ns for nanosecond, us for
+>> + * microsecond, ms for millisecond and s for second. End pointer will be
+>> + * returned in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on
+>> + * other error.
+>> + */
+>> +int qemu_strtotime_ns(const char *nptr, const char **end, uint64_t *result)
+>> +{
+>> +    static const char *suffixes[] = { "ns", "us", "ms", "s" };
+>> +
+>> +    return do_strtomul(nptr, end, suffixes, 4, "ns", 1000, result);
+> 
+> Same as above[1].
+> 
+>>   }
+>>   
+>>   /**
+>> -- 
+>> 2.20.1
+>>
+> 
 
 
