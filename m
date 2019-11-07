@@ -2,84 +2,64 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF98C5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 04:22:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA10C5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 06:01:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 089762166E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 04:22:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JI3xUP34"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 089762166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4CD3921882
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 06:01:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CD3921882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSZJc-0004rN-3b
-	for qemu-devel@archiver.kernel.org; Wed, 06 Nov 2019 23:22:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49958)
+	id 1iSar7-0006YS-Fz
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 01:01:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33620)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jasowang@redhat.com>) id 1iSZIZ-0004Ou-PH
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 23:21:32 -0500
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iSaqP-00063C-60
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 01:00:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jasowang@redhat.com>) id 1iSZIW-00074F-Vz
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 23:21:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59710
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iSaqN-0002fL-TW
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 01:00:33 -0500
+Received: from mga09.intel.com ([134.134.136.24]:36796)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iSZIW-00072x-SB
- for qemu-devel@nongnu.org; Wed, 06 Nov 2019 23:21:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573100487;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MUqmXJFPu/ehbA5mmVoLVJcBN9hFKprG7wWXc1sJd6c=;
- b=JI3xUP34kQ15h95A+atU/qSgF5AZ/2DRWp4TzaCn0U+QXMiN4cfdYA2AzscnS3vfX0z/q2
- 56lj3vjUDJrB7v5gkGiA/bttbTUSGLJ+pB4YRio222pQOFjTs2ZmW9UAYWLe2ZfYqDeinQ
- m1Hz/ay3CQhW9LT0cQWgstaSI4hay1A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-31-_fffvus1PgqWSMXbCobeUw-1; Wed, 06 Nov 2019 23:21:23 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02ACC800C61;
- Thu,  7 Nov 2019 04:21:23 +0000 (UTC)
-Received: from [10.72.12.214] (ovpn-12-214.pek2.redhat.com [10.72.12.214])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EE26A10002D0;
- Thu,  7 Nov 2019 04:21:07 +0000 (UTC)
-Subject: Re: [Qemu-devel] [PATCH v2 1/2] net: assert that tx packets have
- nonzero size
-To: "Oleinik, Alexander" <alxndr@bu.edu>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20190722132344.30798-1-alxndr@bu.edu>
- <20190722132344.30798-2-alxndr@bu.edu>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <d549979a-3482-febc-4dc8-77dae431ad2c@redhat.com>
-Date: Thu, 7 Nov 2019 12:21:04 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1iSaqN-0002Mw-KA
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 01:00:31 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 06 Nov 2019 22:00:23 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,276,1569308400"; d="scan'208";a="233146158"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by fmsmga002.fm.intel.com with ESMTP; 06 Nov 2019 22:00:22 -0800
+Date: Thu, 7 Nov 2019 14:00:11 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 5/6] migration/postcopy: enable random order target page
+ arrival
+Message-ID: <20191107060010.GA13394@richard>
+References: <20191018004850.9888-1-richardw.yang@linux.intel.com>
+ <20191018004850.9888-6-richardw.yang@linux.intel.com>
+ <20191106200828.GL2802@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20190722132344.30798-2-alxndr@bu.edu>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: _fffvus1PgqWSMXbCobeUw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191106200828.GL2802@work-vm>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,56 +71,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "bsd@redhat.com" <bsd@redhat.com>, "stefanha@redhat.com" <stefanha@redhat.com>
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, Wei Yang <richardw.yang@linux.intel.com>,
+ quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2019/7/22 =E4=B8=8B=E5=8D=889:24, Oleinik, Alexander wrote:
-> Virtual devices should not try to send zero-sized packets. The caller
-> should check the size prior to calling qemu_sendv_packet_async.
+On Wed, Nov 06, 2019 at 08:08:28PM +0000, Dr. David Alan Gilbert wrote:
+>* Wei Yang (richardw.yang@linux.intel.com) wrote:
+>> After using number of target page received to track one host page, we
+>> could have the capability to handle random order target page arrival in
+>> one host page.
+>> 
+>> This is a preparation for enabling compress during postcopy.
+>> 
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> ---
+>>  migration/ram.c | 16 +++-------------
+>>  1 file changed, 3 insertions(+), 13 deletions(-)
+>> 
+>> diff --git a/migration/ram.c b/migration/ram.c
+>> index b5759793a9..da0596411c 100644
+>> --- a/migration/ram.c
+>> +++ b/migration/ram.c
+>> @@ -4015,7 +4015,6 @@ static int ram_load_postcopy(QEMUFile *f)
+>>      MigrationIncomingState *mis = migration_incoming_get_current();
+>>      /* Temporary page that is later 'placed' */
+>>      void *postcopy_host_page = mis->postcopy_tmp_page;
+>> -    void *last_host = NULL;
+>>      bool all_zero = false;
+>>      int target_pages = 0;
+>>  
+>> @@ -4062,24 +4061,15 @@ static int ram_load_postcopy(QEMUFile *f)
+>>               * that's moved into place later.
+>>               * The migration protocol uses,  possibly smaller, target-pages
+>>               * however the source ensures it always sends all the components
+>> -             * of a host page in order.
+>> +             * of a host page in one chunk.
+>>               */
+>>              page_buffer = postcopy_host_page +
+>>                            ((uintptr_t)host & (block->page_size - 1));
+>>              /* If all TP are zero then we can optimise the place */
+>>              if (target_pages == 1) {
+>>                  all_zero = true;
+>> -            } else {
+>> -                /* not the 1st TP within the HP */
+>> -                if (host != (last_host + TARGET_PAGE_SIZE)) {
+>> -                    error_report("Non-sequential target page %p/%p",
+>> -                                  host, last_host);
+>> -                    ret = -EINVAL;
+>> -                    break;
+>> -                }
 >
-> Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
-> ---
-> v2:
->    * Improve the comment to explain the rationale for adding the assert.
->   net/net.c | 9 +++++++++
->   1 file changed, 9 insertions(+)
+>I think this is losing more protection than needed.
+>I think you can still protect against a page from a different host-page
+>arriving until we've placed the current host-page.
+>So something like:
 >
-> diff --git a/net/net.c b/net/net.c
-> index 7d4098254f..4ad21df36f 100644
-> --- a/net/net.c
-> +++ b/net/net.c
-> @@ -741,6 +741,15 @@ ssize_t qemu_sendv_packet_async(NetClientState *send=
-er,
->       size_t size =3D iov_size(iov, iovcnt);
->       int ret;
->  =20
-> +    /*
-> +     * Since this function returns the size of the sent packets, and a r=
-eturn
-> +     * value of zero indicates that the packet will be sent asynchronous=
-ly,
-> +     * there is currently no way to report that a 0-sized packet has bee=
-n sent
-> +     * successfully. Forbid it for now, and if someone needs this functi=
-onality
-> +     * later, the API will require a change.
-> +     */
-> +    assert(size);
+>    if (((uintptr_t)host & ~(block->page_size - 1)) !=
+>        last_host)
+>
 
+OK, looks reasonable.
 
-This probably will make the assertion triggerable from guest. Is this=20
-better to warn and return NET_BUFSIZE + 1 here?
+>and then set last_host to the start of the host page.
+>
 
-Thanks
+I think it is not necessary to update the last_host on each target page. We
+can just set it at the first target page.
 
+>Then you'll check if that flush is really working.
+>
+>Dave
+>
+>>              }
+>>  
+>> -
+>>              /*
+>>               * If it's the last part of a host page then we place the host
+>>               * page
+>> @@ -4090,7 +4080,6 @@ static int ram_load_postcopy(QEMUFile *f)
+>>              }
+>>              place_source = postcopy_host_page;
+>>          }
+>> -        last_host = host;
+>>  
+>>          switch (flags & ~RAM_SAVE_FLAG_CONTINUE) {
+>>          case RAM_SAVE_FLAG_ZERO:
+>> @@ -4143,7 +4132,8 @@ static int ram_load_postcopy(QEMUFile *f)
+>>  
+>>          if (!ret && place_needed) {
+>>              /* This gets called at the last target page in the host page */
+>> -            void *place_dest = host + TARGET_PAGE_SIZE - block->page_size;
+>> +            void *place_dest = (void *)QEMU_ALIGN_DOWN((unsigned long)host,
+>> +                                                       block->page_size);
+>>  
+>>              if (all_zero) {
+>>                  ret = postcopy_place_page_zero(mis, place_dest,
+>> -- 
+>> 2.17.1
+>> 
+>--
+>Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-> +
->       if (size > NET_BUFSIZE) {
->           return size;
->       }
-
+-- 
+Wei Yang
+Help you, Help me
 
