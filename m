@@ -2,75 +2,103 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42625C5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8577DC5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:38:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08A1F214D8
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:38:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F6FC214D8
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:38:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GsZEWlB0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08A1F214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="rcGgJCEd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F6FC214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSivw-0007ll-0F
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 09:38:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48824)
+	id 1iSiw3-0007wW-1P
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 09:38:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iSirN-0002hT-Ca
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:34:06 -0500
+ (envelope-from <darren.kenny@oracle.com>) id 1iSiq7-0001l3-Ia
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:32:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iSirM-0004bj-4v
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:34:05 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58918
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iSirM-0004bU-1A
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:34:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573137243;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=BU5CTWObR/gc1QtVCNsoEt3My/ik3tUTSZr9Wb8faKA=;
- b=GsZEWlB0cu/AnaVTPb0Y3YvPmCFNFxRdOfketay4uiXbtrVYhVbmVMyyAlToH/jTPYIA3A
- vut8zGTIWb6IIxD9l7V8GxEOim0QyeKZNWO0Ktv6EpotMYl91v0ZDvcWitglwVyU2A3Bfd
- FEfVLphj8FA22Hb2iDvopI8P2Teo5u4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-5SOoTcD0Pg2JpSwwzghKjQ-1; Thu, 07 Nov 2019 09:34:00 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E47751800D6B;
- Thu,  7 Nov 2019 14:33:58 +0000 (UTC)
-Received: from localhost (ovpn-117-149.ams2.redhat.com [10.36.117.149])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 83C2660BFB;
- Thu,  7 Nov 2019 14:33:57 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 0/3] Block patches for 4.2.0-rc0/4.1.1
-Date: Thu,  7 Nov 2019 15:33:53 +0100
-Message-Id: <20191107143356.579334-1-mreitz@redhat.com>
+ (envelope-from <darren.kenny@oracle.com>) id 1iSiq5-0003OT-KK
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:32:47 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:41028)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+ id 1iSiq3-0003MK-Iu
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:32:45 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA7EOH28019035;
+ Thu, 7 Nov 2019 14:32:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=2xBKTGN/88ja9dwYdafrH8Y04Zq974dnCfHKTXSiSPA=;
+ b=rcGgJCEdgCLdCZUUs8CAY2D7kNxiXZ04U8YgfsNWPIi85ccOBKYjVk/xYIAiOFFiGT6F
+ R29sWs7sdEEBPGw6wPaq/3xjByCTgcDan7FtoGaOAVrLHv2q08uSeXPvLZZbpv+hniJW
+ 098Q386zTWGEYgTRwf5fsEnKXF+zD6IJOL+VY3eVzdwkzJKYucb0XN7F5YMhjX2Scgx/
+ 57tFqvoGvtWFiaJTHfi54pVBg6+1U4lgRg0iNYKwgVbxDOO8TdYP5BM1vF/IUcGzERPj
+ rtFw4OzqLzfaFFCRucBKI0htej9VnULcu71MCo5Nev0r08tF5Ly3j71TQHj9exlxLBY5 0w== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by aserp2120.oracle.com with ESMTP id 2w41w0xhh8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 07 Nov 2019 14:32:41 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA7EOBGe075668;
+ Thu, 7 Nov 2019 14:32:41 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by aserp3020.oracle.com with ESMTP id 2w4k2vad3y-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 07 Nov 2019 14:32:41 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xA7EWdb2001391;
+ Thu, 7 Nov 2019 14:32:39 GMT
+Received: from starbug-mbp.localdomain (/10.175.193.46)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 07 Nov 2019 06:32:39 -0800
+Received: from starbug-mbp (localhost [127.0.0.1])
+ by starbug-mbp.localdomain (Postfix) with SMTP id 900244B2C302;
+ Thu,  7 Nov 2019 14:32:37 +0000 (GMT)
+Date: Thu, 7 Nov 2019 14:32:37 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Subject: Re: [PATCH v4 08/20] tests: provide test variables to other targets
+Message-ID: <20191107143237.swmy3xmqc5ujwvs5@starbug-mbp>
+Mail-Followup-To: "Oleinik, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20191030144926.11873-1-alxndr@bu.edu>
+ <20191030144926.11873-9-alxndr@bu.edu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 5SOoTcD0Pg2JpSwwzghKjQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20191030144926.11873-9-alxndr@bu.edu>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911070143
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911070143
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,50 +110,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-stable@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit d0f90e1423b4f412adc620eee93e8bfef8af4117=
-:
+On Wed, Oct 30, 2019 at 02:49:54PM +0000, Oleinik, Alexander wrote:
+>From: Alexander Oleinik <alxndr@bu.edu>
+>
+>Before, when tests/Makefile.include was included, the contents would be
+>ignored if config-host.mak was defined. Moving the ifneq responsible for
+>this allows a target to depend on both testing-related and host-related
+>objects. For example the virtual-device fuzzer relies on both
+>libqtest/libqos objects and softmmu objects.
+>
+>Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20191106-pull-req=
-uest' into staging (2019-11-07 09:21:52 +0000)
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 
-are available in the Git repository at:
-
-  https://github.com/XanClic/qemu.git tags/pull-block-2019-11-07
-
-for you to fetch changes up to b7cd2c11f76d27930f53d3cf26d7b695c78d613b:
-
-  iotests: Add test for 4G+ compressed qcow2 write (2019-11-07 14:37:46 +01=
-00)
-
-----------------------------------------------------------------
-Block patches for 4.2.0-rc0/4.1.1:
-- Fix writing to compressed qcow2 images > 4 GB
-- Fix size sanity check for qcow2 bitmaps
-
-----------------------------------------------------------------
-Max Reitz (2):
-  qcow2: Fix QCOW2_COMPRESSED_SECTOR_MASK
-  iotests: Add test for 4G+ compressed qcow2 write
-
-Tuguoyi (1):
-  qcow2-bitmap: Fix uint64_t left-shift overflow
-
- block/qcow2-bitmap.c       | 14 +++++--
- block/qcow2.h              |  2 +-
- tests/qemu-iotests/272     | 79 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/272.out | 10 +++++
- tests/qemu-iotests/group   |  1 +
- 5 files changed, 102 insertions(+), 4 deletions(-)
- create mode 100755 tests/qemu-iotests/272
- create mode 100644 tests/qemu-iotests/272.out
-
---=20
-2.23.0
-
+>---
+> tests/Makefile.include | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
+>
+>diff --git a/tests/Makefile.include b/tests/Makefile.include
+>index 34ec03391c..67853d10c3 100644
+>--- a/tests/Makefile.include
+>+++ b/tests/Makefile.include
+>@@ -27,7 +27,6 @@ check-help:
+> 	@echo "Default options are -k and (for $(MAKE) V=1) --verbose; they can be"
+> 	@echo "changed with variable GTESTER_OPTIONS."
+>
+>-ifneq ($(wildcard config-host.mak),)
+> export SRC_PATH
+>
+> # TODO don't duplicate $(SRC_PATH)/Makefile's qapi-py here
+>@@ -873,6 +872,8 @@ tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
+>
+> SPEED = quick
+>
+>+ifneq ($(wildcard config-host.mak),)
+>+
+> # gtester tests, possibly with verbose output
+> # do_test_tap runs all tests, even if some of them fail, while do_test_human
+> # stops at the first failure unless -k is given on the command line
+>-- 
+>2.23.0
+>
+>
 
