@@ -6,78 +6,85 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6287C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 16:22:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59974C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 16:24:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90C4A206DF
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 16:22:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F7BF206DF
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 16:24:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="akYd7ZpT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90C4A206DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HNuuxFD/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F7BF206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45044 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSkXz-0002qL-PE
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 11:22:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40182)
+	id 1iSkaX-0004Dx-3N
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 11:24:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40705)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iSkXG-0002JM-IL
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 11:21:28 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iSkZp-0003if-JJ
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 11:24:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iSkXD-00078h-UV
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 11:21:25 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44136
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iSkXD-000782-QF
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 11:21:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573143682;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZIRIICvfy6AZMs7+APK39qauSxSo7JXinYs/UwT0dvY=;
- b=akYd7ZpTHP08YxVEsaIpEhF5FCCIb0/GHYZVpXYSj5rmODF79Jne5aQ9XBDmYer6dp1DAn
- ToCDzZ9rQ1P8UW6dlk4RqMfHcrJnvCEqnAMag8DGWbNJIbLJ1Lk5gvNAdCsa53fkpoK1w+
- wuvfrrPff41w0cEyCsDjinvNefWhfNo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-OxR3wM6wNgGzK7Zw4i9ULA-1; Thu, 07 Nov 2019 11:21:19 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D44D71005500;
- Thu,  7 Nov 2019 16:21:17 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 391EC5C557;
- Thu,  7 Nov 2019 16:21:16 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8E49011385C9; Thu,  7 Nov 2019 17:21:14 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [RFC PATCH 01/18] qemu-storage-daemon: Add barebone tool
-References: <20191017130204.16131-1-kwolf@redhat.com>
- <20191017130204.16131-2-kwolf@redhat.com>
-Date: Thu, 07 Nov 2019 17:21:14 +0100
-In-Reply-To: <20191017130204.16131-2-kwolf@redhat.com> (Kevin Wolf's message
- of "Thu, 17 Oct 2019 15:01:47 +0200")
-Message-ID: <87tv7fverp.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <alex.bennee@linaro.org>) id 1iSkZn-0000Dj-Cg
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 11:24:05 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36653)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iSkZn-0000D5-3g
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 11:24:03 -0500
+Received: by mail-wr1-x443.google.com with SMTP id r10so3753180wrx.3
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 08:24:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=BgOJ9n1jjbZsgSm0LJpyq2BGvnTr88O6R86l6L0ErZI=;
+ b=HNuuxFD/H+B1AZEjoRrQRZOivQql6V9BbvBLQX8d3NTKR5NG2UN9aPBCeZst7G6dLx
+ GNSl4DuRrzBhIx5vGcu0z+DxnjjxnS9vbk8N3WkdmdzXlJKoVg5fkO4dD+T6u8IcMtmH
+ HoG7q9InZsQ6Cqkkqj8rQDf0V+KADoNIlNxeVwuUGLoR2pm3RJMsSaaf/1Kw7+nQnp88
+ 2i01L1CqHybRXL/81fBXWo9ztoeX9okL+wmciLROsCcIwqL5RmAnU+Cf7+Te5uHg5cyf
+ PoyjpeEss1kte2M0tdD8udaxJ6pmRH6s4zSOYsIlW5vZS8FCxP572AKQMV0IMVio5bd6
+ GKcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=BgOJ9n1jjbZsgSm0LJpyq2BGvnTr88O6R86l6L0ErZI=;
+ b=ff/LOrYqIP9gOwxkc2WuSHfWgKQujU1tNcpQJdfTDgZIAo+LSiWFLt177m0xRD5eRR
+ +CHux4tUktT2LtU3xyNWAO8KDpIZhvENZXCCvS4LfffesjQk4hfHmvJWTAw9OmsT8Voc
+ yhC0dK+XWXnOcn0e+9gBR7853G5NzARNWJ8vp9Ja6F/sFDnqrGOOqyMWypzxWtKPwCHl
+ GNTgNqePRStKmKz7+wd4ek1bmDtaM/Y/mN3GG0QBekdPn1HuJPYEBENKH1jPcta0KgLp
+ rw6gs0u5KUmIsG71hYSvN4awvFg8/EPWJkzsug0cy0th39zSxttQLPe3AOwyE/hheBbB
+ UDDQ==
+X-Gm-Message-State: APjAAAWm0/r3+kiyq7hPY6Zd8wXGerosNPaiG89bVj57xxPc1go876mM
+ 1kKIOIvow3Ix0JEhwmlfpzsXSQ==
+X-Google-Smtp-Source: APXvYqyhFgpgBRjq0E6BwiZKLeBljbQdCV5CJmUL3vaRKwuh2G3X08eA5byqGp82b7LQfl0EWeBy8g==
+X-Received: by 2002:adf:ee10:: with SMTP id y16mr3653962wrn.67.1573143841540; 
+ Thu, 07 Nov 2019 08:24:01 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 200sm3847353wme.32.2019.11.07.08.24.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 07 Nov 2019 08:24:00 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 8EA111FF87;
+ Thu,  7 Nov 2019 16:23:59 +0000 (GMT)
+References: <20191107142613.2379-1-robert.foley@linaro.org>
+ <20191107142613.2379-3-robert.foley@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH 2/4] Add use of RCU for qemu_logfile.
+In-reply-to: <20191107142613.2379-3-robert.foley@linaro.org>
+Date: Thu, 07 Nov 2019 16:23:59 +0000
+Message-ID: <87zhh7hcyo.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: OxR3wM6wNgGzK7Zw4i9ULA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,258 +96,449 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: peter.puhov@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In addition to Eric's review:
 
-Kevin Wolf <kwolf@redhat.com> writes:
+Robert Foley <robert.foley@linaro.org> writes:
 
-> This adds a new binary qemu-storage-daemon that doesn't yet do more than
-> some typical initialisation for tools and parsing the basic command
-> options --version, --help and --trace.
+> This now allows changing the logfile while logging is active,
+> and also solves the issue of a seg fault while changing the logfile.
 >
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Any read access to the qemu_logfile handle will use
+> the rcu_read_lock()/unlock() around the use of the handle.
+> To fetch the handle we will use atomic_rcu_read().
+> We also in many cases do a check for validity of the
+> logfile handle before using it to deal with the case where the
+> file is closed and set to NULL.
+>
+> The cases where we write to the qemu_logfile will use atomic_rcu_set().
+> Writers will also use call_rcu() with a newly added qemu_logfile_free
+> function for freeing/closing when readers have finished.
+>
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
 > ---
->  configure             |   2 +-
->  qemu-storage-daemon.c | 141 ++++++++++++++++++++++++++++++++++++++++++
->  Makefile              |   1 +
->  3 files changed, 143 insertions(+), 1 deletion(-)
->  create mode 100644 qemu-storage-daemon.c
+>  include/qemu/log.h | 47 ++++++++++++++++++++++++----
+>  util/log.c         | 78 ++++++++++++++++++++++++++++++++++------------
+>  include/exec/log.h | 33 +++++++++++++++++---
+>  tcg/tcg.c          | 12 +++++--
+>  4 files changed, 138 insertions(+), 32 deletions(-)
 >
-> diff --git a/configure b/configure
-> index 08ca4bcb46..bb3d55fb25 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6034,7 +6034,7 @@ tools=3D""
->  if test "$want_tools" =3D "yes" ; then
->    tools=3D"qemu-img\$(EXESUF) qemu-io\$(EXESUF) qemu-edid\$(EXESUF) $too=
-ls"
->    if [ "$linux" =3D "yes" -o "$bsd" =3D "yes" -o "$solaris" =3D "yes" ] =
-; then
-> -    tools=3D"qemu-nbd\$(EXESUF) $tools"
-> +    tools=3D"qemu-nbd\$(EXESUF) qemu-storage-daemon\$(EXESUF) $tools"
->    fi
->    if [ "$ivshmem" =3D "yes" ]; then
->      tools=3D"ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
-> diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
-> new file mode 100644
-> index 0000000000..a251dc255c
-> --- /dev/null
-> +++ b/qemu-storage-daemon.c
-> @@ -0,0 +1,141 @@
-> +/*
-> + * QEMU storage daemon
-> + *
-> + * Copyright (c) 2019 Kevin Wolf <kwolf@redhat.com>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining=
- a copy
-> + * of this software and associated documentation files (the "Software"),=
- to deal
-> + * in the Software without restriction, including without limitation the=
- rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or =
-sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be includ=
-ed in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRE=
-SS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILI=
-TY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHA=
-LL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR =
-OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISI=
-NG FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALING=
-S IN
-> + * THE SOFTWARE.
-> + */
-
-Standard request for new code: please make this GPLv2+, or tell us why
-it has to be something else.
-
+> diff --git a/include/qemu/log.h b/include/qemu/log.h
+> index a91105b2ad..975de18e23 100644
+> --- a/include/qemu/log.h
+> +++ b/include/qemu/log.h
+> @@ -3,9 +3,17 @@
+>
+>  /* A small part of this API is split into its own header */
+>  #include "qemu/log-for-trace.h"
+> +#include "qemu/rcu.h"
 > +
-> +#include "qemu/osdep.h"
-> +
-> +#include "block/block.h"
-> +#include "crypto/init.h"
-> +
-> +#include "qapi/error.h"
-> +#include "qemu-common.h"
-> +#include "qemu-version.h"
-> +#include "qemu/config-file.h"
-> +#include "qemu/error-report.h"
-> +#include "qemu/log.h"
-> +#include "qemu/main-loop.h"
-> +#include "qemu/module.h"
-> +
-> +#include "trace/control.h"
-> +
-> +#include <getopt.h>
-> +
-> +static void help(void)
-> +{
-> +    printf(
-> +"Usage: %s [options]\n"
-> +"QEMU storage daemon\n"
-> +"\n"
-> +"  -h, --help             display this help and exit\n"
-> +"  -T, --trace [[enable=3D]<pattern>][,events=3D<file>][,file=3D<file>]\=
-n"
-> +"                         specify tracing options\n"
-> +"  -V, --version          output version information and exit\n"
-> +"\n"
-> +QEMU_HELP_BOTTOM "\n",
-> +    error_get_progname());
-> +}
-> +
-> +static int process_options(int argc, char *argv[], Error **errp)
-> +{
-> +    int c;
-> +    char *trace_file =3D NULL;
-> +    int ret =3D -EINVAL;
-> +
-> +    static const struct option long_options[] =3D {
-> +        {"help", no_argument, 0, 'h'},
+> +struct QemuLogFile {
+> +    struct rcu_head rcu;
+> +    FILE *fd;
+> +};
+> +typedef struct QemuLogFile QemuLogFile;
 
-You initialize member int *flag with 0 here, ....
+If you are declaring a typedef then do it in one:
 
-> +        {"version", no_argument, 0, 'V'},
-> +        {"trace", required_argument, NULL, 'T'},
+  typedef struct QemuLogFile { ...
 
-... and with NULL here.  Recommend to pick one and stick to it.
+We only really use the second form for opaque structs where the handle
+is passed around but the contents hidden from the rest of QEMU.
 
-> +        {0, 0, 0, 0}
-
-{0} or {} would do.
-
-> +    };
+>
+>  /* Private global variable, don't use */
+> -extern FILE *qemu_logfile;
+> +extern QemuLogFile *qemu_logfile;
 > +
-> +    while ((c =3D getopt_long(argc, argv, ":hT:V", long_options, NULL)) =
-!=3D -1) {
-> +        switch (c) {
-> +        case '?':
-> +            error_setg(errp, "Unknown option '%s'", argv[optind - 1]);
-> +            goto out;
-> +        case ':':
-> +            error_setg(errp, "Missing option argument for '%s'",
-> +                       argv[optind - 1]);
-> +            goto out;
-> +        case 'h':
-> +            help();
-> +            exit(EXIT_SUCCESS);
-> +        case 'V':
-> +            printf("qemu-storage-daemon version "
-> +                   QEMU_FULL_VERSION "\n" QEMU_COPYRIGHT "\n");
-> +            exit(EXIT_SUCCESS);
-> +        case 'T':
-> +            g_free(trace_file);
-> +            trace_file =3D trace_opt_parse(optarg);
 
-This is QemuOpts below the hood.  Fact, not criticism :)
+Do we need multiple
 
-> +            break;
+>
+>  /*
+>   * The new API:
+> @@ -25,7 +33,17 @@ static inline bool qemu_log_enabled(void)
+>   */
+>  static inline bool qemu_log_separate(void)
+>  {
+> -    return qemu_logfile !=3D NULL && qemu_logfile !=3D stderr;
+> +    QemuLogFile *logfile;
+> +
+> +    if (qemu_log_enabled()) {
+> +        rcu_read_lock();
+> +        logfile =3D atomic_rcu_read(&qemu_logfile);
+> +        if (logfile && logfile->fd !=3D stderr) {
+> +            return true;
 > +        }
-
-Suggest (your preferred variation of) default: assert(0) to catch
-omissions.
-
+> +        rcu_read_unlock();
 > +    }
-> +    if (optind !=3D argc) {
-> +        error_setg(errp, "Unexpected argument: %s", argv[optind]);
-> +        goto out;
+> +    return false;
+
+This is unbalanced as you'll have incremented the reader count. Also
+qemu_log_enabled() is also synonymous with logfile existing so you could
+fold that into:
+
+  bool res =3D false;
+
+  rcu_read_lock();
+  *logfile =3D atomic_rcu_read(&qemu_logfile);
+  if (logfile && logfile->fd !=3D stderr) {
+     res =3D true;
+  }
+  rcu_read_unlock();
+  return res;
+
+There is technically a race there as the answer may become invalid after
+qemu_log_separate() returns. However given the users I don't see what
+could fail afterwards.
+
+
+>  }
+>
+>  #define CPU_LOG_TB_OUT_ASM (1 << 0)
+> @@ -55,12 +73,23 @@ static inline bool qemu_log_separate(void)
+>
+>  static inline void qemu_log_lock(void)
+>  {
+> -    qemu_flockfile(qemu_logfile);
+> +    QemuLogFile *logfile;
+> +    rcu_read_lock();
+> +    logfile =3D atomic_rcu_read(&qemu_logfile);
+> +    if (logfile) {
+> +        qemu_flockfile(logfile->fd);
 > +    }
+> +    rcu_read_unlock();
+>  }
+
+static inline FILE *fd qemu_log_lock(void)
+{
+    FILE *fd;
+    rcu_read_lock();
+    fd =3D atomic_rcu_read(&qemu_logfile);
+    if (fd) {
+        qemu_flockfile(fd);
+        return fd;
+    } else {
+        rcu_read_unlock();
+        return NULL;
+    }
+}
+
+static inline qemu_log_unlock(FILE *fd)
+{
+    if (fd) {
+        qemu_funlockfile(fd);
+        rcu_read_unlock();
+    }
+}
+
+While the rcu_read_lock() is in progress then we won't ever finish with
+the fd - which we don't want to do until the file locking is finished.
+
+<snip>
+>
+>  /* Logging functions: */
+> @@ -70,9 +99,14 @@ static inline void qemu_log_unlock(void)
+>  static inline void GCC_FMT_ATTR(1, 0)
+>  qemu_log_vprintf(const char *fmt, va_list va)
+>  {
+> -    if (qemu_logfile) {
+> -        vfprintf(qemu_logfile, fmt, va);
+> +    QemuLogFile *logfile;
 > +
-> +    if (!trace_init_backends()) {
-> +        error_setg(errp, "Could not initialize trace backends");
-> +        goto out;
-> +    }
-> +    trace_init_file(trace_file);
-> +    qemu_set_log(LOG_TRACE);
-
-I suspect the only reason for hiding trace initialization within
-process_options() is avoiding a global variable @trace_file.  I'd prefer
-the global variable over the hiding.
-
+> +    rcu_read_lock();
+> +    logfile =3D atomic_rcu_read(&qemu_logfile);
+> +    if (logfile) {
+> +        vfprintf(logfile->fd, fmt, va);
+>      }
+> +    rcu_read_unlock();
+>  }
+>
+>  /* log only if a bit is set on the current loglevel mask:
+> @@ -129,5 +163,6 @@ void qemu_print_log_usage(FILE *f);
+>  void qemu_log_flush(void);
+>  /* Close the log file */
+>  void qemu_log_close(void);
+> +void qemu_logfile_free(QemuLogFile *logfile);
+>
+>  #endif
+> diff --git a/util/log.c b/util/log.c
+> index dff2f98c8c..d409532b8f 100644
+> --- a/util/log.c
+> +++ b/util/log.c
+> @@ -29,7 +29,7 @@
+>  static char *logfilename;
+>  static bool qemu_logfile_initialized;
+>  static QemuMutex qemu_logfile_mutex;
+> -FILE *qemu_logfile;
+> +QemuLogFile *qemu_logfile;
+>  int qemu_loglevel;
+>  static int log_append =3D 0;
+>  static GArray *debug_regions;
+> @@ -38,10 +38,14 @@ static GArray *debug_regions;
+>  int qemu_log(const char *fmt, ...)
+>  {
+>      int ret =3D 0;
+> -    if (qemu_logfile) {
+> +    QemuLogFile *logfile;
 > +
-> +    ret =3D 0;
-> +out:
-> +    g_free(trace_file);
-> +    return ret;
+> +    rcu_read_lock();
+> +    logfile =3D atomic_rcu_read(&qemu_logfile);
+> +    if (logfile) {
+>          va_list ap;
+>          va_start(ap, fmt);
+> -        ret =3D vfprintf(qemu_logfile, fmt, ap);
+> +        ret =3D vfprintf(logfile->fd, fmt, ap);
+>          va_end(ap);
+>
+>          /* Don't pass back error results.  */
+> @@ -49,6 +53,7 @@ int qemu_log(const char *fmt, ...)
+>              ret =3D 0;
+>          }
+>      }
+> +    rcu_read_unlock();
+>      return ret;
+>  }
+>
+> @@ -65,6 +70,8 @@ static bool log_uses_own_buffers;
+>  /* enable or disable low levels log */
+>  void qemu_set_log(int log_flags)
+>  {
+> +    QemuLogFile *logfile;
+> +
+>      qemu_loglevel =3D log_flags;
+>  #ifdef CONFIG_TRACE_LOG
+>      qemu_loglevel |=3D LOG_TRACE;
+> @@ -77,43 +84,51 @@ void qemu_set_log(int log_flags)
+>      qemu_mutex_lock(&qemu_logfile_mutex);
+>      if (!qemu_logfile &&
+>          (is_daemonized() ? logfilename !=3D NULL : qemu_loglevel)) {
+> +        logfile =3D g_new0(QemuLogFile, 1);
+>          if (logfilename) {
+
+You can assume logfilename exists as glib memory allocations would
+abort() otherwise.
+
+> -            qemu_logfile =3D fopen(logfilename, log_append ? "a" : "w");
+> -            if (!qemu_logfile) {
+> +            logfile->fd =3D fopen(logfilename, log_append ? "a" : "w");
+> +            if (!logfile->fd) {
+> +                g_free(logfile);
+>                  perror(logfilename);
+>                  _exit(1);
+>              }
+>              /* In case we are a daemon redirect stderr to logfile */
+>              if (is_daemonized()) {
+> -                dup2(fileno(qemu_logfile), STDERR_FILENO);
+> -                fclose(qemu_logfile);
+> +                dup2(fileno(logfile->fd), STDERR_FILENO);
+> +                fclose(logfile->fd);
+>                  /* This will skip closing logfile in qemu_log_close() */
+> -                qemu_logfile =3D stderr;
+> +                logfile->fd =3D stderr;
+>              }
+>          } else {
+>              /* Default to stderr if no log file specified */
+>              assert(!is_daemonized());
+> -            qemu_logfile =3D stderr;
+> +            logfile->fd =3D stderr;
+>          }
+>          /* must avoid mmap() usage of glibc by setting a buffer "by hand=
+" */
+>          if (log_uses_own_buffers) {
+>              static char logfile_buf[4096];
+>
+> -            setvbuf(qemu_logfile, logfile_buf, _IOLBF, sizeof(logfile_bu=
+f));
+> +            setvbuf(logfile->fd, logfile_buf, _IOLBF, sizeof(logfile_buf=
+));
+>          } else {
+>  #if defined(_WIN32)
+>              /* Win32 doesn't support line-buffering, so use unbuffered o=
+utput. */
+> -            setvbuf(qemu_logfile, NULL, _IONBF, 0);
+> +            setvbuf(logfile->fd, NULL, _IONBF, 0);
+>  #else
+> -            setvbuf(qemu_logfile, NULL, _IOLBF, 0);
+> +            setvbuf(logfile->fd, NULL, _IOLBF, 0);
+>  #endif
+>              log_append =3D 1;
+>          }
+> +        atomic_rcu_set(&qemu_logfile, logfile);
+>      }
+> -    qemu_mutex_unlock(&qemu_logfile_mutex);
+> +    logfile =3D qemu_logfile;
+> +
+>      if (qemu_logfile &&
+>          (is_daemonized() ? logfilename =3D=3D NULL : !qemu_loglevel)) {
+> -        qemu_log_close();
+> +        atomic_rcu_set(&qemu_logfile, NULL);
+> +        qemu_mutex_unlock(&qemu_logfile_mutex);
+> +        call_rcu(logfile, qemu_logfile_free, rcu);
+> +    } else {
+> +        qemu_mutex_unlock(&qemu_logfile_mutex);
+>      }
+>  }
+>
+> @@ -247,17 +262,40 @@ out:
+>  /* fflush() the log file */
+>  void qemu_log_flush(void)
+>  {
+> -    fflush(qemu_logfile);
+> +    QemuLogFile *logfile;
+> +
+> +    rcu_read_lock();
+> +    logfile =3D atomic_rcu_read(&qemu_logfile);
+> +    if (logfile) {
+> +        fflush(logfile->fd);
+> +    }
+> +    rcu_read_unlock();
 > +}
-
-Since the function exit(0)s on -h and -V anyway, let's exit(1) on error
-instead of mucking around with error_setg().  You can then leave
-reporting unknown options and missing option arguments to getopt_long().
-Saves you the trouble of fixing the bug Max pointed out.
-
 > +
-> +int main(int argc, char *argv[])
+> +void qemu_logfile_free(QemuLogFile *logfile)
+
+This can be static as it's internal to log.c
+
 > +{
-> +    Error *local_err =3D NULL;
-> +    int ret;
-> +
-> +#ifdef CONFIG_POSIX
-> +    signal(SIGPIPE, SIG_IGN);
-> +#endif
-> +
-> +    error_init(argv[0]);
-> +    qemu_init_exec_dir(argv[0]);
-> +
-> +    module_call_init(MODULE_INIT_QOM);
-> +    module_call_init(MODULE_INIT_TRACE);
-> +    qemu_add_opts(&qemu_trace_opts);
-> +    qcrypto_init(&error_fatal);
-> +    bdrv_init();
+> +    if (logfile) {
 
-Out of curiosity: how did you come up with this set of initializations?
+g_assert(logfile) instead of the if?
 
-> +
-> +    if (qemu_init_main_loop(&local_err)) {
-> +        error_report_err(local_err);
-> +        return EXIT_FAILURE;
-
-What's wrong with
-
-       qemu_init_main_loop(&error_fatal)
-
-?
-
+> +        if (logfile->fd !=3D stderr) {
+> +            fclose(logfile->fd);
+> +        }
+> +        g_free(logfile);
 > +    }
+>  }
+>
+>  /* Close the log file */
+>  void qemu_log_close(void)
+>  {
+> -    if (qemu_logfile) {
+> -        if (qemu_logfile !=3D stderr) {
+> -            fclose(qemu_logfile);
+> -        }
+> -        qemu_logfile =3D NULL;
+> +    QemuLogFile *logfile;
 > +
-> +    ret =3D process_options(argc, argv, &local_err);
-> +    if (ret < 0) {
-> +        error_report_err(local_err);
-> +        return EXIT_FAILURE;
-> +    }
+> +    qemu_mutex_lock(&qemu_logfile_mutex);
+> +    logfile =3D qemu_logfile;
 > +
-> +    return EXIT_SUCCESS;
-> +}
-> diff --git a/Makefile b/Makefile
-> index 30f0abfb42..76338d0ab4 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -558,6 +558,7 @@ qemu-img.o: qemu-img-cmds.h
->  qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj=
--y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
->  qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj=
--y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
->  qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y=
-) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-> +qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(blo=
-ck-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
-> =20
->  qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
+> +    if (logfile) {
+> +        atomic_rcu_set(&qemu_logfile, NULL);
+> +        qemu_mutex_unlock(&qemu_logfile_mutex);
 
+I think you can move the both the unlocks out of the if/else and drop
+the else.
+
+> +        call_rcu(logfile, qemu_logfile_free, rcu);
+> +    } else {
+> +        qemu_mutex_unlock(&qemu_logfile_mutex);
+>      }
+>  }
+>
+> diff --git a/include/exec/log.h b/include/exec/log.h
+> index e2cfd436e6..9bd1e4aa20 100644
+> --- a/include/exec/log.h
+> +++ b/include/exec/log.h
+> @@ -15,8 +15,15 @@
+>   */
+>  static inline void log_cpu_state(CPUState *cpu, int flags)
+>  {
+> +    QemuLogFile *logfile;
+> +
+>      if (qemu_log_enabled()) {
+> -        cpu_dump_state(cpu, qemu_logfile, flags);
+> +        rcu_read_lock();
+> +        logfile =3D atomic_rcu_read(&qemu_logfile);
+> +        if (logfile) {
+> +            cpu_dump_state(cpu, logfile->fd, flags);
+> +        }
+> +        rcu_read_unlock();
+>      }
+>  }
+>
+> @@ -40,19 +47,37 @@ static inline void log_cpu_state_mask(int mask, CPUSt=
+ate *cpu, int flags)
+>  static inline void log_target_disas(CPUState *cpu, target_ulong start,
+>                                      target_ulong len)
+>  {
+> -    target_disas(qemu_logfile, cpu, start, len);
+> +    QemuLogFile *logfile;
+> +    rcu_read_lock();
+> +    logfile =3D atomic_rcu_read(&qemu_logfile);
+> +    if (logfile) {
+> +        target_disas(logfile->fd, cpu, start, len);
+> +    }
+> +    rcu_read_unlock();
+>  }
+>
+>  static inline void log_disas(void *code, unsigned long size)
+>  {
+> -    disas(qemu_logfile, code, size);
+> +    QemuLogFile *logfile;
+> +    rcu_read_lock();
+> +    logfile =3D atomic_rcu_read(&qemu_logfile);
+> +    if (logfile) {
+> +        disas(logfile->fd, code, size);
+> +    }
+> +    rcu_read_unlock();
+>  }
+>
+>  #if defined(CONFIG_USER_ONLY)
+>  /* page_dump() output to the log file: */
+>  static inline void log_page_dump(void)
+>  {
+> -    page_dump(qemu_logfile);
+> +    QemuLogFile *logfile;
+> +    rcu_read_lock();
+> +    logfile =3D atomic_rcu_read(&qemu_logfile);
+> +    if (logfile) {
+> +        page_dump(logfile->fd);
+> +    }
+> +    rcu_read_unlock();
+>  }
+>  #endif
+>  #endif
+> diff --git a/tcg/tcg.c b/tcg/tcg.c
+> index 5475d49ed1..220eaac7c7 100644
+> --- a/tcg/tcg.c
+> +++ b/tcg/tcg.c
+> @@ -2114,9 +2114,17 @@ static void tcg_dump_ops(TCGContext *s, bool have_=
+prefs)
+>          }
+>
+>          if (have_prefs || op->life) {
+> -            for (; col < 40; ++col) {
+> -                putc(' ', qemu_logfile);
+> +
+> +            QemuLogFile *logfile;
+> +
+> +            rcu_read_lock();
+> +            logfile =3D atomic_rcu_read(&qemu_logfile);
+
+This can probably be a qemu_log_lock() instead given interleaving output
+is going to be confusing.
+
+> +            if (logfile) {
+> +                for (; col < 40; ++col) {
+> +                    putc(' ', logfile->fd);
+> +                }
+>              }
+> +            rcu_read_unlock();
+
+and qemu_log_unlock();
+
+This cleanup could even be in a separate patch.
+
+>          }
+>
+>          if (op->life) {
+
+
+--
+Alex Benn=C3=A9e
 
