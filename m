@@ -2,84 +2,88 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA3DC5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52FF6C5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:12:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0C002087E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:11:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0C002087E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1D96A2087E
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:12:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aNn30DyY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D96A2087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSfhm-0002Mu-NL
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 06:11:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46428)
+	id 1iSfiX-0003JK-6r
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 06:12:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46484)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iSfgy-0001k0-6b
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:11:09 -0500
+ (envelope-from <kraxel@redhat.com>) id 1iSfhO-00022r-Ki
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:11:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iSfgw-0005Ob-V5
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:11:08 -0500
-Received: from indium.canonical.com ([91.189.90.7]:55522)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iSfgw-0005Nu-PR
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:11:06 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iSfgt-0006iQ-4L
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 11:11:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1FC9B2E80D1
- for <qemu-devel@nongnu.org>; Thu,  7 Nov 2019 11:11:03 +0000 (UTC)
+ (envelope-from <kraxel@redhat.com>) id 1iSfhK-0005k9-WF
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:11:32 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:41200
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iSfhK-0005ih-Ju
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:11:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573125088;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0aGeSVzgwKjsrXKMdq8Ivn9Y5aaE1IhMsIqpWtxZrHI=;
+ b=aNn30DyYyeQFo2vUQ7xgtMwLcPHU0ZjSzriJ2GEkggsL87moBc8bQp2SpSLiBgijHofozX
+ zsPTtZbATnrzgyapwJX4tv5s/Fx1PT4J6lBV9DxSsKBRmmRFB9FSpt0kQwueHE3feHzxEa
+ ythXiQZqlOk7nBQgFwlsZ3Ta23ZRaUs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-375-im4jj4FlO2-FPvAmStvLNQ-1; Thu, 07 Nov 2019 06:11:23 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C0951005500;
+ Thu,  7 Nov 2019 11:11:21 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-69.ams2.redhat.com
+ [10.36.116.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C25941001B09;
+ Thu,  7 Nov 2019 11:11:20 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id F3CEA17535; Thu,  7 Nov 2019 12:11:19 +0100 (CET)
+Date: Thu, 7 Nov 2019 12:11:19 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [virtio-dev] Re: guest / host buffer sharing ...
+Message-ID: <20191107111119.qgr2qxgdf64jurin@sirius.home.kraxel.org>
+References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
+ <20191106084344.GB189998@stefanha-x1.localdomain>
+ <20191106095122.jju7eo57scfoat6a@sirius.home.kraxel.org>
+ <20191106101057.GC2802@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20191106101057.GC2802@work-vm>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: im4jj4FlO2-FPvAmStvLNQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Nov 2019 10:56:44 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1848556@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=Medium;
- assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
- component=main; status=Triaged; importance=Medium;
- assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
- component=main; status=Fix Released; importance=Medium;
- assignee=christian.ehrhardt@canonical.com; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: janitor paelzer rodsmith xanclic
-X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
-Message-Id: <157312420454.27803.15238615377942547264.malone@chaenomeles.canonical.com>
-Subject: [Bug 1848556] Re: qemu-img check failing on remote image in Eoan
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 1b82956ea9083c489b0899ff51464160ac2241d4
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,93 +92,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1848556 <1848556@bugs.launchpad.net>
+Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
+ Alex Lau <alexlau@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+ Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
+ David Stevens <stevensd@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
+ =?utf-8?B?U3TDqXBoYW5l?= Marchesin <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Hans Verkuil <hverkuil@xs4all.nl>,
+ Dmitry Morozov <dmitry.morozov@opensynergy.com>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Focal is complete the MPs reviewed, SRU Teamplates ready and pre-tests done.
-Uploading to E-unapproved for the SRU Teams consideration.
+  Hi,
 
--- =
+> > This is not about host memory, buffers are in guest ram, everything els=
+e
+> > would make sharing those buffers between drivers inside the guest (as
+> > dma-buf) quite difficult.
+>=20
+> Given it's just guest memory, can the guest just have a virt queue on
+> which it places pointers to the memory it wants to share as elements in
+> the queue?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1848556
+Well, good question.  I'm actually wondering what the best approach is
+to handle long-living, large buffers in virtio ...
 
-Title:
-  qemu-img check failing on remote image in Eoan
+virtio-blk (and others) are using the approach you describe.  They put a
+pointer to the io request header, followed by pointer(s) to the io
+buffers directly into the virtqueue.  That works great with storage for
+example.  The queue entries are tagged being "in" or "out" (driver to
+device or visa-versa), so the virtio transport can set up dma mappings
+accordingly or even transparently copy data if needed.
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Eoan:
-  Triaged
-Status in qemu source package in Focal:
-  Fix Released
+For long-living buffers where data can potentially flow both ways this
+model doesn't fit very well though.  So what virtio-gpu does instead is
+transferring the scatter list as virtio payload.  Does feel a bit
+unclean as it doesn't really fit the virtio architecture.  It assumes
+the host can directly access guest memory for example (which is usually
+the case but explicitly not required by virtio).  It also requires
+quirks in virtio-gpu to handle VIRTIO_F_IOMMU_PLATFORM properly, which
+in theory should be handled fully transparently by the virtio-pci
+transport.
 
-Bug description:
-  Ubuntu SRU Template:
+We could instead have a "create-buffer" command which adds the buffer
+pointers as elements to the virtqueue as you describe.  Then simply
+continue using the buffer even after completing the "create-buffer"
+command.  Which isn't exactly clean either.  It would likewise assume
+direct access to guest memory, and it would likewise need quirks for
+VIRTIO_F_IOMMU_PLATFORM as the virtio-pci transport tears down the dma
+mappings for the virtqueue entries after command completion.
 
-  [Impact]
+Comments, suggestions, ideas?
 
-   * There is fallout due to changes in libcurl that affect qemu and might =
+cheers,
+  Gerd
 
-     lead to a hang.
-
-   * Fix by backporting the upstream fix
-
-  [Test Case]
-
-   * If you have network just run
-     $ qemu-img check http://10.193.37.117/cloud/eoan-server-cloudimg-amd64=
-.img
-
-   * Without network, install apache2, and get a complex qemu file (like a =
-
-     cloud image) onto the system. Then access the file via apache http but =
-
-     not localhost (that would work)
-
-  [Regression Potential]
-
-   * The change is local to the libcurl usage of qemu, so that could be =
-
-     affected. But then this is what has been found to not work here, so I'=
-d =
-
-     expect not too much trouble. But if so then in the curl usage (which =
-
-     means disks on http)
-
-  [Other Info]
-   =
-
-   * n/a
-
-  ---
-
-  The "qemu-img check" function is failing on remote (HTTP-hosted)
-  images, beginning with Ubuntu 19.10 (qemu-utils version 1:4.0+dfsg-
-  0ubuntu9). With previous versions, through Ubuntu 19.04/qemu-utils
-  version 1:3.1+dfsg-2ubuntu3.5, the following worked:
-
-  $ /usr/bin/qemu-img check  http://10.193.37.117/cloud/eoan-server-cloudim=
-g-amd64.img
-  No errors were found on the image.
-  19778/36032 =3D 54.89% allocated, 90.34% fragmented, 89.90% compressed cl=
-usters
-  Image end offset: 514064384
-
-  The 10.193.37.117 server holds an Apache server that hosts the cloud
-  images on a LAN. Beginning with Ubuntu 19.10/qemu-utils 1:4.0+dfsg-
-  0ubuntu9, the same command never returns. (I've left it for up to an
-  hour with no change.) I'm able to wget the image from the same server
-  and installation on which qemu-img check fails. I've tried several
-  .img files on the server, ranging from Bionic to Eoan, with the same
-  results with all of them.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1848556/+subscriptions
 
