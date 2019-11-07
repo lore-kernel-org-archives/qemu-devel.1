@@ -2,88 +2,87 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A7DC5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 13:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 871B2C5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 13:23:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 247E9214D8
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 13:18:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54E822187F
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 13:23:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Navu5h7R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 247E9214D8
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O4So0ABl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E822187F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iShfk-000532-Bk
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 08:18:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36794)
+	id 1iShlR-0006Wa-EJ
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 08:23:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37482)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iShf6-0004bG-6o
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:17:21 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iShkn-0005xz-My
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:23:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iShf5-00062X-48
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:17:20 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:34773)
+ (envelope-from <stefanha@gmail.com>) id 1iShkm-0000o2-Lm
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:23:13 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43077)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iShf4-00062K-S7
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:17:19 -0500
-Received: by mail-wr1-x442.google.com with SMTP id e6so3037692wrw.1
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 05:17:18 -0800 (PST)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iShkm-0000mK-D7
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:23:12 -0500
+Received: by mail-wr1-x443.google.com with SMTP id n1so2971015wra.10
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 05:23:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=date:from:to:cc:subject:message-id:references:mime-version
  :content-disposition:in-reply-to:user-agent;
- bh=/wt/ZJ5Iyr74j8Urm4LOKYt6n2yGXUeBiupEIgOKJyw=;
- b=Navu5h7RdVdSy7CqLF8ihhU+hJuIyOd/UONTWESIxsalB2vu0lhiB2NM4mOxYF7szd
- M8Whui9h2K9Y1WJiKv527z0hr1qzhOwD5ybj2QnM9UbvGR6g2O7Ysr3Nh7RqXiqV3Zr2
- XyMVFoC2llsJXI7DC5lcVgfrvBX0wosDzwqYTmUU768qEIqTmmTaANNuVZ9zCgwU1Jyo
- el+fAY7Irkbwz96GnYIzzN7jj54EIF6gMt1xh8i8TN8lTicY8UgJR3rqjsyo7RezdYmK
- fngGX2lTZkYAsI54iiApRvYXsvpsys8Xu+VFtLJNgBrikZXY/K/2TB3pfWKJO1aR/Wno
- waMg==
+ bh=k+Fy0N48NABP7BgoQpKM62TPFUQoOWi0h+RBYbZ+M2c=;
+ b=O4So0ABld4U2mGz6tTEFceo0pww3mclrCUYWrbjrFAJN+D40ruPP/uqMVH1OtOBA6V
+ 86psRmrrvhEvVTP7Y7bUjchWJlEY76ei7lh1oqZA05LNH88ImF90kGuUVCOLlVJJJtH6
+ GAiCWWc1virp+xiepFP2AS3YXYzh5JFimJETRv7HsAM6jopeQrYKHkoTG3RmA6eili9u
+ Zwi94419QDZcboHlkptFduPn4v/8z04m1WHaNzWFcUo5ORwYD+UTAphBUG/QiYjEyzAK
+ TKl5WD0PXqb0b764Ya51YDnCtbm7X+sGuIBDLocDXfM2lKcdcPWSVAS4vOD/AY2X6EBO
+ a9Mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to:user-agent;
- bh=/wt/ZJ5Iyr74j8Urm4LOKYt6n2yGXUeBiupEIgOKJyw=;
- b=DXgDfGKUJ8X4btbtXE9pPgHR+hfFein44vfxVRD+2G1++o+XcU91JGgGWJArPbU8Gd
- n8qdBZBeSIaNKW2IHlZyAWnLUTKpmXABWYfbgFEqHGQZ/UKHDeRDxfny/H83IPeRxFvm
- T2BmbWPZoCVIqDaanwBxtYXlf+VItN3X+QdD1J35ZtIRCqKmMN1BQm2Jz7XmvoZUEw5U
- 6TVvn4YgKiN2KSzDDlCQGspQ5vPYEeqKGYya6vXs0V2JGeshXtg1VVl9fCBle8HKXTzg
- ncDVuqdGJSCi/cCxdpMIPEaz1M/yBTB1KYTOIxMM9sw6jkYWbqqTXLlOgBtuOx/AWxEq
- Z1rg==
-X-Gm-Message-State: APjAAAV4d0CAZXb8OickG5boSHoUzR1LqnIv7a62B/CVdNk4PgHTLTeU
- /FSdDk1MCfyZIRCOXZ1wkks=
-X-Google-Smtp-Source: APXvYqwlugfL1eMMpoesWbkv3jxMG/uKnyEa9S4htNsisSjku3lZacddbx1KohANd89CXYU0cOUA2w==
-X-Received: by 2002:adf:ed11:: with SMTP id a17mr2998874wro.392.1573132637457; 
- Thu, 07 Nov 2019 05:17:17 -0800 (PST)
+ bh=k+Fy0N48NABP7BgoQpKM62TPFUQoOWi0h+RBYbZ+M2c=;
+ b=M8h8upHmXmKwtXcZm/TYhwycjkHmg+dajNnQKGp8JR8grh+YELGzamWZxpDK2/NKeY
+ jajDWnYXB3H0I35l67TMHHfquSM6Jl5RVDbDWdJOy282Koh0DiE4gW7YMC3W/VFowlRg
+ VvuwZZHDuo19JrW1bilK6Tl1ebmbf1fRuIg6Hy77Kv+7b8HP+bRTnQVeCTXiqVbyMMAf
+ XHaDuoPIGFX0H3U3EKu/7AQftVaxz1mMb9Kw49s6PS+CLOP87q+5yadnFK0Fo7THunla
+ yBYtGEawmELnE53Iq3SQfuDZTsBYy7wA4jHDXipvmg1sC3OB215xeZ6ZooY6oBxWMd2d
+ 5Uow==
+X-Gm-Message-State: APjAAAXsWKjnfa8y8wfESLVU7mKOGTHKm5atZWXSITgHMM8yQudovjaV
+ 0EphebXX+ix4+JVHMbfRkR4=
+X-Google-Smtp-Source: APXvYqzvIb9lcdLW6LxZcAM/pPxkGo0hRdTMadFYbg34CI/Ir7qiE3UM0k1Odrwbz24zRrHvqmK3sg==
+X-Received: by 2002:a5d:4645:: with SMTP id j5mr3047546wrs.329.1573132991295; 
+ Thu, 07 Nov 2019 05:23:11 -0800 (PST)
 Received: from localhost (77.119.131.75.wireless.dyn.drei.com. [77.119.131.75])
- by smtp.gmail.com with ESMTPSA id b66sm2248789wmh.39.2019.11.07.05.17.16
+ by smtp.gmail.com with ESMTPSA id d11sm2119341wrn.28.2019.11.07.05.23.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 07 Nov 2019 05:17:16 -0800 (PST)
-Date: Thu, 7 Nov 2019 14:17:05 +0100
+ Thu, 07 Nov 2019 05:23:10 -0800 (PST)
+Date: Thu, 7 Nov 2019 14:22:59 +0100
 From: Stefan Hajnoczi <stefanha@gmail.com>
 To: "Oleinik, Alexander" <alxndr@bu.edu>
-Subject: Re: [PATCH v4 16/20] fuzz: add support for fork-based fuzzing.
-Message-ID: <20191107131705.GB365089@stefanha-x1.localdomain>
+Subject: Re: [PATCH v4 17/20] fuzz: add support for qos-assisted fuzz targets
+Message-ID: <20191107132259.GC365089@stefanha-x1.localdomain>
 References: <20191030144926.11873-1-alxndr@bu.edu>
- <20191030144926.11873-17-alxndr@bu.edu>
+ <20191030144926.11873-18-alxndr@bu.edu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="8GpibOaaTibBMecb"
+ protocol="application/pgp-signature"; boundary="0lnxQi9hkpPO77W3"
 Content-Disposition: inline
-In-Reply-To: <20191030144926.11873-17-alxndr@bu.edu>
+In-Reply-To: <20191030144926.11873-18-alxndr@bu.edu>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,93 +94,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---8GpibOaaTibBMecb
+--0lnxQi9hkpPO77W3
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Wed, Oct 30, 2019 at 02:50:01PM +0000, Oleinik, Alexander wrote:
-> diff --git a/tests/fuzz/fork_fuzz.c b/tests/fuzz/fork_fuzz.c
-> new file mode 100644
-> index 0000000000..4c4d00b034
-> --- /dev/null
-> +++ b/tests/fuzz/fork_fuzz.c
-> @@ -0,0 +1,51 @@
-> +/*
-> + * Fork-based fuzzing helpers
-> + *
-> + * Copyright Red Hat Inc., 2019
-> + *
-> + * Authors:
-> + *  Alexander Bulekov   <alxndr@bu.edu>
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + *
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "fork_fuzz.h"
-> +
-> +uintptr_t feature_shm;
+On Wed, Oct 30, 2019 at 02:50:02PM +0000, Oleinik, Alexander wrote:
+> +static char *qos_build_main_args()
 
-Where is this variable used?
+Please use func(void) in C.  In C () functions have unspecified and
+unchecked arguments whereas in C++ () means (void).  We want the
+compiler to complain if arguments are passed to this function, so it
+needs to be (void).
 
-> +
-> +void counter_shm_init(void)
 > +{
-> +    int fd = shm_open("/qemu-fuzz-cntrs", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
-
-It must be possible to run multiple fuzzer instances simultaneously on
-one host.  Please use a unique shmem path for each parent process (e.g.
-getpid() in the parent and getppid() in the child).
-
-> +    if (fd == -1) {
-> +        perror("Error: ");
-> +        exit(1);
-> +    }
-> +    if (ftruncate(fd, &__FUZZ_COUNTERS_END - &__FUZZ_COUNTERS_START) == -1) {
-> +        perror("Error: ");
-> +        exit(1);
-> +    }
-> +    /* Copy what's in the counter region to the shm.. */
-> +    void *rptr = mmap(NULL ,
-> +            &__FUZZ_COUNTERS_END - &__FUZZ_COUNTERS_START,
-> +            PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-> +    memcpy(rptr,
-> +           &__FUZZ_COUNTERS_START,
-> +           &__FUZZ_COUNTERS_END - &__FUZZ_COUNTERS_START);
+> +    char **path = fuzz_path_vec;
+> +    QOSGraphNode *test_node;
+> +    GString *cmd_line = g_string_new(path[0]);
+> +    void *test_arg;
 > +
-> +    munmap(rptr, &__FUZZ_COUNTERS_END - &__FUZZ_COUNTERS_START);
-> +
-> +    /* And map the shm over the counter region */
-> +    rptr = mmap(&__FUZZ_COUNTERS_START,
-> +            &__FUZZ_COUNTERS_END - &__FUZZ_COUNTERS_START,
-> +            PROT_READ | PROT_WRITE, MAP_SHARED | MAP_FIXED, fd, 0);
+> +    /* Before test */
+> +    current_path = path;
+> +    test_node = qos_graph_get_node(path[(g_strv_length(path) - 1)]);
+> +    test_arg = test_node->u.test.arg;
+> +    if (test_node->u.test.before) {
+> +        test_arg = test_node->u.test.before(cmd_line, test_arg);
+> +    }
+> +    /* Prepend the arguments that we need */
+> +    g_string_prepend(cmd_line,
+> +            "qemu-system-i386 -display none -machine accel=qtest -m 64 ");
 
-fd can be closed here to prevent leaking it.
+Does i386 need to be hardcoded?  An earlier patch declared a fuzz_arch
+or similar variable (from TARGET_NAME).
 
---8GpibOaaTibBMecb
+--0lnxQi9hkpPO77W3
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3EGVEACgkQnKSrs4Gr
-c8g2OwgAlg5KlZGryfuFL6u8TmiWNq1PUlCqr7K/AFS8asQUAWsUcM5F6gePBeze
-0QB7gJd1tIT48GnP/r58Qz7NBxeFacDBPzTobRQT7qNraPqPFglJyvmlO9PHGfML
-HCVNBttRKhUMB7mzMgGcja1zlkbodNBmBaYSUJCSBXjK1AQgkuyzeXdHrdwlSPpJ
-O7+5EWsS1am/yUZ9mTpIPL+vSP5wKi3VU9rhOwprgAFpgCoCM9T+6AVqjrfCEhJn
-vtkMqXaVB3dH7AFvW8hz/A+ni/Kn0FZHz3oRO7vz74GUtu0UjF0xsSjNXMBKBD5b
-DY0bmEcpyO+fb5o/en2kUUhJ0eEEeA==
-=Ll9q
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3EGrMACgkQnKSrs4Gr
+c8i8cQgAq4vmN/UBIxHirvzgJ7L9eDN5tS9CEt6NpSGfj1CPUmq+J1IfpCOWYwf4
+dUPquMWRxuyQ3QS2AlCA0YdStpnkzqo/K8lEuHBRggiX5uGo4onsYTXM7L9m2zrR
+JAZCsKid1lngB1HN/neGm+VR2x+T05PCXosNR+Sa97bsO/Q2mMe+u1Ln+edgmKmC
+7jEGYZY+0Svtn/uPzLcsO3/KqzFSk457YvVGtBQRUrWDnbnDE86J6QhymCmmCcp9
+Uyxct2EvMUpO7UlzL1cJBz7c3RvNPeKojyCACOtchGVhpaLMFDQzJCbSdMWAJhVJ
+ZmcB9b8J3o+aUm8gGik3Dfi6W2lE6g==
+=g6hQ
 -----END PGP SIGNATURE-----
 
---8GpibOaaTibBMecb--
+--0lnxQi9hkpPO77W3--
 
