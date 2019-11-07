@@ -2,93 +2,91 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09158C5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 17:26:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E34A3C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 17:27:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C90482085B
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 17:26:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A86BC2085B
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 17:27:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="LAPBIfkF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C90482085B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kV1H3BZx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A86BC2085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSlY5-0003qa-W9
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 12:26:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51611)
+	id 1iSlZ8-0004lA-U1
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 12:27:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51807)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cminyard@mvista.com>) id 1iSlXP-0003HF-Iz
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 12:25:40 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iSlYG-0004AU-Tm
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 12:26:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cminyard@mvista.com>) id 1iSlXN-0005Be-Vg
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 12:25:39 -0500
-Received: from mail-yw1-xc42.google.com ([2607:f8b0:4864:20::c42]:39692)
+ (envelope-from <alex.bennee@linaro.org>) id 1iSlYF-0006Rz-BC
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 12:26:32 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39023)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1iSlXN-0005B9-J2
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 12:25:37 -0500
-Received: by mail-yw1-xc42.google.com with SMTP id d80so451123ywa.6
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 09:25:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mvista-com.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to
- :user-agent; bh=tK+EsN6zs3aDhv77AhMla1lU5UKC/kwH41zcMLcyUrg=;
- b=LAPBIfkFQ+emPFn0vBAQFUbaCYklfPSnKfJbCjamnzM7ts1k9TZxxLd0wVdTFLaOAX
- jg9iHSjPY70rOz93BDJIOIoIOIiwkokjqGa0D7OTO/L1EoCN2NbCBgM0/xDEKjahc9TQ
- kXAb4GkA+rWa/rQ2Ny9Tn/g1nXwea/Db5P/S5dN7yOOxlNHLnP8Y6tvc2A9qwCPP/ANm
- was/L15xtRqeLBIt5UdpWHEGdNSA43Z2hI8zU944VdfJHGQFK7jqSqC+5z1snshWMxIv
- rRpwtYD8bJksOipeU3ojW2hXuF/0YvEyKKHAqhx9MvZhRqPHxIjFcsLcIR4zQGmHdDSb
- YyAQ==
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iSlYF-0006RC-3b
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 12:26:31 -0500
+Received: by mail-wm1-x343.google.com with SMTP id t26so3342629wmi.4
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 09:26:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=1cXkH0kwF1ySP+nPdjEKWjExmhPlMRUgxJ0MGtjBGRw=;
+ b=kV1H3BZxjbzw8nKR3LWzGpFg1zREQ7D4FhjFDsnr8mwUQ2HSgI4JPV/hC7sOVa1bLr
+ VklUSyGWnFpXseU2oTzIE/w2Gfxkn2uKwbyS3o3HlNtChIzbP3LqOn07F7Y1Wm3NhXp9
+ KLrli7byfcEVopeP+k1iMn8ogRaHpf9hKjjOcByAYTq70lV33hAtQw55UvfoPxQidsGE
+ i0P72WdX8ii/doHVR8K4Si+YhlXSCtaObO/rJl2WGT+xNWxwYN+x5iKwzd1JYveTbKsU
+ r/obi1NBcgii9Y7YqXq12Mygy+31D0XJyDGE8tqhsj6vm70A8Wje+urh2a6WZyfmx8pB
+ hidg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
- :references:mime-version:content-disposition
- :content-transfer-encoding:in-reply-to:user-agent;
- bh=tK+EsN6zs3aDhv77AhMla1lU5UKC/kwH41zcMLcyUrg=;
- b=U6n+R8KyU+ONcM1WoLqQfjc2u+3R8qtQ3m0sAJojYFp84xi96ZfpmPFXvZ0GaGkITj
- DwEwIhQ7wrfoXvm3knhrv1LnJ0EL4B6n28uuZyBOUJ4CSTGh7ToOZxIcv0UQbLrZBBWm
- 0IRE8cePAh/OYFYAdXpBdxbf4ZZjJLxtn//M+xxfla5gg+W2MbvIk7SJRTysOxdtf/Cg
- did06PHAaAKLX/KrBpAkHY0+pIMWPKzLHDyHoELve0T87qt+uVLFfU0QfDR8toCHVJOg
- vt865tG9cYiGzx8CcEN/x9OLNL07VCdw2FesqVF1etC1aGS6Xtjn2pS9Pvblyfyr2LIu
- AAZw==
-X-Gm-Message-State: APjAAAWKoWu64fN7DBPR6Cn5Y+JbO34ALWqVRcAwNO4yetaRxH/qtBiP
- BEtgyrCysz5LRAFahZWsqByt7iGT6rDcKg==
-X-Google-Smtp-Source: APXvYqz2AOSqQ13YoCf1LGE1ymYNztB3t1hUPGVlZax5ARKfwh73OXV46mNhygr4qswNEtP1iBY2yA==
-X-Received: by 2002:a05:6830:1f4b:: with SMTP id
- u11mr2041670oth.60.1573147534822; 
- Thu, 07 Nov 2019 09:25:34 -0800 (PST)
-Received: from minyard.net ([47.184.136.59])
- by smtp.gmail.com with ESMTPSA id u204sm879897oig.35.2019.11.07.09.25.34
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 07 Nov 2019 09:25:34 -0800 (PST)
-Date: Thu, 7 Nov 2019 11:25:32 -0600
-From: Corey Minyard <cminyard@mvista.com>
-To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH 2/5] ipmi: Add support to customize OEM functions
-Message-ID: <20191107172532.GH10313@minyard.net>
-References: <20191021131215.3693-1-clg@kaod.org>
- <20191021131215.3693-3-clg@kaod.org> <20191021143017.GH25427@t560>
- <20191027174739.GN3552@umbus.metropole.lan>
- <20191027183347.GC2461@minyard.net>
- <20191107170025.GD2461@umbus.Home>
- <156e5bd5-726c-2db5-4b24-394d5ec0f268@kaod.org>
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=1cXkH0kwF1ySP+nPdjEKWjExmhPlMRUgxJ0MGtjBGRw=;
+ b=Eft7DShs/KBhHr0SVcnDd6I75TO4CeRgASSzDVK3yRrKip0T0+RmMy5yIVLF+E3xx7
+ ZCuxhQ/Nhl+mKd7Zy09++52imBmIBuhseKLBab6IgowlVLuQ1Rn+vB0Kdjs7v06TP+1m
+ hbkP8tJd8gfz0Y1FRuS782qBrAUny0dbFwMQveMTRZWxeNf4fLwd9braSh2JTNVyPmno
+ cooLX4Ke1vPRXQgbKTQPywNaGIYHuxg3W5sAVsk3UnDTGG04c8WoeVwLTxZMNYuDhSkw
+ Zqxum/raTIoeo5CDDVHzSigMeo4JD5eaZ9rmJqx7xtfhddqwgrpeNPjXQzEYOZ2crCbH
+ l8YQ==
+X-Gm-Message-State: APjAAAUtMjxy6wv+eBPrBtWaUt2Jr2/1BDMhLUHGahO7n9pq3S0xnS5y
+ LpNXVl7fnuSrR4hwgI5pU4RF1w==
+X-Google-Smtp-Source: APXvYqwJQk57QyPPSliDMpx/TLAP/3gZsfyUbeD0wIjPChdmVZhDN6xHmFptwm401ttBoWD0dmL27g==
+X-Received: by 2002:a7b:ce12:: with SMTP id m18mr4243729wmc.130.1573147589458; 
+ Thu, 07 Nov 2019 09:26:29 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c24sm4188148wrb.27.2019.11.07.09.26.28
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 07 Nov 2019 09:26:28 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id CEE191FF87;
+ Thu,  7 Nov 2019 17:26:27 +0000 (GMT)
+References: <20191107142613.2379-1-robert.foley@linaro.org>
+ <20191107142613.2379-5-robert.foley@linaro.org>
+ <87tv7fhcl7.fsf@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH 4/4] Added tests for close and change of logfile.
+In-reply-to: <87tv7fhcl7.fsf@linaro.org>
+Date: Thu, 07 Nov 2019 17:26:27 +0000
+Message-ID: <87imnvha2k.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <156e5bd5-726c-2db5-4b24-394d5ec0f268@kaod.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::c42
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,44 +98,192 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: cminyard@mvista.com
-Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- Joel Stanley <joel@jms.id.au>, "Marty E . Plummer" <hanetzer@startmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.puhov@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Nov 07, 2019 at 06:14:58PM +0100, Cédric Le Goater wrote:
-> >>> What's the plan for merging this, once it's ready?  Is there an IPMI
-> >>> tree for it to be staged in?  If not I could take it through the ppc
-> >>> tree, but I'd need some Acked-bys in that case.
-> >>
-> >> I have an IPMI tree for this.  I was assuming it was going in to the PPC
-> >> tree, but it's not big deal.
-> > 
-> > I'd be more comfortable if the generic ipmi changes went through the
-> > ipmi tree.  
-> 
-> Here is the patch :
-> 
-> 	http://patchwork.ozlabs.org/patch/1185187/
 
-Ok, I have this in my tree.
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-I assume there is nothing like the linux-next tree for qemu, right?
+> Robert Foley <robert.foley@linaro.org> writes:
+>
+>> One test ensures that the logfile handle is still valid even if
+>> the logfile is changed during logging.
+>> The other test validates that the logfile handle remains valid under
+>> the logfile lock even if the logfile is closed.
 
--corey
+Also this doesn't see to work:
 
-> 
-> 
-> > Note that I've moved the initial ppc specific patch from
-> > my ppc-for-4.2 tree to my ppc-for-4.3 tree, since it missed my
-> > previous pull request and it's not really post-freeze material.
-> 
-> OK. I was wondering where it had gone.
-> 
-> Thanks,
-> 
-> C.
+17:24:31 [alex@zen:~/l/q/b/all] review/rcu-logfile|=E2=80=A6 2 + ./tests/te=
+st-logging
+/logging/parse_range: OK
+/logging/parse_path: OK
+/logging/logfile_write_path: free(): double free detected in tcache 2
+fish: =E2=80=9C./tests/test-logging=E2=80=9D terminated by signal SIGABRT (=
+Abort)
+
+in gdb
+
+Starting program: /home/alex/lsrc/qemu.git/builds/all/tests/test-logging
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1".
+[New Thread 0x7ffff6f38700 (LWP 28960)]
+/logging/parse_range: OK
+/logging/parse_path: OK
+/logging/logfile_write_path: free(): double free detected in tcache 2
+
+Thread 1 "test-logging" received signal SIGABRT, Aborted.
+__GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:50
+50      ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
+(gdb) bt
+#0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:=
+50
+#1  0x00007ffff7587535 in __GI_abort () at abort.c:79
+#2  0x00007ffff75de508 in __libc_message (action=3Daction@entry=3Ddo_abort,=
+ fmt=3Dfmt@entry=3D0x7ffff76e928d "%s\n") at ../sysdeps/posix/libc_fatal.c:=
+181
+#3  0x00007ffff75e4c1a in malloc_printerr (str=3Dstr@entry=3D0x7ffff76eaf58=
+ "free(): double free detected in tcache 2") at malloc.c:5341
+#4  0x00007ffff75e66fd in _int_free (av=3D0x7ffff7720c40 <main_arena>, p=3D=
+0x5555555cac40, have_lock=3D<optimized out>) at malloc.c:4193
+#5  0x00005555555614a8 in qemu_set_log_filename (filename=3D0x5555555cb110 =
+"/tmp/qemu-test-logging.RO35A0/qemu_test_log_write0.log", errp=3D0x7fffffff=
+def0) at /home/alex/lsrc/qemu.git/util/log.c:148
+#6  0x000055555555d8be in test_logfile_write (data=3D0x5555555c7370) at /ho=
+me/alex/lsrc/qemu.git/tests/test-logging.c:127
+#7  0x00007ffff7cdc15a in test_case_run (tc=3D0x5555555c9c60) at ../../../g=
+lib/gtestutils.c:2318
+#8  g_test_run_suite_internal (suite=3Dsuite@entry=3D0x5555555c8a40, path=
+=3Dpath@entry=3D0x0) at ../../../glib/gtestutils.c:2403
+#9  0x00007ffff7cdc014 in g_test_run_suite_internal (suite=3Dsuite@entry=3D=
+0x5555555c8a20, path=3Dpath@entry=3D0x0) at ../../../glib/gtestutils.c:2415
+#10 0x00007ffff7cdc412 in g_test_run_suite (suite=3D0x5555555c8a20) at ../.=
+./../glib/gtestutils.c:2490
+#11 0x00007ffff7cdc431 in g_test_run () at ../../../glib/gtestutils.c:1755
+#12 0x000055555555ce07 in main (argc=3D<optimized out>, argv=3D<optimized o=
+ut>) at /home/alex/lsrc/qemu.git/tests/test-logging.c:212
+
+
+>>
+>> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+>> ---
+>>  tests/test-logging.c | 74 ++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 74 insertions(+)
+>>
+>> diff --git a/tests/test-logging.c b/tests/test-logging.c
+>> index a12585f70a..a3190ff92c 100644
+>> --- a/tests/test-logging.c
+>> +++ b/tests/test-logging.c
+>> @@ -108,6 +108,76 @@ static void test_parse_path(gconstpointer data)
+>>      error_free_or_abort(&err);
+>>  }
+>>
+>> +static void test_logfile_write(gconstpointer data)
+>> +{
+>> +    QemuLogFile *logfile;
+>> +    gchar const *dir =3D data;
+>> +    Error *err =3D NULL;
+>> +    gchar *file_path;
+>> +    gchar *file_path1;
+>
+>   with g_autofree char *file_path you can avoid the free down bellow.
+>
+>> +    FILE *orig_fd;
+>> +
+>> +    file_path =3D g_build_filename(dir, "qemu_test_log_write0.log", NUL=
+L);
+>> +    file_path1 =3D g_build_filename(dir, "qemu_test_log_write1.log", NU=
+LL);
+>> +
+>> +    /*
+>> +     * Test that even if an open file handle is changed,
+>> +     * our handle remains valid due to RCU.
+>> +     */
+>> +    qemu_set_log_filename(file_path, &err);
+>> +    g_assert(!err);
+>> +    rcu_read_lock();
+>> +    logfile =3D atomic_rcu_read(&qemu_logfile);
+>> +    orig_fd =3D logfile->fd;
+>> +    g_assert(logfile && logfile->fd);
+>> +    fprintf(logfile->fd, "%s 1st write to file\n", __func__);
+>> +    fflush(logfile->fd);
+>> +
+>> +    /* Change the logfile and ensure that the handle is still valid. */
+>> +    qemu_set_log_filename(file_path1, &err);
+>> +    g_assert(!err);
+>
+> Maybe better would be:
+>
+>   logfile2 =3D atomic_rcu_read(&qemu_logfile);
+>   g_assert(logfile->fd =3D=3D orig_fd);
+>   g_assert(logfile2->fd !=3D logfile->fd);
+>   fprintf(logfile2->fd, "%s 2nd write to file\n", __func__);
+>   fflush(logfile2->fd);
+>
+> <snip>
+>> +    g_assert(logfile->fd =3D=3D orig_fd);
+>> +    fprintf(logfile->fd, "%s 2nd write to file\n", __func__);
+>> +    fflush(logfile->fd);
+>> +    rcu_read_unlock();
+>> +
+>> +    g_free(file_path);
+>> +    g_free(file_path1);
+>> +}
+>> +
+>> +static void test_logfile_lock(gconstpointer data)
+>> +{
+>> +    FILE *logfile;
+>> +    gchar const *dir =3D data;
+>> +    Error *err =3D NULL;
+>> +    gchar *file_path;
+>
+> g_autofree
+>
+>> +
+>> +    file_path =3D g_build_filename(dir, "qemu_test_logfile_lock0.log", =
+NULL);
+>> +
+>> +    /*
+>> +     * Test the use of the logfile lock, such
+>> +     * that even if an open file handle is closed,
+>> +     * our handle remains valid for use due to RCU.
+>> +     */
+>> +    qemu_set_log_filename(file_path, &err);
+>> +    logfile =3D qemu_log_lock();
+>> +    g_assert(logfile);
+>> +    fprintf(logfile, "%s 1st write to file\n", __func__);
+>> +    fflush(logfile);
+>> +
+>> +    /*
+>> +     * Initiate a close file and make sure our handle remains
+>> +     * valid since we still have the logfile lock.
+>> +     */
+>> +    qemu_log_close();
+>> +    fprintf(logfile, "%s 2nd write to file\n", __func__);
+>> +    fflush(logfile);
+>> +    qemu_log_unlock(logfile);
+>> +
+>> +    g_assert(!err);
+>> +    g_free(file_path);
+>> +}
+>> +
+>>  /* Remove a directory and all its entries (non-recursive). */
+>>  static void rmdir_full(gchar const *root)
+>>  {
+>> @@ -134,6 +204,10 @@ int main(int argc, char **argv)
+>>
+>>      g_test_add_func("/logging/parse_range", test_parse_range);
+>>      g_test_add_data_func("/logging/parse_path", tmp_path, test_parse_pa=
+th);
+>> +    g_test_add_data_func("/logging/logfile_write_path",
+>> +                         tmp_path, test_logfile_write);
+>> +    g_test_add_data_func("/logging/logfile_lock_path",
+>> +                         tmp_path, test_logfile_lock);
+>>
+>>      rc =3D g_test_run();
+
+
+--
+Alex Benn=C3=A9e
 
