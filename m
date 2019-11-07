@@ -2,94 +2,86 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 090CAC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 15:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BFC6C5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 15:12:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C881821D7E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 15:11:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A914218AE
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 15:12:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AjWDaWWQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C881821D7E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3TBWWJt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A914218AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSjRH-0004Is-VP
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 10:11:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56181)
+	id 1iSjSq-0005D5-Cn
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 10:12:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lfy@google.com>) id 1iSjQZ-0003nH-Bg
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:10:28 -0500
+ (envelope-from <lersek@redhat.com>) id 1iSjS4-0004nh-Ep
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:12:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lfy@google.com>) id 1iSjQX-0005Rd-6H
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:10:27 -0500
-Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:42429)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lfy@google.com>) id 1iSjQW-0005R2-UK
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:10:25 -0500
-Received: by mail-ot1-x32f.google.com with SMTP id b16so2281873otk.9
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 07:10:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=vrl3FGILhK8DZvEFWhjpJnUUjOla3+p9TtjZCf618Qo=;
- b=AjWDaWWQims5Ny6hLE3iEQNDL0cINH9IYOeNCXmBtek+k5YBNpPbFV4DBpry/+FJtc
- qaZMLRp5OSMYEVgEeBpfp+17W+znvJZ5A0ZO9TrfE8uajt3qRdEJe5BXL1oByGET+5Zz
- Y6A8ScH5nEIw0L+cikso7Oqa/yx5TC1+dMQXsCHi8CWrI+2rvfOz1c/iR585gp3fYwgy
- ASVvs1LBexz6TjgWV3GZxBuCIMzio1LwgCiErnYEk48J4HxF464oHat/gEuK7JwsFKO8
- BSHGcdxuQSopr7EVeAvhdSVf8ovaC9eREgS5L9iJpI28gU5P3w0chDf6H9lVcA9BDnAq
- jXFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=vrl3FGILhK8DZvEFWhjpJnUUjOla3+p9TtjZCf618Qo=;
- b=JyKxubZlmrr+kYFw2GfgLEM4IdyFDPiq8msIhd+SXGtF5NHEK8/8v9hTwS51RiBuPX
- 4O/ZEDbuRUFQVPdahb3GhDYmY9nvwnmgFZa/NO6kvmaYcUGgoOqlR5kNiz88tbrtn/DD
- SYIRN8acMPwnYAKyfmyZ5baHx1N2Cwg8nylWCnxdA6aFP1z/O24QUoizlh8CAl/d+ldZ
- JbD9qUebYDi1CtAYxaY6uvIVcr03SasenTwR7iUcWonAwt7rdvvOiTR6FSXi+ND4xM9z
- mvMgo1z9DjBVYdVxKgF2OeIBSatWKM7N4ySc72Xd3kkXYXZ4PtcyVv1nSYsOxUYBkb4d
- QtRg==
-X-Gm-Message-State: APjAAAUMALGM9F1GCrYVsOEiLsMdo2w0Z/r7unIsMc0v9DbXA0d6mwKi
- yS3ObZEpsIKM/I2c8xbCunlBDa+0NmjogBvc6e2PZw==
-X-Google-Smtp-Source: APXvYqwNeo9J4ew9BzbV30S7G07Vd1ZK5ZXjNadnIyQVQZrLG91HCFhfLFXjPH/toMhE4waVxe0w0v5Y9/eo1/fW73Q=
-X-Received: by 2002:a9d:5f16:: with SMTP id f22mr3267705oti.13.1573139423049; 
- Thu, 07 Nov 2019 07:10:23 -0800 (PST)
+ (envelope-from <lersek@redhat.com>) id 1iSjS0-00066I-6C
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:11:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31670
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iSjRy-00064x-4u
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:11:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573139512;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tR8j7H7aiTkwStKNBO6ykFl34JCmHQB2Pm7zfoFSfyo=;
+ b=N3TBWWJtpy+laauPEvFk1xCkhb2NwaVCZnM4hec+qlrkhLRghulGqihnSGC4l7OMCgLnwe
+ IZiGAYdHNVwilt5mZ+CKt4aaVhWV0g/ysK37Q5EidyHieDWIDUg3EQuTK1tVkbyJXzAVnI
+ ruDZ1778Z7kivyDbKyobaYsKYsX1yUQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-249-PUk9OG7rPc295j8UsY94yw-1; Thu, 07 Nov 2019 10:11:48 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 354FC8017DD;
+ Thu,  7 Nov 2019 15:11:47 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (unknown [10.36.118.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D43A01001B34;
+ Thu,  7 Nov 2019 15:11:39 +0000 (UTC)
+Subject: Re: privileged entropy sources in QEMU/KVM guests
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Ard Biesheuvel <ard.biesheuvel@linaro.org>
+References: <03e769cf-a5ad-99ce-cd28-690e0a72a310@redhat.com>
+ <CAKv+Gu8gqfu_mOm2zK64dmj5CkVaPvix3gEMEFQScyk1CnOv6w@mail.gmail.com>
+ <ef126cd5-7b64-1b8a-ca74-11bd06b5f4b1@redhat.com>
+ <421cf4ef-ea84-c7e6-81aa-c24a91459de5@redhat.com>
+ <659cd76f-2f46-1e08-342b-ee2fa0877fd8@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <2a14b9f5-e268-b711-279d-a58bf28b201d@redhat.com>
+Date: Thu, 7 Nov 2019 16:11:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
- <20191106084344.GB189998@stefanha-x1.localdomain>
- <20191106095122.jju7eo57scfoat6a@sirius.home.kraxel.org>
- <CAJSP0QUJBkqtVJq17tfX5O-JuvEGcZQviP0C3tv9qSDy-P-hcg@mail.gmail.com>
- <20191106125023.uhdhtqisybilxasr@sirius.home.kraxel.org>
- <CAJSP0QXG5Z3zCnPL+Y7EQfCeey2Fb9OdPdx531Jz2Ofk63wndg@mail.gmail.com>
-In-Reply-To: <CAJSP0QXG5Z3zCnPL+Y7EQfCeey2Fb9OdPdx531Jz2Ofk63wndg@mail.gmail.com>
-From: Frank Yang <lfy@google.com>
-Date: Thu, 7 Nov 2019 07:10:15 -0800
-Message-ID: <CAEkmjvU8or7YT7CCBe7aUx-XQ3yJpUrY4CfBOnqk7pUH9d9RGQ@mail.gmail.com>
-Subject: Re: guest / host buffer sharing ...
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, geoff@hostfission.com, 
- virtio-dev@lists.oasis-open.org, Alex Lau <alexlau@chromium.org>, 
- Alexandre Courbot <acourbot@chromium.org>, qemu-devel <qemu-devel@nongnu.org>, 
- Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>, 
- David Stevens <stevensd@chromium.org>, Daniel Vetter <daniel@ffwll.ch>, 
- =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>, 
- Dylan Reid <dgreid@chromium.org>, Gurchetan Singh <gurchetansingh@chromium.org>,
- Hans Verkuil <hverkuil@xs4all.nl>,
- Dmitry Morozov <dmitry.morozov@opensynergy.com>, 
- Pawel Osciak <posciak@chromium.org>, 
- Linux Media Mailing List <linux-media@vger.kernel.org>
-Content-Type: multipart/alternative; boundary="0000000000007eb04b0596c310f0"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32f
+In-Reply-To: <659cd76f-2f46-1e08-342b-ee2fa0877fd8@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: PUk9OG7rPc295j8UsY94yw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,161 +93,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Jian J Wang <jian.j.wang@intel.com>,
+ edk2-devel-groups-io <devel@edk2.groups.io>,
+ Bret Barkelew <Bret.Barkelew@microsoft.com>,
+ qemu devel list <qemu-devel@nongnu.org>, Erik Bjorge <erik.c.bjorge@intel.com>,
+ Sean Brogan <sean.brogan@microsoft.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000007eb04b0596c310f0
-Content-Type: text/plain; charset="UTF-8"
+On 11/07/19 14:58, Paolo Bonzini wrote:
+> On 07/11/19 14:27, Laszlo Ersek wrote:
+>> The VirtioRngDxe driver is a UEFI driver that follows the UEFI driver
+>> model. Meaning (in this context), it is connected to the virtio-rng
+>> device in the BDS phase, by platform BDS code.
+>>
+>> Put differently, the non-privileged driver that's the source of the
+>> sensitive data would have to be a "platform DXE driver". The virtio
+>> drivers are not such drivers however.
+>=20
+> Yes, it would have to be a platform DXE driver.  What is it that limits
+> virtio to the BDS phase?
 
-So I'm not really sure why people are having issues sharing buffers that
-live on the GPU. Doesn't that show up as some integer ID on the host, and
-some $GuestFramework (dmabuf, gralloc) ID on the guest, and it all works
-out due to maintaining the correspondence in your particular stack of
-virtual devices? For example, if you want to do video decode in hardware on
-an Android guest, there should be a gralloc buffer whose handle contains
-enough information to reconstruct the GPU buffer ID on the host, because
-gralloc is how processes communicate gpu buffer ids to each other on
-Android.
+For virtio-pci, we have:
 
-BTW, if we have a new device just for this, this should also be more
-flexible than being udmabuf on the host. There are other OSes than Linux.
-Keep in mind, also, that across different drivers even on Linux, e.g.,
-NVIDIA proprietary, dmabuf might not always be available.
+- The PCI host bridge / root bridge driver, which is a platform DXE
+driver, and produces PCI Root Bridge IO Protocol instances in its entry
+point.
 
-As for host CPU memory that is allocated in various ways, I think Android
-Emulator has built a very flexible/general solution, esp if we need to
-share a host CPU buffer allocated via something thats not completely under
-our control, such as Vulkan. We reserve a PCI BAR for that and map memory
-directly from the host Vk drier into there, via the address space device.
-It's
+- The PCI bus driver, which is a UEFI driver that follows the UEFI
+driver model. It only does its actual job when BDS connects it to the
+PCI Root Bridge IO Protocol instances mentioned above. At that point,
+the PCI bus driver produces a bunch of PCI IO protocol instances.
 
-https://android.googlesource.com/platform/external/qemu/+/refs/heads/emu-master-dev/hw/pci/goldfish_address_space.c
+- The virtio 0.9.5 and virtio 1.0 PCI transport drivers. They are also
+UEFI drivers that follow the UEFI driver model. They bind PCI IO
+protocol instances when BDS says so, and produce VIRTIO_DEVICE_PROTOCOL
+instances.
 
-https://android.googlesource.com/platform/external/qemu/+/refs/heads/emu-master-dev/android/android-emu/android/emulation/address_space_device.cpp#205
+- The actual virtio device drivers (scsi, blk, net, rng, gpu) that bind
+VIRTIO_DEVICE_PROTOCOL instances, when BDS says so, and produce the
+use-case specific UEFI protocols (such as SCSI pass-thru, Block IO,
+Simple Network, RNG, and Graphics Output).
 
 
-Number of copies is also completely under the user's control, unlike
-ivshmem. It also is not tied to any particular device such as gpu or codec.
-Since the memory is owned by the host and directly mapped to the guest PCI
-without any abstraction, it's contiguous, it doesn't carve out guest RAM,
-doesn't waste CMA, etc.
+For virtio-mmio, we have (on ARM only):
 
-On Thu, Nov 7, 2019 at 4:13 AM Stefan Hajnoczi <stefanha@gmail.com> wrote:
+- a platform DXE driver that enumerates the virtio-mmio transports, in
+its entry point function, based on the DTB that QEMU exposes. Each
+register block / transport is turned into a VIRTIO_DEVICE_PROTOCOL
+instances.
 
-> On Wed, Nov 6, 2019 at 1:50 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > > In the graphics buffer sharing use case, how does the other side
-> > > determine how to interpret this data?
-> >
-> > The idea is to have free form properties (name=value, with value being
-> > a string) for that kind of metadata.
-> >
-> > > Shouldn't there be a VIRTIO
-> > > device spec for the messaging so compatible implementations can be
-> > > written by others?
-> >
-> > Adding a list of common properties to the spec certainly makes sense,
-> > so everybody uses the same names.  Adding struct-ed properties for
-> > common use cases might be useful too.
->
-> Why not define VIRTIO devices for wayland and friends?
->
-> This new device exposes buffer sharing plus properties - effectively a
-> new device model nested inside VIRTIO.  The VIRTIO device model has
-> the necessary primitives to solve the buffer sharing problem so I'm
-> struggling to see the purpose of this new device.
->
-> Custom/niche applications that do not wish to standardize their device
-> type can maintain out-of-tree VIRTIO devices.  Both kernel and
-> userspace drivers can be written for the device and there is already
-> VIRTIO driver code that can be reused.  They have access to the full
-> VIRTIO device model, including feature negotiation and configuration
-> space.
->
-> Stefan
->
->
+- The actual virtio device drivers (scsi, blk, net, rng, gpu) that bind
+VIRTIO_DEVICE_PROTOCOL instances, when BDS says so, and produce the
+use-case specific UEFI protocols (such as SCSI pass-thru, Block IO,
+Simple Network, RNG, and Graphics Output).
 
---0000000000007eb04b0596c310f0
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr">So I&#39;m not really sure why people are having issues sh=
-aring buffers that live on the GPU. Doesn&#39;t that show up as some intege=
-r ID on the host, and some $GuestFramework (dmabuf, gralloc) ID on the gues=
-t, and it all works out due to maintaining the correspondence in your parti=
-cular stack of virtual devices? For example, if you want to do video decode=
- in hardware on an Android guest, there should be a gralloc buffer whose ha=
-ndle contains enough information to reconstruct the GPU buffer ID on the ho=
-st, because gralloc is how processes communicate gpu buffer ids to each oth=
-er on Android.<div><br></div><div>BTW, if we have a new device just for thi=
-s, this should also be more flexible than being udmabuf on the host. There =
-are other OSes than Linux. Keep in mind, also, that across different driver=
-s even on Linux, e.g., NVIDIA proprietary, dmabuf might not always be avail=
-able.<div><br><div>As for host CPU memory that is allocated in various ways=
-, I think Android Emulator has built a very flexible/general solution, esp =
-if we need to share a host CPU buffer allocated via something thats not com=
-pletely under our control, such as Vulkan. We reserve a PCI BAR for that an=
-d map memory directly from the host Vk drier into there, via the address sp=
-ace device. It&#39;s=C2=A0</div><div><br></div><div><a href=3D"https://andr=
-oid.googlesource.com/platform/external/qemu/+/refs/heads/emu-master-dev/hw/=
-pci/goldfish_address_space.c">https://android.googlesource.com/platform/ext=
-ernal/qemu/+/refs/heads/emu-master-dev/hw/pci/goldfish_address_space.c</a>=
-=C2=A0</div><div><a href=3D"https://android.googlesource.com/platform/exter=
-nal/qemu/+/refs/heads/emu-master-dev/android/android-emu/android/emulation/=
-address_space_device.cpp#205">https://android.googlesource.com/platform/ext=
-ernal/qemu/+/refs/heads/emu-master-dev/android/android-emu/android/emulatio=
-n/address_space_device.cpp#205</a>=C2=A0<br></div><div><br></div><div><div>=
-Number of copies is also completely under the user&#39;s control, unlike iv=
-shmem. It also is not tied to any particular device such as gpu or codec. S=
-ince the memory is owned by the host and directly mapped to the guest PCI w=
-ithout any abstraction, it&#39;s contiguous, it doesn&#39;t carve out guest=
- RAM, doesn&#39;t waste CMA, etc.</div></div></div></div></div><br><div cla=
-ss=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Nov 7, 201=
-9 at 4:13 AM Stefan Hajnoczi &lt;<a href=3D"mailto:stefanha@gmail.com">stef=
-anha@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" st=
-yle=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padd=
-ing-left:1ex">On Wed, Nov 6, 2019 at 1:50 PM Gerd Hoffmann &lt;<a href=3D"m=
-ailto:kraxel@redhat.com" target=3D"_blank">kraxel@redhat.com</a>&gt; wrote:=
-<br>
-&gt; &gt; In the graphics buffer sharing use case, how does the other side<=
-br>
-&gt; &gt; determine how to interpret this data?<br>
-&gt;<br>
-&gt; The idea is to have free form properties (name=3Dvalue, with value bei=
-ng<br>
-&gt; a string) for that kind of metadata.<br>
-&gt;<br>
-&gt; &gt; Shouldn&#39;t there be a VIRTIO<br>
-&gt; &gt; device spec for the messaging so compatible implementations can b=
-e<br>
-&gt; &gt; written by others?<br>
-&gt;<br>
-&gt; Adding a list of common properties to the spec certainly makes sense,<=
-br>
-&gt; so everybody uses the same names.=C2=A0 Adding struct-ed properties fo=
-r<br>
-&gt; common use cases might be useful too.<br>
-<br>
-Why not define VIRTIO devices for wayland and friends?<br>
-<br>
-This new device exposes buffer sharing plus properties - effectively a<br>
-new device model nested inside VIRTIO.=C2=A0 The VIRTIO device model has<br=
->
-the necessary primitives to solve the buffer sharing problem so I&#39;m<br>
-struggling to see the purpose of this new device.<br>
-<br>
-Custom/niche applications that do not wish to standardize their device<br>
-type can maintain out-of-tree VIRTIO devices.=C2=A0 Both kernel and<br>
-userspace drivers can be written for the device and there is already<br>
-VIRTIO driver code that can be reused.=C2=A0 They have access to the full<b=
-r>
-VIRTIO device model, including feature negotiation and configuration<br>
-space.<br>
-<br>
-Stefan<br>
-<br>
-</blockquote></div>
+UEFI drivers that follow the UEFI driver model allow BDS to orchestrate
+device binding, and don't generally do anything unless called from BDS.
 
---0000000000007eb04b0596c310f0--
+Platform DXE drivers do their job in their entry point functions. If
+they have protocol dependencies, then they either spell that out as a
+DEPEXes (dependency expressions, honored by the DXE Core during driver
+dispatch), or else they operate with low-level protocol notification
+callbacks (=3D they automatically take action, regardless of BDS, when a
+particular protocol appears in the system). They produce their own
+protocols in their entry point functions, or else in said protocol
+notify callbacks, without being asked to by BDS.
+
+UEFI-2.* strongly encourages device driver authors to structure their
+drivers as such UEFI drivers that follow the UEFI driver model, and not
+as platform DXE drivers.
+
+
+A core idea in BDS is that the largest possible set of devices should
+*not* be bound by drivers. If we don't connect anything that we don't
+intend to boot off of (and don't need for other booting purposes [*],
+then that makes for a speedy & frugal boot.
+
+[*] such as console drivers (keyboard, serial, graphics), or RNG
+drivers, ...
+
+The set of devices connected by BDS is, by design, platform policy. When
+the device drivers follow the UEFI driver model, platform BDS can manage
+a large herd of 3rd party UEFI drivers, and only bind the set of devices
+that's actually necessary.
+
+When most device drivers are platform DXE drivers, all doing whatever
+they want, and all acting on their own dependencies, it's very difficult
+to express or implement a similar policy in a central component.
+
+
+In OvmfPkg and ArmVirtPkg, we originally connected all drivers to all
+devices. That was safe, but not too fast (especially when you had tens
+or hundreds of virtio devices in the system). Nowadays, we connect only
+what we really need for booting. That selection / binding procedure is
+driven by the "bootorder" fw_cfg file from QEMU.
+
+https://lists.01.org/hyperkitty/list/edk2-devel@lists.01.org/message/UAYFGP=
+OQVI4FSHTU6MDLA6ULMUWSQ5HJ/
+
+This selection is so effective that, when we first implemented it, we
+actually stopped binding the virtio RNG device. (It was a regression --
+I think the kernel's UEFI stub consumes it, if it's available, and we
+noticed that the stub started complaining.) That happened because
+virtio-rng is never a *bootable* device, and so it's never listed in the
+"bootorder" fw_cfg file. Therefore we had to add custom BDS code to bind
+virtio RNG devices "forcibly".
+
+https://github.com/tianocore/edk2/commit/7ebad830d6ab6
+
+
+Now, technically speaking, we could rewrite VirtioRngDxe to be a
+platform DXE driver. It would register a protocol notify callback for
+VIRTIO_DEVICE_PROTOCOL, it would investigate every such protocol
+instance as they appeared in the protocol database, and bind whichever
+was a virtio-rng device.
+
+It wouldn't make a difference in the end, because the virtio PCI
+transport drivers (producing VIRTIO_DEVICE_PROTOCOL) themselves are UEFI
+drivers that follow the UEFI driver model. Thus, they are "kicked" by BDS.
+
+The PCI Bus driver itself (producing the PCI IO instances that the
+virtio PCI transport drivers bind) is itself a UEFI Driver that follows
+the UEFI driver model. Thus, that too is set in motion by BDS.
+
+--*--
+
+Nonetheless, we might be able to make this work, with a not too terrible
+hack.
+
+- In "OvmfPkg/Library/PlatformBootManagerLib/BdsPlatform.c", hoist the
+virtio-rng binding from the end of the
+PlatformBootManagerBeforeConsole() function, to just before signaling
+End-of-Dxe.
+
+- in the constructor function of OVMF's new SMM-oriented RngLib
+instance, register a protocol notify for EFI_RNG_PROTOCOL. Also register
+an event notification function for End-of-Dxe.
+
+- In the EFI_RNG_PROTOCOL callback, fetch the seed (and make a note that
+the seed has been fetched). Uninstall the same callback.
+
+- In the End-of-Dxe event notification callback, check if the seed has
+been fetched. If not, hang the system. (We must not exit the DXE phase
+without having a seed.)
+
+- In the RngLib APIs that provide randomness to the caller (and so
+depend on a seed having been fetched), hang the system if the seed has
+not been fetched. This will never fire if the first such API call is
+made at, or after, End-of-Dxe (see above), but it could fire if the API
+is called earlier. For example, if the variable SMM driver actually
+needed some randomness before the system reaches End-of-Dxe.
+
+I'll take this last design question back to the TianoCore BZ -- can we
+expect the SMM drivers to fetch the seed at EndOfDxe (and not earlier)?
+Because the EFI_RNG_PROTOCOL instances that are present in the system
+*by then* can be trusted to provide the seed.
+
+Thanks,
+Laszlo
+
 
