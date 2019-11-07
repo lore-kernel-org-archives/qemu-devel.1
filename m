@@ -2,87 +2,83 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 067C8C5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 15:37:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09818C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 15:42:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C74CA2178F
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 15:37:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C71932178F
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 15:42:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hl0LDGXT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C74CA2178F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sMA5Kb/y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C71932178F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSjqu-0004hw-1B
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 10:37:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60698)
+	id 1iSjvb-0007cu-Sz
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 10:42:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33163)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iSjqC-0004Bs-B4
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:36:57 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iSjus-0006wz-Dx
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:41:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iSjq9-0004Vj-QT
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:36:54 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:52065
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iSjq9-0004VR-Jz
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:36:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573141012;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=dK9tP6VheVPY+h5kOHvd2RIPpAhG5X32j11CjHrVhrw=;
- b=hl0LDGXT5UXBegoPa4u6Azhwe+17xIC1o3U5Ec9NcqsKA2My61jQ/iveShKyvGl6ddozpE
- 65B/lhDKG16m8sGCPm3KPbVfTTn3qaqSsC2rVst+t60hPY1YA0o762cGRRLP8sYxJFpn4w
- Q+FP0sDuFB66yGk0cOKRDOe3Q/UEpc4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-313-mBZu14sXMFatvZD82aUiBw-1; Thu, 07 Nov 2019 10:36:50 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A34B8017DD;
- Thu,  7 Nov 2019 15:36:50 +0000 (UTC)
-Received: from [10.3.117.38] (ovpn-117-38.phx2.redhat.com [10.3.117.38])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E3A6F600F0;
- Thu,  7 Nov 2019 15:36:48 +0000 (UTC)
-Subject: Re: [RFC PATCH 06/18] qemu-storage-daemon: Add --nbd-server option
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20191017130204.16131-1-kwolf@redhat.com>
- <20191017130204.16131-7-kwolf@redhat.com>
- <25f74aa7-0856-a396-fb98-f6b7a337b965@redhat.com>
- <1bcb5419-183e-fd7b-e53c-fbb315f29703@redhat.com>
- <20191107083335.GA5007@linux.fritz.box>
- <b5f9a8d8-c548-db26-13a0-0494baf9dc30@redhat.com>
- <20191107152722.GD5007@linux.fritz.box>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <47962dd4-4c2a-257b-0bed-39ad1c143719@redhat.com>
-Date: Thu, 7 Nov 2019 09:36:48 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <stefanha@gmail.com>) id 1iSjur-0000A2-HR
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:41:46 -0500
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:35976)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iSjur-00009k-Dv
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 10:41:45 -0500
+Received: by mail-qk1-x744.google.com with SMTP id d13so2377854qko.3
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 07:41:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=VW3Wa00Ka01SD08qKtLplRF357oGvmmmmd9JytaWrLY=;
+ b=sMA5Kb/yAbcl/qpcXFQm9Z+5Lb3xeKOgnKHED7PhkwYK8VwFwSUYDpPcmuJS6PmkWB
+ xADSkXELIbzDbKKhjS08+wQzgSrdspDBzeRZifMD5eXh12BovlP3n7e5xShdjNnDKfnq
+ O1swZVpq0u1dRtVl12sZy7AvmLDcl9SUPA+YNMI29SD2VRPLEfMeEIBE9+Jd17S1FKM1
+ YTkb5lbc/ztmliY56ULLk9uw/yPMGGviBx+zsFflnMrk4dadrWWy3BxFHQzzCv+/DSn1
+ Wm3EB+6T9qFWkh/QvArZwrq3kLUmuN7Z3M0/LbmSBz345oAw6qHXjVvAiQyPUGq3OnLA
+ bA/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=VW3Wa00Ka01SD08qKtLplRF357oGvmmmmd9JytaWrLY=;
+ b=eHEFAZtnrmw7Q6LYoT/mKosWDFOCmVh1Hg2XeivyzQGAqGRgmJBrtTxEZbZfuC37MR
+ y+1k9ezrPwq4ZwLx/QzOTMY57RGRcGPeZvTxsJXcO6BQIVzAxjdASSRZsbnfS08OWWE5
+ +7tGvxOZ8SGt36INdQdfQ8OmVPRcGx+I/M4Sl8g/H+pGUt+8pUTF60mL8XAswsQUPuSf
+ 3FcZrBrrDI/8e0j67cGGVP0Yk9bHVeobFiL7eo4HrmVBoYd2ER6jKa2J/MI6a5RQfaEg
+ Ua9A8zZ6gJT/MkQeh3QVXgls8RAFB4YCspisWdCPKwmW7py1gv8sLztchCZHInrZnoy0
+ y7vw==
+X-Gm-Message-State: APjAAAVLticCZ0YkaR1dCs6NXcNDQwK1jupSJ0Ar2iVMYq/EiYRCTiBa
+ od5QAH5iynfZq8KcI1CXPjW6GZ5RjyI51haateo=
+X-Google-Smtp-Source: APXvYqzkM2Cu6M578N8IRwaSInHg8NWKdg7g4a49mw5W11Fpit4Kc0joPoksPYEwWsZ9nECZztJPK3onMATBCnTkD7g=
+X-Received: by 2002:a05:620a:14a2:: with SMTP id
+ x2mr3449910qkj.236.1573141304560; 
+ Thu, 07 Nov 2019 07:41:44 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191107152722.GD5007@linux.fritz.box>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: mBZu14sXMFatvZD82aUiBw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20191030144926.11873-1-alxndr@bu.edu>
+ <20191030144926.11873-20-alxndr@bu.edu>
+ <66465e73-d009-ec62-58dd-279bfac6894c@redhat.com>
+In-Reply-To: <66465e73-d009-ec62-58dd-279bfac6894c@redhat.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 7 Nov 2019 16:41:33 +0100
+Message-ID: <CAJSP0QVNe5FcA_fb97iNnzxj7txjV_j3X86zFVTPLL4iVTkqfw@mail.gmail.com>
+Subject: Re: [PATCH v4 19/20] fuzz: add virtio-net fuzz target
+To: Jason Wang <jasowang@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::744
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,51 +90,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, pkrempa@redhat.com, armbru@redhat.com,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: "Oleinik, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/7/19 9:27 AM, Kevin Wolf wrote:
-> Am 07.11.2019 um 14:45 hat Eric Blake geschrieben:
->> On 11/7/19 2:33 AM, Kevin Wolf wrote:
->>> As a replacement nbd-server-add, I envisioned adding something like a
->>> block-export-add, which would work the way that --export already does.
->>> It would also come with query-block-exports and block-export-del, and i=
-t
->>> wouldn't contain only NBD devices, but also vhost-user, FUSE, etc.
->>> exports.
->>>
->>> Now I'm wondering if the same would make sense for nbd-server-start.
->>> Maybe an API change would even allow us to start multiple NBD servers
->>> (e.g. listening on different IP addresses or using different tls-creds)=
-.
->>
->> We want that (the ability to run multiple parallel NBD servers) anyway, =
-to
->> allow parallel incremental backups from different points in time to
->> different clients.
->=20
-> Can't you already have multiple exports on a single NBD server for
-> multiple clients today? Or do you need a different server configuration
-> for each client?
+On Thu, Nov 7, 2019 at 2:44 PM Jason Wang <jasowang@redhat.com> wrote:
+> On 2019/10/30 =E4=B8=8B=E5=8D=8810:50, Oleinik, Alexander wrote:
+> > From: Alexander Oleinik <alxndr@bu.edu>
+> >
+> > The virtio-net fuzz target feeds inputs to all three virtio-net
+> > virtqueues, and uses forking to avoid leaking state between fuzz runs.
+> >
+> > Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+>
+>
+> Can this fuzz vhost-net or vhost-user (I only see socket backend)? If
+> it's not too hard, it would be even more interesting.
 
-With our current code base, you can only run a single NBD server, with=20
-multiple exports, but the TLS creds are shared among all exports.  It is=20
-indeed technically possible to tweak things where the single server=20
-changes _which_ exports are exposed based on _which_ creds were used by=20
-the client (but only when TLS is used, and note that qemu-nbd currently=20
-refuses to mix TLS and Unix sockets, although I need to post a v2 of a=20
-patch I proposed a while back to improve that).  But it is easier still=20
-to run two separate servers on different ports with two different creds,=20
-and where there is no magic on which exports to show merely based on=20
-which creds were presented (and this includes a plaintext connection=20
-over Unix).  Either way, it requires code changes, and most likely for 5.0.
+Fuzzing vhost devices would be awesome but this patch series does not do th=
+at.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+libfuzzer uses coverage-guided fuzzing.  It needs to instrument the
+code.  vhost kernel modules or external vhost-user processes aren't
+instrumented so the fuzzing engine has no code instrumentation
+feedback.
 
+It should be possible to solve those problems eventually.  You could
+also run it as-is, but the fuzzer wouldn't make intelligent decisions
+about mutating input data to explore new code paths in vhost kernel
+modules.
+
+Stefan
 
