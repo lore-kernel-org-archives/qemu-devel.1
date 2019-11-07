@@ -2,79 +2,78 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F71C5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:19:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22401C5DF61
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:26:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33EC5214D8
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:19:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF4592084D
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:26:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sk6m4aa7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33EC5214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EiwVPdHx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF4592084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSetE-0007rj-CF
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:19:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35581)
+	id 1iSezp-0002Xx-2K
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:26:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37134)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iSesP-0007EI-Vw
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:18:55 -0500
+ (envelope-from <ard.biesheuvel@linaro.org>) id 1iSeyn-0001td-EI
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:25:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iSesN-0003Ii-Ej
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:18:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28644
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iSesN-0003GX-Am
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:18:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573121930;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=HdIlwKJ69Zm1SPluhXRNdHJgWpBRL21+6VS5JEbmEgo=;
- b=Sk6m4aa7PvZfIAFdjhZ1b/yd0WnLMXiuQesI/5TJwZYNaC8gMDXWAQOjU+2PK5pQVbsW37
- q1iIbk4GTYkt3wJfPYCG5OqAQjD3CH25i/XABGY44Qaw178pVkugU90swIq5cW/781HIRi
- 0W/GKu1RtrVsUVlZh9KWELn3BZ4rt0s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-190-WFJMf6aENoCoX-z6HZetcQ-1; Thu, 07 Nov 2019 05:18:41 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B73801005500;
- Thu,  7 Nov 2019 10:18:39 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.14])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB94A5D6D8;
- Thu,  7 Nov 2019 10:18:34 +0000 (UTC)
-Date: Thu, 7 Nov 2019 10:18:32 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: privileged entropy sources in QEMU/KVM guests
-Message-ID: <20191107101832.GA2817@work-vm>
-References: <03e769cf-a5ad-99ce-cd28-690e0a72a310@redhat.com>
+ (envelope-from <ard.biesheuvel@linaro.org>) id 1iSeyj-0001Hj-9I
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:25:29 -0500
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:52110)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <ard.biesheuvel@linaro.org>)
+ id 1iSeyi-00015I-MV
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:25:25 -0500
+Received: by mail-wm1-x336.google.com with SMTP id q70so1860494wme.1
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 02:25:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=qAdGETN6AixEqw+ThOSssQbz6q56ocX/c6J8cAihWig=;
+ b=EiwVPdHxSxG04If6SrQjC03OgSWjUnB9hiG0bwTKeoH7Z8sTsKsneDW86ZtZIMp41w
+ nVaQConMSHp94cgKobmgpfsqvYTaP/3XB4vYS0Lphq8cH1deKqEMMyXlsSGe2pyFsBfh
+ shvA1T6bzI6T7nNoeKPO7f48dzXqFLXJ4ZEkJnaYcWusF8ZC9lzpT8ccB5oqCb9sQdOq
+ 6EKyGFBtputXZVP5yS16zv5skRqeEl1JauhufcAogR/VEqcVt+jyef+Aelhd4NU9BgMM
+ iKQhJtcjb2BEidKE4iqFRPT/adGdHpU3KrebMytX/QQQELMbndT9ivIiOkrc4GOJyyzQ
+ elsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=qAdGETN6AixEqw+ThOSssQbz6q56ocX/c6J8cAihWig=;
+ b=lcf7qhEbw/pTF4MGQrsjeVfjGuiSQSZDrvvNIOQ3WGU3K7keXPoWWVUwHvPJYHAy7n
+ EQErQ/lxdUsNTaryK00KpVzIs0FgTUwHPG0VlbJK1u8GK9HDN6Ses5fN7uyYI/CkAhf4
+ ILL3h9RF7J1hsQx8fj4rEYOAuCZCfBE2v7uWYFHXWM5IuqVM0PEMJ67HPOp4+xbx9r0Y
+ NA+2OWk3X3GBq5d0czBkm2y0+BG6wp6KVx46879Rr1JC/HkqjmWEb6aoZ0q2pEl/tOYw
+ ACJIsQEJzy6d9hq+YPutaW7isNhsV+iAwtmk9MiiL/A8/NcjfWdOukiQ99DlIt/tnPDx
+ VowA==
+X-Gm-Message-State: APjAAAWmkakzuE+/KVnj+lgrRTF55LV72aXn1yFLQDGLkiOZP2PbeIr+
+ xnO8+mXHVg3aJp9z4Ic5a+hhu4vz4k0LHLuEumu1Mg==
+X-Google-Smtp-Source: APXvYqy3QX1Gh2dO9py3eFifZjoRwObsWWYZcYFqejsGOV3ObuHly0OTAWUTrRrnWnadTzer6aWiSfKShJghuXaIqz4=
+X-Received: by 2002:a1c:b1c3:: with SMTP id a186mr2181483wmf.10.1573122321759; 
+ Thu, 07 Nov 2019 02:25:21 -0800 (PST)
 MIME-Version: 1.0
+References: <03e769cf-a5ad-99ce-cd28-690e0a72a310@redhat.com>
 In-Reply-To: <03e769cf-a5ad-99ce-cd28-690e0a72a310@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: WFJMf6aENoCoX-z6HZetcQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Thu, 7 Nov 2019 11:25:10 +0100
+Message-ID: <CAKv+Gu8gqfu_mOm2zK64dmj5CkVaPvix3gEMEFQScyk1CnOv6w@mail.gmail.com>
+Subject: Re: privileged entropy sources in QEMU/KVM guests
+To: Laszlo Ersek <lersek@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::336
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,62 +86,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>,
  Jian J Wang <jian.j.wang@intel.com>,
  edk2-devel-groups-io <devel@edk2.groups.io>,
  Bret Barkelew <Bret.Barkelew@microsoft.com>,
  qemu devel list <qemu-devel@nongnu.org>, Erik Bjorge <erik.c.bjorge@intel.com>,
  Sean Brogan <sean.brogan@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Laszlo Ersek (lersek@redhat.com) wrote:
+Hi Laszlo,
+
+Thanks for starting this thread.
+
+
+On Thu, 7 Nov 2019 at 11:11, Laszlo Ersek <lersek@redhat.com> wrote:
+>
 > Hi,
->=20
+>
 > related TianoCore BZ:
->=20
->   https://bugzilla.tianocore.org/show_bug.cgi?id=3D1871
->=20
+>
+>   https://bugzilla.tianocore.org/show_bug.cgi?id=1871
+>
 > (I'm starting this thread separately because at least some of the topics
 > are specific to QEMU, and I didn't want to litter the BZ with a
 > discussion that may not be interesting to all participants CC'd on the
 > BZ. I am keeping people CC'd on this initial posting; please speak up if
 > you'd like to be dropped from the email thread.)
->=20
+>
 > QEMU provides guests with the virtio-rng device, and the OVMF and
 > ArmVirtQemu* edk2 platforms build EFI_RNG_PROTOCOL on top of that
 > device. But, that doesn't seem enough for all edk2 use cases.
->=20
+>
 > Also, virtio-rng (hence EFI_RNG_PROTOCOL too) is optional, and its
 > absence may affect some other use cases.
->=20
->=20
+>
+>
 > (1) For UEFI HTTPS boot, TLS would likely benefit from good quality
 > entropy. If the VM config includes virtio-rng (hence the guest firmware
 > has EFI_RNG_PROTOCOL), then it should be used as a part of HTTPS boot.
->=20
+>
 > However, what if virtio-rng (hence EFI_RNG_PROTOCOL) are absent? Should
 > UEFI HTTPS boot be disabled completely (or prevented / rejected
 > somehow), blaming lack of good entropy? Or should TLS silently fall back
 > to "mixing some counters [such as TSC] together and applying a
 > deterministic cryptographic transformation"?
->=20
+>
 > IOW, knowing that the TLS setup may not be based on good quality
 > entropy, should we allow related firmware services to "degrade silently"
 > (not functionally, but potentially in security), or should we deny the
 > services altogether?
+>
 
-I don't see a downside to insisting that if you want to use https then
-you must provide an entropy source; they're easy enough to add using
-virtio-rng if the CPU doesn't provide it.
+TLS uses a source of randomness to establish symmetric session keys
+for encryption. So it really depends on the use case whether HTTPS is
+used for authentication or for confidentiality, and it seems to me
+that it would typically be the former. So disabling HTTPS boot in this
+case seems counterproductive to me.
 
->=20
+>
 > (2) It looks like the SMM driver implementing the privileged part of the
 > UEFI variable runtime service could need access to good quality entropy,
 > while running in SMM; in the future.
->=20
+>
 > This looks problematic on QEMU. Entropy is a valuable resource, and
 > whatever resource SMM drivers depend on, should not be possible for e.g.
 > a 3rd party UEFI driver (or even for the runtime OS) to exhaust.
@@ -150,7 +157,25 @@ virtio-rng if the CPU doesn't provide it.
 > EFI_RNG_PROTOCOL (which exists at a less critical privilege level, i.e.
 > outside of SMM/SMRAM), but also that SMM drivers must not depend on the
 > same piece of *hardware* that feeds EFI_RNG_PROTOCOL.
->=20
+>
+
+The typical model is to seed a DRBG [deterministic pseudorandom
+sequence generator] using a sufficient amount of high quality entropy.
+Once you have done that, it is rather hard to exhaust a DRBG - it is a
+mathematical construction that is designed to last for a long time (<=
+2^48 invocations [not bytes] according to the NIST spec), after which
+it does not degrade although it may have generated so much output that
+its internal state may be inferred if you have captured enough of it
+(which is a rather theoretical issue IMHO)
+
+The problem is that using the output of a DRBG as a seed is
+non-trivial - the spec describes ways to do this, but wiring
+virtio-rng to a DRBG in the host and using its output to seed a DRBG
+in the guest is slighly problematic.
+
+So it seems to me that the correct way to model this is to make the
+host's true entropy source a shared resource like any other.
+
 > Furthermore, assuming we dedicate a hardware entropy device specifically
 > to SMM drivers, such a device cannot be PCI(e). It would have to be a
 > platform device at a fixed location (IO port or MMIO) that is only
@@ -158,12 +183,7 @@ virtio-rng if the CPU doesn't provide it.
 > would have to be restricted similarly to pflash. (In fact the variable
 > SMM driver will need, AIUI, the entropy for encrypting various variable
 > contents, which are then written into pflash.)
-
-Ewww.  I guess a virtio-rng instance wired to virtio-mmio could do that.
-It's a bit grim though.
-
-Dave
-
+>
 > Alternatively, CPU instructions could exist that return entropy, and are
 > executable only inside SMM. It seems that e.g. RDRAND can be trapped in
 > guests ("A VMEXIT due to RDRAND will have exit reason 57 (decimal)").
@@ -172,15 +192,8 @@ Dave
 > executed from within SMM. Unfortunately, such an arbitrary restriction
 > (of RDRAND to SMM) would diverge from the Intel SDM, and would likely
 > break other (non-SMM) guest code.
->=20
+>
 > Does a platform device that is dynamically detectable and usable in SMM
 > only seem like an acceptable design for QEMU?
->=20
-> Thanks,
-> Laszlo
->=20
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+>
 
