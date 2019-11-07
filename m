@@ -2,74 +2,83 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04225C5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1330DC5DF61
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:54:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC7A82084D
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:52:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC7A82084D
+	by mail.kernel.org (Postfix) with ESMTPS id D1A992084D
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:54:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VZF6Gu/3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1A992084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSeSV-0001mM-Ut
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 04:52:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60105)
+	id 1iSeUd-0002wE-2W
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 04:54:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60336)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iSeRE-0001GP-J2
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:50:49 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iSeTG-0002Q2-Gn
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:52:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iSeRD-0003G2-9p
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:50:48 -0500
-Received: from indium.canonical.com ([91.189.90.7]:33792)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iSeRD-0003Ai-47
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:50:47 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iSeRB-00037F-KD
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 09:50:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 789682E80C9
- for <qemu-devel@nongnu.org>; Thu,  7 Nov 2019 09:50:45 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <mlevitsk@redhat.com>) id 1iSeTD-0004iS-HY
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:52:52 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30897
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iSeTD-0004e4-Dy
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:52:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573120370;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=79ptaaPbW6Rdvj15WRlgi2jVNRp9DD+Z6xLM4tvWnt4=;
+ b=VZF6Gu/3CAb/n33qLzhSsViNFshx0yLwXNTVtYIXYOudhoIiuVP1bOA/HCepMg3AnkVwXS
+ msR00ziPv07ZEwf6P2QgM+b/5TdmBK6d6rZxrjFBiXjnq3Gl8y4XYVBLOxqgjBgnHpHfB1
+ /917OT5qRyQZLz9/62XjoOGBIvdJD3c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-TwQny7DvM5epjstTCBmTow-1; Thu, 07 Nov 2019 04:52:47 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94D64107ACC3;
+ Thu,  7 Nov 2019 09:52:46 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.111])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 57FA15D9CD;
+ Thu,  7 Nov 2019 09:52:45 +0000 (UTC)
+Message-ID: <42e5246d42f1c2b9c5ecf085387aaa24b44b4663.camel@redhat.com>
+Subject: Re: [PATCH v2 10/21] iotests: Replace IMGOPTS= by -o
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Date: Thu, 07 Nov 2019 11:52:44 +0200
+In-Reply-To: <08e8683a-04b2-1604-3b9f-cb2fff8669f1@redhat.com>
+References: <20191015142729.18123-1-mreitz@redhat.com>
+ <20191015142729.18123-11-mreitz@redhat.com>
+ <25befdcb33d3e77f7cab05c98609b88d6ff26766.camel@redhat.com>
+ <08e8683a-04b2-1604-3b9f-cb2fff8669f1@redhat.com>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: TwQny7DvM5epjstTCBmTow-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Nov 2019 09:41:54 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dgilbert-h marietto2008
-X-Launchpad-Bug-Reporter: Marietto (marietto2008)
-X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
-References: <157306426546.28368.6683622999323132409.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157311971459.2909.16940338236959599896.malone@gac.canonical.com>
-Subject: [Bug 1851547] Re: qemu 4 crashes with this parameter attached -usb
- -device usb-host, hostbus=1, hostaddr=7 \
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 03d7e04de58d2edf469a84b497b61bd43e75e14a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -78,80 +87,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1851547 <1851547@bugs.launchpad.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Marietto,
-  Can you attach an lsusb output from your host?
-I'm curious what host bug 1, addr 7 and 8 are.
+On Thu, 2019-11-07 at 10:20 +0100, Max Reitz wrote:
+> On 06.11.19 16:47, Maxim Levitsky wrote:
+> > On Tue, 2019-10-15 at 16:27 +0200, Max Reitz wrote:
+> > > Tests should not overwrite all user-supplied image options, but only =
+add
+> > > to it (which will effectively overwrite conflicting values).  Accompl=
+ish
+> > > this by passing options to _make_test_img via -o instead of $IMGOPTS.
+> > >=20
+> > > For some tests, there is no functional change because they already on=
+ly
+> > > appended options to IMGOPTS.  For these, this patch is just a
+> > > simplification.
+> > >=20
+> > > For others, this is a change, so they now heed user-specified $IMGOPT=
+S.
+> > > Some of those tests do not work with all image options, though, so we
+> > > need to disable them accordingly.
+> > >=20
+> > > Signed-off-by: Max Reitz <mreitz@redhat.com>
+> > > ---
+> > >  tests/qemu-iotests/031 |  9 ++++---
+> > >  tests/qemu-iotests/039 | 24 ++++++------------
+> > >  tests/qemu-iotests/059 | 18 ++++++-------
+> > >  tests/qemu-iotests/060 |  6 ++---
+> > >  tests/qemu-iotests/061 | 57 ++++++++++++++++++++++------------------=
+--
+> > >  tests/qemu-iotests/079 |  3 +--
+> > >  tests/qemu-iotests/106 |  2 +-
+> > >  tests/qemu-iotests/108 |  2 +-
+> > >  tests/qemu-iotests/112 | 32 ++++++++++++------------
+> > >  tests/qemu-iotests/115 |  3 +--
+> > >  tests/qemu-iotests/121 |  6 ++---
+> > >  tests/qemu-iotests/125 |  2 +-
+> > >  tests/qemu-iotests/137 |  2 +-
+> > >  tests/qemu-iotests/138 |  3 +--
+> > >  tests/qemu-iotests/175 |  2 +-
+> > >  tests/qemu-iotests/190 |  2 +-
+> > >  tests/qemu-iotests/191 |  3 +--
+> > >  tests/qemu-iotests/220 |  4 ++-
+> > >  tests/qemu-iotests/243 |  6 +++--
+> > >  tests/qemu-iotests/244 | 10 +++++---
+> > >  tests/qemu-iotests/250 |  3 +--
+> > >  tests/qemu-iotests/265 |  2 +-
+> > >  22 files changed, 100 insertions(+), 101 deletions(-)
+>=20
+> [...]
+>=20
+> > > @@ -161,7 +161,7 @@ _cleanup_test_img
+> > > =20
+> > >  echo
+> > >  echo "=3D=3D=3D Testing 4TB monolithicFlat creation and IO =3D=3D=3D=
+"
+> > > -IMGOPTS=3D"subformat=3DmonolithicFlat" _make_test_img 4T
+> > > +_make_test_img -o "subformat=3DmonolithicFlat" 4T
+> > >  _img_info
+> > >  $QEMU_IO -c "write -P 0xa 900G 512" "$TEST_IMG" | _filter_qemu_io
+> > >  $QEMU_IO -c "read -v 900G 1024" "$TEST_IMG" | _filter_qemu_io
+> > > @@ -170,7 +170,7 @@ _cleanup_test_img
+> > >  echo
+> > >  echo "=3D=3D=3D Testing qemu-img map on extents =3D=3D=3D"
+> > >  for fmt in monolithicSparse twoGbMaxExtentSparse; do
+> > > -    IMGOPTS=3D"subformat=3D$fmt" _make_test_img 31G
+> > > +    _make_test_img -o "subformat=3D$fmt" 31G
+> > >      $QEMU_IO -c "write 65024 1k" "$TEST_IMG" | _filter_qemu_io
+> > >      $QEMU_IO -c "write 2147483136 1k" "$TEST_IMG" | _filter_qemu_io
+> > >      $QEMU_IO -c "write 5G 1k" "$TEST_IMG" | _filter_qemu_io
+> >=20
+> > Looks good. Another test that pokes at guessed locations... :-)
+>=20
+> Actually, no.  These are writes on the format, not the file itself.  The
+> monolithicSparse subformat will store everything in a single file,
+> whereas twoGbMaxExtentSparse will create one file per 2 GB of guest
+> disk.  So the locations are chosen accordingly to that 2 GB limit ((1)
+> something somewhere in the first extent, (2) something that wraps around
+> the first 2 GB limit, so hits extents #0 and #1, and (3) something in
+> the middle of extent #2.)
+>=20
+> (The following qemu-img map call then verifies that it lands in the
+> different files for twoGbMaxExtentSparse, and that monolithicSparse is
+> at least indeed sparsely allocated.)
+>=20
+> Max
+Good to know, I missed this one.
 
-Dave
 
--- =
+Best regards,
+=09Maxim Levitsky
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1851547
 
-Title:
-  qemu 4 crashes with this parameter attached -usb -device usb-
-  host,hostbus=3D1,hostaddr=3D7 \
 
-Status in QEMU:
-  New
-
-Bug description:
-  Hello.
-
-  qemu / kvm does not start anymore after upgrading ubuntu from 19.04 to
-  19.10 and qemu from 3 to 4,as you can see below. what can I do ?
-
-  root@ziomario-Z390-AORUS-PRO:/home/ziomario/Scrivania/OS-KVM# ./boot-
-  OS-HSP2.sh
-
-  ----> qemu-system-x86_64: /build/qemu-
-  UryNDZ/qemu-4.0+dfsg/hw/usb/core.c:720: usb_ep_get: asserzione "dev !=3D
-  NULL" non riuscita.
-
-  ./boot-OS-HSP2.sh: riga 40: 26312 Annullato (core dump creato) qemu-
-  system-x86_64 -enable-kvm -m 16000 -cpu
-  Penryn,kvm=3Don,vendor=3DGenuineIntel,+invtsc,vmware-cpuid-
-  freq=3Don,$MY_OPTIONS -machine pc-q35-2.9 -smp 4,cores=3D2 -vga none
-  -device vfio-pci,host=3D01:00.0,bus=3Dpcie.0,multifunction=3Don -device
-  vfio-pci,host=3D01:00.1,bus=3Dpcie.0 -device vfio-
-  pci,host=3D01:00.2,bus=3Dpcie.0 -device vfio-pci,host=3D01:00.3,bus=3Dpci=
-e.0
-  -usb -device usb-host,hostbus=3D1,hostaddr=3D7 -drive
-  if=3Dpflash,format=3Draw,readonly,file=3D$OVMF/OVMF_CODE.fd -drive
-  if=3Dpflash,format=3Draw,file=3D$OVMF/OVMF_VARS-1024x768.fd -smbios type=
-=3D2
-  -device ich9-ahci,id=3Dsata -drive
-  id=3DClover,if=3Dnone,snapshot=3Don,format=3Dqcow2,file=3D./'Mo/CloverNG.=
-qcow2'
-  -device ide-hd,bus=3Dsata.2,drive=3DClover -device ide-
-  hd,bus=3Dsata.3,drive=3DInstallMedia -drive
-  id=3DInstallMedia,if=3Dnone,file=3DBaseSystemHS.img,format=3Draw -drive
-  id=3DBsdHDD,if=3Dnone,file=3D/dev/sdg,format=3Draw -device ide-
-  hd,bus=3Dsata.4,drive=3DBsdHDD -netdev
-  tap,id=3Dnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno -device
-  e1000-82545em,netdev=3Dnet0,id=3Dnet0,mac=3D52:54:00:c9:18:27 -monitor st=
-dio
-
-  It seems that this line is not good anymore (it worked with qemu 3.x)
-  :
-
-  -usb -device usb-host,hostbus=3D1,hostaddr=3D7 \
-
-  when I removed it,it works. But I need that. With what can I change it
-  ? You can reproduce that upgrading ubuntu 19.04 to 19.10 because in
-  that way also qemu will be upgraded from 3 to 4. These are the
-  packages that I'm using :
-
-  root@ziomario-Z390-AORUS-PRO:/home/ziomario# qemu-system-x86_64 --version
-  QEMU emulator version 4.0.0 (Debian 1:4.0+dfsg-0ubuntu9)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1851547/+subscriptions
 
