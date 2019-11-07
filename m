@@ -2,86 +2,121 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51FE6C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 18:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB296C5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 18:32:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E68E20679
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 18:31:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T96Bdefy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E68E20679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C522721D6C
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 18:32:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C522721D6C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSmY3-0006oj-V4
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 13:30:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35367)
+	id 1iSmZw-00089u-Q8
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 13:32:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34406)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <wainersm@redhat.com>) id 1iSmX0-00064T-Bb
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:29:19 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iSmTn-0002yt-LH
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:26:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <wainersm@redhat.com>) id 1iSmWx-0001lZ-7g
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:29:16 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38321
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iSmWx-0001ki-3d
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:29:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573151354;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=KIEr/2Xz1X+YbHl8yLPshQ/EqBiO6Xx+/q/m2LF+avw=;
- b=T96Bdefy0PMBd3zLzB9y6YA6LHkOn41OxdVI14c8P4sFzvWoedc/JhEazV0g2lqnAUyRRf
- x2orlYfyxtimRpFhlv8cyHoNMd37s00pgOPNbXjoqUdpjtqv4Sl+1HCzPuM7v9PXwU6+lP
- vfetq1FF5DSM0pRI6kv6uli6vxoyeWY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-rxS-uO1DMdStR09sui2ObQ-1; Thu, 07 Nov 2019 13:29:10 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D336800C61;
- Thu,  7 Nov 2019 18:29:09 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-91.gru2.redhat.com
- [10.97.116.91])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D0214608B2;
- Thu,  7 Nov 2019 18:29:04 +0000 (UTC)
-Subject: Re: [PATCH 2/3] Acceptance tests: introduce utility method for tags
- unique vals
-To: qemu-devel@nongnu.org
-References: <20190924194501.9303-1-crosa@redhat.com>
- <20190924194501.9303-3-crosa@redhat.com>
- <53219208-0345-cba4-0482-aea085bca6c0@redhat.com>
- <20191028230259.GA6770@localhost.localdomain>
-From: Wainer dos Santos Moschetta <wainersm@redhat.com>
-Message-ID: <9a7e3c76-1b35-1260-d798-280981520f11@redhat.com>
-Date: Thu, 7 Nov 2019 16:29:03 -0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ (envelope-from <laurent@vivier.eu>) id 1iSmTm-0006fc-9h
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:25:59 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:38753)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iSmTk-0006e5-JZ
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:25:58 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M3UhQ-1iTKhv468Q-000coX; Thu, 07 Nov 2019 19:25:46 +0100
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Eric Blake <eblake@redhat.com>
+References: <20191028181643.5143-12-laurent@vivier.eu>
+ <20191029232320.12419-1-crosa@redhat.com>
+ <19097f6f-28a8-12ee-6761-da0f34735910@redhat.com>
+ <1209928652.10986630.1573144690743.JavaMail.zimbra@redhat.com>
+ <bb0c5db0-899e-c5a6-caa3-add8bf64f780@vivier.eu>
+ <77a6200c-7f53-4305-1aad-4574f0faa904@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH 0/2] Acceptance test: update kernel used on m68k/q800 test
+Message-ID: <bd03703f-26f9-0d3c-fc8b-ba3c5773606c@vivier.eu>
+Date: Thu, 7 Nov 2019 19:25:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191028230259.GA6770@localhost.localdomain>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: rxS-uO1DMdStR09sui2ObQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <77a6200c-7f53-4305-1aad-4574f0faa904@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:93JZH9HuGJe9P+jp/FqK0B7c8r+3IJkv21WUEWJFOh4LHyRadPu
+ Si0r8tcOGUjLKoJx9jojHvk20jUs9jDWslBlW0hU1ZHTHDJPSqBFAsde8KL1GoMnKui9oqV
+ /D25LqbPhjEK/xS8xxLhN+idkeTcEqlANlzbUKF8ZQCmxBeTchCX60Of5wdUUsoY6pp/2Zj
+ RfjHsRoAugREQhMF2PQ6A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:M0OxjSNz80A=:gH345uEmf+rYRdUySrmcha
+ iCz/TEVH93NiamtJqiG3v43yxTeAOGBa5PY7EpDxq+nE8BWYRpnPGd62cjv8YmqqI+ASp1djX
+ fx9r+/5+SPcVeuYdnL8bToUHwgKEmNZYvavA0OkHfDu0pLbrE+h8POrUgZqPZtwBDTMA7KlID
+ USK6WjxGz1r65s+8b4AlG8qgPCZIng94S7TwrjFu4vHPgUEj5rJED92u+qou0G1Zz9IEvWMr3
+ 3HnrtjcySY20Ppj7LRIPBCQahm5XVhDm23kaabSquCK7Ir/MPy21AFHfxcyNed5XYfn3zokMt
+ /l4q0ISbAJ6+ILTkCEs1/PvckxpLzIKFALe75HRyqqNMU0qFKeStj5/2JHX774EqHouJWfaZv
+ dc66+tRALB9KlkFQ7s6Egv4kltEVoUpFGGDh/sdtDBHsujhCWUdCrYAL+DkVdyFT50BPT5C0q
+ FA5mAsSLyvRlguJB65NO6ONKnM4GhDqliVpmgTwh1KAWbQD5v0YgUbTSA618Wa6rbPUnWX3OF
+ 1eNz8/zGYX4bas8xPz8PKt1OCViWC7WmqhkGmVoKhQTPC/HA/CbaEld2THU9yPsvCRqikDpgP
+ 4a9YbV3+Srn7DI9lwEqvdBBGnlgaPj6clfngatJM7wRraww6T2XYmwmk+AjZTmKROLCKwu3FQ
+ RM/BANcaJtRCDP6nTFXzbxBzwM/Gcs/c5c6zEE2OFPKu3UCH+Ue2bphjrquMG7shVvcJtFvbZ
+ ov75BDq+IfEHFVU++XCzXd0L4bcfXb4bASQnuVS9XnUMCvwkEcr+DijewnNu9qgu+MqdleBUw
+ U1uBkJ9iRE6C8b2oKi/70PYqNnU9CJSqyjzksYaAxvMsH2WgJDL30/iVmATzivfJAvgcmBq6z
+ o0tv86H+gjfGWhqRbq5kl34a6D/D6fJFIYIa3cMfU=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,99 +128,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Aleksandar Rikalo <arikalo@wavecomp.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Willian Rampazzo <wrampazz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 10/28/19 8:02 PM, Cleber Rosa wrote:
-> On Thu, Oct 24, 2019 at 06:12:25PM -0300, Wainer dos Santos Moschetta wro=
-te:
->> Hi Cleber,
->>
->> On 9/24/19 4:45 PM, Cleber Rosa wrote:
->>> Currently a test can describe the target architecture binary that it
->>> should primarily be run with, be setting a single tag value.
+Le 07/11/2019 à 19:00, Philippe Mathieu-Daudé a écrit :
+> On 11/7/19 6:18 PM, Laurent Vivier wrote:
+>> Le 07/11/2019 à 17:38, Cleber Rosa a écrit :
+>>> ----- Original Message -----
+>>>> From: "Eric Blake" <eblake@redhat.com>
+>>>> To: "Cleber Rosa" <crosa@redhat.com>, qemu-devel@nongnu.org
+>>>> Cc: "Peter Maydell" <peter.maydell@linaro.org>, "Eduardo Habkost"
+>>>> <ehabkost@redhat.com>, "Philippe Mathieu-Daudé"
+>>>> <f4bug@amsat.org>, "Wainer dos Santos Moschetta"
+>>>> <wainersm@redhat.com>, "Laurent Vivier" <laurent@vivier.eu>,
+>>>> "Willian Rampazzo" <wrampazz@redhat.com>, "Philippe Mathieu-Daudé"
+>>>> <philmd@redhat.com>
+>>>> Sent: Thursday, November 7, 2019 10:43:08 AM
+>>>> Subject: Re: [PATCH 0/2] Acceptance test: update kernel used on
+>>>> m68k/q800 test
+>>>>
+>>>> On 10/29/19 6:23 PM, Cleber Rosa wrote:
+>>>>> The boot_linux_console.py:BootLinuxConsole.test_m68k_q800 was very
+>>>>> recently merged, but between its last review and now, the Kernel
+>>>>> package used went missing.
+>>>>>
+>>>>
+>>>> meta-question: Why was this series posted in-reply-to the pull request,
+>>>> rather than as a new top-level thread? I nearly missed it because I
+>>>> don't expect to see unreviewed patches buried in threading like that.
+>>>> My workflow would have been to post the series in isolation, then
+>>>> manually reply to the pull request to mention the message-id of the
+>>>> related series proposed as a followup.
+>>>>
 >>>
->>> The same approach is expected to be done with other QEMU aspects to be
->>> tested, for instance, the machine type and accelerator, so let's
->>> generalize the logic into a utility method.
+>>> Hi Eric,
 >>>
->>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->>> ---
->>>    tests/acceptance/avocado_qemu/__init__.py | 19 +++++++++++++------
->>>    1 file changed, 13 insertions(+), 6 deletions(-)
+>>> That was my attempt to signal that it was a fix to something which
+>>> had *just*
+>>> being merged as part of that pull request (though now caused by it).
 >>>
->>> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptan=
-ce/avocado_qemu/__init__.py
->>> index bd41e0443c..02775bafcf 100644
->>> --- a/tests/acceptance/avocado_qemu/__init__.py
->>> +++ b/tests/acceptance/avocado_qemu/__init__.py
->>> @@ -54,14 +54,21 @@ def pick_default_qemu_bin(arch=3DNone):
->>>    class Test(avocado.Test):
->>> +    def _get_unique_tag_val(self, tag_name):
->>> +        """
->>> +        Gets a tag value, if unique for a key
->>> +        """
->>> +        vals =3D self.tags.get(tag_name, [])
->>> +        if len(vals) =3D=3D 1:
+>>> I basically did not know how to act properly, so I thank you for the
+>>> workflow
+>>> suggestion.  I'll certainly follow it next time.
 >>
->> An small optimization:
+>> IMHO, you should send your series and then replies to the pull request
+>> to tell you have sent your series that fixes the patch in the pull
+>> request, or vice-versa.
 >>
->> if vals:
->>
->>  =A0 return vals.pop()
->>
-> IIUC, this would break the idea of uniqueness that this method, for
-> now, has.  Read on.
->
->>> +            return vals.pop()
->>> +        return None
->> Does it allows to express a scenario like "I want my test method to run =
-on
->> x86_64 and aarch64" using tags? If so, _get_unique_tag_val logic returns
->> None for multi-value tags (e.g. 'tags=3Darch:x86_64,arch:aarch64').
->>
-> I thought that initially we should attempt to pick a default arch or
-> machine type only of len(vals) =3D=3D 1.  Not because what you describe
-> can't be done, but because I would like to go through the tests and
-> make sure we run them in all the given tagged arches when we allow
-> that.
+>> But your series has been queued by Alex, so there is no problem...
+> 
+> I prepared a different fix around the same time, but closed my laptop
+> before the patch was sent and noticed the next day:
+> https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg08120.html
+> 
+> Laurent, are you OK with the new kernel being tested?
+> 
 
-Ok, understood the rationale now.
+I'm fine. We could have problems with 5.4 because the address mapping
+has been changed for SWIM (aee6bff1c325 "m68k: mac: Revisit floppy disc
+controller base addresses), but this has been fixed by my patch that has
+been merged today in QEMU (653901ca2b  "q800: fix I/O memory map").
 
-Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
-
->
-> Thanks,
-> - Cleber.
->
->> Thanks,
->>
->> Wainer
->>
->>> +
->>>        def setUp(self):
->>>            self._vms =3D {}
->>> -        arches =3D self.tags.get('arch', [])
->>> -        if len(arches) =3D=3D 1:
->>> -            arch =3D arches.pop()
->>> -        else:
->>> -            arch =3D None
->>> -        self.arch =3D self.params.get('arch', default=3Darch)
->>> +
->>> +        self.arch =3D self.params.get('arch',
->>> +                                    default=3Dself._get_unique_tag_val=
-('arch'))
->>> +
->>>            default_qemu_bin =3D pick_default_qemu_bin(arch=3Dself.arch)
->>>            self.qemu_bin =3D self.params.get('qemu_bin',
->>>                                            default=3Ddefault_qemu_bin)
->
+Thanks,
+Laurent
 
 
