@@ -2,64 +2,85 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB4F2C5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 06:26:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E64B7C5DF61
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 06:49:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5B0521D6C
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 06:26:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B0521D6C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id AF39321882
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 06:49:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZteAsuAv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF39321882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSbF3-0003HW-QQ
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 01:26:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36366)
+	id 1iSbbc-0007to-Oy
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 01:49:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40116)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iSbE5-0002km-99
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 01:25:02 -0500
+ (envelope-from <kraxel@redhat.com>) id 1iSbas-0007Sg-5r
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 01:48:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iSbE3-00022h-Ir
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 01:25:00 -0500
-Received: from mga07.intel.com ([134.134.136.100]:28420)
+ (envelope-from <kraxel@redhat.com>) id 1iSbap-0007Xu-OV
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 01:48:32 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33279
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iSbE3-00020u-AT
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 01:24:59 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
- by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 06 Nov 2019 22:24:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,277,1569308400"; d="scan'208";a="206062710"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.196.161])
- ([10.239.196.161])
- by orsmga006.jf.intel.com with ESMTP; 06 Nov 2019 22:24:53 -0800
-Subject: Re: [PATCH v14 03/11] tests: Add test for QAPI builtin type time
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20191028075220.25673-1-tao3.xu@intel.com>
- <20191028075220.25673-4-tao3.xu@intel.com>
- <20191106205359.GR3812@habkost.net>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <1f2fa942-0993-548b-1f5c-8345d564bf29@intel.com>
-Date: Thu, 7 Nov 2019 14:24:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iSbap-0007VT-DM
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 01:48:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573109310;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CN2ulGtul0X2pd3Lw/bT87JsQKQsHK/UR87J4cDQl/k=;
+ b=ZteAsuAvkH7Tjja8RIMyJS50GVUYcDYaPcgcEgqHwQN3ENuEcORALC7V6TqCFFKTzZwBVk
+ 9d4MTiIc5lm1Beuhgz8z176Q0LpkYZlKQQ1oKVJHQNcmT6vcxLDI2o3zKMTCIL1baceeM8
+ CxV2B7Y4lCUYTgG44xf8fczvMoVWIPU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-280-0cipqxXqMOu9hvOV8Hxp6w-1; Thu, 07 Nov 2019 01:48:23 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 057661800D6B;
+ Thu,  7 Nov 2019 06:48:21 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-69.ams2.redhat.com
+ [10.36.116.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3FE6C1A7E2;
+ Thu,  7 Nov 2019 06:48:19 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 0397416E08; Thu,  7 Nov 2019 07:48:18 +0100 (CET)
+Date: Thu, 7 Nov 2019 07:48:17 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Geoffrey McRae <geoff@hostfission.com>
+Subject: Re: guest / host buffer sharing ...
+Message-ID: <20191107064817.j3sfzl6viea4qigc@sirius.home.kraxel.org>
+References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
+ <CAD=HUj7EsxrkSubmY6HE4aYJOykVKtmGXjMjeGqnoJw1KZUc5Q@mail.gmail.com>
+ <20191106124101.fsfxibdkypo4rswv@sirius.home.kraxel.org>
+ <72712fe048af1489368f7416faa92c45@hostfission.com>
 MIME-Version: 1.0
-In-Reply-To: <20191106205359.GR3812@habkost.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.100
+In-Reply-To: <72712fe048af1489368f7416faa92c45@hostfission.com>
+User-Agent: NeoMutt/20180716
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 0cipqxXqMOu9hvOV8Hxp6w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,68 +92,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
- "thuth@redhat.com" <thuth@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
- Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>
+Cc: Hans Verkuil <hverkuil@xs4all.nl>, Alex Lau <alexlau@chromium.org>,
+ Alexandre Courbot <acourbot@chromium.org>, virtio-dev@lists.oasis-open.org,
+ qemu-devel@nongnu.org, Tomasz Figa <tfiga@chromium.org>,
+ Keiichi Watanabe <keiichiw@chromium.org>,
+ David Stevens <stevensd@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
+ =?utf-8?B?U3TDqXBoYW5l?= Marchesin <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Dmitry Morozov <dmitry.morozov@opensynergy.com>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/7/2019 4:53 AM, Eduardo Habkost wrote:
-> On Mon, Oct 28, 2019 at 03:52:12PM +0800, Tao Xu wrote:
->> Add tests for time input such as zero, around limit of precision,
->> signed upper limit, actual upper limit, beyond limits, time suffixes,
->> and etc.
->>
->> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->> ---
-> [...]
->> +    /* Close to signed upper limit 0x7ffffffffffffc00 (53 msbs set) */
->> +    qdict = keyval_parse("time1=9223372036854774784," /* 7ffffffffffffc00 */
->> +                         "time2=9223372036854775295", /* 7ffffffffffffdff */
->> +                         NULL, &error_abort);
->> +    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
->> +    qobject_unref(qdict);
->> +    visit_start_struct(v, NULL, NULL, 0, &error_abort);
->> +    visit_type_time(v, "time1", &time, &error_abort);
->> +    g_assert_cmphex(time, ==, 0x7ffffffffffffc00);
->> +    visit_type_time(v, "time2", &time, &error_abort);
->> +    g_assert_cmphex(time, ==, 0x7ffffffffffffc00);
-> 
-> I'm confused by this test case and the one below[1].  Are these
-> known bugs?  Shouldn't we document them as known bugs?
+> On 2019-11-06 23:41, Gerd Hoffmann wrote:
+> > On Wed, Nov 06, 2019 at 05:36:22PM +0900, David Stevens wrote:
+> > > > (1) The virtio device
+> > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > >
+> > > > Has a single virtio queue, so the guest can send commands to regist=
+er
+> > > > and unregister buffers.  Buffers are allocated in guest ram.  Each =
+buffer
+> > > > has a list of memory ranges for the data. Each buffer also has some
+> > >=20
+> > > Allocating from guest ram would work most of the time, but I think
+> > > it's insufficient for many use cases. It doesn't really support thing=
+s
+> > > such as contiguous allocations, allocations from carveouts or <4GB,
+> > > protected buffers, etc.
+> >=20
+> > If there are additional constrains (due to gpu hardware I guess)
+> > I think it is better to leave the buffer allocation to virtio-gpu.
+>=20
+> The entire point of this for our purposes is due to the fact that we can
+> not allocate the buffer, it's either provided by the GPU driver or
+> DirectX. If virtio-gpu were to allocate the buffer we might as well forge=
+t
+> all this and continue using the ivshmem device.
 
-Because do_strtosz() or do_strtomul() actually parse with strtod(), so 
-the precision is 53 bits, so in these cases, 7ffffffffffffdff and 
-fffffffffffffbff are rounded.
-> 
->> +    visit_check_struct(v, &error_abort);
->> +    visit_end_struct(v, NULL);
->> +    visit_free(v);
->> +
->> +    /* Close to actual upper limit 0xfffffffffffff800 (53 msbs set) */
->> +    qdict = keyval_parse("time1=18446744073709549568," /* fffffffffffff800 */
->> +                         "time2=18446744073709550591", /* fffffffffffffbff */
->> +                         NULL, &error_abort);
->> +    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
->> +    qobject_unref(qdict);
->> +    visit_start_struct(v, NULL, NULL, 0, &error_abort);
->> +    visit_type_time(v, "time1", &time, &error_abort);
->> +    g_assert_cmphex(time, ==, 0xfffffffffffff800);
->> +    visit_type_time(v, "time2", &time, &error_abort);
->> +    g_assert_cmphex(time, ==, 0xfffffffffffff800);
-> 
-> [1]
-> 
->> +    visit_check_struct(v, &error_abort);
->> +    visit_end_struct(v, NULL);
->> +    visit_free(v);
-> [...]
-> 
+Well, virtio-gpu resources are in guest ram, like the buffers of a
+virtio-buffers device would be.  So it isn't much of a difference.  If
+the buffer provided by the (nvidia/amd/intel) gpu driver lives in ram
+you can create a virtio-gpu resource for it.
+
+On the linux side that is typically handled with dma-buf, one driver
+exports the dma-buf and the other imports it.  virtio-gpu doesn't
+support that fully yet though (import is being worked on, export is done
+and will land upstream in the next merge window).
+
+No clue how this looks like for windows guests ...
+
+> Currently IVSHMEM is used by two projects that I am aware of, Looking
+> Glass and SCREAM. While Looking Glass is solving a problem that is out of
+> scope for QEMU, SCREAM is working around the audio problems in QEMU that
+> have been present for years now.
+
+Side note: sound in qemu 3.1+ should be alot better than in 2.x
+versions.
+
+cheers,
+  Gerd
 
 
