@@ -2,89 +2,103 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC24FC6195
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBFBDFC6195
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:05:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B8BA214D8
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:03:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8093B214D8
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:05:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a4gBxspM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B8BA214D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="rzm/dbVW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8093B214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSiNw-0006bd-9I
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 09:03:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43607)
+	id 1iSiPM-00089b-JE
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 09:05:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iSiMr-00063f-Jw
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:02:43 -0500
+ (envelope-from <darren.kenny@oracle.com>) id 1iSiNn-0006kL-TI
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:03:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iSiMk-00053I-Jh
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:02:33 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51838)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iSiMk-00051M-DE
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:02:26 -0500
-Received: by mail-wm1-x341.google.com with SMTP id q70so2620536wme.1
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 06:02:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=9QOHXp3rlTE2VS/zti5aN/hBO4n0Zgp2Fc+LAAOfUqE=;
- b=a4gBxspMsvnADT9okWm18coedAnC8MHH6jIKfACNQ/63DL6K6uR/6IAw+69M/MxxUs
- Y36TxK3Acsxz4YYzSyfUbt7+y1QTh7z3zFCv2+U8AC8Cr2rtKlUUu/3TH0fpM5Qv/DyQ
- BqmJxIQcXRzFGoMKoJdiKmI8rmnmZ/B8X2qHJvZutSESL57XoQNXvtxmPBvWGHkfvspz
- Ay4QrKjaNzerptYXVzcceCAk8wKoIpPKgmhnMzxuKDD8I7cbk2DGeu/8iLj6YG0DytDR
- Mfu5/UniYLoi9ZsMFFBe3XhpckLokzGEtO4mZH3+3dmaZsgaBgbZAr5HIsDs6iZ2GJCl
- C8WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=9QOHXp3rlTE2VS/zti5aN/hBO4n0Zgp2Fc+LAAOfUqE=;
- b=HxZ79I7jSC7pxIMX6gczi8ddEepjqCUN10qLJHIYVHfGdd+nPgn2lPIDfN4mhWceBP
- SVTxjn01ZoMhetVeUEloVENpTcji9dEhauZW0yQB9haRQ/FPFNho/43NRG0OJINyZy+g
- gXbKWEq1L30gFaM5DjdGFSi+n4Eo7v5vkKKtsa/6G2ivhRC1DIeuPa8cdHUY7ZwSfWSd
- aZit8eVzbanKR+RDdUpdOzTHBIq6Uiu0ErfaDeIFh6xeRYv0+4s1gb+eotZG2mtSk51/
- yZ7x/03mSKoe/nIA2VcmdQXYqJ+NarORhow+G+p3zIltVKXN8xqcqtY7rOyTQND8uhxV
- HImw==
-X-Gm-Message-State: APjAAAVwMQ38qTJb9TsQRTB4wZbevfCCQ2JS9i22medenCcnPcdC63g1
- xeBmigZs7Avrd0MWLVS2UxI=
-X-Google-Smtp-Source: APXvYqy2jziMmOWVqhsRTV0RSkQkJU4Sc6V5ZM/fFi679qK3HzC5rgvEOKFNjBnBqOPbPH6hmTbcwA==
-X-Received: by 2002:a1c:4907:: with SMTP id w7mr3001694wma.62.1573135345042;
- Thu, 07 Nov 2019 06:02:25 -0800 (PST)
-Received: from localhost (77.119.131.75.wireless.dyn.drei.com. [77.119.131.75])
- by smtp.gmail.com with ESMTPSA id w12sm2195906wmi.17.2019.11.07.06.02.23
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 07 Nov 2019 06:02:23 -0800 (PST)
-Date: Thu, 7 Nov 2019 15:02:20 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Jagannathan Raman <jag.raman@oracle.com>
-Subject: Re: [RFC v4 PATCH 49/49] multi-process: add configure and usage
- information
-Message-ID: <20191107140220.GI365089@stefanha-x1.localdomain>
-References: <cover.1571905346.git.jag.raman@oracle.com>
- <2736d12f29d2c9051966864b5d865ab0f392b8d1.1571905346.git.jag.raman@oracle.com>
+ (envelope-from <darren.kenny@oracle.com>) id 1iSiNi-0005rz-AG
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:03:31 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:59158)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <darren.kenny@oracle.com>)
+ id 1iSiNf-0005qt-KE
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:03:24 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA7Dx5KA190378;
+ Thu, 7 Nov 2019 14:03:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=nRMmqYPPSqu9yPqEGbMe3y+cXNmqhtkaIrHW8rByKuk=;
+ b=rzm/dbVW63Hq+6prJB55PMd6Zt9E6z9jx3K+F/RuKX8zfudZ6PEP0+ATykVUPY7BPL61
+ zSe44eDjttQOzOv3EqKHOMgniAQP3HZP4OuTOIUrzOVl5LAIp60lsIVjQAS9Y69aW8/6
+ Q5GZsagDe3GMgx+hi/Ly9if+QX1Q0Hxh9glNCYJCUrT0ro2TAP/U8bZW4nvdWUxp3VSD
+ FoUaVLi+iBty8AzRHrQgHQJhGdWC3JHc0vwcPe39f2CRCKHRiqEer9O4e9gt44e2/CA+
+ RJMxDdDuv/CfHPU4Q1KvKXnK/Zkm1oVZQSdAp88asPYdVqA4iNtttfH5Qg94vqjxyjLf 8w== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by aserp2120.oracle.com with ESMTP id 2w41w0xa8f-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 07 Nov 2019 14:03:19 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xA7DwRFp115756;
+ Thu, 7 Nov 2019 14:03:18 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3020.oracle.com with ESMTP id 2w41wh8k6c-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 07 Nov 2019 14:03:18 +0000
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xA7E3Hpa025203;
+ Thu, 7 Nov 2019 14:03:17 GMT
+Received: from starbug-mbp.localdomain (/10.175.193.46)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 07 Nov 2019 06:03:17 -0800
+Received: from starbug-mbp (localhost [127.0.0.1])
+ by starbug-mbp.localdomain (Postfix) with SMTP id 9C7014B2BC74;
+ Thu,  7 Nov 2019 14:03:14 +0000 (GMT)
+Date: Thu, 7 Nov 2019 14:03:14 +0000
+From: Darren Kenny <darren.kenny@oracle.com>
+To: "Oleinik, Alexander" <alxndr@bu.edu>
+Subject: Re: [PATCH v4 09/20] libqos: split qos-test and libqos makefile vars
+Message-ID: <20191107140314.gljw6drskhoot7ye@starbug-mbp>
+Mail-Followup-To: "Oleinik, Alexander" <alxndr@bu.edu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20191030144926.11873-1-alxndr@bu.edu>
+ <20191030144926.11873-10-alxndr@bu.edu>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="zqjkMoGlbUJ91oFe"
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <2736d12f29d2c9051966864b5d865ab0f392b8d1.1571905346.git.jag.raman@oracle.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+In-Reply-To: <20191030144926.11873-10-alxndr@bu.edu>
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911070141
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9433
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911070141
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 141.146.126.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,172 +110,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com, mst@redhat.com,
- armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, rth@twiddle.net, kwolf@redhat.com,
- berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
- marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, Oct 30, 2019 at 02:49:55PM +0000, Oleinik, Alexander wrote:
+>From: Alexander Oleinik <alxndr@bu.edu>
+>
+>Most qos-related objects were specified in the qos-test-obj-y variable.
+>qos-test-obj-y also included qos-test.o which defines a main().
+>This made it difficult to repurpose qos-test-obj-y to link anything
+>beside tests/qos-test against libqos. This change separates objects that
+>are libqos-specific and ones that are qos-test specific into different
+>variables.
+>
+>Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
 
---zqjkMoGlbUJ91oFe
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 
-On Thu, Oct 24, 2019 at 05:09:30AM -0400, Jagannathan Raman wrote:
-> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
->=20
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-> ---
->  docs/qemu-multiprocess.txt | 86 ++++++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 86 insertions(+)
->  create mode 100644 docs/qemu-multiprocess.txt
->=20
-> diff --git a/docs/qemu-multiprocess.txt b/docs/qemu-multiprocess.txt
-> new file mode 100644
-> index 0000000..c29f4df
-> --- /dev/null
-> +++ b/docs/qemu-multiprocess.txt
-> @@ -0,0 +1,86 @@
-> +Multi-process QEMU
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +This document describes how to configure and use multi-process qemu.
-> +For the design document refer to docs/devel/qemu-multiprocess.
-> +
-> +1) Configuration
-> +----------------
-> +
-> +To enable support for multi-process add --enable-mpqemu
-> +to the list of options for the "configure" script.
-> +
-> +
-> +2) Usage
-> +--------
-> +
-> +To start qemu with devices intended to run in a separate emulation
-> +process without libvirtd support, the following should be used on QEMU
-> +command line. As of now, we only support the emulation of lsi53c895a
-> +in a separate process
-> +
-> +* Since parts of the RAM are shared between QEMU & remote process, a
-> +  memory-backend-file is required to facilitate this, as follows:
-> +
-> +  -object memory-backend-file,id=3Dmem,mem-path=3D/dev/shm/,size=3D4096M=
-,share=3Don
-> +
-> +* The devices to be emulated in the separate process are defined as
-> +  before with addition of "rid" suboption that serves as a remote group
-> +  identificator.
-> +
-> +  -device <device options>,rid=3D"remote process id"
-> +
-> +  For exmaple, for non multi-process qemu:
-
-s/exmaple/example/
-
-> +    -device lsi53c895a,id=3Dscsi0 device
-> +    -device scsi-hd,drive=3Ddrive0,bus=3Dscsi0.0,scsi-id=3D0
-> +    -drive id=3Ddrive0,file=3Ddata-disk.img
-> +
-> +  and for multi-process qemu and no libvirt
-> +  support (i.e. QEMU forks child processes):
-> +    -device lsi53c895a,id=3Dscsi0,rid=3D0
-> +    -device scsi-hd,drive=3Ddrive0,bus=3Dscsi0.0,scsi-id=3D0,rid=3D"0"
-> +
-> +* The command-line options for the remote process is added to the "comma=
-nd"
-
-s/is added/are added/
-
-> +  suboption of the newly added "-remote" option.=20
-> +
-> +   -remote [socket],rid=3D,command=3D"..."
-> +
-> +  The drives to be emulated by the remote process are specified as part =
-of
-> +  this command sub-option. The device to be used to connect to the monit=
-or
-> +  is also specified as part of this suboption.
-> +
-> +  For example, the following option adds a drive and monitor to the remo=
-te
-> +  process:
-> +  -remote rid=3D0,command=3D"-drive id=3Ddrive0,,file=3Ddata-disk.img -m=
-onitor unix:/home/qmp-sock,,server,,nowait"
-> +
-> +  Note: There's an issue with this "command" subtion which we are in the
-
-s/subtion/sub-option/
-
-> +  process of fixing. To work around this issue, it requires additional
-> +  "comma" characters as illustrated above, and in the example below.
-> +
-> +* Example QEMU command-line to launch lsi53c895a in a remote process
-> +
-> +  #/bin/sh
-> +  qemu-system-x86_64 \
-> +  -name "OL7.4" \
-> +  -machine q35,accel=3Dkvm \
-> +  -smp sockets=3D1,cores=3D1,threads=3D1 \
-> +  -cpu host \
-> +  -m 2048 \
-> +  -object memory-backend-file,id=3Dmem,mem-path=3D/dev/shm/,size=3D2G,sh=
-are=3Don \
-> +  -numa node,memdev=3Dmem \
-> +  -device virtio-scsi-pci,id=3Dvirtio_scsi_pci0 \
-> +  -drive id=3Ddrive_image1,if=3Dnone,format=3Draw,file=3D/root/ol7.qcow2=
- \
-> +  -device scsi-hd,id=3Dimage1,drive=3Ddrive_image1,bus=3Dvirtio_scsi_pci=
-0.0 \
-> +  -boot d \
-> +  -monitor stdio \
-> +  -vnc :0 \
-> +  -device lsi53c895a,id=3Dlsi0,remote,rid=3D8,command=3D"qemu-scsi-dev" \
-> +  -device scsi-hd,id=3Ddrive2,drive=3Ddrive_image2,bus=3Dlsi0.0,scsi-id=
-=3D0,remote,rid=3D8,command=3D"qemu-scsi-dev"\
-> +  -remote rid=3D8,command=3D"-drive id=3Ddrive_image2,,file=3D/root/remo=
-te-process-disk.img -monitor unix:/home/qmp-sock,,server,,nowait"
-> +
-> +  We could connect to the monitor using the following command:
-> +  socat /home/qmp-sock stdio
-> +
-> +  After hotplugging disks to the remote process, please execute the
-> +  following command in the guest to refresh the list of storage devices:
-> +  rescan_scsi_bus.sh -a
-
-This documentation suggests that QEMU spawns the remote processes.  How
-do this work with unprivileged QEMU?  Is there an additional step where
-QEMU drops privileges after having spawned remote processes?
-
-Remote processes require accesses to resources that the main QEMU
-process does not need access to, so I'm wondering how this process model
-ensures that each process has only the privileges it needs.
-
-Stefan
-
---zqjkMoGlbUJ91oFe
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3EI+sACgkQnKSrs4Gr
-c8g78wgAgUZkX3pxPTmUiqua4o5o82tJ3aSZYq9vvuc+x99fIF4dLfCVLM9jXSRs
-CE/uBKZ1HTilU00ArA1JS0FbxtNxwHTOuFm2d2fViidTAFEJvlzb4rAHbAJnoXnx
-oEjCKOGgfieWMoYtdgZgnwRxbyMp0XlmD6GpD8sFpDwZqyO1/Ss20tICG/Spc8Sn
-CSxH2/H/zRWROB8vRopcedLjI7ECuf1DDv+8aRet8v6cU4G7uIEmi55LfrIUdAs1
-zIB0WIv9n26D6k/O8ahRVb/rnp6f2RVnckECcptaLJ7G6gkJE1c2VMnUDOxCL3ZW
-YsUStCcylEwgQOHhUGVcKialznc5sA==
-=6J3T
------END PGP SIGNATURE-----
-
---zqjkMoGlbUJ91oFe--
+>---
+> tests/Makefile.include | 71 +++++++++++++++++++++---------------------
+> 1 file changed, 36 insertions(+), 35 deletions(-)
+>
+>diff --git a/tests/Makefile.include b/tests/Makefile.include
+>index 67853d10c3..1517c4817e 100644
+>--- a/tests/Makefile.include
+>+++ b/tests/Makefile.include
+>@@ -699,52 +699,53 @@ tests/test-crypto-block$(EXESUF): tests/test-crypto-block.o $(test-crypto-obj-y)
+>
+> libqgraph-obj-y = tests/libqos/qgraph.o
+>
+>-libqos-obj-y = $(libqgraph-obj-y) tests/libqos/pci.o tests/libqos/fw_cfg.o
+>-libqos-obj-y += tests/libqos/malloc.o
+>-libqos-obj-y += tests/libqos/libqos.o
+>-libqos-spapr-obj-y = $(libqos-obj-y) tests/libqos/malloc-spapr.o
+>+libqos-core-obj-y = $(libqgraph-obj-y) tests/libqos/pci.o tests/libqos/fw_cfg.o
+>+libqos-core-obj-y += tests/libqos/malloc.o
+>+libqos-core-obj-y += tests/libqos/libqos.o
+>+libqos-spapr-obj-y = $(libqos-core-obj-y) tests/libqos/malloc-spapr.o
+> libqos-spapr-obj-y += tests/libqos/libqos-spapr.o
+> libqos-spapr-obj-y += tests/libqos/rtas.o
+> libqos-spapr-obj-y += tests/libqos/pci-spapr.o
+>-libqos-pc-obj-y = $(libqos-obj-y) tests/libqos/pci-pc.o
+>+libqos-pc-obj-y = $(libqos-core-obj-y) tests/libqos/pci-pc.o
+> libqos-pc-obj-y += tests/libqos/malloc-pc.o tests/libqos/libqos-pc.o
+> libqos-pc-obj-y += tests/libqos/ahci.o
+> libqos-usb-obj-y = $(libqos-spapr-obj-y) $(libqos-pc-obj-y) tests/libqos/usb.o
+>
+> # Devices
+>-qos-test-obj-y = tests/qos-test.o $(libqgraph-obj-y)
+>-qos-test-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+>-qos-test-obj-y += tests/libqos/e1000e.o
+>-qos-test-obj-y += tests/libqos/i2c.o
+>-qos-test-obj-y += tests/libqos/i2c-imx.o
+>-qos-test-obj-y += tests/libqos/i2c-omap.o
+>-qos-test-obj-y += tests/libqos/sdhci.o
+>-qos-test-obj-y += tests/libqos/tpci200.o
+>-qos-test-obj-y += tests/libqos/virtio.o
+>-qos-test-obj-$(CONFIG_VIRTFS) += tests/libqos/virtio-9p.o
+>-qos-test-obj-y += tests/libqos/virtio-balloon.o
+>-qos-test-obj-y += tests/libqos/virtio-blk.o
+>-qos-test-obj-y += tests/libqos/virtio-mmio.o
+>-qos-test-obj-y += tests/libqos/virtio-net.o
+>-qos-test-obj-y += tests/libqos/virtio-pci.o
+>-qos-test-obj-y += tests/libqos/virtio-pci-modern.o
+>-qos-test-obj-y += tests/libqos/virtio-rng.o
+>-qos-test-obj-y += tests/libqos/virtio-scsi.o
+>-qos-test-obj-y += tests/libqos/virtio-serial.o
+>+libqos-obj-y = $(libqgraph-obj-y)
+>+libqos-obj-y += $(libqos-pc-obj-y) $(libqos-spapr-obj-y)
+>+libqos-obj-y += tests/libqos/e1000e.o
+>+libqos-obj-y += tests/libqos/i2c.o
+>+libqos-obj-y += tests/libqos/i2c-imx.o
+>+libqos-obj-y += tests/libqos/i2c-omap.o
+>+libqos-obj-y += tests/libqos/sdhci.o
+>+libqos-obj-y += tests/libqos/tpci200.o
+>+libqos-obj-y += tests/libqos/virtio.o
+>+libqos-obj-$(CONFIG_VIRTFS) += tests/libqos/virtio-9p.o
+>+libqos-obj-y += tests/libqos/virtio-balloon.o
+>+libqos-obj-y += tests/libqos/virtio-blk.o
+>+libqos-obj-y += tests/libqos/virtio-mmio.o
+>+libqos-obj-y += tests/libqos/virtio-net.o
+>+libqos-obj-y += tests/libqos/virtio-pci.o
+>+libqos-obj-y += tests/libqos/virtio-pci-modern.o
+>+libqos-obj-y += tests/libqos/virtio-rng.o
+>+libqos-obj-y += tests/libqos/virtio-scsi.o
+>+libqos-obj-y += tests/libqos/virtio-serial.o
+>
+> # Machines
+>-qos-test-obj-y += tests/libqos/aarch64-xlnx-zcu102-machine.o
+>-qos-test-obj-y += tests/libqos/arm-imx25-pdk-machine.o
+>-qos-test-obj-y += tests/libqos/arm-n800-machine.o
+>-qos-test-obj-y += tests/libqos/arm-raspi2-machine.o
+>-qos-test-obj-y += tests/libqos/arm-sabrelite-machine.o
+>-qos-test-obj-y += tests/libqos/arm-smdkc210-machine.o
+>-qos-test-obj-y += tests/libqos/arm-virt-machine.o
+>-qos-test-obj-y += tests/libqos/arm-xilinx-zynq-a9-machine.o
+>-qos-test-obj-y += tests/libqos/ppc64_pseries-machine.o
+>-qos-test-obj-y += tests/libqos/x86_64_pc-machine.o
+>+libqos-obj-y += tests/libqos/aarch64-xlnx-zcu102-machine.o
+>+libqos-obj-y += tests/libqos/arm-imx25-pdk-machine.o
+>+libqos-obj-y += tests/libqos/arm-n800-machine.o
+>+libqos-obj-y += tests/libqos/arm-raspi2-machine.o
+>+libqos-obj-y += tests/libqos/arm-sabrelite-machine.o
+>+libqos-obj-y += tests/libqos/arm-smdkc210-machine.o
+>+libqos-obj-y += tests/libqos/arm-virt-machine.o
+>+libqos-obj-y += tests/libqos/arm-xilinx-zynq-a9-machine.o
+>+libqos-obj-y += tests/libqos/ppc64_pseries-machine.o
+>+libqos-obj-y += tests/libqos/x86_64_pc-machine.o
+>
+> # Tests
+>+qos-test-obj-y = tests/qos-test.o
+> qos-test-obj-y += tests/ac97-test.o
+> qos-test-obj-y += tests/ds1338-test.o
+> qos-test-obj-y += tests/e1000-test.o
+>@@ -776,7 +777,7 @@ check-unit-y += tests/test-qgraph$(EXESUF)
+> tests/test-qgraph$(EXESUF): tests/test-qgraph.o $(libqgraph-obj-y)
+>
+> check-qtest-generic-y += tests/qos-test$(EXESUF)
+>-tests/qos-test$(EXESUF): $(qos-test-obj-y)
+>+tests/qos-test$(EXESUF): $(qos-test-obj-y) $(libqos-obj-y)
+>
+> tests/qmp-test$(EXESUF): tests/qmp-test.o
+> tests/qmp-cmd-test$(EXESUF): tests/qmp-cmd-test.o
+>-- 
+>2.23.0
+>
+>
 
