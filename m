@@ -2,80 +2,64 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBC9C5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:57:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F03C5DF61
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:58:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FDC02166E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:57:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yykln24A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FDC02166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6769C2166E
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:58:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6769C2166E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSgPi-00036g-P9
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 06:57:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53028)
+	id 1iSgQf-00044x-Lb
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 06:58:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53245)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iSgOe-00029p-J5
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:56:17 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1iSgQ3-0003aD-AK
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:57:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iSgOd-0000dP-B4
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:56:16 -0500
-Received: from mail-oi1-x231.google.com ([2607:f8b0:4864:20::231]:44230)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iSgOd-0000d7-5L
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:56:15 -0500
-Received: by mail-oi1-x231.google.com with SMTP id s71so1674128oih.11
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 03:56:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=h/RFSiOoZIXnOLwxgmqA8lnvIBK82wgvF3pldT9PXrk=;
- b=yykln24ARkwlp4kldJ5Zim7cPq9GoEOPdKuDiZ4VgbKP3vBX1EmJtIzSuA2vaNepcR
- QqSDpzo12pkMQ8cFPrhMKEx0RzRxUQp/2UJRCWhvbq7OzRY70RshzWimnFdJzwhVIdqo
- viVmO0raiDF+vW36E58MSbXxIfnQdzGYrrg4Hk//hLBFGEVjNKftx1u08CQLqFJs+I1L
- SrZt3M+EIzmPvgmeg2o3CCHv4UFr2qBUZMRBy4xS6+OmFe9yHhrv2NBIdYPoASSslWhb
- li+4EvsXWPhG1fUUVTPdJ53xUezjBbVikiaqWS7Axg5MJ9USM+KmJjNBRgB6pkxcFq4O
- 4HLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=h/RFSiOoZIXnOLwxgmqA8lnvIBK82wgvF3pldT9PXrk=;
- b=JnTzyj1HEDUExLq3A8Lcfcz//uRbBiXUp8iEGp1KxUOoLCX+vA1vkPeW/p/CwAmDBy
- tK+QTGxnwyW/S4Us4hMxkfS+2XNu0rJySU4h4hZTAUCwvCgYXGAYl8vCpWNBxgJ2nzwG
- Eh5NejimCz0wnUoR9IY+Hoq+CDyGwWAgWX56YOBK1KLrfHQp79kipW2GG7Y6OKmHso8R
- qBwcKAUA+aKrMRA33QmWsPQRDJY6OY0GvvFx/Ic5g1JrL7wujCSJ+KeRHB12ARPmCrVQ
- cYZnKZQQvV3SzVf2oTGLFYquKd4VNe+sxLOZddxkSufxzpuYsZ6OtDzHvOfHsW/suQYI
- Xlpw==
-X-Gm-Message-State: APjAAAXL5YBKz71GOXG17hzYXzOGNukvnl/FVeoNifePIXMoxIOP9NyU
- YIJcTsa45dv6crQYqnjUacJUYKoTcGyWFW2bSiNrGw==
-X-Google-Smtp-Source: APXvYqz9NT3KfkXudDLLyqkjIMSiaQF8tAU3j+/ge88xbLwTFiPs57glEG2w0EzM29eL6HVW8ohNSfzDynWRuUBai/E=
-X-Received: by 2002:a05:6808:7d1:: with SMTP id
- f17mr3210402oij.163.1573127774201; 
- Thu, 07 Nov 2019 03:56:14 -0800 (PST)
+ (envelope-from <guoheyi@huawei.com>) id 1iSgQ2-0001F5-3C
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:57:43 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:48724 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1iSgPy-000178-2k; Thu, 07 Nov 2019 06:57:38 -0500
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id E310182D411826A41F90;
+ Thu,  7 Nov 2019 19:57:31 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.439.0; Thu, 7 Nov 2019
+ 19:57:23 +0800
+Subject: Re: [RFC v2 11/14] linux-headers/kvm.h: add capability to forward
+ hypercall
+To: "Michael S. Tsirkin" <mst@redhat.com>
+References: <20191105091056.9541-1-guoheyi@huawei.com>
+ <20191105091056.9541-12-guoheyi@huawei.com>
+ <20191106185524.0fe51c50.cohuck@redhat.com>
+ <4dbcbd18-0e6c-f985-c36d-96df65331d11@huawei.com>
+ <20191107035624-mutt-send-email-mst@kernel.org>
+From: Guoheyi <guoheyi@huawei.com>
+Message-ID: <da720295-2a84-e38b-9828-5287daefcfa2@huawei.com>
+Date: Thu, 7 Nov 2019 19:57:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-References: <20191106122524.5537-1-kraxel@redhat.com>
-In-Reply-To: <20191106122524.5537-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Nov 2019 11:56:03 +0000
-Message-ID: <CAFEAcA8uHQUvWm2H_=Y46qtdpNLBtcYRHWsvvWf+CyjYdFdLag@mail.gmail.com>
-Subject: Re: [PULL 0/1] Seabios 20191106 patches
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::231
+In-Reply-To: <20191107035624-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,49 +71,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 6 Nov 2019 at 12:26, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit 36609b4fa36f0ac934874371874416f7533a5408:
->
->   Merge remote-tracking branch 'remotes/palmer/tags/palmer-for-master-4.2-sf1' into staging (2019-11-02 17:59:03 +0000)
->
-> are available in the Git repository at:
->
->   git://git.kraxel.org/qemu tags/seabios-20191106-pull-request
->
-> for you to fetch changes up to 58b16e57ded751e2e8be626124aad1d46a408a33:
->
->   seabios: update to pre-1.13 snapshot (2019-11-06 13:23:02 +0100)
->
-> ----------------------------------------------------------------
-> seabios: update to pre-1.13 snapshot
->
-> ----------------------------------------------------------------
->
-> Gerd Hoffmann (1):
->   seabios: update to pre-1.13 snapshot
 
-Hi; this fails 'make check' on at least
-aarch64, aarch32, FreeBSD, NetBSD, s390:
 
-ERROR:/home/linux1/qemu/tests/boot-sector.c:161:boot_sector_test:
-assertion failed (signature == SIGNATURE): (0x00000000 == 0x0000dead)
-ERROR - Bail out!
-ERROR:/home/linux1/qemu/tests/boot-sector.c:161:boot_sector_test:
-assertion failed (signature == SIGNATURE): (0x00000000 == 0x0000dead)
-PASS 9 bios-tables-test /x86_64/acpi/q35/bridge
-Aborted (core dumped)
-/home/linux1/qemu/tests/Makefile.include:916: recipe for target
-'check-qtest-i386' failed
-make: *** [check-qtest-i386] Error 1
+On 2019/11/7 16:57, Michael S. Tsirkin wrote:
+> On Thu, Nov 07, 2019 at 09:44:36AM +0800, Guoheyi wrote:
+>>
+>> On 2019/11/7 1:55, Cornelia Huck wrote:
+>>> On Tue, 5 Nov 2019 17:10:53 +0800
+>>> Heyi Guo <guoheyi@huawei.com> wrote:
+>>>
+>>>> To keep backward compatibility, we add new KVM capability
+>>>> "KVM_CAP_FORWARD_HYPERCALL" to probe whether KVM supports forwarding
+>>>> hypercall to userspace.
+>>>>
+>>>> The capability should be enabled explicitly, for we don't want user
+>>>> space application to deal with unexpected hypercall exits. After
+>>>> enabling this cap, all HVC calls unhandled by kvm will be forwarded to
+>>>> user space.
+>>>>
+>>>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+>>>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>>>> Cc: Cornelia Huck <cohuck@redhat.com>
+>>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>>> Cc: Dave Martin <Dave.Martin@arm.com>
+>>>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>>>> Cc: Mark Rutland <mark.rutland@arm.com>
+>>>> Cc: James Morse <james.morse@arm.com>
+>>>> ---
+>>>>    linux-headers/linux/kvm.h |  1 +
+>>>>    target/arm/sdei.c         | 16 ++++++++++++++++
+>>>>    target/arm/sdei.h         |  2 ++
+>>>>    3 files changed, 19 insertions(+)
+>>>>
+>>>> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+>>>> index 3d9b18f7f8..36c9b3859f 100644
+>>>> --- a/linux-headers/linux/kvm.h
+>>>> +++ b/linux-headers/linux/kvm.h
+>>>> @@ -1000,6 +1000,7 @@ struct kvm_ppc_resize_hpt {
+>>>>    #define KVM_CAP_PMU_EVENT_FILTER 173
+>>>>    #define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
+>>>>    #define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
+>>>> +#define KVM_CAP_FORWARD_HYPERCALL 176
+>>>>    #ifdef KVM_CAP_IRQ_ROUTING
+>>> Is this cap upstream already? I would have thought your header sync
+>>> would have brought it in, then. (Saying this, that header sync looks
+>>> awfully small.)
+>>>
+>>> If it is not upstream yet, please split off this hunk into a separate
+>>> patch -- it's a bit annoying, but makes life easier for merging.
+>> No, it is not upstream yet. The whole framework and interfaces between KVM
+>> and qemu are still under discussion. I'll keep in mind of this when moving
+>> forward to next steps...
+>>
+>> Thanks,
+>> HG
+> It's best to add it in some other place meanwhile.
+Do you mean to split this patch from the whole patch set and send it 
+separately? Sorry I'm not clear about maintainers' work and may bring 
+you some trouble...
 
-the x86-64 bootsector tests seem to fail similarly.
+Thanks,
+HG
 
-thanks
--- PMM
+> Then we can drop it when it's in an upstream header.
+>
+>
+>>>
+>>> .
+>>>
+> .
+>
+
+
 
