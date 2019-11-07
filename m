@@ -2,79 +2,69 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C6ADC5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:54:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 189AEC43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:55:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1579A21882
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:54:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wWXsEolQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1579A21882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id DBAAE2178F
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 14:55:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBAAE2178F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSjBO-0007OQ-6S
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 09:54:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51046)
+	id 1iSjCN-0008NO-00
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 09:55:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51308)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iSj2U-0007jl-0l
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:45:37 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iSj3z-0000Nu-Mu
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:47:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iSj2R-0005WZ-HP
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:45:33 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:44332)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iSj2R-0005Vn-9C
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:45:31 -0500
-Received: by mail-ot1-x343.google.com with SMTP id c19so2179446otr.11
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 06:45:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=CStpoHHKe0+UQ/H5qfcj7cFooIQs2EAxJDKO3qojGtU=;
- b=wWXsEolQiu/XMCAt0OnluEgyIDK4bqOXrlPbz0bs4bKAQqTlEtyef3SI+jE9F4OgEH
- 87LcswxTYVZHagAvxWv0VwkP6CJZ9vu3nMWGM2aTFseo+Emz5c77wLYRkrW0LPAhJHkS
- GkbMJjxx1y3ThKvTg0gt746tQRGfWSNs2Qg/+T2mHcS/1s7wEtYLmyOOB9Guc52E2Q/j
- KzhWdQTiLYYCW9hK0Gd8TndvWcgk5tiWlMrPaKnkOCKBBvlY1VPSI+cXYVYZ4U+3zfea
- fvdcn4CPX5Buj2O5x9hkQh7Sa9IWUxypkyDokoM9y00D+2tjKiqL/cEs0Wl/GLWuIUKn
- nEaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=CStpoHHKe0+UQ/H5qfcj7cFooIQs2EAxJDKO3qojGtU=;
- b=PaLaXtfBBI+gcof6LHq8ioWNU19hUSWPIuZrQGrBQn6Mas4qOr9tltbbqvu3GICEoA
- MGWvMN5sxu3Zv5T6bmbJXFrDot5511FzkaYI0JPgJr2DVhgX7BNGWqbwXsjmjyWWSrjs
- TYjuacvmPfOWbsE3YLseR6ceVxgVGe1gPm8TM5DHT8+aSjwPTIwYVqQXi6cd8N4G0JUL
- Jmxem7N164r5KuT1baih2eQHxcBe66dEKFNuiHZsnmmA7oUYDnt4kWxZE4uHE/oTmcif
- JMfRXuaLgaj9q0wFuCpYYnwj2urBH0vcHMAuMEwRJOMA6dc9t+cE/NY8aSimXNlcmKoW
- VQzw==
-X-Gm-Message-State: APjAAAUWGUFSnwHlPOPmKcb6hDCABnTsQTyevqhLN8MXPGRE+SPilqf+
- cqMJyCzPPZp8hrIbgfV7HpnLFTCjy82YMGK90AGwxQo2T88=
-X-Google-Smtp-Source: APXvYqx6Y+mKkvN9yzsi8gPidZRX1YF6GfLfdmnm5T2Jn+CTk+sr2hWpQNMWWXGmZTXjEXxXM/nFCf/UxViuqKlqrrg=
-X-Received: by 2002:a9d:7f12:: with SMTP id j18mr3136768otq.221.1573137929357; 
- Thu, 07 Nov 2019 06:45:29 -0800 (PST)
+ (envelope-from <no-reply@patchew.org>) id 1iSj3u-00085p-Hn
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:47:04 -0500
+Resent-Date: Thu, 07 Nov 2019 09:47:03 -0500
+Resent-Message-Id: <E1iSj3u-00085p-Hn@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21402)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iSj3u-00081R-9a
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 09:47:02 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1573138014; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=BLQUT31bmkz0/lNooPVI/s+K4TjnL/AeXxWsk11df9gT4UK3tt7ImjQBL1Z0SKXihPdoQedf4zH5P8O7vWrbqSKu8OLqwFAg4NS1YbUWjvim7v1B5/RhGdcmw7cdA5FHPOC5743QCl8u4Y6+J/9Qim1iOUclroNNaUOk0RVsMtM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1573138014;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=BhBaygzwc0BBKF6FN1iAyh85y8BmOsnG/Yvj+viR5CE=; 
+ b=HcuzLAUlHYjHCk0efX+QndzyFDKx3UJ/CJLAPrbgzbSgQnoTwTw2nnFEtiXmq8km+oGkn5CMwyMluZO30EiyFyesnoFW9a1qkwQn74kEy1421qm8e3fgs3q6qX82hDYT4W4hVji934W83FqolXrmB14WjAIX3BoOOhEBykONjvE=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1573138012058230.54973871838547;
+ Thu, 7 Nov 2019 06:46:52 -0800 (PST)
+In-Reply-To: <20191107142613.2379-1-robert.foley@linaro.org>
+Subject: Re: [PATCH 0/4] Make the qemu_logfile handle thread safe.
+Message-ID: <157313801088.31898.2951120289072713083@37313f22b938>
 MIME-Version: 1.0
-References: <20191106123407.20997-1-mst@redhat.com>
-In-Reply-To: <20191106123407.20997-1-mst@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Nov 2019 14:45:18 +0000
-Message-ID: <CAFEAcA_4sgguVSvp-fFi8FAcGF80X63J2KOQo6VxM-Ca8nAefw@mail.gmail.com>
-Subject: Re: [PULL 0/3] virtio, pci: fixes
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: robert.foley@linaro.org
+Date: Thu, 7 Nov 2019 06:46:52 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,37 +76,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: peter.puhov@linaro.org, alex.bennee@linaro.org, qemu-devel@nongnu.org,
+ robert.foley@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 6 Nov 2019 at 12:35, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> The following changes since commit 36609b4fa36f0ac934874371874416f7533a5408:
->
->   Merge remote-tracking branch 'remotes/palmer/tags/palmer-for-master-4.2-sf1' into staging (2019-11-02 17:59:03 +0000)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
->
-> for you to fetch changes up to fcccb271e0894bc04078ababb29d3d5e06b79892:
->
->   virtio: notify virtqueue via host notifier when available (2019-11-06 06:35:00 -0500)
->
-> ----------------------------------------------------------------
-> virtio, pci: fixes
->
-> A couple of bugfixes.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwNzE0MjYxMy4yMzc5
+LTEtcm9iZXJ0LmZvbGV5QGxpbmFyby5vcmcvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
+ZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
+ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
+dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9
+MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9
+MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBURVNUICAgIGNoZWNr
+LXVuaXQ6IHRlc3RzL3Rlc3QtaGJpdG1hcAogIFRFU1QgICAgY2hlY2stdW5pdDogdGVzdHMvdGVz
+dC1iZHJ2LWRyYWluCnRlc3QtYmRydi1kcmFpbjogL3RtcC9xZW11LXRlc3Qvc3JjL3V0aWwvYXN5
+bmMuYzoyODM6IGFpb19jdHhfZmluYWxpemU6IEFzc2VydGlvbiBgIXFlbXVfbG9ja2NudF9jb3Vu
+dCgmY3R4LT5saXN0X2xvY2spJyBmYWlsZWQuCkVSUk9SIC0gdG9vIGZldyB0ZXN0cyBydW4gKGV4
+cGVjdGVkIDQyLCBnb3QgMTcpCm1ha2U6ICoqKiBbY2hlY2stdW5pdF0gRXJyb3IgMQptYWtlOiAq
+KiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgogIFRFU1QgICAgaW90ZXN0LXFjb3cy
+OiAwMTMKICBURVNUICAgIGlvdGVzdC1xY293MjogMDE3Ci0tLQogICAgcmFpc2UgQ2FsbGVkUHJv
+Y2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENv
+bW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFl
+bXUuaW5zdGFuY2UudXVpZD1lYWE1N2UzNDQ5ZmI0MzNlYmRlMGVjZWI5ZDA1YjZjMicsICctdScs
+ICcxMDAzJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywg
+Jy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUn
+LCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScs
+ICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3
+Mi8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC14dzQzbDF6cS9zcmMvZG9ja2VyLXNyYy4yMDE5LTEx
+LTA3LTA5LjM0LjA5LjI1MzQxOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcnLCAn
+L3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBleGl0
+IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVpZD1l
+YWE1N2UzNDQ5ZmI0MzNlYmRlMGVjZWI5ZDA1YjZjMgptYWtlWzFdOiAqKiogW2RvY2tlci1ydW5d
+IEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXctdGVz
+dGVyLXRtcC14dzQzbDF6cS9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNrQGNl
+bnRvczddIEVycm9yIDIKCnJlYWwgICAgMTJtMzkuODMzcwp1c2VyICAgIDBtOC4xMzdzCgoKVGhl
+IGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTEw
+NzE0MjYxMy4yMzc5LTEtcm9iZXJ0LmZvbGV5QGxpbmFyby5vcmcvdGVzdGluZy5kb2NrZXItcXVp
+Y2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2Fs
+bHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
+ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
-
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
 
