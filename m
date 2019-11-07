@@ -2,88 +2,74 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7A92C5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:43:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04225C5DF61
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:52:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92B30214D8
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:43:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CL+MzRXS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92B30214D8
+	by mail.kernel.org (Postfix) with ESMTPS id CC7A82084D
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 09:52:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC7A82084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSeKR-0007Om-O1
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 04:43:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58941)
+	id 1iSeSV-0001mM-Ut
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 04:52:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60105)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iSeIP-0006kC-Ap
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:41:42 -0500
+ (envelope-from <bounces@canonical.com>) id 1iSeRE-0001GP-J2
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:50:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iSeII-0003Z6-3t
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:41:35 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21596
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iSeIH-0003L4-WA
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:41:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573119691;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=y5Am/bmKOQljdwSN/Vsn1Yvyt/rAr5pOWGpinuz+AfA=;
- b=CL+MzRXSWXnVfya2lFqM8ZIFnTQDmBwJqni1wBUdgQrr4kM6EBH6wyYNds9aoqRbdXYXlH
- y8u/pX4hXcQT6HlkoPZnCnfPqsEp54SJNhkxlcEADnsoOOjxLVxuNHy4KUslthixC8MqNl
- /RXtnE0AZNkavPeyQuxU6lmXaMxuCqs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-281-qjWyVPcHPZiLmzSSJl6EvQ-1; Thu, 07 Nov 2019 04:41:26 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F7EB801E54;
- Thu,  7 Nov 2019 09:41:25 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
- (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9611A5D713;
- Thu,  7 Nov 2019 09:41:25 +0000 (UTC)
-Received: from zmail25.collab.prod.int.phx2.redhat.com
- (zmail25.collab.prod.int.phx2.redhat.com [10.5.83.31])
- by colo-mx.corp.redhat.com (Postfix) with ESMTP id 4DC9318095FF;
- Thu,  7 Nov 2019 09:41:25 +0000 (UTC)
-Date: Thu, 7 Nov 2019 04:41:25 -0500 (EST)
-From: Thomas Huth <thuth@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <1233611027.10012683.1573119684999.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20191107091136.359965-1-stefanha@redhat.com>
-References: <20191107091136.359965-1-stefanha@redhat.com>
-Subject: Re: [qemu-web PATCH] Add device fuzzing blog post
+ (envelope-from <bounces@canonical.com>) id 1iSeRD-0003G2-9p
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:50:48 -0500
+Received: from indium.canonical.com ([91.189.90.7]:33792)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iSeRD-0003Ai-47
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 04:50:47 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iSeRB-00037F-KD
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 09:50:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 789682E80C9
+ for <qemu-devel@nongnu.org>; Thu,  7 Nov 2019 09:50:45 +0000 (UTC)
 MIME-Version: 1.0
-X-Originating-IP: [217.232.52.98, 10.4.196.13, 10.5.100.50, 10.4.195.10]
-Thread-Topic: Add device fuzzing blog post
-Thread-Index: IdRy6/XeybAqs1fdsIxgCXr3Qit8pg==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: qjWyVPcHPZiLmzSSJl6EvQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 Nov 2019 09:41:54 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h marietto2008
+X-Launchpad-Bug-Reporter: Marietto (marietto2008)
+X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
+References: <157306426546.28368.6683622999323132409.malonedeb@chaenomeles.canonical.com>
+Message-Id: <157311971459.2909.16940338236959599896.malone@gac.canonical.com>
+Subject: [Bug 1851547] Re: qemu 4 crashes with this parameter attached -usb
+ -device usb-host, hostbus=1, hostaddr=7 \
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 03d7e04de58d2edf469a84b497b61bd43e75e14a
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,36 +78,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: megele@bu.edu, bsd@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
- qemu-devel@nongnu.org, Alexander Oleinik <alxndr@bu.edu>
+Reply-To: Bug 1851547 <1851547@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
------ Original Message -----
-> From: "Stefan Hajnoczi" <stefanha@redhat.com>
-> Sent: Thursday, November 7, 2019 10:11:36 AM
->=20
-> This blog post covers the device fuzzing GSoC project that Alexander
-> Olenik did in 2019.
-[...]
-> +This article was contributed by Stefan Hajnoczi and Alexander Oleinik.
+Hi Marietto,
+  Can you attach an lsusb output from your host?
+I'm curious what host bug 1, addr 7 and 8 are.
 
-You could also use the "author:" field in the header for this.
+Dave
 
-> diff --git a/screenshots/fuzzing-intro.png b/screenshots/fuzzing-intro.pn=
-g
-> new file mode 100644
-> index 0000000..e130027
-> Binary files /dev/null and b/screenshots/fuzzing-intro.png differ
-> diff --git a/screenshots/fuzzing.png b/screenshots/fuzzing.png
-> new file mode 100644
-> index 0000000..2f15ecb
-> Binary files /dev/null and b/screenshots/fuzzing.png differ
+-- =
 
-Seems like the images are missing ... can you please attach them?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1851547
 
- Thanks,
-  Thomas
+Title:
+  qemu 4 crashes with this parameter attached -usb -device usb-
+  host,hostbus=3D1,hostaddr=3D7 \
 
+Status in QEMU:
+  New
+
+Bug description:
+  Hello.
+
+  qemu / kvm does not start anymore after upgrading ubuntu from 19.04 to
+  19.10 and qemu from 3 to 4,as you can see below. what can I do ?
+
+  root@ziomario-Z390-AORUS-PRO:/home/ziomario/Scrivania/OS-KVM# ./boot-
+  OS-HSP2.sh
+
+  ----> qemu-system-x86_64: /build/qemu-
+  UryNDZ/qemu-4.0+dfsg/hw/usb/core.c:720: usb_ep_get: asserzione "dev !=3D
+  NULL" non riuscita.
+
+  ./boot-OS-HSP2.sh: riga 40: 26312 Annullato (core dump creato) qemu-
+  system-x86_64 -enable-kvm -m 16000 -cpu
+  Penryn,kvm=3Don,vendor=3DGenuineIntel,+invtsc,vmware-cpuid-
+  freq=3Don,$MY_OPTIONS -machine pc-q35-2.9 -smp 4,cores=3D2 -vga none
+  -device vfio-pci,host=3D01:00.0,bus=3Dpcie.0,multifunction=3Don -device
+  vfio-pci,host=3D01:00.1,bus=3Dpcie.0 -device vfio-
+  pci,host=3D01:00.2,bus=3Dpcie.0 -device vfio-pci,host=3D01:00.3,bus=3Dpci=
+e.0
+  -usb -device usb-host,hostbus=3D1,hostaddr=3D7 -drive
+  if=3Dpflash,format=3Draw,readonly,file=3D$OVMF/OVMF_CODE.fd -drive
+  if=3Dpflash,format=3Draw,file=3D$OVMF/OVMF_VARS-1024x768.fd -smbios type=
+=3D2
+  -device ich9-ahci,id=3Dsata -drive
+  id=3DClover,if=3Dnone,snapshot=3Don,format=3Dqcow2,file=3D./'Mo/CloverNG.=
+qcow2'
+  -device ide-hd,bus=3Dsata.2,drive=3DClover -device ide-
+  hd,bus=3Dsata.3,drive=3DInstallMedia -drive
+  id=3DInstallMedia,if=3Dnone,file=3DBaseSystemHS.img,format=3Draw -drive
+  id=3DBsdHDD,if=3Dnone,file=3D/dev/sdg,format=3Draw -device ide-
+  hd,bus=3Dsata.4,drive=3DBsdHDD -netdev
+  tap,id=3Dnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno -device
+  e1000-82545em,netdev=3Dnet0,id=3Dnet0,mac=3D52:54:00:c9:18:27 -monitor st=
+dio
+
+  It seems that this line is not good anymore (it worked with qemu 3.x)
+  :
+
+  -usb -device usb-host,hostbus=3D1,hostaddr=3D7 \
+
+  when I removed it,it works. But I need that. With what can I change it
+  ? You can reproduce that upgrading ubuntu 19.04 to 19.10 because in
+  that way also qemu will be upgraded from 3 to 4. These are the
+  packages that I'm using :
+
+  root@ziomario-Z390-AORUS-PRO:/home/ziomario# qemu-system-x86_64 --version
+  QEMU emulator version 4.0.0 (Debian 1:4.0+dfsg-0ubuntu9)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1851547/+subscriptions
 
