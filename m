@@ -2,83 +2,89 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 030F2C5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:17:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B004EC5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:19:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF6CC2187F
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:17:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A3D22187F
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 11:19:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S2nFFohY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF6CC2187F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yptuVbBc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A3D22187F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSfnK-00068x-VZ
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 06:17:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47201)
+	id 1iSfor-0007Zw-M4
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 06:19:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47634)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iSfmG-0005WE-Ee
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:16:37 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iSfny-00071O-Gv
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:18:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iSfmE-0001Cw-HT
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:16:35 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43040
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iSfmE-0001CY-Dd
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:16:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573125393;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xAjtWTZFGVGmU+z+TlpgDIFQ7RxMzAz9ig4BilDW1QY=;
- b=S2nFFohYpbm1D/8MXQYRR/8wWIA004fuILqkjlXSf9PB+yVhtHrM40WhuyPUTU4TIKZq31
- H8bCRWYeZK7XAKW2y5P/J/pgQ/N6FT/ARcVJbGDSNu1toXI2sHhve6EKz49Y9hfDTyxkRm
- ZIiAKsmIAMLO/UjONMaa+8a75y1eYDA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-XQ_TWMOzOcuypzi0dH6vLA-1; Thu, 07 Nov 2019 06:16:30 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 321D51800D7A;
- Thu,  7 Nov 2019 11:16:28 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.14])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F837600F0;
- Thu,  7 Nov 2019 11:16:21 +0000 (UTC)
-Date: Thu, 7 Nov 2019 11:16:18 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Subject: Re: [virtio-dev] Re: guest / host buffer sharing ...
-Message-ID: <20191107111618.GE2816@work-vm>
-References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
- <20191106084344.GB189998@stefanha-x1.localdomain>
- <20191106095122.jju7eo57scfoat6a@sirius.home.kraxel.org>
- <20191106101057.GC2802@work-vm>
- <20191107111119.qgr2qxgdf64jurin@sirius.home.kraxel.org>
+ (envelope-from <alex.bennee@linaro.org>) id 1iSfnw-0002NM-0B
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:18:22 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:43264)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iSfnu-0002Kv-7Q
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 06:18:18 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id n1so2525990wra.10
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 03:18:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=K7gjfPMjYg9jEet+wQlkfS4ORUZSEUVQA+OIQlXC0t8=;
+ b=yptuVbBcc9g4SmTPSyiPTQ2+WOtE6DTNl3wx9prDHtpZPZikYq1sqSjlQE90QbN/d/
+ 82BGsSC/UKYpij+MpQYKx5dg96wb0b+SXG9oVH2d73o7PT9zc8kwZWpMUL/imQSNvtZo
+ jLfDqMyROXpllmzcH0Jzc1g1WzQosg6U7gZJ3B2R3cAFI+YVXF3bSXjK4iWGsq6NUDlr
+ YsXBig3xlNin8gEsIgL8fBShcE9OEPw5XKF5SOwPu5onYP7bF0+byXevJY+U9hrYB/Mc
+ Qg1U2lXKqfn5wNgDHGYVNssLTb7s3/BifmBhpo/aJvFfTdWXMfpAIBet5d4NJtveEbCR
+ uF9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=K7gjfPMjYg9jEet+wQlkfS4ORUZSEUVQA+OIQlXC0t8=;
+ b=bX5M7d0Rb6b1x7a1dfyiYDx6+zcHOTUx000dM2NU0B2cnzeSfnwjWTOS7gRKAFhzu3
+ VNdR5uaji4wbKARiuneCWKKRFZyraxT8JJ5Fp57kPI49zEvJi9BniIu4abBdF0/UCQ7a
+ XCKhWT4GKjpdkIqgS/E4/hGtE9oMwNDLzUJrJ46cj3Hv8Qq8YWKLZH1EEhHBvy563qWj
+ Rqpyzqzixz9EfbVlOUlMWUihSdGIuvU5msC4aX77auL+BKKoHCsTp/53+hH99F4Ig6P/
+ CECUAtNtnd+MeeAuHz8G78Rdnu92Zh8kw+mkM9Ci9p7MVNIkLIPJcOEya2i2+CYqccul
+ /6Vw==
+X-Gm-Message-State: APjAAAU9GdDDrK3wyMtbJrEq7hzmjyJC31KVFtVV/WZIknU6iulXYYtB
+ 1xCDsxMkfmRpWDGTFemjlkJQbBq+NzM=
+X-Google-Smtp-Source: APXvYqyN0AiJ2tt7Xyt4zbFUsCZd4i9mrFsURZFns3WiqhxsTRdK/UOanHijFCBNornECJB5XmGEIA==
+X-Received: by 2002:a5d:414a:: with SMTP id c10mr2498088wrq.100.1573125494634; 
+ Thu, 07 Nov 2019 03:18:14 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id j22sm2711638wrd.41.2019.11.07.03.18.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 07 Nov 2019 03:18:13 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 60A391FF87;
+ Thu,  7 Nov 2019 11:18:12 +0000 (GMT)
+References: <f5a16b3c-2c17-60e4-e80b-dd20b3c088cc@cs.utexas.edu>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: Re: Looking for issues/features for my first contribution
+In-reply-to: <f5a16b3c-2c17-60e4-e80b-dd20b3c088cc@cs.utexas.edu>
+Date: Thu, 07 Nov 2019 11:18:12 +0000
+Message-ID: <878soshr4b.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191107111119.qgr2qxgdf64jurin@sirius.home.kraxel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: XQ_TWMOzOcuypzi0dH6vLA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,73 +96,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
- Alex Lau <alexlau@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
- Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
- David Stevens <stevensd@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
- =?iso-8859-1?Q?St=E9phane?= Marchesin <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Hans Verkuil <hverkuil@xs4all.nl>,
- Dmitry Morozov <dmitry.morozov@opensynergy.com>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Gerd Hoffmann (kraxel@redhat.com) wrote:
->   Hi,
->=20
-> > > This is not about host memory, buffers are in guest ram, everything e=
-lse
-> > > would make sharing those buffers between drivers inside the guest (as
-> > > dma-buf) quite difficult.
-> >=20
-> > Given it's just guest memory, can the guest just have a virt queue on
-> > which it places pointers to the memory it wants to share as elements in
-> > the queue?
->=20
-> Well, good question.  I'm actually wondering what the best approach is
-> to handle long-living, large buffers in virtio ...
->=20
-> virtio-blk (and others) are using the approach you describe.  They put a
-> pointer to the io request header, followed by pointer(s) to the io
-> buffers directly into the virtqueue.  That works great with storage for
-> example.  The queue entries are tagged being "in" or "out" (driver to
-> device or visa-versa), so the virtio transport can set up dma mappings
-> accordingly or even transparently copy data if needed.
->=20
-> For long-living buffers where data can potentially flow both ways this
-> model doesn't fit very well though.  So what virtio-gpu does instead is
-> transferring the scatter list as virtio payload.  Does feel a bit
-> unclean as it doesn't really fit the virtio architecture.  It assumes
-> the host can directly access guest memory for example (which is usually
-> the case but explicitly not required by virtio).  It also requires
-> quirks in virtio-gpu to handle VIRTIO_F_IOMMU_PLATFORM properly, which
-> in theory should be handled fully transparently by the virtio-pci
-> transport.
->=20
-> We could instead have a "create-buffer" command which adds the buffer
-> pointers as elements to the virtqueue as you describe.  Then simply
-> continue using the buffer even after completing the "create-buffer"
-> command.  Which isn't exactly clean either.  It would likewise assume
-> direct access to guest memory, and it would likewise need quirks for
-> VIRTIO_F_IOMMU_PLATFORM as the virtio-pci transport tears down the dma
-> mappings for the virtqueue entries after command completion.
->=20
-> Comments, suggestions, ideas?
 
-What about not completing the command while the device is using the
-memory?
+Rajath Shashidhara <rajaths@cs.utexas.edu> writes:
 
-Dave
+> Hi all,
+>
+> I am a Computer Science graduate student at The University of Texas at
+> Austin (UT, Austin). I am looking forward to contributing to qemu !
+>
+> This semester, I am taking a class in Virtualization
+> (https://github.com/vijay03/cs378-f19) and contributing to a
+> virtualization related open-source project is a significant part of
+> the course.
+> I would be interested in contributing a patchset to qemu - possibly a
+> self-contained feature or a reasonably complex bug fix that can be
+> completed in under a month's time. I did look at both the bugtracker
+> and the QEMU Google Summer of Code 2019 page
+> [https://wiki.qemu.org/Google_Summer_of_Code_2019] for ideas. However,
+> I would be interested in hearing from the community and I would be
+> delighted if somebody can be suggest a suitable project !
 
-> cheers,
->   Gerd
->=20
+Ahh someone else looking at QEMU \o/
+
+You might find some suggestions in the thread:
+
+  Date: Sun, 3 Nov 2019 04:59:31 -0600
+  Message-ID: <CAOyzTAivEpv1VXzPXVH3Za9Zcz1URFjnpFCZQrRB4K=3DZ-oy1Dw@mail.g=
+mail.com>
+  Subject: Feature Recommendations?
+
+> I am an advanced C programmer with both professional and academic
+> background in systems design & implementation - especially OS &
+> Networks. Given my background, I feel fairly confident that I can
+> pickup the QEMU codebase quickly.
+>
+> Eagerly looking forward to hearing from the community !
+
+Expanding a device emulation could be doable. I'm not sure what the
+current state of the Raspberry Pi emulations are but I don't think they
+are complete as we keep having to fix bits as kernel drivers are
+enabled. Phillipe (cc'd) might be able to give some pointers.
+
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Alex Benn=C3=A9e
 
