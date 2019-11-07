@@ -2,83 +2,114 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1483C5DF60
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:38:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F4AC5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:42:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EA25218AE
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:38:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D9022178F
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 10:42:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V45JiLhq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EA25218AE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=here.com header.i=@here.com header.b="IWqvUjlL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D9022178F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=here.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSfBS-0007h4-Jg
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:38:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40004)
+	id 1iSfFg-0002bG-Rd
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 05:42:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40829)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iSfAL-0007AM-OF
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:37:27 -0500
+ (envelope-from <laurent.bonnans@here.com>) id 1iSfEl-0001tR-Ld
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:42:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iSfAK-0002w8-61
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:37:25 -0500
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:36553)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iSfAH-0002mV-N2
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:37:22 -0500
-Received: by mail-oi1-x22a.google.com with SMTP id j7so1535733oib.3
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 02:37:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=SF55EwY0cbAJy4hZ8ZsKKrWvstgFCdY1KUBVJWsYL80=;
- b=V45JiLhqsWemvcutuk4hshcBwuAM1QxFro21unsY0OKH5jhRtZgaJE6b5YGk7uvZRQ
- RKTKxvZR7HoQC1MRmO8KFTW9R6ihcLE95u7BP7/gFMlWEyAxqXQ7OIAXODOMysAXP1RP
- Ek6F4DG01aXf5+KcId9+gYB7OVrKkWu/FITfHY78VBetcyM+ludUSmhoPd8/+4cZFS7x
- xfCl6/H3E6Kjk+hEj8RtqCkFfamnQ3lyk32qTZ4DVm3yHAF1KkXNgb5G7LqmrkoMZSQr
- PvSbq0ThBoPpUqPIrXf0tjuJnX0WuYu98MjpUyJBALpLrmRTCQCJy3Ax3zPUwtGtM+t5
- TwVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=SF55EwY0cbAJy4hZ8ZsKKrWvstgFCdY1KUBVJWsYL80=;
- b=ifsDcZFwlZTBfgF0J6Dj8xef4QcnZ2bMT20XA9WUOp/uZnreAoQZgQnFLbUBhO4be4
- CBHFYFwk0NbTmmbmH8Dt+FiIRAI/fCZeXFtkL5QP6YbgSElltioPESrWCsaKMNQ3kBWB
- 9051LUmLm8HJzugmWEJSxEvHF2P+2XcLZmUN4OZF/aHCuvB1FjWLeQrzuupK5CS3LVXf
- EKfGLPp+xHRWkI/7dgHOBSNkbqYQzaYF0I0W2XqWSvtwRmLP2J1/NlCUKHp0J/sJDQJu
- ygTOtf3813+5DgkRtCZkiBgx1tH8R4ifntU+Oh5Iznfj2BVcZCvV4igzFSCDVtx/NziA
- or8Q==
-X-Gm-Message-State: APjAAAW8eANJyZBYFFq8g0b9PVfBoaWUak91HzcZ74IgsiC7sVIF/JhR
- vYDgoE5uC+hPunjOyqKHo4HbBD9fpWx2EKRId6MHuw==
-X-Google-Smtp-Source: APXvYqw1RhfNM1gIdWAZTjJsAM0k2BArvz/NIBbc8BNoPVFXCgMzztIhIXjF2f2AKsOcbjw0N06wRbSSxh9nu2GXpME=
-X-Received: by 2002:a05:6808:90:: with SMTP id
- s16mr2861790oic.62.1573123038411; 
- Thu, 07 Nov 2019 02:37:18 -0800 (PST)
+ (envelope-from <laurent.bonnans@here.com>) id 1iSfEj-0005lC-GG
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 05:41:58 -0500
+Received: from mail-eopbgr70132.outbound.protection.outlook.com
+ ([40.107.7.132]:48470 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <laurent.bonnans@here.com>)
+ id 1iSfEj-0005cG-1J; Thu, 07 Nov 2019 05:41:57 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e2Z1bSAjobUsZzuCMxgJccaiQsyw6PDUwwzAr4dWDkNoJIUTIG4tZ7niD0LCoYAbdv0rbxHlvfMUiqLPDrJuHrwPhAm7wLBjdZ4umCQ1g5+2flwhKtznG9BMj1vu13yhwFkUrnTh7SQFbNm/B1tlL2Bp28JGSnSQ01T7+OFiYL3X5luzisHgcFvwjK7LM/4F5m5OrM+/p0DAFyAk2nz37ftND2pGDGdNU+4b4ThCp5LrCmoVQIA8KguDCfW0PRhy26++zmf/D0dWQrMw4PdnBCxwfv0XnZKgq8PprsBi1Tz2QxaQH8xWnSD/ZA+o47CLKuPRBs7tFbX7YRkC2Oybsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uQuWuDGCA1yC1fG3tvEW3QfKCz6TrQtiBhFRLFVml1E=;
+ b=WhwhUhGCGGuL58YkqbUQ4kyu9RBvufPTU1mDLFDwWiD1E4t/t/Cf34dI3gTNBHBtFNKjogryfSEbLPkRE22BEY7+EoN10ID0CveC7SOkbKrL1lpEYFqK33XhVa4gwBbAXtNNH+tbT16TDHfoBx2m2A7pZyRQx2iZtA1YC//iooo0szAzbqJz62FqQ91gtU4zc7emAnu/IXZeQjIjELQODJFNm/pWx2f8FjVanXDc+0oH7oCdm4+p1UDBqfcnASiKlRNagSja9RoQnb2yNO/I5Ba3Fsi5bw17hsbrIQcPVovuKnOTGJdytDp2E5odBLgYzo0FKmfWUjujyjDlxIrijg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=here.com; dmarc=pass action=none header.from=here.com;
+ dkim=pass header.d=here.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=here.com; s=selector2; 
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uQuWuDGCA1yC1fG3tvEW3QfKCz6TrQtiBhFRLFVml1E=;
+ b=IWqvUjlLizgnUCjBvfP3kHhrFeY1AfUR9/duSG+PVj+usd1aw+bC0YD6QL5oASoBETOka0DPfzqLw7MfHP33fyW0WjI8hWgW73+RrKLBZzVw1Zpo33uOvjcpey+45DRzMOxB+Wnlwd/eoNF+cDiI4V5X/0rRkaxOsO0g+ds0KTA=
+Received: from AM5PR04MB3299.eurprd04.prod.outlook.com (10.173.255.158) by
+ AM5PR04MB3138.eurprd04.prod.outlook.com (10.167.170.151) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2408.24; Thu, 7 Nov 2019 10:41:53 +0000
+Received: from AM5PR04MB3299.eurprd04.prod.outlook.com
+ ([fe80::8ce8:9eaf:3916:4bc9]) by AM5PR04MB3299.eurprd04.prod.outlook.com
+ ([fe80::8ce8:9eaf:3916:4bc9%6]) with mapi id 15.20.2430.023; Thu, 7 Nov 2019
+ 10:41:53 +0000
+From: "Bonnans, Laurent" <laurent.bonnans@here.com>
+To: =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Re: [PATCH v3 11/16] hw/arm/raspi: Use -smp cores=<N> option to
+ restrict enabled cores
+Thread-Topic: [PATCH v3 11/16] hw/arm/raspi: Use -smp cores=<N> option to
+ restrict enabled cores
+Thread-Index: AQHVhteXkTVRZwI30EKFSoYgoiDcEKd/ojwA
+Date: Thu, 7 Nov 2019 10:41:52 +0000
+Message-ID: <ab9cdba2-1655-ea43-abe7-59220664bfa6@here.com>
+References: <20191019234715.25750-1-f4bug@amsat.org>
+ <20191019234715.25750-12-f4bug@amsat.org>
+In-Reply-To: <20191019234715.25750-12-f4bug@amsat.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=laurent.bonnans@here.com; 
+x-originating-ip: [131.228.216.128]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 49e0c20b-4d6f-402f-b4fe-08d7636f1a6f
+x-ms-traffictypediagnostic: AM5PR04MB3138:|AM5PR04MB3138:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM5PR04MB313825B0117F73D3E361F63B85780@AM5PR04MB3138.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:114;
+x-forefront-prvs: 0214EB3F68
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(4636009)(396003)(346002)(366004)(39850400004)(376002)(136003)(199004)(189003)(51914003)(66446008)(6436002)(7736002)(31686004)(66476007)(66556008)(64756008)(478600001)(7416002)(6512007)(486006)(25786009)(76176011)(4326008)(66066001)(305945005)(6246003)(5660300002)(229853002)(36756003)(86362001)(54906003)(110136005)(76116006)(91956017)(99286004)(31696002)(81166006)(476003)(11346002)(6506007)(446003)(3846002)(8936002)(81156014)(26005)(53546011)(8676002)(14454004)(14444005)(256004)(102836004)(71200400001)(71190400001)(316002)(6486002)(66946007)(6116002)(2501003)(186003)(2616005)(2906002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM5PR04MB3138;
+ H:AM5PR04MB3299.eurprd04.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: here.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: dWvA7c4rWvEzci/Z6G3RfwZlrr55PKn0fFpOUfyF/Xc3GYnfyqm9iEQAE8mDDY6HE4cF/rf9P9iF+ypPBLgWPYPKzqv13w3n7skroczFZDuCE1O/aKSoaxIqXrWTBktxm1N5bg/X6mI/e+QJGWDLS5OcD1XoqUZ36gfctIscuBlE0fwQTtTjwpzIQsykYSn7ee7vlGyRGvPqtxPzStYJlYOozQ+8SYfk66J5B5GtBynkxfiA5MPAQLfcPE6s4ghBHKS7E+i74mZn2Aun4Ko/b2yFbX6oK9c8b4OEDGMKoxV32zyREkvUsY9zeM1PWTUr1MiOIfEbc/4tY9twAnf/V/5VdMqf/pf+DDmwfKcwO2d1b5biw67IIT9vlodaFvNVd4XCB4P/EO4QSYsmo/N3ED3xPp7rOfN+UvHnzkRh/Z52CmXQuveYudE4mD4mM+Uy
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <BC4EE5EB6AFEFE41AB258F96C9EEA9AA@eurprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Received: by 2002:a9d:5e89:0:0:0:0:0 with HTTP;
- Thu, 7 Nov 2019 02:37:17 -0800 (PST)
-In-Reply-To: <f5a16b3c-2c17-60e4-e80b-dd20b3c088cc@cs.utexas.edu>
-References: <f5a16b3c-2c17-60e4-e80b-dd20b3c088cc@cs.utexas.edu>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 7 Nov 2019 11:37:17 +0100
-Message-ID: <CAL1e-=g8c=QJiMm1AvBCNmsTyVWoUAjL0na2HWodHCQPiLdWJw@mail.gmail.com>
-Subject: Re: Looking for issues/features for my first contribution
-To: Rajath Shashidhara <rajaths@cs.utexas.edu>
-Content-Type: multipart/alternative; boundary="000000000000e47fc80596bf3ff7"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::22a
+X-OriginatorOrg: here.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49e0c20b-4d6f-402f-b4fe-08d7636f1a6f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Nov 2019 10:41:53.0233 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 6d4034cd-7225-4f72-b853-91feaea64919
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PXW4YGJsXTsrV6XV1Wnk/M4UBhp/I3L9F86Mgu0wsl6mE0h8pNfq9RooiPN5GGuBmpH8/9jTsJs0sfbRL6eSUXpf9vyvdeaZvBUpF1pCJ0c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR04MB3138
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.7.132
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,143 +121,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Matthias Brugger <mbrugger@suse.com>, Rob Herring <robh@kernel.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Esteban Bosse <estebanbosse@gmail.com>, "Emilio G . Cota" <cota@braap.org>,
+ Clement Deschamps <clement.deschamps@antfield.fr>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Cleber Rosa <crosa@redhat.com>,
+ Pete Batard <pete@akeo.ie>, "Xiang, Cheng" <ext-cheng.xiang@here.com>,
+ =?utf-8?B?UGhpbGlwcGUgTWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
+ Pekka Enberg <penberg@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000e47fc80596bf3ff7
-Content-Type: text/plain; charset="UTF-8"
-
-On Thursday, November 7, 2019, Rajath Shashidhara <rajaths@cs.utexas.edu>
-wrote:
-
-> Hi all,
->
-> I am a Computer Science graduate student at The University of Texas at
-> Austin (UT, Austin). I am looking forward to contributing to qemu !
->
-> This semester, I am taking a class in Virtualization (
-> https://github.com/vijay03/cs378-f19) and contributing to a
-> virtualization related open-source project is a significant part of the
-> course.
-> I would be interested in contributing a patchset to qemu - possibly a
-> self-contained feature or a reasonably complex bug fix that can be
-> completed in under a month's time. I did look at both the bugtracker and
-> the QEMU Google Summer of Code 2019 page [https://wiki.qemu.org/Google_
-> Summer_of_Code_2019] for ideas. However, I would be interested in hearing
-> from the community and I would be delighted if somebody can be suggest a
-> suitable project !
->
->
-Hello, Rajath!
-
-Thank you for expressing interest in QEMU open source project.
-
-There is certainly a place for you and your contributions in QEMU, and you
-are very welcomed!
-
-It looks to me the following project would fit your description:
-
-'Implement emulation of DS3231 real time clock in QEMU'
-
-Datasheet:
-
-https://datasheets.maximintegrated.com/en/ds/DS3231.pdf
-
-The steps needed to complete it (in my opinion):
-
-- collect datasheets of as many as possible RTC chips already emulated in
-QEMU (there are around of dozen of them, see folder hw/rtc)
-
-- do a comparative analysis of selected RTC implementations in QEMU
-
-- get to know general QEMU device model
-
-- design and implement DS3231 emulation
-
-I can give you (unfortunately constrained by tight time limits) some help
-and guidance. But there are other people in community too (more
-knowledgable in the area than me).
-
-I salute your initiative!
-
-Yours,
-Aleksandar
-
-
-
-
-> I am an advanced C programmer with both professional and academic
-> background in systems design & implementation - especially OS & Networks.
-> Given my background, I feel fairly confident that I can pickup the QEMU
-> codebase quickly.
->
-> Eagerly looking forward to hearing from the community !
->
-> Thanks,
-> Rajath Shashidhara
->
->
->
-
---000000000000e47fc80596bf3ff7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<br><br>On Thursday, November 7, 2019, Rajath Shashidhara &lt;<a href=3D"ma=
-ilto:rajaths@cs.utexas.edu">rajaths@cs.utexas.edu</a>&gt; wrote:<br><blockq=
-uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
-solid;padding-left:1ex">Hi all,<br>
-<br>
-I am a Computer Science graduate student at The University of Texas at Aust=
-in (UT, Austin). I am looking forward to contributing to qemu !<br>
-<br>
-This semester, I am taking a class in Virtualization (<a href=3D"https://gi=
-thub.com/vijay03/cs378-f19" target=3D"_blank">https://github.com/vijay03/cs=
-<wbr>378-f19</a>) and contributing to a virtualization related open-source =
-project is a significant part of the course.<br>
-I would be interested in contributing a patchset to qemu - possibly a self-=
-contained feature or a reasonably complex bug fix that can be completed in =
-under a month&#39;s time. I did look at both the bugtracker and the QEMU Go=
-ogle Summer of Code 2019 page [<a href=3D"https://wiki.qemu.org/Google_Summ=
-er_of_Code_2019" target=3D"_blank">https://wiki.qemu.org/Google_<wbr>Summer=
-_of_Code_2019</a>] for ideas. However, I would be interested in hearing fro=
-m the community and I would be delighted if somebody can be suggest a suita=
-ble project !<br>
-<br></blockquote><div><br></div><div>Hello, Rajath!</div><div><br></div><di=
-v>Thank you for expressing interest in QEMU open source project.</div><div>=
-<br></div><div>There is certainly a place for you and your contributions in=
- QEMU, and you are very welcomed!</div><div><br></div><div>It looks to me t=
-he following project would fit your description:</div><div><br></div><div>&=
-#39;Implement emulation of DS3231 real time clock in QEMU&#39;</div><div><b=
-r></div><div>Datasheet:</div><div><br></div><div><a href=3D"https://datashe=
-ets.maximintegrated.com/en/ds/DS3231.pdf">https://datasheets.maximintegrate=
-d.com/en/ds/DS3231.pdf</a><br></div><div><br></div><div>The steps needed to=
- complete it (in my opinion):</div><div><br></div><div>- collect datasheets=
- of as many as possible RTC chips already emulated in QEMU (there are aroun=
-d of dozen of them, see folder hw/rtc)</div><div><br></div><div>- do a comp=
-arative analysis of selected RTC implementations in QEMU</div><div><br></di=
-v><div>- get to know general QEMU device model</div><div><br></div><div>- d=
-esign and implement DS3231 emulation</div><div><br></div><div>I can give yo=
-u (unfortunately constrained by tight time limits) some help and guidance. =
-But there are other people in community too (more knowledgable in the area =
-than me).</div><div><br></div><div>I salute your initiative!</div><div><br>=
-</div><div>Yours,</div><div>Aleksandar</div><div><br></div><div><br></div><=
-div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8e=
-x;border-left:1px #ccc solid;padding-left:1ex">
-I am an advanced C programmer with both professional and academic backgroun=
-d in systems design &amp; implementation - especially OS &amp; Networks. Gi=
-ven my background, I feel fairly confident that I can pickup the QEMU codeb=
-ase quickly.<br>
-<br>
-Eagerly looking forward to hearing from the community !<br>
-<br>
-Thanks,<br>
-Rajath Shashidhara<br>
-<br>
-<br>
-</blockquote>
-
---000000000000e47fc80596bf3ff7--
+T24gMTAvMjAvMTkgMTo0NyBBTSwgUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgd3JvdGU6DQo+IFRo
+ZSBhYnN0cmFjdCBUWVBFX0JDTTI4M1ggZGV2aWNlIHByb3ZpZGVzIGEgJ2VuYWJsZWQtY3B1cycg
+cHJvcGVydHkNCj4gdG8gcmVzdHJpY3QgdGhlIG51bWJlciBvZiBjb3JlcyBwb3dlcmVkIG9uIHJl
+c2V0LiBUaGlzIGJlY2F1c2Ugb24NCj4gcmVhbCBoYXJkd2FyZSB0aGUgR1BVIGlzIHJlc3BvbnNp
+YmxlIG9mIHN0YXJ0aW5nIHRoZSBjb3JlcyBhbmQga2VlcA0KPiB0aGVtIHNwaW5uaW5nIHVudGls
+IHRoZSBMaW51eCBrZXJuZWwgaXMgcmVhZHkgdG8gdXNlIHRoZW0uDQo+IFdoZW4gdXNpbmcgdGhl
+IC1rZXJuZWwgcGFyYW1lbnRlciwgUUVNVSBkb2VzIHRoaXMgYnkgaW5zdGFsbGluZyB0aGUNCj4g
+J3Jhc3BpX3NtcGJvb3QnIGNvZGUgd2hlbiBhcm1fYm9vdF9pbmZvOjp3cml0ZV9ib2FyZF9zZXR1
+cCgpIGlzDQo+IGNhbGxlZC4gVGhpcyBpcyBhIHNwZWNpYWwgZmVhdHVyZSB0byBoZWxwIHRoZSBM
+aW51eCBrZXJuZWwsIGFuZCBjYW4NCj4gb25seSBiZSB1c2VkIHdpdGggYSBMaW51eCBrZXJuZWwu
+DQo+DQo+IEV2ZW4gaWYgbG9hZGVkIHdpdGggdGhlIC1rZXJuZWwgb3B0aW9uLCBVLWJvb3QgaXMg
+bm90IExpbnV4LCB0aHVzDQo+IGlzIG5vdCByZWNvZ25pemVkIGFzIGl0IGFuZCB0aGUgcmFzcGlf
+c21wYm9vdCBjb2RlIGlzIG5vdCBpbnN0YWxsZWQuDQo+DQo+IFVwb24gaW50cm9kdWN0aW9uIG9m
+IHRoaXMgbWFjaGluZSBpbiBjb21taXQgMWRmN2QxZjkzMDMsIHRoZSAtc21wIDxOPg0KPiBvcHRp
+b24gYWxsb3dkIHRvIGxpbWl0IHRoZSBudW1iZXIgb2YgY29yZXMgcG93ZXJlZCBvbiByZXNldC4N
+Cj4gVW5mb3J0dW5hdGVseSBsYXRlciBjb21taXQgNzI2NDk2MTkzNDEgYWRkZWQgYSBjaGVjayB3
+aGljaCBtYWRlIHRoaXMNCj4gZmVhdHVyZSB1bnVzYWJsZToNCj4NCj4gICAgJCBxZW11LXN5c3Rl
+bS1hYXJjaDY0IC1NIHJhc3BpMyAtc21wIDENCj4gICAgcWVtdS1zeXN0ZW0tYWFyY2g2NDogSW52
+YWxpZCBTTVAgQ1BVcyAxLiBUaGUgbWluIENQVXMgc3VwcG9ydGVkIGJ5IG1hY2hpbmUgJ3Jhc3Bp
+MycgaXMgNA0KPg0KPiBGb3J0dW5hdGVseSwgdGhlIC1zbXAgb3B0aW9uIGFsbG93IHZhcmlvdXMg
+a2luZCBvZiBDUFUgdG9wb2xvZ3k6DQo+DQo+ICAgIC1zbXAgW2NwdXM9XW5bLG1heGNwdXM9Y3B1
+c11bLGNvcmVzPWNvcmVzXVssdGhyZWFkcz10aHJlYWRzXVssZGllcz1kaWVzXVssc29ja2V0cz1z
+b2NrZXRzXQ0KPiAgICAgICAgICAgICBzZXQgdGhlIG51bWJlciBvZiBDUFVzIHRvICduJyBbZGVm
+YXVsdD0xXQ0KPiAgICAgICAgICAgICBtYXhjcHVzPSBtYXhpbXVtIG51bWJlciBvZiB0b3RhbCBj
+cHVzLCBpbmNsdWRpbmcNCj4gICAgICAgICAgICAgb2ZmbGluZSBDUFVzIGZvciBob3RwbHVnLCBl
+dGMNCj4gICAgICAgICAgICAgY29yZXM9IG51bWJlciBvZiBDUFUgY29yZXMgb24gb25lIHNvY2tl
+dCAoZm9yIFBDLCBpdCdzIG9uIG9uZSBkaWUpDQo+ICAgICAgICAgICAgIHRocmVhZHM9IG51bWJl
+ciBvZiB0aHJlYWRzIG9uIG9uZSBDUFUgY29yZQ0KPiAgICAgICAgICAgICBkaWVzPSBudW1iZXIg
+b2YgQ1BVIGRpZXMgb24gb25lIHNvY2tldCAoZm9yIFBDIG9ubHkpDQo+ICAgICAgICAgICAgIHNv
+Y2tldHM9IG51bWJlciBvZiBkaXNjcmV0ZSBzb2NrZXRzIGluIHRoZSBzeXN0ZW0NCj4NCj4gTGV0
+J3MgdXNlIHRoZSAnY29yZXMnIGFyZ3VtZW50IHRvIHNwZWNpZnkgdGhlIG51bWJlciBvZiBjb3Jl
+cyBwb3dlcmVkDQo+IGF0IHJlc2V0IHRvIHJlc3RvcmUgdGhpcyBmZWF0dXJlLCBhbmQgYWxsb3cg
+dG8gYm9vdCBVLWJvb3QuDQo+DQo+IFdlIGNhbiBub3cgcnVuIFUtYm9vdCB1c2luZzoNCj4NCj4g
+ICAgJCBxZW11LXN5c3RlbS1hYXJjaDY0IC1NIHJhc3BpMyAtc21wIDQsY29yZXM9MSAuLi4NCj4N
+Cj4gUmVwb3J0ZWQtYnk6IExhdXJlbnQgQm9ubmFucyA8bGF1cmVudC5ib25uYW5zQGhlcmUuY29t
+Pg0KPiBTaWduZWQtb2ZmLWJ5OiBQaGlsaXBwZSBNYXRoaWV1LURhdWTDqSA8ZjRidWdAYW1zYXQu
+b3JnPg0KPiAtLS0NCj4gICBody9hcm0vcmFzcGkuYyB8IDQgKystLQ0KPiAgIDEgZmlsZSBjaGFu
+Z2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9o
+dy9hcm0vcmFzcGkuYyBiL2h3L2FybS9yYXNwaS5jDQo+IGluZGV4IDU2OWQ4NWMxMWEuLjQ1ZDNm
+OTFmOTUgMTAwNjQ0DQo+IC0tLSBhL2h3L2FybS9yYXNwaS5jDQo+ICsrKyBiL2h3L2FybS9yYXNw
+aS5jDQo+IEBAIC0xOTAsOCArMTkwLDggQEAgc3RhdGljIHZvaWQgcmFzcGlfaW5pdChNYWNoaW5l
+U3RhdGUgKm1hY2hpbmUsIGludCB2ZXJzaW9uKQ0KPiAgICAgICAvKiBTZXR1cCB0aGUgU09DICov
+DQo+ICAgICAgIG9iamVjdF9wcm9wZXJ0eV9hZGRfY29uc3RfbGluayhPQkpFQ1QoJnMtPnNvYyks
+ICJyYW0iLCBPQkpFQ1QoJnMtPnJhbSksDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAmZXJyb3JfYWJvcnQpOw0KPiAtICAgIG9iamVjdF9wcm9wZXJ0eV9zZXRfaW50KE9C
+SkVDVCgmcy0+c29jKSwgbWFjaGluZS0+c21wLmNwdXMsICJlbmFibGVkLWNwdXMiLA0KPiAtICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICZlcnJvcl9hYm9ydCk7DQo+ICsgICAgb2JqZWN0X3By
+b3BlcnR5X3NldF9pbnQoT0JKRUNUKCZzLT5zb2MpLCBtYWNoaW5lLT5zbXAuY29yZXMsDQo+ICsg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgImVuYWJsZWQtY3B1cyIsICZlcnJvcl9hYm9ydCk7
+DQo+ICAgICAgIGludCBib2FyZF9yZXYgPSB2ZXJzaW9uID09IDMgPyAweGEwMjA4MiA6IDB4YTIx
+MDQxOw0KPiAgICAgICBvYmplY3RfcHJvcGVydHlfc2V0X2ludChPQkpFQ1QoJnMtPnNvYyksIGJv
+YXJkX3JldiwgImJvYXJkLXJldiIsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZl
+cnJvcl9hYm9ydCk7DQoNCkhpIFBoaWwsDQoNClRoYW5rcyBmb3IgdGhlIHBhdGNoLCBJIGZpbmFs
+bHkgZ290IHRoZSBjaGFuY2UgdG8gbWFrZSBzb21lIHRlc3RzIChzb3JyeSANCmFib3V0IHRoZSBk
+ZWxheSkuDQoNClVzaW5nIHRoZSBwcm9wb3NlZCAtc21wIG9wdGlvbnMgaW5kZWVkIGhlbHBzIHRv
+IHJ1biB1LWJvb3QgZWxmcyANCmRpcmVjdGx5LiBIb3dldmVyLCB0aGUgY29yZXMgZmFpbCB0byBz
+dGFydCB3aGVuIHN3aXRjaGluZyB0byBsaW51eCANCih0ZXN0ZWQgb24gcmFzcGkyKToNCg0KWyAw
+LjA3MTAzMF0gc21wOiBCcmluZ2luZyB1cCBzZWNvbmRhcnkgQ1BVcyAuLi4NClsgMS4xNTc4NzZd
+IENQVTE6IGZhaWxlZCB0byBjb21lIG9ubGluZQ0KWyAyLjIxOTg5OV0gQ1BVMjogZmFpbGVkIHRv
+IGNvbWUgb25saW5lDQpbIDMuMjg1NDEyXSBDUFUzOiBmYWlsZWQgdG8gY29tZSBvbmxpbmUNClsg
+My4yODYxMzddIHNtcDogQnJvdWdodCB1cCAxIG5vZGUsIDEgQ1BVDQpbIDMuMjg2NzY2XSBTTVA6
+IFRvdGFsIG9mIDEgcHJvY2Vzc29ycyBhY3RpdmF0ZWQgKDEyNS4wMCBCb2dvTUlQUykuDQpbIDMu
+Mjg3NDQyXSBDUFU6IEFsbCBDUFUocykgc3RhcnRlZCBpbiBTVkMgbW9kZS4NCg0KVGhlIGJlaGF2
+aW9yIHBlcnNpc3QgZXZlbiB3aXRob3V0IHVzaW5nIHRoZSBvcHRpb24gb24gdGhlIGNvbW1hbmQg
+bGluZS4NClRoZSBub3JtYWwgYmVoYXZpb3IgaXMgcmVzdG9yZWQgaWYgSSB1c2UgIi1zbXAgNCwg
+Y29yZXM9NCINCg0KR3JlZXRpbmdzLA0KDQpMYXVyZW50DQo=
 
