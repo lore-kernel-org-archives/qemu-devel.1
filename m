@@ -2,82 +2,82 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA6AC5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 12:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC4BC5DF60
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 12:13:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95F6921D79
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 12:12:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4A372166E
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 12:13:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EKVQuk55"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F6921D79
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="equvkdjR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4A372166E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSgdv-0003fC-Ls
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 07:12:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55160)
+	id 1iSgex-0004N6-0u
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 07:13:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55247)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iSgd2-00036x-Op
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:11:10 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iSgdZ-0003NX-2i
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:11:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iSgcz-0006zj-IO
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:11:07 -0500
-Received: from mail-qv1-xf43.google.com ([2607:f8b0:4864:20::f43]:36298)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iSgcz-0006xI-EW
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:11:05 -0500
-Received: by mail-qv1-xf43.google.com with SMTP id f12so679724qvu.3
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 04:11:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BKA8s1JfODN4WpwTCWOwtgTT+YzZkjzLVM4z9feXflo=;
- b=EKVQuk55NqGEBZhbV8BVxDQYjsoT81dzTmsRxPY6wkvHgR2201EEbrXM/f+4dt4b8x
- MPP/nzcAMrp6SuDo7mbSGX+LcQXh9/pd9oETm1jFw8TBDLojxjDHClV4PYzZjrVoAfzl
- csCkA+bh69AXVz2hqudiqDmMhOKR2EP2/zDBezyvS6xwXVvU6VeH4m5JKswsrvrFK8bR
- HmHUt1XUt7m8iCpGV+8+6/RH8ExPqoITwjlgKh04ScfyEKG2NEHwTyUI4FssxUMUdT+M
- pM9jt1TEN20IHzkT063k8iwpbZp2J6R173q2JvMGx6Bb28lCQmAMELV9z9q/3QBIxOjF
- EIdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=BKA8s1JfODN4WpwTCWOwtgTT+YzZkjzLVM4z9feXflo=;
- b=dsQtDfGowpktNkC/Zt92JbSzl2sbd3i51R0CxZjgRuOcN3ayUJG6g7zNO75QZPkgJ2
- +BIftWeY6JT/MmQTQXWUTJR/wSpVmoaHPz+0MtsWlK6hCR/cULi0T8d3gGkFe1kkot38
- afTSqgoB4M8OFsq3ejLrUqQEYapCIh09fFFYaLZ9PTVoRXUc+brYYvGU73jLUlI09ZH6
- ucPehKNaA/NkLc1VSxm7QNiD9/AiX9AFDpR476WWSdwhCCaaGZcpeGvOVO4OSLIF0CEb
- U7lBGzL1ZBu/f31p5TdlUGvGEo8loh9/NyoEyQzjyw8aybS8wfIHIwcdrWKSKUtTj6DN
- 1OVQ==
-X-Gm-Message-State: APjAAAWZTdKLIoovzIQ/R3zurHQEPxlAJ6MV4YIX5q+eWTeMYJFa7Q9S
- 77KlFll+Kp9TdhOjdI0K6Fejz+xFzLTj+TzUBKg=
-X-Google-Smtp-Source: APXvYqzsPlvpOUDn7EkcGf9rJWzzK0UmVSKgbkHC5ep6B4ucYn8RQygbhppA26x9x2LAw1qeWeDvK70JS85dMoOF3WQ=
-X-Received: by 2002:a0c:87b5:: with SMTP id 50mr3064636qvj.143.1573128663596; 
- Thu, 07 Nov 2019 04:11:03 -0800 (PST)
+ (envelope-from <dgilbert@redhat.com>) id 1iSgdX-0007Hl-8c
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:11:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44298
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iSgdX-0007Gu-3p
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 07:11:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573128693;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=O37KNe058FRW/xYbyj9Ui7LgdAoReAFGIHly4bLVUqs=;
+ b=equvkdjRdhU1IDlwykIQw57VRes6kXcdRgUo7Y1/ocoFC65ZmtCRsiF/UbcGGZNN82+HJd
+ OUDH9ir9KpcurnMm7xeu2v+j2jdUHYM7b1y6j/EDQ0I6k76wgZXwt+VY3/sqozfOXCBPAa
+ enNAQVgPPMmpyaJLWN3sY1NFcT9SglU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-236-JJGui4duOgWM60d1eWyXcg-1; Thu, 07 Nov 2019 07:11:29 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4B071800D7A;
+ Thu,  7 Nov 2019 12:11:28 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.14])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0FEDC19C6A;
+ Thu,  7 Nov 2019 12:11:27 +0000 (UTC)
+Date: Thu, 7 Nov 2019 12:11:25 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH 2/2] migration/compress: disable compress if failed to
+ setup
+Message-ID: <20191107121125.GI2816@work-vm>
+References: <20191012023932.1863-1-richardw.yang@linux.intel.com>
+ <20191012023932.1863-3-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
- <20191106084344.GB189998@stefanha-x1.localdomain>
- <20191106095122.jju7eo57scfoat6a@sirius.home.kraxel.org>
- <CAJSP0QUJBkqtVJq17tfX5O-JuvEGcZQviP0C3tv9qSDy-P-hcg@mail.gmail.com>
- <20191106125023.uhdhtqisybilxasr@sirius.home.kraxel.org>
-In-Reply-To: <20191106125023.uhdhtqisybilxasr@sirius.home.kraxel.org>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 7 Nov 2019 13:10:52 +0100
-Message-ID: <CAJSP0QXG5Z3zCnPL+Y7EQfCeey2Fb9OdPdx531Jz2Ofk63wndg@mail.gmail.com>
-Subject: Re: guest / host buffer sharing ...
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::f43
+In-Reply-To: <20191012023932.1863-3-richardw.yang@linux.intel.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: JJGui4duOgWM60d1eWyXcg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,50 +89,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
- Alex Lau <alexlau@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
- qemu-devel <qemu-devel@nongnu.org>, Tomasz Figa <tfiga@chromium.org>,
- Keiichi Watanabe <keiichiw@chromium.org>,
- David Stevens <stevensd@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
- =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Hans Verkuil <hverkuil@xs4all.nl>,
- Dmitry Morozov <dmitry.morozov@opensynergy.com>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 6, 2019 at 1:50 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
-> > In the graphics buffer sharing use case, how does the other side
-> > determine how to interpret this data?
->
-> The idea is to have free form properties (name=value, with value being
-> a string) for that kind of metadata.
->
-> > Shouldn't there be a VIRTIO
-> > device spec for the messaging so compatible implementations can be
-> > written by others?
->
-> Adding a list of common properties to the spec certainly makes sense,
-> so everybody uses the same names.  Adding struct-ed properties for
-> common use cases might be useful too.
+* Wei Yang (richardw.yang@linux.intel.com) wrote:
+> In current logic, if compress_threads_save_setup() returns -1 the whole
+> migration would fail, while we could handle it gracefully by disable
+> compress.
 
-Why not define VIRTIO devices for wayland and friends?
+I think it's fine for migration to fail here; the user askd for
+compression - if it doesn't work then it's OK to fail and they can
+switch it off; since it fails right at the start there's nothing lost.
 
-This new device exposes buffer sharing plus properties - effectively a
-new device model nested inside VIRTIO.  The VIRTIO device model has
-the necessary primitives to solve the buffer sharing problem so I'm
-struggling to see the purpose of this new device.
+Dave
 
-Custom/niche applications that do not wish to standardize their device
-type can maintain out-of-tree VIRTIO devices.  Both kernel and
-userspace drivers can be written for the device and there is already
-VIRTIO driver code that can be reused.  They have access to the full
-VIRTIO device model, including feature negotiation and configuration
-space.
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> ---
+>  migration/migration.c |  9 +++++++++
+>  migration/migration.h |  1 +
+>  migration/ram.c       | 15 ++++++++-------
+>  3 files changed, 18 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 5f7e4d15e9..02b95f4223 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2093,6 +2093,15 @@ bool migrate_use_compression(void)
+>      return s->enabled_capabilities[MIGRATION_CAPABILITY_COMPRESS];
+>  }
+> =20
+> +void migrate_disable_compression(void)
+> +{
+> +    MigrationState *s;
+> +
+> +    s =3D migrate_get_current();
+> +
+> +    s->enabled_capabilities[MIGRATION_CAPABILITY_COMPRESS] =3D false;
+> +}
+> +
+>  int migrate_compress_level(void)
+>  {
+>      MigrationState *s;
+> diff --git a/migration/migration.h b/migration/migration.h
+> index 4f2fe193dc..51368d3a6e 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -309,6 +309,7 @@ bool migrate_use_return_path(void);
+>  uint64_t ram_get_total_transferred_pages(void);
+> =20
+>  bool migrate_use_compression(void);
+> +void migrate_disable_compression(void);
+>  int migrate_compress_level(void);
+>  int migrate_compress_threads(void);
+>  int migrate_compress_wait_thread(void);
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 96c9b16402..39279161a8 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -533,12 +533,12 @@ static void compress_threads_save_cleanup(void)
+>      comp_param =3D NULL;
+>  }
+> =20
+> -static int compress_threads_save_setup(void)
+> +static void compress_threads_save_setup(void)
+>  {
+>      int i, thread_count;
+> =20
+>      if (!migrate_use_compression()) {
+> -        return 0;
+> +        return;
+>      }
+>      thread_count =3D migrate_compress_threads();
+>      compress_threads =3D g_new0(QemuThread, thread_count);
+> @@ -569,11 +569,14 @@ static int compress_threads_save_setup(void)
+>                             do_data_compress, comp_param + i,
+>                             QEMU_THREAD_JOINABLE);
+>      }
+> -    return 0;
+> +    return;
+> =20
+>  exit:
+>      compress_threads_save_cleanup();
+> -    return -1;
+> +    migrate_disable_compression();
+> +    error_report("%s: failed to setup compress threads, compress disable=
+d",
+> +                 __func__);
+> +    return;
+>  }
+> =20
+>  /* Multiple fd's */
+> @@ -3338,9 +3341,7 @@ static int ram_save_setup(QEMUFile *f, void *opaque=
+)
+>      RAMState **rsp =3D opaque;
+>      RAMBlock *block;
+> =20
+> -    if (compress_threads_save_setup()) {
+> -        return -1;
+> -    }
+> +    compress_threads_save_setup();
+> =20
+>      /* migration has already setup the bitmap, reuse it. */
+>      if (!migration_in_colo_state()) {
+> --=20
+> 2.17.1
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
-Stefan
 
