@@ -2,87 +2,75 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F49CC5DF61
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 13:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80B86C5DF61
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 13:56:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A67B2178F
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 13:55:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgiAn9+v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A67B2178F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 51C47214D8
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 13:56:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C47214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSiG5-0000ai-Ds
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 08:55:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41923)
+	id 1iSiHO-0002Su-G5
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 08:56:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42155)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iSiF0-00085H-4i
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:54:27 -0500
+ (envelope-from <bounces@canonical.com>) id 1iSiGG-0001K8-7H
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:55:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iSiEx-0007uL-7o
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:54:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50137
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iSiEx-0007ti-2h
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:54:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573134862;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZAPXLzu/WWGlIR7eYqolsYiUpc16e9PqSb22Q2rDzRc=;
- b=UgiAn9+vRRfWH7+tO2+DLkM1yLx/seHD3LxxZDyvqHblmSkvbMA/YH5wC0Y9NjcXt/fvSg
- mVByoIJITT6yG7L6owzF1gSV6dTvT0AgWAF/rzDqyfMI76pdBscn8eUF4maee9GtC77+9t
- MaWPk642L6bTgwOYlhCywUPFwOLjDbs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-VPWNaCA6My-XFr4xbFDCOQ-1; Thu, 07 Nov 2019 08:54:17 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70F6C102;
- Thu,  7 Nov 2019 13:54:16 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.16.105])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D0F0608B2;
- Thu,  7 Nov 2019 13:54:07 +0000 (UTC)
-Date: Thu, 7 Nov 2019 13:54:05 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: privileged entropy sources in QEMU/KVM guests
-Message-ID: <20191107135405.GF120292@redhat.com>
-References: <03e769cf-a5ad-99ce-cd28-690e0a72a310@redhat.com>
- <20191107115203.GD120292@redhat.com>
- <31917972-da28-8e0d-432d-1cb7607ff3e7@redhat.com>
- <ad6a25e6-6019-e02f-b632-e19e6eeb0b95@redhat.com>
+ (envelope-from <bounces@canonical.com>) id 1iSiGE-0000KC-UR
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:55:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:35168)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iSiGE-0000Jm-Op
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 08:55:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iSiGD-0002ox-CP
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 13:55:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 599252E80AD
+ for <qemu-devel@nongnu.org>; Thu,  7 Nov 2019 13:55:41 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <ad6a25e6-6019-e02f-b632-e19e6eeb0b95@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: VPWNaCA6My-XFr4xbFDCOQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Date: Thu, 07 Nov 2019 13:47:57 -0000
+From: Marietto <marietto2008@gmail.com>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h marietto2008
+X-Launchpad-Bug-Reporter: Marietto (marietto2008)
+X-Launchpad-Bug-Modifier: Marietto (marietto2008)
+References: <157306426546.28368.6683622999323132409.malonedeb@chaenomeles.canonical.com>
+Message-Id: <157313447736.28519.2758845895217673309.malone@chaenomeles.canonical.com>
+Subject: [Bug 1851547] Re: qemu 4 crashes with this parameter attached -usb
+ -device usb-host, hostbus=1, hostaddr=7 \
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="469f241f4e73cc0bdffa4e30654052a2af068e06";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: fc52fa30092c1e656216995c18e5a24f31706820
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -91,97 +79,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
- Jian J Wang <jian.j.wang@intel.com>,
- edk2-devel-groups-io <devel@edk2.groups.io>,
- Bret Barkelew <Bret.Barkelew@microsoft.com>,
- qemu devel list <qemu-devel@nongnu.org>, Erik Bjorge <erik.c.bjorge@intel.com>,
- Sean Brogan <sean.brogan@microsoft.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Reply-To: Bug 1851547 <1851547@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Nov 07, 2019 at 02:44:11PM +0100, Laszlo Ersek wrote:
-> On 11/07/19 13:47, Paolo Bonzini wrote:
-> > On 07/11/19 12:52, Daniel P. Berrang=C3=A9 wrote:
-> >>
-> >> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/com=
-mit/?id=3Dbb5530e4082446aac3a3d69780cd4dbfa4520013
-> >>
-> >> Is it practical to provide a jitter entropy source for EDK2
-> >> too ?
-> >=20
-> > The hard part is not collecting jitter (though the firmware might be to=
-o
-> > deterministic for that), but rather turning it into a random number see=
-d
-> > (mixing data from various sources, crediting entropy, etc.).
->=20
-> If there is *any* entropy source that (a) we can trust to be random
-> enough and (b) depends only on the CPU, then we shouldn't struggle with
-> virtio-rng (or similar devices) at all. RDRAND would be a no-brainer,
-> but the "community literature" suggests it should not be trusted in itsel=
-f.
->=20
-> I've read the commit message linked above, and it appears too good to be
-> true.
->=20
->     The CPU Jitter RNG provides a source of good entropy by collecting
->     CPU executing time jitter. [...] The RNG does not have any
->     dependencies on any other service in the kernel. The RNG only needs
->     a high-resolution time stamp. [...]
->=20
-> http://www.chronox.de/jent.html
->=20
->     The CPU Jitter Random Number Generator provides a non-physical true
->     random number generator that works equally in kernel and user land.
->     The only prerequisite is the availability of a high-resolution timer
->     that is available in modern CPUs.
->=20
-> http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.html
->=20
->     Today=E2=80=99s operating systems provide non-physical true random nu=
-mber
->     generators which are based on hardware events. With the advent of
->     virtualization and the ever growing need of more high-quality random
->     numbers, these random number generators reach their limits.
->     Additional sources of entropy must be opened up. This document
->     introduces an entropy source based on CPU execution time jitter. The
->     design and implementation of a non-physical true random number
->     generator, the CPU Jitter random number generator, its statistical
->     properties and the maintenance and behavior of entropy is discussed
->     in this document.
->=20
-> If this construct is legit, a core edk2 implementation (available to all
-> platforms, and on all edk2 arches) would be a huge win.
->=20
-> On the other hand, we're having this discussion because the premise of
-> TianoCore#1871 is that we shouldn't rely on just the CPU and a high
-> resolution timer... I simply cannot decide if this construct is
-> trustworthy. (With any solution that was based in the host's /dev/random
-> or /dev/urandom, the trustworthiness question would be side-stepped in
-> the firmware.)
+001:008 Compx 2.4G Receiver. Problem arise because I've detached one of
+my USB disk and the numbering of the USB devices attached changed.
+specially the compx 2.4g receiver changed from hostaddr 7 to 8 and when
+this happens qemu 4 seems to work not as good as qemu 3.
 
-I can't claim to have knowledge of whether the above text is accurate
-or not, instead I just defer to the Linux maintainers recommendatiohns.
-They've considered it acceptable to merge it into Linux, and to me that
-says it should be acceptable to have in EDK2 too.
+-- =
 
-As a second data point, jitter entropy has been the recommended solution
-in RHEL for VMs where there's no RDRAND or virtio-rng available. In RHEL-7
-this was implemented in userspace in rng-tools rather than with the kernel
-module I link above, but the approach is the same in both cases IIUC.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1851547
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+Title:
+  qemu 4 crashes with this parameter attached -usb -device usb-
+  host,hostbus=3D1,hostaddr=3D7 \
 
+Status in QEMU:
+  New
+
+Bug description:
+  Hello.
+
+  qemu / kvm does not start anymore after upgrading ubuntu from 19.04 to
+  19.10 and qemu from 3 to 4,as you can see below. what can I do ?
+
+  root@ziomario-Z390-AORUS-PRO:/home/ziomario/Scrivania/OS-KVM# ./boot-
+  OS-HSP2.sh
+
+  ----> qemu-system-x86_64: /build/qemu-
+  UryNDZ/qemu-4.0+dfsg/hw/usb/core.c:720: usb_ep_get: asserzione "dev !=3D
+  NULL" non riuscita.
+
+  ./boot-OS-HSP2.sh: riga 40: 26312 Annullato (core dump creato) qemu-
+  system-x86_64 -enable-kvm -m 16000 -cpu
+  Penryn,kvm=3Don,vendor=3DGenuineIntel,+invtsc,vmware-cpuid-
+  freq=3Don,$MY_OPTIONS -machine pc-q35-2.9 -smp 4,cores=3D2 -vga none
+  -device vfio-pci,host=3D01:00.0,bus=3Dpcie.0,multifunction=3Don -device
+  vfio-pci,host=3D01:00.1,bus=3Dpcie.0 -device vfio-
+  pci,host=3D01:00.2,bus=3Dpcie.0 -device vfio-pci,host=3D01:00.3,bus=3Dpci=
+e.0
+  -usb -device usb-host,hostbus=3D1,hostaddr=3D7 -drive
+  if=3Dpflash,format=3Draw,readonly,file=3D$OVMF/OVMF_CODE.fd -drive
+  if=3Dpflash,format=3Draw,file=3D$OVMF/OVMF_VARS-1024x768.fd -smbios type=
+=3D2
+  -device ich9-ahci,id=3Dsata -drive
+  id=3DClover,if=3Dnone,snapshot=3Don,format=3Dqcow2,file=3D./'Mo/CloverNG.=
+qcow2'
+  -device ide-hd,bus=3Dsata.2,drive=3DClover -device ide-
+  hd,bus=3Dsata.3,drive=3DInstallMedia -drive
+  id=3DInstallMedia,if=3Dnone,file=3DBaseSystemHS.img,format=3Draw -drive
+  id=3DBsdHDD,if=3Dnone,file=3D/dev/sdg,format=3Draw -device ide-
+  hd,bus=3Dsata.4,drive=3DBsdHDD -netdev
+  tap,id=3Dnet0,ifname=3Dtap0,script=3Dno,downscript=3Dno -device
+  e1000-82545em,netdev=3Dnet0,id=3Dnet0,mac=3D52:54:00:c9:18:27 -monitor st=
+dio
+
+  It seems that this line is not good anymore (it worked with qemu 3.x)
+  :
+
+  -usb -device usb-host,hostbus=3D1,hostaddr=3D7 \
+
+  when I removed it,it works. But I need that. With what can I change it
+  ? You can reproduce that upgrading ubuntu 19.04 to 19.10 because in
+  that way also qemu will be upgraded from 3 to 4. These are the
+  packages that I'm using :
+
+  root@ziomario-Z390-AORUS-PRO:/home/ziomario# qemu-system-x86_64 --version
+  QEMU emulator version 4.0.0 (Debian 1:4.0+dfsg-0ubuntu9)
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1851547/+subscriptions
 
