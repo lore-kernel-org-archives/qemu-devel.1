@@ -2,92 +2,137 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3EBC43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 20:14:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4B3C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 20:32:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 858122166E
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 20:14:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 942D020869
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 20:32:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kqqkh/Wc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 858122166E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TNdsi6CL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 942D020869
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSoAr-0004fN-N4
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 15:14:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54765)
+	id 1iSoSA-00013X-OG
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 15:32:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38604)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iSo94-00049r-Tf
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 15:12:44 -0500
+ (envelope-from <lvivier@redhat.com>) id 1iSoRE-0000OD-Dt
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 15:31:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iSo92-0002OS-NQ
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 15:12:42 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35990)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iSo92-0002N1-Ef
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 15:12:40 -0500
-Received: by mail-wm1-x344.google.com with SMTP id c22so3915673wmd.1
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 12:12:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=EhnmLO2RD4mb6YZZBDOZ19p4IxdMpLbZJ5TlQJ7wui8=;
- b=kqqkh/WcDPwF14pZGOYacb6+ZH34DH2a5oRoJoOppreg4O6c8ltvvUxfC0qDbGLj1k
- miA+dIlGE981VezW+wqPIctSJY7bem0Wa+N6/Kxl9f0Q1yoJ2Nl69ImpxOSswsQ5Ahcq
- XcjtmZYO97tNNF6K/5+Lr0qbti0Zc8r9+BLZ7mmNz5QwNiAWzeD+pW8lPgxVytph6JqO
- RvqkWcCV5+7iki8+C/JXAKjWTdokKqKh4ybp88Bfp/38uL6z/YXUC1URa40bPbSRFay8
- joFjFUma+tmUpZcFcqKVXL3C4T5a679HjlGxlB/8rzjVVVT6xX74incTtkFxNQ925r/T
- 9fSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=EhnmLO2RD4mb6YZZBDOZ19p4IxdMpLbZJ5TlQJ7wui8=;
- b=oGOsrE+CC+EJjzz6dRWm2EerBNPL8NwYcBH/TxHVMsTyVLTLY6J8V69buw8k//jyHA
- 7sU4DloRnCp1vS9SfD8xqLCeGhYs21VBprMAD1kdCmX3kneHQv6F4puQ0WJaHFQmo/pO
- Au2LWZr+O8JneDGfEnfJX64JB/DBfTdBvRFqgxVg3N+0XJhj+fkKuIF/8kGRUfFG/Gft
- qBLD1k0VC3LthC7AQ7iz69aT+HjOD0spC8J/y81AJ1P5qTYIvwefkqtW/Mz5iqIScie5
- 9mh1UefVPAAw5EyG8i4ALegXjMyM0goSQHVZTjisOJzdQYCB9Il9Fp7/bjoedv7RZqTK
- iBHQ==
-X-Gm-Message-State: APjAAAU/q85rlwaMUGlgT9bMiARZlYq9u67ZF8N4IVqkTFR/ZTH76A9V
- addiz400BEx2uxVyBQVBij28jg==
-X-Google-Smtp-Source: APXvYqx8C68GAxQ6UyO0WH3j+ATDfLQebDvVIdyjEibSmNKxzSHiebOMm+2iGfscof39HBi1TxoAXg==
-X-Received: by 2002:a1c:9a81:: with SMTP id c123mr4551646wme.118.1573157558750; 
- Thu, 07 Nov 2019 12:12:38 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d4sm2090262wrw.83.2019.11.07.12.12.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 07 Nov 2019 12:12:37 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 2B8E51FF87;
- Thu,  7 Nov 2019 20:12:37 +0000 (GMT)
-References: <20191107142613.2379-1-robert.foley@linaro.org>
- <20191107142613.2379-5-robert.foley@linaro.org>
- <87tv7fhcl7.fsf@linaro.org> <87imnvha2k.fsf@linaro.org>
- <CAEyhzFsxT=A6HtbVeScSPdO1bHqBMq9Sn_bF1j6Y+T4=E=fQDA@mail.gmail.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH 4/4] Added tests for close and change of logfile.
-In-reply-to: <CAEyhzFsxT=A6HtbVeScSPdO1bHqBMq9Sn_bF1j6Y+T4=E=fQDA@mail.gmail.com>
-Date: Thu, 07 Nov 2019 20:12:37 +0000
-Message-ID: <87d0e3h2dm.fsf@linaro.org>
+ (envelope-from <lvivier@redhat.com>) id 1iSoRC-0006ni-KM
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 15:31:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24203
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iSoRC-0006kA-BE
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 15:31:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573158680;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=JGGT+rajwUq8lzL6hzhOpK0LJLG5p50XdsfUiutJSoI=;
+ b=TNdsi6CLpC2tyrtg31TJtkeFYq+N7vyg+THnljdwOTWJFf1wW9qj3kheCJhekZcT5M20b1
+ tSk9WObgpVfGvOSsMQsd8R3XV8lCv7Q+M9JtDzyraZ/jWJq65CM1svy/c3jd96VEAsvFVZ
+ jtovpkh+PCAfDeQwSOXMZglcGQ9LjGI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-169-rqoF6lLdOfe-IumLOjkDMA-1; Thu, 07 Nov 2019 15:31:18 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3B17477
+ for <qemu-devel@nongnu.org>; Thu,  7 Nov 2019 20:31:17 +0000 (UTC)
+Received: from [10.36.117.0] (unknown [10.36.117.0])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0522E5D9E5;
+ Thu,  7 Nov 2019 20:31:04 +0000 (UTC)
+Subject: Re: [PATCH 2/3] qtest: fix qtest_qmp_device_add leak
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191107192731.17330-1-marcandre.lureau@redhat.com>
+ <20191107192731.17330-3-marcandre.lureau@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCNMYXVyZW50IFZp
+ dmllciA8bHZpdmllckByZWRoYXQuY29tPokCOAQTAQIAIgUCVgVQgAIbAwYLCQgHAwIGFQgC
+ CQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjwpgg//fSGy0Rs/t8cPFuzoY1cex4limJQfReLr
+ SJXCANg9NOWy/bFK5wunj+h/RCFxIFhZcyXveurkBwYikDPUrBoBRoOJY/BHK0iZo7/WQkur
+ 6H5losVZtrotmKOGnP/lJYZ3H6OWvXzdz8LL5hb3TvGOP68K8Bn8UsIaZJoeiKhaNR0sOJyI
+ YYbgFQPWMHfVwHD/U+/gqRhD7apVysxv5by/pKDln1I5v0cRRH6hd8M8oXgKhF2+rAOL7gvh
+ jEHSSWKUlMjC7YwwjSZmUkL+TQyE18e2XBk85X8Da3FznrLiHZFHQ/NzETYxRjnOzD7/kOVy
+ gKD/o7asyWQVU65mh/ECrtjfhtCBSYmIIVkopoLaVJ/kEbVJQegT2P6NgERC/31kmTF69vn8
+ uQyW11Hk8tyubicByL3/XVBrq4jZdJW3cePNJbTNaT0d/bjMg5zCWHbMErUib2Nellnbg6bc
+ 2HLDe0NLVPuRZhHUHM9hO/JNnHfvgiRQDh6loNOUnm9Iw2YiVgZNnT4soUehMZ7au8PwSl4I
+ KYE4ulJ8RRiydN7fES3IZWmOPlyskp1QMQBD/w16o+lEtY6HSFEzsK3o0vuBRBVp2WKnssVH
+ qeeV01ZHw0bvWKjxVNOksP98eJfWLfV9l9e7s6TaAeySKRRubtJ+21PRuYAxKsaueBfUE7ZT
+ 7ze0LUxhdXJlbnQgVml2aWVyIChSZWQgSGF0KSA8bHZpdmllckByZWRoYXQuY29tPokCOAQT
+ AQIAIgUCVgUmGQIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjxtNBAA
+ o2xGmbXl9vJQALkj7MVlsMlgewQ1rdoZl+bZ6ythTSBsqwwtl1BUTQGA1GF2LAchRVYca5bJ
+ lw4ai5OdZ/rc5dco2XgrRFtj1np703BzNEhGU1EFxtms/Y9YOobq/GZpck5rK8jV4osEb8oc
+ 3xEgCm/xFwI/2DOe0/s2cHKzRkvdmKWEDhT1M+7UhtSCnloX776zCsrofYiHP2kasFyMa/5R
+ 9J1Rt9Ax/jEAX5vFJ8+NPf68497nBfrAtLM3Xp03YJSr/LDxer44Mevhz8dFw7IMRLhnuSfr
+ 8jP93lr6Wa8zOe3pGmFXZWpNdkV/L0HaeKwTyDKKdUDH4U7SBnE1gcDfe9x08G+oDfVhqED8
+ qStKCxPYxRUKIdUjGPF3f5oj7N56Q5zZaZkfxeLNTQ13LDt3wGbVHyZxzFc81B+qT8mkm74y
+ RbeVSuviPTYjbBQ66GsUgiZZpDUyJ6s54fWqQdJf4VFwd7M/mS8WEejbSjglGHMxMGiBeRik
+ Y0+ur5KAF7z0D1KfW1kHO9ImQ0FbEbMbTMf9u2+QOCrSWOz/rj23EwPrCQ2TSRI2fWakMJZ+
+ zQZvy+ei3D7lZ09I9BT/GfFkTIONgtNfDxwyMc4v4XyP0IvvZs/YZqt7j3atyTZM0S2HSaZ9
+ rXmQYkBt1/u691cZfvy+Tr2xZaDpFcjPkci5Ag0EVgUmGQEQALxSQRbl/QOnmssVDxWhHM5T
+ Gxl7oLNJms2zmBpcmlrIsn8nNz0rRyxT460k2niaTwowSRK8KWVDeAW6ZAaWiYjLlTunoKwv
+ F8vP3JyWpBz0diTxL5o+xpvy/Q6YU3BNefdq8Vy3rFsxgW7mMSrI/CxJ667y8ot5DVugeS2N
+ yHfmZlPGE0Nsy7hlebS4liisXOrN3jFzasKyUws3VXek4V65lHwB23BVzsnFMn/bw/rPliqX
+ Gcwl8CoJu8dSyrCcd1Ibs0/Inq9S9+t0VmWiQWfQkz4rvEeTQkp/VfgZ6z98JRW7S6l6eoph
+ oWs0/ZyRfOm+QVSqRfFZdxdP2PlGeIFMC3fXJgygXJkFPyWkVElr76JTbtSHsGWbt6xUlYHK
+ XWo+xf9WgtLeby3cfSkEchACrxDrQpj+Jt/JFP+q997dybkyZ5IoHWuPkn7uZGBrKIHmBunT
+ co1+cKSuRiSCYpBIXZMHCzPgVDjk4viPbrV9NwRkmaOxVvye0vctJeWvJ6KA7NoAURplIGCq
+ kCRwg0MmLrfoZnK/gRqVJ/f6adhU1oo6z4p2/z3PemA0C0ANatgHgBb90cd16AUxpdEQmOCm
+ dNnNJF/3Zt3inzF+NFzHoM5Vwq6rc1JPjfC3oqRLJzqAEHBDjQFlqNR3IFCIAo4SYQRBdAHB
+ CzkM4rWyRhuVABEBAAGJAh8EGAECAAkFAlYFJhkCGwwACgkQ8ww4vT8vvjwg9w//VQrcnVg3
+ TsjEybxDEUBm8dBmnKqcnTBFmxN5FFtIWlEuY8+YMiWRykd8Ln9RJ/98/ghABHz9TN8TRo2b
+ 6WimV64FmlVn17Ri6FgFU3xNt9TTEChqAcNg88eYryKsYpFwegGpwUlaUaaGh1m9OrTzcQy+
+ klVfZWaVJ9Nw0keoGRGb8j4XjVpL8+2xOhXKrM1fzzb8JtAuSbuzZSQPDwQEI5CKKxp7zf76
+ J21YeRrEW4WDznPyVcDTa+tz++q2S/BpP4W98bXCBIuQgs2m+OflERv5c3Ojldp04/S4NEjX
+ EYRWdiCxN7ca5iPml5gLtuvhJMSy36glU6IW9kn30IWuSoBpTkgV7rLUEhh9Ms82VWW/h2Tx
+ L8enfx40PrfbDtWwqRID3WY8jLrjKfTdR3LW8BnUDNkG+c4FzvvGUs8AvuqxxyHbXAfDx9o/
+ jXfPHVRmJVhSmd+hC3mcQ+4iX5bBPBPMoDqSoLt5w9GoQQ6gDVP2ZjTWqwSRMLzNr37rJjZ1
+ pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
+ XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <c700e47c-3142-4ad8-1582-f2f8045addf6@redhat.com>
+Date: Thu, 7 Nov 2019 21:31:03 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191107192731.17330-3-marcandre.lureau@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: rqoF6lLdOfe-IumLOjkDMA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,241 +144,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Puhov <peter.puhov@linaro.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 07/11/2019 20:27, Marc-Andr=C3=A9 Lureau wrote:
+> Spotted by ASAN.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  tests/libqtest.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 3706bccd8d..91e9cb220c 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -1274,6 +1274,7 @@ void qtest_qmp_device_add(QTestState *qts, const ch=
+ar *driver, const char *id,
+>      qdict_put_str(args, "id", id);
+> =20
+>      qtest_qmp_device_add_qdict(qts, driver, args);
+> +    qobject_unref(args);
+>  }
+> =20
+>  static void device_deleted_cb(void *opaque, const char *name, QDict *dat=
+a)
+>=20
 
-Robert Foley <robert.foley@linaro.org> writes:
+Stupid question: where is the qobject_ref()?
 
-> Thanks for providing the stack trace.
->
-> We debugged this and it seems to come about because of an interesting
-> circumstance.  We added our new tests after a pre-existing test,
-> parse_path(), which runs into an issue, a dangling pointer, which
-> could lead to a double free.  There were no other tests after the test
-> that ran into the issue, so the double free was not exposed until we
-> added our test which called qemu_set_log_filename().
->
-> Upon entry to qemu_set_log_filename() it frees logfilename.   In the
-> case where we get an error, we return out without setting the
-> logfilename to NULL.
-> And on next call into this function we will end up with a double free.
->
-> For a fix, we could put this at the beginning of qemu_set_log_filename().
-> if (logfilename) {
->     g_free(logfilename);
->     logfilename =3D NULL;
-> }
+Thanks,
+Laurent
 
-g_free(logfilename) should be safe against NULL. However we need to
-ensure that logfilename is NULL'ed after it so we don't see the double
-free.
-
-> We were curious to understand why we did not see it in our own
-> testing.  Although we did run make check before our first post, we did
-> not see this issue.  The docker tests seem to use something like
-> MALLOC_CHECK_, which catches memory issues like this.   We will be
-> sure to run the docker tests as well in the future.
-
-I was just running in my normal checkout - it could depend on how glibc
-was built for your system though. Mine is Debian Buster.
-
->
-> On Thu, 7 Nov 2019 at 12:26, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
->>
->>
->> Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
->>
->> > Robert Foley <robert.foley@linaro.org> writes:
->> >
->> >> One test ensures that the logfile handle is still valid even if
->> >> the logfile is changed during logging.
->> >> The other test validates that the logfile handle remains valid under
->> >> the logfile lock even if the logfile is closed.
->>
->> Also this doesn't see to work:
->>
->> 17:24:31 [alex@zen:~/l/q/b/all] review/rcu-logfile|=E2=80=A6 2 + ./tests=
-/test-logging
->> /logging/parse_range: OK
->> /logging/parse_path: OK
->> /logging/logfile_write_path: free(): double free detected in tcache 2
->> fish: =E2=80=9C./tests/test-logging=E2=80=9D terminated by signal SIGABR=
-T (Abort)
->>
->> in gdb
->>
->> Starting program: /home/alex/lsrc/qemu.git/builds/all/tests/test-logging
->> [Thread debugging using libthread_db enabled]
->> Using host libthread_db library "/lib/x86_64-linux-gnu/libthread_db.so.1=
-".
->> [New Thread 0x7ffff6f38700 (LWP 28960)]
->> /logging/parse_range: OK
->> /logging/parse_path: OK
->> /logging/logfile_write_path: free(): double free detected in tcache 2
->>
->> Thread 1 "test-logging" received signal SIGABRT, Aborted.
->> __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise.c:50
->> 50      ../sysdeps/unix/sysv/linux/raise.c: No such file or directory.
->> (gdb) bt
->> #0  __GI_raise (sig=3Dsig@entry=3D6) at ../sysdeps/unix/sysv/linux/raise=
-.c:50
->> #1  0x00007ffff7587535 in __GI_abort () at abort.c:79
->> #2  0x00007ffff75de508 in __libc_message (action=3Daction@entry=3Ddo_abo=
-rt, fmt=3Dfmt@entry=3D0x7ffff76e928d "%s\n") at ../sysdeps/posix/libc_fatal=
-.c:181
->> #3  0x00007ffff75e4c1a in malloc_printerr (str=3Dstr@entry=3D0x7ffff76ea=
-f58 "free(): double free detected in tcache 2") at malloc.c:5341
->> #4  0x00007ffff75e66fd in _int_free (av=3D0x7ffff7720c40 <main_arena>, p=
-=3D0x5555555cac40, have_lock=3D<optimized out>) at malloc.c:4193
->> #5  0x00005555555614a8 in qemu_set_log_filename (filename=3D0x5555555cb1=
-10 "/tmp/qemu-test-logging.RO35A0/qemu_test_log_write0.log", errp=3D0x7ffff=
-fffdef0) at /home/alex/lsrc/qemu.git/util/log.c:148
->> #6  0x000055555555d8be in test_logfile_write (data=3D0x5555555c7370) at =
-/home/alex/lsrc/qemu.git/tests/test-logging.c:127
->> #7  0x00007ffff7cdc15a in test_case_run (tc=3D0x5555555c9c60) at ../../.=
-./glib/gtestutils.c:2318
->> #8  g_test_run_suite_internal (suite=3Dsuite@entry=3D0x5555555c8a40, pat=
-h=3Dpath@entry=3D0x0) at ../../../glib/gtestutils.c:2403
->> #9  0x00007ffff7cdc014 in g_test_run_suite_internal (suite=3Dsuite@entry=
-=3D0x5555555c8a20, path=3Dpath@entry=3D0x0) at ../../../glib/gtestutils.c:2=
-415
->> #10 0x00007ffff7cdc412 in g_test_run_suite (suite=3D0x5555555c8a20) at .=
-./../../glib/gtestutils.c:2490
->> #11 0x00007ffff7cdc431 in g_test_run () at ../../../glib/gtestutils.c:17=
-55
->> #12 0x000055555555ce07 in main (argc=3D<optimized out>, argv=3D<optimize=
-d out>) at /home/alex/lsrc/qemu.git/tests/test-logging.c:212
->>
->>
->> >>
->> >> Signed-off-by: Robert Foley <robert.foley@linaro.org>
->> >> ---
->> >>  tests/test-logging.c | 74 ++++++++++++++++++++++++++++++++++++++++++=
-++
->> >>  1 file changed, 74 insertions(+)
->> >>
->> >> diff --git a/tests/test-logging.c b/tests/test-logging.c
->> >> index a12585f70a..a3190ff92c 100644
->> >> --- a/tests/test-logging.c
->> >> +++ b/tests/test-logging.c
->> >> @@ -108,6 +108,76 @@ static void test_parse_path(gconstpointer data)
->> >>      error_free_or_abort(&err);
->> >>  }
->> >>
->> >> +static void test_logfile_write(gconstpointer data)
->> >> +{
->> >> +    QemuLogFile *logfile;
->> >> +    gchar const *dir =3D data;
->> >> +    Error *err =3D NULL;
->> >> +    gchar *file_path;
->> >> +    gchar *file_path1;
->> >
->> >   with g_autofree char *file_path you can avoid the free down bellow.
->> >
->> >> +    FILE *orig_fd;
->> >> +
->> >> +    file_path =3D g_build_filename(dir, "qemu_test_log_write0.log", =
-NULL);
->> >> +    file_path1 =3D g_build_filename(dir, "qemu_test_log_write1.log",=
- NULL);
->> >> +
->> >> +    /*
->> >> +     * Test that even if an open file handle is changed,
->> >> +     * our handle remains valid due to RCU.
->> >> +     */
->> >> +    qemu_set_log_filename(file_path, &err);
->> >> +    g_assert(!err);
->> >> +    rcu_read_lock();
->> >> +    logfile =3D atomic_rcu_read(&qemu_logfile);
->> >> +    orig_fd =3D logfile->fd;
->> >> +    g_assert(logfile && logfile->fd);
->> >> +    fprintf(logfile->fd, "%s 1st write to file\n", __func__);
->> >> +    fflush(logfile->fd);
->> >> +
->> >> +    /* Change the logfile and ensure that the handle is still valid.=
- */
->> >> +    qemu_set_log_filename(file_path1, &err);
->> >> +    g_assert(!err);
->> >
->> > Maybe better would be:
->> >
->> >   logfile2 =3D atomic_rcu_read(&qemu_logfile);
->> >   g_assert(logfile->fd =3D=3D orig_fd);
->> >   g_assert(logfile2->fd !=3D logfile->fd);
->> >   fprintf(logfile2->fd, "%s 2nd write to file\n", __func__);
->> >   fflush(logfile2->fd);
->> >
->> > <snip>
->> >> +    g_assert(logfile->fd =3D=3D orig_fd);
->> >> +    fprintf(logfile->fd, "%s 2nd write to file\n", __func__);
->> >> +    fflush(logfile->fd);
->> >> +    rcu_read_unlock();
->> >> +
->> >> +    g_free(file_path);
->> >> +    g_free(file_path1);
->> >> +}
->> >> +
->> >> +static void test_logfile_lock(gconstpointer data)
->> >> +{
->> >> +    FILE *logfile;
->> >> +    gchar const *dir =3D data;
->> >> +    Error *err =3D NULL;
->> >> +    gchar *file_path;
->> >
->> > g_autofree
->> >
->> >> +
->> >> +    file_path =3D g_build_filename(dir, "qemu_test_logfile_lock0.log=
-", NULL);
->> >> +
->> >> +    /*
->> >> +     * Test the use of the logfile lock, such
->> >> +     * that even if an open file handle is closed,
->> >> +     * our handle remains valid for use due to RCU.
->> >> +     */
->> >> +    qemu_set_log_filename(file_path, &err);
->> >> +    logfile =3D qemu_log_lock();
->> >> +    g_assert(logfile);
->> >> +    fprintf(logfile, "%s 1st write to file\n", __func__);
->> >> +    fflush(logfile);
->> >> +
->> >> +    /*
->> >> +     * Initiate a close file and make sure our handle remains
->> >> +     * valid since we still have the logfile lock.
->> >> +     */
->> >> +    qemu_log_close();
->> >> +    fprintf(logfile, "%s 2nd write to file\n", __func__);
->> >> +    fflush(logfile);
->> >> +    qemu_log_unlock(logfile);
->> >> +
->> >> +    g_assert(!err);
->> >> +    g_free(file_path);
->> >> +}
->> >> +
->> >>  /* Remove a directory and all its entries (non-recursive). */
->> >>  static void rmdir_full(gchar const *root)
->> >>  {
->> >> @@ -134,6 +204,10 @@ int main(int argc, char **argv)
->> >>
->> >>      g_test_add_func("/logging/parse_range", test_parse_range);
->> >>      g_test_add_data_func("/logging/parse_path", tmp_path, test_parse=
-_path);
->> >> +    g_test_add_data_func("/logging/logfile_write_path",
->> >> +                         tmp_path, test_logfile_write);
->> >> +    g_test_add_data_func("/logging/logfile_lock_path",
->> >> +                         tmp_path, test_logfile_lock);
->> >>
->> >>      rc =3D g_test_run();
->>
->>
->> --
->> Alex Benn=C3=A9e
-
-
---
-Alex Benn=C3=A9e
 
