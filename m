@@ -2,82 +2,89 @@ Return-Path: <SRS0=+ldK=Y7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1110C43331
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 17:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED734C43331
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 18:02:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A28762178F
-	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 17:59:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mSzVGlzc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A28762178F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C04FE2178F
+	for <qemu-devel@archiver.kernel.org>; Thu,  7 Nov 2019 18:02:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C04FE2178F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iSm48-0001qJ-T3
-	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 12:59:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56364)
+	id 1iSm7N-0003vK-EM
+	for qemu-devel@archiver.kernel.org; Thu, 07 Nov 2019 13:02:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56910)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iSm2z-0001IX-0x
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 12:58:18 -0500
+ (envelope-from <philmd@redhat.com>) id 1iSm5C-0002hs-N0
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:00:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iSm2x-0003ms-HD
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 12:58:16 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:40142)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iSm2x-0003kd-Bo
- for qemu-devel@nongnu.org; Thu, 07 Nov 2019 12:58:15 -0500
-Received: by mail-ot1-x342.google.com with SMTP id m15so2781113otq.7
- for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 09:58:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Yv4ylwd25GxZ7ALmze/v8BUzVwPLvD72QcNplUocu5k=;
- b=mSzVGlzcCLG/TN2hqhH7zzmnG8PLcLzInUUJ5G5B9tChnxLpJQd4/ux0vdwJeb05Ol
- CtO1oHKYBhDpBECqPJ9iTEHFGabpn1J9+319ZoOfs393R5cMY4MiOzC8GVBmcLCnCvbL
- 2XDzlitCmnOFDDaUPK2K9MZEB8l8t6J7HubAqrfMQ09UBJDGtuOBgfylytj/K1/3+wUK
- PHBrKkQW+GIR49+0wRm+P+uKTal/vPBZHgfiTneV4cAj8/CYw8e3435bf60c0XjAZot7
- FAOw/dHpfghIjnOU1AbDgHGW3VztJEfJaRm9JMuUCfoIGsCCvbw9a0Ty6GLLPZ2AQ++L
- T+iw==
+ (envelope-from <philmd@redhat.com>) id 1iSm5B-0005Qn-9x
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:00:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48950)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iSm5B-0005OJ-1b
+ for qemu-devel@nongnu.org; Thu, 07 Nov 2019 13:00:33 -0500
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (No client certificate requested)
+ by mx1.redhat.com (Postfix) with ESMTPS id C7E2A51146
+ for <qemu-devel@nongnu.org>; Thu,  7 Nov 2019 18:00:30 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id l3so1491468wrx.21
+ for <qemu-devel@nongnu.org>; Thu, 07 Nov 2019 10:00:30 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Yv4ylwd25GxZ7ALmze/v8BUzVwPLvD72QcNplUocu5k=;
- b=TvYuXH0zcPTwbBweB/geH7s5gDFF7VKRLi2uU58ETv0HM/nXgHWCfMM7KcwQLhzYXw
- 3PDAUfCDrGiPNNVjJoRqk4Ys2cYdzaPL8RyVV8RDgkdcF0Mtq4VLG4E0A/FTMm0cBSTU
- 1Lm7jYv4WYU4o9fpDi2lkoqWkVnt1VgR80Qau6ywLzmeMZ4BFS5+NvkRODOjscPGh/Id
- R/ZeoieM8YaCikBmDvoWZM0BIfucjlwGuhAdfe/4ycCNL4jA92FKufbdaxGpmWkCncJf
- Uk4qN/F065rCAJ9Zobvz/GNHQ3a6FPmZcMym6Utt5XJ+3S1hUcli2YJuYF4S0tW6MfPl
- WTDw==
-X-Gm-Message-State: APjAAAVa2yf3AreuK2+V1vB5SyGAaX+DARMcQF5BW4cNOns5dEpbLb9a
- pEd3L3NB8s9OIyeQ9iC4anWoq7jiOO4G4EukNzS0Eg==
-X-Google-Smtp-Source: APXvYqxBdHmD8PqV0ztRdp5PjYgPhtRtnEotw0BXbTCdeuu3G5CncOvG3W2PndzpAad32SWeIBW/uPTUXKhxnQbewI0=
-X-Received: by 2002:a9d:6357:: with SMTP id y23mr2125115otk.91.1573149493963; 
- Thu, 07 Nov 2019 09:58:13 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=XcSWEuLkg+pWnqHNgl6pW8noSA+3bcWaF87j0rdtyZ4=;
+ b=E27BDU7TyGoZke7xbYJMwVNqFXJgZakwkITepg1xsqTNbpBgZXvo+NuZlpH0FKJYra
+ kcMrevKupZJOgPGO2TYbQZ69RDVDW92pjwsvGGn5YRPxjC70fMDcm0eN7MdF6AS96A4X
+ 9/KWA46s2r9j8yWEN80pgaJS1b5fVtNyPN/r3T4jhp2sAvuM2+QgCNCYZUdbqOv7i1Sg
+ JOgfX+WiNqJJxQBBXEEN40HXMzH9vqwk+pn9Ab3nfytKpqhRDVkAndBQooKC0EhRoXOa
+ qHSI6cQm7iAWJ71kAoSb9TowG5W28Nxz0ugbJCVmARr9qcCDOZ/INgEH+j19hh+q1OqY
+ yB8A==
+X-Gm-Message-State: APjAAAWiFuRsfMrX6IVTDoJgo584O+2SxXCtmwfIIXuZa3b+SvSCN23b
+ BbIPzSMyz8wc/8e+l9W6kNKmYu6mBLOdBBoxjsBHo/Clu7yFwB4ajA4KCQAhKeEzp4c56TDUb1A
+ poC94xBO+oJsic90=
+X-Received: by 2002:adf:fa07:: with SMTP id m7mr3992112wrr.108.1573149629474; 
+ Thu, 07 Nov 2019 10:00:29 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwqnucKGpXwmxX0646MvkTlSQlpINJcVgYtCzzgP0JwfKPMkQtYpXmh8ag8SnnW0UZ+qYSC3A==
+X-Received: by 2002:adf:fa07:: with SMTP id m7mr3992088wrr.108.1573149629273; 
+ Thu, 07 Nov 2019 10:00:29 -0800 (PST)
+Received: from [10.101.1.81] ([176.12.107.132])
+ by smtp.gmail.com with ESMTPSA id c15sm2485067wmb.45.2019.11.07.10.00.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 07 Nov 2019 10:00:28 -0800 (PST)
+Subject: Re: [PATCH 0/2] Acceptance test: update kernel used on m68k/q800 test
+To: Laurent Vivier <laurent@vivier.eu>, Cleber Rosa <crosa@redhat.com>,
+ Eric Blake <eblake@redhat.com>
+References: <20191028181643.5143-12-laurent@vivier.eu>
+ <20191029232320.12419-1-crosa@redhat.com>
+ <19097f6f-28a8-12ee-6761-da0f34735910@redhat.com>
+ <1209928652.10986630.1573144690743.JavaMail.zimbra@redhat.com>
+ <bb0c5db0-899e-c5a6-caa3-add8bf64f780@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <77a6200c-7f53-4305-1aad-4574f0faa904@redhat.com>
+Date: Thu, 7 Nov 2019 19:00:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20191104173654.30125-1-alex.bennee@linaro.org>
- <CAFEAcA9SOok49C8NS-+kEZyk7EYS10R+RNmhprk2J=KB3bJQFw@mail.gmail.com>
- <c926f927-34d2-3efa-b721-f4036939182e@gmx.com>
-In-Reply-To: <c926f927-34d2-3efa-b721-f4036939182e@gmx.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Nov 2019 17:58:02 +0000
-Message-ID: <CAFEAcA8W_g=DsFXaE7cmMvqa3AtnWc0+xQMQvFFhWENvieV3Rw@mail.gmail.com>
-Subject: Re: [PATCH v1 0/6] testing/next (netbsd stuff)
-To: Kamil Rytarowski <n54@gmx.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <bb0c5db0-899e-c5a6-caa3-add8bf64f780@vivier.eu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,57 +96,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, "Daniel P. Berrange" <berrange@redhat.com>,
- Stefan Berger <stefanb@linux.vnet.ibm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Kamil Rytarowski <kamil@netbsd.org>, "Emilio G. Cota" <cota@braap.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-devel@nongnu.org,
+ Willian Rampazzo <wrampazz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 7 Nov 2019 at 17:54, Kamil Rytarowski <n54@gmx.com> wrote:
->
-> On 07.11.2019 18:46, Peter Maydell wrote:
-> > On Mon, 4 Nov 2019 at 17:39, Alex Benn=C3=A9e <alex.bennee@linaro.org> =
-wrote:
-> >>
-> >> Hi,
-> >>
-> >> As we approach hard-freeze I'm trying to temper what comes in through
-> >> the testing/next tree. However it would be nice to get the NetBSD upto
-> >> speed with the other NetBSDs. Although the serial install is working
-> >> well for me this has had a rocky road so if others could also give it
-> >> a good testing that would be great. I've also disabled one of the
-> >> regular failing tests for non-Linux targets. There are other tests
-> >> that still fail however including the tests/test-aio-multithread which
-> >> asserts in the async utils around about 20% of the time:
-> >>
-> >>   assertion "QSLIST_EMPTY(&ctx->scheduled_coroutines)" failed: file
-> >>     "/home/qemu/qemu-test.nS1czd/src/util/async.c", line 279, function
-> >>     "aio_ctx_finalize"
-> >
-> > This is unrelated to your NetBSD update in this series -- it's
-> > one of the persistent intermittents I see on the BSDs:
-> > https://lore.kernel.org/qemu-devel/20190916153312.GD25552@stefanha-x1.l=
-ocaldomain/t/
-> >
-> > (though the failure rate I see is I think <20%, but I haven't
-> > really carefully measured it.)
+On 11/7/19 6:18 PM, Laurent Vivier wrote:
+> Le 07/11/2019 =C3=A0 17:38, Cleber Rosa a =C3=A9crit=C2=A0:
+>> ----- Original Message -----
+>>> From: "Eric Blake" <eblake@redhat.com>
+>>> To: "Cleber Rosa" <crosa@redhat.com>, qemu-devel@nongnu.org
+>>> Cc: "Peter Maydell" <peter.maydell@linaro.org>, "Eduardo Habkost" <eh=
+abkost@redhat.com>, "Philippe Mathieu-Daud=C3=A9"
+>>> <f4bug@amsat.org>, "Wainer dos Santos Moschetta" <wainersm@redhat.com=
+>, "Laurent Vivier" <laurent@vivier.eu>,
+>>> "Willian Rampazzo" <wrampazz@redhat.com>, "Philippe Mathieu-Daud=C3=A9=
+" <philmd@redhat.com>
+>>> Sent: Thursday, November 7, 2019 10:43:08 AM
+>>> Subject: Re: [PATCH 0/2] Acceptance test: update kernel used on m68k/=
+q800 test
+>>>
+>>> On 10/29/19 6:23 PM, Cleber Rosa wrote:
+>>>> The boot_linux_console.py:BootLinuxConsole.test_m68k_q800 was very
+>>>> recently merged, but between its last review and now, the Kernel
+>>>> package used went missing.
+>>>>
+>>>
+>>> meta-question: Why was this series posted in-reply-to the pull reques=
+t,
+>>> rather than as a new top-level thread? I nearly missed it because I
+>>> don't expect to see unreviewed patches buried in threading like that.
+>>> My workflow would have been to post the series in isolation, then
+>>> manually reply to the pull request to mention the message-id of the
+>>> related series proposed as a followup.
+>>>
+>>
+>> Hi Eric,
+>>
+>> That was my attempt to signal that it was a fix to something which had=
+ *just*
+>> being merged as part of that pull request (though now caused by it).
+>>
+>> I basically did not know how to act properly, so I thank you for the w=
+orkflow
+>> suggestion.  I'll certainly follow it next time.
+>=20
+> IMHO, you should send your series and then replies to the pull request
+> to tell you have sent your series that fixes the patch in the pull
+> request, or vice-versa.
+>=20
+> But your series has been queued by Alex, so there is no problem...
 
-> Does this patch rely on AIO API in the kernel? If so than this is
-> unreliable as of today on NetBSD. We plan to fix it, but there is no
-> expected time of accomplishment.
+I prepared a different fix around the same time, but closed my laptop=20
+before the patch was sent and noticed the next day:
+https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg08120.html
 
-No, we use our own AIO implementation which puts fds into non-blocking
-mode and uses a thread which polls them to identify when they're
-ready to actually perform IO (plus a lot of coroutine magic).
-
-thanks
--- PMM
+Laurent, are you OK with the new kernel being tested?
 
