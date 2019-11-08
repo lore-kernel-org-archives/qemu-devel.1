@@ -2,111 +2,87 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 020A2FA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 481F4FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:14:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2A692085B
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:14:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NVjbXEy0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2A692085B
+	by mail.kernel.org (Postfix) with ESMTPS id 1E5092084D
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:14:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E5092084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT45f-0003CN-P5
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 08:14:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51796)
+	id 1iT46L-00044t-9G
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 08:14:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51872)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iT44F-0001pC-Vn
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:12:49 -0500
+ (envelope-from <philmd@redhat.com>) id 1iT44Z-0002M1-MH
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:13:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iT44E-0001Yr-Oq
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:12:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38785
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iT44Y-0001v4-Gx
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:13:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:20154)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iT44E-0001YT-Jn
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:12:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573218766;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=KJ0CKYIUQpWwH8i4ZPOQtmCcyAdv0E09dsd/TbAbFYM=;
- b=NVjbXEy0nHMxvDJ+arzSpcU1NcO1IPrJDxSRzpiy0hKexcz6pCoOvhXMSvGzACFfjaSRvU
- QR13TabFL67Oldu2HQ8WWexhpusnXbChMPYCuE3heBhgqSVtdYFr5B3UpdDrbn0IovzrHW
- aB4xSuiRcl2lhh0DOxLmFeTEVUVf7d0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-145-xE81yOo-Pu21ON5WjIKZLA-1; Fri, 08 Nov 2019 08:12:43 -0500
-X-MC-Unique: xE81yOo-Pu21ON5WjIKZLA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iT44Y-0001uM-7y
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:13:06 -0500
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52960477;
- Fri,  8 Nov 2019 13:12:42 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-78.ams2.redhat.com
- [10.36.117.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1632B194B2;
- Fri,  8 Nov 2019 13:12:37 +0000 (UTC)
-Subject: Re: [PATCH v2 05/11] block/crypto: implement the encryption key
- management
-To: Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org
-References: <20190912223028.18496-1-mlevitsk@redhat.com>
- <20190912223028.18496-6-mlevitsk@redhat.com>
- <bcc8844d-ec0f-93d1-209b-7b7af4f2c24a@redhat.com>
- <afdbbabe3a81e69b0699bca9f69112c317a5ebdc.camel@redhat.com>
- <05065ed2-6b42-ccae-64d9-4960885a7b8f@redhat.com>
- <248adc2a05942db73a310a7d3a0339345f4628a5.camel@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <3b5ab7e8-2f74-1dcb-535f-1c1ba8ada09b@redhat.com>
-Date: Fri, 8 Nov 2019 14:12:36 +0100
+ by mx1.redhat.com (Postfix) with ESMTPS id EE415C057867
+ for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 13:13:04 +0000 (UTC)
+Received: by mail-wr1-f71.google.com with SMTP id j17so3150581wru.13
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 05:13:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=hiUvA3Hm+PV20+e2UC0nmfG5QGIi6yJ/ofNe0luHeew=;
+ b=PR248DbQrzjy1gqcomaeTMH705zezzohUM43krn0jIw2dZjpdfdnaY1OQBnCqQqjX+
+ AfkrKRGzz+yJzHf6TlVhrg+hRxGGEcSCSJJbwhKhsslF6JMmYrVt0vTgyxdFfIODVvR0
+ CigvoshOryt42ReiJrY6jvx7FZU+RNCUkkXGr/8vQgKVjzsbYq1HqewGkrie4s796zzs
+ GKwYpZefQJCZkyb/m8ednoZCPxbjvPcrHKVjlI1o9HXMpJOKI8QCa0l0oXka6VbOk6Om
+ fn8cAFgFcemWVx4hXSi4dvn1z9VshnGMxHhgBQtnc4qvCGOQVowU5l9YUxsb7cIVSd9j
+ R1Ng==
+X-Gm-Message-State: APjAAAVGjrPH/5q2Kx5q8BCH6nn7dtQoUV4t+VpOHZQm6HACm8RB5zyw
+ omPnkT47XiKrEywboqwwrT4vhRPbyNaMGSPVdVvEKKHLDaIJMmOEIHv7JFZWo+mjuv4qaR3CFZx
+ 3KVQUWWGFbV7AfMk=
+X-Received: by 2002:adf:f084:: with SMTP id n4mr8290203wro.369.1573218783751; 
+ Fri, 08 Nov 2019 05:13:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzm5HAY8TKstmPrabsQy4fPlfmAsgMkVg09Xyaj9yZjNpEwG1+qxTHNcXLxOvIU7SIhVlZyXg==
+X-Received: by 2002:adf:f084:: with SMTP id n4mr8290178wro.369.1573218783546; 
+ Fri, 08 Nov 2019 05:13:03 -0800 (PST)
+Received: from [192.168.1.38] (62.red-88-21-202.staticip.rima-tde.net.
+ [88.21.202.62])
+ by smtp.gmail.com with ESMTPSA id x205sm9132072wmb.5.2019.11.08.05.13.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 08 Nov 2019 05:13:03 -0800 (PST)
+Subject: Re: [PATCH v7 6/8] Acceptance tests: add the build directory to the
+ system PATH
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+References: <20191104151323.9883-1-crosa@redhat.com>
+ <20191104151323.9883-7-crosa@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b93b5913-22f1-6aa9-75a1-4b577153288e@redhat.com>
+Date: Fri, 8 Nov 2019 14:13:02 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <248adc2a05942db73a310a7d3a0339345f4628a5.camel@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="XuVyZCNvF1UM7iCzXNzYi41kUgtuEzu9T"
+In-Reply-To: <20191104151323.9883-7-crosa@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 209.132.183.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -118,145 +94,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Beraldo Leal <bleal@redhat.com>, Fabien Chouteau <chouteau@adacore.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>, qemu-ppc@nongnu.org,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XuVyZCNvF1UM7iCzXNzYi41kUgtuEzu9T
-Content-Type: multipart/mixed; boundary="leOZtHj2Rnv3XcUwXocbRKvmWeEtUwmWa"
+On 11/4/19 4:13 PM, Cleber Rosa wrote:
+> So that when binaries such as qemu-img are searched for, those in the
+> build tree will be favored.  As a clarification, SRC_ROOT_DIR is
+> dependent on the location from where tests are executed, so they are
+> equal to the build directory if one is being used.
+> 
+> The original motivation is that Avocado libraries such as
+> avocado.utils.vmimage.get() may use the matching binaries, but it may
+> also apply to any other binary that test code may eventually attempt
+> to execute.
+> 
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>   tests/acceptance/avocado_qemu/__init__.py | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
+> index 17ce583c87..a4bb796a47 100644
+> --- a/tests/acceptance/avocado_qemu/__init__.py
+> +++ b/tests/acceptance/avocado_qemu/__init__.py
+> @@ -110,6 +110,12 @@ class Test(avocado.Test):
+>           return None
+>   
+>       def setUp(self):
+> +        # Some utility code uses binaries from the system's PATH.  For
+> +        # instance, avocado.utils.vmimage.get() uses qemu-img, to
+> +        # create a snapshot image.  This is a transparent way of
+> +        # making sure those utilities find and use binaries on the
+> +        # build tree by default.
+> +        os.environ['PATH'] = '%s:%s' % (SRC_ROOT_DIR, os.environ['PATH'])
 
---leOZtHj2Rnv3XcUwXocbRKvmWeEtUwmWa
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+But qemu-img is compiled in BUILD_ROOT_DIR, isn't it?
 
-On 08.11.19 12:04, Maxim Levitsky wrote:
-> On Fri, 2019-11-08 at 11:49 +0100, Max Reitz wrote:
->> On 08.11.19 10:30, Maxim Levitsky wrote:
->>> On Fri, 2019-10-04 at 20:41 +0200, Max Reitz wrote:
->>>> On 13.09.19 00:30, Maxim Levitsky wrote:
->>>>> This implements the encryption key management
->>>>> using the generic code in qcrypto layer
->>>>> (currently only for qemu-img amend)
->>>>>
->>>>> This code adds another 'write_func' because the initialization
->>>>> write_func works directly on the underlying file,
->>>>> because during the creation, there is no open instance
->>>>> of the luks driver, but during regular use, we have it,
->>>>> and should use it instead.
->>>>>
->>>>>
->>>>> This commit also adds a=09'hack/workaround' I and=09Kevin Wolf (thank=
-s)
->>>>> made to=09make the driver=09still support write sharing,
->>>>> but be safe against concurrent  metadata update (the keys)
->>>>> Eventually write sharing for luks driver will be deprecated
->>>>> and removed together with this hack.
->>>>>
->>>>> The hack is that we ask=09(as a format driver) for
->>>>> BLK_PERM_CONSISTENT_READ always
->>>>> (technically always unless opened with BDRV_O_NO_IO)
->>>>>
->>>>> and then when we want to update=09the keys, we
->>>>> unshare=09that permission. So if someone else
->>>>> has the=09image open, even readonly, this=09will fail.
->>>>>
->>>>> Also thanks to Daniel Berrange for the variant of
->>>>> that hack that involves=09asking for read,
->>>>> rather that write permission
->>>>>
->>>>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
->>>>> ---
->>>>>  block/crypto.c | 118 +++++++++++++++++++++++++++++++++++++++++++++++=
---
->>>>>  1 file changed, 115 insertions(+), 3 deletions(-)
->>>>>
->>>>> diff --git a/block/crypto.c b/block/crypto.c
->>>>> index a6a3e1f1d8..f42fa057e6 100644
->>>>> --- a/block/crypto.c
->>>>> +++ b/block/crypto.c
->>>>> @@ -36,6 +36,7 @@ typedef struct BlockCrypto BlockCrypto;
->>>>> =20
->>>>>  struct BlockCrypto {
->>>>>      QCryptoBlock *block;
->>>>> +    bool updating_keys;
->>>>>  };
->>>>> =20
->>>>> =20
->>>>> @@ -70,6 +71,24 @@ static ssize_t block_crypto_read_func(QCryptoBlock=
- *block,
->>>>>      return ret;
->>>>>  }
->>>>> =20
->>>>> +static ssize_t block_crypto_write_func(QCryptoBlock *block,
->>>>> +                                       size_t offset,
->>>>> +                                       const uint8_t *buf,
->>>>> +                                       size_t buflen,
->>>>> +                                       void *opaque,
->>>>> +                                       Error **errp)
->>>>
->>>> There=E2=80=99s already a function of this name for creation.
->>>
->>> There is a long story why two write functions are needed.
->>> i tried to use only one, but at the end I and Daniel both agreed
->>> that its just better to have two functions.
->>>
->>> The reason is that during creation, the luks BlockDriverState doesn't e=
-xist yet,
->>> and so the creation routine basically just writes to the underlying pro=
-tocol driver.
->>>
->>> Thats is why the block_crypto_create_write_func receives a BlockBackend=
- pointer,
->>> to which the BlockDriverState of the underlying protocol driver is inse=
-rted.
->>>
->>>
->>> On the other hand, for amend, the luks block device is open, and it onl=
-y knows
->>> about its own BlockDriverState, and thus the io should be done on bs->f=
-ile
->>>
->>> So instead of trying to coerce a single callback to do both of this,
->>> we decided to just have a little code duplication.
->>
->> I meant: This doesn=E2=80=99t compile.  There=E2=80=99s already another =
-function of this
->> name.
->>
->=20
-> You probably didn't apply the 'block-crypto: misc refactoring' patch,=20
-> or I forgot to send it.
+Maybe we should pass its path by argument, such --qemu-img /path/to/it.
 
-Maybe you forgot to mention anywhere that I should.
-
-Max
-
-
---leOZtHj2Rnv3XcUwXocbRKvmWeEtUwmWa--
-
---XuVyZCNvF1UM7iCzXNzYi41kUgtuEzu9T
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3FacQACgkQ9AfbAGHV
-z0AKyAf8Cq/jMm6ppH38DeuuTrEK8oFCHHWqToHxRKQjXyaIfiJciWckm9dcHyee
-cdy8HzaDM4zZ/tbYx7Aq3FOUTFXu//BfbNL2gKRjm5WJe8pzv9DPoHLFyREmOCYj
-xIupYdNYRzXRZ/JN5Pbq+hUuq+3lAgJ4o+6zjhA1RmYpGA82D2UkdAtNeiTMQyTO
-oTjoi1vIDduecRmi1xNKkTCMSpWjqivIPRz2qYyg5nSFFzphiKHwsS2zPgcmNa7C
-WcJvlwmsbNY9Ch4ObQIZgMdt7gw3n+LJjCVw7frTkSKNwnNGo/5LPE3FHgAPl5cy
-AayqSwXr94eVQnIf/PgGmQBJfIbnhA==
-=yvV+
------END PGP SIGNATURE-----
-
---XuVyZCNvF1UM7iCzXNzYi41kUgtuEzu9T--
-
+>           self._vms = {}
+>   
+>           self.arch = self.params.get('arch',
+> 
 
