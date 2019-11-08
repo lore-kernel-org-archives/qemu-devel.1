@@ -2,78 +2,75 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34016C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22460FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:24:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0046A2178F
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:24:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E52122178F
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:24:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JqzzvS6k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0046A2178F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L90cCbZ+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E52122178F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT1RE-0005sG-UV
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 05:24:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47121)
+	id 1iT1Rd-0006XW-OH
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 05:24:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47896)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iT1MG-0007iO-MG
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:19:14 -0500
+ (envelope-from <kraxel@redhat.com>) id 1iT1PJ-0003Op-2e
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:22:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iT1MF-0006D1-Ex
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:19:12 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52058
+ (envelope-from <kraxel@redhat.com>) id 1iT1PH-00087a-WB
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:22:20 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43509
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iT1MF-0006Ci-AD
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:19:11 -0500
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iT1PH-00087A-Si
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:22:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573208350;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=st4fe5pzFa0Kv4IaGBc2Ukpw3LGWfDMOao3HR2OY6hQ=;
- b=JqzzvS6kwiEO1Fcqf+L8nolCQJ+hmdaiCr1hju8pHu4Wib+putk4R+D3gITBVCdgnn5RK4
- 5/GaUkjp/wQliN14ZDK1AUrALooHlVHMbLV9Wzt6YFU6YBd8GC9KL4SyLYuM0ZUPEHGP7w
- xSNgXoZoYs+eWFnknP9Mc5obOd/bRUY=
+ s=mimecast20190719; t=1573208539;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=NFIFdqR/JbcUPJAQyR7Yd97xZj9N3PANWKle10gy0kI=;
+ b=L90cCbZ+4Osd6Uv/D3X2YcNn0DX8eRM6SoO+n1RuG9C5CeJ1eRCZIS9CJ6rgpDMvFnYjGQ
+ 1FNbXCRsZLa10p/toji67FwaHqtESNlg5yrGm+sHLJyTPVLrk1NhWxFYYDAnhpA6kQwsZf
+ hfT2yJNquAgxGuDdOs72osgzL5VmcyM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-N1d8Oc2XOMy-1pbASQV-hw-1; Fri, 08 Nov 2019 05:19:09 -0500
+ us-mta-278-VcUyKlCfMhucuEAPLVrnfw-1; Fri, 08 Nov 2019 05:22:17 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3BF67477;
- Fri,  8 Nov 2019 10:19:08 +0000 (UTC)
-Received: from redhat.com (ovpn-112-63.ams2.redhat.com [10.36.112.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 35571600CA;
- Fri,  8 Nov 2019 10:19:02 +0000 (UTC)
-Date: Fri, 8 Nov 2019 10:19:00 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH 2/3] docs: build a global index page
-Message-ID: <20191108101900.GA182396@redhat.com>
-References: <20191108095942.401225-1-stefanha@redhat.com>
- <20191108095942.401225-3-stefanha@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 264C0800C72
+ for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 10:22:17 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-69.ams2.redhat.com
+ [10.36.116.69])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4759C600C9;
+ Fri,  8 Nov 2019 10:22:13 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 80D4517535; Fri,  8 Nov 2019 11:22:12 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/1] Seabios 20191108 patches
+Date: Fri,  8 Nov 2019 11:22:11 +0100
+Message-Id: <20191108102212.11101-1-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191108095942.401225-3-stefanha@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: N1d8Oc2XOMy-1pbASQV-hw-1
+X-MC-Unique: VcUyKlCfMhucuEAPLVrnfw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -88,48 +85,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 08, 2019 at 10:59:41AM +0100, Stefan Hajnoczi wrote:
-> Build docs/ in a single sphinx invocation instead of treating
-> docs/{devel,interop,specs} separately.  This allows us to build a global
-> index page that links to documentation across the different manuals.
->=20
-> Some documentation is built outside of sphinx and is not formatted as
-> reStructuredText.  Link directly to the .html files for the time being.
-> If they are converted to .rst files in the future they can be included
-> more elegantly.
->=20
-> Sphinx wants to build all .rst files and complains if they are not
-> listed in the table of contents.  We have not yet reviewed and
-> categorized some of our .rst files.  Hide these files so they are always
-> built (and syntax-checked from now on!) but not visible in the table of
-> contents.
+The following changes since commit 59015778f3ec7c01202d46c5dbeeac8ab4225c52=
+:
 
-Ah, nice trick.
+  Update version for v4.2.0-rc0 release (2019-11-07 18:17:31 +0000)
 
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  Makefile       | 13 ++++---------
->  docs/index.rst | 27 ++++++++++++++++++++++++++-
->  2 files changed, 30 insertions(+), 10 deletions(-)
+are available in the Git repository at:
 
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+  git://git.kraxel.org/qemu tags/seabios-20191108-pull-request
 
+for you to fetch changes up to f085bf95a6208b42f1ae01f60c76d936d9fed490:
 
-Regards,
-Daniel
+  seabios: update to pre-1.13 snapshot (2019-11-08 11:18:26 +0100)
+
+----------------------------------------------------------------
+seabios: update to pre-1.13 snapshot (gcc 4.8.5 version).
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (1):
+  seabios: update to pre-1.13 snapshot
+
+ pc-bios/bios-256k.bin             | Bin 262144 -> 262144 bytes
+ pc-bios/bios.bin                  | Bin 131072 -> 131072 bytes
+ pc-bios/vgabios-ati.bin           | Bin 38912 -> 39424 bytes
+ pc-bios/vgabios-bochs-display.bin | Bin 27648 -> 28672 bytes
+ pc-bios/vgabios-cirrus.bin        | Bin 38400 -> 38912 bytes
+ pc-bios/vgabios-qxl.bin           | Bin 38912 -> 39424 bytes
+ pc-bios/vgabios-ramfb.bin         | Bin 28160 -> 28672 bytes
+ pc-bios/vgabios-stdvga.bin        | Bin 38912 -> 39424 bytes
+ pc-bios/vgabios-virtio.bin        | Bin 38912 -> 39424 bytes
+ pc-bios/vgabios-vmware.bin        | Bin 38912 -> 39424 bytes
+ pc-bios/vgabios.bin               | Bin 38400 -> 38912 bytes
+ roms/Makefile                     |   2 +-
+ roms/seabios                      |   2 +-
+ 13 files changed, 2 insertions(+), 2 deletions(-)
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+2.18.1
 
 
