@@ -2,68 +2,84 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F462C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C29C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:50:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72BEA206DF
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:44:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72BEA206DF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6977D2067B
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:50:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="c0i/V82r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6977D2067B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59446 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iTABc-0006Xf-KP
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 14:44:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34671)
+	id 1iTAGg-0001TB-5G
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 14:50:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35754)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iTAAN-0005Rv-Gw
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:43:32 -0500
+ (envelope-from <palmer@dabbelt.com>) id 1iTAFA-00008p-1s
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:48:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iTAAM-0002US-1X
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:43:31 -0500
-Resent-Date: Fri, 08 Nov 2019 14:43:31 -0500
-Resent-Message-Id: <E1iTAAM-0002US-1X@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21412)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iTAAL-0002TJ-Q2; Fri, 08 Nov 2019 14:43:29 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1573242198; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=AUApxiHdzIQtZNswcMjpdG9HDYKdKjXehSNfWLenJYkN4neTRZvYvTOvyEltavQOp7jdLu3TIW01Bbf3CfhYTRUCWcvcoCVw0n8+6dhFIw4SFqarI/u+ISub2EOKEmUs8l5c9aNAP31AfOC6qOs+wWeM2xM1+2e8nUUGfy7kpHo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1573242198;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=fOvlGWWxJ57pV35k8/EEZDYgFAuujoSG0MtuOuoCWhU=; 
- b=j2EMYfjxOE4P0zBgSS7Dki69fjUJO1GK7trRAlQLcjcoXSYB7yXySrLmOs7DHFRXaWtjuORvxU2fbME1FNC4SeUty7A2mmuzor0xPtW/U0MiEUToMw/g5Hh/kJrqzHVlMRcz0c0dhGcckhsFpCFXGmXxor7KDR0/WITY+W3kFhc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 157324219731081.98744667723304;
- Fri, 8 Nov 2019 11:43:17 -0800 (PST)
-In-Reply-To: <20191108134249.19004-1-dplotnikov@virtuozzo.com>
-Subject: Re: [PATCH v2 0/1] virtio: fix IO request length in virtio SCSI/block
-Message-ID: <157324219615.8646.11640144980232368551@37313f22b938>
+ (envelope-from <palmer@dabbelt.com>) id 1iTAF9-0005zJ-1S
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:48:27 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33747)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iTAF8-0005w9-Jt
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:48:26 -0500
+Received: by mail-pg1-x542.google.com with SMTP id h27so4630335pgn.0
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 11:48:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dabbelt-com.20150623.gappssmtp.com; s=20150623;
+ h=subject:date:message-id:mime-version:content-transfer-encoding:cc
+ :from:to; bh=kXUfIwaLzekBgu4rO+8d58TXD+81bPyPI2S5oCzPGYs=;
+ b=c0i/V82rl872oRDRzsNny1HZCiTCIFzzt34/kJGvhuWfp/u4Pojwib0Qj0Y1mz1PzT
+ qfFU8q0hTw4m8desBU9Xg+C1pJH39AEfvaOOW4buCSWF1XBM2HiWYF6wnam/MuMdX4Dd
+ Vj9mEAXPxl8zhK04wLxmxhQ/hcrCooDBCRuSrKT0d4RGs5VvQw0Ae2ALK2unR3/pSSf5
+ zy8iJGYR992HIDa+xqa+PazYKMN/rDle7YcCo0w2YDJVCSMe59uDwPm/lU0egiinRk44
+ GfDgux5drYFXQEzCqNZga54mnm5VdKXp155vD2nPkfzYDsZp/Vfj2Tg44rKHyv/w6HjC
+ 8YTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:date:message-id:mime-version
+ :content-transfer-encoding:cc:from:to;
+ bh=kXUfIwaLzekBgu4rO+8d58TXD+81bPyPI2S5oCzPGYs=;
+ b=TwmBZebJAYyCpKaiSvwgRIIlLLcSgYiDL3cTN4Iszvmv6KNykG6Bkn/w/8kHXJJ1Jh
+ VO2UMvGw1aPfFsyhsABr6mrVkf0gkZXpKtRobj7lEp1DFfLolM+4rBj5wfzuQAr61EfD
+ wCRjgFRI7PZAjOEQS1ZjemFKciXnLMS23Twc0KrvEg2CXdnvNfeO+aiuApN744eXwutV
+ SkELD3oyDfHl0WxzDixQ1AzF+4q1J5EKPVEVq/TW+fschuQPBzZt+/gdxD+IDQClCxkm
+ XAp6KdY/BMV2s6TNuxRE+UTbVYiwAnsupNooevi4Zv0NE5bA0DGp8q0JRCWBdBaftwNr
+ pw1A==
+X-Gm-Message-State: APjAAAXwRk/u39T5j4X6JVd97w5JhYgWytx6HstI3dSxSVwhYAwbiawj
+ E2Zwp3KDXIYtknBW0OBUMkFkkw==
+X-Google-Smtp-Source: APXvYqyO8pvXTpDi0TvMfvPWDtSTnfeh/2tIOLJK7JEiHeE41SJeRQ+aQhz25QSrx9lMGQ1k1TyYFQ==
+X-Received: by 2002:a62:1841:: with SMTP id 62mr13763325pfy.108.1573242504332; 
+ Fri, 08 Nov 2019 11:48:24 -0800 (PST)
+Received: from localhost ([12.206.222.5])
+ by smtp.gmail.com with ESMTPSA id y123sm7120494pfg.64.2019.11.08.11.48.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 08 Nov 2019 11:48:23 -0800 (PST)
+Subject: [PATCH v2 0/3] device_tree: Allow for and use string arrays [Was:
+ RISC-V: virt: This is a "sifive, test1" test finisher]
+Date: Fri,  8 Nov 2019 11:47:55 -0800
+Message-Id: <20191108194758.17813-1-palmer@dabbelt.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: dplotnikov@virtuozzo.com
-Date: Fri, 8 Nov 2019 11:43:17 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+Content-Transfer-Encoding: 8bit
+From: Palmer Dabbelt <palmer@dabbelt.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org,
+ david@gibson.dropbear.id.au
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,49 +91,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, mst@redhat.com, qemu-devel@nongnu.org,
- stefanha@redhat.com, den@virtuozzo.com
+Cc: qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwODEzNDI0OS4xOTAw
-NC0xLWRwbG90bmlrb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
-dGhlIGRvY2tlci1xdWlja0BjZW50b3M3IGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
-aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
-bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgo9PT0gVEVT
-VCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCm1ha2UgZG9ja2VyLWltYWdlLWNlbnRvczcg
-Vj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtcXVpY2tAY2VudG9zNyBTSE9XX0VO
-Vj0xIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFRFU1QgICAgY2hl
-Y2stcXRlc3QteDg2XzY0OiB0ZXN0cy9haGNpLXRlc3QKICBURVNUICAgIGNoZWNrLXVuaXQ6IHRl
-c3RzL3Rlc3QtYWlvLW11bHRpdGhyZWFkCnRlc3QtYWlvLW11bHRpdGhyZWFkOiAvdG1wL3FlbXUt
-dGVzdC9zcmMvdXRpbC9hc3luYy5jOjI3OTogYWlvX2N0eF9maW5hbGl6ZTogQXNzZXJ0aW9uIGAo
-KCZjdHgtPnNjaGVkdWxlZF9jb3JvdXRpbmVzKS0+c2xoX2ZpcnN0ID09ICgodm9pZCAqKTApKScg
-ZmFpbGVkLgpFUlJPUiAtIHRvbyBmZXcgdGVzdHMgcnVuIChleHBlY3RlZCA2LCBnb3QgMikKbWFr
-ZTogKioqIFtjaGVjay11bml0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlz
-aGVkIGpvYnMuLi4uCiAgVEVTVCAgICBpb3Rlc3QtcWNvdzI6IDAxMwogIFRFU1QgICAgaW90ZXN0
-LXFjb3cyOiAwMTcKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwgY21k
-KQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1uJywg
-J2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTY2ZjY3
-Njg1ZWYzNTQ3Nzg4ZGRiZmNhNDNlMGU5MjUwJywgJy11JywgJzEwMDEnLCAnLS1zZWN1cml0eS1v
-cHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9Jywg
-Jy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0Jywg
-Jy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zh
-ci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNj
-YWNoZTovdmFyL3RtcC9jY2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10
-bXAtb2M1aHFsZmQvc3JjL2RvY2tlci1zcmMuMjAxOS0xMS0wOC0xNC4zMi4xNC4yMTU3MTovdmFy
-L3RtcC9xZW11Onoscm8nLCAncWVtdTpjZW50b3M3JywgJy92YXIvdG1wL3FlbXUvcnVuJywgJ3Rl
-c3QtcXVpY2snXScgcmV0dXJuZWQgbm9uLXplcm8gZXhpdCBzdGF0dXMgMi4KZmlsdGVyPS0tZmls
-dGVyPWxhYmVsPWNvbS5xZW11Lmluc3RhbmNlLnV1aWQ9NjZmNjc2ODVlZjM1NDc3ODhkZGJmY2E0
-M2UwZTkyNTAKbWFrZVsxXTogKioqIFtkb2NrZXItcnVuXSBFcnJvciAxCm1ha2VbMV06IExlYXZp
-bmcgZGlyZWN0b3J5IGAvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtb2M1aHFsZmQvc3JjJwpt
-YWtlOiAqKiogW2RvY2tlci1ydW4tdGVzdC1xdWlja0BjZW50b3M3XSBFcnJvciAyCgpyZWFsICAg
-IDExbTEuODIwcwp1c2VyICAgIDBtOC41MDdzCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBh
-dApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5MTEwODEzNDI0OS4xOTAwNC0xLWRwbG90bmlr
-b3ZAdmlydHVvenpvLmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3Nh
-Z2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczov
-L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
-bEByZWRoYXQuY29t
+Device trees commonly contain arrays of strings for compatible nodes.
+We recently extended the "sifive,test0" node in a backwards-compatible
+way, but QEMU didn't contain an FDT function to set 'compatible =
+"sifive,test1", "sifive,test0";'.  I've converted over the code from the
+ARM virt board that was doing something similar to be a helper function,
+which I could then use for RISC-V as well.
+
+I haven't tested the ARM change, but I have tested the RISC-V one.  It
+appears to parse correctly in Linux, and a DTC treats it the same way as
+it treats the string arrays it compiles -- specifically:
+
+    $ cat test.dts
+    /dts-v1/;
+
+    / {
+        string = "stringa";
+        strings = "string1", "string2";
+    };
+    $ dtc -I dts test.dts -O dtb -o test.dtb
+    $ dtc -I dtb test.dtb -O dts -o out.dts
+    $ cat out.dts
+    /dts-v1/;
+
+    / {
+            string = "stringa";
+            strings = "string1\0string2";
+    };
+
+and
+
+    $ qemu-system-riscv64 -m virt,dumpdtb=out.dtb ...
+    $ dtc -I dtb test.dtb -O dts -o out.dts
+    $ cat out.dts
+    ...
+            test@100000 {
+                reg = <0x00 0x100000 0x00 0x1000>;
+                compatible = "sifive,test1\0sifive,test0";
+        };
+    ...
+
+Changes since v1 <20191107222500.8018-1-palmer@sifive.com>:
+
+* This is now a multiple patch series.
+* The hepler function has been added and used by the RISC-V virt board.
+* The ARM virt board has been converted to use the helper function
 
 
