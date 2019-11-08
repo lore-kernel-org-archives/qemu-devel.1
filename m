@@ -2,80 +2,85 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C5C5FC6194
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:40:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D14F7FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:40:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19F8F21D7F
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:40:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1F1C21D7E
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:40:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ryBkmpy6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F8F21D7F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jfbu4Ufj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1F1C21D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52620 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT2cU-0004lL-61
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 06:40:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34540)
+	id 1iT2d7-0005iN-1T
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 06:40:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34662)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iT2bk-0004Gs-HL
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:39:17 -0500
+ (envelope-from <lersek@redhat.com>) id 1iT2cB-0004bg-Mh
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:39:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iT2bj-0007TH-Bo
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:39:16 -0500
-Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:36418)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iT2bj-0007Sv-8B
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:39:15 -0500
-Received: by mail-qv1-xf42.google.com with SMTP id f12so2063659qvu.3
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 03:39:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3/u9uKFOo6nKSeTC0Qc8SlldVIziaDkN1sEcEVyf2rw=;
- b=ryBkmpy6kg8FsdWhQscKFhX7aOyFilL1Ngn+B/r/ieib3jkV3GtIBZddR5aw8Gag0p
- GlC6YrGamONyMpv8HmVqfla/SA7OOL5DeqxiVIVBd1yxdBoEtFkRzjof0j2Os8wP/hEq
- HnJtx+UxwSnyxHSaRHZd3+EhcLbDVrzTGqIAQ6iULdVVpZ6q2thbq4GV+k5QCyXSD8oW
- 491ytJbn4HNqG97wiqnAxQgY/CTQ47YX6Dg5mS3fb35Kzfv9N80DdoBg4bMSw9cnbT0y
- 3uUGp387+phFtMd2OfNstMMxozviv2NWz05MX/g6ktBjkuG1MXvKikLR0Kg9vxoMlt9b
- U/eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3/u9uKFOo6nKSeTC0Qc8SlldVIziaDkN1sEcEVyf2rw=;
- b=Wem/3nV0jfKnoh9l/PQqioc601l9hmU+soPx+ODds6RutmCObxzMRCCsJS3YaWeT7K
- Q/lJaYJUrM5nJ5IhZ4/2pzbLPOURJk9GYcE9gmWeX1aoHHV2akDPYGaIoNT7y6qjk5jF
- ssiYfgbb5kvCut2D9Jd/vjsBQ+AFG3ymLu3eCzfeJsNtoYDwDFucQZVoGRqbi9S+JXXV
- dOErLgg0lFygp998k4rLL4rS6NmtIJDRHPo7Qs/kgSPMEFoCK+JcCBG5+8PpPxB0MYyi
- /9yRQY2yVJDAGuSOM8mTgT8HvQ5AbXzE/tBt2hFM5mOMD9Mzu7pW6C4C5gRS0Dcpus7w
- qnQg==
-X-Gm-Message-State: APjAAAUdnRcu8Q3xF/KIDn0wycu6Uu1IlS1tRNQELK8VuPtkM3Qx5Oh3
- MVCNvQADDywEDL+dJWXA1JnTt/hzadK+yhFrvBY=
-X-Google-Smtp-Source: APXvYqxcD0PkzErDLslrA/q1KkciWWpWiuJPrAN9szTQcb8nXkJ9kwV5BTbiuxSQWQu/A5tlRsHM4DoOJaAeOLyRg3w=
-X-Received: by 2002:a0c:87b5:: with SMTP id 50mr8950415qvj.143.1573213154395; 
- Fri, 08 Nov 2019 03:39:14 -0800 (PST)
+ (envelope-from <lersek@redhat.com>) id 1iT2cA-00084N-IZ
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:39:43 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:30361
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iT2cA-000848-Fd
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:39:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573213182;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9MFgiZXRLx4B0se1rCoKI2dGn6KBZP6GEWL5guv6gDI=;
+ b=Jfbu4Ufj/9hYsbjJ/d60hri/8ef/7nTPpaotHvzuuquEy1QGT30q2Alt+oCpqDFROexJBG
+ yC0NdVEUM8hr0zgkMw6xn8SzzbF3remgEYrmuAn5JfWsM1fPT4q+SMsekPTgD+gPcEHNta
+ /47GamUoSqzYcu9PS6RJ5MbDEN+GtBg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-427-HHY1q-FnN3CVYdm4gvAV0Q-1; Fri, 08 Nov 2019 06:39:39 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6E131800D7B;
+ Fri,  8 Nov 2019 11:39:37 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-117-227.ams2.redhat.com
+ [10.36.117.227])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 59E685D6B7;
+ Fri,  8 Nov 2019 11:39:26 +0000 (UTC)
+Subject: Re: [PATCH] configure: Check bzip2 is available
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20191108102805.8258-1-philmd@redhat.com>
+ <b6005d59-c5d2-1844-db94-a67e258c2867@redhat.com>
+ <d0cf0f78-a0c9-e0fa-7959-ecdebf27f912@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <f688cac2-d370-23af-27fd-fa1f3c3637f9@redhat.com>
+Date: Fri, 8 Nov 2019 12:39:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-References: <20191108095942.401225-1-stefanha@redhat.com>
- <20191108095942.401225-3-stefanha@redhat.com>
- <CAFEAcA8b_POWyCWERMaT2mKZxrYA+RDoaLCHtO=pS28f-SCZ3w@mail.gmail.com>
-In-Reply-To: <CAFEAcA8b_POWyCWERMaT2mKZxrYA+RDoaLCHtO=pS28f-SCZ3w@mail.gmail.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 8 Nov 2019 12:39:02 +0100
-Message-ID: <CAJSP0QWoSNk7NmC+AjgWQenyKLw6H5wqHay8C-1evQ8QTrSJ6Q@mail.gmail.com>
-Subject: Re: [PATCH 2/3] docs: build a global index page
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::f42
+In-Reply-To: <d0cf0f78-a0c9-e0fa-7959-ecdebf27f912@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: HHY1q-FnN3CVYdm4gvAV0Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,51 +92,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Berrange <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-trivial@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 8, 2019 at 11:52 AM Peter Maydell <peter.maydell@linaro.org> wrote:
-> On Fri, 8 Nov 2019 at 09:59, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > Build docs/ in a single sphinx invocation instead of treating
-> > docs/{devel,interop,specs} separately.  This allows us to build a global
-> > index page that links to documentation across the different manuals.
-> >
-> > Some documentation is built outside of sphinx and is not formatted as
-> > reStructuredText.  Link directly to the .html files for the time being.
-> > If they are converted to .rst files in the future they can be included
-> > more elegantly.
-> >
-> > Sphinx wants to build all .rst files and complains if they are not
-> > listed in the table of contents.  We have not yet reviewed and
-> > categorized some of our .rst files.  Hide these files so they are always
-> > built (and syntax-checked from now on!) but not visible in the table of
-> > contents.
->
-> So the reason I went for the odd "run sphinx multiple times"
-> approach was because we don't want to ship 'devel' to users,
-> and as far as I could tell there was no way to have a
-> single-invocation build of the docs not include it in
-> eg the index/search (which would then be broken when
-> we don't install devel/ as part of 'make install').
-> Does this patchset result in a set of installed docs
-> that don't have dangling references ?
+On 11/08/19 11:42, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 11/8/19 11:34 AM, Thomas Huth wrote:
+>> On 08/11/2019 11.28, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> The bzip2 tool is not included in default installations.
+>>> On freshly installed systems, ./configure succeeds but 'make'
+>>> might fail later:
+>>>
+>>> =C2=A0=C2=A0=C2=A0=C2=A0 BUNZIP2 pc-bios/edk2-i386-secure-code.fd.bz2
+>>> =C2=A0=C2=A0 /bin/sh: bzip2: command not found
+>>> =C2=A0=C2=A0 make: *** [Makefile:305: pc-bios/edk2-i386-secure-code.fd]=
+ Error 127
+>>> =C2=A0=C2=A0 make: *** Deleting file 'pc-bios/edk2-i386-secure-code.fd'
+>>> =C2=A0=C2=A0 make: *** Waiting for unfinished jobs....
+>>>
+>>> Add a check in ./configure to warn the user if bzip2 is missing.
+>>>
+>>> Fixes: 536d2173b2b
+>>> Reported-by: Thomas Huth <thuth@redhat.com>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>>> ---
+>>> =C2=A0 configure | 7 +++++++
+>>> =C2=A0 1 file changed, 7 insertions(+)
+>>>
+>>> diff --git a/configure b/configure
+>>> index efe165edf9..9957e913e8 100755
+>>> --- a/configure
+>>> +++ b/configure
+>>> @@ -1851,6 +1851,13 @@ python_version=3D$($python -c 'import sys;
+>>> print("%d.%d.%d" % (sys.version_info[0]
+>>> =C2=A0 # Suppress writing compiled files
+>>> =C2=A0 python=3D"$python -B"
+>>> +# Some firmware binaries are compressed with bzip2
+>>> +if has bzip2; then
+>>> +=C2=A0 :
+>>> +else
+>>> +=C2=A0 error_exit "bzip2 program not found. Please install it"
+>>> +fi
+>>
+>> It's only required for the edk2 binaries, isn't it? So should this
+>> maybe also check whether we build any of the i386-softmmu,
+>> x86_64-softmmu arm-softmmu or aarch64-softmmu targets and pass otherwise=
+?
+>=20
+> I have this on my TODO somewhere, because we extract the edk2 firmwares
+> even if we only build MIPS/PowerPC.
 
-You are right:
- * The hidden documents are included in the navigation bar (different
-from the table of contents).
- * The search index (which install-doc omits!) includes content from
-the hidden documents.
+But that applies to all of "BLOBS" in the root-level Makefile, doesn't
+it? We also install, say, "vgabios-qxl.bin", when only the MIPS/PowerPC
+system emulators are built. The only aspect that's specific to edk2
+binaries is that they are kept compressed until installation time, to
+save space in the git repo and in the source tarball.
 
-I have asked on #sphinx-doc.  Let's see if there is a solution.
+I'm reminded of the "external QEMU blob / firmware repo" idea.
 
-It might be possible to hack docs/config.py to exclude devel/ when run
-from make install-sphinxdocs
-(https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-exclude_patterns).
-This requires building the docs again at install time but the
-advantage is we get a single searchable set of documentation.
+Thanks
+Laszlo
 
-Stefan
 
