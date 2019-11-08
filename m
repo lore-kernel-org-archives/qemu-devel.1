@@ -2,75 +2,78 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C29C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C04EAFA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:50:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6977D2067B
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:50:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F09D2067B
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:50:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="c0i/V82r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6977D2067B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="pi7fIL92"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F09D2067B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iTAGg-0001TB-5G
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 14:50:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35754)
+	id 1iTAGj-0001W2-Bo
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 14:50:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35782)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1iTAFA-00008p-1s
+ (envelope-from <palmer@dabbelt.com>) id 1iTAFA-000092-Rb
  for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:48:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1iTAF9-0005zJ-1S
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:48:27 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33747)
+ (envelope-from <palmer@dabbelt.com>) id 1iTAF9-00060u-N1
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:48:28 -0500
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:33748)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iTAF8-0005w9-Jt
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:48:26 -0500
-Received: by mail-pg1-x542.google.com with SMTP id h27so4630335pgn.0
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 11:48:26 -0800 (PST)
+ (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iTAF9-0005zZ-H1
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:48:27 -0500
+Received: by mail-pg1-x543.google.com with SMTP id h27so4630382pgn.0
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 11:48:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=dabbelt-com.20150623.gappssmtp.com; s=20150623;
- h=subject:date:message-id:mime-version:content-transfer-encoding:cc
- :from:to; bh=kXUfIwaLzekBgu4rO+8d58TXD+81bPyPI2S5oCzPGYs=;
- b=c0i/V82rl872oRDRzsNny1HZCiTCIFzzt34/kJGvhuWfp/u4Pojwib0Qj0Y1mz1PzT
- qfFU8q0hTw4m8desBU9Xg+C1pJH39AEfvaOOW4buCSWF1XBM2HiWYF6wnam/MuMdX4Dd
- Vj9mEAXPxl8zhK04wLxmxhQ/hcrCooDBCRuSrKT0d4RGs5VvQw0Ae2ALK2unR3/pSSf5
- zy8iJGYR992HIDa+xqa+PazYKMN/rDle7YcCo0w2YDJVCSMe59uDwPm/lU0egiinRk44
- GfDgux5drYFXQEzCqNZga54mnm5VdKXp155vD2nPkfzYDsZp/Vfj2Tg44rKHyv/w6HjC
- 8YTg==
+ h=subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding:cc:from:to;
+ bh=9MuKvPi+Vd4vUU4gqbdXcIHJqwKNnvJAqsIK6Fo7Ucc=;
+ b=pi7fIL923oWWgDW4NPnQr/eftyTVeXcfwmZIwygNlZzAU9KU4roZv2++952mIomA2A
+ aIf0ihpR6GsxlgDp3WbhP3DMao2VHHieH8F1TJfYCS145O6Q/LnbmrdttZPUkm0Rva7S
+ DXwD9uGEwkdY70/o6rNq6GiprPPjNnjeU66Afl3J7IFfUKV1U22N54TOqkA1NtM+m5R7
+ RIAvi1sQG+hmoWN09m+rdkaeCbMn7IMCqZ9pdNtTF4h3aL257z9sANMewLU/RihQDOz6
+ uJM7n8jBG9OAA9VmElcrAiRrqH/coQ3u9xcdFs4v17kWX/w5zaxmYmgzZMQsWF0jp8hc
+ hboQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:date:message-id:mime-version
- :content-transfer-encoding:cc:from:to;
- bh=kXUfIwaLzekBgu4rO+8d58TXD+81bPyPI2S5oCzPGYs=;
- b=TwmBZebJAYyCpKaiSvwgRIIlLLcSgYiDL3cTN4Iszvmv6KNykG6Bkn/w/8kHXJJ1Jh
- VO2UMvGw1aPfFsyhsABr6mrVkf0gkZXpKtRobj7lEp1DFfLolM+4rBj5wfzuQAr61EfD
- wCRjgFRI7PZAjOEQS1ZjemFKciXnLMS23Twc0KrvEg2CXdnvNfeO+aiuApN744eXwutV
- SkELD3oyDfHl0WxzDixQ1AzF+4q1J5EKPVEVq/TW+fschuQPBzZt+/gdxD+IDQClCxkm
- XAp6KdY/BMV2s6TNuxRE+UTbVYiwAnsupNooevi4Zv0NE5bA0DGp8q0JRCWBdBaftwNr
- pw1A==
-X-Gm-Message-State: APjAAAXwRk/u39T5j4X6JVd97w5JhYgWytx6HstI3dSxSVwhYAwbiawj
- E2Zwp3KDXIYtknBW0OBUMkFkkw==
-X-Google-Smtp-Source: APXvYqyO8pvXTpDi0TvMfvPWDtSTnfeh/2tIOLJK7JEiHeE41SJeRQ+aQhz25QSrx9lMGQ1k1TyYFQ==
-X-Received: by 2002:a62:1841:: with SMTP id 62mr13763325pfy.108.1573242504332; 
- Fri, 08 Nov 2019 11:48:24 -0800 (PST)
+ h=x-gm-message-state:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding:cc:from:to;
+ bh=9MuKvPi+Vd4vUU4gqbdXcIHJqwKNnvJAqsIK6Fo7Ucc=;
+ b=ZWIpiHVfMgK0aaps2KVrOJ/rvvyyZgzyldpQuO8V9/nV02miSO0PEBPJ0FCRrcGc3B
+ O6QSb7Gi/pG/y4C8BxM/9ArL8gWf9LEtrxsWTHje+z+r1WopOxPNK8AXounYOo5g8n4f
+ v3iVbZ9WZYg/REy3HzsBDTZlnUAWeUKT0KSA+YJKqKRbelgkPEcM7udq6l0SR2knG7HK
+ LPYrtRNsaBHaoM0TeJkDUL0nhhf4UvbWdF/D42Z2JB+3brL3ejewUPpgC+EyPr5U1uYf
+ +BsNNA9jMz7omqEqZF3bNUbAxi7gPiglZAYHW9LlPCHGG1X4PzGb7Fmeqmg0jOecMZQo
+ Eexw==
+X-Gm-Message-State: APjAAAUw++TKJ/RWLboLh0fBAWCDhvjAKik006cxAyRo92VyCI3SDPZf
+ +kpwKW6Of9Phe6fX7+cPxKLUEipZ44M=
+X-Google-Smtp-Source: APXvYqye9hkQzVWrvzFfvnjgCHDEpcWJPAIWeA2Fh2TraED35OgiTF3LQL4UzzHFLXFTLDyOEky3hA==
+X-Received: by 2002:a63:e26:: with SMTP id d38mr8265069pgl.44.1573242506131;
+ Fri, 08 Nov 2019 11:48:26 -0800 (PST)
 Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id y123sm7120494pfg.64.2019.11.08.11.48.23
+ by smtp.gmail.com with ESMTPSA id y24sm8053861pfr.116.2019.11.08.11.48.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 Nov 2019 11:48:23 -0800 (PST)
-Subject: [PATCH v2 0/3] device_tree: Allow for and use string arrays [Was:
- RISC-V: virt: This is a "sifive, test1" test finisher]
-Date: Fri,  8 Nov 2019 11:47:55 -0800
-Message-Id: <20191108194758.17813-1-palmer@dabbelt.com>
+ Fri, 08 Nov 2019 11:48:25 -0800 (PST)
+Subject: [PATCH v2 1/3] device_tree: Add a helper function for string arrays
+Date: Fri,  8 Nov 2019 11:47:56 -0800
+Message-Id: <20191108194758.17813-2-palmer@dabbelt.com>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191108194758.17813-1-palmer@dabbelt.com>
+References: <20191108194758.17813-1-palmer@dabbelt.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 From: Palmer Dabbelt <palmer@dabbelt.com>
@@ -79,7 +82,7 @@ To: Peter Maydell <peter.maydell@linaro.org>,
  david@gibson.dropbear.id.au
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::543
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,55 +94,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, qemu-riscv@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Device trees commonly contain arrays of strings for compatible nodes.
-We recently extended the "sifive,test0" node in a backwards-compatible
-way, but QEMU didn't contain an FDT function to set 'compatible =
-"sifive,test1", "sifive,test0";'.  I've converted over the code from the
-ARM virt board that was doing something similar to be a helper function,
-which I could then use for RISC-V as well.
+The device tree format allows for arrays of strings, which are encoded
+with '\0's inside regular strings.  These are ugly to represent in C, so
+the helper function represents them as strings with internal '\0's that
+are terminated with a double '\0'.  In other words, the array
+["string1", "string2"] is represeted as "string1\0string2\0".
 
-I haven't tested the ARM change, but I have tested the RISC-V one.  It
-appears to parse correctly in Linux, and a DTC treats it the same way as
-it treats the string arrays it compiles -- specifically:
+The DTB generated by this function is accepted by DTC and produces an
+array of strings, but I can't find any explicit line in the DT
+specification that defines how these are encoded.
 
-    $ cat test.dts
-    /dts-v1/;
+Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
+---
+ device_tree.c                | 17 +++++++++++++++++
+ include/sysemu/device_tree.h |  6 ++++++
+ 2 files changed, 23 insertions(+)
 
-    / {
-        string = "stringa";
-        strings = "string1", "string2";
-    };
-    $ dtc -I dts test.dts -O dtb -o test.dtb
-    $ dtc -I dtb test.dtb -O dts -o out.dts
-    $ cat out.dts
-    /dts-v1/;
-
-    / {
-            string = "stringa";
-            strings = "string1\0string2";
-    };
-
-and
-
-    $ qemu-system-riscv64 -m virt,dumpdtb=out.dtb ...
-    $ dtc -I dtb test.dtb -O dts -o out.dts
-    $ cat out.dts
-    ...
-            test@100000 {
-                reg = <0x00 0x100000 0x00 0x1000>;
-                compatible = "sifive,test1\0sifive,test0";
-        };
-    ...
-
-Changes since v1 <20191107222500.8018-1-palmer@sifive.com>:
-
-* This is now a multiple patch series.
-* The hepler function has been added and used by the RISC-V virt board.
-* The ARM virt board has been converted to use the helper function
+diff --git a/device_tree.c b/device_tree.c
+index f8b46b3c73..b4379f13a7 100644
+--- a/device_tree.c
++++ b/device_tree.c
+@@ -397,6 +397,23 @@ int qemu_fdt_setprop_string(void *fdt, const char *node_path,
+     return r;
+ }
+ 
++static size_t stringarr_length(const char *strings)
++{
++    size_t count = 1;
++    while (strings[count - 1] != '\0' || strings[count] != '\0') {
++        count++;
++    }
++    return count;
++}
++
++int qemu_fdt_setprop_strings(void *fdt, const char *node_path,
++                            const char *property, const char *strings)
++{
++    size_t length = stringarr_length(strings);
++    return qemu_fdt_setprop(fdt, node_path, property, strings, length);
++}
++
++
+ const void *qemu_fdt_getprop(void *fdt, const char *node_path,
+                              const char *property, int *lenp, Error **errp)
+ {
+diff --git a/include/sysemu/device_tree.h b/include/sysemu/device_tree.h
+index c16fd69bc0..d43c07128e 100644
+--- a/include/sysemu/device_tree.h
++++ b/include/sysemu/device_tree.h
+@@ -70,6 +70,12 @@ int qemu_fdt_setprop_string(void *fdt, const char *node_path,
+ int qemu_fdt_setprop_phandle(void *fdt, const char *node_path,
+                              const char *property,
+                              const char *target_node_path);
++/*
++ * This uses a particularly odd encoding: "strings" is a list of strings that
++ * must be terminated by two back-to-back '\0' characters.
++ */
++int qemu_fdt_setprop_strings(void *fdt, const char *node_path,
++                             const char *property, const char *strings);
+ /**
+  * qemu_fdt_getprop: retrieve the value of a given property
+  * @fdt: pointer to the device tree blob
+-- 
+2.21.0
 
 
