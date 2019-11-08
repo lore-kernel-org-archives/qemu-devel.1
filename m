@@ -6,77 +6,75 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74ECBC5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:45:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B71A4FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:46:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3ED7420659
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:45:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8575C20659
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:46:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LkjUck8G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED7420659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A62VmiaJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8575C20659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55576 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT5WK-0003tD-8U
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 09:45:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41924)
+	id 1iT5WS-00048B-JP
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 09:46:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41348)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iT5UY-0002Ok-Qn
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:44:03 -0500
+ (envelope-from <philmd@redhat.com>) id 1iT5Ra-0006tZ-JX
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:40:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iT5UW-0002C2-SF
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:44:02 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:35320)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iT5UW-0002Bo-MB
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:44:00 -0500
-Received: by mail-oi1-x244.google.com with SMTP id n16so5446548oig.2
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 06:44:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=1yolX350RikgspNGqXnpbhsMD0ygO5qfrBMQwb1uQOE=;
- b=LkjUck8G6OTsye2KDLb/3YWOGM3eRJkjFeWCM9z2pjE3DQ8/NdrsM8PGq7U9dy2OCi
- O/YgCFf0SeDFOcfEZNmRwjKvtJw2RhH6QOYaL0W1efS7zTQed88y4YLLbvDs3WreGMYQ
- ZaxzetERmj5WoinrStEqgJMiR0zHOAQmrETL4DILgKKpCGVquzWqSd6SvTEaxNE7RfAX
- tzjzCQHM/kYy8k8pL3XBfaBIY0XTNl+5K00rkWqQW2r++l25ivevpuk1vFRPta4W5LuY
- 3v9N+1XYBuNJAR2hSF6l2aRqkH0yfWe63qJ0Ktb4ncSfhWRM2TguYjD7gJgDMCZ2RQpD
- 98IA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=1yolX350RikgspNGqXnpbhsMD0ygO5qfrBMQwb1uQOE=;
- b=PXtg1GqMXZ/pNV5xtm8ka30yv7hbCwAT5pjE/OyqFkLrwmINbsGob1qdIyX++VSDFa
- RHkqZkD3EEGpLhZs9PTKdx18zo1C1Bzwox7wpzNa+QISzh5iSEKAihbAem2Hqpf2W7T4
- dbSsPes+vDnfoOkOR6l64rF2zBB6i9hlY/ypvClKMrRQatjGrxk6dhINaC3n55hLXp2G
- 9yGgs27AHsyaj7BHR9LN7fiP4qCH4rzYBor+1uAQI88CUvpfvIZQ9P5mLn5lBRr8d/Ag
- 08Z13mkU/5gDg6IjEBSQc0RibdUGM2m5kNSFffr87gkF5T0d6udTsqO/IDYigmBDkrzd
- hJDg==
-X-Gm-Message-State: APjAAAU74ZL+EgHueQk2nqD6BClhNBAzF6yxaJASY1w9jvzggEAZ3W8q
- A7EbmO74KTe6b8g56/g8NY13SN68XxJ6zlHDvaIoDg==
-X-Google-Smtp-Source: APXvYqwUZgFlH1xjAqaqhUR3zUXHR5SpfUfvGghnpa8T32ZKF1LjGGgbALDJY5/Dasjb6L5O7OZBxk4RJww4eOTC89g=
-X-Received: by 2002:a05:6808:7d1:: with SMTP id
- f17mr10273400oij.163.1573224239534; 
- Fri, 08 Nov 2019 06:43:59 -0800 (PST)
+ (envelope-from <philmd@redhat.com>) id 1iT5RZ-0000EE-0x
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:40:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41665
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iT5RY-0000Dz-TN
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:40:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573224056;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rgCcQxWE/c9r5thmfIml1bcg46hlbRTbC2CJgE1AG/w=;
+ b=A62VmiaJY70hAUOPV0gBrg67GGm79BfSTYAPBBjVspLPzqV0e6K6+aXnM+VknNhxao/Zgt
+ Vg87HmkhQZqUC8c4/+Fxr2rSw6TLGK2TMQDfxZQOaSw8B9izu2DDNWa1f/FNWA7lADYdCe
+ 3NaL+6+hzBuNkqoqFFvW0QvlDU/UosM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-428-8hYWyjnOP7ec5V8B_ySg7w-1; Fri, 08 Nov 2019 09:40:55 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D69E800C72;
+ Fri,  8 Nov 2019 14:40:54 +0000 (UTC)
+Received: from x1w.redhat.com (unknown [10.40.206.29])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 309F95D6AE;
+ Fri,  8 Nov 2019 14:40:49 +0000 (UTC)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Eric Blake <eblake@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 1/3] hw/block/pflash: Remove dynamic field width from trace
+ events
+Date: Fri,  8 Nov 2019 15:40:40 +0100
+Message-Id: <20191108144042.30245-2-philmd@redhat.com>
+In-Reply-To: <20191108144042.30245-1-philmd@redhat.com>
+References: <20191108144042.30245-1-philmd@redhat.com>
 MIME-Version: 1.0
-References: <20191104131836.12566-1-alex.bennee@linaro.org>
-In-Reply-To: <20191104131836.12566-1-alex.bennee@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Nov 2019 14:43:48 +0000
-Message-ID: <CAFEAcA-42Fg-ihBm3JVET41SJ1Mot7m-i1ZGt+Y1afOY1wZ0Ow@mail.gmail.com>
-Subject: Re: [PATCH] tcg plugins: expose an API version concept
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 8hYWyjnOP7ec5V8B_ySg7w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,130 +86,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 4 Nov 2019 at 13:18, Alex Benn=C3=A9e <alex.bennee@linaro.org> wrot=
-e:
->
-> This is a very simple versioning API which allows the plugin
-> infrastructure to check the API a plugin was built against. We also
-> expose a min/cur API version to the plugin via the info block in case
-> it wants to avoid using old deprecated APIs in the future.
+Since not all trace backends support dynamic field width in
+format (dtrace via stap does not), replace by a static field
+width instead.
 
-I think the general idea here is fine, and I want to see
-us get the version-check into 4.2, because I don't think
-we should release a QEMU which doesn't do a basic version
-sanity check. I have some minor comments below.
+Reported-by: Eric Blake <eblake@redhat.com>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1844817
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ hw/block/pflash_cfi01.c | 8 ++++----
+ hw/block/pflash_cfi02.c | 8 ++++----
+ hw/block/trace-events   | 8 ++++----
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index 566c0acb77..787d1196f2 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
+@@ -276,7 +276,7 @@ static uint32_t pflash_data_read(PFlashCFI01 *pfl, hwad=
+dr offset,
+         DPRINTF("BUG in %s\n", __func__);
+         abort();
+     }
+-    trace_pflash_data_read(offset, width << 1, ret);
++    trace_pflash_data_read(offset, width << 3, ret);
+     return ret;
+ }
+=20
+@@ -389,7 +389,7 @@ static uint32_t pflash_read(PFlashCFI01 *pfl, hwaddr of=
+fset,
+=20
+         break;
+     }
+-    trace_pflash_io_read(offset, width, width << 1, ret, pfl->cmd, pfl->wc=
+ycle);
++    trace_pflash_io_read(offset, width << 3, ret, pfl->cmd, pfl->wcycle);
+=20
+     return ret;
+ }
+@@ -414,7 +414,7 @@ static inline void pflash_data_write(PFlashCFI01 *pfl, =
+hwaddr offset,
+ {
+     uint8_t *p =3D pfl->storage;
+=20
+-    trace_pflash_data_write(offset, width << 1, value, pfl->counter);
++    trace_pflash_data_write(offset, width << 3, value, pfl->counter);
+     switch (width) {
+     case 1:
+         p[offset] =3D value;
+@@ -453,7 +453,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offse=
+t,
+=20
+     cmd =3D value;
+=20
+-    trace_pflash_io_write(offset, width, width << 1, value, pfl->wcycle);
++    trace_pflash_io_write(offset, width << 3, value, pfl->wcycle);
+     if (!pfl->wcycle) {
+         /* Set the device in I/O access mode */
+         memory_region_rom_device_set_romd(&pfl->mem, false);
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index 4baca701b7..f2993cdfaa 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
+@@ -260,7 +260,7 @@ static uint64_t pflash_data_read(PFlashCFI02 *pfl, hwad=
+dr offset,
+ {
+     uint8_t *p =3D (uint8_t *)pfl->storage + offset;
+     uint64_t ret =3D pfl->be ? ldn_be_p(p, width) : ldn_le_p(p, width);
+-    trace_pflash_data_read(offset, width << 1, ret);
++    trace_pflash_data_read(offset, width << 3, ret);
+     return ret;
+ }
+=20
+@@ -385,7 +385,7 @@ static uint64_t pflash_read(void *opaque, hwaddr offset=
+, unsigned int width)
+         }
+         break;
+     }
+-    trace_pflash_io_read(offset, width, width << 1, ret, pfl->cmd, pfl->wc=
+ycle);
++    trace_pflash_io_read(offset, width << 3, ret, pfl->cmd, pfl->wcycle);
+=20
+     return ret;
+ }
+@@ -432,7 +432,7 @@ static void pflash_write(void *opaque, hwaddr offset, u=
+int64_t value,
+     uint8_t *p;
+     uint8_t cmd;
+=20
+-    trace_pflash_io_write(offset, width, width << 1, value, pfl->wcycle);
++    trace_pflash_io_write(offset, width << 3, value, pfl->wcycle);
+     cmd =3D value;
+     if (pfl->cmd !=3D 0xA0) {
+         /* Reset does nothing during chip erase and sector erase. */
+@@ -542,7 +542,7 @@ static void pflash_write(void *opaque, hwaddr offset, u=
+int64_t value,
+                 }
+                 goto reset_flash;
+             }
+-            trace_pflash_data_write(offset, width << 1, value, 0);
++            trace_pflash_data_write(offset, width << 3, value, 0);
+             if (!pfl->ro) {
+                 p =3D (uint8_t *)pfl->storage + offset;
+                 if (pfl->be) {
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 13d1b21dd4..b9e195e172 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -8,10 +8,10 @@ fdc_ioport_write(uint8_t reg, uint8_t value) "write reg 0=
+x%02x val 0x%02x"
+ # pflash_cfi01.c
+ pflash_reset(void) "reset"
+ pflash_timer_expired(uint8_t cmd) "command 0x%02x done"
+-pflash_io_read(uint64_t offset, int width, int fmt_width, uint32_t value, =
+uint8_t cmd, uint8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%0*x cm=
+d:0x%02x wcycle:%u"
+-pflash_io_write(uint64_t offset, int width, int fmt_width, uint32_t value,=
+ uint8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%0*x wcycle:%u"
+-pflash_data_read(uint64_t offset, int width, uint32_t value) "data offset:=
+0x%04"PRIx64" value:0x%0*x"
+-pflash_data_write(uint64_t offset, int width, uint32_t value, uint64_t cou=
+nter) "data offset:0x%04"PRIx64" value:0x%0*x counter:0x%016"PRIx64
++pflash_io_read(uint64_t offset, int width, uint32_t value, uint8_t cmd, ui=
+nt8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%04x cmd:0x%02x wcycle=
+:%u"
++pflash_io_write(uint64_t offset, int width, uint32_t value, uint8_t wcycle=
+) "offset:0x%04"PRIx64" width:%d value:0x%04x wcycle:%u"
++pflash_data_read(uint64_t offset, int width, uint32_t value) "data offset:=
+0x%04"PRIx64" width:%d value:0x%04x"
++pflash_data_write(uint64_t offset, int width, uint32_t value, uint64_t cou=
+nter) "data offset:0x%04"PRIx64" width:%d value:0x%04x counter:0x%016"PRIx6=
+4
+ pflash_manufacturer_id(uint16_t id) "Read Manufacturer ID: 0x%04x"
+ pflash_device_id(uint16_t id) "Read Device ID: 0x%04x"
+ pflash_device_info(uint64_t offset) "Read Device Information offset:0x%04"=
+PRIx64
+--=20
+2.21.0
 
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  include/qemu/qemu-plugin.h | 19 +++++++++++++++++++
->  plugins/loader.c           | 15 +++++++++++++++
->  plugins/plugin.h           |  2 ++
->  tests/plugin/bb.c          |  2 ++
->  tests/plugin/empty.c       |  2 ++
->  tests/plugin/hotpages.c    |  2 ++
->  tests/plugin/howvec.c      |  2 ++
->  tests/plugin/insn.c        |  2 ++
->  tests/plugin/mem.c         |  2 ++
->  9 files changed, 48 insertions(+)
->
-> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-> index a00a7deb461..5502e112c81 100644
-> --- a/include/qemu/qemu-plugin.h
-> +++ b/include/qemu/qemu-plugin.h
-
-As an aside, is this the header file used for building
-the plugins? It seems a bit odd to have put it
-in include/qemu, which is for headers used when building
-QEMU itself.
-
-> @@ -38,9 +38,28 @@
->
->  typedef uint64_t qemu_plugin_id_t;
->
-> +/*
-> + * Versioning plugins:
-> + *
-> + * The plugin API will pass a minimum and current API version that
-> + * QEMU currently supports. The minimum API will be incremented if an
-> + * API needs to be deprecated.
-> + *
-> + * The plugins export the API they were built against by exposing the
-> + * symbol qemu_plugin_version which can be checked.
-> + */
-> +
-> +extern QEMU_PLUGIN_EXPORT int qemu_plugin_version;
-> +
-> +#define QEMU_PLUGIN_VERSION 0
-> +
->  typedef struct {
->      /* string describing architecture */
->      const char *target_name;
-> +    struct {
-> +        int min;
-> +        int cur;
-> +    } version;
->      /* is this a full system emulation? */
->      bool system_emulation;
->      union {
-> diff --git a/plugins/loader.c b/plugins/loader.c
-> index ce724ed5839..1bcca909691 100644
-> --- a/plugins/loader.c
-> +++ b/plugins/loader.c
-> @@ -178,6 +178,19 @@ static int plugin_load(struct qemu_plugin_desc *desc=
-, const qemu_info_t *info)
->          goto err_symbol;
->      }
->
-> +    if (!g_module_symbol(ctx->handle, "qemu_plugin_version", &sym)) {
-> +        warn_report("%s: missing version %s", __func__, g_module_error()=
-);
-
-Failure to declare the required version should be an error,
-not just a warning.
-
-> +    } else {
-> +        int version =3D *(int *)sym;
-> +        if (version < QEMU_PLUGIN_MIN_VERSION ||
-> +            version > QEMU_PLUGIN_VERSION) {
-> +            error_report("%s: bad plugin version %d vs %d/%d",
-> +                         __func__, version, QEMU_PLUGIN_MIN_VERSION,
-> +                         QEMU_PLUGIN_VERSION);
-
-I think this message is too cryptic, and would prefer
-something more like:
- "TCG plugin %s requires API version %d, but this QEMU supports only
-versions %d to %d"
-
-where the first %s is the name of the plugin binary, not
-the __func__ of this function (which is not useful to
-the end user).
-
-Better still, special case the MIN_VERSION =3D=3D VERSION
-case to avoid saying "versions 1 to 1".
-
-> +            goto err_symbol;
-> +        }
-> +    }
-> +
->      qemu_rec_mutex_lock(&plugin.lock);
->
->      /* find an unused random id with &ctx as the seed */
-> @@ -248,6 +261,8 @@ int qemu_plugin_load_list(QemuPluginList *head)
->      g_autofree qemu_info_t *info =3D g_new0(qemu_info_t, 1);
->
->      info->target_name =3D TARGET_NAME;
-> +    info->version.min =3D QEMU_PLUGIN_MIN_VERSION;
-> +    info->version.cur =3D QEMU_PLUGIN_VERSION;
->  #ifndef CONFIG_USER_ONLY
->      MachineState *ms =3D MACHINE(qdev_get_machine());
->      info->system_emulation =3D true;
-
-thanks
--- PMM
 
