@@ -2,79 +2,80 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F8FC5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB242C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:00:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 334E1218AE
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:59:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB46321D7B
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:00:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J8Qf+yD6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 334E1218AE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YAk2+BQ9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB46321D7B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT1yl-0003CZ-DA
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 05:58:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55866)
+	id 1iT206-0004EA-Vh
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 06:00:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55946)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iT1xB-0001NF-Va
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:57:26 -0500
+ (envelope-from <berrange@redhat.com>) id 1iT1xE-0001Pi-CU
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:57:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iT1x8-0001ln-6y
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:57:21 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38794)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iT1wJ-0001Kw-Az
+ (envelope-from <berrange@redhat.com>) id 1iT1x8-0001nY-NJ
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:57:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37252
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iT1wq-0001fm-Hk
  for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:57:18 -0500
-Received: by mail-oi1-x244.google.com with SMTP id a14so4864358oid.5
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 02:56:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QSA741uBEPaIbz8uP/VPthR9NV6kG9kvrfc3BOD9kf4=;
- b=J8Qf+yD6XAYhQPCnBo+1qv1A+QVOR93mwqr2RJy0jxDyn7O+rQuF7xf/Wsm/wfm3G4
- sNGqjpt7fa/jw1q0Md68VwwCvcNRRGwuiIVDFk82ELzWirYQcgvl/Mzqs5YbMU7uUcbJ
- 0aAisW2z3Q74ileuhu1YlcCzE/xkR8ruF/CAGror/JI0ZHtdxzYQeFqz9rbNVAJc9bBL
- uj8s84C9+UQP2I2YKo4l6wAzNYy9amUpuuLGyVdiXdz4575ErvThO5vEqcYhP6LXhBQx
- +hDjfCl+EoicsGG4qdAaO97SLOzSM8FvPthziozWubQKFFAN9qdUrRbbkI/S3VXQQOIr
- zYvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=QSA741uBEPaIbz8uP/VPthR9NV6kG9kvrfc3BOD9kf4=;
- b=NPcSLBaDQQYPu4rrPNXKAtt1j4cn7Z5NMFXFLazemmMFCWp4z7Z6xIm1FZ70XXyjaw
- qZblwhB56wVOIzQyCIb2/gf3K+mIWdDpZQ7WoF7DuG9R7ltx9k02Q3Yg6B0rw2fdXlZd
- yKO2jep0Dw9SeAqYMT7hG2HlelTSQrWhddDWu0imzoN/yMgNAj+Mb2juAM4GGrMSSXzu
- 9KonuPdye7LtLTjxfuj2IPaak40aYoihUhtD7RDOVN5oYRYHAVys3eJU7tx6VuL1ecVo
- xm32O/QG1uCen6fT4h3THwEcc3UeJDRTE+nY8Rgrr107hFXpqATpw6OGTFvqbTcKLn22
- Xwzw==
-X-Gm-Message-State: APjAAAXbY7X5bsbq+oFHHxJMcjYbbxKLkkJ7t1sukPQZJ65TA1GX9+/Q
- EorBz6ayBTcjVV3kvlbohz8t4kf47rIO8QZGcU8ksg==
-X-Google-Smtp-Source: APXvYqzAO5QRUWeoxU6W2cEVuuM73q9fek5lxJvaRDFX9SIvlhoFeR84hanADamSWC3icEpM9DAZuKBWnqktNPdp+oA=
-X-Received: by 2002:aca:451:: with SMTP id 78mr9054755oie.170.1573210586355;
- Fri, 08 Nov 2019 02:56:26 -0800 (PST)
-MIME-Version: 1.0
-References: <20191108095942.401225-1-stefanha@redhat.com>
- <20191108095942.401225-4-stefanha@redhat.com>
-In-Reply-To: <20191108095942.401225-4-stefanha@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Nov 2019 10:56:15 +0000
-Message-ID: <CAFEAcA8GS52-a9_LxhOD4xM5dqX++=T8-BNVvjD0hrFTUhm-MQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] docs: install CSS and Javascript files for HTML docs
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573210620;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=bkBLH3nEOBS2VigPxe5xSX04LZYJbsJLTzWcJrNHoZk=;
+ b=YAk2+BQ94Nc2HkouGRCbtlF0d0koMlPeLE2/tjOo8T1KZRofz8abI/UoY6oPVLM/By1ivN
+ pKvI/7qRpqIFukKZK15JRujVKChVqGSbMKj2T6xp9LLPDZVh0puwhfLe06juQcGIbteCT+
+ OtA8HmVSuA3sX2r3dRNnZW803+W2nk4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-229-33fUGljMMTmWp9vDzIywtg-1; Fri, 08 Nov 2019 05:56:58 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6DF08017DD
+ for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 10:56:57 +0000 (UTC)
+Received: from redhat.com (ovpn-112-63.ams2.redhat.com [10.36.112.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A34C75D70E;
+ Fri,  8 Nov 2019 10:56:51 +0000 (UTC)
+Date: Fri, 8 Nov 2019 10:56:48 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+Subject: Re: [qemu-web PATCH v3] documentation: link to nightly documentation
+Message-ID: <20191108105648.GE182396@redhat.com>
+References: <20191108105435.403161-1-stefanha@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <20191108105435.403161-1-stefanha@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: 33fUGljMMTmWp9vDzIywtg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,56 +87,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Berrange <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 8 Nov 2019 at 10:00, Stefan Hajnoczi <stefanha@redhat.com> wrote:
->
-> Install the sphinx CSS/Javascript support files needed by the HTML
-> documentation.  The documentation looks ugly without this.
->
-> The previous patch switched to only invoking sphinx once so there is
-> only one _static/ directory that needs to be installed across all manual
-> sections.
->
+On Fri, Nov 08, 2019 at 11:54:35AM +0100, Stefan Hajnoczi wrote:
+> Link to the documentation built from qemu.git/master once a day.
+>=20
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  Makefile | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/Makefile b/Makefile
-> index 9487a06bed..dd60787d4c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -813,6 +813,7 @@ endef
->  # for QEMU developers, and not interesting to our users.
->  .PHONY: install-sphinxdocs
->  install-sphinxdocs: sphinxdocs
-> +       $(call install-manual,_static)
->         $(call install-manual,interop)
->         $(call install-manual,specs)
->         $(INSTALL_DATA) "$(MANUAL_BUILDDIR)/index.html" "$(DESTDIR)$(qemu_docdir)/index.html"
+> v3:
+>  * Use a qemu.org URL, not a wiki.qemu.org URL [danpb]
+> v2:
+>  * This revision was broken - please ignore! :)
+> ---
+>  documentation.md | 2 ++
+>  1 file changed, 2 insertions(+)
 
-'install-manual' does some complicated stuff to
-(a) handle subdirectories and (b) skip things we don't
-want to install. It's intended for installing manual
-directories (specs, interop, etc). _static is just
-a simple single directory with no underlying files,
-and it's not a manual, so it seems a bit odd to use
-install-manual for it.
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
 
-Also, this is only needed because we're now building
-the docs in a single run (with the 'build manuals
-one at a time' approach you get a separate specs/_static,
-interop/_static, etc, which are installed by the
-relevant install-manual calls for each manual). So
-it seems like it ought to be squashed into the commit
-that switches to doing the docs build in one run of
-sphinx.
+(depends on the corresponding patch to qemu.git to generate the main
+ index.html to be merged before this can be pushed I presume)
 
-thanks
--- PMM
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
