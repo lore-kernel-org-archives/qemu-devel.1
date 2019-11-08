@@ -2,78 +2,86 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D768EC5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:00:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE7BCC5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:02:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0A25215EA
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:00:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5C8120679
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:02:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="me70BZMe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0A25215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="W/mCihPG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5C8120679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT6gJ-0002NG-QG
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:00:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55652)
+	id 1iT6im-0003jA-Nu
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:02:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55523)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iT6ez-00019O-8L
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:58:54 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1iT6eK-0000XR-Ns
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:58:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iT6ex-0000Wf-Un
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:58:52 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36040)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iT6ex-0000WI-OP
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:58:51 -0500
-Received: by mail-oi1-x242.google.com with SMTP id j7so5659683oib.3
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 07:58:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=LQ3GbzhAlWakkp9NcFJ+/X9NGKDGeaOkAkmOLvHt9y8=;
- b=me70BZMeByRR5nOfJOfXrhTXOLix/75IkVNyJwLh3MG2Vs4aWNyArN38fX455vnoiy
- 7xQhnCorGK6EaaJWvFaBzv1o2ALA7IWTvKj86zUDvZn0cVb1cMyqNUhZJVZkMK6/3X00
- 0iGArVQbqZAjRD2cZn5a3b8dfEmFjFoBeQ4+5FfnosuwQQqPe/An1X6s7gjk6MfT9m8A
- EWLf5uhTYtSpz/6oaefKht6SWGDuFlFtC5lcbFEO/7hVX575Bb5sD5oU83jX4Bo5Hxzy
- Lu1AwrTL0g7pnH8VIyr1qlavg8O0kqvCkcgfsth/N3c09i7Yu218RbrTkuCgc/04wCZg
- NNLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=LQ3GbzhAlWakkp9NcFJ+/X9NGKDGeaOkAkmOLvHt9y8=;
- b=I+cFFAx9GXs8apPavZKnFj2PSnaz9G25h0cRo2CIMDbS9gBmNZSVVSMe+C7a8lteLf
- /qyhXzssC/2CoQCTqe0Sd4fia8VgaYW38DUfR0XQx/XciXNv7EwqV4qsgzux0NpaYdkH
- ZCOZ2ZfT2xzGU1or6priLTE0/ZAYFN6fMA3aItTHqK8tWV4DYg0SGybxHYbOAtzpt0D2
- HLcl5VHBsXgLKGdkfVMRGpE6tgDdDz8GqGD3/g6L+wzAKKVsfTZyIbB1Q7pDOqeGHytL
- YsbNCNmQpSZA1doCDG7sGlcQfXHT6+RpCzBn5C/KiUzXuPqA1dJrb9eHHCJ2SDY2g0RR
- o0Zg==
-X-Gm-Message-State: APjAAAVhsY8MTmHP6+Rfoq6YGlKA0XSx7RSLRQ3gU3vuE1MHtBLuSZ1X
- srDFcZT63V8sFPkNi+Mm/1xY1X3GajpIzrUhP7fHlQ==
-X-Google-Smtp-Source: APXvYqzFXH+9WFfpqv3yYUfaBZFAmE/GIL0oVY3rX9uVSdZK284SwP8KgIKsmc754r4MdcrhxIy1eTKYvtJ1dIycOYc=
-X-Received: by 2002:aca:3e8a:: with SMTP id l132mr9887523oia.146.1573228730711; 
- Fri, 08 Nov 2019 07:58:50 -0800 (PST)
+ (envelope-from <damien.hedde@greensocs.com>) id 1iT6eJ-0008Um-NW
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:58:12 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:34520)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1iT6eG-0008Rr-Qo; Fri, 08 Nov 2019 10:58:09 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 2247596EF0;
+ Fri,  8 Nov 2019 15:58:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1573228686;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CY7NMoOalLR5kDxou9MKFlDhUBoay+Dc1KO9XSx/ydQ=;
+ b=W/mCihPGChacv/FwC9GGDhRh5JRYYaM/hnRd6JKzSdSIdqz+aoxB9UKYpiPQ5i9FOBcesa
+ UDzsDVc1M2Tidh13LIu9UslzzZh9YqJ5PndfNImOnJ/dk4CT6V1bkRoJSxrMcR75L+1IyX
+ JBf7XLv68LOL7waggSmiR6Du1XzEqR4=
+Subject: Re: [PATCH v5 00/13] Multi-phase reset mechanism
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191018150630.31099-1-damien.hedde@greensocs.com>
+ <efef625a-8162-5454-128f-489d636563a1@greensocs.com>
+ <aae84bfb-e735-0aac-124c-9abbdea882ff@greensocs.com>
+ <CAFEAcA9QW1JTg72YiGDxuEi5Dip99KUxuHAqDnVma1=A_qqbQQ@mail.gmail.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <a8486664-535d-8b19-4cef-703539e5b9b8@greensocs.com>
+Date: Fri, 8 Nov 2019 16:58:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <20191104115228.30745-1-graf@amazon.com>
-In-Reply-To: <20191104115228.30745-1-graf@amazon.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Nov 2019 15:58:39 +0000
-Message-ID: <CAFEAcA8zkR_MZ-28Nc=x4j05U9MsFYfzQtkHxTf65ZwacK020w@mail.gmail.com>
-Subject: Re: [PATCH] pl031: Expose RTCICR as proper WC register
-To: Alexander Graf <graf@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+In-Reply-To: <CAFEAcA9QW1JTg72YiGDxuEi5Dip99KUxuHAqDnVma1=A_qqbQQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1573228686;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CY7NMoOalLR5kDxou9MKFlDhUBoay+Dc1KO9XSx/ydQ=;
+ b=blkdNHMiN8Ipe/pqsXYqaQ59SDfnga7XHMVtWkxpPWVkv7O+AqB1OkGyuO483MUWXzcKFe
+ uCM1q6XdSEDVEUrSZZQs2jhacl5YE3dOZ7fR0V+tLHDLEE8R9pH7wlGcW+YJDiqKaq9afZ
+ 7kA6Qr+sjnGZ6fyyJ8YYes8eqfPqSWo=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1573228686; a=rsa-sha256; cv=none;
+ b=QgK4M1QWQmiFsmBc16D7Wc1V7cVVIJfVgRSCxPgpdMYQjChuYpRkCOZk7K5mDngsSaR2ru
+ V44E/W+Dk40TzfAmuWFIuTOYtpSoiC78QGooFBA676cOm8CqPo+KqdyLvdvpLDbRsK9hEB
+ Vhkgn5EsH+HpdGBSqUW/UcebOfrzM5I=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,76 +93,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hendrik Borghorst <hborghor@amazon.de>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
+ Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 4 Nov 2019 at 11:52, Alexander Graf <graf@amazon.com> wrote:
->
-> The current pl031 RTCICR register implementation always clears the IRQ
-> pending status on a register write, regardless of the value it writes.
->
-> To justify that behavior, it references the arm926e documentation
-> (DDI0287B) and indicates that said document states that any write clears
-> the internal IRQ state. I could however not find any text in that document
-> backing the statement. In fact, it explicitly says:
->
->   "Writing 1 to bit 0 of RTCICR clears the RTCINTR flag."
->
-> which describes it as much as a write-to-clear register as the PL031 spec
-> (DDI0224) does:
->
->   "Writing 1 to bit position 0 clears the corresponding interrupt.
->    Writing 0 has no effect."
 
-DDI0287B page 11-2 section 11.1 says
-"The interrupt is cleared by writing any data value to the
-interrupt clear register RTCICR". As you note, this contradicts
-what it says later on in section 11.2.2.
+On 11/8/19 4:28 PM, Peter Maydell wrote:
+> On Fri, 8 Nov 2019 at 15:26, Damien Hedde <damien.hedde@greensocs.com> wrote:
+>>
+>>
+>> On 10/29/19 4:53 PM, Damien Hedde wrote:
+>>> Hi,
+>>>
+>>> Does anyone has comment about the interface / patch 3 ?
+>>> Should I try to split it ?
+>>
+>> ping
+> 
+> Hi; this patchset is still in my to-review queue, but we've
+> just gone into softfreeze for 4.2 so I'm a bit short on time
+> to look at anything that's not for this release.
+> 
+> I do definitely want to get this patchset in early in the
+> 5.0 release cycle though.
 
-(Interestingly, the PL030 does have a "write any value to
-clear the interrupt" register, RTCEOI.)
+Hi,
+I understand,
+Then I'll maybe try to advance more on the multiple reset type handling
+and a do v6.
 
-I'm fairly sure this patch is right and the DDI0287B document
-has an error, since it isn't internally consistent and doesn't
-match the proper PL031 TRM.
-
-Did you find this because you had a guest that assumed the
-other behaviour? This bug has been in QEMU for a very long time,
-and it seems odd for a guest to deliberately perform an action
-(writing 0) which is documented to have no effect on the device...
-
-> Let's remove the bogus comment and instead follow both specs to what they
-> say.
->
-> Reported-by: Hendrik Borghorst <hborghor@amazon.de>
-> Signed-off-by: Alexander Graf <graf@amazon.com>
-> ---
->  hw/rtc/pl031.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
->
-> diff --git a/hw/rtc/pl031.c b/hw/rtc/pl031.c
-> index 3a982752a2..c57cf83165 100644
-> --- a/hw/rtc/pl031.c
-> +++ b/hw/rtc/pl031.c
-> @@ -149,11 +149,7 @@ static void pl031_write(void * opaque, hwaddr offset,
->          pl031_update(s);
->          break;
->      case RTC_ICR:
-> -        /* The PL031 documentation (DDI0224B) states that the interrupt is
-> -           cleared when bit 0 of the written value is set.  However the
-> -           arm926e documentation (DDI0287B) states that the interrupt is
-> -           cleared when any value is written.  */
-> -        s->is = 0;
-> +        s->is &= ~value;
->          pl031_update(s);
->          break;
->      case RTC_CR:
-> --
-> 2.17.1
-
-thanks
--- PMM
+Thanks,
+Damien
 
