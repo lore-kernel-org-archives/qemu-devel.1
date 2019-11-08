@@ -6,78 +6,76 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F39C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:37:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 973CDFA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:40:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E799A21882
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:37:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64E8221882
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:40:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aUxhLplX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E799A21882
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fMf5XoEC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64E8221882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT6Kb-0000Tx-W2
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:37:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48757)
+	id 1iT6Mq-0003y1-5N
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:40:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52763)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iT5zV-0002Hf-Ro
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:16:03 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iT6Le-0002Xj-0V
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:38:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iT5zT-0001hZ-A2
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:16:01 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28095
+ (envelope-from <mlevitsk@redhat.com>) id 1iT6Lc-0007YK-TE
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:38:53 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27188
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iT5zT-0001fz-5k
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:15:59 -0500
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iT6Lc-0007Y8-PC
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:38:52 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573226157;
+ s=mimecast20190719; t=1573227532;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9uGkM2ScxKkd527ZctXcwbbvuzGfdXH3Rau2IM2RRUk=;
- b=aUxhLplXgb8ZYPWdrAduh3dhiwWYv4vWkR15fnpROZZ+rfaaIHnqgVK/EtIJ5UiFrRlooM
- wd58gxqJ1b3z0z2ZfiOKqDB5GHLmsNpJrLVy3VkiHOFFxAN8Jq4nm8k2fHQgMlW9iaiMWh
- ayj49PXh5PZ7B6sW7y3OjOtmXEziwZc=
+ bh=n2KZgjNrkTr0sNd/vWmLjWoRd/IHX2yhYtP3tr1O4QI=;
+ b=fMf5XoECz+uc11MFYEjyaNXIkB4+1thgaBF0JsJ+rTW3XeNeuQz+4+rGMnBswDOROHQsgz
+ T/O1ZE3eyI/9O+PY8KzpXPb3EhQT4xJNJ1XTkUM2XZPdbaj7b1NEoLzBtfJpDQQTLF7AAz
+ L9au29DN9yOZaQaE+rhGL6zUQQTpKH0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-64-yKCHPV2QNDSCXZagHpSY1A-1; Fri, 08 Nov 2019 10:15:53 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-257-9FDJlvJcMfSdwfvuENhMWQ-1; Fri, 08 Nov 2019 10:38:50 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 979B48017DD;
- Fri,  8 Nov 2019 15:15:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 65C405DA81;
- Fri,  8 Nov 2019 15:15:52 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D940F11385C9; Fri,  8 Nov 2019 16:15:50 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Jan Kiszka <jan.kiszka@siemens.com>
-Subject: Re: [PATCH v2] ivshmem-server: Terminate also on SIGINT
-References: <99c1a7bd-1876-66a2-4b8e-d5bc86116fe7@web.de>
- <fed41c57-c433-9723-e5db-5eb3a10c4f8b@siemens.com>
-Date: Fri, 08 Nov 2019 16:15:50 +0100
-In-Reply-To: <fed41c57-c433-9723-e5db-5eb3a10c4f8b@siemens.com> (Jan Kiszka's
- message of "Fri, 8 Nov 2019 10:08:31 +0100")
-Message-ID: <87a7968km1.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: yKCHPV2QNDSCXZagHpSY1A-1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2DE88017DE;
+ Fri,  8 Nov 2019 15:38:49 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.23])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2D98B1001902;
+ Fri,  8 Nov 2019 15:38:47 +0000 (UTC)
+Message-ID: <19f074f5136036ace2ca72f3e69b23a6eeace8ae.camel@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 07/11] block: add x-blockdev-amend qmp
+ command
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Date: Fri, 08 Nov 2019 17:38:46 +0200
+In-Reply-To: <87eezpj8j5.fsf@dusky.pond.sub.org>
+References: <20190912223028.18496-1-mlevitsk@redhat.com>
+ <20190912223028.18496-8-mlevitsk@redhat.com>
+ <87eezpj8j5.fsf@dusky.pond.sub.org>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 9FDJlvJcMfSdwfvuENhMWQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,52 +87,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel <qemu-devel@nongnu.org>,
- Claudio Fontana <cfontana@suse.de>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Daniel =?ISO-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Jan Kiszka <jan.kiszka@siemens.com> writes:
+On Mon, 2019-10-07 at 09:53 +0200, Markus Armbruster wrote:
+> Maxim Levitsky <mlevitsk@redhat.com> writes:
+>=20
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > ---
+>=20
+> [...]
+> > diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > index e6edd641f1..7900914506 100644
+> > --- a/qapi/block-core.json
+> > +++ b/qapi/block-core.json
+> > @@ -4650,6 +4650,32 @@
+> >    'data': { 'job-id': 'str',
+> >              'options': 'BlockdevCreateOptions' } }
+> > =20
+> > +##
+> > +# @x-blockdev-amend:
+> > +#
+> > +# Starts a job to amend format specific options of an existing open bl=
+ock device.
+> > +# The job is automatically finalized, but a manual job-dismiss is requ=
+ired.
+> > +#
+> > +# @job-id:          Identifier for the newly created job.
+> > +#
+> > +# @node-name:       Name of the block node to work on
+> > +#
+> > +# @options:         Options (same as for image creation)
+> > +#
+> > +# @force:           Allow unsafe operations, format specific
+> > +#                   For luks that allows erase of the last active keys=
+lot
+> > +#                   (permanent loss of data),
+> > +#                   and replacement of an active keyslot
+> > +#                   (possible loss of data if IO error happens)
+> > +#
+> > +# Since: 4.2
+> > +##
+> > +{ 'command': 'x-blockdev-amend',
+> > +  'data': { 'job-id': 'str',
+> > +            'node-name': 'str',
+> > +            'options': 'BlockdevCreateOptions',
+> > +            '*force': 'bool' } }
+> > +
+> >  ##
+> >  # @blockdev-open-tray:
+> >  #
+> > diff --git a/qapi/job.json b/qapi/job.json
+> > index a121b615fb..342d29a7aa 100644
+> > --- a/qapi/job.json
+> > +++ b/qapi/job.json
+> > @@ -19,10 +19,12 @@
+> >  #
+> >  # @create: image creation job type, see "blockdev-create" (since 3.0)
+> >  #
+> > +# @amend: image options amend job type, see "x-blockdev-amend" (since =
+4.2)
+> > +#
+> >  # Since: 1.7
+> >  ##
+> >  { 'enum': 'JobType',
+> > -  'data': ['commit', 'stream', 'mirror', 'backup', 'create'] }
+> > +  'data': ['commit', 'stream', 'mirror', 'backup', 'create', 'amend'] =
+}
+> > =20
+> >  ##
+> >  # @JobStatus:
+>=20
+> Aha, you introduce "amend" after using the concept in PATCH 02.
+> Rather confusing, I'm afraid.
+>=20
+> I guess secret deletion makes sense with amend somehow, and only with
+> amend.  If yes, the QAPI documentaion should spell that out, and the
+> code should diagnose invalid use (maybe it does already; I haven't
+> looked at it).
 
-> On 03.08.19 15:22, Jan Kiszka wrote:
->> From: Jan Kiszka <jan.kiszka@siemens.com>
->>
->> Allows to shutdown a foreground session via ctrl-c.
->>
->> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
->> ---
->>
->> Changes in v2:
->>   - adjust error message
->>
->>   contrib/ivshmem-server/main.c | 5 +++--
->>   1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/contrib/ivshmem-server/main.c b/contrib/ivshmem-server/main=
-.c
->> index 197c79c57e..e4cd35f74c 100644
->> --- a/contrib/ivshmem-server/main.c
->> +++ b/contrib/ivshmem-server/main.c
->> @@ -223,8 +223,9 @@ main(int argc, char *argv[])
->>       sa_quit.sa_handler =3D ivshmem_server_quit_cb;
->>       sa_quit.sa_flags =3D 0;
->>       if (sigemptyset(&sa_quit.sa_mask) =3D=3D -1 ||
->> -        sigaction(SIGTERM, &sa_quit, 0) =3D=3D -1) {
->> -        perror("failed to add SIGTERM handler; sigaction");
->> +        sigaction(SIGTERM, &sa_quit, 0) =3D=3D -1 ||
->> +        sigaction(SIGINT, &sa_quit, 0) =3D=3D -1) {
->> +        perror("failed to add signal handler; sigaction");
->>           goto err;
->>       }
->>
->> --
->> 2.16.4
->>
->>
->
-> ...and this one for you as well, Markus?
+I think I did mentioned that in QAPI,
+and I do check for optional arguments in the code.
 
-Cc: qemu-trivial
+I will probably stop using the blockdev-create options for amend after all.
+
+Best regards,
+=09Maxim Levitsky
+
+
 
 
