@@ -2,79 +2,115 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25257C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FFDDFA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:18:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7610206A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:13:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A4C3206DF
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:18:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WvyZCPjO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7610206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fiAuD/bY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A4C3206DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT38V-0005HJ-1B
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 07:13:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40831)
+	id 1iT3DY-0007N9-5t
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 07:18:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41815)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iT37q-0004or-HX
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:12:28 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iT3CV-0006rH-TL
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:17:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iT37n-0007Gt-Tx
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:12:25 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46534
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iT37n-0007DD-BJ
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:12:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573215142;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0ceIARZThEEPLFjMSs4jgXIDGcaNsRfs0vsliYEtwPk=;
- b=WvyZCPjOmFmpfJE8e9nxuJ0Zknvpx4PTZ5yuqgQQtGntLQVNlgPnmUXQrRZowdHwoM/Vv1
- EWZ1LnF+jG1DkatDi9L66HMF5T46Cx+k9leyQh3FEdpB/GAq4jFyq6QekI0HKlMwZeoHys
- 3l2jZ1vY0/UO7dqL+ZNQN5hVEennodI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-lifbCqORM7qT0X4zdtwkHQ-1; Fri, 08 Nov 2019 07:12:18 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8E131005502;
- Fri,  8 Nov 2019 12:12:16 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 910E51001902;
- Fri,  8 Nov 2019 12:12:11 +0000 (UTC)
-Date: Fri, 8 Nov 2019 13:12:10 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v15 07/12] numa: Calculate hmat latency and bandwidth
- entry list
-Message-ID: <20191108131210.64096a99@redhat.com>
-In-Reply-To: <20191107074511.14304-8-tao3.xu@intel.com>
-References: <20191107074511.14304-1-tao3.xu@intel.com>
- <20191107074511.14304-8-tao3.xu@intel.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iT3CU-0004ZP-A5
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:17:15 -0500
+Received: from mail-eopbgr70137.outbound.protection.outlook.com
+ ([40.107.7.137]:20308 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iT3CM-0004LQ-0r; Fri, 08 Nov 2019 07:17:06 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iIi6xvwl8OcQvu8zqXwaX6WOy04PkZnkxiuX1JKU+SHKVQmt1/nOBAxV5w3ePy6z++LUyvIegBbl/WKQiUBqzAn73phlb6ftF+xUV9qOHnLSfj11YmZHZejVy0s80AWsDo7FqLytkO4VEsF7jCtomQ1/xNBHjNxaXbEn/oqo/P6NB+HbVUrwgnsxWy7EjIitzraUL10D0x7/rK52n/yRWPYXcfweNJA2EJzgBnu4YpNmb6ebR8xDFkNB66+abCzFPhPwTRdC65mcMyx+skCl9hYLA27abWViyYApf+yKV5gYXwjQiqsiS6/+d/UFYQuiEjpLCcKKX0CPCOzv+YEeBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tn12qx+ciusbu+kbiFlCg6pntroBgO6crq8gUozUnyM=;
+ b=iUiDkGA4Li6ICBahv28GXONrLcyiv/iG0pLLHMQeQrkSg87rD7XGfyIP+98ZYnf+ylItk5SiV1sTRYpMqXrU7DC3naHlQ9wo5CaE8hbWKFaXZaIA0gt0TMAEFQFRb2nMJBgQ7b5S5TBh2Y6O46xx8Zo0GzBfxJHzfKLIe2nBlzXnOwL/uSOyTtg5nbOA4MrXnv0B2klfFybO1zEMN+PhEgyaeEC/JkQ9vnU+HQ4EoGoxApPOM/thj1Y9jYbFZ65UhXxgA7FvMZ/4Xf8xnixS1UMax3Chzxvyc0tR1NeIEILrzukN2NsZm9FqlE9dP1WGoVRrJ4VRlo9/Ke7gRXkybQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tn12qx+ciusbu+kbiFlCg6pntroBgO6crq8gUozUnyM=;
+ b=fiAuD/bYQyJ7+m4NRriVCf4CVOvAHWmwmkvMLZIQDnqZl5VRUFx86TfnDEM/yH90q3FnwBrmzRe90ou72sUxKHT485hAEtPU4PKb1Ayi7v8OuwwJgaNS2sMr+6M9kUZzB9uvagF+VtwVaIjC94N2H5OtDxHHbqwQtiezUAYjcsw=
+Received: from AM0PR08MB4097.eurprd08.prod.outlook.com (20.178.202.217) by
+ AM0PR08MB4051.eurprd08.prod.outlook.com (20.178.117.160) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2430.24; Fri, 8 Nov 2019 12:17:03 +0000
+Received: from AM0PR08MB4097.eurprd08.prod.outlook.com
+ ([fe80::41f0:981:fd75:9946]) by AM0PR08MB4097.eurprd08.prod.outlook.com
+ ([fe80::41f0:981:fd75:9946%3]) with mapi id 15.20.2430.023; Fri, 8 Nov 2019
+ 12:17:02 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Re: [PATCH v2 0/2] Deprecate implicit filters
+Thread-Topic: [PATCH v2 0/2] Deprecate implicit filters
+Thread-Index: AQHVlh2q7xLfFl1yyEGh+UsNp+NUVaeBLBKAgAAEigA=
+Date: Fri, 8 Nov 2019 12:17:02 +0000
+Message-ID: <7e5d3f65-1c3c-26d8-a10f-dd52a501d468@virtuozzo.com>
+References: <157321444410.31898.1482127132000677175@37313f22b938>
+In-Reply-To: <157321444410.31898.1482127132000677175@37313f22b938>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0402CA0017.eurprd04.prod.outlook.com
+ (2603:10a6:3:d0::27) To AM0PR08MB4097.eurprd08.prod.outlook.com
+ (2603:10a6:208:132::25)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191108151700045
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0b4c9fee-e8db-4a7c-20d6-08d764458fe2
+x-ms-traffictypediagnostic: AM0PR08MB4051:
+x-ms-exchange-purlcount: 3
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR08MB40518A5B4693EFF880F4D669C17B0@AM0PR08MB4051.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4303;
+x-forefront-prvs: 0215D7173F
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(376002)(136003)(39840400004)(346002)(396003)(189003)(199004)(14444005)(256004)(305945005)(2906002)(71190400001)(71200400001)(7736002)(2501003)(7416002)(3846002)(6116002)(86362001)(31696002)(316002)(6916009)(66946007)(25786009)(4326008)(31686004)(81156014)(81166006)(66476007)(66556008)(966005)(8676002)(14454004)(54906003)(476003)(446003)(66446008)(486006)(478600001)(2351001)(11346002)(2616005)(8936002)(76176011)(64756008)(52116002)(6512007)(6306002)(5660300002)(5640700003)(36756003)(66066001)(6246003)(6436002)(99286004)(102836004)(6506007)(386003)(186003)(26005)(6486002)(229853002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB4051;
+ H:AM0PR08MB4097.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: i9yeidG5oDbyF/VD+sEyZsZ/Wqd5a3Ul9rL0L4lfNRomv7pYLTaRDTCvuVaIkJTjYiGPvK4lti/Gh6yLQDr6/+TRo41HI+pZIdUFXwB0g4xqYDBd6DbXz5XFIucL4tWLRCkDuxR+tQoof6xP8pvxZIgHPqBf1ZEIIKssUJ/5FsD40XmaL1FaulHGkmAJzOqliucDrPJxhK3TmgkVEbVzHFglhKsVgUCZ9fcZVVDxI1fM5/hBYIjjr4GhXvADjeRHx7vceZCnA4W4kgltfPdFDLbXln2pl4fHlSC4I3xc3NlAEDuHk28Rt72CH4k6yGhqv1YBvlnJgv2Zo5AbKa2j6akWQL3o9CSH5kZU8scU4OR1XsLeqHakN21VhJSnjhnzu3WmjiscyV4NcM6Kxe1gxk8bsjK9MQZ+MGkCb0+u8Tbj3PDh3l9VOZR5tdl/OJdGwyuPIVtcpzvObk8BuOzSs6CbieYpEXhNxQShSzGGk2o=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <06B929F3A56F8143B54BEEC77530742E@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: lifbCqORM7qT0X4zdtwkHQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b4c9fee-e8db-4a7c-20d6-08d764458fe2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2019 12:17:02.7555 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5gAyF3F2BOGyeOlNyy3o7P4UX7xmgvSz+5pl243muphM1jBZ1VMywrxej07s2v/rEpMwERUe9cqxnuG3YD6iISVSQf7lXdqaN1EYWwGhlGQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB4051
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.7.137
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,139 +122,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, jingqi.liu@intel.com, fan.du@intel.com,
- mdroth@linux.vnet.ibm.com, armbru@redhat.com, jonathan.cameron@huawei.com
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "pkrempa@redhat.com" <pkrempa@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "libvir-list@redhat.com" <libvir-list@redhat.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>, "armbru@redhat.com" <armbru@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "dinechin@redhat.com" <dinechin@redhat.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "philmd@redhat.com" <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  7 Nov 2019 15:45:06 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
-
-> Compress HMAT latency and bandwidth raw data into uint16_t data,
-> which can be stored in HMAT table.
->=20
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
->=20
-> No changes in v15.
->=20
-> Changes in v14:
->     - Convert latency from ns to ps, because ACPI 6.3 HMAT table use
->       ps as minimum unit
-> ---
->  hw/core/numa.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 58 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/core/numa.c b/hw/core/numa.c
-> index f391760c20..523dd80822 100644
-> --- a/hw/core/numa.c
-> +++ b/hw/core/numa.c
-> @@ -483,6 +483,47 @@ static void complete_init_numa_distance(MachineState=
- *ms)
->      }
->  }
-> =20
-> +static void calculate_hmat_entry_list(HMAT_LB_Info *hmat_lb, int num_nod=
-es)
-I'd call it verify_hmat_entry_list()
-and I'd only do checks here without post-processing data
-into something else, provided there is checks that requires
-all hmat-lb option parsed first.
-
-> +{
-> +    int i, index;
-> +    uint16_t *entry_list;
-> +    uint64_t base;
-> +    GArray *lb_data_list;
-> +    HMAT_LB_Data *lb_data;
-> +
-> +    if (hmat_lb->data_type <=3D HMAT_LB_DATA_WRITE_LATENCY) {
-> +        base =3D hmat_lb->base_latency;
-> +        lb_data_list =3D hmat_lb->latency;
-> +    } else {
-> +        base =3D hmat_lb->base_bandwidth;
-> +        lb_data_list =3D hmat_lb->bandwidth;
-> +    }
-> +
-> +    entry_list =3D g_malloc0(lb_data_list->len * sizeof(uint16_t));
-> +    for (i =3D 0; i < lb_data_list->len; i++) {
-> +        lb_data =3D &g_array_index(lb_data_list, HMAT_LB_Data, i);
-> +        index =3D lb_data->initiator * num_nodes + lb_data->target;
-> +        if (entry_list[index]) {
-> +            error_report("Duplicate configuration of the latency for "
-> +                "initiator=3D%d and target=3D%d.", lb_data->initiator,
-> +                lb_data->target);
-Is it possible to detect duplicate during hamt-lb option parsing?
-
-
-> +            exit(1);
-> +        }
-
-> +        entry_list[index] =3D (uint16_t)(lb_data->rawdata / base);
-> +    }
-> +    if (hmat_lb->data_type <=3D HMAT_LB_DATA_WRITE_LATENCY) {
-> +        /* Convert latency base from nanoseconds to picosecond */
-> +        hmat_lb->base_latency =3D base * 1000;
-> +        hmat_lb->entry_latency =3D entry_list;
-> +    } else {
-> +        /* Convert bandwidth base from Byte to Megabyte */
-> +        hmat_lb->base_bandwidth =3D base / MiB;
-> +        hmat_lb->entry_bandwidth =3D entry_list;
-> +    }
-I suggest to move this hunk to 10/12 and drop entry_foo fields
-as build_hmat_lb() can walk over lb_data_list and normalize values
-put in ACPI table on its own.
-
-In generic numa code is to check that user provided values won't
-(under|over-flow) ACPI table values once dived/multiplied,
-but leave actual data packing into table to ACPI code.
-
-> +}
-> +
->  void numa_legacy_auto_assign_ram(MachineClass *mc, NodeInfo *nodes,
->                                   int nb_nodes, ram_addr_t size)
->  {
-> @@ -521,9 +562,10 @@ void numa_default_auto_assign_ram(MachineClass *mc, =
-NodeInfo *nodes,
-> =20
->  void numa_complete_configuration(MachineState *ms)
->  {
-> -    int i;
-> +    int i, hierarchy, type;
->      MachineClass *mc =3D MACHINE_GET_CLASS(ms);
->      NodeInfo *numa_info =3D ms->numa_state->nodes;
-> +    HMAT_LB_Info *numa_hmat_lb;
-> =20
->      /*
->       * If memory hotplug is enabled (slots > 0) but without '-numa'
-> @@ -620,6 +662,21 @@ void numa_complete_configuration(MachineState *ms)
->              /* Validation succeeded, now fill in any missing distances. =
-*/
->              complete_init_numa_distance(ms);
->          }
-> +
-> +        if (ms->numa_state->hmat_enabled) {
-> +            for (hierarchy =3D HMAT_LB_MEM_MEMORY;
-> +                 hierarchy <=3D HMAT_LB_MEM_CACHE_3RD_LEVEL; hierarchy++=
-) {
-> +                for (type =3D HMAT_LB_DATA_ACCESS_LATENCY;
-> +                    type <=3D HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
-> +                    numa_hmat_lb =3D ms->numa_state->hmat_lb[hierarchy][=
-type];
-> +
-> +                    if (numa_hmat_lb) {
-> +                        calculate_hmat_entry_list(numa_hmat_lb,
-> +                                                  ms->numa_state->num_no=
-des);
-> +                    }
-> +                }
-> +            }
-> +        }
->      }
->  }
-> =20
-
+DQpTb21ldGhpbmcgc3RyYW5nZSwgSSBkb24ndCB0aGluayBpdCByZWxhdGVkIHRvIHBhdGNoc2V0
+Lg0KDQowOC4xMS4yMDE5IDE1OjAwLCBuby1yZXBseUBwYXRjaGV3Lm9yZyB3cm90ZToNCj4gUGF0
+Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwODEwMTY1NS4xMDYxMS0x
+LXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS8NCj4gDQo+IA0KPiANCj4gSGksDQo+IA0KPiBUaGlz
+IHNlcmllcyBmYWlsZWQgdGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNl
+IGZpbmQgdGhlIHRlc3RpbmcgY29tbWFuZHMgYW5kDQo+IHRoZWlyIG91dHB1dCBiZWxvdy4gSWYg
+eW91IGhhdmUgRG9ja2VyIGluc3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQN
+Cj4gbG9jYWxseS4NCj4gDQo+ID09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0NCj4gIyEgL2Jpbi9i
+YXNoDQo+IGV4cG9ydCBBUkNIPXg4Nl82NA0KPiBtYWtlIGRvY2tlci1pbWFnZS1mZWRvcmEgVj0x
+IE5FVFdPUks9MQ0KPiB0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWluZ3dAZmVkb3JhIEo9MTQgTkVU
+V09SSz0xDQo+ID09PSBURVNUIFNDUklQVCBFTkQgPT09DQo+IA0KPiAgICBTSUdOICAgIHBjLWJp
+b3Mvb3B0aW9ucm9tL3B2aC5iaW4NCj4gICAgR0VOICAgICBkb2NzL2ludGVyb3AvcWVtdS1nYS1y
+ZWYuNw0KPiAvdG1wL3FlbXUtdGVzdC9zcmMvcWVtdS1kZXByZWNhdGVkLnRleGk6MjEwOiBAb3B0
+aW9uIGV4cGVjdGVkIGJyYWNlcw0KPiBtYWtlOiAqKiogW01ha2VmaWxlOjk5NDogcWVtdS1kb2Mu
+dHh0XSBFcnJvciAxDQo+IG1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4u
+DQo+IC90bXAvcWVtdS10ZXN0L3NyYy9xZW11LWRlcHJlY2F0ZWQudGV4aToyMTA6IEBvcHRpb24g
+ZXhwZWN0ZWQgYnJhY2VzDQo+IG1ha2U6ICoqKiBbTWFrZWZpbGU6OTg3OiBxZW11LWRvYy5odG1s
+XSBFcnJvciAxDQo+IFRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToNCj4gICAgRmls
+ZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjIsIGluIDxtb2R1bGU+DQo+ICAg
+ICAgc3lzLmV4aXQobWFpbigpKQ0KPiAtLS0NCj4gICAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJy
+b3IocmV0Y29kZSwgY21kKQ0KPiBzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFu
+ZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5p
+bnN0YW5jZS51dWlkPTNkNDA0NDgyMjc5ZjRmZTY4ZmNiMmM5OTcxZjI0ODBhJywgJy11JywgJzEw
+MDEnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUn
+LCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdW
+PScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0nLCAnLWUn
+LCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0Y2hldy8uY2Fj
+aGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12JywgJy92YXIvdG1w
+L3BhdGNoZXctdGVzdGVyLXRtcC1tbHBva3d0Zy9zcmMvZG9ja2VyLXNyYy4yMDE5LTExLTA4LTA2
+LjU2LjMzLjIzODA1Oi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmZlZG9yYScsICcvdmFyL3Rt
+cC9xZW11L3J1bicsICd0ZXN0LW1pbmd3J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVz
+IDIuDQo+IGZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTNkNDA0
+NDgyMjc5ZjRmZTY4ZmNiMmM5OTcxZjI0ODBhDQo+IG1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0g
+RXJyb3IgMQ0KPiBtYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10
+ZXN0ZXItdG1wLW1scG9rd3RnL3NyYycNCj4gbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtbWlu
+Z3dAZmVkb3JhXSBFcnJvciAyDQo+IA0KPiByZWFsICAgIDRtMTEuMTcwcw0KPiB1c2VyICAgIDBt
+NC40MDRzDQo+IA0KPiANCj4gVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdA0KPiBodHRwOi8v
+cGF0Y2hldy5vcmcvbG9ncy8yMDE5MTEwODEwMTY1NS4xMDYxMS0xLXZzZW1lbnRzb3ZAdmlydHVv
+enpvLmNvbS90ZXN0aW5nLmRvY2tlci1taW5nd0BmZWRvcmEvP3R5cGU9bWVzc2FnZS4NCj4gLS0t
+DQo+IEVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0
+Y2hldy5vcmcvXS4NCj4gUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
+QHJlZGhhdC5jb20NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
