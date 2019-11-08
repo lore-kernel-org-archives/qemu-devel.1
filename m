@@ -2,86 +2,85 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE7BCC5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:02:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA715C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:04:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5C8120679
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:02:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B32D720679
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:04:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="W/mCihPG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5C8120679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FsO6NV5Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B32D720679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT6im-0003jA-Nu
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:02:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55523)
+	id 1iT6kG-0005jd-NX
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:04:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55750)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1iT6eK-0000XR-Ns
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:58:13 -0500
+ (envelope-from <eblake@redhat.com>) id 1iT6fC-0001RG-0v
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:59:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1iT6eJ-0008Um-NW
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:58:12 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:34520)
+ (envelope-from <eblake@redhat.com>) id 1iT6fA-0000ck-Ox
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:59:05 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49163
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1iT6eG-0008Rr-Qo; Fri, 08 Nov 2019 10:58:09 -0500
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 2247596EF0;
- Fri,  8 Nov 2019 15:58:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1573228686;
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iT6fA-0000cR-LL
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:59:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573228744;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CY7NMoOalLR5kDxou9MKFlDhUBoay+Dc1KO9XSx/ydQ=;
- b=W/mCihPGChacv/FwC9GGDhRh5JRYYaM/hnRd6JKzSdSIdqz+aoxB9UKYpiPQ5i9FOBcesa
- UDzsDVc1M2Tidh13LIu9UslzzZh9YqJ5PndfNImOnJ/dk4CT6V1bkRoJSxrMcR75L+1IyX
- JBf7XLv68LOL7waggSmiR6Du1XzEqR4=
-Subject: Re: [PATCH v5 00/13] Multi-phase reset mechanism
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191018150630.31099-1-damien.hedde@greensocs.com>
- <efef625a-8162-5454-128f-489d636563a1@greensocs.com>
- <aae84bfb-e735-0aac-124c-9abbdea882ff@greensocs.com>
- <CAFEAcA9QW1JTg72YiGDxuEi5Dip99KUxuHAqDnVma1=A_qqbQQ@mail.gmail.com>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <a8486664-535d-8b19-4cef-703539e5b9b8@greensocs.com>
-Date: Fri, 8 Nov 2019 16:58:05 +0100
+ bh=UM89Ln7Q5VEIZ4qoJyGex24mShc1AIwIxDaD7G6utA4=;
+ b=FsO6NV5YFuS0cTdvWYqVw/TAMQzKGotL9hzSTLFJfVcKOo6ZbedKWK3IpBbdnfJSD9OAjc
+ wk3RakC+GQtppmSXY+ejYfsUq69LomE6GXeqYnsn96btN/RsbE/Fzljkci8u0V2QYKy5No
+ +AR+5epGbMic8xBb2exT30WkrCqiGKE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-12-rMPk5-n5OTOXT3_7jbMM-g-1; Fri, 08 Nov 2019 10:59:00 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D8CF7477;
+ Fri,  8 Nov 2019 15:58:58 +0000 (UTC)
+Received: from [10.3.117.38] (ovpn-117-38.phx2.redhat.com [10.3.117.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E8D0A5DA82;
+ Fri,  8 Nov 2019 15:58:51 +0000 (UTC)
+Subject: Re: [PATCH v2 2/3] hw/mips/gt64xxx: Remove dynamic field width from
+ trace events
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191108144042.30245-1-philmd@redhat.com>
+ <20191108144042.30245-3-philmd@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <ead1eb4b-a0e0-edf9-8323-ce9f5a291547@redhat.com>
+Date: Fri, 8 Nov 2019 09:58:51 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9QW1JTg72YiGDxuEi5Dip99KUxuHAqDnVma1=A_qqbQQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1573228686;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=CY7NMoOalLR5kDxou9MKFlDhUBoay+Dc1KO9XSx/ydQ=;
- b=blkdNHMiN8Ipe/pqsXYqaQ59SDfnga7XHMVtWkxpPWVkv7O+AqB1OkGyuO483MUWXzcKFe
- uCM1q6XdSEDVEUrSZZQs2jhacl5YE3dOZ7fR0V+tLHDLEE8R9pH7wlGcW+YJDiqKaq9afZ
- 7kA6Qr+sjnGZ6fyyJ8YYes8eqfPqSWo=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1573228686; a=rsa-sha256; cv=none;
- b=QgK4M1QWQmiFsmBc16D7Wc1V7cVVIJfVgRSCxPgpdMYQjChuYpRkCOZk7K5mDngsSaR2ru
- V44E/W+Dk40TzfAmuWFIuTOYtpSoiC78QGooFBA676cOm8CqPo+KqdyLvdvpLDbRsK9hEB
- Vhkgn5EsH+HpdGBSqUW/UcebOfrzM5I=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+In-Reply-To: <20191108144042.30245-3-philmd@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: rMPk5-n5OTOXT3_7jbMM-g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.135.226.135
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,42 +92,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 11/8/19 8:40 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Since not all trace backends support dynamic field width in
+> format (dtrace via stap does not), replace by a static field
+> width instead.
+>=20
+> Reported-by: Eric Blake <eblake@redhat.com>
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1844817
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> ---
+> v2: Do not update qemu_log_mask()
+> ---
+>   hw/mips/gt64xxx_pci.c | 16 ++++++++--------
+>   hw/mips/trace-events  |  4 ++--
+>   2 files changed, 10 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
+> index 5cab9c1ee1..6743e7c929 100644
+> --- a/hw/mips/gt64xxx_pci.c
+> +++ b/hw/mips/gt64xxx_pci.c
+> @@ -642,19 +642,19 @@ static void gt64120_writel(void *opaque, hwaddr add=
+r,
+>           /* not really implemented */
+>           s->regs[saddr] =3D ~(~(s->regs[saddr]) | ~(val & 0xfffffffe));
+>           s->regs[saddr] |=3D !!(s->regs[saddr] & 0xfffffffe);
+> -        trace_gt64120_write("INTRCAUSE", size << 1, val);
+> +        trace_gt64120_write("INTRCAUSE", size << 3, val);
 
-On 11/8/19 4:28 PM, Peter Maydell wrote:
-> On Fri, 8 Nov 2019 at 15:26, Damien Hedde <damien.hedde@greensocs.com> wrote:
->>
->>
->> On 10/29/19 4:53 PM, Damien Hedde wrote:
->>> Hi,
->>>
->>> Does anyone has comment about the interface / patch 3 ?
->>> Should I try to split it ?
->>
->> ping
-> 
-> Hi; this patchset is still in my to-review queue, but we've
-> just gone into softfreeze for 4.2 so I'm a bit short on time
-> to look at anything that's not for this release.
-> 
-> I do definitely want to get this patchset in early in the
-> 5.0 release cycle though.
+Again, this isn't mentioned in the commit message.  Why are you changing=20
+parameter values?
 
-Hi,
-I understand,
-Then I'll maybe try to advance more on the multiple reset type handling
-and a do v6.
 
-Thanks,
-Damien
+> +++ b/hw/mips/trace-events
+> @@ -1,4 +1,4 @@
+>   # gt64xxx.c
+> -gt64120_read(const char *regname, int width, uint64_t value) "gt64120 re=
+ad %s value:0x%0*" PRIx64
+> -gt64120_write(const char *regname, int width, uint64_t value) "gt64120 w=
+rite %s value:0x%0*" PRIx64
+> +gt64120_read(const char *regname, int width, uint64_t value) "gt64120 re=
+ad %s width:%d value:0x%08" PRIx64
+> +gt64120_write(const char *regname, int width, uint64_t value) "gt64120 w=
+rite %s width:%d value:0x%08" PRIx64
+
+Huh, we were really broken - the old code (if passed to printf) would=20
+try to parse 4 parameters, even though it was only passed 3.  But it=20
+looks like you still need a v3.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
