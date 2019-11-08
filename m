@@ -2,82 +2,92 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9EEFA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 09:04:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD2AAC5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 09:08:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48B1E207FA
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 09:04:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 963D021D6C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 09:08:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h/ZRmb7L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48B1E207FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pdp7Lyxv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 963D021D6C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50810 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT0Bx-0004Xh-EV
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 04:04:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60617)
+	id 1iT0GH-0005xi-Pa
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 04:08:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33189)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iT0At-0003uE-8O
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:03:24 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iT0FW-0005Qt-0b
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:08:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iT0Ar-00057L-Hw
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:03:23 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21267
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iT0Ar-00056x-E3
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:03:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573203800;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ofvWgEpyQibwbTOwF1hKiiPL3bHzhf+dbUMImuJP5aA=;
- b=h/ZRmb7L4CIrLtGqeGwAnaNULdHIc8mwqrvNi85D7hRWgyx5NGvsnOgjj1qZsWx7gY1RXP
- qdpzMXvtET6+07lO95/IyJFrJFwoY8KBmRIuSXv4N0pKZVNf9Q6p1gxx2rkvvkLKbjN1gO
- sacsKoibiRFA75RdC7v7yePHkNJbvUU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-112-4FJanWpvPdiVcCKbsSa_Xg-1; Fri, 08 Nov 2019 04:03:19 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08E421005500;
- Fri,  8 Nov 2019 09:03:18 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C7F4E1001DC0;
- Fri,  8 Nov 2019 09:03:17 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 27E6F11385C9; Fri,  8 Nov 2019 10:03:16 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [RFC PATCH 04/18] stubs: Add blk_by_qdev_id()
-References: <20191017130204.16131-1-kwolf@redhat.com>
- <20191017130204.16131-5-kwolf@redhat.com>
-Date: Fri, 08 Nov 2019 10:03:16 +0100
-In-Reply-To: <20191017130204.16131-5-kwolf@redhat.com> (Kevin Wolf's message
- of "Thu, 17 Oct 2019 15:01:50 +0200")
-Message-ID: <87zhh6agff.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <alex.bennee@linaro.org>) id 1iT0FU-00015R-90
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:08:09 -0500
+Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:46451)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iT0FU-00014r-0E
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:08:08 -0500
+Received: by mail-wr1-x42e.google.com with SMTP id b3so6070356wrs.13
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 01:08:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=mg87IWB3WV8NUWV7kbGyhOM3Alh9ahvDKWJFxeXK0Yk=;
+ b=pdp7LyxvDp2aqjSCg5OVHioJQ//m6izX4u29Er1NssZ9EWxFvorYuqTs7GzNJJAgfV
+ sBlOEqKp/xI7g48YJ6fgrqm034y/EBrNchdH/ZEae3We+xDpDw6RTucmFl7MMBvs2LLc
+ N2IgW8ZRNtntpUMefuwc6d6IgCY8JrFavolDdujiywXlrENXD1Vciec5qTn77opQaVZ/
+ puV/zKf8B6BYrusNoiN0XL6YaqYfh8IscYYJEUGlLT6+jLG6qDvEHtfcXSBND44J4n8q
+ iJDvemLBp3Ww0lOiAckkqCE379qkVnLgidkeLV9F7FN9A5yt+QOQpEDN3AKL43xMl5zz
+ 4e/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=mg87IWB3WV8NUWV7kbGyhOM3Alh9ahvDKWJFxeXK0Yk=;
+ b=II9LhL9731k/b+bb5iEw1Q24xBnsbzOgiEjg4GMe01FtVVpeyNrM4BHc60vpp5K3R9
+ 9ExcnGP8I1bs+r1y9AMeoMwuqs0+eagHtS6kB6P0YNQ9GyU79TaqH6iB99dMP0Tem04X
+ 1dB6eDKEomJdhWX1vRkML2KmOW+9ypN48KW5Bnc67KnLD1FLaaw+Y1OjsWh++J+S07XI
+ qcvtkj5YEkDKvV4J7eGrr0gDIAqlckUzun5EqMme5knOyFvILIgbEGe58zJp4KtBoBsl
+ qdzF5v0GzUPrIHXPnJw/ZMHrYhcQdyrwjx6BcwHDuL+6CAgILqvPFJ8u4CaMD2MWN7X9
+ IQFw==
+X-Gm-Message-State: APjAAAWjscTnNn8ccczHKRQpmeyy1SadfREg3mqC7nFwuxS5h7GlgXkv
+ rjtu4637RYxEGv4soTHKSPRehw==
+X-Google-Smtp-Source: APXvYqysO26gKDPWobbnoXu9kIFIxi90jXNua6DfWhLFrqqdZLaRW788oT9ZagIgaPKmOirvYpzjAQ==
+X-Received: by 2002:adf:e74c:: with SMTP id c12mr7164418wrn.133.1573204086631; 
+ Fri, 08 Nov 2019 01:08:06 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a206sm5214914wmf.15.2019.11.08.01.08.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 08 Nov 2019 01:08:05 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C90251FF87;
+ Fri,  8 Nov 2019 09:08:04 +0000 (GMT)
+References: <f5a16b3c-2c17-60e4-e80b-dd20b3c088cc@cs.utexas.edu>
+ <CAL1e-=g8c=QJiMm1AvBCNmsTyVWoUAjL0na2HWodHCQPiLdWJw@mail.gmail.com>
+ <CAL1e-=j8K+FKj=4pTd8HKkL-D=F+9hY+5bF4ibM8WE+Sp+pk=Q@mail.gmail.com>
+ <f300806f-ced2-5926-40ff-4cdd29c5078e@cs.utexas.edu>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: Re: Looking for issues/features for my first contribution
+In-reply-to: <f300806f-ced2-5926-40ff-4cdd29c5078e@cs.utexas.edu>
+Date: Fri, 08 Nov 2019 09:08:04 +0000
+Message-ID: <87a796hh1n.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 4FJanWpvPdiVcCKbsSa_Xg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42e
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,109 +99,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
 
-> blockdev.c uses the blk_by_qdev_id() function, so before we can use the
-> file in tools (i.e. outside of the system emulator), we need to add a
-> stub for it. The function always returns an error.
+Rajath Shashidhara <rajaths@cs.utexas.edu> writes:
+
+> On 07-11-2019 07:33, Aleksandar Markovic wrote:
+>> I did a quick Google search on datasheets of existing RTC
+>> implemtations, and the result is:
+>> DS1338:
+>> https://datasheets.maximintegrated.com/en/ds/DS1338-DS1338Z.pdf
+>> M41T80: https://www.st.com/resource/en/datasheet/m41t80.pdf
+>> M48T59: http://www.elektronikjk.pl/elementy_czynne/IC/M48T59V.pdf
+>> MC146818: https://www.nxp.com/docs/en/data-sheet/MC146818.pdf
+>> PL031: http://infocenter.arm.com/help/topic/com.arm.doc.ddi0224c/real_ti=
+me_clock_pl031_r1p3_technical_reference_manual_DDI0224C.pdf
+>> TWL92230: https://datasheet.octopart.com/TWL92230C-Texas-Instruments-dat=
+asheet-150321.pdf
+>> Zynq RTC: https://www.xilinx.com/support/documentation/user_guides/ug108=
+5-zynq-ultrascale-trm.pdf
+>> (chapter 7)
 >
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  stubs/blk-by-qdev-id.c | 9 +++++++++
->  stubs/Makefile.objs    | 1 +
->  2 files changed, 10 insertions(+)
->  create mode 100644 stubs/blk-by-qdev-id.c
+> I have a few questions about this:
+> [a] Is there any particular reason that you picked DS3231 ? Linux
+> kernel has drivers for DS3232/34 only [1]. I did read the datasheets
+> of both 3232 & 3231 and found that they are quite similar except for
+> the 236 bytes of SRAM support found only in 3232.
 >
-> diff --git a/stubs/blk-by-qdev-id.c b/stubs/blk-by-qdev-id.c
-> new file mode 100644
-> index 0000000000..0b6160fefa
-> --- /dev/null
-> +++ b/stubs/blk-by-qdev-id.c
-> @@ -0,0 +1,9 @@
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "sysemu/block-backend.h"
-> +
-> +BlockBackend *blk_by_qdev_id(const char *id, Error **errp)
-> +{
-> +    error_setg(errp, "qdev IDs/QOM paths exist only in the system emulat=
-or");
-> +    return NULL;
-> +}
+> [b] As per the datasheet, DS3231 has a built-in temperature sensor.
+> Temperature can be read from a dedicated register. There can be two
+> approaches to emulating this: (1) Return a constant temperature value
+> on every read (2) Throw a not-supported exception/warning. What is the
+> qemu convention for handling such features ?
 
-Is this function meant to be called?  Let me check...  it seems to be
-used just for QMP commands that accept either a qdev ID or QOM path (by
-convention 'id') or a block backend name (by convention 'device').
-Evidence:
+Don't throw an exception. You can at the minimum do a
+qemu_log_mask(LOG_UNIMP) to indicate the system is using currently
+unimplemented functionality. Alternatively wire-up a device property via
+QOM so the user can vary the reported temperature.
 
-   static BlockBackend *qmp_get_blk(const char *blk_name, const char *qdev_=
-id,
-                                    Error **errp)
-   {
-       BlockBackend *blk;
+QEMU currently doesn't have a decent API for exposing values for dynamic
+emulated sensors to the outside world aside from QMP for chaning device
+values. It's something we have discussed in the past but the trick is
+coming up with something that can cover the wide range of device types.
+Maybe QMP is good enough?
 
-       if (!blk_name =3D=3D !qdev_id) {
-           error_setg(errp, "Need exactly one of 'device' and 'id'");
-           return NULL;
-       }
+>
+> [c] DS3231 also has programmable square-wave output + 32 KHz output
+> pin. M41T80 chip also supports this feature. However, qemu does not
+> support emulation of these features [2]. Do I take the same approach ?
+>
+> Thanks!
+> Rajath Shashidhara
+>
+> References:
+> [1]
+> https://elixir.bootlin.com/linux/v5.4-rc6/source/drivers/rtc/rtc-ds3232.c
+> [2]
+> https://git.qemu.org/?p=3Dqemu.git;a=3Dblob;f=3Dhw/rtc/m41t80.c;h=3D914ec=
+ac8f4db418633d6daf92608cb50f6b89052;hb=3DHEAD
 
-       if (qdev_id) {
-           blk =3D blk_by_qdev_id(qdev_id, errp);
-       } else {
-           blk =3D blk_by_name(blk_name);
-           if (blk =3D=3D NULL) {
-               error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
-                         "Device '%s' not found", blk_name);
-           }
-       }
 
-       return blk;
-   }
-
-Users:
-
-* eject, blockdev-open-tray, blockdev-change-medium via do_open_tray()
-
-* blockdev-close-tray
-
-* eject, blockdev-remove-medium via blockdev_remove_medium()
-
-* blockdev-insert-medium via blockdev_insert_medium()
-
-  Aside: blockdev_insert_medium() could be inlined.
-
-* blockdev-change-medium
-
-* block_set_io_throttle
-
-* block-latency-histogram-set
-
-The newer ones them don't provide 'device', and pass a null @blk_name to
-qmp_get_blk().  Using blk_by_qdev_id() directly would be clearer.
-
-Where 'device' is provided, it's been deprecated since v2.8.0.  Not
-documented in qemu-deprecated.texi, though.
-
-As far as I understand the storage daemon's intended purpose, none of
-these commands make sense there.  Testing.... aha: it provides them all
-anyway.  Is that a good idea?
-
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index 9f4eb25e02..77fbf72576 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -1,5 +1,6 @@
->  stub-obj-y +=3D arch_type.o
->  stub-obj-y +=3D bdrv-next-monitor-owned.o
-> +stub-obj-y +=3D blk-by-qdev-id.o
->  stub-obj-y +=3D blk-commit-all.o
->  stub-obj-y +=3D blockdev-close-all-bdrv-states.o
->  stub-obj-y +=3D clock-warp.o
-
+--
+Alex Benn=C3=A9e
 
