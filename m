@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC380FC6195
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 153F4FC6195
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:17:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 964C32067B
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:17:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 964C32067B
+	by mail.kernel.org (Postfix) with ESMTPS id E3C44214DB
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:17:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E3C44214DB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT9ky-00033T-HL
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 14:17:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58618)
+	id 1iT9l6-0003Bv-TT
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 14:17:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58640)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iT9fx-0006BU-TI
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:12:06 -0500
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iT9fy-0006DM-86
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:12:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iT9fw-0004Fc-4V
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:12:05 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:46691 helo=mail.rt-rk.com)
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iT9fw-0004Gz-9h
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:12:06 -0500
+Received: from mx2.rt-rk.com ([89.216.37.149]:46714 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iT9fv-0002na-RW
+ id 1iT9fw-0002nh-03
  for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:12:04 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id D24491A1F98;
- Fri,  8 Nov 2019 20:10:58 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTP id 2A7581A2138;
+ Fri,  8 Nov 2019 20:10:59 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id A8C981A2138;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id F199F1A21B4;
  Fri,  8 Nov 2019 20:10:58 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/5] MAINTAINERS: Add a section on git infrastructure
-Date: Fri,  8 Nov 2019 20:10:45 +0100
-Message-Id: <1573240249-6966-2-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH 3/5] MAINTAINERS: Adjust maintainership for Fulong 2E board
+Date: Fri,  8 Nov 2019 20:10:47 +0100
+Message-Id: <1573240249-6966-4-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1573240249-6966-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1573240249-6966-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -74,44 +74,31 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-There should be a patient person maintaining gory details of
-git-related files, and there is no better person for that role
-than Philippe. Alex should be the reviewer for some relations
-with gitdm.
+Change the maintainership for Fulong 2E board to improve its quality.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- MAINTAINERS | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ MAINTAINERS | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 4964fbb..be43ccb 100644
+index 69cdc13..4a478f8 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -2664,6 +2664,23 @@ M: Daniel P. Berrange <berrange@redhat.com>
- S: Odd Fixes
- F: scripts/git-submodule.sh
+@@ -962,9 +962,10 @@ S: Maintained
+ F: hw/mips/mips_r4k.c
 =20
-+GIT infrastructure
+ Fulong 2E
+-M: Aleksandar Markovic <amarkovic@wavecomp.com>
+-R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+-S: Odd Fixes
 +M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-+R: Alex Benn=C3=A9e <alex.bennee@linaro.org>
++R: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
++R: Aleksandar Markovic <amarkovic@wavecomp.com>
 +S: Maintained
-+F: .mailmap
-+F: scripts/git.orderfile
-+F: .gitignore
-+F: tests/fp/.gitignore
-+F: tests/fp/berkeley-softfloat-3/.gitignore
-+F: tests/fp/berkeley-testfloat-3/.gitignore
-+F: tests/migration/.gitignore
-+F: tests/multiboot/.gitignore
-+F: tests/qemu-iotests/.gitignore
-+F: tests/tcg/.gitignore
-+F: tests/uefi-test-tools/.gitignore
-+F: ui/keycodemapdb/tests/.gitignore
-+
- Sphinx documentation configuration and build machinery
- M: Peter Maydell <peter.maydell@linaro.org>
- S: Maintained
+ F: hw/mips/mips_fulong2e.c
+ F: hw/isa/vt82c686.c
+ F: hw/pci-host/bonito.c
 --=20
 2.7.4
 
