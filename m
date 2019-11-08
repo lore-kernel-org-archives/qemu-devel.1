@@ -2,80 +2,79 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDFC8FA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B57FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:30:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A37C921848
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:28:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC7132085B
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:30:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VkIuxEKG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A37C921848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c7j7GHo8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC7132085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT4Jm-0006xo-Qc
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 08:28:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55132)
+	id 1iT4La-0000ev-WE
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 08:30:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55356)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pkrempa@redhat.com>) id 1iT4In-00068f-0x
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:27:50 -0500
+ (envelope-from <armbru@redhat.com>) id 1iT4K7-0007n4-NM
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:29:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pkrempa@redhat.com>) id 1iT4Il-0000bO-N2
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:27:48 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43325
+ (envelope-from <armbru@redhat.com>) id 1iT4K6-0001Ou-GW
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:29:11 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47080
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1iT4Il-0000bA-JL
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:27:47 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iT4K6-0001OM-Cm
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:29:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573219667;
+ s=mimecast20190719; t=1573219750;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=On4KmYTZqusSvP3hteMekMGplZAc0MW1bhI59DoNIcI=;
- b=VkIuxEKGAqppO4BGiHstryYCIskXFKZPhQVfhMZp+kAS2gnhMn2GFdWIYJ/Jlg1p4kqxhN
- HBogqgYFKUiF4YHYjerSomlRgaRZvus9wVoizcpU4tfVEl7qCBq6BoXxRsA22Z4r4xJtZr
- 1b61p7wY7A0q4bMONQpW7afu7QU3R9E=
+ bh=n9npwAj/UByNFsX2/e0xAqWe+kQscTg4qJb4JVLwNvk=;
+ b=c7j7GHo8atJguTeKN5yuuxx4dzDOOhz8Mh74wFfkyPttvCdvcabGAfa7tGKRJgkOWp328n
+ lJS6iH9+V0XkDXq7d6Tg4pHPvWXlBfiR3jtFBrqH1eg+xG86MQWKdHDAGbhTpfBEMhVCto
+ fUse5rJMk114tUf5wVl39Ldj3CWPwCg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-b2anekvsNGKKVs-C17refA-1; Fri, 08 Nov 2019 08:27:44 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-330-TSDQMrWzOsar999WbV-YfA-1; Fri, 08 Nov 2019 08:29:07 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9F301800D9C;
- Fri,  8 Nov 2019 13:27:42 +0000 (UTC)
-Received: from angien.pipo.sk (unknown [10.43.2.229])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F79260856;
- Fri,  8 Nov 2019 13:27:28 +0000 (UTC)
-Date: Fri, 8 Nov 2019 14:27:25 +0100
-From: Peter Krempa <pkrempa@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH v2 2/2] qapi: deprecate implicit filters
-Message-ID: <20191108132725.GH9577@angien.pipo.sk>
-References: <20191108101655.10611-1-vsementsov@virtuozzo.com>
- <20191108101655.10611-3-vsementsov@virtuozzo.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B6D68017DE;
+ Fri,  8 Nov 2019 13:29:07 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C3C9C600C9;
+ Fri,  8 Nov 2019 13:29:06 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 3A83111385C9; Fri,  8 Nov 2019 14:29:05 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [RFC PATCH 05/18] qemu-storage-daemon: Add --blockdev option
+References: <20191017130204.16131-1-kwolf@redhat.com>
+ <20191017130204.16131-6-kwolf@redhat.com>
+Date: Fri, 08 Nov 2019 14:29:05 +0100
+In-Reply-To: <20191017130204.16131-6-kwolf@redhat.com> (Kevin Wolf's message
+ of "Thu, 17 Oct 2019 15:01:51 +0200")
+Message-ID: <87zhh68pjy.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20191108101655.10611-3-vsementsov@virtuozzo.com>
-X-PGP-Key-ID: 0xD018682B
-X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: b2anekvsNGKKVs-C17refA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: TSDQMrWzOsar999WbV-YfA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -90,104 +89,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, mlevitsk@redhat.com, qemu-block@nongnu.org,
- libvir-list@redhat.com, jsnow@redhat.com, armbru@redhat.com,
- qemu-devel@nongnu.org, dinechin@redhat.com, den@openvz.org, mreitz@redhat.com,
- philmd@redhat.com
+Cc: mreitz@redhat.com, pkrempa@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 08, 2019 at 13:16:55 +0300, Vladimir Sementsov-Ogievskiy wrote:
-> To get rid of implicit filters related workarounds in future let's
-> deprecate them now.
->=20
-> Deprecation warning breaks some bash iotests output, so fix it here
-> too: in most of cases just add filter-node-name in test.
->=20
-> In 161 add FIXME and deprecation warning into 161.out.
->=20
-> In 249, the test case is changed, as we don't need to test "default"
-> filter node name anymore.
->=20
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Kevin Wolf <kwolf@redhat.com> writes:
+
+> This adds a --blockdev option to the storage daemon that works the same
+> as the -blockdev option of the system emulator.
+>
+> In order to be able to link with blockdev.o, we also need to change
+> stream.o from common-obj to block-obj, which is where all other block
+> jobs already are.
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  qemu-deprecated.texi       |  6 ++++++
->  qapi/block-core.json       |  9 ++++++---
->  include/block/block_int.h  | 10 +++++++++-
->  blockdev.c                 | 10 ++++++++++
->  tests/qemu-iotests/094     |  1 +
->  tests/qemu-iotests/095     |  6 ++++--
->  tests/qemu-iotests/109     |  1 +
->  tests/qemu-iotests/127     |  1 +
->  tests/qemu-iotests/141     |  5 ++++-
->  tests/qemu-iotests/144     |  3 ++-
->  tests/qemu-iotests/156     |  1 +
->  tests/qemu-iotests/161     |  7 +++++++
->  tests/qemu-iotests/161.out |  1 +
->  tests/qemu-iotests/185     |  3 +++
->  tests/qemu-iotests/191     |  2 ++
->  tests/qemu-iotests/229     |  1 +
->  tests/qemu-iotests/247     |  8 +++++---
->  tests/qemu-iotests/249     |  5 +++--
->  tests/qemu-iotests/249.out |  2 +-
->  19 files changed, 68 insertions(+), 14 deletions(-)
->=20
-> diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-> index 296bfc93a3..c969faf55a 100644
-> --- a/qemu-deprecated.texi
-> +++ b/qemu-deprecated.texi
-> @@ -204,6 +204,12 @@ and accurate ``query-qmp-schema'' command.
->  Character devices creating sockets in client mode should not specify
->  the 'wait' field, which is only applicable to sockets in server mode
+>  qemu-storage-daemon.c | 29 +++++++++++++++++++++++++++++
+>  Makefile              |  5 ++++-
+>  Makefile.objs         |  7 +++++++
+>  block/Makefile.objs   |  2 +-
+>  4 files changed, 41 insertions(+), 2 deletions(-)
+>
+> diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
+> index 48d6af43a6..904e3c3a46 100644
+> --- a/qemu-storage-daemon.c
+> +++ b/qemu-storage-daemon.c
+> @@ -28,6 +28,10 @@
+>  #include "crypto/init.h"
 > =20
-> +@subsection implicit filters in mirror and commit (since 4.2)
+>  #include "qapi/error.h"
+> +#include "qapi/qapi-visit-block-core.h"
+> +#include "qapi/qapi-commands-block-core.h"
+> +#include "qapi/qobject-input-visitor.h"
 > +
-> +Mirror and commit jobs insert filters, which becomes implicit if user
-> +omitted @option(filter-node-name) parameter. So omitting it is deprecate=
-d
-> +in ``blockdev-mirror'', ``drive-mirror'' and ``block-commit'', set it al=
-ways.
-> +
->  @section Human Monitor Protocol (HMP) commands
+>  #include "qemu-common.h"
+>  #include "qemu-version.h"
+>  #include "qemu/config-file.h"
+> @@ -53,6 +57,13 @@ static void help(void)
+>  "                         specify tracing options\n"
+>  "  -V, --version          output version information and exit\n"
+>  "\n"
+> +"  --blockdev [driver=3D]<driver>[,node-name=3D<N>][,discard=3Dignore|un=
+map]\n"
+> +"             [,cache.direct=3Don|off][,cache.no-flush=3Don|off]\n"
+> +"             [,read-only=3Don|off][,auto-read-only=3Don|off]\n"
+> +"             [,force-share=3Don|off][,detect-zeroes=3Don|off|unmap]\n"
+> +"             [,driver specific parameters...]\n"
+> +"                         configure a block backend\n"
+> +"\n"
+>  "  --object <properties>  define a QOM object such as 'secret' for\n"
+>  "                         passwords and/or encryption keys\n"
+>  "\n"
+> @@ -62,6 +73,7 @@ QEMU_HELP_BOTTOM "\n",
 > =20
->  @subsection The hub_id parameter of 'hostfwd_add' / 'hostfwd_remove' (si=
-nce 3.1)
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 93530d3a13..37caed775f 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -1659,7 +1659,8 @@
->  # @filter-node-name: the node name that should be assigned to the
->  #                    filter driver that the commit job inserts into the =
-graph
->  #                    above @top. If this option is not given, a node nam=
-e is
-> -#                    autogenerated. (Since: 2.9)
-> +#                    autogenerated. Omitting this option is deprecated, =
-it will
-> +#                    be required in future. (Since: 2.9)
->  #
->  # @auto-finalize: When false, this job will wait in a PENDING state afte=
-r it has
->  #                 finished its work, waiting for @block-job-finalize bef=
-ore
+>  enum {
+>      OPTION_OBJECT =3D 256,
+> +    OPTION_BLOCKDEV,
+>  };
+> =20
+>  static QemuOptsList qemu_object_opts =3D {
+> @@ -82,6 +94,7 @@ static int process_options(int argc, char *argv[], Erro=
+r **errp)
+>      static const struct option long_options[] =3D {
+>          {"help", no_argument, 0, 'h'},
+>          {"object", required_argument, 0, OPTION_OBJECT},
+> +        {"blockdev", required_argument, 0, OPTION_BLOCKDEV},
+>          {"version", no_argument, 0, 'V'},
+>          {"trace", required_argument, NULL, 'T'},
+>          {0, 0, 0, 0}
+> @@ -123,6 +136,22 @@ static int process_options(int argc, char *argv[], E=
+rror **errp)
+>                  qemu_opts_del(opts);
+>                  break;
+>              }
+> +            break;
+> +        case OPTION_BLOCKDEV:
+> +            {
+> +                Visitor *v;
+> +                BlockdevOptions *options;
+> +
+> +                v =3D qobject_input_visitor_new_str(optarg, "driver",
+> +                                                  &error_fatal);
+> +
+> +                visit_type_BlockdevOptions(v, NULL, &options, &error_fat=
+al);
+> +                visit_free(v);
+> +
+> +                qmp_blockdev_add(options, &error_fatal);
+> +                qapi_free_BlockdevOptions(options);
+> +                break;
+> +            }
+>          }
+>      }
+>      if (optind !=3D argc) {
 
-Note that 'block-commit' and 'drive-mirror' commands are used by libvirt
-in the pre-blockdev era. In those instances we gather statistics of
-block devices by nesting in the output of query-blockstats and
-query-block rather than selecting the appropriate info by any other
-means (e.g. by node name).
+Unlike --object, --blockdev is already QAPIfied, albeit crudely.
 
-This means that the output MUST stay consistend when block jobs are used
-and the hack this patch is deprcating will break those.
+Similar difference to vl.c as for --object: vl.c records the option for
+later processing, while here you process it right away.  Simpler and
+saner.
 
-Note that in libvirt we don't plan to invest time to add workarounds for
-non-blockdev cases since blockdev by itself is complex enough and I'd
-strongly prefer not having a third code path to care about.
+I figure you intend to do all options this way.
 
-Given that -blockdev can't be used in all cases (e.g. for sd-cards)
-which also blocks deprecation of -drive I don't think that hiding of
-implicit filter nodes can be deprecated until -drive is deprecated.
+Should you explain the difference in a commit message?  A comment?
+
+[...]
 
 
