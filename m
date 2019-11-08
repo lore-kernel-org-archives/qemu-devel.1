@@ -6,85 +6,78 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92CF5FC6195
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:25:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D29C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:28:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 611E321882
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:25:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2AE4C21D7E
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:28:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MV+OFNJw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 611E321882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bCh+uqUl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AE4C21D7E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT74q-0002PY-HQ
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:25:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60911)
+	id 1iT77r-00041c-9j
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:28:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33148)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iT73i-0001Xu-6Y
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:24:27 -0500
+ (envelope-from <armbru@redhat.com>) id 1iT771-0003Ns-Ar
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:27:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iT73g-0005KV-R7
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:24:25 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44724)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iT73g-0005JU-KA
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:24:24 -0500
-Received: by mail-wr1-x441.google.com with SMTP id f2so7663981wrs.11
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 08:24:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=PTm34Cee9fPx8B4vdX4KhIB2vraN0Xl78QhfV69LmiQ=;
- b=MV+OFNJwwYS+Ccld018FcQw1yDTLrc1L3hXqDh4lkOa0U7ALJW2DqQrM9Yn9A7ZLus
- KpGyvzaZ5XUy9NQbdG/unvCZyV+B/WnjK8KJpIGMbyBAp/9Cs7QKlcRyR01tySsceYCp
- DzV2onyN+OLJcBI55AJpVm7va6eqGnRVsGDebQvn1FrgdWCBSvMOyPE4PGe8FpAF9DeO
- OptuFHGnpcFmFkvjKzAAgwnZ4afnZs02pTI87IcSfQzAGLj7S9Ezy6V4B7s2DSmXqe4s
- 6JhOKc9JnObFPOv/5RSHcbHeIGlNrRy+bCukve6BTrA4Ok8s9YL/DPujEGP+OLjOFIB/
- nQNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=PTm34Cee9fPx8B4vdX4KhIB2vraN0Xl78QhfV69LmiQ=;
- b=XjDWCTKCDbsGRQwxSlBr78fTUKM7g3nkTIQChji/4jsQv2BnNmRJa+4SE3Yj1fWqbA
- lo+y+1bX9A8KGls9304hMK4I7BtVeUsHltzW6sMC4w9LomfrloVGmk7TVW7NSJ+9G5vf
- kwQc/ii7lrFKp4o1ZSuTm2RmqGrlXv6GYLfd+VtemJYFM9UDvvG/HJ1hz4u1X4xmwiTr
- tZXknb78Bbilzpnd5Y5H8KE/v/F6PktDuaaP/6LxoclDnEEOvVbPxUny+K4o670RxBDu
- 6F8/WG5qVaIK1YjpqhO/0p/Mdjds57NGYZKQIcjiKhnkXg/314A1QKf11jaKJFXsgn99
- VZTw==
-X-Gm-Message-State: APjAAAWHC3qA1Xsy+KusvOerSRnmiHwQ2a8qLaXVain8T582WAyGtH0f
- erVBkkytPANclWTphIsJRbCGIw==
-X-Google-Smtp-Source: APXvYqz/F7wHzdP7GCFJ3DEKGz5d5gvJsIqGWg6mF/QBd39kMim+dpfhL04yOu8P0pEgGBBvofq/kg==
-X-Received: by 2002:adf:a553:: with SMTP id j19mr4683988wrb.184.1573230263284; 
- Fri, 08 Nov 2019 08:24:23 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id x7sm12605616wrg.63.2019.11.08.08.24.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 Nov 2019 08:24:22 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 91A341FF87;
- Fri,  8 Nov 2019 16:24:21 +0000 (GMT)
-References: <20191104131836.12566-1-alex.bennee@linaro.org>
- <CAFEAcA-42Fg-ihBm3JVET41SJ1Mot7m-i1ZGt+Y1afOY1wZ0Ow@mail.gmail.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] tcg plugins: expose an API version concept
-In-reply-to: <CAFEAcA-42Fg-ihBm3JVET41SJ1Mot7m-i1ZGt+Y1afOY1wZ0Ow@mail.gmail.com>
-Date: Fri, 08 Nov 2019 16:24:21 +0000
-Message-ID: <874kzegwui.fsf@linaro.org>
+ (envelope-from <armbru@redhat.com>) id 1iT76z-0006vG-DH
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:27:50 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46214
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iT76z-0006ux-AR
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:27:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573230468;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+rwL41JtnzkSXllU15+Eg14cZWrbIq7pBY3Dm/YikhQ=;
+ b=bCh+uqUlyIPDF6VcsFtwxlvUHYDv1VOn1TUytJS9vOkDsb3VWyIiX+WmCsO73o/Ie9PBo6
+ yDM7qB299qHpWysLIWiQjLFdhoGkaOWhO8uVMwVLf3W+s8LrV9ryQ1NHnLifl+KPfTovWh
+ O6GSw0p1TNGcw2EMgHbmZoGtAlArA2U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-3v1sSldFMQGed_blippJxA-1; Fri, 08 Nov 2019 11:27:45 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AFCB800C72;
+ Fri,  8 Nov 2019 16:27:44 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2D141600C9;
+ Fri,  8 Nov 2019 16:27:44 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9842A11385C9; Fri,  8 Nov 2019 17:27:41 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [RFC PATCH 10/18] qemu-storage-daemon: Add --chardev option
+References: <20191017130204.16131-1-kwolf@redhat.com>
+ <20191017130204.16131-11-kwolf@redhat.com>
+Date: Fri, 08 Nov 2019 17:27:41 +0100
+In-Reply-To: <20191017130204.16131-11-kwolf@redhat.com> (Kevin Wolf's message
+ of "Thu, 17 Oct 2019 15:01:56 +0200")
+Message-ID: <87sgmy5o5e.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: 3v1sSldFMQGed_blippJxA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,56 +89,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Kevin Wolf <kwolf@redhat.com> writes:
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> On Mon, 4 Nov 2019 at 13:18, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
-ote:
->>
->> This is a very simple versioning API which allows the plugin
->> infrastructure to check the API a plugin was built against. We also
->> expose a min/cur API version to the plugin via the info block in case
->> it wants to avoid using old deprecated APIs in the future.
+> This adds a --chardev option to the storage daemon that works the same
+> as the -chardev option of the system emulator.
 >
-> I think the general idea here is fine, and I want to see
-> us get the version-check into 4.2, because I don't think
-> we should release a QEMU which doesn't do a basic version
-> sanity check. I have some minor comments below.
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qemu-storage-daemon.c | 19 +++++++++++++++++++
+>  Makefile              |  2 +-
+>  2 files changed, 20 insertions(+), 1 deletion(-)
 >
->
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  include/qemu/qemu-plugin.h | 19 +++++++++++++++++++
->>  plugins/loader.c           | 15 +++++++++++++++
->>  plugins/plugin.h           |  2 ++
->>  tests/plugin/bb.c          |  2 ++
->>  tests/plugin/empty.c       |  2 ++
->>  tests/plugin/hotpages.c    |  2 ++
->>  tests/plugin/howvec.c      |  2 ++
->>  tests/plugin/insn.c        |  2 ++
->>  tests/plugin/mem.c         |  2 ++
->>  9 files changed, 48 insertions(+)
->>
->> diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
->> index a00a7deb461..5502e112c81 100644
->> --- a/include/qemu/qemu-plugin.h
->> +++ b/include/qemu/qemu-plugin.h
->
-> As an aside, is this the header file used for building
-> the plugins? It seems a bit odd to have put it
-> in include/qemu, which is for headers used when building
-> QEMU itself.
+> diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
+> index 099388f645..46e0a6ea56 100644
+> --- a/qemu-storage-daemon.c
+> +++ b/qemu-storage-daemon.c
+> @@ -26,6 +26,7 @@
+> =20
+>  #include "block/block.h"
+>  #include "block/nbd.h"
+> +#include "chardev/char.h"
+>  #include "crypto/init.h"
+> =20
+>  #include "qapi/error.h"
+> @@ -75,6 +76,9 @@ static void help(void)
+>  "             [,driver specific parameters...]\n"
+>  "                         configure a block backend\n"
+>  "\n"
+> +"  --chardev <options>    configure a character device backend\n"
+> +"                         (see the qemu(1) man page for possible options=
+)\n"
 
-It's also included by the internal plugin header. We could put it
-somewhere else. include/api/? Where do the QMP specs end up?
+If pointing to the manual page was good enough for --help, we could save
+ourselves a ton of trouble :)
 
-I'll make the other changes in v2.
+> +"\n"
+>  "  --export [type=3D]nbd,device=3D<node-name>[,name=3D<export-name>]\n"
+>  "           [,writable=3Don|off][,bitmap=3D<name>]\n"
+>  "                         export the specified block node over NBD\n"
+> @@ -96,10 +100,13 @@ QEMU_HELP_BOTTOM "\n",
+>  enum {
+>      OPTION_OBJECT =3D 256,
+>      OPTION_BLOCKDEV,
+> +    OPTION_CHARDEV,
+>      OPTION_NBD_SERVER,
+>      OPTION_EXPORT,
+>  };
+> =20
+> +extern QemuOptsList qemu_chardev_opts;
+> +
+>  static QemuOptsList qemu_object_opts =3D {
+>      .name =3D "object",
+>      .implied_opt_name =3D "qom-type",
+> @@ -130,6 +137,7 @@ static int process_options(int argc, char *argv[], Er=
+ror **errp)
+>          {"help", no_argument, 0, 'h'},
+>          {"object", required_argument, 0, OPTION_OBJECT},
+>          {"blockdev", required_argument, 0, OPTION_BLOCKDEV},
+> +        {"chardev", required_argument, 0, OPTION_CHARDEV},
+>          {"nbd-server", required_argument, 0, OPTION_NBD_SERVER},
+>          {"export", required_argument, 0, OPTION_EXPORT},
+>          {"version", no_argument, 0, 'V'},
+> @@ -189,6 +197,17 @@ static int process_options(int argc, char *argv[], E=
+rror **errp)
+>                  qapi_free_BlockdevOptions(options);
+>                  break;
+>              }
+> +        case OPTION_CHARDEV:
+> +            {
+> +                QemuOpts *opts =3D qemu_opts_parse(&qemu_chardev_opts,
+> +                                                 optarg, true, &error_fa=
+tal);
+> +                if (!qemu_chr_new_from_opts(opts, NULL, &error_fatal)) {
+> +                    /* No error, but NULL returned means help was printe=
+d */
+> +                    exit(EXIT_SUCCESS);
+> +                }
+> +                qemu_opts_del(opts);
+> +                break;
+> +            }
 
---
-Alex Benn=C3=A9e
+Differs from vl.c similar to --object [PATCH 02]:
+
+* Options are processed left to right.  Good.
+
+* You use &qemu_chardev_opts instead of qemu_opts_find().  Good.
+
+* You use qemu_opts_parse() instead of qemu_opts_parse_noisily().  Only
+  here I can actually point to a loss of help.
+
+  For options where the argument is essentially a tagged union, an
+  option argument "help" usually lists the tags, an argument "T,help"
+  shows help on the parameters that go with tag T.
+
+  --chardev is such an option.  Consider:
+
+    $ qemu-system-x86_64 --chardev help
+    Available chardev backend types:=20
+      ringbuf
+    [...]
+      tty
+    $ qemu-storage-daemon --chardev help
+    Available chardev backend types:=20
+      pty
+    [...]
+      tty
+
+  Works the same, only the available backend types differ.  Intentional?
+
+  Next:
+
+    $ qemu-system-x86_64 --chardev tty,help
+    chardev options:
+      append=3D<bool (on/off)>
+      backend=3D<str>
+      chardev=3D<str>
+      cols=3D<num>
+    [...]
+      width=3D<num>
+    [Exit 1 ]
+
+  The second help isn't very helpful, and the exit code is wrong.  Not
+  this patch's problem.
+
+    $ qemu-storage-daemon --chardev tty,help
+    qemu-storage-daemon: Invalid parameter 'help'
+    [Exit 1 ]
+
+  This patch's problem :)
+
+Also like --object, --chardev is paired with a QMP command, namely
+chardev-add, and the two differ for historical reasons.  If we want to
+give the storage daemon a QAPIfied command line from the start, we'll
+have to decide how to address this issue.
+
+
+>          case OPTION_NBD_SERVER:
+>              {
+>                  Visitor *v;
+> diff --git a/Makefile b/Makefile
+> index b913d4d736..0e3e98582d 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -561,7 +561,7 @@ qemu-img.o: qemu-img-cmds.h
+>  qemu-img$(EXESUF): qemu-img.o $(authz-obj-y) $(block-obj-y) $(crypto-obj=
+-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+>  qemu-nbd$(EXESUF): qemu-nbd.o $(authz-obj-y) $(block-obj-y) $(crypto-obj=
+-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+>  qemu-io$(EXESUF): qemu-io.o $(authz-obj-y) $(block-obj-y) $(crypto-obj-y=
+) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
+> -qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(blo=
+ck-obj-y) $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(storage-daemon-obj-y) =
+$(COMMON_LDADDS)
+> +qemu-storage-daemon$(EXESUF): qemu-storage-daemon.o $(authz-obj-y) $(blo=
+ck-obj-y) $(crypto-obj-y) $(chardev-obj-y) $(io-obj-y) $(qom-obj-y) $(stora=
+ge-daemon-obj-y) $(COMMON_LDADDS)
+> =20
+>  qemu-bridge-helper$(EXESUF): qemu-bridge-helper.o $(COMMON_LDADDS)
+
 
