@@ -2,84 +2,80 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1049FFA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 18:14:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E71C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 18:39:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0D3C214DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 18:14:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D4812087E
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 18:39:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dabbelt-com.20150623.gappssmtp.com header.i=@dabbelt-com.20150623.gappssmtp.com header.b="GUK3+kc/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D3C214DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dabbelt.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NW7KJpOI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D4812087E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT8ll-0003E7-0D
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 13:14:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51226)
+	id 1iT9AW-0001uL-Fg
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 13:39:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54345)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <palmer@dabbelt.com>) id 1iT8l6-0002kM-Rx
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 13:13:22 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iT99T-0001Q8-3D
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 13:38:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <palmer@dabbelt.com>) id 1iT8l5-0002mD-DD
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 13:13:20 -0500
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:36711)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <palmer@dabbelt.com>) id 1iT8l5-0002ki-0o
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 13:13:19 -0500
-Received: by mail-pg1-x544.google.com with SMTP id k13so4468554pgh.3
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 10:13:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dabbelt-com.20150623.gappssmtp.com; s=20150623;
- h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
- :content-transfer-encoding;
- bh=4OhJ8/ssnzX1h1ox9WgBFS8OB0q7jM4PcyUwC85Hrg4=;
- b=GUK3+kc/vYmW25Q3MVf0Dmsc9fNJZYeEbRQX400+9mmAj8fdz82SaNHZeNaM05ZlkP
- Z86Lu/PBQniqj250m5/+sPu3JlqFQu9T80MGj2YrQR1QkKeooqHuUOHHFxz2wfN5xlXn
- 1S9bsxGJ7hxUokOWm1JMGjgxYrLfkRo1BFF+OSbVoYn87nkhxQrBMN3fFoyRFRD29PIB
- c3jtso0fvdiby4i4LY52w5f4Z6GvKanaq3Vhyw2B2rg6sVCZwLvMvr/6aUI/gXtMMDsY
- jqzvKkZp5eDEw8XZlNF8UvSXJWiXn7avipVzLtuLaT6D/TkXEnoLMfyF3d+pBnTHlpaG
- g0tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
- :mime-version:content-transfer-encoding;
- bh=4OhJ8/ssnzX1h1ox9WgBFS8OB0q7jM4PcyUwC85Hrg4=;
- b=iBpQIDGda01FwsYFFA53+8AukiBoXNsRmUtpMo8xwpb3zxQUe/YuDzJR5RTFEBKpV9
- 8DLAH36MZ46pxdO3k2XwdnJgiA/Lp26x7H2vFYx+Y3VU89UIkdFSvAiEW+M8o1lV8X7E
- bqCEDKegp51UzqDAod7H6vXH16AbYi+H4SQqFrkH7R0tqXqiQZe9UoiHMCMcX1WTt455
- 3Q1AkzNyTRvUdr8rtDa3GdwWU0bTrfa274uKwC3S70HBZbiD4FNOWF+Z7CHN0v+AfUvb
- mNDiFWILvkagoM+J/hI3SbidOSZXDUbbiZ0siMSnk2p9haVWO7KxJqy/scHq5fnlruYD
- R20w==
-X-Gm-Message-State: APjAAAWE11c405eZB5AhRd7qRTHUxEAxK2ToTDRkRtAOb7jAkkOzw3Y6
- QR7bs4NwJJrPoMJs3l3D/8COxw==
-X-Google-Smtp-Source: APXvYqxb1jU7qr2xD92YPfh5ymTDFaz4H7vcjKBVV24QD+3Zc6CmQzU3/j32PPusNRdsR/tbXe6hJg==
-X-Received: by 2002:a62:6044:: with SMTP id u65mr13668040pfb.227.1573236797047; 
- Fri, 08 Nov 2019 10:13:17 -0800 (PST)
-Received: from localhost ([12.206.222.5])
- by smtp.gmail.com with ESMTPSA id n72sm6221230pjc.4.2019.11.08.10.13.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 Nov 2019 10:13:16 -0800 (PST)
-Date: Fri, 08 Nov 2019 10:13:16 -0800 (PST)
-X-Google-Original-Date: Fri, 08 Nov 2019 10:13:15 PST (-0800)
-Subject: Re: [PATCH] RISC-V: virt: This is a "sifive,test1" test finisher
-In-Reply-To: <CAFEAcA8k+t2qKCSvMjENitvCXyc-qwiG2qbg6gQFKR_+v_zihg@mail.gmail.com>
-From: Palmer Dabbelt <palmer@dabbelt.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <mhng-3242a5ea-9d0c-49fb-bcf6-d8482328b272@palmer-si-x1c4>
-Mime-Version: 1.0 (MHng)
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::544
+ (envelope-from <dgilbert@redhat.com>) id 1iT99Q-0001rM-EK
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 13:38:29 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28665
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iT99Q-0001qD-AL
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 13:38:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573238306;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KByHflPlHc58HzRs/gAcmPfH/3hoibSYtatpz9m6VwY=;
+ b=NW7KJpOI7Js9PFJgCN3URO/6mbD5r4vMSF2mQowzPg4cp3TTIitpZoh3xHEJ5BYfEiDR68
+ aHG3ZOcVw90rhLHnkxoHFHIk1Y5SsPmmP/fV9n7fiS67KonsXB+Vd9vzwsXh5u6E+6BcOM
+ s2q2gVrnOh5wynYLq6trONWmjRBZ0rg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-320-ErjBPe7hN1mZCWAjhlN_dw-1; Fri, 08 Nov 2019 13:38:24 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 931CA8017DD;
+ Fri,  8 Nov 2019 18:38:23 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 97D035D6AE;
+ Fri,  8 Nov 2019 18:38:19 +0000 (UTC)
+Date: Fri, 8 Nov 2019 18:38:17 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, jfreimann@redhat.com
+Subject: Re: [PATCH] tests/migration: Print some debug on bad status
+Message-ID: <20191108183817.GB2878@work-vm>
+References: <20191108104307.125020-1-dgilbert@redhat.com>
+ <157323517815.7743.2882918933706185467@37313f22b938>
+MIME-Version: 1.0
+In-Reply-To: <157323517815.7743.2882918933706185467@37313f22b938>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: ErjBPe7hN1mZCWAjhlN_dw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,72 +87,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, palmer@sifive.com, qemu-devel@nongnu.org,
- Christoph Hellwig <hch@infradead.org>, alistair23@gmail.com,
- david@gibson.dropbear.id.au
+Cc: thuth@redhat.com, alex.bennee@linaro.org, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 08 Nov 2019 10:04:47 PST (-0800), Peter Maydell wrote:
-> On Fri, 8 Nov 2019 at 17:15, Alistair Francis <alistair23@gmail.com> wrote:
->>
->> On Fri, Nov 8, 2019 at 9:05 AM Palmer Dabbelt <palmer@sifive.com> wrote:
->> >
->> > The test finisher implements the reset command, which means it's a
->> > "sifive,test1" device.  This is a backwards compatible change, so it's
->> > also a "sifive,test0" device.  I copied the odd idiom for adding a
->> > two-string compatible field from the ARM virt board.
->> >
->> > Fixes: 9a2551ed6f ("riscv: sifive_test: Add reset functionality")
->> > Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
->> > Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
->> > ---
->> >  hw/riscv/virt.c | 5 ++++-
->> >  1 file changed, 4 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
->> > index 23f340df19..74f2dce81c 100644
->> > --- a/hw/riscv/virt.c
->> > +++ b/hw/riscv/virt.c
->> > @@ -359,7 +359,10 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->> >      nodename = g_strdup_printf("/test@%lx",
->> >          (long)memmap[VIRT_TEST].base);
->> >      qemu_fdt_add_subnode(fdt, nodename);
->> > -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,test0");
->> > +    {
->> > +        const char compat[] = "sifive,test1\0sifive,test0";
->>
->> Does this really work? Why not use qemu_fdt_setprop_cells()?
->>
->> Alistair
->>
->> > +        qemu_fdt_setprop(fdt, nodename, "compatible", compat, sizeof(compat));
->> > +    }
->
-> qemu_fdt_setprop_cells() is for "set this property to
-> contain this list of 32-bit integers" (and it does a byteswap
-> of each 32-bit value from host to BE). That's not what
-> you want for a string (or a string list, which is what
-> we have here).
->
-> Cc'ing David Gibson who's our device tree expert to see if there's
-> a nicer way to write this. Oddly, given that it's used in the
-> ubiquitous 'compatible' prop, the dtc Documentation/manual.txt
-> doesn't say anything about properties being able to be
-> 'string lists', only 'strings', '32 bit numbers', 'lists of
-> 32-bit numbers' and 'byte sequences'. You have to dig through
-> the header file comments to deduce that a string list is
-> represented by a string with embedded NULs separating
-> each list item.
+Hi Jens,
+  the unplug failover stuff is triggering an assertion occasionally on
+aarch64; but
+  a) I'm not sure the right way to fix it
+  b) And I'm out for a little over a week
 
-I copied this from hw/arm/virt.c, but messed up.  There they use
+so...
 
-        const char compat[] = "arm,armv8-timer\0arm,armv7-timer";
-        qemu_fdt_setprop(vms->fdt, "/timer", "compatible",
-                         compat, sizeof(compat));
+* no-reply@patchew.org (no-reply@patchew.org) wrote:
+> Patchew URL: https://patchew.org/QEMU/20191108104307.125020-1-dgilbert@re=
+dhat.com/
+>=20
+>=20
+>=20
+> Hi,
+>=20
+> This series failed the docker-quick@centos7 build test. Please find the t=
+esting commands and
+> their output below. If you have Docker installed, you can probably reprod=
+uce it
+> locally.
+>=20
+> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> #!/bin/bash
+> make docker-image-centos7 V=3D1 NETWORK=3D1
+> time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=3D1
+> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+>=20
+>   TEST    check-unit: tests/test-bdrv-drain
+> wait_for_migration_fail: unexpected status status=3Dwait-unplug allow_act=
+ive=3D1
 
-I'll send a v2, but I'd be happy to add some sort of setprop_stringlist 
-function.  Maybe we just indicate the length with two '\0's?  IIRC that's how 
-other similar-looking data structures are encoded.
+In tests/migration-test.c we've got wait_for_migration_fail, and it's
+expecting the state to be any one of:
+   setup, failed or maybe active
+
+but it's getting surprised by seeing a 'wait-unplug'
+
+So the question is should we see a wait-unplug?
+
+the migration code has:
+
+    if (qemu_savevm_nr_failover_devices()) {
+        migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+                          MIGRATION_STATUS_WAIT_UNPLUG);
+
+Should qemu_savevm_nr_failover_devices() be true?
+On aarch64 it seems to have a virtio-net device by default
+and qemu_savevm_nr_failover_devices() checks for devices
+having dev_unplug_pending but doesn't call it.
+
+I see two fixes but am not sure which is right:
+   a) Add 'wait-unplug' to the wait_for_migration_fail
+      (easy)
+   b) Actually call dev_unplug_pending in qemu_savevm_nr_failover_devices
+      so that on a guest which has a virtio-net, but no failover device,
+      the state isn't entered.
+
+I think (b) is better, since we shouldn't be exposing the wait-unplug
+event on setups that don't expect it; but I don't understand the unplug
+enough to know if this is a safe change.
+
+Thoughts?
+
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
