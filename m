@@ -2,81 +2,74 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67DA0FA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30D55C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:08:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 31661206BA
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:06:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F132D206BA
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:08:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CWDHleYS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31661206BA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C8oF1TXX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F132D206BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT26I-0000hY-Dv
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 06:06:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57594)
+	id 1iT27o-0002IR-4J
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 06:08:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57963)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iT25B-0008OS-U2
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:05:39 -0500
+ (envelope-from <david@redhat.com>) id 1iT26z-0001KM-3Z
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:07:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iT256-00066b-M5
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:05:37 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44155
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <david@redhat.com>) id 1iT26x-0007RG-O4
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:07:28 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33076
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iT256-00065w-DF
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:05:32 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iT26x-0007PJ-JG
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:07:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573211132;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8QKCahovK7Kq4ddTNQvVxg9K2BLVVX/HgM3FMJOLUTM=;
- b=CWDHleYSngvGuEb6Js7LGs6ZdvrVtNNgQ/HpodJoxYj9Xp1st3adFH/UCwrvq5yATb2Wi8
- Ydbl7VynmXKTk+Fhtfd9gezC2GmCckvz9cM3TGe+/S9ZDdr0I/aRhEHyOWAehLKqVss2cE
- 5uhQcmPbLdcpEYeXsZSFSvh8eb2Yk4M=
+ s=mimecast20190719; t=1573211244;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=sz8ElzisP+9vXO/hdYEzGDPj+rMedEwvWv7li5sP1Dk=;
+ b=C8oF1TXXr85iyZ59X5A3fiu75BqU4M+CzWbs8mC2KMkbQKNYjL3kiROq9YFUaT9ZUyAh/p
+ jEZvuuSQ3/zBZ11gTSVr7Bnil0JhJaVkX68QrfUErs5YYzCJQs7Lnk403Eu13i4UGUQZc6
+ TyG5g6OnH9Z6NiY4uk4CXDSsOwHDA/Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-ra0git6rOjmKpPaQkqThXw-1; Fri, 08 Nov 2019 06:05:30 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-440-8UV7TQyAPFemua4pVmUGog-1; Fri, 08 Nov 2019 06:07:21 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1ED8107ACC3;
- Fri,  8 Nov 2019 11:05:29 +0000 (UTC)
-Received: from redhat.com (ovpn-112-63.ams2.redhat.com [10.36.112.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AA6115D6B7;
- Fri,  8 Nov 2019 11:05:22 +0000 (UTC)
-Date: Fri, 8 Nov 2019 11:05:20 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH] configure: Check bzip2 is available
-Message-ID: <20191108110520.GG182396@redhat.com>
-References: <20191108102805.8258-1-philmd@redhat.com>
- <862eb773-609d-4250-b46b-d922fc5a86a7@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33FB31800D7B;
+ Fri,  8 Nov 2019 11:07:20 +0000 (UTC)
+Received: from t460s.redhat.com (unknown [10.36.118.2])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0F9775DA70;
+ Fri,  8 Nov 2019 11:07:14 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 0/2] s390x/cpumodel: Introduce "best" model variants
+Date: Fri,  8 Nov 2019 12:07:12 +0100
+Message-Id: <20191108110714.7475-1-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <862eb773-609d-4250-b46b-d922fc5a86a7@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: ra0git6rOjmKpPaQkqThXw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: 8UV7TQyAPFemua4pVmUGog-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,62 +81,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-trivial@nongnu.org, Thomas Huth <thuth@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ Michael Mueller <mimu@linux.ibm.com>, Jiri Denemark <jdenemar@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 08, 2019 at 12:01:16PM +0100, Laszlo Ersek wrote:
-> On 11/08/19 11:28, Philippe Mathieu-Daud=C3=A9 wrote:
-> > The bzip2 tool is not included in default installations.
-> > On freshly installed systems, ./configure succeeds but 'make'
-> > might fail later:
-> >=20
-> >     BUNZIP2 pc-bios/edk2-i386-secure-code.fd.bz2
-> >   /bin/sh: bzip2: command not found
-> >   make: *** [Makefile:305: pc-bios/edk2-i386-secure-code.fd] Error 127
-> >   make: *** Deleting file 'pc-bios/edk2-i386-secure-code.fd'
-> >   make: *** Waiting for unfinished jobs....
-> >=20
-> > Add a check in ./configure to warn the user if bzip2 is missing.
->=20
-> We've come full circle. Let me explain:
->=20
-> >=20
-> > Fixes: 536d2173b2b
->=20
-> So this makes me kinda grumpy. If you look at the v3 posting of the patch=
- that would later become commit 536d2173b2b:
->=20
->   http://mid.mail-archive.com/20190321113408.19929-8-lersek@redhat.com
->=20
-> you see the following note in the changelog:
->=20
->     - compress FD files with bzip2 rather than xz, so that decompression =
-at
->       "make install" time succeed on older build OSes too [Peter]
->=20
-> So I couldn't use xz because that was "too new" for some build OSes, but =
-now we also can't take bzip2 for granted because that's "too old" for some =
-other build OSes? This is ridiculous.
+There was recently a discussion regarding CPU model versions. That concept
+does not fit s390x where we have a lot of feature variability. I
+proposed an alternative approach in [1], which might work for x86 as well
+(but I am not sure if x86 still can or wants to switch to that), and
+requires no real changes in upper layers.
 
-We're not saying bzip2 is too old / missing from the OS. Every OS we care
-about has bzip2. The problem is that a minimal installation migt not have
-installed it. This kind of problem is increasingly common with use of
-minimal container images for example. So we're just ensuring we validate
-that what we want is actuall present.
+[1] and patch #2 contains more information on the motivation for this.
 
-Regards,
-Daniel
+E.g., specifying/expanding "z14-best" will result in the "best feature
+set possible on this accelerator, hw and, firmware". While a "z13" does
+not work under TCG and some z/VM versions, "z13-best" will work.
+
+As I had a couple of spare minutes this week, I hacked a quick prototype.
+I did not heavily test this (quick sanity tests under TCG only), but it
+should be decent enough to get the idea and play with it. I'll not be
+working next week, which is why I sent this out now for discussion.
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg07222.html
+
+Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
+Cc: Jiri Denemark <jdenemar@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Michael Mueller <mimu@linux.ibm.com>
+
+David Hildenbrand (2):
+  s390x/cpumodels: Factor out CPU feature dependencies
+  s390x/cpumodel: Introduce "best" model variants
+
+ target/s390x/cpu-qom.h    |   1 +
+ target/s390x/cpu_models.c | 211 +++++++++++++++++++++++++++-----------
+ 2 files changed, 153 insertions(+), 59 deletions(-)
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+2.21.0
 
 
