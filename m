@@ -2,79 +2,86 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B71A4FA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:46:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC1EC5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:47:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8575C20659
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:46:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3CFF20679
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:47:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A62VmiaJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8575C20659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="2TyO2kUO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3CFF20679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT5WS-00048B-JP
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 09:46:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41348)
+	id 1iT5Xo-0004xi-IX
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 09:47:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41841)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iT5Ra-0006tZ-JX
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:40:59 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1iT5Ts-0001OM-OB
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:43:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iT5RZ-0000EE-0x
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:40:58 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41665
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1iT5Tr-0001wr-Ep
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:43:20 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:59606)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iT5RY-0000Dz-TN
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:40:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573224056;
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1iT5Tq-0001rS-Sb
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:43:19 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 5985F96EF0;
+ Fri,  8 Nov 2019 14:43:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1573224196;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rgCcQxWE/c9r5thmfIml1bcg46hlbRTbC2CJgE1AG/w=;
- b=A62VmiaJY70hAUOPV0gBrg67GGm79BfSTYAPBBjVspLPzqV0e6K6+aXnM+VknNhxao/Zgt
- Vg87HmkhQZqUC8c4/+Fxr2rSw6TLGK2TMQDfxZQOaSw8B9izu2DDNWa1f/FNWA7lADYdCe
- 3NaL+6+hzBuNkqoqFFvW0QvlDU/UosM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-428-8hYWyjnOP7ec5V8B_ySg7w-1; Fri, 08 Nov 2019 09:40:55 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D69E800C72;
- Fri,  8 Nov 2019 14:40:54 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.206.29])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 309F95D6AE;
- Fri,  8 Nov 2019 14:40:49 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Eric Blake <eblake@redhat.com>,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2 1/3] hw/block/pflash: Remove dynamic field width from trace
- events
-Date: Fri,  8 Nov 2019 15:40:40 +0100
-Message-Id: <20191108144042.30245-2-philmd@redhat.com>
-In-Reply-To: <20191108144042.30245-1-philmd@redhat.com>
-References: <20191108144042.30245-1-philmd@redhat.com>
+ bh=HAT2F7kxP2DEpceg2hNmWYGoMEhA07nUZZQxaG5Tzg0=;
+ b=2TyO2kUOSZLnKygUV7PwPqGT6x+kB28vMq1/H8bjnVxvPNqKHG3rdgUS9EhFLn7pSiY4zy
+ YWh/RWtMQyf1NXVC3uNSC0zftQqsDPpEgiY6obB+cUOasdDjaiqtea+RV9EusepOTzv8CM
+ v5QYmyJ5Duw9j6gcWnuygH+d1surOww=
+Subject: Re: [PATCH] gdbstub: Fix buffer overflow in handle_read_all_regs
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20191108125534.114474-1-damien.hedde@greensocs.com>
+ <877e4ah32n.fsf@linaro.org>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <7aa732a4-b67f-855f-0432-290580fc239d@greensocs.com>
+Date: Fri, 8 Nov 2019 15:43:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: 8hYWyjnOP7ec5V8B_ySg7w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <877e4ah32n.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1573224196;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HAT2F7kxP2DEpceg2hNmWYGoMEhA07nUZZQxaG5Tzg0=;
+ b=f2jR0xOy41ZIlbmfbHbKFatNbspMUbLzHFpUgulYM3Y+e1cDj9aegBsdtu5hptbfZA21ve
+ GD2i01KJK6SLKxFTIQxSNYXN4J8bkU0bZe9snlz5+fOwxA3ArYhGPVr/Crgjxssl1x9n3T
+ noyGVb0BJMQ/5GxDuKBRsyOtEgA+hyQ=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1573224196; a=rsa-sha256; cv=none;
+ b=rvSjATemCd3+ioJf41n9wbZh9uxjLaNLEsw2v0UOvLANUJjPhqPECghFKHIsHxiT1eijeF
+ h9YFjpC4ICCkxvUQ16b+2Oi0s8ZknfJ8gMnY2DCP7DOjum//TGIOabkNMqcGhttJRi8PxR
+ 9uar2bNw+bpQHiWg/yAZVLdUbzz7YJc=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,152 +93,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since not all trace backends support dynamic field width in
-format (dtrace via stap does not), replace by a static field
-width instead.
 
-Reported-by: Eric Blake <eblake@redhat.com>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1844817
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/block/pflash_cfi01.c | 8 ++++----
- hw/block/pflash_cfi02.c | 8 ++++----
- hw/block/trace-events   | 8 ++++----
- 3 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
-index 566c0acb77..787d1196f2 100644
---- a/hw/block/pflash_cfi01.c
-+++ b/hw/block/pflash_cfi01.c
-@@ -276,7 +276,7 @@ static uint32_t pflash_data_read(PFlashCFI01 *pfl, hwad=
-dr offset,
-         DPRINTF("BUG in %s\n", __func__);
-         abort();
-     }
--    trace_pflash_data_read(offset, width << 1, ret);
-+    trace_pflash_data_read(offset, width << 3, ret);
-     return ret;
- }
-=20
-@@ -389,7 +389,7 @@ static uint32_t pflash_read(PFlashCFI01 *pfl, hwaddr of=
-fset,
-=20
-         break;
-     }
--    trace_pflash_io_read(offset, width, width << 1, ret, pfl->cmd, pfl->wc=
-ycle);
-+    trace_pflash_io_read(offset, width << 3, ret, pfl->cmd, pfl->wcycle);
-=20
-     return ret;
- }
-@@ -414,7 +414,7 @@ static inline void pflash_data_write(PFlashCFI01 *pfl, =
-hwaddr offset,
- {
-     uint8_t *p =3D pfl->storage;
-=20
--    trace_pflash_data_write(offset, width << 1, value, pfl->counter);
-+    trace_pflash_data_write(offset, width << 3, value, pfl->counter);
-     switch (width) {
-     case 1:
-         p[offset] =3D value;
-@@ -453,7 +453,7 @@ static void pflash_write(PFlashCFI01 *pfl, hwaddr offse=
-t,
-=20
-     cmd =3D value;
-=20
--    trace_pflash_io_write(offset, width, width << 1, value, pfl->wcycle);
-+    trace_pflash_io_write(offset, width << 3, value, pfl->wcycle);
-     if (!pfl->wcycle) {
-         /* Set the device in I/O access mode */
-         memory_region_rom_device_set_romd(&pfl->mem, false);
-diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
-index 4baca701b7..f2993cdfaa 100644
---- a/hw/block/pflash_cfi02.c
-+++ b/hw/block/pflash_cfi02.c
-@@ -260,7 +260,7 @@ static uint64_t pflash_data_read(PFlashCFI02 *pfl, hwad=
-dr offset,
- {
-     uint8_t *p =3D (uint8_t *)pfl->storage + offset;
-     uint64_t ret =3D pfl->be ? ldn_be_p(p, width) : ldn_le_p(p, width);
--    trace_pflash_data_read(offset, width << 1, ret);
-+    trace_pflash_data_read(offset, width << 3, ret);
-     return ret;
- }
-=20
-@@ -385,7 +385,7 @@ static uint64_t pflash_read(void *opaque, hwaddr offset=
-, unsigned int width)
-         }
-         break;
-     }
--    trace_pflash_io_read(offset, width, width << 1, ret, pfl->cmd, pfl->wc=
-ycle);
-+    trace_pflash_io_read(offset, width << 3, ret, pfl->cmd, pfl->wcycle);
-=20
-     return ret;
- }
-@@ -432,7 +432,7 @@ static void pflash_write(void *opaque, hwaddr offset, u=
-int64_t value,
-     uint8_t *p;
-     uint8_t cmd;
-=20
--    trace_pflash_io_write(offset, width, width << 1, value, pfl->wcycle);
-+    trace_pflash_io_write(offset, width << 3, value, pfl->wcycle);
-     cmd =3D value;
-     if (pfl->cmd !=3D 0xA0) {
-         /* Reset does nothing during chip erase and sector erase. */
-@@ -542,7 +542,7 @@ static void pflash_write(void *opaque, hwaddr offset, u=
-int64_t value,
-                 }
-                 goto reset_flash;
-             }
--            trace_pflash_data_write(offset, width << 1, value, 0);
-+            trace_pflash_data_write(offset, width << 3, value, 0);
-             if (!pfl->ro) {
-                 p =3D (uint8_t *)pfl->storage + offset;
-                 if (pfl->be) {
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 13d1b21dd4..b9e195e172 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -8,10 +8,10 @@ fdc_ioport_write(uint8_t reg, uint8_t value) "write reg 0=
-x%02x val 0x%02x"
- # pflash_cfi01.c
- pflash_reset(void) "reset"
- pflash_timer_expired(uint8_t cmd) "command 0x%02x done"
--pflash_io_read(uint64_t offset, int width, int fmt_width, uint32_t value, =
-uint8_t cmd, uint8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%0*x cm=
-d:0x%02x wcycle:%u"
--pflash_io_write(uint64_t offset, int width, int fmt_width, uint32_t value,=
- uint8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%0*x wcycle:%u"
--pflash_data_read(uint64_t offset, int width, uint32_t value) "data offset:=
-0x%04"PRIx64" value:0x%0*x"
--pflash_data_write(uint64_t offset, int width, uint32_t value, uint64_t cou=
-nter) "data offset:0x%04"PRIx64" value:0x%0*x counter:0x%016"PRIx64
-+pflash_io_read(uint64_t offset, int width, uint32_t value, uint8_t cmd, ui=
-nt8_t wcycle) "offset:0x%04"PRIx64" width:%d value:0x%04x cmd:0x%02x wcycle=
-:%u"
-+pflash_io_write(uint64_t offset, int width, uint32_t value, uint8_t wcycle=
-) "offset:0x%04"PRIx64" width:%d value:0x%04x wcycle:%u"
-+pflash_data_read(uint64_t offset, int width, uint32_t value) "data offset:=
-0x%04"PRIx64" width:%d value:0x%04x"
-+pflash_data_write(uint64_t offset, int width, uint32_t value, uint64_t cou=
-nter) "data offset:0x%04"PRIx64" width:%d value:0x%04x counter:0x%016"PRIx6=
-4
- pflash_manufacturer_id(uint16_t id) "Read Manufacturer ID: 0x%04x"
- pflash_device_id(uint16_t id) "Read Device ID: 0x%04x"
- pflash_device_info(uint64_t offset) "Read Device Information offset:0x%04"=
-PRIx64
---=20
-2.21.0
+On 11/8/19 3:09 PM, Alex Benn=C3=A9e wrote:
+>=20
+> Damien Hedde <damien.hedde@greensocs.com> writes:
+>=20
+>> Ensure we don't put too much register data in buffers. This avoids
+>> a buffer overflow (and stack corruption) when a target has lots
+>> of registers.
+>>
+>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>> ---
+>>
+>> Hi all,
+>>
+>> While working on a target with many registers. I found out the gdbstub
+>> may do buffer overflows when receiving a 'g' query (to read general
+>> registers). This patch prevents that.
+>>
+>> Gdb is pretty happy with a partial set of registers and queries
+>> remaining registers one by one when needed.
+>=20
+> Heh I was just looking at this code with regards to SVE (which can get
+> quite big).
 
+SVE ?
+
+>=20
+>>
+>> Regards,
+>> Damien
+>> ---
+>>  gdbstub.c | 13 +++++++++++--
+>>  1 file changed, 11 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/gdbstub.c b/gdbstub.c
+>> index 4cf8af365e..dde0cfe0fe 100644
+>> --- a/gdbstub.c
+>> +++ b/gdbstub.c
+>> @@ -1810,8 +1810,17 @@ static void handle_read_all_regs(GdbCmdContext =
+*gdb_ctx, void *user_ctx)
+>>      cpu_synchronize_state(gdb_ctx->s->g_cpu);
+>>      len =3D 0;
+>>      for (addr =3D 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs; addr++=
+) {
+>> -        len +=3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_bu=
+f + len,
+>> -                                 addr);
+>> +        int size =3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->me=
+m_buf + len,
+>> +                                     addr);
+>> +        if (len + size > MAX_PACKET_LENGTH / 2) {
+>> +            /*
+>> +             * Prevent gdb_ctx->str_buf overflow in memtohex() below.
+>> +             * As a consequence, send only the first registers conten=
+t.
+>> +             * Gdb will query remaining ones if/when needed.
+>> +             */
+>=20
+> Haven't we already potentially overflowed gdb_ctx->mem_buf though? I
+> suspect the better fix is for str_buf is to make it growable with
+> g_string and be able to handle arbitrary size conversions (unless the
+> spec limits us). But we still don't want a hostile gdbstub to be able t=
+o
+> spam memory by asking for registers that might be bigger than
+> MAX_PACKET_LENGTH bytes.
+
+For gdb_ctx->mem_buf  it's ok because it has also a size of
+MAX_PACKET_LENGTH. (assuming no single register can be bigger than
+MAX_PACKET_LENGTH)
+str_buf has a size of MAX_PACKET_LENGTH + 1
+
+I'm not sure I've understood the second part but if we increase the size
+of str_buf then we will need also a bigger packet buffer.
+
+The size here only depends on what are the target declared registers, so
+it depends only on the cpu target code.
+
+>=20
+>> +            break;
+>> +        }
+>> +        len +=3D size;
+>>      }
+>>
+>>      memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
+>=20
+>=20
+> --
+> Alex Benn=C3=A9e
+>=20
 
