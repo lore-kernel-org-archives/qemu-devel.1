@@ -2,85 +2,80 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF82C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:33:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C5C5FC6194
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:40:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8556520869
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:33:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 19F8F21D7F
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:40:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FDdSSR57"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8556520869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ryBkmpy6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F8F21D7F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT2Wa-0003HJ-Jz
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 06:33:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33639)
+	id 1iT2cU-0004lL-61
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 06:40:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34540)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iT2Vu-0002q7-UD
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:33:16 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iT2bk-0004Gs-HL
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:39:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iT2Vr-00037q-If
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:33:12 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:31186
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iT2Vr-00037Q-Cz
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:33:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573212790;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xHETSQ950wkWja+qUNXFzQL/4kxS3PBw+B6QaLDaHrE=;
- b=FDdSSR57ghEBYz7jzLveQMcCUjTuc059ELrZJgw3KsFh80eGBqDxuaqSnhNjns4BG4MIOw
- lpc3Fo6kJFRtKv1TWsM16wD5SPrnCsFjfxxheuRUHsNinQ6NkHLgG9J0BvvQFT/oMqg4MM
- SeodLOV4fQlb2K8VDRfnmsVo2FB3g+Q=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-115-fxXt_MQ-PdmIDgvJ6TOm1w-1; Fri, 08 Nov 2019 06:33:06 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6F131005500;
- Fri,  8 Nov 2019 11:33:04 +0000 (UTC)
-Received: from redhat.com (ovpn-112-63.ams2.redhat.com [10.36.112.63])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 31D14600CA;
- Fri,  8 Nov 2019 11:32:51 +0000 (UTC)
-Date: Fri, 8 Nov 2019 11:32:48 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [RFC v4 PATCH 49/49] multi-process: add configure and usage
- information
-Message-ID: <20191108113248.GJ182396@redhat.com>
-References: <cover.1571905346.git.jag.raman@oracle.com>
- <2736d12f29d2c9051966864b5d865ab0f392b8d1.1571905346.git.jag.raman@oracle.com>
- <20191107140220.GI365089@stefanha-x1.localdomain>
- <20191107093059-mutt-send-email-mst@kernel.org>
- <20191108111741.GD402228@stefanha-x1.localdomain>
+ (envelope-from <stefanha@gmail.com>) id 1iT2bj-0007TH-Bo
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:39:16 -0500
+Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:36418)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iT2bj-0007Sv-8B
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:39:15 -0500
+Received: by mail-qv1-xf42.google.com with SMTP id f12so2063659qvu.3
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 03:39:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=3/u9uKFOo6nKSeTC0Qc8SlldVIziaDkN1sEcEVyf2rw=;
+ b=ryBkmpy6kg8FsdWhQscKFhX7aOyFilL1Ngn+B/r/ieib3jkV3GtIBZddR5aw8Gag0p
+ GlC6YrGamONyMpv8HmVqfla/SA7OOL5DeqxiVIVBd1yxdBoEtFkRzjof0j2Os8wP/hEq
+ HnJtx+UxwSnyxHSaRHZd3+EhcLbDVrzTGqIAQ6iULdVVpZ6q2thbq4GV+k5QCyXSD8oW
+ 491ytJbn4HNqG97wiqnAxQgY/CTQ47YX6Dg5mS3fb35Kzfv9N80DdoBg4bMSw9cnbT0y
+ 3uUGp387+phFtMd2OfNstMMxozviv2NWz05MX/g6ktBjkuG1MXvKikLR0Kg9vxoMlt9b
+ U/eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=3/u9uKFOo6nKSeTC0Qc8SlldVIziaDkN1sEcEVyf2rw=;
+ b=Wem/3nV0jfKnoh9l/PQqioc601l9hmU+soPx+ODds6RutmCObxzMRCCsJS3YaWeT7K
+ Q/lJaYJUrM5nJ5IhZ4/2pzbLPOURJk9GYcE9gmWeX1aoHHV2akDPYGaIoNT7y6qjk5jF
+ ssiYfgbb5kvCut2D9Jd/vjsBQ+AFG3ymLu3eCzfeJsNtoYDwDFucQZVoGRqbi9S+JXXV
+ dOErLgg0lFygp998k4rLL4rS6NmtIJDRHPo7Qs/kgSPMEFoCK+JcCBG5+8PpPxB0MYyi
+ /9yRQY2yVJDAGuSOM8mTgT8HvQ5AbXzE/tBt2hFM5mOMD9Mzu7pW6C4C5gRS0Dcpus7w
+ qnQg==
+X-Gm-Message-State: APjAAAUdnRcu8Q3xF/KIDn0wycu6Uu1IlS1tRNQELK8VuPtkM3Qx5Oh3
+ MVCNvQADDywEDL+dJWXA1JnTt/hzadK+yhFrvBY=
+X-Google-Smtp-Source: APXvYqxcD0PkzErDLslrA/q1KkciWWpWiuJPrAN9szTQcb8nXkJ9kwV5BTbiuxSQWQu/A5tlRsHM4DoOJaAeOLyRg3w=
+X-Received: by 2002:a0c:87b5:: with SMTP id 50mr8950415qvj.143.1573213154395; 
+ Fri, 08 Nov 2019 03:39:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191108111741.GD402228@stefanha-x1.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: fxXt_MQ-PdmIDgvJ6TOm1w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20191108095942.401225-1-stefanha@redhat.com>
+ <20191108095942.401225-3-stefanha@redhat.com>
+ <CAFEAcA8b_POWyCWERMaT2mKZxrYA+RDoaLCHtO=pS28f-SCZ3w@mail.gmail.com>
+In-Reply-To: <CAFEAcA8b_POWyCWERMaT2mKZxrYA+RDoaLCHtO=pS28f-SCZ3w@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Fri, 8 Nov 2019 12:39:02 +0100
+Message-ID: <CAJSP0QWoSNk7NmC+AjgWQenyKLw6H5wqHay8C-1evQ8QTrSJ6Q@mail.gmail.com>
+Subject: Re: [PATCH 2/3] docs: build a global index page
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::f42
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,86 +87,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, kraxel@redhat.com,
- Jagannathan Raman <jag.raman@oracle.com>, quintela@redhat.com,
- "Michael S. Tsirkin" <mst@redhat.com>, armbru@redhat.com,
- kanth.ghatraju@oracle.com, thuth@redhat.com, ehabkost@redhat.com,
- konrad.wilk@oracle.com, dgilbert@redhat.com, liran.alon@oracle.com,
- rth@twiddle.net, kwolf@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Daniel Berrange <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 08, 2019 at 12:17:41PM +0100, Stefan Hajnoczi wrote:
-> On Thu, Nov 07, 2019 at 09:33:45AM -0500, Michael S. Tsirkin wrote:
-> > On Thu, Nov 07, 2019 at 03:02:20PM +0100, Stefan Hajnoczi wrote:
-> > > This documentation suggests that QEMU spawns the remote processes.  H=
-ow
-> > > do this work with unprivileged QEMU?  Is there an additional step whe=
-re
-> > > QEMU drops privileges after having spawned remote processes?
-> > >=20
-> > > Remote processes require accesses to resources that the main QEMU
-> > > process does not need access to, so I'm wondering how this process mo=
-del
-> > > ensures that each process has only the privileges it needs.
-> >=20
-> > I guess you have something like capabilities in mind?
->=20
-> Or namespaces (unshare(2)).
->=20
-> > When using something like selinux, priviledges are per binary
-> > so the order of startup doesn't matter.
->=20
-> For static SELinux policies that make sense, thanks for explaining.
->=20
-> Does libvirt also perform dynamic (i.e. per-instance) SELinux
-> configuration?  I guess that cannot be associated with a specific binary
-> because multiple QEMU instances launch the same binary yet need to be
-> differentiated.
+On Fri, Nov 8, 2019 at 11:52 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+> On Fri, 8 Nov 2019 at 09:59, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> > Build docs/ in a single sphinx invocation instead of treating
+> > docs/{devel,interop,specs} separately.  This allows us to build a global
+> > index page that links to documentation across the different manuals.
+> >
+> > Some documentation is built outside of sphinx and is not formatted as
+> > reStructuredText.  Link directly to the .html files for the time being.
+> > If they are converted to .rst files in the future they can be included
+> > more elegantly.
+> >
+> > Sphinx wants to build all .rst files and complains if they are not
+> > listed in the table of contents.  We have not yet reviewed and
+> > categorized some of our .rst files.  Hide these files so they are always
+> > built (and syntax-checked from now on!) but not visible in the table of
+> > contents.
+>
+> So the reason I went for the odd "run sphinx multiple times"
+> approach was because we don't want to ship 'devel' to users,
+> and as far as I could tell there was no way to have a
+> single-invocation build of the docs not include it in
+> eg the index/search (which would then be broken when
+> we don't install devel/ as part of 'make install').
+> Does this patchset result in a set of installed docs
+> that don't have dangling references ?
 
-In a traditional SELinux approach, the SELinux context used for any
-process is determined by a combination of the label on the binary
-and a transition rule.
+You are right:
+ * The hidden documents are included in the navigation bar (different
+from the table of contents).
+ * The search index (which install-doc omits!) includes content from
+the hidden documents.
 
-eg if the qemu-system-x86_64 file is labelled qemu_exec_t, and
-there's a context qemu_t for the QEMU process, a transition
-rule is defined  "virtd_t + qemu_exec_t ->  qemu_t". This says
-that when a process with context "vird_t" execs a binary labelled
-qemu_exec_t, the new process gets qemu_t.
+I have asked on #sphinx-doc.  Let's see if there is a solution.
 
-We sVirt, however, we can't rely on automatic transitions, because
-we need to assign a unique MCS tag for each VM. Thus libvird will
-explicitly tell SELinux what label to apply.
+It might be possible to hack docs/config.py to exclude devel/ when run
+from make install-sphinxdocs
+(https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-exclude_patterns).
+This requires building the docs again at install time but the
+advantage is we get a single searchable set of documentation.
 
-In the case of multiprocess QEMU, if using sVirt from libvirt, then
-we'll need to continue setting the explicit labels as we'll still
-need the MCS tags for each helper process.
-
-If not using libvirt and sVirt, and wanting automatic SELinux
-transitions for QEMU helper processes, then each helper would
-need to be a separate binary on disk so that each helper can
-be given a distinct file label, which in turns lets you define
-a set of transitions for each helper according to its expected
-access needs.
-
-Having said all that I don't think its worth worrying about
-this. Anyone who cares about SELinux with QEMU will want to
-be using sVirt  or an equivalent approach to assign unique
-MCS per VM. And thus automatic transitions are not possible
-even if we had distinct binaries for each helper.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+Stefan
 
