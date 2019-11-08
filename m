@@ -2,80 +2,82 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE13C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:37:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F39C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:37:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5662021882
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:37:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E799A21882
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:37:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rMIaImtN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5662021882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aUxhLplX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E799A21882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT6KJ-0008St-Af
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:37:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50957)
+	id 1iT6Kb-0000Tx-W2
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:37:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48757)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iT6BU-0007iK-28
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:28:24 -0500
+ (envelope-from <armbru@redhat.com>) id 1iT5zV-0002Hf-Ro
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:16:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iT6BS-0001Vr-TK
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:28:23 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36759)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iT6BS-0001Vb-NL
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:28:22 -0500
-Received: by mail-oi1-x242.google.com with SMTP id j7so5567833oib.3
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 07:28:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lp11khKQaPh+6YHpEsxMg/MHNXsCrT4eT+O+6aCFVGs=;
- b=rMIaImtNNNn23rX7Ii/0yuKzn5Z55YCqSxDMB3+bt871XCGy4dGArABNKwYgI6zraX
- 9gIbwFIi+595P5n3pCZPdMQatAEKAmv4ZNe6emrS8p1mal9BtSBfaXhHPA9feM/Cd780
- t++g8QxeBgRx/nGGRXLvMJuOyjVDDN4qgd0DLstUKrs02ZV9HYzapN8MuMLfZBCRrTee
- rxWFyOiOdRf3J4QyAyoioCkeUjUHLnJ9y+R1C1nvxVuYZl/h3t9aFMa2bmL70IbsDR4+
- r+BZqRvdmZg2RlhY6kk/BAjVVMmFjNN7uhwUqBgQ0svmyW5HVTwu5ueTJwqKT2Iet6hq
- l0nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=lp11khKQaPh+6YHpEsxMg/MHNXsCrT4eT+O+6aCFVGs=;
- b=hD82fQW45/ijMBvueQecLL/M8COn3Ov0l5d6nAuhETFKPlO1Y7BWOs1EzyJE68nG+j
- x5V/tN2OkUjSH+w9QwJ8hhJMiKCHC9INPDeIuZmrfcMKBwvIFZ87iQweBbqxDG2YMXkQ
- Pv9m2OrA2swyLYWnpI3/SS+0M83pGHq3mGECdKHOLVkygk67Y+uHA/53eBN1IJOXyWjU
- 4KXi0X6ygraIguOSHdr7JDcdE7AR8EOwZ12+ydlcOwD0SvnQD1/YTAdc7dtA/dvMKRIA
- ce5XTnaXyEy9axPpA929s83jZs2xp7JziP9/c5ncOfwuTsr/SQ6+xTuN7JSbCregyXSq
- ZKsQ==
-X-Gm-Message-State: APjAAAVtb00whYDrv+GuUUjt/GnI2smQk59XaSdJNkzdLlZttsqwZ6dY
- afyslSB4Jt5ZXBTkywRkP3s07wB8dcRbh4ItHxc2Yw==
-X-Google-Smtp-Source: APXvYqzqMYQfldKdiKe3TkeiRTG3tBB8DWOSr+m8V5qrIs5d2CqIcUYyLZg4/brCCZ/OCVFFjwO94ZOFza06NBBD1w8=
-X-Received: by 2002:aca:451:: with SMTP id 78mr10302671oie.170.1573226901895; 
- Fri, 08 Nov 2019 07:28:21 -0800 (PST)
+ (envelope-from <armbru@redhat.com>) id 1iT5zT-0001hZ-A2
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:16:01 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28095
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iT5zT-0001fz-5k
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:15:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573226157;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9uGkM2ScxKkd527ZctXcwbbvuzGfdXH3Rau2IM2RRUk=;
+ b=aUxhLplXgb8ZYPWdrAduh3dhiwWYv4vWkR15fnpROZZ+rfaaIHnqgVK/EtIJ5UiFrRlooM
+ wd58gxqJ1b3z0z2ZfiOKqDB5GHLmsNpJrLVy3VkiHOFFxAN8Jq4nm8k2fHQgMlW9iaiMWh
+ ayj49PXh5PZ7B6sW7y3OjOtmXEziwZc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-64-yKCHPV2QNDSCXZagHpSY1A-1; Fri, 08 Nov 2019 10:15:53 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 979B48017DD;
+ Fri,  8 Nov 2019 15:15:52 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 65C405DA81;
+ Fri,  8 Nov 2019 15:15:52 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id D940F11385C9; Fri,  8 Nov 2019 16:15:50 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Subject: Re: [PATCH v2] ivshmem-server: Terminate also on SIGINT
+References: <99c1a7bd-1876-66a2-4b8e-d5bc86116fe7@web.de>
+ <fed41c57-c433-9723-e5db-5eb3a10c4f8b@siemens.com>
+Date: Fri, 08 Nov 2019 16:15:50 +0100
+In-Reply-To: <fed41c57-c433-9723-e5db-5eb3a10c4f8b@siemens.com> (Jan Kiszka's
+ message of "Fri, 8 Nov 2019 10:08:31 +0100")
+Message-ID: <87a7968km1.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-References: <20191018150630.31099-1-damien.hedde@greensocs.com>
- <efef625a-8162-5454-128f-489d636563a1@greensocs.com>
- <aae84bfb-e735-0aac-124c-9abbdea882ff@greensocs.com>
-In-Reply-To: <aae84bfb-e735-0aac-124c-9abbdea882ff@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Nov 2019 15:28:09 +0000
-Message-ID: <CAFEAcA9QW1JTg72YiGDxuEi5Dip99KUxuHAqDnVma1=A_qqbQQ@mail.gmail.com>
-Subject: Re: [PATCH v5 00/13] Multi-phase reset mechanism
-To: Damien Hedde <damien.hedde@greensocs.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: yKCHPV2QNDSCXZagHpSY1A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,35 +89,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x <qemu-s390x@nongnu.org>,
- Cornelia Huck <cohuck@redhat.com>, Mark Burton <mark.burton@greensocs.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgari@xilinx.com>,
- qemu-arm <qemu-arm@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-trivial@nongnu.org, qemu-devel <qemu-devel@nongnu.org>,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 8 Nov 2019 at 15:26, Damien Hedde <damien.hedde@greensocs.com> wrote:
->
->
-> On 10/29/19 4:53 PM, Damien Hedde wrote:
-> > Hi,
-> >
-> > Does anyone has comment about the interface / patch 3 ?
-> > Should I try to split it ?
->
-> ping
+Jan Kiszka <jan.kiszka@siemens.com> writes:
 
-Hi; this patchset is still in my to-review queue, but we've
-just gone into softfreeze for 4.2 so I'm a bit short on time
-to look at anything that's not for this release.
+> On 03.08.19 15:22, Jan Kiszka wrote:
+>> From: Jan Kiszka <jan.kiszka@siemens.com>
+>>
+>> Allows to shutdown a foreground session via ctrl-c.
+>>
+>> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+>> ---
+>>
+>> Changes in v2:
+>>   - adjust error message
+>>
+>>   contrib/ivshmem-server/main.c | 5 +++--
+>>   1 file changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/contrib/ivshmem-server/main.c b/contrib/ivshmem-server/main=
+.c
+>> index 197c79c57e..e4cd35f74c 100644
+>> --- a/contrib/ivshmem-server/main.c
+>> +++ b/contrib/ivshmem-server/main.c
+>> @@ -223,8 +223,9 @@ main(int argc, char *argv[])
+>>       sa_quit.sa_handler =3D ivshmem_server_quit_cb;
+>>       sa_quit.sa_flags =3D 0;
+>>       if (sigemptyset(&sa_quit.sa_mask) =3D=3D -1 ||
+>> -        sigaction(SIGTERM, &sa_quit, 0) =3D=3D -1) {
+>> -        perror("failed to add SIGTERM handler; sigaction");
+>> +        sigaction(SIGTERM, &sa_quit, 0) =3D=3D -1 ||
+>> +        sigaction(SIGINT, &sa_quit, 0) =3D=3D -1) {
+>> +        perror("failed to add signal handler; sigaction");
+>>           goto err;
+>>       }
+>>
+>> --
+>> 2.16.4
+>>
+>>
+>
+> ...and this one for you as well, Markus?
 
-I do definitely want to get this patchset in early in the
-5.0 release cycle though.
+Cc: qemu-trivial
 
-thanks
--- PMM
 
