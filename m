@@ -2,79 +2,87 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21DB8FC6195
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D03C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:55:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E2998215EA
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:52:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E9D5215EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:55:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CNLrWiw+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2998215EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="fAoa+ebF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E9D5215EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT5d1-0008Dj-52
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 09:52:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44470)
+	id 1iT5ft-0000p3-8t
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 09:55:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44530)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iT5cK-0007lw-Rt
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:52:08 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1iT5ch-00084D-AS
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:52:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iT5cG-0005xs-Mp
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:52:04 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:24975
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1iT5cf-00068r-So
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:52:27 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:59986)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iT5cG-0005xe-JX
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:52:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573224719;
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1iT5cf-00068d-JE
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:52:25 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 8A8D896EF0;
+ Fri,  8 Nov 2019 14:52:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1573224743;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jSrtBdqsZCJ2ZmxXF7f1wcoDJ6RojzjaEd3a3FwYmtU=;
- b=CNLrWiw++FNcAo9Ai4Rn9ruO3OkDRMO7tCX1xMKzWVKt7NMn47PfnydJkrDrQOvqfdMaMb
- xMT80rWXaw/nLqSLnKsjlQwfOWfsM40nx91iMQiczTJVsyTpPvxsxAEnz4Lonncn0CjP+j
- YpvMWA5qLoLrToAhPqu6MRmdAr/foL0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-249-gZQdrMsfPL-K4AS84LW-bA-1; Fri, 08 Nov 2019 09:51:56 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10E6A1005500;
- Fri,  8 Nov 2019 14:51:55 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 420245D6AE;
- Fri,  8 Nov 2019 14:51:49 +0000 (UTC)
-Date: Fri, 8 Nov 2019 15:51:47 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v15 12/12] tests/bios-tables-test: add test cases for
- ACPI HMAT
-Message-ID: <20191108155147.7d64663b@redhat.com>
-In-Reply-To: <20191107074511.14304-13-tao3.xu@intel.com>
-References: <20191107074511.14304-1-tao3.xu@intel.com>
- <20191107074511.14304-13-tao3.xu@intel.com>
+ bh=6DNOQ7vsYv2z6bevm4oIlQT8k2RPxSG1KI7v84PEqb4=;
+ b=fAoa+ebF9Iq2mPSUnIW7RQUx5KdvkDrCN1xyklY38AxKW92+evyQu0uB2r2Zqa13mAmhQa
+ Z3LGr1G11k/m1AFajLJkV0jyCynl/qHKYUpHXKJT8GrH0gmBhbATySrsjqNW+pGMYDa3G1
+ yyHl+YArkqWUgMBSTiQZPxB8pevS0Zk=
+Subject: Re: [PATCH] gdbstub: Fix buffer overflow in handle_read_all_regs
+From: Damien Hedde <damien.hedde@greensocs.com>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20191108125534.114474-1-damien.hedde@greensocs.com>
+ <877e4ah32n.fsf@linaro.org>
+ <7aa732a4-b67f-855f-0432-290580fc239d@greensocs.com>
+Message-ID: <2be19dae-bc42-972c-18d9-ab332e98c825@greensocs.com>
+Date: Fri, 8 Nov 2019 15:52:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: gZQdrMsfPL-K4AS84LW-bA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+In-Reply-To: <7aa732a4-b67f-855f-0432-290580fc239d@greensocs.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1573224743;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6DNOQ7vsYv2z6bevm4oIlQT8k2RPxSG1KI7v84PEqb4=;
+ b=us3D3rbpqx3ST2cqThYBZCMiYUw7rsq6LCYktijR10y8xFnh1druNmhBvq1+sYfmAs0Z1n
+ EDCbguV21I53ViuIcmqrURmg9zB7Pw467hTfFu30J+STVfkv+N+qXK8nxuGhyMqgkgGzmk
+ 4lxeHW0RQqejLpeXDdfq55RMqs0xa5k=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1573224743; a=rsa-sha256; cv=none;
+ b=uOv8481B9JFkB/wsUEikoA5QXVgIE1UWCPWzTzRCdlcT9WkKReSVSE/bgssmcS56dH1VpX
+ 452eUmE3v8tTPCoVJxUtmR9wC8q9UfU+XsFRmG/gsJOZQ9kSHTmhRJC1OqDaZNr2iLz4H+
+ jyjnw9vOLNBmj+Buo6pqVAhSWmaKcMw=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,192 +94,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, jingqi.liu@intel.com, fan.du@intel.com,
- mdroth@linux.vnet.ibm.com, Daniel Black <daniel@linux.ibm.com>,
- armbru@redhat.com, jonathan.cameron@huawei.com
+Cc: philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  7 Nov 2019 15:45:11 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
 
-> ACPI table HMAT has been introduced, QEMU now builds HMAT tables for
-> Heterogeneous Memory with boot option '-numa node'.
+
+On 11/8/19 3:43 PM, Damien Hedde wrote:
 >=20
-> Add test cases on PC and Q35 machines with 2 numa nodes.
-> Because HMAT is generated when system enable numa, the
-> following tables need to be added for this test:
->     tests/data/acpi/pc/APIC.acpihmat
->     tests/data/acpi/pc/SRAT.acpihmat
->     tests/data/acpi/pc/HMAT.acpihmat
->     tests/data/acpi/pc/DSDT.acpihmat
->     tests/data/acpi/q35/APIC.acpihmat
->     tests/data/acpi/q35/SRAT.acpihmat
->     tests/data/acpi/q35/HMAT.acpihmat
->     tests/data/acpi/q35/DSDT.acpihmat
-
-on top of this we need to check that configuring via
-QAPI works as well.
-
-Add an extra test as a separate patch on top,
-building the same topology (so we could reuse the same reference tables)
-using set-numa-node/--preconfig.
-
-See pc_dynamic_cpu_cfg() and for example how to use set-numa-node
-over QMP.
-
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-> Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
-> Suggested-by: Igor Mammedov <imammedo@redhat.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
 >=20
-> Changes in v15:
->     - Make tests without breaking CI (Michael)
+> On 11/8/19 3:09 PM, Alex Benn=C3=A9e wrote:
+>>
+>> Damien Hedde <damien.hedde@greensocs.com> writes:
+>>
+>>> Ensure we don't put too much register data in buffers. This avoids
+>>> a buffer overflow (and stack corruption) when a target has lots
+>>> of registers.
+>>>
+>>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+>>> ---
+>>>
+>>> Hi all,
+>>>
+>>> While working on a target with many registers. I found out the gdbstu=
+b
+>>> may do buffer overflows when receiving a 'g' query (to read general
+>>> registers). This patch prevents that.
+>>>
+>>> Gdb is pretty happy with a partial set of registers and queries
+>>> remaining registers one by one when needed.
+>>
+>> Heh I was just looking at this code with regards to SVE (which can get
+>> quite big).
 >=20
-> Changes in v13:
->     - Use decimal notation with appropriate suffix for cache size
-> ---
->  tests/bios-tables-test-allowed-diff.h |  8 +++++
->  tests/bios-tables-test.c              | 44 +++++++++++++++++++++++++++
->  tests/data/acpi/pc/APIC.acpihmat      |  0
->  tests/data/acpi/pc/DSDT.acpihmat      |  0
->  tests/data/acpi/pc/HMAT.acpihmat      |  0
->  tests/data/acpi/pc/SRAT.acpihmat      |  0
->  tests/data/acpi/q35/APIC.acpihmat     |  0
->  tests/data/acpi/q35/DSDT.acpihmat     |  0
->  tests/data/acpi/q35/HMAT.acpihmat     |  0
->  tests/data/acpi/q35/SRAT.acpihmat     |  0
->  10 files changed, 52 insertions(+)
->  create mode 100644 tests/data/acpi/pc/APIC.acpihmat
->  create mode 100644 tests/data/acpi/pc/DSDT.acpihmat
->  create mode 100644 tests/data/acpi/pc/HMAT.acpihmat
->  create mode 100644 tests/data/acpi/pc/SRAT.acpihmat
->  create mode 100644 tests/data/acpi/q35/APIC.acpihmat
->  create mode 100644 tests/data/acpi/q35/DSDT.acpihmat
->  create mode 100644 tests/data/acpi/q35/HMAT.acpihmat
->  create mode 100644 tests/data/acpi/q35/SRAT.acpihmat
+> SVE ?
 >=20
-> diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-te=
-st-allowed-diff.h
-> index dfb8523c8b..3c9e0c979b 100644
-> --- a/tests/bios-tables-test-allowed-diff.h
-> +++ b/tests/bios-tables-test-allowed-diff.h
-> @@ -1 +1,9 @@
->  /* List of comma-separated changed AML files to ignore */
-> +"tests/data/acpi/pc/APIC.acpihmat",
-> +"tests/data/acpi/pc/SRAT.acpihmat",
-> +"tests/data/acpi/pc/HMAT.acpihmat",
-> +"tests/data/acpi/pc/DSDT.acpihmat",
-> +"tests/data/acpi/q35/APIC.acpihmat",
-> +"tests/data/acpi/q35/SRAT.acpihmat",
-> +"tests/data/acpi/q35/HMAT.acpihmat",
-> +"tests/data/acpi/q35/DSDT.acpihmat",
-> diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-> index 0b33fb265f..96803c1f20 100644
-> --- a/tests/bios-tables-test.c
-> +++ b/tests/bios-tables-test.c
-> @@ -947,6 +947,48 @@ static void test_acpi_virt_tcg_numamem(void)
-> =20
->  }
-> =20
-> +static void test_acpi_tcg_acpi_hmat(const char *machine)
-> +{
-> +    test_data data;
-> +
-> +    memset(&data, 0, sizeof(data));
-> +    data.machine =3D machine;
-> +    data.variant =3D ".acpihmat";
-> +    test_acpi_one(" -machine hmat=3Don"
-> +                  " -smp 2,sockets=3D2"
-> +                  " -m 128M,slots=3D2,maxmem=3D1G"
-> +                  " -object memory-backend-ram,size=3D64M,id=3Dm0"
-> +                  " -object memory-backend-ram,size=3D64M,id=3Dm1"
-> +                  " -numa node,nodeid=3D0,memdev=3Dm0"
-> +                  " -numa node,nodeid=3D1,memdev=3Dm1,initiator=3D0"
-> +                  " -numa cpu,node-id=3D0,socket-id=3D0"
-> +                  " -numa cpu,node-id=3D0,socket-id=3D1"
-> +                  " -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dm=
-emory,"
-> +                  "data-type=3Daccess-latency,latency=3D5ns"
-> +                  " -numa hmat-lb,initiator=3D0,target=3D0,hierarchy=3Dm=
-emory,"
-> +                  "data-type=3Daccess-bandwidth,bandwidth=3D500M"
-> +                  " -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dm=
-emory,"
-> +                  "data-type=3Daccess-latency,latency=3D10ns"
-> +                  " -numa hmat-lb,initiator=3D0,target=3D1,hierarchy=3Dm=
-emory,"
-> +                  "data-type=3Daccess-bandwidth,bandwidth=3D100M"
-> +                  " -numa hmat-cache,node-id=3D0,size=3D10K,level=3D1,as=
-soc=3Ddirect,"
-> +                  "policy=3Dwrite-back,line=3D8"
-> +                  " -numa hmat-cache,node-id=3D1,size=3D10K,level=3D1,as=
-soc=3Ddirect,"
-> +                  "policy=3Dwrite-back,line=3D8",
-> +                  &data);
-> +    free_test_data(&data);
-> +}
-> +
-> +static void test_acpi_q35_tcg_acpi_hmat(void)
-> +{
-> +    test_acpi_tcg_acpi_hmat(MACHINE_Q35);
-> +}
-> +
-> +static void test_acpi_piix4_tcg_acpi_hmat(void)
-> +{
-> +    test_acpi_tcg_acpi_hmat(MACHINE_PC);
-> +}
-> +
->  static void test_acpi_virt_tcg(void)
->  {
->      test_data data =3D {
-> @@ -991,6 +1033,8 @@ int main(int argc, char *argv[])
->          qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
->          qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_px=
-m);
->          qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
-> +        qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_h=
-mat);
-> +        qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat)=
-;
->      } else if (strcmp(arch, "aarch64") =3D=3D 0) {
->          qtest_add_func("acpi/virt", test_acpi_virt_tcg);
->          qtest_add_func("acpi/virt/numamem", test_acpi_virt_tcg_numamem);
-> diff --git a/tests/data/acpi/pc/APIC.acpihmat b/tests/data/acpi/pc/APIC.a=
-cpihmat
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/tests/data/acpi/pc/DSDT.acpihmat b/tests/data/acpi/pc/DSDT.a=
-cpihmat
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/tests/data/acpi/pc/HMAT.acpihmat b/tests/data/acpi/pc/HMAT.a=
-cpihmat
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/tests/data/acpi/pc/SRAT.acpihmat b/tests/data/acpi/pc/SRAT.a=
-cpihmat
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/tests/data/acpi/q35/APIC.acpihmat b/tests/data/acpi/q35/APIC=
-.acpihmat
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/tests/data/acpi/q35/DSDT.acpihmat b/tests/data/acpi/q35/DSDT=
-.acpihmat
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/tests/data/acpi/q35/HMAT.acpihmat b/tests/data/acpi/q35/HMAT=
-.acpihmat
-> new file mode 100644
-> index 0000000000..e69de29bb2
-> diff --git a/tests/data/acpi/q35/SRAT.acpihmat b/tests/data/acpi/q35/SRAT=
-.acpihmat
-> new file mode 100644
-> index 0000000000..e69de29bb2
+>>
+>>>
+>>> Regards,
+>>> Damien
+>>> ---
+>>>  gdbstub.c | 13 +++++++++++--
+>>>  1 file changed, 11 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/gdbstub.c b/gdbstub.c
+>>> index 4cf8af365e..dde0cfe0fe 100644
+>>> --- a/gdbstub.c
+>>> +++ b/gdbstub.c
+>>> @@ -1810,8 +1810,17 @@ static void handle_read_all_regs(GdbCmdContext=
+ *gdb_ctx, void *user_ctx)
+>>>      cpu_synchronize_state(gdb_ctx->s->g_cpu);
+>>>      len =3D 0;
+>>>      for (addr =3D 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs; addr+=
++) {
+>>> -        len +=3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_b=
+uf + len,
+>>> -                                 addr);
+>>> +        int size =3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->m=
+em_buf + len,
+>>> +                                     addr);
+>>> +        if (len + size > MAX_PACKET_LENGTH / 2) {
+>>> +            /*
+>>> +             * Prevent gdb_ctx->str_buf overflow in memtohex() below=
+.
+>>> +             * As a consequence, send only the first registers conte=
+nt.
+>>> +             * Gdb will query remaining ones if/when needed.
+>>> +             */
+>>
+>> Haven't we already potentially overflowed gdb_ctx->mem_buf though? I
+>> suspect the better fix is for str_buf is to make it growable with
+>> g_string and be able to handle arbitrary size conversions (unless the
+>> spec limits us). But we still don't want a hostile gdbstub to be able =
+to
+>> spam memory by asking for registers that might be bigger than
+>> MAX_PACKET_LENGTH bytes.
+>=20
+> For gdb_ctx->mem_buf  it's ok because it has also a size of
+> MAX_PACKET_LENGTH. (assuming no single register can be bigger than
+> MAX_PACKET_LENGTH)
+sorry, it is MAX_PACKET_LENGTH / 2 for the max single register allowed si=
+ze.
 
+> str_buf has a size of MAX_PACKET_LENGTH + 1
+>=20
+> I'm not sure I've understood the second part but if we increase the siz=
+e
+> of str_buf then we will need also a bigger packet buffer.
+>=20
+> The size here only depends on what are the target declared registers, s=
+o
+> it depends only on the cpu target code.
+>=20
+>>
+>>> +            break;
+>>> +        }
+>>> +        len +=3D size;
+>>>      }
+>>>
+>>>      memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+>>
+>=20
 
