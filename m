@@ -2,82 +2,80 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B24BC5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 855F2C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:58:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0453321D6C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:48:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D258222C2
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:58:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="emwCxC1d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0453321D6C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="LDqbLWwo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D258222C2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT3gT-0006lM-1P
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 07:48:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46593)
+	id 1iT3qQ-0000nX-9f
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 07:58:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48038)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iT3eY-0005KL-3v
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:46:15 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1iT3ng-0000Ax-Tx
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:55:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iT3eV-0003EF-UP
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:46:13 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59539
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <damien.hedde@greensocs.com>) id 1iT3nf-0003Mw-IW
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:55:40 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:55632)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iT3eV-0003Dt-QF
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:46:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573217170;
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1iT3nf-0003JI-4I
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:55:39 -0500
+Received: from crumble.bar.greensocs.com (crumble.bar.greensocs.com
+ [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPS id 45B8B96EF0;
+ Fri,  8 Nov 2019 12:55:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1573217736;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SUo1SvmRW1T9BAStRLEJxmsliYF+9UWqSz6o0sDmKsg=;
- b=emwCxC1dc8yZmKE04eJUjd6mZBE5jw/DrPMGVDSh/KGgMPh0FgQxzsICed9bYqQk8kQBwP
- X05TEEhbimtkyfX67AxnpJg+ETfhGtLzXCoGe7XTq6+TUH/WXsvz6Cjdgn/dqG/HqqNHKW
- uUbyEOQsSmMqoCGf/ZznFSacrSfZ3nI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-y3ixSvJYPX6lHnb20KvhaA-1; Fri, 08 Nov 2019 07:46:09 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A14D58017DD;
- Fri,  8 Nov 2019 12:46:07 +0000 (UTC)
-Received: from [10.36.117.63] (ovpn-117-63.ams2.redhat.com [10.36.117.63])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 02AC060BE1;
- Fri,  8 Nov 2019 12:46:01 +0000 (UTC)
-Subject: Re: [PATCH v1 0/2] s390x/cpumodel: Introduce "best" model variants
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191108110714.7475-1-david@redhat.com>
- <CAFEAcA-mD3-Zg2JunGpMqbcaT1qboCenhqEFytZD0FmFcL2i9Q@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <5dd613c0-6d9e-b943-b64d-7ba1791cbefe@redhat.com>
-Date: Fri, 8 Nov 2019 13:46:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=uBAIGING6GHSPD3RtNAZAtENTduFCSOlXmknrLi40VU=;
+ b=LDqbLWwoTOYgreCMXH7TOnLr6OqBTG3NxAjXCLrJTpd6CGnrFE5T/hmlj+3B7V5iYtvNe4
+ +2ZXUXnrFQThPuJa5kar/mSU0KEqSpNo1H02U6W1VqWfTRrzsYvuypw5OT4i8YyBKMdHLk
+ siVN7i2e+nNh8mlBNlZLU4icV1uFo4c=
+From: Damien Hedde <damien.hedde@greensocs.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] gdbstub: Fix buffer overflow in handle_read_all_regs
+Date: Fri,  8 Nov 2019 13:55:34 +0100
+Message-Id: <20191108125534.114474-1-damien.hedde@greensocs.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-mD3-Zg2JunGpMqbcaT1qboCenhqEFytZD0FmFcL2i9Q@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: y3ixSvJYPX6lHnb20KvhaA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1573217736;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=uBAIGING6GHSPD3RtNAZAtENTduFCSOlXmknrLi40VU=;
+ b=5F/GFt3Jjx7+NUCvkPlCfHlp9UwggQ+ZrEODrRcnzqeoXyhxcb21BXy7NUeghLR1+SXqKK
+ vE4j7baxZiidt+//Z5EceEhkiujEJhXcq5a3H5BgIJ1VlM1L/Jyr7S4lo4xseDUMOXhJPl
+ Yf6StHW1ODL6rNNQ30XjmRYiaVIzaZk=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1573217736; a=rsa-sha256; cv=none;
+ b=Wu6wBDbIwAjC3G8Uo0NtH+4CJ8ST5lVIYxYG/zLRXN1vyTFKy1eYH7jQXceKkc5hZjtkpd
+ +O0PXjk5ruo8zHMDMtmqN4D4+ZDfMdTld+brWI77dc6O+i++v9j/b3SpD54rijP8tXQ+S5
+ EJD70DwHj2FX7bafyUZ2kJwpzlEou3c=
+ARC-Authentication-Results: i=1;
+	beetle.greensocs.com;
+	none
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,98 +87,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Michael Mueller <mimu@linux.ibm.com>,
- Jiri Denemark <jdenemar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Damien Hedde <damien.hedde@greensocs.com>, philmd@redhat.com,
+ alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08.11.19 12:10, Peter Maydell wrote:
-> On Fri, 8 Nov 2019 at 11:08, David Hildenbrand <david@redhat.com> wrote:
->>
->> There was recently a discussion regarding CPU model versions. That conce=
-pt
->> does not fit s390x where we have a lot of feature variability. I
->> proposed an alternative approach in [1], which might work for x86 as wel=
-l
->> (but I am not sure if x86 still can or wants to switch to that), and
->> requires no real changes in upper layers.
->>
->> [1] and patch #2 contains more information on the motivation for this.
->>
->> E.g., specifying/expanding "z14-best" will result in the "best feature
->> set possible on this accelerator, hw and, firmware". While a "z13" does
->> not work under TCG and some z/VM versions, "z13-best" will work.
->=20
-> I think other architectures call this concept "max", not "best".
-> If we can manage some cross-architecture consistency that would
-> be helpful, but is s390x using 'max' already for something else?
+Ensure we don't put too much register data in buffers. This avoids
+a buffer overflow (and stack corruption) when a target has lots
+of registers.
 
-We have the "max" model just like other architectures
+Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+---
 
-s390 max             Enables all features supported by the accelerator=20
-in the current host
+Hi all,
 
-It is basically the "host" model under KVM, and the "qemu" model under=20
-TCG (with minor differences for the latter).
+While working on a target with many registers. I found out the gdbstub
+may do buffer overflows when receiving a 'g' query (to read general
+registers). This patch prevents that.
 
+Gdb is pretty happy with a partial set of registers and queries
+remaining registers one by one when needed.
 
-This series introduces e.g.,
+Regards,
+Damien
+---
+ gdbstub.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-s390 z900-best       IBM zSeries 900 GA1 with best features supported by=20
-the accelerator in the current host
-
-s390 z14-best        IBM z14 GA1 with best features supported by the=20
-accelerator in the current host
-
-s390 z14ZR1-best     IBM z14 Model ZR1 GA1 with best features supported=20
-by the accelerator in the current host
-
-s390 gen15a-best     IBM z15 GA1 with best features supported by the=20
-accelerator in the current host
-
-s390 gen15b-best     IBM 8562 GA1 with best features supported by the=20
-accelerator in the current host
-
-
-There is a small but important difference between "max"/"host" and=20
-"best". Max really means "all features", including deprecated ones.=20
-"best", however, can disable experimental or deprecated features. Or any=20
-other features we don't want to be enabled when somebody selects a model=20
-manually.
-
-On s390x, the feature "csske" is deprecated. New HW still has it, but we=20
-want new guests to run without this facility. Dropping it from "max"=20
-would affect existing setups. We already changed the default model=20
-(e.g., -cpu z13) to disable it with never QEMU machines.
-
-E.g., nested virtualization features on some architectures could be a=20
-feature set you want to disable, although contained in the "max" model.=20
-(e.g., no migration support yet).
-
-
-I am not completely against calling these "max" models instead of "best"=20
-models, but I think this makes it clearer that there is indeed a difference=
-.
-
-Maybe, we even want a "-cpu best" that would not map to "-cpu=20
-host"/"-cpu max", but to a cleaned up "-cpu host"/"-cpu max" (e.g.,=20
-disable deprecated features). Long term, we might even want to change=20
-the default when no "-cpu" is specified to "-cpu best" - which should=20
-now be possible with the latest QEMU changes to query the default model=20
-for a specific QEMU machine.
-
+diff --git a/gdbstub.c b/gdbstub.c
+index 4cf8af365e..dde0cfe0fe 100644
+--- a/gdbstub.c
++++ b/gdbstub.c
+@@ -1810,8 +1810,17 @@ static void handle_read_all_regs(GdbCmdContext *gd=
+b_ctx, void *user_ctx)
+     cpu_synchronize_state(gdb_ctx->s->g_cpu);
+     len =3D 0;
+     for (addr =3D 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs; addr++) {
+-        len +=3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf +=
+ len,
+-                                 addr);
++        int size =3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_b=
+uf + len,
++                                     addr);
++        if (len + size > MAX_PACKET_LENGTH / 2) {
++            /*
++             * Prevent gdb_ctx->str_buf overflow in memtohex() below.
++             * As a consequence, send only the first registers content.
++             * Gdb will query remaining ones if/when needed.
++             */
++            break;
++        }
++        len +=3D size;
+     }
+=20
+     memtohex(gdb_ctx->str_buf, gdb_ctx->mem_buf, len);
 --=20
-
-Thanks,
-
-David / dhildenb
+2.24.0
 
 
