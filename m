@@ -2,78 +2,64 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA47C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 17:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D03C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 17:24:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AA8F20673
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 17:15:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MTWWjnaS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AA8F20673
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0D5AD207FA
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 17:24:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D5AD207FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT7qw-0006KK-VX
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 12:15:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40299)
+	id 1iT7zq-0001Ph-7m
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 12:24:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42016)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iT7pr-0005O2-Cp
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 12:14:12 -0500
+ (envelope-from <groug@kaod.org>) id 1iT7yt-0000dE-Qh
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 12:23:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iT7pq-0004Yv-Ae
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 12:14:11 -0500
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:42815)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iT7pn-0004Ws-Ma; Fri, 08 Nov 2019 12:14:07 -0500
-Received: by mail-lj1-x243.google.com with SMTP id n5so6995386ljc.9;
- Fri, 08 Nov 2019 09:14:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0ocDzkZHmhvsS6TvCA5Pl7NkzPwEh956pZ5jNBEqhfU=;
- b=MTWWjnaS4E7pkj0Tx3m/JrAcxC8YSYzFLtIocgrPGCVlN8MbFBDmOUtIgoYBjS7bQI
- Z7TDPk/pPUfUNUC90g61p8Rl/ALM0zY0xcGV+LrLeLLRNELKw5nAeaCnUQrETJjCXZ8m
- ztgZyrALavj4SQT1jOPU3TfMFzlivUjOlhW3fYbkcI1Tf313lQHcyu8EhVllygbl8OSj
- XA/c+wMSuJt7hEpc7PnBAikMpKp/VYzArTmWy3rz/hg+VomR7HYULPII138JktjmDJni
- uUV4AZD/EYmqtzVEu8D2b7rqjMY8f4Ik99cRu8/HF1YOqo9rXbF8m/Adk22FElBIkpa7
- RpnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0ocDzkZHmhvsS6TvCA5Pl7NkzPwEh956pZ5jNBEqhfU=;
- b=NWztUdrGJ9cxjHDurf9G/4lRFXB5GG0gs15GwtOFJQVlbgUAptv9pL5qqjRAyiEAyt
- K3SXoprGKxscaX/8/70X1E1wdZnU7WPnfwzNyiyOhPdbfQXsb+4VKhEYcJq4f/h+h+gU
- V3M9Nj0zR+srEgBuPqy4XZ3WajQ6QEhJuWD3XNk7b8dxFu2rlHGPPinj16ZPYkDCPLIt
- 0ytd0AbWy1WX4IvPJaMeOnmZsc7m/7jYelGvRL8ZDn/4OGzj2Cp/0xqMZr+L8Xd3JM00
- Udl5bGbShEsi/9oJlH/BWwAlttuoz1guLl8N+kEbLMjwbX44arluJUVAFX4miOTAQIoy
- 38aw==
-X-Gm-Message-State: APjAAAWldwCGIOfZNoq4QKQdL7P2K3SVtRzraX9V7AJrdbGP9QyYfolx
- CWn/o7jd3lBIiz1PVThRYCF+x+8PHJashHHMTWg=
-X-Google-Smtp-Source: APXvYqzcd+srBV0OEzSaOc9EYCKzKmICjhXH3lIdI5cHFHY3zNgUpKNcc3RG+fh3CjZbEvqXp5MYdCfPPqKZ8rIdlGo=
-X-Received: by 2002:a2e:9151:: with SMTP id q17mr2787929ljg.156.1573233245997; 
- Fri, 08 Nov 2019 09:14:05 -0800 (PST)
+ (envelope-from <groug@kaod.org>) id 1iT7ys-0003Le-D7
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 12:23:31 -0500
+Received: from 6.mo69.mail-out.ovh.net ([46.105.50.107]:41270)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iT7ys-0003KW-7G
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 12:23:30 -0500
+Received: from player738.ha.ovh.net (unknown [10.108.42.196])
+ by mo69.mail-out.ovh.net (Postfix) with ESMTP id 89D9571A94
+ for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 18:23:26 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player738.ha.ovh.net (Postfix) with ESMTPSA id 28484C0A8AA3;
+ Fri,  8 Nov 2019 17:23:16 +0000 (UTC)
+Date: Fri, 8 Nov 2019 18:23:15 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [PATCH] spapr: Fix VSMT mode when it is not supported by the
+ kernel
+Message-ID: <20191108182315.4c26b3fa@bahia.lan>
+In-Reply-To: <cafafbdc-7869-f8ac-bfc0-5b93cacc5542@redhat.com>
+References: <20191108154035.12913-1-lvivier@redhat.com>
+ <20191108174759.2d4040f1@bahia.lan>
+ <cafafbdc-7869-f8ac-bfc0-5b93cacc5542@redhat.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20191107222500.8018-1-palmer@sifive.com>
-In-Reply-To: <20191107222500.8018-1-palmer@sifive.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 8 Nov 2019 09:13:39 -0800
-Message-ID: <CAKmqyKOodh3tPUGBM92ZRWFLoeo9E=kcaqO9F9dHz1wBMP9ywA@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V: virt: This is a "sifive,test1" test finisher
-To: Palmer Dabbelt <palmer@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::243
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 11857133397968591142
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedruddvuddguddtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.50.107
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,50 +71,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Christoph Hellwig <hch@infradead.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: =?UTF-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org,
+ clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 8, 2019 at 9:05 AM Palmer Dabbelt <palmer@sifive.com> wrote:
->
-> The test finisher implements the reset command, which means it's a
-> "sifive,test1" device.  This is a backwards compatible change, so it's
-> also a "sifive,test0" device.  I copied the odd idiom for adding a
-> two-string compatible field from the ARM virt board.
->
-> Fixes: 9a2551ed6f ("riscv: sifive_test: Add reset functionality")
-> Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
-> Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
-> ---
->  hw/riscv/virt.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index 23f340df19..74f2dce81c 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -359,7 +359,10 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->      nodename = g_strdup_printf("/test@%lx",
->          (long)memmap[VIRT_TEST].base);
->      qemu_fdt_add_subnode(fdt, nodename);
-> -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,test0");
-> +    {
-> +        const char compat[] = "sifive,test1\0sifive,test0";
+On Fri, 8 Nov 2019 18:03:08 +0100
+Laurent Vivier <lvivier@redhat.com> wrote:
 
-Does this really work? Why not use qemu_fdt_setprop_cells()?
+> On 08/11/2019 17:47, Greg Kurz wrote:
+> > On Fri,  8 Nov 2019 16:40:35 +0100
+> > Laurent Vivier <lvivier@redhat.com> wrote:
+> > 
+> >> Commit 29cb4187497d sets by default the VSMT to smp_threads,
+> >> but older kernels (< 4.13) don't support that.
+> >>
+> >> We can reasonably restore previous behavior with this kernel
+> >> to allow to run QEMU as before.
+> >>
+> >> If VSMT is not supported, VSMT will be set to MAX(8, smp_threads)
+> >> as it is done for previous machine types (< pseries-4.2)
+> >>
+> > 
+> > It is usually _bad_ to base the machine behavior on host capabilities.
+> 
+> This is already the case, statically: your patch guesses the kernel
+> always support VSMT. So you can't start the machine (and thus can't
+> migrate it to/from).
+> 
 
-Alistair
+Failing to start the machine is okay. The thing we want to avoid is
+to successfully start the guest and discover later on we cannot
+migrate it.
 
-> +        qemu_fdt_setprop(fdt, nodename, "compatible", compat, sizeof(compat));
-> +    }
->      qemu_fdt_setprop_cells(fdt, nodename, "reg",
->          0x0, memmap[VIRT_TEST].base,
->          0x0, memmap[VIRT_TEST].size);
-> --
-> 2.21.0
->
->
+> > What happens if we migrate between an older kernel and a recent one ?
+> 
+> I think migration is supported correctly only if parameters are
+> explicitly set. So this is not our case.
+> 
+
+Hence my suggestion to introspect...
+
+> > I understand this is to fix tests/migration-test on older kernels.
+> > Couldn't this be achieved with migration-test doing some introspection
+> > and maybe pass vsmt=8 on the QEMU command line ?
+> 
+> It could be a little bit complicated to instrospect this.
+
+... ah, you likely know migration-test better than I do :)
+
+> We could also set by default vsmt=8 at the test level.
+> 
+
+This would mean that we don't test an exact default setup, but this
+would still test most of the migration paths. I guess this could be
+an acceptable trade-off only if 'make check' must *really* support
+older kernels.
+
+> Thanks,
+> Laurent
+> 
+
 
