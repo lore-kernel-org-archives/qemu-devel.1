@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F24D1FC6196
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19075FC6195
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:14:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7ED4206A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:13:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7ED4206A3
+	by mail.kernel.org (Postfix) with ESMTPS id E4D2B206C3
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 19:14:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4D2B206C3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT9hX-0007ju-RO
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 14:13:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58620)
+	id 1iT9hq-0007sc-Hb
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 14:14:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58623)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iT9fx-0006Bd-Gr
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iT9fx-0006C4-HR
  for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:12:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iT9fw-0004GP-7k
+ (envelope-from <aleksandar.markovic@rt-rk.com>) id 1iT9fw-0004Gb-8i
  for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:12:05 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:46696 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:46723 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <aleksandar.markovic@rt-rk.com>)
- id 1iT9fv-0002nc-Rz
+ id 1iT9fv-0002ni-Tp
  for qemu-devel@nongnu.org; Fri, 08 Nov 2019 14:12:04 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id 194011A2252;
+ by mail.rt-rk.com (Postfix) with ESMTP id 393361A21B4;
  Fri,  8 Nov 2019 20:10:59 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw774-lin.domain.local (rtrkw774-lin.domain.local
  [10.10.14.106])
- by mail.rt-rk.com (Postfix) with ESMTPSA id E780C1A2138;
- Fri,  8 Nov 2019 20:10:58 +0100 (CET)
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 0A1BD1A21B7;
+ Fri,  8 Nov 2019 20:10:59 +0100 (CET)
 From: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/5] MAINTAINERS: Add a section on UI translation
-Date: Fri,  8 Nov 2019 20:10:46 +0100
-Message-Id: <1573240249-6966-3-git-send-email-aleksandar.markovic@rt-rk.com>
+Subject: [PATCH 4/5] MAINTAINERS: Adjust maintainership for Malta board
+Date: Fri,  8 Nov 2019 20:10:48 +0100
+Message-Id: <1573240249-6966-5-git-send-email-aleksandar.markovic@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1573240249-6966-1-git-send-email-aleksandar.markovic@rt-rk.com>
 References: <1573240249-6966-1-git-send-email-aleksandar.markovic@rt-rk.com>
@@ -74,31 +74,29 @@ Sender: "Qemu-devel"
 
 From: Aleksandar Markovic <amarkovic@wavecomp.com>
 
-There should be a person who will quickly evaluate new UI
-translation, and find a way to update existing ones should
-something changes in UI.
+Change the maintainership for Malta board to improve its quality.
 
 Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
 ---
- MAINTAINERS | 5 +++++
- 1 file changed, 5 insertions(+)
+ MAINTAINERS | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index be43ccb..69cdc13 100644
+index 4a478f8..1a49381 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -2681,6 +2681,11 @@ F: tests/tcg/.gitignore
- F: tests/uefi-test-tools/.gitignore
- F: ui/keycodemapdb/tests/.gitignore
+@@ -941,8 +941,9 @@ F: hw/display/jazz_led.c
+ F: hw/dma/rc4030.c
 =20
-+UI translations
-+M: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-+R: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-+F: po/*.po
-+
- Sphinx documentation configuration and build machinery
- M: Peter Maydell <peter.maydell@linaro.org>
+ Malta
+-M: Aurelien Jarno <aurelien@aurel32.net>
+-R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
++M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
++R: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
++R: Aurelien Jarno <aurelien@aurel32.net>
  S: Maintained
+ F: hw/mips/mips_malta.c
+ F: hw/mips/gt64xxx_pci.c
 --=20
 2.7.4
 
