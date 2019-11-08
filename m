@@ -2,90 +2,82 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 985A5C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:45:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B24BC5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:48:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6242B206A3
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:45:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0453321D6C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:48:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ppY1d2fM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6242B206A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="emwCxC1d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0453321D6C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT3eF-0004J2-VS
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 07:45:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45995)
+	id 1iT3gT-0006lM-1P
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 07:48:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46593)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iT3bI-0001dS-CG
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:54 -0500
+ (envelope-from <david@redhat.com>) id 1iT3eY-0005KL-3v
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:46:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iT3bG-0000Sy-Ml
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:52 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:41487)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
- id 1iT3bG-0000RE-Dj
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:50 -0500
-Received: by mail-wr1-x441.google.com with SMTP id p4so6895206wrm.8
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 04:42:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Rnzob+CMRQLWYBDPF8sebybDJvDCoUE2UV9qiBp+og0=;
- b=ppY1d2fMM0ZJPtgAd4+5sYEv06JGyJQI9aq0jHHj8jMSk8SyChkZm/DPG1vVs580Zx
- RSI9gmdO5GCsDlSckWGjtITeQMRT3fLvTTMr6w6+00bh604GSyPdb5tHb4P9HQ4fd4X2
- Ij5pFidqe7rXfX0BxqXSXOHYS5gxUfmCpB6eU1HM3dI6dW2Ks812iDLDGKrh0olHG8Jx
- bSCgVNQtZPnCV8E1tWKE96POC+5RKfBlNiWoVMxx2kwiBVGYAAQo4OaUF0FQaWRxphun
- g5E3V2EiV8Pbjs3LN9Kla9Ts9rhCuUAP+P5AoaVvyxLAAg+piB4Yv8H4fB4Ujs1ht1hz
- SUfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Rnzob+CMRQLWYBDPF8sebybDJvDCoUE2UV9qiBp+og0=;
- b=EB/HU7s+NRLHCTu/3jxThe7q9kIkCwMvwAjz5xrnHGtFdVa8q1VafU119LaR7r1fQh
- J2UKdU5F+cETU4ZRhBwuv1KibNinbh5l4Y30/45sgV+3qzgpLTCK1qioTHEd0X6eU9b7
- ZuBK5IZHKbQyByefy5o7lx2885tzpo2arec5C03schlXhB7H6YAshdgYvX1VTPj1RDcw
- fPdQ0twx6vmSNJrAjQzXLj2MKBXvH4S6We2ynHe0tC5Gkrce7boB4zClgSA7u3P1sNr8
- Vwy+NTfgeBJ58kA2mQHA6EAECSSGIlaAzwryXUaey9cuJ+4WPatffIhXaRHG7PwFudU5
- /Pnw==
-X-Gm-Message-State: APjAAAUD1PI8Nr9E0dTYU47Hwlmuj48Vtu8TLd/xjXNTXxPjf2hIC9BU
- ox8ngEU+uHi9+0373DJuHg32LdPxx1k=
-X-Google-Smtp-Source: APXvYqx8Y3Ze/r/BXgbjLD3/lMk+zF7PqpiGFuzW0XMcEoFEmazkDymrw/1d4zarJpqvKb0ZrK3LHg==
-X-Received: by 2002:a05:6000:12c4:: with SMTP id
- l4mr7890980wrx.110.1573216967513; 
- Fri, 08 Nov 2019 04:42:47 -0800 (PST)
-Received: from localhost (ec2-34-244-242-0.eu-west-1.compute.amazonaws.com.
- [34.244.242.0])
- by smtp.gmail.com with ESMTPSA id h140sm7317035wme.22.2019.11.08.04.42.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 Nov 2019 04:42:46 -0800 (PST)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/3] target/microblaze: Plug temp leaks with delay slot
- setup
-Date: Fri,  8 Nov 2019 13:42:18 +0100
-Message-Id: <20191108124219.31348-3-edgar.iglesias@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191108124219.31348-1-edgar.iglesias@gmail.com>
-References: <20191108124219.31348-1-edgar.iglesias@gmail.com>
+ (envelope-from <david@redhat.com>) id 1iT3eV-0003EF-UP
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:46:13 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59539
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iT3eV-0003Dt-QF
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:46:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573217170;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SUo1SvmRW1T9BAStRLEJxmsliYF+9UWqSz6o0sDmKsg=;
+ b=emwCxC1dc8yZmKE04eJUjd6mZBE5jw/DrPMGVDSh/KGgMPh0FgQxzsICed9bYqQk8kQBwP
+ X05TEEhbimtkyfX67AxnpJg+ETfhGtLzXCoGe7XTq6+TUH/WXsvz6Cjdgn/dqG/HqqNHKW
+ uUbyEOQsSmMqoCGf/ZznFSacrSfZ3nI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-348-y3ixSvJYPX6lHnb20KvhaA-1; Fri, 08 Nov 2019 07:46:09 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A14D58017DD;
+ Fri,  8 Nov 2019 12:46:07 +0000 (UTC)
+Received: from [10.36.117.63] (ovpn-117-63.ams2.redhat.com [10.36.117.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 02AC060BE1;
+ Fri,  8 Nov 2019 12:46:01 +0000 (UTC)
+Subject: Re: [PATCH v1 0/2] s390x/cpumodel: Introduce "best" model variants
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191108110714.7475-1-david@redhat.com>
+ <CAFEAcA-mD3-Zg2JunGpMqbcaT1qboCenhqEFytZD0FmFcL2i9Q@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <5dd613c0-6d9e-b943-b64d-7ba1791cbefe@redhat.com>
+Date: Fri, 8 Nov 2019 13:46:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+In-Reply-To: <CAFEAcA-mD3-Zg2JunGpMqbcaT1qboCenhqEFytZD0FmFcL2i9Q@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: y3ixSvJYPX6lHnb20KvhaA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,87 +89,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
- frasse.iglesias@gmail.com, alistair@alistair23.me,
- richard.henderson@linaro.org, frederic.konrad@adacore.com, philmd@redhat.com,
- luc.michel@greensocs.com
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Michael Mueller <mimu@linux.ibm.com>,
+ Jiri Denemark <jdenemar@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+On 08.11.19 12:10, Peter Maydell wrote:
+> On Fri, 8 Nov 2019 at 11:08, David Hildenbrand <david@redhat.com> wrote:
+>>
+>> There was recently a discussion regarding CPU model versions. That conce=
+pt
+>> does not fit s390x where we have a lot of feature variability. I
+>> proposed an alternative approach in [1], which might work for x86 as wel=
+l
+>> (but I am not sure if x86 still can or wants to switch to that), and
+>> requires no real changes in upper layers.
+>>
+>> [1] and patch #2 contains more information on the motivation for this.
+>>
+>> E.g., specifying/expanding "z14-best" will result in the "best feature
+>> set possible on this accelerator, hw and, firmware". While a "z13" does
+>> not work under TCG and some z/VM versions, "z13-best" will work.
+>=20
+> I think other architectures call this concept "max", not "best".
+> If we can manage some cross-architecture consistency that would
+> be helpful, but is s390x using 'max' already for something else?
 
-Plug temp leaks with delay slot setup.
+We have the "max" model just like other architectures
 
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/microblaze/translate.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+s390 max             Enables all features supported by the accelerator=20
+in the current host
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index c8442b18e1..7b4b66a622 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1177,6 +1177,17 @@ static void eval_cond_jmp(DisasContext *dc, TCGv_i64 pc_true, TCGv_i64 pc_false)
-     tcg_temp_free_i64(tmp_zero);
- }
- 
-+static void dec_setup_dslot(DisasContext *dc)
-+{
-+        TCGv_i32 tmp = tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG));
-+
-+        dc->delayed_branch = 2;
-+        dc->tb_flags |= D_FLAG;
-+
-+        tcg_gen_st_i32(tmp, cpu_env, offsetof(CPUMBState, bimm));
-+        tcg_temp_free_i32(tmp);
-+}
-+
- static void dec_bcc(DisasContext *dc)
- {
-     unsigned int cc;
-@@ -1188,10 +1199,7 @@ static void dec_bcc(DisasContext *dc)
- 
-     dc->delayed_branch = 1;
-     if (dslot) {
--        dc->delayed_branch = 2;
--        dc->tb_flags |= D_FLAG;
--        tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
--                      cpu_env, offsetof(CPUMBState, bimm));
-+        dec_setup_dslot(dc);
-     }
- 
-     if (dec_alu_op_b_is_small_imm(dc)) {
-@@ -1250,10 +1258,7 @@ static void dec_br(DisasContext *dc)
- 
-     dc->delayed_branch = 1;
-     if (dslot) {
--        dc->delayed_branch = 2;
--        dc->tb_flags |= D_FLAG;
--        tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
--                      cpu_env, offsetof(CPUMBState, bimm));
-+        dec_setup_dslot(dc);
-     }
-     if (link && dc->rd)
-         tcg_gen_movi_i32(cpu_R[dc->rd], dc->pc);
-@@ -1355,10 +1360,7 @@ static void dec_rts(DisasContext *dc)
-         return;
-     }
- 
--    dc->delayed_branch = 2;
--    dc->tb_flags |= D_FLAG;
--    tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
--                  cpu_env, offsetof(CPUMBState, bimm));
-+    dec_setup_dslot(dc);
- 
-     if (i_bit) {
-         LOG_DIS("rtid ir=%x\n", dc->ir);
--- 
-2.20.1
+It is basically the "host" model under KVM, and the "qemu" model under=20
+TCG (with minor differences for the latter).
+
+
+This series introduces e.g.,
+
+s390 z900-best       IBM zSeries 900 GA1 with best features supported by=20
+the accelerator in the current host
+
+s390 z14-best        IBM z14 GA1 with best features supported by the=20
+accelerator in the current host
+
+s390 z14ZR1-best     IBM z14 Model ZR1 GA1 with best features supported=20
+by the accelerator in the current host
+
+s390 gen15a-best     IBM z15 GA1 with best features supported by the=20
+accelerator in the current host
+
+s390 gen15b-best     IBM 8562 GA1 with best features supported by the=20
+accelerator in the current host
+
+
+There is a small but important difference between "max"/"host" and=20
+"best". Max really means "all features", including deprecated ones.=20
+"best", however, can disable experimental or deprecated features. Or any=20
+other features we don't want to be enabled when somebody selects a model=20
+manually.
+
+On s390x, the feature "csske" is deprecated. New HW still has it, but we=20
+want new guests to run without this facility. Dropping it from "max"=20
+would affect existing setups. We already changed the default model=20
+(e.g., -cpu z13) to disable it with never QEMU machines.
+
+E.g., nested virtualization features on some architectures could be a=20
+feature set you want to disable, although contained in the "max" model.=20
+(e.g., no migration support yet).
+
+
+I am not completely against calling these "max" models instead of "best"=20
+models, but I think this makes it clearer that there is indeed a difference=
+.
+
+Maybe, we even want a "-cpu best" that would not map to "-cpu=20
+host"/"-cpu max", but to a cleaned up "-cpu host"/"-cpu max" (e.g.,=20
+disable deprecated features). Long term, we might even want to change=20
+the default when no "-cpu" is specified to "-cpu best" - which should=20
+now be possible with the latest QEMU changes to query the default model=20
+for a specific QEMU machine.
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
 
