@@ -2,79 +2,117 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6659BC5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3115C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:14:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2923620659
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:13:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90F9C20659
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 14:14:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aRkvfoig"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2923620659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="qKwBiYRv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90F9C20659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT50Y-0000Rx-16
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 09:13:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35111)
+	id 1iT51W-0001dw-NV
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 09:14:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35129)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iT4z7-0007NI-01
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:11:34 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iT4zB-0007Tj-1k
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:11:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iT4z4-0005mT-91
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:11:31 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20618
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iT4z4-0005mB-5A
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:11:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573222288;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=n/xWZREPh0qAXUwoMWa+XT2VE6b6EsHtFkllT8ZX748=;
- b=aRkvfoigZ1TAaKrhggPoynst5PlDipQZwBKBjWJENPc9dZfS0uw6r/o1eAFeydXd8vAFWF
- 5rn1y2wh+cIbYrbR145RACyqhlOUPoRpEPtd6LprZhmuKX8CD03NYT8c0/iw5UzxrJS8Ca
- 85Ssa0Mq4HnjEo4IRENLFCg5mlZ4Gdk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-ORlrdva6PQ-A5DcyW9Fnxw-1; Fri, 08 Nov 2019 09:11:25 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE886107ACC4;
- Fri,  8 Nov 2019 14:11:23 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5CF811001B39;
- Fri,  8 Nov 2019 14:11:13 +0000 (UTC)
-Date: Fri, 8 Nov 2019 15:11:11 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v15 10/12] hmat acpi: Build System Locality Latency and
- Bandwidth Information Structure(s)
-Message-ID: <20191108151111.726f37df@redhat.com>
-In-Reply-To: <20191107074511.14304-11-tao3.xu@intel.com>
-References: <20191107074511.14304-1-tao3.xu@intel.com>
- <20191107074511.14304-11-tao3.xu@intel.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: ORlrdva6PQ-A5DcyW9Fnxw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iT4z9-0005od-Hu
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 09:11:36 -0500
+Received: from mail-eopbgr00090.outbound.protection.outlook.com
+ ([40.107.0.90]:20358 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iT4z9-0005nG-Bd; Fri, 08 Nov 2019 09:11:35 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mr0fSWOLkW77qem8EhCXnISs977m5qseFvNEacNECMG4kPunftjRrbRvQDxL6w/dL8b+oK9h/l56hfunPzTRTnYVAMOTFEGCb8/3cjUk/KQ6FglgkAJdDsfWOd5Kr6cI2Y3rNcLqzvR21A1faRJ21iQaDiQ1DTcWXyV5IkFajyivVhVfuW3xVj7lRjxn79Knz43j+vgKNa5G0kGmtVvdHqtaZJKrGsF9z1io9EtDKeYd3vFC+CpFIFwDCSVl+BjdW+e/PxEYTz7A8UcYeLp3CiUVdFWav2VIYExs+SZx+uCVdsXiaTb695FS+/e+eWwG/MfQ3PmKkPJJuN5odbOM/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IZhQhe5scdDCEY8C4dx6E5E++neGvjd3BJqVrkl0lTs=;
+ b=GNgo863yAFmsHdsSoMY7vcqpDkhOQ98lN+bX1VqSElSkU28wr6Ac5+aA+hkOASlFIq62v3gc/bqhmFPn8jN6PYqDHHBKZLUPRDMP7YUuXUKThXUv2wDtkbaYDGeiRPx/syz8KMaHWgp+yjnxsgjMDa64BYLKZ7ZSTH+kPD6xCvG8MgNRao9XzyZegH98OBIJ+KsHWRQyN12wmto2k2OW7MPE4Q2tqIjHcM/I0IQgGCtYzOj2947PN26k4LRB5uCZYEleNGLhwCrO7xNx8DobjSN7nKb+RoYc9qkxNs96RUdOABd/ES8qGU36YP1yZAtt+QRLVyY84AMtA97XnoDXVA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IZhQhe5scdDCEY8C4dx6E5E++neGvjd3BJqVrkl0lTs=;
+ b=qKwBiYRvq4sXlc++zB26QM0dOt5TNXFRFoAe6Gt9s0MWFvaNfBqX+la3rppRaavVKi2/wZLm0YvMqei6jFLvDIKEEPNrXy/YcxRtPovSl+REpqIY+gVvjhy9w3gp14JYhUJDjD+xnHzZRD8fdQddaMrc6i2jFvQuBGKUieqFMl8=
+Received: from AM0PR08MB4097.eurprd08.prod.outlook.com (20.178.202.217) by
+ AM0PR08MB3761.eurprd08.prod.outlook.com (20.178.23.30) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2430.20; Fri, 8 Nov 2019 14:11:32 +0000
+Received: from AM0PR08MB4097.eurprd08.prod.outlook.com
+ ([fe80::41f0:981:fd75:9946]) by AM0PR08MB4097.eurprd08.prod.outlook.com
+ ([fe80::41f0:981:fd75:9946%3]) with mapi id 15.20.2430.023; Fri, 8 Nov 2019
+ 14:11:32 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH for-5.0 v4 2/5] block: Use bdrv_qapi_perm_to_blk_perm()
+Thread-Topic: [PATCH for-5.0 v4 2/5] block: Use bdrv_qapi_perm_to_blk_perm()
+Thread-Index: AQHVljD1UHUge3tEFkSo3VwbyHKi/aeBUHMA
+Date: Fri, 8 Nov 2019 14:11:32 +0000
+Message-ID: <1dcdf6c3-a378-dd87-aa4d-840cfe2cd4ef@virtuozzo.com>
+References: <20191108123455.39445-1-mreitz@redhat.com>
+ <20191108123455.39445-3-mreitz@redhat.com>
+In-Reply-To: <20191108123455.39445-3-mreitz@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0501CA0003.eurprd05.prod.outlook.com
+ (2603:10a6:3:1a::13) To AM0PR08MB4097.eurprd08.prod.outlook.com
+ (2603:10a6:208:132::25)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191108171130557
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fcc6e1df-d6cc-4f23-ce15-08d764558e7c
+x-ms-traffictypediagnostic: AM0PR08MB3761:
+x-microsoft-antispam-prvs: <AM0PR08MB37610A3202BCEF50B0F64495C17B0@AM0PR08MB3761.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:565;
+x-forefront-prvs: 0215D7173F
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(39840400004)(376002)(396003)(136003)(346002)(199004)(189003)(316002)(486006)(2501003)(110136005)(14454004)(52116002)(476003)(386003)(478600001)(66476007)(66556008)(66446008)(102836004)(64756008)(6246003)(6506007)(6512007)(11346002)(5660300002)(66946007)(229853002)(305945005)(2906002)(6436002)(54906003)(6486002)(76176011)(7736002)(186003)(256004)(8936002)(36756003)(86362001)(99286004)(2616005)(4326008)(446003)(8676002)(26005)(66066001)(71190400001)(3846002)(71200400001)(25786009)(31686004)(81156014)(81166006)(6116002)(31696002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3761;
+ H:AM0PR08MB4097.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: UHqMxf0xfknTc3g4+GYBNEKNmA0xFLjq6lSem84OEA9wb+ApGCVRAZr9ceadxTBsbK9q8/ov1ShmImHEzDdPFWv53Wg+U0UIO43tQ8FzCANVip04Emx0yK+Q/uo59wGKLB/bN9rQ10yeusXQc2bl2rrJlPQrd0gQTAziNlsjf3IPgq2IOFKJZqLo6c6ak0R5CtLPcIoUW1uUCU2O1DadblDcwviPlQEoXxVeJ/Y/63Jog/+crTY7CS2hQv4uiTp5d/ov2X69xaABDiq5MEUeqtVJES1nFCKM2rpWQfFe/5yODcCZu7TkFxnQExTTzJYaWCgrqHF1XQqsp2yyBSKJhM8HtnME9XM/bEvsCklnGw9A/sgMMlwHQD6ZYW1GkcX15Wt0UO1cqZdit4C/IWgQsqAZq3LlPOG4CqwzUAj7cKK+uui3QdfIepq2gsfE7lEY
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <4A3182821A0C0945A6E9761CBD1C19D6@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fcc6e1df-d6cc-4f23-ce15-08d764558e7c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2019 14:11:32.2995 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: wfLvL7Yx/29fMY3zeAhD+3yexX1Uj8HMe+MQmXdnDu+yQnbKea/ILVd8g+8gIgJ9jsvFvCWAuczfvra8olpGnXVfmQzIjT5BYl5/u2ojrq0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3761
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.90
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,189 +124,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, jingqi.liu@intel.com, fan.du@intel.com,
- mdroth@linux.vnet.ibm.com, armbru@redhat.com, jonathan.cameron@huawei.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  7 Nov 2019 15:45:09 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
+08.11.2019 15:34, Max Reitz wrote:
+> We can save some LoC in xdbg_graph_add_edge() by using
+> bdrv_qapi_perm_to_blk_perm().
+>=20
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
 
-> From: Liu Jingqi <jingqi.liu@intel.com>
->=20
-> This structure describes the memory access latency and bandwidth
-> information from various memory access initiator proximity domains.
-> The latency and bandwidth numbers represented in this structure
-> correspond to rated latency and bandwidth for the platform.
-> The software could use this information as hint for optimization.
->=20
-> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+
 > ---
+>   block.c | 29 ++++++++---------------------
+>   1 file changed, 8 insertions(+), 21 deletions(-)
 >=20
-> No changes in v15.
+> diff --git a/block.c b/block.c
+> index 066433f3e2..ae279ff21f 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -4870,36 +4870,23 @@ static void xdbg_graph_add_node(XDbgBlockGraphCon=
+structor *gr, void *node,
+>   static void xdbg_graph_add_edge(XDbgBlockGraphConstructor *gr, void *pa=
+rent,
+>                                   const BdrvChild *child)
+>   {
+> -    typedef struct {
+> -        unsigned int flag;
+> -        BlockPermission num;
+> -    } PermissionMap;
+> -
+> -    static const PermissionMap permissions[] =3D {
+> -        { BLK_PERM_CONSISTENT_READ, BLOCK_PERMISSION_CONSISTENT_READ },
+> -        { BLK_PERM_WRITE,           BLOCK_PERMISSION_WRITE },
+> -        { BLK_PERM_WRITE_UNCHANGED, BLOCK_PERMISSION_WRITE_UNCHANGED },
+> -        { BLK_PERM_RESIZE,          BLOCK_PERMISSION_RESIZE },
+> -        { BLK_PERM_GRAPH_MOD,       BLOCK_PERMISSION_GRAPH_MOD },
+> -        { 0, 0 }
+> -    };
+> -    const PermissionMap *p;
+> +    BlockPermission qapi_perm;
+>       XDbgBlockGraphEdge *edge;
+>  =20
+> -    QEMU_BUILD_BUG_ON(1UL << (ARRAY_SIZE(permissions) - 1) !=3D BLK_PERM=
+_ALL + 1);
+> -
+>       edge =3D g_new0(XDbgBlockGraphEdge, 1);
+>  =20
+>       edge->parent =3D xdbg_graph_node_num(gr, parent);
+>       edge->child =3D xdbg_graph_node_num(gr, child->bs);
+>       edge->name =3D g_strdup(child->name);
+>  =20
+> -    for (p =3D permissions; p->flag; p++) {
+> -        if (p->flag & child->perm) {
+> -            QAPI_LIST_ADD(edge->perm, p->num);
+> +    for (qapi_perm =3D 0; qapi_perm < BLOCK_PERMISSION__MAX; qapi_perm++=
+) {
+> +        uint64_t flag =3D bdrv_qapi_perm_to_blk_perm(qapi_perm);
+> +
+> +        if (flag & child->perm) {
+> +            QAPI_LIST_ADD(edge->perm, qapi_perm);
+>           }
+> -        if (p->flag & child->shared_perm) {
+> -            QAPI_LIST_ADD(edge->shared_perm, p->num);
+> +        if (flag & child->shared_perm) {
+> +            QAPI_LIST_ADD(edge->shared_perm, qapi_perm);
+>           }
+>       }
+>  =20
 >=20
-> Changes in v13:
->     - Calculate the entries in a new patch.
-> ---
->  hw/acpi/hmat.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 95 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-> index c595098ba7..6ec1310e62 100644
-> --- a/hw/acpi/hmat.c
-> +++ b/hw/acpi/hmat.c
-> @@ -27,6 +27,7 @@
->  #include "qemu/osdep.h"
->  #include "sysemu/numa.h"
->  #include "hw/acpi/hmat.h"
-> +#include "qemu/error-report.h"
-> =20
->  /*
->   * ACPI 6.3:
-> @@ -67,11 +68,81 @@ static void build_hmat_mpda(GArray *table_data, uint1=
-6_t flags,
->      build_append_int_noprefix(table_data, 0, 8);
->  }
-> =20
-> +/*
-> + * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
-> + * Structure: Table 5-146
-> + */
-> +static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
-> +                          uint32_t num_initiator, uint32_t num_target,
-> +                          uint32_t *initiator_list)
-> +{
-> +    int i;
-> +    uint16_t *lb_data;
-> +    uint32_t base;
-> +    /*
-> +     * Length in bytes for entire structure, including 32 bytes of
-> +     * fixed length, length of initiator proximity domain list,
-> +     * length of target proximity domain list and length of entries
-> +     * provides latency/bandwidth values.
-> +     */
-> +    uint32_t lb_length =3D 32 + 4 * num_initiator + 4 * num_target +
-> +                              2 * num_initiator * num_target;
-might be described better using field names from spec, as:
 
-  uint32_t len =3D 32 /* table length upto and including Entry Base Unit */
-                 + 4 * num_initiator /* Initiator Proximity Domain List */
-                 + 4 * num_target /* Target Proximity Domain */
-                 ....
 
-> +
-> +    /* Type */
-> +    build_append_int_noprefix(table_data, 1, 2);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /* Length */
-> +    build_append_int_noprefix(table_data, lb_length, 4);
-> +    /* Flags: Bits [3:0] Memory Hierarchy, Bits[7:4] Reserved */
-> +    assert(!(hmat_lb->hierarchy >> 4));
-> +    build_append_int_noprefix(table_data, hmat_lb->hierarchy, 1);
-> +    /* Data Type */
-> +    build_append_int_noprefix(table_data, hmat_lb->data_type, 1);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /* Number of Initiator Proximity Domains (s) */
-> +    build_append_int_noprefix(table_data, num_initiator, 4);
-> +    /* Number of Target Proximity Domains (t) */
-> +    build_append_int_noprefix(table_data, num_target, 4);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 4);
-> +
-
-> +    if (hmat_lb->data_type <=3D HMAT_LB_DATA_WRITE_LATENCY) {
-> +        base =3D hmat_lb->base_latency;
-> +        lb_data =3D hmat_lb->entry_latency;
-> +    } else {
-> +        base =3D hmat_lb->base_bandwidth;
-> +        lb_data =3D hmat_lb->entry_bandwidth;
-> +    }
-I'd move this out into caller hmat_build_table_structs() and instead of
-hmat_lb pass as arguments data_type, base and data, to keep subtable
-API independent of internal NUMA structures.
-
-On this note, considering that a single hmat_lb can represent either
-latency or bandwidth only, I'd suggest to unify
-   hmat_lb->base_latency/hmat_lb->base_bandwidth
-     into hmat_lb->base
-  =20
-and do the same for data entries and use hmat_lb->data_type as discriminato=
-r.
-
-That should simplify code here and in CLI parsing part as well,
-I don't see any reason to keep them separate.=20
-
-> +
-> +    /* Entry Base Unit */
-> +    build_append_int_noprefix(table_data, base, 8);
-> +
-> +    /* Initiator Proximity Domain List */
-> +    for (i =3D 0; i < num_initiator; i++) {
-> +        build_append_int_noprefix(table_data, initiator_list[i], 4);
-> +    }
-> +
-> +    /* Target Proximity Domain List */
-> +    for (i =3D 0; i < num_target; i++) {
-> +        build_append_int_noprefix(table_data, i, 4);
-> +    }
-> +
-> +    /* Latency or Bandwidth Entries */
-> +    for (i =3D 0; i < num_initiator * num_target; i++) {
-> +        build_append_int_noprefix(table_data, lb_data[i], 2);
-> +    }
-> +}
-> +
->  /* Build HMAT sub table structures */
->  static void hmat_build_table_structs(GArray *table_data, NumaState *numa=
-_state)
->  {
->      uint16_t flags;
-> -    int i;
-> +    uint32_t num_initiator =3D 0;
-> +    uint32_t initiator_list[MAX_NODES];
-> +    int i, hierarchy, type;
-> +    HMAT_LB_Info *hmat_lb;
-> =20
->      for (i =3D 0; i < numa_state->num_nodes; i++) {
->          flags =3D 0;
-> @@ -82,6 +153,29 @@ static void hmat_build_table_structs(GArray *table_da=
-ta, NumaState *numa_state)
-> =20
->          build_hmat_mpda(table_data, flags, numa_state->nodes[i].initiato=
-r, i);
->      }
-> +
-> +    for (i =3D 0; i < numa_state->num_nodes; i++) {
-> +        if (numa_state->nodes[i].has_cpu) {
-> +            initiator_list[num_initiator++] =3D i;
-> +        }
-> +    }
-> +
-> +    /*
-> +     * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Informat=
-ion
-> +     * Structure: Table 5-146
-> +     */
-> +    for (hierarchy =3D HMAT_LB_MEM_MEMORY;
-> +         hierarchy <=3D HMAT_LB_MEM_CACHE_3RD_LEVEL; hierarchy++) {
-> +        for (type =3D HMAT_LB_DATA_ACCESS_LATENCY;
-> +             type <=3D HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
-> +            hmat_lb =3D numa_state->hmat_lb[hierarchy][type];
-> +
-> +            if (hmat_lb) {
-> +                build_hmat_lb(table_data, hmat_lb, num_initiator,
-> +                              numa_state->num_nodes, initiator_list);
-> +            }
-> +        }
-> +    }
->  }
-> =20
->  void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_=
-state)
-
+--=20
+Best regards,
+Vladimir
 
