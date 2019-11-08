@@ -2,136 +2,83 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A424AFC6196
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 17:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A58FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 17:14:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FD4520869
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 17:11:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85E6220673
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 17:14:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N5EtgnxX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FD4520869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vWl9oRKq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85E6220673
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT7nN-0003GK-HI
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 12:11:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38130)
+	id 1iT7pz-0005Fr-Fn
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 12:14:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39763)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iT7fK-0002qx-UV
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 12:03:19 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iT7mq-0002vx-GE
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 12:11:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iT7fI-0007Qp-Aq
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 12:03:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34382
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iT7fI-0007Qd-7K
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 12:03:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573232595;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=49xh5wLd8pTFok6WHRCqJIMP2AAj+0JlEGKbMyl/AD8=;
- b=N5EtgnxXb/wtaWlMT8TTUOBJNoONcYbx23OQL8+SL08XyIDhdjoC3e6Jnt5rONbnnM4prj
- Uxkvw1IOf5eA3lxBFIEs+CeGET8RO8WE5hzWhO4u27aX2GUr8sSVK9revCCgP4mcXczDmF
- XuNGODrxbe8Ud08dBR5qSfIkCI5LKbw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-oqM6S4ySPW-rXIqxJLp5-g-1; Fri, 08 Nov 2019 12:03:14 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 01949180496F;
- Fri,  8 Nov 2019 17:03:12 +0000 (UTC)
-Received: from [10.36.117.0] (unknown [10.36.117.0])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BB66A66835;
- Fri,  8 Nov 2019 17:03:09 +0000 (UTC)
-Subject: Re: [PATCH] spapr: Fix VSMT mode when it is not supported by the
- kernel
-To: Greg Kurz <groug@kaod.org>
-References: <20191108154035.12913-1-lvivier@redhat.com>
- <20191108174759.2d4040f1@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <cafafbdc-7869-f8ac-bfc0-5b93cacc5542@redhat.com>
-Date: Fri, 8 Nov 2019 18:03:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <peter.maydell@linaro.org>) id 1iT7mp-0002xt-6C
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 12:11:04 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:37519)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iT7mp-0002xc-0B
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 12:11:03 -0500
+Received: by mail-ot1-x344.google.com with SMTP id d5so5817184otp.4
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 09:11:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=mnalJx4H7+m/gSnRqRgd6jzyL97VfmT3+CQtQppxItA=;
+ b=vWl9oRKqH9BvBjJwegeaDDYe1gHbJV7c4uXSC/eAox4LxcYqnDg17y3EPVL0umWtek
+ kzLz0crhgqK9Rn/kItlcBbbR6D9X3i/DwapfoPsKt6G5u82gLfSumbrx0bqPoSr2yrOE
+ AYp/jtgLF78PIiWA2U4yOIy6v0gj2pez6925/GORFJpW8MIHx4eQiZus8Tc+9M5OsjPF
+ pUzjm2jF34lDMQMLmMLxVJh+65vj8GelDxKszM9y0gDKZjNXcu6/n884/jq+MKhEUWrI
+ Zm9YYXw6OFueBiO0g99xCDArjaCparfKHjCI2b7Bz3tMKrsho48lYt/HSAGGXtz5840F
+ BQZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=mnalJx4H7+m/gSnRqRgd6jzyL97VfmT3+CQtQppxItA=;
+ b=FlMHrCLsZGZbWQLoNeOhXhsAjUv5NeOKZO+1p752PEuXOtkdQETA1nme6PBVlb5d6H
+ kECU6RFYTzRD8aSa4jcAgn5IiTSH8p7e8rMeCc+KHcvoT1V0V577H7OnWhJKcuV2Tqrk
+ 3BH/9ho+f9b0jG4rz/HV7AjFkai2BENmJZCTSB0tBEHG15mlPYnSPM4CQDaMkug9Kyrg
+ Wado6Aw0LBkDkwsgVXowF54yybmPJEKQtcV+R/N2nJCOrg58VRW834aY2hJglNH4oC81
+ /LyEZfU+KUt1P/8Plp0OVUqjPxpk0o/0V99h56H/MxoT0+R4c377hzazM7Se00thfksi
+ dDIA==
+X-Gm-Message-State: APjAAAU4hayFUChvgj+RtmrplYiRrAxSHEl9OY3R6nGYwTo7qJDwhe0B
+ oY74qhZUt0ALJw8/ROd+Nbsl/j8tM4F0K36R4iHdvINWQYs=
+X-Google-Smtp-Source: APXvYqy0x/mWqnLFvbmckS7rUPfeqSOnUktV77TWLR8MK3xAF3eS7ywry2xUnlQh+zI/z1LANrL1YKX51SvQ3e+iRhs=
+X-Received: by 2002:a9d:68cc:: with SMTP id i12mr5771433oto.97.1573233061926; 
+ Fri, 08 Nov 2019 09:11:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191108174759.2d4040f1@bahia.lan>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: oqM6S4ySPW-rXIqxJLp5-g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+References: <20191108102805.8258-1-philmd@redhat.com>
+ <862eb773-609d-4250-b46b-d922fc5a86a7@redhat.com>
+ <00cca0a5-7a51-f2d1-5120-821c335954b8@redhat.com>
+ <51f9b2d9-b196-c30e-dc67-988e29b5df47@redhat.com>
+In-Reply-To: <51f9b2d9-b196-c30e-dc67-988e29b5df47@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Nov 2019 17:10:50 +0000
+Message-ID: <CAFEAcA8EijZRqhFerQbq5cCbaq-qzrMzOrQjc6Ro=v2p6=W_pA@mail.gmail.com>
+Subject: Re: [PATCH] configure: Check bzip2 is available
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -143,47 +90,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org,
- clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/11/2019 17:47, Greg Kurz wrote:
-> On Fri,  8 Nov 2019 16:40:35 +0100
-> Laurent Vivier <lvivier@redhat.com> wrote:
->=20
->> Commit 29cb4187497d sets by default the VSMT to smp_threads,
->> but older kernels (< 4.13) don't support that.
->>
->> We can reasonably restore previous behavior with this kernel
->> to allow to run QEMU as before.
->>
->> If VSMT is not supported, VSMT will be set to MAX(8, smp_threads)
->> as it is done for previous machine types (< pseries-4.2)
->>
->=20
-> It is usually _bad_ to base the machine behavior on host capabilities.
+On Fri, 8 Nov 2019 at 17:07, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+> On 11/8/19 4:43 PM, Eric Blake wrote:
+> > bzip2 is no longer a favored compression.  If we are trying to pick a
+> > compression that is most likely to be present on any system, go with
+> > gzip.  If we are trying to pick a compression that packs tighter and
+> > uncompresses faster, pick xz or zstd.  But bzip2 does neither: it packs
+> > slightly tighter than gzip but has slower performance in doing so, and
+> > thus is no longer used as a default compression.
+>
+> The problem was with OpenBSD 6.1 which hadn't xz available.
+>
+> In commit 12745eaa02 Gerd updated the VM to OpenBSD 6.5 and we now have
+> access to xz. IIRC OSX supported versions also provide xz.
+>
+> If we want to revert Laszlo's patches and apply his first version (using
+> xz), we should do that during 5.0 dev cycle, now it is too late.
+> I'd prefer we simply fix bzip2 for the next release.
 
-This is already the case, statically: your patch guesses the kernel
-always support VSMT. So you can't start the machine (and thus can't
-migrate it to/from).
+I don't think we should try to use 'xz' because I don't see
+the point. We should use something that's generally available,
+whether that's bzip2 or gzip. Life's too short to deal with
+yet another file compression tool and format.
 
-> What happens if we migrate between an older kernel and a recent one ?
-
-I think migration is supported correctly only if parameters are
-explicitly set. So this is not our case.
-
-> I understand this is to fix tests/migration-test on older kernels.
-> Couldn't this be achieved with migration-test doing some introspection
-> and maybe pass vsmt=3D8 on the QEMU command line ?
-
-It could be a little bit complicated to instrospect this.
-We could also set by default vsmt=3D8 at the test level.
-
-Thanks,
-Laurent
-
+thanks
+-- PMM
 
