@@ -2,89 +2,68 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AAB3FA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EBDCC5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:03:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43722207FA
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:59:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43722207FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 16C622085B
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:03:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16C622085B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52879 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT2vF-0005MN-Fy
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 06:59:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38265)
+	id 1iT2yv-0007MP-It
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 07:03:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38787)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iT2uL-000483-AT
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:58:30 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iT2wz-0006Ex-5F
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:01:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iT2uK-0002KA-3s
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:58:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38526)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iT2uJ-0002IS-R3
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:58:28 -0500
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 6478A81F18
- for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 11:58:26 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id y3so3036112wrm.12
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 03:58:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=lDtcoNA1YcT/e930WhhoooBJnhMqdakwlIvwoyvGyf4=;
- b=dfHsEKuCgNNtSrr7DNwCkGmE/tdL07Zyp/n8l0/pIRtEuZIxc/lkP6Un9TyU+uWYwd
- qTE1JrJnwnqWvv/8MSFCTLihkVFBtUq+x6GvQ/IUYLJvdo90p72UcODCLVLGtXXEmZCD
- eKHY2wTh1ME7W6cRyjBFGFa7Hk4QafQ+k9ig/h43WzlvF2OqEIwUWvGVFvDdopYscH9t
- YwImmjhkfqUgpY0xfkP61r39X6YIurWi+cSXOAgCT+0F9XGBVoYI9UqiP2uzNc8HgP+i
- VjOZyflSlfuflnPyPk3x1VFLgNpual4Lc+FNRXrp0Fy0rqqZNKY0Wnm/c2PrfQVCwNdw
- bVeg==
-X-Gm-Message-State: APjAAAVrPWqYNX+BvKnJ9VQlRqJQM515NuwqwKtO8KMwwgy4t0bQkqDm
- i2Abjp1gM9eu6G5MRWpCkq+2KuR5itHs5qPNZSzyjlgoUD/kC7iHWyEdJ6uY/g/PuW8RqWI/0SM
- +Su70JAc7449NlXQ=
-X-Received: by 2002:a5d:5586:: with SMTP id i6mr7821486wrv.81.1573214305134;
- Fri, 08 Nov 2019 03:58:25 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzxu60k3M8WiCj+qcPI/SYkIPeRvALpvUWWa0AWVcQogHC3KEFEHQ/T1bMEtSd4k1qBMpCpCA==
-X-Received: by 2002:a5d:5586:: with SMTP id i6mr7821468wrv.81.1573214304878;
- Fri, 08 Nov 2019 03:58:24 -0800 (PST)
-Received: from [192.168.1.33] (62.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.62])
- by smtp.gmail.com with ESMTPSA id l2sm6274980wrt.15.2019.11.08.03.58.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 08 Nov 2019 03:58:24 -0800 (PST)
-Subject: Re: [PATCH] configure: Check bzip2 is available
-To: Laszlo Ersek <lersek@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191108102805.8258-1-philmd@redhat.com>
- <b6005d59-c5d2-1844-db94-a67e258c2867@redhat.com>
- <d0cf0f78-a0c9-e0fa-7959-ecdebf27f912@redhat.com>
- <f688cac2-d370-23af-27fd-fa1f3c3637f9@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <55f259eb-aaf9-75ce-5346-9d33f8d2464f@redhat.com>
-Date: Fri, 8 Nov 2019 12:58:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <no-reply@patchew.org>) id 1iT2wu-0006Cl-2l
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:01:13 -0500
+Resent-Date: Fri, 08 Nov 2019 07:01:13 -0500
+Resent-Message-Id: <E1iT2wu-0006Cl-2l@eggs.gnu.org>
+Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21840)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iT2wq-0005y7-Gd; Fri, 08 Nov 2019 07:01:04 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1573214448; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=WL8F83rL4Vg/cyldiJzKDH94/DYWccYKqUHBQLuF1G9+7B6YuacR66i99V7ACXng/tOcrd2RGpQ/3fwx9/EyWSjjBvJdDN99k5Q6W8vbU28Ptif39Gqr2/F+Yruw0qlpusTqcCsu/DRD97j2gyDizDcEIJxtzewC1mTkrevNShc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1573214448;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=qgjne4f+JI6AGgrKHyYiv9lTgRZG5zV9fDjl6uoNpts=; 
+ b=O7xnvCrqgQcHemCv8s5tcwDNGwjiGjmlichEr+OrD8H++N1r03JPyPiEG6si4/NmbVkxIeZqamYGE6lLg40X1A1w64ZJoRjaIvXJFvdltTpluGiePT+i+soUd42Z+Tt3GtO+Fof0LkHtLICWvH9XmdaetNz5PT29Xvh4lPArBA8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1573214445895422.60992837946367;
+ Fri, 8 Nov 2019 04:00:45 -0800 (PST)
+In-Reply-To: <20191108101655.10611-1-vsementsov@virtuozzo.com>
+Subject: Re: [PATCH v2 0/2] Deprecate implicit filters
+Message-ID: <157321444410.31898.1482127132000677175@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <f688cac2-d370-23af-27fd-fa1f3c3637f9@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: vsementsov@virtuozzo.com
+Date: Fri, 8 Nov 2019 04:00:45 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.132.183.28
+X-Received-From: 136.143.188.58
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,79 +75,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, mlevitsk@redhat.com, pkrempa@redhat.com,
+ qemu-block@nongnu.org, libvir-list@redhat.com, jsnow@redhat.com,
+ armbru@redhat.com, qemu-devel@nongnu.org, vsementsov@virtuozzo.com,
+ dinechin@redhat.com, den@openvz.org, mreitz@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/8/19 12:39 PM, Laszlo Ersek wrote:
-> On 11/08/19 11:42, Philippe Mathieu-Daud=C3=A9 wrote:
->> On 11/8/19 11:34 AM, Thomas Huth wrote:
->>> On 08/11/2019 11.28, Philippe Mathieu-Daud=C3=A9 wrote:
->>>> The bzip2 tool is not included in default installations.
->>>> On freshly installed systems, ./configure succeeds but 'make'
->>>> might fail later:
->>>>
->>>>  =C2=A0=C2=A0=C2=A0=C2=A0 BUNZIP2 pc-bios/edk2-i386-secure-code.fd.b=
-z2
->>>>  =C2=A0=C2=A0 /bin/sh: bzip2: command not found
->>>>  =C2=A0=C2=A0 make: *** [Makefile:305: pc-bios/edk2-i386-secure-code=
-.fd] Error 127
->>>>  =C2=A0=C2=A0 make: *** Deleting file 'pc-bios/edk2-i386-secure-code=
-.fd'
->>>>  =C2=A0=C2=A0 make: *** Waiting for unfinished jobs....
->>>>
->>>> Add a check in ./configure to warn the user if bzip2 is missing.
->>>>
->>>> Fixes: 536d2173b2b
->>>> Reported-by: Thomas Huth <thuth@redhat.com>
->>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->>>> ---
->>>>  =C2=A0 configure | 7 +++++++
->>>>  =C2=A0 1 file changed, 7 insertions(+)
->>>>
->>>> diff --git a/configure b/configure
->>>> index efe165edf9..9957e913e8 100755
->>>> --- a/configure
->>>> +++ b/configure
->>>> @@ -1851,6 +1851,13 @@ python_version=3D$($python -c 'import sys;
->>>> print("%d.%d.%d" % (sys.version_info[0]
->>>>  =C2=A0 # Suppress writing compiled files
->>>>  =C2=A0 python=3D"$python -B"
->>>> +# Some firmware binaries are compressed with bzip2
->>>> +if has bzip2; then
->>>> +=C2=A0 :
->>>> +else
->>>> +=C2=A0 error_exit "bzip2 program not found. Please install it"
->>>> +fi
->>>
->>> It's only required for the edk2 binaries, isn't it? So should this
->>> maybe also check whether we build any of the i386-softmmu,
->>> x86_64-softmmu arm-softmmu or aarch64-softmmu targets and pass otherw=
-ise?
->>
->> I have this on my TODO somewhere, because we extract the edk2 firmware=
-s
->> even if we only build MIPS/PowerPC.
->=20
-> But that applies to all of "BLOBS" in the root-level Makefile, doesn't
-> it? We also install, say, "vgabios-qxl.bin", when only the MIPS/PowerPC
-> system emulators are built. The only aspect that's specific to edk2
-> binaries is that they are kept compressed until installation time, to
-> save space in the git repo and in the source tarball.
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwODEwMTY1NS4xMDYx
+MS0xLXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBmYWlsZWQg
+dGhlIGRvY2tlci1taW5nd0BmZWRvcmEgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3Rp
+bmcgY29tbWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGlu
+c3RhbGxlZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEgL2Jpbi9iYXNoCmV4cG9ydCBBUkNIPXg4Nl82NAptYWtlIGRv
+Y2tlci1pbWFnZS1mZWRvcmEgVj0xIE5FVFdPUks9MQp0aW1lIG1ha2UgZG9ja2VyLXRlc3QtbWlu
+Z3dAZmVkb3JhIEo9MTQgTkVUV09SSz0xCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgogIFNJR04g
+ICAgcGMtYmlvcy9vcHRpb25yb20vcHZoLmJpbgogIEdFTiAgICAgZG9jcy9pbnRlcm9wL3FlbXUt
+Z2EtcmVmLjcKL3RtcC9xZW11LXRlc3Qvc3JjL3FlbXUtZGVwcmVjYXRlZC50ZXhpOjIxMDogQG9w
+dGlvbiBleHBlY3RlZCBicmFjZXMKbWFrZTogKioqIFtNYWtlZmlsZTo5OTQ6IHFlbXUtZG9jLnR4
+dF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgovdG1w
+L3FlbXUtdGVzdC9zcmMvcWVtdS1kZXByZWNhdGVkLnRleGk6MjEwOiBAb3B0aW9uIGV4cGVjdGVk
+IGJyYWNlcwptYWtlOiAqKiogW01ha2VmaWxlOjk4NzogcWVtdS1kb2MuaHRtbF0gRXJyb3IgMQpU
+cmFjZWJhY2sgKG1vc3QgcmVjZW50IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIv
+ZG9ja2VyLnB5IiwgbGluZSA2NjIsIGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWluKCkpCi0t
+LQogICAgcmFpc2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5D
+YWxsZWRQcm9jZXNzRXJyb3I6IENvbW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVu
+JywgJy0tbGFiZWwnLCAnY29tLnFlbXUuaW5zdGFuY2UudXVpZD0zZDQwNDQ4MjI3OWY0ZmU2OGZj
+YjJjOTk3MWYyNDgwYScsICctdScsICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9
+dW5jb25maW5lZCcsICctLXJtJywgJy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9D
+T05GSUdVUkVfT1BUUz0nLCAnLWUnLCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0n
+LCAnLWUnLCAnU0hPV19FTlY9JywgJy1lJywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywg
+Jy12JywgJy9ob21lL3BhdGNoZXcvLmNhY2hlL3FlbXUtZG9ja2VyLWNjYWNoZTovdmFyL3RtcC9j
+Y2FjaGU6eicsICctdicsICcvdmFyL3RtcC9wYXRjaGV3LXRlc3Rlci10bXAtbWxwb2t3dGcvc3Jj
+L2RvY2tlci1zcmMuMjAxOS0xMS0wOC0wNi41Ni4zMy4yMzgwNTovdmFyL3RtcC9xZW11Onoscm8n
+LCAncWVtdTpmZWRvcmEnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1taW5ndyddJyByZXR1
+cm5lZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFl
+bXUuaW5zdGFuY2UudXVpZD0zZDQwNDQ4MjI3OWY0ZmU2OGZjYjJjOTk3MWYyNDgwYQptYWtlWzFd
+OiAqKiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92
+YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1tbHBva3d0Zy9zcmMnCm1ha2U6ICoqKiBbZG9ja2Vy
+LXJ1bi10ZXN0LW1pbmd3QGZlZG9yYV0gRXJyb3IgMgoKcmVhbCAgICA0bTExLjE3MHMKdXNlciAg
+ICAwbTQuNDA0cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcu
+b3JnL2xvZ3MvMjAxOTExMDgxMDE2NTUuMTA2MTEtMS12c2VtZW50c292QHZpcnR1b3p6by5jb20v
+dGVzdGluZy5kb2NrZXItbWluZ3dAZmVkb3JhLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
+cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBs
+ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-You are right, other targets could improve this too.
-Since this add quite complexity to the buildsys and nobody complained=20
-about that previously, I suggest we clean that *after* we switch the=20
-build machinery to Meson.
-
-> I'm reminded of the "external QEMU blob / firmware repo" idea.
-
-Do you mind starting a new thread asking about it? It would be nice we=20
-clear this during the next dev cycle.
-
-Regards,
-
-Phil.
 
