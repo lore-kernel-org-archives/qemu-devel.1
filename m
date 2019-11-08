@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B232FA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:31:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BD4FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:33:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 244202077C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:31:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A1A621D7E
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:33:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7N9mmgB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 244202077C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QPN0UlNy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A1A621D7E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT7Ao-0006Mp-Hy
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:31:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33500)
+	id 1iT7CY-0007xP-Ke
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:33:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33997)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iT78I-0004Yi-SY
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:29:11 -0500
+ (envelope-from <alistair23@gmail.com>) id 1iT7AQ-0006Ry-Ce
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:31:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iT78H-0007zw-S5
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:29:10 -0500
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:44534)
+ (envelope-from <alistair23@gmail.com>) id 1iT7AN-0001Uv-Ld
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:31:21 -0500
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:46563)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iT78H-0007z4-KU; Fri, 08 Nov 2019 11:29:09 -0500
-Received: by mail-lj1-x241.google.com with SMTP id g3so6830211ljl.11;
- Fri, 08 Nov 2019 08:29:09 -0800 (PST)
+ id 1iT7AN-0001QS-Ci
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:31:19 -0500
+Received: by mail-lj1-x244.google.com with SMTP id e9so6821054ljp.13
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 08:31:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=2EP7wzCUQn8ClW49ZkYJ2vk+A42uQE97hL6HqnEcnSU=;
- b=f7N9mmgBicl5x3TJs/MmnSx+Wywdwo1JQzNPqAXL+536+N36ppmGi5ayeRu8laoJ2k
- edCU6gjxaCyjApx1UfdB8GUhUMqN/BFARs9oXYhtER2WqyEcveaO2qfmMNrIrDYEWvpq
- snyab6RgPtHSw6mOfAAXAJtGTGpwSzheD+QRDIf8Om6/J4AUMQhwYkSyZ/HkY96YJeiX
- vBNdQF6YDSetGgG4x1WGJ7wn3lfBAQHIXwpVY+PC2u1BR4NMuCWtcfMMC4vEfrDrNko1
- +mgHRZKHwuTWHXtw+kqMVBSK7IaySh28/ZmZNEgvG9r02hhSPel4AmitaAZVtRqIwRA4
- LHOA==
+ :cc; bh=TRtp0V9VrfV458gX/yt6vqT1rGMsqUatsW/00pWYS0g=;
+ b=QPN0UlNya+jVX4rmscDx/l1en6jrs/xK+4KVzxzI7BL2ZTjXE23fDNdJVB3v6L6bCi
+ lPbWoCfRfwiTzd1/dw6Pcq6DWkjOY+li405+JMB+fplj6+cV70c5x1KOH3+h030r+P0f
+ X6NDGaPE5XrjF84g4Q+2Lj8jHadML18hbh+2PFHCBzK0tb+kSc+KiSy6g2SkTSzMIYrN
+ Kaj3rC7c1lklMaKXp5U4lZ9JBqanM4m9kyehXnIA43Chr2lYAnsXCV7/8ave79JyAqwL
+ rbkwRKva0UX+W/01SSt5atJZgBd7MOn3lGdhX0IcQ8KyjZ6o19yMnkMahFRM7aKhMmRD
+ 8t5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=2EP7wzCUQn8ClW49ZkYJ2vk+A42uQE97hL6HqnEcnSU=;
- b=GVrTr6q4NdCGQzHUvN0A0XMOkt4xBRB1BwpLvir2k2IWLZqB4x5/yjltJaFxTgSiGK
- nbLGhrPQvzjYdKPbTb8GFGHIc0wJjE81QB6eu/IOk6M1GUCFbFTYY8RyuzuqmvHJuKrN
- ZjsWh+Cof3J31EOHNq3bNvIt+HFbVtnqWyXlOszOfXHaY2MwIexW1inHb9FoJ+DowHbu
- qCGGlyqF+2EbPVD50FCDRI6R0TPD2COCxISsoqTMq5cWK7ZFJIHjDDn8CzwDtSBQWVQf
- iNIVwPWltD9PBq9xCslTgCFSYakxV6Yr2cmVUW6dHQln754Yg8oAG0JRcyl+QdQpW6ds
- iz3Q==
-X-Gm-Message-State: APjAAAVoPl+O8Y1xOrXROkfU2w/qT2GsCd6D46kuQ1l9SkaGb/xSDrNI
- iblebrafTfBBAXbYOwb8Ulgm5xFU3wshDWoZwW4=
-X-Google-Smtp-Source: APXvYqywLW1OiKc2JJ2yN9wo96vKNLbdDVwIgqTmTv134nojaggP0HbNalMUhTG1T/9/uklajtT8bK7KxYajERKFOhs=
-X-Received: by 2002:a2e:420a:: with SMTP id p10mr7700622lja.16.1573230547906; 
- Fri, 08 Nov 2019 08:29:07 -0800 (PST)
+ bh=TRtp0V9VrfV458gX/yt6vqT1rGMsqUatsW/00pWYS0g=;
+ b=n9mHjfqo+lkgrlS2v8n+wtNSq0RZrTxjNs/+jrPdS1IBBTngo8oB1UurSRz+14iJsp
+ NRB6WM6iHvveMRwP2VMd6coy75B+BOJbcafQp00qaQ9/fcVjZ+u99k8jnrQb8x7oib71
+ 08DOufgjdv/zl8O6w4ncFcCrguAkfbudbYZGmSmpjEta4SNbpf5yRiasO7BnNgv7wR98
+ wlhmPhLzAIsRkkZVo7pEsgnfyDXRZ60cKPZD9cM2PCI7bBp1vZwGArzKCePqIk4JJSBG
+ askzHUfaod5oXjfBpdpz6+64oQfZzouAi4Eub65AWaUbaYBaqBLnrge8MYoSXPBPkCkm
+ r8Gw==
+X-Gm-Message-State: APjAAAX/cjuql230nWZBckTCKy26xV7lIwgYKIazOXRPzyTTdXUK98xj
+ QS+cybkFWQ/xq9xG5AjMhvNZ+b9w5zFC3Hg1gT5KS63S
+X-Google-Smtp-Source: APXvYqzlnkUNYCFn+YmGVsxcIPiiAbNFGJyh++Nwy9bI3n8O1erW6LI4FdRMjbXXzzcyOjWG3H+Yz6BwkQOr/k3OM8E=
+X-Received: by 2002:a2e:420a:: with SMTP id p10mr7708018lja.16.1573230677682; 
+ Fri, 08 Nov 2019 08:31:17 -0800 (PST)
 MIME-Version: 1.0
-References: <03c2f42b32fb4e304319c241122ae83584f085e0.1573087610.git.alistair.francis@wdc.com>
- <mhng-35530489-a164-4825-90da-e550083fef9d@palmer-si-x1c4>
-In-Reply-To: <mhng-35530489-a164-4825-90da-e550083fef9d@palmer-si-x1c4>
+References: <20191108124219.31348-1-edgar.iglesias@gmail.com>
+ <20191108124219.31348-2-edgar.iglesias@gmail.com>
+In-Reply-To: <20191108124219.31348-2-edgar.iglesias@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 8 Nov 2019 08:28:41 -0800
-Message-ID: <CAKmqyKNfhsmHK2tnsyEHddTaSJLY5hRL+E7K8ZL7UN8KgWz4wQ@mail.gmail.com>
-Subject: Re: [PATCH for 4.2 v1 1/1] riscv/virt: Increase flash size
-To: Palmer Dabbelt <palmer@dabbelt.com>
+Date: Fri, 8 Nov 2019 08:30:50 -0800
+Message-ID: <CAKmqyKMY8PhT-72L7+WyagfwhKNv3P0mYYt=VrnRFuuhhiJkcA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] target/microblaze: Plug temp leaks for loads/stores
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::241
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,54 +87,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Stefano Stabellini <sstabellini@kernel.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Nov 7, 2019 at 8:58 AM Palmer Dabbelt <palmer@dabbelt.com> wrote:
+On Fri, Nov 8, 2019 at 4:43 AM Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
 >
-> On Wed, 06 Nov 2019 16:47:20 PST (-0800), Alistair Francis wrote:
-> > Coreboot developers have requested that they have at least 32MB of flash
-> > to load binaries. We currently have 32MB of flash, but it is split in
-> > two to allow loading two flash binaries. Let's increase the flash size
-> > from 32MB to 64MB to ensure we have a single region that is 32MB.
-> >
-> > No QEMU release has include flash in the RISC-V virt machine, so this
-> > isn't a breaking change.
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 >
-> Even if we had, I wouldn't consider it a breaking change because it adds to
-> the memory map so existing programs will continue to run fine.
+> Simplify endian reversion of address also plugging TCG temp
+> leaks for loads/stores.
 >
-> >
-> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  hw/riscv/virt.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> > index cc8f311e6b..23f340df19 100644
-> > --- a/hw/riscv/virt.c
-> > +++ b/hw/riscv/virt.c
-> > @@ -62,7 +62,7 @@ static const struct MemmapEntry {
-> >      [VIRT_PLIC] =        {  0xc000000,     0x4000000 },
-> >      [VIRT_UART0] =       { 0x10000000,         0x100 },
-> >      [VIRT_VIRTIO] =      { 0x10001000,        0x1000 },
-> > -    [VIRT_FLASH] =       { 0x20000000,     0x2000000 },
-> > +    [VIRT_FLASH] =       { 0x20000000,     0x4000000 },
-> >      [VIRT_DRAM] =        { 0x80000000,           0x0 },
-> >      [VIRT_PCIE_MMIO] =   { 0x40000000,    0x40000000 },
-> >      [VIRT_PCIE_PIO] =    { 0x03000000,    0x00010000 },
->
-> Reviewed-by: Palmer Dabbelt <palmer@dabbelt.com>
->
-> I'll include this in my next PR, which should be soon -- I was about to send
-> it, but figure I should look at my email first :)
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Ping! I want to make sure the current patches you have make it into 4.2.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
+
+> ---
+>  target/microblaze/translate.c | 46 +++++++++++++++--------------------
+>  1 file changed, 20 insertions(+), 26 deletions(-)
+>
+> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+> index 761f535357..c8442b18e1 100644
+> --- a/target/microblaze/translate.c
+> +++ b/target/microblaze/translate.c
+> @@ -962,17 +962,7 @@ static void dec_load(DisasContext *dc)
+>          switch (size) {
+>              case 1:
+>              {
+> -                /* 00 -> 11
+> -                   01 -> 10
+> -                   10 -> 10
+> -                   11 -> 00 */
+> -                TCGv low = tcg_temp_new();
+> -
+> -                tcg_gen_andi_tl(low, addr, 3);
+> -                tcg_gen_sub_tl(low, tcg_const_tl(3), low);
+> -                tcg_gen_andi_tl(addr, addr, ~3);
+> -                tcg_gen_or_tl(addr, addr, low);
+> -                tcg_temp_free(low);
+> +                tcg_gen_xori_tl(addr, addr, 3);
+>                  break;
+>              }
+>
+> @@ -1006,9 +996,16 @@ static void dec_load(DisasContext *dc)
+>      tcg_gen_qemu_ld_i32(v, addr, mem_index, mop);
+>
+>      if ((dc->cpu->env.pvr.regs[2] & PVR2_UNALIGNED_EXC_MASK) && size > 1) {
+> +        TCGv_i32 t0 = tcg_const_i32(0);
+> +        TCGv_i32 treg = tcg_const_i32(dc->rd);
+> +        TCGv_i32 tsize = tcg_const_i32(size - 1);
+> +
+>          tcg_gen_movi_i64(cpu_SR[SR_PC], dc->pc);
+> -        gen_helper_memalign(cpu_env, addr, tcg_const_i32(dc->rd),
+> -                            tcg_const_i32(0), tcg_const_i32(size - 1));
+> +        gen_helper_memalign(cpu_env, addr, treg, t0, tsize);
+> +
+> +        tcg_temp_free_i32(t0);
+> +        tcg_temp_free_i32(treg);
+> +        tcg_temp_free_i32(tsize);
+>      }
+>
+>      if (ex) {
+> @@ -1095,17 +1092,7 @@ static void dec_store(DisasContext *dc)
+>          switch (size) {
+>              case 1:
+>              {
+> -                /* 00 -> 11
+> -                   01 -> 10
+> -                   10 -> 10
+> -                   11 -> 00 */
+> -                TCGv low = tcg_temp_new();
+> -
+> -                tcg_gen_andi_tl(low, addr, 3);
+> -                tcg_gen_sub_tl(low, tcg_const_tl(3), low);
+> -                tcg_gen_andi_tl(addr, addr, ~3);
+> -                tcg_gen_or_tl(addr, addr, low);
+> -                tcg_temp_free(low);
+> +                tcg_gen_xori_tl(addr, addr, 3);
+>                  break;
+>              }
+>
+> @@ -1124,6 +1111,10 @@ static void dec_store(DisasContext *dc)
+>
+>      /* Verify alignment if needed.  */
+>      if ((dc->cpu->env.pvr.regs[2] & PVR2_UNALIGNED_EXC_MASK) && size > 1) {
+> +        TCGv_i32 t1 = tcg_const_i32(1);
+> +        TCGv_i32 treg = tcg_const_i32(dc->rd);
+> +        TCGv_i32 tsize = tcg_const_i32(size - 1);
+> +
+>          tcg_gen_movi_i64(cpu_SR[SR_PC], dc->pc);
+>          /* FIXME: if the alignment is wrong, we should restore the value
+>           *        in memory. One possible way to achieve this is to probe
+> @@ -1131,8 +1122,11 @@ static void dec_store(DisasContext *dc)
+>           *        the alignment checks in between the probe and the mem
+>           *        access.
+>           */
+> -        gen_helper_memalign(cpu_env, addr, tcg_const_i32(dc->rd),
+> -                            tcg_const_i32(1), tcg_const_i32(size - 1));
+> +        gen_helper_memalign(cpu_env, addr, treg, t1, tsize);
+> +
+> +        tcg_temp_free_i32(t1);
+> +        tcg_temp_free_i32(treg);
+> +        tcg_temp_free_i32(tsize);
+>      }
+>
+>      if (ex) {
+> --
+> 2.20.1
+>
+>
 
