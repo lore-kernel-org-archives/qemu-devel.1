@@ -6,79 +6,63 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A715C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BBD6C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:44:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0586221882
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:43:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 986CC21882
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:44:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NcRJWjuI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0586221882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="BbvXJoR5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 986CC21882
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT6Pq-0007gl-U8
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:43:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52354)
+	id 1iT6RG-0000QS-UV
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:44:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53370)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iT6JI-0007b9-Sp
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:36:29 -0500
+ (envelope-from <berto@igalia.com>) id 1iT6PC-0007Hk-SO
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:42:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iT6JH-0006V4-PN
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:36:28 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21996
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iT6JH-0006Ur-Lw
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:36:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573227387;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=g++Exd2DWJ1NcfVD1rs7GQslVMB/MVUHEm3VTU7xIpo=;
- b=NcRJWjuIrZd1Gm3mcD+EJVv4XtRDgwmjGisXHvMGi56Fw2ef1AOi9vAKddQKrjtRoKUMxC
- 2kE+HIFpTpMXmG7GDgtQOEw8KNF9jWwlsUVtvTksrnOZ1b3O+EIiZbPzF69hmiEK0AqLPj
- zWDgy1ihVldpBgsEho4ed7V2yM/Y2jc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-103-YkkxOV1wMeCN1ijhqhDf-w-1; Fri, 08 Nov 2019 10:36:24 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25D4F1005500;
- Fri,  8 Nov 2019 15:36:23 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DFD193CC6;
- Fri,  8 Nov 2019 15:36:22 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 5884611385C9; Fri,  8 Nov 2019 16:36:21 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [RFC PATCH 06/18] qemu-storage-daemon: Add --nbd-server option
-References: <20191017130204.16131-1-kwolf@redhat.com>
- <20191017130204.16131-7-kwolf@redhat.com>
- <25f74aa7-0856-a396-fb98-f6b7a337b965@redhat.com>
-Date: Fri, 08 Nov 2019 16:36:21 +0100
-In-Reply-To: <25f74aa7-0856-a396-fb98-f6b7a337b965@redhat.com> (Max Reitz's
- message of "Wed, 6 Nov 2019 13:51:42 +0100")
-Message-ID: <87d0e2753e.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <berto@igalia.com>) id 1iT6PA-0000j3-4d
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:42:34 -0500
+Received: from fanzine.igalia.com ([178.60.130.6]:47372)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1iT6P9-0000hq-SC; Fri, 08 Nov 2019 10:42:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=FvYcp3uc0deWfNrYF2v+QHECyFzOCJtqx2LIrsSBts8=; 
+ b=BbvXJoR5iv/bh5PESbfdFOYnSrKIiDhC8CR7e60OdxaizS7wB1GBcSW3EgAPsJnjXmBAEMnDrbUKrWeSi5XmZnJ/JMwN/u/QzaPL0EOY54bLREdDU23rZZlvfy9Eie4O0bEjaYqSwQ7nesLhYFwQmflOWQmNmDIunF03DfMN0C/l67gHVji3LGVXQ6qvBklrpQm3jrIKG55bQV+kjosJ/OHFefwvrF3/xDjcSYJFdPSbegVUpgl/MyUOrWcBIhtRyjqZ8jgUfHqcISJGLWVAIdahWTzrF4KgKD6PeNvzV3AmgAG1zD1l8dtvSamPCBs32GpIwZixYiMpcuBagT+A5A==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1iT6P6-0002jj-N0; Fri, 08 Nov 2019 16:42:28 +0100
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1iT6P6-0006j0-KT; Fri, 08 Nov 2019 16:42:28 +0100
+From: Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [RFC PATCH v2 14/26] qcow2: Add subcluster support to
+ qcow2_get_cluster_offset()
+In-Reply-To: <673d72da-bf8c-3ffb-a324-79e93f88a140@redhat.com>
+References: <cover.1572125022.git.berto@igalia.com>
+ <6932c2ddfe19a564cad7c54246290e166525fc46.1572125022.git.berto@igalia.com>
+ <673d72da-bf8c-3ffb-a324-79e93f88a140@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Fri, 08 Nov 2019 16:42:28 +0100
+Message-ID: <w51ftiys7bv.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: YkkxOV1wMeCN1ijhqhDf-w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,60 +74,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, pkrempa@redhat.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Max Reitz <mreitz@redhat.com> writes:
+On Mon 04 Nov 2019 03:58:57 PM CET, Max Reitz wrote:
+> OTOH, what I don=E2=80=99t like so far about this series is that the =E2=
+=80=9Ccluster
+> logic=E2=80=9D is still everywhere when I think it should just be about
+> subclusters now.  (Except in few places where it must be about
+> clusters as in something that can have a distinct host offset and/or
+> has an own L2 entry.)  So maybe the parameter should really be
+> @nb_subclusters.
 
-> On 17.10.19 15:01, Kevin Wolf wrote:
->> Add a --nbd-server option to qemu-storage-daemon to start the built-in
->> NBD server right away. It maps the arguments for nbd-server-start to the
->> command line.
+> But I=E2=80=99m not sure.  For how this function is written right now, it
+> makes sense for it to be @nb_clusters, but I think it could be changed
+> so it would work with @nb_subclusters, too.
+
+I'm still reviewing your (much appreciated) feedback, but one thing I
+can tell you is that my initial versions were doing everything with
+subclusters because of the reasons you mention (i.e. there was
+@nb_subclusters and all that).
+
+Later when I started to tidy things up I realized that most of those
+places only needed the number of clusters after all, and in some cases
+the necessary changes were really minimal (like in handle_copied()).
+
+>> +static int count_contiguous_subclusters(BlockDriverState *bs, int nb_cl=
+usters,
+>> +                                        unsigned sc_index, uint64_t *l2=
+_slice,
+>> +                                        int l2_index)
+>>  {
+   /* ... */
+>> +    if (type =3D=3D QCOW2_CLUSTER_COMPRESSED) {
+>> +        return 1; /* Compressed clusters are always counted one by one =
+*/
 >
-> Well, it doesn=E2=80=99t quite, because nbd-server-start takes a
-> SocketAddressLegacy, and this takes a SocketAddress.
+> Hm, yes, but cluster by cluster, not subcluster by subcluster, so this
+> should be s->subclusters_per_cluster, and perhaps sc_index should be
+> asserted to be 0.  (Or it should be s->subclusters_per_cluster -
+> sc_index.)
+
+Right, that's a bug, it forces the caller to decompress the cluster 32
+times in order to read it completely! Thanks!
+
+(in reality this is not used because this function doesn't get called
+for compressed clusters but the same problem happens in the calling
+function, as you correctly point out. Maybe I should assert here
+instead)
+
+>> @@ -514,8 +499,8 @@ int qcow2_get_cluster_offset(BlockDriverState *bs, u=
+int64_t offset,
 >
-> On one hand I can understand why you would do it differently (especially
-> for command-line options), but on the other I find it a bit problematic
-> to have --nbd-server be slightly different from nbd-server-start when
-> both are intended to be the same.
->
-> My biggest problem though lies in the duplication in the QAPI schema.
-> If NbdServerOptions.addr were a SocketAddressLegacy, we could let
-> nbd-server-start=E2=80=99s options just be of type NbdServerOptions and t=
-hus get
-> rid of the duplication.
->
-> I suspect in practice it=E2=80=99s all not that big of a problem.  I can=
-=E2=80=99t call
-> it bad if --nbd-server is just nicer to use.  And the biggest problem
-> with duplication in the QAPI schema is that nbd-server-start and
-> --nbd-server might get out of sync.  But realistically, I don=E2=80=99t s=
-ee that
-> happen, because if nbd-server-start changes, nbd_server_start() will
-> change, too, so we=E2=80=99ll get compile errors in nbd_server_start_opti=
-ons().
->
-> *shrug*
+> I suppose this is get_subcluster_offset now.
 
-Two good reasons for making new --nbd-server differ from existing
-nbd-server-start:
+Hmmm no, this returns the actual host cluster offset, then the caller
+uses offset_into_cluster() to get the final value (which doesn't need to
+be subcluster-aligned anyway).
 
-1. The nesting sucks.  The CLI's dotted key syntax makes it suck harder.
-
-2. New interfaces should not use SocketAddressLegacy (or any other
-   "simple" union) if we can help it.
-
-The duplication is the price we pay for getting it right om the second
-try.
-
-> But I do think the commit message should explain why we can=E2=80=99t jus=
-t use
-> NbdServerOptions for nbd-server-start.
-
-Yes, and throw in a comment.
-
+Berto
 
