@@ -2,67 +2,68 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF159FC6197
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:40:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2B1FC6196
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:40:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93EF220674
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:40:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93EF220674
+	by mail.kernel.org (Postfix) with ESMTPS id 3562520674
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:40:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3562520674
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iTB3G-0005Yo-Kj
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 15:40:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47438)
+	id 1iTB3H-0005aW-7X
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 15:40:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47460)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iTB22-0004ZL-9n
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:38:59 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iTB25-0004ae-1v
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:39:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iTB20-0002yw-AP
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:38:58 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:55703)
+ (envelope-from <laurent@vivier.eu>) id 1iTB22-00030u-73
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:39:00 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:55867)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iTB20-0002qU-14
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:38:56 -0500
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iTB20-0002qz-6m
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:38:57 -0500
 Received: from localhost.localdomain ([78.238.229.36]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MrPVJ-1i6EkZ2GMp-00oVl6; Fri, 08 Nov 2019 21:38:48 +0100
+ id 1MWjQU-1iQvxZ2zdY-00X8Id; Fri, 08 Nov 2019 21:38:49 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/2] Q800 branch patches
-Date: Fri,  8 Nov 2019 21:38:44 +0100
-Message-Id: <20191108203846.8837-1-laurent@vivier.eu>
+Subject: [PULL 2/2] dp8393x: fix dp8393x_receive()
+Date: Fri,  8 Nov 2019 21:38:46 +0100
+Message-Id: <20191108203846.8837-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191108203846.8837-1-laurent@vivier.eu>
+References: <20191108203846.8837-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:UEq1ImDzzqzeYUjxj7nsNvJ+2czOvG9EfL9jyMEDBO2/cBF3tG2
- mKU1rufddNZe/HdHIcU3AdOKWzfC9xCYrNtTfuFmUZrg6XNZhv3FPJbinMiXmFp8BuhNf0J
- zoBA1NeMXItU9r+4/sO6O58Z6BDFIM15BY0waGOg53t13KhP9yjJ2eMqf/IithUAjCAFeCH
- 6zsJAX7E1s7uOXODbYCaw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:2g08UT3j+MU=:m6/u7k/IheLiMieYVCSJd1
- jk9wkD1J4hQlXQaUjUCIB628nTNy2bbutQG0Oz9+bYXkzVaM1SwIXMNzJzpTfK7fF9AIR0Lum
- V/sebGOizu12YD3BnXROqGQCQz+ZcCSFnx/+amTVhKmVu1ZoPrtxHVm0nH44ZIANHvGT25kPO
- 1sb5l4wisq/jH4YixwEj/ZsTzEL32AIq2aohMrABP8IHOsuBkEw2s5QnHgKUi3L4yT5aXP5sG
- beevYAQ7D+ie8OtyEpaButzItNbiMQ6zHF4kPPMeDqMibuB1E2iSmxq3zUZJoJkajF+GkNPDT
- V2WdSc9hVuB88l7AShVoWjNZcEHQfzFJ9fQ2Q2RY9Wsk6qTgzxl61MbPY63mbe77/uX8MFe+9
- KwmG2/8FOnbdyKd8WKreIzGh/lt26yqvYweBgd+3poFH9G7e7CR8rH2AjHQyoZzoLJtX5XFGe
- QEuo2jRszSawFT95wa2LXDg4oVjpQG6KLErpNro2zDr+w+M7tMpUTCI3JcFku8l+IkFiBuEn2
- 8n2koM/ZXoGy906uxb6cA/S7pn1r/oAoA//40axgfmWvA8dSqFmzJwVedXU1okr2jEkafL90J
- O0WwVqpwgw388ghsLSBISuOUZPbBDcP6HCSkEDctD3zrfPfrD5lLcrZC7F8b+eu9kT+nVTBkR
- fO7eT1BdN2yM71nmZ121fiKupJp3m/uPdE66vJdXwOtGd9k+ECRmS2ZQ0bOmeVm8dg6k5krji
- JNdQ8emzjfLz6CK+tTQPNIOJpdKStu9+uD5zXilTLl+t6Dwb6WQ+BpegWagORXYVVfm9s91jM
- tOxTq1NwX3kpTFIcj7WjeWyUXyr2fnW91rcDqSAcpjaDFKvcoL5dEZUj6WiHqKF1T28d8nX/Z
- 4N1QBXV6zCzPbDvQ19catqVImoe4M1m8X7SVFq/GU=
+X-Provags-ID: V03:K1:DepvcJcesC1ySjR1qILdISoUcOoALj8D8qzYfTGOJYYZnMcmZaK
+ w+Ku1vhvAtVlK1X21Gr7Bnpis4BUDlNzKRDc8WrzNepMgawS02G8kPjn+4mUDBGZ7zMLX2R
+ Q8vgZq6zUrtDLOc64Kt62+JcCFBbBmzSk4cETfHucgJ28QLdFUOyoJm33vlAVVuPoLrVHY6
+ N/cF78HgwJk7KjVscCoqA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:WeWGax1OJQk=:WG7Y+oYnZHrODKT+xHWz6w
+ CMzKvKwUiv0YNbA90WeapgWEB+fbaluHX9zbN685cP0MBTk8Bd3l/36l9DbCbmfjcTlpUfA2U
+ 82qN/aw4bXBcaTD3RytJR7jfXAw3DdOrtA3TW2uI5hYody4rI0k3feXn8aTRAYufnOEYOVFlm
+ z8zbEkIggC0KufpjngC+J8fGkxmSSj1+ntdXbqcVbGrPxYMQHJpKB9M6uxZ75G9gxjT109Vj7
+ UuxYJSjsxDs/BCtdZPhSPmz1vC2pO7rnilxtNRkn5tijZAj+ausjaMR8cZ10CuNCGpBGC4lVw
+ TK7ZX2wEz7YzrwWBlJQx6Z9Zt72kC4CXVd+eceA/+8/4JLkFw8SQgFXhbBOTt2WHtE9BYw0ny
+ 6Eakrl3lAF3AByOqeDGT+29uCQncc/ev+cF4YhVevjJpZsTgyFcnifq3CroE2rQDdlaEcwzQF
+ hbSQQ1P/YrmjH/hPiuYzaVrTvcqBVMg69YlECID514Z8P4ale9t0xLyGiEtEcHKb/viGM9YtQ
+ OLUBhRvvu1LkT7uWkSZvaG2ghvKsepeXcmzYQ1D7UIweZ3kS/C9Nv+XyHqkVewoagUYX4gakg
+ 1WHUtng5PEp9PvrUG062WRFZmHwFgOwELSzUwPH2O9TbYJTF/kIyzrvQil53L6mGDB9AGDv2u
+ yM8+1sTVtOXJ+bwaxkmzVeJQMOlRnw289nj4b8F5HGhFNosO7vVHazJMYKQlRaSVIEUxNOBTo
+ xrQPZlnMfzar8kiEIqK8us4ZpFbsminJov4Zzd2tRvIUjcos7dE7San7pTSnJO8KS3dD2fg8A
+ aa+WOXYdlzuGRJTZrIfI07hMRKZ4Mo07aiR1QWIkgNOaR1qEyFUwdgtih2Gpku2q2+UqHuZvL
+ Iisyf6jHpbKN8WOXnjZcsHV8BlUn6nQO9ZaFf9z9w=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 217.72.192.73
@@ -77,36 +78,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 1cee80fa665d37411f8ad8a930b84840bbab62e5:
+RXpkt.in_use is always 16 bit wide, but when the bus access mode is 32bit
+and the endianness is big, we must access the second word and not the
+first. This patch adjusts the offset according to the size and endianness.
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20191107-pull-request' into staging (2019-11-08 11:00:28 +0000)
+This fixes DHCP for Q800 guest.
 
-are available in the Git repository at:
+Fixes: be9208419865 ("dp8393x: manage big endian bus")
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Tested-by: Hervé Poussineau <hpoussin@reactos.org>
+Message-Id: <20191106112341.23735-3-laurent@vivier.eu>
+---
+ hw/net/dp8393x.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-  git://github.com/vivier/qemu-m68k.git tags/q800-branch-pull-request
-
-for you to fetch changes up to c744cf78791e7ddc903a46d6506f1a0cbcbb3387:
-
-  dp8393x: fix dp8393x_receive() (2019-11-08 21:32:31 +0100)
-
-----------------------------------------------------------------
-Fix dp8393x when used in big-endian/double-word mode
-(fix DHCP address allocation for q800 machine)
-
-----------------------------------------------------------------
-
-Laurent Vivier (2):
-  dp8393x: put the DMA buffer in the state structure
-  dp8393x: fix dp8393x_receive()
-
- hw/net/dp8393x.c | 113 ++++++++++++++++++++++++-----------------------
- 1 file changed, 57 insertions(+), 56 deletions(-)
-
+diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
+index 85d3f3788e..3d991af163 100644
+--- a/hw/net/dp8393x.c
++++ b/hw/net/dp8393x.c
+@@ -831,9 +831,15 @@ static ssize_t dp8393x_receive(NetClientState *nc, const uint8_t * buf,
+         /* EOL detected */
+         s->regs[SONIC_ISR] |= SONIC_ISR_RDE;
+     } else {
+-        dp8393x_put(s, width, 0, 0); /* in_use */
+-        address_space_rw(&s->as, dp8393x_crda(s) + sizeof(uint16_t) * 6 * width,
+-            MEMTXATTRS_UNSPECIFIED, (uint8_t *)s->data, sizeof(uint16_t), 1);
++        /* Clear in_use, but it is always 16bit wide */
++        int offset = dp8393x_crda(s) + sizeof(uint16_t) * 6 * width;
++        if (s->big_endian && width == 2) {
++            /* we need to adjust the offset of the 16bit field */
++            offset += sizeof(uint16_t);
++        }
++        s->data[0] = 0;
++        address_space_rw(&s->as, offset, MEMTXATTRS_UNSPECIFIED,
++                         (uint8_t *)s->data, sizeof(uint16_t), 1);
+         s->regs[SONIC_CRDA] = s->regs[SONIC_LLFA];
+         s->regs[SONIC_ISR] |= SONIC_ISR_PKTRX;
+         s->regs[SONIC_RSC] = (s->regs[SONIC_RSC] & 0xff00) | (((s->regs[SONIC_RSC] & 0x00ff) + 1) & 0x00ff);
 -- 
 2.21.0
 
