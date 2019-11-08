@@ -2,102 +2,77 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27B3FFA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:06:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE3C7FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:06:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4596214DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:06:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78193214DB
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:06:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fKcOSpjc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4596214DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WtICZYzl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78193214DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51438 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT19W-0000Ku-Id
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 05:06:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43262)
+	id 1iT19n-0000my-5v
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 05:06:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43235)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iT17u-0007E1-69
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:04:23 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iT17s-0007Bz-CO
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:04:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iT17t-0005SU-8o
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:04:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41081
+ (envelope-from <mlevitsk@redhat.com>) id 1iT17r-0005MI-1L
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:04:20 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30589
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iT17t-0005SE-3J
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:04:21 -0500
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iT17q-0005Kv-TU
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:04:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573207460;
+ s=mimecast20190719; t=1573207458;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=CKEFCIph6vg4F6zATjapPQ1m8ngpwJMJ7ThbWmYZxp8=;
- b=fKcOSpjcZ9DhHHBXVS1qnaTSN4s7eqIU1MWMD64BUV8QYp6aRQsodgNb65ZXfh1EK6peQn
- UepbKt+6wopHgE3SO44wkGHF3VsZBnvd/FYlkw+OKefn1va6qxuaXWFqzG6knSlpmVpNba
- jxG+ucgqgnt/ssA9F4N3jlN8oZee20k=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=e8kAm7lki0HEyIketRqHW+FrvJ+aE7pa4AGa298cFEY=;
+ b=WtICZYzlDXdUZ0u+4O+WRvrGlNpgulRMMP3WrNxKXgPVp6ya6x0LoKErrW1/h/SjDO13vO
+ W/tJDpHc1omNFUDzeeFKB5LYaloU3/pmmsTuKWG2F+IL1mvBVgnFfe/m0bsHv/jF/hosIe
+ 72wgvUWGP0x4q4yllUB56wmFgwwf5fg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-18--tsMUEXgP4mt-OPNkfQN_A-1; Fri, 08 Nov 2019 05:04:19 -0500
-X-MC-Unique: -tsMUEXgP4mt-OPNkfQN_A-1
+ us-mta-372-2-cJLhBONViDOYw8Q7qMrw-1; Fri, 08 Nov 2019 05:04:13 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D6B2477;
- Fri,  8 Nov 2019 10:04:18 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-78.ams2.redhat.com
- [10.36.117.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8239C5C290;
- Fri,  8 Nov 2019 10:04:17 +0000 (UTC)
-Subject: Re: [PATCH] iotests: Fix "no qualified output" error path
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20191108085713.27551-1-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <5d90f6c9-bcb6-1c72-350d-44d4f5091280@redhat.com>
-Date: Fri, 8 Nov 2019 11:04:16 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
-MIME-Version: 1.0
-In-Reply-To: <20191108085713.27551-1-kwolf@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E17171005500;
+ Fri,  8 Nov 2019 10:04:12 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.23])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5C88E5C290;
+ Fri,  8 Nov 2019 10:04:08 +0000 (UTC)
+Message-ID: <01869101beb86ddca08e1003e48dfd653ca45d58.camel@redhat.com>
+Subject: Re: [PATCH v2 02/11] qcrypto-luks: extend the create options for
+ upcoming encryption key management
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Date: Fri, 08 Nov 2019 12:04:07 +0200
+In-Reply-To: <20191010134423.GC7616@localhost.localdomain>
+References: <20190912223028.18496-1-mlevitsk@redhat.com>
+ <20190912223028.18496-3-mlevitsk@redhat.com>
+ <20191010134423.GC7616@localhost.localdomain>
+Mime-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 2-cJLhBONViDOYw8Q7qMrw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="BzoDs6WQKL25sgbxAEee4ovLENJ2k5O3l"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.120
@@ -112,53 +87,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: "Daniel P. =?ISO-8859-1?Q?Berrang=E9?=" <berrange@redhat.com>,
+ qemu-block@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BzoDs6WQKL25sgbxAEee4ovLENJ2k5O3l
-Content-Type: multipart/mixed; boundary="vyZJxQMxP0u6azyByPFvVYsVoChjU8BLw"
-
---vyZJxQMxP0u6azyByPFvVYsVoChjU8BLw
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 08.11.19 09:57, Kevin Wolf wrote:
-> The variable for error messages to be displayed is $results, not
-> $reason. Fix 'check' to print the "no qualified output" error message
-> again instead of having a failure without any message telling the user
-> why it failed.
+On Thu, 2019-10-10 at 15:44 +0200, Kevin Wolf wrote:
+> Am 13.09.2019 um 00:30 hat Maxim Levitsky geschrieben:
+> > Now you can specify which slot to put the encryption key to
+> > Plus add 'active' option which will let  user erase the key secret
+> > instead of adding it.
+> > Check that active=3Dtrue it when creating.
+> >=20
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > diff --git a/qapi/crypto.json b/qapi/crypto.json
+> > index b2a4cff683..9b83a70634 100644
+> > --- a/qapi/crypto.json
+> > +++ b/qapi/crypto.json
+> > @@ -190,6 +190,20 @@
+> >  #                  Currently defaults to 'sha256'
+> >  # @hash-alg: the master key hash algorithm
+> >  #            Currently defaults to 'sha256'
+> > +#
+> > +# @active: Should the new secret be added (true) or erased (false)
+> > +#          (amend only, since 4.2)
+> > +#
+> > +# @slot: The slot in which to put/erase the secret
+> > +#        if not given, will select first free slot for secret addtion
+> > +#        and erase all matching keyslots for erase. except last one
+> > +#        (optional, since 4.2)
+> > +#
+> > +# @unlock-secret: The secret to use to unlock the image
+> > +#        If not given, will use the secret that was used
+> > +#        when opening the image.
+> > +#        (optional, for amend only, since 4.2)
+> > +#
+> >  # @iter-time: number of milliseconds to spend in
+> >  #             PBKDF passphrase processing. Currently defaults
+> >  #             to 2000. (since 2.8)
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/check | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> This approach doesn't look right to me. BlockdevCreateOptions should
+> describe the state of the image after the operation. You're describing
+> an update instead (and in a way that doesn't allow you to change
+> everything that you may want to change, so that you need to call the
+> operation multiple times).
+>=20
+> I imagined the syntax of a blockdev-amend QMP command similar to
+> x-blockdev-reopen: Describe the full set of options that you want to
+> have in effect after the operation; if you don't want to change some
+> option, you just specify it again with its old value.
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+This approach is a compromise trying to create more or less usable interfac=
+e.
+In particular we (I and Daniel) wanted the following to work:
+
+1. ability to add a new password to an empty keyslot and then remove the
+old password. This is probably the most common operation and it won't
+require the caller to know anything about the keyslots.
+
+2. Allow the user to not know the passwords of some keyslots.
+For example if I want to add a new keyslot, I might  not know
+some of the other keyslots. Specifying all the active keyslots,
+on each amend would force the user to know all the passwords
+(you can't 'extract' a password by reading a keyslot, since only
+hash of it is stored there for the security reasons)
 
 
---vyZJxQMxP0u6azyByPFvVYsVoChjU8BLw--
+Thus the amend interface either allows you to add a keyslot (either a speci=
+fic one,
+or first free one), and to remove a keyslot (again, either a specific one, =
+or
+one that matches given password).
 
---BzoDs6WQKL25sgbxAEee4ovLENJ2k5O3l
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3FPaAACgkQ9AfbAGHV
-z0CCowgAn/dsWVgiXMQxVXwa8cXgoGl3kHUypcGnSrf11G+dktX00+uhmYZ5GzJN
-L+lM04XSvSjmKKX2ZC8GxSOABoJU3oC6jToQCelTVLBo+zcqGf4F6YQnOw6MWV+6
-JSinGr7aYEFpmUFR2M/yDMcuAVaSZLVraM4GIrdjsAF4W6rUOmhTd0Ln337rNF05
-OC8IMTyN53wdauclJM7BABD233JQnI+FSi5SoqZv+GZ11z3feK92kXhdKopZLEfu
-qy+1nKyq81PNL+phM92fNeVbQdpeS32jDi+qDzgvt0w5/bVy9u6V7DgcRzOaZIT6
-SpsmaiEDAZGk2IBySUlRD5EhGOYWEw==
-=nlOK
------END PGP SIGNATURE-----
 
---BzoDs6WQKL25sgbxAEee4ovLENJ2k5O3l--
+>=20
+> Specifically for luks, this probably means that you have a @slots, which
+> is a list that contains at least the secret for each slot, or JSON null
+> for a slot that should be left empty.
+>=20
+> With the same approach, you don't have to make 'size' optional in later
+> patches, you can just require that the current size is re-specified. And
+> later, blockdev-amend could actually allow changing the size of images
+> if you provide a different value.
+
+This can be done IMHO.
+
+>=20
+> Kevin
+
+
+Best regards,=09
+=09Maxim Levitsky
 
 
