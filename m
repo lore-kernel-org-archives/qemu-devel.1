@@ -2,84 +2,87 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F929C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38EEBC5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:44:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A42D21D7E
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:44:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 03CBD218AE
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:44:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HMTGJZcV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A42D21D7E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SVhQ8nIf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03CBD218AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT3cy-00038c-SI
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 07:44:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45964)
+	id 1iT3dG-0003KW-Nl
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 07:44:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45981)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iT3b7-0001TU-TY
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:42 -0500
+ (envelope-from <edgar.iglesias@gmail.com>) id 1iT3bB-0001b1-TW
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iT3b6-0000I6-PT
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:41 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55966)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1iT3bA-0000Ot-MZ
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:45 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52308)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
- id 1iT3b6-0000H1-Jg
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:40 -0500
-Received: by mail-wm1-x342.google.com with SMTP id b11so6031055wmb.5
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 04:42:40 -0800 (PST)
+ id 1iT3bA-0000L7-Ez
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:44 -0500
+Received: by mail-wm1-x341.google.com with SMTP id c17so6058217wmk.2
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 04:42:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=/5O7PjcjAoeRLO1L/DKR9iB88xGHJxmmESpBt8TEgNY=;
- b=HMTGJZcVSrwOWJ09+KEcCWLEX09GolY8kyQD9kdUGrTCcEJaN679jLFI92TIW0I9nx
- H3hnSwgO96WmGDxyS2m4EGjLA4qfUYoOQwNfurpGjc1pHV8JuvTEK6BLJ4SXfRb2Xo43
- t/Rx9uucP6Gjudq5YotJaFrkcmLx/D29W7sz3V2qbtEnKTcaH1bGkp6jtdDDc34Jlt/b
- yEgnljBpJaEEoWgwv766vK+CGHjRWKJcplNl4TP0y4GWXoWSpC9JWZA0MgsFqhCYAuCF
- Ew+4jpKfYn/YSnrxUoHtTmRhealrwqM9aUWR/+2+sqyqJ29UuKrmYyKojP7k97Yp4nEw
- 5bHw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=9JFteoyFShjxDG1bJSY5A5RCb3N4szoLWvl3shrMJDg=;
+ b=SVhQ8nIfLm3NFz7n5Kn4X5uEqIW83SpAoIQ/IIyUNKA/lBQCXm35v58588Et/vlL7D
+ KQYP8rjXad7zUuDccUzsuRKbGOob7Q/+oceNQNzn+eqBQYP2LF22HlAroO0zm6tRjxyM
+ Q9akNDHp3tZvGfOc+uqNMv85uQjyEKqjLBsFbJO1VWJn+d/AeEUkkzxWEJ/+5W4gExd3
+ N0cUe0baUvO2tzbqQHPztxP1YVls9EQidlISgdGVBZHCCeGY7NYSpPQGTArijCn7B/ss
+ MoZYGtQASS0e65P5ZCOxyHWQncZWr5iAkowMAKXnrZ0AxC0N3VysUB2oZpejIQpHNkYk
+ XdFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=/5O7PjcjAoeRLO1L/DKR9iB88xGHJxmmESpBt8TEgNY=;
- b=DMw0y3A+Gd5vWVe08xiw4ujlrSLTNqVvpPsKKBI5mMwUtaEpzAfECzhSpyFuLhTA9v
- y2zmvMsiIcZyamKGKU1Zs+k9S8UR3bJi0d6gofjxvGjB7GSlJ+sp7C11OSR5GqXj8xdx
- pejAq7F/MzCO6Kt3TUA10v5zoAd9nzQ0fo0ISmU8uqcqAxzF5uvfbS0z+UT+UKVAsihD
- ZYiBhv49Wy2OXIRH/M8UkXxYzeXYqi7fWsHFBC9HDnfGTr6xZsZtqDjXFxCGvlU+KkTy
- 8FsMAym5hXbqX6D+H62gvfq7MG013vUUASaETE9U36VKuU8mCPs3mQCfqVA2q/iWBskk
- trNw==
-X-Gm-Message-State: APjAAAW/BmjZj33itXTuhH1iF7g5BULXffTT8L+8ucDPejgUB4hZSbYD
- LMZ0zmfGvfidWUyjdwGaY5YLWA5/oqk=
-X-Google-Smtp-Source: APXvYqyhxghajvi9FrabLdsoSxHScmVzb6hh7CZfkeR/mwSyF8YNnnI30gYYo9hPyRDVQipVOdQvDw==
-X-Received: by 2002:a7b:cb83:: with SMTP id m3mr7434830wmi.134.1573216958229; 
- Fri, 08 Nov 2019 04:42:38 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=9JFteoyFShjxDG1bJSY5A5RCb3N4szoLWvl3shrMJDg=;
+ b=husZ+ukn7JSkhmySa+UkOdStOv3FpF3b3tSR61gR0tCLQdgTTdASVu658VfQWmBdgg
+ uwQx+nwMTgqawMpQdhNmOc1YVw+2+0GqjayfXxO6WiZ8aKqEmVvwO1MjslRgF1AKI5PP
+ NsqMoqEEXZyKzkdxrziPoKoast0AWVY95agzHP6X9oZwg1IfRrK4nwOTPEIfmTkQ2hyl
+ K9x5qZ06a3d6VQm/Hr71Af6SB/PVXlB7TC1ympmykwlkbKxKjG4BknC1b59gvOBP3Byc
+ 8Sgl3buPFmhzpRPk3KTSjihfuDqCTPulRZiPR2zEnnJORuj5AsAgdKfrQDcCX74IerJa
+ K5tw==
+X-Gm-Message-State: APjAAAXFDdEOJCXM+J+O1AK+i3WAm0T6lSJyPmc1RywlVWeZnVHp0o+Y
+ ZMj4lmqRe2lTmgC8REfZPqqQ6/X8s2o=
+X-Google-Smtp-Source: APXvYqzZd4QXgPqIW0fOYm22ZWWNYnvs84UVyFK8JJFkOon52ozmalhXCejj6PfioVXRAYxnHNuF2Q==
+X-Received: by 2002:a7b:c7c7:: with SMTP id z7mr7624314wmk.133.1573216962944; 
+ Fri, 08 Nov 2019 04:42:42 -0800 (PST)
 Received: from localhost (ec2-34-244-242-0.eu-west-1.compute.amazonaws.com.
  [34.244.242.0])
- by smtp.gmail.com with ESMTPSA id d4sm5030967wrw.83.2019.11.08.04.42.36
+ by smtp.gmail.com with ESMTPSA id r5sm5732026wrl.86.2019.11.08.04.42.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 Nov 2019 04:42:37 -0800 (PST)
+ Fri, 08 Nov 2019 04:42:42 -0800 (PST)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/3] target/microblaze: Plug tcg temp leaks
-Date: Fri,  8 Nov 2019 13:42:16 +0100
-Message-Id: <20191108124219.31348-1-edgar.iglesias@gmail.com>
+Subject: [PATCH v2 1/3] target/microblaze: Plug temp leaks for loads/stores
+Date: Fri,  8 Nov 2019 13:42:17 +0100
+Message-Id: <20191108124219.31348-2-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191108124219.31348-1-edgar.iglesias@gmail.com>
+References: <20191108124219.31348-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,26 +105,101 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-On some workloads we've seen TCG run out of temps due to leakage
-in the MicroBlaze translator. This series fixes the leaks.
+Simplify endian reversion of address also plugging TCG temp
+leaks for loads/stores.
 
-Cheers,
-Edgar
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ target/microblaze/translate.c | 46 +++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 26 deletions(-)
 
-ChangeLog:
-
-v1 -> v2:
-* Use tcg_gen_xori_tl when endian reversing load/store addresses
-
-
-Edgar E. Iglesias (3):
-  target/microblaze: Plug temp leaks for loads/stores
-  target/microblaze: Plug temp leaks with delay slot setup
-  target/microblaze: Plug temp leak around eval_cond_jmp()
-
- target/microblaze/translate.c | 77 +++++++++++++++++------------------
- 1 file changed, 38 insertions(+), 39 deletions(-)
-
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index 761f535357..c8442b18e1 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -962,17 +962,7 @@ static void dec_load(DisasContext *dc)
+         switch (size) {
+             case 1:
+             {
+-                /* 00 -> 11
+-                   01 -> 10
+-                   10 -> 10
+-                   11 -> 00 */
+-                TCGv low = tcg_temp_new();
+-
+-                tcg_gen_andi_tl(low, addr, 3);
+-                tcg_gen_sub_tl(low, tcg_const_tl(3), low);
+-                tcg_gen_andi_tl(addr, addr, ~3);
+-                tcg_gen_or_tl(addr, addr, low);
+-                tcg_temp_free(low);
++                tcg_gen_xori_tl(addr, addr, 3);
+                 break;
+             }
+ 
+@@ -1006,9 +996,16 @@ static void dec_load(DisasContext *dc)
+     tcg_gen_qemu_ld_i32(v, addr, mem_index, mop);
+ 
+     if ((dc->cpu->env.pvr.regs[2] & PVR2_UNALIGNED_EXC_MASK) && size > 1) {
++        TCGv_i32 t0 = tcg_const_i32(0);
++        TCGv_i32 treg = tcg_const_i32(dc->rd);
++        TCGv_i32 tsize = tcg_const_i32(size - 1);
++
+         tcg_gen_movi_i64(cpu_SR[SR_PC], dc->pc);
+-        gen_helper_memalign(cpu_env, addr, tcg_const_i32(dc->rd),
+-                            tcg_const_i32(0), tcg_const_i32(size - 1));
++        gen_helper_memalign(cpu_env, addr, treg, t0, tsize);
++
++        tcg_temp_free_i32(t0);
++        tcg_temp_free_i32(treg);
++        tcg_temp_free_i32(tsize);
+     }
+ 
+     if (ex) {
+@@ -1095,17 +1092,7 @@ static void dec_store(DisasContext *dc)
+         switch (size) {
+             case 1:
+             {
+-                /* 00 -> 11
+-                   01 -> 10
+-                   10 -> 10
+-                   11 -> 00 */
+-                TCGv low = tcg_temp_new();
+-
+-                tcg_gen_andi_tl(low, addr, 3);
+-                tcg_gen_sub_tl(low, tcg_const_tl(3), low);
+-                tcg_gen_andi_tl(addr, addr, ~3);
+-                tcg_gen_or_tl(addr, addr, low);
+-                tcg_temp_free(low);
++                tcg_gen_xori_tl(addr, addr, 3);
+                 break;
+             }
+ 
+@@ -1124,6 +1111,10 @@ static void dec_store(DisasContext *dc)
+ 
+     /* Verify alignment if needed.  */
+     if ((dc->cpu->env.pvr.regs[2] & PVR2_UNALIGNED_EXC_MASK) && size > 1) {
++        TCGv_i32 t1 = tcg_const_i32(1);
++        TCGv_i32 treg = tcg_const_i32(dc->rd);
++        TCGv_i32 tsize = tcg_const_i32(size - 1);
++
+         tcg_gen_movi_i64(cpu_SR[SR_PC], dc->pc);
+         /* FIXME: if the alignment is wrong, we should restore the value
+          *        in memory. One possible way to achieve this is to probe
+@@ -1131,8 +1122,11 @@ static void dec_store(DisasContext *dc)
+          *        the alignment checks in between the probe and the mem
+          *        access.
+          */
+-        gen_helper_memalign(cpu_env, addr, tcg_const_i32(dc->rd),
+-                            tcg_const_i32(1), tcg_const_i32(size - 1));
++        gen_helper_memalign(cpu_env, addr, treg, t1, tsize);
++
++        tcg_temp_free_i32(t1);
++        tcg_temp_free_i32(treg);
++        tcg_temp_free_i32(tsize);
+     }
+ 
+     if (ex) {
 -- 
 2.20.1
 
