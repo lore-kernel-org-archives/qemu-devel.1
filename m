@@ -2,75 +2,59 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7F0C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECEE9C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:16:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77E82214DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:07:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bA1uqNAL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77E82214DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B82CC2178F
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 10:16:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B82CC2178F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT1AW-0001rP-ME
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 05:07:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43584)
+	id 1iT1Jn-00059W-Ch
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 05:16:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44564)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iT197-0000IQ-EZ
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:05:38 -0500
+ (envelope-from <jan.kiszka@siemens.com>) id 1iT1EO-00039u-Vn
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:11:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iT196-0006Je-5u
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:05:37 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46042
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <jan.kiszka@siemens.com>) id 1iT1EL-0000p1-Is
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:11:02 -0500
+Received: from thoth.sbs.de ([192.35.17.2]:45327)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iT196-0006JU-2P
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:05:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573207535;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=o2BqW75FcQ/QGfmXuaO4iWeubKRhDpX6nMSu4yDPQZA=;
- b=bA1uqNAL0JvYf2zn1Cwxnx4xHRDGnA+xys+hGKOXQPUUH77yFOtszvdg7xhqSUaaggExrO
- l7+GLNB1i1wkP62S+R1Gi9whp0ZNZmQaD/xNS6r3W4IGXqLMLKY/UvS6ShMR1sl1urXho5
- 2VTlr5lnz3cuwcW8FkY1zP6HHjGE6+U=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-fICsfHJqMliPSHCzqknQKg-1; Fri, 08 Nov 2019 05:05:32 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B590B1005500
- for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 10:05:31 +0000 (UTC)
-Received: from localhost (ovpn-116-74.ams2.redhat.com [10.36.116.74])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 48EBB1001DC2;
- Fri,  8 Nov 2019 10:05:28 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [qemu-web PATCH] documentation: link to nightly documentation
-Date: Fri,  8 Nov 2019 11:05:26 +0100
-Message-Id: <20191108100526.401847-1-stefanha@redhat.com>
+ (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+ id 1iT1EL-0000iC-8b
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 05:11:01 -0500
+Received: from mail1.sbs.de (mail1.sbs.de [192.129.41.35])
+ by thoth.sbs.de (8.15.2/8.15.2) with ESMTPS id xA898YNb003511
+ (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 8 Nov 2019 10:08:34 +0100
+Received: from [167.87.14.235] ([167.87.14.235])
+ by mail1.sbs.de (8.15.2/8.15.2) with ESMTP id xA898Vx0018440;
+ Fri, 8 Nov 2019 10:08:32 +0100
+Subject: Re: [PATCH v2] ivshmem-server: Terminate also on SIGINT
+From: Jan Kiszka <jan.kiszka@siemens.com>
+To: Markus Armbruster <armbru@redhat.com>
+References: <99c1a7bd-1876-66a2-4b8e-d5bc86116fe7@web.de>
+Message-ID: <fed41c57-c433-9723-e5db-5eb3a10c4f8b@siemens.com>
+Date: Fri, 8 Nov 2019 10:08:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: fICsfHJqMliPSHCzqknQKg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+In-Reply-To: <99c1a7bd-1876-66a2-4b8e-d5bc86116fe7@web.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 192.35.17.2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,39 +66,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Daniel Berrange <berrange@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Link to the documentation built from qemu.git/master once a day.
+On 03.08.19 15:22, Jan Kiszka wrote:
+> From: Jan Kiszka <jan.kiszka@siemens.com>
+> 
+> Allows to shutdown a foreground session via ctrl-c.
+> 
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> ---
+> 
+> Changes in v2:
+>   - adjust error message
+> 
+>   contrib/ivshmem-server/main.c | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/contrib/ivshmem-server/main.c b/contrib/ivshmem-server/main.c
+> index 197c79c57e..e4cd35f74c 100644
+> --- a/contrib/ivshmem-server/main.c
+> +++ b/contrib/ivshmem-server/main.c
+> @@ -223,8 +223,9 @@ main(int argc, char *argv[])
+>       sa_quit.sa_handler = ivshmem_server_quit_cb;
+>       sa_quit.sa_flags = 0;
+>       if (sigemptyset(&sa_quit.sa_mask) == -1 ||
+> -        sigaction(SIGTERM, &sa_quit, 0) == -1) {
+> -        perror("failed to add SIGTERM handler; sigaction");
+> +        sigaction(SIGTERM, &sa_quit, 0) == -1 ||
+> +        sigaction(SIGINT, &sa_quit, 0) == -1) {
+> +        perror("failed to add signal handler; sigaction");
+>           goto err;
+>       }
+> 
+> --
+> 2.16.4
+> 
+> 
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-This depends on qemu.git "[PATCH 0/3] docs: build an index page for the
-HTML docs".  We need that in order to build index.html.
+...and this one for you as well, Markus?
 
- documentation.md | 2 ++
- 1 file changed, 2 insertions(+)
+Jan
 
-diff --git a/documentation.md b/documentation.md
-index f4ef9f4..662750c 100644
---- a/documentation.md
-+++ b/documentation.md
-@@ -3,6 +3,8 @@ title: QEMU documentation
- permalink: /documentation/
- ---
-=20
-+The latest development version documentation is available [here](https://w=
-iki.qemu.org/docs/index.html).
-+
- The [QEMU user manual](https://qemu.weilnetz.de/qemu-doc.html) can be read=
- online, courtesy of Stefan Weil.
- More documentation is found in the <a href=3D"https://git.qemu.org/?p=3Dqe=
-mu.git;a=3Dtree;f=3Ddocs;hb=3Dmaster">`docs`</a>
- directory of the QEMU git tree.
---=20
-2.23.0
-
+-- 
+Siemens AG, Corporate Technology, CT RDA IOT SES-DE
+Corporate Competence Center Embedded Linux
 
