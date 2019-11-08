@@ -8,81 +8,83 @@ X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38EEBC5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:44:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D8A7FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:44:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03CBD218AE
+	by mail.kernel.org (Postfix) with ESMTPS id DE3CC218AE
 	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 12:44:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SVhQ8nIf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03CBD218AE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rlqgxq+M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE3CC218AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT3dG-0003KW-Nl
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 07:44:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45981)
+	id 1iT3dH-0003NE-K3
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 07:44:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46008)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iT3bB-0001b1-TW
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:48 -0500
+ (envelope-from <edgar.iglesias@gmail.com>) id 1iT3bM-0001eR-A5
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iT3bA-0000Ot-MZ
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:45 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52308)
+ (envelope-from <edgar.iglesias@gmail.com>) id 1iT3bK-0000Uu-A0
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:55 -0500
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33483)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
- id 1iT3bA-0000L7-Ez
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:44 -0500
-Received: by mail-wm1-x341.google.com with SMTP id c17so6058217wmk.2
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 04:42:44 -0800 (PST)
+ id 1iT3bJ-0000U6-BB
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 07:42:54 -0500
+Received: by mail-wr1-x443.google.com with SMTP id w9so103974wrr.0
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 04:42:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=9JFteoyFShjxDG1bJSY5A5RCb3N4szoLWvl3shrMJDg=;
- b=SVhQ8nIfLm3NFz7n5Kn4X5uEqIW83SpAoIQ/IIyUNKA/lBQCXm35v58588Et/vlL7D
- KQYP8rjXad7zUuDccUzsuRKbGOob7Q/+oceNQNzn+eqBQYP2LF22HlAroO0zm6tRjxyM
- Q9akNDHp3tZvGfOc+uqNMv85uQjyEKqjLBsFbJO1VWJn+d/AeEUkkzxWEJ/+5W4gExd3
- N0cUe0baUvO2tzbqQHPztxP1YVls9EQidlISgdGVBZHCCeGY7NYSpPQGTArijCn7B/ss
- MoZYGtQASS0e65P5ZCOxyHWQncZWr5iAkowMAKXnrZ0AxC0N3VysUB2oZpejIQpHNkYk
- XdFA==
+ bh=O+7oqTj35SxpOp+OUToP9NWOXc7v9VZvqQg34DnV5Ds=;
+ b=Rlqgxq+M3G5kUDVU+FeUVLZznllzB9pffc+eViEeqPtm+9mu5sfblkggk1waBq03BT
+ z/8CSPkONIGn0BqHooX5aUOBAR9YxqAsC4gagQlevPt2OtM2NFfpHKK0k/rmV45NDpp6
+ GWkp2Fsn7WxT2Fb7aiPDkSLdBqMFb2lXkFVoQ8puDhdO03vp6xPkRnR5Fa7Vzf3upFIy
+ ZR/rHuzIThuwZswcItF9qn38SukPs886cTIBn2qsmS1lTCaIwuwQZBtkpNB0+RGMf7Z+
+ OoYu3y9u3r1oHN/KNFrBzHZWRojgNDOzmXX0r1blc7pNBTE1NqSknriMYzJFer7Ga+nt
+ tVCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=9JFteoyFShjxDG1bJSY5A5RCb3N4szoLWvl3shrMJDg=;
- b=husZ+ukn7JSkhmySa+UkOdStOv3FpF3b3tSR61gR0tCLQdgTTdASVu658VfQWmBdgg
- uwQx+nwMTgqawMpQdhNmOc1YVw+2+0GqjayfXxO6WiZ8aKqEmVvwO1MjslRgF1AKI5PP
- NsqMoqEEXZyKzkdxrziPoKoast0AWVY95agzHP6X9oZwg1IfRrK4nwOTPEIfmTkQ2hyl
- K9x5qZ06a3d6VQm/Hr71Af6SB/PVXlB7TC1ympmykwlkbKxKjG4BknC1b59gvOBP3Byc
- 8Sgl3buPFmhzpRPk3KTSjihfuDqCTPulRZiPR2zEnnJORuj5AsAgdKfrQDcCX74IerJa
- K5tw==
-X-Gm-Message-State: APjAAAXFDdEOJCXM+J+O1AK+i3WAm0T6lSJyPmc1RywlVWeZnVHp0o+Y
- ZMj4lmqRe2lTmgC8REfZPqqQ6/X8s2o=
-X-Google-Smtp-Source: APXvYqzZd4QXgPqIW0fOYm22ZWWNYnvs84UVyFK8JJFkOon52ozmalhXCejj6PfioVXRAYxnHNuF2Q==
-X-Received: by 2002:a7b:c7c7:: with SMTP id z7mr7624314wmk.133.1573216962944; 
- Fri, 08 Nov 2019 04:42:42 -0800 (PST)
+ bh=O+7oqTj35SxpOp+OUToP9NWOXc7v9VZvqQg34DnV5Ds=;
+ b=BWcFq3F/EHEOxruVrqhHxcm8UgIccabQ1fOV3gJEJlHX7GMzWxcdwZRw6Q0bTGwBQo
+ Npmr13zMJX4JLsqkKN+ClvUDAQDBiFvOtU0mOllKW6zFBaFInPnuLBDSUm7L+kdcAiRO
+ LUnNS5FXrS5I/hvF9fnngtAGKXcTAlBWF9T5hDh6t6SHawumZjk8RfJtfl6rIi5SOvWO
+ uxcX2bCkP7eISWa6AzDcHElUiRH5BjJ6sca16H26VyVQWRIMTEUpj8ipZY3M1AxSNjzC
+ GL2rb0zIGX8Pf+tEum0HAQLJ/70csLLYga6UQfiUzEknheUg4Of5WdaEPRCxGdl8jNRV
+ zs6A==
+X-Gm-Message-State: APjAAAVPG5HRDgsn+zT0dGlsbfJiAuLX1n6zWrf2StpnB3l58nlWnhCD
+ jQcV1PJrw9zBVw/wH/f2aiYyFFN5RSA=
+X-Google-Smtp-Source: APXvYqxzRllVgQgIHOmx0PAmgeo+eQVh4kC2FW0ZuCWYbghhdgXmdZL6+5xthcNuOPkmxwxyrzLJ/A==
+X-Received: by 2002:a5d:4946:: with SMTP id r6mr7442094wrs.155.1573216972047; 
+ Fri, 08 Nov 2019 04:42:52 -0800 (PST)
 Received: from localhost (ec2-34-244-242-0.eu-west-1.compute.amazonaws.com.
  [34.244.242.0])
- by smtp.gmail.com with ESMTPSA id r5sm5732026wrl.86.2019.11.08.04.42.41
+ by smtp.gmail.com with ESMTPSA id m15sm5866397wrq.97.2019.11.08.04.42.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 Nov 2019 04:42:42 -0800 (PST)
+ Fri, 08 Nov 2019 04:42:51 -0800 (PST)
 From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/3] target/microblaze: Plug temp leaks for loads/stores
-Date: Fri,  8 Nov 2019 13:42:17 +0100
-Message-Id: <20191108124219.31348-2-edgar.iglesias@gmail.com>
+Subject: [PATCH v2 3/3] target/microblaze: Plug temp leak around
+ eval_cond_jmp()
+Date: Fri,  8 Nov 2019 13:42:19 +0100
+Message-Id: <20191108124219.31348-4-edgar.iglesias@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191108124219.31348-1-edgar.iglesias@gmail.com>
 References: <20191108124219.31348-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Received-From: 2a00:1450:4864:20::443
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,101 +107,33 @@ Sender: "Qemu-devel"
 
 From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Simplify endian reversion of address also plugging TCG temp
-leaks for loads/stores.
+Plug temp leak around eval_cond_jmp().
 
-Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 ---
- target/microblaze/translate.c | 46 +++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 26 deletions(-)
+ target/microblaze/translate.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 761f535357..c8442b18e1 100644
+index 7b4b66a622..bdc7d5326a 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -962,17 +962,7 @@ static void dec_load(DisasContext *dc)
-         switch (size) {
-             case 1:
-             {
--                /* 00 -> 11
--                   01 -> 10
--                   10 -> 10
--                   11 -> 00 */
--                TCGv low = tcg_temp_new();
--
--                tcg_gen_andi_tl(low, addr, 3);
--                tcg_gen_sub_tl(low, tcg_const_tl(3), low);
--                tcg_gen_andi_tl(addr, addr, ~3);
--                tcg_gen_or_tl(addr, addr, low);
--                tcg_temp_free(low);
-+                tcg_gen_xori_tl(addr, addr, 3);
-                 break;
-             }
- 
-@@ -1006,9 +996,16 @@ static void dec_load(DisasContext *dc)
-     tcg_gen_qemu_ld_i32(v, addr, mem_index, mop);
- 
-     if ((dc->cpu->env.pvr.regs[2] & PVR2_UNALIGNED_EXC_MASK) && size > 1) {
-+        TCGv_i32 t0 = tcg_const_i32(0);
-+        TCGv_i32 treg = tcg_const_i32(dc->rd);
-+        TCGv_i32 tsize = tcg_const_i32(size - 1);
+@@ -1681,7 +1681,10 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+                 dc->tb_flags &= ~D_FLAG;
+                 /* If it is a direct jump, try direct chaining.  */
+                 if (dc->jmp == JMP_INDIRECT) {
+-                    eval_cond_jmp(dc, env_btarget, tcg_const_i64(dc->pc));
++                    TCGv_i64 tmp_pc = tcg_const_i64(dc->pc);
++                    eval_cond_jmp(dc, env_btarget, tmp_pc);
++                    tcg_temp_free_i64(tmp_pc);
 +
-         tcg_gen_movi_i64(cpu_SR[SR_PC], dc->pc);
--        gen_helper_memalign(cpu_env, addr, tcg_const_i32(dc->rd),
--                            tcg_const_i32(0), tcg_const_i32(size - 1));
-+        gen_helper_memalign(cpu_env, addr, treg, t0, tsize);
-+
-+        tcg_temp_free_i32(t0);
-+        tcg_temp_free_i32(treg);
-+        tcg_temp_free_i32(tsize);
-     }
- 
-     if (ex) {
-@@ -1095,17 +1092,7 @@ static void dec_store(DisasContext *dc)
-         switch (size) {
-             case 1:
-             {
--                /* 00 -> 11
--                   01 -> 10
--                   10 -> 10
--                   11 -> 00 */
--                TCGv low = tcg_temp_new();
--
--                tcg_gen_andi_tl(low, addr, 3);
--                tcg_gen_sub_tl(low, tcg_const_tl(3), low);
--                tcg_gen_andi_tl(addr, addr, ~3);
--                tcg_gen_or_tl(addr, addr, low);
--                tcg_temp_free(low);
-+                tcg_gen_xori_tl(addr, addr, 3);
-                 break;
-             }
- 
-@@ -1124,6 +1111,10 @@ static void dec_store(DisasContext *dc)
- 
-     /* Verify alignment if needed.  */
-     if ((dc->cpu->env.pvr.regs[2] & PVR2_UNALIGNED_EXC_MASK) && size > 1) {
-+        TCGv_i32 t1 = tcg_const_i32(1);
-+        TCGv_i32 treg = tcg_const_i32(dc->rd);
-+        TCGv_i32 tsize = tcg_const_i32(size - 1);
-+
-         tcg_gen_movi_i64(cpu_SR[SR_PC], dc->pc);
-         /* FIXME: if the alignment is wrong, we should restore the value
-          *        in memory. One possible way to achieve this is to probe
-@@ -1131,8 +1122,11 @@ static void dec_store(DisasContext *dc)
-          *        the alignment checks in between the probe and the mem
-          *        access.
-          */
--        gen_helper_memalign(cpu_env, addr, tcg_const_i32(dc->rd),
--                            tcg_const_i32(1), tcg_const_i32(size - 1));
-+        gen_helper_memalign(cpu_env, addr, treg, t1, tsize);
-+
-+        tcg_temp_free_i32(t1);
-+        tcg_temp_free_i32(treg);
-+        tcg_temp_free_i32(tsize);
-     }
- 
-     if (ex) {
+                     dc->is_jmp = DISAS_JUMP;
+                 } else if (dc->jmp == JMP_DIRECT) {
+                     t_sync_flags(dc);
 -- 
 2.20.1
 
