@@ -2,65 +2,75 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3739C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA15FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:04:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C6B2215EA
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:03:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8050215EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:04:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="aDo7qxRU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C6B2215EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BwRm17Sj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8050215EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT5nL-0003JS-1J
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:03:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45765)
+	id 1iT5nt-0003pM-An
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:04:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45819)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iT5lO-0002Ga-D7
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:01:27 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iT5lc-0002Ra-6S
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:01:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iT5lM-00030t-Ki
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:01:25 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:46905 helo=ozlabs.org)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iT5la-0003Bs-Db
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:01:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41603
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iT5lK-0002wB-KS; Fri, 08 Nov 2019 10:01:24 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 478k452K5yz9sP3; Sat,  9 Nov 2019 02:01:08 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1573225269;
- bh=L8m+l5KOyEEAqLTzbmGNsdw8kzr53pZ8Ue9gy7VS200=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=aDo7qxRUjtKN9NMRjVU4w6g2mIiXxM11urZXQRDzWwj7OgzybU7sIVNZ1PT5muoMI
- /ohc5hfExfOuHLgd3ZTqaesZmvKVfL5DPGHHiqt8AniOPYD04vLbpbwtgKMImTSoyk
- 3wJtFMVtt9zc2F3dGbZcju94R6fn2Y5k6OQO02RQ=
-Date: Fri, 8 Nov 2019 14:26:10 +0000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PULL 06/28] spapr: Set VSMT to smp_threads by default
-Message-ID: <20191108142610.GM2461@umbus.Home>
-References: <20191024081813.2115-1-david@gibson.dropbear.id.au>
- <20191024081813.2115-7-david@gibson.dropbear.id.au>
- <9aebac7e-8ea3-0c16-30ca-251bcddd7699@redhat.com>
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1iT5la-0003BM-3q
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:01:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573225297;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=4Kg4YoKWk8215DGBZ61EfFtdBmhVEjwNz3VE/HN4tPw=;
+ b=BwRm17Sj4V2Vm+3bEgkQydILWkEPoc0HTRd7qHuvTNQBUkOHZ+Yww9D3SG4rHwDrBihqA9
+ Gx8kWap/MwffeQkW92naXfN63yB9MemWrxSLF/Mwmx+C7eC/yZrEtjf89cppbkalZqrhAD
+ QRkgdZOjfOLBGeWS1AoWs8QGTjhjoSw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-416-tYoS62LwNwq00DeH-06rFg-1; Fri, 08 Nov 2019 10:01:35 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DC158017DD
+ for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 15:01:35 +0000 (UTC)
+Received: from localhost (ovpn-112-25.ams2.redhat.com [10.36.112.25])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 216575C1BB;
+ Fri,  8 Nov 2019 15:01:26 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v6 00/25] monitor: add asynchronous command type
+Date: Fri,  8 Nov 2019 19:00:58 +0400
+Message-Id: <20191108150123.12213-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="AQYPrgrEUc/1pSX1"
-Content-Disposition: inline
-In-Reply-To: <9aebac7e-8ea3-0c16-30ca-251bcddd7699@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: tYoS62LwNwq00DeH-06rFg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,149 +82,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Juan Quintela <quintela@redhat.com>,
- groug@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ armbru@redhat.com, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi,
 
---AQYPrgrEUc/1pSX1
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+HMP and QMP commands are handled synchronously in qemu today. But
+there are benefits allowing the command handler to re-enter the main
+loop if the command cannot be handled synchronously, or if it is
+long-lasting. Some bugs such as rhbz#1230527 are difficult to solve
+without it.
 
-On Fri, Nov 08, 2019 at 02:11:03PM +0100, Laurent Vivier wrote:
-> On 24/10/2019 10:17, David Gibson wrote:
-> > From: Greg Kurz <groug@kaod.org>
-> >=20
-> > Support for setting VSMT is available in KVM since linux-4.13. Most dis=
-tros
-> > that support KVM on POWER already have it. It thus seem reasonable enou=
-gh
-> > to have the default machine to set VSMT to smp_threads.
-> >=20
-> > This brings contiguous VCPU ids and thus brings their upper bound down =
-to
-> > the machine's max_cpus. This is especially useful for XIVE KVM devices,
-> > which may thus allocate only one VP descriptor per VCPU.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > Message-Id: <157010411885.246126.12610015369068227139.stgit@bahia.lan>
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/ppc/spapr.c         | 7 ++++++-
-> >  include/hw/ppc/spapr.h | 1 +
-> >  2 files changed, 7 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> > index 4eb97d3a9b..428b834f30 100644
-> > --- a/hw/ppc/spapr.c
-> > +++ b/hw/ppc/spapr.c
-> > @@ -2496,6 +2496,7 @@ static CPUArchId *spapr_find_cpu_slot(MachineStat=
-e *ms, uint32_t id, int *idx)
-> >  static void spapr_set_vsmt_mode(SpaprMachineState *spapr, Error **errp)
-> >  {
-> >      MachineState *ms =3D MACHINE(spapr);
-> > +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> >      Error *local_err =3D NULL;
-> >      bool vsmt_user =3D !!spapr->vsmt;
-> >      int kvm_smt =3D kvmppc_smt_threads();
-> > @@ -2522,7 +2523,7 @@ static void spapr_set_vsmt_mode(SpaprMachineState=
- *spapr, Error **errp)
-> >              goto out;
-> >          }
-> >          /* In this case, spapr->vsmt has been set by the command line =
-*/
-> > -    } else {
-> > +    } else if (!smc->smp_threads_vsmt) {
-> >          /*
-> >           * Default VSMT value is tricky, because we need it to be as
-> >           * consistent as possible (for migration), but this requires
-> > @@ -2531,6 +2532,8 @@ static void spapr_set_vsmt_mode(SpaprMachineState=
- *spapr, Error **errp)
-> >           * overwhelmingly common case in production systems.
-> >           */
-> >          spapr->vsmt =3D MAX(8, smp_threads);
-> > +    } else {
-> > +        spapr->vsmt =3D smp_threads;
-> >      }
-> > =20
-> >      /* KVM: If necessary, set the SMT mode: */
-> > @@ -4438,6 +4441,7 @@ static void spapr_machine_class_init(ObjectClass =
-*oc, void *data)
-> >      smc->irq =3D &spapr_irq_dual;
-> >      smc->dr_phb_enabled =3D true;
-> >      smc->linux_pci_probe =3D true;
-> > +    smc->smp_threads_vsmt =3D true;
-> >  }
-> > =20
-> >  static const TypeInfo spapr_machine_info =3D {
-> > @@ -4505,6 +4509,7 @@ static void spapr_machine_4_1_class_options(Machi=
-neClass *mc)
-> > =20
-> >      spapr_machine_4_2_class_options(mc);
-> >      smc->linux_pci_probe =3D false;
-> > +    smc->smp_threads_vsmt =3D false;
-> >      compat_props_add(mc->compat_props, hw_compat_4_1, hw_compat_4_1_le=
-n);
-> >      compat_props_add(mc->compat_props, compat, G_N_ELEMENTS(compat));
-> >  }
-> > diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> > index cbd1a4c9f3..2009eb64f9 100644
-> > --- a/include/hw/ppc/spapr.h
-> > +++ b/include/hw/ppc/spapr.h
-> > @@ -122,6 +122,7 @@ struct SpaprMachineClass {
-> >      bool broken_host_serial_model; /* present real host info to the gu=
-est */
-> >      bool pre_4_1_migration; /* don't migrate hpt-max-page-size */
-> >      bool linux_pci_probe;
-> > +    bool smp_threads_vsmt; /* set VSMT to smp_threads by default */
-> > =20
-> >      void (*phb_placement)(SpaprMachineState *spapr, uint32_t index,
-> >                            uint64_t *buid, hwaddr *pio,=20
-> >=20
->=20
-> This patch breaks tests/migration-test on P8 host with kernel older than
-> 4.3 because it tries by default to set the VSMT to 1.
->=20
-> qemu-system-ppc64: Failed to set KVM's VSMT mode to 1 (errno -22)
-> On PPC, a VM with 1 threads/core on a host with 8 threads/core requires
-> the use of VSMT mode 1.
-> This KVM seems to be too old to support VSMT.
->=20
-> As this is clearly intentional, is there a way to fix migration-test?
+The common solution is to use a pair of command+event in this case.
+But this approach has a number of issues:
+- you can't "fix" an existing command: you need a new API, and ad-hoc
+  documentation for that command+signal association, and old/broken
+  command deprecation
+- since the reply event is broadcasted and 'id' is used for matching the
+  request, it may conflict with other clients request 'id' space
+- it is arguably less efficient and elegant (weird API, useless return
+  in most cases, broadcast reply, no cancelling on disconnect etc)
 
-Hrm.  I believe the argument for this was that the broken kernels were
-old enough we didn't care.  What platform are you testing on where
-you're hitting this?
+The following series implements an internal async command solution
+instead. By introducing a session context and a command return
+handler, QMP handlers can:
+- defer the return, allowing the mainloop to reenter
+- return only to the caller (instead of the broadcast event reply)
+- optionnally allow cancellation when the client is gone
+- track on-going qapi command(s) per session
+
+This does not introduce new QMP APIs or client visible changes, the
+command are handled in order, and the reply still come in order (even
+when handlers finish out of order).
+
+Existing qemu commands can be gradually replaced by async:true
+variants when needed, while carefully reviewing the concurrency
+aspects. The async:true commands marshaller helpers are splitted in
+half, the calling and return functions. The command is called with a
+QmpReturn context, that can return immediately or later, using the
+generated return helper.
+
+The screendump command is converted to an async:true version to solve
+rhbz#1230527. The command shows basic cancellation (this could be
+extended if needed). It could be further improved to do asynchronous
+IO writes as well.
+
+v6:
+- includes PPM save code improvements (will be sent seperatly,
+  included for convenience for now)
+- remove qmp_return_get_monitor() need, which is problematic with the
+  QMP session over HMP monitor ("monitor: teach HMP about asynchronous
+  commands")
+- rebased
+
+v5:
+- rebased
+
+v4:
+- rebased, mostly adapting to new OOB code
+  (there was not much feedback in v3 for the async command part,
+   but preliminary patches got merged!)
+- drop the RFC status
+
+v3:
+- complete rework, dropping the asynchronous commands visibility from
+  the protocol side entirely (until there is a real need for it)
+- rebased, with a few preliminary cleanup patches
+- teach asynchronous commands to HMP
+
+v2:
+- documentation fixes and improvements
+- fix calling async commands sync without id
+- fix bad hmp monitor assert
+- add a few extra asserts
+- add async with no-id failure and screendump test
+
+Marc-Andr=C3=A9 Lureau (25):
+  qmp: constify QmpCommand and list
+  json-lexer: make it safe to call destroy multiple times
+  qmp: add QmpSession
+  QmpSession: add a return callback
+  QmpSession: add json parser and use it in qga
+  monitor: use qmp session to parse json feed
+  qga: simplify dispatch_return_cb
+  QmpSession: introduce QmpReturn
+  qmp: simplify qmp_return_error()
+  QmpSession: keep a queue of pending commands
+  QmpSession: return orderly
+  qmp: introduce asynchronous command type
+  scripts: learn 'async' qapi commands
+  qmp: add qmp_return_is_cancelled()
+  console: add graphic_hw_update_done()
+  ppm-save: pass opened fd
+  ui: add pixman image g_autoptr support
+  object: add g_autoptr support
+  screendump: replace FILE with QIOChannel and fix close()/qemu_close()
+  osdep: add qemu_unlink()
+  screendump: use qemu_unlink()
+  console: make screendump asynchronous
+  monitor: start making qmp_human_monitor_command() asynchronous
+  monitor: teach HMP about asynchronous commands
+  hmp: call the asynchronous QMP screendump to fix outdated/glitches
+
+ hmp-commands.hx                         |   3 +-
+ hw/display/qxl-render.c                 |   9 +-
+ hw/display/qxl.c                        |   1 +
+ include/qapi/qmp/dispatch.h             |  89 +++++++++-
+ include/qapi/qmp/json-parser.h          |   7 +-
+ include/qemu/osdep.h                    |   1 +
+ include/qom/object.h                    |   3 +
+ include/ui/console.h                    |   4 +
+ include/ui/qemu-pixman.h                |   2 +
+ monitor/hmp-cmds.c                      |   6 +-
+ monitor/hmp.c                           | 110 +++++++++++-
+ monitor/misc.c                          |  46 +----
+ monitor/monitor-internal.h              |  12 +-
+ monitor/monitor.c                       |   2 +-
+ monitor/qmp.c                           |  64 +++----
+ qapi/misc.json                          |   3 +-
+ qapi/qmp-dispatch.c                     | 214 +++++++++++++++++++-----
+ qapi/qmp-registry.c                     |  33 +++-
+ qapi/ui.json                            |   3 +-
+ qga/commands.c                          |   2 +-
+ qga/main.c                              |  51 ++----
+ qobject/json-lexer.c                    |   5 +-
+ qobject/json-streamer.c                 |   3 +-
+ scripts/qapi/commands.py                | 149 ++++++++++++++---
+ scripts/qapi/doc.py                     |   2 +-
+ scripts/qapi/expr.py                    |   4 +-
+ scripts/qapi/introspect.py              |   2 +-
+ scripts/qapi/schema.py                  |  11 +-
+ tests/qapi-schema/qapi-schema-test.json |   5 +
+ tests/qapi-schema/qapi-schema-test.out  |   8 +
+ tests/qapi-schema/test-qapi.py          |   7 +-
+ tests/test-qmp-cmds.c                   | 206 +++++++++++++++++++----
+ ui/console.c                            | 165 ++++++++++++------
+ ui/trace-events                         |   2 +-
+ util/osdep.c                            |  15 ++
+ 35 files changed, 937 insertions(+), 312 deletions(-)
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+2.24.0
 
---AQYPrgrEUc/1pSX1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3FewIACgkQbDjKyiDZ
-s5LckRAAgP49qITSZ0dF4utjDRiDRv9dydTSVAl2g4x58tyGCfe38MqnBR0BSqhE
-V+s8s5WwV6fd5dnbcDOi/eURoZuND/wzQFnf5rjlaer/XdRTAw7vscPxikatI8uY
-801NzTBEBU4RXKeQl+gfFm4CQuTxtSMoaTKRMBgRGjJDxyTfjt9a5HoVOb3vklFx
-VF3+GbGXpKmPSL8YdWmW/nl6JssPE9Srj79ReRR4x/iXo6Q5bNgU8wAy4sOEPiUb
-wWUkJmY2jHuvxA4Em1Gi57NbEtxj8mp7LaetZEiAjGfCmdW+j5H70PS0BLFf4UOW
-73BoY28mkXtNVspQeWNRePPiPhc0XpCscDXS7sdsqKjrAKDYT1skjOPu4fiEvVK0
-tcNF02xqutBb8S0oLEJYBx/BscEs+dXmMWH+1IApYlLsSAkduEU0Q3jY6Ul+vnFF
-bK4d+P8LabB20QsGEBDmQ7295vkKQV7qTAmNVLpVgKpillnhztWi9di5oj5SCG6o
-xuew96EfMxUJNgQRqmCojpkoRb58hBCHmafVdjyS/0Wi2RyQ3qTJBJzt62koqcrl
-eoYgDHtSvy1ptdH6IhL/vsHDS7hMm9CSoKxos631dR+ujj0BoHE71IZo06Qble9h
-4KXq2AWifj1Mk3oho89vHAmav4zmTpIKiEydZ3PKDw8sMK7KG8g=
-=nVqk
------END PGP SIGNATURE-----
-
---AQYPrgrEUc/1pSX1--
 
