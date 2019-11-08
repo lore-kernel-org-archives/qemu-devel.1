@@ -2,83 +2,62 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96470FA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40250FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:49:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60D022178F
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:47:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hWskhn0M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60D022178F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 141FD2178F
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:49:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 141FD2178F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT7Pq-0003jD-Eh
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:47:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35971)
+	id 1iT7SE-00054v-6y
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:49:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36269)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iT7Oc-00037w-Hr
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:46:03 -0500
+ (envelope-from <groug@kaod.org>) id 1iT7Qo-0004OU-3Y
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:48:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iT7Oa-0000TS-9P
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:46:01 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57259
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1iT7Qm-0003aM-RN
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:48:17 -0500
+Received: from 13.mo5.mail-out.ovh.net ([87.98.182.191]:33576)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iT7OY-0000Sv-Sw
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:45:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573231557;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DsUpmdz6qIL1cRNfa2LeI7Opv7GOpfnCYL50H5kG54o=;
- b=hWskhn0MIvnX+EiQAuvehK+xfYw2TzHiUnzWeRQVRUQBskWjVMplYWqOCNDiOF2a5604Kg
- YRiQyJcag0dlYFs13CxZEZ+MKoYOtPRyMCEdDzU/shYo9Oel+SiAB2kuASXl60FZAOhV2M
- vh+QOk2EPRM3WXArb4JYdNUZds/FOjE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-348-pMjMTmWTN7qZ7Y1w6EdjMg-1; Fri, 08 Nov 2019 11:45:53 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D65E107ACC4;
- Fri,  8 Nov 2019 16:45:52 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E17711A7E2;
- Fri,  8 Nov 2019 16:45:51 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4244911385C9; Fri,  8 Nov 2019 17:45:46 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [RFC PATCH 12/18] stubs: Update monitor stubs for
- qemu-storage-daemon
-References: <20191017130204.16131-1-kwolf@redhat.com>
- <20191017130204.16131-13-kwolf@redhat.com>
-Date: Fri, 08 Nov 2019 17:45:46 +0100
-In-Reply-To: <20191017130204.16131-13-kwolf@redhat.com> (Kevin Wolf's message
- of "Thu, 17 Oct 2019 15:01:58 +0200")
-Message-ID: <87k18a5nb9.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iT7Qi-0003Sc-Te
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:48:14 -0500
+Received: from player759.ha.ovh.net (unknown [10.108.42.5])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id 5281B259565
+ for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 17:48:10 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player759.ha.ovh.net (Postfix) with ESMTPSA id DDE8ABF39256;
+ Fri,  8 Nov 2019 16:48:00 +0000 (UTC)
+Date: Fri, 8 Nov 2019 17:47:59 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [PATCH] spapr: Fix VSMT mode when it is not supported by the
+ kernel
+Message-ID: <20191108174759.2d4040f1@bahia.lan>
+In-Reply-To: <20191108154035.12913-1-lvivier@redhat.com>
+References: <20191108154035.12913-1-lvivier@redhat.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: pMjMTmWTN7qZ7Y1w6EdjMg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 11261532344613312806
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedruddvuddgleehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeehledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 87.98.182.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,112 +69,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: =?UTF-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org,
+ clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On Fri,  8 Nov 2019 16:40:35 +0100
+Laurent Vivier <lvivier@redhat.com> wrote:
 
-> Before we can add the monitor to qemu-storage-daemon, we need to add a
-> few monitor stubs,
+> Commit 29cb4187497d sets by default the VSMT to smp_threads,
+> but older kernels (< 4.13) don't support that.
+>=20
+> We can reasonably restore previous behavior with this kernel
+> to allow to run QEMU as before.
+>=20
+> If VSMT is not supported, VSMT will be set to MAX(8, smp_threads)
+> as it is done for previous machine types (< pseries-4.2)
+>=20
 
-I can see just one: monitor_fdsets_cleanup().
+It is usually _bad_ to base the machine behavior on host capabilities.
+What happens if we migrate between an older kernel and a recent one ?
 
->                    and we need to make sure that stubs that are actually
-> implemented in the monitor core aren't linked so that we don't get
-> linker errors because of duplicate symbols.
+I understand this is to fix tests/migration-test on older kernels.
+Couldn't this be achieved with migration-test doing some introspection
+and maybe pass vsmt=3D8 on the QEMU command line ?
 
-, by moving them from stubs/monitor.c to new stubs/monitor-core.c
-
->
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Fixes: 29cb4187497d ("spapr: Set VSMT to smp_threads by default")
+> Cc: groug@kaod.org
+> Reported-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 > ---
->  stubs/monitor-core.c | 21 +++++++++++++++++++++
->  stubs/monitor.c      | 15 ++-------------
->  stubs/Makefile.objs  |  1 +
->  3 files changed, 24 insertions(+), 13 deletions(-)
->  create mode 100644 stubs/monitor-core.c
->
-> diff --git a/stubs/monitor-core.c b/stubs/monitor-core.c
-> new file mode 100644
-> index 0000000000..403c00a6d0
-> --- /dev/null
-> +++ b/stubs/monitor-core.c
-> @@ -0,0 +1,21 @@
-> +#include "qemu/osdep.h"
-> +#include "monitor/monitor.h"
-> +#include "qemu-common.h"
-> +#include "qapi/qapi-emit-events.h"
-> +
-> +__thread Monitor *cur_mon;
-> +
-> +void monitor_init_qmp(Chardev *chr, bool pretty)
-> +{
-> +}
-> +
-> +void qapi_event_emit(QAPIEvent event, QDict *qdict)
-> +{
-> +}
-> +
-> +int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
-> +{
-> +    abort();
-> +}
-> +
-> +
-> diff --git a/stubs/monitor.c b/stubs/monitor.c
-> index c3e9a2e4dc..9403f8e72c 100644
-> --- a/stubs/monitor.c
-> +++ b/stubs/monitor.c
-> @@ -1,14 +1,7 @@
->  #include "qemu/osdep.h"
->  #include "qapi/error.h"
-> -#include "qapi/qapi-emit-events.h"
->  #include "monitor/monitor.h"
-> -
-> -__thread Monitor *cur_mon;
-> -
-> -int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap)
-> -{
-> -    abort();
-> -}
-> +#include "../monitor/monitor-internal.h"
-
-../ is ugly.  I don't have better ideas.
-
-> =20
->  int monitor_get_fd(Monitor *mon, const char *name, Error **errp)
->  {
-> @@ -16,14 +9,10 @@ int monitor_get_fd(Monitor *mon, const char *name, Err=
-or **errp)
->      return -1;
+>  hw/ppc/spapr.c       | 2 +-
+>  target/ppc/kvm.c     | 5 +++++
+>  target/ppc/kvm_ppc.h | 6 ++++++
+>  3 files changed, 12 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 94f9d27096af..f6c8ad1eda32 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -2522,7 +2522,7 @@ static void spapr_set_vsmt_mode(SpaprMachineState *=
+spapr, Error **errp)
+>              goto out;
+>          }
+>          /* In this case, spapr->vsmt has been set by the command line */
+> -    } else if (!smc->smp_threads_vsmt) {
+> +    } else if (!smc->smp_threads_vsmt || !kvmppc_check_smt_possible()) {
+>          /*
+>           * Default VSMT value is tricky, because we need it to be as
+>           * consistent as possible (for migration), but this requires
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 7d2e8969ac5f..40ed59881167 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -2060,6 +2060,11 @@ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mp=
+ic_proxy)
+>      }
 >  }
 > =20
-> -void monitor_init_qmp(Chardev *chr, bool pretty)
-> -{
-> -}
-> -
->  void monitor_init_hmp(Chardev *chr, bool use_readline)
+> +bool kvmppc_check_smt_possible(void)
+> +{
+> +    return kvm_enabled() && cap_ppc_smt_possible;
+> +}
+> +
+>  int kvmppc_smt_threads(void)
+>  {
+>      return cap_ppc_smt ? cap_ppc_smt : 1;
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index 98bd7d5da6d6..c9629a416b0b 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -27,6 +27,7 @@ void kvmppc_enable_h_page_init(void);
+>  void kvmppc_set_papr(PowerPCCPU *cpu);
+>  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+>  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
+> +bool kvmppc_check_smt_possible(void);
+>  int kvmppc_smt_threads(void);
+>  void kvmppc_hint_smt_possible(Error **errp);
+>  int kvmppc_set_smt_threads(int smt);
+> @@ -159,6 +160,11 @@ static inline void kvmppc_set_mpic_proxy(PowerPCCPU =
+*cpu, int mpic_proxy)
 >  {
 >  }
 > =20
-> -void qapi_event_emit(QAPIEvent event, QDict *qdict)
-> +void monitor_fdsets_cleanup(void)
+> +static inline bool kvmppc_check_smt_possible(void)
+> +{
+> +    return false;
+> +}
+> +
+>  static inline int kvmppc_smt_threads(void)
 >  {
->  }
-> diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> index 77fbf72576..ad4515ac70 100644
-> --- a/stubs/Makefile.objs
-> +++ b/stubs/Makefile.objs
-> @@ -19,6 +19,7 @@ stub-obj-y +=3D machine-init-done.o
->  stub-obj-y +=3D migr-blocker.o
->  stub-obj-y +=3D change-state-handler.o
->  stub-obj-y +=3D monitor.o
-> +stub-obj-y +=3D monitor-core.o
->  stub-obj-y +=3D notify-event.o
->  stub-obj-y +=3D qtest.o
->  stub-obj-y +=3D replay.o
+>      return 1;
 
 
