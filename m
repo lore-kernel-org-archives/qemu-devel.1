@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CEF8C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 519D2C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:10:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54F6E215EA
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:09:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1C183215EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:10:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PRbYFbMH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54F6E215EA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RwDVLt9d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C183215EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT5tU-00036a-1Q
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:09:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46493)
+	id 1iT5ua-0004Ir-0E
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:10:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46441)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iT5oH-0004th-3a
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:04:27 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iT5nq-0004Rl-H3
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iT5oF-0004u4-BM
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:04:24 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37175
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iT5no-0004ZT-LZ
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:03:58 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45748
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iT5oE-0004tF-1u
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:04:22 -0500
+ id 1iT5no-0004ZL-Hs
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:03:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573225461;
+ s=mimecast20190719; t=1573225436;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qchnptFi058dP+AH94G/eZXd37hN440uraGqVjM2KYE=;
- b=PRbYFbMHAtVJyMQ0YpVOFq2H7oDjaESiaOex8SErkFVVIuP+zGSKVX8Y4P64X/UzEgAlVg
- U3BEvDWkLxmQnqUVzHQ6FbSivLQKcs/MGNww85YZaTPSRBQq2xyBDprTh4cQHR38IPeL/F
- 8P9p47uLisYD2Xed0VxL910xaAH9ch8=
+ bh=tokP4vjSso+mNJQryUKg0EPaJ0vjrJNzrRiRGvfAkFI=;
+ b=RwDVLt9dHEDvbUQKDDRXvEEAhX2g0rsUSxv9FDIvt9QAoavnegr3LgEykWpoNhzn6zp2S0
+ wOqnXrsWlxDzGAUt47BUpuSK7kXlQf1KI3lO0VHeEoBaVSZ28JbWVZaqG9qstIcNOX0DLD
+ 2d3EjTmszHUF1mRu8H9ZUScqLzXHP1I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324-depKDAkFO_CFx_4sucFtuw-1; Fri, 08 Nov 2019 10:04:20 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-215-qe37uHoCO7yql5MqneRGJg-1; Fri, 08 Nov 2019 10:03:54 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14252107ACC4
- for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 15:04:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C71E7180496F
+ for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 15:03:53 +0000 (UTC)
 Received: from localhost (ovpn-112-25.ams2.redhat.com [10.36.112.25])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 388795C1BB;
- Fri,  8 Nov 2019 15:04:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E519060BE2;
+ Fri,  8 Nov 2019 15:03:46 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 12/25] qmp: introduce asynchronous command type
-Date: Fri,  8 Nov 2019 19:01:10 +0400
-Message-Id: <20191108150123.12213-13-marcandre.lureau@redhat.com>
+Subject: [PATCH v6 10/25] QmpSession: keep a queue of pending commands
+Date: Fri,  8 Nov 2019 19:01:08 +0400
+Message-Id: <20191108150123.12213-11-marcandre.lureau@redhat.com>
 In-Reply-To: <20191108150123.12213-1-marcandre.lureau@redhat.com>
 References: <20191108150123.12213-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: depKDAkFO_CFx_4sucFtuw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: qe37uHoCO7yql5MqneRGJg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,170 +91,127 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a new type of command, QmpCommandFuncAsync: those commands can
-return later thanks to QmpReturn. This commit introduces the new type
-and register function and teach qmp_dipatch() to call it without
-qmp_return(). The async_fn callback will be responsible for calling
-qmp_return(), either synchronously or asynchronously.
+The following commit will introduce asynchronous commands. Let's keep
+the session aware of the pending commands, so we can do interesting
+things like order the replies, or cancel pending operations when the
+client is gone.
+
+The queue needs a lock, since QmpReturn may be called from any thread.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/qapi/qmp/dispatch.h | 10 +++++++++-
- qapi/qmp-dispatch.c         | 27 ++++++++++++++++-----------
- qapi/qmp-registry.c         | 27 ++++++++++++++++++++++++---
- 3 files changed, 49 insertions(+), 15 deletions(-)
+ include/qapi/qmp/dispatch.h |  4 ++++
+ qapi/qmp-dispatch.c         | 32 ++++++++++++++++++++++++++++++--
+ 2 files changed, 34 insertions(+), 2 deletions(-)
 
 diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
-index 92d6fd1afb..6aef0abc70 100644
+index 6c0d21968e..7c9de9780d 100644
 --- a/include/qapi/qmp/dispatch.h
 +++ b/include/qapi/qmp/dispatch.h
-@@ -21,6 +21,7 @@
+@@ -16,6 +16,7 @@
+=20
+ #include "qemu/queue.h"
+ #include "qapi/qmp/json-parser.h"
++#include "qemu/thread.h"
+=20
  typedef struct QmpReturn QmpReturn;
 =20
- typedef void (QmpCommandFunc)(QDict *, QObject **, Error **);
-+typedef void (QmpCommandAsyncFunc)(QDict *, QmpReturn *);
+@@ -47,11 +48,14 @@ struct QmpSession {
+     const QmpCommandList *cmds;
+     JSONMessageParser parser;
+     QmpDispatchReturn *return_cb;
++    QemuMutex pending_lock;
++    QTAILQ_HEAD(, QmpReturn) pending;
+ };
 =20
- typedef enum QmpCommandOptions
- {
-@@ -28,12 +29,16 @@ typedef enum QmpCommandOptions
-     QCO_NO_SUCCESS_RESP       =3D  (1U << 0),
-     QCO_ALLOW_OOB             =3D  (1U << 1),
-     QCO_ALLOW_PRECONFIG       =3D  (1U << 2),
-+    QCO_ASYNC                 =3D  (1U << 3),
- } QmpCommandOptions;
+ struct QmpReturn {
+     QmpSession *session;
+     QDict *rsp;
++    QTAILQ_ENTRY(QmpReturn) entry;
+ };
 =20
- typedef struct QmpCommand
- {
-     const char *name;
--    QmpCommandFunc *fn;
-+    union {
-+        QmpCommandFunc *fn;
-+        QmpCommandAsyncFunc *async_fn;
-+    };
-     QmpCommandOptions options;
-     QTAILQ_ENTRY(QmpCommand) node;
-     bool enabled;
-@@ -88,6 +93,9 @@ void qmp_return_error(QmpReturn *qret, Error *err);
-=20
- void qmp_register_command(QmpCommandList *cmds, const char *name,
-                           QmpCommandFunc *fn, QmpCommandOptions options);
-+void qmp_register_async_command(QmpCommandList *cmds, const char *name,
-+                                QmpCommandAsyncFunc *fn,
-+                                QmpCommandOptions options);
- const QmpCommand *qmp_find_command(const QmpCommandList *cmds,
-                                    const char *name);
- void qmp_session_init(QmpSession *session,
+ /**
 diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
-index 3eb7e4b610..85e99671a9 100644
+index fcf6cb0bf8..aed5c91057 100644
 --- a/qapi/qmp-dispatch.c
 +++ b/qapi/qmp-dispatch.c
-@@ -171,7 +171,7 @@ static QDict *qmp_dispatch_check_obj(const QObject *req=
-uest, bool allow_oob,
-     return dict;
+@@ -32,11 +32,24 @@ QmpReturn *qmp_return_new(QmpSession *session, const QO=
+bject *request)
+         qdict_put_obj(qret->rsp, "id", id);
+     }
+=20
++    qemu_mutex_lock(&session->pending_lock);
++    QTAILQ_INSERT_TAIL(&session->pending, qret, entry);
++    qemu_mutex_unlock(&session->pending_lock);
++
+     return qret;
  }
 =20
--static QObject *do_qmp_dispatch(const QmpCommandList *cmds, QObject *reque=
-st,
-+static QObject *do_qmp_dispatch(QmpSession *session, QObject *request,
-                                 bool allow_oob, Error **errp)
+ void qmp_return_free(QmpReturn *qret)
  {
-     Error *local_err =3D NULL;
-@@ -193,7 +193,7 @@ static QObject *do_qmp_dispatch(const QmpCommandList *c=
-mds, QObject *request,
-         command =3D qdict_get_str(dict, "exec-oob");
-         oob =3D true;
-     }
--    cmd =3D qmp_find_command(cmds, command);
-+    cmd =3D qmp_find_command(session->cmds, command);
-     if (cmd =3D=3D NULL) {
-         error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-                   "The command %s has not been found", command);
-@@ -225,14 +225,19 @@ static QObject *do_qmp_dispatch(const QmpCommandList =
-*cmds, QObject *request,
-         qobject_ref(args);
-     }
-=20
--    cmd->fn(args, &ret, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--    } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
--        g_assert(!ret);
--    } else if (!ret) {
--        /* TODO turn into assertion */
--        ret =3D QOBJECT(qdict_new());
++    QmpSession *session =3D qret->session;
 +
-+    if (cmd->options & QCO_ASYNC) {
-+        cmd->async_fn(args, qmp_return_new(session, request));
-+    } else {
-+        cmd->fn(args, &ret, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+        } else if (cmd->options & QCO_NO_SUCCESS_RESP) {
-+            g_assert(!ret);
-+        } else if (!ret) {
-+            /* TODO turn into assertion */
-+            ret =3D QOBJECT(qdict_new());
-+        }
-     }
-=20
-     qobject_unref(args);
-@@ -305,7 +310,7 @@ void qmp_dispatch(QmpSession *session, QObject *request=
-, bool allow_oob)
-     Error *err =3D NULL;
-     QObject *ret;
-=20
--    ret =3D do_qmp_dispatch(session->cmds, request, allow_oob, &err);
-+    ret =3D do_qmp_dispatch(session, request, allow_oob, &err);
-     if (err) {
-         qmp_return_error(qmp_return_new(session, request), err);
-     } else if (ret) {
-diff --git a/qapi/qmp-registry.c b/qapi/qmp-registry.c
-index d0f9a1d3e3..0f3d521ce5 100644
---- a/qapi/qmp-registry.c
-+++ b/qapi/qmp-registry.c
-@@ -15,16 +15,37 @@
- #include "qemu/osdep.h"
- #include "qapi/qmp/dispatch.h"
-=20
--void qmp_register_command(QmpCommandList *cmds, const char *name,
--                          QmpCommandFunc *fn, QmpCommandOptions options)
-+
-+static QmpCommand *qmp_command_new(QmpCommandList *cmds, const char *name,
-+                                   QmpCommandOptions options)
++    if (session) {
++        qemu_mutex_lock(&session->pending_lock);
++    }
++    QTAILQ_REMOVE(&session->pending, qret, entry);
++    if (session) {
++        qemu_mutex_unlock(&session->pending_lock);
++    }
+     qobject_unref(qret->rsp);
+     g_free(qret);
+ }
+@@ -44,7 +57,9 @@ void qmp_return_free(QmpReturn *qret)
+ void qmp_return(QmpReturn *qret, QObject *rsp)
  {
-     QmpCommand *cmd =3D g_malloc0(sizeof(*cmd));
-=20
-     cmd->name =3D name;
--    cmd->fn =3D fn;
-     cmd->enabled =3D true;
-     cmd->options =3D options;
-     QTAILQ_INSERT_TAIL(cmds, cmd, node);
-+
-+    return cmd;
-+}
-+
-+
-+void qmp_register_command(QmpCommandList *cmds, const char *name,
-+                          QmpCommandFunc *fn, QmpCommandOptions options)
-+{
-+    QmpCommand *cmd =3D qmp_command_new(cmds, name, options);
-+
-+    assert(!(options & QCO_ASYNC));
-+    cmd->fn =3D fn;
-+}
-+
-+void qmp_register_async_command(QmpCommandList *cmds, const char *name,
-+                            QmpCommandAsyncFunc *fn, QmpCommandOptions opt=
-ions)
-+{
-+    QmpCommand *cmd =3D qmp_command_new(cmds, name, options);
-+
-+    assert(options & QCO_ASYNC);
-+    cmd->async_fn =3D fn;
+     qdict_put_obj(qret->rsp, "return", rsp ?: QOBJECT(qdict_new()));
+-    qret->session->return_cb(qret->session, qret->rsp);
++    if (qret->session) {
++        qret->session->return_cb(qret->session, qret->rsp);
++    }
+     qmp_return_free(qret);
  }
 =20
- const QmpCommand *qmp_find_command(const QmpCommandList *cmds, const char =
-*name)
+@@ -55,7 +70,9 @@ void qmp_return_error(QmpReturn *qret, Error *err)
+     qdict_put_str(qdict, "desc", error_get_pretty(err));
+     qdict_put_obj(qret->rsp, "error", QOBJECT(qdict));
+     error_free(err);
+-    qret->session->return_cb(qret->session, qret->rsp);
++    if (qret->session) {
++        qret->session->return_cb(qret->session, qret->rsp);
++    }
+     qmp_return_free(qret);
+ }
+=20
+@@ -220,17 +237,28 @@ void qmp_session_init(QmpSession *session,
+                              session, NULL);
+     session->cmds =3D cmds;
+     session->return_cb =3D return_cb;
++    qemu_mutex_init(&session->pending_lock);
++    QTAILQ_INIT(&session->pending);
+ }
+=20
+ void qmp_session_destroy(QmpSession *session)
+ {
++    QmpReturn *ret, *next;
++
+     if (!session->return_cb) {
+         return;
+     }
+=20
++    qemu_mutex_lock(&session->pending_lock);
++    QTAILQ_FOREACH_SAFE(ret, &session->pending, entry, next) {
++        ret->session =3D NULL;
++        QTAILQ_REMOVE(&session->pending, ret, entry);
++    }
++    qemu_mutex_unlock(&session->pending_lock);
+     session->cmds =3D NULL;
+     session->return_cb =3D NULL;
+     json_message_parser_destroy(&session->parser);
++    qemu_mutex_destroy(&session->pending_lock);
+ }
+=20
+ void qmp_dispatch(QmpSession *session, QObject *request, bool allow_oob)
 --=20
 2.24.0
 
