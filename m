@@ -6,69 +6,69 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0E5FC5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 09:27:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 936A7C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 09:28:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 986EF2178F
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 09:27:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6135D2178F
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 09:28:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LiqPmf4I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 986EF2178F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VQHaafWm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6135D2178F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT0YC-0004NY-OP
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 04:27:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36257)
+	id 1iT0ZJ-0005OT-Af
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 04:28:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36449)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlevitsk@redhat.com>) id 1iT0XP-0003nR-Qo
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:26:41 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iT0Ye-0004tH-Bj
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:27:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlevitsk@redhat.com>) id 1iT0XO-00040r-FM
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:26:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51943
+ (envelope-from <mlevitsk@redhat.com>) id 1iT0Yc-0004bb-Pk
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:27:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57481
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iT0XO-00040G-Bu
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:26:38 -0500
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iT0Yc-0004bM-Mh
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 04:27:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573205196;
+ s=mimecast20190719; t=1573205274;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=o3H8jVVJfIqSVI5b0lbaZ1v7fSYkYMLX3tzyvY6smOc=;
- b=LiqPmf4IqGmfstPjaQ7h2BTHQyiReyiPySwQrWugMJOBdIjIoLwpSucqtk+ov2yumhD9sy
- bZo6+LF3yeOR4BAgy7Vxkc1cEgx918igjWy67yudtC3VziYKV/G4qkXvymuWPK2MvxgWI2
- eL8rtK6VKPtOHQnWiu//08auOTFkbcw=
+ bh=Op0JSEpoFVsy5CrFqhnRIG0u0fzbg7cEH2uNdU/Xnn8=;
+ b=VQHaafWmrzddJ38OOn28p8D6ukfBLOREdfqquCgT2VzKMuS7HFGqFQM4hTu50c9YsgBsog
+ MgUco4oUdpKcGQSHhqPLq5w3hUV2P2iMBpS33sommFK7ZtO95/qkkNWakSxCQBQvVlXXxr
+ fsyB4V23qTb8yySHWaiMTqZz28ZPBjI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-AdLfLM3tMMuPfW4Q8iX_XA-1; Fri, 08 Nov 2019 04:26:34 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-153-eVII036MMpahiO5Sb_k4Vg-1; Fri, 08 Nov 2019 04:27:49 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D1D4107ACC3;
- Fri,  8 Nov 2019 09:26:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 812BB107ACC3;
+ Fri,  8 Nov 2019 09:27:48 +0000 (UTC)
 Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.23])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5EB2C5DA82;
- Fri,  8 Nov 2019 09:26:24 +0000 (UTC)
-Message-ID: <268fd0b724a685b69e2d41067e34e403b68e244e.camel@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ACF7D19757;
+ Fri,  8 Nov 2019 09:27:27 +0000 (UTC)
+Message-ID: <ec9879d5319d169f410e8c68bf9a880c0bc6b572.camel@redhat.com>
 Subject: Re: [PATCH v2 07/11] block: add x-blockdev-amend qmp command
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
-Date: Fri, 08 Nov 2019 11:26:23 +0200
+Date: Fri, 08 Nov 2019 11:27:26 +0200
 In-Reply-To: <931af700-bb9a-ae84-bd01-215560f66494@redhat.com>
 References: <20190912223028.18496-1-mlevitsk@redhat.com>
  <20190912223028.18496-8-mlevitsk@redhat.com>
  <931af700-bb9a-ae84-bd01-215560f66494@redhat.com>
 Mime-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: AdLfLM3tMMuPfW4Q8iX_XA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: eVII036MMpahiO5Sb_k4Vg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -108,7 +108,7 @@ On Fri, 2019-10-04 at 20:53 +0200, Max Reitz wrote:
 > I think I=E2=80=99d move this (and everything to belongs to it) to a diff=
 erent
 > series.
-I already kind of do this, patches prior to this one fully implment
+I already kind of do this, patches prior to this one fully implement
 the existing amend code path, while this and patches after this
 one implement the qmp x-blockdev-amend code path.
 
@@ -210,6 +210,7 @@ I looked through the status reporting of the qcow2 amend
 code (which doesn't really allowed to be run through
 qmp blockdev-amend, due to complexity of changing=20
 the qcow2 format on the fly).
+
 
 
 >=20
