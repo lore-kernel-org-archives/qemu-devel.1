@@ -6,74 +6,75 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC8ACC5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E18EDC5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:26:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 979C52178F
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:25:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF7C82178F
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 15:26:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LiERhUNp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 979C52178F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xusmo5R3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF7C82178F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT68v-0003qH-G9
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:25:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46646)
+	id 1iT69V-0004fR-FW
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 10:26:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47173)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iT5p6-0005dX-3Q
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:05:17 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iT5qu-00006l-2n
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:07:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iT5p3-0005Wc-Of
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:05:15 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:33575
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iT5qs-0007uw-SS
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:07:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44199
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iT5p3-0005VT-Kh
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:05:13 -0500
+ id 1iT5qs-0007s1-O1
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 10:07:06 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573225510;
+ s=mimecast20190719; t=1573225626;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=K6atlegt2pHhl2BHFOIZn9sIb4MIPYLA7+KTpFuvx0s=;
- b=LiERhUNpgbhsIzkKg6NiTZp5sApI/i8leO+DWdAeLBqJ6wpWDsYxnGqDvFqt6vo5nGWCq3
- 42i5crvNLMdJ/wIfEIX6LXTuTefqKj7PS/1Ga95V4M5gfbqdHRmoZ98+CjoT2Mm7R21oOU
- ugwTEbcoEPEqz3xd2GRnc/hsgW688CQ=
+ bh=l8YNejVxznOcDAaMUcNNOGhdD0r56jyIWDDN7FE48fc=;
+ b=Xusmo5R3odNFLvpu/KRKzM1NjbuJsSNJTcnNw6COH9tDVxEiM12RsEPOEw79hMg8ETMsXJ
+ 1bj7KUyhqbaEUupgCgieTUt5DAr6uSM5Hmzu3awvQACuj5LyZZDXkIu5J3MVX5o5k+TvFx
+ PuFYvChkWygVNbeC0Y2J5i6/hcn2IiQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-bUcHVWTCMxmOc7_-1CU6-g-1; Fri, 08 Nov 2019 10:05:09 -0500
+ us-mta-382-4HcH353HN_uQkdXD2rCBGQ-1; Fri, 08 Nov 2019 10:07:05 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D45D0107ACC4
- for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 15:05:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81724180496F
+ for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 15:07:02 +0000 (UTC)
 Received: from localhost (ovpn-112-25.ams2.redhat.com [10.36.112.25])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2A538277B6;
- Fri,  8 Nov 2019 15:04:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4127C50;
+ Fri,  8 Nov 2019 15:06:54 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 16/25] ppm-save: pass opened fd
-Date: Fri,  8 Nov 2019 19:01:14 +0400
-Message-Id: <20191108150123.12213-17-marcandre.lureau@redhat.com>
+Subject: [PATCH v6 25/25] hmp: call the asynchronous QMP screendump to fix
+ outdated/glitches
+Date: Fri,  8 Nov 2019 19:01:23 +0400
+Message-Id: <20191108150123.12213-26-marcandre.lureau@redhat.com>
 In-Reply-To: <20191108150123.12213-1-marcandre.lureau@redhat.com>
 References: <20191108150123.12213-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: bUcHVWTCMxmOc7_-1CU6-g-1
+X-MC-Unique: 4HcH353HN_uQkdXD2rCBGQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,45 +92,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will allow to pre-open the file before running the async finish
-handler and avoid potential monitor fdset races.
+In order to fix the bad screendumps (same as rhbz#1230527), call into
+the asynchonous version of the QMP command.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- ui/console.c    | 45 ++++++++++++++++++++++-----------------------
- ui/trace-events |  2 +-
- 2 files changed, 23 insertions(+), 24 deletions(-)
+ hmp-commands.hx      |  3 ++-
+ include/ui/console.h |  5 ++---
+ monitor/hmp-cmds.c   |  6 ++----
+ ui/console.c         | 32 --------------------------------
+ 4 files changed, 6 insertions(+), 40 deletions(-)
 
-diff --git a/ui/console.c b/ui/console.c
-index 3c941528d2..77d62fe76d 100644
---- a/ui/console.c
-+++ b/ui/console.c
-@@ -193,6 +193,7 @@ static void dpy_refresh(DisplayState *s);
- static DisplayState *get_alloc_displaystate(void);
- static void text_console_update_cursor_timer(void);
- static void text_console_update_cursor(void *opaque);
-+static bool ppm_save(int fd, DisplaySurface *ds, Error **errp);
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index cfcc044ce4..82b9236deb 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -278,7 +278,8 @@ ETEXI
+         .params     =3D "filename [device [head]]",
+         .help       =3D "save screen from head 'head' of display device 'd=
+evice' "
+                       "into PPM image 'filename'",
+-        .cmd        =3D hmp_screendump,
++        .async_cmd  =3D hmp_screendump_async,
++        .async      =3D true,
+     },
 =20
- static void gui_update(void *opaque)
- {
-@@ -308,29 +309,22 @@ void graphic_hw_invalidate(QemuConsole *con)
-     }
+ STEXI
+diff --git a/include/ui/console.h b/include/ui/console.h
+index a1935557cc..d0a2a2066f 100644
+--- a/include/ui/console.h
++++ b/include/ui/console.h
+@@ -6,6 +6,7 @@
+ #include "qemu/notify.h"
+ #include "qemu/error-report.h"
+ #include "qapi/qapi-types-ui.h"
++#include "qapi/qmp/dispatch.h"
+=20
+ #ifdef CONFIG_OPENGL
+ # include <epoxy/gl.h>
+@@ -74,9 +75,7 @@ typedef struct MouseTransformInfo {
+ } MouseTransformInfo;
+=20
+ void hmp_mouse_set(Monitor *mon, const QDict *qdict);
+-void hmp_screendump_sync(const char *filename,
+-                         bool has_device, const char *device,
+-                         bool has_head, int64_t head, Error **errp);
++void hmp_screendump_async(Monitor *mon, const QDict *qdict, QmpReturn *qre=
+t);
+=20
+ /* keysym is a unicode code except for special keys (see QEMU_KEY_xxx
+    constants) */
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index c52e78fedf..93b061cf4f 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -2301,15 +2301,13 @@ err_out:
+     goto out;
  }
 =20
--static void ppm_save(const char *filename, DisplaySurface *ds,
--                     Error **errp)
-+static bool ppm_save(int fd, DisplaySurface *ds, Error **errp)
+-void hmp_screendump(Monitor *mon, const QDict *qdict)
++void hmp_screendump_async(Monitor *mon, const QDict *qdict, QmpReturn *qre=
+t)
  {
-     int width =3D pixman_image_get_width(ds->image);
-     int height =3D pixman_image_get_height(ds->image);
--    int fd;
-     FILE *f;
-     int y;
-     int ret;
-     pixman_image_t *linebuf;
-+    bool success =3D false;
+     const char *filename =3D qdict_get_str(qdict, "filename");
+     const char *id =3D qdict_get_try_str(qdict, "device");
+     int64_t head =3D qdict_get_try_int(qdict, "head", 0);
+-    Error *err =3D NULL;
 =20
--    trace_ppm_save(filename, ds);
+-    hmp_screendump_sync(filename, id !=3D NULL, id, id !=3D NULL, head, &e=
+rr);
+-    hmp_handle_error(mon, &err);
++    qmp_screendump(filename, id !=3D NULL, id, id !=3D NULL, head, qret);
+ }
+=20
+ void hmp_nbd_server_start(Monitor *mon, const QDict *qdict)
+diff --git a/ui/console.c b/ui/console.c
+index fd87605b7c..a6f8e34e61 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -417,38 +417,6 @@ static QemuConsole *get_console(bool has_device, const=
+ char *device,
+     return con;
+ }
+=20
+-void hmp_screendump_sync(const char *filename,
+-                         bool has_device, const char *device,
+-                         bool has_head, int64_t head, Error **errp)
+-{
+-    DisplaySurface *surface;
+-    QemuConsole *con =3D get_console(has_device, device, has_head, head, e=
+rrp);
+-    int fd;
+-
+-    if (!con) {
+-        return;
+-    }
+-    /* This may not complete the drawing with Spice, you may have
+-     * glitches or outdated dumps, use qmp instead! */
+-    graphic_hw_update(con);
+-    surface =3D qemu_console_surface(con);
+-    if (!surface) {
+-        error_setg(errp, "no surface");
+-        return;
+-    }
+-
 -    fd =3D qemu_open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 06=
 66);
 -    if (fd =3D=3D -1) {
@@ -137,91 +203,15 @@ index 3c941528d2..77d62fe76d 100644
 -                   strerror(errno));
 -        return;
 -    }
-+    trace_ppm_save(fd, ds);
-     f =3D fdopen(fd, "wb");
-     ret =3D fprintf(f, "P6\n%d %d\n%d\n", width, height, 255);
-     if (ret < 0) {
-         linebuf =3D NULL;
--        goto write_err;
-+        goto end;
-     }
-     linebuf =3D qemu_pixman_linebuf_create(PIXMAN_BE_r8g8b8, width);
-     for (y =3D 0; y < height; y++) {
-@@ -339,21 +333,16 @@ static void ppm_save(const char *filename, DisplaySur=
-face *ds,
-         ret =3D fwrite(pixman_image_get_data(linebuf), 1,
-                      pixman_image_get_stride(linebuf), f);
-         (void)ret;
--        if (ferror(f)) {
--            goto write_err;
--        }
-+        success =3D !ferror(f);
-     }
-=20
--out:
-+end:
-+    if (!success) {
-+        error_setg(errp, "failed to write to PPM file: %s", strerror(errno=
-));
-+    }
-     qemu_pixman_image_unref(linebuf);
-     fclose(f);
--    return;
 -
--write_err:
--    error_setg(errp, "failed to write to file '%s': %s", filename,
--               strerror(errno));
--    unlink(filename);
--    goto out;
-+    return success;
- }
-=20
- void qmp_screendump(const char *filename, bool has_device, const char *dev=
-ice,
-@@ -361,6 +350,7 @@ void qmp_screendump(const char *filename, bool has_devi=
-ce, const char *device,
- {
-     QemuConsole *con;
-     DisplaySurface *surface;
-+    int fd;
-=20
-     if (has_device) {
-         con =3D qemu_console_lookup_by_device_name(device, has_head ? head=
- : 0,
-@@ -387,7 +377,16 @@ void qmp_screendump(const char *filename, bool has_dev=
-ice, const char *device,
-         return;
-     }
-=20
--    ppm_save(filename, surface, errp);
-+    fd =3D qemu_open(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 06=
-66);
-+    if (fd =3D=3D -1) {
-+        error_setg(errp, "failed to open file '%s': %s", filename,
-+                   strerror(errno));
-+        return;
-+    }
-+
-+    if (!ppm_save(fd, surface, errp)) {
-+        unlink(filename);
-+    }
- }
-=20
- void graphic_hw_text_update(QemuConsole *con, console_ch_t *chardata)
-diff --git a/ui/trace-events b/ui/trace-events
-index 63de72a798..0dcda393c1 100644
---- a/ui/trace-events
-+++ b/ui/trace-events
-@@ -15,7 +15,7 @@ displaysurface_create_pixman(void *display_surface) "surf=
-ace=3D%p"
- displaysurface_free(void *display_surface) "surface=3D%p"
- displaychangelistener_register(void *dcl, const char *name) "%p [ %s ]"
- displaychangelistener_unregister(void *dcl, const char *name) "%p [ %s ]"
--ppm_save(const char *filename, void *display_surface) "%s surface=3D%p"
-+ppm_save(int fd, void *display_surface) "fd=3D%d surface=3D%p"
-=20
- # gtk.c
- # gtk-gl-area.c
+-    if (!ppm_save(fd, surface, errp)) {
+-        qemu_unlink(filename);
+-    }
+-}
+-
+ void qmp_screendump(const char *filename,
+                     bool has_device, const char *device,
+                     bool has_head, int64_t head,
 --=20
 2.24.0
 
