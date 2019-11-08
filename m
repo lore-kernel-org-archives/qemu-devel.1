@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F51FC6197
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:52:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06450FC6196
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:57:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB2EA21848
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:52:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA1DC214DB
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:57:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g8BHG9eG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB2EA21848
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yi0gIHV/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA1DC214DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60326 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iTBEk-0003zz-TD
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 15:52:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50274)
+	id 1iTBJU-0007Fe-U4
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 15:57:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52010)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iTBDj-0002oO-3R
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:51:05 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iTBIk-0006ke-RN
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:56:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iTBDh-0000IJ-En
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:51:02 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41932)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iTBIj-00031M-Mh
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:56:14 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37547)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iTBDh-0000Hy-5R; Fri, 08 Nov 2019 15:51:01 -0500
-Received: by mail-wr1-x444.google.com with SMTP id p4so8494326wrm.8;
- Fri, 08 Nov 2019 12:51:00 -0800 (PST)
+ id 1iTBIj-000310-EN
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:56:13 -0500
+Received: by mail-wr1-x442.google.com with SMTP id t1so8536160wrv.4
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 12:56:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=/WiaEsTIDX7uoX/2NXG1N4EIPVeOpEJFAq1BfVcoLrQ=;
- b=g8BHG9eGjD3XT+m+4abp+NTQe9w/1vhNXlrHBzGWRb96Uu/df9SN6PoesxJWRU1GRg
- yPFphzKLu2sz/W3fZszpDuAaIW+l6IR36WhsrxFjWlWEo7g40ExfI/lZiaiWIuqNOZXW
- ez/xpapEJzpVO7CJbmyfQSVJFayH1a4LsGC7GwTFwkczDCf0u91jX7XSezB2YU55StAE
- aAsAUUy6cpxj0+5NzOIeVkjShY2gOuDiACrEDrEaTh1Be1gRWrEyGK2y1sc3SVKwlook
- LGneRRnZ1WH2Q73+yH7642Onj1hW8TtHWNkoVLppA+ivdQF5GeQo/wtKkpch78hdj7cF
- gCEg==
+ bh=NzJmXAGXwTKAL5SyQxEUp59S86q+GhuJWH0OEyVhcTo=;
+ b=Yi0gIHV/z6a0DPLufo3sTSY8Airm/id3GhJEURvlRqMa9yvNHeeopGBjQ3Of3CS/If
+ //IjX7LUUpDMPb88h5MonuXE9l1MYRsZNcNly/hL7poqbnMz+0BZAhzH14VX6wq04ghL
+ hoURuCc1cfRhbWbJPPLGZBp8jXF4im97++wGPNmHkjnMhxVqbSwBe6PA8MSvDGWS73qa
+ GHX53LxFzhTbLIiWBob5lNbeCNz9fDs4GfdPMXmTmhiMyP2cxW9TYXpD3zwO/R4VVzZw
+ jqJkJUgLJNurn7uhK8k8h2PDtgHqFlUcPbpDZf2g2ZS8ygB5/8gmKDLTMfpeKk8RYOWK
+ wCcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=/WiaEsTIDX7uoX/2NXG1N4EIPVeOpEJFAq1BfVcoLrQ=;
- b=M5Fc2RJ83mxJpcfudE7ZjO/Pe1SfTMbjBXr1E8gUf51Mefxc2iq+Im9l5GoFUqp/d5
- yhDJdYS5a3nMGKkVHsuF/ocMnGrKeizElS/RPXkRHGnFpz26AUin/FDI3rlI1Pr2ilIO
- m8NK287Xp9riT3KTyJSUhwAruQYKoXsjc8MN3TDGgsKEK4j1nJ/Bg8Xg/JgvxZxZGkUo
- IyFuit8z3cjHnvQjfB21xTA2K6f2nl8e66zvKX+4a77M+D9J1Or6+NUB5HQoau6nx3OV
- CwXta1/OkPzDsQUIXvwXSg8o/f0Z8TAG1r7iu15mxU48If6zx4u2y76FXaKTiUekS+TE
- B+Qg==
-X-Gm-Message-State: APjAAAUyZDDtD/DS33V7IEu533LoCaI28XvdUvseTRXaGakycXWhu4kr
- AkJgZJfhfd6FQiAodqBvawRMAj9bxROVlLq3Y6qXyvjDSuE=
-X-Google-Smtp-Source: APXvYqzbg0rqSaID2GU7Hlhw0f3F/KRETWksf8KIPueMwTihzGXM2ttrveU7tsGumf8t6s0Z+o2o7MSoELv7xuYH/IU=
-X-Received: by 2002:a5d:4ad2:: with SMTP id y18mr10054543wrs.396.1573246259368; 
- Fri, 08 Nov 2019 12:50:59 -0800 (PST)
+ bh=NzJmXAGXwTKAL5SyQxEUp59S86q+GhuJWH0OEyVhcTo=;
+ b=t7fPp1ZYFOxEG9hI74Fw1sQANElqM8sPr0rK9wR3z/hAVJt1ZEzA9J4s4iWHSRTGV7
+ FH2xnDZt0XflLXu1U1zSe0MaiTA3Tw8MIfJH4UIul96pBTs8l754EBTlaaBSMukhKqwP
+ KafldtqSFoqs5dh4uQ2vq68ok43RMBjVdFNO5KtvzDjoHHkFPar0k5xRnA/w5G5snXpw
+ s7Yl4dD3XL5gSxP1Fo1eQd5IiXu1tcCPo5o5IXP2UkuWjNU6HvibeAIcveCgj0ZeiquZ
+ yhN3hZTR2/PNuBHQsGnXXxpc2mJzvZRNfGxX0LBPzdHXquSG3mEVH3tv1e6rPrbikr4s
+ mr0w==
+X-Gm-Message-State: APjAAAWdFhJLQTc+VnxbzexHql1EUnN/cLtCzRY/Z7LfhIfrKILdXp0Y
+ joZnjNpdjX4egCXo8Uc2rEbGhujttQh7yxZpBNU=
+X-Google-Smtp-Source: APXvYqyYnvPUJgNBA8U//eMYMG+IqzKgXpse6bwmw60+ltHWiRjUch7KltNsk65DOhADbYcLsBgm5ilyD2S0F4/5SqI=
+X-Received: by 2002:adf:ef0f:: with SMTP id e15mr10247086wro.312.1573246571919; 
+ Fri, 08 Nov 2019 12:56:11 -0800 (PST)
 MIME-Version: 1.0
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
- <20191011160552.22907-9-vsementsov@virtuozzo.com>
-In-Reply-To: <20191011160552.22907-9-vsementsov@virtuozzo.com>
+ <20191011160552.22907-11-vsementsov@virtuozzo.com>
+In-Reply-To: <20191011160552.22907-11-vsementsov@virtuozzo.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sat, 9 Nov 2019 00:50:47 +0400
-Message-ID: <CAJ+F1CJJxQC-oUsmMrOP-iQe=5npQSHZ5pYPwrxThbGzA49MTw@mail.gmail.com>
-Subject: Re: [RFC v5 008/126] ppc: well form kvmppc_hint_smt_possible error
- hint helper
+Date: Sat, 9 Nov 2019 00:55:59 +0400
+Message-ID: <CAJ+F1CKwSDM=zjQeTU=Tx5dQSQj_RVjnGqdN+qEV5AkiWXrQxQ@mail.gmail.com>
+Subject: Re: [RFC v5 010/126] hw/core/qdev: cleanup Error ** variables
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,103 +89,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>,
- "open list:sPAPR pseries" <qemu-ppc@nongnu.org>, QEMU <qemu-devel@nongnu.org>,
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
  Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 11, 2019 at 8:14 PM Vladimir Sementsov-Ogievskiy
+On Fri, Oct 11, 2019 at 8:18 PM Vladimir Sementsov-Ogievskiy
 <vsementsov@virtuozzo.com> wrote:
 >
-> Make kvmppc_hint_smt_possible hint append helper well formed:
-> rename errp to errp_in, as it is IN-parameter here (which is unusual
-> for errp), rename function to be error_append_*_hint.
+> Rename Error ** parameter in check_only_migratable to common errp.
+>
+> In device_set_realized:
+>
+>  - Move "if (local_err !=3D NULL)" closer to error setters.
+>
+>  - Drop 'Error **local_errp': it doesn't save any LoCs, but it's very
+>    unusual.
 >
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  target/ppc/kvm_ppc.h | 4 ++--
->  hw/ppc/spapr.c       | 2 +-
->  target/ppc/kvm.c     | 6 +++---
->  3 files changed, 6 insertions(+), 6 deletions(-)
+>  hw/core/qdev.c | 28 +++++++++++++---------------
+>  1 file changed, 13 insertions(+), 15 deletions(-)
 >
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index 98bd7d5da6..35f1d499ad 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -28,7 +28,7 @@ void kvmppc_set_papr(PowerPCCPU *cpu);
->  int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
->  void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
->  int kvmppc_smt_threads(void);
-> -void kvmppc_hint_smt_possible(Error **errp);
-> +void error_append_kvmppc_smt_possible_hint(Error **errp_in);
->  int kvmppc_set_smt_threads(int smt);
->  int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
->  int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
-> @@ -164,7 +164,7 @@ static inline int kvmppc_smt_threads(void)
->      return 1;
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index cbad6c1d55..e3be8cc3c4 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -796,12 +796,12 @@ static bool device_get_realized(Object *obj, Error =
+**errp)
+>      return dev->realized;
 >  }
 >
-> -static inline void kvmppc_hint_smt_possible(Error **errp)
-> +static inline void error_append_kvmppc_smt_possible_hint(Error **errp_in=
-)
-
-Please keep the kvmppc_ prefix
-
-other than that:
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
+> -static bool check_only_migratable(Object *obj, Error **err)
+> +static bool check_only_migratable(Object *obj, Error **errp)
 >  {
->      return;
->  }
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 514a17ae74..6729269aa9 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -2565,7 +2565,7 @@ static void spapr_set_vsmt_mode(SpaprMachineState *=
-spapr, Error **errp)
->                                        " requires the use of VSMT mode %d=
-.\n",
->                                        smp_threads, kvm_smt, spapr->vsmt)=
-;
->                  }
-> -                kvmppc_hint_smt_possible(&local_err);
-> +                error_append_kvmppc_smt_possible_hint(&local_err);
->                  goto out;
->              }
->          }
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 820724cc7d..af6e667bf8 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2076,7 +2076,7 @@ int kvmppc_set_smt_threads(int smt)
->      return ret;
->  }
+>      DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
 >
-> -void kvmppc_hint_smt_possible(Error **errp)
-> +void error_append_kvmppc_smt_possible_hint(Error **errp_in)
->  {
->      int i;
->      GString *g;
-> @@ -2091,10 +2091,10 @@ void kvmppc_hint_smt_possible(Error **errp)
->              }
+>      if (!vmstate_check_only_migratable(dc->vmsd)) {
+> -        error_setg(err, "Device %s is not migratable, but "
+> +        error_setg(errp, "Device %s is not migratable, but "
+>                     "--only-migratable was specified",
+>                     object_get_typename(obj));
+>          return false;
+> @@ -850,10 +850,9 @@ static void device_set_realized(Object *obj, bool va=
+lue, Error **errp)
+>
+>          if (dc->realize) {
+>              dc->realize(dev, &local_err);
+> -        }
+> -
+> -        if (local_err !=3D NULL) {
+> -            goto fail;
+> +            if (local_err !=3D NULL) {
+> +                goto fail;
+> +            }
 >          }
->          s =3D g_string_free(g, false);
-> -        error_append_hint(errp, "%s.\n", s);
-> +        error_append_hint(errp_in, "%s.\n", s);
->          g_free(s);
->      } else {
-> -        error_append_hint(errp,
-> +        error_append_hint(errp_in,
->                            "This KVM seems to be too old to support VSMT.=
-\n");
+>
+>          DEVICE_LISTENER_CALL(realize, Forward, dev);
+> @@ -894,27 +893,26 @@ static void device_set_realized(Object *obj, bool v=
+alue, Error **errp)
+>         }
+>
+>      } else if (!value && dev->realized) {
+> -        Error **local_errp =3D NULL;
+> +        /* We want to catch in local_err only first error */
+>          QLIST_FOREACH(bus, &dev->child_bus, sibling) {
+> -            local_errp =3D local_err ? NULL : &local_err;
+>              object_property_set_bool(OBJECT(bus), false, "realized",
+> -                                     local_errp);
+> +                                     local_err ? NULL : &local_err);
+>          }
+>          if (qdev_get_vmsd(dev)) {
+>              vmstate_unregister(dev, qdev_get_vmsd(dev), dev);
+>          }
+>          if (dc->unrealize) {
+> -            local_errp =3D local_err ? NULL : &local_err;
+> -            dc->unrealize(dev, local_errp);
+> +            dc->unrealize(dev, local_err ? NULL : &local_err);
+>          }
+>          dev->pending_deleted_event =3D true;
+>          DEVICE_LISTENER_CALL(unrealize, Reverse, dev);
+> -    }
+>
+> -    if (local_err !=3D NULL) {
+> -        goto fail;
+> +        if (local_err !=3D NULL) {
+> +            goto fail;
+> +        }
 >      }
+>
+> +    assert(local_err =3D=3D NULL);
+>      dev->realized =3D value;
+>      return;
+>
+> @@ -952,7 +950,7 @@ static bool device_get_hotpluggable(Object *obj, Erro=
+r **errp)
+>                                  qbus_is_hotpluggable(dev->parent_bus));
 >  }
+>
+> -static bool device_get_hotplugged(Object *obj, Error **err)
+> +static bool device_get_hotplugged(Object *obj, Error **errp)
+>  {
+>      DeviceState *dev =3D DEVICE(obj);
+>
 > --
 > 2.21.0
 >
 >
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
 
 --=20
