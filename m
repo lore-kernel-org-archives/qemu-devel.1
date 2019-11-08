@@ -6,80 +6,80 @@ X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 481F4FA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C422C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:16:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E5092084D
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:14:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E5092084D
+	by mail.kernel.org (Postfix) with ESMTPS id 0FBEE20865
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:16:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FBEE20865
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT46L-00044t-9G
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 08:14:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51872)
+	id 1iT485-0005ie-9G
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 08:16:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52403)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iT44Z-0002M1-MH
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:13:08 -0500
+ (envelope-from <philmd@redhat.com>) id 1iT46S-0004YT-D8
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:15:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iT44Y-0001v4-Gx
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:13:07 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:20154)
+ (envelope-from <philmd@redhat.com>) id 1iT46Q-0004Xd-9Z
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:15:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54296)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iT44Y-0001uM-7y
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:13:06 -0500
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71])
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iT46Q-0004Uy-0X
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:15:02 -0500
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69])
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
  (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id EE415C057867
- for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 13:13:04 +0000 (UTC)
-Received: by mail-wr1-f71.google.com with SMTP id j17so3150581wru.13
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 05:13:04 -0800 (PST)
+ by mx1.redhat.com (Postfix) with ESMTPS id 20BB7C0568FD
+ for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 13:15:01 +0000 (UTC)
+Received: by mail-wr1-f69.google.com with SMTP id e3so3131436wrs.17
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 05:15:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=hiUvA3Hm+PV20+e2UC0nmfG5QGIi6yJ/ofNe0luHeew=;
- b=PR248DbQrzjy1gqcomaeTMH705zezzohUM43krn0jIw2dZjpdfdnaY1OQBnCqQqjX+
- AfkrKRGzz+yJzHf6TlVhrg+hRxGGEcSCSJJbwhKhsslF6JMmYrVt0vTgyxdFfIODVvR0
- CigvoshOryt42ReiJrY6jvx7FZU+RNCUkkXGr/8vQgKVjzsbYq1HqewGkrie4s796zzs
- GKwYpZefQJCZkyb/m8ednoZCPxbjvPcrHKVjlI1o9HXMpJOKI8QCa0l0oXka6VbOk6Om
- fn8cAFgFcemWVx4hXSi4dvn1z9VshnGMxHhgBQtnc4qvCGOQVowU5l9YUxsb7cIVSd9j
- R1Ng==
-X-Gm-Message-State: APjAAAVGjrPH/5q2Kx5q8BCH6nn7dtQoUV4t+VpOHZQm6HACm8RB5zyw
- omPnkT47XiKrEywboqwwrT4vhRPbyNaMGSPVdVvEKKHLDaIJMmOEIHv7JFZWo+mjuv4qaR3CFZx
- 3KVQUWWGFbV7AfMk=
-X-Received: by 2002:adf:f084:: with SMTP id n4mr8290203wro.369.1573218783751; 
- Fri, 08 Nov 2019 05:13:03 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzm5HAY8TKstmPrabsQy4fPlfmAsgMkVg09Xyaj9yZjNpEwG1+qxTHNcXLxOvIU7SIhVlZyXg==
-X-Received: by 2002:adf:f084:: with SMTP id n4mr8290178wro.369.1573218783546; 
- Fri, 08 Nov 2019 05:13:03 -0800 (PST)
+ bh=RfGG6nxRw4Fehbqx4neSoGAyKdBzJJ31hjvaYDntmB4=;
+ b=G2ExcadBkqLWvoE3djuMfOTqKlBbLTh7izQVuGCP+BBb/epe858YWoJpvl2Ep57td1
+ vIyeumLxHMXlwMvF6zCT7wMQkV/KD2chMsPc/8L8XUsaiFlKcTB1f6sgNbNlz3EFA7xD
+ iYIqCjQNxVldjr9Uv6/rk5mszRLmEsAk8VzuwQbv2TUkqDRFhyWAQw1Nao0HANg3gALW
+ ppgx1rEpNzdX3jlEwnTYHvAur37GPItZDsWUIPtrlTmf8K04QogpMHeB4FF5iDUSlXWz
+ Oorg134fxRRkfMqoYqUX4Y/4yf9Q3ayojoGtd4UMroorR4aTNjHZDNpZfJEFWg4mx3Id
+ bOEA==
+X-Gm-Message-State: APjAAAVzlj6JIZX8O1d/jx128/bLqy5c/uGggNvuxQ6PZWieCh3EZVnI
+ JNYOhxRpRpu4QMWiNMyjH9ypHdTpHJ4mrGOliHadhnT4c3WcsGj6+P5rOC7H1jgwqmh4+3oW09e
+ /dL5LhXYfaTqmXL4=
+X-Received: by 2002:adf:f651:: with SMTP id x17mr8846515wrp.114.1573218899895; 
+ Fri, 08 Nov 2019 05:14:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzouqWsJKMypjWrkHw9ZEkJVDEBENTP/sseEa+lZYDzQVljLrbg3qfGKGA1aSdugMYrvyVdug==
+X-Received: by 2002:adf:f651:: with SMTP id x17mr8846489wrp.114.1573218899530; 
+ Fri, 08 Nov 2019 05:14:59 -0800 (PST)
 Received: from [192.168.1.38] (62.red-88-21-202.staticip.rima-tde.net.
  [88.21.202.62])
- by smtp.gmail.com with ESMTPSA id x205sm9132072wmb.5.2019.11.08.05.13.02
+ by smtp.gmail.com with ESMTPSA id f14sm5009666wrv.17.2019.11.08.05.14.58
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 08 Nov 2019 05:13:03 -0800 (PST)
-Subject: Re: [PATCH v7 6/8] Acceptance tests: add the build directory to the
- system PATH
+ Fri, 08 Nov 2019 05:14:58 -0800 (PST)
+Subject: Re: [PATCH v7 2/8] Acceptance tests: introduce utility method for
+ tags unique vals
 To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
 References: <20191104151323.9883-1-crosa@redhat.com>
- <20191104151323.9883-7-crosa@redhat.com>
+ <20191104151323.9883-3-crosa@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b93b5913-22f1-6aa9-75a1-4b577153288e@redhat.com>
-Date: Fri, 8 Nov 2019 14:13:02 +0100
+Message-ID: <619a8f8e-ab0c-f837-853e-34e61e85a583@redhat.com>
+Date: Fri, 8 Nov 2019 14:14:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191104151323.9883-7-crosa@redhat.com>
+In-Reply-To: <20191104151323.9883-3-crosa@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 209.132.183.28
@@ -106,42 +106,57 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 11/4/19 4:13 PM, Cleber Rosa wrote:
-> So that when binaries such as qemu-img are searched for, those in the
-> build tree will be favored.  As a clarification, SRC_ROOT_DIR is
-> dependent on the location from where tests are executed, so they are
-> equal to the build directory if one is being used.
-> 
-> The original motivation is that Avocado libraries such as
-> avocado.utils.vmimage.get() may use the matching binaries, but it may
-> also apply to any other binary that test code may eventually attempt
-> to execute.
-> 
+> Currently a test can describe the target architecture binary that it
+> should primarily be run with, be setting a single tag value.
+>=20
+> The same approach is expected to be done with other QEMU aspects to be
+> tested, for instance, the machine type and accelerator, so let's
+> generalize the logic into a utility method.
+>=20
 > Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
->   tests/acceptance/avocado_qemu/__init__.py | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance/avocado_qemu/__init__.py
-> index 17ce583c87..a4bb796a47 100644
+>   tests/acceptance/avocado_qemu/__init__.py | 19 +++++++++++++------
+>   1 file changed, 13 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptan=
+ce/avocado_qemu/__init__.py
+> index 9a57c020d8..e676d9c4e7 100644
 > --- a/tests/acceptance/avocado_qemu/__init__.py
 > +++ b/tests/acceptance/avocado_qemu/__init__.py
-> @@ -110,6 +110,12 @@ class Test(avocado.Test):
->           return None
->   
+> @@ -100,14 +100,21 @@ def exec_command_and_wait_for_pattern(test, comma=
+nd,
+>  =20
+>  =20
+>   class Test(avocado.Test):
+> +    def _get_unique_tag_val(self, tag_name):
+> +        """
+> +        Gets a tag value, if unique for a key
+
+'Get'?
+
+> +        """
+> +        vals =3D self.tags.get(tag_name, [])
+> +        if len(vals) =3D=3D 1:
+> +            return vals.pop()
+> +        return None
+> +
 >       def setUp(self):
-> +        # Some utility code uses binaries from the system's PATH.  For
-> +        # instance, avocado.utils.vmimage.get() uses qemu-img, to
-> +        # create a snapshot image.  This is a transparent way of
-> +        # making sure those utilities find and use binaries on the
-> +        # build tree by default.
-> +        os.environ['PATH'] = '%s:%s' % (SRC_ROOT_DIR, os.environ['PATH'])
+>           self._vms =3D {}
+> -        arches =3D self.tags.get('arch', [])
+> -        if len(arches) =3D=3D 1:
+> -            arch =3D arches.pop()
+> -        else:
+> -            arch =3D None
+> -        self.arch =3D self.params.get('arch', default=3Darch)
+> +
+> +        self.arch =3D self.params.get('arch',
+> +                                    default=3Dself._get_unique_tag_val=
+('arch'))
+> +
+>           default_qemu_bin =3D pick_default_qemu_bin(arch=3Dself.arch)
+>           self.qemu_bin =3D self.params.get('qemu_bin',
+>                                           default=3Ddefault_qemu_bin)
+>=20
 
-But qemu-img is compiled in BUILD_ROOT_DIR, isn't it?
-
-Maybe we should pass its path by argument, such --qemu-img /path/to/it.
-
->           self._vms = {}
->   
->           self.arch = self.params.get('arch',
-> 
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
