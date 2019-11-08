@@ -2,87 +2,91 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C422C5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE7F3C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:19:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0FBEE20865
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:16:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FBEE20865
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A3CEF2178F
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:19:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JcS19dMw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3CEF2178F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54188 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54208 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT485-0005ie-9G
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 08:16:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52403)
+	id 1iT4Ab-000763-R3
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 08:19:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52649)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iT46S-0004YT-D8
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:15:05 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iT47D-0005WD-OU
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:15:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iT46Q-0004Xd-9Z
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:15:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:54296)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iT46Q-0004Uy-0X
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:15:02 -0500
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69])
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (No client certificate requested)
- by mx1.redhat.com (Postfix) with ESMTPS id 20BB7C0568FD
- for <qemu-devel@nongnu.org>; Fri,  8 Nov 2019 13:15:01 +0000 (UTC)
-Received: by mail-wr1-f69.google.com with SMTP id e3so3131436wrs.17
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 05:15:01 -0800 (PST)
+ (envelope-from <richard.henderson@linaro.org>) id 1iT47B-0005ro-9p
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:15:51 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37414)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iT478-0005mF-K9
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:15:48 -0500
+Received: by mail-wm1-x341.google.com with SMTP id q130so6205288wme.2
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 05:15:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=jwbQ3SYWggzpE6CpWE5l1YZF0hptKFDwW7jW4K6jgYo=;
+ b=JcS19dMwYQPq2n8XfOxnRfzwhMMD0wrsduojUPUmGNRQZxDJeNhQDHt4nFPFlIKAnw
+ t+mNlcLdKplVnslOeFYe8hIoW4vOLls267e5Mlj8Y2moJy/d5uDG+9f10dgMVK4W4aFK
+ 0BPz5OyYwALy/IItQqzztm7Q6r3YGnp7/TMWSney8tKqd2/n9LFsaoOrCYNYhXh6tAS/
+ Q5AUryGK3eUoQjEnlkrGcfiIQ3bu9+GCUWYzoR5zxlylpq8O3USVtNHvzF2rWDPnXVcI
+ NO+WnT3yr9spB47/63x3wasunqQVntiMTp6aaVHT98rGZFzKhkqz3NZXoYgb7gl2S5DW
+ 1MiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=RfGG6nxRw4Fehbqx4neSoGAyKdBzJJ31hjvaYDntmB4=;
- b=G2ExcadBkqLWvoE3djuMfOTqKlBbLTh7izQVuGCP+BBb/epe858YWoJpvl2Ep57td1
- vIyeumLxHMXlwMvF6zCT7wMQkV/KD2chMsPc/8L8XUsaiFlKcTB1f6sgNbNlz3EFA7xD
- iYIqCjQNxVldjr9Uv6/rk5mszRLmEsAk8VzuwQbv2TUkqDRFhyWAQw1Nao0HANg3gALW
- ppgx1rEpNzdX3jlEwnTYHvAur37GPItZDsWUIPtrlTmf8K04QogpMHeB4FF5iDUSlXWz
- Oorg134fxRRkfMqoYqUX4Y/4yf9Q3ayojoGtd4UMroorR4aTNjHZDNpZfJEFWg4mx3Id
- bOEA==
-X-Gm-Message-State: APjAAAVzlj6JIZX8O1d/jx128/bLqy5c/uGggNvuxQ6PZWieCh3EZVnI
- JNYOhxRpRpu4QMWiNMyjH9ypHdTpHJ4mrGOliHadhnT4c3WcsGj6+P5rOC7H1jgwqmh4+3oW09e
- /dL5LhXYfaTqmXL4=
-X-Received: by 2002:adf:f651:: with SMTP id x17mr8846515wrp.114.1573218899895; 
- Fri, 08 Nov 2019 05:14:59 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzouqWsJKMypjWrkHw9ZEkJVDEBENTP/sseEa+lZYDzQVljLrbg3qfGKGA1aSdugMYrvyVdug==
-X-Received: by 2002:adf:f651:: with SMTP id x17mr8846489wrp.114.1573218899530; 
- Fri, 08 Nov 2019 05:14:59 -0800 (PST)
-Received: from [192.168.1.38] (62.red-88-21-202.staticip.rima-tde.net.
- [88.21.202.62])
- by smtp.gmail.com with ESMTPSA id f14sm5009666wrv.17.2019.11.08.05.14.58
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 08 Nov 2019 05:14:58 -0800 (PST)
-Subject: Re: [PATCH v7 2/8] Acceptance tests: introduce utility method for
- tags unique vals
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-References: <20191104151323.9883-1-crosa@redhat.com>
- <20191104151323.9883-3-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <619a8f8e-ab0c-f837-853e-34e61e85a583@redhat.com>
-Date: Fri, 8 Nov 2019 14:14:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=jwbQ3SYWggzpE6CpWE5l1YZF0hptKFDwW7jW4K6jgYo=;
+ b=bdtoP/xfuJwZkiBETIQSwikBu1MkQLelRroxK3QVaKGIGtyZG6u6W3847BsjlU6A9J
+ irHiMEiAXlORnbpxFa8ne3CmnOOj2WWB3mUV3Le+Wavr780TX8V3IsGx6zPpcH8RaGt/
+ 22Soc4o83B0AODLldhPTJTzIXvu9xwgtvxWJQMrmVhzrwAZPs0x1GN5Uf2jYQnR5HpBT
+ FCbmBoej9/J1hg2OTjQ42GREEZ8cPJhUtpMtHVb2l4V24g14vtpYp2sDJwE0jfXbYp82
+ Oz24KFU2ZQ+8kMlHDRjYrJ9aN4XE8CYn7BxucV028++WmCNf9ukwT+O2kojpuJTEkhW9
+ 3GVA==
+X-Gm-Message-State: APjAAAU7WxIGKU4naaqUb4kLPPxdG5IqR0ZENeRzVZ5SeUZh2ZgQW55U
+ CqDkqmbOgOeBSrTYbolCMeX/mQ==
+X-Google-Smtp-Source: APXvYqyxGm7ochCIgBKtVNxuL+MoJMCyqVQ/sfHm2EdesdwVybSEJdZHnn+b+HVUMsCa9jqTS2ngDg==
+X-Received: by 2002:a7b:c08c:: with SMTP id r12mr8103523wmh.67.1573218943140; 
+ Fri, 08 Nov 2019 05:15:43 -0800 (PST)
+Received: from [192.168.8.102] (212.red-213-99-162.dynamicip.rima-tde.net.
+ [213.99.162.212])
+ by smtp.gmail.com with ESMTPSA id n22sm4849332wmk.19.2019.11.08.05.15.41
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 08 Nov 2019 05:15:42 -0800 (PST)
+Subject: Re: [PATCH v2 1/3] target/microblaze: Plug temp leaks for loads/stores
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-devel@nongnu.org
+References: <20191108124219.31348-1-edgar.iglesias@gmail.com>
+ <20191108124219.31348-2-edgar.iglesias@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <9673b4b4-b8c2-fbaf-5071-bd72a0cd04e9@linaro.org>
+Date: Fri, 8 Nov 2019 14:15:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191104151323.9883-3-crosa@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20191108124219.31348-2-edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.132.183.28
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,69 +98,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beraldo Leal <bleal@redhat.com>, Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, qemu-ppc@nongnu.org,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, alistair@alistair23.me, frederic.konrad@adacore.com,
+ philmd@redhat.com, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/4/19 4:13 PM, Cleber Rosa wrote:
-> Currently a test can describe the target architecture binary that it
-> should primarily be run with, be setting a single tag value.
->=20
-> The same approach is expected to be done with other QEMU aspects to be
-> tested, for instance, the machine type and accelerator, so let's
-> generalize the logic into a utility method.
->=20
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+On 11/8/19 1:42 PM, Edgar E. Iglesias wrote:
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+> 
+> Simplify endian reversion of address also plugging TCG temp
+> leaks for loads/stores.
+> 
+> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 > ---
->   tests/acceptance/avocado_qemu/__init__.py | 19 +++++++++++++------
->   1 file changed, 13 insertions(+), 6 deletions(-)
->=20
-> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptan=
-ce/avocado_qemu/__init__.py
-> index 9a57c020d8..e676d9c4e7 100644
-> --- a/tests/acceptance/avocado_qemu/__init__.py
-> +++ b/tests/acceptance/avocado_qemu/__init__.py
-> @@ -100,14 +100,21 @@ def exec_command_and_wait_for_pattern(test, comma=
-nd,
->  =20
->  =20
->   class Test(avocado.Test):
-> +    def _get_unique_tag_val(self, tag_name):
-> +        """
-> +        Gets a tag value, if unique for a key
+>  target/microblaze/translate.c | 46 +++++++++++++++--------------------
+>  1 file changed, 20 insertions(+), 26 deletions(-)
 
-'Get'?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> +        """
-> +        vals =3D self.tags.get(tag_name, [])
-> +        if len(vals) =3D=3D 1:
-> +            return vals.pop()
-> +        return None
-> +
->       def setUp(self):
->           self._vms =3D {}
-> -        arches =3D self.tags.get('arch', [])
-> -        if len(arches) =3D=3D 1:
-> -            arch =3D arches.pop()
-> -        else:
-> -            arch =3D None
-> -        self.arch =3D self.params.get('arch', default=3Darch)
-> +
-> +        self.arch =3D self.params.get('arch',
-> +                                    default=3Dself._get_unique_tag_val=
-('arch'))
-> +
->           default_qemu_bin =3D pick_default_qemu_bin(arch=3Dself.arch)
->           self.qemu_bin =3D self.params.get('qemu_bin',
->                                           default=3Ddefault_qemu_bin)
->=20
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+r~
 
