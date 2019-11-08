@@ -2,112 +2,70 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-13.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4979FC6196
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF159FC6197
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:40:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E65020674
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:32:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="EMlnzs0x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E65020674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
+	by mail.kernel.org (Postfix) with ESMTPS id 93EF220674
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:40:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93EF220674
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iTAw4-0002P4-LQ
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 15:32:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44380)
+	id 1iTB3G-0005Yo-Kj
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 15:40:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47438)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sunilmut@microsoft.com>) id 1iTAvJ-0001w8-8r
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:32:02 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iTB22-0004ZL-9n
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:38:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sunilmut@microsoft.com>) id 1iTAvH-0006yO-6x
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:32:00 -0500
-Received: from mail-eopbgr740114.outbound.protection.outlook.com
- ([40.107.74.114]:47264 helo=NAM01-BN3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sunilmut@microsoft.com>)
- id 1iTAvG-0006y0-QQ
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:31:59 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mQNxmmozSYrkhZ6OIpaUlnvwUvHmVqNKr4Gsj97TbnD2i4B7h6er0QzPsKb7kqavlpB+7a/u8gblXw9MxE1Mbj8D9LufWFz5gqSjIYZ+RNAiPyR5QhDwpkXvKR0nuZglYOCbh+91cR8z47qUaaJfQxZHf60tGNutcw/dy2/setQWah4vgxKPGTDzWZgxXLRQtBY81uDvzUdbR8PRX+fCFomikLUbjDYi+T62E/4K4RCvBZie/mduJQ8EZFAp+x/ktx/mA845hBT0cfomrzBtXkiSt+YsF4pVVTwmf+YQbJxQKzrHEekUgBeVYAsyJFGgrCtUyoYBeX3TocNXK6+m2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=87UZAE5LtjaW4wRFZzMSaoP+4y7sDK+4GwB5jFenl1Q=;
- b=bHgSuS8lZ3DBp1/U1/aRpMsP+aKECJXr/NYXZhQInehvmPrXHkIJJG0LbScs4l+C8fjRGIxQkDFx+pCv020QxAHrVXGZrbAOEkYZ2sL14z8oluaf/FIo/gvVUE8XXMsQbiFoTVYGypPcumr0guC3i2qd/7zW1yUxnnQTpKRip2k75xiyATjbEbvpG2Y6PcGp8K//3/XYLo6USQvcOHiGNDBGiBnfmizGCxs8lFqjoo2lPBHn3S851kPvF7djKXcR1lngWAABpsfQAH+dLsxHLChB6WK5kBFkgpb8dy2pdKwtjbUuGsf/VcyEomiQqFY5murY7O5wr63Vm0L8PJV0tQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=87UZAE5LtjaW4wRFZzMSaoP+4y7sDK+4GwB5jFenl1Q=;
- b=EMlnzs0x9QgPQcRtutvMaAXLinFUMWsOpsybdUkS2k5SrQy2Q7FA1i8UWGWIvPWSam7+iOQHhevTpoiETido1UhxLDrkw6ERUU2kXUfhWqfJR3de7RRs3tODe+O0f5eULLN09j8b9yZHSFAeTUX5MnmGFPHiV7fGTRPc62/2cQY=
-Received: from MW2PR2101MB1116.namprd21.prod.outlook.com (52.132.149.33) by
- MW2PR2101MB1052.namprd21.prod.outlook.com (52.132.149.16) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.13; Fri, 8 Nov 2019 20:31:54 +0000
-Received: from MW2PR2101MB1116.namprd21.prod.outlook.com
- ([fe80::121:8a4f:76a8:fd9]) by MW2PR2101MB1116.namprd21.prod.outlook.com
- ([fe80::121:8a4f:76a8:fd9%7]) with mapi id 15.20.2430.023; Fri, 8 Nov 2019
- 20:31:53 +0000
-From: Sunil Muthuswamy <sunilmut@microsoft.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
- Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>
-CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Justin Terry (VM)"
- <juterry@microsoft.com>
-Subject: [PATCH] WHPX: refactor load library
-Thread-Topic: [PATCH] WHPX: refactor load library
-Thread-Index: AdWWczxfa/0gc1vPTEu6TOvflPR6ng==
-Date: Fri, 8 Nov 2019 20:31:53 +0000
-Message-ID: <MW2PR2101MB1116386CFE4628B6767D6CDBC07B0@MW2PR2101MB1116.namprd21.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=sunilmut@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:0:fdd5:fbfa:b235:c4a3]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: fc832620-548e-40ff-68d1-08d7648ab152
-x-ms-traffictypediagnostic: MW2PR2101MB1052:|MW2PR2101MB1052:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MW2PR2101MB1052A6E0849B16941127F645C07B0@MW2PR2101MB1052.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:462;
-x-forefront-prvs: 0215D7173F
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(39860400002)(366004)(136003)(376002)(396003)(199004)(189003)(54906003)(5660300002)(107886003)(71190400001)(71200400001)(476003)(305945005)(74316002)(8990500004)(10090500001)(4326008)(256004)(7736002)(478600001)(2906002)(6436002)(52536014)(14454004)(186003)(6116002)(10290500003)(66946007)(46003)(66556008)(64756008)(66446008)(8936002)(25786009)(7696005)(9686003)(22452003)(8676002)(81156014)(86362001)(33656002)(55016002)(6506007)(102836004)(76116006)(316002)(66476007)(81166006)(99286004)(110136005)(486006);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MW2PR2101MB1052;
- H:MW2PR2101MB1116.namprd21.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ItU+VTQBKMGNtSS+oMqHZC689rIYbtGPplXXqLnjfUecBFfWRzT6GsdPjiCyBw3ySTEqbtE0zg8EQvyAYZQvZSCCNFLczBaSwxXjYeB7PKSqJXAiZbRbFBRiF3Ql2l3EiKhX6B/MkkjwCD9deVGOA8vwJUu9JdbHXlZkK9FVv3bzkmVG9pJMw+ugY9kEL3+XjyFGfJd61mf/jmcc4bdjZky41+f3zHAhWayQs+NPTbH8MSffmcKcBD3ujW42S2jYyZrEpL1GgAvnYKeQALTLQOvme6QCbLTeB9mzcLuv4XRzJ1DsZFHXw55zIiX7TQFawdHNFJJ4gvptwemvNHCyv3Po2JvA4FVGfUvuRqHiIe7Aso8mHZrLp/mTu8RLssfVQ4O78L0LgQ+0M/kkxOLCXA5504fFWvljcQgPeHHsFf4RqmAIouRgZHCODvVkAl2f
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <laurent@vivier.eu>) id 1iTB20-0002yw-AP
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:38:58 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:55703)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iTB20-0002qU-14
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:38:56 -0500
+Received: from localhost.localdomain ([78.238.229.36]) by
+ mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1MrPVJ-1i6EkZ2GMp-00oVl6; Fri, 08 Nov 2019 21:38:48 +0100
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/2] Q800 branch patches
+Date: Fri,  8 Nov 2019 21:38:44 +0100
+Message-Id: <20191108203846.8837-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc832620-548e-40ff-68d1-08d7648ab152
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2019 20:31:53.7777 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6h/LpZqzcgRpdTxc/MmY3cBf+uMTZIm4h2yCJtnHPYlvkhNygA/B9DJPxFcXi+SJ/WohsJd5ag5XuJpVPS4XiLq9c+QubuO37BfM4uMexSo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR2101MB1052
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.74.114
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:UEq1ImDzzqzeYUjxj7nsNvJ+2czOvG9EfL9jyMEDBO2/cBF3tG2
+ mKU1rufddNZe/HdHIcU3AdOKWzfC9xCYrNtTfuFmUZrg6XNZhv3FPJbinMiXmFp8BuhNf0J
+ zoBA1NeMXItU9r+4/sO6O58Z6BDFIM15BY0waGOg53t13KhP9yjJ2eMqf/IithUAjCAFeCH
+ 6zsJAX7E1s7uOXODbYCaw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:2g08UT3j+MU=:m6/u7k/IheLiMieYVCSJd1
+ jk9wkD1J4hQlXQaUjUCIB628nTNy2bbutQG0Oz9+bYXkzVaM1SwIXMNzJzpTfK7fF9AIR0Lum
+ V/sebGOizu12YD3BnXROqGQCQz+ZcCSFnx/+amTVhKmVu1ZoPrtxHVm0nH44ZIANHvGT25kPO
+ 1sb5l4wisq/jH4YixwEj/ZsTzEL32AIq2aohMrABP8IHOsuBkEw2s5QnHgKUi3L4yT5aXP5sG
+ beevYAQ7D+ie8OtyEpaButzItNbiMQ6zHF4kPPMeDqMibuB1E2iSmxq3zUZJoJkajF+GkNPDT
+ V2WdSc9hVuB88l7AShVoWjNZcEHQfzFJ9fQ2Q2RY9Wsk6qTgzxl61MbPY63mbe77/uX8MFe+9
+ KwmG2/8FOnbdyKd8WKreIzGh/lt26yqvYweBgd+3poFH9G7e7CR8rH2AjHQyoZzoLJtX5XFGe
+ QEuo2jRszSawFT95wa2LXDg4oVjpQG6KLErpNro2zDr+w+M7tMpUTCI3JcFku8l+IkFiBuEn2
+ 8n2koM/ZXoGy906uxb6cA/S7pn1r/oAoA//40axgfmWvA8dSqFmzJwVedXU1okr2jEkafL90J
+ O0WwVqpwgw388ghsLSBISuOUZPbBDcP6HCSkEDctD3zrfPfrD5lLcrZC7F8b+eu9kT+nVTBkR
+ fO7eT1BdN2yM71nmZ121fiKupJp3m/uPdE66vJdXwOtGd9k+ECRmS2ZQ0bOmeVm8dg6k5krji
+ JNdQ8emzjfLz6CK+tTQPNIOJpdKStu9+uD5zXilTLl+t6Dwb6WQ+BpegWagORXYVVfm9s91jM
+ tOxTq1NwX3kpTFIcj7WjeWyUXyr2fnW91rcDqSAcpjaDFKvcoL5dEZUj6WiHqKF1T28d8nX/Z
+ 4N1QBXV6zCzPbDvQ19catqVImoe4M1m8X7SVFq/GU=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 217.72.192.73
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -119,161 +77,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Jason Wang <jasowang@redhat.com>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This refactors the load library of WHV libraries to make it more
-modular. It makes a helper routine that can be called on demand.
-This allows future expansion of load library/functions to support
-functionality that is depenedent on some feature being available.
+The following changes since commit 1cee80fa665d37411f8ad8a930b84840bbab62e5:
 
-Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
----
- target/i386/whp-dispatch.h |  4 +++
- target/i386/whpx-all.c     | 84 +++++++++++++++++++++++++++++++-----------=
-----
- 2 files changed, 61 insertions(+), 27 deletions(-)
+  Merge remote-tracking branch 'remotes/kraxel/tags/usb-20191107-pull-request' into staging (2019-11-08 11:00:28 +0000)
 
-diff --git a/target/i386/whp-dispatch.h b/target/i386/whp-dispatch.h
-index 23791fbb47..87d049ceab 100644
---- a/target/i386/whp-dispatch.h
-+++ b/target/i386/whp-dispatch.h
-@@ -50,5 +50,9 @@ extern struct WHPDispatch whp_dispatch;
-=20
- bool init_whp_dispatch(void);
-=20
-+typedef enum WHPFunctionList {
-+    WINHV_PLATFORM_FNS_DEFAULT,
-+    WINHV_EMULATION_FNS_DEFAULT,
-+} WHPFunctionList;
-=20
- #endif /* WHP_DISPATCH_H */
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index ed95105eae..4688f40a65 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -1356,6 +1356,57 @@ static void whpx_handle_interrupt(CPUState *cpu, int=
- mask)
-     }
- }
-=20
-+/*
-+ * Load the functions from the given library, using the given handle. If a
-+ * handle is provided, it is used, otherwise the library is opened. The
-+ * handle will be updated on return with the opened one.
-+ */
-+static bool load_whp_dipatch_fns(HMODULE *handle, WHPFunctionList function=
-_list)
-+{
-+    HMODULE hLib =3D *handle;
-+
-+    #define WINHV_PLATFORM_DLL "WinHvPlatform.dll"
-+    #define WINHV_EMULATION_DLL "WinHvEmulation.dll"
-+    #define WHP_LOAD_FIELD(return_type, function_name, signature) \
-+        whp_dispatch.function_name =3D \
-+            (function_name ## _t)GetProcAddress(hLib, #function_name); \
-+        if (!whp_dispatch.function_name) { \
-+            error_report("Could not load function %s", #function_name); \
-+            goto error; \
-+        } \
-+
-+    #define WHP_LOAD_LIB(lib_name, handle_lib) \
-+    if (!handle_lib) { \
-+        handle_lib =3D LoadLibrary(lib_name); \
-+        if (!handle_lib) { \
-+            error_report("Could not load library %s.", lib_name); \
-+            goto error; \
-+        } \
-+    } \
-+
-+    switch (function_list) {
-+    case WINHV_PLATFORM_FNS_DEFAULT:
-+        WHP_LOAD_LIB(WINHV_PLATFORM_DLL, hLib)
-+        LIST_WINHVPLATFORM_FUNCTIONS(WHP_LOAD_FIELD)
-+        break;
-+
-+    case WINHV_EMULATION_FNS_DEFAULT:
-+        WHP_LOAD_LIB(WINHV_EMULATION_DLL, hLib)
-+        LIST_WINHVEMULATION_FUNCTIONS(WHP_LOAD_FIELD)
-+        break;
-+    }
-+
-+    *handle =3D hLib;
-+    return true;
-+
-+error:
-+    if (hLib) {
-+        FreeLibrary(hWinHvEmulation);
-+    }
-+
-+    return false;
-+}
-+
- /*
-  * Partition support
-  */
-@@ -1491,51 +1542,30 @@ static void whpx_type_init(void)
-=20
- bool init_whp_dispatch(void)
- {
--    const char *lib_name;
--    HMODULE hLib;
--
-     if (whp_dispatch_initialized) {
-         return true;
-     }
-=20
--    #define WHP_LOAD_FIELD(return_type, function_name, signature) \
--        whp_dispatch.function_name =3D \
--            (function_name ## _t)GetProcAddress(hLib, #function_name); \
--        if (!whp_dispatch.function_name) { \
--            error_report("Could not load function %s from library %s.", \
--                         #function_name, lib_name); \
--            goto error; \
--        } \
--
--    lib_name =3D "WinHvPlatform.dll";
--    hWinHvPlatform =3D LoadLibrary(lib_name);
--    if (!hWinHvPlatform) {
--        error_report("Could not load library %s.", lib_name);
-+    if (!load_whp_dipatch_fns(&hWinHvPlatform, WINHV_PLATFORM_FNS_DEFAULT)=
-) {
-         goto error;
-     }
--    hLib =3D hWinHvPlatform;
--    LIST_WINHVPLATFORM_FUNCTIONS(WHP_LOAD_FIELD)
-=20
--    lib_name =3D "WinHvEmulation.dll";
--    hWinHvEmulation =3D LoadLibrary(lib_name);
--    if (!hWinHvEmulation) {
--        error_report("Could not load library %s.", lib_name);
-+    if (!load_whp_dipatch_fns(&hWinHvEmulation, WINHV_EMULATION_FNS_DEFAUL=
-T)) {
-         goto error;
-     }
--    hLib =3D hWinHvEmulation;
--    LIST_WINHVEMULATION_FUNCTIONS(WHP_LOAD_FIELD)
-=20
-     whp_dispatch_initialized =3D true;
--    return true;
--
--    error:
-=20
-+    return true;
-+error:
-     if (hWinHvPlatform) {
-         FreeLibrary(hWinHvPlatform);
-     }
-+
-     if (hWinHvEmulation) {
-         FreeLibrary(hWinHvEmulation);
-     }
-+
-     return false;
- }
-=20
---=20
-2.16.4
+are available in the Git repository at:
+
+  git://github.com/vivier/qemu-m68k.git tags/q800-branch-pull-request
+
+for you to fetch changes up to c744cf78791e7ddc903a46d6506f1a0cbcbb3387:
+
+  dp8393x: fix dp8393x_receive() (2019-11-08 21:32:31 +0100)
+
+----------------------------------------------------------------
+Fix dp8393x when used in big-endian/double-word mode
+(fix DHCP address allocation for q800 machine)
+
+----------------------------------------------------------------
+
+Laurent Vivier (2):
+  dp8393x: put the DMA buffer in the state structure
+  dp8393x: fix dp8393x_receive()
+
+ hw/net/dp8393x.c | 113 ++++++++++++++++++++++++-----------------------
+ 1 file changed, 57 insertions(+), 56 deletions(-)
+
+-- 
+2.21.0
 
 
