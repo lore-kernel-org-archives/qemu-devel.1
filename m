@@ -2,79 +2,118 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47CDDC5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:45:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17AD2FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:51:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13EDA2084D
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:45:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C32E321D7F
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 13:51:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I0B14KM7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13EDA2084D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ELaawYEZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C32E321D7F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54582 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT4a1-0005ZR-T1
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 08:45:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58588)
+	id 1iT4fJ-0001S7-V9
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 08:51:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59666)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iT4Yp-0004Op-07
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:44:24 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iT4eF-0000Ni-ML
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:50:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iT4Ym-0003AJ-3M
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:44:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41116
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iT4Yl-00037s-LE
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:44:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573220658;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5I6oLyHlXmNY/V+QTAg0wcNtjTNEMDAPulxYqXaqJA4=;
- b=I0B14KM74RWcdyordKnYR+XVkW0M/MXqaAKsHMbbqfCQtqM+StksC0/4txjr1pHufH1pTp
- ArtIiAojegLFT9naF15HN2XBAbnLiUwiOPmy/YfEB9QW4pyssP413010AnHxVZjrAARK91
- SHnOMRQqkLE8Lkuh+LNzOsxIBhIPDt0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-RYndkY18MvS1B16Cw8pNQA-1; Fri, 08 Nov 2019 08:44:15 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D83A11800D7B;
- Fri,  8 Nov 2019 13:44:13 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AC0255D6AE;
- Fri,  8 Nov 2019 13:44:08 +0000 (UTC)
-Date: Fri, 8 Nov 2019 14:44:07 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Tao Xu <tao3.xu@intel.com>
-Subject: Re: [PATCH v15 09/12] hmat acpi: Build Memory Proximity Domain
- Attributes Structure(s)
-Message-ID: <20191108144407.204130ba@redhat.com>
-In-Reply-To: <20191107074511.14304-10-tao3.xu@intel.com>
-References: <20191107074511.14304-1-tao3.xu@intel.com>
- <20191107074511.14304-10-tao3.xu@intel.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iT4eD-0008L9-VQ
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 08:49:59 -0500
+Received: from mail-eopbgr60112.outbound.protection.outlook.com
+ ([40.107.6.112]:18086 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iT4e9-0008H4-89; Fri, 08 Nov 2019 08:49:53 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lJhP3JtePZ5NGdYJG/EhfPN1r2p4XOLj/urHCkaJn75lkJxNWNUzX+JwpyOIhm9Q1u+j0diAumVqk9ArfrucIXqubV/ShLZ4k9zDMw3iEwJCD1rY2oEL8R6mze2zfd0QwH7EK1YEInznt1Xcu0qu3hfGnCuBWSgxZ8x7V2UzlhAf9qHmE+kt3Za8JxfnptNGr4vjq1lSpLFOSuu/wF9QmhOR4IK0SYzxKe71CGdUxQ5IjizZUADDpjGj7piVsF6lIxdOXCwzFRyVsik4nX0E0wXMR5jF2KDEROhJzBq5Po62fnqlVe6uuiNF8ghMn7TFp6ObLiU4gDiLYQkRc9K4XA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Oa3mMZXEMj0OZE0uZa7fB+g5g1Be8dc0VoF89SLCV6s=;
+ b=iWr63h+bhH1dyYz9pJ+THsxWiR90ePO12ZNSIg88KRuuNJ2aNq/ifYlMJsr3DIrVVE9NpZUQ4sgJOnY/mIqj91ZHS+96YfKUIyfIzQtcfg8KIcV6G7J5l8MGps2dSh7fWpYWPW6FEbupXrncb569QC5nCe1/H28VSBNx3x7GQ0sWvRXlNOkzuhwE+G/1QYMxD+JCeRHS/jXabfNZ8EWMoxuisqV6Q+AjAlfUyxAqLXe1aIPejOfTkXRTdIi0BMHtPqESttaGUx6uMuHQOFzZ78Kzs2tqILhyndhiRBVxVWdzIsGDUoNdGlvAtC5M32GifA12i376tmJoldir3UXFDw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Oa3mMZXEMj0OZE0uZa7fB+g5g1Be8dc0VoF89SLCV6s=;
+ b=ELaawYEZe+ewzV0z/aRUx0p3bE+RAb6KKa2Y9uoqqHmxbMDGw2zWRPpNvV516DVUa5tUGIOyKm3dZHjUN6td5mzA/45UbGFfctdJ+M/Rkz351qro4hD6CY7dsEtBqUQ/OVg2sxcFh3zOZvoFta6TT6x3dCDDT2Auko0KLymnhMo=
+Received: from AM0PR08MB4097.eurprd08.prod.outlook.com (20.178.202.217) by
+ AM0PR08MB3714.eurprd08.prod.outlook.com (20.178.22.225) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2430.22; Fri, 8 Nov 2019 13:49:50 +0000
+Received: from AM0PR08MB4097.eurprd08.prod.outlook.com
+ ([fe80::41f0:981:fd75:9946]) by AM0PR08MB4097.eurprd08.prod.outlook.com
+ ([fe80::41f0:981:fd75:9946%3]) with mapi id 15.20.2430.023; Fri, 8 Nov 2019
+ 13:49:50 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH v3] iotests: Test NBD client reconnection
+Thread-Topic: [PATCH v3] iotests: Test NBD client reconnection
+Thread-Index: AQHVkNUTCIjq3h2Nq0u5SV1Il1g456eBVRsA
+Date: Fri, 8 Nov 2019 13:49:50 +0000
+Message-ID: <feb2b810-3436-6550-43b2-a07ec1fc5280@virtuozzo.com>
+References: <1572627272-23359-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1572627272-23359-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0202CA0027.eurprd02.prod.outlook.com
+ (2603:10a6:3:e4::13) To AM0PR08MB4097.eurprd08.prod.outlook.com
+ (2603:10a6:208:132::25)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191108164948498
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ff01dfc7-83de-4691-a54e-08d76452866c
+x-ms-traffictypediagnostic: AM0PR08MB3714:
+x-ms-exchange-purlcount: 1
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR08MB3714A8A749F13F4FBE9F00A7C17B0@AM0PR08MB3714.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-forefront-prvs: 0215D7173F
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(346002)(136003)(39840400004)(366004)(396003)(376002)(189003)(199004)(36756003)(102836004)(2201001)(52116002)(486006)(6246003)(71190400001)(71200400001)(107886003)(14454004)(31686004)(4326008)(110136005)(256004)(478600001)(31696002)(66946007)(25786009)(66476007)(66556008)(64756008)(66446008)(86362001)(5660300002)(316002)(6506007)(6116002)(81166006)(2501003)(186003)(3846002)(8936002)(81156014)(6436002)(6486002)(229853002)(8676002)(446003)(6306002)(26005)(14444005)(76176011)(2906002)(476003)(54906003)(305945005)(386003)(7736002)(6512007)(99286004)(66066001)(11346002)(2616005)(2004002)(33290500001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3714;
+ H:AM0PR08MB4097.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ldlEojA/9y0BCs060dvP5tnLQECHd3ShTdFhiYK//7+Ep7sdQALbuvR2MI4nQYRyNpRki7Y1CWfxMMpc/jVJ6o457o0CVV6EArsI8kDDyEnwVqUwi9/82o3Bmm3pQkazJNLe4PGFjlUpMkI0e6NNr3HeN17siIokDLY8rvO3v8z5/oJVeTKHHM9swAuTaiv52s25VSvZM752i3WZvQ2DIhEYQcCxDqIERfrHeNCNaV2xs6F6u0le7kOZmzXMr8Er0WYQ0xJa7VZTq98xFsWqEBgnY0UyBWZarwa1tdQb8e9WuYRfpk6dlfdKOwS0mm/V4qg9ogTf1p23ijlhvtgZzFUGD9OuaDCjtxRmu3vRp9H9UOhX05Vu2LJGhDIRdLYFMsHxLSxVoJgrscGAUZ4B69tr5itgGcJAWyXDHx30Kb/z9ppeP1ivNEWVRuPhPeNjmffJEDFCRffpIM5nopkWLm0CsNl0Kr9b2eWtBMi/kNk=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <9FBE5EA72629A94D820D8B43F7384D42@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: RYndkY18MvS1B16Cw8pNQA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff01dfc7-83de-4691-a54e-08d76452866c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2019 13:49:50.3146 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3IprZwaZTVKpXV4XkB4S0+OVf9F1pahk6900BfZRpUY0MJdhSxUddNrZ32O//+hqMsBueMtQkX3blEhv//M59ZLzmvEKwvsvxI/f7QVbk+A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3714
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.6.112
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,294 +125,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, jingqi.liu@intel.com, fan.du@intel.com,
- mdroth@linux.vnet.ibm.com, Daniel Black <daniel@linux.ibm.com>,
- armbru@redhat.com, jonathan.cameron@huawei.com
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu,  7 Nov 2019 15:45:08 +0800
-Tao Xu <tao3.xu@intel.com> wrote:
-
-> From: Liu Jingqi <jingqi.liu@intel.com>
->=20
-> HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Table
-> (HMAT). The specification references below link:
-> http://www.uefi.org/sites/default/files/resources/ACPI_6_3_final_Jan30.pd=
-f
->=20
-> It describes the memory attributes, such as memory side cache
-> attributes and bandwidth and latency details, related to the
-> Memory Proximity Domain. The software is
-> expected to use this information as hint for optimization.
->=20
-> This structure describes Memory Proximity Domain Attributes by memory
-> subsystem and its associativity with processor proximity domain as well a=
-s
-> hint for memory usage.
->=20
-> In the linux kernel, the codes in drivers/acpi/hmat/hmat.c parse and repo=
-rt
-> the platform's HMAT tables.
->=20
-> Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
-> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> ---
-
-with nit below fixed
-  Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
->=20
-> No changes in v15.
->=20
-> Changes in v13:
->     - Remove the unnecessary head file.
-> ---
->  hw/acpi/Kconfig       |  7 ++-
->  hw/acpi/Makefile.objs |  1 +
->  hw/acpi/hmat.c        | 99 +++++++++++++++++++++++++++++++++++++++++++
->  hw/acpi/hmat.h        | 42 ++++++++++++++++++
->  hw/i386/acpi-build.c  |  5 +++
->  5 files changed, 152 insertions(+), 2 deletions(-)
->  create mode 100644 hw/acpi/hmat.c
->  create mode 100644 hw/acpi/hmat.h
->=20
-> diff --git a/hw/acpi/Kconfig b/hw/acpi/Kconfig
-> index 12e3f1e86e..54209c6f2f 100644
-> --- a/hw/acpi/Kconfig
-> +++ b/hw/acpi/Kconfig
-> @@ -7,6 +7,7 @@ config ACPI_X86
->      select ACPI_NVDIMM
->      select ACPI_CPU_HOTPLUG
->      select ACPI_MEMORY_HOTPLUG
-> +    select ACPI_HMAT
-> =20
->  config ACPI_X86_ICH
->      bool
-> @@ -23,6 +24,10 @@ config ACPI_NVDIMM
->      bool
->      depends on ACPI
-> =20
-> +config ACPI_HMAT
-> +    bool
-> +    depends on ACPI
-> +
->  config ACPI_PCI
->      bool
->      depends on ACPI && PCI
-> @@ -33,5 +38,3 @@ config ACPI_VMGENID
->      depends on PC
-> =20
->  config ACPI_HW_REDUCED
-> -    bool
-> -    depends on ACPI
-> diff --git a/hw/acpi/Makefile.objs b/hw/acpi/Makefile.objs
-> index 655a9c1973..517bd88704 100644
-> --- a/hw/acpi/Makefile.objs
-> +++ b/hw/acpi/Makefile.objs
-> @@ -7,6 +7,7 @@ common-obj-$(CONFIG_ACPI_CPU_HOTPLUG) +=3D cpu.o
->  common-obj-$(CONFIG_ACPI_NVDIMM) +=3D nvdimm.o
->  common-obj-$(CONFIG_ACPI_VMGENID) +=3D vmgenid.o
->  common-obj-$(CONFIG_ACPI_HW_REDUCED) +=3D generic_event_device.o
-> +common-obj-$(CONFIG_ACPI_HMAT) +=3D hmat.o
->  common-obj-$(call lnot,$(CONFIG_ACPI_X86)) +=3D acpi-stub.o
-> =20
->  common-obj-y +=3D acpi_interface.o
-> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
-> new file mode 100644
-> index 0000000000..c595098ba7
-> --- /dev/null
-> +++ b/hw/acpi/hmat.c
-> @@ -0,0 +1,99 @@
-> +/*
-> + * HMAT ACPI Implementation
-> + *
-> + * Copyright(C) 2019 Intel Corporation.
-> + *
-> + * Author:
-> + *  Liu jingqi <jingqi.liu@linux.intel.com>
-> + *  Tao Xu <tao3.xu@intel.com>
-> + *
-> + * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Ta=
-ble
-> + * (HMAT)
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "sysemu/numa.h"
-> +#include "hw/acpi/hmat.h"
-> +
-> +/*
-> + * ACPI 6.3:
-> + * 5.2.27.3 Memory Proximity Domain Attributes Structure: Table 5-145
-> + */
-> +static void build_hmat_mpda(GArray *table_data, uint16_t flags,
-
-> +                            uint16_t initiator, uint16_t mem_node)
-why do you use 16 bit for fields that spec defines as 4byte ones?
-
-It's ACPI api so it, I suggest to stay close to spec when building
-ACPI primitives (i.e. use uint32_t here).
-
-> +{
-> +
-> +    /* Memory Proximity Domain Attributes Structure */
-> +    /* Type */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /* Length */
-> +    build_append_int_noprefix(table_data, 40, 4);
-> +    /* Flags */
-> +    build_append_int_noprefix(table_data, flags, 2);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 2);
-> +    /* Proximity Domain for the Attached Initiator */
-> +    build_append_int_noprefix(table_data, initiator, 4);
-> +    /* Proximity Domain for the Memory */
-> +    build_append_int_noprefix(table_data, mem_node, 4);
-> +    /* Reserved */
-> +    build_append_int_noprefix(table_data, 0, 4);
-> +    /*
-> +     * Reserved:
-> +     * Previously defined as the Start Address of the System Physical
-> +     * Address Range. Deprecated since ACPI Spec 6.3.
-> +     */
-> +    build_append_int_noprefix(table_data, 0, 8);
-> +    /*
-> +     * Reserved:
-> +     * Previously defined as the Range Length of the region in bytes.
-> +     * Deprecated since ACPI Spec 6.3.
-> +     */
-> +    build_append_int_noprefix(table_data, 0, 8);
-> +}
-> +
-> +/* Build HMAT sub table structures */
-> +static void hmat_build_table_structs(GArray *table_data, NumaState *numa=
-_state)
-> +{
-> +    uint16_t flags;
-> +    int i;
-> +
-> +    for (i =3D 0; i < numa_state->num_nodes; i++) {
-> +        flags =3D 0;
-> +
-> +        if (numa_state->nodes[i].initiator < MAX_NODES) {
-> +            flags |=3D HMAT_PROXIMITY_INITIATOR_VALID;
-> +        }
-> +
-> +        build_hmat_mpda(table_data, flags, numa_state->nodes[i].initiato=
-r, i);
-> +    }
-> +}
-> +
-> +void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_=
-state)
-> +{
-> +    int hmat_start =3D table_data->len;
-> +
-> +    /* reserve space for HMAT header  */
-> +    acpi_data_push(table_data, 40);
-> +
-> +    hmat_build_table_structs(table_data, numa_state);
-> +
-> +    build_header(linker, table_data,
-> +                 (void *)(table_data->data + hmat_start),
-> +                 "HMAT", table_data->len - hmat_start, 2, NULL, NULL);
-> +}
-> diff --git a/hw/acpi/hmat.h b/hw/acpi/hmat.h
-> new file mode 100644
-> index 0000000000..437dbc6872
-> --- /dev/null
-> +++ b/hw/acpi/hmat.h
-> @@ -0,0 +1,42 @@
-> +/*
-> + * HMAT ACPI Implementation Header
-> + *
-> + * Copyright(C) 2019 Intel Corporation.
-> + *
-> + * Author:
-> + *  Liu jingqi <jingqi.liu@linux.intel.com>
-> + *  Tao Xu <tao3.xu@intel.com>
-> + *
-> + * HMAT is defined in ACPI 6.3: 5.2.27 Heterogeneous Memory Attribute Ta=
-ble
-> + * (HMAT)
-> + *
-> + * This library is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU Lesser General Public
-> + * License as published by the Free Software Foundation; either
-> + * version 2 of the License, or (at your option) any later version.
-> + *
-> + * This library is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + * Lesser General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU Lesser General Public
-> + * License along with this library; if not, see <http://www.gnu.org/lice=
-nses/>
-> + */
-> +
-> +#ifndef HMAT_H
-> +#define HMAT_H
-> +
-> +#include "hw/acpi/aml-build.h"
-> +
-> +/*
-> + * ACPI 6.3: 5.2.27.3 Memory Proximity Domain Attributes Structure,
-> + * Table 5-145, Field "flag", Bit [0]: set to 1 to indicate that data in
-> + * the Proximity Domain for the Attached Initiator field is valid.
-> + * Other bits reserved.
-> + */
-> +#define HMAT_PROXIMITY_INITIATOR_VALID  0x1
-> +
-> +void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_=
-state);
-> +
-> +#endif
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index 266d9b534b..aec8b71569 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -67,6 +67,7 @@
->  #include "hw/i386/intel_iommu.h"
-> =20
->  #include "hw/acpi/ipmi.h"
-> +#include "hw/acpi/hmat.h"
-> =20
->  /* These are used to size the ACPI tables for -M pc-i440fx-1.7 and
->   * -M pc-i440fx-2.0.  Even if the actual amount of AML generated grows
-> @@ -2721,6 +2722,10 @@ void acpi_build(AcpiBuildTables *tables, MachineSt=
-ate *machine)
->              acpi_add_table(table_offsets, tables_blob);
->              build_slit(tables_blob, tables->linker, machine);
->          }
-> +        if (machine->numa_state->hmat_enabled) {
-> +            acpi_add_table(table_offsets, tables_blob);
-> +            build_hmat(tables_blob, tables->linker, machine->numa_state)=
-;
-> +        }
->      }
->      if (acpi_get_mcfg(&mcfg)) {
->          acpi_add_table(table_offsets, tables_blob);
-
+MDEuMTEuMjAxOSAxOTo1NCwgQW5kcmV5IFNoaW5rZXZpY2ggd3JvdGU6DQo+IFRoZSB0ZXN0IGZv
+ciBhbiBOQkQgY2xpZW50LiBUaGUgTkJEIHNlcnZlciBpcyBkaXNjb25uZWN0ZWQgYWZ0ZXIgdGhl
+DQo+IGNsaWVudCB3cml0ZSByZXF1ZXN0LiBUaGUgTkJEIGNsaWVudCBzaG91bGQgcmVjb25uZWN0
+IGFuZCBjb21wbGV0ZQ0KPiB0aGUgd3JpdGUgb3BlcmF0aW9uLg0KPiANCj4gU3VnZ2VzdGVkLWJ5
+OiBEZW5pcyBWLiBMdW5ldiA8ZGVuQG9wZW52ei5vcmc+DQo+IFN1Z2dlc3RlZC1ieTogVmxhZGlt
+aXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8uY29tPg0KPiBTaWdu
+ZWQtb2ZmLWJ5OiBBbmRyZXkgU2hpbmtldmljaCA8YW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpv
+LmNvbT4NCj4gLS0tDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzI3NyAgICAgICAgICAgICAgICAg
+ICB8IDEwMiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAgdGVzdHMvcWVtdS1p
+b3Rlc3RzLzI3Ny5vdXQgICAgICAgICAgICAgICB8ICAgNiArKw0KPiAgIHRlc3RzL3FlbXUtaW90
+ZXN0cy9ncm91cCAgICAgICAgICAgICAgICAgfCAgIDEgKw0KPiAgIHRlc3RzL3FlbXUtaW90ZXN0
+cy9pb3Rlc3RzLnB5ICAgICAgICAgICAgfCAgIDUgKysNCj4gICB0ZXN0cy9xZW11LWlvdGVzdHMv
+bmJkLWZhdWx0LWluamVjdG9yLnB5IHwgICAzICstDQo+ICAgNSBmaWxlcyBjaGFuZ2VkLCAxMTYg
+aW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0KPiAgIGNyZWF0ZSBtb2RlIDEwMDc1NSB0ZXN0
+cy9xZW11LWlvdGVzdHMvMjc3DQo+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IHRlc3RzL3FlbXUtaW90
+ZXN0cy8yNzcub3V0DQo+IA0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzI3NyBi
+L3Rlc3RzL3FlbXUtaW90ZXN0cy8yNzcNCj4gbmV3IGZpbGUgbW9kZSAxMDA3NTUNCj4gaW5kZXgg
+MDAwMDAwMC4uZTRlNjczMA0KPiAtLS0gL2Rldi9udWxsDQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90
+ZXN0cy8yNzcNCj4gQEAgLTAsMCArMSwxMDIgQEANCj4gKyMhL3Vzci9iaW4vZW52IHB5dGhvbg0K
+PiArIw0KPiArIyBUZXN0IE5CRCBjbGllbnQgcmVjb25uZWN0aW9uDQo+ICsjDQo+ICsjIENvcHly
+aWdodCAoYykgMjAxOSBWaXJ0dW96em8gSW50ZXJuYXRpb25hbCBHbWJIDQo+ICsjDQo+ICsjIFRo
+aXMgcHJvZ3JhbSBpcyBmcmVlIHNvZnR3YXJlOyB5b3UgY2FuIHJlZGlzdHJpYnV0ZSBpdCBhbmQv
+b3IgbW9kaWZ5DQo+ICsjIGl0IHVuZGVyIHRoZSB0ZXJtcyBvZiB0aGUgR05VIEdlbmVyYWwgUHVi
+bGljIExpY2Vuc2UgYXMgcHVibGlzaGVkIGJ5DQo+ICsjIHRoZSBGcmVlIFNvZnR3YXJlIEZvdW5k
+YXRpb247IGVpdGhlciB2ZXJzaW9uIDIgb2YgdGhlIExpY2Vuc2UsIG9yDQo+ICsjIChhdCB5b3Vy
+IG9wdGlvbikgYW55IGxhdGVyIHZlcnNpb24uDQo+ICsjDQo+ICsjIFRoaXMgcHJvZ3JhbSBpcyBk
+aXN0cmlidXRlZCBpbiB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLA0KPiArIyBidXQg
+V0lUSE9VVCBBTlkgV0FSUkFOVFk7IHdpdGhvdXQgZXZlbiB0aGUgaW1wbGllZCB3YXJyYW50eSBv
+Zg0KPiArIyBNRVJDSEFOVEFCSUxJVFkgb3IgRklUTkVTUyBGT1IgQSBQQVJUSUNVTEFSIFBVUlBP
+U0UuICBTZWUgdGhlDQo+ICsjIEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRl
+dGFpbHMuDQo+ICsjDQo+ICsjIFlvdSBzaG91bGQgaGF2ZSByZWNlaXZlZCBhIGNvcHkgb2YgdGhl
+IEdOVSBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlDQo+ICsjIGFsb25nIHdpdGggdGhpcyBwcm9ncmFt
+LiAgSWYgbm90LCBzZWUgPGh0dHA6Ly93d3cuZ251Lm9yZy9saWNlbnNlcy8+Lg0KPiArIw0KPiAr
+DQo+ICtpbXBvcnQgb3MNCj4gK2ltcG9ydCBzdWJwcm9jZXNzDQo+ICtpbXBvcnQgaW90ZXN0cw0K
+PiArZnJvbSBpb3Rlc3RzIGltcG9ydCBmaWxlX3BhdGgsIGxvZw0KPiArDQo+ICsNCj4gK2RlZiBt
+YWtlX2NvbmZfZmlsZShldmVudCk6DQo+ICsgICAgIiIiDQo+ICsgICAgQ3JlYXRlIGNvbmZpZ3Vy
+YXRpb24gZmlsZSBmb3IgdGhlIG5iZC1mYXVsdC1pbmplY3Rvci5weQ0KPiArDQo+ICsgICAgOnBh
+cmFtIGV2ZW50OiB3aGljaCBldmVudCB0aGUgc2VydmVyIHNob3VsZCBjbG9zZSBhIGNvbm5lY3Rp
+b24gb24NCj4gKyAgICAiIiINCj4gKyAgICBpZiBvcy5wYXRoLmV4aXN0cyhjb25mX2ZpbGUpOg0K
+PiArICAgICAgICBvcy5yZW1vdmUoY29uZl9maWxlKQ0KDQphIGJpdCBzdHJhbmdlIGZvciBteSBl
+eWVzIHRvIHNlZSBnbG9iYWwgdmFyaWFibGUgbm90IGRlZmluZWQgaGlnaGVyIGluIHRoZSBmaWxl
+IHRoYW4gdXNlZC4uDQoNCj4gKw0KPiArICAgIHdpdGggb3Blbihjb25mX2ZpbGUsICJ3KyIpIGFz
+IGNvbmZmOg0KPiArICAgICAgICBjb25mZi53cml0ZSgiW2luamVjdC1lcnJvcl1cbmV2ZW50PXt9
+XG53aGVuPWFmdGVyIi5mb3JtYXQoZXZlbnQpKQ0KDQpiZXR0ZXIgb3BlbiB3aXRoICJ3IiBhbmQg
+ZG9uJ3QgbmVlZCB0byByZW1vdmUgZmlsZSBiZWZvcmUgaXQuDQoNCj4gKw0KPiArDQo+ICtkZWYg
+c3RhcnRfc2VydmVyX05CRChldmVudCk6DQo+ICsgICAgbWFrZV9jb25mX2ZpbGUoZXZlbnQpDQo+
+ICsNCj4gKyAgICBzcnYgPSBzdWJwcm9jZXNzLlBvcGVuKFsibmJkLWZhdWx0LWluamVjdG9yLnB5
+IiwgIi0tY2xhc3NpYy1uZWdvdGlhdGlvbiIsDQo+ICsgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBuYmRfc29jaywgY29uZl9maWxlXSwgc3Rkb3V0PXN1YnByb2Nlc3MuUElQRSwNCj4gKyAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIHN0ZGVycj1zdWJwcm9jZXNzLlNURE9VVCwgdW5pdmVyc2Fs
+X25ld2xpbmVzPVRydWUpDQo+ICsgICAgbGluZSA9IHNydi5zdGRvdXQucmVhZGxpbmUoKQ0KPiAr
+ICAgIGlmICJMaXN0ZW5pbmcgb24gIiBpbiBsaW5lOg0KPiArICAgICAgICBsb2coJ05CRCBzZXJ2
+ZXI6IHN0YXJ0ZWQnKQ0KPiArICAgIGVsc2U6DQo+ICsgICAgICAgIGxvZygnTkJEIHNlcnZlcjog
+JyArIGxpbmUucnN0cmlwKCkpDQo+ICsNCj4gKyAgICByZXR1cm4gc3J2DQo+ICsNCj4gKw0KPiAr
+ZGVmIHN0YXJ0X2NsaWVudF9OQkQoKToNCj4gKyAgICBsb2coJ05CRCBjbGllbnQ6IFFFTVUtSU8g
+d3JpdGUnKQ0KPiArICAgIGFyZ3MgPSBpb3Rlc3RzLnFlbXVfaW9fYXJnc19ub19mbXQgKyBcDQo+
+ICsgICAgICAgIFsnLWMnLCAnd3JpdGUgLVAgMHg3IDAgM00nLCAnLS1pbWFnZS1vcHRzJywNCj4g
+KyAgICAgICAgICdkcml2ZXI9bmJkLHNlcnZlci50eXBlPXVuaXgsc2VydmVyLnBhdGg9e30sJw0K
+PiArICAgICAgICAgJ3JlY29ubmVjdC1kZWxheT03Jy5mb3JtYXQobmJkX3NvY2spXQ0KPiArICAg
+IGNsdCA9IHN1YnByb2Nlc3MuUG9wZW4oYXJncywgc3Rkb3V0PXN1YnByb2Nlc3MuUElQRSwNCj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgIHN0ZGVycj1zdWJwcm9jZXNzLlNURE9VVCwNCj4g
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgIHVuaXZlcnNhbF9uZXdsaW5lcz1UcnVlKQ0KPiAr
+ICAgIHJldHVybiBjbHQNCg0KQ291bGQgeW91IHJldXNlIFFlbXVJb0ludGVyYWN0aXZlIGFzIGEg
+Y2xpZW50Pw0KDQo+ICsNCj4gKw0KPiArZGVmIGNoZWNrX3Byb2NfTkJEKHByb2MsIGNvbm5lY3Rv
+cik6DQo+ICsgICAgdHJ5Og0KPiArICAgICAgICBleGl0Y29kZSA9IHByb2Mud2FpdCh0aW1lb3V0
+PTEwKQ0KPiArDQo+ICsgICAgICAgIGlmIGV4aXRjb2RlIDwgMDoNCj4gKyAgICAgICAgICAgIGxv
+ZygnTkJEIHt9OiBFWElUIFNJR05BTCB7fVxuJy5mb3JtYXQoY29ubmVjdG9yLCAtZXhpdGNvZGUp
+KQ0KPiArICAgICAgICAgICAgbG9nKHByb2MuY29tbXVuaWNhdGUoKVswXSkNCj4gKyAgICAgICAg
+ZWxzZToNCj4gKyAgICAgICAgICAgIGxpbmUgPSBwcm9jLnN0ZG91dC5yZWFkbGluZSgpDQoNCg0K
+Y291bGQgd2UgdXNlIHByb2MuY29tbXVuaWNhdGUoKSBmb3IgYm90aCBjYXNlcywgd2hhdCBpcyB0
+aGUgZGlmZmVyZW5jZT8NCg0KPiArICAgICAgICAgICAgbG9nKCdOQkQge306IHt9Jy5mb3JtYXQo
+Y29ubmVjdG9yLCBsaW5lLnJzdHJpcCgpKSkNCj4gKw0KPiArICAgIGV4Y2VwdCBzdWJwcm9jZXNz
+LlRpbWVvdXRFeHBpcmVkOg0KPiArICAgICAgICBwcm9jLmtpbGwoKQ0KPiArICAgICAgICBsb2co
+J05CRCB7fTogRVJST1IgdGltZW91dCBleHBpcmVkJy5mb3JtYXQoY29ubmVjdG9yKSkNCj4gKyAg
+ICBmaW5hbGx5Og0KPiArICAgICAgICBpZiBjb25uZWN0b3IgPT0gJ3NlcnZlcic6DQo+ICsgICAg
+ICAgICAgICBvcy5yZW1vdmUobmJkX3NvY2spDQo+ICsgICAgICAgICAgICBvcy5yZW1vdmUoY29u
+Zl9maWxlKQ0KPiArDQo+ICsNCj4gK2NvbmZfZmlsZSA9IG9zLnBhdGguam9pbihpb3Rlc3RzLnRl
+c3RfZGlyLCAibmJkLWZhdWx0LWluamVjdG9yLmNvbmYiKQ0KDQp1c2UgZmlsZV9wYXRoIGhlcmUg
+dG9vLg0KDQo+ICtuYmRfc29jayA9IGZpbGVfcGF0aCgnbmJkLXNvY2snKQ0KPiArbmJkX3VyaSA9
+ICduYmQrdW5peDovLy8/c29ja2V0PScgKyBuYmRfc29jaw0KDQp1bnVzZWQgdmFyaWFibGUNCg0K
+PiAraWYgb3MucGF0aC5leGlzdHMobmJkX3NvY2spOg0KPiArICAgIG9zLnJlbW92ZShuYmRfc29j
+aykNCg0KSSBkb24ndCB0aGluayB3ZSBuZWVkIHRoaXMNCg0KPiArDQo+ICtzcnYgPSBzdGFydF9z
+ZXJ2ZXJfTkJEKCdkYXRhJykNCj4gK2NsdCA9IHN0YXJ0X2NsaWVudF9OQkQoKQ0KPiArIyBUaGUg
+c2VydmVyIHNob3VsZCBjbG9zZSB0aGUgY29ubmVjdGlvbiBhZnRlciBhIGNsaWVudCB3cml0ZSBy
+ZXF1ZXN0DQo+ICtjaGVja19wcm9jX05CRChzcnYsICdzZXJ2ZXInKQ0KPiArIyBTdGFydCB0aGUg
+TkJEIHNlcnZlciBhZ2Fpbg0KPiArc3J2ID0gc3RhcnRfc2VydmVyX05CRCgncmVwbHknKQ0KPiAr
+IyBUaGUgY2xpZW50IHNob3VsZCByZWNvbm5lY3QgYW5kIGNvbXBsZXRlIHRoZSB3cml0ZSBvcGVy
+YXRpb24NCj4gK2NoZWNrX3Byb2NfTkJEKGNsdCwgJ2NsaWVudCcpDQo+ICsjIE1ha2UgaXQgc3Vy
+ZSB0aGF0IHNlcnZlciB0ZXJtaW5hdGVkDQo+ICtjaGVja19wcm9jX05CRChzcnYsICdzZXJ2ZXIn
+KQ0KPiBkaWZmIC0tZ2l0IGEvdGVzdHMvcWVtdS1pb3Rlc3RzLzI3Ny5vdXQgYi90ZXN0cy9xZW11
+LWlvdGVzdHMvMjc3Lm91dA0KPiBuZXcgZmlsZSBtb2RlIDEwMDY0NA0KPiBpbmRleCAwMDAwMDAw
+Li40NTQwNGIzDQo+IC0tLSAvZGV2L251bGwNCj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzI3
+Ny5vdXQNCj4gQEAgLTAsMCArMSw2IEBADQo+ICtOQkQgc2VydmVyOiBzdGFydGVkDQo+ICtOQkQg
+Y2xpZW50OiBRRU1VLUlPIHdyaXRlDQo+ICtOQkQgc2VydmVyOiBDbG9zaW5nIGNvbm5lY3Rpb24g
+b24gcnVsZSBtYXRjaCBpbmplY3QtZXJyb3INCj4gK05CRCBzZXJ2ZXI6IHN0YXJ0ZWQNCj4gK05C
+RCBjbGllbnQ6IHdyb3RlIDMxNDU3MjgvMzE0NTcyOCBieXRlcyBhdCBvZmZzZXQgMA0KPiArTkJE
+IHNlcnZlcjogQ2xvc2luZyBjb25uZWN0aW9uIG9uIHJ1bGUgbWF0Y2ggaW5qZWN0LWVycm9yDQo+
+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvZ3JvdXAgYi90ZXN0cy9xZW11LWlvdGVz
+dHMvZ3JvdXANCj4gaW5kZXggYWYzMjJhZi4uMjJlZjFiOCAxMDA2NDQNCj4gLS0tIGEvdGVzdHMv
+cWVtdS1pb3Rlc3RzL2dyb3VwDQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9ncm91cA0KPiBA
+QCAtMjgyLDMgKzI4Miw0IEBADQo+ICAgMjY3IHJ3IGF1dG8gcXVpY2sgc25hcHNob3QNCj4gICAy
+NjggcncgYXV0byBxdWljaw0KPiAgIDI3MCBydyBiYWNraW5nIHF1aWNrDQo+ICsyNzcgcncNCj4g
+ZGlmZiAtLWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy9pb3Rlc3RzLnB5IGIvdGVzdHMvcWVtdS1p
+b3Rlc3RzL2lvdGVzdHMucHkNCj4gaW5kZXggNzA5ZGVmNC4uMGQxNjMwMyAxMDA2NDQNCj4gLS0t
+IGEvdGVzdHMvcWVtdS1pb3Rlc3RzL2lvdGVzdHMucHkNCj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rl
+c3RzL2lvdGVzdHMucHkNCj4gQEAgLTQ3LDYgKzQ3LDExIEBAIHFlbXVfaW9fYXJncyA9IFtvcy5l
+bnZpcm9uLmdldCgnUUVNVV9JT19QUk9HJywgJ3FlbXUtaW8nKV0NCj4gICBpZiBvcy5lbnZpcm9u
+LmdldCgnUUVNVV9JT19PUFRJT05TJyk6DQo+ICAgICAgIHFlbXVfaW9fYXJncyArPSBvcy5lbnZp
+cm9uWydRRU1VX0lPX09QVElPTlMnXS5zdHJpcCgpLnNwbGl0KCcgJykNCj4gICANCj4gK3FlbXVf
+aW9fYXJnc19ub19mbXQgPSBbb3MuZW52aXJvbi5nZXQoJ1FFTVVfSU9fUFJPRycsICdxZW11LWlv
+JyldDQo+ICtpZiBvcy5lbnZpcm9uLmdldCgnUUVNVV9JT19PUFRJT05TX05PX0ZNVCcpOg0KPiAr
+ICAgIHFlbXVfaW9fYXJnc19ub19mbXQgKz0gXA0KPiArICAgICAgICBvcy5lbnZpcm9uWydRRU1V
+X0lPX09QVElPTlNfTk9fRk1UJ10uc3RyaXAoKS5zcGxpdCgnICcpDQo+ICsNCj4gICBxZW11X25i
+ZF9hcmdzID0gW29zLmVudmlyb24uZ2V0KCdRRU1VX05CRF9QUk9HJywgJ3FlbXUtbmJkJyldDQo+
+ICAgaWYgb3MuZW52aXJvbi5nZXQoJ1FFTVVfTkJEX09QVElPTlMnKToNCj4gICAgICAgcWVtdV9u
+YmRfYXJncyArPSBvcy5lbnZpcm9uWydRRU1VX05CRF9PUFRJT05TJ10uc3RyaXAoKS5zcGxpdCgn
+ICcpDQo+IGRpZmYgLS1naXQgYS90ZXN0cy9xZW11LWlvdGVzdHMvbmJkLWZhdWx0LWluamVjdG9y
+LnB5IGIvdGVzdHMvcWVtdS1pb3Rlc3RzL25iZC1mYXVsdC1pbmplY3Rvci5weQ0KPiBpbmRleCA2
+YjJkNjU5Li43ZTJkYWI2IDEwMDc1NQ0KPiAtLS0gYS90ZXN0cy9xZW11LWlvdGVzdHMvbmJkLWZh
+dWx0LWluamVjdG9yLnB5DQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy9uYmQtZmF1bHQtaW5q
+ZWN0b3IucHkNCj4gQEAgLTExNSw3ICsxMTUsOCBAQCBjbGFzcyBGYXVsdEluamVjdGlvblNvY2tl
+dChvYmplY3QpOg0KPiAgICAgICAgICAgICAgIGlmIHJ1bGUubWF0Y2goZXZlbnQsIGlvKToNCj4g
+ICAgICAgICAgICAgICAgICAgaWYgcnVsZS53aGVuID09IDAgb3IgYnVmc2l6ZSBpcyBOb25lOg0K
+PiAgICAgICAgICAgICAgICAgICAgICAgcHJpbnQoJ0Nsb3NpbmcgY29ubmVjdGlvbiBvbiBydWxl
+IG1hdGNoICVzJyAlIHJ1bGUubmFtZSkNCj4gLSAgICAgICAgICAgICAgICAgICAgc2VsZi5zb2Nr
+LmZsdXNoKCkNCj4gKyAgICAgICAgICAgICAgICAgICAgc2VsZi5zb2NrLmNsb3NlKCkNCj4gKyAg
+ICAgICAgICAgICAgICAgICAgc3lzLnN0ZG91dC5mbHVzaCgpDQoNCldoeSBkbyB5b3UgbmVlZCB0
+aGlzPyBJdCBzaG91bGQgYmUgbWVudGlvbmVkIGluIGNvbW1pdCBtZXNzYWdlIEkgdGhpbmsuDQoN
+Cj4gICAgICAgICAgICAgICAgICAgICAgIHN5cy5leGl0KDApDQo+ICAgICAgICAgICAgICAgICAg
+IGlmIHJ1bGUud2hlbiAhPSAtMToNCj4gICAgICAgICAgICAgICAgICAgICAgIHJldHVybiBydWxl
+LndoZW4NCj4gDQoNCg0KLS0gDQpCZXN0IHJlZ2FyZHMsDQpWbGFkaW1pcg0K
 
