@@ -2,79 +2,68 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F8BC5DF60
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1821C5DF60
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:24:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E6B821848
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:23:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C8iO6i6x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E6B821848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9924E21848
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 11:24:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9924E21848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT2Mq-0000NQ-DJ
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 06:23:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60576)
+	id 1iT2Ns-0001TJ-SG
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 06:24:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60773)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iT2MC-0008Pb-5l
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:23:13 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iT2NG-0000xn-Aw
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:24:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iT2MB-0003n2-6G
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:23:12 -0500
-Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:35218)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iT2MB-0003mo-2b
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:23:11 -0500
-Received: by mail-qv1-xf44.google.com with SMTP id y18so2042243qve.2
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 03:23:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mbBbjjj3rYoOsEgKB4/GVW2NvCSqFBTulzzQEuMxeX4=;
- b=C8iO6i6x1ZDdpxISn2UkGJeDHE0ljR4SCF6g5hDM+kVRk8W1zSEuQoGARvoZAKgnEk
- uePPfoFrtFIWjCBKei4LUVkRQvadkAwgTyH9/HrSBvHMOMFWbnt1w8nD0MXYdTSHVWC2
- IXzbxqdt3U5UBZkvwI3qmBQCVTT01w3Fz4ZSvwEz/zGkWuxeayFWT1gA9Qri3RDr5D6W
- DqaDEu6U9wxEkSk/DxheN7ZEUtIv4F7FWfxJ542pMK+3R+w24L/8iYVHNBRkQgcDTsqK
- B0JNVJScngqvyCaepf/V3ne0dgAJhnZLEiJMxMtq60JXywxf4058vTlDSL/9tYVA63kg
- evsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=mbBbjjj3rYoOsEgKB4/GVW2NvCSqFBTulzzQEuMxeX4=;
- b=EuCA+SYIAllCusEFNYAivMh5BAYdjUc/KL+U0waC516ZZvH01EbqilAXGRDeeu0WdZ
- CElfcn6UE2ZFha6QGo52NpzgD54zS5KubkF/FiCqUDAKnLN7ahqzhA9VF1QMVbPdZmTM
- nHt1eQjDwKHKo/7w9Yhx3fF2dj78C4WacPEEgsAU9spfxSuv44LC2uSDMoCgrivK9go7
- atEGLULaPDZNv0Q4C/hnF9Ivf/gasSfTGT5wePHFi8JZavio2fexqSRM6ByLPxe72RWZ
- buOVC+/+UuM4D19uZpQjkEV3pHRUzGN/KT4DNG8uxpH5fNt48rCcArefxeW+Y+6mG1jR
- BmyQ==
-X-Gm-Message-State: APjAAAXOzPvu5AlzL1ZGbQZyUL9ZPHVhb4P6Md0Nb5G3gWC2KJ/NoWz8
- 7gZFKpJRauBGBmh/cXVPB7hfD9Eh+pvGiK3BbbA=
-X-Google-Smtp-Source: APXvYqyzqtwZLZtOjgBZPEzhUa4K2oVTzaSVpB2DCuSrA/u5kV9inC2JOIEzbn6GvIjkAJQuKSsPCrVZkTTtJAbxwS0=
-X-Received: by 2002:a0c:9637:: with SMTP id 52mr8623861qvx.174.1573212190352; 
- Fri, 08 Nov 2019 03:23:10 -0800 (PST)
+ (envelope-from <no-reply@patchew.org>) id 1iT2NF-0004Wa-3w
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 06:24:18 -0500
+Resent-Date: Fri, 08 Nov 2019 06:24:18 -0500
+Resent-Message-Id: <E1iT2NF-0004Wa-3w@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21436)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iT2NB-0004SY-1x; Fri, 08 Nov 2019 06:24:13 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1573212244; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=DG2WO8yhDnjUYo/DbxQWAE+McVf1CEN4nq759fcEps5X8i5KAWVnyp7FsHoqr6HMO8MjIiNTVOjzccFtPlLu3S0+aAPpkMaVO8To0bEs0DfSIkNzeRRPr5DDL/sUXnjCz8tU2BdaD+tZ+AuLn63P4KLlIfZNRRldzlFjifqWnSE=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1573212244;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=/MNSNdp2iNDpTVbByy+IkIzDRk4nRgNaoa++TiVqG8U=; 
+ b=KEjWqMRuIIn7jz0+c05wEgoUBKgj0vbJCWXq8vOdk1w+HNYDyt/ALeIXjwpmcDP4jf/mF9GpwCetiOclbRInhW9F8cKxZCBxlPhkqFAZYJAt1A3KIeO6seclt9FJ6n19sOlsL+9PfQDx6DFpMwkz7pMrgM9d0I7MYed/ltM6jko=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1573212242118546.7460132847632;
+ Fri, 8 Nov 2019 03:24:02 -0800 (PST)
+In-Reply-To: <20191108085713.27551-1-kwolf@redhat.com>
+Subject: Re: [PATCH] iotests: Fix "no qualified output" error path
+Message-ID: <157321224098.31898.13968932212318461287@37313f22b938>
 MIME-Version: 1.0
-References: <20191108100526.401847-1-stefanha@redhat.com>
- <77573e2e-2508-9386-89b8-d44b9e7f2ade@redhat.com>
-In-Reply-To: <77573e2e-2508-9386-89b8-d44b9e7f2ade@redhat.com>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 8 Nov 2019 12:22:59 +0100
-Message-ID: <CAJSP0QXv=vYc8thTYWaOs93wVdJjD8cJnkEbXfxw8E+q6g82sQ@mail.gmail.com>
-Subject: Re: [qemu-web PATCH] documentation: link to nightly documentation
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::f44
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: kwolf@redhat.com
+Date: Fri, 8 Nov 2019 03:24:02 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,40 +75,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Daniel Berrange <berrange@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 8, 2019 at 11:45 AM Thomas Huth <thuth@redhat.com> wrote:
-> On 08/11/2019 11.05, Stefan Hajnoczi wrote:
-> > Link to the documentation built from qemu.git/master once a day.
-> >
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> > ---
-> > This depends on qemu.git "[PATCH 0/3] docs: build an index page for the
-> > HTML docs".  We need that in order to build index.html.
-> >
-> >   documentation.md | 2 ++
-> >   1 file changed, 2 insertions(+)
-> >
-> > diff --git a/documentation.md b/documentation.md
-> > index f4ef9f4..662750c 100644
-> > --- a/documentation.md
-> > +++ b/documentation.md
-> > @@ -3,6 +3,8 @@ title: QEMU documentation
-> >   permalink: /documentation/
-> >   ---
-> >
-> > +The latest development version documentation is available [here](https://wiki.qemu.org/docs/index.html).
->
-> Why are we using wiki.qemu.org here? Generated docs are not part of the
-> Wiki, so this sounds confusing to me... Shouldn't this put somewhere on
-> the main www.qemu.org domain instead?
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEwODA4NTcxMy4yNzU1
+MS0xLWt3b2xmQHJlZGhhdC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRoZSBkb2Nr
+ZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGluZyBjb21t
+YW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5zdGFsbGVk
+LCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1QgU0NSSVBU
+IEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9MSBORVRX
+T1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9MSBKPTE0
+IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBURVNUICAgIGlvdGVzdC1xY293
+MjogMjY4CkZhaWx1cmVzOiAxOTIKRmFpbGVkIDEgb2YgMTA4IGlvdGVzdHMKbWFrZTogKioqIFtj
+aGVjay10ZXN0cy9jaGVjay1ibG9jay5zaF0gRXJyb3IgMQpUcmFjZWJhY2sgKG1vc3QgcmVjZW50
+IGNhbGwgbGFzdCk6CiAgRmlsZSAiLi90ZXN0cy9kb2NrZXIvZG9ja2VyLnB5IiwgbGluZSA2NjIs
+IGluIDxtb2R1bGU+CiAgICBzeXMuZXhpdChtYWluKCkpCi0tLQogICAgcmFpc2UgQ2FsbGVkUHJv
+Y2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9jZXNzRXJyb3I6IENv
+bW1hbmQgJ1snc3VkbycsICctbicsICdkb2NrZXInLCAncnVuJywgJy0tbGFiZWwnLCAnY29tLnFl
+bXUuaW5zdGFuY2UudXVpZD00MTRhNzcxZGJkODE0YTExODNmZDc3MzJiMGMxZjJjNScsICctdScs
+ICcxMDAxJywgJy0tc2VjdXJpdHktb3B0JywgJ3NlY2NvbXA9dW5jb25maW5lZCcsICctLXJtJywg
+Jy1lJywgJ1RBUkdFVF9MSVNUPScsICctZScsICdFWFRSQV9DT05GSUdVUkVfT1BUUz0nLCAnLWUn
+LCAnVj0nLCAnLWUnLCAnSj0xNCcsICctZScsICdERUJVRz0nLCAnLWUnLCAnU0hPV19FTlY9MScs
+ICctZScsICdDQ0FDSEVfRElSPS92YXIvdG1wL2NjYWNoZScsICctdicsICcvaG9tZS9wYXRjaGV3
+Ly5jYWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zh
+ci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLWcybXV1N2ZtL3NyYy9kb2NrZXItc3JjLjIwMTktMTEt
+MDgtMDYuMTAuMzguMTA5OTI6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcv
+dmFyL3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQg
+c3RhdHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTQx
+NGE3NzFkYmQ4MTRhMTE4M2ZkNzczMmIwYzFmMmM1Cm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0g
+RXJyb3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLWcybXV1N2ZtL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2Vu
+dG9zN10gRXJyb3IgMgoKcmVhbCAgICAxM20yMy43MTRzCnVzZXIgICAgMG05LjAzM3MKCgpUaGUg
+ZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMTA4
+MDg1NzEzLjI3NTUxLTEta3dvbGZAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50
+b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQ
+YXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sg
+dG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
-Thanks for bringing this up.  The docs are now available at
-https://qemu.org/docs/master/.
-
-Stefan
 
