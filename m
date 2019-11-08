@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06450FC6196
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAAA9FC6196
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 21:00:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA1DC214DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 20:57:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B497A20869
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 21:00:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yi0gIHV/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA1DC214DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vP76qVAk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B497A20869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iTBJU-0007Fe-U4
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 15:57:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52010)
+	id 1iTBN6-0001Bj-TZ
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 16:00:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52592)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iTBIk-0006ke-RN
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:56:15 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iTBLl-0000CW-I6
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:59:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iTBIj-00031M-Mh
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:56:14 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37547)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iTBLk-0004pJ-Jq
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:59:21 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:46949)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iTBIj-000310-EN
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:56:13 -0500
-Received: by mail-wr1-x442.google.com with SMTP id t1so8536160wrv.4
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 12:56:13 -0800 (PST)
+ id 1iTBLk-0004p5-Dz
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 15:59:20 -0500
+Received: by mail-wr1-x442.google.com with SMTP id b3so8484014wrs.13
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 12:59:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=NzJmXAGXwTKAL5SyQxEUp59S86q+GhuJWH0OEyVhcTo=;
- b=Yi0gIHV/z6a0DPLufo3sTSY8Airm/id3GhJEURvlRqMa9yvNHeeopGBjQ3Of3CS/If
- //IjX7LUUpDMPb88h5MonuXE9l1MYRsZNcNly/hL7poqbnMz+0BZAhzH14VX6wq04ghL
- hoURuCc1cfRhbWbJPPLGZBp8jXF4im97++wGPNmHkjnMhxVqbSwBe6PA8MSvDGWS73qa
- GHX53LxFzhTbLIiWBob5lNbeCNz9fDs4GfdPMXmTmhiMyP2cxW9TYXpD3zwO/R4VVzZw
- jqJkJUgLJNurn7uhK8k8h2PDtgHqFlUcPbpDZf2g2ZS8ygB5/8gmKDLTMfpeKk8RYOWK
- wCcw==
+ bh=tRfRi6VB/Y3Y8JzSXjtEjiocNzaOaRNdnQhQ6MBN/dQ=;
+ b=vP76qVAkbvSt4yayqxKbMmixNqRTDeR46/sPRIAIIif0m7/Phu5lH3IY1HuGviIuPa
+ HZ4/CsRh3BtIiLCPzaN78HAZBiT8X9Nf+vukDw8lbjDUUnZ52898ZCdrpwssbX6i0XJ7
+ ViO2lxD2ssiobni8KG6UYNqqJs1v+6qLa6LgEod8O1fQNtAaUpEahuJlQd4uv49NbE7F
+ ucONb3CByyy37c7tUzzu6uNqsEScIcEQLGvhLB30LJq/2pPhf3RMGSIabKFuj4cwB8s7
+ PmdHfF7ktAlNr0THOPEkqk1JgEVzCO9nV6T6i6v9PAYkwTxK6mH+RG4m+24Qj94Axhzp
+ WGSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=NzJmXAGXwTKAL5SyQxEUp59S86q+GhuJWH0OEyVhcTo=;
- b=t7fPp1ZYFOxEG9hI74Fw1sQANElqM8sPr0rK9wR3z/hAVJt1ZEzA9J4s4iWHSRTGV7
- FH2xnDZt0XflLXu1U1zSe0MaiTA3Tw8MIfJH4UIul96pBTs8l754EBTlaaBSMukhKqwP
- KafldtqSFoqs5dh4uQ2vq68ok43RMBjVdFNO5KtvzDjoHHkFPar0k5xRnA/w5G5snXpw
- s7Yl4dD3XL5gSxP1Fo1eQd5IiXu1tcCPo5o5IXP2UkuWjNU6HvibeAIcveCgj0ZeiquZ
- yhN3hZTR2/PNuBHQsGnXXxpc2mJzvZRNfGxX0LBPzdHXquSG3mEVH3tv1e6rPrbikr4s
- mr0w==
-X-Gm-Message-State: APjAAAWdFhJLQTc+VnxbzexHql1EUnN/cLtCzRY/Z7LfhIfrKILdXp0Y
- joZnjNpdjX4egCXo8Uc2rEbGhujttQh7yxZpBNU=
-X-Google-Smtp-Source: APXvYqyYnvPUJgNBA8U//eMYMG+IqzKgXpse6bwmw60+ltHWiRjUch7KltNsk65DOhADbYcLsBgm5ilyD2S0F4/5SqI=
-X-Received: by 2002:adf:ef0f:: with SMTP id e15mr10247086wro.312.1573246571919; 
- Fri, 08 Nov 2019 12:56:11 -0800 (PST)
+ bh=tRfRi6VB/Y3Y8JzSXjtEjiocNzaOaRNdnQhQ6MBN/dQ=;
+ b=mYxXLPihpqyWQzAKyKnp8X4k0y+wxyv5M9WcufNcBMDscT+ABTv900l3UcHnr7bI/H
+ bSbqCU68N4yIBMOkyHbzWJBYDk/Fw1EZQ+v2VRT4ZLJ9geSeRY8xvC0hCLDJMFzT7tT4
+ 6QDkTyYG1Gu+jh8GIZCvAqle/CHevX5G7KmuQUvMyf16W3tUOqTz+Huj5eE6HlzWX2eJ
+ 8M7SSLeNQ5gcVDEWF7J4YyHOfhupdNcbfEh0FLNHU98BfwsQ+OsGWYEZL9STzgjbiy9B
+ QS0sPw3kYQSEAXPj5k3jBuYrPq1OnBoV/aN0YMXu6Uj4nWe4Adv/97vMzIr6YcSqcwYE
+ uejg==
+X-Gm-Message-State: APjAAAWi6neU4Iv6cb1ZG6Jq6WyUMhhv2KVs3tD1l8QwEZfjCCXAkt/T
+ dsblVrtqYNpcJkLbPuRVF0YBOcc5cczfSzOl/AQ=
+X-Google-Smtp-Source: APXvYqz3bfeW+Uxse2EjUZ8+UeleH8XWfdO0UYex6UEUt4x0P8XJ/KoVlC6uCmFo9mzqIdH6AuTjo8BVohn95//j4Pk=
+X-Received: by 2002:adf:ed4e:: with SMTP id u14mr10627026wro.132.1573246759485; 
+ Fri, 08 Nov 2019 12:59:19 -0800 (PST)
 MIME-Version: 1.0
 References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
- <20191011160552.22907-11-vsementsov@virtuozzo.com>
-In-Reply-To: <20191011160552.22907-11-vsementsov@virtuozzo.com>
+ <20191011160552.22907-23-vsementsov@virtuozzo.com>
+In-Reply-To: <20191011160552.22907-23-vsementsov@virtuozzo.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sat, 9 Nov 2019 00:55:59 +0400
-Message-ID: <CAJ+F1CKwSDM=zjQeTU=Tx5dQSQj_RVjnGqdN+qEV5AkiWXrQxQ@mail.gmail.com>
-Subject: Re: [RFC v5 010/126] hw/core/qdev: cleanup Error ** variables
+Date: Sat, 9 Nov 2019 00:59:07 +0400
+Message-ID: <CAJ+F1CKo9tuJRoq3qw=Ypz9_wjQ5rvy2GOXfH7gT+8_FoSv9BA@mail.gmail.com>
+Subject: Re: [RFC v5 022/126] backends/cryptodev: drop local_err from
+ cryptodev_backend_complete()
 To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
@@ -89,119 +90,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- QEMU <qemu-devel@nongnu.org>, Eduardo Habkost <ehabkost@redhat.com>,
+Cc: "Gonglei \(Arei\)" <arei.gonglei@huawei.com>, QEMU <qemu-devel@nongnu.org>,
  Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 11, 2019 at 8:18 PM Vladimir Sementsov-Ogievskiy
+On Fri, Oct 11, 2019 at 8:58 PM Vladimir Sementsov-Ogievskiy
 <vsementsov@virtuozzo.com> wrote:
 >
-> Rename Error ** parameter in check_only_migratable to common errp.
->
-> In device_set_realized:
->
->  - Move "if (local_err !=3D NULL)" closer to error setters.
->
->  - Drop 'Error **local_errp': it doesn't save any LoCs, but it's very
->    unusual.
+> No reason for local_err here, use errp directly instead.
 >
 > Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 > ---
->  hw/core/qdev.c | 28 +++++++++++++---------------
->  1 file changed, 13 insertions(+), 15 deletions(-)
+>  backends/cryptodev.c | 11 +----------
+>  1 file changed, 1 insertion(+), 10 deletions(-)
 >
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index cbad6c1d55..e3be8cc3c4 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -796,12 +796,12 @@ static bool device_get_realized(Object *obj, Error =
-**errp)
->      return dev->realized;
->  }
->
-> -static bool check_only_migratable(Object *obj, Error **err)
-> +static bool check_only_migratable(Object *obj, Error **errp)
+> diff --git a/backends/cryptodev.c b/backends/cryptodev.c
+> index 3c071eab95..5a9735684e 100644
+> --- a/backends/cryptodev.c
+> +++ b/backends/cryptodev.c
+> @@ -176,19 +176,10 @@ cryptodev_backend_complete(UserCreatable *uc, Error=
+ **errp)
 >  {
->      DeviceClass *dc =3D DEVICE_GET_CLASS(obj);
+>      CryptoDevBackend *backend =3D CRYPTODEV_BACKEND(uc);
+>      CryptoDevBackendClass *bc =3D CRYPTODEV_BACKEND_GET_CLASS(uc);
+> -    Error *local_err =3D NULL;
 >
->      if (!vmstate_check_only_migratable(dc->vmsd)) {
-> -        error_setg(err, "Device %s is not migratable, but "
-> +        error_setg(errp, "Device %s is not migratable, but "
->                     "--only-migratable was specified",
->                     object_get_typename(obj));
->          return false;
-> @@ -850,10 +850,9 @@ static void device_set_realized(Object *obj, bool va=
-lue, Error **errp)
->
->          if (dc->realize) {
->              dc->realize(dev, &local_err);
+>      if (bc->init) {
+> -        bc->init(backend, &local_err);
+> -        if (local_err) {
+> -            goto out;
 > -        }
-> -
-> -        if (local_err !=3D NULL) {
-> -            goto fail;
-> +            if (local_err !=3D NULL) {
-> +                goto fail;
-> +            }
->          }
->
->          DEVICE_LISTENER_CALL(realize, Forward, dev);
-> @@ -894,27 +893,26 @@ static void device_set_realized(Object *obj, bool v=
-alue, Error **errp)
->         }
->
->      } else if (!value && dev->realized) {
-> -        Error **local_errp =3D NULL;
-> +        /* We want to catch in local_err only first error */
->          QLIST_FOREACH(bus, &dev->child_bus, sibling) {
-> -            local_errp =3D local_err ? NULL : &local_err;
->              object_property_set_bool(OBJECT(bus), false, "realized",
-> -                                     local_errp);
-> +                                     local_err ? NULL : &local_err);
->          }
->          if (qdev_get_vmsd(dev)) {
->              vmstate_unregister(dev, qdev_get_vmsd(dev), dev);
->          }
->          if (dc->unrealize) {
-> -            local_errp =3D local_err ? NULL : &local_err;
-> -            dc->unrealize(dev, local_errp);
-> +            dc->unrealize(dev, local_err ? NULL : &local_err);
->          }
->          dev->pending_deleted_event =3D true;
->          DEVICE_LISTENER_CALL(unrealize, Reverse, dev);
-> -    }
->
-> -    if (local_err !=3D NULL) {
-> -        goto fail;
-> +        if (local_err !=3D NULL) {
-> +            goto fail;
-> +        }
+> +        bc->init(backend, errp);
 >      }
->
-> +    assert(local_err =3D=3D NULL);
->      dev->realized =3D value;
->      return;
->
-> @@ -952,7 +950,7 @@ static bool device_get_hotpluggable(Object *obj, Erro=
-r **errp)
->                                  qbus_is_hotpluggable(dev->parent_bus));
+> -
+> -    return;
+> -
+> -out:
+> -    error_propagate(errp, local_err);
 >  }
 >
-> -static bool device_get_hotplugged(Object *obj, Error **err)
-> +static bool device_get_hotplugged(Object *obj, Error **errp)
->  {
->      DeviceState *dev =3D DEVICE(obj);
->
+>  void cryptodev_backend_set_used(CryptoDevBackend *backend, bool used)
 > --
 > 2.21.0
 >
 >
 
 Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
 
 --=20
 Marc-Andr=C3=A9 Lureau
