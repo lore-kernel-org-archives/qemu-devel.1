@@ -2,90 +2,87 @@ Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88146FA372C
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82C04FA372C
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:54:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CDD32178F
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:51:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B73C2178F
+	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 16:54:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MkLcQWIK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CDD32178F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="ebIeFKlE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B73C2178F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iT7To-0006G6-Fn
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:51:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36490)
+	id 1iT7Wj-0007SI-9F
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 11:54:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36538)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iT7Sm-0005dM-Ls
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:50:21 -0500
+ (envelope-from <damien.hedde@greensocs.com>) id 1iT7TB-0005yt-2s
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:50:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iT7Sk-0006d7-Bt
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:50:20 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33459)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iT7Si-0006TK-EY
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:50:18 -0500
-Received: by mail-wm1-x344.google.com with SMTP id a17so7026510wmb.0
- for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 08:50:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Iy8Gilt6K/VmLrMs25ELxt+JksPIAkZPo+SYu1J222k=;
- b=MkLcQWIK70drUoMmqbUCZeRCYs9nne9NXbf6Z9SYY1zJa1sNkHhSDK1DtHJE9VS5JM
- WIix9aeI5HlYnbcuIw2cshbsp6+T/n7fs6P5rf/HB4FaEPj9FnnKNnIuokEdFFb9w7nH
- 31AyRaEDsK1CYn0IMUkEzot2Ft3VMEFQZY61iFmm2oCErKgBOEz1v67s9O6y2tysMJcq
- 3Nk3gyb9O0YrZkD6ejPHemCW5I9QKflii2wQ04AzLxr2Vo1hjPC91eKB/ABZnSl9P5kl
- vQxlb+zxvJpeRDtdNsbSxkInQl7q9x2MEjM6nUeOHzOKp6cfFaxrWu1rHRBrIbutSBn/
- YlDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Iy8Gilt6K/VmLrMs25ELxt+JksPIAkZPo+SYu1J222k=;
- b=ZDapzS4Qe9dW/k5y4fJeWTgkERrpqbyIqDTZfNiNVlYM8ljsMzZag89pCCMVmbF6J6
- BWeoVohK1NVIzA8iWRUMOlkQhbO5Rnid/CvCGJGErHWVyYcvUNfeQcXqG88UdyvD1Y/s
- izyMgKmql18zLTy/eRqQbe9BzQ9LHGHLmUQhdesOQfhpskIq1ESDBmOsbc7jz7jeiMOA
- 5adtb4zXw2U2x2BgYLmaYYFly2YaHxfHsG9trc37l7aw9wE+av3BsPxrHgSRz9oVBbQo
- 7/fAtvYxxQG7l4ncyv7derm8jNEdiC/aA+hI0sbxmvsWbF4mRjG1A8j7MPS4TPBEqH6n
- eklg==
-X-Gm-Message-State: APjAAAURpbp2JsoC+9vogvcTmgMY9CaD55L9p6w0ep1ZOO1WY8G0QPdH
- lUK5id6lSAQIP2wkBRDoNkKUYA==
-X-Google-Smtp-Source: APXvYqysNLDawi4nLjh2LGoA+g4eNzPAHTjScvXRkN+5ZU041qVeqZkVF4bR2VBfP1YiC2bn3UfZ0A==
-X-Received: by 2002:a1c:e308:: with SMTP id a8mr9123365wmh.55.1573231814255;
- Fri, 08 Nov 2019 08:50:14 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id u203sm6781521wme.34.2019.11.08.08.50.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 08 Nov 2019 08:50:13 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 733F51FF87;
- Fri,  8 Nov 2019 16:50:12 +0000 (GMT)
-References: <20191108125534.114474-1-damien.hedde@greensocs.com>
- <877e4ah32n.fsf@linaro.org>
- <7aa732a4-b67f-855f-0432-290580fc239d@greensocs.com>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Damien Hedde <damien.hedde@greensocs.com>
-Subject: Re: [PATCH] gdbstub: Fix buffer overflow in handle_read_all_regs
-In-reply-to: <7aa732a4-b67f-855f-0432-290580fc239d@greensocs.com>
-Date: Fri, 08 Nov 2019 16:50:12 +0000
-Message-ID: <87v9rufh2z.fsf@linaro.org>
+ (envelope-from <damien.hedde@greensocs.com>) id 1iT7T9-0008EI-FA
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:50:44 -0500
+Received: from beetle.greensocs.com ([5.135.226.135]:36080)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
+ id 1iT7T8-0007xF-9D
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 11:50:42 -0500
+Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
+ by beetle.greensocs.com (Postfix) with ESMTPSA id 5C0AF96EF0;
+ Fri,  8 Nov 2019 16:50:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
+ s=mail; t=1573231839;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=M+9tE0DETWQYpJXS67JXpnNPmDD6hnQXbcAhcIpT4+g=;
+ b=ebIeFKlEXgP3S5OEQjjnE9brv/IlnsrB7KOHP7pCCRix+AfvHUeGxv+UCR49/xAMADncMh
+ 2fcL3etQMwpjfAbE1Jup9UPp5cGehcrETV5bqckQBMStWi2nJICEPJ4uZOIO1yFOPGk4qk
+ dMgH8cwjqOqJ3SjX7jrkUShtVye5g9A=
+Subject: Re: [PATCH v6 01/25] qmp: constify QmpCommand and list
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191108150123.12213-1-marcandre.lureau@redhat.com>
+ <20191108150123.12213-2-marcandre.lureau@redhat.com>
+From: Damien Hedde <damien.hedde@greensocs.com>
+Message-ID: <cc27aa10-c6e2-0de8-a55f-b9a8da67dde2@greensocs.com>
+Date: Fri, 8 Nov 2019 17:50:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
+In-Reply-To: <20191108150123.12213-2-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US-large
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
+ s=mail; t=1573231839;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=M+9tE0DETWQYpJXS67JXpnNPmDD6hnQXbcAhcIpT4+g=;
+ b=JynvSUVsZdlSdYTicXOEIUJ1cd/4u1JDmh5HHZz/+ejr1eStipbjUy7p7ju+I4+9T8Br7C
+ Ku549mmmkMYscHKeq+kFe4lbfOymSHS4upLpKRFMZ8n7auLGCTC4Z7YsnilPMs82rPG9ud
+ 2vJle+PdU+ArRZpPkMEajNrgkELi0dQ=
+ARC-Seal: i=1; s=mail; d=greensocs.com; t=1573231839; a=rsa-sha256; cv=none;
+ b=i/crOpoMNR8pC3XE8MI5gMA95Q0UibDsczPQ74jH/HLqnox8wzPB/EOWavUNeH/NjCGv3U
+ LO8fKmbjGuP6Emw+QsLsHbA1nUD7WqVTvy4Fiyig/IqLpw0bvcE5CrkKQeWOcYF0mJjQ7M
+ 8tPAenB2jhWuLzZSarG5Aq4ozP/qAxU=
+ARC-Authentication-Results: i=1; ORIGINATING;
+ auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::344
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 5.135.226.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,102 +94,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Damien Hedde <damien.hedde@greensocs.com> writes:
 
-> On 11/8/19 3:09 PM, Alex Benn=C3=A9e wrote:
->>
->> Damien Hedde <damien.hedde@greensocs.com> writes:
->>
->>> Ensure we don't put too much register data in buffers. This avoids
->>> a buffer overflow (and stack corruption) when a target has lots
->>> of registers.
->>>
->>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
->>> ---
->>>
->>> Hi all,
->>>
->>> While working on a target with many registers. I found out the gdbstub
->>> may do buffer overflows when receiving a 'g' query (to read general
->>> registers). This patch prevents that.
->>>
->>> Gdb is pretty happy with a partial set of registers and queries
->>> remaining registers one by one when needed.
->>
->> Heh I was just looking at this code with regards to SVE (which can get
->> quite big).
->
-> SVE ?
+On 11/8/19 4:00 PM, Marc-Andr=C3=A9 Lureau wrote:
+> Since 0b69f6f72ce47a37a749b056b6d5ec64c61f11e8 "qapi: remove
+> qmp_unregister_command()", the command list can be declared const.
+>=20
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/qapi/qmp/dispatch.h | 9 +++++----
+>  monitor/misc.c              | 2 +-
+>  monitor/monitor-internal.h  | 2 +-
+>  qapi/qmp-dispatch.c         | 6 +++---
+>  qapi/qmp-registry.c         | 6 +++---
+>  qga/commands.c              | 2 +-
+>  qga/main.c                  | 6 +++---
+>  7 files changed, 17 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/include/qapi/qmp/dispatch.h b/include/qapi/qmp/dispatch.h
+> index 9aa426a398..5a9cf82472 100644
+> --- a/include/qapi/qmp/dispatch.h
+> +++ b/include/qapi/qmp/dispatch.h
+> @@ -39,7 +39,8 @@ typedef QTAILQ_HEAD(QmpCommandList, QmpCommand) QmpCo=
+mmandList;
+> =20
+>  void qmp_register_command(QmpCommandList *cmds, const char *name,
+>                            QmpCommandFunc *fn, QmpCommandOptions option=
+s);
+> -QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name);
+> +const QmpCommand *qmp_find_command(const QmpCommandList *cmds,
+> +                                   const char *name);
+>  void qmp_disable_command(QmpCommandList *cmds, const char *name);
+>  void qmp_enable_command(QmpCommandList *cmds, const char *name);
+> =20
+> @@ -47,13 +48,13 @@ bool qmp_command_is_enabled(const QmpCommand *cmd);
+>  const char *qmp_command_name(const QmpCommand *cmd);
+>  bool qmp_has_success_response(const QmpCommand *cmd);
+>  QDict *qmp_error_response(Error *err);
+> -QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+> +QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+>                      bool allow_oob);
+>  bool qmp_is_oob(const QDict *dict);
+> =20
+> -typedef void (*qmp_cmd_callback_fn)(QmpCommand *cmd, void *opaque);
+> +typedef void (*qmp_cmd_callback_fn)(const QmpCommand *cmd, void *opaqu=
+e);
+> =20
+> -void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn=
+,
+> +void qmp_for_each_command(const QmpCommandList *cmds, qmp_cmd_callback=
+_fn fn,
+>                            void *opaque);
+> =20
+>  #endif
+> diff --git a/monitor/misc.c b/monitor/misc.c
+> index 3baa15f3bf..3052bfe8f1 100644
+> --- a/monitor/misc.c
+> +++ b/monitor/misc.c
+> @@ -230,7 +230,7 @@ static void hmp_info_help(Monitor *mon, const QDict=
+ *qdict)
+>      help_cmd(mon, "info");
+>  }
+> =20
+> -static void query_commands_cb(QmpCommand *cmd, void *opaque)
+> +static void query_commands_cb(const QmpCommand *cmd, void *opaque)
+>  {
+>      CommandInfoList *info, **list =3D opaque;
+> =20
+> diff --git a/monitor/monitor-internal.h b/monitor/monitor-internal.h
+> index d78f5ca190..3e7dac5910 100644
+> --- a/monitor/monitor-internal.h
+> +++ b/monitor/monitor-internal.h
+> @@ -132,7 +132,7 @@ typedef struct {
+>       * qmp_capabilities succeeds, we go into command mode, and
+>       * @command becomes &qmp_commands.
+>       */
+> -    QmpCommandList *commands;
+> +    const QmpCommandList *commands;
+>      bool capab_offered[QMP_CAPABILITY__MAX]; /* capabilities offered *=
+/
+>      bool capab[QMP_CAPABILITY__MAX];         /* offered and accepted *=
+/
+>      /*
+> diff --git a/qapi/qmp-dispatch.c b/qapi/qmp-dispatch.c
+> index bc264b3c9b..857399c5fe 100644
+> --- a/qapi/qmp-dispatch.c
+> +++ b/qapi/qmp-dispatch.c
+> @@ -75,14 +75,14 @@ static QDict *qmp_dispatch_check_obj(const QObject =
+*request, bool allow_oob,
+>      return dict;
+>  }
+> =20
+> -static QObject *do_qmp_dispatch(QmpCommandList *cmds, QObject *request=
+,
+> +static QObject *do_qmp_dispatch(const QmpCommandList *cmds, QObject *r=
+equest,
+>                                  bool allow_oob, Error **errp)
+>  {
+>      Error *local_err =3D NULL;
+>      bool oob;
+>      const char *command;
+>      QDict *args, *dict;
+> -    QmpCommand *cmd;
+> +    const QmpCommand *cmd;
+>      QObject *ret =3D NULL;
+> =20
+>      dict =3D qmp_dispatch_check_obj(request, allow_oob, errp);
+> @@ -164,7 +164,7 @@ bool qmp_is_oob(const QDict *dict)
+>          && !qdict_haskey(dict, "execute");
+>  }
+> =20
+> -QDict *qmp_dispatch(QmpCommandList *cmds, QObject *request,
+> +QDict *qmp_dispatch(const QmpCommandList *cmds, QObject *request,
+>                      bool allow_oob)
+>  {
+>      Error *err =3D NULL;
+> diff --git a/qapi/qmp-registry.c b/qapi/qmp-registry.c
+> index ca00f74795..d0f9a1d3e3 100644
+> --- a/qapi/qmp-registry.c
+> +++ b/qapi/qmp-registry.c
+> @@ -27,7 +27,7 @@ void qmp_register_command(QmpCommandList *cmds, const=
+ char *name,
+>      QTAILQ_INSERT_TAIL(cmds, cmd, node);
+>  }
+> =20
+> -QmpCommand *qmp_find_command(QmpCommandList *cmds, const char *name)
+> +const QmpCommand *qmp_find_command(const QmpCommandList *cmds, const c=
+har *name)
+>  {
+>      QmpCommand *cmd;
+> =20
+> @@ -77,10 +77,10 @@ bool qmp_has_success_response(const QmpCommand *cmd=
+)
+>      return !(cmd->options & QCO_NO_SUCCESS_RESP);
+>  }
+> =20
+> -void qmp_for_each_command(QmpCommandList *cmds, qmp_cmd_callback_fn fn=
+,
+> +void qmp_for_each_command(const QmpCommandList *cmds, qmp_cmd_callback=
+_fn fn,
+>                            void *opaque)
+>  {
+> -    QmpCommand *cmd;
+> +    const QmpCommand *cmd;
+> =20
+>      QTAILQ_FOREACH(cmd, cmds, node) {
+>          fn(cmd, opaque);
+> diff --git a/qga/commands.c b/qga/commands.c
+> index 0c7d1385c2..05e9ab6c3d 100644
+> --- a/qga/commands.c
+> +++ b/qga/commands.c
+> @@ -54,7 +54,7 @@ void qmp_guest_ping(Error **errp)
+>      slog("guest-ping called");
+>  }
+> =20
+> -static void qmp_command_info(QmpCommand *cmd, void *opaque)
+> +static void qmp_command_info(const QmpCommand *cmd, void *opaque)
+>  {
+>      GuestAgentInfo *info =3D opaque;
+>      GuestAgentCommandInfo *cmd_info;
+> diff --git a/qga/main.c b/qga/main.c
+> index c35c2a2120..f23614528e 100644
+> --- a/qga/main.c
+> +++ b/qga/main.c
+> @@ -359,7 +359,7 @@ static gint ga_strcmp(gconstpointer str1, gconstpoi=
+nter str2)
+>  }
+> =20
+>  /* disable commands that aren't safe for fsfreeze */
+> -static void ga_disable_non_whitelisted(QmpCommand *cmd, void *opaque)
+> +static void ga_disable_non_whitelisted(const QmpCommand *cmd, void *op=
+aque)
+>  {
+>      bool whitelisted =3D false;
+>      int i =3D 0;
+> @@ -378,7 +378,7 @@ static void ga_disable_non_whitelisted(QmpCommand *=
+cmd, void *opaque)
+>  }
+> =20
+>  /* [re-]enable all commands, except those explicitly blacklisted by us=
+er */
+> -static void ga_enable_non_blacklisted(QmpCommand *cmd, void *opaque)
+> +static void ga_enable_non_blacklisted(const QmpCommand *cmd, void *opa=
+que)
+>  {
+>      GList *blacklist =3D opaque;
+>      const char *name =3D qmp_command_name(cmd);
+> @@ -918,7 +918,7 @@ int64_t ga_get_fd_handle(GAState *s, Error **errp)
+>      return handle;
+>  }
+> =20
+> -static void ga_print_cmd(QmpCommand *cmd, void *opaque)
+> +static void ga_print_cmd(const QmpCommand *cmd, void *opaque)
+>  {
+>      printf("%s\n", qmp_command_name(cmd));
+>  }
+>=20
 
-ARM's Scalable Vector Registers which currently can get upto 16 vector
-quads (256 bytes) but are likely to get bigger.
+Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
 
->
->>
->>>
->>> Regards,
->>> Damien
->>> ---
->>>  gdbstub.c | 13 +++++++++++--
->>>  1 file changed, 11 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/gdbstub.c b/gdbstub.c
->>> index 4cf8af365e..dde0cfe0fe 100644
->>> --- a/gdbstub.c
->>> +++ b/gdbstub.c
->>> @@ -1810,8 +1810,17 @@ static void handle_read_all_regs(GdbCmdContext *=
-gdb_ctx, void *user_ctx)
->>>      cpu_synchronize_state(gdb_ctx->s->g_cpu);
->>>      len =3D 0;
->>>      for (addr =3D 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs; addr++)=
- {
->>> -        len +=3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem_buf=
- + len,
->>> -                                 addr);
->>> +        int size =3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->mem=
-_buf + len,
->>> +                                     addr);
->>> +        if (len + size > MAX_PACKET_LENGTH / 2) {
->>> +            /*
->>> +             * Prevent gdb_ctx->str_buf overflow in memtohex() below.
->>> +             * As a consequence, send only the first registers content.
->>> +             * Gdb will query remaining ones if/when needed.
->>> +             */
->>
->> Haven't we already potentially overflowed gdb_ctx->mem_buf though? I
->> suspect the better fix is for str_buf is to make it growable with
->> g_string and be able to handle arbitrary size conversions (unless the
->> spec limits us). But we still don't want a hostile gdbstub to be able to
->> spam memory by asking for registers that might be bigger than
->> MAX_PACKET_LENGTH bytes.
->
-> For gdb_ctx->mem_buf  it's ok because it has also a size of
-> MAX_PACKET_LENGTH. (assuming no single register can be bigger than
-> MAX_PACKET_LENGTH)
-> str_buf has a size of MAX_PACKET_LENGTH + 1
-
-Are these limits of the protocol rather than our own internal limits?
-
-> I'm not sure I've understood the second part but if we increase the size
-> of str_buf then we will need also a bigger packet buffer.
-
-Glib provides some nice functions for managing arbitrary sized strings
-in a nice flexible way which grow on demand. There is also a nice
-growable GByteArray type which we can use for the packet buffer. I think
-I'd started down this road of re-factoring but never got around to
-posting the patches.
-
-> The size here only depends on what are the target declared registers, so
-> it depends only on the cpu target code.
-
-Sure - but guest registers are growing all the time!
-
---
-Alex Benn=C3=A9e
+Damien
 
