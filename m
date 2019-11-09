@@ -2,80 +2,80 @@ Return-Path: <SRS0=4+Bn=ZB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B176EC43331
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 Nov 2019 15:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10108C43331
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 Nov 2019 16:00:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77FDF21848
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 Nov 2019 15:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6A6921848
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 Nov 2019 16:00:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lhw4tYnx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77FDF21848
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aPB40RBc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6A6921848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iTT77-0003aE-Me
-	for qemu-devel@archiver.kernel.org; Sat, 09 Nov 2019 10:57:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49756)
+	id 1iTT9u-0004m0-VI
+	for qemu-devel@archiver.kernel.org; Sat, 09 Nov 2019 11:00:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49961)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iTT6J-00036n-BA
- for qemu-devel@nongnu.org; Sat, 09 Nov 2019 10:56:36 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iTT9F-0004FN-Vp
+ for qemu-devel@nongnu.org; Sat, 09 Nov 2019 10:59:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iTT6I-0007Lg-7m
- for qemu-devel@nongnu.org; Sat, 09 Nov 2019 10:56:35 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:42741)
+ (envelope-from <peter.maydell@linaro.org>) id 1iTT9E-0000MR-TJ
+ for qemu-devel@nongnu.org; Sat, 09 Nov 2019 10:59:37 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:36335)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iTT6I-0007L8-1d
- for qemu-devel@nongnu.org; Sat, 09 Nov 2019 10:56:34 -0500
-Received: by mail-oi1-x242.google.com with SMTP id i185so7937110oif.9
- for <qemu-devel@nongnu.org>; Sat, 09 Nov 2019 07:56:33 -0800 (PST)
+ id 1iTT9E-0000M3-No
+ for qemu-devel@nongnu.org; Sat, 09 Nov 2019 10:59:36 -0500
+Received: by mail-ot1-x342.google.com with SMTP id f10so7841042oto.3
+ for <qemu-devel@nongnu.org>; Sat, 09 Nov 2019 07:59:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=V0J39ZP+gqYtH1FsiwOzOQMPVqG43LmtvsVt/9EATI0=;
- b=lhw4tYnxaLtJhVn/kv0pYyxVffeF3PaUuxP7p9Fpbt2/GNC3uU+Ck1KADCeI4ku2Z5
- Xzw7gam0h72lV02AGEqBW7aWk7HyHggOxmMZdD0MF9uBExKZpC5pQlxz2vVC2Ci3KRIB
- TJ9kSjXLyo5d+vy8j2gDrYX3i8WXv4sWQodFw88rDUSewzKOpH1LRoR3HGoGHZwPYVBv
- u4eDtFqF+Blm0DpTqdlV0gMy+wxhy9VIeHG0k1OCB69MAhanpZbpAfxPkR6wgBYnD3Ed
- Q/ZWFmOWHVGfqT2Fc1XiGoKdDvj6gIwCM7cEbhdv/nFK5jy2OBvnkQEVl6XMzjxyQAyl
- thMQ==
+ :cc; bh=UGGqpT/gP0e7fQ+6MCtKgbbjn+3VKjT+JR7zDj4O5G8=;
+ b=aPB40RBcvrYHnkdE8sTfrneeyu1ffg6LGblJlFthmzsR1AR2li65z9OCnUNyvn14Bs
+ R/+ajrdR2e1iEkAJYF2BkvA6YfIgMxpm06O1qvZ6AhpqTCF8A3qfZ4mJgbGpak/qJqFG
+ NtPmiohiLQuvl4MG8oo+xG1yWfb9tKf4YC6YQPax8c1nrj5jhkZMCzmy6gK7LEXNb59Y
+ AI5CXPu3P3BIo3tZ8gKc4b0fg0PGVAXnJGWHuFnYbDlBmOtpbLWVkoJMPC/zyhymC0PL
+ h3amHFTZ7dotzMPzV8jp1A+FYH/GiqwOoNxzBIpcFz3KRQmbRYOSErawFZ3WAknqGyzz
+ zwew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=V0J39ZP+gqYtH1FsiwOzOQMPVqG43LmtvsVt/9EATI0=;
- b=tx5+yeCbEGOIWVTdDPd9ikrtO+yiYZdGsdG0RNzywfq1jPENgSTcf/L2mZIGztUx7I
- c+3rr2Y55hpI3GFcwe9bn5TdVQ+8JGrI1ekO/DkZcYYGD2eP7jJjxmvsMIsjh6oHki/3
- mCo6Ah+GHCiXKbmBcD5kTedrnKYWHFnCP+G8n0DWdwBLpKCxrOhQVKzDOGDtmkpIC2IR
- FRaarOvV2mY1IvC3koUMaeol9FMeMW2TNlHZ0REQk8aQAjd5Qnj2OHlvyyFMd+TjsPyL
- ouK0QRCysPj9qVkwV+ERjs06XTEFyEY98eA0V4r8Nn2X+JjhYqK/9woPqUgLNgBDjRkE
- gvEg==
-X-Gm-Message-State: APjAAAUHXwmG9M+Kcpv8510l4Og+HxreL3qemj0s9QCdf72hRXGF3Jol
- IZBrutTPd3Xi9/e7bxykec/unwyHX9BhL2+WbWTWRg==
-X-Google-Smtp-Source: APXvYqwXLfMPazDakHpZ1f42MzE2uWF80g/h7LXsMxSCtr0+m1Yh0ZRS+Ovm0y3B/4Yu55S3pJED+7jptfFAe4vmlC0=
-X-Received: by 2002:a05:6808:7d1:: with SMTP id
- f17mr16124762oij.163.1573314992944; 
- Sat, 09 Nov 2019 07:56:32 -0800 (PST)
+ bh=UGGqpT/gP0e7fQ+6MCtKgbbjn+3VKjT+JR7zDj4O5G8=;
+ b=g35PCSHaWcPTcHboEd9hf0WCaq+FWRKTHzTEiAT5ekdM1+8oFjyEjPyDOulEJGZd1O
+ nDLGn7X35DRb45mFx5w56bZmP9pKsaTfMtWfF/nUAYdD57iE0luiJUO8t4BxKmJdmcCZ
+ e4aJ25wHBRnwjG+2j4X2jlDaoEX+OFqa/kKZz4BXyq8JcXkZILduyF+nkHsNEVf3LZs0
+ ysrdMCYNq/BmGIS3/BELGu1uxAlC0Vx00V0oDITLU9qnUVr1KVN60SwC8bhLHSOshT0l
+ U7pEIJlF9tpVmCKqZOFciRpEK9FRogbJy7Lw083DVOnzVjdqUyPWOGKdJ5ldG4R/pul/
+ HFJw==
+X-Gm-Message-State: APjAAAXF/30AqPYLLwSeqXsiS44ns3vclGbgav9mFFxDeGUEA0gCrqwA
+ 5TJ0jvPxGU9Dp9DgB7pRM4rs3fhqQkW9F1Y3xwc1Cg==
+X-Google-Smtp-Source: APXvYqw/Xcz8YEkW7c16WutFz4OG+fG7nzQepXTdu5rISugNjVPZixJ25wf4N8W5VEdP6M5uStDXYPOJ2/RtGw9KvNQ=
+X-Received: by 2002:a9d:7f12:: with SMTP id j18mr13025700otq.221.1573315175828; 
+ Sat, 09 Nov 2019 07:59:35 -0800 (PST)
 MIME-Version: 1.0
 References: <20191108194758.17813-1-palmer@dabbelt.com>
- <20191108194758.17813-3-palmer@dabbelt.com>
-In-Reply-To: <20191108194758.17813-3-palmer@dabbelt.com>
+ <20191108194758.17813-2-palmer@dabbelt.com>
+In-Reply-To: <20191108194758.17813-2-palmer@dabbelt.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 9 Nov 2019 15:56:21 +0000
-Message-ID: <CAFEAcA_Lj2SmxMTEN06+FxwQrkuR80Vw5=Dkh1achFUySSFAxA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] ARM/virt: Use fdt_setprop_strings()
+Date: Sat, 9 Nov 2019 15:59:24 +0000
+Message-ID: <CAFEAcA_3jgn1WrX2wpBd+sCYe=nNaqA2POvaZkj-NsSyT2N9bQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] device_tree: Add a helper function for string
+ arrays
 To: Palmer Dabbelt <palmer@dabbelt.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,35 +97,37 @@ Sender: "Qemu-devel"
 
 On Fri, 8 Nov 2019 at 19:48, Palmer Dabbelt <palmer@dabbelt.com> wrote:
 >
-> This new helper function encodes the idiom used by the ARM virt board to
-> set a string array.  I don't currently have a working ARM userspace, so I haven't tested
-> this, but I made the helper function because I wanted to use it for the
-> RISC-V virt board where I have tested it.
+> The device tree format allows for arrays of strings, which are encoded
+> with '\0's inside regular strings.  These are ugly to represent in C, so
+> the helper function represents them as strings with internal '\0's that
+> are terminated with a double '\0'.  In other words, the array
+> ["string1", "string2"] is represeted as "string1\0string2\0".
 >
-> Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
-> ---
->  hw/arm/virt.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index d4bedc2607..4dc00f54d5 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -304,9 +304,8 @@ static void fdt_add_timer_nodes(const VirtMachineState *vms)
->
->      armcpu = ARM_CPU(qemu_get_cpu(0));
->      if (arm_feature(&armcpu->env, ARM_FEATURE_V8)) {
-> -        const char compat[] = "arm,armv8-timer\0arm,armv7-timer";
-> -        qemu_fdt_setprop(vms->fdt, "/timer", "compatible",
-> -                         compat, sizeof(compat));
-> +        qemu_fdt_setprop_strings(vms->fdt, "/timer", "compatible",
-> +                                 "arm,armv8-timer\0arm,armv7-timer\0");
->      } else {
+> The DTB generated by this function is accepted by DTC and produces an
+> array of strings, but I can't find any explicit line in the DT
+> specification that defines how these are encoded.
 
+> +/*
+> + * This uses a particularly odd encoding: "strings" is a list of strings that
+> + * must be terminated by two back-to-back '\0' characters.
+> + */
+> +int qemu_fdt_setprop_strings(void *fdt, const char *node_path,
+> +                             const char *property, const char *strings);
 
-This seems to be changing the property we put in -- in
-the old code it is 'foo\0bar\0', but in the new code
-there will end up being two \0 at the end: 'foo\0bar\0\0'.
+The clean API for this would be to use varargs so you could write
+
+qemu_fdt_setprop_stringlist(fdt, node, prop, "arm,armv8-timer",
+                            "arm,armv7-timer");
+
+and have it do the assembly into the encoding that fdt expects.
+That would require us to do a bit of allocation-and-freeing
+to assemble the string, of course, but then we only do fdt
+creation at startup.
+
+NB: I think that this is a good idea but not-for-4.2 material,
+so if you wanted your sifive board change to go into 4.2 you
+should probably start with the simple approach and leave the
+refactoring for the next release cycle.
 
 thanks
 -- PMM
