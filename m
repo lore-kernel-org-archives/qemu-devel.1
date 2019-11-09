@@ -2,86 +2,84 @@ Return-Path: <SRS0=4+Bn=ZB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB60C17441
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 Nov 2019 01:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F08C17441
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 Nov 2019 02:18:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6743921019
-	for <qemu-devel@archiver.kernel.org>; Sat,  9 Nov 2019 01:26:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1403D214DA
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 Nov 2019 02:18:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPEUsd3R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6743921019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="S7Ja/TiG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1403D214DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iTFVr-0005wk-KT
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 20:26:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58566)
+	id 1iTGKg-00070v-7i
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 21:18:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60444)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.weiyang@gmail.com>) id 1iTFUv-0005Iz-8s
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 20:25:06 -0500
+ (envelope-from <marcheu@google.com>) id 1iTFkg-0000HP-8e
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 20:41:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.weiyang@gmail.com>) id 1iTFUu-0007vk-22
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 20:25:05 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46446)
+ (envelope-from <marcheu@google.com>) id 1iTFkf-00044n-08
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 20:41:22 -0500
+Received: from mail-il1-x133.google.com ([2607:f8b0:4864:20::133]:38263)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
- id 1iTFUt-0007uw-R0; Fri, 08 Nov 2019 20:25:04 -0500
-Received: by mail-wr1-x444.google.com with SMTP id b3so8958514wrs.13;
- Fri, 08 Nov 2019 17:25:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=ceKV9Tu/BH2YZe3Lb3SDCMtApqlpLDwm1J/JrqSvcAE=;
- b=VPEUsd3R99h7D4dDX+o1zjJMqQANEGqWlWawK8YTWvBTIyIvdMBLdc+CmpsbKMT/cU
- Do3TD7qFp0iZeBWeTvQXIIA2XN/U79HFJc/jzh9fWXI8IaqfkCkBivQdNk6qDmK85ZSu
- X/kxcjPfa4QcppcsV56FdEhlQ64KhShrDilau3wrQ6/uWjpYpjc3h/Fzx8/fFuhDi7n+
- VFwixgutdgyx1afJjLl1KxqgwVHcHKO7/uErjvBrmt4Mf8va6AtoM4oqIy+P9afBOhKn
- 5gv/Cv9HGVqcYcTZs5ybfmbmoOKC47pc/b4u1ikDwmZntU8nnuVcc6Al5t0Sw/cOlSqS
- FZBg==
+ (Exim 4.71) (envelope-from <marcheu@google.com>) id 1iTFke-00041A-Nn
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 20:41:20 -0500
+Received: by mail-il1-x133.google.com with SMTP id u17so1905830ilq.5
+ for <qemu-devel@nongnu.org>; Fri, 08 Nov 2019 17:41:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=wVtEFg/Qou+aYXahULIg4Ddk9uw4TDjxaxbD5XH4JVs=;
+ b=S7Ja/TiGlPkwGljdD/iajvmhHtBPABLFf+GeQU9NhSJftJ5DYnEhmRClF/OVp7pyj2
+ I+vI3Z150NjX/t6quJ9JBX7l6ZSxi410Oq4lJPoW0T28FDVLf6oAiBcMvmB+TRuUupAl
+ PoYg/UknnwucQ1CO3eC98JAtBBqzEiT+FMkrw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
- :references:mime-version:content-disposition:in-reply-to:user-agent;
- bh=ceKV9Tu/BH2YZe3Lb3SDCMtApqlpLDwm1J/JrqSvcAE=;
- b=qxWZ9jhqghKrdQ2MDB6qhvD+agSRw0/r8xa/dMFWk4bNm0ghU47xDSPqlfb8EHiII6
- hQNZQgLcE3zJXd+48TgM5u+VHPX3th2SaKf11/ox1SfIBWJjGem/UBGr711q4sXTokot
- fv+HIlodfXfnJWTOoGxC1luoZ2gxI/GyswY0YsVx5+/momjUFI/M9uT6Rq+0sONqZlcB
- fUMo7dTdQHaY8BCyL7BDEAfZQ3itqM+Hqv1azxAJl8JmCWd9NkvH0PMz33G97FxypG1K
- dqztJeY4cqX34soiSQi5KQ31q//fquUIVGW/5SqOFAswE6Fapa6RfF6LfblFfzOWi57a
- QbYw==
-X-Gm-Message-State: APjAAAVlTaYYeHdPfbPjpRnkWAM4BicuATNjxI2YHS8JEQbZwbtoTC2U
- vFKYjilMAgaXT8MsQOCt6z0=
-X-Google-Smtp-Source: APXvYqzW97BsU30yGCQaFVeVjW2Eusmo5F4HHLzMGA8ogmlPbkNrajXO43xBNaMF6Sj+r5z7QRkaSA==
-X-Received: by 2002:adf:eed2:: with SMTP id a18mr8956035wrp.273.1573262702585; 
- Fri, 08 Nov 2019 17:25:02 -0800 (PST)
-Received: from localhost ([185.92.221.13])
- by smtp.gmail.com with ESMTPSA id 16sm10827998wmf.0.2019.11.08.17.25.01
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Fri, 08 Nov 2019 17:25:01 -0800 (PST)
-Date: Sat, 9 Nov 2019 01:25:01 +0000
-From: Wei Yang <richard.weiyang@gmail.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Subject: Re: [PATCH 0/2] replace sysconf(_SC_PAGESIZE) with
- qemu_real_host_page_size
-Message-ID: <20191109012501.rb3jn37urqrrspdf@master>
-References: <20191015031350.4345-1-richardw.yang@linux.intel.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=wVtEFg/Qou+aYXahULIg4Ddk9uw4TDjxaxbD5XH4JVs=;
+ b=jmuRei4QMsOxYHKqLX7OrQg0yKgn1cwHdYgnO0+CdpSz8VmCNML8QVCL3itpDhZKar
+ MFnvjpkE+4EljZMLTbSwMeU95Um3ZswprEGF8JBmCyy/ZWjkRl5LlAEqbht8rcS7bt+m
+ DirsbbLsmylUrsPAExautApURRXAemMY+J4tNkeXYzgIZtOrkBMbW/pkxIFUbjCiFdKi
+ RuZe91y0Ru9pPeR3R1yIMWi1D0CRVM6GYqecHrajELzIMKwobgovZTUbo3A6WN8XFCoM
+ OgIVHBA8ZTdlKmkatemhPfehcINZh3GnDGin5XefFxhYc8LwCQTEWpjBkKT73PKOs8yu
+ LNZA==
+X-Gm-Message-State: APjAAAWom9fmCE7pxiqTDX4l8s4RziECcB7DsOJsHDbqQV+zZ4mew9EF
+ jkYC77urnVh7D+zviBoRZvw/B6TAjt33QvT9lSoDYw==
+X-Google-Smtp-Source: APXvYqyH9hhaGKo/8SsZPmZFQrsL0XDoeeBeKZspgW0B81ZfhsLOgDMjyjHCpc90IJaEKILodBC9tZm0Wuo1ZEWPa3Q=
+X-Received: by 2002:a92:5d88:: with SMTP id e8mr16072462ilg.95.1573263676306; 
+ Fri, 08 Nov 2019 17:41:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191015031350.4345-1-richardw.yang@linux.intel.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
+ <20191106084344.GB189998@stefanha-x1.localdomain>
+ <20191106095122.jju7eo57scfoat6a@sirius.home.kraxel.org>
+ <CAJSP0QUJBkqtVJq17tfX5O-JuvEGcZQviP0C3tv9qSDy-P-hcg@mail.gmail.com>
+ <20191106125023.uhdhtqisybilxasr@sirius.home.kraxel.org>
+ <CAJSP0QXG5Z3zCnPL+Y7EQfCeey2Fb9OdPdx531Jz2Ofk63wndg@mail.gmail.com>
+ <20191108072210.ywyneaoc2y4slth6@sirius.home.kraxel.org>
+ <CAJSP0QWZc=z56CHEKa8WVe9Cw2-EhDFU+7NeGgL+g-Go5q3K5Q@mail.gmail.com>
+In-Reply-To: <CAJSP0QWZc=z56CHEKa8WVe9Cw2-EhDFU+7NeGgL+g-Go5q3K5Q@mail.gmail.com>
+From: =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>
+Date: Fri, 8 Nov 2019 17:41:04 -0800
+Message-ID: <CADMs+9ZrfEt4QfCM9pC243KTejvbORQ-Nzo0eHjU0FJ8y-2kwQ@mail.gmail.com>
+Subject: Re: guest / host buffer sharing ...
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2607:f8b0:4864:20::133
+X-Mailman-Approved-At: Fri, 08 Nov 2019 21:15:51 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,39 +91,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- jasowang@redhat.com, richard.henderson@linaro.org, dgilbert@redhat.com,
- mreitz@redhat.com, alex.bennee@linaro.org
+Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
+ Alex Lau <alexlau@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>,
+ Alexandre Courbot <acourbot@chromium.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Daniel Vetter <daniel@ffwll.ch>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Hans Verkuil <hverkuil@xs4all.nl>,
+ Dmitry Morozov <dmitry.morozov@opensynergy.com>,
+ Pawel Osciak <posciak@chromium.org>, David Stevens <stevensd@chromium.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 15, 2019 at 11:13:48AM +0800, Wei Yang wrote:
->This is a following up patch to cleanup page size, suggested by
->"Dr. David Alan Gilbert" <dgilbert@redhat.com>.
+On Thu, Nov 7, 2019 at 11:35 PM Stefan Hajnoczi <stefanha@gmail.com> wrote:
 >
->Patch 2 does the job, while during the cleanup I found test-mmap.c has quite a
->lot code style problem. To make the code looks good, patch 1 is introduced to
->make checkpatch.pl happy a little.
+> On Fri, Nov 8, 2019 at 8:22 AM Gerd Hoffmann <kraxel@redhat.com> wrote:
+> > > > Adding a list of common properties to the spec certainly makes sens=
+e,
+> > > > so everybody uses the same names.  Adding struct-ed properties for
+> > > > common use cases might be useful too.
+> > >
+> > > Why not define VIRTIO devices for wayland and friends?
+> >
+> > There is an out-of-tree implementation of that, so yes, that surely is
+> > an option.
+> >
+> > Wayland needs (a) shared buffers, mostly for gfx data, and (b) a stream
+> > pipe as control channel.  Pretty much the same for X11, except that
+> > shared buffers are optional because the X protocol can also squeeze all
+> > display updates through the stream pipe.
+> >
+> > So, if you want allow guests talk to the host display server you can ru=
+n
+> > the stream pipe over vsock.  But there is nothing for the shared
+> > buffers ...
+> >
+> > We could replicate vsock functionality elsewhere.  I think that happene=
+d
+> > in the out-of-tree virtio-wayland implementation.  There also was some
+> > discussion about adding streams to virtio-gpu, slightly pimped up so yo=
+u
+> > can easily pass around virtio-gpu resource references for buffer
+> > sharing.  But given that getting vsock right isn't exactly trivial
+> > (consider all the fairness issues when multiplexing multiple streams
+> > over a virtqueue for example) I don't think this is a good plan.
+>
+> I also think vsock isn't the right fit.
+>
 
-Does this patch set look good?
++1 we are using vsock right now and we have a few pains because of it.
+
+I think the high-level problem is that because it is a side channel,
+we don't see everything that happens to the buffer in one place
+(rendering + display) and we can't do things like reallocate the
+format accordingly if needed, or we can't do flushing etc. on that
+buffer where needed.
+
+Best,
+St=C3=A9phane
 
 >
->Wei Yang (2):
->  tests/tcg/multiarch: fix code style in function main of test-mmap.c
->  core: replace sysconf(_SC_PAGESIZE) with qemu_real_host_page_size
+> Defining a virtio-wayland device makes sense to me: you get the guest
+> RAM access via virtqueues, plus the VIRTIO infrastructure (device IDs,
+> configuration space, feature bits, and existing reusable
+> kernel/userspace/QEMU code).
 >
-> block/file-posix.c              |  2 +-
-> net/l2tpv3.c                    |  2 +-
-> tests/tcg/multiarch/test-mmap.c | 67 ++++++++++++++++++---------------
-> 3 files changed, 38 insertions(+), 33 deletions(-)
->
->-- 
->2.17.1
->
-
--- 
-Wei Yang
-Help you, Help me
+> Stefan
 
