@@ -1,87 +1,87 @@
-Return-Path: <SRS0=73np=ZA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=4+Bn=ZB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-1.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 517F9C17440
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 22:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB60C17441
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 Nov 2019 01:26:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B685214DB
-	for <qemu-devel@archiver.kernel.org>; Fri,  8 Nov 2019 22:59:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6743921019
+	for <qemu-devel@archiver.kernel.org>; Sat,  9 Nov 2019 01:26:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZjSlU6iC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B685214DB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VPEUsd3R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6743921019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iTDDu-0005lb-8V
-	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 17:59:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40923)
+	id 1iTFVr-0005wk-KT
+	for qemu-devel@archiver.kernel.org; Fri, 08 Nov 2019 20:26:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58566)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iTDCt-0004zb-Q9
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 17:58:20 -0500
+ (envelope-from <richard.weiyang@gmail.com>) id 1iTFUv-0005Iz-8s
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 20:25:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iTDCr-00065S-SU
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 17:58:18 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55875
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iTDCr-00065K-PU
- for qemu-devel@nongnu.org; Fri, 08 Nov 2019 17:58:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573253897;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=u/DJ05jUqZGuG8XqVbeeR7hecFT0ihnRwbt4aF074N8=;
- b=ZjSlU6iCMPCqZG6zvIGrzwSZvpsHSnnttz03cl2R9J+yfg6pPaJHenustq15xERfxJYAMi
- 8he61dqVrGFbgiW/TanjeFT1JXOsS0Rzd87nq90VWgIdEpFSAo1FfVEPSWCSoTISf1eINT
- IR717jRA+617pxMDR6AQ1qrb9118zKg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-dCw8KMztMjCmYaLPg6T3xA-1; Fri, 08 Nov 2019 17:58:14 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFF08800C72;
- Fri,  8 Nov 2019 22:58:12 +0000 (UTC)
-Received: from [10.36.116.65] (ovpn-116-65.ams2.redhat.com [10.36.116.65])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9111860BE1;
- Fri,  8 Nov 2019 22:58:09 +0000 (UTC)
-Subject: Re: [PATCH v1 0/2] s390x/cpumodel: Introduce "best" model variants
-To: Eduardo Habkost <ehabkost@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20191108110714.7475-1-david@redhat.com>
- <CAFEAcA-mD3-Zg2JunGpMqbcaT1qboCenhqEFytZD0FmFcL2i9Q@mail.gmail.com>
- <5dd613c0-6d9e-b943-b64d-7ba1791cbefe@redhat.com>
- <CAFEAcA-4r53vM-K24WYr1OFSOufhZ7hDHeZBhnywyaJ0gpMO1g@mail.gmail.com>
- <20191108191057.GZ3812@habkost.net>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <2ad063d7-7434-a55c-9994-a3d4d3622e0b@redhat.com>
-Date: Fri, 8 Nov 2019 23:58:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <richard.weiyang@gmail.com>) id 1iTFUu-0007vk-22
+ for qemu-devel@nongnu.org; Fri, 08 Nov 2019 20:25:05 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46446)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+ id 1iTFUt-0007uw-R0; Fri, 08 Nov 2019 20:25:04 -0500
+Received: by mail-wr1-x444.google.com with SMTP id b3so8958514wrs.13;
+ Fri, 08 Nov 2019 17:25:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=ceKV9Tu/BH2YZe3Lb3SDCMtApqlpLDwm1J/JrqSvcAE=;
+ b=VPEUsd3R99h7D4dDX+o1zjJMqQANEGqWlWawK8YTWvBTIyIvdMBLdc+CmpsbKMT/cU
+ Do3TD7qFp0iZeBWeTvQXIIA2XN/U79HFJc/jzh9fWXI8IaqfkCkBivQdNk6qDmK85ZSu
+ X/kxcjPfa4QcppcsV56FdEhlQ64KhShrDilau3wrQ6/uWjpYpjc3h/Fzx8/fFuhDi7n+
+ VFwixgutdgyx1afJjLl1KxqgwVHcHKO7/uErjvBrmt4Mf8va6AtoM4oqIy+P9afBOhKn
+ 5gv/Cv9HGVqcYcTZs5ybfmbmoOKC47pc/b4u1ikDwmZntU8nnuVcc6Al5t0Sw/cOlSqS
+ FZBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=ceKV9Tu/BH2YZe3Lb3SDCMtApqlpLDwm1J/JrqSvcAE=;
+ b=qxWZ9jhqghKrdQ2MDB6qhvD+agSRw0/r8xa/dMFWk4bNm0ghU47xDSPqlfb8EHiII6
+ hQNZQgLcE3zJXd+48TgM5u+VHPX3th2SaKf11/ox1SfIBWJjGem/UBGr711q4sXTokot
+ fv+HIlodfXfnJWTOoGxC1luoZ2gxI/GyswY0YsVx5+/momjUFI/M9uT6Rq+0sONqZlcB
+ fUMo7dTdQHaY8BCyL7BDEAfZQ3itqM+Hqv1azxAJl8JmCWd9NkvH0PMz33G97FxypG1K
+ dqztJeY4cqX34soiSQi5KQ31q//fquUIVGW/5SqOFAswE6Fapa6RfF6LfblFfzOWi57a
+ QbYw==
+X-Gm-Message-State: APjAAAVlTaYYeHdPfbPjpRnkWAM4BicuATNjxI2YHS8JEQbZwbtoTC2U
+ vFKYjilMAgaXT8MsQOCt6z0=
+X-Google-Smtp-Source: APXvYqzW97BsU30yGCQaFVeVjW2Eusmo5F4HHLzMGA8ogmlPbkNrajXO43xBNaMF6Sj+r5z7QRkaSA==
+X-Received: by 2002:adf:eed2:: with SMTP id a18mr8956035wrp.273.1573262702585; 
+ Fri, 08 Nov 2019 17:25:02 -0800 (PST)
+Received: from localhost ([185.92.221.13])
+ by smtp.gmail.com with ESMTPSA id 16sm10827998wmf.0.2019.11.08.17.25.01
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Fri, 08 Nov 2019 17:25:01 -0800 (PST)
+Date: Sat, 9 Nov 2019 01:25:01 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH 0/2] replace sysconf(_SC_PAGESIZE) with
+ qemu_real_host_page_size
+Message-ID: <20191109012501.rb3jn37urqrrspdf@master>
+References: <20191015031350.4345-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20191108191057.GZ3812@habkost.net>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: dCw8KMztMjCmYaLPg6T3xA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191015031350.4345-1-richardw.yang@linux.intel.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,43 +93,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Michael Mueller <mimu@linux.ibm.com>,
- Jiri Denemark <jdenemar@redhat.com>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ jasowang@redhat.com, richard.henderson@linaro.org, dgilbert@redhat.com,
+ mreitz@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08.11.19 20:10, Eduardo Habkost wrote:
-> On Fri, Nov 08, 2019 at 01:02:28PM +0000, Peter Maydell wrote:
->> On Fri, 8 Nov 2019 at 12:46, David Hildenbrand <david@redhat.com> wrote:
->>> There is a small but important difference between "max"/"host" and
->>> "best". Max really means "all features", including deprecated ones.
->>> "best", however, can disable experimental or deprecated features. Or an=
-y
->>> other features we don't want to be enabled when somebody selects a mode=
-l
->>> manually.
->=20
-> On x86, this is implemented by "host".  "max" gives you the full
-> set of features that can be enabled by the user.  "host" gives
-> you a reasonable set of features you will want to see enabled by
-> default when the user says "use the host CPU".
+On Tue, Oct 15, 2019 at 11:13:48AM +0800, Wei Yang wrote:
+>This is a following up patch to cleanup page size, suggested by
+>"Dr. David Alan Gilbert" <dgilbert@redhat.com>.
+>
+>Patch 2 does the job, while during the cleanup I found test-mmap.c has quite a
+>lot code style problem. To make the code looks good, patch 1 is introduced to
+>make checkpatch.pl happy a little.
 
-Interesting. Maybe for s390x we might want to split host/max at one=20
-time, too. E.g., exclude deprecated features from "host". Thanks for=20
-that info.
+Does this patch set look good?
 
---=20
+>
+>Wei Yang (2):
+>  tests/tcg/multiarch: fix code style in function main of test-mmap.c
+>  core: replace sysconf(_SC_PAGESIZE) with qemu_real_host_page_size
+>
+> block/file-posix.c              |  2 +-
+> net/l2tpv3.c                    |  2 +-
+> tests/tcg/multiarch/test-mmap.c | 67 ++++++++++++++++++---------------
+> 3 files changed, 38 insertions(+), 33 deletions(-)
+>
+>-- 
+>2.17.1
+>
 
-Thanks,
-
-David / dhildenb
-
+-- 
+Wei Yang
+Help you, Help me
 
