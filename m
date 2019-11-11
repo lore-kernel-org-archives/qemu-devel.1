@@ -2,79 +2,86 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D207C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 11:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E4B2C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 11:53:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED10220659
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 11:42:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 485AB21655
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 11:53:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ex6f9vIb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED10220659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CSmw+1zX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 485AB21655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iU85A-0007fC-3K
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 06:42:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59606)
+	id 1iU8GV-0001Ik-Eo
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 06:53:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60779)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iU84X-000781-4u
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:41:30 -0500
+ (envelope-from <thuth@redhat.com>) id 1iU8Fo-0000qT-AX
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:53:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iU84V-0007tB-UR
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:41:28 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34051)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iU84V-0007sn-OY
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:41:27 -0500
-Received: by mail-ot1-x342.google.com with SMTP id t4so11007485otr.1
- for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 03:41:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=AtPSNj6z0S1pVpexbPs9ZLnCorH702J0Ex7uyj4ZEY8=;
- b=ex6f9vIbsRDhKRZeqp2h9DrOxKpraMvCR5q+S7CizPIXJrCnVhbsJG0WuAs+5/ATfh
- SUqbMHkNbGNIIcYOMC7Dg/PUKkD0KTnMEDufMOiMsJsPQai+/CYhDbLfJs2wL+HYVqD4
- rofxtgc95mMRqPSLnXwBELY0PiFzwxdKb4gAwXh59EuloNqq7fR9w0+CoaDc8ubzNKqN
- 6pbZ2qRPnQ0q5X7xrWUp9VX8eOj0a9wfhzYrg+QibJt5+jGFSqlI/xtEkLgq9n/FmSPL
- MZIt6Rj2/Oqt8/vIpJPcBeU3+fovLvyU8+rv6YEmVSNNk8fv9wYpZSl1pqA60L6np552
- ftTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=AtPSNj6z0S1pVpexbPs9ZLnCorH702J0Ex7uyj4ZEY8=;
- b=URiES9cd/0qMp1Xib1rI1Obzgma/Dv56QNMwfj/TQZrefKi3eY5rSgf4mIQEClP9YB
- TZegE1x50O6T6Os/odLocicIrahKYF7cxD09eJKRHflxcrJs8QkXADEGrulIel9XpO6W
- cumd46R1sg7MuGGaTidqNdCcs+DALM3j+9DZswRbeMm/oeQBqR06+ObdHioTYC05NMyS
- K3uqQtQZj+5mZjzkUk9dxR5boTUenALo9tTkrCqjtKfGyHNiXyQBeIP9DrIwgwv1sWwo
- WcUWVav1XTudIjsVVwnu242vxA2yCZ/naAVFzxd8DPQtUVhdaqebcco2N2iPD9EL6vff
- r8qA==
-X-Gm-Message-State: APjAAAWujJDexvfDyyeqzEeh8jqQNufer67Bp0WWCFia/pSQZIsiM5kV
- lgnKSGiUxy0O7fj2rRxsXeMHkdLNrhGf2kQLUWjZhQ==
-X-Google-Smtp-Source: APXvYqxD6gNLqRXQRRB9a1ZZ7u6VRxGqEW/2t31QBuQuKt37hVRTfdGAox5sqP37WFVYXU628STAhCNkVRZcSNgUww4=
-X-Received: by 2002:a9d:12d2:: with SMTP id g76mr21584489otg.232.1573472486652; 
- Mon, 11 Nov 2019 03:41:26 -0800 (PST)
+ (envelope-from <thuth@redhat.com>) id 1iU8Fk-0003AG-FJ
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:53:06 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42780
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iU8Fk-00038w-16
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:53:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573473182;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ppDbyQQBYmMNbfaSaQPOjZ9c5naPfZz0RDJpZp0PC5Q=;
+ b=CSmw+1zXX8mYg+3hHUP5w8efSmBsQSkwBwQB+9ufjI966z3dixmndz6JNkSTcV99fJlmMw
+ A003EGVgTIlLfzWT2Y1QwF6eeHdpMI54WHzxwdmLc4xVTglQkiz4rBZZGX+c6EqbDiYzLm
+ oVkYoWFPBaGClbxWEA1iTOwsTZHQeN0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-229-RR71SIFOMgif_wZvZS8Ghg-1; Mon, 11 Nov 2019 06:51:19 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39789800C61;
+ Mon, 11 Nov 2019 11:51:18 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-162.ams2.redhat.com
+ [10.36.116.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ACE704145;
+ Mon, 11 Nov 2019 11:51:07 +0000 (UTC)
+Subject: Re: [PATCH] configure: Check bzip2 is available
+To: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+References: <20191108102805.8258-1-philmd@redhat.com>
+ <862eb773-609d-4250-b46b-d922fc5a86a7@redhat.com>
+ <00cca0a5-7a51-f2d1-5120-821c335954b8@redhat.com>
+ <51f9b2d9-b196-c30e-dc67-988e29b5df47@redhat.com>
+ <CAFEAcA8EijZRqhFerQbq5cCbaq-qzrMzOrQjc6Ro=v2p6=W_pA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ac065856-56e2-bceb-851c-a9c150068e71@redhat.com>
+Date: Mon, 11 Nov 2019 12:51:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-References: <20191104151137.81931-1-clement.deschamps@greensocs.com>
-In-Reply-To: <20191104151137.81931-1-clement.deschamps@greensocs.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 11 Nov 2019 11:41:15 +0000
-Message-ID: <CAFEAcA93tmw3GJWz-7hrLAc3YSzfDtTwNL-GY9OoeUBDcGHNqw@mail.gmail.com>
-Subject: Re: [PATCH] hw/arm/boot: Set NSACR.{CP11,
- CP10} in dummy SMC setup routine
-To: Clement Deschamps <clement.deschamps@greensocs.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+In-Reply-To: <CAFEAcA8EijZRqhFerQbq5cCbaq-qzrMzOrQjc6Ro=v2p6=W_pA@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: RR71SIFOMgif_wZvZS8Ghg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,88 +93,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>,
+ QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 4 Nov 2019 at 15:12, Clement Deschamps
-<clement.deschamps@greensocs.com> wrote:
->
-> Set the NSACR CP11 and CP10 bits, to allow FPU access in Non-Secure state
-> when using dummy SMC setup routine. Otherwise an AArch32 kernel will UNDEF as
-> soon as it tries to use the FPU.
->
-> This fixes kernel panic when booting raspbian on raspi2.
->
-> Successfully tested with:
->   2017-01-11-raspbian-jessie-lite.img
->   2018-11-13-raspbian-stretch-lite.img
->   2019-07-10-raspbian-buster-lite.img
->
-> See also commit ece628fcf6 that fixes the issue when *not* using the
-> dummy SMC setup routine.
->
-> Fixes: fc1120a7f5
-> Signed-off-by: Clement Deschamps <clement.deschamps@greensocs.com>
-> ---
->  hw/arm/boot.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index ef6724960c..8fb4a63606 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -240,6 +240,9 @@ void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
->      };
->      uint32_t board_setup_blob[] = {
->          /* board setup addr */
-> +        0xee110f51, /* mrc     p15, 0, r0, c1, c1, 2  ;read NSACR */
-> +        0xe3800b03, /* orr     r0, #0xc00             ;set CP11, CP10 */
-> +        0xee010f51, /* mcr     p15, 0, r0, c1, c1, 2  ;write NSACR */
->          0xe3a00e00 + (mvbar_addr >> 4), /* mov r0, #mvbar_addr */
->          0xee0c0f30, /* mcr     p15, 0, r0, c12, c0, 1 ;set MVBAR */
->          0xee110f11, /* mrc     p15, 0, r0, c1 , c1, 0 ;read SCR */
-> --
-> 2.23.0
+On 08/11/2019 18.10, Peter Maydell wrote:
+> On Fri, 8 Nov 2019 at 17:07, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.c=
+om> wrote:
+>> On 11/8/19 4:43 PM, Eric Blake wrote:
+>>> bzip2 is no longer a favored compression.  If we are trying to pick a
+>>> compression that is most likely to be present on any system, go with
+>>> gzip.  If we are trying to pick a compression that packs tighter and
+>>> uncompresses faster, pick xz or zstd.  But bzip2 does neither: it packs
+>>> slightly tighter than gzip but has slower performance in doing so, and
+>>> thus is no longer used as a default compression.
+>>
+>> The problem was with OpenBSD 6.1 which hadn't xz available.
+>>
+>> In commit 12745eaa02 Gerd updated the VM to OpenBSD 6.5 and we now have
+>> access to xz. IIRC OSX supported versions also provide xz.
+>>
+>> If we want to revert Laszlo's patches and apply his first version (using
+>> xz), we should do that during 5.0 dev cycle, now it is too late.
+>> I'd prefer we simply fix bzip2 for the next release.
+>=20
+> I don't think we should try to use 'xz' because I don't see
+> the point. We should use something that's generally available,
+> whether that's bzip2 or gzip. Life's too short to deal with
+> yet another file compression tool and format.
 
-Yep. The boot.c logic sets NSACR.{CP11,CP10} for booting a
-Linux kernel unless (a) the board says we should boot the
-kernel in Secure mode or (b) this is the primary CPU and
-the board requires the board_setup code to run in Secure mode.
-In that case the board_setup code must set NSACR in the same
-way that it is responsible for dropping down to NS.
+FWIW, on the weekend, I accidentially came accross this page:
 
-This affects highbank and raspi, which are the only boards
-that set info->secure_board_setup; both of those use the
-arm_write_secure_board_setup_dummy_smc(), so this fix is
-all we should need.
+ https://www.nongnu.org/lzip/xz_inadequate.html
 
-I plan to fold in this comment update:
+After reading that, I also don't think anymore that we should switch to
+'xz'.
 
-diff --git a/include/hw/arm/boot.h b/include/hw/arm/boot.h
-index 7f4d0ca7cdf..ce2b48b88bc 100644
---- a/include/hw/arm/boot.h
-+++ b/include/hw/arm/boot.h
-@@ -107,9 +107,12 @@ struct arm_boot_info {
-     void (*write_board_setup)(ARMCPU *cpu,
-                               const struct arm_boot_info *info);
+ Thomas
 
--    /* If set, the board specific loader/setup blob will be run from secure
-+    /*
-+     * If set, the board specific loader/setup blob will be run from secure
-      * mode, regardless of secure_boot. The blob becomes responsible for
--     * changing to non-secure state if implementing a non-secure boot
-+     * changing to non-secure state if implementing a non-secure boot,
-+     * including setting up EL3/Secure registers such as the NSACR as
-+     * required by the Linux booting ABI before the switch to non-secure.
-      */
-     bool secure_board_setup;
-
-and tweak the commit message to mention highbank, when I
-apply it to target-arm.next.
-
-thanks
--- PMM
 
