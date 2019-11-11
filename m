@@ -2,82 +2,60 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E04D0C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 10:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02391C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 10:18:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA93F206BB
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 10:18:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GTovPwVc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA93F206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CD005206BB
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 10:18:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD005206BB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aurel32.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iU6m7-00074M-OZ
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 05:18:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47423)
+	id 1iU6m9-0006R8-Mq
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 05:18:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46965)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jfreimann@redhat.com>) id 1iU6lC-0006OY-Gb
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 05:17:28 -0500
+ (envelope-from <aurelien@aurel32.net>) id 1iU6hg-0004Xd-Fm
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 05:13:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jfreimann@redhat.com>) id 1iU6lA-0000hG-Nj
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 05:17:25 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57665
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
- id 1iU6lA-0000h6-HS
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 05:17:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573467443;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hB+02TOM2itiemu0NxlGKSixLqLWbMMO37xJFMDuthc=;
- b=GTovPwVcavAnM4F70GW3HHutr+TcTFVuDLNcqXoG82U1x9sMDeIE4cDpYMNpp/3f0t0IGG
- Q8NPMr8WS49UEz+b7G/LBgGd9t8USc1Kb8OOo8TjHDHsmXWHxT+VV3jRKa3W8YVrCTAp0Q
- GFOcbUW1vrX0uaVl4t2IxNznSkdyFag=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-121-8eJ0BAopP2iyv2R_OumgQA-1; Mon, 11 Nov 2019 05:16:01 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED97B107B7D6;
- Mon, 11 Nov 2019 10:16:00 +0000 (UTC)
-Received: from localhost (dhcp-192-217.str.redhat.com [10.33.192.217])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 03F2C3DA3;
- Mon, 11 Nov 2019 10:15:55 +0000 (UTC)
-Date: Mon, 11 Nov 2019 11:15:54 +0100
-From: Jens Freimann <jfreimann@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH] tests/migration: Print some debug on bad status
-Message-ID: <20191111101554.m3lwn4divi7643ri@jenstp.localdomain>
-References: <20191108104307.125020-1-dgilbert@redhat.com>
- <157323517815.7743.2882918933706185467@37313f22b938>
- <20191108183817.GB2878@work-vm>
+ (envelope-from <aurelien@aurel32.net>) id 1iU6hf-0008GP-Bb
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 05:13:48 -0500
+Received: from hall.aurel32.net ([2001:bc8:30d7:100::1]:46992)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <aurelien@aurel32.net>)
+ id 1iU6hf-0008Fx-5r
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 05:13:47 -0500
+Received: from [2a01:e35:2fdd:a4e1:fe91:fc89:bc43:b814] (helo=ohm.rr44.fr)
+ by hall.aurel32.net with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.92) (envelope-from <aurelien@aurel32.net>)
+ id 1iU6he-0002KI-Bx; Mon, 11 Nov 2019 11:13:46 +0100
+Received: from aurel32 by ohm.rr44.fr with local (Exim 4.92.3)
+ (envelope-from <aurelien@aurel32.net>)
+ id 1iU6hd-0007X4-U5; Mon, 11 Nov 2019 11:13:45 +0100
+Date: Mon, 11 Nov 2019 11:13:45 +0100
+From: Aurelien Jarno <aurelien@aurel32.net>
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>
+Subject: Re: [PATCH 5/5] MAINTAINERS: Adjust maintainership for R4000 systems
+Message-ID: <20191111101345.GD28851@aurel32.net>
+References: <1573240249-6966-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1573240249-6966-6-git-send-email-aleksandar.markovic@rt-rk.com>
 MIME-Version: 1.0
-In-Reply-To: <20191108183817.GB2878@work-vm>
-User-Agent: NeoMutt/20180716-1376-5d6ed1
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 8eJ0BAopP2iyv2R_OumgQA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-15
 Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1573240249-6966-6-git-send-email-aleksandar.markovic@rt-rk.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2001:bc8:30d7:100::1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,78 +67,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, alex.bennee@linaro.org, qemu-devel@nongnu.org,
- quintela@redhat.com
+Cc: peter.maydell@linaro.org, philmd@redhat.com, qemu-devel@nongnu.org,
+ hpoussin@reactos.org, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ aleksandar.rikalo@rt-rk.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 08, 2019 at 06:38:17PM +0000, Dr. David Alan Gilbert wrote:
->Hi Jens,
->  the unplug failover stuff is triggering an assertion occasionally on
->aarch64; but
->  a) I'm not sure the right way to fix it
->  b) And I'm out for a little over a week
->
->so...
+On 2019-11-08 20:10, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
+>=20
+> Change the maintainership for R4000 systems to improve its quality.
+>=20
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>  MAINTAINERS | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 1a49381..62e7d6d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -957,8 +957,9 @@ F: hw/mips/mips_mipssim.c
+>  F: hw/net/mipsnet.c
+> =20
+>  R4000
+> -M: Aurelien Jarno <aurelien@aurel32.net>
+> -R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+> +M: Herv=E9 Poussineau <hpoussin@reactos.org>
+> +R: Aurelien Jarno <aurelien@aurel32.net>
+> +R: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+>  S: Maintained
+>  F: hw/mips/mips_r4k.c
 
-I'll take care of it.=20
+Acked-by: Aurelien Jarno <aurelien@aurel32.net>
 
->
->* no-reply@patchew.org (no-reply@patchew.org) wrote:
->> Patchew URL: https://patchew.org/QEMU/20191108104307.125020-1-dgilbert@r=
-edhat.com/
->>
->>
->>
->> Hi,
->>
->> This series failed the docker-quick@centos7 build test. Please find the =
-testing commands and
->> their output below. If you have Docker installed, you can probably repro=
-duce it
->> locally.
->>
->> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
->> #!/bin/bash
->> make docker-image-centos7 V=3D1 NETWORK=3D1
->> time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=3D1
->> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->>
->>   TEST    check-unit: tests/test-bdrv-drain
->> wait_for_migration_fail: unexpected status status=3Dwait-unplug allow_ac=
-tive=3D1
->
->In tests/migration-test.c we've got wait_for_migration_fail, and it's
->expecting the state to be any one of:
->   setup, failed or maybe active
->
->but it's getting surprised by seeing a 'wait-unplug'
->
->So the question is should we see a wait-unplug?
->
->the migration code has:
->
->    if (qemu_savevm_nr_failover_devices()) {
->        migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
->                          MIGRATION_STATUS_WAIT_UNPLUG);
->
->Should qemu_savevm_nr_failover_devices() be true?
->On aarch64 it seems to have a virtio-net device by default
->and qemu_savevm_nr_failover_devices() checks for devices
->having dev_unplug_pending but doesn't call it.
->
->I see two fixes but am not sure which is right:
->   a) Add 'wait-unplug' to the wait_for_migration_fail
->      (easy)
->   b) Actually call dev_unplug_pending in qemu_savevm_nr_failover_devices
->      so that on a guest which has a virtio-net, but no failover device,
->      the state isn't entered.
-
-I also prefer b over a, but I should only set up dev_unplug_pending when
-failover=3Don to avoid this. I'll send a patch.
-
-regards
-Jens
-
+--=20
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                 http://www.aurel32.net
 
