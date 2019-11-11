@@ -6,73 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31CCFC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:08:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95404C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:08:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F18702196E
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:08:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61EF42196E
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:08:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C4wvlncZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F18702196E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ccoNezzC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61EF42196E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54577 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUCEu-0006AJ-OX
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 11:08:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38896)
+	id 1iUCF0-0006Id-8B
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 11:08:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38942)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iUC9B-0007cx-Hb
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:34 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iUC9G-0007k8-Uw
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iUC9A-0002eD-3n
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:33 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29496
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iUC9F-0002ic-L7
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:38 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32132
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iUC9A-0002e5-0f
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:32 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iUC9F-0002iR-GO
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:37 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573488151;
+ s=mimecast20190719; t=1573488157;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oYWxyAmuO3FgSq/YJGZHxk4ZXvR/0OK0pMpLY2h3gm4=;
- b=C4wvlncZUCA9vCFR8LHSeyshJe0w0CsrEzwLsOe9LFzs0oP71K2vgijTNnvYtAU+tKi3Uo
- w1U+Z1GLLpeZfHxVvS4NyJqOMzQWy2YEfEXQF0QSx152IZP0VLZ9IZ3oVzOQTSX6he2WtO
- VGm400hLcAqO3rGj1J7pK74sW6NGNuk=
+ bh=6JuuBg3yIfbXvKOIwpye2mO65C0TEQ6XQ2POeXscqTY=;
+ b=ccoNezzCLV4SaJgy7VAafNMj6qb+snARgNZoXAKeFdp6/8hcjwwSNAN6Snu3T0bGPWVCa9
+ 2zXR4OCRxaCNL0rKdLyVt2Yk6rtpuEy0GpoaO5+5dXYI60AKJY1XnqTvA+2Dqn5IsiVJrh
+ +/foaroSoW4XSnIOyo48A8dAp87xSdI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-102-pNgn-R6eN7OgKlM3jpjfjw-1; Mon, 11 Nov 2019 11:02:28 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-340-bqG8W5D-M4SgmCJoz4t_SQ-1; Mon, 11 Nov 2019 11:02:32 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E57B18A3097;
- Mon, 11 Nov 2019 16:02:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A57F7805D84;
+ Mon, 11 Nov 2019 16:02:31 +0000 (UTC)
 Received: from localhost (ovpn-117-116.ams2.redhat.com [10.36.117.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 50D1367154;
- Mon, 11 Nov 2019 16:02:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 20EA54521;
+ Mon, 11 Nov 2019 16:02:30 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH for-5.0 v2 02/23] blockdev: Allow resizing everywhere
-Date: Mon, 11 Nov 2019 17:01:55 +0100
-Message-Id: <20191111160216.197086-3-mreitz@redhat.com>
+Subject: [PATCH for-5.0 v2 04/23] iotests: Let 041 use -blockdev for quorum
+ children
+Date: Mon, 11 Nov 2019 17:01:57 +0100
+Message-Id: <20191111160216.197086-5-mreitz@redhat.com>
 In-Reply-To: <20191111160216.197086-1-mreitz@redhat.com>
 References: <20191111160216.197086-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: pNgn-R6eN7OgKlM3jpjfjw-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: bqG8W5D-M4SgmCJoz4t_SQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,34 +93,34 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Block nodes that do not allow resizing should not share BLK_PERM_RESIZE.
-It does not matter whether they are the first non-filter in their chain
-or not.
+Using -drive with default options means that a virtio-blk drive will be
+created that has write access to the to-be quorum children.  Quorum
+should have exclusive write access to them, so we should use -blockdev
+instead.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- blockdev.c | 5 -----
- 1 file changed, 5 deletions(-)
+ tests/qemu-iotests/041 | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/blockdev.c b/blockdev.c
-index ab78230d23..9dc2238bf3 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3177,11 +3177,6 @@ void qmp_block_resize(bool has_device, const char *d=
-evice,
-     aio_context =3D bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
+diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
+index d7be30b62b..3c60c07b01 100755
+--- a/tests/qemu-iotests/041
++++ b/tests/qemu-iotests/041
+@@ -884,7 +884,10 @@ class TestRepairQuorum(iotests.QMPTestCase):
+             # Assign a node name to each quorum image in order to manipula=
+te
+             # them
+             opts =3D "node-name=3Dimg%i" % self.IMAGES.index(i)
+-            self.vm =3D self.vm.add_drive(i, opts)
++            opts +=3D ',driver=3D%s' % iotests.imgfmt
++            opts +=3D ',file.driver=3Dfile'
++            opts +=3D ',file.filename=3D%s' % i
++            self.vm =3D self.vm.add_blockdev(opts)
 =20
--    if (!bdrv_is_first_non_filter(bs)) {
--        error_setg(errp, QERR_FEATURE_DISABLED, "resize");
--        goto out;
--    }
--
-     if (size < 0) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "size", "a >0 size"=
-);
-         goto out;
+         self.vm.launch()
+=20
 --=20
 2.23.0
 
