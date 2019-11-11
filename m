@@ -2,68 +2,89 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C276C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:44:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85ED2C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:47:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 40D4620679
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:44:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40D4620679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
+	by mail.kernel.org (Postfix) with ESMTPS id 502CC20679
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:47:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CR3TYvCc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 502CC20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUBrU-00057s-C9
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 10:44:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36223)
+	id 1iUBuW-0006ek-G8
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 10:47:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37096)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.kiszka@siemens.com>) id 1iUBqX-0004bu-KR
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:43:18 -0500
+ (envelope-from <richard.weiyang@gmail.com>) id 1iUBtn-00069q-JC
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:46:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.kiszka@siemens.com>) id 1iUBqU-0000bC-6K
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:43:15 -0500
-Received: from david.siemens.de ([192.35.17.14]:37934)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
- id 1iUBqT-0000Wt-Sh
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:43:14 -0500
-Received: from mail1.sbs.de (mail1.sbs.de [192.129.41.35])
- by david.siemens.de (8.15.2/8.15.2) with ESMTPS id xABFgraZ018869
- (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 11 Nov 2019 16:42:53 +0100
-Received: from [139.25.68.37] ([139.25.68.37])
- by mail1.sbs.de (8.15.2/8.15.2) with ESMTP id xABFgqFU001458;
- Mon, 11 Nov 2019 16:42:52 +0100
-Subject: Re: [RFC][PATCH 2/3] docs/specs: Add specification of ivshmem device
- revision 2
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-References: <cover.1573477032.git.jan.kiszka@siemens.com>
- <f5996d934d24775160bcedbf28ac975a95d91101.1573477032.git.jan.kiszka@siemens.com>
- <20191111084327-mutt-send-email-mst@kernel.org>
- <0b0475c1-2564-f433-46d8-ff1a06c13569@siemens.com>
- <20191111100607-mutt-send-email-mst@kernel.org>
- <20191111152743.GM814211@redhat.com>
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Message-ID: <129c527c-1e61-8c0c-3ca1-fe93e26c8bd2@siemens.com>
-Date: Mon, 11 Nov 2019 16:42:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+ (envelope-from <richard.weiyang@gmail.com>) id 1iUBtm-00039M-FE
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:46:39 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33552)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.weiyang@gmail.com>)
+ id 1iUBtj-00036B-VS; Mon, 11 Nov 2019 10:46:36 -0500
+Received: by mail-wm1-x341.google.com with SMTP id a17so184927wmb.0;
+ Mon, 11 Nov 2019 07:46:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=5wBPsLuiDPtO8uLbb7XLHTQq5udq31B0NEzHpamjLm8=;
+ b=CR3TYvCcGCVFgpxF/uKvZC1AAK+WQBzmzSNIkmuwBpi/Mz5L+6nmcheGWFzUne7kcF
+ xDfrA4GYEzWmzBYM2ILFUTy+B2HMpxjLAmF6f0Bs0zM4esqfX5ECiCcJWfoEYx0b0Jmz
+ TfUwpb5S56T6fnqhQKtOb7chBPbmTy+FoOJPGR2+MjD90zrI4H71FoMLPF0sccIsbXIy
+ u9ZfRDEg862TtBi2wmRhZDiCIxtXyvLpLezow2m5pojQrUFDgzyT32oOwRbxTu3Psehp
+ 2/Kk/TAtLV1uDQTS1p2cEfe0Rsln8ucLDMpRCTbhM/Ckl7dQUmrf1mnVEyR8afP8ZQcH
+ T2gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+ :references:mime-version:content-disposition:in-reply-to:user-agent;
+ bh=5wBPsLuiDPtO8uLbb7XLHTQq5udq31B0NEzHpamjLm8=;
+ b=l3AggbfDtYOHs/X2LrRQVLO3isqE/9JLO3iWRjT8voFLqybAgB5P1mUk/y9nkvsAdZ
+ OSwYq42f8lQfGTRp1IhNDjy50hUrf0uTomuuzIFt4sLHO3fNjDGnrwCVi2vRZVq5hYPK
+ l1r2EAjY2DqveX9mYHydhpisadR8qFDbTA11spVIUtmYNpufUayXwZm4IMEcYno7S9DA
+ tjs7QnXZVLN1Mgl4zQ0B4yvP7MqQI86YIokZ0Tjn1yIgn8HM4kaELXY1uyHnYZjzlqmu
+ YWQ5bB4x//KPOsnB6a42pbXFm6m9XW+gxYvC185xsgbFYhE1h2Q27jGGwiTcKZZrGmRb
+ S17w==
+X-Gm-Message-State: APjAAAWCvMcEDzfpiQ1RrR2KwoxZ3cXJLvemvfCfePEV2q3SzkFisWvO
+ eluXBCkdjxSHagGx2nvD8gE=
+X-Google-Smtp-Source: APXvYqxKhmxFJ1H10FpiWpb1w3wBNAkkr3cWiizqH7tHY90pYHdtqMX1ORlkmEWBHpVNCjrqcB+H2Q==
+X-Received: by 2002:a1c:96c9:: with SMTP id y192mr22066308wmd.8.1573487194512; 
+ Mon, 11 Nov 2019 07:46:34 -0800 (PST)
+Received: from localhost ([185.92.221.13])
+ by smtp.gmail.com with ESMTPSA id i13sm15201591wrp.12.2019.11.11.07.46.33
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Mon, 11 Nov 2019 07:46:33 -0800 (PST)
+Date: Mon, 11 Nov 2019 15:46:32 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Subject: Re: [PATCH 2/2] core: replace sysconf(_SC_PAGESIZE) with
+ qemu_real_host_page_size
+Message-ID: <20191111154632.2nxjsdirbl2xz4no@master>
+References: <20191015031350.4345-1-richardw.yang@linux.intel.com>
+ <20191015031350.4345-3-richardw.yang@linux.intel.com>
+ <20191111100641.uvi47rjjb3ink5jl@steredhat>
 MIME-Version: 1.0
-In-Reply-To: <20191111152743.GM814211@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-X-MIME-Autoconverted: from 8bit to quoted-printable by david.siemens.de id
- xABFgraZ018869
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 192.35.17.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191111100641.uvi47rjjb3ink5jl@steredhat>
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,74 +96,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: liang yan <lyan@suse.com>, Jailhouse <jailhouse-dev@googlegroups.com>,
- Claudio Fontana <claudio.fontana@gmail.com>,
- qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Hannes Reinecke <hare@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ Wei Yang <richardw.yang@linux.intel.com>, mreitz@redhat.com,
+ alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11.11.19 16:27, Daniel P. Berrang=C3=A9 wrote:
-> On Mon, Nov 11, 2019 at 10:08:20AM -0500, Michael S. Tsirkin wrote:
->> On Mon, Nov 11, 2019 at 02:59:07PM +0100, Jan Kiszka wrote:
->>> On 11.11.19 14:45, Michael S. Tsirkin wrote:
->>>> On Mon, Nov 11, 2019 at 01:57:11PM +0100, Jan Kiszka wrote:
->>>>> +| Offset | Register               | Content                       =
-                       |
->>>>> +|-------:|:-----------------------|:------------------------------=
------------------------|
->>>>> +|    00h | Vendor ID              | 1AF4h                         =
-                       |
->>>>> +|    02h | Device ID              | 1110h                         =
-                       |
->>>>
->>>> Given it's a virtio vendor ID, please reserve a device ID
->>>> with the virtio TC.
->>>
->>> Yeah, QEMU's IVSHMEM was always using that. I'm happy to make this fi=
-nally
->>> official.
->>>
->>
->> And I guess we will just mark it reserved or something right?
->> Since at least IVSHMEM 1 isn't a virtio device.
->> And will you be reusing same ID for IVSHMEM 2 or a new one?
->=20
-> 1110h isn't under either of the virtio PCI device ID allowed ranges
-> according to the spec:
->=20
->    "Any PCI device with PCI Vendor ID 0x1AF4, and PCI Device
->     ID 0x1000 through 0x107F inclusive is a virtio device.
->     ...
->     Additionally, devices MAY utilize a Transitional PCI Device
->     ID range, 0x1000 to 0x103F depending on the device type. "
->=20
-> So there's no need to reserve 0x1110h from the virtio spec POV.
+On Mon, Nov 11, 2019 at 11:06:41AM +0100, Stefano Garzarella wrote:
+>Why "core:" in the commit title?
+>
+>Perhaps to indicate that the patch concerns different subsystems,
+>I'd use "qemu: ", but I'm not sure :-)
+>
 
-Indeed.
+I didn't find a better one. Maybe "qemu" is better :-)
 
->=20
-> I have, however, ensured it is assigned to ivshmem from POV of
-> Red Hat's own internal tracking of allocated device IDs, under
-> its vendor ID.
->=20
-> If ivshmem 2 is now a virtio device, then it is a good thing that
-> it will get a new/different PCI device ID, to show that it is not
-> compatible with the old device impl.
+>On Tue, Oct 15, 2019 at 11:13:50AM +0800, Wei Yang wrote:
+>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>> Suggested-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> CC: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  block/file-posix.c              | 2 +-
+>>  net/l2tpv3.c                    | 2 +-
+>>  tests/tcg/multiarch/test-mmap.c | 2 +-
+>>  3 files changed, 3 insertions(+), 3 deletions(-)
+>> 
+>> diff --git a/block/file-posix.c b/block/file-posix.c
+>> index 5d1995a07c..853ed42134 100644
+>> --- a/block/file-posix.c
+>> +++ b/block/file-posix.c
+>> @@ -2562,7 +2562,7 @@ static void check_cache_dropped(BlockDriverState *bs, Error **errp)
+>>      off_t end;
+>>  
+>>      /* mincore(2) page status information requires 1 byte per page */
+>> -    page_size = sysconf(_SC_PAGESIZE);
+>> +    page_size = qemu_real_host_page_size;
+>>      vec = g_malloc(DIV_ROUND_UP(window_size, page_size));
+>>  
+>>      end = raw_getlength(bs);
+>> diff --git a/net/l2tpv3.c b/net/l2tpv3.c
+>> index 55fea17c0f..5f843240de 100644
+>> --- a/net/l2tpv3.c
+>> +++ b/net/l2tpv3.c
+>> @@ -41,7 +41,7 @@
+>>   * chosen to be sufficient to accommodate one packet with some headers
+>>   */
+>>  
+>> -#define BUFFER_ALIGN sysconf(_SC_PAGESIZE)
+>> +#define BUFFER_ALIGN qemu_real_host_page_size
+>>  #define BUFFER_SIZE 2048
+>>  #define IOVSIZE 2
+>>  #define MAX_L2TPV3_MSGCNT 64
+>> diff --git a/tests/tcg/multiarch/test-mmap.c b/tests/tcg/multiarch/test-mmap.c
+>> index 9ea49e2307..370842e5c2 100644
+>> --- a/tests/tcg/multiarch/test-mmap.c
+>> +++ b/tests/tcg/multiarch/test-mmap.c
+>> @@ -466,7 +466,7 @@ int main(int argc, char **argv)
+>>      if (argc > 1) {
+>>          qemu_strtoul(argv[1], NULL, 0, &pagesize);
+>>      } else {
+>> -        pagesize = sysconf(_SC_PAGESIZE);
+>> +        pagesize = qemu_real_host_page_size;
+>>      }
+>>  
+>>      /* Assume pagesize is a power of two.  */
+>
+>The patch LGTM:
+>Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>
+>Thanks,
+>Stefano
+>
 
-At this stage, it is just a PCI device that may be used in combination=20
-with virtio (stacked on top), but it is not designed like a normal=20
-virtio (PCI) device. That's because it lacks many properties of regular=20
-virtio devices, like queues.
-
-So, if such a device could be come part of the virtio spec, it would be=20
-separate from the rest, and having an ID from the regular range would=20
-likely not be helpful in this regard.
-
-Jan
-
---=20
-Siemens AG, Corporate Technology, CT RDA IOT SES-DE
-Corporate Competence Center Embedded Linux
+-- 
+Wei Yang
+Help you, Help me
 
