@@ -2,78 +2,86 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8CFC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D46ECC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:52:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2499621783
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:47:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DA8D20659
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:52:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LDATR3LI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2499621783
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Askna8PI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DA8D20659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUAyn-0003PA-4i
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 09:47:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57070)
+	id 1iUB2u-0004rQ-B6
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 09:52:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57578)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iUAxo-0002tG-VB
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:46:46 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iUB2G-0004IK-LR
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:51:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iUAxn-0001ER-Dt
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:46:44 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33794
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iUAxn-0001Dp-AG
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:46:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573483602;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=LZydry80oyQXH8KpJ6MxrynCvNld+ei+1kOrA0VeTJo=;
- b=LDATR3LIzci3NHeXRmOfx38Z/QXunMHdmWa5KlFl1RI9AocCGImPaCOOjiKYcZY7FNCfSh
- QpeLh6wm22guPmD4ESjKsYPbzy8wSzglfmf6sDVTtI4MM7PktZLGjTkJjkcaXuGV4H/U1S
- v8b/2o7GINZDUjCK+RfqigznN1LDZDE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-pcuDuBSgNvGijyqUsKvevw-1; Mon, 11 Nov 2019 09:46:39 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FD768017E0;
- Mon, 11 Nov 2019 14:46:38 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8E47D17196;
- Mon, 11 Nov 2019 14:46:29 +0000 (UTC)
-Date: Mon, 11 Nov 2019 15:46:27 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH 4/5] hw/arm/boot: Expose the pmem nodes in the DT
-Message-ID: <20191111154627.63fc061b@redhat.com>
-In-Reply-To: <20191004155302.4632-5-shameerali.kolothum.thodi@huawei.com>
-References: <20191004155302.4632-1-shameerali.kolothum.thodi@huawei.com>
- <20191004155302.4632-5-shameerali.kolothum.thodi@huawei.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iUB2F-00034I-1z
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:51:20 -0500
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40688)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iUB2E-000346-RH
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:51:19 -0500
+Received: by mail-ot1-x341.google.com with SMTP id m15so11433548otq.7
+ for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 06:51:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=+HrbDuHa2Emu11NCkGhRBg30qDF8ulgWsBtJ38iCy70=;
+ b=Askna8PIBPoVR4KEl53GTlYkW+logY2cGp9kSalXsbFWsrkam3jBFWu1mySrSEcjss
+ IPkOBJwXWwYVpYU3VOJ1K90scPLj5znC7NDoLov479c3TQUPkenM9lFx2C4IDnIhvXew
+ Fy25Kns7KdJ3k4sUHfhPMT+NQKxQy2knHWT32LHzBmySP/kLmvgFQu5Kr2ys7/Sv1Ajt
+ OWQ/CSGCrg5+J6b2z+TxwOzqTcEKHw0IyCnIJL2DROVFRNWO2sotV6l3PUX5Fi3JVjvC
+ RL0ePVuX0UOKsMR3E+SP5POuhToDi8T/c0KLinZ1sdfoRKqAAn/1+mQIvvng766qYdqN
+ nU4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=+HrbDuHa2Emu11NCkGhRBg30qDF8ulgWsBtJ38iCy70=;
+ b=rALUekNW7bMej4X2DKKkUviePWcCX7O0pNLcxOiCQVxM6aswU0B367ClEcHMUZzai5
+ UtyOJ0vH2D3HVWLhYIqPE9Cyn/XnFIzv6pSRqUS5LCXlEzZaERB55D1MV3LZ6nylXScT
+ QJrOjPN0t3pYPDXTE6qzhFVs09d68b+yGdN4zVU64i7tVoo/sBDe5MrxBCzJYWj0TsPa
+ +bnE89XAY2V2ww/CjLjq7H4yqL2xvi4AHm4uJ+3nFZeGVPTyeTv5i1f05Ex9+OwnqZUF
+ 7Oe16AprL/b9FyvJicPFAHkW0/EoGDKA0CUymw3kDSHvKIYe9p5JLvcuwtaME0fTMYu8
+ vJ1A==
+X-Gm-Message-State: APjAAAWcLGl3q0edbAi7VwDBbJPdfMQHFz8SbEv8V2znuRggbHFWd6p3
+ nV5I4sKwg0Rw96Va1exoI8gGKIuaS6Ta6g65vuUdfw==
+X-Google-Smtp-Source: APXvYqxk89QOPIEWf4ImPWmGTSbwD8qDKsgEr43Xn65yi6cT1rfSNKaCHP/GKDFhIrdUkbTccWN0+YuD5xFyH6UYOMg=
+X-Received: by 2002:a9d:68cc:: with SMTP id i12mr16955128oto.97.1573483877816; 
+ Mon, 11 Nov 2019 06:51:17 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: pcuDuBSgNvGijyqUsKvevw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+References: <89ada4b1-ee3d-a512-07c2-9bc1ba5806da@redhat.com>
+ <20191024224622.12371-1-keithp@keithp.com> <8736fhm9tw.fsf@linaro.org>
+ <87pnik4w9n.fsf@keithp.com>
+ <CAFEAcA-g+RkvYjseDE=1Z=gnLum0Cjvn_7bqB3ti+cBq9UZ3Eg@mail.gmail.com>
+ <87mudo4owu.fsf@keithp.com>
+ <CAFEAcA-nnkHuj4y8+vFu5=virUoxwarg=kqQvUWeN73SDs+TzA@mail.gmail.com>
+ <87eeymx603.fsf@keithp.com>
+In-Reply-To: <87eeymx603.fsf@keithp.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Nov 2019 14:51:06 +0000
+Message-ID: <CAFEAcA9rSS8jwSOSFjHd7GZ0gNywEDDJPBJhJ4FxhyqqtjU6OQ@mail.gmail.com>
+Subject: Re: [PATCH] Semihost SYS_READC implementation (v4)
+To: Keith Packard <keithp@keithp.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,110 +93,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, shannon.zhaosl@gmail.com, qemu-devel@nongnu.org,
- xuwei5@hisilicon.com, linuxarm@huawei.com, eric.auger@redhat.com,
- qemu-arm@nongnu.org, lersek@redhat.com
+Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 4 Oct 2019 16:53:01 +0100
-Shameer Kolothum <shameerali.kolothum.thodi@huawei.com> wrote:
+On Tue, 5 Nov 2019 at 05:10, Keith Packard <keithp@keithp.com> wrote:
+>
+> Peter Maydell <peter.maydell@linaro.org> writes:
+>
+> > I'm going to push for somebody actually writing out a
+> > document and putting it somewhere that we can point to
+> > and say "that's the authoritative spec", please...
+> > it doesn't have to be a big formal thing, but I do
+> > think you want it written down, because the whole point
+> > is for multiple implementations and users to interoperate.
+>
+> That happened in June -- I was just looking at the wrong version of the
+> spec. In the current version, which can be found here:
+>
+>         https://riscv.org/specifications/
+>
+>                    The RISC-V Instruction Set Manual
+>                        Volume I: Unprivileged ISA
+>                 Document Version 20190608-Base-Ratified
+>
+> Section 2.8 says:
+>
+>         Another use of EBREAK is to support =E2=80=9Csemihosting=E2=80=9D=
+, where the
+>         execution environment includes a debugger that can provide
+>         services over an alternate system call interface built around
+>         the EBREAK instruction.  Because the RISC-V base ISA does not
+>         provide more than one EBREAK instruction, RISC-V semihosting
+>         uses a special sequence of instructions to distinguish a
+>         semihosting EBREAK from a debugger inserted EBREAK.
+>
+>                 slli x0, x0, 0x1f   # Entry NOP
+>                 ebreak              # Break to debugger
+>                 srai x0, x0, 7      # NOP encoding the semihosting call n=
+umber 7
+>
+>         Note that these three instructions must be 32-bit-wide
+>         instructions, i.e., they mustn=E2=80=99t be among the compressed =
+16-bit
+>         instructions described in Chapter 16.
+>
+>         The shift NOP instructions are still considered available for
+>         use as HINTS.
+>
+>         Semihosting is a form of service call and would be more
+>         naturally encoded as an ECALL using an existing ABI, but this
+>         would require the debugger to be able to intercept ECALLs, which
+>         is a newer addition to the debug standard.  We intend to move
+>         over to using ECALLs with a standard ABI, in which case,
+>         semihosting can share a service ABI with an existing standard.
+>
+>         We note that ARM processors have also moved to using SVC instead
+>         of BKPT for semihosting calls in newer designs.
 
-> From: Eric Auger <eric.auger@redhat.com>
->=20
-> In case of NV-DIMM slots, let's add /pmem DT nodes
-Why should we do it for NVDIMM but not for PC-DIMM?
+That defines the instruction sequence used to make a semihosting
+call, but not the specification of what the calls are:
+ * what call numbers perform which functions
+ * how arguments are passed to the call (registers? parameter
+   blocks in memory? other?)
+ * the semantics of each function supported (number of arguments,
+   behaviour, error handling)
 
->=20
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> ---
->  hw/arm/boot.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 45 insertions(+)
->=20
-> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
-> index c264864c11..bd6d72b33e 100644
-> --- a/hw/arm/boot.c
-> +++ b/hw/arm/boot.c
-> @@ -20,6 +20,7 @@
->  #include "hw/boards.h"
->  #include "sysemu/reset.h"
->  #include "hw/loader.h"
-> +#include "hw/mem/memory-device.h"
->  #include "elf.h"
->  #include "sysemu/device_tree.h"
->  #include "qemu/config-file.h"
-> @@ -523,6 +524,44 @@ static void fdt_add_psci_node(void *fdt)
->      qemu_fdt_setprop_cell(fdt, "/psci", "migrate", migrate_fn);
->  }
-> =20
-> +static int fdt_add_pmem_node(void *fdt, uint32_t acells, uint32_t scells=
-)
-> +{
-> +    MemoryDeviceInfoList *info, *info_list =3D qmp_memory_device_list();
-> +    MemoryDeviceInfo *mi;
-> +    int ret;
-> +
-> +    for (info =3D info_list; info !=3D NULL; info =3D info->next) {
-> +        mi =3D info->value;
-> +
-> +        if (mi->type =3D=3D MEMORY_DEVICE_INFO_KIND_NVDIMM) {
-> +            PCDIMMDeviceInfo *di =3D mi->u.nvdimm.data;
-> +            char *nodename;
-> +
-> +            nodename =3D g_strdup_printf("/pmem@%" PRIx64, di->addr);
-> +            qemu_fdt_add_subnode(fdt, nodename);
-> +            qemu_fdt_setprop_string(fdt, nodename, "compatible", "pmem-r=
-egion");
-> +            ret =3D qemu_fdt_setprop_sized_cells(fdt, nodename, "reg", a=
-cells,
-> +                                               di->addr, scells, di->siz=
-e);
-> +            /* only set the NUMA ID if it is specified */
-> +            if (!ret && di->node >=3D 0) {
-> +                ret =3D qemu_fdt_setprop_cell(fdt, nodename, "numa-node-=
-id",
-> +                                            di->node);
-> +            }
-> +
-> +            g_free(nodename);
-> +
-> +            if (ret < 0) {
-> +                fprintf(stderr, "couldn't add NVDIMM /memory@%"PRIx64" n=
-ode\n",
-shouldn't it be s:/memory:/pmem:
+That's really what I had in mind by the overall semihosting spec.
 
-and maybe move error printing outside like it's done in fdt_add_memory_node=
-()
-to be consistent with current code.
+PS: the parenthetical about ARM semihosting at the bottom  of
+the text you quote is wrong, incidentally. The traditional insn
+for semihosting on A-profile devices has always been SWI/SVC; it
+is BKPT only on M-profile devices; and the latest revision of the
+semihosting spec recommends the HLT instruction for both A- and M-.
 
-> +                        di->addr);
-> +                goto out;
-> +            }
-> +        }
-> +    }
-> +out:
-> +    qapi_free_MemoryDeviceInfoList(info_list);
-> +    return ret;
-> +}
-> +
->  int arm_load_dtb(hwaddr addr, const struct arm_boot_info *binfo,
->                   hwaddr addr_limit, AddressSpace *as, MachineState *ms)
->  {
-> @@ -622,6 +661,12 @@ int arm_load_dtb(hwaddr addr, const struct arm_boot_=
-info *binfo,
->          }
->      }
-> =20
-> +    rc =3D fdt_add_pmem_node(fdt, acells, scells);
-> +    if (rc < 0) {
-> +        fprintf(stderr, "couldn't add pmem memory nodes\n");
-> +        goto fail;
-> +    }
-> +
->      rc =3D fdt_path_offset(fdt, "/chosen");
->      if (rc < 0) {
->          qemu_fdt_add_subnode(fdt, "/chosen");
-
+thanks
+-- PMM
 
