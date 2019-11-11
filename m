@@ -2,78 +2,107 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8B9C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:36:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C816C17445
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:36:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CE3F20679
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:36:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A72E20656
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:36:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jOwiC8h9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CE3F20679
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfyDY40a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A72E20656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUCg0-0005J8-DR
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 11:36:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39440)
+	id 1iUCg1-0005JS-1C
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 11:36:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42855)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iUCAF-0000RU-Ge
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:03:41 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iUCVN-0002Di-4Z
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:25:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iUCA9-0003AB-TX
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:03:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54854
+ (envelope-from <mreitz@redhat.com>) id 1iUCVM-0005Ym-0Q
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:25:29 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28973
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iUCA9-00039c-PB
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:03:33 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iUCVL-0005Xy-24
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:25:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573488212;
+ s=mimecast20190719; t=1573489526;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=whUrYdJLhBASdpWCpuLFMfQuo3veDYHSDj2xi+Fnx2w=;
- b=jOwiC8h90pZhHFg1K21fLWxbjWtYzVJnp9H1uIO/oT3hMqDKRR3zNRVb6ayzM85kFLtsDx
- J6N99oNRfRjx8P7n6jrCEJtmAgcPJHYB3g4E9eXgEcRcXAUR9jvXtuALijsGCbKxzJqhmp
- rMnTeUVmRr4cveLxmbIbFYN3yVDiC5c=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Vvbi9HZm3SKQRBkIS83XZwIYMywaBsXfPJAaeEnG3a4=;
+ b=dfyDY40a6E46zFse4KQKIGeiVuz/toXzeGfxRJEBFAQOkb+YtS5ta34O7gWW+CwW+AMXuV
+ pArc69Z2Wyk0fLxSvC64R76mV1M/J/rMBuEs6qHs4mAGtz0XDVs9vFnyWvIiCn1JFwrP/z
+ vM3wBo8b481UzcOG7H7mSttXRqkFoEw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-344-JvaqgvzvP0S0b2aKMOMFRg-1; Mon, 11 Nov 2019 11:03:31 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-23-Js-FmxvQP4-BvpLYRlm7DQ-1; Mon, 11 Nov 2019 11:25:18 -0500
+X-MC-Unique: Js-FmxvQP4-BvpLYRlm7DQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D1A9107ACC5;
- Mon, 11 Nov 2019 16:03:30 +0000 (UTC)
-Received: from localhost (ovpn-117-116.ams2.redhat.com [10.36.117.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B3BBA608FF;
- Mon, 11 Nov 2019 16:03:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5731F101AF1F;
+ Mon, 11 Nov 2019 16:25:17 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-116.ams2.redhat.com
+ [10.36.117.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BB6314B4;
+ Mon, 11 Nov 2019 16:25:05 +0000 (UTC)
+Subject: Re: [PATCH v2 03/15] block/block: add BDRV flag for io_uring
+To: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+References: <20191025160444.31632-1-stefanha@redhat.com>
+ <20191025160444.31632-4-stefanha@redhat.com>
+ <20191111105759.GB7297@linux.fritz.box>
 From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH for-5.0 v2 23/23] iotests: Mirror must not attempt to create
- loops
-Date: Mon, 11 Nov 2019 17:02:16 +0100
-Message-Id: <20191111160216.197086-24-mreitz@redhat.com>
-In-Reply-To: <20191111160216.197086-1-mreitz@redhat.com>
-References: <20191111160216.197086-1-mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <6e8cf473-d3e9-c743-d2bd-75a0d955e6c6@redhat.com>
+Date: Mon, 11 Nov 2019 17:25:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: JvaqgvzvP0S0b2aKMOMFRg-1
+In-Reply-To: <20191111105759.GB7297@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="wv1QQczEPh1MLbDCfJNuUsLnsNefdwFAk"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,291 +114,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, oleksandr@redhat.com,
+ Maxim Levitsky <maximlevitsky@gmail.com>, qemu-block@nongnu.org,
+ Julia Suvorova <jusual@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Aarushi Mehta <mehta.aaru20@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/041     | 235 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/041.out |   4 +-
- 2 files changed, 237 insertions(+), 2 deletions(-)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wv1QQczEPh1MLbDCfJNuUsLnsNefdwFAk
+Content-Type: multipart/mixed; boundary="mTnm7e8iVeyIPpldY9ww7k1gXk60uVcjQ"
 
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index 9a00cf6f7b..0e43bb699d 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -1246,6 +1246,241 @@ class TestReplaces(iotests.QMPTestCase):
-=20
-         self.vm.assert_block_path('filter0', '/file', 'target')
-=20
-+    """
-+    See what happens when the @sync/@replaces configuration dictates
-+    creating a loop.
-+    """
-+    @iotests.skip_if_unsupported(['throttle'])
-+    def test_loop(self):
-+        qemu_img('create', '-f', iotests.imgfmt, test_img, str(1 * 1024 * =
-1024))
-+
-+        # Dummy group so we can create a NOP filter
-+        result =3D self.vm.qmp('object-add', qom_type=3D'throttle-group', =
-id=3D'tg0')
-+        self.assert_qmp(result, 'return', {})
-+
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                                 'driver': 'throttle',
-+                                 'node-name': 'source',
-+                                 'throttle-group': 'tg0',
-+                                 'file': {
-+                                     'driver': iotests.imgfmt,
-+                                     'node-name': 'filtered',
-+                                     'file': {
-+                                         'driver': 'file',
-+                                         'filename': test_img
-+                                     }
-+                                 }
-+                             })
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Block graph is now:
-+        #   source[throttle] --file--> filtered[imgfmt] --file--> ...
-+
-+        result =3D self.vm.qmp('drive-mirror', job_id=3D'mirror', device=
-=3D'source',
-+                             target=3Dtarget_img, format=3Diotests.imgfmt,
-+                             node_name=3D'target', sync=3D'none',
-+                             replaces=3D'filtered')
-+
-+        """
-+        Block graph before mirror exits would be (ignoring mirror_top):
-+          source[throttle] --file--> filtered[imgfmt] --file--> ...
-+          target[imgfmt] --file--> ...
-+
-+        Then, because of sync=3Dnone and drive-mirror in absolute-paths mo=
-de,
-+        the source is attached to the target:
-+          source[throttle] --file--> filtered[imgfmt] --file--> ...
-+                 ^
-+              backing
-+                 |
-+            target[imgfmt] --file--> ...
-+
-+        Replacing filtered by target would yield:
-+          source[throttle] --file--> target[imgfmt] --file--> ...
-+                 ^                        |
-+                 +------- backing --------+
-+
-+        I.e., a loop.  bdrv_replace_node() detects this and simply
-+        does not let source's file link point to target.  However,
-+        that means that target cannot really replace source.
-+
-+        drive-mirror should detect this and not allow this case.
-+        """
-+
-+        self.assert_qmp(result, 'error/desc',
-+                        "Replacing 'filtered' by 'target' with this sync "=
- + \
-+                        "mode would result in a loop, because the former "=
- + \
-+                        "would be a child of the latter's backing file " +=
- \
-+                        "('source') after the mirror job")
-+
-+    """
-+    Test what happens when there would be no loop with the pre-mirror
-+    configuration, but something changes during the mirror job that asks
-+    for a loop to be created during completion.
-+    """
-+    @iotests.skip_if_unsupported(['copy-on-read', 'quorum'])
-+    def test_loop_during_mirror(self):
-+        qemu_img('create', '-f', iotests.imgfmt, test_img, str(1 * 1024 * =
-1024))
-+
-+        """
-+        In this test, we are going to mirror from a node that is a
-+        filter above some file "common-base".  The target is a quorum
-+        node (with just an unrelated null-co child).
-+
-+        We will ask the mirror job to replace common-base by the
-+        target upon completion.  That is a completely valid
-+        configuration so far.
-+
-+        However, while the job is running, we add common-base as an
-+        (indirect[1]) child to the target quorum node.  This way,
-+        completing the job as requested would yield a loop, because
-+        the target would be supposed to replace common-base -- which
-+        is its own (indirect) child.
-+
-+        [1] It needs to be an indirect child, because if it were a
-+        direct child, the mirror job would simply end by effectively
-+        injecting the target above common-base.  This is the same
-+        effect as when using sync=3Dnone: The target ends up above the
-+        source.
-+
-+        So only loops that have a length of more than one node are
-+        forbidden, which means common-base must be an indirect child
-+        of the target.
-+
-+        (Furthermore, we are going to use x-blockdev-change to add
-+        common-base as a child to the target.  This command only
-+        allows doing so for nodes that have no parent yet.
-+        common-base will have a parent already, though, namely the
-+        source node.  Therefore, this is another reason why we need at
-+        least one node above common-base, so this parent can become
-+        target's child during the mirror.)
-+        """
-+
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                                 'driver': 'null-co',
-+                                 'node-name': 'common-base',
-+                                 'read-zeroes': True,
-+                                 'size': 1 * 1024 * 1024
-+                             })
-+        self.assert_qmp(result, 'return', {})
-+
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                                 'driver': 'copy-on-read',
-+                                 'node-name': 'source',
-+                                 'file': 'common-base'
-+                             })
-+        self.assert_qmp(result, 'return', {})
-+
-+        """
-+        As explained above, we have to create a parent above
-+        common-base.
-+
-+        We cannot use any parent that would forward the RESIZE
-+        permission, because the job takes it on the target, but
-+        unshares it on the source: After the x-blockdev-change
-+        operation during the mirror job, this parent will be a child
-+        of the target, so common-base will be an (indirect) child of
-+        both the mirror's source and target.  Thus, the job would
-+        conflict with itself.
-+
-+        Therefore, we make common-base a backing child of a $imgfmt
-+        node.  Unfortunately, we cannot let the mirror job replace a
-+        node that acts as a backing child somewhere (because of an op
-+        blocker), so we put another raw node between the $imgfmt node
-+        and common-base.
-+        """
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                                 'driver': iotests.imgfmt,
-+                                 'node-name': 'base-parent',
-+                                 'file': {
-+                                     'driver': 'file',
-+                                     'filename': test_img
-+                                 },
-+                                 'backing': {
-+                                     'driver': 'raw',
-+                                     'file': 'common-base'
-+                                 }
-+                             })
-+
-+        """
-+        Add a quorum node with a single child, we will add base-parent
-+        to prepare a loop later.
-+        (We do not care about this single child at all, but it is
-+        impossible to create a quorum node without any children.  We
-+        will ignore this child from now on.)
-+        """
-+        result =3D self.vm.qmp('blockdev-add', **{
-+                                 'driver': 'quorum',
-+                                 'node-name': 'target',
-+                                 'vote-threshold': 1,
-+                                 'children': [
-+                                     {
-+                                         'driver': 'null-co',
-+                                         'read-zeroes': True,
-+                                         'size': 1 * 1024 * 1024
-+                                     }
-+                                 ]
-+                             })
-+        self.assert_qmp(result, 'return', {})
-+
-+        """
-+        Current block graph:
-+
-+        base-parent[$imgfmt] --backing--> [raw]
-+                                            |
-+                                           file
-+                                            v
-+              source[COR] --file--> common-base[null-co]
-+
-+        target[quorum]
-+
-+
-+        The following blockdev-mirror asks for this graph post-mirror:
-+
-+        base-parent[$imgfmt] --backing--> [raw]
-+                                            |
-+                                           file
-+                                            v
-+                source[COR] --file--> target[quorum]
-+
-+        That would be a valid configuration without any loops.
-+        """
-+
-+        result =3D self.vm.qmp('blockdev-mirror', job_id=3D'mirror',
-+                             device=3D'source', target=3D'target', sync=3D=
-'full',
-+                             replaces=3D'common-base')
-+        self.assert_qmp(result, 'return', {})
-+
-+        """
-+        However, now we will make base-parent a child of target.
-+        Before the mirror job completes, that is still completely
-+        valid:
-+
-+                                             source
-+                                               |
-+                                               v
-+        target -> base-parent -> [raw] -> common-base
-+        """
-+
-+        result =3D self.vm.qmp('x-blockdev-change',
-+                             parent=3D'target', node=3D'base-parent')
-+        self.assert_qmp(result, 'return', {})
-+
-+        """
-+        However, post-mirror, we thus ask for a loop:
-+
-+        source -> target (replaced common-base) -> base-parent
-+                                  ^                    |
-+                                  |                    v
-+                                  +----------------- [raw]
-+
-+        bdrv_replace_node() would not allow such a configuration, but
-+        we should not pretend we can create it, so the mirror job
-+        should fail during completion.
-+        """
-+
-+        self.complete_and_wait('mirror',
-+                               completion_error=3D'Operation not permitted=
-')
-+
- if __name__ =3D=3D '__main__':
-     iotests.main(supported_fmts=3D['qcow2', 'qed'],
-                  supported_protocols=3D['file'])
-diff --git a/tests/qemu-iotests/041.out b/tests/qemu-iotests/041.out
-index 877b76fd31..20a8158b99 100644
---- a/tests/qemu-iotests/041.out
-+++ b/tests/qemu-iotests/041.out
-@@ -1,5 +1,5 @@
--..........................................................................=
-....................
-+..........................................................................=
-......................
- ----------------------------------------------------------------------
--Ran 94 tests
-+Ran 96 tests
-=20
- OK
---=20
-2.23.0
+--mTnm7e8iVeyIPpldY9ww7k1gXk60uVcjQ
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 11.11.19 11:57, Kevin Wolf wrote:
+> Am 25.10.2019 um 18:04 hat Stefan Hajnoczi geschrieben:
+>> From: Aarushi Mehta <mehta.aaru20@gmail.com>
+>>
+>> Signed-off-by: Aarushi Mehta <mehta.aaru20@gmail.com>
+>> Reviewed-by: Maxim Levitsky <maximlevitsky@gmail.com>
+>> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> ---
+>>  include/block/block.h | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/include/block/block.h b/include/block/block.h
+>> index 89606bd9f8..bdb48dcd1b 100644
+>> --- a/include/block/block.h
+>> +++ b/include/block/block.h
+>> @@ -126,6 +126,7 @@ typedef struct HDGeometry {
+>>                                        ignoring the format layer */
+>>  #define BDRV_O_NO_IO       0x10000 /* don't initialize for I/O */
+>>  #define BDRV_O_AUTO_RDONLY 0x20000 /* degrade to read-only if opening r=
+ead-write fails */
+>> +#define BDRV_O_IO_URING    0x40000 /* use io_uring instead of the threa=
+d pool */
+>=20
+> Why do we need a new (global!) flag rather than a driver-specific option
+> for file-posix? This looks wrong to me, the flag has no sensible meaning
+> for any other driver.
+>=20
+> (Yes, BDRV_O_NATIVE_AIO is wrong, too, but compatibility means we can't
+> remove it easily.)
+
+To add to that, Kevin and me had a short talk on IRC, and it seemed like
+the reason would be that it=E2=80=99s easier to use this way than an option
+would be.
+
+To me, the problem seems to be that it=E2=80=99s only easier to use because=
+ of
+the option inheritance we have in the block layer (so you can set this
+flag on a qcow2 node and its file node will have it, too).  But
+naturally this inheritance is a bit of magic (because qemu has to guess
+where you probably want the flag to end up), so I=E2=80=99d too rather avoi=
+d
+adding to it.
+
+OTOH, I wonder whether ease of use is really that important here.  Would
+people who want to use io_uring really care about a command line that=E2=80=
+=99s
+going to be a bit more complicated than just
+-drive file=3Dfoo.img,format=3D$imgfmt,aio=3Dio_uring,if=3D$interface?  (Na=
+mely
+file.aio in this case, or maybe even a full-on block graph definition.)
+
+Max
+
+
+--mTnm7e8iVeyIPpldY9ww7k1gXk60uVcjQ--
+
+--wv1QQczEPh1MLbDCfJNuUsLnsNefdwFAk
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3Ji2AACgkQ9AfbAGHV
+z0DvCQf/dKHfQwr8HCfFXmjwU2FYvMTlPQPdr+zAeCUCqZ/GZN0/jEyYXlNzeEAP
+z68vOI/yFAW/TXTCS/xrS2upk4aBpZoaocP8fb7l+2x9qHDR77H2wIxZsS8YjL/G
+StLwODzcvCcGyj5iv/4TUyl9wJVqH/PD0Fz1C6H0ZsaMfWJCuLXVJ6n6COqDrzbg
+k+qwOjK4UxBL54RTfpa8cU4u6npb7Su45Vm6SfBv15IBC3et83txnbSKM5NAG5rH
+iWXA00z+JgmuaGkEonDW2wlEBIEqWFi1NVZKOo2FvZU571HDEJIYy4mMAokbhOv/
+nG3Q3nh5JRXs1rVy7z/5uB0mIMNJ3Q==
+=Dbqd
+-----END PGP SIGNATURE-----
+
+--wv1QQczEPh1MLbDCfJNuUsLnsNefdwFAk--
 
 
