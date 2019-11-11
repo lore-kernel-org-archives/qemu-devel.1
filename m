@@ -2,74 +2,91 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A52A7C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:05:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59488C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 708F82196E
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:05:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 242012190F
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:06:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B6V1BE2t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 708F82196E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EXIEbYlZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 242012190F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUCC0-0001jp-8y
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 11:05:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38842)
+	id 1iUCCW-0002OF-GZ
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 11:06:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38609)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iUC93-0007VE-Lb
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:30 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iUC76-0005yJ-9l
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:00:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iUC92-0002bA-3q
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:25 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49258
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iUC92-0002aL-0N
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573488143;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=QTZz8SJ2g1j005GQqmZemMI7nc7bLOtiiF1dHolqpwQ=;
- b=B6V1BE2thS67jnCodNhYzmI6KKUIFgX+1P0mqkk1QyRWBve8NnAGyv/c0n+gIeUDHUB3Ij
- Bv/npGGAuKUwUWk4TEWf8OPTcMDGQX5OVJ0qBAqhBVPlt6v9tQvYyM44gnntSvkuCLOQMU
- 82UX5tJxPXWM7UGx6Dhx3guctBvV6w4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-10AOw8HaPxqAyuAdb2tIng-1; Mon, 11 Nov 2019 11:02:19 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6FA1100550E;
- Mon, 11 Nov 2019 16:02:18 +0000 (UTC)
-Received: from localhost (ovpn-117-116.ams2.redhat.com [10.36.117.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 450471C6;
- Mon, 11 Nov 2019 16:02:18 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH for-5.0 v2 00/23] block: Fix check_to_replace_node()
-Date: Mon, 11 Nov 2019 17:01:53 +0100
-Message-Id: <20191111160216.197086-1-mreitz@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iUC74-0001Gt-Lk
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:00:24 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55220)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iUC74-0001Ff-E6
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:00:22 -0500
+Received: by mail-wm1-x341.google.com with SMTP id z26so13881623wmi.4
+ for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 08:00:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=swfh1DOP8Csnct6CodKeLM66wiAltk5xFhAmY8Px8zQ=;
+ b=EXIEbYlZ1CUw3j1oDDOWG6N2BWMaRkMxoclRwNRCg5DXwURAsPIkG/E3kpEaz1NkP9
+ L0v1Pkh4oy+w/E0UIh6EHhMgSZb3zSiBnSBgi82yhuh4fWZ7fvmezRQbygisX3PMzbZF
+ G149V0GEhv/K6a2BJeU8CEEuh3Ja/+1/975cOcLgnL0vKXLsE7WL79Y6eMYMpsIt2nee
+ y9s56pkr0AiSGmyphSAuo31iENWkubnjCERHnCt6ia6LxffUz974GbJ3vR9cWH2e5L9q
+ uVhhe1mG/T4ysmqhETQXoWxLvAyaNC3KWd7PeyZfgMXgkOzTFk/1F3K6x1ZuD7aIN/Sh
+ CVuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=swfh1DOP8Csnct6CodKeLM66wiAltk5xFhAmY8Px8zQ=;
+ b=Ze0RMLhB2+nuQyVkfdye7C0dAVOqW7LkmMvvuccp1jGg2yGBCFcGdzTWLv+V29WU3P
+ caQixmK8JfO7wFaac1G3bNfL8QUHzDeLBd3bJF7+6x1wVEMYQmHLScN+4xgf2qzoyrVd
+ oYIhaQuZ5l6jrO2U2mMn338hvqtAnpJMHJeQx/SzT94bdUxnUY+XZH4MXylwfN38exCU
+ 0+NlZMyQxuFZ3i6ItqvK5wnk8P5zAbL433AzQaFjUsfO4XyV5cUn0VgRLmR7xXOcTxXk
+ RfZaG09WFFmb/455uohrAr3zIf2XOVSenhGbphGf7E1KijNJ97+KicAwldvJARFrE5/K
+ hcUw==
+X-Gm-Message-State: APjAAAVz8IzgUHGmqDpWHdoFbqqSi8ggU15vh2x/CNEWryAfbCoH4sA5
+ c1M0TxuukcMSTxIFpfq4PgGZTw==
+X-Google-Smtp-Source: APXvYqw49c4xGFJCR81Iaa0bYoCoILMCzFAYUELJ+bAekUZWuSHKbB5dpS0AE2460AC9i+bEq51KEQ==
+X-Received: by 2002:a7b:c1ca:: with SMTP id a10mr22730338wmj.161.1573488020498; 
+ Mon, 11 Nov 2019 08:00:20 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id k4sm19327290wmk.26.2019.11.11.08.00.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 11 Nov 2019 08:00:19 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C76321FF87;
+ Mon, 11 Nov 2019 16:00:18 +0000 (GMT)
+References: <20191015031350.4345-1-richardw.yang@linux.intel.com>
+ <20191015031350.4345-2-richardw.yang@linux.intel.com>
+ <87bltiaevs.fsf@linaro.org> <20191111154733.ssb3mcvb7rwkrob2@master>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Wei Yang <richard.weiyang@gmail.com>
+Subject: Re: [PATCH 1/2] tests/tcg/multiarch: fix code style in function
+ main of test-mmap.c
+In-reply-to: <20191111154733.ssb3mcvb7rwkrob2@master>
+Date: Mon, 11 Nov 2019 16:00:18 +0000
+Message-ID: <875zjq9ze5.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 10AOw8HaPxqAyuAdb2tIng-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -81,133 +98,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, jasowang@redhat.com,
+ richard.henderson@linaro.org, qemu-devel@nongnu.org, dgilbert@redhat.com,
+ Wei Yang <richardw.yang@linux.intel.com>, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Based-on: <20191108123455.39445-1-mreitz@redhat.com>
-(=E2=80=9Ciotests: Test failing mirror complete=E2=80=9D)
 
-(Because both add cases to 041.)
+Wei Yang <richard.weiyang@gmail.com> writes:
+
+> On Mon, Nov 11, 2019 at 10:25:43AM +0000, Alex Benn??e wrote:
+>>
+>>Wei Yang <richardw.yang@linux.intel.com> writes:
+>>
+>>> This file uses quite a different code style and changing just one line
+>>> would leads to some awkward appearance.
+>>>
+>>> This is a preparation for the following replacement of
+>>> sysconf(_SC_PAGESIZE).
+>>>
+>>> BTW, to depress ERROR message from checkpatch.pl, this patch replaces
+>>> strtoul with qemu_strtoul.
+>>
+>>
+>>NACK I'm afraid.
+>>
+>>The tests/tcg directory all build against glibc only to make them easier
+>>to cross-compile for the various targets. If you run check-tcg and have
+>>a non-native cross compiler setup you'll notice this fails to build:
+>>
+>>    BUILD   aarch64-linux-user guest-tests with aarch64-linux-gnu-gcc
+>>  /home/alex/lsrc/qemu.git/tests/tcg/multiarch/test-mmap.c: In function ?=
+??main???:
+>>  /home/alex/lsrc/qemu.git/tests/tcg/multiarch/test-mmap.c:467:9: warning=
+: implicit declaration of function ???qemu_strtoul???; did you mean ???strt=
+oul???? [-Wimplicit-function-declaration]
+>>           qemu_strtoul(argv[1], NULL, 0, &pagesize);
+>>           ^~~~~~~~~~~~
+>>           strtoul
+>>  /home/alex/lsrc/qemu.git/tests/tcg/multiarch/test-mmap.c:469:20: error:=
+ ???qemu_real_host_page_size??? undeclared (first use in this function)
+>>           pagesize =3D qemu_real_host_page_size;
+>>                      ^~~~~~~~~~~~~~~~~~~~~~~~
+>>  /home/alex/lsrc/qemu.git/tests/tcg/multiarch/test-mmap.c:469:20: note: =
+each undeclared identifier is reported only once for each function it appea=
+rs in
+>>  make[2]: *** [../Makefile.target:103: test-mmap] Error 1
+>>  make[1]: *** [/home/alex/lsrc/qemu.git/tests/tcg/Makefile.qemu:33: cros=
+s-build-guest-tests] Error 2
+>>  make: *** [/home/alex/lsrc/qemu.git/tests/Makefile.include:1094: build-=
+tcg-tests-aarch64-linux-user] Error 2
+>>  make: *** Waiting for unfinished jobs....
+>>
+>
+> This output is from "make test" ?
+
+make check-tcg
+
+>
+>>>
+>>> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+>>> ---
+>>>  tests/tcg/multiarch/test-mmap.c | 67 ++++++++++++++++++---------------
+>>>  1 file changed, 36 insertions(+), 31 deletions(-)
+>>>
+>>> diff --git a/tests/tcg/multiarch/test-mmap.c b/tests/tcg/multiarch/test=
+-mmap.c
+>>> index 11d0e777b1..9ea49e2307 100644
+>>> --- a/tests/tcg/multiarch/test-mmap.c
+>>> +++ b/tests/tcg/multiarch/test-mmap.c
+>>> @@ -456,49 +456,54 @@ void check_invalid_mmaps(void)
+>>>
+>>>  int main(int argc, char **argv)
+>>>  {
+>>> -	char tempname[] =3D "/tmp/.cmmapXXXXXX";
+>>> -	unsigned int i;
+>>> -
+>>> -	/* Trust the first argument, otherwise probe the system for our
+>>> -	   pagesize.  */
+>>> -	if (argc > 1)
+>>> -		pagesize =3D strtoul(argv[1], NULL, 0);
+>>> -	else
+>>> -		pagesize =3D sysconf(_SC_PAGESIZE);
+>>> +    char tempname[] =3D "/tmp/.cmmapXXXXXX";
+>>> +    unsigned int i;
+>>> +
+>>> +    /*
+>>> +     * Trust the first argument, otherwise probe the system for our
+>>> +     * pagesize.
+>>> +     */
+>>> +    if (argc > 1) {
+>>> +        qemu_strtoul(argv[1], NULL, 0, &pagesize);
+>>> +    } else {
+>>> +        pagesize =3D sysconf(_SC_PAGESIZE);
+>>> +    }
+>>>
+>>> -	/* Assume pagesize is a power of two.  */
+>>> -	pagemask =3D pagesize - 1;
+>>> -	dummybuf =3D malloc (pagesize);
+>>> -	printf ("pagesize=3D%u pagemask=3D%x\n", pagesize, pagemask);
+>>> +    /* Assume pagesize is a power of two.  */
+>>> +    pagemask =3D pagesize - 1;
+>>> +    dummybuf =3D malloc(pagesize);
+>>> +    printf("pagesize=3D%u pagemask=3D%x\n", pagesize, pagemask);
+>>>
+>>> -	test_fd =3D mkstemp(tempname);
+>>> -	unlink(tempname);
+>>> +    test_fd =3D mkstemp(tempname);
+>>> +    unlink(tempname);
+>>>
+>>> -	/* Fill the file with int's counting from zero and up.  */
+>>> +    /* Fill the file with int's counting from zero and up.  */
+>>>      for (i =3D 0; i < (pagesize * 4) / sizeof i; i++) {
+>>>          checked_write(test_fd, &i, sizeof i);
+>>>      }
+>>>
+>>> -	/* Append a few extra writes to make the file end at non
+>>> -	   page boundary.  */
+>>> +    /*
+>>> +     * Append a few extra writes to make the file end at non
+>>> +     * page boundary.
+>>> +     */
+>>>      checked_write(test_fd, &i, sizeof i); i++;
+>>>      checked_write(test_fd, &i, sizeof i); i++;
+>>>      checked_write(test_fd, &i, sizeof i); i++;
+>>>
+>>> -	test_fsize =3D lseek(test_fd, 0, SEEK_CUR);
+>>> +    test_fsize =3D lseek(test_fd, 0, SEEK_CUR);
+>>>
+>>> -	/* Run the tests.  */
+>>> -	check_aligned_anonymous_unfixed_mmaps();
+>>> -	check_aligned_anonymous_unfixed_colliding_mmaps();
+>>> -	check_aligned_anonymous_fixed_mmaps();
+>>> -	check_file_unfixed_mmaps();
+>>> -	check_file_fixed_mmaps();
+>>> -	check_file_fixed_eof_mmaps();
+>>> -	check_file_unfixed_eof_mmaps();
+>>> -	check_invalid_mmaps();
+>>> +    /* Run the tests.  */
+>>> +    check_aligned_anonymous_unfixed_mmaps();
+>>> +    check_aligned_anonymous_unfixed_colliding_mmaps();
+>>> +    check_aligned_anonymous_fixed_mmaps();
+>>> +    check_file_unfixed_mmaps();
+>>> +    check_file_fixed_mmaps();
+>>> +    check_file_fixed_eof_mmaps();
+>>> +    check_file_unfixed_eof_mmaps();
+>>> +    check_invalid_mmaps();
+>>>
+>>> -	/* Fails at the moment.  */
+>>> -	/* check_aligned_anonymous_fixed_mmaps_collide_with_host(); */
+>>> +    /* Fails at the moment.  */
+>>> +    /* check_aligned_anonymous_fixed_mmaps_collide_with_host(); */
+>>>
+>>> -	return EXIT_SUCCESS;
+>>> +    return EXIT_SUCCESS;
+>>>  }
+>>
+>>
+>>--
+>>Alex Benn??e
 
 
-Hi,
-
-For what this series does, see the cover letter of v1:
-
-https://lists.nongnu.org/archive/html/qemu-block/2019-09/msg01027.html
-
-
-Now, in v2 I=E2=80=99ve addressed Vladimir=E2=80=99s comments:
-- Patch 5: Extend explanation in the commit message
-- Patch 6: Prefer driver-specific .bdrv_recurse_can_replace()
-           implementation before the generic one for filters
-- Patch 8: Some more s/BdrvChild \*/QuorumChild/
-- Patch 15: Fix typo in the commit message
-- Patch 17: Added
-- Patch 18:
-  - Split @path into @root + @path
-  - In one instance, use x =3D next(y, z) instead of
-    try: x =3D next(y); except StopIteration: x =3D z;
-  - %s/'''/"""/
-- Patch 19: Fallout from the patch 18 changes
-- Patch 20: Fix in the commit message (uncommenting -> commenting out)
-- Patch 21:
-  - Check full stderr message by inspecting the VM log
-  - Fallout from the patch 18 changes
-  - %s/'''/"""/
-- Patch 22:
-  - Skip case if COR is unsupported
-  - Fallout from the patch 18 changes
-  - %s/'''/"""/
-- Patch 23:
-  - Added more comments
-  - Skip cases if throttle/COR/quorum (as appropriate) is unsupported
-  - Use imgfmt instead of hard-coding qcow2
-  - Fallout from the patch 18 changes
-  - %s/'''/"""/
-
-
-git-backport-diff against v1:
-
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, respecti=
-vely
-
-001/23:[----] [--] 'blockdev: Allow external snapshots everywhere'
-002/23:[----] [--] 'blockdev: Allow resizing everywhere'
-003/23:[----] [--] 'block: Drop bdrv_is_first_non_filter()'
-004/23:[----] [--] 'iotests: Let 041 use -blockdev for quorum children'
-005/23:[----] [--] 'quorum: Fix child permissions'
-006/23:[0012] [FC] 'block: Add bdrv_recurse_can_replace()'
-007/23:[----] [--] 'blkverify: Implement .bdrv_recurse_can_replace()'
-008/23:[0006] [FC] 'quorum: Store children in own structure'
-009/23:[----] [--] 'quorum: Add QuorumChild.to_be_replaced'
-010/23:[----] [--] 'quorum: Implement .bdrv_recurse_can_replace()'
-011/23:[----] [--] 'block: Use bdrv_recurse_can_replace()'
-012/23:[----] [--] 'block: Remove bdrv_recurse_is_first_non_filter()'
-013/23:[----] [--] 'mirror: Double-check immediately before replacing'
-014/23:[----] [--] 'quorum: Stop marking it as a filter'
-015/23:[----] [--] 'mirror: Prevent loops'
-016/23:[----] [--] 'iotests: Use complete_and_wait() in 155'
-017/23:[down] 'iotests: Use skip_if_unsupported decorator in 041'
-018/23:[0037] [FC] 'iotests: Add VM.assert_block_path()'
-019/23:[0004] [FC] 'iotests: Resolve TODOs in 041'
-020/23:[----] [--] 'iotests: Use self.image_len in TestRepairQuorum'
-021/23:[0027] [FC] 'iotests: Add tests for invalid Quorum @replaces'
-022/23:[0007] [FC] 'iotests: Check that @replaces can replace filters'
-023/23:[0141] [FC] 'iotests: Mirror must not attempt to create loops'
-
-
-Max Reitz (23):
-  blockdev: Allow external snapshots everywhere
-  blockdev: Allow resizing everywhere
-  block: Drop bdrv_is_first_non_filter()
-  iotests: Let 041 use -blockdev for quorum children
-  quorum: Fix child permissions
-  block: Add bdrv_recurse_can_replace()
-  blkverify: Implement .bdrv_recurse_can_replace()
-  quorum: Store children in own structure
-  quorum: Add QuorumChild.to_be_replaced
-  quorum: Implement .bdrv_recurse_can_replace()
-  block: Use bdrv_recurse_can_replace()
-  block: Remove bdrv_recurse_is_first_non_filter()
-  mirror: Double-check immediately before replacing
-  quorum: Stop marking it as a filter
-  mirror: Prevent loops
-  iotests: Use complete_and_wait() in 155
-  iotests: Use skip_if_unsupported decorator in 041
-  iotests: Add VM.assert_block_path()
-  iotests: Resolve TODOs in 041
-  iotests: Use self.image_len in TestRepairQuorum
-  iotests: Add tests for invalid Quorum @replaces
-  iotests: Check that @replaces can replace filters
-  iotests: Mirror must not attempt to create loops
-
- block.c                       | 115 ++++++----
- block/blkverify.c             |  20 +-
- block/copy-on-read.c          |   9 -
- block/mirror.c                |  31 ++-
- block/quorum.c                | 161 +++++++++++---
- block/replication.c           |   7 -
- block/throttle.c              |   8 -
- blockdev.c                    |  58 ++++-
- include/block/block.h         |   5 -
- include/block/block_int.h     |  19 +-
- tests/qemu-iotests/041        | 402 ++++++++++++++++++++++++++++++----
- tests/qemu-iotests/041.out    |   4 +-
- tests/qemu-iotests/155        |   7 +-
- tests/qemu-iotests/iotests.py |  59 +++++
- 14 files changed, 715 insertions(+), 190 deletions(-)
-
---=20
-2.23.0
-
+--
+Alex Benn=C3=A9e
 
