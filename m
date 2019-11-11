@@ -2,80 +2,92 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E4DDC17447
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:29:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 225CDC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:30:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1813214E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:29:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MjjIgdjl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1813214E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id EADCC214E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:30:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EADCC214E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUBct-0006wr-Up
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 10:29:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34414)
+	id 1iUBe0-0007us-4m
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 10:30:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34447)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bmeng.cn@gmail.com>) id 1iUBc6-0006U9-LA
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:28:23 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iUBcB-0006X2-C9
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:28:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bmeng.cn@gmail.com>) id 1iUBc5-0002Cv-A3
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:28:22 -0500
-Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:44234)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
- id 1iUBc5-0002CU-5s; Mon, 11 Nov 2019 10:28:21 -0500
-Received: by mail-yb1-xb42.google.com with SMTP id g38so6313139ybe.11;
- Mon, 11 Nov 2019 07:28:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TMToojQjb4LkQHlyZn7r98q377dW+PcJDMvYM+oBKcU=;
- b=MjjIgdjlEv9gLe8d7DhqcAID7MxoTXXtw0tDhiMSoynixVhGgGRNTxdM0T4fwqg0yY
- DEhFtCJDRPZ0tG7OZensTTA2cRqS+FxE8zcCi9CP0gqjCqW5mcbpgyvuu4vuAWHcX+gk
- s+W5fiRKzUXxmaQqk0Le/qh4G7H23Da65lEKFOuR1glCXrJuv76CCO3wUzliN2ghNHE+
- 2WDiH2epkR3V7RJYDllhPaGKVhTkbV4H4E9mDje/qWVQQa5WJqKGRXS1Lt2x/aTKETW1
- IGXbsqXMutJ4FiVvchD3NDo4p/vNvTLjQEtp3TInwUWpfxH3B1u754cypE0UKwzJBBll
- mKpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=TMToojQjb4LkQHlyZn7r98q377dW+PcJDMvYM+oBKcU=;
- b=NWhbKwcV9X5zl6dHnisJDXYBYKIs6W+EkklWmEcqZ7YXnXW/RDhBTF6G/y7+cdDjGH
- nkJpRBkHmqBHDwhsjIzehdxaSVg9xcGsD25t0G2Gs6I6OjZb/RzPlHBjgwYf9muI2oLe
- gvE0/NgP+xXGEDxfSKlznxl2wEDdTmC4NbK4m/1oYZKDiuUgV7jG6hLIJJK61z/e3/aA
- cKt8h343G0wf/aqe+6ow4ZFvqeW2YdiKtBruyzru+woORGEKSq30tLahEc6ehfeFThOj
- tteYM0i6ZnxjkuxaMy7JGl4LnbRqFkdWl2jRRXtO4KUFY7O1VyoT1Ygu2QXz4FHY2CgH
- wzEg==
-X-Gm-Message-State: APjAAAUUtlhLlOE0B+7UQ8WFz7fjVMttH68RE8IjEZlDPn6mpGOTN44m
- Sx9G1T7t3fcpiYQ8KLwEFLDgJvRrasu7VDl5nQw=
-X-Google-Smtp-Source: APXvYqxH+NylZgUAdZZ4urnINrmISZPDqSVccdgJGOVL7knRVM31R7jzn3yGZi1ervUPtYGqYMyFaDP36tPxK5bkqX4=
-X-Received: by 2002:a25:42d6:: with SMTP id p205mr11713997yba.65.1573486100092; 
- Mon, 11 Nov 2019 07:28:20 -0800 (PST)
+ (envelope-from <frankja@linux.ibm.com>) id 1iUBcA-0002GL-5T
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:28:27 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20434)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iUBc9-0002Fu-SR
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:28:26 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ xABFP6L5083343
+ for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 10:28:24 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2w7923mgfa-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 10:28:23 -0500
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Mon, 11 Nov 2019 15:28:21 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Mon, 11 Nov 2019 15:28:18 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xABFSHJj28770468
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 11 Nov 2019 15:28:17 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AC20C4C04E;
+ Mon, 11 Nov 2019 15:28:17 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6E1654C04A;
+ Mon, 11 Nov 2019 15:28:16 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.179.89])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Mon, 11 Nov 2019 15:28:16 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] s390x: Properly fetch the short psw on diag308 subc 0/1
+Date: Mon, 11 Nov 2019 10:28:08 -0500
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20191111133804.14454-1-anup.patel@wdc.com>
- <MN2PR04MB60618CCC891177DC612532E98D740@MN2PR04MB6061.namprd04.prod.outlook.com>
-In-Reply-To: <MN2PR04MB60618CCC891177DC612532E98D740@MN2PR04MB6061.namprd04.prod.outlook.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Mon, 11 Nov 2019 23:28:08 +0800
-Message-ID: <CAEUhbmVCjFHD6HbA1LS2xbbUGjL5goo3dZat_ZXWiTV=50LvTA@mail.gmail.com>
-Subject: Re: [PATCH] riscv/virt: Add syscon reboot and poweroff DT nodes
-To: Anup Patel <Anup.Patel@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::b42
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19111115-0008-0000-0000-0000032E107B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111115-0009-0000-0000-00004A4D1142
+Message-Id: <20191111152808.13371-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-11-11_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911110141
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,104 +99,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Christoph Hellwig <hch@lst.de>
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 11, 2019 at 9:42 PM Anup Patel <Anup.Patel@wdc.com> wrote:
->
-> Correct Palmer's email address.
->
-> > -----Original Message-----
-> > From: Anup Patel
-> > Sent: Monday, November 11, 2019 7:08 PM
-> > To: Peter Maydell <peter.maydell@linaro.org>; Palmer Dabbelt
-> > <palmer@sifive.com>; Alistair Francis <Alistair.Francis@wdc.com>; Sagar
-> > Karandikar <sagark@eecs.berkeley.edu>
-> > Cc: Atish Patra <Atish.Patra@wdc.com>; Christoph Hellwig <hch@lst.de>;
-> > Anup Patel <anup@brainfault.org>; qemu-riscv@nongnu.org; qemu-
-> > devel@nongnu.org; Anup Patel <Anup.Patel@wdc.com>
-> > Subject: [PATCH] riscv/virt: Add syscon reboot and poweroff DT nodes
-> >
-> > The SiFive test device found on virt machine can be used by generic syscon
-> > reboot and poweroff drivers available in Linux kernel.
-> >
-> > This patch updates FDT generation in virt machine so that Linux kernel can
-> > probe and use generic syscon drivers.
-> >
-> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> > ---
-> >  hw/riscv/virt.c | 28 ++++++++++++++++++++++++----
-> >  1 file changed, 24 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c index cc8f311e6b..fdfa359713
-> > 100644
-> > --- a/hw/riscv/virt.c
-> > +++ b/hw/riscv/virt.c
-> > @@ -182,11 +182,11 @@ static void create_fdt(RISCVVirtState *s, const
-> > struct MemmapEntry *memmap,
-> >      uint64_t mem_size, const char *cmdline)  {
-> >      void *fdt;
-> > -    int cpu;
-> > +    int cpu, i;
-> >      uint32_t *cells;
-> >      char *nodename;
-> > -    uint32_t plic_phandle, phandle = 1;
-> > -    int i;
-> > +    const char test_compat[] = "sifive,test0\0syscon";
-> > +    uint32_t plic_phandle, test_phandle, phandle = 1;
-> >      hwaddr flashsize = virt_memmap[VIRT_FLASH].size / 2;
-> >      hwaddr flashbase = virt_memmap[VIRT_FLASH].base;
-> >
-> > @@ -356,13 +356,33 @@ static void create_fdt(RISCVVirtState *s, const
-> > struct MemmapEntry *memmap,
-> >      create_pcie_irq_map(fdt, nodename, plic_phandle);
-> >      g_free(nodename);
-> >
-> > +    test_phandle = phandle++;
-> >      nodename = g_strdup_printf("/test@%lx",
-> >          (long)memmap[VIRT_TEST].base);
-> >      qemu_fdt_add_subnode(fdt, nodename);
-> > -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,test0");
-> > +    qemu_fdt_setprop(fdt, nodename, "compatible",
-> > +                     test_compat, sizeof(test_compat));
-> >      qemu_fdt_setprop_cells(fdt, nodename, "reg",
-> >          0x0, memmap[VIRT_TEST].base,
-> >          0x0, memmap[VIRT_TEST].size);
-> > +    qemu_fdt_setprop_cell(fdt, nodename, "phandle", test_phandle);
-> > +    test_phandle = qemu_fdt_get_phandle(fdt, nodename);
+We need to actually fetch the cpu mask and set it. As we invert the
+short psw indication in the mask, SIE will report a specification
+exception, if it wasn't present in the reset psw.
 
-Is this necessary?
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ target/s390x/cpu.c | 12 ++++++++++--
+ target/s390x/cpu.h |  1 +
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-> > +    g_free(nodename);
-> > +
-> > +    nodename = g_strdup_printf("/reboot");
-> > +    qemu_fdt_add_subnode(fdt, nodename);
-> > +    qemu_fdt_setprop_string(fdt, nodename, "compatible", "syscon-
-> > reboot");
-> > +    qemu_fdt_setprop_cell(fdt, nodename, "regmap", test_phandle);
-> > +    qemu_fdt_setprop_cell(fdt, nodename, "offset", 0x0);
-> > +    qemu_fdt_setprop_cell(fdt, nodename, "value", FINISHER_RESET);
-> > +    g_free(nodename);
-> > +
-> > +    nodename = g_strdup_printf("/poweroff");
-> > +    qemu_fdt_add_subnode(fdt, nodename);
-> > +    qemu_fdt_setprop_string(fdt, nodename, "compatible", "syscon-
-> > poweroff");
-> > +    qemu_fdt_setprop_cell(fdt, nodename, "regmap", test_phandle);
-> > +    qemu_fdt_setprop_cell(fdt, nodename, "offset", 0x0);
-> > +    qemu_fdt_setprop_cell(fdt, nodename, "value", FINISHER_PASS);
-> >      g_free(nodename);
-> >
-> >      nodename = g_strdup_printf("/uart@%lx",
-> > --
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 736a7903e2..40aa42e092 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -76,8 +76,16 @@ static bool s390_cpu_has_work(CPUState *cs)
+ static void s390_cpu_load_normal(CPUState *s)
+ {
+     S390CPU *cpu = S390_CPU(s);
+-    cpu->env.psw.addr = ldl_phys(s->as, 4) & PSW_MASK_ESA_ADDR;
+-    cpu->env.psw.mask = PSW_MASK_32 | PSW_MASK_64;
++    uint64_t spsw = ldq_phys(s->as, 0);
++
++    cpu->env.psw.mask = spsw & 0xffffffff80000000UL;
++    /*
++     * Invert short psw indication, so SIE will report a specification
++     * exception if it was not set.
++     */
++    cpu->env.psw.mask ^= PSW_MASK_SHORTPSW;
++    cpu->env.psw.addr = spsw & 0x7fffffffUL;
++
+     s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+ }
+ #endif
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 947553386f..2c687185f1 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -261,6 +261,7 @@ extern const struct VMStateDescription vmstate_s390_cpu;
+ #define PSW_MASK_EXT            0x0100000000000000ULL
+ #define PSW_MASK_KEY            0x00F0000000000000ULL
+ #define PSW_SHIFT_KEY           52
++#define PSW_MASK_SHORTPSW	0x0008000000000000ULL
+ #define PSW_MASK_MCHECK         0x0004000000000000ULL
+ #define PSW_MASK_WAIT           0x0002000000000000ULL
+ #define PSW_MASK_PSTATE         0x0001000000000000ULL
+-- 
+2.20.1
 
-Regards,
-Bin
 
