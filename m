@@ -2,69 +2,51 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFDACC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AA6FC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:39:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2197214E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:38:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2197214E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5EE05214E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:39:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5EE05214E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUChs-0007ZB-Ch
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 11:38:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44557)
+	id 1iUCif-0008Tu-9q
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 11:39:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iUCcc-0000m1-HV
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:33:00 -0500
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iUCBO-0001ND-WB
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:04:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iUCca-0002Nv-L8
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:32:58 -0500
-Resent-Date: Mon, 11 Nov 2019 11:32:58 -0500
-Resent-Message-Id: <E1iUCca-0002Nv-L8@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21480)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iUCcV-0002Iq-Sr; Mon, 11 Nov 2019 11:32:52 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1573489953; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=fuglPj5c578Ps0L2i9n6TpWvNqvtX2em8IcSd8LRCH5UVLHlC+4IA+3CCVZI0GynyeH7Fzx0/LQn3oJD/C7cvoJ0b8E10swCb217kOPghQ93HtLavNyIz/XZbjKhjA6F9cbI/deADBVFj2zWeNjlsc2NjtsEU8CJeR97iURVmdQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1573489953;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=RPtMSZy8S3X/Alz40116ml+w4BEHdxC2/zj0PSYREow=; 
- b=FLhOoa5wdSnclR4cKv/WgPaDePdwBpynaLRXEWnXZeBZo+AtYlCheZsoqWMRQvE2ss1vT+So9306R4oEC4zEZB+BoeihpY7+xbuvbNsX85Bz9FVzasDkjxrTYnHW3YNe7ZSW9ttnIXaDuOKzlb/P2s3/8Xv0mcgnZrF16N8r93Q=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1573489950444355.7882265461002;
- Mon, 11 Nov 2019 08:32:30 -0800 (PST)
-In-Reply-To: <20191111122545.252478-1-its@irrelevant.dk>
-Subject: Re: [PATCH v3 00/20] nvme: support NVMe v1.3d,
- SGLs and multiple namespaces
-Message-ID: <157348994892.9707.4695709251635650046@37313f22b938>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: its@irrelevant.dk
-Date: Mon, 11 Nov 2019 08:32:30 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iUCBN-0003SG-3G
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:04:50 -0500
+Received: from relay.sw.ru ([185.231.240.75]:58210)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iUCBL-0003RT-AD; Mon, 11 Nov 2019 11:04:48 -0500
+Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iUCBC-0003my-OJ; Mon, 11 Nov 2019 19:04:38 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Subject: [PATCH v6 1/3] block: introduce compress filter driver
+Date: Mon, 11 Nov 2019 19:04:35 +0300
+Message-Id: <1573488277-794975-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1573488277-794975-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+References: <1573488277-794975-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,106 +58,290 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, javier@javigon.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, ross.lagerwall@citrix.com,
- Paul.Durrant@citrix.com, kbusch@kernel.org, sbates@raithlin.com
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
+ mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTExMTEyMjU0NS4yNTI0
-NzgtMS1pdHNAaXJyZWxldmFudC5kay8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZl
-IHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGlu
-Zm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYzIDAwLzIwXSBudm1lOiBzdXBwb3J0IE5WTWUg
-djEuM2QsIFNHTHMgYW5kIG11bHRpcGxlIG5hbWVzcGFjZXMKVHlwZTogc2VyaWVzCk1lc3NhZ2Ut
-aWQ6IDIwMTkxMTExMTIyNTQ1LjI1MjQ3OC0xLWl0c0BpcnJlbGV2YW50LmRrCgo9PT0gVEVTVCBT
-Q1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVs
-bCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxn
-b3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2Uu
-Lgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRk
-MWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmQ0NDcw
-NDMgbnZtZTogaGFuZGxlIGRtYSBlcnJvcnMKMzYzYjQxMiBwY2k6IHBhc3MgYWxvbmcgdGhlIHJl
-dHVybiB2YWx1ZSBvZiBkbWFfbWVtb3J5X3J3Cjk5MzE0ODAgbnZtZTogbWFrZSBsYmEgZGF0YSBz
-aXplIGNvbmZpZ3VyYWJsZQo2NTNkZmVjIG52bWU6IHJlbW92ZSByZWR1bmRhbnQgTnZtZUNtZCBw
-b2ludGVyIHBhcmFtZXRlcgpmNWQyZDU1IG52bWU6IGJ1bXAgY29udHJvbGxlciBwY2kgZGV2aWNl
-IGlkCjg5OWVmZTEgbnZtZTogc3VwcG9ydCBtdWx0aXBsZSBuYW1lc3BhY2VzCjRmYTUzOGMgbnZt
-ZTogYWRkIHN1cHBvcnQgZm9yIHNjYXR0ZXIgZ2F0aGVyIGxpc3RzCjc3YTk2ZjcgbnZtZTogYWxs
-b3cgbXVsdGlwbGUgYWlvcyBwZXIgY29tbWFuZApjMmUxNGEwIG52bWU6IHJlZmFjdG9yIHBycCBt
-YXBwaW5nCjhkN2NlODUgbnZtZTogYnVtcCBzdXBwb3J0ZWQgc3BlY2lmaWNhdGlvbiB2ZXJzaW9u
-IHRvIDEuMwozYzRjNDY2IG52bWU6IGFkZCBtaXNzaW5nIG1hbmRhdG9yeSBmZWF0dXJlcwpjMmFl
-OTJjIG52bWU6IGFkZCBsb2dnaW5nIHRvIGVycm9yIGluZm9ybWF0aW9uIGxvZyBwYWdlCjE1ZjU3
-MGYgbnZtZTogYWRkIHN1cHBvcnQgZm9yIHRoZSBhc3luY2hyb25vdXMgZXZlbnQgcmVxdWVzdCBj
-b21tYW5kCjg5NzM2ZDUgbnZtZTogYWRkIHN1cHBvcnQgZm9yIHRoZSBnZXQgbG9nIHBhZ2UgY29t
-bWFuZAozZTUyN2Q4IG52bWU6IHJlZmFjdG9yIGRldmljZSByZWFsaXphdGlvbgozZjEzNjQ3IG52
-bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgYWJvcnQgY29tbWFuZAoyOWMxMzIzIG52bWU6IGFsbG93
-IGNvbXBsZXRpb24gcXVldWVzIGluIHRoZSBjbWIKYzhlMzkwMCBudm1lOiBwb3B1bGF0ZSB0aGUg
-bWFuZGF0b3J5IHN1Ym5xbiBhbmQgdmVyIGZpZWxkcwplNGQ5Njg0IG52bWU6IGFkZCBtaXNzaW5n
-IGZpZWxkcyBpbiB0aGUgaWRlbnRpZnkgY29udHJvbGxlciBkYXRhIHN0cnVjdHVyZQozZGE5NGQ0
-IG52bWU6IG1vdmUgZGV2aWNlIHBhcmFtZXRlcnMgdG8gc2VwYXJhdGUgc3RydWN0CjQ4NjAwZjMg
-bnZtZTogcmVtb3ZlIHN1cGVyZmx1b3VzIGJyZWFrcwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8y
-MSBDaGVja2luZyBjb21taXQgNDg2MDBmMzAwOTA4IChudm1lOiByZW1vdmUgc3VwZXJmbHVvdXMg
-YnJlYWtzKQoyLzIxIENoZWNraW5nIGNvbW1pdCAzZGE5NGQ0ZmU4NTUgKG52bWU6IG1vdmUgZGV2
-aWNlIHBhcmFtZXRlcnMgdG8gc2VwYXJhdGUgc3RydWN0KQpFUlJPUjogTWFjcm9zIHdpdGggY29t
-cGxleCB2YWx1ZXMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIHBhcmVudGhlc2lzCiMxNzc6IEZJTEU6
-IGh3L2Jsb2NrL252bWUuaDo2OgorI2RlZmluZSBERUZJTkVfTlZNRV9QUk9QRVJUSUVTKF9zdGF0
-ZSwgX3Byb3BzKSBcCisgICAgREVGSU5FX1BST1BfU1RSSU5HKCJzZXJpYWwiLCBfc3RhdGUsIF9w
-cm9wcy5zZXJpYWwpLCBcCisgICAgREVGSU5FX1BST1BfVUlOVDMyKCJjbWJfc2l6ZV9tYiIsIF9z
-dGF0ZSwgX3Byb3BzLmNtYl9zaXplX21iLCAwKSwgXAorICAgIERFRklORV9QUk9QX1VJTlQzMigi
-bnVtX3F1ZXVlcyIsIF9zdGF0ZSwgX3Byb3BzLm51bV9xdWV1ZXMsIDY0KQoKdG90YWw6IDEgZXJy
-b3JzLCAwIHdhcm5pbmdzLCAxODEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMi8yMSBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKMy8yMSBDaGVja2luZyBjb21taXQgZTRkOTY4NDAyZDYyIChudm1l
-OiBhZGQgbWlzc2luZyBmaWVsZHMgaW4gdGhlIGlkZW50aWZ5IGNvbnRyb2xsZXIgZGF0YSBzdHJ1
-Y3R1cmUpCjQvMjEgQ2hlY2tpbmcgY29tbWl0IGM4ZTM5MDBiOGY5YiAobnZtZTogcG9wdWxhdGUg
-dGhlIG1hbmRhdG9yeSBzdWJucW4gYW5kIHZlciBmaWVsZHMpCjUvMjEgQ2hlY2tpbmcgY29tbWl0
-IDI5YzEzMjM0YjIwNCAobnZtZTogYWxsb3cgY29tcGxldGlvbiBxdWV1ZXMgaW4gdGhlIGNtYikK
-Ni8yMSBDaGVja2luZyBjb21taXQgM2YxMzY0Nzk4ZTRjIChudm1lOiBhZGQgc3VwcG9ydCBmb3Ig
-dGhlIGFib3J0IGNvbW1hbmQpCjcvMjEgQ2hlY2tpbmcgY29tbWl0IDNlNTI3ZDg1MGMwYyAobnZt
-ZTogcmVmYWN0b3IgZGV2aWNlIHJlYWxpemF0aW9uKQo4LzIxIENoZWNraW5nIGNvbW1pdCA4OTcz
-NmQ1ZDI1NzUgKG52bWU6IGFkZCBzdXBwb3J0IGZvciB0aGUgZ2V0IGxvZyBwYWdlIGNvbW1hbmQp
-CjkvMjEgQ2hlY2tpbmcgY29tbWl0IDE1ZjU3MGZjNWU4NyAobnZtZTogYWRkIHN1cHBvcnQgZm9y
-IHRoZSBhc3luY2hyb25vdXMgZXZlbnQgcmVxdWVzdCBjb21tYW5kKQoxMC8yMSBDaGVja2luZyBj
-b21taXQgYzJhZTkyY2ExZGNlIChudm1lOiBhZGQgbG9nZ2luZyB0byBlcnJvciBpbmZvcm1hdGlv
-biBsb2cgcGFnZSkKMTEvMjEgQ2hlY2tpbmcgY29tbWl0IDNjNGM0NjZhNTRmMyAobnZtZTogYWRk
-IG1pc3NpbmcgbWFuZGF0b3J5IGZlYXR1cmVzKQoxMi8yMSBDaGVja2luZyBjb21taXQgOGQ3Y2U4
-NWQwMmRlIChudm1lOiBidW1wIHN1cHBvcnRlZCBzcGVjaWZpY2F0aW9uIHZlcnNpb24gdG8gMS4z
-KQoxMy8yMSBDaGVja2luZyBjb21taXQgYzJlMTRhMDA5YzY0IChudm1lOiByZWZhY3RvciBwcnAg
-bWFwcGluZykKMTQvMjEgQ2hlY2tpbmcgY29tbWl0IDc3YTk2ZjdiMGRhNyAobnZtZTogYWxsb3cg
-bXVsdGlwbGUgYWlvcyBwZXIgY29tbWFuZCkKMTUvMjEgQ2hlY2tpbmcgY29tbWl0IDRmYTUzOGM4
-MGQ1ZiAobnZtZTogYWRkIHN1cHBvcnQgZm9yIHNjYXR0ZXIgZ2F0aGVyIGxpc3RzKQoxNi8yMSBD
-aGVja2luZyBjb21taXQgODk5ZWZlMWYxYjE2IChudm1lOiBzdXBwb3J0IG11bHRpcGxlIG5hbWVz
-cGFjZXMpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJ
-TlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzQyOiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCkVSUk9S
-OiBNYWNyb3Mgd2l0aCBjb21wbGV4IHZhbHVlcyBzaG91bGQgYmUgZW5jbG9zZWQgaW4gcGFyZW50
-aGVzaXMKIzIxODogRklMRTogaHcvYmxvY2svbnZtZS1ucy5oOjg6CisjZGVmaW5lIERFRklORV9O
-Vk1FX05TX1BST1BFUlRJRVMoX3N0YXRlLCBfcHJvcHMpIFwKKyAgICBERUZJTkVfUFJPUF9EUklW
-RSgiZHJpdmUiLCBfc3RhdGUsIGJsayksIFwKKyAgICBERUZJTkVfUFJPUF9VSU5UMzIoIm5zaWQi
-LCBfc3RhdGUsIF9wcm9wcy5uc2lkLCAwKQoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCA4
-MzIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTYvMjEgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CjE3LzIxIENoZWNraW5nIGNvbW1pdCBmNWQyZDU1OTcyYTEgKG52bWU6IGJ1bXAgY29udHJvbGxl
-ciBwY2kgZGV2aWNlIGlkKQoxOC8yMSBDaGVja2luZyBjb21taXQgNjUzZGZlY2I3NWU5IChudm1l
-OiByZW1vdmUgcmVkdW5kYW50IE52bWVDbWQgcG9pbnRlciBwYXJhbWV0ZXIpCjE5LzIxIENoZWNr
-aW5nIGNvbW1pdCA5OTMxNDgwY2U4ZTMgKG52bWU6IG1ha2UgbGJhIGRhdGEgc2l6ZSBjb25maWd1
-cmFibGUpCjIwLzIxIENoZWNraW5nIGNvbW1pdCAzNjNiNDEyODY0ZWEgKHBjaTogcGFzcyBhbG9u
-ZyB0aGUgcmV0dXJuIHZhbHVlIG9mIGRtYV9tZW1vcnlfcncpCjIxLzIxIENoZWNraW5nIGNvbW1p
-dCBkNDQ3MDQzY2ZiOWIgKG52bWU6IGhhbmRsZSBkbWEgZXJyb3JzKQpXQVJOSU5HOiBsaW5lIG92
-ZXIgODAgY2hhcmFjdGVycwojNzc6IEZJTEU6IGh3L2Jsb2NrL252bWUuYzoyNTc6CisgICAgICAg
-ICAgICAgICAgICAgIGlmIChudm1lX2FkZHJfcmVhZChuLCBwcnBfZW50LCAodm9pZCAqKSBwcnBf
-bGlzdCwgcHJwX3RyYW5zKSkgewoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEw
-MzogRklMRTogaHcvYmxvY2svbnZtZS5jOjQyODoKKyAgICAgICAgaWYgKG52bWVfYWRkcl9yZWFk
-KG4sIGFkZHIsIHNlZ21lbnQsIG5zZ2xkICogc2l6ZW9mKE52bWVTZ2xEZXNjcmlwdG9yKSkpIHsK
-CnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTQ4IGxpbmVzIGNoZWNrZWQKClBhdGNoIDIx
-LzIxIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBl
-cnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBj
-b21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0
-Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMTExMTIyNTQ1LjI1MjQ3OC0xLWl0c0BpcnJl
-bGV2YW50LmRrL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2Vu
-ZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQ
-bGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Allow writing all the data compressed through the filter driver.
+The written data will be aligned by the cluster size.
+Based on the QEMU current implementation, that data can be written to
+unallocated clusters only. May be used for a backup job.
+
+Suggested-by: Max Reitz <mreitz@redhat.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+---
+ block/Makefile.objs     |   1 +
+ block/filter-compress.c | 212 ++++++++++++++++++++++++++++++++++++++++++++++++
+ qapi/block-core.json    |  10 ++-
+ 3 files changed, 219 insertions(+), 4 deletions(-)
+ create mode 100644 block/filter-compress.c
+
+diff --git a/block/Makefile.objs b/block/Makefile.objs
+index e394fe0..330529b 100644
+--- a/block/Makefile.objs
++++ b/block/Makefile.objs
+@@ -43,6 +43,7 @@ block-obj-y += crypto.o
+ 
+ block-obj-y += aio_task.o
+ block-obj-y += backup-top.o
++block-obj-y += filter-compress.o
+ 
+ common-obj-y += stream.o
+ 
+diff --git a/block/filter-compress.c b/block/filter-compress.c
+new file mode 100644
+index 0000000..a7b0337
+--- /dev/null
++++ b/block/filter-compress.c
+@@ -0,0 +1,212 @@
++/*
++ * Compress filter block driver
++ *
++ * Copyright (c) 2019 Virtuozzo International GmbH
++ *
++ * Author:
++ *   Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
++ *   (based on block/copy-on-read.c by Max Reitz)
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License as
++ * published by the Free Software Foundation; either version 2 or
++ * (at your option) any later version of the License.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "block/block_int.h"
++#include "qemu/module.h"
++
++
++static int zip_open(BlockDriverState *bs, QDict *options, int flags,
++                     Error **errp)
++{
++    bs->backing = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
++                                  errp);
++    if (!bs->backing) {
++        return -EINVAL;
++    }
++
++    bs->supported_write_flags = BDRV_REQ_WRITE_UNCHANGED |
++        BDRV_REQ_WRITE_COMPRESSED |
++        (BDRV_REQ_FUA & bs->backing->bs->supported_write_flags);
++
++    bs->supported_zero_flags = BDRV_REQ_WRITE_UNCHANGED |
++        ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK) &
++            bs->backing->bs->supported_zero_flags);
++
++    return 0;
++}
++
++
++#define PERM_PASSTHROUGH (BLK_PERM_CONSISTENT_READ \
++                          | BLK_PERM_WRITE \
++                          | BLK_PERM_RESIZE)
++#define PERM_UNCHANGED (BLK_PERM_ALL & ~PERM_PASSTHROUGH)
++
++static void zip_child_perm(BlockDriverState *bs, BdrvChild *c,
++                            const BdrvChildRole *role,
++                            BlockReopenQueue *reopen_queue,
++                            uint64_t perm, uint64_t shared,
++                            uint64_t *nperm, uint64_t *nshared)
++{
++    *nperm = perm & PERM_PASSTHROUGH;
++    *nshared = (shared & PERM_PASSTHROUGH) | PERM_UNCHANGED;
++
++    /*
++     * We must not request write permissions for an inactive node, the child
++     * cannot provide it.
++     */
++    if (!(bs->open_flags & BDRV_O_INACTIVE)) {
++        *nperm |= BLK_PERM_WRITE_UNCHANGED;
++    }
++}
++
++
++static int64_t zip_getlength(BlockDriverState *bs)
++{
++    return bdrv_getlength(bs->backing->bs);
++}
++
++
++static int coroutine_fn zip_co_truncate(BlockDriverState *bs, int64_t offset,
++                                         bool exact, PreallocMode prealloc,
++                                         Error **errp)
++{
++    return bdrv_co_truncate(bs->backing, offset, exact, prealloc, errp);
++}
++
++
++static int coroutine_fn zip_co_preadv(BlockDriverState *bs,
++                                       uint64_t offset, uint64_t bytes,
++                                       QEMUIOVector *qiov, int flags)
++{
++    return bdrv_co_preadv(bs->backing, offset, bytes, qiov, flags);
++}
++
++
++static int coroutine_fn zip_co_preadv_part(BlockDriverState *bs,
++                                            uint64_t offset, uint64_t bytes,
++                                            QEMUIOVector *qiov,
++                                            size_t qiov_offset,
++                                            int flags)
++{
++    return bdrv_co_preadv_part(bs->backing, offset, bytes, qiov, qiov_offset,
++                               flags);
++}
++
++
++static int coroutine_fn zip_co_pwritev(BlockDriverState *bs,
++                                        uint64_t offset, uint64_t bytes,
++                                        QEMUIOVector *qiov, int flags)
++{
++    return bdrv_co_pwritev(bs->backing, offset, bytes, qiov,
++                           flags | BDRV_REQ_WRITE_COMPRESSED);
++}
++
++
++static int coroutine_fn zip_co_pwritev_part(BlockDriverState *bs,
++                                             uint64_t offset, uint64_t bytes,
++                                             QEMUIOVector *qiov,
++                                             size_t qiov_offset, int flags)
++{
++    return bdrv_co_pwritev_part(bs->backing, offset, bytes, qiov, qiov_offset,
++                                flags | BDRV_REQ_WRITE_COMPRESSED);
++}
++
++
++static int coroutine_fn zip_co_pwrite_zeroes(BlockDriverState *bs,
++                                              int64_t offset, int bytes,
++                                              BdrvRequestFlags flags)
++{
++    return bdrv_co_pwrite_zeroes(bs->backing, offset, bytes, flags);
++}
++
++
++static int coroutine_fn zip_co_pdiscard(BlockDriverState *bs,
++                                         int64_t offset, int bytes)
++{
++    return bdrv_co_pdiscard(bs->backing, offset, bytes);
++}
++
++
++static void zip_refresh_limits(BlockDriverState *bs, Error **errp)
++{
++    BlockDriverInfo bdi;
++    int ret;
++
++    if (!bs->backing) {
++        return;
++    }
++
++    ret = bdrv_get_info(bs->backing->bs, &bdi);
++    if (ret < 0 || bdi.cluster_size == 0) {
++        return;
++    }
++
++    bs->backing->bs->bl.request_alignment = bdi.cluster_size;
++    bs->backing->bs->bl.max_transfer = bdi.cluster_size;
++}
++
++
++static void zip_eject(BlockDriverState *bs, bool eject_flag)
++{
++    bdrv_eject(bs->backing->bs, eject_flag);
++}
++
++
++static void zip_lock_medium(BlockDriverState *bs, bool locked)
++{
++    bdrv_lock_medium(bs->backing->bs, locked);
++}
++
++
++static bool zip_recurse_is_first_non_filter(BlockDriverState *bs,
++                                             BlockDriverState *candidate)
++{
++    return bdrv_recurse_is_first_non_filter(bs->backing->bs, candidate);
++}
++
++
++static BlockDriver bdrv_compress = {
++    .format_name                        = "compress",
++
++    .bdrv_open                          = zip_open,
++    .bdrv_child_perm                    = zip_child_perm,
++
++    .bdrv_getlength                     = zip_getlength,
++    .bdrv_co_truncate                   = zip_co_truncate,
++
++    .bdrv_co_preadv                     = zip_co_preadv,
++    .bdrv_co_preadv_part                = zip_co_preadv_part,
++    .bdrv_co_pwritev                    = zip_co_pwritev,
++    .bdrv_co_pwritev_part               = zip_co_pwritev_part,
++    .bdrv_co_pwrite_zeroes              = zip_co_pwrite_zeroes,
++    .bdrv_co_pdiscard                   = zip_co_pdiscard,
++    .bdrv_refresh_limits                = zip_refresh_limits,
++
++    .bdrv_eject                         = zip_eject,
++    .bdrv_lock_medium                   = zip_lock_medium,
++
++    .bdrv_co_block_status               = bdrv_co_block_status_from_backing,
++
++    .bdrv_recurse_is_first_non_filter   = zip_recurse_is_first_non_filter,
++
++    .has_variable_length                = true,
++    .is_filter                          = true,
++};
++
++static void bdrv_compress_init(void)
++{
++    bdrv_register(&bdrv_compress);
++}
++
++block_init(bdrv_compress_init);
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index aa97ee2..33d8cd8 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -2884,15 +2884,16 @@
+ # @copy-on-read: Since 3.0
+ # @blklogwrites: Since 3.0
+ # @blkreplay: Since 4.2
++# @compress: Since 4.2
+ #
+ # Since: 2.9
+ ##
+ { 'enum': 'BlockdevDriver',
+   'data': [ 'blkdebug', 'blklogwrites', 'blkreplay', 'blkverify', 'bochs',
+-            'cloop', 'copy-on-read', 'dmg', 'file', 'ftp', 'ftps', 'gluster',
+-            'host_cdrom', 'host_device', 'http', 'https', 'iscsi', 'luks',
+-            'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels', 'qcow',
+-            'qcow2', 'qed', 'quorum', 'raw', 'rbd',
++            'cloop', 'copy-on-read', 'compress', 'dmg', 'file', 'ftp', 'ftps',
++            'gluster', 'host_cdrom', 'host_device', 'http', 'https', 'iscsi',
++            'luks', 'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels',
++            'qcow', 'qcow2', 'qed', 'quorum', 'raw', 'rbd',
+             { 'name': 'replication', 'if': 'defined(CONFIG_REPLICATION)' },
+             'sheepdog',
+             'ssh', 'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
+@@ -4045,6 +4046,7 @@
+       'bochs':      'BlockdevOptionsGenericFormat',
+       'cloop':      'BlockdevOptionsGenericFormat',
+       'copy-on-read':'BlockdevOptionsGenericFormat',
++      'compress':   'BlockdevOptionsGenericFormat',
+       'dmg':        'BlockdevOptionsGenericFormat',
+       'file':       'BlockdevOptionsFile',
+       'ftp':        'BlockdevOptionsCurlFtp',
+-- 
+1.8.3.1
+
 
