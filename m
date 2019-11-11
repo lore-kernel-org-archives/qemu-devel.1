@@ -2,85 +2,78 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 582FCC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D79C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:33:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24378214E0
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:31:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 929A5214E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 15:33:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KtLGCmTm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24378214E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HRTakYy7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 929A5214E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUBfK-0000Wm-JP
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 10:31:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34531)
+	id 1iUBhG-0001nd-M4
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 10:33:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34774)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iUBcq-00070v-0Y
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:29:09 -0500
+ (envelope-from <bmeng.cn@gmail.com>) id 1iUBec-00005R-50
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:30:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iUBcn-0002Pz-Bt
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:29:06 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40809
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iUBcm-0002Pm-UQ
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:29:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573486144;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hZUpsan7ynawPn4cZlERvm27mWsq78DDG0gqXnnrob8=;
- b=KtLGCmTmaTAxf8ydn0tAivY/wLDDM5VGn/hMLEAgZ4UMsVBzOes3BIUyUUUvhYVPWpPKi5
- 5HP1qpXsTsRMlYA0B7ppHv2BvCsrQMZzgy35qGuF8CExubK7/sd7LZDKsRUtpFD7wrzLM6
- v/RkKtvCQzJNOxZ08CIc+t4CG20XHLw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-165-kNwO3cPvP4G4TGyclD_Uhg-1; Mon, 11 Nov 2019 10:27:55 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79471106BB8C;
- Mon, 11 Nov 2019 15:27:54 +0000 (UTC)
-Received: from redhat.com (ovpn-112-45.ams2.redhat.com [10.36.112.45])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9878C5D9C9;
- Mon, 11 Nov 2019 15:27:46 +0000 (UTC)
-Date: Mon, 11 Nov 2019 15:27:43 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [RFC][PATCH 2/3] docs/specs: Add specification of ivshmem device
- revision 2
-Message-ID: <20191111152743.GM814211@redhat.com>
-References: <cover.1573477032.git.jan.kiszka@siemens.com>
- <f5996d934d24775160bcedbf28ac975a95d91101.1573477032.git.jan.kiszka@siemens.com>
- <20191111084327-mutt-send-email-mst@kernel.org>
- <0b0475c1-2564-f433-46d8-ff1a06c13569@siemens.com>
- <20191111100607-mutt-send-email-mst@kernel.org>
+ (envelope-from <bmeng.cn@gmail.com>) id 1iUBeb-0002wR-3h
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:30:58 -0500
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:38440)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bmeng.cn@gmail.com>)
+ id 1iUBea-0002vE-Tv; Mon, 11 Nov 2019 10:30:57 -0500
+Received: by mail-yb1-xb43.google.com with SMTP id k206so2500955ybb.5;
+ Mon, 11 Nov 2019 07:30:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=nNX87jqf7w0yVC+SWgvceNRMH4E2BIFEdTKvtHwkW88=;
+ b=HRTakYy7Q63CyRGUZ9nITftVbai57xCwUA4/OxZcep6z1FWq8smJV4G6OkupcBlsnt
+ nqm0Ea30usX138sLfQvAU4NREMa+KnJzCnR9tZNtcpQh2Cm4sjy2U8TUIMD9zDjLmHaM
+ 9bsObPZgBNguCVemqFqah37gbrPWwqmcrp8AsuUJHz6wurvSEPSfVbkHP9EjHCdu2zUn
+ vAO19ft6HqJocY+uLednhwYfbyPzcOMHoSI+7zhBqZ4a7iluNImCRToLQ6WUuRNqnSrj
+ 6mnPdocwXfrSS9nZ+QgK/uuDH7CPSfTWKGr+kCi1Ytw+cYBLLeOtU/8hywLvhDMu6Xqf
+ /hrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=nNX87jqf7w0yVC+SWgvceNRMH4E2BIFEdTKvtHwkW88=;
+ b=VYVHVS9qzoAG5k0wG2+rf9pIE81DvNQxxozGTYcu6rMuaI1uemx6YW2+GjTc9A3I5b
+ ecyJS/vQM4mrk+dR/HLmskzWSMmtz9J4S8aQEZznd/rY58sw108lcJVDNhSItCHdNsQL
+ 56fMhtXqpESXGcfEYFvXheyv459MG8MoulAIx+6iHTOAaqTXWfLJ0GcqzQeaOkcGYgeM
+ f72BKNE9lQ7R/u88uzKQkIi7URA6m4YVmeeKaha/tJVwCoktKvhV+WP2LZq6BkwQ3DSH
+ acUgewWN+gp90xbDGGwCYG+h7yJGBaVzJXVxiqRiDeQX4pUv6m6lGLnPUAXnBxH0Njou
+ I97g==
+X-Gm-Message-State: APjAAAUS9bc5D9BG1TKgMxGVdAeqUwKbIwO3yYlq617QdF/bT/hC56Gg
+ 1+kQHrN2UyXi7SVyrIHn54BkAPaB1OAnroWMb3Q=
+X-Google-Smtp-Source: APXvYqzq2lCHJ5rDH1EDw7SEToEdbx1HFK3JpYPm+55NnT6E6tkaUUgaMOQHAvCtFL0jR+0zVv/D2VJDpeA9wdvurhM=
+X-Received: by 2002:a25:4144:: with SMTP id o65mr21208253yba.11.1573486256031; 
+ Mon, 11 Nov 2019 07:30:56 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191111100607-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: kNwO3cPvP4G4TGyclD_Uhg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <03c2f42b32fb4e304319c241122ae83584f085e0.1573087610.git.alistair.francis@wdc.com>
+In-Reply-To: <03c2f42b32fb4e304319c241122ae83584f085e0.1573087610.git.alistair.francis@wdc.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Mon, 11 Nov 2019 23:30:43 +0800
+Message-ID: <CAEUhbmWaT06GAdz=d-oVtMsM6bOWR23bZjicgBsJLUHqaVRH7g@mail.gmail.com>
+Subject: Re: [PATCH for 4.2 v1 1/1] riscv/virt: Increase flash size
+To: Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::b43
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,68 +85,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: liang yan <lyan@suse.com>, Jailhouse <jailhouse-dev@googlegroups.com>,
- Claudio Fontana <claudio.fontana@gmail.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Hannes Reinecke <hare@suse.de>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Alistair Francis <alistair23@gmail.com>, Palmer Dabbelt <palmer@sifive.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 11, 2019 at 10:08:20AM -0500, Michael S. Tsirkin wrote:
-> On Mon, Nov 11, 2019 at 02:59:07PM +0100, Jan Kiszka wrote:
-> > On 11.11.19 14:45, Michael S. Tsirkin wrote:
-> > > On Mon, Nov 11, 2019 at 01:57:11PM +0100, Jan Kiszka wrote:
-> > > > +| Offset | Register               | Content                       =
-                       |
-> > > > +|-------:|:-----------------------|:------------------------------=
------------------------|
-> > > > +|    00h | Vendor ID              | 1AF4h                         =
-                       |
-> > > > +|    02h | Device ID              | 1110h                         =
-                       |
-> > >=20
-> > > Given it's a virtio vendor ID, please reserve a device ID
-> > > with the virtio TC.
-> >=20
-> > Yeah, QEMU's IVSHMEM was always using that. I'm happy to make this fina=
-lly
-> > official.
-> >=20
->=20
-> And I guess we will just mark it reserved or something right?
-> Since at least IVSHMEM 1 isn't a virtio device.
-> And will you be reusing same ID for IVSHMEM 2 or a new one?
+On Thu, Nov 7, 2019 at 8:54 AM Alistair Francis
+<alistair.francis@wdc.com> wrote:
+>
+> Coreboot developers have requested that they have at least 32MB of flash
+> to load binaries. We currently have 32MB of flash, but it is split in
+> two to allow loading two flash binaries. Let's increase the flash size
+> from 32MB to 64MB to ensure we have a single region that is 32MB.
+>
+> No QEMU release has include flash in the RISC-V virt machine, so this
+> isn't a breaking change.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  hw/riscv/virt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
 
-1110h isn't under either of the virtio PCI device ID allowed ranges
-according to the spec:
-
-  "Any PCI device with PCI Vendor ID 0x1AF4, and PCI Device
-   ID 0x1000 through 0x107F inclusive is a virtio device.
-   ...
-   Additionally, devices MAY utilize a Transitional PCI Device=20
-   ID range, 0x1000 to 0x103F depending on the device type. "
-
-So there's no need to reserve 0x1110h from the virtio spec POV.
-
-I have, however, ensured it is assigned to ivshmem from POV of
-Red Hat's own internal tracking of allocated device IDs, under
-its vendor ID.
-
-If ivshmem 2 is now a virtio device, then it is a good thing that
-it will get a new/different PCI device ID, to show that it is not
-compatible with the old device impl.
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+Reviewed-by: Bin Meng <bmeng.cn@gmail.com>
 
