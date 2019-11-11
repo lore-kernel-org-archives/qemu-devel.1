@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 083F9C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 12:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F400C17445
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 12:43:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC9E22067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 12:43:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC9E22067B
+	by mail.kernel.org (Postfix) with ESMTPS id 136162067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 12:43:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 136162067B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iU92b-0002VN-Ng
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 07:43:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37269)
+	id 1iU92d-0002XC-19
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 07:43:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37290)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1iU8mC-0008IH-Nb
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:26:39 -0500
+ (envelope-from <its@irrelevant.dk>) id 1iU8mE-0008Km-Sl
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:26:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1iU8m8-0003bN-HB
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:26:36 -0500
-Received: from charlie.dont.surf ([128.199.63.193]:52246)
+ (envelope-from <its@irrelevant.dk>) id 1iU8mA-0003c7-N6
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:26:38 -0500
+Received: from charlie.dont.surf ([128.199.63.193]:52272)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1iU8ly-0003Q5-Rv; Mon, 11 Nov 2019 07:26:23 -0500
+ id 1iU8lz-0003QK-Lq; Mon, 11 Nov 2019 07:26:23 -0500
 Received: from apples.localdomain (unknown [194.62.217.57])
- by charlie.dont.surf (Postfix) with ESMTPSA id B1864BFB01;
- Mon, 11 Nov 2019 12:26:01 +0000 (UTC)
+ by charlie.dont.surf (Postfix) with ESMTPSA id 6C035BFB11;
+ Mon, 11 Nov 2019 12:26:02 +0000 (UTC)
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-block@nongnu.org
-Subject: [PATCH v3 14/21] nvme: allow multiple aios per command
-Date: Mon, 11 Nov 2019 13:25:38 +0100
-Message-Id: <20191111122545.252478-15-its@irrelevant.dk>
+Subject: [PATCH v3 16/21] nvme: support multiple namespaces
+Date: Mon, 11 Nov 2019 13:25:40 +0100
+Message-Id: <20191111122545.252478-17-its@irrelevant.dk>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191111122545.252478-1-its@irrelevant.dk>
 References: <20191111122545.252478-1-its@irrelevant.dk>
@@ -68,979 +68,1003 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This refactors how the device issues asynchronous block backend
-requests. The NvmeRequest now holds a queue of NvmeAIOs that are
-associated with the command. This allows multiple aios to be issued for
-a command. Only when all requests have been completed will the device
-post a completion queue entry.
+This adds support for multiple namespaces by introducing a new 'nvme-ns'
+device model. The nvme device creates a bus named from the device name
+('id'). The nvme-ns devices then connect to this and registers
+themselves with the nvme device.
 
-Because the device is currently guaranteed to only issue a single aio
-request per command, the benefit is not immediately obvious. But this
-functionality is required to support metadata.
+This changes how an nvme device is created. Example with two namespaces:
+
+  -drive file=3Dnvme0n1.img,if=3Dnone,id=3Ddisk1
+  -drive file=3Dnvme0n2.img,if=3Dnone,id=3Ddisk2
+  -device nvme,serial=3Ddeadbeef,id=3Dnvme0
+  -device nvme-ns,drive=3Ddisk1,bus=3Dnvme0,nsid=3D1
+  -device nvme-ns,drive=3Ddisk2,bus=3Dnvme0,nsid=3D2
+
+The drive property is kept on the nvme device to keep the change
+backward compatible, but the property is now optional. Specifying a
+drive for the nvme device will always create the namespace with nsid 1.
 
 Signed-off-by: Klaus Jensen <klaus.jensen@cnexlabs.com>
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- hw/block/nvme.c       | 455 +++++++++++++++++++++++++++++++++---------
- hw/block/nvme.h       | 165 ++++++++++++---
- hw/block/trace-events |   8 +
- 3 files changed, 511 insertions(+), 117 deletions(-)
+ hw/block/Makefile.objs |   2 +-
+ hw/block/nvme-ns.c     | 158 +++++++++++++++++++++++++++++
+ hw/block/nvme-ns.h     |  60 +++++++++++
+ hw/block/nvme.c        | 222 ++++++++++++++++++++++++-----------------
+ hw/block/nvme.h        |  60 ++++++-----
+ hw/block/trace-events  |   6 +-
+ 6 files changed, 389 insertions(+), 119 deletions(-)
+ create mode 100644 hw/block/nvme-ns.c
+ create mode 100644 hw/block/nvme-ns.h
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 43c139e1644c..230f4277f6e5 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -25,6 +25,8 @@
-  *                              Default: 64
-  *   cmb_size_mb=3D<uint32>     : Size of Controller Memory Buffer in MB=
-s.
-  *                              Default: 0 (disabled)
-+ *   mdts=3D<uint8>             : Maximum Data Transfer Size (power of t=
-wo)
-+ *                              Default: 7
-  */
+diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
+index 28c2495a00dc..45f463462f1e 100644
+--- a/hw/block/Makefile.objs
++++ b/hw/block/Makefile.objs
+@@ -7,7 +7,7 @@ common-obj-$(CONFIG_PFLASH_CFI02) +=3D pflash_cfi02.o
+ common-obj-$(CONFIG_XEN) +=3D xen-block.o
+ common-obj-$(CONFIG_ECC) +=3D ecc.o
+ common-obj-$(CONFIG_ONENAND) +=3D onenand.o
+-common-obj-$(CONFIG_NVME_PCI) +=3D nvme.o
++common-obj-$(CONFIG_NVME_PCI) +=3D nvme.o nvme-ns.o
+ common-obj-$(CONFIG_SWIM) +=3D swim.o
 =20
- #include "qemu/osdep.h"
-@@ -56,6 +58,7 @@
-     } while (0)
-=20
- static void nvme_process_sq(void *opaque);
-+static void nvme_aio_cb(void *opaque, int ret);
-=20
- static inline bool nvme_addr_is_cmb(NvmeCtrl *n, hwaddr addr)
- {
-@@ -197,7 +200,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList =
-*qsg, uint64_t prp1,
-     }
-=20
-     if (nvme_addr_is_cmb(n, prp1)) {
--        req->is_cmb =3D true;
-+        nvme_req_set_cmb(req);
-     }
-=20
-     pci_dma_sglist_init(qsg, &n->parent_obj, num_prps);
-@@ -255,8 +258,8 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList =
-*qsg, uint64_t prp1,
-                 }
-=20
-                 addr_is_cmb =3D nvme_addr_is_cmb(n, prp_ent);
--                if ((req->is_cmb && !addr_is_cmb) ||
--                    (!req->is_cmb && addr_is_cmb)) {
-+                if ((nvme_req_is_cmb(req) && !addr_is_cmb) ||
-+                    (!nvme_req_is_cmb(req) && addr_is_cmb)) {
-                     status =3D NVME_INVALID_USE_OF_CMB | NVME_DNR;
-                     goto unmap;
-                 }
-@@ -269,8 +272,8 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList =
-*qsg, uint64_t prp1,
-             }
-         } else {
-             bool addr_is_cmb =3D nvme_addr_is_cmb(n, prp2);
--            if ((req->is_cmb && !addr_is_cmb) ||
--                (!req->is_cmb && addr_is_cmb)) {
-+            if ((nvme_req_is_cmb(req) && !addr_is_cmb) ||
-+                (!nvme_req_is_cmb(req) && addr_is_cmb)) {
-                 status =3D NVME_INVALID_USE_OF_CMB | NVME_DNR;
-                 goto unmap;
-             }
-@@ -312,7 +315,7 @@ static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uint8=
-_t *ptr, uint32_t len,
-         return status;
-     }
-=20
--    if (req->is_cmb) {
-+    if (nvme_req_is_cmb(req)) {
-         QEMUIOVector iov;
-=20
-         qemu_iovec_init(&iov, qsg.nsg);
-@@ -341,19 +344,18 @@ static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uin=
-t8_t *ptr, uint32_t len,
- static uint16_t nvme_dma_read_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t le=
-n,
-     uint64_t prp1, uint64_t prp2, NvmeRequest *req)
- {
--    QEMUSGList qsg;
-     uint16_t status =3D NVME_SUCCESS;
-=20
--    status =3D nvme_map_prp(n, &qsg, prp1, prp2, len, req);
-+    status =3D nvme_map_prp(n, &req->qsg, prp1, prp2, len, req);
-     if (status) {
-         return status;
-     }
-=20
--    if (req->is_cmb) {
-+    if (nvme_req_is_cmb(req)) {
-         QEMUIOVector iov;
-=20
--        qemu_iovec_init(&iov, qsg.nsg);
--        dma_to_cmb(n, &qsg, &iov);
-+        qemu_iovec_init(&iov, req->qsg.nsg);
-+        dma_to_cmb(n, &req->qsg, &iov);
-=20
-         if (unlikely(qemu_iovec_from_buf(&iov, 0, ptr, len) !=3D len)) {
-             trace_nvme_err_invalid_dma();
-@@ -365,17 +367,137 @@ static uint16_t nvme_dma_read_prp(NvmeCtrl *n, uin=
-t8_t *ptr, uint32_t len,
-         goto out;
-     }
-=20
--    if (unlikely(dma_buf_read(ptr, len, &qsg))) {
-+    if (unlikely(dma_buf_read(ptr, len, &req->qsg))) {
-         trace_nvme_err_invalid_dma();
-         status =3D NVME_INVALID_FIELD | NVME_DNR;
-     }
-=20
- out:
--    qemu_sglist_destroy(&qsg);
-+    qemu_sglist_destroy(&req->qsg);
-=20
-     return status;
- }
-=20
-+static uint16_t nvme_map(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+ obj-$(CONFIG_SH4) +=3D tc58128.o
+diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
+new file mode 100644
+index 000000000000..36deedee07a6
+--- /dev/null
++++ b/hw/block/nvme-ns.c
+@@ -0,0 +1,158 @@
++#include "qemu/osdep.h"
++#include "qemu/units.h"
++#include "qemu/cutils.h"
++#include "qemu/log.h"
++#include "hw/block/block.h"
++#include "hw/pci/msix.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/block-backend.h"
++#include "qapi/error.h"
++
++#include "hw/qdev-properties.h"
++#include "hw/qdev-core.h"
++
++#include "nvme.h"
++#include "nvme-ns.h"
++
++static int nvme_ns_init(NvmeNamespace *ns)
 +{
-+    NvmeNamespace *ns =3D req->ns;
++    NvmeIdNs *id_ns =3D &ns->id_ns;
 +
-+    uint32_t len =3D req->nlb << nvme_ns_lbads(ns);
-+    uint64_t prp1 =3D le64_to_cpu(cmd->prp1);
-+    uint64_t prp2 =3D le64_to_cpu(cmd->prp2);
++    id_ns->lbaf[0].ds =3D BDRV_SECTOR_BITS;
++    id_ns->nuse =3D id_ns->ncap =3D id_ns->nsze =3D
++        cpu_to_le64(nvme_ns_nlbas(ns));
 +
-+    return nvme_map_prp(n, &req->qsg, prp1, prp2, len, req);
++    return 0;
 +}
 +
-+static void nvme_aio_destroy(NvmeAIO *aio)
++static int nvme_ns_init_blk(NvmeCtrl *n, NvmeNamespace *ns, NvmeIdCtrl *=
+id,
++    Error **errp)
 +{
-+    if (aio->iov.nalloc) {
-+        qemu_iovec_destroy(&aio->iov);
-+    }
-+
-+    g_free(aio);
-+}
-+
-+static NvmeAIO *nvme_aio_new(BlockBackend *blk, int64_t offset,
-+    QEMUSGList *qsg, NvmeRequest *req, NvmeAIOCompletionFunc *cb)
-+{
-+    NvmeAIO *aio =3D g_malloc0(sizeof(*aio));
-+
-+    *aio =3D (NvmeAIO) {
-+        .blk =3D blk,
-+        .offset =3D offset,
-+        .req =3D req,
-+        .qsg =3D qsg,
-+        .cb =3D cb,
-+    };
-+
-+    if (qsg && nvme_req_is_cmb(req)) {
-+        NvmeCtrl *n =3D nvme_ctrl(req);
-+
-+        qemu_iovec_init(&aio->iov, qsg->nsg);
-+        dma_to_cmb(n, qsg, &aio->iov);
-+
-+        aio->qsg =3D NULL;
-+    }
-+
-+    return aio;
-+}
-+
-+static inline void nvme_req_register_aio(NvmeRequest *req, NvmeAIO *aio,
-+    NvmeAIOOp opc)
-+{
-+    aio->opc =3D opc;
-+
-+    trace_nvme_req_register_aio(nvme_cid(req), aio, blk_name(aio->blk),
-+        aio->offset, aio->qsg ? aio->qsg->size : aio->iov.size,
-+        nvme_aio_opc_str(aio), req);
-+
-+    if (req) {
-+        QTAILQ_INSERT_TAIL(&req->aio_tailq, aio, tailq_entry);
-+    }
-+}
-+
-+static void nvme_aio(NvmeAIO *aio)
-+{
-+    BlockBackend *blk =3D aio->blk;
-+    BlockAcctCookie *acct =3D &aio->acct;
-+    BlockAcctStats *stats =3D blk_get_stats(blk);
-+
-+    bool is_write, dma;
-+
-+    switch (aio->opc) {
-+    case NVME_AIO_OPC_NONE:
-+        break;
-+
-+    case NVME_AIO_OPC_FLUSH:
-+        block_acct_start(stats, acct, 0, BLOCK_ACCT_FLUSH);
-+        aio->aiocb =3D blk_aio_flush(blk, nvme_aio_cb, aio);
-+        break;
-+
-+    case NVME_AIO_OPC_WRITE_ZEROES:
-+        block_acct_start(stats, acct, aio->iov.size, BLOCK_ACCT_WRITE);
-+        aio->aiocb =3D blk_aio_pwrite_zeroes(aio->blk, aio->offset,
-+            aio->iov.size, BDRV_REQ_MAY_UNMAP, nvme_aio_cb, aio);
-+        break;
-+
-+    case NVME_AIO_OPC_READ:
-+    case NVME_AIO_OPC_WRITE:
-+        dma =3D aio->qsg !=3D NULL;
-+        is_write =3D (aio->opc =3D=3D NVME_AIO_OPC_WRITE);
-+
-+        block_acct_start(stats, acct,
-+            dma ? aio->qsg->size : aio->iov.size,
-+            is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ);
-+
-+        if (dma) {
-+            aio->aiocb =3D is_write ?
-+                dma_blk_write(blk, aio->qsg, aio->offset,
-+                    BDRV_SECTOR_SIZE, nvme_aio_cb, aio) :
-+                dma_blk_read(blk, aio->qsg, aio->offset,
-+                    BDRV_SECTOR_SIZE, nvme_aio_cb, aio);
-+
-+            return;
-+        }
-+
-+        aio->aiocb =3D is_write ?
-+            blk_aio_pwritev(blk, aio->offset, &aio->iov, 0,
-+                nvme_aio_cb, aio) :
-+            blk_aio_preadv(blk, aio->offset, &aio->iov, 0,
-+                nvme_aio_cb, aio);
-+
-+        break;
-+    }
-+}
-+
-+static void nvme_rw_aio(BlockBackend *blk, uint64_t offset, QEMUSGList *=
-qsg,
-+    NvmeRequest *req)
-+{
-+    NvmeAIO *aio =3D nvme_aio_new(blk, offset, qsg, req, NULL);
-+    nvme_req_register_aio(req, aio, nvme_req_is_write(req) ?
-+        NVME_AIO_OPC_WRITE : NVME_AIO_OPC_READ);
-+    nvme_aio(aio);
-+}
-+
- static void nvme_post_cqes(void *opaque)
- {
-     NvmeCQueue *cq =3D opaque;
-@@ -411,6 +533,11 @@ static void nvme_enqueue_req_completion(NvmeCQueue *=
-cq, NvmeRequest *req)
-     assert(cq->cqid =3D=3D req->sq->cqid);
-=20
-     trace_nvme_enqueue_req_completion(req->cid, cq->cqid, req->status);
-+
-+    if (req->qsg.nalloc) {
-+        qemu_sglist_destroy(&req->qsg);
-+    }
-+
-     QTAILQ_REMOVE(&req->sq->out_req_list, req, entry);
-     QTAILQ_INSERT_TAIL(&cq->req_list, req, entry);
-     timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
-@@ -456,135 +583,266 @@ static void nvme_clear_events(NvmeCtrl *n, uint8_=
-t event_type)
-     }
- }
-=20
--static void nvme_rw_cb(void *opaque, int ret)
-+static void nvme_rw_cb(NvmeRequest *req, void *opaque)
- {
--    NvmeRequest *req =3D opaque;
-     NvmeSQueue *sq =3D req->sq;
-     NvmeCtrl *n =3D sq->ctrl;
-     NvmeCQueue *cq =3D n->cq[sq->cqid];
--    NvmeRwCmd *rw =3D (NvmeRwCmd *) &req->cmd;
-+
-+    trace_nvme_rw_cb(req->cid, req->cmd.nsid);
-+
-+    nvme_enqueue_req_completion(cq, req);
-+}
-+
-+static void nvme_aio_cb(void *opaque, int ret)
-+{
-+    NvmeAIO *aio =3D opaque;
-+    NvmeRequest *req =3D aio->req;
-+
-+    BlockBackend *blk =3D aio->blk;
-+    BlockAcctCookie *acct =3D &aio->acct;
-+    BlockAcctStats *stats =3D blk_get_stats(blk);
++    uint64_t perm, shared_perm;
 +
 +    Error *local_err =3D NULL;
++    int ret;
 +
-+    trace_nvme_aio_cb(nvme_cid(req), aio, blk_name(aio->blk), aio->offse=
-t,
-+        nvme_aio_opc_str(aio), req);
++    perm =3D BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE;
++    shared_perm =3D BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE_UNCHANGED =
+|
++        BLK_PERM_GRAPH_MOD;
 +
-+    if (req) {
-+        QTAILQ_REMOVE(&req->aio_tailq, aio, tailq_entry);
-+    }
-=20
-     if (!ret) {
--        block_acct_done(blk_get_stats(n->conf.blk), &req->acct);
--        req->status =3D NVME_SUCCESS;
-+        block_acct_done(stats, acct);
-+
-+        if (aio->cb) {
-+            aio->cb(aio, aio->cb_arg);
-+        }
-     } else {
--        block_acct_failed(blk_get_stats(n->conf.blk), &req->acct);
--        nvme_set_error_page(n, sq->sqid, cpu_to_le16(req->cid),
--            NVME_INTERNAL_DEV_ERROR, offsetof(NvmeRwCmd, slba), rw->slba=
-, 1);
--        req->status =3D NVME_INTERNAL_DEV_ERROR | NVME_MORE;
--    }
-+        block_acct_failed(stats, acct);
-+
-+        if (req) {
-+            NvmeRwCmd *rw =3D (NvmeRwCmd *) &req->cmd;
-+            NvmeSQueue *sq =3D req->sq;
-+            NvmeCtrl *n =3D sq->ctrl;
-+            uint16_t status;
-+
-+            switch (aio->opc) {
-+            case NVME_AIO_OPC_READ:
-+                status =3D NVME_UNRECOVERED_READ;
-+                break;
-+            case NVME_AIO_OPC_WRITE:
-+            case NVME_AIO_OPC_WRITE_ZEROES:
-+                status =3D NVME_WRITE_FAULT;
-+                break;
-+            default:
-+                status =3D NVME_INTERNAL_DEV_ERROR;
-+                break;
-+            }
-=20
--    if (req->qsg.nalloc) {
--        qemu_sglist_destroy(&req->qsg);
-+            trace_nvme_err_aio(nvme_cid(req), aio, blk_name(aio->blk),
-+                aio->offset, nvme_aio_opc_str(aio), req, status);
-+
-+            nvme_set_error_page(n, sq->sqid, cpu_to_le16(req->cid), stat=
-us,
-+                offsetof(NvmeRwCmd, slba), rw->slba, 1);
-+
-+            error_setg_errno(&local_err, -ret, "aio failed");
-+            error_report_err(local_err);
-+
-+            /*
-+             * An Internal Error trumps all other errors. For other erro=
-rs,
-+             * only set the first error encountered. Any additional erro=
-rs will
-+             * be recorded in the error information log page.
-+             */
-+            if (!req->status ||
-+                nvme_is_error(status, NVME_INTERNAL_DEV_ERROR)) {
-+                req->status =3D status;
-+            }
-+        }
-     }
--    if (req->iov.nalloc) {
--        qemu_iovec_destroy(&req->iov);
-+
-+    if (req && QTAILQ_EMPTY(&req->aio_tailq)) {
-+        if (req->cb) {
-+            req->cb(req, req->cb_arg);
-+        } else {
-+            NvmeSQueue *sq =3D req->sq;
-+            NvmeCtrl *n =3D sq->ctrl;
-+            NvmeCQueue *cq =3D n->cq[sq->cqid];
-+
-+            nvme_enqueue_req_completion(cq, req);
-+        }
-     }
-=20
--    nvme_enqueue_req_completion(cq, req);
-+    nvme_aio_destroy(aio);
- }
-=20
--static uint16_t nvme_flush(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
-+static inline uint16_t nvme_check_mdts(NvmeCtrl *n, size_t len,
-     NvmeRequest *req)
- {
--    block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
--         BLOCK_ACCT_FLUSH);
--    req->aiocb =3D blk_aio_flush(n->conf.blk, nvme_rw_cb, req);
-+    uint8_t mdts =3D n->params.mdts;
-=20
--    return NVME_NO_COMPLETE;
-+    if (mdts && len > n->page_size << mdts) {
-+        trace_nvme_err_mdts(nvme_cid(req), n->page_size << mdts, len);
-+        return NVME_INVALID_FIELD | NVME_DNR;
++    ret =3D blk_set_perm(ns->blk, perm, shared_perm, &local_err);
++    if (ret) {
++        error_propagate_prepend(errp, local_err, "blk_set_perm: ");
++        return ret;
 +    }
 +
-+    return NVME_SUCCESS;
- }
-=20
--static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd=
- *cmd,
--    NvmeRequest *req)
-+static inline uint16_t nvme_check_prinfo(NvmeCtrl *n, NvmeRequest *req)
- {
--    NvmeRwCmd *rw =3D (NvmeRwCmd *)cmd;
--    const uint8_t lba_index =3D NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
--    const uint8_t data_shift =3D ns->id_ns.lbaf[lba_index].ds;
--    uint64_t slba =3D le64_to_cpu(rw->slba);
--    uint32_t nlb  =3D le16_to_cpu(rw->nlb) + 1;
--    uint64_t offset =3D slba << data_shift;
--    uint32_t count =3D nlb << data_shift;
-+    NvmeRwCmd *rw =3D (NvmeRwCmd *) &req->cmd;
-+    NvmeNamespace *ns =3D req->ns;
-+
-+    uint16_t ctrl =3D le16_to_cpu(rw->control);
-+
-+    if ((ctrl & NVME_RW_PRINFO_PRACT) && !(ns->id_ns.dps & DPS_TYPE_MASK=
-)) {
-+        trace_nvme_err_prinfo(nvme_cid(req), ctrl);
-+        return NVME_INVALID_FIELD | NVME_DNR;
++    ns->size =3D blk_getlength(ns->blk);
++    if (ns->size < 0) {
++        error_setg_errno(errp, -ns->size, "blk_getlength");
++        return 1;
 +    }
 +
-+    return NVME_SUCCESS;
-+}
-=20
--    if (unlikely(slba + nlb > ns->id_ns.nsze)) {
--        trace_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
-+static inline uint16_t nvme_check_bounds(NvmeCtrl *n, NvmeRequest *req)
-+{
-+    NvmeNamespace *ns =3D req->ns;
-+    uint64_t nsze =3D le64_to_cpu(ns->id_ns.nsze);
-+
-+    if (unlikely((req->slba + req->nlb) > nsze)) {
-+        block_acct_invalid(blk_get_stats(n->conf.blk),
-+            nvme_req_is_write(req) ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ)=
-;
-+        trace_nvme_err_invalid_lba_range(req->slba, req->nlb, nsze);
-         return NVME_LBA_RANGE | NVME_DNR;
-     }
-=20
--    block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
--                     BLOCK_ACCT_WRITE);
--    req->aiocb =3D blk_aio_pwrite_zeroes(n->conf.blk, offset, count,
--                                        BDRV_REQ_MAY_UNMAP, nvme_rw_cb, =
-req);
-+    return NVME_SUCCESS;
-+}
-+
-+static uint16_t nvme_check_rw(NvmeCtrl *n, NvmeRequest *req)
-+{
-+    NvmeNamespace *ns =3D req->ns;
-+    size_t len =3D req->nlb << nvme_ns_lbads(ns);
-+    uint16_t status;
-+
-+    status =3D nvme_check_mdts(n, len, req);
-+    if (status) {
-+        return status;
-+    }
-+
-+    status =3D nvme_check_prinfo(n, req);
-+    if (status) {
-+        return status;
-+    }
-+
-+    status =3D nvme_check_bounds(n, req);
-+    if (status) {
-+        return status;
-+    }
-+
-+    return NVME_SUCCESS;
-+}
-+
-+static uint16_t nvme_flush(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-+{
-+    NvmeAIO *aio =3D nvme_aio_new(n->conf.blk, 0x0, NULL, req, NULL);
-+
-+    nvme_req_register_aio(req, aio, NVME_AIO_OPC_FLUSH);
-+    nvme_aio(aio);
-+
-     return NVME_NO_COMPLETE;
- }
-=20
--static uint16_t nvme_rw(NvmeCtrl *n, NvmeNamespace *ns, NvmeCmd *cmd,
--    NvmeRequest *req)
-+static uint16_t nvme_write_zeros(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest =
-*req)
- {
--    NvmeRwCmd *rw =3D (NvmeRwCmd *)cmd;
--    uint32_t nlb  =3D le32_to_cpu(rw->nlb) + 1;
--    uint64_t slba =3D le64_to_cpu(rw->slba);
--    uint64_t prp1 =3D le64_to_cpu(rw->prp1);
--    uint64_t prp2 =3D le64_to_cpu(rw->prp2);
-+    NvmeAIO *aio;
-=20
--    uint8_t lba_index  =3D NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
--    uint8_t data_shift =3D ns->id_ns.lbaf[lba_index].ds;
--    uint64_t data_size =3D (uint64_t)nlb << data_shift;
--    uint64_t data_offset =3D slba << data_shift;
--    int is_write =3D rw->opcode =3D=3D NVME_CMD_WRITE ? 1 : 0;
--    enum BlockAcctType acct =3D is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT=
-_READ;
-+    NvmeNamespace *ns =3D req->ns;
-+    NvmeRwCmd *rw =3D (NvmeRwCmd *) cmd;
-=20
--    trace_nvme_rw(is_write ? "write" : "read", nlb, data_size, slba);
-+    int64_t offset;
-+    size_t count;
-+    uint16_t status;
-=20
--    if (unlikely((slba + nlb) > ns->id_ns.nsze)) {
--        block_acct_invalid(blk_get_stats(n->conf.blk), acct);
--        trace_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
--        return NVME_LBA_RANGE | NVME_DNR;
-+    req->slba =3D le64_to_cpu(rw->slba);
-+    req->nlb  =3D le16_to_cpu(rw->nlb) + 1;
-+
-+    trace_nvme_write_zeros(req->cid, le32_to_cpu(cmd->nsid), req->slba,
-+        req->nlb);
-+
-+    status =3D nvme_check_bounds(n, req);
-+    if (unlikely(status)) {
-+        block_acct_invalid(blk_get_stats(n->conf.blk), BLOCK_ACCT_WRITE)=
-;
-+        return status;
-     }
-=20
--    if (nvme_map_prp(n, &req->qsg, prp1, prp2, data_size, req)) {
-+    offset =3D req->slba << nvme_ns_lbads(ns);
-+    count =3D req->nlb << nvme_ns_lbads(ns);
-+
-+    aio =3D nvme_aio_new(n->conf.blk, offset, NULL, req, NULL);
-+
-+    aio->iov.size =3D count;
-+
-+    nvme_req_register_aio(req, aio, NVME_AIO_OPC_WRITE_ZEROES);
-+    nvme_aio(aio);
-+
-+    return NVME_NO_COMPLETE;
-+}
-+
-+static uint16_t nvme_rw(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
-+{
-+    NvmeRwCmd *rw =3D (NvmeRwCmd *) cmd;
-+    NvmeNamespace *ns =3D req->ns;
-+    int status;
-+
-+    enum BlockAcctType acct =3D
-+        nvme_req_is_write(req) ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ;
-+
-+    req->nlb  =3D le16_to_cpu(rw->nlb) + 1;
-+    req->slba =3D le64_to_cpu(rw->slba);
-+
-+    trace_nvme_rw(nvme_req_is_write(req) ? "write" : "read", req->nlb,
-+        req->nlb << nvme_ns_lbads(req->ns), req->slba);
-+
-+    status =3D nvme_check_rw(n, req);
-+    if (status) {
-         block_acct_invalid(blk_get_stats(n->conf.blk), acct);
--        return NVME_INVALID_FIELD | NVME_DNR;
-+        return status;
-     }
-=20
--    dma_acct_start(n->conf.blk, &req->acct, &req->qsg, acct);
--    if (!req->is_cmb) {
--        req->aiocb =3D is_write ?
--            dma_blk_write(n->conf.blk, &req->qsg, data_offset, BDRV_SECT=
-OR_SIZE,
--                          nvme_rw_cb, req) :
--            dma_blk_read(n->conf.blk, &req->qsg, data_offset, BDRV_SECTO=
-R_SIZE,
--                         nvme_rw_cb, req);
--    } else {
--        qemu_iovec_init(&req->iov, req->qsg.nsg);
--        dma_to_cmb(n, &req->qsg, &req->iov);
--        req->aiocb =3D is_write ?
--            blk_aio_pwritev(n->conf.blk, data_offset, &req->iov, 0, nvme=
-_rw_cb,
--                            req) :
--            blk_aio_preadv(n->conf.blk, data_offset, &req->iov, 0, nvme_=
-rw_cb,
--                           req);
-+    status =3D nvme_map(n, cmd, req);
-+    if (status) {
-+        block_acct_invalid(blk_get_stats(n->conf.blk), acct);
-+        return status;
-     }
-=20
-+    nvme_rw_aio(n->conf.blk, req->slba << nvme_ns_lbads(ns), &req->qsg, =
-req);
-+    nvme_req_set_cb(req, nvme_rw_cb, NULL);
-+
-     return NVME_NO_COMPLETE;
- }
-=20
- static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
- {
--    NvmeNamespace *ns;
-     uint32_t nsid =3D le32_to_cpu(cmd->nsid);
-=20
-+    trace_nvme_io_cmd(req->cid, nsid, le16_to_cpu(req->sq->sqid), cmd->o=
-pcode);
-+
-     if (unlikely(nsid =3D=3D 0 || nsid > n->num_namespaces)) {
-         trace_nvme_err_invalid_ns(nsid, n->num_namespaces);
-         return NVME_INVALID_NSID | NVME_DNR;
-     }
-=20
--    ns =3D &n->namespaces[nsid - 1];
-+    req->ns =3D &n->namespaces[nsid - 1];
-+
-     switch (cmd->opcode) {
-     case NVME_CMD_FLUSH:
--        return nvme_flush(n, ns, cmd, req);
-+        return nvme_flush(n, cmd, req);
-     case NVME_CMD_WRITE_ZEROS:
--        return nvme_write_zeros(n, ns, cmd, req);
-+        return nvme_write_zeros(n, cmd, req);
-     case NVME_CMD_WRITE:
-     case NVME_CMD_READ:
--        return nvme_rw(n, ns, cmd, req);
-+        return nvme_rw(n, cmd, req);
-     default:
-         trace_nvme_err_invalid_opc(cmd->opcode);
-         return NVME_INVALID_OPCODE | NVME_DNR;
-@@ -609,6 +867,7 @@ static uint16_t nvme_del_sq(NvmeCtrl *n, NvmeCmd *cmd=
-)
-     NvmeRequest *req, *next;
-     NvmeSQueue *sq;
-     NvmeCQueue *cq;
-+    NvmeAIO *aio;
-     uint16_t qid =3D le16_to_cpu(c->qid);
-=20
-     if (unlikely(!qid || nvme_check_sqid(n, qid))) {
-@@ -621,8 +880,11 @@ static uint16_t nvme_del_sq(NvmeCtrl *n, NvmeCmd *cm=
-d)
-     sq =3D n->sq[qid];
-     while (!QTAILQ_EMPTY(&sq->out_req_list)) {
-         req =3D QTAILQ_FIRST(&sq->out_req_list);
--        assert(req->aiocb);
--        blk_aio_cancel(req->aiocb);
-+        while (!QTAILQ_EMPTY(&req->aio_tailq)) {
-+            aio =3D QTAILQ_FIRST(&req->aio_tailq);
-+            assert(aio->aiocb);
-+            blk_aio_cancel(aio->aiocb);
-+        }
-     }
-     if (!nvme_check_cqid(n, sq->cqid)) {
-         cq =3D n->cq[sq->cqid];
-@@ -659,6 +921,7 @@ static void nvme_init_sq(NvmeSQueue *sq, NvmeCtrl *n,=
- uint64_t dma_addr,
-     QTAILQ_INIT(&sq->out_req_list);
-     for (i =3D 0; i < sq->size; i++) {
-         sq->io_req[i].sq =3D sq;
-+        QTAILQ_INIT(&(sq->io_req[i].aio_tailq));
-         QTAILQ_INSERT_TAIL(&(sq->req_list), &sq->io_req[i], entry);
-     }
-     sq->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, nvme_process_sq, sq);
-@@ -819,6 +1082,7 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *c=
-md, NvmeRequest *req)
-     uint32_t numdl, numdu;
-     uint64_t off, lpol, lpou;
-     size_t   len;
-+    uint16_t status;
-=20
-     numdl =3D (dw10 >> 16);
-     numdu =3D (dw11 & 0xffff);
-@@ -834,6 +1098,11 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeCmd *=
-cmd, NvmeRequest *req)
-=20
-     trace_nvme_get_log(req->cid, lid, lsp, rae, len, off);
-=20
-+    status =3D nvme_check_mdts(n, len, req);
-+    if (status) {
-+        return status;
-+    }
-+
-     switch (lid) {
-     case NVME_LOG_ERROR_INFO:
-         return nvme_error_info(n, cmd, rae, len, off, req);
-@@ -1352,8 +1621,9 @@ static void nvme_init_req(NvmeCtrl *n, NvmeCmd *cmd=
-, NvmeRequest *req)
-=20
-     memcpy(&req->cmd, cmd, sizeof(NvmeCmd));
-     req->status =3D NVME_SUCCESS;
--    req->is_cmb =3D false;
--    req->is_write =3D false;
-+    req->flags =3D 0x0;
-+    req->cb =3D NULL;
-+    req->cb_arg =3D NULL;
- }
-=20
- static void nvme_process_sq(void *opaque)
-@@ -1952,6 +2222,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
-     id->ieee[0] =3D 0x00;
-     id->ieee[1] =3D 0x02;
-     id->ieee[2] =3D 0xb3;
-+    id->mdts =3D params->mdts;
-     id->ver =3D cpu_to_le32(0x00010300);
-     id->oacs =3D cpu_to_le16(0);
-     id->acl =3D 3;
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index add9ff335aa5..2f6706899de1 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -8,7 +8,8 @@
-     DEFINE_PROP_UINT32("cmb_size_mb", _state, _props.cmb_size_mb, 0), \
-     DEFINE_PROP_UINT32("num_queues", _state, _props.num_queues, 64), \
-     DEFINE_PROP_UINT8("elpe", _state, _props.elpe, 24), \
--    DEFINE_PROP_UINT8("aerl", _state, _props.aerl, 3)
-+    DEFINE_PROP_UINT8("aerl", _state, _props.aerl, 3), \
-+    DEFINE_PROP_UINT8("mdts", _state, _props.mdts, 7)
-=20
- typedef struct NvmeParams {
-     char     *serial;
-@@ -16,6 +17,7 @@ typedef struct NvmeParams {
-     uint32_t cmb_size_mb;
-     uint8_t  elpe;
-     uint8_t  aerl;
-+    uint8_t  mdts;
- } NvmeParams;
-=20
- typedef struct NvmeAsyncEvent {
-@@ -23,23 +25,124 @@ typedef struct NvmeAsyncEvent {
-     NvmeAerResult result;
- } NvmeAsyncEvent;
-=20
--typedef struct NvmeRequest {
--    struct NvmeSQueue       *sq;
--    BlockAIOCB              *aiocb;
--    uint16_t                status;
--    uint16_t                cid;
--    bool                    is_cmb;
--    bool                    is_write;
--    NvmeCqe                 cqe;
--    BlockAcctCookie         acct;
--    QEMUSGList              qsg;
--    QEMUIOVector            iov;
--    NvmeCmd                 cmd;
--    QTAILQ_ENTRY(NvmeRequest)entry;
--} NvmeRequest;
--
--typedef struct NvmeSQueue {
--    struct NvmeCtrl *ctrl;
-+typedef enum NvmeAIOOp {
-+    NVME_AIO_OPC_NONE         =3D 0x0,
-+    NVME_AIO_OPC_FLUSH        =3D 0x1,
-+    NVME_AIO_OPC_READ         =3D 0x2,
-+    NVME_AIO_OPC_WRITE        =3D 0x3,
-+    NVME_AIO_OPC_WRITE_ZEROES =3D 0x4,
-+} NvmeAIOOp;
-+
-+typedef struct NvmeRequest NvmeRequest;
-+typedef struct NvmeAIO NvmeAIO;
-+typedef void NvmeAIOCompletionFunc(NvmeAIO *aio, void *opaque);
-+
-+struct NvmeAIO {
-+    NvmeRequest *req;
-+
-+    NvmeAIOOp       opc;
-+    int64_t         offset;
-+    BlockBackend    *blk;
-+    BlockAIOCB      *aiocb;
-+    BlockAcctCookie acct;
-+
-+    NvmeAIOCompletionFunc *cb;
-+    void                  *cb_arg;
-+
-+    QEMUSGList   *qsg;
-+    QEMUIOVector iov;
-+
-+    QTAILQ_ENTRY(NvmeAIO) tailq_entry;
-+};
-+
-+static inline const char *nvme_aio_opc_str(NvmeAIO *aio)
-+{
-+    switch (aio->opc) {
-+    case NVME_AIO_OPC_NONE:         return "NVME_AIO_OP_NONE";
-+    case NVME_AIO_OPC_FLUSH:        return "NVME_AIO_OP_FLUSH";
-+    case NVME_AIO_OPC_READ:         return "NVME_AIO_OP_READ";
-+    case NVME_AIO_OPC_WRITE:        return "NVME_AIO_OP_WRITE";
-+    case NVME_AIO_OPC_WRITE_ZEROES: return "NVME_AIO_OP_WRITE_ZEROES";
-+    default:                        return "NVME_AIO_OP_UNKNOWN";
-+    }
-+}
-+
-+#define NVME_REQ_TRANSFER_DMA  0x1
-+#define NVME_REQ_TRANSFER_CMB  0x2
-+#define NVME_REQ_TRANSFER_MASK 0x3
-+
-+typedef struct NvmeSQueue    NvmeSQueue;
-+typedef struct NvmeNamespace NvmeNamespace;
-+typedef void NvmeRequestCompletionFunc(NvmeRequest *req, void *opaque);
-+
-+struct NvmeRequest {
-+    NvmeSQueue    *sq;
-+    NvmeNamespace *ns;
-+    NvmeCqe       cqe;
-+    NvmeCmd       cmd;
-+
-+    uint64_t slba;
-+    uint32_t nlb;
-+    uint16_t status;
-+    uint16_t cid;
-+    int      flags;
-+
-+    NvmeRequestCompletionFunc *cb;
-+    void                      *cb_arg;
-+
-+    QEMUSGList qsg;
-+
-+    QTAILQ_HEAD(, NvmeAIO)    aio_tailq;
-+    QTAILQ_ENTRY(NvmeRequest) entry;
-+};
-+
-+static inline void nvme_req_set_cb(NvmeRequest *req,
-+    NvmeRequestCompletionFunc *cb, void *cb_arg)
-+{
-+    req->cb =3D cb;
-+    req->cb_arg =3D cb_arg;
-+}
-+
-+static inline void nvme_req_clear_cb(NvmeRequest *req)
-+{
-+    req->cb =3D req->cb_arg =3D NULL;
-+}
-+
-+static inline uint16_t nvme_cid(NvmeRequest *req)
-+{
-+    if (req) {
-+        return req->cid;
-+    }
-+
-+    return 0xffff;
-+}
-+
-+static inline bool nvme_req_is_cmb(NvmeRequest *req)
-+{
-+    return (req->flags & NVME_REQ_TRANSFER_MASK) =3D=3D NVME_REQ_TRANSFE=
-R_CMB;
-+}
-+
-+static void nvme_req_set_cmb(NvmeRequest *req)
-+{
-+    req->flags =3D NVME_REQ_TRANSFER_CMB;
-+}
-+
-+static inline bool nvme_req_is_write(NvmeRequest *req)
-+{
-+    switch (req->cmd.opcode) {
-+    case NVME_CMD_WRITE:
-+    case NVME_CMD_WRITE_UNCOR:
-+    case NVME_CMD_WRITE_ZEROS:
-+        return true;
++    switch (n->conf.wce) {
++    case ON_OFF_AUTO_ON:
++        n->features.volatile_wc =3D 1;
++        break;
++    case ON_OFF_AUTO_OFF:
++        n->features.volatile_wc =3D 0;
++    case ON_OFF_AUTO_AUTO:
++        n->features.volatile_wc =3D blk_enable_write_cache(ns->blk);
++        break;
 +    default:
-+        return false;
++        abort();
 +    }
++
++    blk_set_enable_write_cache(ns->blk, n->features.volatile_wc);
++
++    return 0;
++}
++
++static int nvme_ns_check_constraints(NvmeNamespace *ns, Error **errp)
++{
++    if (!ns->blk) {
++        error_setg(errp, "block backend not configured");
++        return 1;
++    }
++
++    return 0;
++}
++
++int nvme_ns_setup(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
++{
++    Error *local_err =3D NULL;
++
++    if (nvme_ns_check_constraints(ns, &local_err)) {
++        error_propagate_prepend(errp, local_err,
++            "nvme_ns_check_constraints: ");
++        return 1;
++    }
++
++    if (nvme_ns_init_blk(n, ns, &n->id_ctrl, &local_err)) {
++        error_propagate_prepend(errp, local_err, "nvme_ns_init_blk: ");
++        return 1;
++    }
++
++    nvme_ns_init(ns);
++    if (nvme_register_namespace(n, ns, &local_err)) {
++        error_propagate_prepend(errp, local_err, "nvme_register_namespac=
+e: ");
++        return 1;
++    }
++
++    return 0;
++}
++
++static void nvme_ns_realize(DeviceState *dev, Error **errp)
++{
++    NvmeNamespace *ns =3D NVME_NS(dev);
++    BusState *s =3D qdev_get_parent_bus(dev);
++    NvmeCtrl *n =3D NVME(s->parent);
++    Error *local_err =3D NULL;
++
++    if (nvme_ns_setup(n, ns, &local_err)) {
++        error_propagate_prepend(errp, local_err, "nvme_ns_setup: ");
++        return;
++    }
++}
++
++static Property nvme_ns_props[] =3D {
++    DEFINE_NVME_NS_PROPERTIES(NvmeNamespace, params),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void nvme_ns_class_init(ObjectClass *oc, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(oc);
++
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++
++    dc->bus_type =3D TYPE_NVME_BUS;
++    dc->realize =3D nvme_ns_realize;
++    dc->props =3D nvme_ns_props;
++    dc->desc =3D "virtual nvme namespace";
++}
++
++static void nvme_ns_instance_init(Object *obj)
++{
++    NvmeNamespace *ns =3D NVME_NS(obj);
++    char *bootindex =3D g_strdup_printf("/namespace@%d,0", ns->params.ns=
+id);
++
++    device_add_bootindex_property(obj, &ns->bootindex, "bootindex",
++        bootindex, DEVICE(obj), &error_abort);
++
++    g_free(bootindex);
++}
++
++static const TypeInfo nvme_ns_info =3D {
++    .name =3D TYPE_NVME_NS,
++    .parent =3D TYPE_DEVICE,
++    .class_init =3D nvme_ns_class_init,
++    .instance_size =3D sizeof(NvmeNamespace),
++    .instance_init =3D nvme_ns_instance_init,
++};
++
++static void nvme_ns_register_types(void)
++{
++    type_register_static(&nvme_ns_info);
++}
++
++type_init(nvme_ns_register_types)
+diff --git a/hw/block/nvme-ns.h b/hw/block/nvme-ns.h
+new file mode 100644
+index 000000000000..b564bac25f6d
+--- /dev/null
++++ b/hw/block/nvme-ns.h
+@@ -0,0 +1,60 @@
++#ifndef NVME_NS_H
++#define NVME_NS_H
++
++#define TYPE_NVME_NS "nvme-ns"
++#define NVME_NS(obj) \
++    OBJECT_CHECK(NvmeNamespace, (obj), TYPE_NVME_NS)
++
++#define DEFINE_NVME_NS_PROPERTIES(_state, _props) \
++    DEFINE_PROP_DRIVE("drive", _state, blk), \
++    DEFINE_PROP_UINT32("nsid", _state, _props.nsid, 0)
++
++typedef struct NvmeNamespaceParams {
++    uint32_t nsid;
++} NvmeNamespaceParams;
++
++typedef struct NvmeNamespace {
++    DeviceState  parent_obj;
++    BlockBackend *blk;
++    int32_t      bootindex;
++    int64_t      size;
++
++    NvmeIdNs            id_ns;
++    NvmeNamespaceParams params;
++} NvmeNamespace;
++
++static inline uint32_t nvme_nsid(NvmeNamespace *ns)
++{
++    if (ns) {
++        return ns->params.nsid;
++    }
++
++    return -1;
++}
++
++static inline NvmeLBAF nvme_ns_lbaf(NvmeNamespace *ns)
++{
++    NvmeIdNs *id_ns =3D &ns->id_ns;
++    return id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(id_ns->flbas)];
++}
++
++static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
++{
++    return nvme_ns_lbaf(ns).ds;
++}
++
++static inline size_t nvme_ns_lbads_bytes(NvmeNamespace *ns)
++{
++    return 1 << nvme_ns_lbads(ns);
++}
++
++static inline uint64_t nvme_ns_nlbas(NvmeNamespace *ns)
++{
++    return ns->size >> nvme_ns_lbads(ns);
 +}
 +
 +typedef struct NvmeCtrl NvmeCtrl;
 +
-+struct NvmeSQueue {
-+    NvmeCtrl    *ctrl;
-     uint16_t    sqid;
-     uint16_t    cqid;
-     uint32_t    head;
-@@ -51,10 +154,12 @@ typedef struct NvmeSQueue {
-     QTAILQ_HEAD(, NvmeRequest) req_list;
-     QTAILQ_HEAD(, NvmeRequest) out_req_list;
-     QTAILQ_ENTRY(NvmeSQueue) entry;
--} NvmeSQueue;
-+};
-=20
--typedef struct NvmeCQueue {
--    struct NvmeCtrl *ctrl;
-+typedef struct NvmeCQueue NvmeCQueue;
++int nvme_ns_setup(NvmeCtrl *n, NvmeNamespace *ns, Error **errp);
 +
-+struct NvmeCQueue {
-+    NvmeCtrl    *ctrl;
-     uint8_t     phase;
-     uint16_t    cqid;
-     uint16_t    irq_enabled;
-@@ -66,11 +171,11 @@ typedef struct NvmeCQueue {
-     QEMUTimer   *timer;
-     QTAILQ_HEAD(, NvmeSQueue) sq_list;
-     QTAILQ_HEAD(, NvmeRequest) req_list;
--} NvmeCQueue;
-+};
++#endif /* NVME_NS_H */
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 06b2530aa06c..7bd5c1bb2f55 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -17,7 +17,8 @@
+ /**
+  * Usage: add options:
+  *     -drive file=3D<file>,if=3Dnone,id=3D<drive_id>
+- *     -device nvme,drive=3D<drive_id>,serial=3D<serial>,id=3D<id[option=
+al]>
++ *     -device nvme,serial=3D<serial>,id=3Dnvme0
++ *     -device nvme-ns,drive=3D<drive_id>,bus=3Dnvme0,nsid=3D1
+  *
+  * Advanced optional options:
+  *
+@@ -31,6 +32,7 @@
 =20
--typedef struct NvmeNamespace {
-+struct NvmeNamespace {
-     NvmeIdNs        id_ns;
--} NvmeNamespace;
+ #include "qemu/osdep.h"
+ #include "qemu/units.h"
++#include "qemu/error-report.h"
+ #include "hw/block/block.h"
+ #include "hw/pci/msix.h"
+ #include "hw/pci/pci.h"
+@@ -46,6 +48,7 @@
+ #include "qemu/cutils.h"
+ #include "trace.h"
+ #include "nvme.h"
++#include "nvme-ns.h"
+=20
+ #define NVME_MAX_QS PCI_MSIX_FLAGS_QSIZE
+ #define NVME_TEMPERATURE 0x143
+@@ -882,11 +885,12 @@ static void nvme_clear_events(NvmeCtrl *n, uint8_t =
+event_type)
+=20
+ static void nvme_rw_cb(NvmeRequest *req, void *opaque)
+ {
++    NvmeNamespace *ns =3D req->ns;
+     NvmeSQueue *sq =3D req->sq;
+     NvmeCtrl *n =3D sq->ctrl;
+     NvmeCQueue *cq =3D n->cq[sq->cqid];
+=20
+-    trace_nvme_rw_cb(req->cid, req->cmd.nsid);
++    trace_nvme_rw_cb(req->cid, nvme_nsid(ns));
+=20
+     nvme_enqueue_req_completion(cq, req);
+ }
+@@ -919,6 +923,7 @@ static void nvme_aio_cb(void *opaque, int ret)
+         block_acct_failed(stats, acct);
+=20
+         if (req) {
++            NvmeNamespace *ns =3D req->ns;
+             NvmeRwCmd *rw =3D (NvmeRwCmd *) &req->cmd;
+             NvmeSQueue *sq =3D req->sq;
+             NvmeCtrl *n =3D sq->ctrl;
+@@ -941,7 +946,7 @@ static void nvme_aio_cb(void *opaque, int ret)
+                 aio->offset, nvme_aio_opc_str(aio), req, status);
+=20
+             nvme_set_error_page(n, sq->sqid, cpu_to_le16(req->cid), stat=
+us,
+-                offsetof(NvmeRwCmd, slba), rw->slba, 1);
++                offsetof(NvmeRwCmd, slba), rw->slba, nvme_nsid(ns));
+=20
+             error_setg_errno(&local_err, -ret, "aio failed");
+             error_report_err(local_err);
+@@ -1007,7 +1012,7 @@ static inline uint16_t nvme_check_bounds(NvmeCtrl *=
+n, NvmeRequest *req)
+     uint64_t nsze =3D le64_to_cpu(ns->id_ns.nsze);
+=20
+     if (unlikely((req->slba + req->nlb) > nsze)) {
+-        block_acct_invalid(blk_get_stats(n->conf.blk),
++        block_acct_invalid(blk_get_stats(ns->blk),
+             nvme_req_is_write(req) ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ)=
+;
+         trace_nvme_err_invalid_lba_range(req->slba, req->nlb, nsze);
+         return NVME_LBA_RANGE | NVME_DNR;
+@@ -1042,7 +1047,9 @@ static uint16_t nvme_check_rw(NvmeCtrl *n, NvmeRequ=
+est *req)
+=20
+ static uint16_t nvme_flush(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+ {
+-    NvmeAIO *aio =3D nvme_aio_new(n->conf.blk, 0x0, NULL, req, NULL);
++    NvmeNamespace *ns =3D req->ns;
++
++    NvmeAIO *aio =3D nvme_aio_new(ns->blk, 0x0, NULL, req, NULL);
+=20
+     nvme_req_register_aio(req, aio, NVME_AIO_OPC_FLUSH);
+     nvme_aio(aio);
+@@ -1064,19 +1071,18 @@ static uint16_t nvme_write_zeros(NvmeCtrl *n, Nvm=
+eCmd *cmd, NvmeRequest *req)
+     req->slba =3D le64_to_cpu(rw->slba);
+     req->nlb  =3D le16_to_cpu(rw->nlb) + 1;
+=20
+-    trace_nvme_write_zeros(req->cid, le32_to_cpu(cmd->nsid), req->slba,
+-        req->nlb);
++    trace_nvme_write_zeros(req->cid, nvme_nsid(ns), req->slba, req->nlb)=
+;
+=20
+     status =3D nvme_check_bounds(n, req);
+     if (unlikely(status)) {
+-        block_acct_invalid(blk_get_stats(n->conf.blk), BLOCK_ACCT_WRITE)=
+;
++        block_acct_invalid(blk_get_stats(ns->blk), BLOCK_ACCT_WRITE);
+         return status;
+     }
+=20
+     offset =3D req->slba << nvme_ns_lbads(ns);
+     count =3D req->nlb << nvme_ns_lbads(ns);
+=20
+-    aio =3D nvme_aio_new(n->conf.blk, offset, NULL, req, NULL);
++    aio =3D nvme_aio_new(ns->blk, offset, NULL, req, NULL);
+=20
+     aio->iov.size =3D count;
+=20
+@@ -1098,22 +1104,23 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeCmd *cmd=
+, NvmeRequest *req)
+     req->nlb  =3D le16_to_cpu(rw->nlb) + 1;
+     req->slba =3D le64_to_cpu(rw->slba);
+=20
+-    trace_nvme_rw(nvme_req_is_write(req) ? "write" : "read", req->nlb,
+-        req->nlb << nvme_ns_lbads(req->ns), req->slba);
++    trace_nvme_rw(req->cid, nvme_req_is_write(req) ? "write" : "read",
++        nvme_nsid(ns), req->nlb, req->nlb << nvme_ns_lbads(ns),
++        req->slba);
+=20
+     status =3D nvme_check_rw(n, req);
+     if (status) {
+-        block_acct_invalid(blk_get_stats(n->conf.blk), acct);
++        block_acct_invalid(blk_get_stats(ns->blk), acct);
+         return status;
+     }
+=20
+     status =3D nvme_map(n, cmd, req);
+     if (status) {
+-        block_acct_invalid(blk_get_stats(n->conf.blk), acct);
++        block_acct_invalid(blk_get_stats(ns->blk), acct);
+         return status;
+     }
+=20
+-    nvme_rw_aio(n->conf.blk, req->slba << nvme_ns_lbads(ns), &req->qsg, =
+req);
++    nvme_rw_aio(ns->blk, req->slba << nvme_ns_lbads(ns), &req->qsg, req)=
+;
+     nvme_req_set_cb(req, nvme_rw_cb, NULL);
+=20
+     return NVME_NO_COMPLETE;
+@@ -1125,12 +1132,11 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeCmd =
+*cmd, NvmeRequest *req)
+=20
+     trace_nvme_io_cmd(req->cid, nsid, le16_to_cpu(req->sq->sqid), cmd->o=
+pcode);
+=20
+-    if (unlikely(nsid =3D=3D 0 || nsid > n->num_namespaces)) {
+-        trace_nvme_err_invalid_ns(nsid, n->num_namespaces);
+-        return NVME_INVALID_NSID | NVME_DNR;
+-    }
++    req->ns =3D nvme_ns(n, nsid);
+=20
+-    req->ns =3D &n->namespaces[nsid - 1];
++    if (unlikely(!req->ns)) {
++        return nvme_nsid_err(n, nsid);
++    }
+=20
+     switch (cmd->opcode) {
+     case NVME_CMD_FLUSH:
+@@ -1296,18 +1302,24 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, Nvme=
+Cmd *cmd, uint8_t rae,
+     uint64_t units_read =3D 0, units_written =3D 0, read_commands =3D 0,
+         write_commands =3D 0;
+     NvmeSmartLog smart;
+-    BlockAcctStats *s;
+=20
+     if (nsid && nsid !=3D 0xffffffff) {
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+=20
+-    s =3D blk_get_stats(n->conf.blk);
++    for (int i =3D 1; i <=3D n->num_namespaces; i++) {
++        NvmeNamespace *ns =3D nvme_ns(n, i);
++        if (!ns) {
++            continue;
++        }
++
++        BlockAcctStats *s =3D blk_get_stats(ns->blk);
+=20
+-    units_read =3D s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
+-    units_written =3D s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BITS;
+-    read_commands =3D s->nr_ops[BLOCK_ACCT_READ];
+-    write_commands =3D s->nr_ops[BLOCK_ACCT_WRITE];
++        units_read +=3D s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS=
+;
++        units_written +=3D s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_=
+BITS;
++        read_commands +=3D s->nr_ops[BLOCK_ACCT_READ];
++        write_commands +=3D s->nr_ops[BLOCK_ACCT_WRITE];
++    }
+=20
+     if (off > sizeof(smart)) {
+         return NVME_INVALID_FIELD | NVME_DNR;
+@@ -1507,20 +1519,25 @@ static uint16_t nvme_identify_ctrl(NvmeCtrl *n, N=
+vmeCmd *cmd, NvmeRequest *req)
+=20
+ static uint16_t nvme_identify_ns(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest =
+*req)
+ {
+-    NvmeNamespace *ns;
++    NvmeIdNs *id_ns, inactive =3D { 0 };
+     uint32_t nsid =3D le32_to_cpu(cmd->nsid);
++    NvmeNamespace *ns =3D nvme_ns(n, nsid);
+=20
+     trace_nvme_identify_ns(nsid);
+=20
+-    if (unlikely(nsid =3D=3D 0 || nsid > n->num_namespaces)) {
+-        trace_nvme_err_invalid_ns(nsid, n->num_namespaces);
+-        return NVME_INVALID_NSID | NVME_DNR;
+-    }
++    if (unlikely(!ns)) {
++        uint16_t status =3D nvme_nsid_err(n, nsid);
++
++        if (!nvme_is_error(status, NVME_INVALID_FIELD)) {
++            return status;
++        }
+=20
+-    ns =3D &n->namespaces[nsid - 1];
++        id_ns =3D &inactive;
++    } else {
++        id_ns =3D &ns->id_ns;
++    }
+=20
+-    return nvme_dma_read(n, (uint8_t *) &ns->id_ns, sizeof(ns->id_ns), c=
+md,
+-        req);
++    return nvme_dma_read(n, (uint8_t *) id_ns, sizeof(NvmeIdNs), cmd, re=
+q);
+ }
+=20
+ static uint16_t nvme_identify_ns_list(NvmeCtrl *n, NvmeCmd *cmd,
+@@ -1535,11 +1552,11 @@ static uint16_t nvme_identify_ns_list(NvmeCtrl *n=
+, NvmeCmd *cmd,
+     trace_nvme_identify_ns_list(min_nsid);
+=20
+     list =3D g_malloc0(data_len);
+-    for (i =3D 0; i < n->num_namespaces; i++) {
+-        if (i < min_nsid) {
++    for (i =3D 1; i <=3D n->num_namespaces; i++) {
++        if (i <=3D min_nsid || !nvme_ns(n, i)) {
+             continue;
+         }
+-        list[j++] =3D cpu_to_le32(i + 1);
++        list[j++] =3D cpu_to_le32(i);
+         if (j =3D=3D data_len / sizeof(uint32_t)) {
+             break;
+         }
+@@ -1568,9 +1585,8 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtr=
+l *n, NvmeCmd *cmd,
+=20
+     trace_nvme_identify_ns_descr_list(nsid);
+=20
+-    if (unlikely(nsid =3D=3D 0 || nsid > n->num_namespaces)) {
+-        trace_nvme_err_invalid_ns(nsid, n->num_namespaces);
+-        return NVME_INVALID_NSID | NVME_DNR;
++    if (unlikely(!nvme_ns(n, nsid))) {
++        return nvme_nsid_err(n, nsid);
+     }
+=20
+     list =3D g_malloc0(len);
+@@ -1685,7 +1701,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeC=
+md *cmd, NvmeRequest *req)
+         result =3D cpu_to_le32(n->features.err_rec);
+         break;
+     case NVME_VOLATILE_WRITE_CACHE:
+-        result =3D blk_enable_write_cache(n->conf.blk);
++        result =3D cpu_to_le32(n->features.volatile_wc);
+         trace_nvme_getfeat_vwcache(result ? "enabled" : "disabled");
+         break;
+     case NVME_NUMBER_OF_QUEUES:
+@@ -1739,6 +1755,8 @@ static uint16_t nvme_set_feature_timestamp(NvmeCtrl=
+ *n, NvmeCmd *cmd,
+=20
+ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest =
+*req)
+ {
++    NvmeNamespace *ns;
++
+     uint32_t dw10 =3D le32_to_cpu(cmd->cdw10);
+     uint32_t dw11 =3D le32_to_cpu(cmd->cdw11);
+=20
+@@ -1756,8 +1774,19 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, Nvme=
+Cmd *cmd, NvmeRequest *req)
+         break;
+=20
+     case NVME_VOLATILE_WRITE_CACHE:
+-        blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
++        n->features.volatile_wc =3D dw11;
++
++        for (int i =3D 1; i <=3D n->num_namespaces; i++) {
++            ns =3D nvme_ns(n, i);
++            if (!ns) {
++                continue;
++            }
++
++            blk_set_enable_write_cache(ns->blk, dw11 & 1);
++        }
++
+         break;
++
+     case NVME_NUMBER_OF_QUEUES:
+         if (n->qs_created > 2) {
+             return NVME_CMD_SEQ_ERROR | NVME_DNR;
+@@ -1931,9 +1960,17 @@ static void nvme_process_sq(void *opaque)
+=20
+ static void nvme_clear_ctrl(NvmeCtrl *n)
+ {
++    NvmeNamespace *ns;
+     int i;
+=20
+-    blk_drain(n->conf.blk);
++    for (i =3D 1; i <=3D n->num_namespaces; i++) {
++        ns =3D nvme_ns(n, i);
++        if (!ns) {
++            continue;
++        }
++
++        blk_drain(ns->blk);
++    }
+=20
+     for (i =3D 0; i < n->params.num_queues; i++) {
+         if (n->sq[i] !=3D NULL) {
+@@ -1960,7 +1997,15 @@ static void nvme_clear_ctrl(NvmeCtrl *n)
+=20
+     n->outstanding_aers =3D 0;
+=20
+-    blk_flush(n->conf.blk);
++    for (i =3D 1; i <=3D n->num_namespaces; i++) {
++        ns =3D nvme_ns(n, i);
++        if (!ns) {
++            continue;
++        }
++
++        blk_flush(ns->blk);
++    }
++
+     n->bar.cc =3D 0;
+ }
+=20
+@@ -2381,8 +2426,8 @@ static int nvme_check_constraints(NvmeCtrl *n, Erro=
+r **errp)
+ {
+     NvmeParams *params =3D &n->params;
+=20
+-    if (!n->conf.blk) {
+-        error_setg(errp, "nvme: block backend not configured");
++    if (!n->namespace.blk && !n->parent_obj.qdev.id) {
++        error_setg(errp, "nvme: invalid 'id' parameter");
+         return 1;
+     }
+=20
+@@ -2399,22 +2444,10 @@ static int nvme_check_constraints(NvmeCtrl *n, Er=
+ror **errp)
+     return 0;
+ }
+=20
+-static int nvme_init_blk(NvmeCtrl *n, Error **errp)
+-{
+-    blkconf_blocksizes(&n->conf);
+-    if (!blkconf_apply_backend_options(&n->conf, blk_is_read_only(n->con=
+f.blk),
+-        false, errp)) {
+-        return 1;
+-    }
+-
+-    return 0;
+-}
+-
+ static void nvme_init_state(NvmeCtrl *n)
+ {
+-    n->num_namespaces =3D 1;
++    n->num_namespaces =3D 0;
+     n->reg_size =3D pow2ceil(0x1004 + 2 * (n->params.num_queues + 1) * 4=
+);
+-    n->namespaces =3D g_new0(NvmeNamespace, n->num_namespaces);
+     n->sq =3D g_new0(NvmeSQueue *, n->params.num_queues);
+     n->cq =3D g_new0(NvmeCQueue *, n->params.num_queues);
+     n->elpes =3D g_new0(NvmeErrorLog, n->params.elpe + 1);
+@@ -2506,12 +2539,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+     id->cqes =3D (0x4 << 4) | 0x4;
+     id->nn =3D cpu_to_le32(n->num_namespaces);
+     id->oncs =3D cpu_to_le16(NVME_ONCS_WRITE_ZEROS | NVME_ONCS_TIMESTAMP=
+);
+-
+-
+-    if (blk_enable_write_cache(n->conf.blk)) {
+-        id->vwc =3D 1;
+-    }
+-
++    id->vwc =3D 1;
+     id->sgls =3D cpu_to_le32(0x1);
+=20
+     strcpy((char *) id->subnqn, "nqn.2019-08.org.qemu:");
+@@ -2532,22 +2560,25 @@ static void nvme_init_ctrl(NvmeCtrl *n)
+     n->bar.intmc =3D n->bar.intms =3D 0;
+ }
+=20
+-static int nvme_init_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **e=
+rrp)
++int nvme_register_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp=
+)
+ {
+-    int64_t bs_size;
+-    NvmeIdNs *id_ns =3D &ns->id_ns;
++    uint32_t nsid =3D nvme_nsid(ns);
++
++    if (nsid =3D=3D 0 || nsid > NVME_MAX_NAMESPACES) {
++        error_setg(errp, "invalid nsid");
++        return 1;
++    }
+=20
+-    bs_size =3D blk_getlength(n->conf.blk);
+-    if (bs_size < 0) {
+-        error_setg_errno(errp, -bs_size, "blk_getlength");
++    if (n->namespaces[nsid - 1]) {
++        error_setg(errp, "nsid must be unique");
+         return 1;
+     }
+=20
+-    id_ns->lbaf[0].ds =3D BDRV_SECTOR_BITS;
+-    n->ns_size =3D bs_size;
++    trace_nvme_register_namespace(nsid);
+=20
+-    id_ns->ncap =3D id_ns->nuse =3D id_ns->nsze =3D
+-        cpu_to_le64(nvme_ns_nlbas(n, ns));
++    n->namespaces[nsid - 1] =3D ns;
++    n->num_namespaces =3D MAX(n->num_namespaces, nsid);
++    n->id_ctrl.nn =3D cpu_to_le32(n->num_namespaces);
+=20
+     return 0;
+ }
+@@ -2555,30 +2586,31 @@ static int nvme_init_namespace(NvmeCtrl *n, NvmeN=
+amespace *ns, Error **errp)
+ static void nvme_realize(PCIDevice *pci_dev, Error **errp)
+ {
+     NvmeCtrl *n =3D NVME(pci_dev);
++    NvmeNamespace *ns;
+     Error *local_err =3D NULL;
+-    int i;
+=20
+     if (nvme_check_constraints(n, &local_err)) {
+         error_propagate_prepend(errp, local_err, "nvme_check_constraints=
+: ");
+         return;
+     }
+=20
++    qbus_create_inplace(&n->bus, sizeof(NvmeBus), TYPE_NVME_BUS,
++        &pci_dev->qdev, n->parent_obj.qdev.id);
++
+     nvme_init_state(n);
++    nvme_init_pci(n, pci_dev);
++    nvme_init_ctrl(n);
+=20
+-    if (nvme_init_blk(n, &local_err)) {
+-        error_propagate_prepend(errp, local_err, "nvme_init_blk: ");
+-        return;
+-    }
++    /* setup a namespace if the controller drive property was given */
++    if (n->namespace.blk) {
++        ns =3D &n->namespace;
++        ns->params.nsid =3D 1;
+=20
+-    for (i =3D 0; i < n->num_namespaces; i++) {
+-        if (nvme_init_namespace(n, &n->namespaces[i], &local_err)) {
+-            error_propagate_prepend(errp, local_err, "nvme_init_namespac=
+e: ");
++        if (nvme_ns_setup(n, ns, &local_err)) {
++            error_propagate_prepend(errp, local_err, "nvme_ns_setup: ");
+             return;
+         }
+     }
+-
+-    nvme_init_pci(n, pci_dev);
+-    nvme_init_ctrl(n);
+ }
+=20
+ static void nvme_exit(PCIDevice *pci_dev)
+@@ -2600,7 +2632,8 @@ static void nvme_exit(PCIDevice *pci_dev)
+ }
+=20
+ static Property nvme_props[] =3D {
+-    DEFINE_BLOCK_PROPERTIES(NvmeCtrl, conf),
++    DEFINE_BLOCK_PROPERTIES_BASE(NvmeCtrl, conf), \
++    DEFINE_PROP_DRIVE("drive", NvmeCtrl, namespace.blk), \
+     DEFINE_NVME_PROPERTIES(NvmeCtrl, params),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+@@ -2632,26 +2665,35 @@ static void nvme_instance_init(Object *obj)
+ {
+     NvmeCtrl *s =3D NVME(obj);
+=20
+-    device_add_bootindex_property(obj, &s->conf.bootindex,
+-                                  "bootindex", "/namespace@1,0",
+-                                  DEVICE(obj), &error_abort);
++    if (s->namespace.blk) {
++        device_add_bootindex_property(obj, &s->conf.bootindex,
++                                      "bootindex", "/namespace@1,0",
++                                      DEVICE(obj), &error_abort);
++    }
+ }
+=20
+ static const TypeInfo nvme_info =3D {
+     .name          =3D TYPE_NVME,
+     .parent        =3D TYPE_PCI_DEVICE,
+     .instance_size =3D sizeof(NvmeCtrl),
+-    .class_init    =3D nvme_class_init,
+     .instance_init =3D nvme_instance_init,
++    .class_init    =3D nvme_class_init,
+     .interfaces =3D (InterfaceInfo[]) {
+         { INTERFACE_PCIE_DEVICE },
+         { }
+     },
+ };
+=20
++static const TypeInfo nvme_bus_info =3D {
++    .name =3D TYPE_NVME_BUS,
++    .parent =3D TYPE_BUS,
++    .instance_size =3D sizeof(NvmeBus),
 +};
++
+ static void nvme_register_types(void)
+ {
+     type_register_static(&nvme_info);
++    type_register_static(&nvme_bus_info);
+ }
+=20
+ type_init(nvme_register_types)
+diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+index 2f6706899de1..175a988bd85f 100644
+--- a/hw/block/nvme.h
++++ b/hw/block/nvme.h
+@@ -2,6 +2,10 @@
+ #define HW_NVME_H
+=20
+ #include "block/nvme.h"
++#include "nvme-ns.h"
++#include "trace.h"
++
++#define NVME_MAX_NAMESPACES 256
+=20
+ #define DEFINE_NVME_PROPERTIES(_state, _props) \
+     DEFINE_PROP_STRING("serial", _state, _props.serial), \
+@@ -72,7 +76,6 @@ static inline const char *nvme_aio_opc_str(NvmeAIO *aio=
+)
+ #define NVME_REQ_TRANSFER_MASK 0x3
+=20
+ typedef struct NvmeSQueue    NvmeSQueue;
+-typedef struct NvmeNamespace NvmeNamespace;
+ typedef void NvmeRequestCompletionFunc(NvmeRequest *req, void *opaque);
+=20
+ struct NvmeRequest {
+@@ -122,7 +125,7 @@ static inline bool nvme_req_is_cmb(NvmeRequest *req)
+     return (req->flags & NVME_REQ_TRANSFER_MASK) =3D=3D NVME_REQ_TRANSFE=
+R_CMB;
+ }
+=20
+-static void nvme_req_set_cmb(NvmeRequest *req)
++static inline void nvme_req_set_cmb(NvmeRequest *req)
+ {
+     req->flags =3D NVME_REQ_TRANSFER_CMB;
+ }
+@@ -173,9 +176,12 @@ struct NvmeCQueue {
+     QTAILQ_HEAD(, NvmeRequest) req_list;
+ };
+=20
+-struct NvmeNamespace {
+-    NvmeIdNs        id_ns;
+-};
++#define TYPE_NVME_BUS "nvme-bus"
++#define NVME_BUS(obj) OBJECT_CHECK(NvmeBus, (obj), TYPE_NVME_BUS)
++
++typedef struct NvmeBus {
++    BusState parent_bus;
++} NvmeBus;
 =20
  #define TYPE_NVME "nvme"
  #define NVME(obj) \
-@@ -122,6 +227,17 @@ typedef struct NvmeCtrl {
+@@ -186,8 +192,9 @@ typedef struct NvmeCtrl {
+     MemoryRegion iomem;
+     MemoryRegion ctrl_mem;
+     NvmeBar      bar;
+-    BlockConf    conf;
+     NvmeParams   params;
++    NvmeBus      bus;
++    BlockConf    conf;
+=20
+     uint32_t    page_size;
+     uint16_t    page_bits;
+@@ -197,7 +204,6 @@ typedef struct NvmeCtrl {
+     uint32_t    reg_size;
+     uint32_t    num_namespaces;
+     uint32_t    max_q_ents;
+-    uint64_t    ns_size;
+     uint8_t     outstanding_aers;
+     uint32_t    cmbsz;
+     uint32_t    cmbloc;
+@@ -217,7 +223,8 @@ typedef struct NvmeCtrl {
+     NvmeRequest **aer_reqs;
+     QTAILQ_HEAD(, NvmeAsyncEvent) aer_queue;
+=20
+-    NvmeNamespace   *namespaces;
++    NvmeNamespace   namespace;
++    NvmeNamespace   *namespaces[NVME_MAX_NAMESPACES];
+     NvmeSQueue      **sq;
+     NvmeCQueue      **cq;
+     NvmeSQueue      admin_sq;
+@@ -227,36 +234,37 @@ typedef struct NvmeCtrl {
      NvmeIdCtrl      id_ctrl;
  } NvmeCtrl;
 =20
-+static inline NvmeCtrl *nvme_ctrl(NvmeRequest *req)
-+{
-+    return req->sq->ctrl;
-+}
-+
-+static inline bool nvme_is_error(uint16_t status, uint16_t err)
-+{
-+    /* strip DNR and MORE */
-+    return (status & 0xfff) =3D=3D err;
-+}
-+
- static inline NvmeLBAF nvme_ns_lbaf(NvmeNamespace *ns)
+-static inline NvmeCtrl *nvme_ctrl(NvmeRequest *req)
++static inline NvmeNamespace *nvme_ns(NvmeCtrl *n, uint32_t nsid)
  {
-     NvmeIdNs *id_ns =3D &ns->id_ns;
-@@ -143,5 +259,4 @@ static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, Nvm=
-eNamespace *ns)
-     return n->ns_size >> nvme_ns_lbads(ns);
+-    return req->sq->ctrl;
+-}
++    if (!nsid || nsid > n->num_namespaces) {
++        return NULL;
++    }
+=20
+-static inline bool nvme_is_error(uint16_t status, uint16_t err)
+-{
+-    /* strip DNR and MORE */
+-    return (status & 0xfff) =3D=3D err;
++    return n->namespaces[nsid - 1];
  }
 =20
--
+-static inline NvmeLBAF nvme_ns_lbaf(NvmeNamespace *ns)
++static inline uint16_t nvme_nsid_err(NvmeCtrl *n, uint32_t nsid)
+ {
+-    NvmeIdNs *id_ns =3D &ns->id_ns;
+-    return id_ns->lbaf[NVME_ID_NS_FLBAS_INDEX(id_ns->flbas)];
+-}
++    if (nsid && nsid < n->num_namespaces) {
++        trace_nvme_err_inactive_ns(nsid, n->num_namespaces);
++        return NVME_INVALID_FIELD | NVME_DNR;
++    }
+=20
+-static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
+-{
+-    return nvme_ns_lbaf(ns).ds;
++    trace_nvme_err_invalid_ns(nsid, n->num_namespaces);
++    return NVME_INVALID_NSID | NVME_DNR;
+ }
+=20
+-static inline size_t nvme_ns_lbads_bytes(NvmeNamespace *ns)
++static inline NvmeCtrl *nvme_ctrl(NvmeRequest *req)
+ {
+-    return 1 << nvme_ns_lbads(ns);
++    return req->sq->ctrl;
+ }
+=20
+-static inline uint64_t nvme_ns_nlbas(NvmeCtrl *n, NvmeNamespace *ns)
++static inline bool nvme_is_error(uint16_t status, uint16_t err)
+ {
+-    return n->ns_size >> nvme_ns_lbads(ns);
++    /* strip DNR and MORE */
++    return (status & 0xfff) =3D=3D err;
+ }
+=20
++int nvme_register_namespace(NvmeCtrl *n, NvmeNamespace *ns, Error **errp=
+);
++
  #endif /* HW_NVME_H */
 diff --git a/hw/block/trace-events b/hw/block/trace-events
-index e81bb3a64ed7..c7e0a1849043 100644
+index 59d42a3b8c39..5df48cca55e4 100644
 --- a/hw/block/trace-events
 +++ b/hw/block/trace-events
-@@ -34,7 +34,12 @@ nvme_irq_pin(void) "pulsing IRQ pin"
+@@ -29,6 +29,7 @@ hd_geometry_guess(void *blk, uint32_t cyls, uint32_t he=
+ads, uint32_t secs, int t
+=20
+ # nvme.c
+ # nvme traces for successful events
++nvme_register_namespace(uint32_t nsid) "nsid %"PRIu32""
+ nvme_irq_msix(uint32_t vector) "raising MSI-X IRQ vector %u"
+ nvme_irq_pin(void) "pulsing IRQ pin"
  nvme_irq_masked(void) "IRQ is masked"
- nvme_dma_read(uint64_t prp1, uint64_t prp2) "DMA read, prp1=3D0x%"PRIx64=
-" prp2=3D0x%"PRIx64""
- nvme_map_prp(uint16_t cid, uint8_t opc, uint64_t trans_len, uint32_t len=
-, uint64_t prp1, uint64_t prp2, int num_prps) "cid %"PRIu16" opc 0x%"PRIx=
-8" trans_len %"PRIu64" len %"PRIu32" prp1 0x%"PRIx64" prp2 0x%"PRIx64" nu=
-m_prps %d"
-+nvme_req_register_aio(uint16_t cid, void *aio, const char *blkname, uint=
+@@ -38,7 +39,7 @@ nvme_map_sgl(uint16_t cid, uint8_t typ, uint32_t nlb, u=
+int64_t len) "cid %"PRIu1
+ nvme_req_register_aio(uint16_t cid, void *aio, const char *blkname, uint=
 64_t offset, uint64_t count, const char *opc, void *req) "cid %"PRIu16" a=
 io %p blk \"%s\" offset %"PRIu64" count %"PRIu64" opc \"%s\" req %p"
-+nvme_aio_cb(uint16_t cid, void *aio, const char *blkname, uint64_t offse=
+ nvme_aio_cb(uint16_t cid, void *aio, const char *blkname, uint64_t offse=
 t, const char *opc, void *req) "cid %"PRIu16" aio %p blk \"%s\" offset %"=
 PRIu64" opc \"%s\" req %p"
-+nvme_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode) =
+ nvme_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode) =
 "cid %"PRIu16" nsid %"PRIu32" sqid %"PRIu16" opc 0x%"PRIx8""
- nvme_rw(const char *verb, uint32_t blk_count, uint64_t byte_count, uint6=
+-nvme_rw(const char *verb, uint32_t blk_count, uint64_t byte_count, uint6=
 4_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64""
-+nvme_rw_cb(uint16_t cid, uint32_t nsid) "cid %"PRIu16" nsid %"PRIu32""
-+nvme_write_zeros(uint16_t cid, uint32_t nsid, uint64_t slba, uint32_t nl=
++nvme_rw(uint16_t cid, const char *verb, uint32_t nsid, uint32_t nlb, uin=
+t64_t count, uint64_t lba) "cid %"PRIu16" %s nsid %"PRIu32" nlb %"PRIu32"=
+ count %"PRIu64" lba 0x%"PRIx64""
+ nvme_rw_cb(uint16_t cid, uint32_t nsid) "cid %"PRIu16" nsid %"PRIu32""
+ nvme_write_zeros(uint16_t cid, uint32_t nsid, uint64_t slba, uint32_t nl=
 b) "cid %"PRIu16" nsid %"PRIu32" slba %"PRIu64" nlb %"PRIu32""
  nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsi=
 ze, uint16_t qflags) "create submission queue, addr=3D0x%"PRIx64", sqid=3D=
 %"PRIu16", cqid=3D%"PRIu16", qsize=3D%"PRIu16", qflags=3D%"PRIu16""
- nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t s=
-ize, uint16_t qflags, int ien) "create completion queue, addr=3D0x%"PRIx6=
-4", cqid=3D%"PRIu16", vector=3D%"PRIu16", qsize=3D%"PRIu16", qflags=3D%"P=
-RIu16", ien=3D%d"
- nvme_del_sq(uint16_t qid) "deleting submission queue sqid=3D%"PRIu16""
-@@ -74,6 +79,9 @@ nvme_mmio_shutdown_set(void) "shutdown bit set"
- nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
-=20
- # nvme traces for error conditions
-+nvme_err_mdts(uint16_t cid, size_t mdts, size_t len) "cid %"PRIu16" mdts=
- %"PRIu64" len %"PRIu64""
-+nvme_err_prinfo(uint16_t cid, uint16_t ctrl) "cid %"PRIu16" ctrl %"PRIu1=
-6""
-+nvme_err_aio(uint16_t cid, void *aio, const char *blkname, uint64_t offs=
-et, const char *opc, void *req, uint16_t status) "cid %"PRIu16" aio %p bl=
-k \"%s\" offset %"PRIu64" opc \"%s\" req %p status 0x%"PRIx16""
- nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
- nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is null o=
-r not page aligned: 0x%"PRIx64""
+@@ -90,7 +91,8 @@ nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP lis=
+t entry is null or not pa
  nvme_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned: 0x=
 %"PRIx64""
+ nvme_err_invalid_prp2_missing(void) "PRP2 is null and more data to be tr=
+ansferred"
+ nvme_err_invalid_prp(void) "invalid PRP"
+-nvme_err_invalid_ns(uint32_t ns, uint32_t limit) "invalid namespace %u n=
+ot within 1-%u"
++nvme_err_invalid_ns(uint32_t nsid, uint32_t nn) "nsid %"PRIu32" nn %"PRI=
+u32""
++nvme_err_inactive_ns(uint32_t nsid, uint32_t nn) "nsid %"PRIu32" nn %"PR=
+Iu32""
+ nvme_err_invalid_opc(uint8_t opc) "invalid opcode 0x%"PRIx8""
+ nvme_err_invalid_admin_opc(uint8_t opc) "invalid admin opcode 0x%"PRIx8"=
+"
+ nvme_err_invalid_lba_range(uint64_t start, uint64_t len, uint64_t limit)=
+ "Invalid LBA start=3D%"PRIu64" len=3D%"PRIu64" limit=3D%"PRIu64""
 --=20
 2.24.0
 
