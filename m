@@ -2,56 +2,58 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32876C17445
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 13:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8179C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 13:06:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBAC32190F
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 13:02:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBAC32190F
+	by mail.kernel.org (Postfix) with ESMTPS id 6B93621872
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 13:06:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B93621872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iU9KV-0003fa-8F
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 08:02:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41455)
+	id 1iU9Ok-0006aJ-JN
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 08:06:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41456)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jan.kiszka@siemens.com>) id 1iU9G1-0001qs-HH
+ (envelope-from <jan.kiszka@siemens.com>) id 1iU9G1-0001r3-NM
  for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:57:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jan.kiszka@siemens.com>) id 1iU9Fx-0006g2-2Z
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:57:24 -0500
-Received: from gecko.sbs.de ([194.138.37.40]:52316)
+ (envelope-from <jan.kiszka@siemens.com>) id 1iU9Fx-0006gA-80
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:57:25 -0500
+Received: from goliath.siemens.de ([192.35.17.28]:50102)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
- id 1iU9Fw-0006dj-JG
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:57:20 -0500
+ id 1iU9Fw-0006di-JG
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:57:21 -0500
 Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
- by gecko.sbs.de (8.15.2/8.15.2) with ESMTPS id xABCvDJI024157
+ by goliath.siemens.de (8.15.2/8.15.2) with ESMTPS id xABCvCLI025570
  (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 11 Nov 2019 13:57:13 +0100
+ Mon, 11 Nov 2019 13:57:12 +0100
 Received: from md1f2u6c.ad001.siemens.net ([139.25.68.37])
- by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id xABCvCBG010919;
+ by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id xABCvCBE010919;
  Mon, 11 Nov 2019 13:57:12 +0100
 From: Jan Kiszka <jan.kiszka@siemens.com>
 To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [RFC][PATCH 3/3] contrib: Add server for ivshmem revision 2
-Date: Mon, 11 Nov 2019 13:57:12 +0100
-Message-Id: <349ba45e162e248a49d83a5ae0cebeb8b7feb032.1573477032.git.jan.kiszka@siemens.com>
+Subject: [RFC][PATCH 1/3] hw/misc: Add implementation of ivshmem revision 2
+ device
+Date: Mon, 11 Nov 2019 13:57:10 +0100
+Message-Id: <45e177ac2518e6a651ffaf8a196cc4eadc05be63.1573477032.git.jan.kiszka@siemens.com>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <cover.1573477032.git.jan.kiszka@siemens.com>
 References: <cover.1573477032.git.jan.kiszka@siemens.com>
 In-Reply-To: <cover.1573477032.git.jan.kiszka@siemens.com>
 References: <cover.1573477032.git.jan.kiszka@siemens.com>
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 194.138.37.40
+X-Received-From: 192.35.17.28
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,1045 +75,1218 @@ Sender: "Qemu-devel"
 
 From: Jan Kiszka <jan.kiszka@siemens.com>
 
-This implements the server process for ivshmem v2 device models of QEMU.
-Again, no effort has been spent yet on sharing code with the v1 server.
-Parts have been copied, others were rewritten.
+This adds a reimplementation of ivshmem in its new revision 2 as
+separate device. The goal of this is not to enable sharing with v1,
+rather to allow explore the properties and potential limitation of the
+new version prior to discussing its integration with the existing code.
 
-In addition to parameters of v1, this server now also specifies
+v2 always requires a server to interconnect two more more QEMU
+instances because it provides signaling between peers unconditionally.
+Therefore, only the interconnecting chardev, master mode, and the usage
+of ioeventfd can be configured at device level. All other parameters are
+defined by the server instance.
 
- - the maximum number of peers to be connected (required to know in
-   advance because of v2's state table)
- - the size of the output sections (can be 0)
- - the protocol ID to be published to all peers
+A new server protocol is introduced along this. Its primary difference
+is the introduction of a single welcome message that contains all peer
+parameters, rather than a series of single-word messages pushing them
+piece by piece.
 
-When a virtio protocol ID is chosen, only 2 peers can be connected.
-Furthermore, the server will signal the backend variant of the ID to the
-master instance and the frontend ID to the slave peer.
+A complicating difference in interrupt handling, compare to v1, is the
+auto-disable mode of v2: When this is active, interrupt delivery is
+disabled by the device after each interrupt event. This prevents the
+usage of irqfd on the receiving side, but it lowers the handling cost
+for guests that implemented interrupt throttling this way (specifically
+when exposing the device via UIO).
 
-To start, e.g., a server that allows virtio console over ivshmem, call
+No changes have been made to the ivshmem device regarding migration:
+Only the master can live-migrate, slave peers have to hot-unplug the
+device first.
 
-ivshmem2-server -F -l 64K -n 2 -V 3 -P 0x8003
+The details of the device model will be specified in a succeeding
+commit. Drivers for this device can currently be found under
 
-TODO: specify the new server protocol.
+http://git.kiszka.org/?p=linux.git;a=shortlog;h=refs/heads/queues/ivshmem2
+
+To instantiate a ivshmem v2 device, just add
+
+ ... -chardev socket,path=/tmp/ivshmem_socket,id=ivshmem \
+     -device ivshmem,chardev=ivshmem
+
+provided the server opened its socket under the default path.
 
 Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
 ---
- Makefile                                  |   3 +
- Makefile.objs                             |   1 +
- configure                                 |   1 +
- contrib/ivshmem2-server/Makefile.objs     |   1 +
- contrib/ivshmem2-server/ivshmem2-server.c | 462 ++++++++++++++++++++++++++++++
- contrib/ivshmem2-server/ivshmem2-server.h | 158 ++++++++++
- contrib/ivshmem2-server/main.c            | 313 ++++++++++++++++++++
- 7 files changed, 939 insertions(+)
- create mode 100644 contrib/ivshmem2-server/Makefile.objs
- create mode 100644 contrib/ivshmem2-server/ivshmem2-server.c
- create mode 100644 contrib/ivshmem2-server/ivshmem2-server.h
- create mode 100644 contrib/ivshmem2-server/main.c
+ hw/misc/Makefile.objs      |    2 +-
+ hw/misc/ivshmem2.c         | 1091 ++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/misc/ivshmem2.h |   48 ++
+ 3 files changed, 1140 insertions(+), 1 deletion(-)
+ create mode 100644 hw/misc/ivshmem2.c
+ create mode 100644 include/hw/misc/ivshmem2.h
 
-diff --git a/Makefile b/Makefile
-index aa9d1a42aa..85b5e985ac 100644
---- a/Makefile
-+++ b/Makefile
-@@ -430,6 +430,7 @@ dummy := $(call unnest-vars,, \
-                 elf2dmp-obj-y \
-                 ivshmem-client-obj-y \
-                 ivshmem-server-obj-y \
-+                ivshmem2-server-obj-y \
-                 rdmacm-mux-obj-y \
-                 libvhost-user-obj-y \
-                 vhost-user-scsi-obj-y \
-@@ -662,6 +663,8 @@ ivshmem-client$(EXESUF): $(ivshmem-client-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
- ivshmem-server$(EXESUF): $(ivshmem-server-obj-y) $(COMMON_LDADDS)
- 	$(call LINK, $^)
-+ivshmem2-server$(EXESUF): $(ivshmem2-server-obj-y) $(COMMON_LDADDS)
-+	$(call LINK, $^)
- endif
- vhost-user-scsi$(EXESUF): $(vhost-user-scsi-obj-y) libvhost-user.a
- 	$(call LINK, $^)
-diff --git a/Makefile.objs b/Makefile.objs
-index 11ba1a36bd..a4a729d808 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -117,6 +117,7 @@ qga-vss-dll-obj-y = qga/
- elf2dmp-obj-y = contrib/elf2dmp/
- ivshmem-client-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-client/
- ivshmem-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem-server/
-+ivshmem2-server-obj-$(CONFIG_IVSHMEM) = contrib/ivshmem2-server/
- libvhost-user-obj-y = contrib/libvhost-user/
- vhost-user-scsi.o-cflags := $(LIBISCSI_CFLAGS)
- vhost-user-scsi.o-libs := $(LIBISCSI_LIBS)
-diff --git a/configure b/configure
-index efe165edf9..1b466b2461 100755
---- a/configure
-+++ b/configure
-@@ -6184,6 +6184,7 @@ if test "$want_tools" = "yes" ; then
-   fi
-   if [ "$ivshmem" = "yes" ]; then
-     tools="ivshmem-client\$(EXESUF) ivshmem-server\$(EXESUF) $tools"
-+    tools="ivshmem2-server\$(EXESUF) $tools"
-   fi
-   if [ "$curl" = "yes" ]; then
-       tools="elf2dmp\$(EXESUF) $tools"
-diff --git a/contrib/ivshmem2-server/Makefile.objs b/contrib/ivshmem2-server/Makefile.objs
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index ba898a5781..90a4a6608c 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -26,7 +26,7 @@ common-obj-$(CONFIG_PUV3) += puv3_pm.o
+ 
+ common-obj-$(CONFIG_MACIO) += macio/
+ 
+-common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o
++common-obj-$(CONFIG_IVSHMEM_DEVICE) += ivshmem.o ivshmem2.o
+ 
+ common-obj-$(CONFIG_REALVIEW) += arm_sysctl.o
+ common-obj-$(CONFIG_NSERIES) += cbus.o
+diff --git a/hw/misc/ivshmem2.c b/hw/misc/ivshmem2.c
 new file mode 100644
-index 0000000000..d233e18ec8
+index 0000000000..aeb5c40e0b
 --- /dev/null
-+++ b/contrib/ivshmem2-server/Makefile.objs
-@@ -0,0 +1 @@
-+ivshmem2-server-obj-y = ivshmem2-server.o main.o
-diff --git a/contrib/ivshmem2-server/ivshmem2-server.c b/contrib/ivshmem2-server/ivshmem2-server.c
-new file mode 100644
-index 0000000000..b341f1fcd0
---- /dev/null
-+++ b/contrib/ivshmem2-server/ivshmem2-server.c
-@@ -0,0 +1,462 @@
++++ b/hw/misc/ivshmem2.c
+@@ -0,0 +1,1091 @@
 +/*
-+ * Copyright 6WIND S.A., 2014
++ * Inter-VM Shared Memory PCI device, version 2.
++ *
 + * Copyright (c) Siemens AG, 2019
 + *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
++ * Authors:
++ *  Jan Kiszka <jan.kiszka@siemens.com>
++ *
++ * Based on ivshmem.c by Cam Macdonell <cam@cs.ualberta.ca>
++ *
++ * This code is licensed under the GNU GPL v2.
 + */
++
 +#include "qemu/osdep.h"
-+#include "qemu/host-utils.h"
-+#include "qemu/sockets.h"
-+#include "qemu/atomic.h"
++#include "qemu/units.h"
++#include "qapi/error.h"
++#include "qemu/cutils.h"
++#include "hw/hw.h"
++#include "hw/pci/pci.h"
++#include "hw/pci/msi.h"
++#include "hw/pci/msix.h"
++#include "hw/qdev-properties.h"
++#include "sysemu/kvm.h"
++#include "migration/blocker.h"
++#include "migration/vmstate.h"
++#include "qemu/error-report.h"
++#include "qemu/event_notifier.h"
++#include "qemu/module.h"
++#include "qom/object_interfaces.h"
++#include "chardev/char-fe.h"
++#include "sysemu/qtest.h"
++#include "qapi/visitor.h"
 +
-+#include <sys/socket.h>
-+#include <sys/un.h>
++#include "hw/misc/ivshmem2.h"
 +
-+#include "ivshmem2-server.h"
++#define PCI_VENDOR_ID_IVSHMEM   PCI_VENDOR_ID_REDHAT_QUMRANET
++#define PCI_DEVICE_ID_IVSHMEM   0x1110
 +
-+/* log a message on stdout if verbose=1 */
-+#define IVSHMEM_SERVER_DEBUG(server, fmt, ...) do { \
-+        if ((server)->args.verbose) {         \
-+            printf(fmt, ## __VA_ARGS__); \
-+        }                                \
++#define IVSHMEM_MAX_PEERS       UINT16_MAX
++#define IVSHMEM_IOEVENTFD       0
++#define IVSHMEM_MSI             1
++
++#define IVSHMEM_REG_BAR_SIZE    0x1000
++
++#define IVSHMEM_REG_ID          0x00
++#define IVSHMEM_REG_MAX_PEERS   0x04
++#define IVSHMEM_REG_FEATURES    0x08
++#define IVSHMEM_REG_INT_CTRL    0x0c
++#define IVSHMEM_REG_DOORBELL    0x10
++#define IVSHMEM_REG_STATE       0x14
++
++#define IVSHMEM_INT_ENABLE      0x1
++
++#define IVSHMEM_ONESHOT_MODE    0x1
++
++#define IVSHMEM_DEBUG 0
++#define IVSHMEM_DPRINTF(fmt, ...)                       \
++    do {                                                \
++        if (IVSHMEM_DEBUG) {                            \
++            printf("IVSHMEM: " fmt, ## __VA_ARGS__);    \
++        }                                               \
 +    } while (0)
 +
-+/** maximum size of a huge page, used by ivshmem_server_ftruncate() */
-+#define IVSHMEM_SERVER_MAX_HUGEPAGE_SIZE (1024 * 1024 * 1024)
++#define TYPE_IVSHMEM "ivshmem"
++#define IVSHMEM(obj) \
++    OBJECT_CHECK(IVShmemState, (obj), TYPE_IVSHMEM)
 +
-+/** default listen backlog (number of sockets not accepted) */
-+#define IVSHMEM_SERVER_LISTEN_BACKLOG 10
++typedef struct Peer {
++    int nb_eventfds;
++    EventNotifier *eventfds;
++} Peer;
 +
-+/* send message to a client unix socket */
-+static int ivshmem_server_send_msg(int sock_fd, void *payload, int len, int fd)
-+{
-+    int ret;
-+    struct msghdr msg;
-+    struct iovec iov[1];
-+    union {
-+        struct cmsghdr cmsg;
-+        char control[CMSG_SPACE(sizeof(int))];
-+    } msg_control;
-+    struct cmsghdr *cmsg;
++typedef struct MSIVector {
++    PCIDevice *pdev;
++    int virq;
++    bool unmasked;
++} MSIVector;
 +
-+    iov[0].iov_base = payload;
-+    iov[0].iov_len = len;
++typedef struct IVShmemVndrCap {
++    uint8_t id;
++    uint8_t next;
++    uint8_t length;
++    uint8_t priv_ctrl;
++    uint32_t state_tab_sz;
++    uint64_t rw_section_sz;
++    uint64_t output_section_sz;
++} IVShmemVndrCap;
 +
-+    memset(&msg, 0, sizeof(msg));
-+    msg.msg_iov = iov;
-+    msg.msg_iovlen = 1;
++typedef struct IVShmemState {
++    /*< private >*/
++    PCIDevice parent_obj;
++    /*< public >*/
 +
-+    /* if fd is specified, add it in a cmsg */
-+    if (fd >= 0) {
-+        memset(&msg_control, 0, sizeof(msg_control));
-+        msg.msg_control = &msg_control;
-+        msg.msg_controllen = sizeof(msg_control);
-+        cmsg = CMSG_FIRSTHDR(&msg);
-+        cmsg->cmsg_level = SOL_SOCKET;
-+        cmsg->cmsg_type = SCM_RIGHTS;
-+        cmsg->cmsg_len = CMSG_LEN(sizeof(int));
-+        memcpy(CMSG_DATA(cmsg), &fd, sizeof(fd));
-+    }
++    uint32_t features;
 +
-+    ret = sendmsg(sock_fd, &msg, 0);
-+    if (ret <= 0) {
-+        return -1;
-+    }
++    CharBackend server_chr;
 +
-+    return 0;
++    /* registers */
++    uint8_t *priv_ctrl;
++    uint32_t vm_id;
++    uint32_t intctrl;
++    uint32_t state;
++
++    /* BARs */
++    MemoryRegion ivshmem_mmio; /* BAR 0 (registers) */
++    MemoryRegion ivshmem_bar2; /* BAR 2 (shared memory) */
++
++    void *shmem;
++    size_t shmem_sz;
++    size_t output_section_sz;
++
++    MemoryRegion state_tab;
++    MemoryRegion rw_section;
++    MemoryRegion input_sections;
++    MemoryRegion output_section;
++
++    /* interrupt support */
++    Peer *peers;
++    int nb_peers;               /* space in @peers[] */
++    uint32_t max_peers;
++    uint32_t vectors;
++    MSIVector *msi_vectors;
++
++    uint8_t msg_buf[32];        /* buffer for receiving server messages */
++    int msg_buffered_bytes;     /* #bytes in @msg_buf */
++
++    uint32_t protocol;
++
++    /* migration stuff */
++    OnOffAuto master;
++    Error *migration_blocker;
++} IVShmemState;
++
++static void ivshmem_enable_irqfd(IVShmemState *s);
++static void ivshmem_disable_irqfd(IVShmemState *s);
++
++static inline uint32_t ivshmem_has_feature(IVShmemState *ivs,
++                                           unsigned int feature) {
++    return (ivs->features & (1 << feature));
 +}
 +
-+static int ivshmem_server_send_event_fd(int sock_fd, int peer_id, int vector,
-+                                        int fd)
++static inline bool ivshmem_is_master(IVShmemState *s)
 +{
-+    IvshmemEventFd msg = {
-+        .header = {
-+            .type = GUINT32_TO_LE(IVSHMEM_MSG_EVENT_FD),
-+            .len = GUINT32_TO_LE(sizeof(msg)),
-+        },
-+        .id = GUINT32_TO_LE(peer_id),
-+        .vector = GUINT32_TO_LE(vector),
-+    };
-+
-+    return ivshmem_server_send_msg(sock_fd, &msg, sizeof(msg), fd);
++    assert(s->master != ON_OFF_AUTO_AUTO);
++    return s->master == ON_OFF_AUTO_ON;
 +}
 +
-+/* free a peer when the server advertises a disconnection or when the
-+ * server is freed */
-+static void
-+ivshmem_server_free_peer(IvshmemServer *server, IvshmemServerPeer *peer)
++static bool ivshmem_irqfd_usable(IVShmemState *s)
 +{
-+    unsigned vector;
-+    IvshmemServerPeer *other_peer;
-+    IvshmemPeerGone msg = {
-+        .header = {
-+            .type = GUINT32_TO_LE(IVSHMEM_MSG_PEER_GONE),
-+            .len = GUINT32_TO_LE(sizeof(msg)),
-+        },
-+        .id = GUINT32_TO_LE(peer->id),
-+    };
++    PCIDevice *pdev = PCI_DEVICE(s);
 +
-+    IVSHMEM_SERVER_DEBUG(server, "free peer %" PRId64 "\n", peer->id);
-+    close(peer->sock_fd);
-+    QTAILQ_REMOVE(&server->peer_list, peer, next);
++    return (s->intctrl & IVSHMEM_INT_ENABLE) && msix_enabled(pdev) &&
++        !(*s->priv_ctrl & IVSHMEM_ONESHOT_MODE);
++}
 +
-+    server->state_table[peer->id] = 0;
++static void ivshmem_update_irqfd(IVShmemState *s, bool was_usable)
++{
++    bool is_usable = ivshmem_irqfd_usable(s);
++
++    if (kvm_msi_via_irqfd_enabled()) {
++        if (!was_usable && is_usable) {
++            ivshmem_enable_irqfd(s);
++        } else if (was_usable && !is_usable) {
++            ivshmem_disable_irqfd(s);
++        }
++    }
++}
++
++static void ivshmem_write_intctrl(IVShmemState *s, uint32_t new_state)
++{
++    bool was_usable = ivshmem_irqfd_usable(s);
++
++    s->intctrl = new_state & IVSHMEM_INT_ENABLE;
++    ivshmem_update_irqfd(s, was_usable);
++}
++
++static void ivshmem_write_state(IVShmemState *s, uint32_t new_state)
++{
++    uint32_t *state_table = s->shmem;
++    int peer;
++
++    state_table[s->vm_id] = new_state;
 +    smp_mb();
 +
-+    /* advertise the deletion to other peers */
-+    QTAILQ_FOREACH(other_peer, &server->peer_list, next) {
-+        ivshmem_server_send_msg(other_peer->sock_fd, &msg, sizeof(msg), -1);
-+    }
-+
-+    for (vector = 0; vector < peer->vectors_count; vector++) {
-+        event_notifier_cleanup(&peer->vectors[vector]);
-+    }
-+
-+    g_free(peer);
-+}
-+
-+/* send the peer id and the shm_fd just after a new client connection */
-+static int
-+ivshmem_server_send_initial_info(IvshmemServer *server, IvshmemServerPeer *peer)
-+{
-+    IvshmemInitialInfo msg = {
-+        .header = {
-+            .type = GUINT32_TO_LE(IVSHMEM_MSG_INIT),
-+            .len = GUINT32_TO_LE(sizeof(msg)),
-+        },
-+        .version = GUINT32_TO_LE(IVSHMEM_PROTOCOL_VERSION),
-+        .compatible_version = GUINT32_TO_LE(IVSHMEM_PROTOCOL_VERSION),
-+        .id = GUINT32_TO_LE(peer->id),
-+        .max_peers = GUINT32_TO_LE(server->args.max_peers),
-+        .vectors = GUINT32_TO_LE(server->args.vectors),
-+        .protocol = GUINT32_TO_LE(server->args.protocol),
-+        .output_section_size = GUINT64_TO_LE(server->args.output_section_size),
-+    };
-+    unsigned virtio_protocol;
-+    int ret;
-+
-+    if (server->args.protocol >= 0x8000) {
-+        virtio_protocol = server->args.protocol & ~0x4000;
-+        msg.protocol &= ~0x4000;
-+        if (peer->id == 0) {
-+            virtio_protocol |= 0x4000;
++    if (s->state != new_state) {
++        s->state = new_state;
++        for (peer = 0; peer < s->nb_peers; peer++) {
++            if (peer != s->vm_id && s->peers[peer].nb_eventfds > 0) {
++                event_notifier_set(&s->peers[peer].eventfds[0]);
++            }
 +        }
-+        msg.protocol = GUINT32_TO_LE(virtio_protocol);
 +    }
-+
-+    ret = ivshmem_server_send_msg(peer->sock_fd, &msg, sizeof(msg),
-+                                  server->shm_fd);
-+    if (ret < 0) {
-+        IVSHMEM_SERVER_DEBUG(server, "cannot send initial info: %s\n",
-+                             strerror(errno));
-+        return -1;
-+    }
-+
-+    return 0;
 +}
 +
-+/* handle message on listening unix socket (new client connection) */
-+static int
-+ivshmem_server_handle_new_conn(IvshmemServer *server)
++static void ivshmem_io_write(void *opaque, hwaddr addr,
++                             uint64_t val, unsigned size)
 +{
-+    IvshmemServerPeer *peer, *other_peer;
-+    struct sockaddr_un unaddr;
-+    socklen_t unaddr_len;
-+    int newfd;
-+    unsigned i;
++    IVShmemState *s = opaque;
 +
-+    /* accept the incoming connection */
-+    unaddr_len = sizeof(unaddr);
-+    newfd = qemu_accept(server->sock_fd,
-+                        (struct sockaddr *)&unaddr, &unaddr_len);
++    uint16_t dest = val >> 16;
++    uint16_t vector = val & 0xff;
 +
-+    if (newfd < 0) {
-+        IVSHMEM_SERVER_DEBUG(server, "cannot accept() %s\n", strerror(errno));
-+        return -1;
-+    }
++    addr &= 0xfc;
 +
-+    qemu_set_nonblock(newfd);
-+    IVSHMEM_SERVER_DEBUG(server, "accept()=%d\n", newfd);
++    IVSHMEM_DPRINTF("writing to addr " TARGET_FMT_plx "\n", addr);
++    switch (addr) {
++    case IVSHMEM_REG_INT_CTRL:
++        ivshmem_write_intctrl(s, val);
++        break;
 +
-+    /* allocate new structure for this peer */
-+    peer = g_malloc0(sizeof(*peer));
-+    peer->sock_fd = newfd;
-+
-+    /* get an unused peer id */
-+    /* XXX: this could use id allocation such as Linux IDA, or simply
-+     * a free-list */
-+    for (i = 0; i < G_MAXUINT16; i++) {
-+        if (ivshmem_server_search_peer(server, i) == NULL) {
++    case IVSHMEM_REG_DOORBELL:
++        /* check that dest VM ID is reasonable */
++        if (dest >= s->nb_peers) {
++            IVSHMEM_DPRINTF("Invalid destination VM ID (%d)\n", dest);
 +            break;
 +        }
-+    }
-+    if (i >= server->args.max_peers) {
-+        IVSHMEM_SERVER_DEBUG(server, "cannot allocate new client id\n");
-+        close(newfd);
-+        g_free(peer);
-+        return -1;
-+    }
-+    peer->id = i;
 +
-+    /* create eventfd, one per vector */
-+    peer->vectors_count = server->args.vectors;
-+    for (i = 0; i < peer->vectors_count; i++) {
-+        if (event_notifier_init(&peer->vectors[i], FALSE) < 0) {
-+            IVSHMEM_SERVER_DEBUG(server, "cannot create eventfd\n");
-+            goto fail;
++        /* check doorbell range */
++        if (vector < s->peers[dest].nb_eventfds) {
++            IVSHMEM_DPRINTF("Notifying VM %d on vector %d\n", dest, vector);
++            event_notifier_set(&s->peers[dest].eventfds[vector]);
++        } else {
++            IVSHMEM_DPRINTF("Invalid destination vector %d on VM %d\n",
++                            vector, dest);
 +        }
-+    }
++        break;
 +
-+    /* send peer id and shm fd */
-+    if (ivshmem_server_send_initial_info(server, peer) < 0) {
-+        IVSHMEM_SERVER_DEBUG(server, "cannot send initial info\n");
-+        goto fail;
-+    }
++    case IVSHMEM_REG_STATE:
++        ivshmem_write_state(s, val);
++        break;
 +
-+    /* advertise the new peer to others */
-+    QTAILQ_FOREACH(other_peer, &server->peer_list, next) {
-+        for (i = 0; i < peer->vectors_count; i++) {
-+            ivshmem_server_send_event_fd(other_peer->sock_fd, peer->id, i,
-+                                         peer->vectors[i].wfd);
-+        }
++    default:
++        IVSHMEM_DPRINTF("Unhandled write " TARGET_FMT_plx "\n", addr);
 +    }
-+
-+    /* advertise the other peers to the new one */
-+    QTAILQ_FOREACH(other_peer, &server->peer_list, next) {
-+        for (i = 0; i < peer->vectors_count; i++) {
-+            ivshmem_server_send_event_fd(peer->sock_fd, other_peer->id, i,
-+                                         other_peer->vectors[i].wfd);
-+        }
-+    }
-+
-+    /* advertise the new peer to itself */
-+    for (i = 0; i < peer->vectors_count; i++) {
-+        ivshmem_server_send_event_fd(peer->sock_fd, peer->id, i,
-+                                     event_notifier_get_fd(&peer->vectors[i]));
-+    }
-+
-+    QTAILQ_INSERT_TAIL(&server->peer_list, peer, next);
-+    IVSHMEM_SERVER_DEBUG(server, "new peer id = %" PRId64 "\n",
-+                         peer->id);
-+    return 0;
-+
-+fail:
-+    while (i--) {
-+        event_notifier_cleanup(&peer->vectors[i]);
-+    }
-+    close(newfd);
-+    g_free(peer);
-+    return -1;
 +}
 +
-+/* Try to ftruncate a file to next power of 2 of shmsize.
-+ * If it fails; all power of 2 above shmsize are tested until
-+ * we reach the maximum huge page size. This is useful
-+ * if the shm file is in a hugetlbfs that cannot be truncated to the
-+ * shm_size value. */
-+static int
-+ivshmem_server_ftruncate(int fd, unsigned shmsize)
++static uint64_t ivshmem_io_read(void *opaque, hwaddr addr,
++                                unsigned size)
 +{
-+    int ret;
-+    struct stat mapstat;
++    IVShmemState *s = opaque;
++    uint32_t ret;
 +
-+    /* align shmsize to next power of 2 */
-+    shmsize = pow2ceil(shmsize);
++    switch (addr) {
++    case IVSHMEM_REG_ID:
++        ret = s->vm_id;
++        break;
 +
-+    if (fstat(fd, &mapstat) != -1 && mapstat.st_size == shmsize) {
-+        return 0;
++    case IVSHMEM_REG_MAX_PEERS:
++        ret = s->max_peers;
++        break;
++
++    case IVSHMEM_REG_FEATURES:
++        ret = 0;
++        break;
++
++    case IVSHMEM_REG_INT_CTRL:
++        ret = s->intctrl;
++        break;
++
++    case IVSHMEM_REG_STATE:
++        ret = s->state;
++        break;
++
++    default:
++        IVSHMEM_DPRINTF("why are we reading " TARGET_FMT_plx "\n", addr);
++        ret = 0;
 +    }
 +
-+    while (shmsize <= IVSHMEM_SERVER_MAX_HUGEPAGE_SIZE) {
-+        ret = ftruncate(fd, shmsize);
-+        if (ret == 0) {
-+            return ret;
-+        }
-+        shmsize *= 2;
-+    }
-+
-+    return -1;
++    return ret;
 +}
 +
-+/* Init a new ivshmem server */
-+void ivshmem_server_init(IvshmemServer *server)
++static const MemoryRegionOps ivshmem_mmio_ops = {
++    .read = ivshmem_io_read,
++    .write = ivshmem_io_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .impl = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++};
++
++static void ivshmem_vector_notify(void *opaque)
 +{
-+    server->sock_fd = -1;
-+    server->shm_fd = -1;
-+    server->state_table = NULL;
-+    QTAILQ_INIT(&server->peer_list);
-+}
++    MSIVector *entry = opaque;
++    PCIDevice *pdev = entry->pdev;
++    IVShmemState *s = IVSHMEM(pdev);
++    int vector = entry - s->msi_vectors;
++    EventNotifier *n = &s->peers[s->vm_id].eventfds[vector];
 +
-+/* open shm, create and bind to the unix socket */
-+int
-+ivshmem_server_start(IvshmemServer *server)
-+{
-+    struct sockaddr_un sun;
-+    int shm_fd, sock_fd, ret;
-+    void *state_table;
-+
-+    /* open shm file */
-+    if (server->args.use_shm_open) {
-+        IVSHMEM_SERVER_DEBUG(server, "Using POSIX shared memory: %s\n",
-+                             server->args.shm_path);
-+        shm_fd = shm_open(server->args.shm_path, O_CREAT | O_RDWR, S_IRWXU);
-+    } else {
-+        gchar *filename = g_strdup_printf("%s/ivshmem.XXXXXX",
-+                                          server->args.shm_path);
-+        IVSHMEM_SERVER_DEBUG(server, "Using file-backed shared memory: %s\n",
-+                             server->args.shm_path);
-+        shm_fd = mkstemp(filename);
-+        unlink(filename);
-+        g_free(filename);
-+    }
-+
-+    if (shm_fd < 0) {
-+        fprintf(stderr, "cannot open shm file %s: %s\n", server->args.shm_path,
-+                strerror(errno));
-+        return -1;
-+    }
-+    if (ivshmem_server_ftruncate(shm_fd, server->args.shm_size) < 0) {
-+        fprintf(stderr, "ftruncate(%s) failed: %s\n", server->args.shm_path,
-+                strerror(errno));
-+        goto err_close_shm;
-+    }
-+    state_table = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED,
-+                       shm_fd, 0);
-+    if (state_table == MAP_FAILED) {
-+        fprintf(stderr, "mmap failed: %s\n", strerror(errno));
-+        goto err_close_shm;
-+    }
-+
-+    IVSHMEM_SERVER_DEBUG(server, "create & bind socket %s\n",
-+                         server->args.unix_socket_path);
-+
-+    /* create the unix listening socket */
-+    sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
-+    if (sock_fd < 0) {
-+        IVSHMEM_SERVER_DEBUG(server, "cannot create socket: %s\n",
-+                             strerror(errno));
-+        goto err_unmap;
-+    }
-+
-+    sun.sun_family = AF_UNIX;
-+    ret = snprintf(sun.sun_path, sizeof(sun.sun_path), "%s",
-+                   server->args.unix_socket_path);
-+    if (ret < 0 || ret >= sizeof(sun.sun_path)) {
-+        IVSHMEM_SERVER_DEBUG(server, "could not copy unix socket path\n");
-+        goto err_close_sock;
-+    }
-+    if (bind(sock_fd, (struct sockaddr *)&sun, sizeof(sun)) < 0) {
-+        IVSHMEM_SERVER_DEBUG(server, "cannot connect to %s: %s\n", sun.sun_path,
-+                             strerror(errno));
-+        goto err_close_sock;
-+    }
-+
-+    if (listen(sock_fd, IVSHMEM_SERVER_LISTEN_BACKLOG) < 0) {
-+        IVSHMEM_SERVER_DEBUG(server, "listen() failed: %s\n", strerror(errno));
-+        goto err_close_sock;
-+    }
-+
-+    server->sock_fd = sock_fd;
-+    server->shm_fd = shm_fd;
-+    server->state_table = state_table;
-+
-+    return 0;
-+
-+err_close_sock:
-+    close(sock_fd);
-+err_unmap:
-+    munmap(state_table, 4096);
-+err_close_shm:
-+    if (server->args.use_shm_open) {
-+        shm_unlink(server->args.shm_path);
-+    }
-+    close(shm_fd);
-+    shm_unlink(server->args.shm_path);
-+    return -1;
-+}
-+
-+/* close connections to clients, the unix socket and the shm fd */
-+void
-+ivshmem_server_close(IvshmemServer *server)
-+{
-+    IvshmemServerPeer *peer, *npeer;
-+
-+    IVSHMEM_SERVER_DEBUG(server, "close server\n");
-+
-+    QTAILQ_FOREACH_SAFE(peer, &server->peer_list, next, npeer) {
-+        ivshmem_server_free_peer(server, peer);
-+    }
-+
-+    unlink(server->args.unix_socket_path);
-+    if (server->args.use_shm_open) {
-+        shm_unlink(server->args.shm_path);
-+    }
-+    close(server->sock_fd);
-+    munmap(server->state_table, 4096);
-+    close(server->shm_fd);
-+    server->sock_fd = -1;
-+    server->shm_fd = -1;
-+}
-+
-+/* get the fd_set according to the unix socket and the peer list */
-+void
-+ivshmem_server_get_fds(const IvshmemServer *server, fd_set *fds, int *maxfd)
-+{
-+    IvshmemServerPeer *peer;
-+
-+    if (server->sock_fd == -1) {
++    if (!event_notifier_test_and_clear(n) ||
++        !(s->intctrl & IVSHMEM_INT_ENABLE)) {
 +        return;
 +    }
 +
-+    FD_SET(server->sock_fd, fds);
-+    if (server->sock_fd >= *maxfd) {
-+        *maxfd = server->sock_fd + 1;
++    IVSHMEM_DPRINTF("interrupt on vector %p %d\n", pdev, vector);
++    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
++        if (msix_enabled(pdev)) {
++            msix_notify(pdev, vector);
++        }
++    } else if (pdev->config[PCI_INTERRUPT_PIN]) {
++        pci_set_irq(pdev, 1);
++        pci_set_irq(pdev, 0);
 +    }
++    if (*s->priv_ctrl & IVSHMEM_ONESHOT_MODE) {
++        s->intctrl &= ~IVSHMEM_INT_ENABLE;
++    }
++}
 +
-+    QTAILQ_FOREACH(peer, &server->peer_list, next) {
-+        FD_SET(peer->sock_fd, fds);
-+        if (peer->sock_fd >= *maxfd) {
-+            *maxfd = peer->sock_fd + 1;
++static int ivshmem_irqfd_vector_unmask(PCIDevice *dev, unsigned vector,
++                                       MSIMessage msg)
++{
++    IVShmemState *s = IVSHMEM(dev);
++    EventNotifier *n = &s->peers[s->vm_id].eventfds[vector];
++    MSIVector *v = &s->msi_vectors[vector];
++    int ret;
++
++    IVSHMEM_DPRINTF("vector unmask %p %d\n", dev, vector);
++    if (!v->pdev) {
++        error_report("ivshmem: vector %d route does not exist", vector);
++        return -EINVAL;
++    }
++    assert(!v->unmasked);
++
++    ret = kvm_irqchip_add_msi_route(kvm_state, vector, dev);
++    if (ret < 0) {
++        error_report("kvm_irqchip_add_msi_route failed");
++        return ret;
++    }
++    v->virq = ret;
++    kvm_irqchip_commit_routes(kvm_state);
++
++    ret = kvm_irqchip_add_irqfd_notifier_gsi(kvm_state, n, NULL, v->virq);
++    if (ret < 0) {
++        error_report("kvm_irqchip_add_irqfd_notifier_gsi failed");
++        return ret;
++    }
++    v->unmasked = true;
++
++    return 0;
++}
++
++static void ivshmem_irqfd_vector_mask(PCIDevice *dev, unsigned vector)
++{
++    IVShmemState *s = IVSHMEM(dev);
++    EventNotifier *n = &s->peers[s->vm_id].eventfds[vector];
++    MSIVector *v = &s->msi_vectors[vector];
++    int ret;
++
++    IVSHMEM_DPRINTF("vector mask %p %d\n", dev, vector);
++    if (!v->pdev) {
++        error_report("ivshmem: vector %d route does not exist", vector);
++        return;
++    }
++    assert(v->unmasked);
++
++    ret = kvm_irqchip_remove_irqfd_notifier_gsi(kvm_state, n, v->virq);
++    if (ret < 0) {
++        error_report("remove_irqfd_notifier_gsi failed");
++        return;
++    }
++    kvm_irqchip_release_virq(kvm_state, v->virq);
++
++    v->unmasked = false;
++}
++
++static void ivshmem_irqfd_vector_poll(PCIDevice *dev,
++                                      unsigned int vector_start,
++                                      unsigned int vector_end)
++{
++    IVShmemState *s = IVSHMEM(dev);
++    unsigned int vector;
++
++    IVSHMEM_DPRINTF("vector poll %p %d-%d\n", dev, vector_start, vector_end);
++
++    vector_end = MIN(vector_end, s->vectors);
++
++    for (vector = vector_start; vector < vector_end; vector++) {
++        EventNotifier *notifier = &s->peers[s->vm_id].eventfds[vector];
++
++        if (!msix_is_masked(dev, vector)) {
++            continue;
++        }
++
++        if (event_notifier_test_and_clear(notifier)) {
++            msix_set_pending(dev, vector);
 +        }
 +    }
 +}
 +
-+/* process incoming messages on the sockets in fd_set */
-+int
-+ivshmem_server_handle_fds(IvshmemServer *server, fd_set *fds, int maxfd)
++static void ivshmem_watch_vector_notifier(IVShmemState *s, int vector)
 +{
-+    IvshmemServerPeer *peer, *peer_next;
++    EventNotifier *n = &s->peers[s->vm_id].eventfds[vector];
++    int eventfd = event_notifier_get_fd(n);
 +
-+    if (server->sock_fd < maxfd && FD_ISSET(server->sock_fd, fds) &&
-+        ivshmem_server_handle_new_conn(server) < 0 && errno != EINTR) {
-+        IVSHMEM_SERVER_DEBUG(server, "ivshmem_server_handle_new_conn() "
-+                             "failed\n");
-+        return -1;
++    assert(!s->msi_vectors[vector].pdev);
++    s->msi_vectors[vector].pdev = PCI_DEVICE(s);
++
++    qemu_set_fd_handler(eventfd, ivshmem_vector_notify,
++                        NULL, &s->msi_vectors[vector]);
++}
++
++static void ivshmem_unwatch_vector_notifier(IVShmemState *s, int vector)
++{
++    EventNotifier *n = &s->peers[s->vm_id].eventfds[vector];
++    int eventfd = event_notifier_get_fd(n);
++
++    if (!s->msi_vectors[vector].pdev) {
++        return;
 +    }
 +
-+    QTAILQ_FOREACH_SAFE(peer, &server->peer_list, next, peer_next) {
-+        /* any message from a peer socket result in a close() */
-+        IVSHMEM_SERVER_DEBUG(server, "peer->sock_fd=%d\n", peer->sock_fd);
-+        if (peer->sock_fd < maxfd && FD_ISSET(peer->sock_fd, fds)) {
-+            ivshmem_server_free_peer(server, peer);
++    qemu_set_fd_handler(eventfd, NULL, NULL, NULL);
++
++    s->msi_vectors[vector].pdev = NULL;
++}
++
++static void ivshmem_add_eventfd(IVShmemState *s, int posn, int i)
++{
++    memory_region_add_eventfd(&s->ivshmem_mmio,
++                              IVSHMEM_REG_DOORBELL,
++                              4,
++                              true,
++                              (posn << 16) | i,
++                              &s->peers[posn].eventfds[i]);
++}
++
++static void ivshmem_del_eventfd(IVShmemState *s, int posn, int i)
++{
++    memory_region_del_eventfd(&s->ivshmem_mmio,
++                              IVSHMEM_REG_DOORBELL,
++                              4,
++                              true,
++                              (posn << 16) | i,
++                              &s->peers[posn].eventfds[i]);
++}
++
++static void close_peer_eventfds(IVShmemState *s, int posn)
++{
++    int i, n;
++
++    assert(posn >= 0 && posn < s->nb_peers);
++    n = s->peers[posn].nb_eventfds;
++
++    if (ivshmem_has_feature(s, IVSHMEM_IOEVENTFD)) {
++        memory_region_transaction_begin();
++        for (i = 0; i < n; i++) {
++            ivshmem_del_eventfd(s, posn, i);
++        }
++        memory_region_transaction_commit();
++    }
++
++    for (i = 0; i < n; i++) {
++        event_notifier_cleanup(&s->peers[posn].eventfds[i]);
++    }
++
++    g_free(s->peers[posn].eventfds);
++    s->peers[posn].nb_eventfds = 0;
++}
++
++static void resize_peers(IVShmemState *s, int nb_peers)
++{
++    int old_nb_peers = s->nb_peers;
++    int i;
++
++    assert(nb_peers > old_nb_peers);
++    IVSHMEM_DPRINTF("bumping storage to %d peers\n", nb_peers);
++
++    s->peers = g_realloc(s->peers, nb_peers * sizeof(Peer));
++    s->nb_peers = nb_peers;
++
++    for (i = old_nb_peers; i < nb_peers; i++) {
++        s->peers[i].eventfds = NULL;
++        s->peers[i].nb_eventfds = 0;
++    }
++}
++
++static void ivshmem_add_kvm_msi_virq(IVShmemState *s, int vector, Error **errp)
++{
++    PCIDevice *pdev = PCI_DEVICE(s);
++
++    IVSHMEM_DPRINTF("ivshmem_add_kvm_msi_virq vector:%d\n", vector);
++    assert(!s->msi_vectors[vector].pdev);
++
++    s->msi_vectors[vector].unmasked = false;
++    s->msi_vectors[vector].pdev = pdev;
++}
++
++static void ivshmem_remove_kvm_msi_virq(IVShmemState *s, int vector)
++{
++    IVSHMEM_DPRINTF("ivshmem_remove_kvm_msi_virq vector:%d\n", vector);
++
++    if (s->msi_vectors[vector].pdev == NULL) {
++        return;
++    }
++
++    if (s->msi_vectors[vector].unmasked) {
++        ivshmem_irqfd_vector_mask(s->msi_vectors[vector].pdev, vector);
++    }
++
++    s->msi_vectors[vector].pdev = NULL;
++}
++
++static void process_msg_disconnect(IVShmemState *s, IvshmemPeerGone *msg,
++                                   Error **errp)
++{
++    if (msg->header.len < sizeof(*msg)) {
++        error_setg(errp, "Invalid peer-gone message size");
++        return;
++    }
++
++    le32_to_cpus(&msg->id);
++
++    IVSHMEM_DPRINTF("peer %d has gone away\n", msg->id);
++    if (msg->id >= s->nb_peers || msg->id == s->vm_id) {
++        error_setg(errp, "invalid peer %d", msg->id);
++        return;
++    }
++    close_peer_eventfds(s, msg->id);
++    event_notifier_set(&s->peers[s->vm_id].eventfds[0]);
++}
++
++static void process_msg_connect(IVShmemState *s, IvshmemEventFd *msg, int fd,
++                                Error **errp)
++{
++    Peer *peer;
++
++    if (msg->header.len < sizeof(*msg)) {
++        error_setg(errp, "Invalid eventfd message size");
++        close(fd);
++        return;
++    }
++
++    le32_to_cpus(&msg->id);
++    le32_to_cpus(&msg->vector);
++
++    if (msg->id >= s->nb_peers) {
++        resize_peers(s, msg->id + 1);
++    }
++
++    peer = &s->peers[msg->id];
++
++    /*
++     * The N-th connect message for this peer comes with the file
++     * descriptor for vector N-1.
++     */
++    if (msg->vector != peer->nb_eventfds) {
++        error_setg(errp, "Received vector %d out of order", msg->vector);
++        close(fd);
++        return;
++    }
++    if (peer->nb_eventfds >= s->vectors) {
++        error_setg(errp, "Too many eventfd received, device has %d vectors",
++                   s->vectors);
++        close(fd);
++        return;
++    }
++    peer->nb_eventfds++;
++
++    if (msg->vector == 0)
++        peer->eventfds = g_new0(EventNotifier, s->vectors);
++
++    IVSHMEM_DPRINTF("eventfds[%d][%d] = %d\n", msg->id, msg->vector, fd);
++    event_notifier_init_fd(&peer->eventfds[msg->vector], fd);
++    fcntl_setfl(fd, O_NONBLOCK); /* msix/irqfd poll non block */
++
++    if (ivshmem_has_feature(s, IVSHMEM_IOEVENTFD)) {
++        ivshmem_add_eventfd(s, msg->id, msg->vector);
++    }
++
++    if (msg->id == s->vm_id) {
++        ivshmem_watch_vector_notifier(s, peer->nb_eventfds - 1);
++    }
++}
++
++static int ivshmem_can_receive(void *opaque)
++{
++    IVShmemState *s = opaque;
++
++    assert(s->msg_buffered_bytes < sizeof(s->msg_buf));
++    return sizeof(s->msg_buf) - s->msg_buffered_bytes;
++}
++
++static void ivshmem_read(void *opaque, const uint8_t *buf, int size)
++{
++    IVShmemState *s = opaque;
++    IvshmemMsgHeader *header = (IvshmemMsgHeader *)&s->msg_buf;
++    Error *err = NULL;
++    int fd;
++
++    assert(size >= 0 && s->msg_buffered_bytes + size <= sizeof(s->msg_buf));
++    memcpy(s->msg_buf + s->msg_buffered_bytes, buf, size);
++    s->msg_buffered_bytes += size;
++    if (s->msg_buffered_bytes < sizeof(*header) ||
++        s->msg_buffered_bytes < le32_to_cpu(header->len)) {
++        return;
++    }
++
++    fd = qemu_chr_fe_get_msgfd(&s->server_chr);
++
++    le32_to_cpus(&header->type);
++    le32_to_cpus(&header->len);
++
++    switch (header->type) {
++    case IVSHMEM_MSG_EVENT_FD:
++        process_msg_connect(s, (IvshmemEventFd *)header, fd, &err);
++        break;
++    case IVSHMEM_MSG_PEER_GONE:
++        process_msg_disconnect(s, (IvshmemPeerGone *)header, &err);
++        break;
++    default:
++        error_setg(&err, "invalid message, type %d", header->type);
++        break;
++    }
++    if (err) {
++        error_report_err(err);
++    }
++
++    s->msg_buffered_bytes -= header->len;
++    memmove(s->msg_buf, s->msg_buf + header->len, s->msg_buffered_bytes);
++}
++
++static void ivshmem_recv_setup(IVShmemState *s, Error **errp)
++{
++    IvshmemInitialInfo msg;
++    struct stat buf;
++    uint8_t dummy;
++    int fd, n, ret;
++
++    n = 0;
++    do {
++        ret = qemu_chr_fe_read_all(&s->server_chr, (uint8_t *)&msg + n,
++                                   sizeof(msg) - n);
++        if (ret < 0) {
++            if (ret == -EINTR) {
++                continue;
++            }
++            error_setg_errno(errp, -ret, "read from server failed");
++            return;
++        }
++        n += ret;
++    } while (n < sizeof(msg));
++
++    fd = qemu_chr_fe_get_msgfd(&s->server_chr);
++
++    le32_to_cpus(&msg.header.type);
++    le32_to_cpus(&msg.header.len);
++    if (msg.header.type != IVSHMEM_MSG_INIT || msg.header.len < sizeof(msg)) {
++        error_setg(errp, "server sent invalid initial info");
++        return;
++    }
++
++    /* consume additional bytes of message */
++    msg.header.len -= sizeof(msg);
++    while (msg.header.len > 0) {
++        ret = qemu_chr_fe_read_all(&s->server_chr, &dummy, 1);
++        if (ret < 0) {
++            if (ret == -EINTR) {
++                continue;
++            }
++            error_setg_errno(errp, -ret, "read from server failed");
++            return;
++        }
++        msg.header.len -= ret;
++    }
++
++    le32_to_cpus(&msg.compatible_version);
++    if (msg.compatible_version != IVSHMEM_PROTOCOL_VERSION) {
++        error_setg(errp, "server sent compatible version %u, expecting %u",
++                   msg.compatible_version, IVSHMEM_PROTOCOL_VERSION);
++        return;
++    }
++
++    le32_to_cpus(&msg.id);
++    if (msg.id > IVSHMEM_MAX_PEERS) {
++        error_setg(errp, "server sent invalid ID");
++        return;
++    }
++    s->vm_id = msg.id;
++
++    if (fstat(fd, &buf) < 0) {
++        error_setg_errno(errp, errno,
++            "can't determine size of shared memory sent by server");
++        close(fd);
++        return;
++    }
++
++    s->shmem_sz = buf.st_size;
++
++    s->shmem = mmap(NULL, s->shmem_sz, PROT_READ | PROT_WRITE, MAP_SHARED,
++                    fd, 0);
++    if (s->shmem == MAP_FAILED) {
++        error_setg_errno(errp, errno,
++                         "can't map shared memory sent by server");
++        return;
++    }
++
++    le32_to_cpus(&msg.vectors);
++    if (msg.vectors < 1 || msg.vectors > 1024) {
++        error_setg(errp, "server sent invalid number of vectors message");
++        return;
++    }
++    s->vectors = msg.vectors;
++
++    s->max_peers = le32_to_cpu(msg.max_peers);
++    s->protocol = le32_to_cpu(msg.protocol);
++    s->output_section_sz = le64_to_cpu(msg.output_section_size);
++}
++
++/* Select the MSI-X vectors used by device.
++ * ivshmem maps events to vectors statically, so
++ * we just enable all vectors on init and after reset. */
++static void ivshmem_msix_vector_use(IVShmemState *s)
++{
++    PCIDevice *d = PCI_DEVICE(s);
++    int i;
++
++    for (i = 0; i < s->vectors; i++) {
++        msix_vector_use(d, i);
++    }
++}
++
++static void ivshmem_reset(DeviceState *d)
++{
++    IVShmemState *s = IVSHMEM(d);
++
++    ivshmem_disable_irqfd(s);
++
++    s->intctrl = 0;
++    ivshmem_write_state(s, 0);
++    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
++        ivshmem_msix_vector_use(s);
++    }
++}
++
++static int ivshmem_setup_interrupts(IVShmemState *s, Error **errp)
++{
++    /* allocate QEMU callback data for receiving interrupts */
++    s->msi_vectors = g_malloc0(s->vectors * sizeof(MSIVector));
++
++    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
++        if (msix_init_exclusive_bar(PCI_DEVICE(s), s->vectors, 1, errp)) {
++            IVSHMEM_DPRINTF("msix requested but not available - disabling\n");
++            s->features &= ~(IVSHMEM_MSI | IVSHMEM_IOEVENTFD);
++        } else {
++            IVSHMEM_DPRINTF("msix initialized (%d vectors)\n", s->vectors);
++            ivshmem_msix_vector_use(s);
 +        }
 +    }
 +
 +    return 0;
 +}
 +
-+/* lookup peer from its id */
-+IvshmemServerPeer *
-+ivshmem_server_search_peer(IvshmemServer *server, int64_t peer_id)
++static void ivshmem_enable_irqfd(IVShmemState *s)
 +{
-+    IvshmemServerPeer *peer;
++    PCIDevice *pdev = PCI_DEVICE(s);
++    int i;
 +
-+    QTAILQ_FOREACH(peer, &server->peer_list, next) {
-+        if (peer->id == peer_id) {
-+            return peer;
++    for (i = 0; i < s->peers[s->vm_id].nb_eventfds; i++) {
++        Error *err = NULL;
++
++        ivshmem_unwatch_vector_notifier(s, i);
++
++        ivshmem_add_kvm_msi_virq(s, i, &err);
++        if (err) {
++            error_report_err(err);
++            goto undo;
 +        }
 +    }
-+    return NULL;
-+}
-diff --git a/contrib/ivshmem2-server/ivshmem2-server.h b/contrib/ivshmem2-server/ivshmem2-server.h
-new file mode 100644
-index 0000000000..3fd6166577
---- /dev/null
-+++ b/contrib/ivshmem2-server/ivshmem2-server.h
-@@ -0,0 +1,158 @@
-+/*
-+ * Copyright 6WIND S.A., 2014
-+ * Copyright (c) Siemens AG, 2019
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
 +
-+#ifndef IVSHMEM2_SERVER_H
-+#define IVSHMEM2_SERVER_H
++    if (msix_set_vector_notifiers(pdev,
++                                  ivshmem_irqfd_vector_unmask,
++                                  ivshmem_irqfd_vector_mask,
++                                  ivshmem_irqfd_vector_poll)) {
++        error_report("ivshmem: msix_set_vector_notifiers failed");
++        goto undo;
++    }
++    return;
 +
-+/**
-+ * The ivshmem server is a daemon that creates a unix socket in listen
-+ * mode. The ivshmem clients (qemu or ivshmem-client) connect to this
-+ * unix socket. For each client, the server will create some eventfd
-+ * (see EVENTFD(2)), one per vector. These fd are transmitted to all
-+ * clients using the SCM_RIGHTS cmsg message. Therefore, each client is
-+ * able to send a notification to another client without being
-+ * "profixied" by the server.
-+ *
-+ * We use this mechanism to send interruptions between guests.
-+ * qemu is able to transform an event on a eventfd into a PCI MSI-x
-+ * interruption in the guest.
-+ *
-+ * The ivshmem server is also able to share the file descriptor
-+ * associated to the ivshmem shared memory.
-+ */
-+
-+#include <sys/select.h>
-+
-+#include "qemu/event_notifier.h"
-+#include "qemu/queue.h"
-+#include "hw/misc/ivshmem2.h"
-+
-+/**
-+ * Maximum number of notification vectors supported by the server
-+ */
-+#define IVSHMEM_SERVER_MAX_VECTORS 64
-+
-+/**
-+ * Structure storing a peer
-+ *
-+ * Each time a client connects to an ivshmem server, a new
-+ * IvshmemServerPeer structure is created. This peer and all its
-+ * vectors are advertised to all connected clients through the connected
-+ * unix sockets.
-+ */
-+typedef struct IvshmemServerPeer {
-+    QTAILQ_ENTRY(IvshmemServerPeer) next;    /**< next in list*/
-+    int sock_fd;                             /**< connected unix sock */
-+    int64_t id;                              /**< the id of the peer */
-+    EventNotifier vectors[IVSHMEM_SERVER_MAX_VECTORS]; /**< one per vector */
-+    unsigned vectors_count;                  /**< number of vectors */
-+} IvshmemServerPeer;
-+
-+/**
-+ * Structure describing ivshmem server arguments
-+ */
-+typedef struct IvshmemServerArgs {
-+    bool verbose;                   /**< true to enable verbose mode */
-+    const char *unix_socket_path;   /**< pointer to unix socket file name */
-+    const char *shm_path;           /**< Path to the shared memory; path
-+                                         corresponds to a POSIX shm name or a
-+                                         hugetlbfs mount point. */
-+    bool use_shm_open;              /**< true to use shm_open, false for
-+                                         file-backed shared memory */
-+    uint64_t shm_size;              /**< total size of shared memory */
-+    uint64_t output_section_size;   /**< size of each output section */
-+    unsigned max_peers;             /**< maximum number of peers */
-+    unsigned vectors;               /**< interrupt vectors per client */
-+    unsigned protocol;              /**< protocol advertised to all clients */
-+} IvshmemServerArgs;
-+
-+/**
-+ * Structure describing an ivshmem server
-+ *
-+ * This structure stores all information related to our server: the name
-+ * of the server unix socket and the list of connected peers.
-+ */
-+typedef struct IvshmemServer {
-+    IvshmemServerArgs args;          /**< server arguments */
-+    int sock_fd;                     /**< unix sock file descriptor */
-+    int shm_fd;                      /**< shm file descriptor */
-+    uint32_t *state_table;           /**< mapped state table */
-+    QTAILQ_HEAD(, IvshmemServerPeer) peer_list; /**< list of peers */
-+} IvshmemServer;
-+
-+/**
-+ * Initialize an ivshmem server
-+ *
-+ * @server:         A pointer to an uninitialized IvshmemServer structure
-+ */
-+void ivshmem_server_init(IvshmemServer *server);
-+
-+/**
-+ * Open the shm, then create and bind to the unix socket
-+ *
-+ * @server: The pointer to the initialized IvshmemServer structure
-+ *
-+ * Returns: 0 on success, or a negative value on error
-+ */
-+int ivshmem_server_start(IvshmemServer *server);
-+
-+/**
-+ * Close the server
-+ *
-+ * Close connections to all clients, close the unix socket and the
-+ * shared memory file descriptor. The structure remains initialized, so
-+ * it is possible to call ivshmem_server_start() again after a call to
-+ * ivshmem_server_close().
-+ *
-+ * @server: The ivshmem server
-+ */
-+void ivshmem_server_close(IvshmemServer *server);
-+
-+/**
-+ * Fill a fd_set with file descriptors to be monitored
-+ *
-+ * This function will fill a fd_set with all file descriptors that must
-+ * be polled (unix server socket and peers unix socket). The function
-+ * will not initialize the fd_set, it is up to the caller to do it.
-+ *
-+ * @server: The ivshmem server
-+ * @fds:    The fd_set to be updated
-+ * @maxfd:  Must be set to the max file descriptor + 1 in fd_set. This value is
-+ *          updated if this function adds a greater fd in fd_set.
-+ */
-+void
-+ivshmem_server_get_fds(const IvshmemServer *server, fd_set *fds, int *maxfd);
-+
-+/**
-+ * Read and handle new messages
-+ *
-+ * Given a fd_set (for instance filled by a call to select()), handle
-+ * incoming messages from peers.
-+ *
-+ * @server: The ivshmem server
-+ * @fds:    The fd_set containing the file descriptors to be checked. Note that
-+ *          file descriptors that are not related to our server are ignored.
-+ * @maxfd:  The maximum fd in fd_set, plus one.
-+ *
-+ * Returns: 0 on success, or a negative value on error
-+ */
-+int ivshmem_server_handle_fds(IvshmemServer *server, fd_set *fds, int maxfd);
-+
-+/**
-+ * Search a peer from its identifier
-+ *
-+ * @server:  The ivshmem server
-+ * @peer_id: The identifier of the peer structure
-+ *
-+ * Returns:  The peer structure, or NULL if not found
-+ */
-+IvshmemServerPeer *
-+ivshmem_server_search_peer(IvshmemServer *server, int64_t peer_id);
-+
-+#endif /* IVSHMEM2_SERVER_H */
-diff --git a/contrib/ivshmem2-server/main.c b/contrib/ivshmem2-server/main.c
-new file mode 100644
-index 0000000000..35cd6fca0f
---- /dev/null
-+++ b/contrib/ivshmem2-server/main.c
-@@ -0,0 +1,313 @@
-+/*
-+ * Copyright 6WIND S.A., 2014
-+ * Copyright (c) Siemens AG, 2019
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.  See the COPYING file in the
-+ * top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/cutils.h"
-+#include "qemu/option.h"
-+#include "ivshmem2-server.h"
-+
-+#define IVSHMEM_SERVER_DEFAULT_FOREGROUND     0
-+#define IVSHMEM_SERVER_DEFAULT_PID_FILE       "/var/run/ivshmem-server.pid"
-+
-+#define IVSHMEM_SERVER_DEFAULT_VERBOSE        0
-+#define IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH "/tmp/ivshmem_socket"
-+#define IVSHMEM_SERVER_DEFAULT_SHM_PATH       "ivshmem"
-+#define IVSHMEM_SERVER_DEFAULT_SHM_SIZE       (4*1024*1024)
-+#define IVSHMEM_SERVER_DEFAULT_OUTPUT_SEC_SZ  0
-+#define IVSHMEM_SERVER_DEFAULT_MAX_PEERS      2
-+#define IVSHMEM_SERVER_DEFAULT_VECTORS        1
-+#define IVSHMEM_SERVER_DEFAULT_PROTOCOL       0
-+
-+/* used to quit on signal SIGTERM */
-+static int ivshmem_server_quit;
-+
-+static bool foreground = IVSHMEM_SERVER_DEFAULT_FOREGROUND;
-+static const char *pid_file = IVSHMEM_SERVER_DEFAULT_PID_FILE;
-+
-+static void
-+ivshmem_server_usage(const char *progname)
-+{
-+    printf("Usage: %s [OPTION]...\n"
-+           "  -h: show this help\n"
-+           "  -v: verbose mode\n"
-+           "  -F: foreground mode (default is to daemonize)\n"
-+           "  -p <pid-file>: path to the PID file (used in daemon mode only)\n"
-+           "     default " IVSHMEM_SERVER_DEFAULT_PID_FILE "\n"
-+           "  -S <unix-socket-path>: path to the unix socket to listen to\n"
-+           "     default " IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH "\n"
-+           "  -M <shm-name>: POSIX shared memory object to use\n"
-+           "     default " IVSHMEM_SERVER_DEFAULT_SHM_PATH "\n"
-+           "  -m <dir-name>: where to create shared memory\n"
-+           "  -l <size>: size of shared memory in bytes\n"
-+           "     suffixes K, M and G can be used, e.g. 1K means 1024\n"
-+           "     default %u\n"
-+           "  -o <size>: size of each output section in bytes "
-+                "(suffixes supported)\n"
-+           "     default %u\n"
-+           "  -n <peers>: maximum number of peers\n"
-+           "     default %u\n"
-+           "  -V <vectors>: number of vectors\n"
-+           "     default %u\n"
-+           "  -P <protocol>: 16-bit protocol to be advertised\n"
-+           "     default 0x%04x\n"
-+           "     When using virtio (0x8000...0xffff), only two peers are "
-+           "supported, peer 0\n"
-+           "     will become backend, peer 1 frontend\n",
-+           progname, IVSHMEM_SERVER_DEFAULT_SHM_SIZE,
-+           IVSHMEM_SERVER_DEFAULT_OUTPUT_SEC_SZ,
-+           IVSHMEM_SERVER_DEFAULT_MAX_PEERS, IVSHMEM_SERVER_DEFAULT_VECTORS,
-+           IVSHMEM_SERVER_DEFAULT_PROTOCOL);
++undo:
++    while (--i >= 0) {
++        ivshmem_remove_kvm_msi_virq(s, i);
++    }
 +}
 +
-+static void
-+ivshmem_server_help(const char *progname)
++static void ivshmem_disable_irqfd(IVShmemState *s)
 +{
-+    fprintf(stderr, "Try '%s -h' for more information.\n", progname);
++    PCIDevice *pdev = PCI_DEVICE(s);
++    int i;
++
++    if (!pdev->msix_vector_use_notifier) {
++        return;
++    }
++
++    msix_unset_vector_notifiers(pdev);
++
++    for (i = 0; i < s->peers[s->vm_id].nb_eventfds; i++) {
++        ivshmem_remove_kvm_msi_virq(s, i);
++        ivshmem_watch_vector_notifier(s, i);
++    }
++
 +}
 +
-+/* parse the program arguments, exit on error */
-+static void
-+ivshmem_server_parse_args(IvshmemServerArgs *args, int argc, char *argv[])
++static void ivshmem_write_config(PCIDevice *pdev, uint32_t address,
++                                 uint32_t val, int len)
 +{
-+    int c;
-+    unsigned long long v;
++    IVShmemState *s = IVSHMEM(pdev);
++    bool was_usable = ivshmem_irqfd_usable(s);
++
++    pci_default_write_config(pdev, address, val, len);
++    ivshmem_update_irqfd(s, was_usable);
++}
++
++static void ivshmem_exit(PCIDevice *dev)
++{
++    IVShmemState *s = IVSHMEM(dev);
++    int i;
++
++    if (s->migration_blocker) {
++        migrate_del_blocker(s->migration_blocker);
++        error_free(s->migration_blocker);
++    }
++
++    if (memory_region_is_mapped(&s->rw_section)) {
++        void *addr = memory_region_get_ram_ptr(&s->rw_section);
++        int fd;
++
++        if (munmap(addr, memory_region_size(&s->rw_section) == -1)) {
++            error_report("Failed to munmap shared memory %s",
++                         strerror(errno));
++        }
++
++        fd = memory_region_get_fd(&s->rw_section);
++        close(fd);
++
++        vmstate_unregister_ram(&s->state_tab, DEVICE(dev));
++        vmstate_unregister_ram(&s->rw_section, DEVICE(dev));
++    }
++
++    if (s->peers) {
++        for (i = 0; i < s->nb_peers; i++) {
++            close_peer_eventfds(s, i);
++        }
++        g_free(s->peers);
++    }
++
++    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
++        msix_uninit_exclusive_bar(dev);
++    }
++
++    g_free(s->msi_vectors);
++}
++
++static int ivshmem_pre_load(void *opaque)
++{
++    IVShmemState *s = opaque;
++
++    if (!ivshmem_is_master(s)) {
++        error_report("'peer' devices are not migratable");
++        return -EINVAL;
++    }
++
++    return 0;
++}
++
++static int ivshmem_post_load(void *opaque, int version_id)
++{
++    IVShmemState *s = opaque;
++
++    if (ivshmem_has_feature(s, IVSHMEM_MSI)) {
++        ivshmem_msix_vector_use(s);
++    }
++    return 0;
++}
++
++static const VMStateDescription ivshmem_vmsd = {
++    .name = TYPE_IVSHMEM,
++    .version_id = 0,
++    .minimum_version_id = 0,
++    .pre_load = ivshmem_pre_load,
++    .post_load = ivshmem_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_PCI_DEVICE(parent_obj, IVShmemState),
++        VMSTATE_MSIX(parent_obj, IVShmemState),
++        VMSTATE_UINT32(state, IVShmemState),
++        VMSTATE_UINT32(intctrl, IVShmemState),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static Property ivshmem_properties[] = {
++    DEFINE_PROP_CHR("chardev", IVShmemState, server_chr),
++    DEFINE_PROP_BIT("ioeventfd", IVShmemState, features, IVSHMEM_IOEVENTFD,
++                    true),
++    DEFINE_PROP_ON_OFF_AUTO("master", IVShmemState, master, ON_OFF_AUTO_OFF),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void ivshmem_init(Object *obj)
++{
++    IVShmemState *s = IVSHMEM(obj);
++
++    s->features |= (1 << IVSHMEM_MSI);
++}
++
++static void ivshmem_realize(PCIDevice *dev, Error **errp)
++{
++    IVShmemState *s = IVSHMEM(dev);
++    Chardev *chr = qemu_chr_fe_get_driver(&s->server_chr);
++    size_t rw_section_sz, input_sections_sz;
++    IVShmemVndrCap *vndr_cap;
 +    Error *err = NULL;
++    uint8_t *pci_conf;
++    int offset, priv_ctrl_pos;
++    off_t shmem_pos;
 +
-+    while ((c = getopt(argc, argv, "hvFp:S:m:M:l:o:n:V:P:")) != -1) {
-+
-+        switch (c) {
-+        case 'h': /* help */
-+            ivshmem_server_usage(argv[0]);
-+            exit(0);
-+            break;
-+
-+        case 'v': /* verbose */
-+            args->verbose = 1;
-+            break;
-+
-+        case 'F': /* foreground */
-+            foreground = 1;
-+            break;
-+
-+        case 'p': /* pid file */
-+            pid_file = optarg;
-+            break;
-+
-+        case 'S': /* unix socket path */
-+            args->unix_socket_path = optarg;
-+            break;
-+
-+        case 'M': /* shm name */
-+        case 'm': /* dir name */
-+            args->shm_path = optarg;
-+            args->use_shm_open = c == 'M';
-+            break;
-+
-+        case 'l': /* shm size */
-+            parse_option_size("shm_size", optarg, &args->shm_size, &err);
-+            if (err) {
-+                error_report_err(err);
-+                ivshmem_server_help(argv[0]);
-+                exit(1);
-+            }
-+            break;
-+
-+        case 'o': /* output section size */
-+            parse_option_size("output_section_size", optarg,
-+                              &args->output_section_size, &err);
-+            if (err) {
-+                error_report_err(err);
-+                ivshmem_server_help(argv[0]);
-+                exit(1);
-+            }
-+            break;
-+
-+        case 'n': /* maximum number of peers */
-+            if (parse_uint_full(optarg, &v, 0) < 0) {
-+                fprintf(stderr, "cannot parse max-peers\n");
-+                ivshmem_server_help(argv[0]);
-+                exit(1);
-+            }
-+            args->max_peers = v;
-+            break;
-+
-+        case 'V': /* number of vectors */
-+            if (parse_uint_full(optarg, &v, 0) < 0) {
-+                fprintf(stderr, "cannot parse vectors\n");
-+                ivshmem_server_help(argv[0]);
-+                exit(1);
-+            }
-+            args->vectors = v;
-+            break;
-+
-+        case 'P': /* protocol */
-+            if (parse_uint_full(optarg, &v, 0) < 0) {
-+                fprintf(stderr, "cannot parse protocol\n");
-+                ivshmem_server_help(argv[0]);
-+                exit(1);
-+            }
-+            args->protocol = v;
-+            break;
-+
-+        default:
-+            ivshmem_server_usage(argv[0]);
-+            exit(1);
-+            break;
-+        }
++    if (!qemu_chr_fe_backend_connected(&s->server_chr)) {
++        error_setg(errp, "You must specify a 'chardev'");
++        return;
 +    }
 +
-+    if (args->vectors > IVSHMEM_SERVER_MAX_VECTORS) {
-+        fprintf(stderr, "too many requested vectors (max is %d)\n",
-+                IVSHMEM_SERVER_MAX_VECTORS);
-+        ivshmem_server_help(argv[0]);
-+        exit(1);
++    /* IRQFD requires MSI */
++    if (ivshmem_has_feature(s, IVSHMEM_IOEVENTFD) &&
++        !ivshmem_has_feature(s, IVSHMEM_MSI)) {
++        error_setg(errp, "ioeventfd/irqfd requires MSI");
++        return;
 +    }
 +
-+    if (args->protocol >= 0x8000 && args->max_peers > 2) {
-+        fprintf(stderr, "virtio protocols only support 2 peers\n");
-+        ivshmem_server_help(argv[0]);
-+        exit(1);
-+    }
++    pci_conf = dev->config;
++    pci_conf[PCI_COMMAND] = PCI_COMMAND_IO | PCI_COMMAND_MEMORY;
 +
-+    if (args->verbose == 1 && foreground == 0) {
-+        fprintf(stderr, "cannot use verbose in daemon mode\n");
-+        ivshmem_server_help(argv[0]);
-+        exit(1);
-+    }
-+}
++    memory_region_init_io(&s->ivshmem_mmio, OBJECT(s), &ivshmem_mmio_ops, s,
++                          "ivshmem.mmio", IVSHMEM_REG_BAR_SIZE);
 +
-+/* wait for events on listening server unix socket and connected client
-+ * sockets */
-+static int
-+ivshmem_server_poll_events(IvshmemServer *server)
-+{
-+    fd_set fds;
-+    int ret = 0, maxfd;
++    /* region for registers*/
++    pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_MEMORY,
++                     &s->ivshmem_mmio);
 +
-+    while (!ivshmem_server_quit) {
-+
-+        FD_ZERO(&fds);
-+        maxfd = 0;
-+        ivshmem_server_get_fds(server, &fds, &maxfd);
-+
-+        ret = select(maxfd, &fds, NULL, NULL, NULL);
-+
-+        if (ret < 0) {
-+            if (errno == EINTR) {
-+                continue;
-+            }
-+
-+            fprintf(stderr, "select error: %s\n", strerror(errno));
-+            break;
-+        }
-+        if (ret == 0) {
-+            continue;
-+        }
-+
-+        if (ivshmem_server_handle_fds(server, &fds, maxfd) < 0) {
-+            fprintf(stderr, "ivshmem_server_handle_fds() failed\n");
-+            break;
-+        }
-+    }
-+
-+    return ret;
-+}
-+
-+static void
-+ivshmem_server_quit_cb(int signum)
-+{
-+    ivshmem_server_quit = 1;
-+}
-+
-+int
-+main(int argc, char *argv[])
-+{
-+    IvshmemServer server = {
-+        .args = {
-+            .verbose = IVSHMEM_SERVER_DEFAULT_VERBOSE,
-+            .unix_socket_path = IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH,
-+            .shm_path = IVSHMEM_SERVER_DEFAULT_SHM_PATH,
-+            .use_shm_open = true,
-+            .shm_size = IVSHMEM_SERVER_DEFAULT_SHM_SIZE,
-+            .output_section_size = IVSHMEM_SERVER_DEFAULT_OUTPUT_SEC_SZ,
-+            .max_peers = IVSHMEM_SERVER_DEFAULT_MAX_PEERS,
-+            .vectors = IVSHMEM_SERVER_DEFAULT_VECTORS,
-+            .protocol = IVSHMEM_SERVER_DEFAULT_PROTOCOL,
-+        },
-+    };
-+    struct sigaction sa, sa_quit;
-+    int ret = 1;
++    assert(chr);
++    IVSHMEM_DPRINTF("using shared memory server (socket = %s)\n",
++                    chr->filename);
 +
 +    /*
-+     * Do not remove this notice without adding proper error handling!
-+     * Start with handling ivshmem_server_send_one_msg() failure.
++     * Receive setup messages from server synchronously.
++     * Older versions did it asynchronously, but that creates a
++     * number of entertaining race conditions.
 +     */
-+    printf("*** Example code, do not use in production ***\n");
-+
-+    /* parse arguments, will exit on error */
-+    ivshmem_server_parse_args(&server.args, argc, argv);
-+
-+    /* Ignore SIGPIPE, see this link for more info:
-+     * http://www.mail-archive.com/libevent-users@monkey.org/msg01606.html */
-+    sa.sa_handler = SIG_IGN;
-+    sa.sa_flags = 0;
-+    if (sigemptyset(&sa.sa_mask) == -1 ||
-+        sigaction(SIGPIPE, &sa, 0) == -1) {
-+        perror("failed to ignore SIGPIPE; sigaction");
-+        goto err;
++    ivshmem_recv_setup(s, &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
 +    }
 +
-+    sa_quit.sa_handler = ivshmem_server_quit_cb;
-+    sa_quit.sa_flags = 0;
-+    if (sigemptyset(&sa_quit.sa_mask) == -1 ||
-+        sigaction(SIGTERM, &sa_quit, 0) == -1 ||
-+        sigaction(SIGINT, &sa_quit, 0) == -1) {
-+        perror("failed to add signal handler; sigaction");
-+        goto err;
++    /* we allocate enough space for 16 peers and grow as needed */
++    resize_peers(s, 16);
++
++    if (s->master == ON_OFF_AUTO_ON && s->vm_id != 0) {
++        error_setg(errp,
++                   "Master must connect to the server before any peers");
++        return;
 +    }
 +
-+    /* init the ivshms structure */
-+    ivshmem_server_init(&server);
++    qemu_chr_fe_set_handlers(&s->server_chr, ivshmem_can_receive,
++                             ivshmem_read, NULL, NULL, s, NULL, true);
 +
-+    /* start the ivshmem server (open shm & unix socket) */
-+    if (ivshmem_server_start(&server) < 0) {
-+        fprintf(stderr, "cannot bind\n");
-+        goto err;
++    if (ivshmem_setup_interrupts(s, errp) < 0) {
++        error_prepend(errp, "Failed to initialize interrupts: ");
++        return;
 +    }
 +
-+    /* daemonize if asked to */
-+    if (!foreground) {
-+        FILE *fp;
++    memory_region_init(&s->ivshmem_bar2, OBJECT(s), "ivshmem.bar2",
++                       s->shmem_sz);
 +
-+        if (qemu_daemon(1, 1) < 0) {
-+            fprintf(stderr, "cannot daemonize: %s\n", strerror(errno));
-+            goto err_close;
++    input_sections_sz = s->output_section_sz * s->max_peers;
++    if (input_sections_sz + 4096 > s->shmem_sz) {
++        error_setg(errp,
++                   "Invalid output section size, shared memory too small");
++        return;
++    }
++    rw_section_sz = s->shmem_sz - input_sections_sz - 4096;
++
++    shmem_pos = 0;
++    memory_region_init_ram_ptr(&s->state_tab, OBJECT(s), "ivshmem.state",
++                               4096, s->shmem + shmem_pos);
++    memory_region_set_readonly(&s->state_tab, true);
++    memory_region_add_subregion(&s->ivshmem_bar2, shmem_pos, &s->state_tab);
++
++    vmstate_register_ram(&s->state_tab, DEVICE(s));
++
++    if (rw_section_sz > 0) {
++        shmem_pos += 4096;
++        memory_region_init_ram_ptr(&s->rw_section, OBJECT(s),
++                                   "ivshmem.rw-section",
++                                   rw_section_sz, s->shmem + shmem_pos);
++        memory_region_add_subregion(&s->ivshmem_bar2, shmem_pos,
++                                    &s->rw_section);
++
++        vmstate_register_ram(&s->rw_section, DEVICE(s));
++    }
++
++    if (s->output_section_sz > 0) {
++        shmem_pos += rw_section_sz;
++        memory_region_init_ram_ptr(&s->input_sections, OBJECT(s),
++                                   "ivshmem.input-sections", input_sections_sz,
++                                   s->shmem + shmem_pos);
++        memory_region_set_readonly(&s->input_sections, true);
++        memory_region_add_subregion(&s->ivshmem_bar2, shmem_pos,
++                                    &s->input_sections);
++
++        shmem_pos += s->vm_id * s->output_section_sz;
++        memory_region_init_ram_ptr(&s->output_section, OBJECT(s),
++                                   "ivshmem.output-section",
++                                   s->output_section_sz, s->shmem + shmem_pos);
++        memory_region_add_subregion_overlap(&s->ivshmem_bar2, shmem_pos,
++                                            &s->output_section, 1);
++
++        vmstate_register_ram(&s->input_sections, DEVICE(s));
++    }
++
++    pci_config_set_class(dev->config, 0xff00 | (s->protocol >> 8));
++    pci_config_set_prog_interface(dev->config, (uint8_t)s->protocol);
++
++    offset = pci_add_capability(dev, PCI_CAP_ID_VNDR, 0, 0x18,
++                                &error_abort);
++    vndr_cap = (IVShmemVndrCap *)(pci_conf + offset);
++    vndr_cap->length = 0x18;
++    vndr_cap->state_tab_sz = cpu_to_le32(4096);
++    vndr_cap->rw_section_sz = cpu_to_le64(rw_section_sz);
++    vndr_cap->output_section_sz = s->output_section_sz;
++
++    priv_ctrl_pos = offset + offsetof(IVShmemVndrCap, priv_ctrl);
++    s->priv_ctrl = &dev->config[priv_ctrl_pos];
++    dev->wmask[priv_ctrl_pos] |= IVSHMEM_ONESHOT_MODE;
++
++    if (s->master == ON_OFF_AUTO_AUTO) {
++        s->master = s->vm_id == 0 ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
++    }
++
++    if (!ivshmem_is_master(s)) {
++        error_setg(&s->migration_blocker,
++                   "Migration is disabled when using feature 'peer mode' in device 'ivshmem'");
++        migrate_add_blocker(s->migration_blocker, &err);
++        if (err) {
++            error_propagate(errp, err);
++            error_free(s->migration_blocker);
++            return;
 +        }
-+
-+        /* write pid file */
-+        fp = fopen(pid_file, "w");
-+        if (fp == NULL) {
-+            fprintf(stderr, "cannot write pid file: %s\n", strerror(errno));
-+            goto err_close;
-+        }
-+
-+        fprintf(fp, "%d\n", (int) getpid());
-+        fclose(fp);
 +    }
 +
-+    ivshmem_server_poll_events(&server);
-+    fprintf(stdout, "server disconnected\n");
-+    ret = 0;
-+
-+err_close:
-+    ivshmem_server_close(&server);
-+err:
-+    return ret;
++    pci_register_bar(PCI_DEVICE(s), 2,
++                     PCI_BASE_ADDRESS_SPACE_MEMORY |
++                     PCI_BASE_ADDRESS_MEM_PREFETCH |
++                     PCI_BASE_ADDRESS_MEM_TYPE_64,
++                     &s->ivshmem_bar2);
 +}
++
++static void ivshmem_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++
++    k->realize = ivshmem_realize;
++    k->exit = ivshmem_exit;
++    k->config_write = ivshmem_write_config;
++    k->vendor_id = PCI_VENDOR_ID_IVSHMEM;
++    k->device_id = PCI_DEVICE_ID_IVSHMEM;
++    k->revision = 2;
++    dc->reset = ivshmem_reset;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++    dc->desc = "Inter-VM shared memory v2";
++
++    dc->props = ivshmem_properties;
++    dc->vmsd = &ivshmem_vmsd;
++}
++
++static const TypeInfo ivshmem_info = {
++    .name          = TYPE_IVSHMEM,
++    .parent        = TYPE_PCI_DEVICE,
++    .instance_size = sizeof(IVShmemState),
++    .instance_init = ivshmem_init,
++    .class_init    = ivshmem_class_init,
++    .interfaces = (InterfaceInfo[]) {
++        { INTERFACE_CONVENTIONAL_PCI_DEVICE },
++        { },
++    },
++};
++
++static void ivshmem_register_types(void)
++{
++    type_register_static(&ivshmem_info);
++}
++
++type_init(ivshmem_register_types)
+diff --git a/include/hw/misc/ivshmem2.h b/include/hw/misc/ivshmem2.h
+new file mode 100644
+index 0000000000..ee994699e8
+--- /dev/null
++++ b/include/hw/misc/ivshmem2.h
+@@ -0,0 +1,48 @@
++/*
++ * Inter-VM Shared Memory PCI device, Version 2.
++ *
++ * Copyright (c) Siemens AG, 2019
++ *
++ * Authors:
++ *  Jan Kiszka <jan.kiszka@siemens.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or
++ * (at your option) any later version.
++ */
++#ifndef IVSHMEM2_H
++#define IVSHMEM2_H
++
++#define IVSHMEM_PROTOCOL_VERSION    2
++
++#define IVSHMEM_MSG_INIT            0
++#define IVSHMEM_MSG_EVENT_FD        1
++#define IVSHMEM_MSG_PEER_GONE       2
++
++typedef struct IvshmemMsgHeader {
++    uint32_t type;
++    uint32_t len;
++} IvshmemMsgHeader;
++
++typedef struct IvshmemInitialInfo {
++    IvshmemMsgHeader header;
++    uint32_t version;
++    uint32_t compatible_version;
++    uint32_t id;
++    uint32_t max_peers;
++    uint32_t vectors;
++    uint32_t protocol;
++    uint64_t output_section_size;
++} IvshmemInitialInfo;
++
++typedef struct IvshmemEventFd {
++    IvshmemMsgHeader header;
++    uint32_t id;
++    uint32_t vector;
++} IvshmemEventFd;
++
++typedef struct IvshmemPeerGone {
++    IvshmemMsgHeader header;
++    uint32_t id;
++} IvshmemPeerGone;
++
++#endif /* IVSHMEM2_H */
 -- 
 2.16.4
 
