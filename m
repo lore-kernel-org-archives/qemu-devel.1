@@ -2,85 +2,88 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 233ADC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 13:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 854FFC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 13:59:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF4ED2067B
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 13:59:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 517852067B
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 13:59:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R28FXNX4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF4ED2067B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V5/q5MqD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 517852067B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUADx-0000oH-Oc
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 08:59:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49498)
+	id 1iUAE1-0000v0-CC
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 08:59:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49551)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iUACm-00083u-QA
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 08:58:09 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iUACp-00084w-Ri
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 08:58:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iUACl-0006LS-By
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 08:58:08 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34245)
+ (envelope-from <peter.maydell@linaro.org>) id 1iUACo-0006N7-JU
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 08:58:11 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:54801)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iUACl-0006L0-4f
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 08:58:07 -0500
-Received: by mail-wr1-x441.google.com with SMTP id e6so14808510wrw.1
- for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 05:58:06 -0800 (PST)
+ id 1iUACo-0006Mj-CP
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 08:58:10 -0500
+Received: by mail-wm1-x335.google.com with SMTP id z26so13411646wmi.4
+ for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 05:58:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=vn/LS1QxQ3Jo7PPa3q2DW5VUSUkioX+p/q5lP9sToUs=;
- b=R28FXNX47v/QaSSXjwONwSJcJ6s8RfEPxc1mh5jrE2b+skULPmBTszUhEeyNkLVtqm
- Ib/Fc/AY7xKGTx12t5CBPZo102itjq9HrEnp6fDp/QOihi7P804lyAejzDJJ6O8dOnln
- 6oBZo8DlMyRfQcpE74IBB7gzfP79akDfvz3GUdPSY+AXVX9mwJZ8Sn67Y67210iLXP+D
- 6LfPuqaY8p4KxVBP686Rg96/Mzbbk9PvYSRVRIPhziqCHg4iSMWSlDUEfJu46GgY5UHn
- QUIISUO6m73nHPDh695TrNrFLyjCMU+Wahb+9Qzeu+CzOPTCx7BpmA5Ah79CgnXzxuzv
- t8hQ==
+ bh=zqttdI7AYiMTfwfogd55wTlfq+dMx85ZrMiofI4wvOY=;
+ b=V5/q5MqDtIhQ56BGbul2DWkfEKmAnpB77XmmcGVCoi6qWus2BSKFZSDqDc4NPequLU
+ 5+UgSRInOolONuJCZhgTHWwFl8gVI1E9YFi8tkcv+kLFv0kGj5aU/UqzrH7ZtO7fzg5e
+ hjU3x9tSM936ftznbvXPVvGUXqwjhuALZpoMfnk7NECohGIRDZDYQHivCLzANvDSWmCi
+ FZBFaALAM2PBjjrdZjq5/leg4sRxBDuLHFnJysGI39El/awHVurPo8lqc2MPaf7gGu7s
+ DTGfd9QKXHvVBImqz0aDw/sXH8coiqgeT6bCwV34OwOOFC7bQuqjXLGrzSIi8B/gtMXj
+ u9SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=vn/LS1QxQ3Jo7PPa3q2DW5VUSUkioX+p/q5lP9sToUs=;
- b=lW3sWPxdChlAPgzHHQ2ec2ghHXvTcRwL/v5Z8N7dmzB/CY1YzJhcu2W2ohyUibdXX/
- wOerdaewn0KwbEiAkO/qZRPIkrMQC6p1uOZoOyMXUSAUfzV/T3eLQTeMS4/WhF2ZfM/j
- 7aLqJKaS4Qj1qlASwOG7moyI3r0YYfzi+uRUo7Da2rGb7PmpEKtO6TN6LmSPPGE6xejA
- VHzAh8TqYiJAPxJ3hB8GQgNmXBvmawsudAnJmMRM7kf4pSMd80SgSL/YmlfZUTL7bPfd
- Kjs3ahi1YVT2sRz9MReDaY8ngDZJxiN3+6Wz1ISTqn+S1M3jMUqjAKu11KPnWBHH7+Vp
- U4HQ==
-X-Gm-Message-State: APjAAAVN7yAib516ss5nXI9oIBzzmP7o235I8o4xUS7J8B6Mk/odIEqy
- BrqSekzHatIIEdElRqW1DZwylmi+7iLKfw==
-X-Google-Smtp-Source: APXvYqz2CAWE6tiPFEArsGPMaPXByz0IPB+qHOz/QOLxDLXSh9zyTY4f4miCVFNHTw1w6zKCP9BAGg==
-X-Received: by 2002:adf:fd45:: with SMTP id h5mr22960795wrs.388.1573480685534; 
- Mon, 11 Nov 2019 05:58:05 -0800 (PST)
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=zqttdI7AYiMTfwfogd55wTlfq+dMx85ZrMiofI4wvOY=;
+ b=S4rYAbLqNRfvArypIDDXx6X/WqkOtjR4e25h2TVxlMNJIrZJ/8Z/kLz7cv6yQ/OxJe
+ X6uJ45NoD8WEitadBf+NwQkpUcg7830GJzIwik3LX6AfWDXjqQ27uQhoqXbFWg02KrOc
+ rDK4U1dMrKEdOKL2brSQPb5PluT+RDzdGlwbZfTuPWoJWyhyvaKjc+VixkbhdX2XSJhb
+ m3S9TO7dDEU46m95rFMbEBlaBFoDq5lWE6JCPTvrdWQO4DQnevG+JFS7UbdQPjvh4OoW
+ Lu3/D7szgjmerYJLCyjs3A2r3HdFGJ4oIPE+Gvfra4vZhdxYTRNE15urcjhxzOiccwwX
+ pajQ==
+X-Gm-Message-State: APjAAAUlbJlmvaoOgp0oNM/b2XEHrtobWpx8cnwZdBDdruHt1AcN+57i
+ zmeavSqGTieNVW4GCgyfkQOhdElbGjxS8w==
+X-Google-Smtp-Source: APXvYqyxitSiY3LOufKhct/EjWOoajvtMELGfY7apcIS83zNV6WPMGdf8DB75l+Wiytg4qVvH6W49Q==
+X-Received: by 2002:a05:600c:c5:: with SMTP id
+ u5mr19772610wmm.35.1573480689034; 
+ Mon, 11 Nov 2019 05:58:09 -0800 (PST)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id t29sm20544857wrb.53.2019.11.11.05.58.04
+ by smtp.gmail.com with ESMTPSA id t29sm20544857wrb.53.2019.11.11.05.58.08
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 Nov 2019 05:58:04 -0800 (PST)
+ Mon, 11 Nov 2019 05:58:08 -0800 (PST)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/3] target-arm queue
-Date: Mon, 11 Nov 2019 13:58:00 +0000
-Message-Id: <20191111135803.14414-1-peter.maydell@linaro.org>
+Subject: [PULL 3/3] hw/arm/boot: Set NSACR.{CP11,
+ CP10} in dummy SMC setup routine
+Date: Mon, 11 Nov 2019 13:58:03 +0000
+Message-Id: <20191111135803.14414-4-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191111135803.14414-1-peter.maydell@linaro.org>
+References: <20191111135803.14414-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::441
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,45 +99,85 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Arm patches for rc1:
- * two final "remove the old API" patches for some API transitions
- * bugfix for raspi/highbank Linux boot
+From: Clement Deschamps <clement.deschamps@greensocs.com>
 
-thanks
--- PMM
+The boot.c code usually puts the CPU into NS mode directly when it is
+booting a kernel.  Since fc1120a7f5f2d4b6 this has included a
+requirement to set NSACR to give NS state access to the FPU; we fixed
+that for the usual code path in ece628fcf6.  However, it is also
+possible for a board model to request an alternative mode of booting,
+where its 'board_setup' code hook runs in Secure state and is
+responsible for doing the S->NS transition after it has done whatever
+work it must do in Secure state.  In this situation the board_setup
+code now also needs to update NSACR.
 
-The following changes since commit 654efcb511d394c1d3f5292c28503d1d19e5b1d3:
+This affects all boards which set info->secure_board_setup, which is
+currently the 'raspi' and 'highbank' families.  They both use the
+common arm_write_secure_board_setup_dummy_smc().
 
-  Merge remote-tracking branch 'remotes/vivier/tags/q800-branch-pull-request' into staging (2019-11-11 09:23:46 +0000)
+Set the NSACR CP11 and CP10 bits in the code written by that
+function, to allow FPU access in Non-Secure state when using dummy
+SMC setup routine.  Otherwise an AArch32 kernel booted on the
+highbank or raspi boards will UNDEF as soon as it tries to use the
+FPU.
 
-are available in the Git repository at:
+Update the comment describing secure_board_setup to note the new
+requirements on users of it.
 
-  https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20191111
+This fixes a kernel panic when booting raspbian on raspi2.
 
-for you to fetch changes up to 45c078f163fd47c35e7505d98928fae63baada7d:
+Successfully tested with:
+  2017-01-11-raspbian-jessie-lite.img
+  2018-11-13-raspbian-stretch-lite.img
+  2019-07-10-raspbian-buster-lite.img
 
-  hw/arm/boot: Set NSACR.{CP11, CP10} in dummy SMC setup routine (2019-11-11 13:44:16 +0000)
+Fixes: fc1120a7f5
+Signed-off-by: Clement Deschamps <clement.deschamps@greensocs.com>
+Tested-by: Laurent Bonnans <laurent.bonnans@here.com>
+Message-id: 20191104151137.81931-1-clement.deschamps@greensocs.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+[PMM: updated comment to boot.h to note new requirement on
+ users of secure_board_setup; edited/rewrote commit message]
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ include/hw/arm/boot.h | 7 +++++--
+ hw/arm/boot.c         | 3 +++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-----------------------------------------------------------------
-target-arm queue:
- * Remove old unassigned_access CPU hook API
- * Remove old ptimer_init_with_bh() API
- * hw/arm/boot: Set NSACR.{CP11, CP10} in dummy SMC setup routine
+diff --git a/include/hw/arm/boot.h b/include/hw/arm/boot.h
+index 7f4d0ca7cdf..ce2b48b88bc 100644
+--- a/include/hw/arm/boot.h
++++ b/include/hw/arm/boot.h
+@@ -107,9 +107,12 @@ struct arm_boot_info {
+     void (*write_board_setup)(ARMCPU *cpu,
+                               const struct arm_boot_info *info);
+ 
+-    /* If set, the board specific loader/setup blob will be run from secure
++    /*
++     * If set, the board specific loader/setup blob will be run from secure
+      * mode, regardless of secure_boot. The blob becomes responsible for
+-     * changing to non-secure state if implementing a non-secure boot
++     * changing to non-secure state if implementing a non-secure boot,
++     * including setting up EL3/Secure registers such as the NSACR as
++     * required by the Linux booting ABI before the switch to non-secure.
+      */
+     bool secure_board_setup;
+ 
+diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+index ef6724960c0..8fb4a63606f 100644
+--- a/hw/arm/boot.c
++++ b/hw/arm/boot.c
+@@ -240,6 +240,9 @@ void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
+     };
+     uint32_t board_setup_blob[] = {
+         /* board setup addr */
++        0xee110f51, /* mrc     p15, 0, r0, c1, c1, 2  ;read NSACR */
++        0xe3800b03, /* orr     r0, #0xc00             ;set CP11, CP10 */
++        0xee010f51, /* mcr     p15, 0, r0, c1, c1, 2  ;write NSACR */
+         0xe3a00e00 + (mvbar_addr >> 4), /* mov r0, #mvbar_addr */
+         0xee0c0f30, /* mcr     p15, 0, r0, c12, c0, 1 ;set MVBAR */
+         0xee110f11, /* mrc     p15, 0, r0, c1 , c1, 0 ;read SCR */
+-- 
+2.20.1
 
-----------------------------------------------------------------
-Clement Deschamps (1):
-      hw/arm/boot: Set NSACR.{CP11, CP10} in dummy SMC setup routine
-
-Peter Maydell (2):
-      ptimer: Remove old ptimer_init_with_bh() API
-      Remove unassigned_access CPU hook
-
- include/hw/arm/boot.h |  7 ++--
- include/hw/core/cpu.h | 24 --------------
- include/hw/ptimer.h   | 45 ++++++++++++-------------
- accel/tcg/cputlb.c    |  2 --
- hw/arm/boot.c         |  3 ++
- hw/core/ptimer.c      | 91 +++++++++------------------------------------------
- memory.c              |  7 ----
- 7 files changed, 44 insertions(+), 135 deletions(-)
 
