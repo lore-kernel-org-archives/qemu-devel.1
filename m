@@ -2,124 +2,95 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB07FC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 09:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE09FC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 09:58:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95327206C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 09:49:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 980FF215EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 09:58:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IFLBPw55"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95327206C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f5Z3DGn6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 980FF215EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iU6Kc-0002e4-P9
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 04:49:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43825)
+	id 1iU6T2-0004n6-Kq
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 04:58:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44931)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rkagan@virtuozzo.com>) id 1iU6JC-0001ft-Vg
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 04:48:32 -0500
+ (envelope-from <sgarzare@redhat.com>) id 1iU6SN-0004ID-Mu
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 04:58:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rkagan@virtuozzo.com>) id 1iU6JB-00055t-DE
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 04:48:30 -0500
-Received: from mail-ve1eur02hn030b.outbound.protection.outlook.com
- ([2a01:111:f400:fe06::30b]:19345
- helo=EUR02-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
- id 1iU6JA-00051m-Iy; Mon, 11 Nov 2019 04:48:29 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nozXAR/VjHr/k2MusZkqfCIQbeIn9xQUKXogrDZ4rS6w3hlcAZ766UIeQmR9eQDx/ud9bauMulae1GXhE1jCA/et75qWPvz+bwDrWZUBmnOD3oduPCi5LRanhvQegXlADDrnNYnrh6wSCoHmIMLYHQA1kgDLLUMu09sMB3TD9syNqttRBjZ+QWGurGu0ztDDP+Pf6TTSeoxtEs3rebzHUa78kYp5pdJSauNYB9omErTDq0OtQ6eagP0z17oL+3bgduvELGMHwnuVVmUmANWL9KQs8HHI05eT3gPMqP8z6gFj0yZNnfjY2V4W0ZTwhu0gSpgbU7zdTpaysb/odpVJdA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xrBY/p3loQlm+kFYc6ftPtWUYu0n8lYDx5o+qOCl+5M=;
- b=Ykrlib9GQlfyLUbyUxSfK0YTQuRHrOfjt/rpaYAT093y8lA9FQ3o++1Qys28RjbHFUF0X7tSaisTg2t5GSc3Jptx8QQAx3dlfjy5SfbTlXNAiSDttI5ZPSun7ObR3441n4Es58mP/S7EPs74X2CcRDf0Bk0DgWng9E04RXzJzGVAdRdJ5yxOpUrEQsY97KxryMAdoy2slr8dq+cw20lLRraVdj/mQh3e2DzsR7s51T+APmQ2O+EdG67pDLoeTPYyV1gcu8jfrhTdsXCV8UH0sO2uhvchrBo8qXO9Rskj9bojpuJQRltAWJBBF+JEpRrU6/CfV5XWLJtT+NXyThpOhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xrBY/p3loQlm+kFYc6ftPtWUYu0n8lYDx5o+qOCl+5M=;
- b=IFLBPw557CAtk9FaKn/fZ/7pBAj+gqg+swdUcZtPjV84GgV3Ep9Ci/6NiQ+g6SfrVVsUb5+i/wgQZm+DLG1Mk6w5JV0TkGs8y/aeZvCmsXd7EcjnkVcd/f0s68ejovMtpVdk1ZgF8gKGG73gKXpyNRrJ7RPzghaersVlA+887yc=
-Received: from VI1PR08MB4608.eurprd08.prod.outlook.com (20.178.80.22) by
- VI1PR08MB5295.eurprd08.prod.outlook.com (20.178.126.213) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2430.20; Mon, 11 Nov 2019 09:48:25 +0000
-Received: from VI1PR08MB4608.eurprd08.prod.outlook.com
- ([fe80::9465:ec66:befb:e8b5]) by VI1PR08MB4608.eurprd08.prod.outlook.com
- ([fe80::9465:ec66:befb:e8b5%3]) with mapi id 15.20.2430.027; Mon, 11 Nov 2019
- 09:48:25 +0000
-From: Roman Kagan <rkagan@virtuozzo.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Subject: Re: [PATCH v3] iotests: Test NBD client reconnection
-Thread-Topic: [PATCH v3] iotests: Test NBD client reconnection
-Thread-Index: AQHVkNUYkueRQi37cke6mp6VF9z0xKeBVR0AgAAEXYCABGboAIAACEIA
-Date: Mon, 11 Nov 2019 09:48:25 +0000
-Message-ID: <20191111094822.GA126513@rkaganb.sw.ru>
-References: <1572627272-23359-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <feb2b810-3436-6550-43b2-a07ec1fc5280@virtuozzo.com>
- <20191108140527.GA63895@rkaganb.sw.ru>
- <55df73cb-ffe8-e4c6-b97a-346bdf28f1e2@virtuozzo.com>
-In-Reply-To: <55df73cb-ffe8-e4c6-b97a-346bdf28f1e2@virtuozzo.com>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mutt/1.12.1 (2019-06-15)
-mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>,	Andrey Shinkevich
- <andrey.shinkevich@virtuozzo.com>,	Vladimir Sementsov-Ogievskiy
- <vsementsov@virtuozzo.com>,	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,	"kwolf@redhat.com"
- <kwolf@redhat.com>,	Denis Lunev <den@virtuozzo.com>,	"mreitz@redhat.com"
- <mreitz@redhat.com>
-x-originating-ip: [185.231.240.5]
-x-clientproxiedby: HE1PR05CA0217.eurprd05.prod.outlook.com
- (2603:10a6:3:fa::17) To VI1PR08MB4608.eurprd08.prod.outlook.com
- (2603:10a6:803:c0::22)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=rkagan@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b3f7b99a-2458-4d59-b43c-08d7668c4bef
-x-ms-traffictypediagnostic: VI1PR08MB5295:
-x-ms-exchange-purlcount: 1
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR08MB5295EAE3E69C26793994D209C9740@VI1PR08MB5295.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0218A015FA
-x-forefront-antispam-report: SFV:SPM;
- SFS:(10019020)(396003)(376002)(136003)(346002)(39840400004)(366004)(199004)(189003)(6486002)(6436002)(26005)(305945005)(1076003)(54906003)(6306002)(58126008)(71200400001)(71190400001)(6862004)(229853002)(7736002)(99286004)(6512007)(9686003)(316002)(6246003)(6116002)(66066001)(86362001)(3846002)(4326008)(66556008)(8676002)(966005)(476003)(25786009)(2906002)(64756008)(66946007)(11346002)(66476007)(446003)(66446008)(81166006)(81156014)(76176011)(36756003)(186003)(52116002)(5660300002)(102836004)(486006)(53546011)(478600001)(386003)(256004)(6506007)(33656002)(6636002)(14454004)(8936002)(30126002);
- DIR:OUT; SFP:1501; SCL:5; SRVR:VI1PR08MB5295;
- H:VI1PR08MB4608.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: aED0zGj6HTWmnXLJa6o3xwybgaZV/xHC/D9jyJHY2CSZ+8+RCN3XRsWkxXoifczuKhrZ0nH3+hk1D8CB0NiIGDbPqA/1KlaL8a0sO1xAOz4enwQIY6YcaWLvA09XUxIb+pJ9XWZz+D4tBCRRsUaTz6h/uvD/NfcDbE0KwkXSY/3jrFbge4mDyYaY3bxleK7Arfs+DJr5Glwmzq0iMjnpIsk5jTyypXWcISljh4h3POyYT3LQSRi0dIncm5lYaeJLDRxxAYZKtf7lhyrvgQbO3olWTT3i7l0nTcCXBWqWi8QHlee5JRY/6POUqsYkxj6nu+EtEtd3qMKXolmzsxkSaakgLW72vnImC/EOiirvn6Ss93B6ZwyihmQCuGvbW38GeB5/DwfgKDXEchdR94EpYgUwQkP+wE3Bj5l21HE9PEQ=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <0964C11C0BEC354C88E04D1A2DA8F88E@eurprd08.prod.outlook.com>
+ (envelope-from <sgarzare@redhat.com>) id 1iU6SM-0003aa-FO
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 04:57:59 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36122
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iU6SM-0003aK-Bq
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 04:57:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573466277;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7LnLc6n1DacsMH9h3xyP+DJ6OR80TLvJhr8mExoEonE=;
+ b=f5Z3DGn6KHjbsOQmG/FxOwsRql4b0q9s1+5qheuS/yR7NMtubjDpY9cqtXlM6oP8xpxVK2
+ HODduV1QiRVtDY/vU3GBjhUelm70H1u8J7fCY31hFxbrEmYTR5R3YxrJSj/S+J97jk1kbV
+ T3XxEw+5XygIRpo/O6Su4dKp0imI8nc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-34-eBZTFYnlNSSMlE1zoyinNg-1; Mon, 11 Nov 2019 04:57:54 -0500
+Received: by mail-wm1-f71.google.com with SMTP id y133so5928138wmd.8
+ for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 01:57:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=1QIu26PlBIMBaZ9ertttxX4zkB9Vu05BPbb+lmR/ztA=;
+ b=RIiS3Tb/HAouQqdr3DFqFOQw1PtAOiVCm1jvmE32akjDYJgYg+9IlHvM1QhL6cVEdw
+ 0DPdH8OxrVwRB8RTWH+wn+k8bcpA2VhaDf9dFNOCOx2kpKENGwkc6VHcW6LQCy4MTsFx
+ Bav1rDcetZPNuAfFdRpYQIdcRfWA/6Jt65fj65+VtVIQi21URt+2eSUX3m603MGg/F9G
+ XVwY93oGuvAPvaw7HIS5VIVt6wcwBA+2RswgwcyYNTGUHWirorSdIJfO9yRipmM3p8aW
+ NiC2w6GAIwbuJmxh0ZvYAcpmIg99qJwDzWzAr2EJLRxlI7eczLuQ2R/0rVcMNqRjbSGo
+ keXw==
+X-Gm-Message-State: APjAAAVUIugZPLh5KYz+0o/0VDQ5kd+qK4ur+kwKaGcGJdMOvrIHYXWt
+ 8klVuyYDM/Xl/DpIMDk+dVFzEvb5FvFv9ApLKUKCrmyCZhMCvYUGEwSO67SdxcjD/HeigXXjiC2
+ sbnHqCpkqvXTD7Zk=
+X-Received: by 2002:a7b:c1d0:: with SMTP id a16mr20875836wmj.127.1573466273276; 
+ Mon, 11 Nov 2019 01:57:53 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwpgZv/ZC0Jm31+bfS3f42HYiQqfMLeFXFu8L2ip8uDLfEeAhyuiFffD7cND45hxn5Bolvifg==
+X-Received: by 2002:a7b:c1d0:: with SMTP id a16mr20875801wmj.127.1573466272936; 
+ Mon, 11 Nov 2019 01:57:52 -0800 (PST)
+Received: from steredhat (a-nu5-32.tin.it. [212.216.181.31])
+ by smtp.gmail.com with ESMTPSA id x7sm40090920wrg.63.2019.11.11.01.57.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 11 Nov 2019 01:57:52 -0800 (PST)
+Date: Mon, 11 Nov 2019 10:57:49 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH 1/2] tests/tcg/multiarch: fix code style in function main
+ of test-mmap.c
+Message-ID: <20191111095749.m7s2bfxmx636f3qo@steredhat>
+References: <20191015031350.4345-1-richardw.yang@linux.intel.com>
+ <20191015031350.4345-2-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3f7b99a-2458-4d59-b43c-08d7668c4bef
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2019 09:48:25.3928 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YZyRZTMFVOgfDNfU9XU21BIQTwiHa56M3fqhLoWEI10pGZQlFuAV1nkFL1FzMX9mXjZ0JZhnlIxkodvmgnOFzw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB5295
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe06::30b
+In-Reply-To: <20191015031350.4345-2-richardw.yang@linux.intel.com>
+X-MC-Unique: eBZTFYnlNSSMlE1zoyinNg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,57 +102,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ jasowang@redhat.com, richard.henderson@linaro.org, dgilbert@redhat.com,
+ mreitz@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 11, 2019 at 12:18:48PM +0300, Andrey Shinkevich wrote:
-> 
-> 
-> On 08/11/2019 17:05, Roman Kagan wrote:
-> > On Fri, Nov 08, 2019 at 01:49:50PM +0000, Vladimir Sementsov-Ogievskiy wrote:
-> >> 01.11.2019 19:54, Andrey Shinkevich wrote:
-> >>> +def check_proc_NBD(proc, connector):
-> >>> +    try:
-> >>> +        exitcode = proc.wait(timeout=10)
-> >>> +
-> >>> +        if exitcode < 0:
-> >>> +            log('NBD {}: EXIT SIGNAL {}\n'.format(connector, -exitcode))
-> >>> +            log(proc.communicate()[0])
-> >>> +        else:
-> >>> +            line = proc.stdout.readline()
-> >>
-> >>
-> >> could we use proc.communicate() for both cases, what is the difference?
-> > 
-> > In fact if proc produces any non-trivial amount of output you are better
-> > off using .communicate() otherwise your child may block on output and
-> > never exit.  See
-> > https://docs.python.org/3/library/subprocess.html#subprocess.Popen.communicate
-> > for how to express the above logic correctly.  The exit code *after*
-> > .communicate is available in .returncode.
-> > 
-> 
-> The pattern by the link above does not work (Python3):
-> 
-> proc = subprocess.Popen(...)
-> try:
->      outs, errs = proc.communicate(timeout=15)
-> except TimeoutExpired:
->      proc.kill()
->      outs, errs = proc.communicate()
-> 
-> as 'proc' cannot be used for output after being killed. It results in 
-> another exception being raised.
+On Tue, Oct 15, 2019 at 11:13:49AM +0800, Wei Yang wrote:
+> This file uses quite a different code style and changing just one line
+> would leads to some awkward appearance.
+>=20
+> This is a preparation for the following replacement of
+> sysconf(_SC_PAGESIZE).
+>=20
+> BTW, to depress ERROR message from checkpatch.pl, this patch replaces
+> strtoul with qemu_strtoul.
+>=20
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> ---
+>  tests/tcg/multiarch/test-mmap.c | 67 ++++++++++++++++++---------------
+>  1 file changed, 36 insertions(+), 31 deletions(-)
+>=20
+> diff --git a/tests/tcg/multiarch/test-mmap.c b/tests/tcg/multiarch/test-m=
+map.c
+> index 11d0e777b1..9ea49e2307 100644
+> --- a/tests/tcg/multiarch/test-mmap.c
+> +++ b/tests/tcg/multiarch/test-mmap.c
+> @@ -456,49 +456,54 @@ void check_invalid_mmaps(void)
+> =20
+>  int main(int argc, char **argv)
+>  {
+> -=09char tempname[] =3D "/tmp/.cmmapXXXXXX";
+> -=09unsigned int i;
+> -
+> -=09/* Trust the first argument, otherwise probe the system for our
+> -=09   pagesize.  */
+> -=09if (argc > 1)
+> -=09=09pagesize =3D strtoul(argv[1], NULL, 0);
+> -=09else
+> -=09=09pagesize =3D sysconf(_SC_PAGESIZE);
+> +    char tempname[] =3D "/tmp/.cmmapXXXXXX";
+> +    unsigned int i;
+> +
+> +    /*
+> +     * Trust the first argument, otherwise probe the system for our
+> +     * pagesize.
+> +     */
+> +    if (argc > 1) {
+> +        qemu_strtoul(argv[1], NULL, 0, &pagesize);
 
-Of course it can't.  You need to use the strings returned by
-.communicate().
+What do you think about doing this change in a separate patch?
 
-Roman.
+> +    } else {
+> +        pagesize =3D sysconf(_SC_PAGESIZE);
+> +    }
+> =20
+> -=09/* Assume pagesize is a power of two.  */
+> -=09pagemask =3D pagesize - 1;
+> -=09dummybuf =3D malloc (pagesize);
+> -=09printf ("pagesize=3D%u pagemask=3D%x\n", pagesize, pagemask);
+> +    /* Assume pagesize is a power of two.  */
+> +    pagemask =3D pagesize - 1;
+> +    dummybuf =3D malloc(pagesize);
+> +    printf("pagesize=3D%u pagemask=3D%x\n", pagesize, pagemask);
+> =20
+> -=09test_fd =3D mkstemp(tempname);
+> -=09unlink(tempname);
+> +    test_fd =3D mkstemp(tempname);
+> +    unlink(tempname);
+> =20
+> -=09/* Fill the file with int's counting from zero and up.  */
+> +    /* Fill the file with int's counting from zero and up.  */
+>      for (i =3D 0; i < (pagesize * 4) / sizeof i; i++) {
+>          checked_write(test_fd, &i, sizeof i);
+>      }
+> =20
+> -=09/* Append a few extra writes to make the file end at non=20
+> -=09   page boundary.  */
+> +    /*
+> +     * Append a few extra writes to make the file end at non
+> +     * page boundary.
+> +     */
+>      checked_write(test_fd, &i, sizeof i); i++;
+>      checked_write(test_fd, &i, sizeof i); i++;
+>      checked_write(test_fd, &i, sizeof i); i++;
+> =20
+> -=09test_fsize =3D lseek(test_fd, 0, SEEK_CUR);
+> +    test_fsize =3D lseek(test_fd, 0, SEEK_CUR);
+> =20
+> -=09/* Run the tests.  */
+> -=09check_aligned_anonymous_unfixed_mmaps();
+> -=09check_aligned_anonymous_unfixed_colliding_mmaps();
+> -=09check_aligned_anonymous_fixed_mmaps();
+> -=09check_file_unfixed_mmaps();
+> -=09check_file_fixed_mmaps();
+> -=09check_file_fixed_eof_mmaps();
+> -=09check_file_unfixed_eof_mmaps();
+> -=09check_invalid_mmaps();
+> +    /* Run the tests.  */
+> +    check_aligned_anonymous_unfixed_mmaps();
+> +    check_aligned_anonymous_unfixed_colliding_mmaps();
+> +    check_aligned_anonymous_fixed_mmaps();
+> +    check_file_unfixed_mmaps();
+> +    check_file_fixed_mmaps();
+> +    check_file_fixed_eof_mmaps();
+> +    check_file_unfixed_eof_mmaps();
+> +    check_invalid_mmaps();
+> =20
+> -=09/* Fails at the moment.  */
+> -=09/* check_aligned_anonymous_fixed_mmaps_collide_with_host(); */
+> +    /* Fails at the moment.  */
+> +    /* check_aligned_anonymous_fixed_mmaps_collide_with_host(); */
+> =20
+> -=09return EXIT_SUCCESS;
+> +    return EXIT_SUCCESS;
+>  }
+
+The rest looks good to me.
+
+Thanks,
+Stefano
+
 
