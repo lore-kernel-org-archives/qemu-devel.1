@@ -2,87 +2,52 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC64C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 12:57:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 824DBC43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 13:02:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11BEF21872
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 12:57:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l0+kwUjZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11BEF21872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 13E3821872
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 13:02:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13E3821872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=siemens.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iU9Fe-0001RP-7H
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 07:57:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41264)
+	id 1iU9KS-0003br-DD
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 08:02:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41441)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iU9EM-0000lK-CS
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:55:43 -0500
+ (envelope-from <jan.kiszka@siemens.com>) id 1iU9G1-0001qU-UR
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:57:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iU9EL-0006Bi-3L
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:55:41 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:36375)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iU9EK-0006BO-Sc
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:55:41 -0500
-Received: by mail-wr1-x442.google.com with SMTP id r10so14542671wrx.3
- for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 04:55:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WpXKEsMaXmP8vqDmswKMng2igukqeb7RB8LRQZsgWoE=;
- b=l0+kwUjZzlHTrGa2M02TSxCslzBYIo4gzMquhlXFkCoklmF3hta3IgdvOS82qPppXI
- jq2vMwO5c7lnQ+aFHs4bMzA5yOK8OM9vfkSEAAbYVkskSLl7p8R5NrGdK8baFsRePiUC
- nffVH63hGzFTys1j0IXGFhTem3VZuB0WBoTU6AVBrpu5MbKi7sePV8huk49jRLlsjIQJ
- Ag3paP02TFHfcIsT5HzIlc0ph/EKduU+1/EncQ9hCeRDetFre/2UXDHf+v5lvA1lr2b4
- aCBZZoXRbeXUW5oTxDGRXyVmEmvNM51qCaoJH2PXxar8rr1RuyhECdAkbfsUb4WwCqzV
- Tl7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WpXKEsMaXmP8vqDmswKMng2igukqeb7RB8LRQZsgWoE=;
- b=EfssaVq0XzTERUPVz0TldC2iTgaon9DBwFepmu+3L9db+5NYK+1SpWUiT4URjml7CZ
- kjAuUchFX4eqGXCtX3k54mkMmfNDtQzFuxVx8gETUXvNzprq78t40sW3VSRTkV8Zo20V
- +SDpZ4qt7gXCuNEX4uLFhJzt12ehESsDQz1OvrO0gImSwlV+DUfsDdxgjYB80/2r9Nfx
- AlBni5Z4CebxKArqPd37VIglhhcBlbMMH4n/C1SeNPWGsWD05kE3xsgyJfOZMSDt81Hh
- 6F05OHA9Yz3poN7E1ZK+pqi+dZAmLlWzVayLYWchO193lpo+40jWO0wnkulQoGvpaJqR
- kQ3A==
-X-Gm-Message-State: APjAAAX/1z+m09aZokAsdGt3AQlO0Ujc3QspWQQHJavYTnY2x+gD9Vul
- m9C+Q5oSMm0Xr52rxKW23GKRaw==
-X-Google-Smtp-Source: APXvYqzYgJcWMdovhtjwqLrbAg8aK9MBXdBMEpkNxr3jEQp3QegChoSnRuicM85slFxM+RG/xrFYDw==
-X-Received: by 2002:a5d:4645:: with SMTP id j5mr13090957wrs.329.1573476939287; 
- Mon, 11 Nov 2019 04:55:39 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g4sm16779813wru.75.2019.11.11.04.55.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 Nov 2019 04:55:37 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 4FA001FF87;
- Mon, 11 Nov 2019 12:55:37 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] tests/migration: use the common library function
-Date: Mon, 11 Nov 2019 12:55:30 +0000
-Message-Id: <20191111125530.26579-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+ (envelope-from <jan.kiszka@siemens.com>) id 1iU9Fx-0006gn-S4
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:57:23 -0500
+Received: from david.siemens.de ([192.35.17.14]:37365)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+ id 1iU9Fx-0006dd-IL
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 07:57:21 -0500
+Received: from mail2.sbs.de (mail2.sbs.de [192.129.41.66])
+ by david.siemens.de (8.15.2/8.15.2) with ESMTPS id xABCvCZT020373
+ (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 11 Nov 2019 13:57:12 +0100
+Received: from md1f2u6c.ad001.siemens.net ([139.25.68.37])
+ by mail2.sbs.de (8.15.2/8.15.2) with ESMTP id xABCvCBD010919;
+ Mon, 11 Nov 2019 13:57:12 +0100
+From: Jan Kiszka <jan.kiszka@siemens.com>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [RFC][PATCH 0/3] IVSHMEM version 2 device for QEMU
+Date: Mon, 11 Nov 2019 13:57:09 +0100
+Message-Id: <cover.1573477032.git.jan.kiszka@siemens.com>
+X-Mailer: git-send-email 2.16.4
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 192.35.17.14
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,31 +59,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- dgilbert@redhat.com
+Cc: liang yan <lyan@suse.com>, Jailhouse <jailhouse-dev@googlegroups.com>,
+ Claudio Fontana <claudio.fontana@gmail.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Hannes Reinecke <hare@suse.de>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- tests/migration/stress.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+To get the ball rolling after my presentation of the topic at KVM Forum
+[1] and many fruitful discussions around it, this is a first concrete
+code series. As discussed, I'm starting with the IVSHMEM implementation
+of a QEMU device and server. It's RFC because, besides specification and
+implementation details, there will still be some decisions needed about
+how to integrate the new version best into the existing code bases.
 
-diff --git a/tests/migration/stress.c b/tests/migration/stress.c
-index 0c239646934..915389b53ae 100644
---- a/tests/migration/stress.c
-+++ b/tests/migration/stress.c
-@@ -31,7 +31,7 @@ const char *argv0;
- 
- static int gettid(void)
- {
--    return syscall(SYS_gettid);
-+    return qemu_get_thread_id();
- }
- 
- static __attribute__((noreturn)) void exit_failure(void)
+If you want to play with this, the basic setup of the shared memory
+device is described in patch 1 and 3. UIO driver and also the
+virtio-ivshmem prototype can be found at
+
+    http://git.kiszka.org/?p=linux.git;a=shortlog;h=refs/heads/queues/ivshmem2
+
+Accessing the device via UIO is trivial enough. If you want to use it
+for virtio, this is additionally to the description in patch 3 needed on
+the virtio console backend side:
+
+    modprobe uio_ivshmem
+    echo "1af4 1110 1af4 1100 ffc003 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
+    linux/tools/virtio/virtio-ivshmem-console /dev/uio0
+
+And for virtio block:
+
+    echo "1af4 1110 1af4 1100 ffc002 ffffff" > /sys/bus/pci/drivers/uio_ivshmem/new_id
+    linux/tools/virtio/virtio-ivshmem-console /dev/uio0 /path/to/disk.img
+
+After that, you can start the QEMU frontend instance with the
+virtio-ivshmem driver installed which can use the new /dev/hvc* or
+/dev/vda* as usual.
+
+Any feedback welcome!
+
+Jan
+
+PS: Let me know if I missed someone potentially interested in this topic
+on CC - or if you would like to be dropped from the list.
+
+PPS: The Jailhouse queues are currently out of sync /wrt minor details
+of this one, primarily the device ID. Will update them when the general
+direction is clear.
+
+[1] https://kvmforum2019.sched.com/event/TmxI
+
+Jan Kiszka (3):
+  hw/misc: Add implementation of ivshmem revision 2 device
+  docs/specs: Add specification of ivshmem device revision 2
+  contrib: Add server for ivshmem revision 2
+
+ Makefile                                  |    3 +
+ Makefile.objs                             |    1 +
+ configure                                 |    1 +
+ contrib/ivshmem2-server/Makefile.objs     |    1 +
+ contrib/ivshmem2-server/ivshmem2-server.c |  462 ++++++++++++
+ contrib/ivshmem2-server/ivshmem2-server.h |  158 +++++
+ contrib/ivshmem2-server/main.c            |  313 +++++++++
+ docs/specs/ivshmem-2-device-spec.md       |  333 +++++++++
+ hw/misc/Makefile.objs                     |    2 +-
+ hw/misc/ivshmem2.c                        | 1091 +++++++++++++++++++++++++++++
+ include/hw/misc/ivshmem2.h                |   48 ++
+ 11 files changed, 2412 insertions(+), 1 deletion(-)
+ create mode 100644 contrib/ivshmem2-server/Makefile.objs
+ create mode 100644 contrib/ivshmem2-server/ivshmem2-server.c
+ create mode 100644 contrib/ivshmem2-server/ivshmem2-server.h
+ create mode 100644 contrib/ivshmem2-server/main.c
+ create mode 100644 docs/specs/ivshmem-2-device-spec.md
+ create mode 100644 hw/misc/ivshmem2.c
+ create mode 100644 include/hw/misc/ivshmem2.h
+
 -- 
-2.20.1
+2.16.4
 
 
