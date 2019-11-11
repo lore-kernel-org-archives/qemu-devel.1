@@ -2,83 +2,95 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4408C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:06:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C3E8C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:11:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EF2D21783
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:06:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49A6E21925
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:11:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Aqz33qcY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EF2D21783
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ux0SFKFy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49A6E21925
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUALI-0008WL-Ln
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 09:06:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51637)
+	id 1iUAQ3-0002J4-FX
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 09:11:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52509)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crobinso@redhat.com>) id 1iUAKM-0007gT-H1
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:05:59 -0500
+ (envelope-from <david@redhat.com>) id 1iUAPO-0001pQ-5L
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:11:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crobinso@redhat.com>) id 1iUAKK-0002o6-Tk
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:05:58 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25202
+ (envelope-from <david@redhat.com>) id 1iUAPM-0004yq-At
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:11:09 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:30213
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1iUAKK-0002mT-PZ
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:05:56 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iUAPM-0004yV-5C
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:11:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573481156;
+ s=mimecast20190719; t=1573481467;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=L12RmkmNTN7CV9rL3yA2PSF247CoPVQnMQyDUeTbuG8=;
- b=Aqz33qcYxsOs56pxWXshCqxpqM9VKyxTi4b8aRg34bI8HjW1OcViHp3l+ILNL/Ob688VMU
- Wq2CHSo5ycJMlKpqS0g3cp+8C93OUFqx5encwxYhExkimt9S0jocBOjpehHzrBB52tc/zL
- RxEUwp79lEa6Egs64/GmGkZqMeSkSAI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-Bg_EgRT1OUKoAlTbyxALvQ-1; Mon, 11 Nov 2019 09:05:52 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E63A7106BF7E;
- Mon, 11 Nov 2019 14:05:51 +0000 (UTC)
-Received: from [10.10.121.92] (ovpn-121-92.rdu2.redhat.com [10.10.121.92])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 862A910016EB;
- Mon, 11 Nov 2019 14:05:51 +0000 (UTC)
-Subject: Re: [PATCH 00/55] Patch Round-up for stable 4.1.1, freeze on
- 2019-11-12
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-References: <20191105205243.3766-1-mdroth@linux.vnet.ibm.com>
- <fa7c8160-ac0e-ed54-ba77-2a516f08b003@redhat.com>
-From: Cole Robinson <crobinso@redhat.com>
-Message-ID: <cc9bab24-3539-455c-e216-64555bc8776c@redhat.com>
-Date: Mon, 11 Nov 2019 09:06:56 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <fa7c8160-ac0e-ed54-ba77-2a516f08b003@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: Bg_EgRT1OUKoAlTbyxALvQ-1
+ bh=1jdDujaBjB4ZuqhhDFpi+IouYG8WnS5A05F/VjT/Jqo=;
+ b=Ux0SFKFyp/0RzHVE+LrasmxCj/XgTevhP+NjJVPu3zO7HYUPThygqysyBUvBtCLGPg9IuM
+ HsNStXvgb/xee9suGPyiGZhryLPImGfdne3DfpYV1f5+HX8Hhh3d8UtT3XGvKLq7pCh+mO
+ JIZHge7M+n0uiHzcLybuRouLPqUVrkM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-0UquGRCBNryXD7WXKv0-kA-1; Mon, 11 Nov 2019 09:09:58 -0500
+Received: by mail-wm1-f70.google.com with SMTP id y133so6271096wmd.8
+ for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 06:09:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:content-transfer-encoding:from:mime-version
+ :subject:date:message-id:references:cc:in-reply-to:to;
+ bh=za0IVuBhC751vDb+jH605+kiTqYQHCdmnWQAJzB5+IY=;
+ b=nVnaFPN61xiyXvE0ePJHTnmY4lUmmzTxZZ8f0eiLEPLhZXtKndtpvtM3oJIwQRSKLk
+ PBm3anvoV2u1Cvksp5dnS21wbi2QIQ5zALDuJ/CA1mGMv7WxcM0K3Zmh+v2GgSWg5QIn
+ NhIfqTgn6spR1+8QmcbP0hKrTxPSJTcw5GcXdAyR4uquKsLtCkYUwIvAT+S5FAL8tNKG
+ hc4Dwpqid1MU7yih4CsiDIvgcZw5J3nVQcym/zQQV0Ubx6Lqc1NptqTObXPnqKxQGPHH
+ TIHHGz5F81J26XkOXZV1c0iC+1hAQCZzQjCm962omNb1WGQ4lZfG/7QMa/IdI6mwrszI
+ DZBA==
+X-Gm-Message-State: APjAAAX7ERDmmHoaaF6U6gH5acbYj/8u8lD+tZemwLRdGEj0z3ewpEY2
+ rflUcxAnX6LWMTHGIHXYxOaATN8r3QjH8g66Dwcg6SGrswSKF2dMXyiZgQI8xT00HS+rhpmEcCA
+ d/PAGaw/WRt8pK3o=
+X-Received: by 2002:a7b:cf36:: with SMTP id m22mr21349854wmg.96.1573481397716; 
+ Mon, 11 Nov 2019 06:09:57 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyNtOooJZLnMT/2813fX5feOQ8iaT2DnY9Cqt/v6jlBb7Itg5xE42ItI2036ivkRqbHyj1ExQ==
+X-Received: by 2002:a7b:cf36:: with SMTP id m22mr21349835wmg.96.1573481397505; 
+ Mon, 11 Nov 2019 06:09:57 -0800 (PST)
+Received: from [192.168.3.122] (p5B0C62A5.dip0.t-ipconnect.de. [91.12.98.165])
+ by smtp.gmail.com with ESMTPSA id
+ n1sm18083852wrr.24.2019.11.11.06.09.56
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 11 Nov 2019 06:09:56 -0800 (PST)
+From: David Hildenbrand <david@redhat.com>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH] s390x: Properly fetch and test the short psw on diag308
+ subc 0/1
+Date: Mon, 11 Nov 2019 15:09:55 +0100
+Message-Id: <6177C7E2-50B9-493D-B42F-A1DCC5C3F36E@redhat.com>
+References: <99a1b443-1bf5-e21b-dcdd-6feafd6d9b6f@linux.ibm.com>
+In-Reply-To: <99a1b443-1bf5-e21b-dcdd-6feafd6d9b6f@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+X-Mailer: iPhone Mail (17A878)
+X-MC-Unique: 0UquGRCBNryXD7WXKv0-kA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,75 +102,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/11/19 9:03 AM, Cole Robinson wrote:
-> On 11/5/19 3:51 PM, Michael Roth wrote:
->> Hi everyone,
->>
->> The following new patches are queued for QEMU stable v4.1.1:
->>
->>   https://github.com/mdroth/qemu/commits/stable-4.1-staging
->>
->> The release is tentatively planned for 2019-11-14:
->>
->>   https://wiki.qemu.org/Planning/4.1
->>
->> Please note that the original release date was planned for 2019-11-21,
->> but was moved up to address a number of qcow2 corruption issues:
->>
->>   https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg07144.html
->>
->> Fixes for the XFS issues noted in the thread are still pending, but will
->> hopefully be qemu.git master in time for 4.1.1 freeze and the
->> currently-scheduled release date for 4.2.0-rc1.
->>
->> The list of still-pending patchsets being tracked for inclusion are:
->>
->>   qcow2: Fix data corruption on XFS
->>     https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg00073.html
->>     (PULL pending)
->>   qcow2: Fix QCOW2_COMPRESSED_SECTOR_MASK
->>     https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg07718.html
->>   qcow2-bitmap: Fix uint64_t left-shift overflow
->>     https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg07989.html
->>
->> Please respond here or CC qemu-stable@nongnu.org on any additional patch=
-es
->> you think should be included in the release.
->>
->> Thanks!
->>
+
+
+> Am 11.11.2019 um 14:52 schrieb Janosch Frank <frankja@linux.ibm.com>:
 >=20
-> Extra patches we are carrying in Fedora 31. First 2 were requested as
-> fixes for gluster 4k issues. Last one fixes tests on newer kernels
+> =EF=BB=BFOn 11/5/19 9:07 PM, David Hildenbrand wrote:
+>>> On 05.11.19 20:34, Janosch Frank wrote:
+>>> On 11/5/19 8:29 PM, David Hildenbrand wrote:
+>>>> On 05.11.19 19:44, Janosch Frank wrote:
+> [...]
+>> Note: For TCG we miss many of these validity checks. For KVM, most=20
+>> should be triggered when running the VCPU AFAIK (that means, we don't=20
+>> have to check for any other scenarios here). Checking for the special=20
+>> case as given in the programming note should be sufficient.
+>>=20
+>>=20
+>> I'll have to think about how to best handle that for TCG (mazbe what I=
+=20
+>> proposed works). We could ignore TCG for now and add a TODO. Then, just=
+=20
+>> wrap the exception in a "if (kvm_enabled())". You could also document=20
+>> why we only have to check for this very specific bit and not the other=
+=20
+>> bits (handled by HW later).
+>>=20
 >=20
+> After some discussion I got an interesting answer:
+> For KVM we need to expand the short psw and invert bit 12.
+> The next SIE entry will automatically report a PIC 6.
 
-Sorry, wrong commit IDs. Actual commits are
+He, that=E2=80=98s a nice trick.
 
-commit a6b257a08e3d72219f03e461a52152672fec0612
-Author: Nir Soffer <nirsof@gmail.com>
-Date:   Tue Aug 13 21:21:03 2019 +0300
+>=20
+> I'd propose that I'll fix this patch and send a v2 and you can fix TCG :)
 
-    file-posix: Handle undetectable alignment
+Yes please. Perform the conversion unconditionally and add a comment - we s=
+hould add the same checks when running the TCG main loop after modifying th=
+e PSW mask.
 
-commit 3a20013fbb26d2a1bd11ef148eefdb1508783787
-Author: Nir Soffer <nirsof@gmail.com>
-Date:   Tue Aug 27 04:05:27 2019 +0300
-
-    block: posix: Always allocate the first block
-
-commit bf9e0313c27d8e6ecd7f7de3d63e1cb25d8f6311
-Author: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-Date:   Wed Aug 21 16:14:27 2019 +0100
-
-    tests: make filemonitor test more robust to event ordering
-
-
-Thanks,
-Cole
+>=20
 
 
