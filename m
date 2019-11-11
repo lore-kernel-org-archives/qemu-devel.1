@@ -2,73 +2,81 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6284C17441
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 18:41:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEEA7C17446
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 18:58:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC71D21783
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 18:41:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC71D21783
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id AF78C21925
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 18:58:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wvZCXoOj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF78C21925
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUEdC-00021x-V5
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 13:41:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33199)
+	id 1iUEtG-0008Qd-UC
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 13:58:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35632)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iUEcS-0001bL-TI
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 13:40:58 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1iUEsY-0007lZ-T6
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 13:57:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iUEcR-00054o-6t
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 13:40:56 -0500
-Received: from indium.canonical.com ([91.189.90.7]:38216)
+ (envelope-from <robert.foley@linaro.org>) id 1iUEsX-0003Gf-EN
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 13:57:34 -0500
+Received: from mail-lf1-x132.google.com ([2a00:1450:4864:20::132]:41954)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iUEcR-00054A-0P
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 13:40:55 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iUEcO-0006sC-2z
- for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 18:40:52 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0ED592E80CC
- for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 18:40:52 +0000 (UTC)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1iUEsX-0003Cs-5r
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 13:57:33 -0500
+Received: by mail-lf1-x132.google.com with SMTP id j14so10698652lfb.8
+ for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 10:57:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:from:date:message-id:subject:to:cc
+ :content-transfer-encoding;
+ bh=b6KAQXUJcOVKlVt+aFtkv4+WZPXEiFKs8GrOxAjWWUU=;
+ b=wvZCXoOjpDM+gUNpVRnpWUU2GlEMqfF4A0pd3gm3kSYgygkMDVFaMFyH2qNiS7nfO2
+ 9bXQSfK1hRSnvlvKlfzUFo4x+hbePdX2jS6yAVlsgk0LoKx+CzxgqbxTFulWZjjfH2dQ
+ ie7HItTRncdKym7fsCyyfaUnBj1XXGxGl4vFQIOu6S5NtOi0UfSrSFTm8VOZFO2PsHFs
+ 2Zw7l9W6m2erZE55KQwyyz/OOpQEYtq+akMSDizTXjBz6EhUhSxBbYdC6zqftcBWnzNZ
+ 9THvNggN9/r/Tshit6+64y/M+KXOg430Lcvpii/paJn+QcifeTOfREmoIL2u5V0u0ytP
+ xKyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
+ :content-transfer-encoding;
+ bh=b6KAQXUJcOVKlVt+aFtkv4+WZPXEiFKs8GrOxAjWWUU=;
+ b=UB1WkgGTbwuJA36hP846ZnV+1sXmKrrU+K2ih/hFuLgRe4eaTXLb3+P8mCK6uHsYT+
+ RvlEH+LSijcwBx0fFeP1k37ZzaPdCcePZxUFxshf/0A/Qd0bwOFc3ZfQyUb7LQAAXWYa
+ P2+gYhz+4msBVUs0yMgVHomspdAz1WX7yimQ8sNTjlMQdmldtBKgt2KCdiY2+iRK3ljo
+ HSHIAtwbv9aqNIiczHq30rgjO0bCbFhTs5P7FtWgYHfU7Kad9wyMl5SxWxA8YhQMJPd1
+ kKUyU/P0V9oGJJHMntDJCBB3479OigfkIiAknuAONTzXkDXuvr602RhFUIiddhi7cfRw
+ EAlA==
+X-Gm-Message-State: APjAAAXaeGEx9IiOTplzJTsJuvyylsAIHhA5ZMTY1Sgc7o+u3BPWGK+S
+ fv1xTg4vfNvJb1y25aRiRNgeuhnYzYZQ3psRmeAqYQ==
+X-Google-Smtp-Source: APXvYqz2DU+6dAY5F3MMbVUcAv5IQuDTY9sRABza6FpnBBYrB38TlxipaDk0Fe46CfpvPvJ/qZHjoXLDZBjMf09CF1A=
+X-Received: by 2002:a19:c606:: with SMTP id w6mr16242932lff.71.1573498641172; 
+ Mon, 11 Nov 2019 10:57:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Robert Foley <robert.foley@linaro.org>
+Date: Mon, 11 Nov 2019 13:57:10 -0500
+Message-ID: <CAEyhzFurM_eGktFU2qRs9BXUET=qZoGcFod6BLihZBm3hSbo4w@mail.gmail.com>
+Subject: RE: [PATCH v2] tcg plugins: expose an API version concept
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Nov 2019 18:33:34 -0000
-From: Cole Robinson <1852115@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: crobinso
-X-Launchpad-Bug-Reporter: Cole Robinson (crobinso)
-X-Launchpad-Bug-Modifier: Cole Robinson (crobinso)
-Message-Id: <157349721480.22191.14354362512617460510.malonedeb@soybean.canonical.com>
-Subject: [Bug 1852115] [NEW] qemu --static user build fails with fedora
- rawhide glibc-2.30.9000
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 3ccaf2af7a239a95ada10f0fc5086001310902e4
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 91.189.90.7
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::132
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,140 +85,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1852115 <1852115@bugs.launchpad.net>
+Cc: cota@braap.org, philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Mon, 11 Nov 2019 at 06:35, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>
+> This is a very simple versioning API which allows the plugin
+> infrastructure to check the API a plugin was built against. We also
+> expose a min/cur API version to the plugin via the info block in case
+> it wants to avoid using old deprecated APIs in the future.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>
+> ---
+> v2
+>   - error out on missing plugin version symbol
+>   - fix missing symbol on hotblocks.so
+>   - more verbose error text, avoid bad grammar
+> ---
 
-Building qemu latest git 654efcb511d on fedora rawhide fails with this
-configure line:
-
-./configure \
-	--static \
-	--disable-system \
-	--enable-linux-user \
-	--disable-werror \
-	--disable-tools \
-	--disable-capstone
-
-make fails with:
-
-/usr/bin/ld: linux-user/syscall.o: in function `do_syscall1':
-/root/qemu.git/linux-user/syscall.c:7769: undefined reference to `stime'
-collect2: error: ld returned 1 exit status
-
-Seems related to this glibc change:
-https://sourceware.org/git/?p=3Dglibc.git;a=3Dcommit;h=3D12cbde1dae6fa4a9a7=
-92b64564c7e0debf7544cc
-
-...
-
-+* The obsolete function stime is no longer available to newly linked
-+  binaries and it has been removed from <time.h> header.  This function
-+  has been deprecated in favor of clock_settime.
-+
-
-# rpm -q glibc
-glibc-2.30.9000-17.fc32.x86_64
-
-
-FWIW there's some other messages but I don't think they are fatal:
-
-/usr/bin/ld: /usr/lib/gcc/x86_64-redhat-linux/9/../../../../lib64/libglib-2=
-.0.a(gutils.c.o): in function `g_get_user_database_entry':
-(.text+0x267): warning: Using 'getpwuid' in statically linked applications =
-requires at runtime the shared libraries from the glibc version used for li=
-nking
-/usr/bin/ld: (.text+0xe0): warning: Using 'getpwnam_r' in statically linked=
- applications requires at runtime the shared libraries from the glibc versi=
-on used for linking
-/usr/bin/ld: (.text+0x11e): warning: Using 'getpwuid_r' in statically linke=
-d applications requires at runtime the shared libraries from the glibc vers=
-ion used for linking
-
-
-Also, --disable-capstone is required to avoid this error, but it is pre-exi=
-sting, not sure if it's a bug, if so I can file a separate one:
-
-  LINK    aarch64-linux-user/qemu-aarch64
-/usr/bin/ld: cannot find -lcapstone
-collect2: error: ld returned 1 exit status
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1852115
-
-Title:
-  qemu --static user build fails with fedora rawhide glibc-2.30.9000
-
-Status in QEMU:
-  New
-
-Bug description:
-  Building qemu latest git 654efcb511d on fedora rawhide fails with this
-  configure line:
-
-  ./configure \
-  	--static \
-  	--disable-system \
-  	--enable-linux-user \
-  	--disable-werror \
-  	--disable-tools \
-  	--disable-capstone
-
-  make fails with:
-
-  /usr/bin/ld: linux-user/syscall.o: in function `do_syscall1':
-  /root/qemu.git/linux-user/syscall.c:7769: undefined reference to `stime'
-  collect2: error: ld returned 1 exit status
-
-  Seems related to this glibc change:
-  https://sourceware.org/git/?p=3Dglibc.git;a=3Dcommit;h=3D12cbde1dae6fa4a9=
-a792b64564c7e0debf7544cc
-
-  ...
-
-  +* The obsolete function stime is no longer available to newly linked
-  +  binaries and it has been removed from <time.h> header.  This function
-  +  has been deprecated in favor of clock_settime.
-  +
-
-  # rpm -q glibc
-  glibc-2.30.9000-17.fc32.x86_64
-
-  =
-
-  FWIW there's some other messages but I don't think they are fatal:
-
-  /usr/bin/ld: /usr/lib/gcc/x86_64-redhat-linux/9/../../../../lib64/libglib=
--2.0.a(gutils.c.o): in function `g_get_user_database_entry':
-  (.text+0x267): warning: Using 'getpwuid' in statically linked application=
-s requires at runtime the shared libraries from the glibc version used for =
-linking
-  /usr/bin/ld: (.text+0xe0): warning: Using 'getpwnam_r' in statically link=
-ed applications requires at runtime the shared libraries from the glibc ver=
-sion used for linking
-  /usr/bin/ld: (.text+0x11e): warning: Using 'getpwuid_r' in statically lin=
-ked applications requires at runtime the shared libraries from the glibc ve=
-rsion used for linking
-
-  =
-
-  Also, --disable-capstone is required to avoid this error, but it is pre-e=
-xisting, not sure if it's a bug, if so I can file a separate one:
-
-    LINK    aarch64-linux-user/qemu-aarch64
-  /usr/bin/ld: cannot find -lcapstone
-  collect2: error: ld returned 1 exit status
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1852115/+subscriptions
+Reviewed-by: Robert Foley <robert.foley@linaro.org>
+Thanks,
+Rob
 
