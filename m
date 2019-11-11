@@ -2,78 +2,74 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF9DC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 19:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B02C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 20:36:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AF152184C
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 19:21:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C57E20659
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 20:36:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dd0saf5A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AF152184C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B9WoY/fr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C57E20659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUFGA-00064M-CF
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 14:21:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38955)
+	id 1iUGQc-0001dn-BC
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 15:36:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49891)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alistair23@gmail.com>) id 1iUFF4-0005dT-Es
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 14:20:51 -0500
+ (envelope-from <eblake@redhat.com>) id 1iUGPQ-0000gS-CN
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 15:35:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alistair23@gmail.com>) id 1iUFF2-0004oa-HF
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 14:20:50 -0500
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:40887)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alistair23@gmail.com>)
- id 1iUFEu-0004cg-Mh; Mon, 11 Nov 2019 14:20:42 -0500
-Received: by mail-lj1-x242.google.com with SMTP id q2so15058483ljg.7;
- Mon, 11 Nov 2019 11:20:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ETdMemaZTfeFpM+B3101O42yHml/IcoDH78rrl1aWNQ=;
- b=Dd0saf5A02IMXZKmZyyJ3V4nIGHo6eoAhbRA9iTLuiHLd8KEsKelJwtKJuEgGRqlFx
- q9RMCBGtnk6++91xJTzdvqY70NBrRH9Wxm4kBSvPtvzd3qWnoIklfnQ8M0V2wXkWneM4
- 1tZpRyG7j0hRT3dcO6HI+ktciC9rTBhNti/aIdK80Wiiv593flZebfeshNa9PqGhAI5P
- RNbEeIgeG+QAy+G1Yr7Lu+HZ0ig5owo966cLjW7y1NDu91/vde9uQalArm97rgIAkc6k
- oSu90KdWOY3wKtfvdkIt0oVxvpI3toUURB9jqkTaNhGNnxIoWcG2AQhGQQEgUua3YIuK
- oWqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=ETdMemaZTfeFpM+B3101O42yHml/IcoDH78rrl1aWNQ=;
- b=OkPuEu3zw1Lr7NEIuaS7EpVXr3v7EmsrWqJ75zQIlhfUplpPy6ESbZYxNaRAUVOJvB
- KA/mc3xM8Nfpz1Hu+qbnuPrrujdPT6qmA4b5yib1XMNBG+CatbsE4BduNP5OXSBgcc9z
- D+ztgXuxn8VdEWx7+IsYoQnps3waGyAoMGJ86tPvN512kC/aOoFPQ8Fqskf+T39I8pfL
- DkT2G/qEMEPFdhKFIXRqQyGJxNB6XwxERnqDXHs3nPJgZWzG2JqIbbfJHUL6Y8a707cP
- PVwTSlNDR3ZYBxpNx7HhyN3JqjkYKucpHKCnz7MMCQoMSHwSAqEC3YlG4pb1qLd8qtmI
- ec/w==
-X-Gm-Message-State: APjAAAXFRdJn+C9CJG9CW+MIST4nV5TjuypkscWsn2TPQ8z+u1I4+kL4
- p2ucsKIcbSQjkGksXBeSmV0TrOtWfx/rn1dFSEg=
-X-Google-Smtp-Source: APXvYqze95lG99GsJO8TEhahnnLdKOaXMiDzfjw4RiTnnNFdfPQpazOuqmfJMLkXTH8Ot+cNkxwZdSb+EOhcIIYfZ7g=
-X-Received: by 2002:a2e:6a19:: with SMTP id f25mr671381ljc.147.1573500031997; 
- Mon, 11 Nov 2019 11:20:31 -0800 (PST)
+ (envelope-from <eblake@redhat.com>) id 1iUGPO-0002Xx-2M
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 15:35:35 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48784
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iUGPN-0002Xb-RM
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 15:35:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573504533;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=UgJRKIftxSKtotUapu/hPu4CT3JdNxKM6gjdNrL3vJk=;
+ b=B9WoY/frvrR1OEQeKypbJcyjUoi3MPqIrYZyRRIm28+JZ2231NTsfxlkOtgc8Rtnpr0buB
+ vWcuLLn5QvmZzeqorwDzLeIW1Q455gCI1bon3zUVzrWMjnRMChH1FKmqhTUdjBou4KzfL2
+ 4NAucJ5wotCgqnG0OoWL2MB7R1cRMq0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-192-dDN-vDm-PFGnK18NKViI6w-1; Mon, 11 Nov 2019 15:35:31 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 57E21DBA3;
+ Mon, 11 Nov 2019 20:35:30 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-116-242.phx2.redhat.com [10.3.116.242])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 46706600CC;
+ Mon, 11 Nov 2019 20:35:27 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qemu-coroutine-sleep: Silence Coverity warning
+Date: Mon, 11 Nov 2019 14:35:24 -0600
+Message-Id: <20191111203524.21912-1-eblake@redhat.com>
 MIME-Version: 1.0
-References: <20191111133804.14454-1-anup.patel@wdc.com>
-In-Reply-To: <20191111133804.14454-1-anup.patel@wdc.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 11 Nov 2019 11:14:44 -0800
-Message-ID: <CAKmqyKNxYY81ZS-G9p4Ne+kY0_mUhuo+6zCAPqbmdRB9hmJN+Q@mail.gmail.com>
-Subject: Re: [PATCH] riscv/virt: Add syscon reboot and poweroff DT nodes
-To: Anup Patel <Anup.Patel@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::242
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: dDN-vDm-PFGnK18NKViI6w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,97 +81,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
- Palmer Dabbelt <palmer@sifive.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Atish Patra <Atish.Patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Christoph Hellwig <hch@lst.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ vsementsov@virtuozzo.com, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 11, 2019 at 5:38 AM Anup Patel <Anup.Patel@wdc.com> wrote:
->
-> The SiFive test device found on virt machine can be used by
-> generic syscon reboot and poweroff drivers available in Linux
-> kernel.
->
-> This patch updates FDT generation in virt machine so that
-> Linux kernel can probe and use generic syscon drivers.
->
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
+Coverity warns that we store the address of a stack variable through a
+pointer passed in by the caller, which would let the caller trivially
+trigger use-after-free if that stored value is still present when we
+finish execution.  However, the way coroutines work is that after our
+call to qemu_coroutine_yield(), control is temporarily continued in
+the caller prior to our function concluding, and in order to resume
+our coroutine, the caller must poll until the variable has been set to
+NULL.  Thus, we can add an assert that we do not leak stack storage to
+the caller on function exit.
 
-Overall this looks fine. Palmer currently has a patch on list changing
-the sifive test string as well. It's probably best to rebase this on
-that patch.
+Fixes: Coverity CID 1406474
+CC: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+---
 
-We probably also need to make sure this is accepted in the RISC-V
-kernel tree first.
+I don't know if this actually shuts Coverity up; Peter, since you
+reported the Coverity issue, are you in a better position to test if
+this makes a difference?  At any rate, the tests still pass after
+this is in place.
 
-Alistair
+I'm not sure if the compiler wants us to insert a 'volatile' in any
+of our uses of QemuCoSleepState.user_state_pointer.
 
-> ---
->  hw/riscv/virt.c | 28 ++++++++++++++++++++++++----
->  1 file changed, 24 insertions(+), 4 deletions(-)
->
-> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
-> index cc8f311e6b..fdfa359713 100644
-> --- a/hw/riscv/virt.c
-> +++ b/hw/riscv/virt.c
-> @@ -182,11 +182,11 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->      uint64_t mem_size, const char *cmdline)
->  {
->      void *fdt;
-> -    int cpu;
-> +    int cpu, i;
->      uint32_t *cells;
->      char *nodename;
-> -    uint32_t plic_phandle, phandle = 1;
-> -    int i;
-> +    const char test_compat[] = "sifive,test0\0syscon";
-> +    uint32_t plic_phandle, test_phandle, phandle = 1;
->      hwaddr flashsize = virt_memmap[VIRT_FLASH].size / 2;
->      hwaddr flashbase = virt_memmap[VIRT_FLASH].base;
->
-> @@ -356,13 +356,33 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
->      create_pcie_irq_map(fdt, nodename, plic_phandle);
->      g_free(nodename);
->
-> +    test_phandle = phandle++;
->      nodename = g_strdup_printf("/test@%lx",
->          (long)memmap[VIRT_TEST].base);
->      qemu_fdt_add_subnode(fdt, nodename);
-> -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,test0");
-> +    qemu_fdt_setprop(fdt, nodename, "compatible",
-> +                     test_compat, sizeof(test_compat));
->      qemu_fdt_setprop_cells(fdt, nodename, "reg",
->          0x0, memmap[VIRT_TEST].base,
->          0x0, memmap[VIRT_TEST].size);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "phandle", test_phandle);
-> +    test_phandle = qemu_fdt_get_phandle(fdt, nodename);
-> +    g_free(nodename);
-> +
-> +    nodename = g_strdup_printf("/reboot");
-> +    qemu_fdt_add_subnode(fdt, nodename);
-> +    qemu_fdt_setprop_string(fdt, nodename, "compatible", "syscon-reboot");
-> +    qemu_fdt_setprop_cell(fdt, nodename, "regmap", test_phandle);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "offset", 0x0);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "value", FINISHER_RESET);
-> +    g_free(nodename);
-> +
-> +    nodename = g_strdup_printf("/poweroff");
-> +    qemu_fdt_add_subnode(fdt, nodename);
-> +    qemu_fdt_setprop_string(fdt, nodename, "compatible", "syscon-poweroff");
-> +    qemu_fdt_setprop_cell(fdt, nodename, "regmap", test_phandle);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "offset", 0x0);
-> +    qemu_fdt_setprop_cell(fdt, nodename, "value", FINISHER_PASS);
->      g_free(nodename);
->
->      nodename = g_strdup_printf("/uart@%lx",
-> --
-> 2.17.1
->
->
+ util/qemu-coroutine-sleep.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/util/qemu-coroutine-sleep.c b/util/qemu-coroutine-sleep.c
+index ae91b92b6e78..769a76e57df0 100644
+--- a/util/qemu-coroutine-sleep.c
++++ b/util/qemu-coroutine-sleep.c
+@@ -68,5 +68,12 @@ void coroutine_fn qemu_co_sleep_ns_wakeable(QEMUClockTyp=
+e type, int64_t ns,
+     }
+     timer_mod(state.ts, qemu_clock_get_ns(type) + ns);
+     qemu_coroutine_yield();
++    if (sleep_state) {
++        /*
++         * Note that *sleep_state is cleared during qemu_co_sleep_wake
++         * before resuming this coroutine.
++         */
++        assert(*sleep_state =3D=3D NULL);
++    }
+     timer_free(state.ts);
+ }
+--=20
+2.21.0
+
 
