@@ -2,79 +2,63 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D12C1C17441
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 17:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E59C17441
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 17:45:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9378420818
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 17:38:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eqp4+i1g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9378420818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 41D4020818
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 17:45:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41D4020818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUDdb-0005Op-ND
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 12:38:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53096)
+	id 1iUDkN-0007TD-CW
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 12:45:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35552)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iUDcP-0004rA-8Y
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 12:36:50 -0500
+ (envelope-from <liam.r.girdwood@linux.intel.com>) id 1iUBlJ-0002qo-Ey
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:37:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iUDcN-0006xR-Rl
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 12:36:48 -0500
-Received: from mail-oi1-x22e.google.com ([2607:f8b0:4864:20::22e]:45968)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iUDcN-0006xF-LR
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 12:36:47 -0500
-Received: by mail-oi1-x22e.google.com with SMTP id 14so6206544oir.12
- for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 09:36:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6jF/2iHRFMxG11xRFjdm5PHGE0fh1dJYo/Hy0BuOMPg=;
- b=eqp4+i1g94pHHda7ryPXJ0xSGrRqQu4uu/PWX3Dp6IEipGkv96CdFLtTAr8WbIkWOI
- W6QFG/raeRhGcBrOi4VUDeMnRw6bicTW9eBdwm18gEtCA9u7Z/zN1ZVs61LY0xZtbvyE
- dgkjoL3g2Rug1uiaCZwSsyy5P8TtY47uewDBW2xuOf/6dtoTstTvEhjzPkDT34Xw9faR
- 0rCWU3IBYlRFrkY3zRfu0Zdzrsht26gt8P2LqpprvgFaSOTP0A5s66f2n/K2xkFSbyEE
- oF9VuQzdNYihhqrTqAeraZLG0mFfxJn1PAZU2PwE6yEwbYaVgeDkkL7qZ2IHo39kj/sQ
- rfrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=6jF/2iHRFMxG11xRFjdm5PHGE0fh1dJYo/Hy0BuOMPg=;
- b=LVnI+DAwxNeSRi3PD3LkXcW7n/O9HTAXllifrGKYhDWOf6uLxV1gwYPxJtOg1Oo+7X
- Qk6J262hziuMWHcPLRYKkX8q/h3uQ+NYa61vs/vt/UCIGOMWSZz2WrreeTNG2w0Aab61
- LyqO4nWp4hfBGXKxTFUzAND2NwaVK/TmGu1zl5DbbNs+3/gFHp4e+FfqWgh6A/prVzha
- h2Rv+2JRQgQC6J75vyBycAtBRFbyyQlyxHwVmOy+Z0brnjtSiswrSfoMbawdSs8mmKf3
- DPttpJLCPf+WwbzPLvKnABQPmbKh8fDqYVvvEx9+kSarO+oVo2zaEI4HSYVTdJJpuf0G
- yt6Q==
-X-Gm-Message-State: APjAAAWPu5uCuRSQqTcEhwSMQ5ykiW2j3UR7R57t4Iol032tRP2wA/pJ
- n7EZvtcrDK4Y+qWo+42qkHE/dCDZJSxhj+jOMcWFYA==
-X-Google-Smtp-Source: APXvYqxANiAoSzKn5bG3keGFnZX8YcJANUTmMd8W6xBBvf1SK1PD/2xcq9Xo+wjkHanT4eIiUti6BEg7jr3HBdSlr9A=
-X-Received: by 2002:aca:3e8a:: with SMTP id l132mr129962oia.146.1573493806392; 
- Mon, 11 Nov 2019 09:36:46 -0800 (PST)
-MIME-Version: 1.0
-References: <20191111155551.13885-1-richard.henderson@linaro.org>
-In-Reply-To: <20191111155551.13885-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 11 Nov 2019 17:36:35 +0000
-Message-ID: <CAFEAcA-pJcB_1WgQA1y3wE+QkyLiqBaS=o1Rsg7-ynz6Au3jJg@mail.gmail.com>
-Subject: Re: [PULL 0/4] tcg patch queue
-To: Richard Henderson <richard.henderson@linaro.org>
+ (envelope-from <liam.r.girdwood@linux.intel.com>) id 1iUBlI-0005q8-D6
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:37:53 -0500
+Received: from mga02.intel.com ([134.134.136.20]:62639)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <liam.r.girdwood@linux.intel.com>)
+ id 1iUBlI-0004dD-3W
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 10:37:52 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 11 Nov 2019 07:36:45 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,293,1569308400"; d="scan'208";a="215709477"
+Received: from jlahtine-desk.ger.corp.intel.com ([10.252.20.50])
+ by orsmga002.jf.intel.com with ESMTP; 11 Nov 2019 07:36:39 -0800
+Message-ID: <c8a6b6f35664ce036c2a48ec41eab97b0f40704d.camel@linux.intel.com>
+Subject: Re: [virtio-dev] Re: guest / host buffer sharing ...
+From: Liam Girdwood <liam.r.girdwood@linux.intel.com>
+To: David Stevens <stevensd@chromium.org>, Stefan Hajnoczi <stefanha@gmail.com>
+Date: Mon, 11 Nov 2019 15:36:38 +0000
+In-Reply-To: <CAD=HUj41r8wHZ2-By8tLftkoqC5r_Bw=pr=zX2aZ7GTs1ESWhg@mail.gmail.com>
+References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
+ <20191106084344.GB189998@stefanha-x1.localdomain>
+ <CAD=HUj41r8wHZ2-By8tLftkoqC5r_Bw=pr=zX2aZ7GTs1ESWhg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::22e
+X-Received-From: 134.134.136.20
+X-Mailman-Approved-At: Mon, 11 Nov 2019 12:43:55 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,35 +70,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
+ Alex Lau <alexlau@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
+ Alexandre Courbot <acourbot@chromium.org>, qemu-devel@nongnu.org,
+ Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Hans Verkuil <hverkuil@xs4all.nl>,
+ =?ISO-8859-1?Q?St=E9phane?= Marchesin <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Dmitry Morozov <dmitry.morozov@opensynergy.com>,
+ Pawel Osciak <posciak@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 11 Nov 2019 at 15:56, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The following changes since commit 654efcb511d394c1d3f5292c28503d1d19e5b1d3:
->
->   Merge remote-tracking branch 'remotes/vivier/tags/q800-branch-pull-request' into staging (2019-11-11 09:23:46 +0000)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-tcg-20191111
->
-> for you to fetch changes up to cb974c95df0e1c9e73a37facd3e13894bd3eedc2:
->
->   tcg/LICENSE: Remove out of date claim about TCG subdirectory licensing (2019-11-11 15:11:21 +0100)
->
-> ----------------------------------------------------------------
-> Remove no-longer-true statement that TCG is BSD-licensed
->
+On Mon, 2019-11-11 at 12:04 +0900, David Stevens wrote:
+> Having a centralized buffer allocator device is one way to deal with
+> sharing buffers, since it gives a definitive buffer identifier that
+> can be used by all drivers/devices to refer to the buffer. That being
+> said, I think the device as proposed is insufficient, as such a
+> centralized buffer allocator should probably be responsible for
+> allocating all shared buffers, not just linear guest ram buffers.
 
+This would work for audio. I need to be able to :-
 
-Applied, thanks.
+1) Allocate buffers on guests that I can pass as SG physical pages to
+DMA engine (via privileged VM driver) for audio data. Can be any memory
+as long as it's DMA-able.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+2) Export hardware mailbox memory (in a real device PCI BAR) as RO to
+each guest to give guests low latency information on each audio stream.
+To support use cases like voice calls, gaming, system notifications and
+general audio processing.
 
--- PMM
+Liam
+
 
