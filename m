@@ -2,87 +2,79 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D9CC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 11:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D207C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 11:42:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3907321655
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 11:36:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED10220659
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 11:42:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wAZsS7af"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3907321655
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ex6f9vIb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED10220659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iU7zT-0005v2-HD
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 06:36:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58605)
+	id 1iU85A-0007fC-3K
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 06:42:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59606)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iU7yS-0005K4-TL
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:35:14 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iU84X-000781-4u
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:41:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iU7yR-0005vW-93
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:35:12 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45735)
+ (envelope-from <peter.maydell@linaro.org>) id 1iU84V-0007tB-UR
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:41:28 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:34051)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iU7yR-0005v1-1Y
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:35:11 -0500
-Received: by mail-wr1-x443.google.com with SMTP id z10so8925729wrs.12
- for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 03:35:10 -0800 (PST)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iU84V-0007sn-OY
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 06:41:27 -0500
+Received: by mail-ot1-x342.google.com with SMTP id t4so11007485otr.1
+ for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 03:41:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=iujIjXNf2J6RDh+vh48v8YCo8pI5M686QBuxEONkGks=;
- b=wAZsS7affDP8e/5OUhdBNJb1Vm0UCF6O+ibUg6zJ7kQeimWdOw2i3XVlvtqXniN2qf
- Jj6Y7XkslsMNCAYsB7eq60vyqcycZRiRBgcg6jIpoy6nlGyoaSucJPRVJkxTupWweM8j
- kL/tEsdAqsRzC1ts7M2j+/kxGPT10z49NSe6xhVngQI4qCZBZPiowkoRsb6683L1p2KE
- j27buQTih17RHddGZBwetgQzR5UZDxd2HxXjWDIi5N90j7T2NjcD7ZBJCWQ1tzNFKLdC
- sTCcoudAleIc3mTHw8aXkH2fcfzTmRSwKcootvisZWfBKGeqN8YimUVTNdgGuIXYe4FI
- qYyA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=AtPSNj6z0S1pVpexbPs9ZLnCorH702J0Ex7uyj4ZEY8=;
+ b=ex6f9vIbsRDhKRZeqp2h9DrOxKpraMvCR5q+S7CizPIXJrCnVhbsJG0WuAs+5/ATfh
+ SUqbMHkNbGNIIcYOMC7Dg/PUKkD0KTnMEDufMOiMsJsPQai+/CYhDbLfJs2wL+HYVqD4
+ rofxtgc95mMRqPSLnXwBELY0PiFzwxdKb4gAwXh59EuloNqq7fR9w0+CoaDc8ubzNKqN
+ 6pbZ2qRPnQ0q5X7xrWUp9VX8eOj0a9wfhzYrg+QibJt5+jGFSqlI/xtEkLgq9n/FmSPL
+ MZIt6Rj2/Oqt8/vIpJPcBeU3+fovLvyU8+rv6YEmVSNNk8fv9wYpZSl1pqA60L6np552
+ ftTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=iujIjXNf2J6RDh+vh48v8YCo8pI5M686QBuxEONkGks=;
- b=pazuHWShdBNlhDGPVT3pa27+/2nyYdE1A23p7vceck/Vgsp79As2MDVo1+mPlaA+co
- IpwVim0Ougk+ZuGmNWq7wz6/mgUEv0paeB6ahGhPaZ/K80atvK/mRkLo4gtDgvkfpXVX
- qAoSaNe/WkAHJoWFQoB+D+RW6+BExRcP422bnRS9+3p2b/Ho/j5VQh3FZruNbr/Oo0RA
- U/idzTUZ7cpL3N4sXRofNcKSh/x6Cio/Ew/cKKnAaJrgbfyVjBafC/BaHSDhO+DR0A9U
- CgSycB7VjrgpPQkDBQyZebO8j1MjAGqsOxz0cQVMyM68wQssh7fnKej9+CKTRJjxY6fV
- cwWw==
-X-Gm-Message-State: APjAAAUMRjXERKqXjmFvjurHyXRtgkzZ/xkUkKCuvz5uMyghcUXot5u/
- 7xV45JZ5OTikg+xapSRc0E76zA==
-X-Google-Smtp-Source: APXvYqzG8FZN/NWnMm6yQBqilNf5fkyv70zFIKePHdfz33wAyQrr8StloSl7oNoZa7ohrjRO1OQIZg==
-X-Received: by 2002:adf:ed49:: with SMTP id u9mr18309263wro.259.1573472109708; 
- Mon, 11 Nov 2019 03:35:09 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c4sm3597827wrp.86.2019.11.11.03.35.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 11 Nov 2019 03:35:08 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id BF4991FF87;
- Mon, 11 Nov 2019 11:35:07 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] tcg plugins: expose an API version concept
-Date: Mon, 11 Nov 2019 11:35:01 +0000
-Message-Id: <20191111113501.10211-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=AtPSNj6z0S1pVpexbPs9ZLnCorH702J0Ex7uyj4ZEY8=;
+ b=URiES9cd/0qMp1Xib1rI1Obzgma/Dv56QNMwfj/TQZrefKi3eY5rSgf4mIQEClP9YB
+ TZegE1x50O6T6Os/odLocicIrahKYF7cxD09eJKRHflxcrJs8QkXADEGrulIel9XpO6W
+ cumd46R1sg7MuGGaTidqNdCcs+DALM3j+9DZswRbeMm/oeQBqR06+ObdHioTYC05NMyS
+ K3uqQtQZj+5mZjzkUk9dxR5boTUenALo9tTkrCqjtKfGyHNiXyQBeIP9DrIwgwv1sWwo
+ WcUWVav1XTudIjsVVwnu242vxA2yCZ/naAVFzxd8DPQtUVhdaqebcco2N2iPD9EL6vff
+ r8qA==
+X-Gm-Message-State: APjAAAWujJDexvfDyyeqzEeh8jqQNufer67Bp0WWCFia/pSQZIsiM5kV
+ lgnKSGiUxy0O7fj2rRxsXeMHkdLNrhGf2kQLUWjZhQ==
+X-Google-Smtp-Source: APXvYqxD6gNLqRXQRRB9a1ZZ7u6VRxGqEW/2t31QBuQuKt37hVRTfdGAox5sqP37WFVYXU628STAhCNkVRZcSNgUww4=
+X-Received: by 2002:a9d:12d2:: with SMTP id g76mr21584489otg.232.1573472486652; 
+ Mon, 11 Nov 2019 03:41:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20191104151137.81931-1-clement.deschamps@greensocs.com>
+In-Reply-To: <20191104151137.81931-1-clement.deschamps@greensocs.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Nov 2019 11:41:15 +0000
+Message-ID: <CAFEAcA93tmw3GJWz-7hrLAc3YSzfDtTwNL-GY9OoeUBDcGHNqw@mail.gmail.com>
+Subject: Re: [PATCH] hw/arm/boot: Set NSACR.{CP11,
+ CP10} in dummy SMC setup routine
+To: Clement Deschamps <clement.deschamps@greensocs.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,216 +86,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, cota@braap.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a very simple versioning API which allows the plugin
-infrastructure to check the API a plugin was built against. We also
-expose a min/cur API version to the plugin via the info block in case
-it wants to avoid using old deprecated APIs in the future.
+On Mon, 4 Nov 2019 at 15:12, Clement Deschamps
+<clement.deschamps@greensocs.com> wrote:
+>
+> Set the NSACR CP11 and CP10 bits, to allow FPU access in Non-Secure state
+> when using dummy SMC setup routine. Otherwise an AArch32 kernel will UNDEF as
+> soon as it tries to use the FPU.
+>
+> This fixes kernel panic when booting raspbian on raspi2.
+>
+> Successfully tested with:
+>   2017-01-11-raspbian-jessie-lite.img
+>   2018-11-13-raspbian-stretch-lite.img
+>   2019-07-10-raspbian-buster-lite.img
+>
+> See also commit ece628fcf6 that fixes the issue when *not* using the
+> dummy SMC setup routine.
+>
+> Fixes: fc1120a7f5
+> Signed-off-by: Clement Deschamps <clement.deschamps@greensocs.com>
+> ---
+>  hw/arm/boot.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/hw/arm/boot.c b/hw/arm/boot.c
+> index ef6724960c..8fb4a63606 100644
+> --- a/hw/arm/boot.c
+> +++ b/hw/arm/boot.c
+> @@ -240,6 +240,9 @@ void arm_write_secure_board_setup_dummy_smc(ARMCPU *cpu,
+>      };
+>      uint32_t board_setup_blob[] = {
+>          /* board setup addr */
+> +        0xee110f51, /* mrc     p15, 0, r0, c1, c1, 2  ;read NSACR */
+> +        0xe3800b03, /* orr     r0, #0xc00             ;set CP11, CP10 */
+> +        0xee010f51, /* mcr     p15, 0, r0, c1, c1, 2  ;write NSACR */
+>          0xe3a00e00 + (mvbar_addr >> 4), /* mov r0, #mvbar_addr */
+>          0xee0c0f30, /* mcr     p15, 0, r0, c12, c0, 1 ;set MVBAR */
+>          0xee110f11, /* mrc     p15, 0, r0, c1 , c1, 0 ;read SCR */
+> --
+> 2.23.0
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Yep. The boot.c logic sets NSACR.{CP11,CP10} for booting a
+Linux kernel unless (a) the board says we should boot the
+kernel in Secure mode or (b) this is the primary CPU and
+the board requires the board_setup code to run in Secure mode.
+In that case the board_setup code must set NSACR in the same
+way that it is responsible for dropping down to NS.
 
----
-v2
-  - error out on missing plugin version symbol
-  - fix missing symbol on hotblocks.so
-  - more verbose error text, avoid bad grammar
----
- include/qemu/qemu-plugin.h | 19 +++++++++++++++++++
- plugins/loader.c           | 21 +++++++++++++++++++++
- plugins/plugin.h           |  2 ++
- tests/plugin/bb.c          |  2 ++
- tests/plugin/empty.c       |  2 ++
- tests/plugin/hotblocks.c   |  2 ++
- tests/plugin/hotpages.c    |  2 ++
- tests/plugin/howvec.c      |  2 ++
- tests/plugin/insn.c        |  2 ++
- tests/plugin/mem.c         |  2 ++
- 10 files changed, 56 insertions(+)
+This affects highbank and raspi, which are the only boards
+that set info->secure_board_setup; both of those use the
+arm_write_secure_board_setup_dummy_smc(), so this fix is
+all we should need.
 
-diff --git a/include/qemu/qemu-plugin.h b/include/qemu/qemu-plugin.h
-index a00a7deb461..5502e112c81 100644
---- a/include/qemu/qemu-plugin.h
-+++ b/include/qemu/qemu-plugin.h
-@@ -38,9 +38,28 @@
- 
- typedef uint64_t qemu_plugin_id_t;
- 
-+/*
-+ * Versioning plugins:
-+ *
-+ * The plugin API will pass a minimum and current API version that
-+ * QEMU currently supports. The minimum API will be incremented if an
-+ * API needs to be deprecated.
-+ *
-+ * The plugins export the API they were built against by exposing the
-+ * symbol qemu_plugin_version which can be checked.
-+ */
-+
-+extern QEMU_PLUGIN_EXPORT int qemu_plugin_version;
-+
-+#define QEMU_PLUGIN_VERSION 0
-+
- typedef struct {
-     /* string describing architecture */
-     const char *target_name;
-+    struct {
-+        int min;
-+        int cur;
-+    } version;
-     /* is this a full system emulation? */
-     bool system_emulation;
-     union {
-diff --git a/plugins/loader.c b/plugins/loader.c
-index ce724ed5839..15fc7e55156 100644
---- a/plugins/loader.c
-+++ b/plugins/loader.c
-@@ -178,6 +178,25 @@ static int plugin_load(struct qemu_plugin_desc *desc, const qemu_info_t *info)
-         goto err_symbol;
-     }
- 
-+    if (!g_module_symbol(ctx->handle, "qemu_plugin_version", &sym)) {
-+        error_report("TCG plugin %s does not declare API version %s",
-+                     desc->path, g_module_error());
-+        goto err_symbol;
-+    } else {
-+        int version = *(int *)sym;
-+        if (version < QEMU_PLUGIN_MIN_VERSION) {
-+            error_report("TCG plugin %s requires API version %d, but "
-+                         "this QEMU supports only a minimum version of %d",
-+                         desc->path, version, QEMU_PLUGIN_MIN_VERSION);
-+            goto err_symbol;
-+        } else if (version > QEMU_PLUGIN_VERSION) {
-+            error_report("TCG plugin %s requires API version %d, but "
-+                         "this QEMU supports only up to version %d",
-+                         desc->path, version, QEMU_PLUGIN_VERSION);
-+            goto err_symbol;
-+        }
-+    }
-+
-     qemu_rec_mutex_lock(&plugin.lock);
- 
-     /* find an unused random id with &ctx as the seed */
-@@ -248,6 +267,8 @@ int qemu_plugin_load_list(QemuPluginList *head)
-     g_autofree qemu_info_t *info = g_new0(qemu_info_t, 1);
- 
-     info->target_name = TARGET_NAME;
-+    info->version.min = QEMU_PLUGIN_MIN_VERSION;
-+    info->version.cur = QEMU_PLUGIN_VERSION;
- #ifndef CONFIG_USER_ONLY
-     MachineState *ms = MACHINE(qdev_get_machine());
-     info->system_emulation = true;
-diff --git a/plugins/plugin.h b/plugins/plugin.h
-index 5482168d797..1aa29dcaddf 100644
---- a/plugins/plugin.h
-+++ b/plugins/plugin.h
-@@ -14,6 +14,8 @@
- 
- #include <gmodule.h>
- 
-+#define QEMU_PLUGIN_MIN_VERSION 0
-+
- /* global state */
- struct qemu_plugin_state {
-     QTAILQ_HEAD(, qemu_plugin_ctx) ctxs;
-diff --git a/tests/plugin/bb.c b/tests/plugin/bb.c
-index 45e1de5bd68..f30bea08dcc 100644
---- a/tests/plugin/bb.c
-+++ b/tests/plugin/bb.c
-@@ -14,6 +14,8 @@
- 
- #include <qemu-plugin.h>
- 
-+QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
- static uint64_t bb_count;
- static uint64_t insn_count;
- static bool do_inline;
-diff --git a/tests/plugin/empty.c b/tests/plugin/empty.c
-index 3f60f690278..8fa6bacd93d 100644
---- a/tests/plugin/empty.c
-+++ b/tests/plugin/empty.c
-@@ -13,6 +13,8 @@
- 
- #include <qemu-plugin.h>
- 
-+QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
- /*
-  * Empty TB translation callback.
-  * This allows us to measure the overhead of injecting and then
-diff --git a/tests/plugin/hotblocks.c b/tests/plugin/hotblocks.c
-index 1bd183849a1..3942a2ca544 100644
---- a/tests/plugin/hotblocks.c
-+++ b/tests/plugin/hotblocks.c
-@@ -15,6 +15,8 @@
- 
- #include <qemu-plugin.h>
- 
-+QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
- static bool do_inline;
- 
- /* Plugins need to take care of their own locking */
-diff --git a/tests/plugin/hotpages.c b/tests/plugin/hotpages.c
-index 77df07a3ccf..ecd6c187327 100644
---- a/tests/plugin/hotpages.c
-+++ b/tests/plugin/hotpages.c
-@@ -18,6 +18,8 @@
- 
- #include <qemu-plugin.h>
- 
-+QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
- #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
- 
- static uint64_t page_size = 4096;
-diff --git a/tests/plugin/howvec.c b/tests/plugin/howvec.c
-index 58fa675e348..4ca555e1239 100644
---- a/tests/plugin/howvec.c
-+++ b/tests/plugin/howvec.c
-@@ -20,6 +20,8 @@
- 
- #include <qemu-plugin.h>
- 
-+QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
- #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
- 
- typedef enum {
-diff --git a/tests/plugin/insn.c b/tests/plugin/insn.c
-index e5fd07fb64b..0a8f5a0000e 100644
---- a/tests/plugin/insn.c
-+++ b/tests/plugin/insn.c
-@@ -14,6 +14,8 @@
- 
- #include <qemu-plugin.h>
- 
-+QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
- static uint64_t insn_count;
- static bool do_inline;
- 
-diff --git a/tests/plugin/mem.c b/tests/plugin/mem.c
-index d9673889896..878abf09d19 100644
---- a/tests/plugin/mem.c
-+++ b/tests/plugin/mem.c
-@@ -14,6 +14,8 @@
- 
- #include <qemu-plugin.h>
- 
-+QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
- static uint64_t mem_count;
- static uint64_t io_count;
- static bool do_inline;
--- 
-2.20.1
+I plan to fold in this comment update:
 
+diff --git a/include/hw/arm/boot.h b/include/hw/arm/boot.h
+index 7f4d0ca7cdf..ce2b48b88bc 100644
+--- a/include/hw/arm/boot.h
++++ b/include/hw/arm/boot.h
+@@ -107,9 +107,12 @@ struct arm_boot_info {
+     void (*write_board_setup)(ARMCPU *cpu,
+                               const struct arm_boot_info *info);
+
+-    /* If set, the board specific loader/setup blob will be run from secure
++    /*
++     * If set, the board specific loader/setup blob will be run from secure
+      * mode, regardless of secure_boot. The blob becomes responsible for
+-     * changing to non-secure state if implementing a non-secure boot
++     * changing to non-secure state if implementing a non-secure boot,
++     * including setting up EL3/Secure registers such as the NSACR as
++     * required by the Linux booting ABI before the switch to non-secure.
+      */
+     bool secure_board_setup;
+
+and tweak the commit message to mention highbank, when I
+apply it to target-arm.next.
+
+thanks
+-- PMM
 
