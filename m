@@ -2,91 +2,69 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADACC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 704B6C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:16:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D825821925
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:14:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r5kI1rWY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D825821925
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 47EA821D7F
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 14:16:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47EA821D7F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUASI-0004Qv-Vf
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 09:14:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52756)
+	id 1iUAU4-00069o-C2
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 09:16:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iUARH-0003gf-48
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:13:11 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iUASH-0004ib-33
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:14:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iUARE-0005NK-KS
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:13:07 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53678)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iUARE-0005N7-EF
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:13:04 -0500
-Received: by mail-wm1-x342.google.com with SMTP id u18so5854510wmc.3
- for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 06:13:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=w7rsXRYYjLafHi1jkrIAu6AcQ6FCgRIXOOq6UkJtVFI=;
- b=r5kI1rWY3eIu9lVWFbWmBIZcWR2scVfb3chuXrCkILjZUadRW4bAESgwwAJLISCHDB
- VpIbDNlM79NycLG4B16kOAGaXRYVUmue7awbvDZR19i+vwbrhnzh99EjaLSXgLyx0Ecv
- T487vztljz5oG56gyzeOSQOgupXO5B09NTwn9cLNXb3WUkjNkCSgMoHa1O6seyKGuZI0
- UbaVWAVaSNLcVwJbb48OrJ0OrvPC3BAJHCdSQBWtKtBWpIVLl9SYayJ1EPZ/7shVLsFw
- jBS5GeF6ej25USPCyI2z7xKM7fNBBTqrApZd2K5jYIlhqQoFBAADfP+c8cIGECatfLtn
- H83w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=w7rsXRYYjLafHi1jkrIAu6AcQ6FCgRIXOOq6UkJtVFI=;
- b=qAxYTAPPH+1vXzPryAjzU7XKmf8t1RArXipEysB45iZ9xesNQVX5n6sIzGMMybFMpS
- hNUXls+6i32ckuETTbFbAQ6w+ZBCBg2IruHPzIkNL2wnUsI9vT6G0+vDx5C2PKRiBP0o
- l7eBykc2GYPBkvALm1Oem4UjEZQjTsNPd+V1Wy9y5OyvLnjfBFvs9FgcksAbJBNNWVX1
- 2fu6nE8rEcjQKL9y8Bc9giO4dmV1tQCnB00BRdbp0oplXl2z8eTz4sMuTzgEDGhvDudO
- 69MJ5xikhD4kXgxFDZ6t+TVTiBNxm8L8OCgfI9HZx9SSy3BIhzcoUkCSLtTE2ODo0HQx
- YnPg==
-X-Gm-Message-State: APjAAAXc0hf2dnOARM95z2G6gWZ+7gvNd2Qux0OgQT0PjXsGa8DFXcSM
- l1hPqRHg19xzBNGPRl0K3z9aiKnMArZdDg==
-X-Google-Smtp-Source: APXvYqyEVyIiRNUbr+u+iSMCvSsV9+mgvhsIJy0Q8yHgLowp9Hkwxmd8dLfHJb0exj00Fin0VyHDiA==
-X-Received: by 2002:a7b:cb4a:: with SMTP id v10mr19431391wmj.106.1573481583108; 
- Mon, 11 Nov 2019 06:13:03 -0800 (PST)
-Received: from [192.168.8.102] (199.red-79-149-206.dynamicip.rima-tde.net.
- [79.149.206.199])
- by smtp.gmail.com with ESMTPSA id d11sm17802336wrn.28.2019.11.11.06.13.01
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 11 Nov 2019 06:13:02 -0800 (PST)
-Subject: Re: [PATCH v2 0/4] tcg/LICENSE: Remove no-longer-true statement that
- TCG is BSD-licensed
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-References: <20191025155848.17362-1-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <743005ac-037c-099b-5591-65518c4565f0@linaro.org>
-Date: Mon, 11 Nov 2019 15:12:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <no-reply@patchew.org>) id 1iUASE-0005uG-Nq
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:14:08 -0500
+Resent-Date: Mon, 11 Nov 2019 09:14:08 -0500
+Resent-Message-Id: <E1iUASE-0005uG-Nq@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21410)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iUASC-0005oO-DT
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 09:14:06 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1573481632; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=lGZz8YupaAPt/tSXD6TQ5k0B7WbYzZTaZC0Gsyz/Tfvw4IaRXn0PQiEaPg2UXfywFGfyh3lkDYriJRxTaDNtVTYTTwTTm5HOrMELO6irY2BE9igH5ThQclgMCxQ8ywnoHJGBsgKw0cP7jlI4wU18dAHGqRDYxmWXgUBnICU/x6g=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1573481632;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=ep9BzcEPNc0ZvfTM6B4ul4j81/YOJXfqWPKBijKs6kQ=; 
+ b=mBgY55fBZTjvWwZ5hoIa8uNQnRgCwWniepqIJrmGkLP7OueZIyWB0EGP7ZFB/CxG089Pt+jw6Sm3brl/N6iWuX0phpDqm3sBmkhWQAaRp0Lva2v4SmNVFbO4J0kNXHre6vWvf9B34TMKBlV+H+ScKpcvJo4oH0IQ3az6ysLBjVg=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1573481631206486.6331191308469;
+ Mon, 11 Nov 2019 06:13:51 -0800 (PST)
+In-Reply-To: <cover.1573468531.git.mprivozn@redhat.com>
+Subject: Re: [PATCH 0/2] A pair of memory access problems
+Message-ID: <157348163007.9707.3702941780158302886@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <20191025155848.17362-1-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: mprivozn@redhat.com
+Date: Mon, 11 Nov 2019 06:13:51 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,74 +76,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Claudio Fontana <claudio.fontana@gmail.com>,
- Ard Biesheuvel <ard.biesheuvel@linaro.org>, Laszlo Ersek <lersek@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@csgraf.de>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: alex.williamson@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/25/19 5:58 PM, Peter Maydell wrote:
-> Since 2008 the tcg/LICENSE file has not changed: it claims that
-> everything under tcg/ is BSD-licensed.
-> 
-> This is not true and hasn't been true for years: in 2013 we
-> accepted the tcg/aarch64 target code under a GPLv2-or-later
-> license statement. We also have generic vector optimisation
-> code under the LGPL2.1-or-later, and the TCI backend is
-> GPLv2-or-later. Further, many of the files are not BSD
-> licensed but MIT licensed.
-> 
-> We don't really consider the tcg subdirectory to be a distinct
-> part of QEMU anyway.
-> 
-> This patchset adds explicit licensing/copyright comments to
-> the three files which were missing them, removes the
-> inaccurate tcg/LICENSE file, and updates the top-level
-> LICENSE file to be more accurate about the current state
-> of the licenses used in the code in tcg/.
-> 
-> If we want a policy that tcg/ code has a restricted
-> permitted set of licenses, then we really need to have
-> this enforced by checkpatch -- history demonstrates that
-> just writing it in tcg/LICENSE does not prevent code under
-> other licenses getting in. In the v1 email thread nobody
-> seemed to be very strongly arguing for this, though, and
-> at this point we would need to make an active effort to
-> track down contributors and get relicensing statements.
-> If anybody wants to push that effort now would be a good
-> time to volunteer :-)
-> 
-> Note on the licensing for the tcg-target.opc.h files:
->  * I've used the same license as the rest of the relevant
->    backend, which is to say GPL2-or-later for tcg/aarch64
->    and MIT for tcg/i386 and tcg/ppc.
->  * In all 3 cases, the only people who've made contributions
->    to the files are Richard Henderson and (for aarch64) Alex Bennée
-> 
-> Richard, Alex -- an acked-by for the relevant patches would
-> be nice (or if you intended a different license for the
-> contributions than I have assumed please say so!)
-> 
-> v1->v2 changes:
->  * note the presence of MIT licensed code as well
->  * 3 new patches adding copyright/licensing to files
->    that were missing it
-> 
-> thanks
-> -- PMM
-> 
-> Peter Maydell (4):
->   tcg/aarch64/tcg-target.opc.h: Add copyright/license
->   tcg/i386/tcg-target.opc.h: Add copyright/license
->   tcg/ppc/tcg-target.opc.h: Add copyright/license
->   tcg/LICENSE: Remove out of date claim about TCG subdirectory licensing
-
-Queued.
-
-
-r~
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTczNDY4NTMxLmdp
+dC5tcHJpdm96bkByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
+bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
+ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
+V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
+NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgVEVTVCAgICBjaGVjay11bml0
+OiB0ZXN0cy90ZXN0LXRocmVhZC1wb29sCiAgVEVTVCAgICBjaGVjay11bml0OiB0ZXN0cy90ZXN0
+LWhiaXRtYXAKKioKRVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL21pZ3JhdGlvbi10ZXN0
+LmM6OTAzOndhaXRfZm9yX21pZ3JhdGlvbl9mYWlsOiBhc3NlcnRpb24gZmFpbGVkOiAoIXN0cmNt
+cChzdGF0dXMsICJzZXR1cCIpIHx8ICFzdHJjbXAoc3RhdHVzLCAiZmFpbGVkIikgfHwgKGFsbG93
+X2FjdGl2ZSAmJiAhc3RyY21wKHN0YXR1cywgImFjdGl2ZSIpKSkKRVJST1IgLSBCYWlsIG91dCEg
+RVJST1I6L3RtcC9xZW11LXRlc3Qvc3JjL3Rlc3RzL21pZ3JhdGlvbi10ZXN0LmM6OTAzOndhaXRf
+Zm9yX21pZ3JhdGlvbl9mYWlsOiBhc3NlcnRpb24gZmFpbGVkOiAoIXN0cmNtcChzdGF0dXMsICJz
+ZXR1cCIpIHx8ICFzdHJjbXAoc3RhdHVzLCAiZmFpbGVkIikgfHwgKGFsbG93X2FjdGl2ZSAmJiAh
+c3RyY21wKHN0YXR1cywgImFjdGl2ZSIpKSkKbWFrZTogKioqIFtjaGVjay1xdGVzdC1hYXJjaDY0
+XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgVEVT
+VCAgICBjaGVjay11bml0OiB0ZXN0cy90ZXN0LWJkcnYtZHJhaW4KICBURVNUICAgIGNoZWNrLXVu
+aXQ6IHRlc3RzL3Rlc3QtYmRydi1ncmFwaC1tb2QKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNz
+RXJyb3IocmV0Y29kZSwgY21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFu
+ZCAnWydzdWRvJywgJy1uJywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5p
+bnN0YW5jZS51dWlkPWU5OTNiNWE4MGVhMTQ4NjNiYWQxN2M4NzUxMjA1ZjllJywgJy11JywgJzEw
+MDMnLCAnLS1zZWN1cml0eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUn
+LCAnVEFSR0VUX0xJU1Q9JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdW
+PScsICctZScsICdKPTE0JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1l
+JywgJ0NDQUNIRV9ESVI9L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5j
+YWNoZS9xZW11LWRvY2tlci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90
+bXAvcGF0Y2hldy10ZXN0ZXItdG1wLV9iMDZzeG1jL3NyYy9kb2NrZXItc3JjLjIwMTktMTEtMTEt
+MDkuMDMuMjguMTc1ODU6L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFy
+L3RtcC9xZW11L3J1bicsICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3Rh
+dHVzIDIuCmZpbHRlcj0tLWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPWU5OTNi
+NWE4MGVhMTQ4NjNiYWQxN2M4NzUxMjA1ZjllCm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJy
+b3IgMQptYWtlWzFdOiBMZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXIt
+dG1wLV9iMDZzeG1jL3NyYycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9z
+N10gRXJyb3IgMgoKcmVhbCAgICAxMG0yMS42MzVzCnVzZXIgICAgMG04LjAwMHMKCgpUaGUgZnVs
+bCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzL2NvdmVyLjE1NzM0
+Njg1MzEuZ2l0Lm1wcml2b3puQHJlZGhhdC5jb20vdGVzdGluZy5kb2NrZXItcXVpY2tAY2VudG9z
+Ny8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
