@@ -2,49 +2,95 @@ Return-Path: <SRS0=6DzB=ZD=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE4ABC43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 10:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F7A0C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 10:07:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B35FC2084F
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 10:06:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B35FC2084F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 09EAC214E0
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 10:07:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JxQbeVrI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09EAC214E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iU6aM-0001Qi-QB
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 05:06:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45592)
+	id 1iU6bZ-0002Uz-4s
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 05:07:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45907)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iU6Yk-0000BX-UF
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 05:04:36 -0500
+ (envelope-from <sgarzare@redhat.com>) id 1iU6au-00022q-DI
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 05:06:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iU6Yj-0005gE-4D
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 05:04:34 -0500
-Received: from relay.sw.ru ([185.231.240.75]:45866)
+ (envelope-from <sgarzare@redhat.com>) id 1iU6at-00069B-87
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 05:06:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43581
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iU6Yi-0005fl-T2; Mon, 11 Nov 2019 05:04:33 -0500
-Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136])
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iU6YZ-0001od-Jd; Mon, 11 Nov 2019 13:04:23 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Subject: [PATCH v4] iotests: Test NBD client reconnection
-Date: Mon, 11 Nov 2019 13:04:23 +0300
-Message-Id: <1573466663-626788-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (Exim 4.71) (envelope-from <sgarzare@redhat.com>) id 1iU6at-000694-49
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 05:06:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573466806;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=kXHKdeXQQV0L0y5nl168v0HCbvS9Pk5W52JaTMiSJbU=;
+ b=JxQbeVrIccDRr6811dVFZuKhd0ljue+46ZGMb9vAp17PuU38tbPbghpm531jLFrqac7jnX
+ 7XhA7SgGH7g4pTgTjR2+IG2NOAjv9Y4LH8eWo9FQVVMQYVrWX0PPTlpvmy9YxRoU/DOWfg
+ EGaWIE+l/BRE+TwMrqecty2bkD5miYg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-388-PiXzSHGyMKmOSYWEypA-Uw-1; Mon, 11 Nov 2019 05:06:45 -0500
+Received: by mail-wr1-f69.google.com with SMTP id e3so9561317wrs.17
+ for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 02:06:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=NWtC/+rTzRpdv6M8je3X7t8oHi07Rfa8UGGXXQzkY28=;
+ b=Np4fgwewxuTcX+H90c2oA3KpIBQAybw87XEMHWKo5FvZ+M1b5ryqXN/ocVQd4aQmRO
+ dkQxUCds9S+ujrlvx9Y/nBmtoqtxNAP1aXJL1xaY8cI/AjYfk5HNxUwkn+Ma9msVAq7e
+ 4Tx/sl0gof4H0wZJy9u3tqKXZHek5x/YhdValrQmc69yp1NiQ1h26JgcRMowsVlf5gQq
+ ZKqzpziBU6uEPO9246wCwfQq9g71V8+HLH3G/tJGU10ECFM61BRlRj3abTfC0zA//Eds
+ ROw30yXzp++Q1QvWOzPGYqbvn4iHbkVXh1kdRJ3SNVQDyq+yiXXFpe3DoYEZ1fFzRhT8
+ gzAg==
+X-Gm-Message-State: APjAAAVrvEjLJwLJn8khmA2UoFRVtRg9+6DPWodRZbuezfdZK7vT7b12
+ bD7w9r1UPiFaUu17qWKbkeyw6iyEzaujExXRwnREYl9p9vxYFqPUNWgUMNIePxgYiNFGiYqRVsY
+ 5CmQ4aiBl/InyPkA=
+X-Received: by 2002:a1c:b1c3:: with SMTP id a186mr20270559wmf.10.1573466804266; 
+ Mon, 11 Nov 2019 02:06:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxWqBMWczXo84etWcUMG9N3t+NKrjt+i8C5o1RZDY0C3ElPSU1dHWWWbnUDay3DkIIOqJ/peg==
+X-Received: by 2002:a1c:b1c3:: with SMTP id a186mr20270542wmf.10.1573466804037; 
+ Mon, 11 Nov 2019 02:06:44 -0800 (PST)
+Received: from steredhat (a-nu5-32.tin.it. [212.216.181.31])
+ by smtp.gmail.com with ESMTPSA id 4sm16959881wmd.33.2019.11.11.02.06.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 11 Nov 2019 02:06:43 -0800 (PST)
+Date: Mon, 11 Nov 2019 11:06:41 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH 2/2] core: replace sysconf(_SC_PAGESIZE) with
+ qemu_real_host_page_size
+Message-ID: <20191111100641.uvi47rjjb3ink5jl@steredhat>
+References: <20191015031350.4345-1-richardw.yang@linux.intel.com>
+ <20191015031350.4345-3-richardw.yang@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <20191015031350.4345-3-richardw.yang@linux.intel.com>
+X-MC-Unique: PiXzSHGyMKmOSYWEypA-Uw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -56,186 +102,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
- rkagan@virtuozzo.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ jasowang@redhat.com, richard.henderson@linaro.org, dgilbert@redhat.com,
+ mreitz@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The test for an NBD client. The NBD server is disconnected after the
-client write request. The NBD client should reconnect and complete
-the write operation.
+Why "core:" in the commit title?
 
-Suggested-by: Denis V. Lunev <den@openvz.org>
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
-v3 was discussed in the email thread with the message ID
-<1572627272-23359-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+Perhaps to indicate that the patch concerns different subsystems,
+I'd use "qemu: ", but I'm not sure :-)
 
- tests/qemu-iotests/277                   | 96 ++++++++++++++++++++++++++++++++
- tests/qemu-iotests/277.out               |  6 ++
- tests/qemu-iotests/group                 |  1 +
- tests/qemu-iotests/iotests.py            |  5 ++
- tests/qemu-iotests/nbd-fault-injector.py |  3 +-
- 5 files changed, 110 insertions(+), 1 deletion(-)
- create mode 100755 tests/qemu-iotests/277
- create mode 100644 tests/qemu-iotests/277.out
+On Tue, Oct 15, 2019 at 11:13:50AM +0800, Wei Yang wrote:
+> Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+> Suggested-by: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> CC: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  block/file-posix.c              | 2 +-
+>  net/l2tpv3.c                    | 2 +-
+>  tests/tcg/multiarch/test-mmap.c | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 5d1995a07c..853ed42134 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -2562,7 +2562,7 @@ static void check_cache_dropped(BlockDriverState *b=
+s, Error **errp)
+>      off_t end;
+> =20
+>      /* mincore(2) page status information requires 1 byte per page */
+> -    page_size =3D sysconf(_SC_PAGESIZE);
+> +    page_size =3D qemu_real_host_page_size;
+>      vec =3D g_malloc(DIV_ROUND_UP(window_size, page_size));
+> =20
+>      end =3D raw_getlength(bs);
+> diff --git a/net/l2tpv3.c b/net/l2tpv3.c
+> index 55fea17c0f..5f843240de 100644
+> --- a/net/l2tpv3.c
+> +++ b/net/l2tpv3.c
+> @@ -41,7 +41,7 @@
+>   * chosen to be sufficient to accommodate one packet with some headers
+>   */
+> =20
+> -#define BUFFER_ALIGN sysconf(_SC_PAGESIZE)
+> +#define BUFFER_ALIGN qemu_real_host_page_size
+>  #define BUFFER_SIZE 2048
+>  #define IOVSIZE 2
+>  #define MAX_L2TPV3_MSGCNT 64
+> diff --git a/tests/tcg/multiarch/test-mmap.c b/tests/tcg/multiarch/test-m=
+map.c
+> index 9ea49e2307..370842e5c2 100644
+> --- a/tests/tcg/multiarch/test-mmap.c
+> +++ b/tests/tcg/multiarch/test-mmap.c
+> @@ -466,7 +466,7 @@ int main(int argc, char **argv)
+>      if (argc > 1) {
+>          qemu_strtoul(argv[1], NULL, 0, &pagesize);
+>      } else {
+> -        pagesize =3D sysconf(_SC_PAGESIZE);
+> +        pagesize =3D qemu_real_host_page_size;
+>      }
+> =20
+>      /* Assume pagesize is a power of two.  */
 
-diff --git a/tests/qemu-iotests/277 b/tests/qemu-iotests/277
-new file mode 100755
-index 0000000..621060b
---- /dev/null
-+++ b/tests/qemu-iotests/277
-@@ -0,0 +1,96 @@
-+#!/usr/bin/env python
-+#
-+# Test NBD client reconnection
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+import os
-+import subprocess
-+import iotests
-+from iotests import file_path, log
-+
-+
-+nbd_sock, conf_file = file_path('nbd-sock', "nbd-fault-injector.conf")
-+
-+
-+def make_conf_file(event):
-+    """
-+    Create configuration file for the nbd-fault-injector.py
-+
-+    :param event: which event the server should close a connection on
-+    """
-+    with open(conf_file, "w") as conff:
-+        conff.write("[inject-error]\nevent={}\nwhen=after".format(event))
-+
-+
-+def start_server_NBD(event):
-+    make_conf_file(event)
-+
-+    srv = subprocess.Popen(["nbd-fault-injector.py", "--classic-negotiation",
-+                           nbd_sock, conf_file], stdout=subprocess.PIPE,
-+                           stderr=subprocess.STDOUT, universal_newlines=True)
-+    line = srv.stdout.readline()
-+    if "Listening on " in line:
-+        log('NBD server: started')
-+    else:
-+        log('NBD server: ' + line.rstrip())
-+
-+    return srv
-+
-+
-+def start_client_NBD():
-+    log('NBD client: QEMU-IO write')
-+    args = iotests.qemu_io_args_no_fmt + \
-+        ['-c', 'write -P 0x7 0 3M', '--image-opts',
-+         'driver=nbd,server.type=unix,server.path={},'
-+         'reconnect-delay=7'.format(nbd_sock)]
-+    clt = subprocess.Popen(args, stdout=subprocess.PIPE,
-+                           stderr=subprocess.STDOUT,
-+                           universal_newlines=True)
-+    return clt
-+
-+
-+def check_proc_NBD(proc, connector):
-+    try:
-+        outs, errs = proc.communicate(timeout=10)
-+
-+        if proc.returncode < 0:
-+            log('NBD {}: EXIT SIGNAL {}\n'.format(connector, proc.returncode))
-+            log(outs)
-+        else:
-+            msg = outs.split("\n", 1)
-+            log('NBD {}: {}'.format(connector, msg[0]))
-+
-+    except subprocess.TimeoutExpired:
-+        proc.kill()
-+        log('NBD {}: ERROR timeout expired'.format(connector))
-+    finally:
-+        if connector == 'server':
-+            os.remove(nbd_sock)
-+            os.remove(conf_file)
-+
-+
-+srv = start_server_NBD('data')
-+clt = start_client_NBD()
-+# The server should close the connection after a client write request
-+check_proc_NBD(srv, 'server')
-+# Start the NBD server again
-+srv = start_server_NBD('reply')
-+# The client should reconnect and complete the write operation
-+check_proc_NBD(clt, 'client')
-+# Make it sure that server terminated
-+check_proc_NBD(srv, 'server')
-diff --git a/tests/qemu-iotests/277.out b/tests/qemu-iotests/277.out
-new file mode 100644
-index 0000000..45404b3
---- /dev/null
-+++ b/tests/qemu-iotests/277.out
-@@ -0,0 +1,6 @@
-+NBD server: started
-+NBD client: QEMU-IO write
-+NBD server: Closing connection on rule match inject-error
-+NBD server: started
-+NBD client: wrote 3145728/3145728 bytes at offset 0
-+NBD server: Closing connection on rule match inject-error
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 0650403..20f7412 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -284,3 +284,4 @@
- 268 rw auto quick
- 270 rw backing quick
- 272 rw
-+277 rw
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 075f473..295b3e4 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -47,6 +47,11 @@ qemu_io_args = [os.environ.get('QEMU_IO_PROG', 'qemu-io')]
- if os.environ.get('QEMU_IO_OPTIONS'):
-     qemu_io_args += os.environ['QEMU_IO_OPTIONS'].strip().split(' ')
- 
-+qemu_io_args_no_fmt = [os.environ.get('QEMU_IO_PROG', 'qemu-io')]
-+if os.environ.get('QEMU_IO_OPTIONS_NO_FMT'):
-+    qemu_io_args_no_fmt += \
-+        os.environ['QEMU_IO_OPTIONS_NO_FMT'].strip().split(' ')
-+
- qemu_nbd_args = [os.environ.get('QEMU_NBD_PROG', 'qemu-nbd')]
- if os.environ.get('QEMU_NBD_OPTIONS'):
-     qemu_nbd_args += os.environ['QEMU_NBD_OPTIONS'].strip().split(' ')
-diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
-index 6b2d659..7e2dab6 100755
---- a/tests/qemu-iotests/nbd-fault-injector.py
-+++ b/tests/qemu-iotests/nbd-fault-injector.py
-@@ -115,7 +115,8 @@ class FaultInjectionSocket(object):
-             if rule.match(event, io):
-                 if rule.when == 0 or bufsize is None:
-                     print('Closing connection on rule match %s' % rule.name)
--                    self.sock.flush()
-+                    self.sock.close()
-+                    sys.stdout.flush()
-                     sys.exit(0)
-                 if rule.when != -1:
-                     return rule.when
--- 
-1.8.3.1
+The patch LGTM:
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
+Thanks,
+Stefano
 
 
