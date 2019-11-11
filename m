@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1D0C43331
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:12:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 330D7C43331
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:14:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5244B20856
-	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:12:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F141E20856
+	for <qemu-devel@archiver.kernel.org>; Mon, 11 Nov 2019 16:14:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UHvaVF/d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5244B20856
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bqGMIHGM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F141E20856
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUCIm-0002Xt-16
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 11:12:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39332)
+	id 1iUCKk-00059L-QP
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 11:14:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39071)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iUCA0-0000Hl-DP
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:03:25 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iUC9U-00080r-Ms
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iUC9u-00032l-Sh
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:03:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:40166
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mreitz@redhat.com>) id 1iUC9T-0002n2-CL
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:52 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25073
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iUC9u-00031l-O1
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:03:18 -0500
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iUC9T-0002mp-7Y
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 11:02:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573488198;
+ s=mimecast20190719; t=1573488170;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4NCOW8nlY+fuC+DwQmCp78uCKYSfszoYLuO4iepSv0g=;
- b=UHvaVF/dnMUNekb8owAecOm5b10yvDWUdskrFXQp950JaQKlLetEEXfAs5aIXdUel8l1J2
- ysrPHr4mRMiwzJiLGIKI50Jj5k07QHVafynb8Vq+mawHNtC6o7/uh7W8lPZDD/H3l5N4aO
- xFLaIQ1Cq1aXgvJcKfLHT0GOHwz4B8E=
+ bh=NEbi0Ur8DfgE4/ZOeodz1rU6ezfOkugTot9Q4UHBw8Y=;
+ b=bqGMIHGMtsUUU8ItE+xLxu4oUhMnPe1fNxp+f3TgYRSwErJaFzbkSvj5WJZNJVfF1+u8DZ
+ R0KtYXQshpftP3axJ/S+vlWyH0CQZAU5f0i2KjvBRmdTJD5qY7wPlyuC3ISvFeSvp5jMdy
+ dhn8yYisIJvJ7Pnel3upVe6yDDIVeNc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-aVsf2vmaPq6YKdgjdjTRkA-1; Mon, 11 Nov 2019 11:03:16 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-215-Die4-GB9Pl6yRNJr3PN7nw-1; Mon, 11 Nov 2019 11:02:48 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6256292CA62;
- Mon, 11 Nov 2019 16:03:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02D90107ACC6;
+ Mon, 11 Nov 2019 16:02:47 +0000 (UTC)
 Received: from localhost (ovpn-117-116.ams2.redhat.com [10.36.117.116])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CD9EE5D6D4;
- Mon, 11 Nov 2019 16:03:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 89C374521;
+ Mon, 11 Nov 2019 16:02:46 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH for-5.0 v2 18/23] iotests: Add VM.assert_block_path()
-Date: Mon, 11 Nov 2019 17:02:11 +0100
-Message-Id: <20191111160216.197086-19-mreitz@redhat.com>
+Subject: [PATCH for-5.0 v2 09/23] quorum: Add QuorumChild.to_be_replaced
+Date: Mon, 11 Nov 2019 17:02:02 +0100
+Message-Id: <20191111160216.197086-10-mreitz@redhat.com>
 In-Reply-To: <20191111160216.197086-1-mreitz@redhat.com>
 References: <20191111160216.197086-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: aVsf2vmaPq6YKdgjdjTRkA-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: Die4-GB9Pl6yRNJr3PN7nw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,85 +92,64 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+We will need this to verify that Quorum can let one of its children be
+replaced without breaking anything else.
+
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tests/qemu-iotests/iotests.py | 59 +++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ block/quorum.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index d34305ce69..3e03320ce3 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -681,6 +681,65 @@ class VM(qtest.QEMUQtestMachine):
+diff --git a/block/quorum.c b/block/quorum.c
+index 59cd524502..3a824e77e3 100644
+--- a/block/quorum.c
++++ b/block/quorum.c
+@@ -67,6 +67,13 @@ typedef struct QuorumVotes {
 =20
-         return fields.items() <=3D ret.items()
+ typedef struct QuorumChild {
+     BdrvChild *child;
++
++    /*
++     * If set, check whether this node can be replaced without any
++     * other parent noticing: Unshare CONSISTENT_READ, and take the
++     * WRITE permission.
++     */
++    bool to_be_replaced;
+ } QuorumChild;
 =20
-+    """
-+    Check whether the node under the given path in the block graph is
-+    @expected_node.
+ /* the following structure holds the state of one quorum instance */
+@@ -1128,6 +1135,16 @@ static void quorum_child_perm(BlockDriverState *bs, =
+BdrvChild *c,
+                               uint64_t perm, uint64_t shared,
+                               uint64_t *nperm, uint64_t *nshared)
+ {
++    BDRVQuorumState *s =3D bs->opaque;
++    int i;
 +
-+    @root is the node name of the node where the @path is rooted.
++    for (i =3D 0; i < s->num_children; i++) {
++        if (s->children[i].child =3D=3D c) {
++            break;
++        }
++    }
++    assert(!c || i < s->num_children);
 +
-+    @path is a string that consists of child names separated by
-+    slashes.  It must begin with a slash.
-+
-+    Examples for @root + @path:
-+      - root=3D"qcow2-node", path=3D"/backing/file"
-+      - root=3D"quorum-node", path=3D"/children.2/file"
-+
-+    Hypothetically, @path could be empty, in which case it would point
-+    to @root.  However, in practice this case is not useful and hence
-+    not allowed.
-+
-+    @expected_node may be None.
-+
-+    @graph may be None or the result of an x-debug-query-block-graph
-+    call that has already been performed.
-+    """
-+    def assert_block_path(self, root, path, expected_node, graph=3DNone):
-+        if graph is None:
-+            graph =3D self.qmp('x-debug-query-block-graph')['return']
-+
-+        iter_path =3D iter(path.split('/'))
-+
-+        # Must start with a /
-+        assert next(iter_path) =3D=3D ''
-+
-+        node =3D next((node for node in graph['nodes'] if node['name'] =3D=
-=3D root),
-+                    None)
-+
-+        for path_node in iter_path:
-+            assert node is not None, 'Cannot follow path %s' % path
-+
-+            try:
-+                node_id =3D next(edge['child'] for edge in graph['edges'] =
-\
-+                                             if edge['parent'] =3D=3D node=
-['id'] and
-+                                                edge['name'] =3D=3D path_n=
-ode)
-+
-+                node =3D next(node for node in graph['nodes'] \
-+                                 if node['id'] =3D=3D node_id)
-+            except StopIteration:
-+                node =3D None
-+
-+        assert node is not None or expected_node is None, \
-+               'No node found under %s (but expected %s)' % \
-+               (path, expected_node)
-+
-+        assert expected_node is not None or node is None, \
-+               'Found node %s under %s (but expected none)' % \
-+               (node['name'], path)
-+
-+        if node is not None and expected_node is not None:
-+            assert node['name'] =3D=3D expected_node, \
-+                   'Found node %s under %s (but expected %s)' % \
-+                   (node['name'], path, expected_node)
+     *nperm =3D perm & DEFAULT_PERM_PASSTHROUGH;
 =20
- index_re =3D re.compile(r'([^\[]+)\[([^\]]+)\]')
+     /*
+@@ -1137,6 +1154,12 @@ static void quorum_child_perm(BlockDriverState *bs, =
+BdrvChild *c,
+     *nshared =3D (shared & (BLK_PERM_CONSISTENT_READ |
+                           BLK_PERM_WRITE_UNCHANGED))
+              | DEFAULT_PERM_UNCHANGED;
++
++    if (c && s->children[i].to_be_replaced) {
++        /* Prepare for sudden data changes */
++        *nperm |=3D BLK_PERM_WRITE;
++        *nshared &=3D ~BLK_PERM_CONSISTENT_READ;
++    }
+ }
 =20
+ static const char *const quorum_strong_runtime_opts[] =3D {
 --=20
 2.23.0
 
