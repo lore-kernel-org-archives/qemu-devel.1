@@ -2,71 +2,90 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AAB6C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE89CC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:23:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6020F20679
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:19:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6020F20679
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 89C1C20679
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:23:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CrHXjY+t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89C1C20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUYtR-0007Jm-JR
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 11:19:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52161)
+	id 1iUYx2-0000Hb-Mr
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 11:23:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52930)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iUYr7-0004tp-Q7
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:17:26 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iUYwO-0008I3-ER
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:22:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iUYr6-0007t6-UM
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:17:25 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:50793)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iUYr6-0007rl-LQ
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:17:24 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MILnm-1iisiE3z9g-00ELwK; Tue, 12 Nov 2019 17:16:59 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/2] linux-user: fix missing break
-Date: Tue, 12 Nov 2019 17:16:53 +0100
-Message-Id: <20191112161654.2253-2-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191112161654.2253-1-laurent@vivier.eu>
-References: <20191112161654.2253-1-laurent@vivier.eu>
+ (envelope-from <alex.bennee@linaro.org>) id 1iUYwM-0005Yk-VI
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:22:52 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:35121)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iUYwM-0005TS-Kc
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:22:50 -0500
+Received: by mail-wm1-x342.google.com with SMTP id 8so3642780wmo.0
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 08:22:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=UBXjsqQUcqNUyCDlLi0zZZgtyo1Pm4NLb9ARW1ugJ6Y=;
+ b=CrHXjY+ts7UF6+YccSiujin/iLExIS43RvKfdekNkZCIMXjvEHG3w8QUNORF37Yg+A
+ bfvtZeCMNZv94xePNLKtjZmXmMWFtG2/C5T0ytxkFu6VvqTsWbAzlhUUIlw8X+MkEXnM
+ 66McNvfIQYlzI6m05/cM9/9JWcbShqr012BqgDuBVJtSUXCPtNTNEX82s4VN8Kcm90jn
+ 3g8PzmuLy8t9l0CNfucmp+bSqv6Cz0bzNMwtFrxJfEEs3SiuqEYgtiZg+SgVs5KOoCUA
+ nqMRpibltrhVA2p9+m4Z6Rx89bT1f/dxjr/L+GWMj5aAF+Ga7XeRBqQeSgUh7v7Fx6De
+ rJWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=UBXjsqQUcqNUyCDlLi0zZZgtyo1Pm4NLb9ARW1ugJ6Y=;
+ b=KAOiw67DRNfTk4d6FAsaPgCwYYIDdNz2A6NSJ/sp2gS5Uvh+LTFKSSQCNTqAWlITNe
+ 1xBSWKO0uFeNt9TCMVUbnE4PqHFXd5592URniWBrb02pgR+uV5UC1kuDpg/jSUOAn5Ol
+ GUasF8zzCRubTx2acR3wE5uuRpHAgwhey7fRURPZYpbHqc2sB/k1go7Zjky+UTzXoWhS
+ QMrhVW7Nza27XVHEWirZ3I/fV70HtY8qZ9OvfBdoHCLciaYWTNltn/oO5Jqf3F3AgCBV
+ H569n4AVdBaAoQJYm7Eh8cm0ubxtpWh+1+eNxd+CVe9rab87jNuZqQGElsSIOg5s/W+v
+ YlLA==
+X-Gm-Message-State: APjAAAULRntFRkl9FOs9NvI4pc+6Ar8QVO8hUKi51L4E5GJ5Dzu0sLq2
+ 7Yhrb5kHTIlc7U5VECHQ0xmO5A==
+X-Google-Smtp-Source: APXvYqzBl0GJ1aMN6fcMAMy2AEf4ls+byXnOAgZQ544zpjhF+c+mknrWyAZaO8mRXpJ1OSedTlawfQ==
+X-Received: by 2002:a1c:49d5:: with SMTP id w204mr4923348wma.111.1573575769063; 
+ Tue, 12 Nov 2019 08:22:49 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id y78sm5400567wmd.32.2019.11.12.08.22.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 12 Nov 2019 08:22:47 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 2487B1FF87;
+ Tue, 12 Nov 2019 16:22:47 +0000 (GMT)
+References: <20191112145028.26386-1-alex.bennee@linaro.org>
+ <CAFEAcA_9AwoTE9zaKbiF6DkpN+O8LaEKGOct-m5S3yvFBHGK1g@mail.gmail.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 0/8] testing and tcg plugin api ver
+In-reply-to: <CAFEAcA_9AwoTE9zaKbiF6DkpN+O8LaEKGOct-m5S3yvFBHGK1g@mail.gmail.com>
+Date: Tue, 12 Nov 2019 16:22:47 +0000
+Message-ID: <87woc583oo.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:4q1ZiXUm1NNxEphIptLzxsFCP5oKPyBKAyhrjBdSzsQbJQQJjqa
- yYgGBkzRkI4rffCarwnM/rbXeZ/DWcXHqqfzc2gPsdtiPS/SZLn2OSPI4XtN8xFRN8jTaVY
- GqJHJLiujCs/JTP2HFm5SiR757aVoE0/1HriLCScr8Bx8oRjK6zkqyJqO0zgTyJST+pIdbk
- K1vuBZTGT3V4ONpWGoePg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:X/8ttX9xq2A=:I/aF08mj3XklnJGxcbX/OZ
- vvR+Ni5NUnWhbksGh92qblu0yzUs8jy6izEiUywm5p+7F8oe6l0b78nEd+a46ikcciPOCQDHY
- iPitZEqOIXtTMadSZPCsNdlYQYMLBrFasf6yvEM1jofR0iRGHOALd0reGkA0FkZuVm5CMKNgn
- nwaw2g5Mbw0r9AUAPLen7kgyXhBjggc8G5FondcOZpiOaqdH0YUOHZRcB/pTe0UMAu/6HN6H/
- qLnMf2n36yr39DhU19OxcE5zPojzTJij4MD19M6cPP7HeGBbw4LuGH52oaAmemrPPwMPzrECw
- nhC/qllNI8qWbGxMbByghqbP9DjOml+pvkIviLdr9i32xe+ScrIoJCEcM7ap1KQw9v34Xgu3P
- wDWW3PfoTstCRgbFR/g10Yqv/KCsfIkh22u9iXnYlXEJRQUEgiv4Uflm+D9ErT1k+AaC1/RVD
- F0v2r9a7PRu53WBDWOIMnWNaY+sLxPQa5AiPIPTtLD+OQD7DBmI5UhJugw6zFEzWWcZ8DaZgu
- lRqHAmsiyJgaJ692sxNwlbOPMSTbeH+y/VQsCDd5Kvm5ImZ7PazZfgNRW28LWFbOoFFjQ3+4a
- 6Nc/BsCEBBgZKn8va0N0kOnwwqLHha+lmvDv6FiHDsAEAkEZ2S8QZJJ4+Vv08tlkEBJwNJ9hu
- KGHUIYT/8jOw5QjBH0PEs2HUSfu5iLCLzlBlvxsEsv2gWBoeKF/y4QKSyJCY1DZuAUNrxJR/H
- YC2BG/JpqHnnnCib325MsLN4i1GVDwRM0TFF1lndXfd/+fQ3YFnwULFWZkEWk++H+Z7fZyCzq
- 6mBrat8W5fdMV4+HDmzopFc96KT54KWkPsszaB33edrwjVdaFty9dQ4CbG4wNiYelZhHo8HPm
- 0+lb95MeTVKbJBpjI39gGnSyZ/i1wXACHS8a/Jz6Q=
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.17.10
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,36 +97,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Josh Kunz <jkz@google.com>, Riku Voipio <riku.voipio@iki.fi>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reported by Coverity (CID 1407221)
-Fixes: a2d866827bd8 ("linux-user: Support for NETLINK socket options")
-cc: Josh Kunz <jkz@google.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20191112105055.32269-1-laurent@vivier.eu>
----
- linux-user/syscall.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index ab9d933e53af..4e97bcf1e5a9 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2632,6 +2632,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
-         default:
-             goto unimplemented;
-         }
-+        break;
- #endif /* SOL_NETLINK */
-     default:
-     unimplemented:
--- 
-2.21.0
+Peter Maydell <peter.maydell@linaro.org> writes:
 
+> On Tue, 12 Nov 2019 at 14:50, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>
+>> The following changes since commit 039e285e095c20a88e623b927654b161aaf9d=
+914:
+>>
+>>   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-pull=
+-request' into staging (2019-11-12 12:09:19 +0000)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://github.com/stsquad/qemu.git tags/pull-testing-and-tcg-121119-1
+>>
+>> for you to fetch changes up to 3fb356cc86461a14450802e14fa79e8436dbbf31:
+>>
+>>   tcg plugins: expose an API version concept (2019-11-12 14:32:55 +0000)
+>>
+>> ----------------------------------------------------------------
+>> Testing and plugins for rc1
+>>
+>>   - add plugin API versioning
+>>   - tests/vm add netbsd autoinstall
+>>   - disable ipmi-bt-test for non-Linux
+>>   - single-thread make check
+>
+>
+> Applied, thanks.
+>
+> Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+> for any user-visible changes.
+
+Yes.. I'll cook something up.
+
+>
+> PS: just noticed, but shouldn't the plugin-version change
+> have needed an update to the docs ?
+>
+> thanks
+> -- PMM
+
+
+--
+Alex Benn=C3=A9e
 
