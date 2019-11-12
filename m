@@ -2,74 +2,74 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22142C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 06:51:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6690CC17440
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 06:53:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5F1B206A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 06:51:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 311BD206A5
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 06:53:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c+NQEjmC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F1B206A3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EGNvAKYn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 311BD206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUQ1t-00057n-KO
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 01:51:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58152)
+	id 1iUQ3B-0006zX-6G
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 01:53:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58196)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iUPu0-0005Xo-Cz
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 01:43:49 -0500
+ (envelope-from <thuth@redhat.com>) id 1iUPu4-0005dj-L0
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 01:43:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iUPtz-0000WV-28
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 01:43:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40440
+ (envelope-from <thuth@redhat.com>) id 1iUPu3-0000cd-IG
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 01:43:52 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50125
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iUPty-0000Vp-Uq
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 01:43:46 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iUPu3-0000cN-Cp
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 01:43:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573541026;
+ s=mimecast20190719; t=1573541031;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mPporNFL0AHIftOFO7b/4qzwt0OV6ge/YucoGK+qrCc=;
- b=c+NQEjmCxmwjC1Jkh3/n3MaPAJqHTgxlVAlDT0KLqUmV7n9BpJIQUCTiBTQWp+q+7awwJB
- JbsLUV6Q5PXWtE3yIJl6uXm4VKe2uXXjdIZ+mwi1atbOBy4bSG9aqDw2ydHWDMOTeVSXCv
- s5lWRY/4YBVUkc6NotyoCPl7nplBdMQ=
+ bh=yVBGcNV8cXbEQTRHK5E3eqn9uEby5ZYMQ51+2U37af0=;
+ b=EGNvAKYnvqhowHIHapPLVHmSKnI8y0giKxxO0itVd8MZ/idvotETraEZL8lGfZkytonhFp
+ hzNkvBbmLEQlIDG4l4gh/U/d/yx+E7BSmzhJPM8Jv3071XipRWR1mlZanM0ORtxIWL0pQM
+ lcHHAQ1T0yhFGBYRxGS4iKsP2FhkpCQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-rnmoRC4BOXqaA37EvYeELg-1; Tue, 12 Nov 2019 01:43:44 -0500
+ us-mta-175-uGhUem4oMCKXGl35l6psMg-1; Tue, 12 Nov 2019 01:43:47 -0500
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAA3F800C61;
- Tue, 12 Nov 2019 06:43:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB3D81800D7A;
+ Tue, 12 Nov 2019 06:43:46 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-116-124.ams2.redhat.com
  [10.36.116.124])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DE76B5DDA8;
- Tue, 12 Nov 2019 06:43:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A03325DDA8;
+ Tue, 12 Nov 2019 06:43:45 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 3/6] MAINTAINERS: slirp: Remove myself as maintainer
-Date: Tue, 12 Nov 2019 07:43:29 +0100
-Message-Id: <20191112064332.5074-4-thuth@redhat.com>
+Subject: [PULL 5/6] configure: Only decompress EDK2 blobs for X86/ARM targets
+Date: Tue, 12 Nov 2019 07:43:31 +0100
+Message-Id: <20191112064332.5074-6-thuth@redhat.com>
 In-Reply-To: <20191112064332.5074-1-thuth@redhat.com>
 References: <20191112064332.5074-1-thuth@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: rnmoRC4BOXqaA37EvYeELg-1
+X-MC-Unique: uGhUem4oMCKXGl35l6psMg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -93,38 +93,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jan Kiszka <jan.kiszka@siemens.com>
+From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-I haven't been doing anything here for a long time, nor does my git repo
-still play a role.
+The EDK2 firmware blobs only target the X86/ARM architectures.
+Define the DECOMPRESS_EDK2_BLOBS variable and only decompress
+the blobs when the variable exists.
 
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-Message-Id: <759f8f44-9a01-a9f1-c7cf-65d40151a93a@web.de>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Acked-by: Samuel Thibault <samuel.thibault@gnu.org>
+See also: 536d2173b2b ("roms: build edk2 firmware binaries ...")
+Suggested-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Message-Id: <20191108114531.21518-2-philmd@redhat.com>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- MAINTAINERS | 2 --
- 1 file changed, 2 deletions(-)
+ Makefile  |  2 ++
+ configure | 13 +++++++++++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 363e72a467..ff8d0d29f4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2143,13 +2143,11 @@ F: include/hw/registerfields.h
+diff --git a/Makefile b/Makefile
+index aa9d1a42aa..3430eca532 100644
+--- a/Makefile
++++ b/Makefile
+@@ -480,7 +480,9 @@ $(SOFTMMU_ALL_RULES): $(chardev-obj-y)
+ $(SOFTMMU_ALL_RULES): $(crypto-obj-y)
+ $(SOFTMMU_ALL_RULES): $(io-obj-y)
+ $(SOFTMMU_ALL_RULES): config-all-devices.mak
++ifdef DECOMPRESS_EDK2_BLOBS
+ $(SOFTMMU_ALL_RULES): $(edk2-decompressed)
++endif
 =20
- SLIRP
- M: Samuel Thibault <samuel.thibault@ens-lyon.org>
--M: Jan Kiszka <jan.kiszka@siemens.com>
- S: Maintained
- F: slirp/
- F: net/slirp.c
- F: include/net/slirp.h
- T: git https://people.debian.org/~sthibault/qemu.git slirp
--T: git git://git.kiszka.org/qemu.git queues/slirp
+ .PHONY: $(TARGET_DIRS_RULES)
+ # The $(TARGET_DIRS_RULES) are of the form SUBDIR/GOAL, so that
+diff --git a/configure b/configure
+index efe165edf9..9b322284c3 100755
+--- a/configure
++++ b/configure
+@@ -427,6 +427,7 @@ softmmu=3D"yes"
+ linux_user=3D"no"
+ bsd_user=3D"no"
+ blobs=3D"yes"
++edk2_blobs=3D"no"
+ pkgversion=3D""
+ pie=3D""
+ qom_cast_debug=3D"yes"
+@@ -2146,6 +2147,14 @@ case " $target_list " in
+   ;;
+ esac
 =20
- Stubs
- M: Paolo Bonzini <pbonzini@redhat.com>
++for target in $target_list; do
++  case "$target" in
++    arm-softmmu | aarch64-softmmu | i386-softmmu | x86_64-softmmu)
++      edk2_blobs=3D"yes"
++      ;;
++  esac
++done
++
+ feature_not_found() {
+   feature=3D$1
+   remedy=3D$2
+@@ -7526,6 +7535,10 @@ if test "$libudev" !=3D "no"; then
+     echo "LIBUDEV_LIBS=3D$libudev_libs" >> $config_host_mak
+ fi
+=20
++if test "$edk2_blobs" =3D "yes" ; then
++  echo "DECOMPRESS_EDK2_BLOBS=3Dy" >> $config_host_mak
++fi
++
+ # use included Linux headers
+ if test "$linux" =3D "yes" ; then
+   mkdir -p linux-headers
 --=20
 2.23.0
 
