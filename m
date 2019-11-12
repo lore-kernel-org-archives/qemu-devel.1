@@ -2,81 +2,119 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A33F9C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 14:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C1C3C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 14:50:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D50020679
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 14:45:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 100CD2196E
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 14:50:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AvCCICM5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D50020679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="JfqpNI2T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 100CD2196E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUXQ2-00029c-LV
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 09:45:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58892)
+	id 1iUXVI-0003ML-RB
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 09:50:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59567)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crobinso@redhat.com>) id 1iUXPI-0001jl-Lu
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:44:37 -0500
+ (envelope-from <rkagan@virtuozzo.com>) id 1iUXUU-0002x2-DL
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:50:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crobinso@redhat.com>) id 1iUXPH-0000ef-FM
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:44:36 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56272
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1iUXOp-0000Tz-An
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:44:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573569846;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=h7JVVE7L7sD63OM7pAuHUS7dRBa2HN+CBoyJXKABCAY=;
- b=AvCCICM5Il102aYMsoTNtJosWGpEkT3owVewMhqCWyiun88Ze5xPs4he0FGqE5XwrWuN/W
- sg3+B/qwW//9jBICdYx4KDQs/GOACYdEeV/qZ8dNqROkfFtJtMjfoNkUyKVc+YC2IeOC1x
- /0AkytMauHNSIA4eSHnTQnJmXzBQgo0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-35-hyxO3d-FOOur7ws80l71CA-1; Tue, 12 Nov 2019 09:44:03 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0FE8E107ACC7;
- Tue, 12 Nov 2019 14:44:02 +0000 (UTC)
-Received: from [10.18.17.238] (dhcp-17-238.bos.redhat.com [10.18.17.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4F28A5DDAA;
- Tue, 12 Nov 2019 14:44:01 +0000 (UTC)
-Subject: Re: [PATCH] linux-user: remove host stime() syscall
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20191112142556.6335-1-laurent@vivier.eu>
-From: Cole Robinson <crobinso@redhat.com>
-Message-ID: <cc44061b-542c-d639-bd5b-2b2bfbb74a9f@redhat.com>
-Date: Tue, 12 Nov 2019 09:45:06 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20191112142556.6335-1-laurent@vivier.eu>
+ (envelope-from <rkagan@virtuozzo.com>) id 1iUXUS-0002ng-Oa
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:49:58 -0500
+Received: from mail-bgr052101128088.outbound.protection.outlook.com
+ ([52.101.128.88]:43622 helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
+ id 1iUXUS-0002l0-37
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:49:56 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IZ0yWjZIirY3IXnZRQLVKriFTVk9HdgsP//T2qYD9UCs68sWevRVhyF3EQW6PobL92aA7VQUFvFwphC0cqg9J8nBFNnKBm0x3Yq5YsIQlIfMT9Cx6/6yOcvTKhpjAmVfx9BuiuT+Yp0743YEToxSZaxF6DtnGxkFdS64Z+dLCyAyW21B/TGnvjI7YbgfPZ97yr5tGQDCQgl4pyVG1dr5RSJq8o7lTxUDRDqGZ0Z0gubiTlrqZPzz8C5oZN/VB+DdSsJTqhR+dszrm9QJqncvIbewtm2utkdvBl//w5JDmfWJ96IKP+XhkMBVnaRtuYmGD9qSfLcp+weLptdpd5WpHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sQXpvlGi5daoBtmV2MLrMW0+kGLqOLnhiVf09Ppd3Dw=;
+ b=ftJpvcPjCvRxUelia99f0pNK1vreMCxqxoTO3O0FuMyswY5d27ZcxtW8BLkHr4YDrQSoQVRvXqHilIEutDLTTva/sA7ZxDyAsTT8HcuT58BBTAFNU9N6+c2USWztYTUiR1GEqU6xHogrEMRubDFOpm/1+ILJVBWkYf4+ikeiPxjOOvssMwE7920cy0ng7ZWnVtf1UuTl5iSQTWMe3X3RGunLhl4wIQUysw6SkLnjGUvOc53PIQGOPoZWDIe80dSdRZ2QbVnHrkuogRYJH7ioz2bGM/+bTNkG9rkXOlnr+yjBW7yIrMjzMb0NBYjAbTHWUCbcgpnsnyaSUuerRBOT3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sQXpvlGi5daoBtmV2MLrMW0+kGLqOLnhiVf09Ppd3Dw=;
+ b=JfqpNI2TzK40tjhGzH8DzGLuSH/YpobGOTcG5B5xOsiRH3asFP+G6SnwvsEpx7Yq1XVeg75N4FhK2Qbv7CYEpTujxbFLxhhKAo3TWCcw3IqTTcIQUt5oEJr7oNpYsnv3II5rKmJ6Jwag3cViXgR2vMMuTx4plBkZ5+9rKidme40=
+Received: from VI1PR08MB4608.eurprd08.prod.outlook.com (20.178.80.22) by
+ VI1PR08MB3471.eurprd08.prod.outlook.com (20.177.59.86) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2430.25; Tue, 12 Nov 2019 14:49:47 +0000
+Received: from VI1PR08MB4608.eurprd08.prod.outlook.com
+ ([fe80::9465:ec66:befb:e8b5]) by VI1PR08MB4608.eurprd08.prod.outlook.com
+ ([fe80::9465:ec66:befb:e8b5%3]) with mapi id 15.20.2430.027; Tue, 12 Nov 2019
+ 14:49:47 +0000
+From: Roman Kagan <rkagan@virtuozzo.com>
+To: "lantianyu1986@gmail.com" <lantianyu1986@gmail.com>
+Subject: Re: [PATCH V4] target/i386/kvm: Add Hyper-V direct tlb flush support
+Thread-Topic: [PATCH V4] target/i386/kvm: Add Hyper-V direct tlb flush support
+Thread-Index: AQHVmQooMjAMF4hMsk+z5W7t6cZOKaeHnsGA
+Date: Tue, 12 Nov 2019 14:49:47 +0000
+Message-ID: <20191112144943.GD2397@rkaganb.sw.ru>
+References: <20191112033427.7204-1-Tianyu.Lan@microsoft.com>
+In-Reply-To: <20191112033427.7204-1-Tianyu.Lan@microsoft.com>
+Accept-Language: en-US, ru-RU
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: hyxO3d-FOOur7ws80l71CA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mutt/1.12.1 (2019-06-15)
+mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>, lantianyu1986@gmail.com, 
+ pbonzini@redhat.com, rth@twiddle.net,	ehabkost@redhat.com,
+ mtosatti@redhat.com, vkuznets@redhat.com,	Tianyu Lan
+ <Tianyu.Lan@microsoft.com>, qemu-devel@nongnu.org,	kvm@vger.kernel.org
+x-originating-ip: [185.231.240.5]
+x-clientproxiedby: HE1P191CA0004.EURP191.PROD.OUTLOOK.COM (2603:10a6:3:cf::14)
+ To VI1PR08MB4608.eurprd08.prod.outlook.com
+ (2603:10a6:803:c0::22)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=rkagan@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e13e0db8-9943-4e42-33b3-08d7677f9000
+x-ms-traffictypediagnostic: VI1PR08MB3471:
+x-microsoft-antispam-prvs: <VI1PR08MB347147F8A0F3067B83A1A8C0C9770@VI1PR08MB3471.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1850;
+x-forefront-prvs: 021975AE46
+x-forefront-antispam-report: SFV:SPM;
+ SFS:(10019020)(376002)(396003)(346002)(39850400004)(366004)(136003)(54094003)(199004)(189003)(6246003)(5660300002)(5640700003)(478600001)(14454004)(6436002)(4326008)(25786009)(6116002)(229853002)(36756003)(66476007)(3846002)(9686003)(6512007)(66556008)(66946007)(2501003)(6486002)(64756008)(66446008)(1076003)(446003)(14444005)(99286004)(486006)(256004)(81166006)(71190400001)(71200400001)(1411001)(11346002)(54906003)(102836004)(26005)(66066001)(52116002)(8676002)(476003)(8936002)(186003)(2351001)(76176011)(386003)(6506007)(33656002)(86362001)(2906002)(7736002)(1361003)(81156014)(6916009)(305945005)(316002)(58126008)(30126002);
+ DIR:OUT; SFP:1501; SCL:5; SRVR:VI1PR08MB3471;
+ H:VI1PR08MB4608.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-transport-forked: True
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ELCLHyOfVzOvDwbmLRdcmpPKnhZxNrOf9t+ZaitBLXaNd3iO6iYZ7tbw1upCdON3a58qPdlxXXj10+JIOQ3K7VTM1CWcoZZWn114sOK3KFjRK8u8rLRtgIzk2fGLRPQRtMYkAlJoRY/mrqGkcOhZKPUJwsW5cQPfC7jdJVXjqi7n/E9LpV3WKe7qRdFl/M/x5ZRI7UtplsEd0DP0+pNuNEG9KLv9hl5xdDbhmvHxY8jY4/RHQz7HGKPoZv6+q3Vc2TGKGNHo2GJ+ppjvr0A6JCDpR8JrH31rmk1Uwi6mQ+HJmktG6TrARJ9iBrS+PAwxDxr62vLduRBbLO2l9Cj9dUboPdC8YwfLSdOzLr9C9koIRiR7nYfdN4ncsFt6LD01
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <AB96B3B89FB7624FA45598987B45EF63@eurprd08.prod.outlook.com>
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e13e0db8-9943-4e42-33b3-08d7677f9000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Nov 2019 14:49:47.4052 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 4e3DEayglwleibheiFvthRQEoIgBbAIfvrWY9/YW7XHiwDrUoolABIh6P7TEKmv6Rsj27yc6Aa6zTNh5TWdTaw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3471
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 52.101.128.88
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,47 +126,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P . Berrange" <dan@berrange.com>,
- Peter Maydell <peter.maydell@linaro.org>, Riku Voipio <riku.voipio@iki.fi>
+Cc: Tianyu Lan <Tianyu.Lan@microsoft.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mtosatti@redhat.com" <mtosatti@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "vkuznets@redhat.com" <vkuznets@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/12/19 9:25 AM, Laurent Vivier wrote:
-> stime() has been withdrawn from glibc
-> (12cbde1dae6f "Use clock_settime to implement stime; withdraw stime.")
->=20
-> Implement the target stime() syscall using host
-> clock_settime(CLOCK_REALTIME, ...) as it is done internally in glibc.
->=20
-> Tested qemu-ppc/x86_64 with:
->=20
-> =09#include <time.h>
-> =09#include <stdio.h>
->=20
-> =09int main(void)
-> =09{
-> =09=09time_t t;
-> =09=09int ret;
->=20
-> =09=09/* date -u -d"2019-11-12T15:11:00" "+%s" */
-> =09=09t =3D 1573571460;
-> =09=09ret =3D stime(&t);
-> =09=09printf("ret %d\n", ret);
-> =09=09return 0;
-> =09}
->=20
->         # date; ./stime; date
->         Tue Nov 12 14:18:32 UTC 2019
->         ret 0
->         Tue Nov 12 15:11:00 UTC 2019
->=20
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1852115
-> Reported-by: Cole Robinson <crobinso@redhat.com>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+On Tue, Nov 12, 2019 at 11:34:27AM +0800, lantianyu1986@gmail.com wrote:
+> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
+> 
+> Hyper-V direct tlb flush targets KVM on Hyper-V guest.
+> Enable direct TLB flush for its guests meaning that TLB
+> flush hypercalls are handled by Level 0 hypervisor (Hyper-V)
+> bypassing KVM in Level 1. Due to the different ABI for hypercall
+> parameters between Hyper-V and KVM, KVM capabilities should be
+> hidden when enable Hyper-V direct tlb flush otherwise KVM
+> hypercalls may be intercepted by Hyper-V. Add new parameter
+> "hv-direct-tlbflush". Check expose_kvm and Hyper-V tlb flush
+> capability status before enabling the feature.
+> 
+> Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
+> ---
+> Change since v3:
+>        - Fix logic of Hyper-V passthrough mode with direct
+>        tlb flush.
+> 
+> Change sicne v2:
+>        - Update new feature description and name.
+>        - Change failure print log.
+> 
+> Change since v1:
+>        - Add direct tlb flush's Hyper-V property and use
+>        hv_cpuid_check_and_set() to check the dependency of tlbflush
+>        feature.
+>        - Make new feature work with Hyper-V passthrough mode.
+> ---
+>  docs/hyperv.txt   | 10 ++++++++++
+>  target/i386/cpu.c |  2 ++
+>  target/i386/cpu.h |  1 +
+>  target/i386/kvm.c | 24 ++++++++++++++++++++++++
+>  4 files changed, 37 insertions(+)
+> 
+> diff --git a/docs/hyperv.txt b/docs/hyperv.txt
+> index 8fdf25c829..140a5c7e44 100644
+> --- a/docs/hyperv.txt
+> +++ b/docs/hyperv.txt
+> @@ -184,6 +184,16 @@ enabled.
+>  
+>  Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
+>  
+> +3.18. hv-direct-tlbflush
+> +=======================
+> +Enable direct TLB flush for KVM when it is running as a nested
+> +hypervisor on top Hyper-V. When enabled, TLB flush hypercalls from L2
+> +guests are being passed through to L0 (Hyper-V) for handling. Due to ABI
+> +differences between Hyper-V and KVM hypercalls, L2 guests will not be
+> +able to issue KVM hypercalls (as those could be mishanled by L0
+> +Hyper-V), this requires KVM hypervisor signature to be hidden.
 
-Fixes the build issue for me. Thanks Laurent!
+On a second thought, I wonder if this is the only conflict we have.
 
-- Cole
+In KVM, kvm_emulate_hypercall, when sees Hyper-V hypercalls enabled,
+just calls kvm_hv_hypercall and returns.  I.e. once the userspace
+enables Hyper-V hypercalls (which QEMU does when any of hv_* flags is
+given), KVM treats *all* hypercalls as Hyper-V ones and handles *no* KVM
+hypercalls.
 
+So, if hiding the KVM hypervisor signature is the only way to prevent the
+guest from issuing KVM hypercalls (need to double-check), then, I'm
+afraid, we just need to require it as soon as any Hyper-V feature is
+enabled.
+
+
+> +Requires: hv-tlbflush, -kvm
+>  
+>  4. Development features
+>  ========================
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 44f1bbdcac..7bc7fee512 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -6156,6 +6156,8 @@ static Property x86_cpu_properties[] = {
+>                        HYPERV_FEAT_IPI, 0),
+>      DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
+>                        HYPERV_FEAT_STIMER_DIRECT, 0),
+> +    DEFINE_PROP_BIT64("hv-direct-tlbflush", X86CPU, hyperv_features,
+> +                      HYPERV_FEAT_DIRECT_TLBFLUSH, 0),
+>      DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
+>  
+>      DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
+> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> index eaa5395aa5..3cb105f7d6 100644
+> --- a/target/i386/cpu.h
+> +++ b/target/i386/cpu.h
+> @@ -907,6 +907,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+>  #define HYPERV_FEAT_EVMCS               12
+>  #define HYPERV_FEAT_IPI                 13
+>  #define HYPERV_FEAT_STIMER_DIRECT       14
+> +#define HYPERV_FEAT_DIRECT_TLBFLUSH     15
+>  
+>  #ifndef HYPERV_SPINLOCK_NEVER_RETRY
+>  #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
+> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> index 11b9c854b5..43f5cbc3f6 100644
+> --- a/target/i386/kvm.c
+> +++ b/target/i386/kvm.c
+> @@ -900,6 +900,10 @@ static struct {
+>          },
+>          .dependencies = BIT(HYPERV_FEAT_STIMER)
+>      },
+> +    [HYPERV_FEAT_DIRECT_TLBFLUSH] = {
+> +        .desc = "direct paravirtualized TLB flush (hv-direct-tlbflush)",
+> +        .dependencies = BIT(HYPERV_FEAT_TLBFLUSH)
+> +    },
+>  };
+>  
+>  static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max)
+> @@ -1224,6 +1228,7 @@ static int hyperv_handle_properties(CPUState *cs,
+>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_EVMCS);
+>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_IPI);
+>      r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_STIMER_DIRECT);
+> +    r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_DIRECT_TLBFLUSH);
+>  
+>      /* Additional dependencies not covered by kvm_hyperv_properties[] */
+>      if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC) &&
+> @@ -1243,6 +1248,25 @@ static int hyperv_handle_properties(CPUState *cs,
+>          goto free;
+>      }
+>  
+> +    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH)) {
+> +        if (kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_DIRECT_TLBFLUSH, 0, 0)) {
+> +            if (!cpu->hyperv_passthrough) {
+> +                fprintf(stderr,
+> +                    "Hyper-V %s is not supported by kernel\n",
+> +                    kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
+> +                return -ENOSYS;
+> +            }
+> +
+> +            cpu->hyperv_features &= ~BIT(HYPERV_FEAT_DIRECT_TLBFLUSH);
+> +        } else if (cpu->expose_kvm) {
+> +            fprintf(stderr,
+> +                "Hyper-V %s requires KVM hypervisor signature "
+> +                "to be hidden (-kvm).\n",
+> +                kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
+> +            return -ENOSYS;
+> +        }
+
+In view of my comment above, this "else if" clause may become
+unnecessary.
+
+However, it doesn't hurt either, and doesn't make things worse, so, if
+this is seen as 4.2 material and the general KVM vs Hyper-V hypercall
+conflict resolution is postponed till after 4.2, the patch looks ok as
+it is.
+
+Under this provision
+
+Reviewed-by: Roman Kagan <rkagan@virtuozzo.com>
+
+> +    }
+> +
+>      if (cpu->hyperv_passthrough) {
+>          /* We already copied all feature words from KVM as is */
+>          r = cpuid->nent;
+> -- 
+> 2.14.5
+> 
 
