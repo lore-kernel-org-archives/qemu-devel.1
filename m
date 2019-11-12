@@ -6,74 +6,74 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81409C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ECF7C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:34:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 507D321783
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:34:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CEFA121783
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:34:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ov2fEOrY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 507D321783
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OAndAIb2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEFA121783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUUR4-0008UZ-JH
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 06:34:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35444)
+	id 1iUURO-0000au-Gq
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 06:34:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35573)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iUUOU-0006as-3z
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:31:35 -0500
+ (envelope-from <slp@redhat.com>) id 1iUUP2-0007G9-82
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:32:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iUUOP-00011a-36
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:31:34 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:36495
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <slp@redhat.com>) id 1iUUOy-00019c-AQ
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:32:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20320
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iUUOO-00011P-G1
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:31:28 -0500
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iUUOy-00018K-0E
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:32:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573558288;
+ s=mimecast20190719; t=1573558321;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Gb1RH33aSR0RM4IoeQcShNydzzy0Bqn3bnB1YpWv//o=;
- b=Ov2fEOrYobjWyM5iV9x4FgcXQexyMPTkxTBGEqbe1gQCtMru8bvu+sK3bGKIQhQomf59Iz
- OKX+cm5eape6ERuaWTfFSKe1zSQK5cjVd8T/HCY8u0QU/EFkLSspNptskP/a9QVuMdm1cI
- LfLRyz0T9ILKC/kusEvRraf2uTRu2Fc=
+ bh=wbvPC0j2Q4yaXtsYW/Ngr7jfFhiP1PPYm5HSHEmn2Q0=;
+ b=OAndAIb2R7B1D681Jw+jGWUiQvtjkiBbzygPAdRdgOfYrvx7xcUwIZJuPD7Bo3uo3uv6+j
+ eeIgvv6Y6vLh/FG3qUws0ZQe7HANwrWjpuTIDWshIGjMZld+3vG4cdvvN3YP9Kn64jaH0i
+ Om8jiItZYFl4WoSRtI8bJQh79S5HVcc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-cW7v-wWnOP6HWPzoekkNUA-1; Tue, 12 Nov 2019 06:30:20 -0500
+ us-mta-9-9tauDOo0MqibY3ubE9t7Rw-1; Tue, 12 Nov 2019 06:30:32 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 624FD800C61;
- Tue, 12 Nov 2019 11:30:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 780B3DC20;
+ Tue, 12 Nov 2019 11:30:31 +0000 (UTC)
 Received: from dritchie.redhat.com (unknown [10.33.36.176])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BFB3A60D5C;
- Tue, 12 Nov 2019 11:30:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D864D6090D;
+ Tue, 12 Nov 2019 11:30:29 +0000 (UTC)
 From: Sergio Lopez <slp@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 1/8] blockdev: merge drive_backup_prepare with
- do_drive_backup
-Date: Tue, 12 Nov 2019 12:30:05 +0100
-Message-Id: <20191112113012.71136-2-slp@redhat.com>
+Subject: [PATCH v3 6/8] blockdev: place blockdev_backup_prepare with the other
+ related transaction helpers
+Date: Tue, 12 Nov 2019 12:30:10 +0100
+Message-Id: <20191112113012.71136-7-slp@redhat.com>
 In-Reply-To: <20191112113012.71136-1-slp@redhat.com>
 References: <20191112113012.71136-1-slp@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: cW7v-wWnOP6HWPzoekkNUA-1
+X-MC-Unique: 9tauDOo0MqibY3ubE9t7Rw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,137 +92,108 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Consolidate drive_backup_prepare() with do_drive_backup() as a first
-step towards streamlining all functionality through transactions.
+Move blockdev_backup_prepare() to be side by side with the other
+related transaction helper functions.
 
 Signed-off-by: Sergio Lopez <slp@redhat.com>
 ---
- blockdev.c | 58 +++++++++++++++---------------------------------------
- 1 file changed, 16 insertions(+), 42 deletions(-)
+ blockdev.c | 70 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 35 insertions(+), 35 deletions(-)
 
 diff --git a/blockdev.c b/blockdev.c
-index 8e029e9c01..5d30aff1e5 100644
+index 128707cdc6..f94aaa98f0 100644
 --- a/blockdev.c
 +++ b/blockdev.c
-@@ -1764,40 +1764,6 @@ typedef struct DriveBackupState {
- static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
-                             Error **errp);
+@@ -1940,6 +1940,41 @@ typedef struct BlockdevBackupState {
+     BlockJob *job;
+ } BlockdevBackupState;
 =20
--static void drive_backup_prepare(BlkActionState *common, Error **errp)
++static void blockdev_backup_prepare(BlkActionState *common, Error **errp)
++{
++    BlockdevBackupState *state =3D DO_UPCAST(BlockdevBackupState, common, =
+common);
++    BlockdevBackup *backup;
++    BlockDriverState *bs;
++    BlockDriverState *target_bs;
++    AioContext *aio_context;
++
++    assert(common->action->type =3D=3D TRANSACTION_ACTION_KIND_BLOCKDEV_BA=
+CKUP);
++    backup =3D common->action->u.blockdev_backup.data;
++
++    bs =3D bdrv_lookup_bs(backup->device, backup->device, errp);
++    if (!bs) {
++        return;
++    }
++
++    target_bs =3D bdrv_lookup_bs(backup->target, backup->target, errp);
++    if (!target_bs) {
++        return;
++    }
++
++    aio_context =3D bdrv_get_aio_context(bs);
++    aio_context_acquire(aio_context);
++    state->bs =3D bs;
++
++    /* Paired with .clean() */
++    bdrv_drained_begin(state->bs);
++
++    state->job =3D do_backup_common(qapi_BlockdevBackup_base(backup),
++                                  bs, target_bs, aio_context,
++                                  common->block_job_txn, errp);
++
++    aio_context_release(aio_context);
++}
++
+ static void blockdev_backup_commit(BlkActionState *common)
+ {
+     BlockdevBackupState *state =3D DO_UPCAST(BlockdevBackupState, common, =
+common);
+@@ -3654,41 +3689,6 @@ XDbgBlockGraph *qmp_x_debug_query_block_graph(Error =
+**errp)
+     return bdrv_get_xdbg_block_graph(errp);
+ }
+=20
+-static void blockdev_backup_prepare(BlkActionState *common, Error **errp)
 -{
--    DriveBackupState *state =3D DO_UPCAST(DriveBackupState, common, common=
-);
+-    BlockdevBackupState *state =3D DO_UPCAST(BlockdevBackupState, common, =
+common);
+-    BlockdevBackup *backup;
 -    BlockDriverState *bs;
--    DriveBackup *backup;
+-    BlockDriverState *target_bs;
 -    AioContext *aio_context;
--    Error *local_err =3D NULL;
 -
--    assert(common->action->type =3D=3D TRANSACTION_ACTION_KIND_DRIVE_BACKU=
-P);
--    backup =3D common->action->u.drive_backup.data;
+-    assert(common->action->type =3D=3D TRANSACTION_ACTION_KIND_BLOCKDEV_BA=
+CKUP);
+-    backup =3D common->action->u.blockdev_backup.data;
 -
 -    bs =3D bdrv_lookup_bs(backup->device, backup->device, errp);
 -    if (!bs) {
 -        return;
 -    }
 -
--    aio_context =3D bdrv_get_aio_context(bs);
--    aio_context_acquire(aio_context);
--
--    /* Paired with .clean() */
--    bdrv_drained_begin(bs);
--
--    state->bs =3D bs;
--
--    state->job =3D do_drive_backup(backup, common->block_job_txn, &local_e=
-rr);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        goto out;
+-    target_bs =3D bdrv_lookup_bs(backup->target, backup->target, errp);
+-    if (!target_bs) {
+-        return;
 -    }
 -
--out:
+-    aio_context =3D bdrv_get_aio_context(bs);
+-    aio_context_acquire(aio_context);
+-    state->bs =3D bs;
+-
+-    /* Paired with .clean() */
+-    bdrv_drained_begin(state->bs);
+-
+-    state->job =3D do_backup_common(qapi_BlockdevBackup_base(backup),
+-                                  bs, target_bs, aio_context,
+-                                  common->block_job_txn, errp);
+-
 -    aio_context_release(aio_context);
 -}
 -
- static void drive_backup_commit(BlkActionState *common)
+ void qmp_blockdev_backup(BlockdevBackup *arg, Error **errp)
  {
-     DriveBackupState *state =3D DO_UPCAST(DriveBackupState, common, common=
-);
-@@ -3587,13 +3553,13 @@ static BlockJob *do_backup_common(BackupCommon *bac=
-kup,
-     return job;
- }
-=20
--static BlockJob *do_drive_backup(DriveBackup *backup, JobTxn *txn,
--                                 Error **errp)
-+static void drive_backup_prepare(BlkActionState *common, Error **errp)
- {
-+    DriveBackupState *state =3D DO_UPCAST(DriveBackupState, common, common=
-);
-+    DriveBackup *backup;
-     BlockDriverState *bs;
-     BlockDriverState *target_bs;
-     BlockDriverState *source =3D NULL;
--    BlockJob *job =3D NULL;
-     AioContext *aio_context;
-     QDict *options;
-     Error *local_err =3D NULL;
-@@ -3601,23 +3567,29 @@ static BlockJob *do_drive_backup(DriveBackup *backu=
-p, JobTxn *txn,
-     int64_t size;
-     bool set_backing_hd =3D false;
-=20
-+    assert(common->action->type =3D=3D TRANSACTION_ACTION_KIND_DRIVE_BACKU=
-P);
-+    backup =3D common->action->u.drive_backup.data;
-+
-     if (!backup->has_mode) {
-         backup->mode =3D NEW_IMAGE_MODE_ABSOLUTE_PATHS;
-     }
-=20
-     bs =3D bdrv_lookup_bs(backup->device, backup->device, errp);
-     if (!bs) {
--        return NULL;
-+        return;
-     }
-=20
-     if (!bs->drv) {
-         error_setg(errp, "Device has no medium");
--        return NULL;
-+        return;
-     }
-=20
-     aio_context =3D bdrv_get_aio_context(bs);
-     aio_context_acquire(aio_context);
-=20
-+    /* Paired with .clean() */
-+    bdrv_drained_begin(bs);
-+
-     if (!backup->has_format) {
-         backup->format =3D backup->mode =3D=3D NEW_IMAGE_MODE_EXISTING ?
-                          NULL : (char*) bs->drv->format_name;
-@@ -3687,14 +3659,16 @@ static BlockJob *do_drive_backup(DriveBackup *backu=
-p, JobTxn *txn,
-         }
-     }
-=20
--    job =3D do_backup_common(qapi_DriveBackup_base(backup),
--                           bs, target_bs, aio_context, txn, errp);
-+    state->bs =3D bs;
-+
-+    state->job =3D do_backup_common(qapi_DriveBackup_base(backup),
-+                                  bs, target_bs, aio_context,
-+                                  common->block_job_txn, errp);
-=20
- unref:
-     bdrv_unref(target_bs);
- out:
-     aio_context_release(aio_context);
--    return job;
- }
-=20
- void qmp_drive_backup(DriveBackup *arg, Error **errp)
+     BlockJob *job;
 --=20
 2.23.0
 
