@@ -2,89 +2,79 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B22C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 14:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F035C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 14:56:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABB9D20656
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 14:55:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29DC220656
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 14:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eh4Liq78"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABB9D20656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TC8QBphr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29DC220656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUXZf-00006p-Gb
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 09:55:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59767)
+	id 1iUXau-0001Lu-AM
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 09:56:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60024)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iUXVC-0003X9-LD
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:50:43 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iUXXa-0006TA-7K
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:53:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iUXVB-00036j-Af
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:50:42 -0500
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:39611)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iUXVB-00035s-3v
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:50:41 -0500
-Received: by mail-wr1-x436.google.com with SMTP id l7so7265691wrp.6
- for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 06:50:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=OuBID0cJqkigSPofx9+aC0NVHfNM9AtTCEr/b96Ovls=;
- b=eh4Liq78aWKNj3ut3flg/QtyGPjidZUrYm/7rObzK7AEItIjVFcq2nEAgXUGIm6nzE
- olyra1ItCQjBgNIq2Q32/ogAwZlUix/0t8HlMoEfvmgi8GkRpYjYXvONrrH1V4M78pX1
- Z/jV5ij7ZShlM4Q3gpmwOLcrwX1oe+mbD6p+jfq7R2wegnRTAKKCe+702lic+JqcHT4n
- 1038Iv+LbXafXLFe4usUOaS9Kg9zBZ4h/63ccbpO5FC+ND804KJ+HazhZsqw+kRIZScZ
- OwmdFuaww9VJfr/l8/TkH09Du9fGu4dIXsZwNNmzt55vvw1UHnqr2mcNBM6JO4iUkMzF
- okxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=OuBID0cJqkigSPofx9+aC0NVHfNM9AtTCEr/b96Ovls=;
- b=LUkiKEvhr8XVDrsAlM2Bq9tNTwWrWJ9Ab9HwLVTHSAFuphKau+/4qekOMRnlaj8BTy
- 2MTYftPXYR3jwdKTXSuk2Ki20KsCGUm8qiIdCy2FoewbBIa/7wqdmo84Jc2zys8epcbS
- AfLB99OXq3RdRHv7+ZoWhUIUChmGHnCMcXI0nSl9IzshbkflMpdIbtMWwWb2ibIj1OP2
- cGLMi+dMcINCwX4I8bT/6OGYoaG/ZG1p2BhdmVTq1MjysFJ25opp0oO+220cjLsgndGo
- nrUWaPHeeKjYxZIb7NmdzUkcz6SfKhM31Uvz4JKm3eaJmDwgJ8ZC1B3FQFLJcahbCSHe
- 2XOg==
-X-Gm-Message-State: APjAAAXTytTTc9pUZ1zMyIuOz2+4skHX2uvtW0DBBMuRAHCdNvqYz/fL
- 6WRVL47voEa/Xmf9bGzIXEyy/Q==
-X-Google-Smtp-Source: APXvYqzBdxMKEK4v7nZeNMQgzL7UBpGRb8+TPOcfwwiagNsffbMGBeT2aqtw00npxSjcxfFF9pLVdw==
-X-Received: by 2002:adf:dc06:: with SMTP id t6mr26944129wri.378.1573570238599; 
- Tue, 12 Nov 2019 06:50:38 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id q15sm18905974wrr.82.2019.11.12.06.50.31
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 Nov 2019 06:50:35 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8E4131FF93;
- Tue, 12 Nov 2019 14:50:29 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: peter.maydell@linaro.org
-Subject: [PULL 6/8] tests/vm: support sites with sha512 checksums
-Date: Tue, 12 Nov 2019 14:50:26 +0000
-Message-Id: <20191112145028.26386-7-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191112145028.26386-1-alex.bennee@linaro.org>
-References: <20191112145028.26386-1-alex.bennee@linaro.org>
+ (envelope-from <imammedo@redhat.com>) id 1iUXXY-0004M1-4p
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:53:09 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:29987
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iUXXX-0004LR-KA
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 09:53:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573570386;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tPTS6mLbTN7tU940wnGTobkD2V7rdyFvf0zuWM59LE8=;
+ b=TC8QBphrc4MNBqq6CvetTPDuIn87NT/4CPl+gsDfHbZzf7I3DAia3XFUrMs/qAv/BSZBV8
+ opnWoxWqg58CNpFzDTbk+pKmf18Nq+92qGBu8H8sjgg9lBV7maUkS3ZMGk8iJl+QvR7FKk
+ b7kKqra63eeLtHgq/hQwfHnkwMxxe/k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-241-5urAgn5-O2W-hbbjGpxvpA-1; Tue, 12 Nov 2019 09:53:03 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BB51107ACCD;
+ Tue, 12 Nov 2019 14:53:02 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2B924610E5;
+ Tue, 12 Nov 2019 14:52:55 +0000 (UTC)
+Date: Tue, 12 Nov 2019 15:52:53 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Heyi Guo <guoheyi@huawei.com>
+Subject: Re: [RFC v2 14/14] virt/acpi: add SDEI table if SDEI is enabled
+Message-ID: <20191112155253.543e15ad@redhat.com>
+In-Reply-To: <20191105091056.9541-15-guoheyi@huawei.com>
+References: <20191105091056.9541-1-guoheyi@huawei.com>
+ <20191105091056.9541-15-guoheyi@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::436
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: 5urAgn5-O2W-hbbjGpxvpA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,74 +86,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, "Michael
+ S. Tsirkin" <mst@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>,
+ qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ qemu-arm@nongnu.org, James Morse <james.morse@arm.com>,
+ wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The NetBSD project uses SHA512 for its checksums so lets support that
-in the download helper.
+On Tue, 5 Nov 2019 17:10:56 +0800
+Heyi Guo <guoheyi@huawei.com> wrote:
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Add SDEI table if SDEI is enabled, so that guest OS can get aware and
+> utilize the interfaces.
+>=20
+> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Dave Martin <Dave.Martin@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> ---
+>=20
+> Notes:
+>     v2:
+>     - Drop SDEI table definition and add comments
+>=20
+>  hw/arm/virt-acpi-build.c | 26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+>=20
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 4cd50175e0..73d3f8cd15 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -32,6 +32,7 @@
+>  #include "trace.h"
+>  #include "hw/core/cpu.h"
+>  #include "target/arm/cpu.h"
+> +#include "target/arm/sdei.h"
+>  #include "hw/acpi/acpi-defs.h"
+>  #include "hw/acpi/acpi.h"
+>  #include "hw/nvram/fw_cfg.h"
+> @@ -475,6 +476,26 @@ build_iort(GArray *table_data, BIOSLinker *linker, V=
+irtMachineState *vms)
+>                   "IORT", table_data->len - iort_start, 0, NULL, NULL);
+>  }
+> =20
+> +/*
+> + * ACPI spec 6.2 Software Delegated Exception Interface (SDEI).
+> + * (Revision 1.0)
+> + * "SDEI" was reserved in ACPI 6.2. See "Links to ACPI-Related Documents=
+"
+> + * (http://uefi.org/acpi) under the heading "Software
+> + * Delegated Exceptions Interface." The definition is under
+> + * "10 Appendix C: ACPI table definitions for SDEI" in the linked docume=
+nt.
+> + *
+> + * This is a dummy table to expose platform SDEI capbility to OS.
+> + */
+> +static void
+> +build_sdei(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms=
+)
+> +{
+> +    int sdei_start =3D table_data->len;
+> +
+> +    (void)acpi_data_push(table_data, sizeof(AcpiTableHeader));
+> +    build_header(linker, table_data, (void *)(table_data->data + sdei_st=
+art),
+> +                 "SDEI", table_data->len - sdei_start, 1, NULL, NULL);
+> +}
+> +
+>  static void
+>  build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms=
+)
+>  {
+> @@ -825,6 +846,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuil=
+dTables *tables)
+>      acpi_add_table(table_offsets, tables_blob);
+>      build_spcr(tables_blob, tables->linker, vms);
+> =20
+> +    if (sdei_enabled) {
+globals shouldn't be introduced in new code
 
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 086bfb2c66d..91a9226026d 100755
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -95,19 +95,25 @@ class BaseVM(object):
-             logging.info("KVM not available, not using -enable-kvm")
-         self._data_args = []
- 
--    def _download_with_cache(self, url, sha256sum=None):
-+    def _download_with_cache(self, url, sha256sum=None, sha512sum=None):
-         def check_sha256sum(fname):
-             if not sha256sum:
-                 return True
-             checksum = subprocess.check_output(["sha256sum", fname]).split()[0]
-             return sha256sum == checksum.decode("utf-8")
- 
-+        def check_sha512sum(fname):
-+            if not sha512sum:
-+                return True
-+            checksum = subprocess.check_output(["sha512sum", fname]).split()[0]
-+            return sha512sum == checksum.decode("utf-8")
-+
-         cache_dir = os.path.expanduser("~/.cache/qemu-vm/download")
-         if not os.path.exists(cache_dir):
-             os.makedirs(cache_dir)
-         fname = os.path.join(cache_dir,
-                              hashlib.sha1(url.encode("utf-8")).hexdigest())
--        if os.path.exists(fname) and check_sha256sum(fname):
-+        if os.path.exists(fname) and check_sha256sum(fname) and check_sha512sum(fname):
-             return fname
-         logging.debug("Downloading %s to %s...", url, fname)
-         subprocess.check_call(["wget", "-c", url, "-O", fname + ".download"],
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-index c48c60853e7..611e6cc5b5c 100755
---- a/tests/vm/netbsd
-+++ b/tests/vm/netbsd
-@@ -23,6 +23,7 @@ class NetBSDVM(basevm.BaseVM):
-     arch = "x86_64"
- 
-     link = "https://cdn.netbsd.org/pub/NetBSD/NetBSD-8.1/images/NetBSD-8.1-amd64.iso"
-+    csum = "718f275b7e0879599bdac95630c5e3f2184700032fdb6cdebf3bdd63687898c48ff3f08f57b89f4437a86cdd8ea07c01a39d432dbb37e1e4b008f4985f98da3f"
-     size = "20G"
-     pkgs = [
-         # tools
-@@ -70,7 +71,7 @@ class NetBSDVM(basevm.BaseVM):
-     ipv6 = False
- 
-     def build_image(self, img):
--        cimg = self._download_with_cache(self.link)
-+        cimg = self._download_with_cache(self.link, sha512sum=self.csum)
-         img_tmp = img + ".tmp"
-         iso = img + ".install.iso"
- 
--- 
-2.20.1
+> +        acpi_add_table(table_offsets, tables_blob);
+> +        build_sdei(tables_blob, tables->linker, vms);
+> +    }
+> +
+>      if (ms->numa_state->num_nodes > 0) {
+>          acpi_add_table(table_offsets, tables_blob);
+>          build_srat(tables_blob, tables->linker, vms);
 
 
