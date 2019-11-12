@@ -6,38 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EE3BC17440
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAEF0C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:38:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 084A620650
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:37:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 084A620650
+	by mail.kernel.org (Postfix) with ESMTPS id BCF7520650
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:38:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCF7520650
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUSbi-0003co-62
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:37:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48903)
+	id 1iUScy-000501-07
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:38:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49170)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iUSZV-0001y4-NR
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:34:50 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iUScH-0004FQ-JL
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:37:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iUSZU-0006fc-Fv
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:34:49 -0500
-Received: from mout.kundenserver.de ([217.72.192.73]:60627)
+ (envelope-from <laurent@vivier.eu>) id 1iUScF-0007Qm-U5
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:37:41 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:54117)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iUSZT-0006f9-AS; Tue, 12 Nov 2019 04:34:48 -0500
+ id 1iUScD-0007Pj-LP; Tue, 12 Nov 2019 04:37:37 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MWiUg-1iNjPU3uFE-00X7Bh; Tue, 12 Nov 2019 10:34:41 +0100
-Subject: Re: [PATCH] numa: Add missing \n to error message
-To: Greg Kurz <groug@kaod.org>, Eduardo Habkost <ehabkost@redhat.com>
-References: <157304440026.351774.14607704217028190097.stgit@bahia.lan>
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N9d91-1hsFZO1i9V-015dA0; Tue, 12 Nov 2019 10:37:31 +0100
+Subject: Re: [PATCH v2] ivshmem-server: Terminate also on SIGINT
+To: Markus Armbruster <armbru@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+References: <99c1a7bd-1876-66a2-4b8e-d5bc86116fe7@web.de>
+ <fed41c57-c433-9723-e5db-5eb3a10c4f8b@siemens.com>
+ <87a7968km1.fsf@dusky.pond.sub.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,36 +83,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <89950cbb-c788-36d7-8987-9e64a5591169@vivier.eu>
-Date: Tue, 12 Nov 2019 10:34:39 +0100
+Message-ID: <b0fda46b-6518-4228-b7e3-2bd1bdf27817@vivier.eu>
+Date: Tue, 12 Nov 2019 10:37:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <157304440026.351774.14607704217028190097.stgit@bahia.lan>
+In-Reply-To: <87a7968km1.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:OyWeVbKIuUp/KtQwl2WUwplj6nEGLOCRU1av1ZEgPHMDygpZkM3
- 2mkc+bWR3ibV63hqz3pct6FzeIZST7eaL53eBYwki0nGF2t6YE9HRGHr5Y5/X6x0iuiU4RV
- tiuw2IfDloEbC9HrxMkcRndQNx6jYRrU1H1rtqbGHWBKQWNw1sBeCYXILH1DtH+E17FxT3E
- Hw2y//fT0XTh66hIyJcjg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8TWoRjj6VEw=:0zEf3Ins3nXTHZjUCBrGgE
- wGmhqDqj0ACB9c5S75fvU8EgCL+ImZ6FTRKsW1O8Jp4XBZwVHmUKqmE09RawqybQiTbvxBVCD
- ISNr3ttTH8hz/yTsl0ZNniM6Tp2xX0I/HsCxQYR6p3Xa+GZdzbOB9sdoQs2ICBAt/ltd/eHrl
- D5GmyxMeEVLFLMR+odts4jCiSjA4BNtCa6i2Vm9EOaQDNbzvv2mXKcP4jBlvvKnDX/P8KW3gu
- CUCYStpI4hM1NGxVtcRrDcyAv1xNRl4flP5wzpca165A8t1eVw4h32LFlgjGuEOYbqyo1g9j6
- GeiEgMAqJsx5GxJe4YnSV6hcfYghVxEHxPtUbQq7J3pm4micRLEx/cVK/Zo4pq2ptMTgKjAyr
- dhopYBmotWIgf9PwGyCyriA1tRLnHGNJitM2n80dV7B7693JUjzbre16llD+/C6TOdOnozCaz
- H3BZHUx8T+VSTdfG4uWuJO5SiFfF76eL906dfjwblRhiVVwQ7rf0g4B9+Rni6rivp8xncbMfx
- nZLW3O6zGKSLWlEaDIjtfpvmQKc+RRltLvE6wqJdimZebi7Vggv78ck0RJ2d0zVsBYaITBdFC
- PA88pKRFKluxJVM+LcXdZKlpLPL+thjFUxmLmKeMEiHxzn6JoP5I3mYFog6iMpynh9MGzTWv9
- suvuyL7XHJDHN9dVZkuFBPlCnEtyw0qfusmJjH9xHUATySVT/Rv6InafFWGNHG8hpxeS0i7aj
- nRFvv90KXCYGCitwO5c0AYvHf8BBJ1xR/xGVjGAEjMxSN4hGOcrSdwe0TGMGM6Wmlfptta3dC
- Bn1AiLJmrZpVAsJyAbXjXF589RmD9RGlziKglnyBkY5zbV9quzpM+ANfoAsckZsBX4jtP1kLR
- kH6Gh8Ep5NE7sunm550g==
+X-Provags-ID: V03:K1:nQNyJBWKmy47yS9fg7wGpnBBnonEJ8lSB4igRqbxxvF/7R59GWZ
+ ray5CprKCKS22by/InN/eSPKSmdNYFEh1AjYbsJOI5GJWQh+QvSQjBmijYa8rutTkQKSw94
+ BTLLY68oNy4oW305ZqbDUsw894Vx9Pz2FxAo8yWf75YxxG/RN0fCgwfyqCLCX05VJzy0c/h
+ OGjWdbfnPwv3BuANyn/Ug==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:rkkrestwDpg=:IO1ZeCBV7K+DaPAaZTl7GK
+ y7qvCn+mGYAilp7bA3bfKlkk92QLfyMLf1OZQuZtq9FZjgIHHtD3ku8eS1kvMHlHq+nfFrv8+
+ EYMPygCT+AXmHqOL2+BVdtYrj51tDQ/FXGjtXtn6QqRjB/eBhH06DpVQrMVKcG041QMfsL9EU
+ OhNFCGCCu3Foge7wDz0fMsBCgQt4Aks/C5yZebGg1rVt7p6hKm6AIXj70Y/PfJI3nXOKhy28f
+ QtWduxKWoPvLPYnt9ygHPIgHL21ciinMh16ZOUqHVPCvtiwjOMk+GRqzUyowWjbkgDBJGlAoa
+ JkwMhKewvp9hJXuBRwpJa2pnPG6IrYFHd+S6ZXpTaXD2umKZQGkegfEvQxzHGtdzqJbhNHQd4
+ pdl8bVXrekeQ1BJ/WOpVRiSOyaVYp8kx+5A6+T9CbmmW/A5a/Dao7+v0wQ3th9fVEAFNVS/Ck
+ ENS9WvWrFA4gahGD1Z2niSY78Xt826fSz5BiWKKg+ke69RNS7zyVNOv7waaA7lAK1ut3aJyCB
+ M2St+yKXHpTqpOmtscBiyit2GA+jz1LTu814WkmNmz6AyaDE+MdlHIaQ8lHdyaL/waw16rsSj
+ fV2HQ4Z/H205jNcFT6JqGMfKXQ9s2EHZ3j24+eDjcR1bjkrsHjUcbduv0Fto0PeuJPZfiNJjD
+ z7HtB9zRwUkUe+Vx4idRIscQw8sZhUxKQXSSACbmObPwTwt1waOmRdWWQljOjXuyTxLv/Uaya
+ 38Bhe9yffCk/ziEuZr0TzulPllFZiAW9EKI4EyXvI+teHRDG5YFN11WLk5sUmEGXZ9NB0ihyc
+ h6dHCYwhrvM4/ppcBLn33kngBHHBIyfAyLRPU4jCJkfF3HKiYW+AybL2khPMv5tG6VZ38wl/c
+ KKrkqVACzEFDXnQauvowGQbHm8H8Vndqgf4c4e3WQ=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 217.72.192.73
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,46 +124,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marcel Apfelbaum <marcel@redhat.com>, qemu-trivial@nongnu.org,
- qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, qemu-devel <qemu-devel@nongnu.org>,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 06/11/2019 à 13:46, Greg Kurz a écrit :
-> If memory allocation fails when using -mem-path, QEMU is supposed to print
-> out a message to indicate that fallback to anonymous RAM is deprecated. This
-> is done with error_printf() which does output buffering. As a consequence,
-> the message is only printed at the next flush, eg. when quiting QEMU, and
-> it also lacks a trailing newline:
+Le 08/11/2019 à 16:15, Markus Armbruster a écrit :
+> Jan Kiszka <jan.kiszka@siemens.com> writes:
 > 
-> qemu-system-ppc64: unable to map backing store for guest RAM: Cannot allocate memory
-> qemu-system-ppc64: warning: falling back to regular RAM allocation
-> QEMU 4.1.50 monitor - type 'help' for more information
-> (qemu) q
-> This is deprecated. Make sure that -mem-path  specified path has sufficient resources to allocate -m specified RAM amountgreg@boss02:~/Work/qemu/qemu-spapr$
+>> On 03.08.19 15:22, Jan Kiszka wrote:
+>>> From: Jan Kiszka <jan.kiszka@siemens.com>
+>>>
+>>> Allows to shutdown a foreground session via ctrl-c.
+>>>
+>>> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+>>> ---
+>>>
+>>> Changes in v2:
+>>>   - adjust error message
+>>>
+>>>   contrib/ivshmem-server/main.c | 5 +++--
+>>>   1 file changed, 3 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/contrib/ivshmem-server/main.c b/contrib/ivshmem-server/main.c
+>>> index 197c79c57e..e4cd35f74c 100644
+>>> --- a/contrib/ivshmem-server/main.c
+>>> +++ b/contrib/ivshmem-server/main.c
+>>> @@ -223,8 +223,9 @@ main(int argc, char *argv[])
+>>>       sa_quit.sa_handler = ivshmem_server_quit_cb;
+>>>       sa_quit.sa_flags = 0;
+>>>       if (sigemptyset(&sa_quit.sa_mask) == -1 ||
+>>> -        sigaction(SIGTERM, &sa_quit, 0) == -1) {
+>>> -        perror("failed to add SIGTERM handler; sigaction");
+>>> +        sigaction(SIGTERM, &sa_quit, 0) == -1 ||
+>>> +        sigaction(SIGINT, &sa_quit, 0) == -1) {
+>>> +        perror("failed to add signal handler; sigaction");
+>>>           goto err;
+>>>       }
+>>>
+>>> --
+>>> 2.16.4
+>>>
+>>>
+>>
+>> ...and this one for you as well, Markus?
 > 
-> Add the missing \n to fix both issues.
-> 
-> Fixes: cb79224b7e4b "deprecate -mem-path fallback to anonymous RAM"
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  hw/core/numa.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/numa.c b/hw/core/numa.c
-> index 038c96d4abc6..e3332a984f7c 100644
-> --- a/hw/core/numa.c
-> +++ b/hw/core/numa.c
-> @@ -503,7 +503,7 @@ static void allocate_system_memory_nonnuma(MemoryRegion *mr, Object *owner,
->              warn_report("falling back to regular RAM allocation");
->              error_printf("This is deprecated. Make sure that -mem-path "
->                           " specified path has sufficient resources to allocate"
-> -                         " -m specified RAM amount");
-> +                         " -m specified RAM amount\n");
->              /* Legacy behavior: if allocation failed, fall back to
->               * regular RAM allocation.
->               */
+> Cc: qemu-trivial
 > 
 > 
 
