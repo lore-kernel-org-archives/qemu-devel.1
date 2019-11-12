@@ -2,81 +2,83 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E36FCC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:40:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34E89C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:42:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC9E420650
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:40:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F08D721783
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:42:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L1Iezslw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC9E420650
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fnu0oc/5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F08D721783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUSet-0007ZG-Sa
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:40:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49491)
+	id 1iUSgw-0000Jg-4J
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:42:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49917)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iUSe2-0006NE-BF
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:39:31 -0500
+ (envelope-from <armbru@redhat.com>) id 1iUSgE-0008Gc-VC
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:41:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iUSe0-0007yR-9M
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:39:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33900
+ (envelope-from <armbru@redhat.com>) id 1iUSgD-0000Tl-ON
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:41:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21825
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iUSdz-0007y8-VX
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:39:28 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iUSgD-0000Tc-LC
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:41:45 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573551567;
+ s=mimecast20190719; t=1573551705;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LM/+iaXxJ6sy6RVvMX055G/edcyt+JOeVXrhbN5Be4M=;
- b=L1IezslwyiLmnQJAKTZaMmkrAuyGXKBGCov9SL7peMZV7SUGkSBa2wUhEMHVHiNGPFKyrC
- hJQqmR4W6FDTOiwHLpAn+Ac5ercci2gbDdiq2D73ZN51XX18j8TGTVsUQgO9kGt7lNeqEU
- UxL4Xc2YoumXcJke6fOq+OEaiZ+SoTs=
+ bh=8UXxo8FrUQvRaOHwGklG7BVo4Yld+bP5q25dZ424V5g=;
+ b=Fnu0oc/5XBSMcoZAuuPHTjD6dcGMYnc1tD+8mmzFm78Ryc108TX98anfJC5XESWgZEGKVi
+ 9BQD5S3yCmnKAiq/3PRvPuL9hcivSzr41NmgSIpsSnoTf64Gew0n/9Si74o2S9Rx1SeGvo
+ OwEYL6BA38MS1Va+HKKcmjicHamo5Ps=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-400-xskc6DZqO-aD49nX8DHtDg-1; Tue, 12 Nov 2019 04:39:23 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-169-mqykLXTOOrax-dsw6KB9YQ-1; Tue, 12 Nov 2019 04:41:42 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C31A4DC20;
- Tue, 12 Nov 2019 09:39:22 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-43.ams2.redhat.com [10.36.117.43])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DACFD100EBCC;
- Tue, 12 Nov 2019 09:39:13 +0000 (UTC)
-Date: Tue, 12 Nov 2019 10:39:12 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Subject: Re: [PATCH v6 1/3] block: introduce compress filter driver
-Message-ID: <20191112093912.GC5364@linux.fritz.box>
-References: <1573488277-794975-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1573488277-794975-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5251485EE92;
+ Tue, 12 Nov 2019 09:41:41 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E9B9460872;
+ Tue, 12 Nov 2019 09:41:40 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 76B891138648; Tue, 12 Nov 2019 10:41:39 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [RFC PATCH 16/18] qapi: Create 'pragma' module
+References: <20191017130204.16131-1-kwolf@redhat.com>
+ <20191017130204.16131-17-kwolf@redhat.com>
+Date: Tue, 12 Nov 2019 10:41:39 +0100
+In-Reply-To: <20191017130204.16131-17-kwolf@redhat.com> (Kevin Wolf's message
+ of "Thu, 17 Oct 2019 15:02:02 +0200")
+Message-ID: <87mud1juss.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <1573488277-794975-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: xskc6DZqO-aD49nX8DHtDg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: mqykLXTOOrax-dsw6KB9YQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,61 +90,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, qemu-block@nongnu.org, armbru@redhat.com,
- qemu-devel@nongnu.org, den@openvz.org, mreitz@redhat.com
+Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 11.11.2019 um 17:04 hat Andrey Shinkevich geschrieben:
-> Allow writing all the data compressed through the filter driver.
-> The written data will be aligned by the cluster size.
-> Based on the QEMU current implementation, that data can be written to
-> unallocated clusters only. May be used for a backup job.
->=20
-> Suggested-by: Max Reitz <mreitz@redhat.com>
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Kevin Wolf <kwolf@redhat.com> writes:
 
-> +static BlockDriver bdrv_compress =3D {
-> +    .format_name                        =3D "compress",
+> We want to share the whitelists between the system emulator schema and
+> the storage daemon schema, so move all the pragmas from the main schema
+> file into a separate file that can be included from both.
+
+Confusing because the storage daemon schema doesn't exist at this point.
+PATCH 13's commit message has the same issue.
+
+I'll revisit this when I review PATCH 18.
+
+>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/pragma.json      | 24 ++++++++++++++++++++++++
+>  qapi/qapi-schema.json | 25 +------------------------
+>  qapi/Makefile.objs    |  2 +-
+>  3 files changed, 26 insertions(+), 25 deletions(-)
+>  create mode 100644 qapi/pragma.json
+>
+> diff --git a/qapi/pragma.json b/qapi/pragma.json
+> new file mode 100644
+> index 0000000000..cffae27666
+> --- /dev/null
+> +++ b/qapi/pragma.json
+> @@ -0,0 +1,24 @@
+> +{ 'pragma': { 'doc-required': true } }
 > +
-> +    .bdrv_open                          =3D zip_open,
-> +    .bdrv_child_perm                    =3D zip_child_perm,
+> +# Whitelists to permit QAPI rule violations; think twice before you
+> +# add to them!
+> +{ 'pragma': {
+> +    # Commands allowed to return a non-dictionary:
+> +    'returns-whitelist': [
+> +        'human-monitor-command',
+> +        'qom-get',
+> +        'query-migrate-cache-size',
+> +        'query-tpm-models',
+> +        'query-tpm-types',
+> +        'ringbuf-read' ],
+> +    'name-case-whitelist': [
+> +        'ACPISlotType',             # DIMM, visible through query-acpi-o=
+spm-status
+> +        'CpuInfoMIPS',              # PC, visible through query-cpu
+> +        'CpuInfoTricore',           # PC, visible through query-cpu
+> +        'BlockdevVmdkSubformat',    # all members, to match VMDK spec sp=
+ellings
+> +        'BlockdevVmdkAdapterType',  # legacyESX, to match VMDK spec spel=
+lings
+> +        'QapiErrorClass',           # all members, visible through error=
+s
+> +        'UuidInfo',                 # UUID, visible through query-uuid
+> +        'X86CPURegister32',         # all members, visible indirectly th=
+rough qom-get
+> +        'CpuInfo'                   # CPU, visible through query-cpu
+> +    ] } }
+> diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+> index be90422ffe..85b4048535 100644
+> --- a/qapi/qapi-schema.json
+> +++ b/qapi/qapi-schema.json
+> @@ -49,30 +49,7 @@
+>  #
+>  ##
+> =20
+> -{ 'pragma': { 'doc-required': true } }
+> -
+> -# Whitelists to permit QAPI rule violations; think twice before you
+> -# add to them!
+> -{ 'pragma': {
+> -    # Commands allowed to return a non-dictionary:
+> -    'returns-whitelist': [
+> -        'human-monitor-command',
+> -        'qom-get',
+> -        'query-migrate-cache-size',
+> -        'query-tpm-models',
+> -        'query-tpm-types',
+> -        'ringbuf-read' ],
+> -    'name-case-whitelist': [
+> -        'ACPISlotType',             # DIMM, visible through query-acpi-o=
+spm-status
+> -        'CpuInfoMIPS',              # PC, visible through query-cpu
+> -        'CpuInfoTricore',           # PC, visible through query-cpu
+> -        'BlockdevVmdkSubformat',    # all members, to match VMDK spec sp=
+ellings
+> -        'BlockdevVmdkAdapterType',  # legacyESX, to match VMDK spec spel=
+lings
+> -        'QapiErrorClass',           # all members, visible through error=
+s
+> -        'UuidInfo',                 # UUID, visible through query-uuid
+> -        'X86CPURegister32',         # all members, visible indirectly th=
+rough qom-get
+> -        'CpuInfo'                   # CPU, visible through query-cpu
+> -    ] } }
+> +{ 'include': 'pragma.json' }
+> =20
+>  # Documentation generated with qapi-gen.py is in source order, with
+>  # included sub-schemas inserted at the first include directive
+> diff --git a/qapi/Makefile.objs b/qapi/Makefile.objs
+> index 519b6f1a8e..3e04e299ed 100644
+> --- a/qapi/Makefile.objs
+> +++ b/qapi/Makefile.objs
+> @@ -7,7 +7,7 @@ util-obj-y +=3D qapi-util.o
+> =20
+>  QAPI_COMMON_MODULES =3D audio authz block-core block char common crypto
+>  QAPI_COMMON_MODULES +=3D dump error introspect job machine migration mis=
+c monitor
+> -QAPI_COMMON_MODULES +=3D net qdev qom rdma rocker run-state sockets tpm
+> +QAPI_COMMON_MODULES +=3D net pragma qdev qom rdma rocker run-state socke=
+ts tpm
+>  QAPI_COMMON_MODULES +=3D trace transaction ui
+>  QAPI_TARGET_MODULES =3D machine-target misc-target
+>  QAPI_MODULES =3D $(QAPI_COMMON_MODULES) $(QAPI_TARGET_MODULES)
 
-Why do you call the functions zip_* when the driver is called compress?
-I think zip would be a driver for zip archives, which we don't use here.
+Only works because we accept and ignore names in these whitelists that
+don't exist in the schema.
 
-> +    .bdrv_getlength                     =3D zip_getlength,
-> +    .bdrv_co_truncate                   =3D zip_co_truncate,
-> +
-> +    .bdrv_co_preadv                     =3D zip_co_preadv,
-> +    .bdrv_co_preadv_part                =3D zip_co_preadv_part,
-> +    .bdrv_co_pwritev                    =3D zip_co_pwritev,
-> +    .bdrv_co_pwritev_part               =3D zip_co_pwritev_part,
-
-If you implement .bdrv_co_preadv/pwritev_part, isn't the implementation
-of .bdrv_co_preadv/pwritev (without _part) dead code?
-
-> +    .bdrv_co_pwrite_zeroes              =3D zip_co_pwrite_zeroes,
-> +    .bdrv_co_pdiscard                   =3D zip_co_pdiscard,
-> +    .bdrv_refresh_limits                =3D zip_refresh_limits,
-> +
-> +    .bdrv_eject                         =3D zip_eject,
-> +    .bdrv_lock_medium                   =3D zip_lock_medium,
-> +
-> +    .bdrv_co_block_status               =3D bdrv_co_block_status_from_ba=
-cking,
-
-Why not use bs->file? (Well, apart from the still not merged filter
-series by Max...)
-
-> +    .bdrv_recurse_is_first_non_filter   =3D zip_recurse_is_first_non_fil=
-ter,
-> +
-> +    .has_variable_length                =3D true,
-> +    .is_filter                          =3D true,
-> +};
-
-Kevin
+Which parts of the whitelists are actually needed in the storage daemon?
 
 
