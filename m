@@ -2,90 +2,101 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE9A3C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:06:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8760BC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:16:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A575D2067B
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:06:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A575D2067B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4CDA721872
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:16:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HCe1354P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CDA721872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38740 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUaYb-0001IY-Qf
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 13:06:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38250)
+	id 1iUaig-0003f4-Ho
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 13:16:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39162)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iUaXm-0000lw-G1
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:05:36 -0500
+ (envelope-from <philmd@redhat.com>) id 1iUahH-0002nE-4M
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:15:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iUaXk-0001Oa-FP
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:05:34 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13526)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
- id 1iUaXf-0001Cl-9T; Tue, 12 Nov 2019 13:05:27 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- xACHxAWE031860; Tue, 12 Nov 2019 13:05:25 -0500
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2w7yxumc98-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 12 Nov 2019 13:05:24 -0500
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xACI5C39010454;
- Tue, 12 Nov 2019 18:05:23 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma03dal.us.ibm.com with ESMTP id 2w5n36h617-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 12 Nov 2019 18:05:23 +0000
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xACI5MrY46399960
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 12 Nov 2019 18:05:22 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 46334BE04F;
- Tue, 12 Nov 2019 18:05:22 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2282ABE051;
- Tue, 12 Nov 2019 18:05:22 +0000 (GMT)
-Received: from localhost (unknown [9.53.179.218])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 12 Nov 2019 18:05:21 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+ (envelope-from <philmd@redhat.com>) id 1iUahE-0008QM-Kd
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:15:21 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21351
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iUahE-0008Py-Gp
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:15:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573582519;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Z2kV4bgB3Kt8d3doWvMF/1U6nS/1sXhYK9iHIqH0u1k=;
+ b=HCe1354Pq+Z0BHDPIoAP5YFz+l1s0tEbtl+gv9aMyEInr1P/O1dzlRM7nvok0V/D9MWtZz
+ K9RzoNB0OGnl3zfLGl6F+77uFs14oRajfzZJvpxNNhbd8fP4kCn2OT8vqk8EqcSmanfA1P
+ VyIjYi1PYxWoehCvzSqcsvBe77x2+j0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-46fkVoOCNPKYN_3iKgT56w-1; Tue, 12 Nov 2019 13:15:16 -0500
+Received: by mail-wr1-f72.google.com with SMTP id 92so12453566wro.14
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 10:15:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=E/su7BECqHJSJlTrUQrP5nwzf0jEfOkcU1V5I6cKnd8=;
+ b=oeGGCIYuHU22luYosVt7EL92R4LkBRKigiKXUlhllqZV38ADSfapeB3PnOI7Bx1mBj
+ 3G3DISMaQ+uzuv/PAPYfmr2Pp0oifV4OGNeVuyYwcxQI/CBw+F2whGLQpnom9UH5wFq0
+ hoJusEyzWTnXyES1TBipCXzXyr1cxWkRUr+mE31IFmejSb5FPhKifeOWpYhhWDvHegeK
+ CpfkUIodrBcmBGGkNx7oAGwYO1aDLer0+ke7JMS1ocubD3QnLAxwULDg1BO2arCPIs7U
+ ZLb5A0E8DkmdyzhdIlwNPjHF4VwB7+812VZ3mqst90JtfSLYUkQl7V7dC/cgUjo9vhHj
+ HBMA==
+X-Gm-Message-State: APjAAAWTQ7ih432qDME4qPka/89jPSqgQagBvfXw05sMZ3rFOOzeTSfZ
+ LqhY4qMugdSwpaiAE0fnm1Q/zN+69wCDfRuB/UYAxPlPeWeKndU0Oj3DCAQLnicKG4Jc19Fg6tL
+ yIqQsJ1B1iMLLcOg=
+X-Received: by 2002:a1c:808d:: with SMTP id b135mr4959140wmd.175.1573582515464; 
+ Tue, 12 Nov 2019 10:15:15 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxUM5BJz2eUgqst4NOsziroWcD6U+k0CwRQwdPb00g3ndX4SwQtPmNREK1ddAMwZZhbJfTRzg==
+X-Received: by 2002:a1c:808d:: with SMTP id b135mr4959106wmd.175.1573582515230; 
+ Tue, 12 Nov 2019 10:15:15 -0800 (PST)
+Received: from [192.168.1.35] (170.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.170])
+ by smtp.gmail.com with ESMTPSA id z4sm4309921wmf.36.2019.11.12.10.15.14
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 12 Nov 2019 10:15:14 -0800 (PST)
+Subject: Re: [PATCH v7 3/8] Acceptance tests: use avocado tags for machine type
+To: Cleber Rosa <crosa@redhat.com>
+References: <20191104151323.9883-1-crosa@redhat.com>
+ <20191104151323.9883-4-crosa@redhat.com>
+ <b1730ec3-51ce-719b-81ca-e24194283ec7@redhat.com>
+ <20191111214957.GC19559@localhost.localdomain>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ebd5af02-c0cc-813b-1fd0-5e9768833e9d@redhat.com>
+Date: Tue, 12 Nov 2019 19:15:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
+In-Reply-To: <20191111214957.GC19559@localhost.localdomain>
+Content-Language: en-US
+X-MC-Unique: 46fkVoOCNPKYN_3iKgT56w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-To: qemu-devel@nongnu.org
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20191105205243.3766-1-mdroth@linux.vnet.ibm.com>
-References: <20191105205243.3766-1-mdroth@linux.vnet.ibm.com>
-Message-ID: <157358191470.15278.15115766530719237134@sif>
-User-Agent: alot/0.7
-Subject: Re: [PATCH 00/55] Patch Round-up for stable 4.1.1,
- freeze on 2019-11-12
-Date: Tue, 12 Nov 2019 12:05:14 -0600
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-11-12_06:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911120154
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,322 +108,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org
+Cc: Beraldo Leal <bleal@redhat.com>, qemu-devel@nongnu.org,
+ Fabien Chouteau <chouteau@adacore.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Willian Rampazzo <wrampazz@redhat.com>, qemu-ppc@nongnu.org,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Quoting Michael Roth (2019-11-05 14:51:48)
-> Hi everyone,
-> =
-
-> The following new patches are queued for QEMU stable v4.1.1:
-> =
-
->   https://github.com/mdroth/qemu/commits/stable-4.1-staging
-> =
-
-> The release is tentatively planned for 2019-11-14:
-> =
-
->   https://wiki.qemu.org/Planning/4.1
-> =
-
-> Please note that the original release date was planned for 2019-11-21,
-> but was moved up to address a number of qcow2 corruption issues:
-> =
-
->   https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg07144.html
-> =
-
-> Fixes for the XFS issues noted in the thread are still pending, but will
-> hopefully be qemu.git master in time for 4.1.1 freeze and the
-> currently-scheduled release date for 4.2.0-rc1.
-> =
-
-> The list of still-pending patchsets being tracked for inclusion are:
-> =
-
->   qcow2: Fix data corruption on XFS
->     https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg00073.html
->     (PULL pending)
->   qcow2: Fix QCOW2_COMPRESSED_SECTOR_MASK
->     https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg07718.html
->   qcow2-bitmap: Fix uint64_t left-shift overflow
->     https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg07989.html
-> =
-
-> Please respond here or CC qemu-stable@nongnu.org on any additional patches
-> you think should be included in the release.
-
-The following additional patches have been pushed to the staging tree:
-
-  tests: make filemonitor test more robust to event ordering
-  block: posix: Always allocate the first block
-  file-posix: Handle undetectable alignment
-  block/file-posix: Let post-EOF fallocate serialize
-  block: Add bdrv_co_get_self_request()
-  block: Make wait/mark serialising requests public
-  block/io: refactor padding
-  util/iov: improve qemu_iovec_is_zero
-  util/iov: introduce qemu_iovec_init_extended
-  qcow2-bitmap: Fix uint64_t left-shift overflow
-  iotests: Add peek_file* functions
-  iotests: Add test for 4G+ compressed qcow2 write
-  qcow2: Fix QCOW2_COMPRESSED_SECTOR_MASK
-
-Thank you for the suggestions.
-
-> =
-
-> Thanks!
-> =
-
-> ----------------------------------------------------------------
-> Adrian Moreno (1):
->       vhost-user: save features if the char dev is closed
-> =
-
-> Alberto Garcia (1):
->       qcow2: Fix the calculation of the maximum L2 cache size
-> =
-
-> Anthony PERARD (1):
->       xen-bus: Fix backend state transition on device reset
-> =
-
-> Aurelien Jarno (1):
->       target/alpha: fix tlb_fill trap_arg2 value for instruction fetch
-> =
-
-> Christophe Lyon (1):
->       target/arm: Allow reading flags from FPSCR for M-profile
-> =
-
-> David Hildenbrand (1):
->       s390x/tcg: Fix VERIM with 32/64 bit elements
-> =
-
-> Eduardo Habkost (1):
->       pc: Don't make die-id mandatory unless necessary
-> =
-
-> Fan Yang (1):
->       COLO-compare: Fix incorrect `if` logic
-> =
-
-> Hikaru Nishida (1):
->       ui: Fix hanging up Cocoa display on macOS 10.15 (Catalina)
-> =
-
-> Igor Mammedov (1):
->       x86: do not advertise die-id in query-hotpluggbale-cpus if '-smp di=
-es' is not set
-> =
-
-> Johannes Berg (1):
->       libvhost-user: fix SLAVE_SEND_FD handling
-> =
-
-> John Snow (2):
->       Revert "ide/ahci: Check for -ECANCELED in aio callbacks"
->       iotests: add testing shim for script-style python tests
-> =
-
-> Kevin Wolf (4):
->       coroutine: Add qemu_co_mutex_assert_locked()
->       qcow2: Fix corruption bug in qcow2_detect_metadata_preallocation()
->       block/snapshot: Restrict set of snapshot nodes
->       iotests: Test internal snapshots with -blockdev
-> =
-
-> Markus Armbruster (1):
->       pr-manager: Fix invalid g_free() crash bug
-> =
-
-> Matthew Rosato (1):
->       s390: PCI: fix IOMMU region init
-> =
-
-> Max Filippov (1):
->       target/xtensa: regenerate and re-import test_mmuhifi_c3 core
-> =
-
-> Max Reitz (16):
->       block/file-posix: Reduce xfsctl() use
->       iotests: Test reverse sub-cluster qcow2 writes
->       vpc: Return 0 from vpc_co_create() on success
->       iotests: Add supported protocols to execute_test()
->       iotests: Restrict file Python tests to file
->       iotests: Restrict nbd Python tests to nbd
->       iotests: Test blockdev-create for vpc
->       curl: Keep pointer to the CURLState in CURLSocket
->       curl: Keep *socket until the end of curl_sock_cb()
->       curl: Check completion in curl_multi_do()
->       curl: Pass CURLSocket to curl_multi_do()
->       curl: Report only ready sockets
->       curl: Handle success in multi_check_completion
->       qcow2: Limit total allocation range to INT_MAX
->       iotests: Test large write request to qcow2 file
->       mirror: Do not dereference invalid pointers
-> =
-
-> Maxim Levitsky (1):
->       block/qcow2: Fix corruption introduced by commit 8ac0f15f335
-> =
-
-> Michael Roth (2):
->       make-release: pull in edk2 submodules so we can build it from tarba=
-lls
->       roms/Makefile.edk2: don't pull in submodules when building from tar=
-ball
-> =
-
-> Michael S. Tsirkin (1):
->       virtio: new post_load hook
-> =
-
-> Mikhail Sennikovsky (1):
->       virtio-net: prevent offloads reset on migration
-> =
-
-> Paolo Bonzini (2):
->       dma-helpers: ensure AIO callback is invoked after cancellation
->       scsi: lsi: exit infinite loop while executing script (CVE-2019-1206=
-8)
-> =
-
-> Paul Durrant (1):
->       xen-bus: check whether the frontend is active during device reset...
-> =
-
-> Peter Lieven (1):
->       block/nfs: tear down aio before nfs_close
-> =
-
-> Peter Maydell (3):
->       target/arm: Free TCG temps in trans_VMOV_64_sp()
->       target/arm: Don't abort on M-profile exception return in linux-user=
- mode
->       hw/arm/boot.c: Set NSACR.{CP11,CP10} for NS kernel boots
-> =
-
-> Philippe Mathieu-Daud=C3=A9 (1):
->       virtio-blk: Cancel the pending BH when the dataplane is reset
-> =
-
-> Sergio Lopez (1):
->       blockjob: update nodes head while removing all bdrv
-> =
-
-> Thomas Huth (1):
->       hw/core/loader: Fix possible crash in rom_copy()
-> =
-
-> Vladimir Sementsov-Ogievskiy (4):
->       block/backup: fix max_transfer handling for copy_range
->       block/backup: fix backup_cow_with_offload for last cluster
->       util/hbitmap: strict hbitmap_reset
->       hbitmap: handle set/reset with zero length
-> =
-
->  block/backup.c                                     |   17 +-
->  block/curl.c                                       |  125 +-
->  block/file-posix.c                                 |   77 +-
->  block/mirror.c                                     |   13 +-
->  block/nfs.c                                        |    6 +-
->  block/qcow2-cluster.c                              |   12 +-
->  block/qcow2-refcount.c                             |    2 +
->  block/qcow2.c                                      |    9 +-
->  block/snapshot.c                                   |   26 +-
->  block/vpc.c                                        |    3 +-
->  blockjob.c                                         |   17 +-
->  contrib/libvhost-user/libvhost-user.c              |    3 +-
->  dma-helpers.c                                      |   13 +-
->  hw/arm/boot.c                                      |    2 +
->  hw/block/dataplane/virtio-blk.c                    |    3 +
->  hw/core/loader.c                                   |    2 +-
->  hw/i386/pc.c                                       |   14 +-
->  hw/ide/ahci.c                                      |    3 -
->  hw/ide/core.c                                      |   14 -
->  hw/net/virtio-net.c                                |   27 +-
->  hw/s390x/s390-pci-bus.c                            |    7 +-
->  hw/scsi/lsi53c895a.c                               |   41 +-
->  hw/virtio/virtio.c                                 |    7 +
->  hw/xen/xen-bus.c                                   |   23 +-
->  include/hw/virtio/virtio-net.h                     |    2 +
->  include/hw/virtio/virtio.h                         |    6 +
->  include/qemu/coroutine.h                           |   15 +
->  include/qemu/hbitmap.h                             |    5 +
->  net/colo-compare.c                                 |    6 +-
->  net/vhost-user.c                                   |    4 +
->  roms/Makefile.edk2                                 |    7 +-
->  scripts/make-release                               |    8 +
->  scsi/pr-manager.c                                  |    1 -
->  target/alpha/helper.c                              |    4 +-
->  target/arm/translate-vfp.inc.c                     |    7 +-
->  target/arm/translate.c                             |   21 +-
->  target/s390x/translate_vx.inc.c                    |    2 +-
->  target/xtensa/core-test_mmuhifi_c3.c               |    3 +-
->  target/xtensa/core-test_mmuhifi_c3/core-isa.h      |  116 +-
->  .../xtensa/core-test_mmuhifi_c3/gdb-config.inc.c   |  114 +-
->  .../core-test_mmuhifi_c3/xtensa-modules.inc.c      | 6384 ++++++++++----=
-------
->  tests/acceptance/pc_cpu_hotplug_props.py           |   35 +
->  tests/qemu-iotests/030                             |    3 +-
->  tests/qemu-iotests/040                             |    3 +-
->  tests/qemu-iotests/041                             |    3 +-
->  tests/qemu-iotests/044                             |    3 +-
->  tests/qemu-iotests/045                             |    3 +-
->  tests/qemu-iotests/055                             |    3 +-
->  tests/qemu-iotests/056                             |    3 +-
->  tests/qemu-iotests/057                             |    3 +-
->  tests/qemu-iotests/065                             |    3 +-
->  tests/qemu-iotests/096                             |    3 +-
->  tests/qemu-iotests/118                             |    3 +-
->  tests/qemu-iotests/124                             |    3 +-
->  tests/qemu-iotests/129                             |    3 +-
->  tests/qemu-iotests/132                             |    3 +-
->  tests/qemu-iotests/139                             |    3 +-
->  tests/qemu-iotests/147                             |    5 +-
->  tests/qemu-iotests/148                             |    3 +-
->  tests/qemu-iotests/151                             |    3 +-
->  tests/qemu-iotests/152                             |    3 +-
->  tests/qemu-iotests/155                             |    3 +-
->  tests/qemu-iotests/163                             |    3 +-
->  tests/qemu-iotests/165                             |    3 +-
->  tests/qemu-iotests/169                             |    3 +-
->  tests/qemu-iotests/196                             |    3 +-
->  tests/qemu-iotests/199                             |    3 +-
->  tests/qemu-iotests/205                             |    3 +-
->  tests/qemu-iotests/245                             |    3 +-
->  tests/qemu-iotests/265                             |   67 +
->  tests/qemu-iotests/265.out                         |    6 +
->  tests/qemu-iotests/266                             |  153 +
->  tests/qemu-iotests/266.out                         |  137 +
->  tests/qemu-iotests/267                             |  168 +
->  tests/qemu-iotests/267.out                         |  182 +
->  tests/qemu-iotests/270                             |   83 +
->  tests/qemu-iotests/270.out                         |    9 +
->  tests/qemu-iotests/common.filter                   |   11 +-
->  tests/qemu-iotests/group                           |    4 +
->  tests/qemu-iotests/iotests.py                      |   42 +-
->  tests/test-hbitmap.c                               |    2 +-
->  ui/cocoa.m                                         |   12 +
->  util/hbitmap.c                                     |   12 +
->  83 files changed, 4663 insertions(+), 3514 deletions(-)
->  create mode 100644 tests/acceptance/pc_cpu_hotplug_props.py
->  create mode 100755 tests/qemu-iotests/265
->  create mode 100644 tests/qemu-iotests/265.out
->  create mode 100755 tests/qemu-iotests/266
->  create mode 100644 tests/qemu-iotests/266.out
->  create mode 100755 tests/qemu-iotests/267
->  create mode 100644 tests/qemu-iotests/267.out
->  create mode 100755 tests/qemu-iotests/270
->  create mode 100644 tests/qemu-iotests/270.out
-> =
-
-> =
-
+On 11/11/19 10:49 PM, Cleber Rosa wrote:
+> On Fri, Nov 08, 2019 at 02:20:45PM +0100, Philippe Mathieu-Daud=E9 wrote:
+>>> @@ -310,7 +302,7 @@ class BootLinuxConsole(Test):
+>>>        def test_arm_emcraft_sf2(self):
+>>>            """
+>>>            :avocado: tags=3Darch:arm
+>>> -        :avocado: tags=3Dmachine:emcraft_sf2
+>>> +        :avocado: tags=3Dmachine:emcraft-sf2
+>>
+>> Maybe add a comment about this change, "Since avocado 72(?) we can ... s=
+o
+>> use ..."
+>>
 >=20
+> You mean on this specific test docstring?  I'm confused if there's a
+
+No! Just in the commit description :)
+
+> special reason for doing it here, of if you're suggesting adding a
+> similar command to all tag entries which make use of the extended
+> character set (which I think would be too verbose, repetitve, and hard
+> to maintain).
+>=20
+>>> diff --git a/tests/acceptance/cpu_queries.py b/tests/acceptance/cpu_que=
+ries.py
+>>> index af47d2795a..293dccb89a 100644
+>>> --- a/tests/acceptance/cpu_queries.py
+>>> +++ b/tests/acceptance/cpu_queries.py
+>>> @@ -20,8 +20,8 @@ class QueryCPUModelExpansion(Test):
+>>>        def test(self):
+>>>            """
+>>>            :avocado: tags=3Darch:x86_64
+>>> +        :avocado: tags=3Dmachine:none
+>>
+>> Not to confuse with None :)
+>>
+>=20
+> Yep! :)
+>=20
+> - Cleber.
+>=20
+
 
