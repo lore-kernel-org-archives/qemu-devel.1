@@ -2,96 +2,80 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C1B7C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:57:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75110C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:58:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8F3B20818
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:57:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F26820818
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:58:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P3cnUr3O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8F3B20818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pqkQGZ6S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F26820818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUUo0-000521-So
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 06:57:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38746)
+	id 1iUUoM-0005XT-Cu
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 06:58:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38786)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iUUnG-0004LP-Hz
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:57:11 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iUUnX-0004ZT-Rq
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:57:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iUUnD-0000dh-Sy
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:57:08 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28243
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iUUnD-0000dT-HM
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:57:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573559826;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Wzs8lJkoQadgyqQ+6CYM8vuQF90xsOpSjkIHYpXYnUg=;
- b=P3cnUr3O4LQwGdvj9qo7GECI+zYEJXpoz3MHEUoE45/TRQbz8QrbxhhANsKZ/9dv1G1c/h
- lICbXX8rByIho8yNvsVy3tO0JpiT9dU2MurcGb4WI+lMSJsQHgBittg0bgivu3z/ciUOnu
- s7vzBnEdmHYk47ewpoWK457Q5cVWj2k=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-7CmWAS8fPiCw9n947Aj5eA-1; Tue, 12 Nov 2019 06:57:05 -0500
-Received: by mail-wr1-f70.google.com with SMTP id b4so11721205wrn.8
- for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 03:57:05 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1iUUnW-0000hw-HO
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:57:27 -0500
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:43769)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iUUnV-0000he-VU
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:57:26 -0500
+Received: by mail-ot1-x343.google.com with SMTP id l14so14031807oti.10
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 03:57:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=mHpwGMoPzVkjMtJKGRfojVDKC+X1kuu8azyLDSIFOE4=;
+ b=pqkQGZ6STXIyXNO4PMpO1Yen/Pj4jbOobXe9Pewp56aTepFfn964MHsmDQCZAN5uhq
+ R8PU4Xjs1cKsQGQdrT3PcNJdxL+gcs+psvSXjRtR9vsIk78uozNerRKc+rDnegADqX+s
+ 3UHPthspSxA0Tkah9vqod3p6lF09oycDAQgdoP9pCe5nZm2+SVen6HDiSEYNd7tlDEVM
+ GH+ddjvWFSvkOtomPc5gpV7ZZI7c/2fNeLnb9007YUIw3HJwwviECrvWowzI6mlmCSW6
+ 5nHNy2pddcqZ8Zd8YY5V1d/wX09sjI9TYmR41N1Xm7IRPkMKf+OE9gbMkkRInoSnhIGf
+ MsFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version;
- bh=fRRWibjhMYah7FVG3z/hGlGYki3qe/QauVO3dHWuZl0=;
- b=WuKATh1l6sF7euByqzKBl/sdW05Ww2gLKdM4/cBziKvXHG9tKMESm76xCm5UO8ltlx
- F2DTztGl303KBOVbu/lkN3wfoPpYPDHSGLG0o9wkRnC4vYq6n7PWHhusGTBGhfFcG+9x
- KDgkfKJYVqPuZqAz2kliC7GVb/9m/N6v1KhD1MF5VoKpvZFe6fbcG14+jHYQWwBm+ocl
- z1oX6Z4DeUwkiMAzsk9sA9jF5Q87fummBR0GIfGtaYCUZe3EHuUfegHvwZLNPH17ikA6
- 2aaXlpal77OmGcWl5tIEJ7EiO1Wp+2HMfMc7UEzqKUfURIUpTGUdoFHBD6gCr+IvkdCC
- DG1A==
-X-Gm-Message-State: APjAAAX+sw3Q9gW9bkAJn3z30Sr7UDxJ1MwVLT2GI1ijqjK+4rXN8Hsn
- Tgc53Swiw2WLm2pXaCJYNlxN8uVdzTX5PX+MLwvZSasu8vsM4r54i9E7RAahJ5MsO5N/ZB2bTyr
- IPwj7ynOln0bmo1o=
-X-Received: by 2002:adf:dd10:: with SMTP id a16mr26711936wrm.213.1573559823945; 
- Tue, 12 Nov 2019 03:57:03 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy0P0/FBY753WsOEv33725rNsFsWAO4+Q9TYdQ/mXHaqJxFy0umCND/t7Q9HU6Qs8Lz75myrQ==
-X-Received: by 2002:adf:dd10:: with SMTP id a16mr26711915wrm.213.1573559823734; 
- Tue, 12 Nov 2019 03:57:03 -0800 (PST)
-Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
- [95.120.215.139])
- by smtp.gmail.com with ESMTPSA id 76sm4530971wma.0.2019.11.12.03.57.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 Nov 2019 03:57:03 -0800 (PST)
-References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
- <1571925835-31930-21-git-send-email-pbonzini@redhat.com>
- <CAFEAcA-wqep+Lq93Ps=d6Cgx9bbYSNCcankbdvzoGz5T2P1_YA@mail.gmail.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 20/39] hw/i386: Introduce the microvm machine type
-In-reply-to: <CAFEAcA-wqep+Lq93Ps=d6Cgx9bbYSNCcankbdvzoGz5T2P1_YA@mail.gmail.com>
-Date: Tue, 12 Nov 2019 12:57:02 +0100
-Message-ID: <87y2wls3xt.fsf@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=mHpwGMoPzVkjMtJKGRfojVDKC+X1kuu8azyLDSIFOE4=;
+ b=ZjcXpYeEKFRjbFOtDxL3xfzbsEKt1dR3dqYmnDCSHTyNEPbycA1uWGOS767OEN+XQT
+ 3Lhh2kCyQy6LDeVxd8TLdeAy2QpSNNRkGJOVaLBy8adAzx7OW7xeLCgjcFKJtR2prIGh
+ kcC4y1Abdu1D77V35v1wtttSASbrOdvgdRm+bQYBiUjrYzjGk+p02nipr1liKmcxViVk
+ NdySSXY38uYbZcOZf8lAwP+Lhqu0VxF2AVckco6nvnbnShHAET3Vxp0lmL+twHkHdcft
+ 4u3MLz9KM+Zv2u2EokOyBdBoRJJAq/wNTayvi1pkBgf+0/ZjYSSJAEdrknD6QnI3UXVb
+ 5saA==
+X-Gm-Message-State: APjAAAUKAEOcJ1LW6i3VhbXJM+LUw8/epFjEofZLoKpz87J2SYJXK815
+ V/DqaZMEo4bR9t7lkLMlf7f76d2pGBcHSNnwClHCyg==
+X-Google-Smtp-Source: APXvYqzvWiUMaXUA0GTitEP9X7HvLd3GBuL3U28I/qW73lQTmUCNiaX1f1O5y8ulNbtk27e9AA7P9Chh2pb+cUG6Onk=
+X-Received: by 2002:a9d:7ac2:: with SMTP id m2mr15265137otn.135.1573559844701; 
+ Tue, 12 Nov 2019 03:57:24 -0800 (PST)
 MIME-Version: 1.0
-X-MC-Unique: 7CmWAS8fPiCw9n947Aj5eA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191104115228.30745-1-graf@amazon.com>
+ <CAFEAcA8zkR_MZ-28Nc=x4j05U9MsFYfzQtkHxTf65ZwacK020w@mail.gmail.com>
+ <246a7cd4-7c39-c92e-05c3-1045bca2c114@amazon.com>
+In-Reply-To: <246a7cd4-7c39-c92e-05c3-1045bca2c114@amazon.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Nov 2019 11:57:13 +0000
+Message-ID: <CAFEAcA_kwscZRqK5wTRu5WLkixGYbdV0c7mZMV6n+40DOS0-Mg@mail.gmail.com>
+Subject: Re: [PATCH] pl031: Expose RTCICR as proper WC register
+To: Alexander Graf <graf@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,91 +87,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
+Cc: Hendrik Borghorst <hborghor@amazon.de>, qemu-arm <qemu-arm@nongnu.org>,
  QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, 12 Nov 2019 at 07:28, Alexander Graf <graf@amazon.com> wrote:
+>
+> Hey Peter,
+>
+> On 08.11.19 17:58, Peter Maydell wrote:
+> > Did you find this because you had a guest that assumed the
+> > other behaviour? This bug has been in QEMU for a very long time,
+> > and it seems odd for a guest to deliberately perform an action
+> > (writing 0) which is documented to have no effect on the device...
+>
+> We found this bug by trying to find justification for the behavior in
+> the spec and apparently my spec reading skills were lacking. I could not
+> find the reference you cited above.
+>
+> So no, I did not see any guest breakage.
+>
+> I still think that being consistent with the actual PL031 spec is
+> preferable though. If any real world guest breaks because of this, we
+> can still revert this patch and document the exact breakage in the
+> comment instead.
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+Yeah, I agree; I'm essentially just gathering material
+for the commit message here. (The gold standard would be
+to go find some hardware with a real pl031 and prod it
+to confirm behaviour, but that's more effort than really
+seems justified to me.)
 
-> On Thu, 24 Oct 2019 at 16:19, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> From: Sergio Lopez <slp@redhat.com>
->>
->> microvm is a machine type inspired by Firecracker and constructed
->> after its machine model.
->>
->> It's a minimalist machine type without PCI nor ACPI support, designed
->> for short-lived guests. microvm also establishes a baseline for
->> benchmarking and optimizing both QEMU and guest operating systems,
->> since it is optimized for both boot time and footprint.
->
-> Hi; Coverity points out a memory leak in this commit
-> (CID 1407218):
->
->
->> +static void microvm_fix_kernel_cmdline(MachineState *machine)
->> +{
->> +    X86MachineState *x86ms =3D X86_MACHINE(machine);
->> +    BusState *bus;
->> +    BusChild *kid;
->> +    char *cmdline;
->> +
->> +    /*
->> +     * Find MMIO transports with attached devices, and add them to the =
-kernel
->> +     * command line.
->> +     *
->> +     * Yes, this is a hack, but one that heavily improves the UX withou=
-t
->> +     * introducing any significant issues.
->> +     */
->> +    cmdline =3D g_strdup(machine->kernel_cmdline);
->
-> Here we allocate memory for cmdline...
->
->> +    bus =3D sysbus_get_default();
->> +    QTAILQ_FOREACH(kid, &bus->children, sibling) {
->> +        DeviceState *dev =3D kid->child;
->> +        ObjectClass *class =3D object_get_class(OBJECT(dev));
->> +
->> +        if (class =3D=3D object_class_by_name(TYPE_VIRTIO_MMIO)) {
->> +            VirtIOMMIOProxy *mmio =3D VIRTIO_MMIO(OBJECT(dev));
->> +            VirtioBusState *mmio_virtio_bus =3D &mmio->bus;
->> +            BusState *mmio_bus =3D &mmio_virtio_bus->parent_obj;
->> +
->> +            if (!QTAILQ_EMPTY(&mmio_bus->children)) {
->> +                gchar *mmio_cmdline =3D microvm_get_mmio_cmdline(mmio_b=
-us->name);
->> +                if (mmio_cmdline) {
->> +                    char *newcmd =3D g_strjoin(NULL, cmdline, mmio_cmdl=
-ine, NULL);
->> +                    g_free(mmio_cmdline);
->> +                    g_free(cmdline);
->> +                    cmdline =3D newcmd;
->> +                }
->> +            }
->> +        }
->> +    }
->> +
->> +    fw_cfg_modify_i32(x86ms->fw_cfg, FW_CFG_CMDLINE_SIZE, strlen(cmdlin=
-e) + 1);
->> +    fw_cfg_modify_string(x86ms->fw_cfg, FW_CFG_CMDLINE_DATA, cmdline);
->
-> ...but fw_cfg_modify_string() takes a copy of the string it's passed,
-> so we still have ownership of 'cmdline' and need to free it here
-> to avoid a leak.
-
-Ack, will send a patch ASAP.
-
-Thanks,
-Sergio.
-
->> +}
->
-> thanks
-> -- PMM
-
+thanks
+-- PMM
 
