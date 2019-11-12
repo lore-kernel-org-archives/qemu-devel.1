@@ -2,82 +2,79 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 328E5C43331
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2AFEC17440
 	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 12:10:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC42C206BB
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 12:10:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70D3F206BB
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 12:10:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YVyW1h/D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC42C206BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OYpmTPU1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70D3F206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUV08-0001Xt-0t
+	id 1iUV08-0001Yj-Hn
 	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 07:10:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40139)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40147)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iUUz2-0000iE-G6
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 07:09:21 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iUUz3-0000iF-An
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 07:09:22 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iUUz1-0003uO-81
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 07:09:20 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40813
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iUUz1-0003uK-4t
+ (envelope-from <peter.maydell@linaro.org>) id 1iUUz1-0003ux-Uy
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 07:09:21 -0500
+Received: from mail-ot1-x32f.google.com ([2607:f8b0:4864:20::32f]:39690)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iUUz1-0003uT-Np
  for qemu-devel@nongnu.org; Tue, 12 Nov 2019 07:09:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573560558;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/gvYWhnobCrZkJKh7e8ugpGPy22zr78ITqyoRf2iztQ=;
- b=YVyW1h/DXlyh0lInooX0FYgqTxIN17zttZVbWZKfIKVjDAV0tAJ1186ms9aV63z32ZI5ul
- g6zqOjijtqIp6OXk2XrjFNgvN4ZlQqftJvZsbVfjvlZHyXSglAzvhmAG/gojnAvAZa/8ZN
- YcKRTaHnNW1chonWFfznyvpknXJMUpA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-mT5U7TolNVqUO6E2RE-Hig-1; Tue, 12 Nov 2019 07:09:15 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6CDCA1800D63;
- Tue, 12 Nov 2019 12:09:14 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-124.ams2.redhat.com
- [10.36.116.124])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3D0E460A35;
- Tue, 12 Nov 2019 12:09:09 +0000 (UTC)
-Subject: Re: [qemu-web PATCH v3] documentation: link to nightly documentation
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20191108105435.403161-1-stefanha@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3fa14fbe-32e1-9bed-2557-428343deedd1@redhat.com>
-Date: Tue, 12 Nov 2019 13:09:08 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+Received: by mail-ot1-x32f.google.com with SMTP id z9so924433otq.6
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 04:09:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=fHMl2EwqwWUp1hddtFwsPziWvjWArTHS+ynXRb/jzJQ=;
+ b=OYpmTPU1dA2Q13Z0gdS+7rFqz+Z7ef9hRitxEz5+N0rbqIcWDFgrp7Lg0wC4zOM9ce
+ FRjeb2hsMPxXsUpUXuYEVATMpOTi4RKZi9jU8XWDXOPZs2RIFuvjy+zPdMTlB0O3X3R4
+ AeNnAJzOf/qAtgC6HGvuwTG1e8Xi+cYqzl2jGws6U6C5nP6fYniT5lDJGlOtIT06OZi1
+ TstBNNkGvwOhlNOXyy+Ia6rdgIF+q5WRE4c4ghCU2I/NupOf2dCHiIZyWNn55ZWeju+5
+ +veF7Rkg8omblMKt2QlU8gg7gzReTG+ej3gdlz/TTvQFRAfDVmo9cYqlV4UHWNnq7Z92
+ +OPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=fHMl2EwqwWUp1hddtFwsPziWvjWArTHS+ynXRb/jzJQ=;
+ b=dMBeBVoFatwyyEWxOLaYUjKe8Z7/uMeqr/ExvGZPmHB7Pn4ycHGokaXnahp8QC4fpu
+ wMCPj1+nBFOJaPYXVcFDe4D27vLV/u7Qb4aPXjWnFMHGh8CurDDEJsBK3+hKFcqrqjeO
+ Vub9lBO7t9ZOJp/dfWSPhp7ZUCRRX510JfKlqpU9KussDgPYh18lkXcIkCNfsOqAzH8I
+ e4AWtaAnxtaMFVDTCtKJuPBlOA7RQ4wzqabNGREjVH6bXxBUI6QSymUyOwslCenBja7r
+ +n2QdUg63hzbZkAA4w1wg48gKspHLgVU5ItQPwuCCSklRNcKhEsK0lCFyhfPMi6EnRQc
+ wQ1A==
+X-Gm-Message-State: APjAAAX6xN/oyrY1UA5uv2wGl+Z1cBDZQCpS2nk0nPH/Ytm+wMET80Gp
+ WmtoZOHbojAJ6jasv9QywJpkanMXQiHVbjKi2OcoBg==
+X-Google-Smtp-Source: APXvYqwDJqC8csJcm1aHFGRp731d3l1NY9HQLrTRdgBjFQ8eVU2fN8pvGhrXKww8IB3KtWUs+NM5clLVEse+ZSIvdJs=
+X-Received: by 2002:a9d:68cc:: with SMTP id i12mr20370939oto.97.1573560558808; 
+ Tue, 12 Nov 2019 04:09:18 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191108105435.403161-1-stefanha@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: mT5U7TolNVqUO6E2RE-Hig-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20191112064332.5074-1-thuth@redhat.com>
+In-Reply-To: <20191112064332.5074-1-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Nov 2019 12:09:07 +0000
+Message-ID: <CAFEAcA-=_a7ibQ27n08bwe_6fk6-0T4_6HkiQ4o2quqg6X+tOw@mail.gmail.com>
+Subject: Re: [PULL 0/6] qtest and misc patches
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,49 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Daniel Berrange <berrange@redhat.com>,
- Stefan Weil <sw@weilnetz.de>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/11/2019 11.54, Stefan Hajnoczi wrote:
-> Link to the documentation built from qemu.git/master once a day.
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
-> v3:
->  * Use a qemu.org URL, not a wiki.qemu.org URL [danpb]
-> v2:
->  * This revision was broken - please ignore! :)
-> ---
->  documentation.md | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/documentation.md b/documentation.md
-> index f4ef9f4..5198e02 100644
-> --- a/documentation.md
-> +++ b/documentation.md
-> @@ -3,6 +3,8 @@ title: QEMU documentation
->  permalink: /documentation/
->  ---
-> =20
-> +The latest development version documentation is available [here](https:/=
-/qemu.org/docs/master/index.html).
-> +
->  The [QEMU user manual](https://qemu.weilnetz.de/qemu-doc.html) can be re=
-ad online, courtesy of Stefan Weil.
+On Tue, 12 Nov 2019 at 06:43, Thomas Huth <thuth@redhat.com> wrote:
+>
+>  Hi Peter,
+>
+> the following changes since commit 654efcb511d394c1d3f5292c28503d1d19e5b1d3:
+>
+>   Merge remote-tracking branch 'remotes/vivier/tags/q800-branch-pull-request' into staging (2019-11-11 09:23:46 +0000)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/huth/qemu.git tags/pull-request-2019-11-12
+>
+> for you to fetch changes up to 623ef637a2e42e023e7436d4bfbdc5159fb36684:
+>
+>   configure: Check bzip2 is available (2019-11-11 14:35:41 +0100)
+>
+> ----------------------------------------------------------------
+> - Fix memory leaks for QTESTS
+> - Update MAINTAINERS file
+> - Check for the availability of bzip2 in "configure"
+> ----------------------------------------------------------------
 
-I assume your generated docs will also contain the qemu-doc.html for the
-users? Should we then remove the link to weilnetz here?
 
->  More documentation is found in the <a href=3D"https://git.qemu.org/?p=3D=
-qemu.git;a=3Dtree;f=3Ddocs;hb=3Dmaster">`docs`</a>
->  directory of the QEMU git tree.
+Applied, thanks.
 
-Do we still need the link to the docs folder in the git repo after your
-changes?
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
 
- Thomas
-
+-- PMM
 
