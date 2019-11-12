@@ -2,88 +2,83 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA49C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 527A0C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:08:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB1E320679
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:08:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D706214E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:08:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EMKEoD8+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB1E320679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BblIpJm8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D706214E0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUYiK-0007ZK-L5
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 11:08:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50237)
+	id 1iUYii-0008Ah-Pu
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 11:08:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50566)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iUYfG-0004Nc-3L
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:05:11 -0500
+ (envelope-from <pkrempa@redhat.com>) id 1iUYhc-0006tQ-N7
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:07:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <edgar.iglesias@gmail.com>) id 1iUYfB-0007I6-5J
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:05:10 -0500
-Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:53545)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
- id 1iUYfA-0007HR-VX
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:05:05 -0500
-Received: by mail-wm1-x336.google.com with SMTP id u18so3805207wmc.3
- for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 08:05:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Rnzob+CMRQLWYBDPF8sebybDJvDCoUE2UV9qiBp+og0=;
- b=EMKEoD8+gI+V1ppQZi51XB0AikaVDO+bkJxUuZ8HOZRC4Rhk0XMySZI2PiKpTD+6Ss
- ML+rZ1wbXMn8w3fd2oQyP6zL5JC2ObDoQOTEkO9btSUVnD7CZsgoX+Qb6ogqBKkWzm7k
- pbnMwqMLX+g1Y00/kOUSuNd1lXbZZMXeIjwvYJlIGJMVBLFMU0oGWXgD4f0Peh+iImg3
- DsYlwm4twGrQxWrzXG1iwdfO23Nbblwxk1XvNo9eiwcrgSCi39binYwD20AEtjFcHayp
- wKXA3wooF1w2qOiJiybqrp1azSE96U3JoBdurAomoYJnvERHxSoPxPYgxg2L2UsyaLyM
- LuSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Rnzob+CMRQLWYBDPF8sebybDJvDCoUE2UV9qiBp+og0=;
- b=kBSeUf/AfCoDzVc/q7N/9hoqzvT7luOP3H2iaeOkfyt20XMUQhG71Jjq8UY7x7HX47
- 1/+Gn84GG399uc1HS5+3aN0J0v8RsPUJKrZmYT8B7wquIkpFi6oMSx0mH+Kl4CbdqRxd
- OOXJ5Gg9ArWe7o6546s6x2XMJuL+b6fSMWENoDvn3M50c1C58wEesW4HYhS1Z+pXYPqk
- 2saNDtK4RgmPfhpKl49LL68ugQGctFofB7JOeO4GjXavgkeVJhvIJVQgfPnCg0mQ16f/
- RJv9V/1jV3PlOCatozBOb2tbCtLxWKPZ0iDpQSyXYMwTM3nd4F1VcrTHJgY7wjKOjI62
- MvCQ==
-X-Gm-Message-State: APjAAAXIn98/X5cnccVznBav8HFnaez0VZUzZndVylU8MWxjed8nY4HT
- AVBCmHL8EL8Mb+VYQuf0ED+k+f4n6uc=
-X-Google-Smtp-Source: APXvYqwBInl9Y13r9BSDDMtOCP7EqKV69gcjiaOy7lWDEUDXI8uKHfiYAtRO+vOUnu4IWNLeaLBj0w==
-X-Received: by 2002:a1c:dd06:: with SMTP id u6mr4800727wmg.109.1573574703569; 
- Tue, 12 Nov 2019 08:05:03 -0800 (PST)
-Received: from localhost (ec2-34-244-242-0.eu-west-1.compute.amazonaws.com.
- [34.244.242.0])
- by smtp.gmail.com with ESMTPSA id d13sm19698453wrq.51.2019.11.12.08.05.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 Nov 2019 08:05:02 -0800 (PST)
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL v1 2/3] target/microblaze: Plug temp leaks with delay slot setup
-Date: Tue, 12 Nov 2019 17:04:48 +0100
-Message-Id: <20191112160449.29212-3-edgar.iglesias@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191112160449.29212-1-edgar.iglesias@gmail.com>
-References: <20191112160449.29212-1-edgar.iglesias@gmail.com>
+ (envelope-from <pkrempa@redhat.com>) id 1iUYhb-0000ch-8u
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:07:36 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60937
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pkrempa@redhat.com>) id 1iUYhb-0000bu-3n
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:07:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573574854;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4oOB2ggRZJk7OJKiTCYznI5HKAK/lgPZDPGYp0Psjzc=;
+ b=BblIpJm8bidg7SgjDh23rq7r2m1fECwwWBYu6Cw6LNUcn+iyu2/pLBA3+fU+7Ufa9eCeT9
+ cIkxyQHTm0ZuP+Ke4Ih2qwKAV0lHijYW+whZ58AiUOgM4UvKgwDJ+qwx6GXycUzvLTLS7a
+ hG6Tya12s4AIc2aZLk7gUIfLMhTJpdk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-236-6ROENHTMMSelwjjX7A5csg-1; Tue, 12 Nov 2019 11:07:33 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EB73C107B7DD;
+ Tue, 12 Nov 2019 16:07:31 +0000 (UTC)
+Received: from angien.pipo.sk (unknown [10.43.2.48])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 90BA4101E815;
+ Tue, 12 Nov 2019 16:07:28 +0000 (UTC)
+Date: Tue, 12 Nov 2019 17:07:26 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH 2/2] iotests: Test multiple blockdev-snapshot calls
+Message-ID: <20191112160726.GC163480@angien.pipo.sk>
+References: <20191108085312.27049-1-kwolf@redhat.com>
+ <20191108085312.27049-3-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::336
+In-Reply-To: <20191108085312.27049-3-kwolf@redhat.com>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 6ROENHTMMSelwjjX7A5csg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,83 +90,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+On Fri, Nov 08, 2019 at 09:53:12 +0100, Kevin Wolf wrote:
+> Test that doing a second blockdev-snapshot doesn't make the first
+> overlay's backing file go away.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/273     |  76 +++++++++
+>  tests/qemu-iotests/273.out | 337 +++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 414 insertions(+)
+>  create mode 100755 tests/qemu-iotests/273
+>  create mode 100644 tests/qemu-iotests/273.out
 
-Plug temp leaks with delay slot setup.
+Didn't apply cleanly for me.
 
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
----
- target/microblaze/translate.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/tests/qemu-iotests/273 b/tests/qemu-iotests/273
+> new file mode 100755
+> index 0000000000..60076de7ce
+> --- /dev/null
+> +++ b/tests/qemu-iotests/273
+> @@ -0,0 +1,76 @@
+> +#!/usr/bin/env bash
+> +#
+> +# Test large write to a qcow2 image
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index c8442b18e1..7b4b66a622 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1177,6 +1177,17 @@ static void eval_cond_jmp(DisasContext *dc, TCGv_i64 pc_true, TCGv_i64 pc_false)
-     tcg_temp_free_i64(tmp_zero);
- }
- 
-+static void dec_setup_dslot(DisasContext *dc)
-+{
-+        TCGv_i32 tmp = tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG));
-+
-+        dc->delayed_branch = 2;
-+        dc->tb_flags |= D_FLAG;
-+
-+        tcg_gen_st_i32(tmp, cpu_env, offsetof(CPUMBState, bimm));
-+        tcg_temp_free_i32(tmp);
-+}
-+
- static void dec_bcc(DisasContext *dc)
- {
-     unsigned int cc;
-@@ -1188,10 +1199,7 @@ static void dec_bcc(DisasContext *dc)
- 
-     dc->delayed_branch = 1;
-     if (dslot) {
--        dc->delayed_branch = 2;
--        dc->tb_flags |= D_FLAG;
--        tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
--                      cpu_env, offsetof(CPUMBState, bimm));
-+        dec_setup_dslot(dc);
-     }
- 
-     if (dec_alu_op_b_is_small_imm(dc)) {
-@@ -1250,10 +1258,7 @@ static void dec_br(DisasContext *dc)
- 
-     dc->delayed_branch = 1;
-     if (dslot) {
--        dc->delayed_branch = 2;
--        dc->tb_flags |= D_FLAG;
--        tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
--                      cpu_env, offsetof(CPUMBState, bimm));
-+        dec_setup_dslot(dc);
-     }
-     if (link && dc->rd)
-         tcg_gen_movi_i32(cpu_R[dc->rd], dc->pc);
-@@ -1355,10 +1360,7 @@ static void dec_rts(DisasContext *dc)
-         return;
-     }
- 
--    dc->delayed_branch = 2;
--    dc->tb_flags |= D_FLAG;
--    tcg_gen_st_i32(tcg_const_i32(dc->type_b && (dc->tb_flags & IMM_FLAG)),
--                  cpu_env, offsetof(CPUMBState, bimm));
-+    dec_setup_dslot(dc);
- 
-     if (i_bit) {
-         LOG_DIS("rtid ir=%x\n", dc->ir);
--- 
-2.20.1
+Cut&paste?
+
+
+Rest looks good
+
+Reviewed-by: Peter Krempa <pkrempa@redhat.com>
+
+> +#
+> +# Copyright (C) 2019 Red Hat, Inc.
+> +#
+> +# This program is free software; you can redistribute it and/or modify
+> +# it under the terms of the GNU General Public License as published by
+> +# the Free Software Foundation; either version 2 of the License, or
+> +# (at your option) any later version.
+> +#
+> +# This program is distributed in the hope that it will be useful,
+> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> +# GNU General Public License for more details.
+> +#
+> +# You should have received a copy of the GNU General Public License
+> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+> +#
+> +
+> +seq=3D$(basename "$0")
+> +echo "QA output created by $seq"
+> +
+> +status=3D1=09# failure is the default!
+> +
+> +_cleanup()
+> +{
+> +    _cleanup_test_img
+> +}
+> +trap "_cleanup; exit \$status" 0 1 2 3 15
+> +
+> +# get standard environment, filters and checks
+> +. ./common.rc
+> +. ./common.filter
+> +
+> +# This is a qcow2 regression test
+> +_supported_fmt qcow2
+> +_supported_proto file
+> +_supported_os Linux
+> +
+> +do_run_qemu()
+> +{
+> +    echo Testing: "$@"
+> +    $QEMU -nographic -qmp-pretty stdio -nodefaults "$@"
+
+-qmp-pretty, that's useful
+
+> +    echo
+> +}
+> +
+> +run_qemu()
+> +{
+> +    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qemu | _filter_qmp=
+ |
+> +        _filter_generated_node_ids | _filter_imgfmt | _filter_actual_ima=
+ge_size
+> +}
+> +
+> +TEST_IMG=3D"$TEST_IMG.base" _make_test_img 64M
+> +TEST_IMG=3D"$TEST_IMG.mid" _make_test_img -b "$TEST_IMG.base"
+> +_make_test_img -b "$TEST_IMG.mid"
+> +
+> +run_qemu \
+> +    -blockdev file,node-name=3Dbase,filename=3D"$TEST_IMG.base" \
+> +     -blockdev file,node-name=3Dmidf,filename=3D"$TEST_IMG.mid" \
+> +     -blockdev '{"driver":"qcow2","node-name":"mid","file":"midf","backi=
+ng":null}' \
+> +     -blockdev file,node-name=3Dtopf,filename=3D"$TEST_IMG" \
+> +     -blockdev '{"driver":"qcow2","file":"topf","node-name":"top","backi=
+ng":null}' \
+> +<<EOF
+> +{"execute":"qmp_capabilities"}
+> +{"execute":"blockdev-snapshot","arguments":{"node":"base","overlay":"mid=
+"}}
+> +{"execute":"blockdev-snapshot","arguments":{"node":"mid","overlay":"top"=
+}}
+> +{"execute":"query-named-block-nodes"}
+> +{"execute":"x-debug-query-block-graph"}
+
+Oh, this too!
+
+> +{"execute":"quit"}
+> +EOF
+> +
+> +# success, all done
+> +echo "*** done"
+> +rm -f $seq.full
+> +status=3D0
 
 
