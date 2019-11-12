@@ -2,80 +2,100 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 979E4C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:13:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD7FC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:16:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61CDA214E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:13:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 557CF21A49
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:16:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bW6lZRrh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61CDA214E0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mp8WBJSu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 557CF21A49
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUSEy-00031G-JP
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:13:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45400)
+	id 1iUSIE-0004YM-Fp
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:16:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45820)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iUSEL-0002XI-DO
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:12:58 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iUSH8-0003s5-OM
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:15:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iUSEK-0004Ag-58
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:12:57 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56748
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1iUSH7-0005KU-OR
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:15:50 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:23445
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iUSEK-0004AH-1q
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:12:56 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iUSH7-0005KF-L6
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:15:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573549975;
+ s=mimecast20190719; t=1573550149;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xAHDriL9+0K2QaszthS1D7H3s/wHnNNqn04kCo7xOSM=;
- b=bW6lZRrhj2enJsyydbrVbUXxMpfAvKJMDqdyAB5jZcsDXOyIYkJHtyclN0N16NOF0Mw3qE
- 5EapMZh5yPGEIQGo6fC/Il2s511x+LCf9g8WM8aivsYyeYW2wXNj2++ZC2hMzZpMzDx1fv
- sNqqvjGJbvcJNvipS1zumz3dipZPeTM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-K8ZwaHA8N66f0G_kTiAGXg-1; Tue, 12 Nov 2019 04:12:52 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B89B38017E0;
- Tue, 12 Nov 2019 09:12:51 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-43.ams2.redhat.com [10.36.117.43])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E798760872;
- Tue, 12 Nov 2019 09:12:46 +0000 (UTC)
-Date: Tue, 12 Nov 2019 10:12:45 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: API definition for LUKS key management
-Message-ID: <20191112091245.GB5364@linux.fritz.box>
-References: <122fc70c802b9a1185e008bf13fb7f078fe70af7.camel@redhat.com>
- <20191111183424.GR814211@redhat.com>
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=A+tdr1qp7+aUa0drhLGKEWaUxpgrWNl/wUgju6EPFRA=;
+ b=Mp8WBJSuak/3crzQgRo9RdMiy4YBDNJWn3DbmmvaTzU858hbIHgG09ffzm2yZhS58CBJNt
+ x7nqVqDN3UYfOkAiFP6I7jBqDFRvc2IrDaC5y91IqbY6Xk43qi0A/M+pkgbVOE3oL8wuWF
+ QMpqXWvKIRgk2ByMlSqPFiwLo0khhxU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-127-f5e_g4_rOWGXQXxHo9NT7g-1; Tue, 12 Nov 2019 04:15:46 -0500
+Received: by mail-wm1-f70.google.com with SMTP id f14so922463wmc.0
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 01:15:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fo6RZMfIdlNBUYkZqR9uVjnc1J5hKM3Tz/Ts0c/kyt0=;
+ b=qJZ60P61+N0qjsxCD8NEDcIBNb1bNbNII5fQfG/eY+So2dLUe36KzSPth4wSpkJ7pq
+ gcXvgaWQrZq42piUkHpctrazRYzvjCRzVy45BImaT/bISQfrjLFGu2tmQ8CcF1qjOpu0
+ cbFtpT1djyMQbDBtPUwuF/km8les515Mmu5JiqsQwvKXQ+m9RulbP3mQTQrDGnVs6bSR
+ HoVvNYd4m2S9YDiEaEzo/cOK5/a02NVoU3OeSRNTowjOIyUrbbtovm5aKbC1kLnoCDvZ
+ kMlmLXyas/FHBu09CPIAY245TB0Ha69YPWagmGjrD8Cp9eZ2sAPRuAYbh+/wrmwd/0JR
+ zaSQ==
+X-Gm-Message-State: APjAAAW9yuL0GFtc9QkUMU3PsbXXGZxAKA9ZLbX/DFFY8dgxMeHHAzz/
+ ouQqo18/E/kknUDbY3dz8qqNBbLuGUj2l3h10q3BYT5qlaYquNn0WW59IMLDJ5CFGRR2na88eAs
+ 7xzIi5N5a4MtX5F8=
+X-Received: by 2002:adf:9506:: with SMTP id 6mr26103512wrs.274.1573550145048; 
+ Tue, 12 Nov 2019 01:15:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyI3tpXZhgDWr1vuXVYvXPmeHJW4/Wol11TpBb/x+9EBOXYEMXJGcBYAHXNGauNC9YGjebT3g==
+X-Received: by 2002:adf:9506:: with SMTP id 6mr26103486wrs.274.1573550144682; 
+ Tue, 12 Nov 2019 01:15:44 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:8c9d:1a6f:4730:367c?
+ ([2001:b07:6468:f312:8c9d:1a6f:4730:367c])
+ by smtp.gmail.com with ESMTPSA id p14sm20842897wrq.72.2019.11.12.01.15.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 12 Nov 2019 01:15:44 -0800 (PST)
+Subject: Re: [PATCH qemu] scripts: Detect git worktrees for get_maintainer.pl
+ --git
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+References: <20191112034532.69079-1-aik@ozlabs.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <049148d5-0a35-e8bf-4a8b-714a3f1fb9d1@redhat.com>
+Date: Tue, 12 Nov 2019 10:15:44 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191111183424.GR814211@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: K8ZwaHA8N66f0G_kTiAGXg-1
+In-Reply-To: <20191112034532.69079-1-aik@ozlabs.ru>
+Content-Language: en-US
+X-MC-Unique: f5e_g4_rOWGXQXxHo9NT7g-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,101 +107,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Ferlan <jferlan@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: qemu-trivial@nongnu.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 11.11.2019 um 19:34 hat Daniel P. Berrang=E9 geschrieben:
-> On Mon, Nov 11, 2019 at 05:58:20PM +0200, Maxim Levitsky wrote:
-> > One of the concerns that was raised during the review was that amend in=
-terface for luks that I propose is
-> > different from the amend inteface used currently for qcow2.
-> >=20
-> > qcow2 amend interface specifies all the format options, thus overwrites=
- the existing options.
-> > Thus it seems natural to make the luks amend interface work the same wa=
-y, that it receive an array
-> > of 8 slots, and for each slot specify if it is active, and if true what=
- password to put in it.
-> > This does allow to add and erase the keyslots, but it doesn't allow:
-> >=20
-> >    * add a password without knowing all other passwords that exist in e=
-xisting keyslots
-> >      this can be mitigated by specifying which keyslots to modify for e=
-xample by omitting the
-> >      keyslots that shouldn't be touched from the array (passing null pl=
-aceholder instead)
-> >      but then it already doesn't follow the 'specify all the options ea=
-ch time' principle.
+On 12/11/19 04:45, Alexey Kardashevskiy wrote:
+> Recent git versions support worktrees where .git is not a directory but
+> a file with a path to the .git repository; however the get_maintainer.pl
+> script only recognises the .git directory, let's fix it.
 >=20
-> I think this is highly undesirable, as we must not assume that the
-> mgmt app has access to all the passwords currently set.
-
-And I think this shows the problem that we realy have with the crypto
-driver and amend: For every other driver, if you must, you can query the
-current settings and just write them back.
-
-The difference here is that crypto doesn't allow to directly query or
-specify the content of some options (the keyslots), but provides only a
-way to derives that content from a secret, and obviously there is no way
-back from the stored data to the secret (that's what it's for).
-
-I think we have two options here:
-
-1. Add a special "don't touch this" value for keyslots. Normally, just
-   leaving out the value would be suitable syntax for this. Here,
-   however, we have a list of keyslots, so we can't leave anything out.
-
-   We could use something like an alternate between str (new secret ID),
-   null (erase keyslot) and empty dict (leave it alone) - the latter
-   feels a bit hackish, but maybe it's not too bad. If the list is
-   shorter than 8 entries, the rest is assumed to mean "leave it alone",
-   too.
-
-2. Allow to query and set the raw key, which doesn't require a password
-
-> The two key use cases for having multiple key slots are
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+>  scripts/get_maintainer.pl | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
->   - To enable a two-phase change of passwords to ensure new password
->     is safely written out before erasing the old password
->    =20
->   - To allow for multiple access passwords with different controls
->     or access to when each password is made available.
+> diff --git a/scripts/get_maintainer.pl b/scripts/get_maintainer.pl
+> index 71415e3c7061..27991eb1cfb4 100755
+> --- a/scripts/get_maintainer.pl
+> +++ b/scripts/get_maintainer.pl
+> @@ -81,7 +81,7 @@ my %VCS_cmds;
+> =20
+>  my %VCS_cmds_git =3D (
+>      "execute_cmd" =3D> \&git_execute_cmd,
+> -    "available" =3D> '(which("git") ne "") && (-d ".git")',
+> +    "available" =3D> '(which("git") ne "") && (-e ".git")',
+>      "find_signers_cmd" =3D>
+>  =09"git log --no-color --follow --since=3D\$email_git_since " .
+>  =09    '--format=3D"GitCommit: %H%n' .
 >=20
->     eg each VM may have a separate "backup password" securely
->     stored off host that is only made available for use when
->     doing disaster recovery.
->=20
-> the second use case is doomed if you need to always provide all
-> current passwords when changing any key slots.
 
-That providing all current passwords doesn't work is obvious.
+Queued, thanks.
 
-> >    * erase all keyslots matching a password - this is really hard to do=
- using this approach,
-> >      unless we give user some kind of api to try each keyslot with give=
-n password,
-> >      which is kind of ugly and might be racy as well.
->=20
-> > So what do you think?
->=20
-> The point of using "amend" is that we already have some of the boilerplat=
-e
-> supporting framework around that, so it saves effort for both QEMU and
-> our users. If the semantics of "amend" don't fit nicely though, then the
-> benefit of re-using "amend" is cancelled out and we should go back to
-> considering a separate "key-manage" command.
-
-This wouldn't solve the fundamental problem that the crypto block
-driver, as it currently is, isn't able to provide a blockdev-amend
-callback. It's worse for qcow2 because qcow2 already implements amend.
-
-I think we need to find a solution for the amend API.
-
-Kevin
+Paolo
 
 
