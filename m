@@ -2,98 +2,90 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CA53C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:21:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5C1C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:22:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2520821D7F
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:21:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC49221872
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:22:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eJnwbQ2N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2520821D7F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j0w8yqp7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC49221872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUan7-0006dH-83
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 13:21:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39640)
+	id 1iUanu-0007W8-4p
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 13:22:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39730)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iUamS-00068S-3N
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:20:45 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iUanC-0006qP-Cs
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:21:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iUamR-0002Di-11
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:20:44 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55472
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iUamQ-0002DU-Sr
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:20:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573582842;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pwfMGdZ0LRJFwHLVYzMTAtDvU1P/sV2TpCImCPUoXVg=;
- b=eJnwbQ2NAUsFh+q/Tp0faxVz7XDMMmQYiWA3kGoBaWXja+ohVs2fGTZROG6l6ye6PMh/oM
- 6sBXrxMPS/Dreb6sjfEDMHEYCsogf9PFBEUK7xw+3WhinNROf15QSKzANYz91jE7D3sj2m
- Em81dBXgYQ8u9h9fe9uVwvuoHkJr/To=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232--cYOz2WJNiShcJu6J2FiPw-1; Tue, 12 Nov 2019 13:20:41 -0500
-Received: by mail-wr1-f69.google.com with SMTP id 92so12468932wro.14
- for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 10:20:41 -0800 (PST)
+ (envelope-from <alex.bennee@linaro.org>) id 1iUanA-0002Q7-SI
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:21:30 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42525)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iUanA-0002PJ-LT
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:21:28 -0500
+Received: by mail-wr1-x442.google.com with SMTP id a15so19612327wrf.9
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 10:21:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=ze0qk99a0ZI4xKqJVhmmFP7mmohB+jerB0F3KktSdLU=;
+ b=j0w8yqp7CkOV4q8Kquk7tSkNF1uFiZICsF5E62ruQJ4hw673TTyL7YS0vayZJr5Mpn
+ ZqR3QeszpXBtZwgpod5WJb5V6vhZjX3UG3DUrT/XAoi9JvlfmkrepfnkyZFx7+m0cLV8
+ MolugZgvs4//u/lHrYQjEbi7jSliwiOMEw63VfZIFrrWX7SxyFezBYeTZ3wih3ecd7uL
+ vxC3W7vGhGvdDq/OP3TraIELPXjfZnR2RxGGuhImiAg0bFCnxVDusHNJrjheEWoa6qYF
+ QbxnXbBiAcvB3AvOoNrQCg2rDP98RQmM5u5t7DQOYmaFPqyWP5vfCFJnLbu8juiBGj0m
+ +cJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=migp4Ev5+nwifmMBFw9H/sfQDtdmrtnRYIgJZ7wGCds=;
- b=Z33WCtP3V0nlokjw2AXvsCUmlPNNxRlsffjfK5s6imvSUyc3juut8t8w8SVMchWohu
- BHS+3kgrvuPG0AxOc/XLcQ81eazQBeNQ0odLhDh88cFmOttF8J3pY8i3KUec78XhoSfa
- V1aqw1uvxl0rfF0loZQZVDaBSKlk+8868Nh7cQSWKaWtTPS7CoqZmkisfxn5FkHDxup1
- AFfcVMaINTWYOsdWCNqkfdCdecmFXYY+TtI4znr3+zc3aLgrhtLs2n2L5l7AwYUK3dpi
- ksQc2Q3i+gYH6ZXRR1b8mnT573J3gNlJLhF28bLP0/jmVKpytV/w/Je+YoGdAk7RRW6/
- o+Nw==
-X-Gm-Message-State: APjAAAUwjiDKdSi8TDiM4evCf3PuWtm23tHORwUmDB5933xvTqKxM0WS
- CcEtW6biE0WRwUs9X0vkMnDrn7nqS2PZMuDgd2VTIDOj4+R6Lm7ySFAgJIJWTVdQEZAjeQv03Sv
- qNFz/6MQrfmxQN4Y=
-X-Received: by 2002:adf:f743:: with SMTP id z3mr25781763wrp.200.1573582840217; 
- Tue, 12 Nov 2019 10:20:40 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzIrLy4kH99DF4O6BT7N3ZH6NHGMWgt/YLIxs2ut42OfnqAlI9uYKRkCypsmJ4Y4zT6jzyNDg==
-X-Received: by 2002:adf:f743:: with SMTP id z3mr25781732wrp.200.1573582839970; 
- Tue, 12 Nov 2019 10:20:39 -0800 (PST)
-Received: from [192.168.1.35] (170.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.170])
- by smtp.gmail.com with ESMTPSA id 62sm28779560wre.38.2019.11.12.10.20.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 12 Nov 2019 10:20:39 -0800 (PST)
-Subject: Re: [PATCH v7 8/8] Acceptance test: add "boot_linux" tests
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-References: <20191104151323.9883-1-crosa@redhat.com>
- <20191104151323.9883-9-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1a4e69bb-2713-3aa8-a58d-7fbb6c6886ed@redhat.com>
-Date: Tue, 12 Nov 2019 19:20:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=ze0qk99a0ZI4xKqJVhmmFP7mmohB+jerB0F3KktSdLU=;
+ b=BQTUVY+sjMwGXuGfZKdFr3TQaGEPj+nevQt5lgSQhWQnXpBpctk4wVCUXEP1wg+8it
+ Hady0xSLpJZuDUjW84bY9NmRgmzS4/e2jBONq/ZxpvL0z2olM5wZQYnXplu1WNKVdaPA
+ zLrBDKEvbxt9ZcJQ/55vDdJVGTEVSE4OvzlSobLPzYhM2js5PWeAlAhYbRTf6cXZunAK
+ eBpRBsNuBaq3IjSFxf21tVn54iVUFLk+DFochqQZV4mZTmKKJTQCaZTRScADOo9HRv4v
+ HAza/RfhgxpMuJsmYznPbfYRy3RmMkck6SleAecAkPnJ/6Pu836UXux5/KlupjT1J48s
+ yk5Q==
+X-Gm-Message-State: APjAAAVFtU9gqvVVFEHnLyYlOJj8Z+TLoYyPdKcj+OhbPLzKa7yVSVAl
+ 5NjUurF5V9L5WOcD57NBwJhH24A+nEo=
+X-Google-Smtp-Source: APXvYqyu4AoUpPx29Wf2P9rb738Fo7QGzxTfvWFtmqL99YElvT98RGZqj1pwD604gPDCZQR2eaSSaA==
+X-Received: by 2002:a5d:6cc3:: with SMTP id c3mr26607220wrc.202.1573582887060; 
+ Tue, 12 Nov 2019 10:21:27 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u26sm3909599wmj.9.2019.11.12.10.21.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 12 Nov 2019 10:21:25 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 13B921FF87;
+ Tue, 12 Nov 2019 18:21:25 +0000 (GMT)
+References: <20191112150105.2498-1-robert.foley@linaro.org>
+ <20191112150105.2498-5-robert.foley@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v1 4/5] Added tests for close and change of logfile.
+In-reply-to: <20191112150105.2498-5-robert.foley@linaro.org>
+Date: Tue, 12 Nov 2019 18:21:25 +0000
+Message-ID: <87imnp7y6y.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191104151323.9883-9-crosa@redhat.com>
-Content-Language: en-US
-X-MC-Unique: -cYOz2WJNiShcJu6J2FiPw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,56 +97,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Beraldo Leal <bleal@redhat.com>, Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, qemu-ppc@nongnu.org,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: peter.puhov@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/4/19 4:13 PM, Cleber Rosa wrote:
-> This acceptance test, validates that a full blown Linux guest can
-> successfully boot in QEMU.  In this specific case, the guest chosen is
-> Fedora version 31.
->=20
->   * x86_64, pc and q35 machine types, with and without kvm as an
->     accellerator
 
-typo "accelerator"
+Robert Foley <robert.foley@linaro.org> writes:
 
->=20
->   * aarch64 and virt machine type, with and without kvm as an
->     accellerator
+> One test ensures that the logfile handle is still valid even if
+> the logfile is changed during logging.
+> The other test validates that the logfile handle remains valid under
+> the logfile lock even if the logfile is closed.
+>
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
 
-Ditto.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
->=20
->   * ppc64 and pseries machine type
->=20
->   * s390x and s390-ccw-virtio machine type
->=20
-> The method for checking the successful boot is based on "cloudinit"
-> and its "phone home" feature.  The guest is given an ISO image
-> with the location of the phone home server, and the information to
-> post (the instance ID).  Upon receiving the correct information,
-> from the guest, the test is considered to have PASSed.
->=20
-> This test is currently limited to user mode networking only, and
-> instructs the guest to connect to the "router" address that is hard
-> coded in QEMU.
->=20
-> To create the cloudinit ISO image that will be used to configure the
-> guest, the pycdlib library is also required and has been added as
-> requirement to the virtual environment created by "check-venv".
->=20
-> The console output is read by a separate thread, by means of the
-> Avocado datadrainer utility module.
->=20
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> --
+> v1
+>     - Changes for first round of code review comments.
+>     - Added in use of g_autofree, removed the g_free()s.
+>     - Added in use of logfile2 and changed sequence of asserts.
 > ---
+>  tests/test-logging.c | 80 ++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 80 insertions(+)
+>
+> diff --git a/tests/test-logging.c b/tests/test-logging.c
+> index a12585f70a..1e646f045d 100644
+> --- a/tests/test-logging.c
+> +++ b/tests/test-logging.c
+> @@ -108,6 +108,82 @@ static void test_parse_path(gconstpointer data)
+>      error_free_or_abort(&err);
+>  }
+>
+> +static void test_logfile_write(gconstpointer data)
+> +{
+> +    QemuLogFile *logfile;
+> +    QemuLogFile *logfile2;
+> +    gchar const *dir =3D data;
+> +    Error *err =3D NULL;
+> +    g_autofree gchar *file_path;
+> +    g_autofree gchar *file_path1;
+> +    FILE *orig_fd;
+> +
+> +    /*
+> +     * Before starting test, set log flags, to ensure the file gets
+> +     * opened below with the call to qemu_set_log_filename().
+> +     * In cases where a logging backend other than log is used,
+> +     * this is needed.
+> +     */
+> +    qemu_set_log(CPU_LOG_TB_OUT_ASM);
+> +    file_path =3D g_build_filename(dir, "qemu_test_log_write0.log", NULL=
+);
+> +    file_path1 =3D g_build_filename(dir, "qemu_test_log_write1.log", NUL=
+L);
+> +
+> +    /*
+> +     * Test that even if an open file handle is changed,
+> +     * our handle remains valid due to RCU.
+> +     */
+> +    qemu_set_log_filename(file_path, &err);
+> +    g_assert(!err);
+> +    rcu_read_lock();
+> +    logfile =3D atomic_rcu_read(&qemu_logfile);
+> +    orig_fd =3D logfile->fd;
+> +    g_assert(logfile && logfile->fd);
+> +    fprintf(logfile->fd, "%s 1st write to file\n", __func__);
+> +    fflush(logfile->fd);
+> +
+> +    /* Change the logfile and ensure that the handle is still valid. */
+> +    qemu_set_log_filename(file_path1, &err);
+> +    g_assert(!err);
+> +    logfile2 =3D atomic_rcu_read(&qemu_logfile);
+> +    g_assert(logfile->fd =3D=3D orig_fd);
+> +    g_assert(logfile2->fd !=3D logfile->fd);
+> +    fprintf(logfile->fd, "%s 2nd write to file\n", __func__);
+> +    fflush(logfile->fd);
+> +    rcu_read_unlock();
+> +}
+> +
+> +static void test_logfile_lock(gconstpointer data)
+> +{
+> +    FILE *logfile;
+> +    gchar const *dir =3D data;
+> +    Error *err =3D NULL;
+> +    g_autofree gchar *file_path;
+> +
+> +    file_path =3D g_build_filename(dir, "qemu_test_logfile_lock0.log", N=
+ULL);
+> +
+> +    /*
+> +     * Test the use of the logfile lock, such
+> +     * that even if an open file handle is closed,
+> +     * our handle remains valid for use due to RCU.
+> +     */
+> +    qemu_set_log_filename(file_path, &err);
+> +    logfile =3D qemu_log_lock();
+> +    g_assert(logfile);
+> +    fprintf(logfile, "%s 1st write to file\n", __func__);
+> +    fflush(logfile);
+> +
+> +    /*
+> +     * Initiate a close file and make sure our handle remains
+> +     * valid since we still have the logfile lock.
+> +     */
+> +    qemu_log_close();
+> +    fprintf(logfile, "%s 2nd write to file\n", __func__);
+> +    fflush(logfile);
+> +    qemu_log_unlock(logfile);
+> +
+> +    g_assert(!err);
+> +}
+> +
+>  /* Remove a directory and all its entries (non-recursive). */
+>  static void rmdir_full(gchar const *root)
+>  {
+> @@ -134,6 +210,10 @@ int main(int argc, char **argv)
+>
+>      g_test_add_func("/logging/parse_range", test_parse_range);
+>      g_test_add_data_func("/logging/parse_path", tmp_path, test_parse_pat=
+h);
+> +    g_test_add_data_func("/logging/logfile_write_path",
+> +                         tmp_path, test_logfile_write);
+> +    g_test_add_data_func("/logging/logfile_lock_path",
+> +                         tmp_path, test_logfile_lock);
+>
+>      rc =3D g_test_run();
 
+
+--
+Alex Benn=C3=A9e
 
