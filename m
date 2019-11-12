@@ -2,79 +2,80 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B6FC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:12:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BE5C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:14:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7521D214E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:12:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C5BB6214E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:14:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GXKcKWEN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7521D214E0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="E5DwSDnn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5BB6214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUT9z-0003hD-N1
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 05:12:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54639)
+	id 1iUTCJ-0004hH-0M
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 05:14:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iUT92-00030t-T2
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:11:34 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iUTBZ-0004Ep-JH
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:14:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iUT91-00066S-Jr
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:11:32 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:45738)
+ (envelope-from <peter.maydell@linaro.org>) id 1iUTBY-0008IH-IF
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:14:09 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:34262)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iUT91-00065y-Df
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:11:31 -0500
-Received: by mail-ot1-x344.google.com with SMTP id r24so13786067otk.12
- for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 02:11:31 -0800 (PST)
+ id 1iUTBY-0008Hj-Cw
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:14:08 -0500
+Received: by mail-oi1-x244.google.com with SMTP id l202so14301725oig.1
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 02:14:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=mcex5tKYR5kzchIuDH/dGD55kEemk/iIXwnLCDeRETo=;
- b=GXKcKWENluTlcfZ3RY48ui1MgE00FdZut7YQOYO7G/rUFPjqh4ruNImrR23OBV/Soy
- vmQbFsmiqm63ROWqBFMSUycz6o8L1O6mMGa1mj37++iuTYDmJxq9D9Oz+WX/7hQEvsUw
- u6MhdtzbKxcPObRbAfPp8hDBpGFF4QuAj695e79UvkAxQGg/zPA5QPJdvtLNZBoUCgn8
- eO+uXLmdN1J9+j2ekjtzSRnntKLAA4kbI8WglbhMMqyRChqp/unImcMiXAEdOUclxw7S
- TSykqSJw2uP16rWI8ANxL78TKQArB6uLiRw1B+WNbF31ROCKE8L9BIJzg6D+5wajZFrU
- jCAw==
+ :cc; bh=wm43u0jf0oCeAS8ZP7PJ21XO1JfIpRn6ORwg5al3DqA=;
+ b=E5DwSDnnUh/tDhHXeQe3vGbImJgode9bTafg6r4DgHgnL8vLoyb0Q6AOEFG9SA9d92
+ OGpl2EW8BPTSPyhJJy6OqwbxwP074MfyvPyJhwPImr2jEhrv+V+djpIKsu5220r9VcU0
+ saee5OO2QYZ6V0hIFR7C6QcGWZhaL1bIbEgIcB40uIcEbMRDxR/RFG7uUPtvVGFuWjx4
+ QQk2uJcsToh7M4LbHhKlL2fryIuN3qA+z2NLv7OTyxN+LPKWgVU4+hQqa/8a2Cs3uNLN
+ gHO5naEJgLybpbuv8fmM0DUBJ2LVOsIkR6LVK+M/LP2xSs511Ry5HYUqFxgsPnajqb0N
+ 4oYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=mcex5tKYR5kzchIuDH/dGD55kEemk/iIXwnLCDeRETo=;
- b=Vxip9KslgJqKK8nHbnVpu80YwhI96hwr6c5iQWCYIZfNCL5K7tqKNKqFSNaSTgaStn
- ZB550Rj7zRNgajpxUCLQuqFjU0N2k6szLP/QwS3lULPPe5vIeBS//+NTSsMN7q84l6lr
- D3JR0AztT+oZYGA53mTMwW5hqHakKY7FZdKeQ5KdQLJ71lsg3/YLFfy+7MYpL6neIebl
- 03Z2w71Xuy5TJd0AKdjbgtFODENzpGJMC9Wmlml+kSdG1YnrJV0lYBTbH7Uv2DuBqe6w
- vj3/DWNoCTFJzVXjv1NHEqNqTs5xbwmeQMOYMzkAIwBoNraFUldmiWZlm/mIrDW8sYWE
- YjOg==
-X-Gm-Message-State: APjAAAVWiwsDvrZZdUR2mjbxNByXLtKjj6kuWXe7pFvilgx81LV/b4cq
- 4bz7XdC3+3UEwLEGIPnoG+HL7ZhOILCAbPw1qTwCug==
-X-Google-Smtp-Source: APXvYqwRebUTxYY5thVFoDR1BmPwG2vJ7lg1ITZueVio8cgV6+ut4gsC/nbjdPYzw0u1NU8ksz5gAhHK0IJJ5IeZZpU=
-X-Received: by 2002:a9d:7ac2:: with SMTP id m2mr14930216otn.135.1573553490290; 
- Tue, 12 Nov 2019 02:11:30 -0800 (PST)
+ bh=wm43u0jf0oCeAS8ZP7PJ21XO1JfIpRn6ORwg5al3DqA=;
+ b=IRBoF320vM1uM7SSW0e7b7MGeFwcVRjgN/Dutbwwj/yWcYue1pETGYqGkflST/xrxt
+ RYD6fVBJLc5PbPIzzbaS8JtR4O1epZvstCCxXLISmuDN1+0Yw8gpImMsUvKquqQS5grD
+ pyr18iQljG8KFvNij3SeXs0evSVRJWnN3K91l3R9TTNroQggCRhI0mr4h+C2uv2g5d+l
+ 0TvBpXGxUMdIHb5hnD+COdu9SBMFvvUXDongUIaZxuPJBKlPgUopqXXIkTREXaKyIT5w
+ NFAU+jNV84trg6i5NVmWOdXDb+vYLmT9CWwQLkc3Yx7n4BZ131Uoqw7VB11DVjybZxRf
+ z5Ew==
+X-Gm-Message-State: APjAAAVkw7kDh72TG8VF5yvWTS+Cmh8tt6J2jw0sj5pw+MAjsOMqEP/k
+ akODsbGt5C7Lt78+PMVsMpI5EbKdufolhATwzDiOzQ==
+X-Google-Smtp-Source: APXvYqx+bWE9Uz5NjNoUz+wUApKzy4omL1QeJ8U8i7/BRYr8UcsWm2SGlfBA/qKJYcXZMxiSEVgLPqSivN/GF3W52JI=
+X-Received: by 2002:a05:6808:b04:: with SMTP id
+ s4mr3363737oij.163.1573553647455; 
+ Tue, 12 Nov 2019 02:14:07 -0800 (PST)
 MIME-Version: 1.0
-References: <20191106130456.6176-1-laurent@vivier.eu>
- <20191106130456.6176-2-laurent@vivier.eu>
-In-Reply-To: <20191106130456.6176-2-laurent@vivier.eu>
+References: <20191029225932.14585-1-mst@redhat.com>
+ <20191029225932.14585-12-mst@redhat.com>
+In-Reply-To: <20191029225932.14585-12-mst@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Nov 2019 10:11:19 +0000
-Message-ID: <CAFEAcA-fTQzYjDtHRzghwA6EAREN=m=JixWJzOMkBc7ZPDmp_g@mail.gmail.com>
-Subject: Re: [PULL v2 01/13] linux-user: Support for NETLINK socket options
-To: Laurent Vivier <laurent@vivier.eu>
+Date: Tue, 12 Nov 2019 10:13:56 +0000
+Message-ID: <CAFEAcA8z9Guw1JdnDTuanuANB4a05GK5S7PSsB5UETNA0reB6A@mail.gmail.com>
+Subject: Re: [PULL 11/14] vfio: unplug failover primary device before migration
+To: "Michael S. Tsirkin" <mst@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,157 +87,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Josh Kunz <jkz@google.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+ Jens Freimann <jfreimann@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 6 Nov 2019 at 13:07, Laurent Vivier <laurent@vivier.eu> wrote:
+On Tue, 29 Oct 2019 at 23:01, Michael S. Tsirkin <mst@redhat.com> wrote:
 >
-> From: Josh Kunz <jkz@google.com>
+> From: Jens Freimann <jfreimann@redhat.com>
 >
-> This change includes support for all AF_NETLINK socket options up to about
-> kernel version 5.4 (5.4 is not formally released at the time of writing).
-> Socket options that were introduced in kernel versions before the oldest
-> currently stable kernel version are guarded by kernel version macros.
+> As usual block all vfio-pci devices from being migrated, but make an
+> exception for failover primary devices. This is achieved by setting
+> unmigratable to 0 but also add a migration blocker for all vfio-pci
+> devices except failover primary devices. These will be unplugged before
+> migration happens by the migration handler of the corresponding
+> virtio-net standby device.
+
+Hi; Coverity reports a 'value written to variable but never used'
+issue here (CID 1407219):
+
+
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 12fac39804..e6569a7968 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -40,6 +40,7 @@
+>  #include "pci.h"
+>  #include "trace.h"
+>  #include "qapi/error.h"
+> +#include "migration/blocker.h"
 >
-> This change has been built under gcc 8.3, and clang 9.0, and it passes
-> `make check`. The netlink options have been tested by emulating some
-> non-trival software that uses NETLINK socket options, but they have
-> not been exaustively verified.
+>  #define TYPE_VFIO_PCI "vfio-pci"
+>  #define PCI_VFIO(obj)    OBJECT_CHECK(VFIOPCIDevice, obj, TYPE_VFIO_PCI)
+> @@ -2732,6 +2733,17 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+>          return;
+>      }
+>
+> +    if (!pdev->failover_pair_id) {
+> +        error_setg(&vdev->migration_blocker,
+> +                "VFIO device doesn't support migration");
+> +        ret = migrate_add_blocker(vdev->migration_blocker, &err);
 
-Hi; Coverity reports a missing-break-in-switch error for
-this commit (CID 1407221):
+Here we assign to 'ret', but we never use it on the 'if (err)'
+path, and on the success case we don't look at it either; it's
+just overwritten by the later 'ret = vfio_get_device(...)'.
 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index f6751eecb78c..247883292ce5 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -2248,6 +2248,39 @@ set_timeout:
->              return -TARGET_EFAULT;
->         ret = get_errno(setsockopt(sockfd, SOL_SOCKET, optname, &val, sizeof(val)));
->          break;
-> +#ifdef SOL_NETLINK
-> +    case SOL_NETLINK:
-> +        switch (optname) {
-> +        case NETLINK_PKTINFO:
-> +        case NETLINK_ADD_MEMBERSHIP:
-> +        case NETLINK_DROP_MEMBERSHIP:
-> +        case NETLINK_BROADCAST_ERROR:
-> +        case NETLINK_NO_ENOBUFS:
-> +#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0)
-> +        case NETLINK_LISTEN_ALL_NSID:
-> +        case NETLINK_CAP_ACK:
-> +#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0) */
-> +#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
-> +        case NETLINK_EXT_ACK:
-> +#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0) */
-> +#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
-> +        case NETLINK_GET_STRICT_CHK:
-> +#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0) */
-> +            break;
-> +        default:
-> +            goto unimplemented;
+> +        if (err) {
+> +            error_propagate(errp, err);
+> +            error_free(vdev->migration_blocker);
+> +            return;
 > +        }
-> +        val = 0;
-> +        if (optlen < sizeof(uint32_t)) {
-> +            return -TARGET_EINVAL;
-> +        }
-> +        if (get_user_u32(val, optval_addr)) {
-> +            return -TARGET_EFAULT;
-> +        }
-> +        ret = get_errno(setsockopt(sockfd, SOL_NETLINK, optname, &val,
-> +                                   sizeof(val)));
-> +        break;
-> +#endif /* SOL_NETLINK */
->      default:
->      unimplemented:
->          gemu_log("Unsupported setsockopt level=%d optname=%d\n", level, optname);
-> @@ -2532,6 +2565,74 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
->              break;
->          }
->          break;
-> +#ifdef SOL_NETLINK
-> +    case SOL_NETLINK:
-> +        switch (optname) {
-> +        case NETLINK_PKTINFO:
-> +        case NETLINK_BROADCAST_ERROR:
-> +        case NETLINK_NO_ENOBUFS:
-> +#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0)
-> +        case NETLINK_LISTEN_ALL_NSID:
-> +        case NETLINK_CAP_ACK:
-> +#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0) */
-> +#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0)
-> +        case NETLINK_EXT_ACK:
-> +#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0) */
-> +#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
-> +        case NETLINK_GET_STRICT_CHK:
-> +#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 12, 0) */
-> +            if (get_user_u32(len, optlen)) {
-> +                return -TARGET_EFAULT;
-> +            }
-> +            if (len != sizeof(val)) {
-> +                return -TARGET_EINVAL;
-> +            }
-> +            lv = len;
-> +            ret = get_errno(getsockopt(sockfd, level, optname, &val, &lv));
-> +            if (ret < 0) {
-> +                return ret;
-> +            }
-> +            if (put_user_u32(lv, optlen)
-> +                || put_user_u32(val, optval_addr)) {
-> +                return -TARGET_EFAULT;
-> +            }
-> +            break;
-> +#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0)
-> +        case NETLINK_LIST_MEMBERSHIPS:
-> +        {
-> +            uint32_t *results;
-> +            int i;
-> +            if (get_user_u32(len, optlen)) {
-> +                return -TARGET_EFAULT;
-> +            }
-> +            if (len < 0) {
-> +                return -TARGET_EINVAL;
-> +            }
-> +            results = lock_user(VERIFY_WRITE, optval_addr, len, 1);
-> +            if (!results) {
-> +                return -TARGET_EFAULT;
-> +            }
-> +            lv = len;
-> +            ret = get_errno(getsockopt(sockfd, level, optname, results, &lv));
-> +            if (ret < 0) {
-> +                unlock_user(results, optval_addr, 0);
-> +                return ret;
-> +            }
-> +            /* swap host endianess to target endianess. */
-> +            for (i = 0; i < (len / sizeof(uint32_t)); i++) {
-> +                results[i] = tswap32(results[i]);
-> +            }
-> +            if (put_user_u32(lv, optlen)) {
-> +                return -TARGET_EFAULT;
-> +            }
-> +            unlock_user(results, optval_addr, 0);
-> +            break;
-> +        }
-> +#endif /* LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0) */
-> +        default:
-> +            goto unimplemented;
-> +        }
-> +#endif /* SOL_NETLINK */
-
-Here at the end of the 'case SOL_NETLINK' we will just
-fall straight through into 'default:'. Missing 'break' ?
-
->      default:
->      unimplemented:
->          gemu_log("getsockopt level=%d optname=%d not yet supported\n",
-> --
-> 2.21.0
+> +    }
 
 thanks
 -- PMM
