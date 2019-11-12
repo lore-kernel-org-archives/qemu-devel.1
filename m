@@ -2,115 +2,88 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8392C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B905C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:10:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BBFF9214E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:09:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBFF9214E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 4A82A20679
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 16:10:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OFdp0Jqi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A82A20679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUYjN-0000kb-Oe
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 11:09:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50576)
+	id 1iUYk9-0001tO-7w
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 11:10:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50247)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iUYhd-0006uO-Tj
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:07:42 -0500
+ (envelope-from <edgar.iglesias@gmail.com>) id 1iUYfH-0004PA-4h
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:05:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iUYhc-0000e2-Lk
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:07:37 -0500
-Received: from mout.kundenserver.de ([212.227.126.135]:36491)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iUYhc-0000cJ-CE
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:07:36 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MjSLi-1i1Ig53boI-00kyC6; Tue, 12 Nov 2019 17:07:24 +0100
-Subject: Re: [PATCH] linux-user: fix missing break
+ (envelope-from <edgar.iglesias@gmail.com>) id 1iUYfG-0007Ka-21
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:05:11 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:51440)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1iUYfF-0007K7-Rq
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 11:05:09 -0500
+Received: by mail-wm1-x335.google.com with SMTP id q70so3828772wme.1
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 08:05:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=O+7oqTj35SxpOp+OUToP9NWOXc7v9VZvqQg34DnV5Ds=;
+ b=OFdp0JqiIAONYGeN+hkG6JSO0zYB6BSrVhvq09qzUANFF/EE17xkUS7THVsOWvCi0S
+ u5ThIenbyRXW1VpaCOItFgB4j+mNk2Vaio/Bb2N+hjG4SdxCgb9iDuz9ARCRnhrEJna6
+ RdANw84dWoBaTNy3+Alyr4lRAfHLfVxKZBJMXAb10IJyxXVYlOQZrHxaJHXTDuITvwKT
+ eZnDsMd3ZdpHZQB9lWinBOspeLSCORUSwHmxoHZPPthD/Dc7T7flqElvsfYRa5iio/LW
+ nWYIdL7JxbE4eNHQp8xNbuZ9/YbEyZFddJAMGBVQ8lJwXiMZ8C2bMZrzySeACYDAKLiu
+ 7s2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=O+7oqTj35SxpOp+OUToP9NWOXc7v9VZvqQg34DnV5Ds=;
+ b=JHsOvf5wfCiN+eEGISsMaqyQf/SdnN60XdKp+6gxQ8Wdh3Iq4Jbj7JsZr3fpuLkind
+ 60KeCoNohXnqT8Gr8BkH7SvvkqY5N2dTe4nePBI6EMe1iMVvNVeVmEB2fUVUrR/gKbDq
+ asUDqReHS7ZIUVk76l3NGsidBw50SyfiMVp8TdHqlNsABbPUd5LkMLOPwrno1foq7RPL
+ 9mwrOBbnfaT+IlXiiww25t2mp5y9Xwn1CiNK6R5EgrL/9RXnhbhf/7p+1cRHMOYFdAnV
+ IV27B4N7b+wx0beVSXAkA57dG9z3HUkXsQIRv3PkDvx8J89NoCrZ6GyNqpbxnmjlOp4x
+ v/EA==
+X-Gm-Message-State: APjAAAWGvoBpc6MjnroKam7J9yw0uL4wWLWTEBrKUA2BDPlmIOZ+/Ccp
+ TgY5mYZM2BW71q74+rFy3FdRiGxfqMU=
+X-Google-Smtp-Source: APXvYqwrFiH475fyasK7r7vWWq82Dw43WtuYuphWVqvJx8Y9nz1lC+jwRGsHgRTqdSmFazHdGprq7A==
+X-Received: by 2002:a7b:c776:: with SMTP id x22mr4478483wmk.144.1573574708500; 
+ Tue, 12 Nov 2019 08:05:08 -0800 (PST)
+Received: from localhost (ec2-34-244-242-0.eu-west-1.compute.amazonaws.com.
+ [34.244.242.0])
+ by smtp.gmail.com with ESMTPSA id v6sm16175841wrt.13.2019.11.12.08.05.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 12 Nov 2019 08:05:07 -0800 (PST)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 To: qemu-devel@nongnu.org
-References: <20191112105055.32269-1-laurent@vivier.eu>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <ff8b25b3-95dd-8a6f-e92f-1df86cdb10f1@vivier.eu>
-Date: Tue, 12 Nov 2019 17:07:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+Subject: [PULL v1 3/3] target/microblaze: Plug temp leak around eval_cond_jmp()
+Date: Tue, 12 Nov 2019 17:04:49 +0100
+Message-Id: <20191112160449.29212-4-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191112160449.29212-1-edgar.iglesias@gmail.com>
+References: <20191112160449.29212-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191112105055.32269-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:XbSIjgw+6mPTRteEh4Qfz9dwI2QU65XoSIu1QIzQpHFDsiLoElm
- ROCWPQpUugLT0k/0bK5H64b1bFgWcMbCg306J1X7qiCkgKcgWtTfo3Jg005oYMXNHRDhuh5
- JW9+TePUq30Jz88KI7L99cO3/6XSADRGGFYRCrEDM+tywj9swjqogjDAgAnkEtHsg3H0YOu
- CWwQB/0HUGJvXYkbppfqg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9h//p1sKw70=:c/6LWzSJ5rJir9MTT8aqwk
- SQzW6I1EbGeWTkZk7yZWm6AJCPMkTG7QyqsJDmRdWl0lAYINhqEDuWbU2vxEhT5zmQv78EHsH
- 16qqsgw7o0asgi6cQCyklMD31naW4/X0VQC9RvNwiHd+R3A3MyFKrEdySF3Hm5jH4xK0J7Xd8
- Wwjtb7ilSc3VgWj14cqcD4649NWpuWrMmdooOr+AEkyRLts2kUS1e0Swx691192zlOIn1PyAj
- IXyXqyTL2PYRk0BLKPfQpQ3xMUTm/0VzkLkrW6NoLdgZ4RSPoJwJUgKk0li1L/kfuvXXU4QsN
- SsoCGOE482J/ASjHj3urMRek13IoKG0/WY8xWrWjUUfLqtg0PYX9fnifnxtz84owM1TwFNa18
- 9k3oHqeloM0uhgA+MbmW/MgedJcnobTx4+BYP+2B4taiw8jrl1jDbaSdgkkdOquNwJPw69rFs
- zP0byuGdo2NkfJ9fez1e/FWjxbh80UEVc7m6qqkcxpONpNtnsHReqGEn44acNL6SwYklcx+iW
- yN6g/Lc1B0rxMqt/7H7K3K2dqag7D9VbRMfEM2kGcshyPC1Jpj1kc8HMY8TMcp0ke8lPANK/J
- pKn16G+70/7aGrZe+kx3G4AWutWzedpjnHWxndvdBXs94rZYBUbRYD8AzC3t0a3b+fG1cFBCF
- KtqiHGkbZ3/a3rOU3s2iAog5pie/8t4PhWz8ElX8eER5VYoEo0qACpNXq/rMfwP12Rch0jXVX
- dVWHvpHG57FLrD3mo/lrpoBfHTHbeDW8K9wjGt6TAvEHUCVNiK2f/csv8iUnrRSaWYnuxuDZ9
- wiyApQ+kjY4Juc6RBj1sfLv9/9DX+502Ukq5/mrT3JTrw/6M9op6MFcBp44YECK34dvF1Vgby
- ZSxOV1+eJqv14b3W7SQA==
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 212.227.126.135
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,36 +95,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Josh Kunz <jkz@google.com>, Riku Voipio <riku.voipio@iki.fi>
+Cc: edgar.iglesias@xilinx.com, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 12/11/2019 à 11:50, Laurent Vivier a écrit :
-> Reported by Coverity (CID 1407221)
-> Fixes: a2d866827bd8 ("linux-user: Support for NETLINK socket options")
-> cc: Josh Kunz <jkz@google.com>
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->  linux-user/syscall.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index ab9d933e53af..4e97bcf1e5a9 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -2632,6 +2632,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
->          default:
->              goto unimplemented;
->          }
-> +        break;
->  #endif /* SOL_NETLINK */
->      default:
->      unimplemented:
-> 
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-Applied to my linux-user branch.
+Plug temp leak around eval_cond_jmp().
 
-Thanks,
-Laurent
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ target/microblaze/translate.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index 7b4b66a622..bdc7d5326a 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -1681,7 +1681,10 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
+                 dc->tb_flags &= ~D_FLAG;
+                 /* If it is a direct jump, try direct chaining.  */
+                 if (dc->jmp == JMP_INDIRECT) {
+-                    eval_cond_jmp(dc, env_btarget, tcg_const_i64(dc->pc));
++                    TCGv_i64 tmp_pc = tcg_const_i64(dc->pc);
++                    eval_cond_jmp(dc, env_btarget, tmp_pc);
++                    tcg_temp_free_i64(tmp_pc);
++
+                     dc->is_jmp = DISAS_JUMP;
+                 } else if (dc->jmp == JMP_DIRECT) {
+                     t_sync_flags(dc);
+-- 
+2.20.1
+
 
