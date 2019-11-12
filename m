@@ -2,70 +2,96 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 173FCC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:49:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C1B7C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:57:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D68652084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:49:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D68652084E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id D8F3B20818
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 11:57:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P3cnUr3O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8F3B20818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33829 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33880 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUUfl-00033B-2e
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 06:49:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37897)
+	id 1iUUo0-000521-So
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 06:57:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38746)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iUUf7-0002df-Pg
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:48:47 -0500
+ (envelope-from <slp@redhat.com>) id 1iUUnG-0004LP-Hz
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:57:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iUUf5-0006DT-S4
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:48:45 -0500
-Resent-Date: Tue, 12 Nov 2019 06:48:45 -0500
-Resent-Message-Id: <E1iUUf5-0006DT-S4@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21479)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iUUf5-0006DH-MF
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:48:43 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1573559308; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=dBU7GhAn8GxXmsN6+sg5o+MQgHJILl3X05BocM/97FrZplZZO2CA7lMuEM3zQqLDkNQjPr6WAbl0f1xoe/3YQwyKZqcfY+y62FuJcSwvg2IiNz5cJsaZTBLcwEPc3l373/6KYjq9mg1VKe5qLCND98uC6j/J1tEav4WibQTifxc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1573559308;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=6OnA9JV2jAOtqvhUKNdKMh/BQDk72+mvdpMkjceEI9I=; 
- b=JNvowMSab+C9/F3lpTIBrQBwNbB/wDc7YmC7Itk41neyqzUCABsyZ370f7eFIFqg69JpBxFcKQquDDjpqOWfTQfyz+DEAAlsDyV6qwfKs5LnP7TSm2dhWQ8UfBsAokVVYHssCFJ0IInwCkMbHDc/zH4iowrzBMinZYE+LKRGbrw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1573559306470592.6176251177448;
- Tue, 12 Nov 2019 03:48:26 -0800 (PST)
-In-Reply-To: <20191112035043.54600-1-kmcopper@danwin1210.me>
-Subject: Re: [PATCH] i386: define the 'flush_l1d' CPUID feature bit
- (CVE-2018-3646)
-Message-ID: <157355930545.9707.8514084726027961622@37313f22b938>
+ (envelope-from <slp@redhat.com>) id 1iUUnD-0000dh-Sy
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:57:08 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:28243
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iUUnD-0000dT-HM
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 06:57:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573559826;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Wzs8lJkoQadgyqQ+6CYM8vuQF90xsOpSjkIHYpXYnUg=;
+ b=P3cnUr3O4LQwGdvj9qo7GECI+zYEJXpoz3MHEUoE45/TRQbz8QrbxhhANsKZ/9dv1G1c/h
+ lICbXX8rByIho8yNvsVy3tO0JpiT9dU2MurcGb4WI+lMSJsQHgBittg0bgivu3z/ciUOnu
+ s7vzBnEdmHYk47ewpoWK457Q5cVWj2k=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-402-7CmWAS8fPiCw9n947Aj5eA-1; Tue, 12 Nov 2019 06:57:05 -0500
+Received: by mail-wr1-f70.google.com with SMTP id b4so11721205wrn.8
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 03:57:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version;
+ bh=fRRWibjhMYah7FVG3z/hGlGYki3qe/QauVO3dHWuZl0=;
+ b=WuKATh1l6sF7euByqzKBl/sdW05Ww2gLKdM4/cBziKvXHG9tKMESm76xCm5UO8ltlx
+ F2DTztGl303KBOVbu/lkN3wfoPpYPDHSGLG0o9wkRnC4vYq6n7PWHhusGTBGhfFcG+9x
+ KDgkfKJYVqPuZqAz2kliC7GVb/9m/N6v1KhD1MF5VoKpvZFe6fbcG14+jHYQWwBm+ocl
+ z1oX6Z4DeUwkiMAzsk9sA9jF5Q87fummBR0GIfGtaYCUZe3EHuUfegHvwZLNPH17ikA6
+ 2aaXlpal77OmGcWl5tIEJ7EiO1Wp+2HMfMc7UEzqKUfURIUpTGUdoFHBD6gCr+IvkdCC
+ DG1A==
+X-Gm-Message-State: APjAAAX+sw3Q9gW9bkAJn3z30Sr7UDxJ1MwVLT2GI1ijqjK+4rXN8Hsn
+ Tgc53Swiw2WLm2pXaCJYNlxN8uVdzTX5PX+MLwvZSasu8vsM4r54i9E7RAahJ5MsO5N/ZB2bTyr
+ IPwj7ynOln0bmo1o=
+X-Received: by 2002:adf:dd10:: with SMTP id a16mr26711936wrm.213.1573559823945; 
+ Tue, 12 Nov 2019 03:57:03 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy0P0/FBY753WsOEv33725rNsFsWAO4+Q9TYdQ/mXHaqJxFy0umCND/t7Q9HU6Qs8Lz75myrQ==
+X-Received: by 2002:adf:dd10:: with SMTP id a16mr26711915wrm.213.1573559823734; 
+ Tue, 12 Nov 2019 03:57:03 -0800 (PST)
+Received: from dritchie.redhat.com (139.red-95-120-215.dynamicip.rima-tde.net.
+ [95.120.215.139])
+ by smtp.gmail.com with ESMTPSA id 76sm4530971wma.0.2019.11.12.03.57.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 12 Nov 2019 03:57:03 -0800 (PST)
+References: <1571925835-31930-1-git-send-email-pbonzini@redhat.com>
+ <1571925835-31930-21-git-send-email-pbonzini@redhat.com>
+ <CAFEAcA-wqep+Lq93Ps=d6Cgx9bbYSNCcankbdvzoGz5T2P1_YA@mail.gmail.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 20/39] hw/i386: Introduce the microvm machine type
+In-reply-to: <CAFEAcA-wqep+Lq93Ps=d6Cgx9bbYSNCcankbdvzoGz5T2P1_YA@mail.gmail.com>
+Date: Tue, 12 Nov 2019 12:57:02 +0100
+Message-ID: <87y2wls3xt.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: qemu-devel@nongnu.org
-Date: Tue, 12 Nov 2019 03:48:26 -0800 (PST)
-X-ZohoMailClient: External
+X-MC-Unique: 7CmWAS8fPiCw9n947Aj5eA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,107 +103,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kmcopper@danwin1210.me, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTExMjAzNTA0My41NDYw
-MC0xLWttY29wcGVyQGRhbndpbjEyMTAubWUvCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVkIHRo
-ZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVzdGlu
-ZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIgaW5z
-dGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3IFY9
-MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19FTlY9
-MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKcWVtdS1zeXN0ZW0teDg2
-XzY0OiAvdG1wL3FlbXUtdGVzdC9zcmMvdGFyZ2V0L2kzODYvY3B1LmM6NTg5NjogeDg2X2NwdV9y
-ZWdpc3Rlcl9mZWF0dXJlX2JpdF9wcm9wczogQXNzZXJ0aW9uIGAhKF9fZXh0ZW5zaW9uX18gKF9f
-YnVpbHRpbl9jb25zdGFudF9wICgnXycpICYmICFfX2J1aWx0aW5fY29uc3RhbnRfcCAobmFtZSkg
-JiYgKCdfJykgPT0gJ1wwJyA/IChjaGFyICopIF9fcmF3bWVtY2hyIChuYW1lLCAnXycpIDogX19i
-dWlsdGluX3N0cmNociAobmFtZSwgJ18nKSkpJyBmYWlsZWQuCkJyb2tlbiBwaXBlCi90bXAvcWVt
-dS10ZXN0L3NyYy90ZXN0cy9saWJxdGVzdC5jOjE0OToga2lsbF9xZW11KCkgZGV0ZWN0ZWQgUUVN
-VSBkZWF0aCBmcm9tIHNpZ25hbCA2IChBYm9ydGVkKSAoY29yZSBkdW1wZWQpCkVSUk9SIC0gdG9v
-IGZldyB0ZXN0cyBydW4gKGV4cGVjdGVkIDMsIGdvdCAwKQptYWtlOiAqKiogW2NoZWNrLXF0ZXN0
-LXg4Nl82NF0gRXJyb3IgMQptYWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4u
-LgogIFRFU1QgICAgY2hlY2stcXRlc3QtYWFyY2g2NDogdGVzdHMvbnVtYS10ZXN0CiAgVEVTVCAg
-ICBjaGVjay11bml0OiB0ZXN0cy9jaGVjay1ibG9jay1xZGljdAotLS0KIFRlc3Rpbmc6CiBRRU1V
-IFguWS5aIG1vbml0b3IgLSB0eXBlICdoZWxwJyBmb3IgbW9yZSBpbmZvcm1hdGlvbgotKHFlbXUp
-IHNhdmV2bSBzbmFwMAotRXJyb3I6IE5vIGJsb2NrIGRldmljZSBjYW4gYWNjZXB0IHNuYXBzaG90
-cwotKHFlbXUpIGluZm8gc25hcHNob3RzCi1ObyBhdmFpbGFibGUgYmxvY2sgZGV2aWNlIHN1cHBv
-cnRzIHNuYXBzaG90cwotKHFlbXUpIGxvYWR2bSBzbmFwMAotRXJyb3I6IE5vIGJsb2NrIGRldmlj
-ZSBzdXBwb3J0cyBzbmFwc2hvdHMKLShxZW11KSBxdWl0CisocWVtdSkgUUVNVV9QUk9HOiBURVNU
-X0RJUi9zcmMvdGFyZ2V0L2kzODYvY3B1LmM6NTg5NjogeDg2X2NwdV9yZWdpc3Rlcl9mZWF0dXJl
-X2JpdF9wcm9wczogQXNzZXJ0aW9uIGAhKF9fZXh0ZW5zaW9uX18gKF9fYnVpbHRpbl9jb25zdGFu
-dF9wICgnXycpICYmICFfX2J1aWx0aW5fY29uc3RhbnRfcCAobmFtZSkgJiYgKCdfJykgPT0gJ1ww
-JyA/IChjaGFyICopIF9fcmF3bWVtY2hyIChuYW1lLCAnXycpIDogX19idWlsdGluX3N0cmNociAo
-bmFtZSwgJ18nKSkpJyBmYWlsZWQuCisuL2NvbW1vbi5yYzogbGluZSAxMjE6ICAzNzgzIEFib3J0
-ZWQgICAgICAgICAgICAgICAgIChjb3JlIGR1bXBlZCkgKCBpZiBbIC1uICIke1FFTVVfTkVFRF9Q
-SUR9IiBdOyB0aGVuCi0tLQogVGVzdGluZzogLWRyaXZlIGRyaXZlcj1maWxlLGZpbGU9VEVTVF9E
-SVIvdC5JTUdGTVQsaWY9bm9uZQogUUVNVSBYLlkuWiBtb25pdG9yIC0gdHlwZSAnaGVscCcgZm9y
-IG1vcmUgaW5mb3JtYXRpb24KLShxZW11KSBzYXZldm0gc25hcDAKLUVycm9yOiBEZXZpY2UgJ25v
-bmUwJyBpcyB3cml0YWJsZSBidXQgZG9lcyBub3Qgc3VwcG9ydCBzbmFwc2hvdHMKLShxZW11KSBp
-bmZvIHNuYXBzaG90cwotTm8gYXZhaWxhYmxlIGJsb2NrIGRldmljZSBzdXBwb3J0cyBzbmFwc2hv
-dHMKLShxZW11KSBsb2Fkdm0gc25hcDAKLUVycm9yOiBEZXZpY2UgJ25vbmUwJyBpcyB3cml0YWJs
-ZSBidXQgZG9lcyBub3Qgc3VwcG9ydCBzbmFwc2hvdHMKLShxZW11KSBxdWl0CisocWVtdSkgUUVN
-VV9QUk9HOiBURVNUX0RJUi9zcmMvdGFyZ2V0L2kzODYvY3B1LmM6NTg5NjogeDg2X2NwdV9yZWdp
-c3Rlcl9mZWF0dXJlX2JpdF9wcm9wczogQXNzZXJ0aW9uIGAhKF9fZXh0ZW5zaW9uX18gKF9fYnVp
-bHRpbl9jb25zdGFudF9wICgnXycpICYmICFfX2J1aWx0aW5fY29uc3RhbnRfcCAobmFtZSkgJiYg
-KCdfJykgPT0gJ1wwJyA/IChjaGFyICopIF9fcmF3bWVtY2hyIChuYW1lLCAnXycpIDogX19idWls
-dGluX3N0cmNociAobmFtZSwgJ18nKSkpJyBmYWlsZWQuCisuL2NvbW1vbi5yYzogbGluZSAxMjE6
-ICAzODEzIEFib3J0ZWQgICAgICAgICAgICAgICAgIChjb3JlIGR1bXBlZCkgKCBpZiBbIC1uICIk
-e1FFTVVfTkVFRF9QSUR9IiBdOyB0aGVuCi0tLQogVGVzdGluZzogLWRyaXZlIGRyaXZlcj1maWxl
-LGZpbGU9VEVTVF9ESVIvdC5JTUdGTVQsaWY9dmlydGlvCiBRRU1VIFguWS5aIG1vbml0b3IgLSB0
-eXBlICdoZWxwJyBmb3IgbW9yZSBpbmZvcm1hdGlvbgotKHFlbXUpIHNhdmV2bSBzbmFwMAotRXJy
-b3I6IERldmljZSAndmlydGlvMCcgaXMgd3JpdGFibGUgYnV0IGRvZXMgbm90IHN1cHBvcnQgc25h
-cHNob3RzCi0ocWVtdSkgaW5mbyBzbmFwc2hvdHMKLU5vIGF2YWlsYWJsZSBibG9jayBkZXZpY2Ug
-c3VwcG9ydHMgc25hcHNob3RzCi0ocWVtdSkgbG9hZHZtIHNuYXAwCi1FcnJvcjogRGV2aWNlICd2
-aXJ0aW8wJyBpcyB3cml0YWJsZSBidXQgZG9lcyBub3Qgc3VwcG9ydCBzbmFwc2hvdHMKLShxZW11
-KSBxdWl0CisocWVtdSkgUUVNVV9QUk9HOiBURVNUX0RJUi9zcmMvdGFyZ2V0L2kzODYvY3B1LmM6
-NTg5NjogeDg2X2NwdV9yZWdpc3Rlcl9mZWF0dXJlX2JpdF9wcm9wczogQXNzZXJ0aW9uIGAhKF9f
-ZXh0ZW5zaW9uX18gKF9fYnVpbHRpbl9jb25zdGFudF9wICgnXycpICYmICFfX2J1aWx0aW5fY29u
-c3RhbnRfcCAobmFtZSkgJiYgKCdfJykgPT0gJ1wwJyA/IChjaGFyICopIF9fcmF3bWVtY2hyIChu
-YW1lLCAnXycpIDogX19idWlsdGluX3N0cmNociAobmFtZSwgJ18nKSkpJyBmYWlsZWQuCisuL2Nv
-bW1vbi5yYzogbGluZSAxMjE6ICAzOTA1IEFib3J0ZWQgICAgICAgICAgICAgICAgIChjb3JlIGR1
-bXBlZCkgKCBpZiBbIC1uICIke1FFTVVfTkVFRF9QSUR9IiBdOyB0aGVuCi0tLQogVGVzdGluZzog
-LWJsb2NrZGV2IGRyaXZlcj1maWxlLGZpbGVuYW1lPVRFU1RfRElSL3QuSU1HRk1ULG5vZGUtbmFt
-ZT1maWxlCiBRRU1VIFguWS5aIG1vbml0b3IgLSB0eXBlICdoZWxwJyBmb3IgbW9yZSBpbmZvcm1h
-dGlvbgotKHFlbXUpIHNhdmV2bSBzbmFwMAotRXJyb3I6IERldmljZSAnJyBpcyB3cml0YWJsZSBi
-dXQgZG9lcyBub3Qgc3VwcG9ydCBzbmFwc2hvdHMKLShxZW11KSBpbmZvIHNuYXBzaG90cwotTm8g
-YXZhaWxhYmxlIGJsb2NrIGRldmljZSBzdXBwb3J0cyBzbmFwc2hvdHMKLShxZW11KSBsb2Fkdm0g
-c25hcDAKLUVycm9yOiBEZXZpY2UgJycgaXMgd3JpdGFibGUgYnV0IGRvZXMgbm90IHN1cHBvcnQg
-c25hcHNob3RzCi0ocWVtdSkgcXVpdAorKHFlbXUpIFFFTVVfUFJPRzogVEVTVF9ESVIvc3JjL3Rh
-cmdldC9pMzg2L2NwdS5jOjU4OTY6IHg4Nl9jcHVfcmVnaXN0ZXJfZmVhdHVyZV9iaXRfcHJvcHM6
-IEFzc2VydGlvbiBgIShfX2V4dGVuc2lvbl9fIChfX2J1aWx0aW5fY29uc3RhbnRfcCAoJ18nKSAm
-JiAhX19idWlsdGluX2NvbnN0YW50X3AgKG5hbWUpICYmICgnXycpID09ICdcMCcgPyAoY2hhciAq
-KSBfX3Jhd21lbWNociAobmFtZSwgJ18nKSA6IF9fYnVpbHRpbl9zdHJjaHIgKG5hbWUsICdfJykp
-KScgZmFpbGVkLgorLi9jb21tb24ucmM6IGxpbmUgMTIxOiAgMzk2MyBBYm9ydGVkICAgICAgICAg
-ICAgICAgICAoY29yZSBkdW1wZWQpICggaWYgWyAtbiAiJHtRRU1VX05FRURfUElEfSIgXTsgdGhl
-bgotLS0KICBURVNUICAgIGlvdGVzdC1xY293MjogMjY4CkZhaWx1cmVzOiAwNjAgMDcxIDA5OSAx
-MTcgMTIwIDE0MCAxNDEgMTQzIDE1NiAxNjEgMTcyIDE3NiAxODQgMTg2IDE5MSAxOTIgMTk1IDIy
-OSAyNDkgMjY3CkZhaWxlZCAyMCBvZiAxMDggaW90ZXN0cwptYWtlOiAqKiogW2NoZWNrLXRlc3Rz
-L2NoZWNrLWJsb2NrLnNoXSBFcnJvciAxCiAgVEVTVCAgICBjaGVjay1xdGVzdC1hYXJjaDY0OiB0
-ZXN0cy90ZXN0LWhtcAogIFRFU1QgICAgY2hlY2stcXRlc3QtYWFyY2g2NDogdGVzdHMvcW9zLXRl
-c3QKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3QpOgotLS0KICAgIHJhaXNlIENhbGxl
-ZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9y
-OiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICctLWxhYmVsJywgJ2Nv
-bS5xZW11Lmluc3RhbmNlLnV1aWQ9OWE3MjcxY2EzMWFlNDBlYmE5YWI1NDA1YzRjMGYyOGUnLCAn
-LXUnLCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29uZmluZWQnLCAnLS1y
-bScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklHVVJFX09QVFM9Jywg
-Jy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1lJywgJ1NIT1dfRU5W
-PTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYnLCAnL2hvbWUvcGF0
-Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNoZTp6JywgJy12Jywg
-Jy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC1mZ3oybGF1ai9zcmMvZG9ja2VyLXNyYy4yMDE5
-LTExLTEyLTA2LjM4LjAwLjIxMDIxOi92YXIvdG1wL3FlbXU6eixybycsICdxZW11OmNlbnRvczcn
-LCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5lZCBub24temVybyBl
-eGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUuaW5zdGFuY2UudXVp
-ZD05YTcyNzFjYTMxYWU0MGViYTlhYjU0MDVjNGMwZjI4ZQptYWtlWzFdOiAqKiogW2RvY2tlci1y
-dW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIvdG1wL3BhdGNoZXct
-dGVzdGVyLXRtcC1mZ3oybGF1ai9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1bi10ZXN0LXF1aWNr
-QGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgMTBtMjQuNzg1cwp1c2VyICAgIDBtOC4yODVzCgoK
-VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDE5
-MTExMjAzNTA0My41NDYwMC0xLWttY29wcGVyQGRhbndpbjEyMTAubWUvdGVzdGluZy5kb2NrZXIt
-cXVpY2tAY2VudG9zNy8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> On Thu, 24 Oct 2019 at 16:19, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> From: Sergio Lopez <slp@redhat.com>
+>>
+>> microvm is a machine type inspired by Firecracker and constructed
+>> after its machine model.
+>>
+>> It's a minimalist machine type without PCI nor ACPI support, designed
+>> for short-lived guests. microvm also establishes a baseline for
+>> benchmarking and optimizing both QEMU and guest operating systems,
+>> since it is optimized for both boot time and footprint.
+>
+> Hi; Coverity points out a memory leak in this commit
+> (CID 1407218):
+>
+>
+>> +static void microvm_fix_kernel_cmdline(MachineState *machine)
+>> +{
+>> +    X86MachineState *x86ms =3D X86_MACHINE(machine);
+>> +    BusState *bus;
+>> +    BusChild *kid;
+>> +    char *cmdline;
+>> +
+>> +    /*
+>> +     * Find MMIO transports with attached devices, and add them to the =
+kernel
+>> +     * command line.
+>> +     *
+>> +     * Yes, this is a hack, but one that heavily improves the UX withou=
+t
+>> +     * introducing any significant issues.
+>> +     */
+>> +    cmdline =3D g_strdup(machine->kernel_cmdline);
+>
+> Here we allocate memory for cmdline...
+>
+>> +    bus =3D sysbus_get_default();
+>> +    QTAILQ_FOREACH(kid, &bus->children, sibling) {
+>> +        DeviceState *dev =3D kid->child;
+>> +        ObjectClass *class =3D object_get_class(OBJECT(dev));
+>> +
+>> +        if (class =3D=3D object_class_by_name(TYPE_VIRTIO_MMIO)) {
+>> +            VirtIOMMIOProxy *mmio =3D VIRTIO_MMIO(OBJECT(dev));
+>> +            VirtioBusState *mmio_virtio_bus =3D &mmio->bus;
+>> +            BusState *mmio_bus =3D &mmio_virtio_bus->parent_obj;
+>> +
+>> +            if (!QTAILQ_EMPTY(&mmio_bus->children)) {
+>> +                gchar *mmio_cmdline =3D microvm_get_mmio_cmdline(mmio_b=
+us->name);
+>> +                if (mmio_cmdline) {
+>> +                    char *newcmd =3D g_strjoin(NULL, cmdline, mmio_cmdl=
+ine, NULL);
+>> +                    g_free(mmio_cmdline);
+>> +                    g_free(cmdline);
+>> +                    cmdline =3D newcmd;
+>> +                }
+>> +            }
+>> +        }
+>> +    }
+>> +
+>> +    fw_cfg_modify_i32(x86ms->fw_cfg, FW_CFG_CMDLINE_SIZE, strlen(cmdlin=
+e) + 1);
+>> +    fw_cfg_modify_string(x86ms->fw_cfg, FW_CFG_CMDLINE_DATA, cmdline);
+>
+> ...but fw_cfg_modify_string() takes a copy of the string it's passed,
+> so we still have ownership of 'cmdline' and need to free it here
+> to avoid a leak.
+
+Ack, will send a patch ASAP.
+
+Thanks,
+Sergio.
+
+>> +}
+>
+> thanks
+> -- PMM
+
 
