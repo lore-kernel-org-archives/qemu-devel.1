@@ -2,79 +2,114 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 024DDC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5FADC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C6DD9214E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:40:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64E8120818
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:43:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="froQg6DU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6DD9214E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="bkB0Mu0j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64E8120818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUb5j-0002en-T7
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 13:40:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41739)
+	id 1iUb8B-0003kW-Ie
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 13:43:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42021)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iUb56-0002AM-7c
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:40:01 -0500
+ (envelope-from <sunilmut@microsoft.com>) id 1iUb79-0003Hp-9Q
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:42:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iUb54-0007Qu-VT
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:40:00 -0500
-Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:42528)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iUb54-0007Qe-Nl
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:39:58 -0500
-Received: by mail-ot1-x32c.google.com with SMTP id b16so15215068otk.9
- for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 10:39:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9zwVg2O8wptvJsGyfjFUwZZJImE1hfapMUoloLI0lnk=;
- b=froQg6DUP7S51/DFD97DmN5wImcamN+tO/Oa5ZxmLQbyJT5VQkNF/+EDy/uyEaoM5J
- sjxRjTFy108KOC/MEfOe8kK40VGn+mlM+b/OmOG5ipRlHkkdzFRRrHF59PnQbOyvVxur
- qSIEfffusKk9CEjd5SuBZljPkGzGIk4YPRnoPCsYv7F9X9v50Rw4uxTjxvgN/BqHaaWE
- dDuyhfPiCJCu3XEmzm9zOZreVq1KMRdX7wMNyWfP8N2jbF0rb5XoVcu4Cufe6VRkISkt
- mRCB/iwxo9XnjBras2HWGrWdp8aYHcW99qNLVuvdxt4S72IQeDhW+xSDKDdpxjP5fOnC
- Wsqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=9zwVg2O8wptvJsGyfjFUwZZJImE1hfapMUoloLI0lnk=;
- b=X7rGAUrH1GweyoKo31PeeJQfmugTWbca7k235XAt7vgDK0fJpGS4uSYXYhIqGp60nS
- pgcYPDGYdEeSZxr7+Rc9xYJV0aPZOL084rb2MdlIDsK6UwOI3SRU9nMy0gY4OBDBDJgK
- mzbVjrV3c0cetoj7UR+lcjE/WHGC/8ujgvJbY3Jsw4FrFPth6+9KgCNhvhn/Bk6YGK6E
- wOrDYpHv2lXWwwI8t2eXuupcStATdZACvQml9jnZspIytQNUaR2aM8p3tHu3FZNnVWW5
- HfAIyyRgXBzS9oaqhgieJViedsNsdl2ThXDFJfmBvX38kNYAOGeKHIxPWuUB/GPKMP+O
- Fgqw==
-X-Gm-Message-State: APjAAAX/rFbppPwo8O1B4Uuf+AQqBTl5mmNydUSOktOBNEIxTqqy54c6
- CplxvNrQZsldQC4wPTcOyY1Q9jEZIyGaDAUQtTYQwQ==
-X-Google-Smtp-Source: APXvYqwtYdZInmxKfgya/UllSv2VTH+CM6bqTCGs55oH4sJA2fIIsaC/DQU9dAdU3/NSPNj3tLf/o3ZO6SBlk0A/sXM=
-X-Received: by 2002:a9d:7ac2:: with SMTP id m2mr16740218otn.135.1573583997721; 
- Tue, 12 Nov 2019 10:39:57 -0800 (PST)
+ (envelope-from <sunilmut@microsoft.com>) id 1iUb77-00009T-4I
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:42:06 -0500
+Received: from mail-eopbgr720095.outbound.protection.outlook.com
+ ([40.107.72.95]:42352 helo=NAM05-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <sunilmut@microsoft.com>)
+ id 1iUb76-00007G-Nj
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:42:05 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y2eRE4TxAebQD31pomoCKZFHWP3TG4R0BK9IqYy+JleNAvhSIwkxmci54T/wcpx66kp9Hi8CTBQrNiL3L3WMRxswHF8ogWSL03fuI8uKSo83av3IaR0TNpZ5nvIIQuVuLS89IEt7IIJDLtr88gYzyiPOlGXp+NjptX0NPvwoH5joKGms5MtCXDIDq4K7OLEFQ6BvNSN4QBDNlAQkPAJnyA801oBxgBF8aOQ20NPVF4NIT4dlT5XVG0QPj24guuc4Ur1XS5ESsjcZxoJKzLtrAQIshvPex4TBVHoZpm7pug/YEaoR/glQDKrGUawr7LseZIWz9ahAKcFZQ42BJ3xPdQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ojG8DIQLfCUn34ksC/rjxUFeUWDaDvrrc5DEvZaW0wg=;
+ b=ePqH/wZ4qiaudEO8dXN7Kpb2cIfsA0xSBCsCLtfT2dNh7dZbVM9sVtu2HIXVqbgk0FeGd4YySpIkTFzzDMeyrvQGrKQtkfTfrke1FPzn2vX8d8O5nIRcHwkWu+VdvBCZ/gUwAuIDPwgQji/cdy45mZ2/vYAkdvBJ54yirKJRqdf7zkcAXxBOVeo77Vvr3nPsG7RgSepzIYcN/GH1VMJbZMZJYTSvyBLj/JU5uIxBOqxZAbG/DzxFBmZ7ntJJQnauCFAAP90VwXvJqBiONvMQooxMBi4yhxvWfnViZScZJ0fYZ4spcBA30bTAB7F9X+hv+ylLaagcrretMC0DnOz5Fg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ojG8DIQLfCUn34ksC/rjxUFeUWDaDvrrc5DEvZaW0wg=;
+ b=bkB0Mu0jvUB6Kc84mDhNS7rZbIk5lcVsD5n0ku1aENAPocnEK/9g2/irrvf33T27IiQKwex6I8hL6pYVt94I1HWCAr46OyUuRd7IQUamVMOC2c2HuRMzq1h7flH5sbRhneeeLCN4pP3Va4duwwdRQINMt9Ybw+zyOR1otdlvKnY=
+Received: from MW2PR2101MB1116.namprd21.prod.outlook.com (52.132.149.33) by
+ MW2PR2101MB1083.namprd21.prod.outlook.com (52.132.149.24) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.15; Tue, 12 Nov 2019 18:42:02 +0000
+Received: from MW2PR2101MB1116.namprd21.prod.outlook.com
+ ([fe80::121:8a4f:76a8:fd9]) by MW2PR2101MB1116.namprd21.prod.outlook.com
+ ([fe80::121:8a4f:76a8:fd9%6]) with mapi id 15.20.2451.018; Tue, 12 Nov 2019
+ 18:42:01 +0000
+From: Sunil Muthuswamy <sunilmut@microsoft.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
+ Eduardo Habkost <ehabkost@redhat.com>, Stefan Weil <sw@weilnetz.de>
+CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Justin Terry (VM)"
+ <juterry@microsoft.com>
+Subject: RE: [PATCH] WHPX: refactor load library
+Thread-Topic: [PATCH] WHPX: refactor load library
+Thread-Index: AdWWczxfa/0gc1vPTEu6TOvflPR6ngDFYVqA
+Date: Tue, 12 Nov 2019 18:42:00 +0000
+Message-ID: <MW2PR2101MB1116C3DF422DB5E301B74AEEC0770@MW2PR2101MB1116.namprd21.prod.outlook.com>
+References: <MW2PR2101MB1116386CFE4628B6767D6CDBC07B0@MW2PR2101MB1116.namprd21.prod.outlook.com>
+In-Reply-To: <MW2PR2101MB1116386CFE4628B6767D6CDBC07B0@MW2PR2101MB1116.namprd21.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=sunilmut@microsoft.com; 
+x-originating-ip: [2001:4898:80e8:0:4c8c:ac9e:157a:29d]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 0227ff82-e3e1-4ada-416c-08d767a00170
+x-ms-traffictypediagnostic: MW2PR2101MB1083:|MW2PR2101MB1083:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MW2PR2101MB1083B00670B2C76D8A33FCAAC0770@MW2PR2101MB1083.namprd21.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2733;
+x-forefront-prvs: 021975AE46
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(396003)(346002)(366004)(136003)(39860400002)(13464003)(199004)(189003)(81156014)(186003)(14454004)(486006)(4744005)(8936002)(107886003)(74316002)(5660300002)(81166006)(2906002)(7736002)(76176011)(10290500003)(6246003)(54906003)(7696005)(305945005)(110136005)(25786009)(33656002)(8676002)(6506007)(53546011)(316002)(102836004)(99286004)(64756008)(8990500004)(66446008)(71190400001)(71200400001)(229853002)(446003)(6436002)(476003)(11346002)(256004)(10090500001)(66556008)(66476007)(66946007)(478600001)(52536014)(4326008)(86362001)(22452003)(76116006)(46003)(55016002)(6116002)(9686003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:MW2PR2101MB1083;
+ H:MW2PR2101MB1116.namprd21.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: microsoft.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 93Ry8pbjQsJcz5RCjShg8qXOLRXpVAPS01XzlYvrGqtuJbztByui2uYJXDu3pI4u6o8HjYAWHcheOFaq/o22F93hT/pccruIhh9EOrWmjegS2VXoDcpqsGDrLqR6DCgoxoU8QkAIfqVvVS4wuF6ZJG9CH0uyu8vwkDOKlqpdzyllj0Z0ZEoDMmBjTC943hgHRhsl/ieU5qZYEChpX/SpiTNwHrBYDTz4JsrMMjhXTKKouvRECJEAchMReOJFg87Xak9MU2ziSL7mRfYyiFXRsAvQP/q1WB8TL5oXrPIDUfB9ZQRt+Z2Pum13fJLAqTCLBelZSzNk0BxOaiCjrQplkd0eOyY0+LdXP9bHrAWMVtJrhEZpomvO/8rwLKHQFsBktpBdf90rcRBzwrXaZj3eXsszpUFBOSt3y9qs/dRqKs6DOBzd5UUfDFBk1O8dVx8/
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20191112161654.2253-1-laurent@vivier.eu>
-In-Reply-To: <20191112161654.2253-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Nov 2019 18:39:46 +0000
-Message-ID: <CAFEAcA_6JO-3FXSjOFizes9r2mO23-QmvDEoFEZHg9oPk0-DLA@mail.gmail.com>
-Subject: Re: [PULL 0/2] Linux user for 4.2 patches
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::32c
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0227ff82-e3e1-4ada-416c-08d767a00170
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Nov 2019 18:42:01.0368 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: szDWew4JMoOs26azIGSUN1QNR0eA+eCZrgZDrYzZOAXnyAp3F8OQsrmvo7nKZQUztJAVMIG/31ACqHfgD5PPb4OwTtvR/GYlEdzO7QcsHnM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR2101MB1083
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.72.95
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,40 +121,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 12 Nov 2019 at 16:18, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> The following changes since commit 2a7e7c3e103a5c29af7c583390c243d85a2527e8:
->
->   Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-and-tcg-121119-1' into staging (2019-11-12 14:51:00 +0000)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/linux-user-for-4.2-pull-request
->
-> for you to fetch changes up to 0f1f2d4596aee037d3ccbcf10592466daa54107f:
->
->   linux-user: remove host stime() syscall (2019-11-12 17:05:57 +0100)
->
-> ----------------------------------------------------------------
-> Fix CID 1407221 and stime()
->
-> ----------------------------------------------------------------
->
-> Laurent Vivier (2):
->   linux-user: fix missing break
->   linux-user: remove host stime() syscall
->
 
 
-Applied, thanks.
+> -----Original Message-----
+> From: Sunil Muthuswamy
+> Sent: Friday, November 8, 2019 12:32 PM
+> To: 'Paolo Bonzini' <pbonzini@redhat.com>; 'Richard Henderson' <rth@twidd=
+le.net>; 'Eduardo Habkost' <ehabkost@redhat.com>; 'Stefan
+> Weil' <sw@weilnetz.de>
+> Cc: 'qemu-devel@nongnu.org' <qemu-devel@nongnu.org>; Justin Terry (VM) <j=
+uterry@microsoft.com>
+> Subject: [PATCH] WHPX: refactor load library
+>=20
+> This refactors the load library of WHV libraries to make it more
+> modular. It makes a helper routine that can be called on demand.
+> This allows future expansion of load library/functions to support
+> functionality that is depenedent on some feature being available.
+>=20
+> Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
+> ---
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+Can I possibly get some eyes on this?
 
--- PMM
 
