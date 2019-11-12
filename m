@@ -2,83 +2,78 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 482BBC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90033C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:57:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1370520656
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:52:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58FEA206BA
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:57:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HNSZuVw/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1370520656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="umlJOWFJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58FEA206BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUSqA-0005jJ-60
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:52:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51254)
+	id 1iUSvH-0007Au-GU
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:57:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51718)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iUSpS-0004uo-8d
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:51:19 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iUSuf-0006jC-GW
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:56:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iUSpQ-0005vl-FN
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:51:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26183
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iUSpQ-0005vX-Bu
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:51:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573552275;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IUrBt6Z8YT3OCPILCb5VdeEDG5vDPhgYmmE1TKoajaw=;
- b=HNSZuVw/qi5jUM0O5dc0hUKgW/K2ctcMP8tZu38O8ecxKie1Aq9hXDZYOo1sDhbYHUVg7O
- tumKtoadtF11Q+6vs4oUm/EpSeyQU8aaPR+fQujecqrq4KOIT20qM5NmL5c1FrSMMekLb3
- /45jeyV005VA/J6DaBTvhkaucwaKES0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-Le-xX2s5N-GuFLFQItg-1g-1; Tue, 12 Nov 2019 04:51:13 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5415C800C61;
- Tue, 12 Nov 2019 09:51:12 +0000 (UTC)
-Received: from redhat.com (ovpn-112-58.ams2.redhat.com [10.36.112.58])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C57761F58;
- Tue, 12 Nov 2019 09:51:10 +0000 (UTC)
-Date: Tue, 12 Nov 2019 09:51:08 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Kyle Copperfield <kmcopper@danwin1210.me>,
- Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] i386: define the 'flush_l1d' CPUID feature bit
- (CVE-2018-3646)
-Message-ID: <20191112095108.GL2366658@redhat.com>
-References: <20191112035043.54600-1-kmcopper@danwin1210.me>
+ (envelope-from <peter.maydell@linaro.org>) id 1iUSue-0007Qx-9Z
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:56:41 -0500
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37890)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iUSue-0007QU-45
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:56:40 -0500
+Received: by mail-oi1-x241.google.com with SMTP id a14so14245062oid.5
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 01:56:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=+qQ7U7N0vkKUJMDlT+UKnYLKZ9+HFAaytOYXlGys/K0=;
+ b=umlJOWFJTmo6JiqNXGi6GR0KHDhuvi4HbXWQ7CNMLpjUFnAYx+80Z1mJEiR9ntopGJ
+ D0BsxiGgG0yBC9ncAph5zT+caVJq7OuOl1g6k+eCE1jAYgHT6fPV8Sc7y9sdtceUn/7w
+ MkG4rE+qx+n8j7Mu8bmbnLIh6+T0huKwe93SfSd4PLdPTfu8YBJPqywk+2ySTcLVxOJT
+ T6nCHb+fVeFYs1WDWTBUDuyeidfY4R88cogLlyy6JU1Pkc5gAUn3Vq5F66YGOGC9Rjjw
+ W8ofS37GS3AysiohTSb+xanvi3qDbQ2/8aJ3H7vniXnfvvPTc73D6md11AW5NFqcaGWr
+ aouA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=+qQ7U7N0vkKUJMDlT+UKnYLKZ9+HFAaytOYXlGys/K0=;
+ b=Kqk+9rbgWjvewCpVkWQ4RAiO6cZf/jrq6r71ykpoCb7woMaY2i9web2r07600IGOd0
+ 8O/YGOZkEE+oAjjt56dETmPZQm8G7Cx/V9cMwvgfjRwLxsJewMyYRYzfvYxZxIEC2Aw8
+ Exftko+wfst6LWPXI+lzXgMeMQC+BL72VwynRWeFX8CkmpZyE4YJ7uPqv/sgEfAwxVav
+ 1O+pafygVKF1qtEmq8iZvbU7WzpcbctF62hriOFiRE3KG/J+deKHQx9J7LI9pnLCwONB
+ XOJIqZE1TTdHQhcplZCdf4WMxqmnxN0b3jP5dV/nP1ubrYhtcT8rtbGpKMlTcg6OTBgh
+ nlGQ==
+X-Gm-Message-State: APjAAAXz93B8vC8+gPVcc/SkwoSa5Ut+yXOlbXuzD9qRsL78uqx7nUlO
+ opvUSUI1HKyC4ugAm4UdK6PqHdw1kmrXRR6aBjW8+Q==
+X-Google-Smtp-Source: APXvYqx0YOLvCxoBmcuJ+xanyzFc0FKXrXK3iVPG3zjm2whEQH5C1oriNLXz1ZHs23+fe2a2ble3UYG191cYbl1iDZk=
+X-Received: by 2002:aca:451:: with SMTP id 78mr3321021oie.170.1573552599122;
+ Tue, 12 Nov 2019 01:56:39 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191112035043.54600-1-kmcopper@danwin1210.me>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: Le-xX2s5N-GuFLFQItg-1g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20191111203524.21912-1-eblake@redhat.com>
+In-Reply-To: <20191111203524.21912-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Nov 2019 09:56:27 +0000
+Message-ID: <CAFEAcA99d8ArWGBDFZ1ZK-i6X14M3U9+ZqPyk=fi+d7cQk8E4w@mail.gmail.com>
+Subject: Re: [PATCH] qemu-coroutine-sleep: Silence Coverity warning
+To: Eric Blake <eblake@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::241
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,76 +85,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 12, 2019 at 03:50:43AM +0000, Kyle Copperfield via wrote:
-> New microcode introduces the "Flush L1D Cache" CPUID feature bit.
-> This needs to be exposed to guest OS to allow them to protect against
-> CVE-2018-3646.
-
-My understanding was that this is only required in the L0 hypervisor,
-not the guests or nested hypervisors, which is why QEMU hadn't already
-exposed this feature when L1TF first went public.
-
-Copying Paolo for a definitive answer on that though....
-
->=20
-> Signed-off-by: Kyle Copperfield <kmcopper@danwin1210.me>
+On Mon, 11 Nov 2019 at 20:35, Eric Blake <eblake@redhat.com> wrote:
+>
+> Coverity warns that we store the address of a stack variable through a
+> pointer passed in by the caller, which would let the caller trivially
+> trigger use-after-free if that stored value is still present when we
+> finish execution.  However, the way coroutines work is that after our
+> call to qemu_coroutine_yield(), control is temporarily continued in
+> the caller prior to our function concluding, and in order to resume
+> our coroutine, the caller must poll until the variable has been set to
+> NULL.  Thus, we can add an assert that we do not leak stack storage to
+> the caller on function exit.
+>
+> Fixes: Coverity CID 1406474
+> CC: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  docs/qemu-cpu-models.texi | 7 +++++++
->  target/i386/cpu.c         | 2 +-
->  2 files changed, 8 insertions(+), 1 deletion(-)
->=20
-> diff --git a/docs/qemu-cpu-models.texi b/docs/qemu-cpu-models.texi
-> index f88a1def0d..1b5349d86a 100644
-> --- a/docs/qemu-cpu-models.texi
-> +++ b/docs/qemu-cpu-models.texi
-> @@ -180,6 +180,13 @@ Must be explicitly turned on for all Intel CPU model=
-s.
->  Requires the host CPU microcode to support this feature before it
->  can be used for guest CPUs.
-> =20
-> +@item @code{flush_l1d}
-> +
-> +Required to enable strong Foreshadow-NG (VMM) (CVE-2018-3646) fixes in
-> +guests.
-> +
-> +Requires the host CPU microcode to support this feature before it
-> +can be used for guest CPUs.
-> =20
->  @item @code{ssbd}
-> =20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index a624163ac2..1fb6d677e2 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1083,7 +1083,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WO=
-RDS] =3D {
->              NULL, NULL, NULL /* pconfig */, NULL,
->              NULL, NULL, NULL, NULL,
->              NULL, NULL, "spec-ctrl", "stibp",
-> -            NULL, "arch-capabilities", "core-capability", "ssbd",
-> +            "flush_l1d", "arch-capabilities", "core-capability", "ssbd",
->          },
->          .cpuid =3D {
->              .eax =3D 7,
-> --=20
-> 2.24.0
->=20
->=20
+>
+> I don't know if this actually shuts Coverity up; Peter, since you
+> reported the Coverity issue, are you in a better position to test if
+> this makes a difference?  At any rate, the tests still pass after
+> this is in place.
 
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+The only way to test is to commit it to master and wait for
+the next run...
 
+-- PMM
 
