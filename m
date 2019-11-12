@@ -2,68 +2,79 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12D11C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:52:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96855C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:52:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCBED2084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:52:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCBED2084E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 5CC442084E
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:52:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m239Hntt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CC442084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUTmG-0004XV-VT
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 05:52:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59268)
+	id 1iUTmM-0004gd-EY
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 05:52:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59270)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iUTlM-0003id-Bg
+ (envelope-from <peter.maydell@linaro.org>) id 1iUTlM-0003ie-Jd
  for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:51:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iUTlL-0002WH-6b
+ (envelope-from <peter.maydell@linaro.org>) id 1iUTlL-0002WP-C5
  for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:51:08 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:54397)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iUTlK-0002Ve-UD
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34376)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iUTlL-0002Vr-6j
  for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:51:07 -0500
-Received: from localhost.localdomain ([78.238.229.36]) by
- mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MNcYX-1iEsiV0Pb1-00P3wn; Tue, 12 Nov 2019 11:51:00 +0100
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] linux-user: fix missing break
-Date: Tue, 12 Nov 2019 11:50:55 +0100
-Message-Id: <20191112105055.32269-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.21.0
+Received: by mail-ot1-x341.google.com with SMTP id 5so77994otk.1
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 02:51:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=IU6TXDnvwtd6p1q67vCtVzrG4DPIqESfBgVohMfO8uM=;
+ b=m239HnttZceqjMxpc93PXydJp+8S4f6bZDhDoI01jTMObd8sNEVeg3brvmWLclDgZ6
+ Exr3gGtZxRfirPv4pc/zA2dQ3tcTezE20kb5N+eptDc43vBlmcfNDKTb6ufuKhwsv2GY
+ Bn9JTUEimGXSOhZFTYA4h1jyH1Wor+RQb3uGdo9Qbe7/ma3s7LIfFa+Zuc/UUR/UXSfu
+ RyTl+3Zf2diq0+y2tRX/yKuHVacsGooqHWUMtMqEV7sRqD5gvsIRefR+a/eCHWXj8mgX
+ F/RfthcOK4cJIuE3tN+ZIht/ojnCIumvj+yeK2abq1MniiTG+YNC6QBoXelC9s5yzDvL
+ TzcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=IU6TXDnvwtd6p1q67vCtVzrG4DPIqESfBgVohMfO8uM=;
+ b=esnd6NuY7QMdAui0uDMJTrZeNmffTTfRMY4B9DAGCDN2TAEz4nKEPo+OKT3mKSDe6g
+ XhjX4UNBPD2rE/tgblQvDdD0/zH8rCn8fdJTG3fICanc9TMGVbLZ5wUoXTXw3rncMBe4
+ Xfy4PgbalefkN+vswolzGWKi5LiFrVzOOf+maFZvsitY5eCTlDUhPxiEIjpcdztuIiiV
+ +GA9SR68mORKRj4FcpdfmEHBrvh852Z1TgFOBAuty2DLte/xgrK80s/bHujbSs4OUAGW
+ lVhTTocdHfWeuP3ARQm0xDx+4lh0RvciKB+W8lgoTn6SjlbfRUjRraSo3o+w3VLvWRUF
+ J8oQ==
+X-Gm-Message-State: APjAAAXPaALm/hAW73FewWkWO9w7c1Ix1WkT8cdxZ34BokC2iYBx4q8G
+ ZB9UZMLFT1MynnmoAN/5FxeobEWBmmqbI57voAR87w==
+X-Google-Smtp-Source: APXvYqxhfZ33HCwkYRAbgqCJP6zt8rKp5o3knj2nFWb8DKn25JTXYoDEd88Dqp5eK7isVApVnD3mD0fbaXiyn5i9Cqs=
+X-Received: by 2002:a9d:68cc:: with SMTP id i12mr20128754oto.97.1573555866074; 
+ Tue, 12 Nov 2019 02:51:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:feQOa5mrAbJkb8xmIdg7mAdrMydTVb5ufSlSBYOxGMpDREW2WbB
- NuSeqzlfS53aHocRBRoTdG2moEVyHxEwZRbVgLA8zbLAwRmwTd8xj0Jv5ZFvHuypYm6bDZD
- 2HBf4lPi3G2QodQWvLVitHGR8+ldn3mT3h3qa1LKCnU5pmckGfWujdHGQMLm7AsSZzeJYSD
- hdXNEnVdsTD7tl4Al7Kpw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:x7XhYMi6zpg=:kfyeapW/d964Lohz2rcPHZ
- lPubeQUe75qTzEqV9htyTV2QYAWPYJFqZ68oHA3XeNzF4ML8919nIShpdukN29UdQ2/9oGWB2
- vJKZf1ZGhtAvyFEyudgboqEOuFltCVwYfpbf3aLs02a39l0AmUBrErwHVrbQNFpnxxdaBIVH+
- 0IPol0yNiYbogh+O0IO+W6YXFM60xmlHujjAqnnqSo5D97AU4aFMR7gYDq5Iohl/RbV66aXd+
- oo6OY6Lxr4nqB9/h8LStug+lLdfhW40YwB8RNFV6Y50WsaGm7goqKoLTQghJ8fGQSVccLTXhu
- i/tkAW6YIo9oCJgIDPB6HdyI9nJ84vlR4oapJrGJUlAVdndACYp4kq5aTbWGvVqaboXy996E4
- EsJoqXUtxrAve71Sm2y7c3n5ntKi38GGyaMlalz6ilM3/ws5HeSIjBuDGixurm7595zoX/jgs
- s4xUJ5gmg696paIIeR7pVQqe9No4Y+G1ZvszruzeAX+yXfhnIUOilMbRxm51QoE54N+fefVIu
- z+h3k6350vNehHilcxUoWlFQifbj42C8sDTEfqYYXEaAr6GVCDiT3tgzc7qeZFvxo3PzE7bhW
- 4a+q01P23160RdpZIt9HfP1Spb+Thr7U0X7RTA4QDR/8bI1tYeB6eXtYnEhJ+f9wXPqkpZ7Fb
- bb+VX7/1Rvky9HTGxolo3B5VxE/ppOAmawZX4T79RZqBwgzaCeFbDx15pBeqJQ0lNtxbz1mm8
- mrptW9dKd6mykEi4pmAuagjKAT2E3eMCg6mI13HmezzDJQCOcDjY0Mf4J6ndaZKd1c4rqiQwT
- 0hQiy20dLI/UY/ZXSB1Ei5g7ZCkc+8gQ5lPAGjdGDhHRfkI+rZuZF2ixKVqoBm+7EEI8N4ZXz
- DttwNT8MxdlPVEioT7wg==
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 217.72.192.74
+References: <20191111203524.21912-1-eblake@redhat.com>
+ <9f0f8f87-3025-67be-d423-51e2e910f5f5@virtuozzo.com>
+In-Reply-To: <9f0f8f87-3025-67be-d423-51e2e910f5f5@virtuozzo.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Nov 2019 10:50:55 +0000
+Message-ID: <CAFEAcA889WOTONP-veXYzPHmBOs8pkFXdJKe9O-SpnCJGdTocw@mail.gmail.com>
+Subject: Re: [PATCH] qemu-coroutine-sleep: Silence Coverity warning
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,33 +86,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Josh Kunz <jkz@google.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reported by Coverity (CID 1407221)
-Fixes: a2d866827bd8 ("linux-user: Support for NETLINK socket options")
-cc: Josh Kunz <jkz@google.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/syscall.c | 1 +
- 1 file changed, 1 insertion(+)
+On Tue, 12 Nov 2019 at 10:08, Vladimir Sementsov-Ogievskiy
+<vsementsov@virtuozzo.com> wrote:
+>
+> 11.11.2019 23:35, Eric Blake wrote:
+> > Coverity warns that we store the address of a stack variable through a
+> > pointer passed in by the caller, which would let the caller trivially
+> > trigger use-after-free if that stored value is still present when we
+> > finish execution.  However, the way coroutines work is that after our
+> > call to qemu_coroutine_yield(), control is temporarily continued in
+> > the caller prior to our function concluding, and in order to resume
+> > our coroutine, the caller must poll until the variable has been set to
+> > NULL.  Thus, we can add an assert that we do not leak stack storage to
+> > the caller on function exit.
+> >
+> > Fixes: Coverity CID 1406474
+>
+> Hmm, I doubt that it will fix it.. Do Coverity pay attention to assertions?
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index ab9d933e53af..4e97bcf1e5a9 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2632,6 +2632,7 @@ static abi_long do_getsockopt(int sockfd, int level, int optname,
-         default:
-             goto unimplemented;
-         }
-+        break;
- #endif /* SOL_NETLINK */
-     default:
-     unimplemented:
--- 
-2.21.0
+Yes, it knows that an assertion means that the condition must
+be true.
 
+thanks
+-- PMM
 
