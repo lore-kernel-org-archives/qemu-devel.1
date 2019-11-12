@@ -2,84 +2,84 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 371B1C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 20:16:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8589C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 20:58:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 007E3214E0
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 20:16:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F3BF21872
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 20:58:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GlsFH4/W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 007E3214E0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eNV/7jbt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F3BF21872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUcav-0007gL-5k
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 15:16:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53740)
+	id 1iUdEr-00079N-JH
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 15:58:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58236)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iUcaD-0007DH-VF
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 15:16:15 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iUdDy-0006f5-AN
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 15:57:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iUcaA-00006F-5O
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 15:16:11 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60462
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iUca9-00005D-K9
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 15:16:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573589768;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oTAB+bhQUyGoE7iXKbW+GaFHgKl3QOzfk/vtOtBbFh4=;
- b=GlsFH4/W7c7LoGYm5fQnvHNgGkzibTcIHNchAeGvaRG1pb/AfX7Ox8Gt6IQVK+m29wqaXN
- 9Mi5NAjvs+6iwRkOiCFOQ/IdqPkPBNBnUllXnQqEwtXCrQWIzINf9Mjj16ClHz2yHTIRzQ
- 5O+1oyxkhfkr6QP9SRHsJ/AuVdvxkuw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-123-cAsmu7yHP4-LDQF31e_35g-1; Tue, 12 Nov 2019 15:16:04 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E51DDB20;
- Tue, 12 Nov 2019 20:16:03 +0000 (UTC)
-Received: from localhost (ovpn-116-59.gru2.redhat.com [10.97.116.59])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EBEF961081;
- Tue, 12 Nov 2019 20:15:59 +0000 (UTC)
-Date: Tue, 12 Nov 2019 17:15:58 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v14 03/11] tests: Add test for QAPI builtin type time
-Message-ID: <20191112201558.GG3812@habkost.net>
-References: <20191028075220.25673-1-tao3.xu@intel.com>
- <20191028075220.25673-4-tao3.xu@intel.com>
- <20191106205359.GR3812@habkost.net>
- <1f2fa942-0993-548b-1f5c-8345d564bf29@intel.com>
- <20191107133112.GS3812@habkost.net>
- <9ecafb7f-69b9-870b-b109-939fef47acde@intel.com>
- <87lfsqbxnj.fsf@dusky.pond.sub.org>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iUdDv-0008Uv-NG
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 15:57:18 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41077)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iUdDu-0008TE-Hk
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 15:57:15 -0500
+Received: by mail-oi1-x243.google.com with SMTP id e9so16168341oif.8
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 12:57:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=3EtxS1gBzRcDuo4Wl6SUpDEG1FLOTwDekzY18u3HWEE=;
+ b=eNV/7jbtcKMaInvtlYGV+T64gt5Jqvdu8ZDN+m2TQGD0NNHqx7h3dD5uFSrs/UJ0+r
+ 9Sp1kPPygB73XRuR7fKD8Um5wLz+SPjUWWteEFh3M+R0AgTLi1SHFzHIBJ+CF6gRlzMt
+ ELn+vmrdWeL2nGOXJwaMPlJldmy8UXonqkG9SLk6NucS6X7PjjRYf+iE/omXz30cTEW+
+ rwQPTNwCfRtiglIQ0tJW13gCjhAykjOUxhSft2k/ri5aPiBdBwp8Cw4ukuD8NB1oSIol
+ gDwQG3h9VKbZipxNcozQfz80bfipZhmMvaxSgj4tDSX35yMAOPDyD73dwhhYcj09Z0wo
+ 2xsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=3EtxS1gBzRcDuo4Wl6SUpDEG1FLOTwDekzY18u3HWEE=;
+ b=ObhYZdutWwx+amfB25eJsVXrwto3b/S7kguYC+1blQeoTMHV7NmiC9LXM7uiKk9uId
+ ytJS/QJjJ0zklTT2Wv7CGoAkepmQLg/KJ2ZwB0aJnt4OJlSUfSd1HnGlohY8LZ6kDsVH
+ qf33xsS3+ciH+OKodrkpZ4hrxFmZOFQKEgazCdlzjeHmsjuxqo726H0+oPTyV5X65bN6
+ qATUuu/hlhRRMPDf+k34F72CABupwjZzUZQPhdfPZjxH7eq68m9P3zmQn6LaogoujOcK
+ y4grk27oFxDbVSDNlTaUsD763mU6R5pcubUZoiwoGnh+aENuohrTEEXi+DVP6OpuUmQC
+ kVIw==
+X-Gm-Message-State: APjAAAWLYax1EL8j5r/Q//RyX00WwOJBEkKvECIUpYEs3xZLQmAXTlED
+ xguXXeeFC3Nj8SqxQPzT1iJCQcDletJF3oENFX4=
+X-Google-Smtp-Source: APXvYqwNGNYETi7ng8es+TXtOFFin6vTcu5udZz9IHy+ZmrDy2RrR6zf1eAB/LVHZerCcV15i2hYmaM9vCydHZM/3Ks=
+X-Received: by 2002:aca:650a:: with SMTP id m10mr836881oim.106.1573592232984; 
+ Tue, 12 Nov 2019 12:57:12 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <87lfsqbxnj.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: cAsmu7yHP4-LDQF31e_35g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Tue, 12 Nov 2019 12:57:12
+ -0800 (PST)
+In-Reply-To: <87tv79823k.fsf@linaro.org>
+References: <1573240249-6966-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1573240249-6966-2-git-send-email-aleksandar.markovic@rt-rk.com>
+ <87tv79823k.fsf@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Tue, 12 Nov 2019 21:57:12 +0100
+Message-ID: <CAL1e-=hr6RACEo=uVZZRNSyrmVd3yvqS=Qj24Pny6C=Sryvwuw@mail.gmail.com>
+Subject: Re: [PATCH 1/5] MAINTAINERS: Add a section on git infrastructure
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000001185d605972c7e96"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,112 +91,184 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
- "thuth@redhat.com" <thuth@redhat.com>, "mst@redhat.com" <mst@redhat.com>, "Liu,
- Jingqi" <jingqi.liu@intel.com>, Tao Xu <tao3.xu@intel.com>, "Du,
- Fan" <fan.du@intel.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>,
- "imammedo@redhat.com" <imammedo@redhat.com>
+ Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ "hpoussin@reactos.org" <hpoussin@reactos.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ "aleksandar.rikalo@rt-rk.com" <aleksandar.rikalo@rt-rk.com>,
+ "philmd@redhat.com" <philmd@redhat.com>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 08, 2019 at 09:05:52AM +0100, Markus Armbruster wrote:
-> Tao Xu <tao3.xu@intel.com> writes:
->=20
-> > On 11/7/2019 9:31 PM, Eduardo Habkost wrote:
-> >> On Thu, Nov 07, 2019 at 02:24:52PM +0800, Tao Xu wrote:
-> >>> On 11/7/2019 4:53 AM, Eduardo Habkost wrote:
-> >>>> On Mon, Oct 28, 2019 at 03:52:12PM +0800, Tao Xu wrote:
-> >>>>> Add tests for time input such as zero, around limit of precision,
-> >>>>> signed upper limit, actual upper limit, beyond limits, time suffixe=
-s,
-> >>>>> and etc.
-> >>>>>
-> >>>>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
-> >>>>> ---
-> >>>> [...]
-> >>>>> +    /* Close to signed upper limit 0x7ffffffffffffc00 (53 msbs set=
-) */
-> >>>>> +    qdict =3D keyval_parse("time1=3D9223372036854774784," /* 7ffff=
-ffffffffc00 */
-> >>>>> +                         "time2=3D9223372036854775295", /* 7ffffff=
-ffffffdff */
-> >>>>> +                         NULL, &error_abort);
-> >>>>> +    v =3D qobject_input_visitor_new_keyval(QOBJECT(qdict));
-> >>>>> +    qobject_unref(qdict);
-> >>>>> +    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-> >>>>> +    visit_type_time(v, "time1", &time, &error_abort);
-> >>>>> +    g_assert_cmphex(time, =3D=3D, 0x7ffffffffffffc00);
-> >>>>> +    visit_type_time(v, "time2", &time, &error_abort);
-> >>>>> +    g_assert_cmphex(time, =3D=3D, 0x7ffffffffffffc00);
-> >>>>
-> >>>> I'm confused by this test case and the one below[1].  Are these
-> >>>> known bugs?  Shouldn't we document them as known bugs?
-> >>>
-> >>> Because do_strtosz() or do_strtomul() actually parse with strtod(), s=
-o the
-> >>> precision is 53 bits, so in these cases, 7ffffffffffffdff and
-> >>> fffffffffffffbff are rounded.
-> >>
-> >> My questions remain: why isn't this being treated like a bug?
-> >>
-> > Hi Markus,
+--0000000000001185d605972c7e96
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Tuesday, November 12, 2019, Alex Benn=C3=A9e <alex.bennee@linaro.org> wr=
+ote:
+
+>
+> Aleksandar Markovic <aleksandar.markovic@rt-rk.com> writes:
+>
+> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
 > >
-> > I am confused about the code here too. Because in do_strtosz(), the
-> > upper limit is
+> > There should be a patient person maintaining gory details of
+> > git-related files, and there is no better person for that role
+> > than Philippe. Alex should be the reviewer for some relations
+> > with gitdm.
+>
+> I'm not sure about this. The .gitignore files are best updated by people
+> responsible for the various parts of the tree. Once out-of-tree builds
+> become standard we should be able to eliminate them all together. As far
+> as .mailmap is concerned I think people are quite capable of updating it
+> themselves without putting the changes through a maintainer tree.
+>
+>
+Thank you Alex for your feedback.
+
+People here are mainly concerned about the substance of their contribution,
+and don't know or don't care about .mailmap file - as evidenced by many
+items Philippe had to add to that file. The essence of this patch was not
+to force people to go to the maintainer approval, but that the maintainer
+ftom time to time refreshes the file, if needed.
+
+But, OK, if you have such reservations that you mentioned, I am going to
+remove this patch in v2. We leave all these files listed in this patch
+unmaintained.
+
+Yours,
+Aleksandar
+
+
+
 > >
-> > val * mul >=3D 0xfffffffffffffc00
+> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> > ---
+> >  MAINTAINERS | 17 +++++++++++++++++
+> >  1 file changed, 17 insertions(+)
 > >
-> > So some data near 53 bit may be rounded. Is there a bug?
->=20
-> No, but the design is surprising, and the functions lack written
-> contracts, except for the do_strtosz() helper, which has one that sucks.
->=20
-> qemu_strtosz() & friends are designed to accept fraction * unit
-> multiplier.  Example: 1.5M means 1.5 * 1024 * 1024 with qemu_strtosz()
-> and qemu_strtosz_MiB(), and 1.5 * 1000 * 1000 with
-> qemu_strtosz_metric().  Whether supporting fractions is a good idea is
-> debatable, but it's what we've got.
->=20
-> The implementation limits the numeric part to the precision of double,
-> i.e. 53 bits.  "8PiB should be enough for anybody."
->=20
-> Switching it from double to long double raises the limit to the
-> precision of long double.  At least 64 bit on common hosts, but hosts
-> exist where it's the same 53 bits.  Do we support any such hosts?  If
-> yes, then we'd make the precision depend on the host, which feels like a
-> bad idea.
->=20
-> A possible alternative is to parse the numeric part both as a double and
-> as a 64 bit unsigned integer, then use whatever consumes more
-> characters.  This enables providing full 64 bits unless you actually use
-> a fraction.
->=20
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 4964fbb..be43ccb 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -2664,6 +2664,23 @@ M: Daniel P. Berrange <berrange@redhat.com>
+> >  S: Odd Fixes
+> >  F: scripts/git-submodule.sh
+> >
+> > +GIT infrastructure
+> > +M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> > +R: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> > +S: Maintained
+> > +F: .mailmap
+> > +F: scripts/git.orderfile
+> > +F: .gitignore
+> > +F: tests/fp/.gitignore
+> > +F: tests/fp/berkeley-softfloat-3/.gitignore
+> > +F: tests/fp/berkeley-testfloat-3/.gitignore
+> > +F: tests/migration/.gitignore
+> > +F: tests/multiboot/.gitignore
+> > +F: tests/qemu-iotests/.gitignore
+> > +F: tests/tcg/.gitignore
+> > +F: tests/uefi-test-tools/.gitignore
+> > +F: ui/keycodemapdb/tests/.gitignore
+> > +
+> >  Sphinx documentation configuration and build machinery
+> >  M: Peter Maydell <peter.maydell@linaro.org>
+> >  S: Maintained
+>
+>
+> --
+> Alex Benn=C3=A9e
+>
+>
 
-This sounds like the right thing to do, if user input is an
-integer and the code in the other end is consuming an integer.
+--0000000000001185d605972c7e96
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+<br><br>On Tuesday, November 12, 2019, Alex Benn=C3=A9e &lt;<a href=3D"mail=
+to:alex.bennee@linaro.org">alex.bennee@linaro.org</a>&gt; wrote:<br><blockq=
+uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
+solid;padding-left:1ex"><br>
+Aleksandar Markovic &lt;<a href=3D"mailto:aleksandar.markovic@rt-rk.com">al=
+eksandar.markovic@rt-rk.com</a>&gt; writes:<br>
+<br>
+&gt; From: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.com=
+">amarkovic@wavecomp.com</a>&gt;<br>
+&gt;<br>
+&gt; There should be a patient person maintaining gory details of<br>
+&gt; git-related files, and there is no better person for that role<br>
+&gt; than Philippe. Alex should be the reviewer for some relations<br>
+&gt; with gitdm.<br>
+<br>
+I&#39;m not sure about this. The .gitignore files are best updated by peopl=
+e<br>
+responsible for the various parts of the tree. Once out-of-tree builds<br>
+become standard we should be able to eliminate them all together. As far<br=
+>
+as .mailmap is concerned I think people are quite capable of updating it<br=
+>
+themselves without putting the changes through a maintainer tree.<br>
+<br></blockquote><div><br></div><div>Thank you Alex for your feedback.</div=
+><div><br></div><div>People here are mainly concerned about the substance o=
+f their contribution, and don&#39;t know or don&#39;t care about .mailmap f=
+ile - as evidenced by many items Philippe had to add to that file. The esse=
+nce of this patch was not to force people to go to the maintainer approval,=
+ but that the maintainer ftom time to time refreshes the file, if needed.</=
+div><div><br></div><div>But, OK, if you have such reservations that you men=
+tioned, I am going to remove this patch in v2. We leave all these files lis=
+ted in this patch unmaintained.</div><div><br></div><div>Yours,</div><div>A=
+leksandar</div><div><br></div><div>=C2=A0</div><blockquote class=3D"gmail_q=
+uote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1e=
+x">
+&gt;<br>
+&gt; Signed-off-by: Aleksandar Markovic &lt;<a href=3D"mailto:amarkovic@wav=
+ecomp.com">amarkovic@wavecomp.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 MAINTAINERS | 17 +++++++++++++++++<br>
+&gt;=C2=A0 1 file changed, 17 insertions(+)<br>
+&gt;<br>
+&gt; diff --git a/MAINTAINERS b/MAINTAINERS<br>
+&gt; index 4964fbb..be43ccb 100644<br>
+&gt; --- a/MAINTAINERS<br>
+&gt; +++ b/MAINTAINERS<br>
+&gt; @@ -2664,6 +2664,23 @@ M: Daniel P. Berrange &lt;<a href=3D"mailto:ber=
+range@redhat.com">berrange@redhat.com</a>&gt;<br>
+&gt;=C2=A0 S: Odd Fixes<br>
+&gt;=C2=A0 F: scripts/git-submodule.sh<br>
+&gt;<br>
+&gt; +GIT infrastructure<br>
+&gt; +M: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.co=
+m">philmd@redhat.com</a>&gt;<br>
+&gt; +R: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.org">ale=
+x.bennee@linaro.org</a>&gt;<br>
+&gt; +S: Maintained<br>
+&gt; +F: .mailmap<br>
+&gt; +F: scripts/git.orderfile<br>
+&gt; +F: .gitignore<br>
+&gt; +F: tests/fp/.gitignore<br>
+&gt; +F: tests/fp/berkeley-softfloat-3/<wbr>.gitignore<br>
+&gt; +F: tests/fp/berkeley-testfloat-3/<wbr>.gitignore<br>
+&gt; +F: tests/migration/.gitignore<br>
+&gt; +F: tests/multiboot/.gitignore<br>
+&gt; +F: tests/qemu-iotests/.gitignore<br>
+&gt; +F: tests/tcg/.gitignore<br>
+&gt; +F: tests/uefi-test-tools/.<wbr>gitignore<br>
+&gt; +F: ui/keycodemapdb/tests/.<wbr>gitignore<br>
+&gt; +<br>
+&gt;=C2=A0 Sphinx documentation configuration and build machinery<br>
+&gt;=C2=A0 M: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org"=
+>peter.maydell@linaro.org</a>&gt;<br>
+&gt;=C2=A0 S: Maintained<br>
+<br>
+<br>
+--<br>
+Alex Benn=C3=A9e<br>
+<br>
+</blockquote>
 
-> As far as I remember, the only problem we've ever had with the 53 bits
-> limit is developer confusion :)
->=20
-
-Developer confusion, I can deal with.  However, exposing this
-behavior on external interfaces is a bug to me.
-
-I don't know how serious the bug is because I don't know which
-interfaces are affected by it.  Do we have a list?
-
-> Patches welcome.
-
-My first goal is to get the maintainers of that code to recognize
-it as a bug.  Then I hope this will motivate somebody else to fix
-it.  :)
-
---=20
-Eduardo
-
+--0000000000001185d605972c7e96--
 
