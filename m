@@ -2,77 +2,78 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 846A1C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 15:26:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99867C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 15:26:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DAC821D7F
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 15:26:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6634421D7F
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 15:26:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jC6W1tdQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DAC821D7F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AA5fH37c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6634421D7F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUY3n-0000b4-CO
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 10:26:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43741)
+	id 1iUY3r-0000iP-H7
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 10:26:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43596)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mprivozn@redhat.com>) id 1iUY2i-0007hh-A4
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 10:25:21 -0500
+ (envelope-from <eblake@redhat.com>) id 1iUY1z-0006fU-2t
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 10:24:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mprivozn@redhat.com>) id 1iUY2h-0005GZ-5D
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 10:25:20 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:45739
+ (envelope-from <eblake@redhat.com>) id 1iUY1w-00051A-BJ
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 10:24:33 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:34051
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1iUY2h-0005G8-1O
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 10:25:19 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iUY1w-00050z-50
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 10:24:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573572318;
+ s=mimecast20190719; t=1573572271;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=z67yfXaSOWDYhSiwyMrm96n26qIeGtERwwBi3Wv+KeM=;
- b=jC6W1tdQYt4tjVGhNUIgpQ3Vbh/e8rJoTLIQsgVzsgur71cOio/4TWlg7ZSdZb43glLuwN
- asG9PCOTtz/IuCRMKpRXgpi48Ksz8PaW8XtXMH7BJCx99+nOfXZG19QWz9MUtXswFVa0tu
- je5vUzB/2O5wD1EepqQEgUy0Uxz72YU=
+ bh=1S5uZn9nVF/MYEDjy+HnQn7FuR6x+DXCDMLzQqeO99U=;
+ b=AA5fH37cjQp+uTPGNHKbR5dlIjiNG0oxj+USKs4ndimXFezckS9hL6n7V21qInjxHNmVAS
+ iIkGqbgxWqChOcOUGUS8psWlghKVN34uj5wefs4Tl52QPmMmvnAxr1Fi2PcQ4l3MusZslR
+ 6kVEwosc1TzKeNDE2KYEM9vgMQ0lHXk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-8W45cQgoNfqHAqHMRVNdgQ-1; Tue, 12 Nov 2019 10:25:17 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-194-zzZ4Hkj3PSaAgjCwrVN70w-1; Tue, 12 Nov 2019 10:24:29 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 418BC8C652F
- for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 15:25:16 +0000 (UTC)
-Received: from [10.43.2.30] (unknown [10.43.2.30])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 87692816E;
- Tue, 12 Nov 2019 15:25:12 +0000 (UTC)
-Subject: Re: [PATCH 2/2] vfio-helpers: Free QEMUVFIOState in qemu_vfio_close()
-To: Cornelia Huck <cohuck@redhat.com>
-References: <cover.1573468531.git.mprivozn@redhat.com>
- <14247f68a13c7b9292b91eb7df02de9b9d248544.1573468531.git.mprivozn@redhat.com>
- <20191111121523.4e692f1f.cohuck@redhat.com>
-From: Michal Privoznik <mprivozn@redhat.com>
-Message-ID: <cdaf4c86-7704-367e-e044-383c34cbbc1e@redhat.com>
-Date: Tue, 12 Nov 2019 16:25:11 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36A448FB0C0;
+ Tue, 12 Nov 2019 15:24:28 +0000 (UTC)
+Received: from [10.3.116.242] (ovpn-116-242.phx2.redhat.com [10.3.116.242])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 26C5166834;
+ Tue, 12 Nov 2019 15:24:25 +0000 (UTC)
+Subject: Re: [RFC PATCH] tests/vm: make --interactive (and therefor DEBUG=1)
+ unconditional
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ peter.maydell@linaro.org
+References: <20191112151051.2205-1-alex.bennee@linaro.org>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <4ab19c3c-232e-d92b-e104-5562e9a55e41@redhat.com>
+Date: Tue, 12 Nov 2019 09:24:24 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.1
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191111121523.4e692f1f.cohuck@redhat.com>
+In-Reply-To: <20191112151051.2205-1-alex.bennee@linaro.org>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 8W45cQgoNfqHAqHMRVNdgQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: zzZ4Hkj3PSaAgjCwrVN70w-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
@@ -90,61 +91,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.williamson@redhat.com, qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/11/19 12:15 PM, Cornelia Huck wrote:
-> On Mon, 11 Nov 2019 11:37:42 +0100
-> Michal Privoznik <mprivozn@redhat.com> wrote:
->=20
->> The qemu_vfio_open_pci() allocates this QEMUVFIOState structure
->> but free counterpart is missing. Since we already have
->> qemu_vfio_close() which does cleanup of the state, it looks like
->> a perfect place to free the structure too.
->>
->> =3D=3D178278=3D=3D 528 (360 direct, 168 indirect) bytes in 1 blocks are =
-definitely lost in loss record 6,605 of 6,985
->> =3D=3D178278=3D=3D    at 0x4A35476: calloc (vg_replace_malloc.c:752)
->> =3D=3D178278=3D=3D    by 0x51B1158: g_malloc0 (in /usr/lib64/libglib-2.0=
-.so.0.6000.6)
->> =3D=3D178278=3D=3D    by 0xA68613: qemu_vfio_open_pci (vfio-helpers.c:42=
-8)
->> =3D=3D178278=3D=3D    by 0x9779EA: nvme_init (nvme.c:606)
->> =3D=3D178278=3D=3D    by 0x97830F: nvme_file_open (nvme.c:795)
->> =3D=3D178278=3D=3D    by 0x8E9439: bdrv_open_driver (block.c:1293)
->> =3D=3D178278=3D=3D    by 0x8E9E1C: bdrv_open_common (block.c:1553)
->> =3D=3D178278=3D=3D    by 0x8ED264: bdrv_open_inherit (block.c:3083)
->> =3D=3D178278=3D=3D    by 0x8ED79D: bdrv_open (block.c:3176)
->> =3D=3D178278=3D=3D    by 0x5DA5C1: bds_tree_init (blockdev.c:670)
->> =3D=3D178278=3D=3D    by 0x5E2B64: qmp_blockdev_add (blockdev.c:4354)
->> =3D=3D178278=3D=3D    by 0x5ECB1D: configure_blockdev (vl.c:1202)
->>
->> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
->> ---
->>   util/vfio-helpers.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
->> index 813f7ec564..5ff91c1e5c 100644
->> --- a/util/vfio-helpers.c
->> +++ b/util/vfio-helpers.c
->> @@ -721,4 +721,5 @@ void qemu_vfio_close(QEMUVFIOState *s)
->>       close(s->device);
->>       close(s->group);
->>       close(s->container);
->> +    g_free(s);
->=20
-> Not sure if freeing the parameter passed in via a function called
-> 'close' isn't too surprising... it's not that obvious that the caller
-> is also relinquishing its reference to the QEMUVFIOState; maybe rename
-> the function to qemu_vfio_close_and_free() or so?
+On 11/12/19 9:10 AM, Alex Benn=C3=A9e wrote:
 
-Alright, I'll rename the function. I worry that if free is left as an=20
-exercise to caller then it'll be always forgotten about. That's why I=20
-put the call into close function.
+In the subject: s/therefor/therefore/
 
-Michal
+> While the concepts of only dropping to ssh if a test fails is nice it
+
+s/concepts/concept/
+
+> is more useful for this to be unconditional. You usually just want to
+> get the build up and running and then noodle around debugging or
+> attempting to replicate.
+>=20
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+> ---
+>   tests/vm/basevm.py | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> index 91a9226026d..0b8c1b26576 100755
+> --- a/tests/vm/basevm.py
+> +++ b/tests/vm/basevm.py
+> @@ -403,7 +403,7 @@ def main(vmcls):
+>       exitcode =3D 0
+>       if vm.ssh(*cmd) !=3D 0:
+>           exitcode =3D 3
+> -    if exitcode !=3D 0 and args.interactive:
+> +    if args.interactive:
+>           vm.ssh()
+>  =20
+>       if not args.snapshot:
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
