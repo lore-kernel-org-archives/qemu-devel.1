@@ -2,79 +2,98 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE66C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 13:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB5FC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 13:43:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 548972084F
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 13:38:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2EC82084F
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 13:43:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JzdbRZ8O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 548972084F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUiBDI+J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2EC82084F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35114 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUWNQ-0008MG-Hz
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 08:38:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50790)
+	id 1iUWSU-0002jE-Or
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 08:43:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51467)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iUWMk-0007wP-8H
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 08:37:55 -0500
+ (envelope-from <philmd@redhat.com>) id 1iUWRn-0002In-M7
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 08:43:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iUWMj-0000fb-61
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 08:37:54 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20513
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iUWRl-0003Wr-FN
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 08:43:06 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33589
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iUWMj-0000f4-1h
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 08:37:53 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iUWRl-0003WF-Bq
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 08:43:05 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573565872;
+ s=mimecast20190719; t=1573566184;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sPFfrDxs4r30IdsbEEjnUPVXYT7Q9mGgPs0T6qwhr3U=;
- b=JzdbRZ8O5yxV3DiLTrlu6imu9Q+Pmeb2Fsz9RKgTmG0Gyk2ddGCkC8ZFuXDDBCsnW4BfeM
- RWgZtc1QetOzl6NCEMSsL8+9uACEcQIOJSH+t4fn0sdkpM6rpBxtEyoUht8quhsbcp6fc/
- DMpBlSV6nhcInEvSMjqvFB323YNW2JE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-Aw-gokJbOX2BT1tlYSe0-g-1; Tue, 12 Nov 2019 08:37:49 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 497C08C4756;
- Tue, 12 Nov 2019 13:37:48 +0000 (UTC)
-Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 265B354681;
- Tue, 12 Nov 2019 13:37:40 +0000 (UTC)
-Date: Tue, 12 Nov 2019 14:37:38 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [RFC v5 056/126] virtio-ccw: introduce ERRP_AUTO_PROPAGATE
-Message-ID: <20191112143738.68bdcafd.cohuck@redhat.com>
-In-Reply-To: <20191011160552.22907-57-vsementsov@virtuozzo.com>
-References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
- <20191011160552.22907-57-vsementsov@virtuozzo.com>
-Organization: Red Hat GmbH
+ bh=nub0s+Zx1POdhbS7dveYsgY2Lp9GqtJs1cwZuSA9C50=;
+ b=ZUiBDI+JSacC+M8pDWC58nwRPVLPu7OOdg9vncLmNAOfflwZYAvPKq3KqOa0StcaEG7Fuk
+ OxP6T2uDQ4pgEHagT4QYF8gYisd6YvgVT92gl7+yjefc5D3an78GrrGeOu0aOsPblSTgAP
+ pgssdgVszLiNXK58sMpRcnZ+sglApPQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-370-ZsPSOKUyO5Ox0efplZPUhQ-1; Tue, 12 Nov 2019 08:41:53 -0500
+Received: by mail-wm1-f71.google.com with SMTP id f16so1173744wmb.2
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 05:41:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WLxbm54fA/cmntev27hYbb9okDTUqQC777aFToSe/G0=;
+ b=ABnbW6b40KUcIICN82DIFr8Su+zYFMhbTqJecvV8lx8V+/Irzk4zq2VgX+3hg88xQg
+ s6FmyDrw4GB7wowy6KzRhe9xUzPmfrXb5f8FaGw5QPb/wldhJPHsXZ7iFkfDbpfTi/rm
+ BOMd4oqcO+wGjwvx59RGyrn5l5QTXJnVu/GkAen+BHOr68+e0izYelnXvvXy9KmDi3NQ
+ pk/RRtxl0y03DE4DCIq+cdqNdQpxd6o/0vN7lbsXoyzQ39ObTMNTT4L4wfm+d7JWxc3w
+ JM+MO9PAMcAQD4Hd6OUIncxSRdSzcnxQkurtciYNdDwrKBfvp2W1manJBDjBHrR6FnAu
+ jyFQ==
+X-Gm-Message-State: APjAAAV2RlhM5LwhJ+O1d/+KpV9VT8c06VJq33OvPckyQnCXmu01LwG3
+ xcAGMsmACxIClvm41dgnoXPeNSqYBhsShyqpQRFXOirDFB7oVktUAslnas/CMHf5lNor66TndP5
+ mCmOZrempG4SgWE8=
+X-Received: by 2002:adf:fe89:: with SMTP id l9mr10437754wrr.368.1573566112307; 
+ Tue, 12 Nov 2019 05:41:52 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzlDhvYXlz6eUtJASX1G/QALft5F/JoQ92IeyoUvc5pdfS4IKid8yJ+k5Ij4yRjNjvSX7m2Tg==
+X-Received: by 2002:adf:fe89:: with SMTP id l9mr10437748wrr.368.1573566112133; 
+ Tue, 12 Nov 2019 05:41:52 -0800 (PST)
+Received: from [192.168.1.35] (170.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.170])
+ by smtp.gmail.com with ESMTPSA id 65sm39312427wrs.9.2019.11.12.05.41.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 12 Nov 2019 05:41:51 -0800 (PST)
+Subject: Re: [PATCH] linux-user: fix missing break
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20191112105055.32269-1-laurent@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <99dd2737-5c95-8e8f-b9b7-0d7d1ede552a@redhat.com>
+Date: Tue, 12 Nov 2019 14:41:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: Aw-gokJbOX2BT1tlYSe0-g-1
+In-Reply-To: <20191112105055.32269-1-laurent@vivier.eu>
+Content-Language: en-US
+X-MC-Unique: ZsPSOKUyO5Ox0efplZPUhQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,69 +105,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- armbru@redhat.com, David Hildenbrand <david@redhat.com>,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Josh Kunz <jkz@google.com>, Riku Voipio <riku.voipio@iki.fi>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 11 Oct 2019 19:04:42 +0300
-Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
-
-> If we want to add some info to errp (by error_prepend() or
-> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
-> Otherwise, this info will not be added when errp =3D=3D &fatal_err
-> (the program will exit prior to the error_append_hint() or
-> error_prepend() call).  Fix such cases.
->=20
-> If we want to check error after errp-function call, we need to
-> introduce local_err and than propagate it to errp. Instead, use
-> ERRP_AUTO_PROPAGATE macro, benefits are:
-> 1. No need of explicit error_propagate call
-> 2. No need of explicit local_err variable: use errp directly
-> 3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
->    &error_fatel, this means that we don't break error_abort
->    (we'll abort on error_set, not on error_propagate)
->=20
-> This commit (together with its neighbors) was generated by
->=20
-> for f in $(git grep -l errp \*.[ch]); do \
->     spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
->     --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f;=
- \
-> done;
->=20
-> then fix a bit of compilation problems: coccinelle for some reason
-> leaves several
-> f() {
->     ...
->     goto out;
->     ...
->     out:
-> }
-> patterns, with "out:" at function end.
->=20
-> then
-> ./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
->=20
-> (auto-msg was a file with this commit message)
->=20
-> Still, for backporting it may be more comfortable to use only the first
-> command and then do one huge commit.
->=20
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Reported-by: Greg Kurz <groug@kaod.org>
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+On 11/12/19 11:50 AM, Laurent Vivier wrote:
+> Reported by Coverity (CID 1407221)
+> Fixes: a2d866827bd8 ("linux-user: Support for NETLINK socket options")
+> cc: Josh Kunz <jkz@google.com>
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  hw/s390x/virtio-ccw-crypto.c |  7 +++----
->  hw/s390x/virtio-ccw-rng.c    |  7 +++----
->  hw/s390x/virtio-ccw.c        | 13 ++++++-------
->  3 files changed, 12 insertions(+), 15 deletions(-)
+>   linux-user/syscall.c | 1 +
+>   1 file changed, 1 insertion(+)
+>=20
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index ab9d933e53af..4e97bcf1e5a9 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -2632,6 +2632,7 @@ static abi_long do_getsockopt(int sockfd, int level=
+, int optname,
+>           default:
+>               goto unimplemented;
+>           }
+> +        break;
+>   #endif /* SOL_NETLINK */
+>       default:
+>       unimplemented:
+>=20
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
 
