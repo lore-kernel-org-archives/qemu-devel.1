@@ -2,90 +2,79 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE6E3C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 024DDC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:40:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB74F21E6F
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:24:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6DD9214E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 18:40:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qCJHgKbX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB74F21E6F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="froQg6DU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6DD9214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUape-0008S7-Va
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 13:24:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39915)
+	id 1iUb5j-0002en-T7
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 13:40:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41739)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iUaok-0007zy-B2
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:23:07 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iUb56-0002AM-7c
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:40:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iUaoj-0002sQ-Dy
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:23:06 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45165)
+ (envelope-from <peter.maydell@linaro.org>) id 1iUb54-0007Qu-VT
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:40:00 -0500
+Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:42528)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iUaoj-0002sC-87
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:23:05 -0500
-Received: by mail-wr1-x443.google.com with SMTP id z10so14341155wrs.12
- for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 10:23:05 -0800 (PST)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iUb54-0007Qe-Nl
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 13:39:58 -0500
+Received: by mail-ot1-x32c.google.com with SMTP id b16so15215068otk.9
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 10:39:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=F75F6QfCpsQdU6dODz2D/z5TptqBOUX/XUlcd4a/kNw=;
- b=qCJHgKbXUinlneV4y/oSi++w7Gy6+PdYtK0jgPLkIANZy4fA5PnFHQn0VaPi1tDti/
- j39zG7nzg+1NHtZcUH2x1xiQ3AV0+zNu/8jSJjbVez/g3GDSYBAT3FkOe7e5BpeLdzJ3
- lUgqVo8doN0XpA6bPDRy8kR0Oggj1zn5Io/1OGOtWqmm72LxVAc5W3ak2yj8Ssfe6mGj
- v+QeRLmx4d3D2bvBQZDpXmEp7Tg760jxusf2YNcVl51cMDjrng1+uk8NK3T6lV1MRned
- DZeJPmxp3Z+WFQNZLLs9Bgq/GPQvIUx+WxOAxqNtGafFOgpz8QjRI2f5cBQ706VYDgBY
- ua6Q==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=9zwVg2O8wptvJsGyfjFUwZZJImE1hfapMUoloLI0lnk=;
+ b=froQg6DUP7S51/DFD97DmN5wImcamN+tO/Oa5ZxmLQbyJT5VQkNF/+EDy/uyEaoM5J
+ sjxRjTFy108KOC/MEfOe8kK40VGn+mlM+b/OmOG5ipRlHkkdzFRRrHF59PnQbOyvVxur
+ qSIEfffusKk9CEjd5SuBZljPkGzGIk4YPRnoPCsYv7F9X9v50Rw4uxTjxvgN/BqHaaWE
+ dDuyhfPiCJCu3XEmzm9zOZreVq1KMRdX7wMNyWfP8N2jbF0rb5XoVcu4Cufe6VRkISkt
+ mRCB/iwxo9XnjBras2HWGrWdp8aYHcW99qNLVuvdxt4S72IQeDhW+xSDKDdpxjP5fOnC
+ Wsqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=F75F6QfCpsQdU6dODz2D/z5TptqBOUX/XUlcd4a/kNw=;
- b=I5WJyh72+yHZbdcGdKtXb4VIxUBvpzInn1kCFxyGYP7rLYYfJnCNIgz4tOhaQ7bW6v
- oK94OHBJj0h4/5MkMXPZIBvsp7Avg4kxBmW9/boqAfNwKjmDg8p0+CKVEf7hxu9Bwbb/
- d/DeFwiwbcmVhjLoidTRABUucGIutYPj5MV+yUWYyW7XTNCAC/Q33HTvIifAf+b+7IND
- sGPhfnoQrrUaDYM1v6vdyPhLmUBHqnFa4ScOsz6NwzuOxXwZjeK9Lplr/2ESUgiL9AMi
- EGwNZzjeKF5UGVDlVZA5BXRyaAu/tgwP4xvkXCUuIwG9utbPiuVLdlxz7FtwVOWXs8RY
- JLSA==
-X-Gm-Message-State: APjAAAU+tM2ashWeG9vhCF3jykHBiuRFrBCtXwl0MFk4T6fEtBF3uWK0
- LNCBFH78OpjrwGtIEojG7/bV2j2G8KU=
-X-Google-Smtp-Source: APXvYqzpvLKd1oZFPBVc/3Xt3xlnLQsiMViNaCiq/h4KPZfxNYekfMIZ/tDtzJmJslw4B5THWMfmLQ==
-X-Received: by 2002:adf:9ec7:: with SMTP id b7mr27268447wrf.221.1573582983820; 
- Tue, 12 Nov 2019 10:23:03 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id m3sm20045825wrw.20.2019.11.12.10.23.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 Nov 2019 10:23:02 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 569541FF87;
- Tue, 12 Nov 2019 18:23:02 +0000 (GMT)
-References: <20191112150105.2498-1-robert.foley@linaro.org>
- <20191112150105.2498-6-robert.foley@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Robert Foley <robert.foley@linaro.org>
-Subject: Re: [PATCH v1 5/5] Fix double free issue in qemu_set_log_filename().
-In-reply-to: <20191112150105.2498-6-robert.foley@linaro.org>
-Date: Tue, 12 Nov 2019 18:23:02 +0000
-Message-ID: <87ftit7y49.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=9zwVg2O8wptvJsGyfjFUwZZJImE1hfapMUoloLI0lnk=;
+ b=X7rGAUrH1GweyoKo31PeeJQfmugTWbca7k235XAt7vgDK0fJpGS4uSYXYhIqGp60nS
+ pgcYPDGYdEeSZxr7+Rc9xYJV0aPZOL084rb2MdlIDsK6UwOI3SRU9nMy0gY4OBDBDJgK
+ mzbVjrV3c0cetoj7UR+lcjE/WHGC/8ujgvJbY3Jsw4FrFPth6+9KgCNhvhn/Bk6YGK6E
+ wOrDYpHv2lXWwwI8t2eXuupcStATdZACvQml9jnZspIytQNUaR2aM8p3tHu3FZNnVWW5
+ HfAIyyRgXBzS9oaqhgieJViedsNsdl2ThXDFJfmBvX38kNYAOGeKHIxPWuUB/GPKMP+O
+ Fgqw==
+X-Gm-Message-State: APjAAAX/rFbppPwo8O1B4Uuf+AQqBTl5mmNydUSOktOBNEIxTqqy54c6
+ CplxvNrQZsldQC4wPTcOyY1Q9jEZIyGaDAUQtTYQwQ==
+X-Google-Smtp-Source: APXvYqwtYdZInmxKfgya/UllSv2VTH+CM6bqTCGs55oH4sJA2fIIsaC/DQU9dAdU3/NSPNj3tLf/o3ZO6SBlk0A/sXM=
+X-Received: by 2002:a9d:7ac2:: with SMTP id m2mr16740218otn.135.1573583997721; 
+ Tue, 12 Nov 2019 10:39:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20191112161654.2253-1-laurent@vivier.eu>
+In-Reply-To: <20191112161654.2253-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Nov 2019 18:39:46 +0000
+Message-ID: <CAFEAcA_6JO-3FXSjOFizes9r2mO23-QmvDEoFEZHg9oPk0-DLA@mail.gmail.com>
+Subject: Re: [PULL 0/2] Linux user for 4.2 patches
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::32c
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,46 +86,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.puhov@linaro.org, qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Robert Foley <robert.foley@linaro.org> writes:
-
-> After freeing the logfilename, we set logfilename to NULL, in case of an
-> error which returns without setting logfilename.
+On Tue, 12 Nov 2019 at 16:18, Laurent Vivier <laurent@vivier.eu> wrote:
 >
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-
-As this fixes an existing bug I would put this at the start of the
-series. Otherwise:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-> ---
-> v1
->     - This is new in the patch v1.
-> ---
->  util/log.c | 1 +
->  1 file changed, 1 insertion(+)
+> The following changes since commit 2a7e7c3e103a5c29af7c583390c243d85a2527e8:
 >
-> diff --git a/util/log.c b/util/log.c
-> index 802b8de42e..1eed74788c 100644
-> --- a/util/log.c
-> +++ b/util/log.c
-> @@ -148,6 +148,7 @@ void qemu_set_log_filename(const char *filename, Erro=
-r **errp)
->      char *pidstr;
+>   Merge remote-tracking branch 'remotes/stsquad/tags/pull-testing-and-tcg-121119-1' into staging (2019-11-12 14:51:00 +0000)
 >
->      g_free(logfilename);
-> +    logfilename =3D NULL;
+> are available in the Git repository at:
 >
->      pidstr =3D strstr(filename, "%");
->      if (pidstr) {
+>   git://github.com/vivier/qemu.git tags/linux-user-for-4.2-pull-request
+>
+> for you to fetch changes up to 0f1f2d4596aee037d3ccbcf10592466daa54107f:
+>
+>   linux-user: remove host stime() syscall (2019-11-12 17:05:57 +0100)
+>
+> ----------------------------------------------------------------
+> Fix CID 1407221 and stime()
+>
+> ----------------------------------------------------------------
+>
+> Laurent Vivier (2):
+>   linux-user: fix missing break
+>   linux-user: remove host stime() syscall
+>
 
 
---
-Alex Benn=C3=A9e
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
+for any user-visible changes.
+
+-- PMM
 
