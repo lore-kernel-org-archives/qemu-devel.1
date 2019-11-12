@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48EA5C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:08:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 979E4C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:13:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13B7A20674
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:08:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61CDA214E0
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:13:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R+L8SF0y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13B7A20674
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bW6lZRrh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61CDA214E0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUSA3-0001Y5-6M
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:08:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44861)
+	id 1iUSEy-00031G-JP
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:13:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45400)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iUS93-0000zE-Qo
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:07:31 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iUSEL-0002XI-DO
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:12:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iUS90-0000ha-Cn
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:07:27 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:28042
+ (envelope-from <kwolf@redhat.com>) id 1iUSEK-0004Ag-58
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:12:57 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:56748
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iUS90-0000ej-8v
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:07:26 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iUSEK-0004AH-1q
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:12:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573549645;
+ s=mimecast20190719; t=1573549975;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Q2yMtfegfgcrZLvMPywVDFoMeBCj2HIux92CvQtz0XA=;
- b=R+L8SF0ythKgttQ/vd2UC/hI9/V65gokswYthHb7omXVt2B69SwwlkCbJcCbYwwz3k/piV
- MhpQknTDK/oa3VZseKlMuBW3ntEBbyMYKfNhfdxFO6vrrTnACpcFwZNHHKF94kJIN5cRKt
- WEvCHaoJsB0j5F/bKOHLTBZfNoeoKTw=
+ bh=xAHDriL9+0K2QaszthS1D7H3s/wHnNNqn04kCo7xOSM=;
+ b=bW6lZRrhj2enJsyydbrVbUXxMpfAvKJMDqdyAB5jZcsDXOyIYkJHtyclN0N16NOF0Mw3qE
+ 5EapMZh5yPGEIQGo6fC/Il2s511x+LCf9g8WM8aivsYyeYW2wXNj2++ZC2hMzZpMzDx1fv
+ sNqqvjGJbvcJNvipS1zumz3dipZPeTM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-150-Up68VqPkMIqsz5hyxMkt7A-1; Tue, 12 Nov 2019 04:06:17 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-349-K8ZwaHA8N66f0G_kTiAGXg-1; Tue, 12 Nov 2019 04:12:52 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AABD100729C;
- Tue, 12 Nov 2019 09:06:16 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-207.ams2.redhat.com
- [10.36.116.207])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A9E1F61075;
- Tue, 12 Nov 2019 09:06:11 +0000 (UTC)
-Subject: Re: virtio,iommu_platform=on
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-References: <17da2769-1999-a0a3-590d-9f9bc6a9adc3@ozlabs.ru>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <9204f8a7-0dfa-b689-7f97-5997d3298fdd@redhat.com>
-Date: Tue, 12 Nov 2019 10:06:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B89B38017E0;
+ Tue, 12 Nov 2019 09:12:51 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-43.ams2.redhat.com [10.36.117.43])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E798760872;
+ Tue, 12 Nov 2019 09:12:46 +0000 (UTC)
+Date: Tue, 12 Nov 2019 10:12:45 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: API definition for LUKS key management
+Message-ID: <20191112091245.GB5364@linux.fritz.box>
+References: <122fc70c802b9a1185e008bf13fb7f078fe70af7.camel@redhat.com>
+ <20191111183424.GR814211@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <17da2769-1999-a0a3-590d-9f9bc6a9adc3@ozlabs.ru>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: Up68VqPkMIqsz5hyxMkt7A-1
+In-Reply-To: <20191111183424.GR814211@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: K8ZwaHA8N66f0G_kTiAGXg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.81
@@ -88,173 +87,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ John Ferlan <jferlan@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/12/19 04:53, Alexey Kardashevskiy wrote:
-> Hi!
+Am 11.11.2019 um 19:34 hat Daniel P. Berrang=E9 geschrieben:
+> On Mon, Nov 11, 2019 at 05:58:20PM +0200, Maxim Levitsky wrote:
+> > One of the concerns that was raised during the review was that amend in=
+terface for luks that I propose is
+> > different from the amend inteface used currently for qcow2.
+> >=20
+> > qcow2 amend interface specifies all the format options, thus overwrites=
+ the existing options.
+> > Thus it seems natural to make the luks amend interface work the same wa=
+y, that it receive an array
+> > of 8 slots, and for each slot specify if it is active, and if true what=
+ password to put in it.
+> > This does allow to add and erase the keyslots, but it doesn't allow:
+> >=20
+> >    * add a password without knowing all other passwords that exist in e=
+xisting keyslots
+> >      this can be mitigated by specifying which keyslots to modify for e=
+xample by omitting the
+> >      keyslots that shouldn't be touched from the array (passing null pl=
+aceholder instead)
+> >      but then it already doesn't follow the 'specify all the options ea=
+ch time' principle.
 >=20
-> I am enabling IOMMU for virtio in the pseries firmware (SLOF) and seeing
-> problems, one of them is SLOF does SCSI bus scan, then it stops the
-> virtio-scsi by clearing MMIO|IO|BUSMASTER from PCI_COMMAND (as SLOF
-> stopped using the devices) and when this happens, I see unassigned
-> memory access (see below) which happens because disabling busmaster
-> disables IOMMU and QEMU cannot access the rings to do some shutdown. And
-> when this happens, the device does not come back even if SLOF re-enables =
-it.
->=20
-> Hacking SLOF to not clear BUSMASTER makes virtio-scsi work but it is
-> hardly a right fix.
->=20
-> Is this something expected? Thanks,
+> I think this is highly undesirable, as we must not assume that the
+> mgmt app has access to all the passwords currently set.
 
-Can you perform a virtio reset (write 0 to the virtio-scsi-pci device's
-virtio status register) in SLOF, before clearing PCI_COMMAND?
+And I think this shows the problem that we realy have with the crypto
+driver and amend: For every other driver, if you must, you can query the
+current settings and just write them back.
 
-Thanks,
-Laszlo
+The difference here is that crypto doesn't allow to directly query or
+specify the content of some options (the keyslots), but provides only a
+way to derives that content from a secret, and obviously there is no way
+back from the stored data to the secret (that's what it's for).
 
+I think we have two options here:
 
+1. Add a special "don't touch this" value for keyslots. Normally, just
+   leaving out the value would be suitable syntax for this. Here,
+   however, we have a list of keyslots, so we can't leave anything out.
+
+   We could use something like an alternate between str (new secret ID),
+   null (erase keyslot) and empty dict (leave it alone) - the latter
+   feels a bit hackish, but maybe it's not too bad. If the list is
+   shorter than 8 entries, the rest is assumed to mean "leave it alone",
+   too.
+
+2. Allow to query and set the raw key, which doesn't require a password
+
+> The two key use cases for having multiple key slots are
 >=20
+>   - To enable a two-phase change of passwords to ensure new password
+>     is safely written out before erasing the old password
+>    =20
+>   - To allow for multiple access passwords with different controls
+>     or access to when each password is made available.
 >=20
-> Here is the exact command line:
+>     eg each VM may have a separate "backup password" securely
+>     stored off host that is only made available for use when
+>     doing disaster recovery.
 >=20
-> /home/aik/pbuild/qemu-garrison2-ppc64/ppc64-softmmu/qemu-system-ppc64 \
+> the second use case is doomed if you need to always provide all
+> current passwords when changing any key slots.
+
+That providing all current passwords doesn't work is obvious.
+
+> >    * erase all keyslots matching a password - this is really hard to do=
+ using this approach,
+> >      unless we give user some kind of api to try each keyslot with give=
+n password,
+> >      which is kind of ugly and might be racy as well.
 >=20
-> -nodefaults \
+> > So what do you think?
 >=20
-> -chardev stdio,id=3DSTDIO0,signal=3Doff,mux=3Don \
->=20
-> -device spapr-vty,id=3Dsvty0,reg=3D0x71000110,chardev=3DSTDIO0 \
->=20
-> -mon id=3DMON0,chardev=3DSTDIO0,mode=3Dreadline \
->=20
-> -nographic \
->=20
-> -vga none \
->=20
-> -enable-kvm \
-> -m 2G \
->=20
-> -device
-> virtio-scsi-pci,id=3Dvscsi0,iommu_platform=3Don,disable-modern=3Doff,disa=
-ble-legacy=3Don
-> \
-> -drive id=3DDRIVE0,if=3Dnone,file=3Dimg/u1804-64le.qcow2,format=3Dqcow2 \
->=20
-> -device scsi-disk,id=3Dscsi-disk0,drive=3DDRIVE0 \
->=20
-> -snapshot \
->=20
-> -smp 1 \
->=20
-> -machine pseries \
->=20
-> -L /home/aik/t/qemu-ppc64-bios/ \
->=20
-> -trace events=3Dqemu_trace_events \
->=20
-> -d guest_errors \
->=20
-> -chardev socket,id=3DSOCKET0,server,nowait,path=3Dqemu.mon.ssh59518 \
->=20
-> -mon chardev=3DSOCKET0,mode=3Dcontrol
->=20
->=20
->=20
-> Here is the backtrace:
->=20
-> Thread 5 "qemu-system-ppc" hit Breakpoint 8, unassigned_mem_accepts
-> (opaque=3D0x0, addr=3D0x5802, size=3D0x2, is_write=3D0x0, attrs=3D...) at=
- /home/
-> aik/p/qemu/memory.c:1275
-> 1275        return false;
-> #0  unassigned_mem_accepts (opaque=3D0x0, addr=3D0x5802, size=3D0x2,
-> is_write=3D0x0, attrs=3D...) at /home/aik/p/qemu/memory.c:1275
-> #1  0x00000000100a8ac8 in memory_region_access_valid (mr=3D0x1105c230
-> <io_mem_unassigned>, addr=3D0x5802, size=3D0x2, is_write=3D0x0, attrs=3D.=
-..) at
-> /home/aik/p/qemu/memory.c:1377
-> #2  0x00000000100a8c88 in memory_region_dispatch_read (mr=3D0x1105c230
-> <io_mem_unassigned>, addr=3D0x5802, pval=3D0x7ffff550d410, op=3DMO_16,
-> attrs=3D...) at /home/aik/p/qemu/memory.c:1418
-> #3  0x000000001001cad4 in address_space_lduw_internal_cached_slow
-> (cache=3D0x7fff68036fa0, addr=3D0x2, attrs=3D..., result=3D0x0,
-> endian=3DDEVICE_LITTLE_ENDIAN) at /home/aik/p/qemu/memory_ldst.inc.c:211
-> #4  0x000000001001cc84 in address_space_lduw_le_cached_slow
-> (cache=3D0x7fff68036fa0, addr=3D0x2, attrs=3D..., result=3D0x0) at
-> /home/aik/p/qemu/memory_ldst.inc.c:249
-> #5  0x000000001019bd80 in address_space_lduw_le_cached
-> (cache=3D0x7fff68036fa0, addr=3D0x2, attrs=3D..., result=3D0x0) at
-> /home/aik/p/qemu/include/exec/memory_ldst_cached.inc.h:56
-> #6  0x000000001019c10c in lduw_le_phys_cached (cache=3D0x7fff68036fa0,
-> addr=3D0x2) at /home/aik/p/qemu/include/exec/memory_ldst_phys.inc.h:91
-> #7  0x000000001019d86c in virtio_lduw_phys_cached (vdev=3D0x118b9110,
-> cache=3D0x7fff68036fa0, pa=3D0x2) at
-> /home/aik/p/qemu/include/hw/virtio/virtio-access.h:166
-> #8  0x000000001019e648 in vring_avail_idx (vq=3D0x118c2720) at
-> /home/aik/p/qemu/hw/virtio/virtio.c:302
-> #9  0x000000001019f5bc in virtio_queue_split_empty (vq=3D0x118c2720) at
-> /home/aik/p/qemu/hw/virtio/virtio.c:581
-> #10 0x000000001019f838 in virtio_queue_empty (vq=3D0x118c2720) at
-> /home/aik/p/qemu/hw/virtio/virtio.c:612
-> #11 0x00000000101a8fa8 in virtio_queue_host_notifier_aio_poll
-> (opaque=3D0x118c2798) at /home/aik/p/qemu/hw/virtio/virtio.c:3389
-> #12 0x000000001092679c in run_poll_handlers_once (ctx=3D0x11212e40,
-> timeout=3D0x7ffff550d7d8) at /home/aik/p/qemu/util/aio-posix.c:520
-> #13 0x0000000010926aec in try_poll_mode (ctx=3D0x11212e40,
-> timeout=3D0x7ffff550d7d8) at /home/aik/p/qemu/util/aio-posix.c:607
-> #14 0x0000000010926c2c in aio_poll (ctx=3D0x11212e40, blocking=3D0x1) at
-> /home/aik/p/qemu/util/aio-posix.c:639
-> #15 0x000000001091fe0c in aio_wait_bh_oneshot (ctx=3D0x11212e40,
-> cb=3D0x1016f35c <virtio_scsi_dataplane_stop_bh>, opaque=3D0x118b9110) at
-> /home/aik/p/qemu/util/aio-wait.c:71
-> #16 0x000000001016fa60 in virtio_scsi_dataplane_stop (vdev=3D0x118b9110)
-> at /home/aik/p/qemu/hw/scsi/virtio-scsi-dataplane.c:211
-> #17 0x0000000010684740 in virtio_bus_stop_ioeventfd (bus=3D0x118b9098) at
-> /home/aik/p/qemu/hw/virtio/virtio-bus.c:245
-> #18 0x0000000010688290 in virtio_pci_stop_ioeventfd (proxy=3D0x118b0fa0)
-> at /home/aik/p/qemu/hw/virtio/virtio-pci.c:292
-> #19 0x00000000106891e8 in virtio_write_config (pci_dev=3D0x118b0fa0,
-> address=3D0x4, val=3D0x100100, len=3D0x4) at
-> /home/aik/p/qemu/hw/virtio/virtio-pci.c:613
-> #20 0x00000000105b7228 in pci_host_config_write_common
-> (pci_dev=3D0x118b0fa0, addr=3D0x4, limit=3D0x100, val=3D0x100100, len=3D0=
-x4) at
-> /home/aik/p/qemu/hw/pci/pci_host.c:81
-> #21 0x00000000101f7bdc in finish_write_pci_config (spapr=3D0x11217200,
-> buid=3D0x800000020000000, addr=3D0x4, size=3D0x4, val=3D0x100100,
-> rets=3D0x7e7533e0) at /home/aik/p/qemu/hw/ppc/spapr_pci.c:192
-> #22 0x00000000101f7cec in rtas_ibm_write_pci_config (cpu=3D0x11540df0,
-> spapr=3D0x11217200, token=3D0x2017, nargs=3D0x5, args=3D0x7e7533cc, nret=
-=3D0x1,
-> rets=3D0x7e7533e0) at /home/aik/p/qemu/hw/ppc/spapr_pci.c:216
-> #23 0x00000000101f5860 in spapr_rtas_call (cpu=3D0x11540df0,
-> spapr=3D0x11217200, token=3D0x2017, nargs=3D0x5, args=3D0x7e7533cc, nret=
-=3D0x1,
-> rets=3D0x7e7533e0) at /home/aik/p/qemu/hw/ppc/spapr_rtas.c:416
-> #24 0x00000000101ee214 in h_rtas (cpu=3D0x11540df0, spapr=3D0x11217200,
-> opcode=3D0xf000, args=3D0x7ffff4cf0030) at
-> /home/aik/p/qemu/hw/ppc/spapr_hcall.c:1214
-> #25 0x00000000101f0524 in spapr_hypercall (cpu=3D0x11540df0,
-> opcode=3D0xf000, args=3D0x7ffff4cf0030) at
-> /home/aik/p/qemu/hw/ppc/spapr_hcall.c:2014
-> #26 0x000000001033bff0 in kvm_arch_handle_exit (cs=3D0x11540df0,
-> run=3D0x7ffff4cf0000) at /home/aik/p/qemu/target/ppc/kvm.c:1684
-> #27 0x00000000100cc7c8 in kvm_cpu_exec (cpu=3D0x11540df0) at
-> /home/aik/p/qemu/accel/kvm/kvm-all.c:2391
-> #28 0x000000001008edf8 in qemu_kvm_cpu_thread_fn (arg=3D0x11540df0) at
-> /home/aik/p/qemu/cpus.c:1318
-> #29 0x000000001092c704 in qemu_thread_start (args=3D0x11588d90) at
-> /home/aik/p/qemu/util/qemu-thread-posix.c:519
-> #30 0x00007ffff7b58070 in start_thread (arg=3D0x7ffff550ebf0) at
-> pthread_create.c:335
-> #31 0x00007ffff7aa3a70 in clone () at
-> ../sysdeps/unix/sysv/linux/powerpc/powerpc64/clone.S:96
-> (gdb)
->=20
+> The point of using "amend" is that we already have some of the boilerplat=
+e
+> supporting framework around that, so it saves effort for both QEMU and
+> our users. If the semantics of "amend" don't fit nicely though, then the
+> benefit of re-using "amend" is cancelled out and we should go back to
+> considering a separate "key-manage" command.
+
+This wouldn't solve the fundamental problem that the crypto block
+driver, as it currently is, isn't able to provide a blockdev-amend
+callback. It's worse for qcow2 because qcow2 already implements amend.
+
+I think we need to find a solution for the amend API.
+
+Kevin
 
 
