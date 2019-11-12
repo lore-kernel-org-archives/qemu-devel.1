@@ -2,78 +2,80 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90033C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25310C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:04:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58FEA206BA
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:57:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E43DA21783
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:04:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="umlJOWFJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58FEA206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cnL3Hy1G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E43DA21783
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60898 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUSvH-0007Au-GU
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:57:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51718)
+	id 1iUT27-0001Ih-4k
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 05:04:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52512)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iUSuf-0006jC-GW
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:56:42 -0500
+ (envelope-from <berrange@redhat.com>) id 1iUT0y-0000Ky-JH
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:03:13 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iUSue-0007Qx-9Z
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:56:41 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37890)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iUSue-0007QU-45
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:56:40 -0500
-Received: by mail-oi1-x241.google.com with SMTP id a14so14245062oid.5
- for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 01:56:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=+qQ7U7N0vkKUJMDlT+UKnYLKZ9+HFAaytOYXlGys/K0=;
- b=umlJOWFJTmo6JiqNXGi6GR0KHDhuvi4HbXWQ7CNMLpjUFnAYx+80Z1mJEiR9ntopGJ
- D0BsxiGgG0yBC9ncAph5zT+caVJq7OuOl1g6k+eCE1jAYgHT6fPV8Sc7y9sdtceUn/7w
- MkG4rE+qx+n8j7Mu8bmbnLIh6+T0huKwe93SfSd4PLdPTfu8YBJPqywk+2ySTcLVxOJT
- T6nCHb+fVeFYs1WDWTBUDuyeidfY4R88cogLlyy6JU1Pkc5gAUn3Vq5F66YGOGC9Rjjw
- W8ofS37GS3AysiohTSb+xanvi3qDbQ2/8aJ3H7vniXnfvvPTc73D6md11AW5NFqcaGWr
- aouA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=+qQ7U7N0vkKUJMDlT+UKnYLKZ9+HFAaytOYXlGys/K0=;
- b=Kqk+9rbgWjvewCpVkWQ4RAiO6cZf/jrq6r71ykpoCb7woMaY2i9web2r07600IGOd0
- 8O/YGOZkEE+oAjjt56dETmPZQm8G7Cx/V9cMwvgfjRwLxsJewMyYRYzfvYxZxIEC2Aw8
- Exftko+wfst6LWPXI+lzXgMeMQC+BL72VwynRWeFX8CkmpZyE4YJ7uPqv/sgEfAwxVav
- 1O+pafygVKF1qtEmq8iZvbU7WzpcbctF62hriOFiRE3KG/J+deKHQx9J7LI9pnLCwONB
- XOJIqZE1TTdHQhcplZCdf4WMxqmnxN0b3jP5dV/nP1ubrYhtcT8rtbGpKMlTcg6OTBgh
- nlGQ==
-X-Gm-Message-State: APjAAAXz93B8vC8+gPVcc/SkwoSa5Ut+yXOlbXuzD9qRsL78uqx7nUlO
- opvUSUI1HKyC4ugAm4UdK6PqHdw1kmrXRR6aBjW8+Q==
-X-Google-Smtp-Source: APXvYqx0YOLvCxoBmcuJ+xanyzFc0FKXrXK3iVPG3zjm2whEQH5C1oriNLXz1ZHs23+fe2a2ble3UYG191cYbl1iDZk=
-X-Received: by 2002:aca:451:: with SMTP id 78mr3321021oie.170.1573552599122;
- Tue, 12 Nov 2019 01:56:39 -0800 (PST)
+ (envelope-from <berrange@redhat.com>) id 1iUT0v-0001VZ-Ny
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:03:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30350
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iUT0u-0001VC-UE
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:03:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573552988;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=oEDxfOCECsOU6yR8VVeFKkQgLNRhacxG+v9Z9i4GeO4=;
+ b=cnL3Hy1G2KHa/F81XYDVDMeL9uAatngQNvuf2Ap+D0XJNXXMzVrwTw15UbwlRvnarHRbfb
+ sYhr0AfexYPfzOklnmOtzvRr8U22UCgxLDKc+x1tbkEso9DzGjpCF/Ajq7PdHnGa5UNSWW
+ yDdEV6mVjJeDsyawHoRP3O9fplY/mis=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-405-5y5cqkCqPnW-hLlmSOaVNQ-1; Tue, 12 Nov 2019 05:03:02 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7229F1800D63;
+ Tue, 12 Nov 2019 10:03:01 +0000 (UTC)
+Received: from redhat.com (ovpn-112-58.ams2.redhat.com [10.36.112.58])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5DBB33DB2;
+ Tue, 12 Nov 2019 10:02:56 +0000 (UTC)
+Date: Tue, 12 Nov 2019 10:02:53 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: API definition for LUKS key management
+Message-ID: <20191112100253.GM2366658@redhat.com>
+References: <122fc70c802b9a1185e008bf13fb7f078fe70af7.camel@redhat.com>
 MIME-Version: 1.0
-References: <20191111203524.21912-1-eblake@redhat.com>
-In-Reply-To: <20191111203524.21912-1-eblake@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Nov 2019 09:56:27 +0000
-Message-ID: <CAFEAcA99d8ArWGBDFZ1ZK-i6X14M3U9+ZqPyk=fi+d7cQk8E4w@mail.gmail.com>
-Subject: Re: [PATCH] qemu-coroutine-sleep: Silence Coverity warning
-To: Eric Blake <eblake@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+In-Reply-To: <122fc70c802b9a1185e008bf13fb7f078fe70af7.camel@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 5y5cqkCqPnW-hLlmSOaVNQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,37 +87,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ John Ferlan <jferlan@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 11 Nov 2019 at 20:35, Eric Blake <eblake@redhat.com> wrote:
->
-> Coverity warns that we store the address of a stack variable through a
-> pointer passed in by the caller, which would let the caller trivially
-> trigger use-after-free if that stored value is still present when we
-> finish execution.  However, the way coroutines work is that after our
-> call to qemu_coroutine_yield(), control is temporarily continued in
-> the caller prior to our function concluding, and in order to resume
-> our coroutine, the caller must poll until the variable has been set to
-> NULL.  Thus, we can add an assert that we do not leak stack storage to
-> the caller on function exit.
->
-> Fixes: Coverity CID 1406474
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->
-> I don't know if this actually shuts Coverity up; Peter, since you
-> reported the Coverity issue, are you in a better position to test if
-> this makes a difference?  At any rate, the tests still pass after
-> this is in place.
+On Mon, Nov 11, 2019 at 05:58:20PM +0200, Maxim Levitsky wrote:
+> I will try to explain the interface with bunch of examples:
 
-The only way to test is to commit it to master and wait for
-the next run...
+I want to fill in equiv examples from cryptsetup for sake
+of comparison
 
--- PMM
+> # adds a new password, defined by qemu secret 'sec0' to first unused slot
+> # give user a error if all keyslots are occupied
+> qemu-img amend --secret ... -o key-secret=3Dsec1 image.luks
+
+  cryptsetup luksAddKey --key-file currentkey.txt \
+                        --new-key-file newkey.txt \
+                        /dev/mapper/foo
+
+> # erases all keyslots that can be opened by password that is contained in=
+ a qemu secret 'sec0'
+> # active=3Doff means that the given password/keyslot won't be active afte=
+r the operation
+> qemu-img amend --secret ... -o key-secret=3Dsec0,active=3Doff image.luks
+
+
+  cryptsetup luksRemoveKey --key-file currentkey.txt \
+                           /dev/mapper/foo
+
+> # erase the slot 5 (this is more low level command, less expected to be u=
+sed)
+> qemu-img amend --secret ... -o slot=3D5,active=3Doff image.luks
+
+  cryptsetup luksKillSlot /dev/mapper/foo 5
+
+> # add new secret to slot 5 (will fail if the slot is already marked as ac=
+tive)
+> qemu-img amend --secret ... -o slot=3D5,key-secret=3Dsec1 image.luks
+
+  cryptsetup luksAddKey --key-file currentkey.txt \
+                        --new-key-file newkey.txt \
+=09=09=09--key-slot 5 \
+                        /dev/mapper/foo
+
+They look very different in syntax because they are taking two differnet
+approaches.
+
+The cryptsetup approach is functional, where the user states what action
+they want performed.
+
+The qemu-img amend approach is declarative, where the user expresses what
+end state they want the image to be in.
+
+The challenge is that the qemu-img proposal isn't fully declarative as
+we are only partially expressing the end state, attempting to leave other
+slots unspecified. This is good as it means we don't have to specify a
+huge amount of data on the CLI. This is bad as makes it less obvious
+what actual effects of the commands will be and I feel users will end
+up needing to read the manual every time to re-learn it.
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
+
 
