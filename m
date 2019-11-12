@@ -2,117 +2,115 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EFE7C43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6315C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:10:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59B2D21783
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:09:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8F22C21783
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 10:10:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="GJOcYJj+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59B2D21783
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Q0wzFhEN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F22C21783
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUT7E-0008IB-7P
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 05:09:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54147)
+	id 1iUT8A-0001Hy-Fb
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 05:10:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53990)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iUT65-0006vz-7j
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:08:30 -0500
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iUT5Y-00061Y-VI
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:07:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iUT64-0003tG-0b
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:08:29 -0500
-Received: from mail-eopbgr50125.outbound.protection.outlook.com
- ([40.107.5.125]:43349 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iUT5X-0003aQ-N4
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:07:56 -0500
+Received: from mail-eopbgr60110.outbound.protection.outlook.com
+ ([40.107.6.110]:14830 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iUT63-0003sx-Pl
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 05:08:27 -0500
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iUT5T-0003Wk-Uc; Tue, 12 Nov 2019 05:07:52 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ps2QAmv1z2jflmI9M1VY6blbOaAKnzlKOV7oZ2KaNmvGBJqlt918xRI6P8BuTSL+3duuXWXL0S/uekFm+CU7uVRVb/mWqIyIuJ0kibw/ZoumLKw1Jl1H+F9s/YLrCYuaWsy4/j1XCcL6bqBdD6CrX6bCbU7tan72iyHw2DPX9qyp9hskVGBtQxyNXJGWa8XqzUHRRlK3hRFp1VaOS261Csms+3iEQCt1Gc4VVBQ67YQNWU7f2iiJH2rIP0IUAsK119ZOYOWPlu1bK22Y4ZpzWGfuRem7C227ToJW8Kgfcb1XA1m96Fbfldv7zd8HWp94wYz/bvP70dDxfCC72qRFlA==
+ b=bWCUB3WCYDzo+2w4EGtbkzwy//oLToVHtJLtgjpK8zAnKjuKsyo1+3C9LV1XEZgkkMFSSAgH3ma+gMFpDFg1SpbHKeY6LhNtkhfrYTcH36164/RISmhWMamhxzgV5zNHXdbnSpyXyClMUHsE6xd28gzIpBlB+HD2UjshQVMujcjnod9GgeBcMCnKNtgbLq7Kx5jxWd4/jQhz2iYEX25lDBDzyVOhgMBH1CQ7NbZcZM5lIO4vPDNrmv9SHjBNdDD/3IobuJ8iUnpR1HddSBm3HvTTyhD16Yuv7UhGxMq3+m/qOlS45Py7qvqnPOyeT9gnAPrdVdS3C5rTIIdCHmO7vg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i1bX5unqhpQKieJa+AV71Uf9WOL+JpN9HL6VqPZWX/I=;
- b=b2JPWwEX25UkqxWItxyGkqQH0Cia4W1QGtZ00QF4oGKHe8bATXihvAEsznaCTTbDFZ7Zwg+yBcf/oOx4CPpN28C5MtbB2G0pHGo7/FOysrl3OAIEmmUG+zFgowCPJBfrIxnQhcbkR/E2YQhl+th70ndrLVPzi4Zkw81MecTfsCkSzWR9C55kPRVQ53H+2Sp2cptvKaWud/k+MV1K3wEjen4NSD+TAf2g5ZkvvEYwcT3kHsZJgNalOxqMu0XE4p83ur0YtZfoP35T1jAF8QYgnqmUuvYRwrPxiJCtjOQUupwOU1AoJvyuh6YlQ80bqa0XuYVmXa6oUJ4xiifXeUmlww==
+ bh=BRwfw1e5d7VN2JFATvKXbdNjKZnU5exInJ+At2b7pMU=;
+ b=MsyulkHbkKO/LSvAZV0jckInI4Oq1DzUVhjQRIVGzhiu6XyiA8l8VRUKINk8ZJKOr3/WRdNcLN8aX83an/HKOvPokKqvZ8iwmQWCy9LhLAUKZcvl59FfdO7okirTihgF/RsWB1cZzL/hSYU8ZrFphkRLtH5662nlpyZqEuC3xbLv4q/GmktMu6mLc7qI/HTAtKWY+qr/OC7vWGoj+kc6cEYR8Y2ZdrLizhzBL15qOdJHHibp6g9OQG65/BJzNjcw7vH1QnqxBP9mpabxebHgw7nJCJMvJ0W6rBFNIz+rmMgs4ZaOQnA0FyN0ML/ODf4BOi2aKECGq/6F15f3VgaV4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i1bX5unqhpQKieJa+AV71Uf9WOL+JpN9HL6VqPZWX/I=;
- b=GJOcYJj+Ufpu+TXPUj/8+/QmANYJ0K6LjJhfOstdO031/aZ+URSTV6/MTU1keYWS29okSczT3SUjEFR6rGW29tr5EGEswWj2Cs19rFCcngW3Djn/vGV/7iYaO79Ykb5jHcxuAUbaTyvrRAj88nRCrkMHbug/rG59p1vyWDJwko8=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3125.eurprd08.prod.outlook.com (52.135.164.10) with Microsoft SMTP
+ bh=BRwfw1e5d7VN2JFATvKXbdNjKZnU5exInJ+At2b7pMU=;
+ b=Q0wzFhENMW1EmBZQSoy/UZeGMSCrBfhQ8pV91y9cck2pddL1GAnU+c/jqVTdm1jGsyZaRuFTFnqBQ48GFvlrezdDw0g1GP0PGX0weVCec+YA04dWYZ0OSKWXw3ApZj231XLAO+T4ZSHI/BCX80z69bEZoXeEju/dY+YpSka6UNU=
+Received: from DB6PR08MB2757.eurprd08.prod.outlook.com (10.170.220.33) by
+ DB6PR08MB2838.eurprd08.prod.outlook.com (10.175.234.14) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.22; Tue, 12 Nov 2019 10:08:25 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2430.027; Tue, 12 Nov 2019
- 10:08:25 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: Re: [PATCH] qemu-coroutine-sleep: Silence Coverity warning
-Thread-Topic: [PATCH] qemu-coroutine-sleep: Silence Coverity warning
-Thread-Index: AQHVmM+U9laNqp2pZkywys5l+H8GrKeHUJyA
-Date: Tue, 12 Nov 2019 10:08:25 +0000
-Message-ID: <9f0f8f87-3025-67be-d423-51e2e910f5f5@virtuozzo.com>
-References: <20191111203524.21912-1-eblake@redhat.com>
-In-Reply-To: <20191111203524.21912-1-eblake@redhat.com>
-Accept-Language: ru-RU, en-US
+ 15.20.2430.22; Tue, 12 Nov 2019 10:07:47 +0000
+Received: from DB6PR08MB2757.eurprd08.prod.outlook.com
+ ([fe80::a1ee:668f:c3a5:87b]) by DB6PR08MB2757.eurprd08.prod.outlook.com
+ ([fe80::a1ee:668f:c3a5:87b%4]) with mapi id 15.20.2430.027; Tue, 12 Nov 2019
+ 10:07:47 +0000
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v6 1/3] block: introduce compress filter driver
+Thread-Topic: [PATCH v6 1/3] block: introduce compress filter driver
+Thread-Index: AQHVmKnAkAyy5MwXBk+X/RQ5OedZu6eHSMAAgAAH+oA=
+Date: Tue, 12 Nov 2019 10:07:47 +0000
+Message-ID: <9df49b41-c2a5-d087-36ac-3f31ae7f4c85@virtuozzo.com>
+References: <1573488277-794975-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1573488277-794975-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <20191112093912.GC5364@linux.fritz.box>
+In-Reply-To: <20191112093912.GC5364@linux.fritz.box>
+Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0102CA0050.eurprd01.prod.exchangelabs.com
- (2603:10a6:7:7d::27) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
+x-clientproxiedby: HE1PR0401CA0071.eurprd04.prod.outlook.com
+ (2603:10a6:3:19::39) To DB6PR08MB2757.eurprd08.prod.outlook.com
+ (2603:10a6:6:18::33)
 authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
+ smtp.mailfrom=andrey.shinkevich@virtuozzo.com; 
 x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191112130823291
 x-originating-ip: [185.231.240.5]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bb95877c-7568-447b-ec23-08d767584187
-x-ms-traffictypediagnostic: AM6PR08MB3125:
-x-microsoft-antispam-prvs: <AM6PR08MB3125C53491D4665C11FF4434C1770@AM6PR08MB3125.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-office365-filtering-correlation-id: 2b9bcb4a-9d25-4180-7036-08d767582b3d
+x-ms-traffictypediagnostic: DB6PR08MB2838:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DB6PR08MB283877007718DD05B74F0CBAF4770@DB6PR08MB2838.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
 x-forefront-prvs: 021975AE46
 x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(396003)(366004)(39840400004)(136003)(346002)(124014002)(189003)(199004)(478600001)(8936002)(81156014)(81166006)(6436002)(8676002)(14454004)(2906002)(229853002)(305945005)(7736002)(6486002)(25786009)(186003)(26005)(66066001)(99286004)(4326008)(6246003)(36756003)(2501003)(6506007)(52116002)(386003)(76176011)(14444005)(476003)(486006)(2616005)(6116002)(316002)(256004)(11346002)(446003)(71200400001)(71190400001)(3846002)(6512007)(110136005)(54906003)(5660300002)(31696002)(86362001)(102836004)(66476007)(66556008)(64756008)(31686004)(66946007)(66446008);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3125;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ SFS:(10019020)(346002)(366004)(136003)(376002)(39840400004)(396003)(189003)(199004)(66946007)(229853002)(66476007)(6486002)(66556008)(66446008)(7736002)(8676002)(31696002)(81156014)(6512007)(64756008)(31686004)(186003)(6916009)(81166006)(6436002)(4326008)(256004)(8936002)(6246003)(107886003)(305945005)(14444005)(316002)(86362001)(54906003)(26005)(99286004)(76176011)(52116002)(3846002)(6116002)(386003)(6506007)(53546011)(2906002)(478600001)(102836004)(5660300002)(66066001)(14454004)(2616005)(11346002)(476003)(446003)(36756003)(71190400001)(25786009)(44832011)(71200400001)(486006);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:DB6PR08MB2838;
+ H:DB6PR08MB2757.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
  PTR:InfoNoRecords; MX:1; A:1; 
 received-spf: None (protection.outlook.com: virtuozzo.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Q/VpNZBG1/u9ZHDe+w4rUO83sJEsFMLUaKlLf2s2TwXijMCVoWpVUku/Wh6Z6+gw4IIuXFiIsp3IjnldafWy0NhFgUoJjfJ1wtVA3FIldeWEZycMk/HaVDJyGBzf+pBr7u4xuA0qycBrqEJC4uKzj5LJtPin4BV3NXm+HeMXZDB7DJMP8h3LWDyzjZ2UmZ/mdn77ZCDUF9QlslsonArxVFB6Pc6Y8Zb6xTVure9ySVhzZ+H9Tw/oVu3SKgoF9EzLncgxRdLSaACN/4HIfV9COWkVkOgYs2NTI37MHMB9SFxsOzviucuJswkz/GQXwimgo/hENLtNuRCkb1o7dXR8MZzIKtA9F52q5VpYFo0lE7dGvW1cx6PErrZGwrCbiWU+qrK+0LDsNzm/NwoPdnwYTqjvFYiA/SXgoFLDrwrHvUMF5w9THaPsTcTCT/ILq23k
-x-ms-exchange-transport-forked: True
+x-microsoft-antispam-message-info: Y7o+M9lGzg48otWJhpy10fUhMKstmeherFHPBtnX0TFgxQ2/6ryjBQaqqb8HKK5lD0HhiEfFwrEuLKqbbqqf6a0xyvY96uddHOi4Thq3Kh2K8njKx7pf4xXPXV1SYhetatkFMkzoMkFW4zYyBM2rlR1DXA0psgvnlmT1lekOG54BqcRkJP7r0a95QwHKl3HIrVHK0mg74lXsCcVVOf4un6IvTL+HEs57nRZM7YuNSQx+c7czKCer+cR6aXdRl3IxATBSPzG4WsEquFoEBzCbb53Gp89zpehYQwhrLn9WAqQfTP/Hok8pxjm6jQiJzihCYDZaTogirTRbX8NkaWvxfs+XKFd5Zhe8OZNOWa9IE9cupVQRz5/ekPEDbG9zKY4lHP9wt4xpi6/yJjmf8AWGy+NoF5FJ7uMHbx8+YaHSHDBpsrr5iffwc8WRy436zNXo
 Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <7E618CC132E2354B9CABA8206E899C59@eurprd08.prod.outlook.com>
+Content-ID: <2859ED8E1D19CD4B89983519E6AE7F35@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb95877c-7568-447b-ec23-08d767584187
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Nov 2019 10:08:25.1883 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2b9bcb4a-9d25-4180-7036-08d767582b3d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Nov 2019 10:07:47.7981 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tk89OAk0dEm1UgAYnmdT/j5AJtgbxZ5iUfaxOnUfSfm7Sy5dNU/rNGfZAtloUsZ/3Wi/I+HU+Uj3Qz2ZP00DXrApEMWLRcDOljWt+CHz/8U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3125
+X-MS-Exchange-CrossTenant-userprincipalname: 3FCnN7PYMmCxyHEiuLBa+v1Oa6BEk3zUOYZEdYxUjW4PVE6b2SWQWK58JdtIHGWMPuRMYA0fFEe12p8HxFoKnfeWE3Ke7B4yldgjcSi28c4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR08MB2838
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.125
+X-Received-From: 40.107.6.110
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,81 +122,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Denis Lunev <den@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-11.11.2019 23:35, Eric Blake wrote:
-> Coverity warns that we store the address of a stack variable through a
-> pointer passed in by the caller, which would let the caller trivially
-> trigger use-after-free if that stored value is still present when we
-> finish execution.  However, the way coroutines work is that after our
-> call to qemu_coroutine_yield(), control is temporarily continued in
-> the caller prior to our function concluding, and in order to resume
-> our coroutine, the caller must poll until the variable has been set to
-> NULL.  Thus, we can add an assert that we do not leak stack storage to
-> the caller on function exit.
+On 12/11/2019 12:39, Kevin Wolf wrote:
+> Am 11.11.2019 um 17:04 hat Andrey Shinkevich geschrieben:
+>> Allow writing all the data compressed through the filter driver.
+>> The written data will be aligned by the cluster size.
+>> Based on the QEMU current implementation, that data can be written to
+>> unallocated clusters only. May be used for a backup job.
+>>
+>> Suggested-by: Max Reitz <mreitz@redhat.com>
+>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 >=20
-> Fixes: Coverity CID 1406474
-
-Hmm, I doubt that it will fix it.. Do Coverity pay attention to assertions?
-
-> CC: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
+>> +static BlockDriver bdrv_compress =3D {
+>> +    .format_name                        =3D "compress",
+>> +
+>> +    .bdrv_open                          =3D zip_open,
+>> +    .bdrv_child_perm                    =3D zip_child_perm,
 >=20
-> I don't know if this actually shuts Coverity up; Peter, since you
-> reported the Coverity issue, are you in a better position to test if
-> this makes a difference?  At any rate, the tests still pass after
-> this is in place.
->=20
-> I'm not sure if the compiler wants us to insert a 'volatile' in any
-> of our uses of QemuCoSleepState.user_state_pointer.
->=20
->   util/qemu-coroutine-sleep.c | 7 +++++++
->   1 file changed, 7 insertions(+)
->=20
-> diff --git a/util/qemu-coroutine-sleep.c b/util/qemu-coroutine-sleep.c
-> index ae91b92b6e78..769a76e57df0 100644
-> --- a/util/qemu-coroutine-sleep.c
-> +++ b/util/qemu-coroutine-sleep.c
-> @@ -68,5 +68,12 @@ void coroutine_fn qemu_co_sleep_ns_wakeable(QEMUClockT=
-ype type, int64_t ns,
->       }
->       timer_mod(state.ts, qemu_clock_get_ns(type) + ns);
->       qemu_coroutine_yield();
-> +    if (sleep_state) {
-> +        /*
-> +         * Note that *sleep_state is cleared during qemu_co_sleep_wake
-> +         * before resuming this coroutine.
-> +         */
-> +        assert(*sleep_state =3D=3D NULL);
-> +    }
-
-Hmm.. sleep_state is not owned by this code, and this is possible that user=
- of the API may want
-to reuse the variable (for another call to qemu_co_sleep_ns_wakeable) immed=
-iately after calling
-qemu_co_sleep_wake (which don't call qemu_coroutine_enter but aio_co_wake).=
-.
-
-Seems, current usage in nbd code is not the case, so we may add this assert=
-ion, but I'd add a comment
-to qemu_co_sleep_ns_wakeable, that sleep_state must not be reused until qem=
-u_co_sleep_ns_wakeable
-finish.. It seems obvious, but actually it isn't, keeping in mind that qemu=
-_co_sleep_wake() call
-may be interpreted as a point where sleep_state is freed..
-
-
->       timer_free(state.ts);
->   }
+> Why do you call the functions zip_* when the driver is called compress?
+> I think zip would be a driver for zip archives, which we don't use here.
 >=20
 
+Kevin,
+Thanks for your response.
+I was trying to make my mind up with a short form for 'compress'.
+I will change the 'zip' for something like 'compr'.
+
+>> +    .bdrv_getlength                     =3D zip_getlength,
+>> +    .bdrv_co_truncate                   =3D zip_co_truncate,
+>> +
+>> +    .bdrv_co_preadv                     =3D zip_co_preadv,
+>> +    .bdrv_co_preadv_part                =3D zip_co_preadv_part,
+>> +    .bdrv_co_pwritev                    =3D zip_co_pwritev,
+>> +    .bdrv_co_pwritev_part               =3D zip_co_pwritev_part,
+>=20
+> If you implement .bdrv_co_preadv/pwritev_part, isn't the implementation
+> of .bdrv_co_preadv/pwritev (without _part) dead code?
+>=20
+
+Understood and will remove the dead path.
+
+>> +    .bdrv_co_pwrite_zeroes              =3D zip_co_pwrite_zeroes,
+>> +    .bdrv_co_pdiscard                   =3D zip_co_pdiscard,
+>> +    .bdrv_refresh_limits                =3D zip_refresh_limits,
+>> +
+>> +    .bdrv_eject                         =3D zip_eject,
+>> +    .bdrv_lock_medium                   =3D zip_lock_medium,
+>> +
+>> +    .bdrv_co_block_status               =3D bdrv_co_block_status_from_b=
+acking,
+>=20
+> Why not use bs->file? (Well, apart from the still not merged filter
+> series by Max...)
+>=20
+
+We need to keep a backing chain unbroken with the filter inserted. So,=20
+the backing child should not be zero. It is necessary for the backup=20
+job, for instance. When I initialized both children pointing to the same=20
+node, the code didn't work properly. I have to reproduce it again to=20
+tell you exactly what happened then and will appreciate your advice=20
+about a proper design.
+
+Andrey
+
+>> +    .bdrv_recurse_is_first_non_filter   =3D zip_recurse_is_first_non_fi=
+lter,
+>> +
+>> +    .has_variable_length                =3D true,
+>> +    .is_filter                          =3D true,
+>> +};
+>=20
+> Kevin
+>=20
 
 --=20
-Best regards,
-Vladimir
+With the best regards,
+Andrey Shinkevich
 
