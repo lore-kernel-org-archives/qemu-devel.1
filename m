@@ -2,69 +2,65 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 546BAC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 07:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C1CFC43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 07:53:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2603F206A3
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 07:49:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2603F206A3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4890021872
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 07:53:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4890021872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUQvj-0001fW-9H
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 02:49:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35743)
+	id 1iUQzN-00047p-JJ
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 02:53:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36256)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iUQuZ-0000ny-Ds
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 02:48:28 -0500
+ (envelope-from <clg@kaod.org>) id 1iUQyP-0003Ov-VQ
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 02:52:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iUQuX-0001YO-PA
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 02:48:27 -0500
-Resent-Date: Tue, 12 Nov 2019 02:48:27 -0500
-Resent-Message-Id: <E1iUQuX-0001YO-PA@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21401)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iUQuX-0001VC-H9
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 02:48:25 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1573544892; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=mLxmsalGfS6EAvQGCEFQHpA6GPDgW71GhWmeaS0klwuqXFWYwwXaQuPog8MbDNFDbVpVobfV+wYN/HSShNpslpQT3xbUYbGS2XtLX/hdGLkAAJtiRE795R3GmFYz/dU7xDcMkoabO3KY0EWYb6uQdiOOJMgJqehz7zVare7NcAA=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1573544892;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=Nsicyw1EkkOofEVO1Y2+dvlQZ2Eqe5QFnUcT/K32Czg=; 
- b=SX5/2sOcF6ACrqe+a06gvOw3CQcOmbU4unBoWsmkmd2lOtqFZOfUfcVlPRRnbP0CFZ4GUVMgFX/JKx+n1BK2DHJ8aJWtKbkVIH0MXCQw/gH58LwoC1Ig5XLxABPVz8Of04+OAX+1A0Rsfto0sburIyXCpWOAjwd9+ZqeCJQMvZg=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1573544890949651.2963378754483;
- Mon, 11 Nov 2019 23:48:10 -0800 (PST)
-In-Reply-To: <20191111152808.13371-1-frankja@linux.ibm.com>
-Subject: Re: [PATCH v2] s390x: Properly fetch the short psw on diag308 subc 0/1
-Message-ID: <157354488986.9707.6899205076509397269@37313f22b938>
+ (envelope-from <clg@kaod.org>) id 1iUQyM-0001F6-OU
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 02:52:24 -0500
+Received: from 9.mo7.mail-out.ovh.net ([46.105.60.248]:58736)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iUQyM-000193-JB
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 02:52:22 -0500
+Received: from player762.ha.ovh.net (unknown [10.109.160.230])
+ by mo7.mail-out.ovh.net (Postfix) with ESMTP id F0E7313DDFB
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 08:52:18 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player762.ha.ovh.net (Postfix) with ESMTPSA id 4A60DBFD8BB1;
+ Tue, 12 Nov 2019 07:52:13 +0000 (UTC)
+Subject: Re: [PATCH 3/4] watchdog/aspeed: Improve watchdog timeout message
+To: Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ Andrew Jeffery <andrew@aj.id.au>
+References: <20191112064058.13275-1-joel@jms.id.au>
+ <20191112064058.13275-4-joel@jms.id.au>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <036a1f38-6258-fad0-bc45-0e3cfe0a93b7@kaod.org>
+Date: Tue, 12 Nov 2019 08:52:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: frankja@linux.ibm.com
-Date: Mon, 11 Nov 2019 23:48:10 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20191112064058.13275-4-joel@jms.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 7255861952999820096
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedruddvkedgheekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 46.105.60.248
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,37 +72,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, qemu-devel@nongnu.org,
- david@redhat.com
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTExMTE1MjgwOC4xMzM3
-MS0xLWZyYW5ramFAbGludXguaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIHYyXSBzMzkweDogUHJvcGVybHkgZmV0Y2gg
-dGhlIHNob3J0IHBzdyBvbiBkaWFnMzA4IHN1YmMgMC8xClR5cGU6IHNlcmllcwpNZXNzYWdlLWlk
-OiAyMDE5MTExMTE1MjgwOC4xMzM3MS0xLWZyYW5ramFAbGludXguaWJtLmNvbQoKPT09IFRFU1Qg
-U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251
-bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
-Z29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNl
-Li4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0
-ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo3NGQ2
-MGRjIHMzOTB4OiBQcm9wZXJseSBmZXRjaCB0aGUgc2hvcnQgcHN3IG9uIGRpYWczMDggc3ViYyAw
-LzEKCj09PSBPVVRQVVQgQkVHSU4gPT09CkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzQ2OiBGSUxFOiB0YXJnZXQvczM5MHgvY3B1Lmg6MjY4OgorI2RlZmluZSBQU1df
-TUFTS19TSE9SVFBTV15JMHgwMDA4MDAwMDAwMDAwMDAwVUxMJAoKdG90YWw6IDEgZXJyb3JzLCAw
-IHdhcm5pbmdzLCAyNSBsaW5lcyBjaGVja2VkCgpDb21taXQgNzRkNjBkYzQ4NmEwIChzMzkweDog
-UHJvcGVybHkgZmV0Y2ggdGhlIHNob3J0IHBzdyBvbiBkaWFnMzA4IHN1YmMgMC8xKSBoYXMgc3R5
-bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBm
-YWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BB
-VENIIGluIE1BSU5UQUlORVJTLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0
-ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0
-Y2hldy5vcmcvbG9ncy8yMDE5MTExMTE1MjgwOC4xMzM3MS0xLWZyYW5ramFAbGludXguaWJtLmNv
-bS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBh
-dXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNl
-bmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 12/11/2019 07:40, Joel Stanley wrote:
+> Users benefit from knowing which watchdog timer has expired. The addres=
+s
+> of the watchdog's registers unambiguously indicates which has expired,
+> so log that.
+>=20
+> Signed-off-by: Joel Stanley <joel@jms.id.au>
+
+
+The format below should be using HWADDR_PRIx. No need to resend.=20
+I will fix it.=20
+
+Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
+
+C.=20
+
+> ---
+>  hw/watchdog/wdt_aspeed.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+> index 145be6f99ce2..5697ed83325a 100644
+> --- a/hw/watchdog/wdt_aspeed.c
+> +++ b/hw/watchdog/wdt_aspeed.c
+> @@ -219,7 +219,8 @@ static void aspeed_wdt_timer_expired(void *dev)
+>          return;
+>      }
+> =20
+> -    qemu_log_mask(CPU_LOG_RESET, "Watchdog timer expired.\n");
+> +    qemu_log_mask(CPU_LOG_RESET, "Watchdog timer %08lx expired.\n",
+> +            s->iomem.addr);
+>      watchdog_perform_action();
+>      timer_del(s->timer);
+>  }
+>=20
+
 
