@@ -2,82 +2,49 @@ Return-Path: <SRS0=1YIe=ZE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24DBEC43331
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 03:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 117F0C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 03:40:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF1DA2084E
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 03:35:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ar5AXk2p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF1DA2084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id BE42F2084E
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 03:40:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE42F2084E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58892 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUMxt-0001px-0m
-	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 22:35:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43542)
+	id 1iUN2n-0003QO-43
+	for qemu-devel@archiver.kernel.org; Mon, 11 Nov 2019 22:40:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43887)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lantianyu1986@gmail.com>) id 1iUMxE-0001KY-R8
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 22:34:58 -0500
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iUN1u-0002vB-3P
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 22:39:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lantianyu1986@gmail.com>) id 1iUMxD-0005vl-KT
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 22:34:56 -0500
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:34749)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <lantianyu1986@gmail.com>)
- id 1iUMxD-0005vC-Cr
- for qemu-devel@nongnu.org; Mon, 11 Nov 2019 22:34:55 -0500
-Received: by mail-pg1-x543.google.com with SMTP id z188so4967697pgb.1
- for <qemu-devel@nongnu.org>; Mon, 11 Nov 2019 19:34:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=RjB3o0NjWZXINNESvPz4COiSojg7wROs/y6CgxKZ/Pw=;
- b=Ar5AXk2psvjukJXi6gdH+xtvXmPp9uIXKwTYX28+pv4edMenYVt2Q9cSx6Sir1B8To
- U/Mp7UNwz4u9P6dJcQtjMhdBxKtaekycaC+pbD1ure7q3xluNVB4AY694Wdw5hhbXVnj
- LCOw7QFIpSTm4GC9WPrTKXscJfsQ5h8EPGAgNsqrxdBSfO9qYez338FgkBWHcDsFytET
- 4/fJcb2Qp8DPFg75MLd5Ed36cVo8VjZ3GhwtHY9VWQHzYNHgzp95trzk4oApjEOf1+Sv
- GdWYuiYl0LWZalpZUzwibW2heGA4Ks6Bn4tUENTyBrSlyKKZ4H+7oZX0er/id3Ug2alL
- KMqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=RjB3o0NjWZXINNESvPz4COiSojg7wROs/y6CgxKZ/Pw=;
- b=A1NdleHDwT5Pccw35edVBk6peafY+4ZmvVTAJeBSh8dzi3wg8BeDDFyjyPWh3HRTsd
- qJEU8ZvcQoSQnPrp2TI1SsxHIWCQywhVek17MWq3JkCVPKbGQnvlUYmSuxLt2Fu+28sS
- 01T2v9puAx/HpyfDOca/qtbovuevZdsroiMs4kdpejWbNX5hY/8DADrmpPrTdbXiw3l4
- SVOZKzoABW8oFgbL/fFjsVGXN8DxVa+4xUvld5ZDrpFwaKC2Rp4Lx7bufUIiTLVkqQXP
- DDBw0ooLhdv6gZOGQAJV6or/3w3QKMAyjx4Keju6YSqUAZMcu8d27g0t/3ydSgAyr6g6
- aH8A==
-X-Gm-Message-State: APjAAAVWrxvxzoP8oU78XnYIifbdsH3kNv0kGRMGIVRs7wAy7k0voaY6
- pbVmXkXoZJRVLLf3O5ekhuA=
-X-Google-Smtp-Source: APXvYqxm3G75qyaUjRQQIkPwyZGO7sh/u2z8W5LqAbtVsVJkIsjXh8sN7kIATp92EqxAESEhDElMYQ==
-X-Received: by 2002:a65:46c1:: with SMTP id n1mr11037437pgr.257.1573529693925; 
- Mon, 11 Nov 2019 19:34:53 -0800 (PST)
-Received: from localhost.corp.microsoft.com ([167.220.255.5])
- by smtp.googlemail.com with ESMTPSA id f5sm114018pjp.1.2019.11.11.19.34.50
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 11 Nov 2019 19:34:53 -0800 (PST)
-From: lantianyu1986@gmail.com
-X-Google-Original-From: Tianyu.Lan@microsoft.com
-To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
- mtosatti@redhat.com, rkagan@virtuozzo.com, vkuznets@redhat.com
-Subject: [PATCH V4] target/i386/kvm: Add Hyper-V direct tlb flush support
-Date: Tue, 12 Nov 2019 11:34:27 +0800
-Message-Id: <20191112033427.7204-1-Tianyu.Lan@microsoft.com>
-X-Mailer: git-send-email 2.14.5
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::543
+ (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iUN1r-0007tI-Sx
+ for qemu-devel@nongnu.org; Mon, 11 Nov 2019 22:39:45 -0500
+Received: from relay.sw.ru ([185.231.240.75]:52174)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iUN1r-0007so-LM; Mon, 11 Nov 2019 22:39:43 -0500
+Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136])
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1iUN1l-0006wB-Nh; Tue, 12 Nov 2019 06:39:37 +0300
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+To: qemu-devel@nongnu.org,
+	qemu-block@nongnu.org
+Subject: [PATCH v5] iotests: Test NBD client reconnection
+Date: Tue, 12 Nov 2019 06:39:36 +0300
+Message-Id: <1573529976-815699-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Mailer: git-send-email 1.8.3.1
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,142 +56,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tianyu Lan <Tianyu.Lan@microsoft.com>, qemu-devel@nongnu.org,
- kvm@vger.kernel.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, mreitz@redhat.com,
+ rkagan@virtuozzo.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Tianyu Lan <Tianyu.Lan@microsoft.com>
+The test for an NBD client. The NBD server is disconnected after the
+client write request. The NBD client should reconnect and complete
+the write operation.
 
-Hyper-V direct tlb flush targets KVM on Hyper-V guest.
-Enable direct TLB flush for its guests meaning that TLB
-flush hypercalls are handled by Level 0 hypervisor (Hyper-V)
-bypassing KVM in Level 1. Due to the different ABI for hypercall
-parameters between Hyper-V and KVM, KVM capabilities should be
-hidden when enable Hyper-V direct tlb flush otherwise KVM
-hypercalls may be intercepted by Hyper-V. Add new parameter
-"hv-direct-tlbflush". Check expose_kvm and Hyper-V tlb flush
-capability status before enabling the feature.
-
-Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
+Suggested-by: Denis V. Lunev <den@openvz.org>
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Tested-by: Eric Blake <eblake@redhat.com>
 ---
-Change since v3:
-       - Fix logic of Hyper-V passthrough mode with direct
-       tlb flush.
+v5:  "" were replaced with '' in the test except the function comments.
+    The 'quick' word was added to the 'qroup' file next to the test #277.
 
-Change sicne v2:
-       - Update new feature description and name.
-       - Change failure print log.
+ tests/qemu-iotests/277                   | 96 ++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/277.out               |  6 ++
+ tests/qemu-iotests/group                 |  1 +
+ tests/qemu-iotests/iotests.py            |  5 ++
+ tests/qemu-iotests/nbd-fault-injector.py |  3 +-
+ 5 files changed, 110 insertions(+), 1 deletion(-)
+ create mode 100755 tests/qemu-iotests/277
+ create mode 100644 tests/qemu-iotests/277.out
 
-Change since v1:
-       - Add direct tlb flush's Hyper-V property and use
-       hv_cpuid_check_and_set() to check the dependency of tlbflush
-       feature.
-       - Make new feature work with Hyper-V passthrough mode.
----
- docs/hyperv.txt   | 10 ++++++++++
- target/i386/cpu.c |  2 ++
- target/i386/cpu.h |  1 +
- target/i386/kvm.c | 24 ++++++++++++++++++++++++
- 4 files changed, 37 insertions(+)
-
-diff --git a/docs/hyperv.txt b/docs/hyperv.txt
-index 8fdf25c829..140a5c7e44 100644
---- a/docs/hyperv.txt
-+++ b/docs/hyperv.txt
-@@ -184,6 +184,16 @@ enabled.
- 
- Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
- 
-+3.18. hv-direct-tlbflush
-+=======================
-+Enable direct TLB flush for KVM when it is running as a nested
-+hypervisor on top Hyper-V. When enabled, TLB flush hypercalls from L2
-+guests are being passed through to L0 (Hyper-V) for handling. Due to ABI
-+differences between Hyper-V and KVM hypercalls, L2 guests will not be
-+able to issue KVM hypercalls (as those could be mishanled by L0
-+Hyper-V), this requires KVM hypervisor signature to be hidden.
+diff --git a/tests/qemu-iotests/277 b/tests/qemu-iotests/277
+new file mode 100755
+index 0000000..1f72dca
+--- /dev/null
++++ b/tests/qemu-iotests/277
+@@ -0,0 +1,96 @@
++#!/usr/bin/env python
++#
++# Test NBD client reconnection
++#
++# Copyright (c) 2019 Virtuozzo International GmbH
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+Requires: hv-tlbflush, -kvm
- 
- 4. Development features
- ========================
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 44f1bbdcac..7bc7fee512 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6156,6 +6156,8 @@ static Property x86_cpu_properties[] = {
-                       HYPERV_FEAT_IPI, 0),
-     DEFINE_PROP_BIT64("hv-stimer-direct", X86CPU, hyperv_features,
-                       HYPERV_FEAT_STIMER_DIRECT, 0),
-+    DEFINE_PROP_BIT64("hv-direct-tlbflush", X86CPU, hyperv_features,
-+                      HYPERV_FEAT_DIRECT_TLBFLUSH, 0),
-     DEFINE_PROP_BOOL("hv-passthrough", X86CPU, hyperv_passthrough, false),
- 
-     DEFINE_PROP_BOOL("check", X86CPU, check_cpuid, true),
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index eaa5395aa5..3cb105f7d6 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -907,6 +907,7 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
- #define HYPERV_FEAT_EVMCS               12
- #define HYPERV_FEAT_IPI                 13
- #define HYPERV_FEAT_STIMER_DIRECT       14
-+#define HYPERV_FEAT_DIRECT_TLBFLUSH     15
- 
- #ifndef HYPERV_SPINLOCK_NEVER_RETRY
- #define HYPERV_SPINLOCK_NEVER_RETRY             0xFFFFFFFF
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 11b9c854b5..43f5cbc3f6 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -900,6 +900,10 @@ static struct {
-         },
-         .dependencies = BIT(HYPERV_FEAT_STIMER)
-     },
-+    [HYPERV_FEAT_DIRECT_TLBFLUSH] = {
-+        .desc = "direct paravirtualized TLB flush (hv-direct-tlbflush)",
-+        .dependencies = BIT(HYPERV_FEAT_TLBFLUSH)
-+    },
- };
- 
- static struct kvm_cpuid2 *try_get_hv_cpuid(CPUState *cs, int max)
-@@ -1224,6 +1228,7 @@ static int hyperv_handle_properties(CPUState *cs,
-     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_EVMCS);
-     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_IPI);
-     r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_STIMER_DIRECT);
-+    r |= hv_cpuid_check_and_set(cs, cpuid, HYPERV_FEAT_DIRECT_TLBFLUSH);
- 
-     /* Additional dependencies not covered by kvm_hyperv_properties[] */
-     if (hyperv_feat_enabled(cpu, HYPERV_FEAT_SYNIC) &&
-@@ -1243,6 +1248,25 @@ static int hyperv_handle_properties(CPUState *cs,
-         goto free;
-     }
- 
-+    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_DIRECT_TLBFLUSH)) {
-+        if (kvm_vcpu_enable_cap(cs, KVM_CAP_HYPERV_DIRECT_TLBFLUSH, 0, 0)) {
-+            if (!cpu->hyperv_passthrough) {
-+                fprintf(stderr,
-+                    "Hyper-V %s is not supported by kernel\n",
-+                    kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
-+                return -ENOSYS;
-+            }
++import os
++import subprocess
++import iotests
++from iotests import file_path, log
 +
-+            cpu->hyperv_features &= ~BIT(HYPERV_FEAT_DIRECT_TLBFLUSH);
-+        } else if (cpu->expose_kvm) {
-+            fprintf(stderr,
-+                "Hyper-V %s requires KVM hypervisor signature "
-+                "to be hidden (-kvm).\n",
-+                kvm_hyperv_properties[HYPERV_FEAT_DIRECT_TLBFLUSH].desc);
-+            return -ENOSYS;
-+        }
-+    }
 +
-     if (cpu->hyperv_passthrough) {
-         /* We already copied all feature words from KVM as is */
-         r = cpuid->nent;
++nbd_sock, conf_file = file_path('nbd-sock', 'nbd-fault-injector.conf')
++
++
++def make_conf_file(event):
++    """
++    Create configuration file for the nbd-fault-injector.py
++
++    :param event: which event the server should close a connection on
++    """
++    with open(conf_file, 'w') as conff:
++        conff.write('[inject-error]\nevent={}\nwhen=after'.format(event))
++
++
++def start_server_NBD(event):
++    make_conf_file(event)
++
++    srv = subprocess.Popen(['nbd-fault-injector.py', '--classic-negotiation',
++                           nbd_sock, conf_file], stdout=subprocess.PIPE,
++                           stderr=subprocess.STDOUT, universal_newlines=True)
++    line = srv.stdout.readline()
++    if 'Listening on ' in line:
++        log('NBD server: started')
++    else:
++        log('NBD server: ' + line.rstrip())
++
++    return srv
++
++
++def start_client_NBD():
++    log('NBD client: QEMU-IO write')
++    args = iotests.qemu_io_args_no_fmt + \
++        ['-c', 'write -P 0x7 0 3M', '--image-opts',
++         'driver=nbd,server.type=unix,server.path={},'
++         'reconnect-delay=7'.format(nbd_sock)]
++    clt = subprocess.Popen(args, stdout=subprocess.PIPE,
++                           stderr=subprocess.STDOUT,
++                           universal_newlines=True)
++    return clt
++
++
++def check_proc_NBD(proc, connector):
++    try:
++        outs, errs = proc.communicate(timeout=10)
++
++        if proc.returncode < 0:
++            log('NBD {}: EXIT SIGNAL {}\n'.format(connector, proc.returncode))
++            log(outs)
++        else:
++            msg = outs.split('\n', 1)
++            log('NBD {}: {}'.format(connector, msg[0]))
++
++    except subprocess.TimeoutExpired:
++        proc.kill()
++        log('NBD {}: ERROR timeout expired'.format(connector))
++    finally:
++        if connector == 'server':
++            os.remove(nbd_sock)
++            os.remove(conf_file)
++
++
++srv = start_server_NBD('data')
++clt = start_client_NBD()
++# The server should close the connection after a client write request
++check_proc_NBD(srv, 'server')
++# Start the NBD server again
++srv = start_server_NBD('reply')
++# The client should reconnect and complete the write operation
++check_proc_NBD(clt, 'client')
++# Make it sure that server terminated
++check_proc_NBD(srv, 'server')
+diff --git a/tests/qemu-iotests/277.out b/tests/qemu-iotests/277.out
+new file mode 100644
+index 0000000..45404b3
+--- /dev/null
++++ b/tests/qemu-iotests/277.out
+@@ -0,0 +1,6 @@
++NBD server: started
++NBD client: QEMU-IO write
++NBD server: Closing connection on rule match inject-error
++NBD server: started
++NBD client: wrote 3145728/3145728 bytes at offset 0
++NBD server: Closing connection on rule match inject-error
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 0650403..6a9acfb 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -284,3 +284,4 @@
+ 268 rw auto quick
+ 270 rw backing quick
+ 272 rw
++277 rw quick
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 075f473..295b3e4 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -47,6 +47,11 @@ qemu_io_args = [os.environ.get('QEMU_IO_PROG', 'qemu-io')]
+ if os.environ.get('QEMU_IO_OPTIONS'):
+     qemu_io_args += os.environ['QEMU_IO_OPTIONS'].strip().split(' ')
+ 
++qemu_io_args_no_fmt = [os.environ.get('QEMU_IO_PROG', 'qemu-io')]
++if os.environ.get('QEMU_IO_OPTIONS_NO_FMT'):
++    qemu_io_args_no_fmt += \
++        os.environ['QEMU_IO_OPTIONS_NO_FMT'].strip().split(' ')
++
+ qemu_nbd_args = [os.environ.get('QEMU_NBD_PROG', 'qemu-nbd')]
+ if os.environ.get('QEMU_NBD_OPTIONS'):
+     qemu_nbd_args += os.environ['QEMU_NBD_OPTIONS'].strip().split(' ')
+diff --git a/tests/qemu-iotests/nbd-fault-injector.py b/tests/qemu-iotests/nbd-fault-injector.py
+index 6b2d659..7e2dab6 100755
+--- a/tests/qemu-iotests/nbd-fault-injector.py
++++ b/tests/qemu-iotests/nbd-fault-injector.py
+@@ -115,7 +115,8 @@ class FaultInjectionSocket(object):
+             if rule.match(event, io):
+                 if rule.when == 0 or bufsize is None:
+                     print('Closing connection on rule match %s' % rule.name)
+-                    self.sock.flush()
++                    self.sock.close()
++                    sys.stdout.flush()
+                     sys.exit(0)
+                 if rule.when != -1:
+                     return rule.when
 -- 
-2.14.5
+1.8.3.1
 
 
