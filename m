@@ -6,40 +6,40 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B8FC17440
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD488C43331
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:36:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ACEA020650
-	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:34:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACEA020650
+	by mail.kernel.org (Postfix) with ESMTPS id 7F68D20650
+	for <qemu-devel@archiver.kernel.org>; Tue, 12 Nov 2019 09:36:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F68D20650
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUSZF-0001bN-Tz
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:34:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48669)
+	id 1iUSai-0002gn-Vv
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 04:36:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48720)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iUSYF-0000vB-BJ
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:33:32 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iUSYW-0001Fj-5x
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:33:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iUSYE-0006Hh-6q
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:33:31 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:47869)
+ (envelope-from <laurent@vivier.eu>) id 1iUSYV-0006Mf-0y
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 04:33:48 -0500
+Received: from mout.kundenserver.de ([212.227.17.10]:47025)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <laurent@vivier.eu>)
- id 1iUSYB-0006Fp-JE; Tue, 12 Nov 2019 04:33:27 -0500
+ id 1iUSYU-0006MH-OQ; Tue, 12 Nov 2019 04:33:46 -0500
 Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mjjvp-1i1gUu3jP1-00lCaG; Tue, 12 Nov 2019 10:32:08 +0100
-Subject: Re: [PATCH] Makefile: install bios-microvm like other binary blobs
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Sergio Lopez <slp@redhat.com>
-References: <20191102114346.6445-1-philmd@redhat.com>
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M8yoa-1iZOEN36s2-0063NB; Tue, 12 Nov 2019 10:33:41 +0100
+Subject: Re: [PATCH] qom: Fix error message in object_class_property_add()
 From: Laurent Vivier <laurent@vivier.eu>
+To: Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>
+References: <157287383591.234942.311840593519058490.stgit@bahia.tlslab.ibm.com>
+ <4edf8200-ec7a-65f7-844c-63735ac67b54@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
  WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
@@ -82,36 +82,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <2598c193-61fc-725a-5bff-b542120eb634@vivier.eu>
-Date: Tue, 12 Nov 2019 10:32:06 +0100
+Message-ID: <d54b8758-a972-a5d0-3030-cd4d200f688b@vivier.eu>
+Date: Tue, 12 Nov 2019 10:33:37 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191102114346.6445-1-philmd@redhat.com>
+In-Reply-To: <4edf8200-ec7a-65f7-844c-63735ac67b54@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:85Js8v4a6W1818izND4QK4qlR4f3DuE7gYSB6VOmPy0M+g7njQ7
- Ens+b7LmSDWncJsCmDu3SH3XcpXhvquUJpvabKZ7LiQVJCzFngpawl/CV4fEORdoX/E3zLI
- oM238ZeYI4yNpHT1hnozZxau15sGchUcBhFlZVvBRL4DlFCTT91Ef85UIlbt+StxEBp2t9N
- vVN+5fSrsfvc6WMBnt1ng==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:bK9V1dqIP/o=:v5aC9KEPcqrhNWUBTCPbUu
- ug0WtCPtGWhTaXbxb/gMuWIIfHbgdFKos3oqioOjCsBh+k3MVMIdEdHjPzExb+rapO/Ua38R+
- mV8FNr3eUrt03yNeiiEk9FbUaA/sSriIDixg+HtEomk5NmQ3vO7qriTlsUlySjyBFakxGtVDN
- pAjkxQXpaS599rzXis6nBcb/2ubB8p7qih51gf3b+LdIezxkSLRiHUYY3scFyTcVuz2yiEDvB
- a0UM7Uuw5np6Zw4xOINZFydN21ENv+ce+nVKtdtR060NPptbRg4LP7vloGpaATL8g+u1sUwKs
- 4tvOwSEiW3QeLnnBCe2ffjW0Wwj/84hJYYfUWwU1zqnTnQ7Ierd24v9ZKSd1pMRDOIMng4v5R
- /5ijxq1y5ZrTHyXDCDoWwhAr+ysIAbCvktz+y+fv3hdF/wglma8EWoLSgbUVe4WDZdnV/NegE
- gDsKC8wko4/z9zCKZQeIqO4KPZQ/ITi6/xMqexJzkZuIjLmmlMZUnL5cSGZRCnpSwr5LPWgJy
- arV3FiXLOrZcGPSkz4Waso9VPxGtM38qSQENzxWZMmO2Z04emySc0a9rl5WVw2u3yGIabeZ/O
- l+Vo8UoSMI1swDRLjXvRbF2b6iXiwqk3cai5UvFKsWuJSYFU9uTQcGIXbarvQ3OdQ1cR6hv+0
- v9FCR/Y535bI4p1WmDwLMzRkbzwA42na07bImUNCr6o2A8XcOBifoo/p7eSUboMookAcnDghO
- 9D+jq+4MeA3d6AR1NKpbt68IWcyvx02UQkvEpA9OgDRHLQnmEDlDDaJERXVtDpPWTnPIPVuUs
- Os4OpZzGcuIDh9JyGNCtoLbfcThbY74vgG7abrYm2puBak1I0NFDm6t0MC0Aqa6YYsQQ3XvN3
- Xu4EXS9ca1cKEVwRIHfTWpIjS8zwSSCfjJZuQ2rZU=
+X-Provags-ID: V03:K1:8wh7jjwKxYBsu1Z00UtQwuV18ghUFvkpITablsmxHgngWTQRu4D
+ XfvEbDoQtEkue3japBMqQzzLXgV/+1zLiWjCLU7fCw60m217mU53s3twybZxs047eRU1Zh0
+ xHgZQdoPIs6OdhpGURgVDAL6vcXiw86ZxO2rL4Xc+ci5G2f//YNxe6Li28w5tMOXbA284kU
+ EVkZUhkjS8Xcq5LZ9xoiw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:2oKXsYQCy2k=:Cap91AP6+cAUvcRSPAXNH1
+ 7SyUfEmxrqbMte5twL5I8gTStmzhURiGbjBM075PNSFAphHn/pSDxKBkYhbgk2BKq7ezA05Tl
+ pqVyDsSdb7rsXYgnPSJ5fg3EIJzCf2Tq7rt1UknUk+OJQlBBIaYpYavYsn2ZfkdtUD7POZaxs
+ n/jvtwnCB0+/TEsZEiRa4IsliCgMQaba1rpbgMFxYb1wJaukW9DncQ3ka0NBUwWXhT+STv1S4
+ gB8vdHSMY8LEsuLaxLSe1jjHgnnGvE+0PKm4bi2ExRcnd9tR7wSBGYPBp04wBcFaHRzsO3Jlg
+ Ybmq24jwbEaw5of0wj1i08hdGnu5FZP+DBh8qbQ7r8zkZ2DfM2o5BunNiHWkWVmpuBj96vY2A
+ ONTjkNaganoHFvS1KCNmeRBg/vTe7jzVfxIQN3DPPt+Q58cbW+SmN87XNk2mxksvMu3Gbn0qE
+ fO4Hi3so27oCxuMQaFLFcMEDKvAXMqP+vsOW5PFq4gEhPvkOj2OgYGQMz53FAbZq8GdShLguU
+ QqySZRjO+xkuXyrCKjmzLNLV2dXMNDayh/UOI45dqM05UVkLWTouKn8oB8nEwuTz2sB30qhzD
+ PMCF0xSxWXcsEVhQ5qIioCwnAnhq5qKIHIv7P0KN3UMSN4TL3Q7nttMNb+pF/g+VGOcoQwLcZ
+ HULZx80MunFVseaz2u1zQahwww0J2M96qh0fCo2ZarEqVwWu+S3BkaV96lbfVTaXs3YS6i/xc
+ +y7gtStERfePUINXWLb6sjPPhLx3shDQfxqjqJfUnIOoXRvqMfJaq9WHxeY3XBnB7hjtUa6/Q
+ i9X/Bp6qxHrFFHxUjVoz9QLje3bQNE6jLUNxOfUMx1YDwnHOrQrQ1EGKNNyEpCtk6jWEFVW5R
+ KNf5gxYwJCeW67HIDuWw==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 217.72.192.74
+X-Received-From: 212.227.17.10
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,44 +123,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, "Michael S . Tsirkin" <mst@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Bruce Rogers <brogers@suse.com>
+Cc: qemu-trivial@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 02/11/2019 à 12:43, Philippe Mathieu-Daudé a écrit :
-> From: Bruce Rogers <brogers@suse.com>
+Le 05/11/2019 à 15:05, Laurent Vivier a écrit :
+> Le 04/11/2019 à 14:23, Greg Kurz a écrit :
+>> The error message in object_class_property_add() was copied from
+>> object_property_add() in commit 16bf7f522a2ff. Clarify that it is
+>> about a class, not an object.
+>>
+>> While here, have the format string in both functions to fit in a
+>> single line for better grep-ability, despite the checkpatch warning.
+>>
+>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>> ---
+>>  qom/object.c |   10 ++++------
+>>  1 file changed, 4 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/qom/object.c b/qom/object.c
+>> index 6fa9c619fac4..d51b57fba11e 100644
+>> --- a/qom/object.c
+>> +++ b/qom/object.c
+>> @@ -1106,9 +1106,8 @@ object_property_add(Object *obj, const char *name, const char *type,
+>>      }
+>>  
+>>      if (object_property_find(obj, name, NULL) != NULL) {
+>> -        error_setg(errp, "attempt to add duplicate property '%s'"
+>> -                   " to object (type '%s')", name,
+>> -                   object_get_typename(obj));
+>> +        error_setg(errp, "attempt to add duplicate property '%s' to object (type '%s')",
+>> +                   name, object_get_typename(obj));
+>>          return NULL;
+>>      }
+>>  
+>> @@ -1139,9 +1138,8 @@ object_class_property_add(ObjectClass *klass,
+>>      ObjectProperty *prop;
+>>  
+>>      if (object_class_property_find(klass, name, NULL) != NULL) {
+>> -        error_setg(errp, "attempt to add duplicate property '%s'"
+>> -                   " to object (type '%s')", name,
+>> -                   object_class_get_name(klass));
+>> +        error_setg(errp, "attempt to add duplicate property '%s' to class (type '%s')",
+>> +                   name, object_class_get_name(klass));
+>>          return NULL;
+>>      }
+>>  
+>>
+>>
 > 
-> Commit 0d5fae3e52e introduced bios-microvm.bin but forgot to add
-> it to the list of blobs being installed.
-> Add it to the list of BLOBS that get installed.
+> Applied to my trivial-patches branch.
 > 
-> Fixes: 0d5fae3e52e "roms: add microvm-bios (qboot) as binary"
-> Signed-off-by: Bruce Rogers <brogers@suse.com>
-> [PMD: Reworded description]
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index bd6376d295..755aa6c5f5 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -770,7 +770,7 @@ de-ch  es     fo  fr-ca  hu     ja  mk  pt  sl     tr \
->  bepo    cz
->  
->  ifdef INSTALL_BLOBS
-> -BLOBS=bios.bin bios-256k.bin sgabios.bin vgabios.bin vgabios-cirrus.bin \
-> +BLOBS=bios.bin bios-256k.bin bios-microvm.bin sgabios.bin vgabios.bin vgabios-cirrus.bin \
->  vgabios-stdvga.bin vgabios-vmware.bin vgabios-qxl.bin vgabios-virtio.bin \
->  vgabios-ramfb.bin vgabios-bochs-display.bin vgabios-ati.bin \
->  ppc_rom.bin openbios-sparc32 openbios-sparc64 openbios-ppc QEMU,tcx.bin QEMU,cgthree.bin \
+> Thanks,
+> Laurent
 > 
 
-Applied to my trivial-patches branch.
+Applied to my trivial-patches branch again.
 
 Thanks,
 Laurent
+
 
