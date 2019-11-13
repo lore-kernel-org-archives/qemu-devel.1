@@ -2,90 +2,86 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9486AC432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62DF7C43141
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:06:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD746206D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:05:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD746206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 93BF4206D9
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:06:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="lttokBwn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93BF4206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUxwq-00073o-Jg
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 14:05:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47732)
+	id 1iUxyR-00086m-9f
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 14:06:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47807)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pmorel@linux.ibm.com>) id 1iUxuf-0005ny-P7
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:02:47 -0500
+ (envelope-from <kwankhede@nvidia.com>) id 1iUxv9-0005yR-5o
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:03:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pmorel@linux.ibm.com>) id 1iUxue-0000sm-2O
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:02:45 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12498)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
- id 1iUxud-0000rN-Qh
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:02:44 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
- xADIlWWs132905
- for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 14:02:40 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2w8ny0c1e5-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 14:02:40 -0500
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
- Wed, 13 Nov 2019 19:02:38 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 13 Nov 2019 19:02:35 -0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
- [9.149.105.59])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xADJ2Ywj50790484
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 13 Nov 2019 19:02:34 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 78981A406B;
- Wed, 13 Nov 2019 19:02:34 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 35FD5A4059;
- Wed, 13 Nov 2019 19:02:34 +0000 (GMT)
-Received: from oc3016276355.ibm.com (unknown [9.152.222.55])
- by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 13 Nov 2019 19:02:34 +0000 (GMT)
-From: Pierre Morel <pmorel@linux.ibm.com>
-To: qemu-s390x@nongnu.org
-Subject: [PATCH v1] s390x: kvm-unit-tests: a PONG device for Sub Channels tests
-Date: Wed, 13 Nov 2019 20:02:33 +0100
-X-Mailer: git-send-email 1.8.3.1
-X-TM-AS-GCONF: 00
-x-cbid: 19111319-0012-0000-0000-000003635EDB
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111319-0013-0000-0000-0000219ED4FE
-Message-Id: <1573671753-15115-1-git-send-email-pmorel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
- definitions=2019-11-13_04:, , signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911130159
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+ (envelope-from <kwankhede@nvidia.com>) id 1iUxv5-0000z4-S0
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:03:14 -0500
+Received: from hqemgate16.nvidia.com ([216.228.121.65]:6102)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
+ id 1iUxv5-0000wu-C6
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:03:11 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
+ hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5dcc53340001>; Wed, 13 Nov 2019 11:02:13 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+ by hqpgpgate101.nvidia.com (PGP Universal service);
+ Wed, 13 Nov 2019 11:03:08 -0800
+X-PGP-Universal: processed;
+ by hqpgpgate101.nvidia.com on Wed, 13 Nov 2019 11:03:08 -0800
+Received: from [10.25.73.195] (172.20.13.39) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
+ 2019 19:02:59 +0000
+Subject: Re: [PATCH v9 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+To: Yan Zhao <yan.y.zhao@intel.com>, Alex Williamson
+ <alex.williamson@redhat.com>
+References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
+ <1573578220-7530-2-git-send-email-kwankhede@nvidia.com>
+ <20191112153005.53bf324c@x1.home> <20191113032332.GB18001@joy-OptiPlex-7040>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <d0be166b-9ffe-645d-de74-b48855995326@nvidia.com>
+Date: Thu, 14 Nov 2019 00:32:55 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.2
+MIME-Version: 1.0
+In-Reply-To: <20191113032332.GB18001@joy-OptiPlex-7040>
+X-Originating-IP: [172.20.13.39]
+X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1573671733; bh=02IXtYJjC9MopIQU9j+hRxbcJ5sh+uG9/rjhEPOYkT4=;
+ h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
+ Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
+ X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
+ Content-Transfer-Encoding;
+ b=lttokBwno4E9QV9k6n9BaDQkd2ibZLPPBhOwU88+/8rwR9uhOkaZw6FJgW7H3ziWY
+ R63EhFXp0c28nRK70BFjJ8ZD6E5n1M6V9BA3LYGKzV6PaVpsQ9FwUfKAZNO6BUYZfA
+ YhmzYOyCmPxazwMPEiMd3oEfe4PDMh0m7cAcjiRG1pA90s6Sy6FIMdo5Qa7Ty+uTqH
+ MgHxsMR71+UZNIbIIwVyefCzxeobSoBNK/C1qyiWkofdhDx0mL4FRjVdFWYfyRooXH
+ OZ24VOGQs7uYMjZbyZNHz9kPzgsuKfP75/iYy9ax20zjQYt9SPY2sA5MKVNMX9BhoL
+ v8X4rRT20yLoA==
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 216.228.121.65
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,285 +93,386 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, cohuck@redhat.com, david@redhat.com,
- qemu-devel@nongnu.org, frankja@linux.ibm.com
+Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
+ Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
+ Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "cohuck@redhat.com" <cohuck@redhat.com>,
+ "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, 
+ Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
+ "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
+ "eauger@redhat.com" <eauger@redhat.com>,
+ "felipe@nutanix.com" <felipe@nutanix.com>,
+ "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
+ Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The PONG device accept two commands: PONG_READ and PONG_WRITE
-which allow to read from and write to an internal buffer of
-1024 bytes.
 
-The QEMU device is named ccw-pong.
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- hw/s390x/Makefile.objs  |   1 +
- hw/s390x/ccw-pong.c     | 186 ++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/s390x/pong.h |  47 ++++++++++++
- 3 files changed, 234 insertions(+)
- create mode 100644 hw/s390x/ccw-pong.c
- create mode 100644 include/hw/s390x/pong.h
+On 11/13/2019 8:53 AM, Yan Zhao wrote:
+> On Wed, Nov 13, 2019 at 06:30:05AM +0800, Alex Williamson wrote:
+>> On Tue, 12 Nov 2019 22:33:36 +0530
+>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>
+>>> - Defined MIGRATION region type and sub-type.
+>>> - Used 3 bits to define VFIO device states.
+>>>      Bit 0 => _RUNNING
+>>>      Bit 1 => _SAVING
+>>>      Bit 2 => _RESUMING
+>>>      Combination of these bits defines VFIO device's state during migration
+>>>      _RUNNING => Normal VFIO device running state. When its reset, it
+>>> 		indicates _STOPPED state. when device is changed to
+>>> 		_STOPPED, driver should stop device before write()
+>>> 		returns.
+>>>      _SAVING | _RUNNING => vCPUs are running, VFIO device is running but
+>>>                            start saving state of device i.e. pre-copy state
+>>>      _SAVING  => vCPUs are stopped, VFIO device should be stopped, and
+>>
+>> s/should/must/
+>>
+>>>                  save device state,i.e. stop-n-copy state
+>>>      _RESUMING => VFIO device resuming state.
+>>>      _SAVING | _RESUMING and _RUNNING | _RESUMING => Invalid states
+>>
+>> A table might be useful here and in the uapi header to indicate valid
+>> states:
+>>
+>> | _RESUMING | _SAVING | _RUNNING | Description
+>> +-----------+---------+----------+------------------------------------------
+>> |     0     |    0    |     0    | Stopped, not saving or resuming (a)
+>> +-----------+---------+----------+------------------------------------------
+>> |     0     |    0    |     1    | Running, default state
+>> +-----------+---------+----------+------------------------------------------
+>> |     0     |    1    |     0    | Stopped, migration interface in save mode
+>> +-----------+---------+----------+------------------------------------------
+>> |     0     |    1    |     1    | Running, save mode interface, iterative
+>> +-----------+---------+----------+------------------------------------------
+>> |     1     |    0    |     0    | Stopped, migration resume interface active
+>> +-----------+---------+----------+------------------------------------------
+>> |     1     |    0    |     1    | Invalid (b)
+>> +-----------+---------+----------+------------------------------------------
+>> |     1     |    1    |     0    | Invalid (c)
+>> +-----------+---------+----------+------------------------------------------
+>> |     1     |    1    |     1    | Invalid (d)
+>>
+>> I think we need to consider whether we define (a) as generally
+>> available, for instance we might want to use it for diagnostics or a
+>> fatal error condition outside of migration.
+>>
 
-diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
-index ee91152..3a83438 100644
---- a/hw/s390x/Makefile.objs
-+++ b/hw/s390x/Makefile.objs
-@@ -32,6 +32,7 @@ obj-$(CONFIG_KVM) += tod-kvm.o
- obj-$(CONFIG_KVM) += s390-skeys-kvm.o
- obj-$(CONFIG_KVM) += s390-stattrib-kvm.o s390-mchk.o
- obj-y += s390-ccw.o
-+obj-y += ccw-pong.o
- obj-y += ap-device.o
- obj-y += ap-bridge.o
- obj-y += s390-sei.o
-diff --git a/hw/s390x/ccw-pong.c b/hw/s390x/ccw-pong.c
-new file mode 100644
-index 0000000..e7439d5
---- /dev/null
-+++ b/hw/s390x/ccw-pong.c
-@@ -0,0 +1,186 @@
-+/*
-+ * CCW PING-PONG
-+ *
-+ * Copyright 2019 IBM Corp.
-+ * Author(s): Pierre Morel <pmorel@linux.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/module.h"
-+#include "cpu.h"
-+#include "exec/address-spaces.h"
-+#include "hw/s390x/css.h"
-+#include "hw/s390x/css-bridge.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/s390x/pong.h"
-+
-+#define PONG_BUF_SIZE 0x1000
-+static char buf[PONG_BUF_SIZE] = "Hello world\n";
-+
-+static inline int pong_rw(CCW1 *ccw, char *p, int len, bool dir)
-+{
-+    int ret;
-+
-+    ret = address_space_rw(&address_space_memory, ccw->cda,
-+                           MEMTXATTRS_UNSPECIFIED,
-+                           (unsigned char *)buf, len, dir);
-+
-+    return (ret == MEMTX_OK) ? -EIO : 0;
-+}
-+
-+/* Handle READ ccw commands from guest */
-+static int handle_payload_read(CcwPONGDevice *dev, CCW1 *ccw)
-+{
-+    CcwDevice *ccw_dev = CCW_DEVICE(dev);
-+    int len;
-+
-+    if (!ccw->cda) {
-+        return -EFAULT;
-+    }
-+
-+    if (ccw->count > PONG_BUF_SIZE) {
-+        len = PONG_BUF_SIZE;
-+        ccw_dev->sch->curr_status.scsw.count = ccw->count - PONG_BUF_SIZE;
-+    } else {
-+        len = ccw->count;
-+        ccw_dev->sch->curr_status.scsw.count = 0;
-+    }
-+
-+    return pong_rw(ccw, buf, len, 1);
-+}
-+
-+/*
-+ * Handle WRITE ccw commands to write data to client
-+ * The SCSW count is set to the number of bytes not transfered.
-+ */
-+static int handle_payload_write(CcwPONGDevice *dev, CCW1 *ccw)
-+{
-+    CcwDevice *ccw_dev = CCW_DEVICE(dev);
-+    int len;
-+
-+    if (!ccw->cda) {
-+        ccw_dev->sch->curr_status.scsw.count = ccw->count;
-+        return -EFAULT;
-+    }
-+
-+    if (ccw->count > PONG_BUF_SIZE) {
-+        len = PONG_BUF_SIZE;
-+        ccw_dev->sch->curr_status.scsw.count = ccw->count - PONG_BUF_SIZE;
-+    } else {
-+        len = ccw->count;
-+        ccw_dev->sch->curr_status.scsw.count = 0;
-+    }
-+
-+    return pong_rw(ccw, buf, len, 0);
-+}
-+
-+static int pong_ccw_cb(SubchDev *sch, CCW1 ccw)
-+{
-+    int rc = 0;
-+    CcwPONGDevice *dev = sch->driver_data;
-+
-+    switch (ccw.cmd_code) {
-+    case PONG_WRITE:
-+        rc = handle_payload_write(dev, &ccw);
-+        break;
-+    case PONG_READ:
-+        rc = handle_payload_read(dev, &ccw);
-+        break;
-+    default:
-+        rc = -ENOSYS;
-+        break;
-+    }
-+
-+    if (rc == -EIO) {
-+        /* I/O error, specific devices generate specific conditions */
-+        SCHIB *schib = &sch->curr_status;
-+
-+        sch->curr_status.scsw.dstat = SCSW_DSTAT_UNIT_CHECK;
-+        sch->sense_data[0] = 0x40;    /* intervention-req */
-+        schib->scsw.ctrl &= ~SCSW_ACTL_START_PEND;
-+        schib->scsw.ctrl &= ~SCSW_CTRL_MASK_STCTL;
-+        schib->scsw.ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
-+                   SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
-+    }
-+    return rc;
-+}
-+
-+static void pong_ccw_realize(DeviceState *ds, Error **errp)
-+{
-+    uint16_t chpid;
-+    CcwPONGDevice *dev = CCW_PONG(ds);
-+    CcwDevice *cdev = CCW_DEVICE(ds);
-+    CCWDeviceClass *cdk = CCW_DEVICE_GET_CLASS(cdev);
-+    SubchDev *sch;
-+    Error *err = NULL;
-+
-+    sch = css_create_sch(cdev->devno, errp);
-+    if (!sch) {
-+        return;
-+    }
-+
-+    sch->driver_data = dev;
-+    cdev->sch = sch;
-+    chpid = css_find_free_chpid(sch->cssid);
-+
-+    if (chpid > MAX_CHPID) {
-+        error_setg(&err, "No available chpid to use.");
-+        goto out_err;
-+    }
-+
-+    sch->id.reserved = 0xff;
-+    sch->id.cu_type = CCW_PONG_CU_TYPE;
-+    css_sch_build_virtual_schib(sch, (uint8_t)chpid,
-+                                CCW_PONG_CHPID_TYPE);
-+    sch->do_subchannel_work = do_subchannel_work_virtual;
-+    sch->ccw_cb = pong_ccw_cb;
-+
-+    cdk->realize(cdev, &err);
-+    if (err) {
-+        goto out_err;
-+    }
-+
-+    css_reset_sch(sch);
-+    return;
-+
-+out_err:
-+    error_propagate(errp, err);
-+    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
-+    cdev->sch = NULL;
-+    g_free(sch);
-+}
-+
-+static Property pong_ccw_properties[] = {
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void pong_ccw_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->props = pong_ccw_properties;
-+    dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
-+    dc->realize = pong_ccw_realize;
-+    dc->hotpluggable = false;
-+    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
-+}
-+
-+static const TypeInfo pong_ccw_info = {
-+    .name = TYPE_CCW_PONG,
-+    .parent = TYPE_CCW_DEVICE,
-+    .instance_size = sizeof(CcwPONGDevice),
-+    .class_init = pong_ccw_class_init,
-+    .class_size = sizeof(CcwPONGClass),
-+};
-+
-+static void pong_ccw_register(void)
-+{
-+    type_register_static(&pong_ccw_info);
-+}
-+
-+type_init(pong_ccw_register)
-diff --git a/include/hw/s390x/pong.h b/include/hw/s390x/pong.h
-new file mode 100644
-index 0000000..6358e2d
---- /dev/null
-+++ b/include/hw/s390x/pong.h
-@@ -0,0 +1,47 @@
-+/*
-+ *  ccw-attached PONG definitions
-+ *
-+ * Copyright 2019 IBM Corp.
-+ * Author(s): Pierre Morel <pmorel@linux.ibm.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or (at
-+ * your option) any later version. See the COPYING file in the top-level
-+ * directory.
-+ */
-+
-+#ifndef HW_S390X_PONG_CCW_H
-+#define HW_S390X_PONG_CCW_H
-+
-+#include "hw/sysbus.h"
-+#include "hw/s390x/css.h"
-+#include "hw/s390x/ccw-device.h"
-+
-+#define CCW_PONG_CU_TYPE 0x0007
-+#define CCW_PONG_CHPID_TYPE 0x09
-+
-+#define TYPE_CCW_PONG "ccw-pong"
-+
-+/* Local Channel Commands */
-+#define PONG_WRITE 0x21         /* Write */
-+#define PONG_READ  0x22         /* Read buffer */
-+
-+#define CCW_PONG(obj) \
-+     OBJECT_CHECK(CcwPONGDevice, (obj), TYPE_CCW_PONG)
-+#define CCW_PONG_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(CcwPONGClass, (klass), TYPE_CCW_PONG)
-+#define CCW_PONG_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(CcwPONGClass, (obj), TYPE_CCW_PONG)
-+
-+typedef struct CcwPONGDevice {
-+    CcwDevice parent_obj;
-+} CcwPONGDevice;
-+
-+typedef struct CcwPONGClass {
-+    CCWDeviceClass parent_class;
-+
-+    void (*init)(CcwPONGDevice *, Error **);
-+    int (*read_payload)(CcwPONGDevice *);
-+    int (*write_payload)(CcwPONGDevice *, uint8_t);
-+} CcwPONGClass;
-+
-+#endif
--- 
-2.7.4
+We have to set it as init state. I'll add this it.
 
+>> Are there hidden assumptions between state transitions here or are
+>> there specific next possible state diagrams that we need to include as
+>> well?
+>>
+>> I'm curious if Intel agrees with the states marked invalid with their
+>> push for post-copy support.
+>>
+> hi Alex and Kirti,
+> Actually, for postcopy, I think we anyway need an extra POSTCOPY state
+> introduced. Reasons as below:
+> - in the target side, _RSESUMING state is set in the beginning of
+>    migration. It cannot be used as a state to inform device of that
+>    currently it's in postcopy state and device DMAs are to be trapped and
+>    pre-faulted.
+>    we also cannot use state (_RESUMING + _RUNNING) as an indicator of
+>    postcopy, because before device & vm running in target side, some device
+>    state are already loaded (e.g. page tables, pending workloads),
+>    target side can do pre-pagefault at that period before target vm up.
+> - in the source side, after device is stopped, postcopy needs saving
+>    device state only (as compared to device state + remaining dirty
+>    pages in precopy). state (!_RUNNING + _SAVING) here again cannot
+>    differentiate precopy and postcopy here.
+> 
+>>>      Bits 3 - 31 are reserved for future use. User should perform
+>>>      read-modify-write operation on this field.
+>>> - Defined vfio_device_migration_info structure which will be placed at 0th
+>>>    offset of migration region to get/set VFIO device related information.
+>>>    Defined members of structure and usage on read/write access:
+>>>      * device_state: (read/write)
+>>>          To convey VFIO device state to be transitioned to. Only 3 bits are
+>>> 	used as of now, Bits 3 - 31 are reserved for future use.
+>>>      * pending bytes: (read only)
+>>>          To get pending bytes yet to be migrated for VFIO device.
+>>>      * data_offset: (read only)
+>>>          To get data offset in migration region from where data exist
+>>> 	during _SAVING and from where data should be written by user space
+>>> 	application during _RESUMING state.
+>>>      * data_size: (read/write)
+>>>          To get and set size in bytes of data copied in migration region
+>>> 	during _SAVING and _RESUMING state.
+>>>
+>>> Migration region looks like:
+>>>   ------------------------------------------------------------------
+>>> |vfio_device_migration_info|    data section                      |
+>>> |                          |     ///////////////////////////////  |
+>>>   ------------------------------------------------------------------
+>>>   ^                              ^
+>>>   offset 0-trapped part        data_offset
+>>>
+>>> Structure vfio_device_migration_info is always followed by data section
+>>> in the region, so data_offset will always be non-0. Offset from where data
+>>> to be copied is decided by kernel driver, data section can be trapped or
+>>> mapped depending on how kernel driver defines data section.
+>>> Data section partition can be defined as mapped by sparse mmap capability.
+>>> If mmapped, then data_offset should be page aligned, where as initial
+>>> section which contain vfio_device_migration_info structure might not end
+>>> at offset which is page aligned.
+>>> Vendor driver should decide whether to partition data section and how to
+>>> partition the data section. Vendor driver should return data_offset
+>>> accordingly.
+>>>
+>>> For user application, data is opaque. User should write data in the same
+>>> order as received.
+>>>
+>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>>> ---
+>>>   include/uapi/linux/vfio.h | 108 ++++++++++++++++++++++++++++++++++++++++++++++
+>>>   1 file changed, 108 insertions(+)
+>>>
+>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>>> index 9e843a147ead..35b09427ad9f 100644
+>>> --- a/include/uapi/linux/vfio.h
+>>> +++ b/include/uapi/linux/vfio.h
+>>> @@ -305,6 +305,7 @@ struct vfio_region_info_cap_type {
+>>>   #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+>>>   #define VFIO_REGION_TYPE_GFX                    (1)
+>>>   #define VFIO_REGION_TYPE_CCW			(2)
+>>> +#define VFIO_REGION_TYPE_MIGRATION              (3)
+>>>   
+>>>   /* sub-types for VFIO_REGION_TYPE_PCI_* */
+>>>   
+>>> @@ -379,6 +380,113 @@ struct vfio_region_gfx_edid {
+>>>   /* sub-types for VFIO_REGION_TYPE_CCW */
+>>>   #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+>>>   
+>>> +/* sub-types for VFIO_REGION_TYPE_MIGRATION */
+>>> +#define VFIO_REGION_SUBTYPE_MIGRATION           (1)
+>>> +
+>>> +/*
+>>> + * Structure vfio_device_migration_info is placed at 0th offset of
+>>> + * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
+>>> + * information. Field accesses from this structure are only supported at their
+>>> + * native width and alignment, otherwise the result is undefined and vendor
+>>> + * drivers should return an error.
+>>> + *
+>>> + * device_state: (read/write)
+>>> + *      To indicate vendor driver the state VFIO device should be transitioned
+>>> + *      to. If device state transition fails, write on this field return error.
+>>> + *      It consists of 3 bits:
+>>> + *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
+>>
+>> Let's use set/cleared or 1/0 to indicate bit values, 'reset' is somewhat
+>> ambiguous.
+
+Ok. Updating it.
+
+>>
+>>> + *        _STOPPED state. When device is changed to _STOPPED, driver should stop
+>>> + *        device before write() returns.
+>>> + *      - If bit 1 set, indicates _SAVING state. When set, that indicates driver
+>>> + *        should start gathering device state information which will be provided
+>>> + *        to VFIO user space application to save device's state.
+>>> + *      - If bit 2 set, indicates _RESUMING state. When set, that indicates
+>>> + *        prepare to resume device, data provided through migration region
+>>> + *        should be used to resume device.
+>>> + *      Bits 3 - 31 are reserved for future use. User should perform
+>>> + *      read-modify-write operation on this field.
+>>> + *      _SAVING and _RESUMING bits set at the same time is invalid state.
+>>> + *	Similarly _RUNNING and _RESUMING bits set is invalid state.
+>>> + *
+>>> + * pending bytes: (read only)
+>>> + *      Number of pending bytes yet to be migrated from vendor driver
+>>> + *
+>>> + * data_offset: (read only)
+>>> + *      User application should read data_offset in migration region from where
+>>> + *      user application should read device data during _SAVING state or write
+>>> + *      device data during _RESUMING state. See below for detail of sequence to
+>>> + *      be followed.
+>>> + *
+>>> + * data_size: (read/write)
+>>> + *      User application should read data_size to get size of data copied in
+>>> + *      bytes in migration region during _SAVING state and write size of data
+>>> + *      copied in bytes in migration region during _RESUMING state.
+>>> + *
+>>> + * Migration region looks like:
+>>> + *  ------------------------------------------------------------------
+>>> + * |vfio_device_migration_info|    data section                      |
+>>> + * |                          |     ///////////////////////////////  |
+>>> + * ------------------------------------------------------------------
+>>> + *   ^                              ^
+>>> + *  offset 0-trapped part        data_offset
+>>> + *
+>>> + * Structure vfio_device_migration_info is always followed by data section in
+>>> + * the region, so data_offset will always be non-0. Offset from where data is
+>>> + * copied is decided by kernel driver, data section can be trapped or mapped
+>>> + * or partitioned, depending on how kernel driver defines data section.
+>>> + * Data section partition can be defined as mapped by sparse mmap capability.
+>>> + * If mmapped, then data_offset should be page aligned, where as initial section
+>>> + * which contain vfio_device_migration_info structure might not end at offset
+>>> + * which is page aligned.
+>>
+>> "The user is not required to to access via mmap regardless of the
+>> region mmap capabilities."
+>>
+> But once the user decides to access via mmap, it has to read data of
+> data_size each time, otherwise the vendor driver has no idea of how many
+> data are already read from user. Agree?
+> 
+
+that's right.
+
+>>> + * Vendor driver should decide whether to partition data section and how to
+>>> + * partition the data section. Vendor driver should return data_offset
+>>> + * accordingly.
+>>> + *
+>>> + * Sequence to be followed for _SAVING|_RUNNING device state or pre-copy phase
+>>> + * and for _SAVING device state or stop-and-copy phase:
+>>> + * a. read pending_bytes. If pending_bytes > 0, go through below steps.
+>>> + * b. read data_offset, indicates kernel driver to write data to staging buffer.
+>>> + *    Kernel driver should return this read operation only after writing data to
+>>> + *    staging buffer is done.
+> May I know under what condition this data_offset will be changed per
+> each iteration from a-f ?
+> 
+
+Its upto vendor driver, if vendor driver maintains multiple partitions 
+in data section.
+
+>>
+>> "staging buffer" implies a vendor driver implementation, perhaps we
+>> could just state that data is available from (region + data_offset) to
+>> (region + data_offset + data_size) upon return of this read operation.
+>>
+
+Makes sense. Updating it.
+
+>>> + * c. read data_size, amount of data in bytes written by vendor driver in
+>>> + *    migration region.
+>>> + * d. read data_size bytes of data from data_offset in the migration region.
+>>> + * e. process data.
+>>> + * f. Loop through a to e. Next read on pending_bytes indicates that read data
+>>> + *    operation from migration region for previous iteration is done.
+>>
+>> I think this indicate that step (f) should be to read pending_bytes, the
+>> read sequence is not complete until this step.  Optionally the user can
+>> then proceed to step (b).  There are no read side-effects of (a) afaict.
+>>
+
+I tried to reword this sequence to be more specific:
+
+* Sequence to be followed for _SAVING|_RUNNING device state or pre-copy 
+* phase and for _SAVING device state or stop-and-copy phase:
+* a. read pending_bytes, indicates start of new iteration to get device 
+*    data. If there was previous iteration, then this read operation
+*    indicates previous iteration is done. If pending_bytes > 0, go
+*    through below steps.
+* b. read data_offset, indicates kernel driver to make data available
+*    through data section. Kernel driver should return this read
+*    operation only after data is available from (region + data_offset)
+*    to (region + data_offset + data_size).
+* c. read data_size, amount of data in bytes available through migration
+*    region.
+* d. read data of data_size bytes from (region + data_offset) from
+*    migration region.
+* e. process data.
+* f. Loop through a to e.
+
+Hope this is more clear.
+
+>> Is the use required to reach pending_bytes == 0 before changing
+>> device_state, particularly transitioning to !_RUNNING?
+
+No, its not necessary to reach till pending_bytes==0 in pre-copy phase.
+
+>>  Presumably the
+>> user can exit this sequence at any time by clearing _SAVING.
+
+In that case device state data is not complete, which will result in not 
+able to resume device with that data.
+In stop-and-copy phase, user should iterate till pending_bytes is 0.
+
+>>
+>>> + *
+>>> + * Sequence to be followed while _RESUMING device state:
+>>> + * While data for this device is available, repeat below steps:
+>>> + * a. read data_offset from where user application should write data.
+> before proceed to step b, need to read data_size from vendor driver to determine
+> the max len of data to write. I think it's necessary in such a condition
+> that source vendor driver and target vendor driver do not offer data sections of
+> the same size. e.g. in source side, the data section is of size 100M,
+> but in target side, the data section is only of 50M size.
+> rather than simply fail, loop and write seems better.
+> 
+
+Makes sense. Doing this change for next version.
+
+> Thanks
+> Yan
+>>> + * b. write data of data_size to migration region from data_offset.
+>>> + * c. write data_size which indicates vendor driver that data is written in
+>>> + *    staging buffer. Vendor driver should read this data from migration
+>>> + *    region and resume device's state.
+>>
+>> The device defaults to _RUNNING state, so a prerequisite is to set
+>> _RESUMING and clear _RUNNING, right?
+
+Yes.
+
+>>
+>>> + *
+>>> + * For user application, data is opaque. User should write data in the same
+>>> + * order as received.
+>>> + */
+>>> +
+>>> +struct vfio_device_migration_info {
+>>> +	__u32 device_state;         /* VFIO device state */
+>>> +#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
+>>> +#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
+>>> +#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
+>>> +#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
+>>> +				     VFIO_DEVICE_STATE_SAVING |  \
+>>> +				     VFIO_DEVICE_STATE_RESUMING)
+>>> +
+>>> +#define VFIO_DEVICE_STATE_INVALID_CASE1    (VFIO_DEVICE_STATE_SAVING | \
+>>> +					    VFIO_DEVICE_STATE_RESUMING)
+>>> +
+>>> +#define VFIO_DEVICE_STATE_INVALID_CASE2    (VFIO_DEVICE_STATE_RUNNING | \
+>>> +					    VFIO_DEVICE_STATE_RESUMING)
+>>
+>> These seem difficult to use, maybe we just need a
+>> VFIO_DEVICE_STATE_VALID macro?
+>>
+>> #define VFIO_DEVICE_STATE_VALID(state) \
+>>    (state & VFIO_DEVICE_STATE_RESUMING ? \
+>>    (state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_RESUMING : 1)
+>>
+
+This will not be work when use of other bits gets added in future. 
+That's the reason I preferred to add individual invalid states which 
+user should check.
+
+Thanks,
+Kirti
+
+>> Thanks,
+>> Alex
+>>
+>>> +	__u32 reserved;
+>>> +	__u64 pending_bytes;
+>>> +	__u64 data_offset;
+>>> +	__u64 data_size;
+>>> +} __attribute__((packed));
+>>> +
+>>>   /*
+>>>    * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+>>>    * which allows direct access to non-MSIX registers which happened to be within
+>>
 
