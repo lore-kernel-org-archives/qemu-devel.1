@@ -2,75 +2,76 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5BD6C4741F
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:31:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5580C43141
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:34:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0540233C5
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 15:55:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD8AC204EF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:34:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XeVYnGfK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0540233C5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QQ2pS8xn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD8AC204EF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUuz3-00079N-6F
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 10:55:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38631)
+	id 1iUvb1-0000Us-Mu
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 11:34:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43538)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iUuy7-0006XZ-8J
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 10:54:08 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iUvZz-0008FD-Hm
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:33:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iUuy5-0004U0-Vb
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 10:54:07 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25497
+ (envelope-from <stefanha@redhat.com>) id 1iUvZy-0003Yf-7u
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:33:15 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32354
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iUuy5-0004Tq-RS
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 10:54:05 -0500
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iUvZy-0003YT-43
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:33:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573660445;
+ s=mimecast20190719; t=1573662793;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=VVJ8fJkqlMO3n9KhheC4nUSbBS6LFb8Oj7qlcjLuq38=;
- b=XeVYnGfKxISVoJXFoOgsU4EHyI/6bJKpOwIVg2tPpxdFdEqE1cfQnlqbB0cexci3YJcMVA
- gILltGd4iUIoyOwFjPGRFBHgOSAbdL9qnOJzShkHAF6Iy7FjNl/BGCyEGRwGcble9q6+03
- Oec1T3NE7NLQJ2tWYA0JDZQPjM5lo2s=
+ bh=aV7aW7e+dZhaghHwln3l1mSz/SjcA88O0mnaAZ5G2Mo=;
+ b=QQ2pS8xnM8CZnE+Gip1luAR09nCOwBhuNNjeFA19+1WBocBF+Ki3TOPQV++ntUFFL6zZ0t
+ 7ceszKbQVBE2WTBKNNrgwunvofksKkYmaYl9oZwDqpVb/FO37W6KMYThd8DoJr7oo6MxU8
+ z3xMnItRPJfBIZWJuYy8a5lEh2F5fsY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-331-azM27VtDOv-Qc_woqjuaHw-1; Wed, 13 Nov 2019 10:54:01 -0500
-X-MC-Unique: azM27VtDOv-Qc_woqjuaHw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-261-Zp_4L1wWOQiB30zYZu0eww-1; Wed, 13 Nov 2019 11:33:10 -0500
+X-MC-Unique: Zp_4L1wWOQiB30zYZu0eww-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCF80802921;
- Wed, 13 Nov 2019 15:53:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65098802880;
+ Wed, 13 Nov 2019 16:33:07 +0000 (UTC)
 Received: from localhost (ovpn-117-166.ams2.redhat.com [10.36.117.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9AAF59472;
- Wed, 13 Nov 2019 15:53:53 +0000 (UTC)
-Date: Wed, 13 Nov 2019 15:53:52 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F309B1077D95;
+ Wed, 13 Nov 2019 16:33:01 +0000 (UTC)
+Date: Wed, 13 Nov 2019 16:33:00 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: Jagannathan Raman <jag.raman@oracle.com>
-Subject: Re: [RFC v4 PATCH 07/49] multi-process: define mpqemu-link object
-Message-ID: <20191113155352.GC563983@stefanha-x1.localdomain>
+Subject: Re: [RFC v4 PATCH 11/49] multi-process: setup memory manager for
+ remote device
+Message-ID: <20191113163300.GF563983@stefanha-x1.localdomain>
 References: <cover.1571905346.git.jag.raman@oracle.com>
- <b0bc2a517b0a41eb138ed4127aebe8a3952daec6.1571905346.git.jag.raman@oracle.com>
+ <5bfab4fa2f7f12137d0030e08a494d9ac3e11f04.1571905346.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <b0bc2a517b0a41eb138ed4127aebe8a3952daec6.1571905346.git.jag.raman@oracle.com>
+In-Reply-To: <5bfab4fa2f7f12137d0030e08a494d9ac3e11f04.1571905346.git.jag.raman@oracle.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="XWOWbaMNXpFDWE00"
+ protocol="application/pgp-signature"; boundary="JcvBIhDvR6w3jUPA"
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -97,145 +98,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---XWOWbaMNXpFDWE00
+--JcvBIhDvR6w3jUPA
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Thu, Oct 24, 2019 at 05:08:48AM -0400, Jagannathan Raman wrote:
-> +#ifndef MPQEMU_LINK_H
-> +#define MPQEMU_LINK_H
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +
-> +#include <stddef.h>
-> +#include <stdint.h>
-
-These are already included by "qemu/osdep.h".
-
-> +#include <pthread.h>
-
-Is <pthread.h> needed?
-
-> +
-> +#include "qom/object.h"
-> +#include "qemu/thread.h"
-> +
-> +#define TYPE_MPQEMU_LINK "mpqemu-link"
-> +#define MPQEMU_LINK(obj) \
-> +    OBJECT_CHECK(MPQemuLinkState, (obj), TYPE_MPQEMU_LINK)
-> +
-> +#define REMOTE_MAX_FDS 8
-> +
-> +#define MPQEMU_MSG_HDR_SIZE offsetof(MPQemuMsg, data1.u64)
-> +
-> +/**
-> + * mpqemu_cmd_t:
-> + * CONF_READ        PCI config. space read
-> + * CONF_WRITE       PCI config. space write
-> + *
-> + * proc_cmd_t enum type to specify the command to be executed on the remote
-> + * device.
-> + */
-> +typedef enum {
-> +    INIT = 0,
-> +    CONF_READ,
-> +    CONF_WRITE,
-> +    MAX,
-> +} mpqemu_cmd_t;
-
-Please allow for future non-PCI devices by clearly naming PCI-specific
-commands and including a bus type in the initialization messages.
-
-> diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
-> new file mode 100644
-> index 0000000..b39f4d0
-> --- /dev/null
-> +++ b/io/mpqemu-link.c
-> @@ -0,0 +1,309 @@
-> +/*
-> + * Communication channel between QEMU and remote device process
-> + *
-> + * Copyright 2019, Oracle and/or its affiliates.
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +
-> +#include <assert.h>
-> +#include <errno.h>
-> +#include <pthread.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <sys/types.h>
-> +#include <sys/socket.h>
-> +#include <sys/un.h>
-> +#include <unistd.h>
-> +#include <limits.h>
-> +#include <poll.h>
-
-Many of these are already included by "qemu/osdep.h".  Some of them
-shouldn't be used directly because QEMU or glib have abstractions that
-hide the platform-specific differences (e.g. pthread, poll).
-
-> +MPQemuLinkState *mpqemu_link_create(void)
+On Thu, Oct 24, 2019 at 05:08:52AM -0400, Jagannathan Raman wrote:
+> +static void remote_ram_destructor(MemoryRegion *mr)
 > +{
-> +    return MPQEMU_LINK(object_new(TYPE_MPQEMU_LINK));
+> +    qemu_ram_free(mr->ram_block);
+> +}
+> +
+> +static void remote_ram_init_from_fd(MemoryRegion *mr, int fd, uint64_t size,
+> +                                    ram_addr_t offset, Error **errp)
+> +{
+> +    char *name = g_strdup_printf("%d", fd);
+> +
+> +    memory_region_init(mr, NULL, name, size);
+> +    mr->ram = true;
+> +    mr->terminates = true;
+> +    mr->destructor = NULL;
+> +    mr->align = 0;
+> +    mr->ram_block = qemu_ram_alloc_from_fd(size, mr, RAM_SHARED, fd, offset,
+> +                                           errp);
+> +    mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+> +
+> +    g_free(name);
 > +}
 
-I'm not sure what the purpose of this object is.  mpqemu_link_create()
-suggests the objects will be created internally instead of via -object
-mpqemu-link,..., which is unusual.
+This is not specific to remote/memory.c and could be shared in case
+something else in QEMU wants to initialize from an fd.
 
-mpqemu_msg_send() and mpqemu_msg_recv() seem to be the main functions
-but they do not even use their MPQemuLinkState *s argument.
-
-> +void mpqemu_start_coms(MPQemuLinkState *s)
+> +
+> +void remote_sysmem_reconfig(MPQemuMsg *msg, Error **errp)
 > +{
-> +
-> +    g_assert(g_source_attach(&s->com->gsrc, s->ctx));
-> +
-> +    g_main_loop_run(s->loop);
-> +}
+> +    sync_sysmem_msg_t *sysmem_info = &msg->data1.sync_sysmem;
 
-There is already IOThread if you need an event loop thread.  But does
-this need to be its own thread?  The communication should be
-asynchronous and therefore it can run in the main event loop or any
-existing IOThread.
+A possible security issue with MPQemuMsg: was the message size
+validatedb before we access msg->data1.sync_sysmem?
 
---XWOWbaMNXpFDWE00
+If not, then we might access uninitialized data.  I didn't see if there
+is a single place in the code that always zeroes msg, but I think the
+answer is no.  Accessing uninitialized data could expose the old
+contents of the stack/heap to the other process.  Information leaks like
+this can be used to defeat address-space randomization because the other
+process may learn about our memory layout if there are memory addresses
+in the uninitialized data.
+
+--JcvBIhDvR6w3jUPA
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3MJxAACgkQnKSrs4Gr
-c8jvXQf+IAkEW92a0592aS2IyA7cghQOiXoU8B9gwDIIgd8IQSd25F4761ODNJ9K
-qkMJkQrAUfoNSUE4QRc+HnxzZss0SXqT3RM74vhcudEYm7rRG93eBiuHP3fyc1I0
-kO9fe+XXwYE3eumkS8t2MUVnL69BxFDg4WSTUvC3Xi6BBb7Gbg6sBbTFEtacuHhZ
-KifIVbA8iUAPy/5CaYY1r4wa/MqOPixF8G25MxQcEzZoVXqWNPJLOEJjNFiEJPfr
-KCgSBiScCMZXftVP6Ts7MXNxKr3Xh5Bc06SZ9GBIdvukRriK2bv/SBrdu7RIcZYX
-zHfQyIrzpOhJ1QFUzNKLw8Af4iX8Lw==
-=JslS
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3MMDwACgkQnKSrs4Gr
+c8jlCgf+MIh6V0G/2YZ8kaHYEQKdJIuOrSEL/jixbWpDabyjYfLJNo1eGSHLQaZx
+FbUgS6uje339cUyLqKwlaDRPUVnY10T74KRRTqC39uMPTxn7lG839FnNsTjXIY1w
+hLov+VxZV16CS6OTK1AGBFwkPxfdmaHAdVrWmepDX1mDZaQ7yFJKIofq98QPlXRl
+h3Um0qVwtHiNGhYbEOB1Ig7GnvOgX/UWgIRRabcvIutNrqyQ7CN2zFrGNbzZdcuG
+xpaZYYA+TDVOgnD1vPxIzLdQcTMk/ESGHLqhA1hP/H3ZcOhp/IWmHayVuNZMs+J+
+RPWYFvihmk8odNkbP/ZoU3ozlirHdw==
+=oacJ
 -----END PGP SIGNATURE-----
 
---XWOWbaMNXpFDWE00--
+--JcvBIhDvR6w3jUPA--
 
 
