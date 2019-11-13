@@ -6,99 +6,76 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 551C8C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E340AC432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:22:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F80D21A49
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:22:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1B6321A49
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:22:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LoFjasAu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F80D21A49
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K1iv6INl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1B6321A49
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUvPD-0002vM-73
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 11:22:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42080)
+	id 1iUvPx-0003vR-QV
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 11:22:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42217)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1iUvOW-0002SU-H0
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:21:25 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iUvPG-0003EF-P0
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:22:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1iUvOV-0006wD-9H
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:21:24 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:51004)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1iUvOV-0006vP-1N
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:21:23 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADGEQg1170265;
- Wed, 13 Nov 2019 16:21:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=GN+LIruyivakxoQC/wssjeaIwXQLXJ08uM6Tz3LXFeE=;
- b=LoFjasAur1uThKBex2lz2cIkI+8I0Ux8rBn9s1UIFjBA7f4Wz3KrEcV1FZ9s3lhq9SuB
- 3qTUC7paxQzNsHf1W3gyn9Sim8aufT3lr+1yZgW72APXX82c5nJEpQJy1/nBq8m0DsnA
- fPSdLNYY0m/m80QlTofiQMHpMPV3odPzf5TpBef9uuhm9R5gmtJg+fJxb2Lznrm6iyon
- oMITmZHjBW3h9AwkjkxgXtMg8l8TXVyA1e+czJIOGACL3JySNITzGCOf4guqg6TZKK+U
- /TgsoA3INzXr6kNSRmQd0Dt93fYc+0MgsB+zn+Fja5hxOhyuXoRionzLLnHO7EOOU5dn 5Q== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2120.oracle.com with ESMTP id 2w5p3qwfu9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 13 Nov 2019 16:21:13 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADGIV8S075023;
- Wed, 13 Nov 2019 16:21:13 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3020.oracle.com with ESMTP id 2w7j0829j1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 13 Nov 2019 16:21:12 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xADGLALY008075;
- Wed, 13 Nov 2019 16:21:10 GMT
-Received: from [10.152.34.2] (/10.152.34.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 13 Nov 2019 08:21:10 -0800
-Subject: Re: [RFC v4 PATCH 47/49] multi-process: Enable support for multiple
- devices in remote
-To: Stefan Hajnoczi <stefanha@redhat.com>
+ (envelope-from <stefanha@redhat.com>) id 1iUvPD-0007Nt-OU
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:22:09 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29716
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iUvPD-0007NV-Cm
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:22:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573662126;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=6rNetjWE6Pudhzve4zbq3pyRMaxN5XkUT6KfLU7p7SU=;
+ b=K1iv6INllDFIJaGMRg8+zQ4rVc3IfMKWd/dJe80QIw9zL/MrS6pHmhrB9eTKlI0sUIrWuh
+ geTWAETel3T9TZcaSOpTHLW9ygJhbC5eayEnltRz/P/v7ptJfFb0lVj6vlxXDDvvEZIbYW
+ Y7mmgLGQvREFrLVMdpz+cdaGZ9hoK0I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-272-pmv3Io1APPiZAaC77vcpNg-1; Wed, 13 Nov 2019 11:22:05 -0500
+X-MC-Unique: pmv3Io1APPiZAaC77vcpNg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 440F56C614;
+ Wed, 13 Nov 2019 16:22:03 +0000 (UTC)
+Received: from localhost (ovpn-117-166.ams2.redhat.com [10.36.117.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 96C6360317;
+ Wed, 13 Nov 2019 16:22:02 +0000 (UTC)
+Date: Wed, 13 Nov 2019 16:22:01 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Subject: Re: [RFC v4 PATCH 10/49] multi-process: setup a machine object for
+ remote device process
+Message-ID: <20191113162201.GE563983@stefanha-x1.localdomain>
 References: <cover.1571905346.git.jag.raman@oracle.com>
- <c67656abcd0e41278710460d2920036254ecffb7.1571905346.git.jag.raman@oracle.com>
- <20191111161542.GF402228@stefanha-x1.localdomain>
-From: Jag Raman <jag.raman@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <9529c2b2-7faf-1b1c-cb6e-a147930e24fb@oracle.com>
-Date: Wed, 13 Nov 2019 11:21:08 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ <6df05bbf3cba4611b462879a7b937f40486cea0a.1571905346.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20191111161542.GF402228@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9439
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911130145
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9439
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911130145
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+In-Reply-To: <6df05bbf3cba4611b462879a7b937f40486cea0a.1571905346.git.jag.raman@oracle.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="lkTb+7nhmha7W+c3"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,51 +89,108 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: elena.ufimtseva@oracle.com, fam@euphon.net, thuth@redhat.com,
  john.g.johnson@oracle.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
- liran.alon@oracle.com, rth@twiddle.net, quintela@redhat.com,
+ quintela@redhat.com, berrange@redhat.com, mst@redhat.com,
  qemu-devel@nongnu.org, armbru@redhat.com, ross.lagerwall@citrix.com,
- mst@redhat.com, kraxel@redhat.com, kwolf@redhat.com, pbonzini@redhat.com,
- berrange@redhat.com, mreitz@redhat.com, kanth.ghatraju@oracle.com,
- dgilbert@redhat.com, marcandre.lureau@gmail.com
+ kanth.ghatraju@oracle.com, kraxel@redhat.com, kwolf@redhat.com,
+ pbonzini@redhat.com, liran.alon@oracle.com, marcandre.lureau@gmail.com,
+ mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--lkTb+7nhmha7W+c3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+On Thu, Oct 24, 2019 at 05:08:51AM -0400, Jagannathan Raman wrote:
+> +static NotifierList machine_init_done_notifiers =
+> +    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
+> +
+> +bool machine_init_done;
+> +
+> +void qemu_add_machine_init_done_notifier(Notifier *notify)
+> +{
+> +    notifier_list_add(&machine_init_done_notifiers, notify);
+> +    if (machine_init_done) {
+> +        notify->notify(notify, NULL);
+> +    }
+> +}
+> +
+> +void qemu_remove_machine_init_done_notifier(Notifier *notify)
+> +{
+> +    notifier_remove(notify);
+> +}
+> +
+> +void qemu_run_machine_init_done_notifiers(void)
+> +{
+> +    machine_init_done = true;
+> +    notifier_list_notify(&machine_init_done_notifiers, NULL);
+> +}
 
-On 11/11/2019 11:15 AM, Stefan Hajnoczi wrote:
-> On Thu, Oct 24, 2019 at 05:09:28AM -0400, Jagannathan Raman wrote:
->> @@ -93,7 +94,8 @@ static void process_config_write(MPQemuMsg *msg)
->>       struct conf_data_msg *conf = (struct conf_data_msg *)msg->data2;
->>   
->>       qemu_mutex_lock_iothread();
->> -    pci_default_write_config(remote_pci_dev, conf->addr, conf->val, conf->l);
->> +    pci_default_write_config(remote_pci_devs[msg->id], conf->addr, conf->val,
->> +                             conf->l);
->>       qemu_mutex_unlock_iothread();
->>   }
->>   
->> @@ -106,7 +108,8 @@ static void process_config_read(MPQemuMsg *msg)
->>       wait = msg->fds[0];
->>   
->>       qemu_mutex_lock_iothread();
->> -    val = pci_default_read_config(remote_pci_dev, conf->addr, conf->l);
->> +    val = pci_default_read_config(remote_pci_devs[msg->id], conf->addr,
->> +                                  conf->l);
->>       qemu_mutex_unlock_iothread();
->>   
->>       notify_proxy(wait, val);
-> 
-> msg->id was read from a socket and hasn't been validated before indexing
-> into remote_pci_devs[].
+qemu_add_machine_init_done_notifier() is already defined in vl.c.
+Please share the implementation instead of duplicating it into the
+remote program.
 
-We see the common thread, w.r.t your concerns about security. Thanks for
-pointing them out.
+> +
+> +static void remote_machine_init(Object *obj)
+> +{
+> +    RemMachineState *s = REMOTE_MACHINE(obj);
+> +    RemPCIHost *rem_host;
+> +    MemoryRegion *system_memory, *system_io, *pci_memory;
+> +
+> +    Error *error_abort = NULL;
+> +
+> +    qemu_mutex_init(&ram_list.mutex);
 
-We will fix this and other similar issues in the future.
+Please keep global initialization separate from RemMachineState (e.g. do
+it in main() or a function called by main()).  This function should only
+initialize RemMachineState.
 
-Thank you very much!
---
-Jag
+> +
+> +    object_property_add_child(object_get_root(), "machine", obj, &error_abort);
+> +    if (error_abort) {
+> +        error_report_err(error_abort);
+> +    }
+> +
+> +    memory_map_init();
 
-> 
+This is global init, please move it elsewhere.
+
+> +
+> +    system_memory = get_system_memory();
+> +    system_io = get_system_io();
+> +
+> +    pci_memory = g_new(MemoryRegion, 1);
+> +    memory_region_init(pci_memory, NULL, "pci", UINT64_MAX);
+> +
+> +    rem_host = REMOTE_HOST_DEVICE(qdev_create(NULL, TYPE_REMOTE_HOST_DEVICE));
+> +
+> +    rem_host->mr_pci_mem = pci_memory;
+> +    rem_host->mr_sys_mem = system_memory;
+> +    rem_host->mr_sys_io = system_io;
+> +
+> +    s->host = rem_host;
+
+Both s and rem_host are QOM objects.  There should be a child property
+relationship between them here.  It will ensure that rem_host is cleaned
+up when s is cleaned up.  Please use that instead of a regular C
+pointer.
+
+--lkTb+7nhmha7W+c3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3MLakACgkQnKSrs4Gr
+c8jwsAgAqDm8qaVr2QVm8z/93T+wQqaqSlwlxgTWpjDQuk987vS2VIHWkISbn4nR
+p5KumtCPDJDpJGdWgzgNnEoKXdVwOCmQ1TGq11pZ7ygjvvBNmPHT8XuhcGUMafFe
+VMsmLShZ7sA1c6rMtxoZThvpYLwd7Wn9QcEjgg0uDlndby+/7Ok2De/NrtTylyxc
+ED1ix43ItWHSm5okdt4/OIMb2lIaiRqYiHr1ajGuOHsv6vj3B8CtfKRbbzPEps1t
+td1U2kfLLwXmHGHSGi1dim2saunFVF9y5iFIrA4gIkix6oYarH2WViYoVLgeD2UF
+BB/PN1Z6DG8QQVfWgIRfA//cDHVCLg==
+=PkEO
+-----END PGP SIGNATURE-----
+
+--lkTb+7nhmha7W+c3--
+
 
