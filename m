@@ -2,87 +2,103 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87D4BC43215
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65FCFC432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:52:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0818E206D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:52:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D642C206D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:52:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dJBNqxW8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0818E206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Nbn/TQt7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D642C206D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUvfZ-000500-Uc
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 11:39:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43879)
+	id 1iUvd4-0002L1-3w
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 11:36:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43817)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sameid@google.com>) id 1iUvbz-0001OP-VM
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:35:21 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1iUvbu-0001KF-M5
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:35:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sameid@google.com>) id 1iUvby-00044B-Ip
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:35:19 -0500
-Received: from mail-qk1-x741.google.com ([2607:f8b0:4864:20::741]:37767)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <sameid@google.com>) id 1iUvbw-00041k-J2
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:35:18 -0500
-Received: by mail-qk1-x741.google.com with SMTP id e187so2285003qkf.4
- for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 08:35:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=SkZ7vb9dOUvTVroUidoDFjMZpFuFCc60ezXoeOjm4Ok=;
- b=dJBNqxW8vTw6t3KaiY1EOt58shSLuxRhHA1NVADvsra1/HKpV7unGQPyt949M1VgBk
- Ny4r9bU83uR3klDzlTaMV5I/mBXXIiGZnhEgioq7WTgvLCnmW7W980mWeXwEqYzn3U3i
- 6XY5y8Sjm1ME+3Ks420GXILpQNRjHqqNGX33P7WYrFImF9r6lLSW7VuMnzisCYj91FBf
- fJ7He3punD/f5Sw87ylf6oiH6u+NaX0CTJmpfbnI6g5upxBslTj17kCadHkArgEbygkM
- Q3DbBzKsGlPrx4UnCR395npKuxcuMIhDCn4UcqSfEujw/kQRIex4FJXRZU8Ht3FQoGyg
- et5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=SkZ7vb9dOUvTVroUidoDFjMZpFuFCc60ezXoeOjm4Ok=;
- b=Qte6cHhSNsCDIs86c/ilCduJ3bXZ4MgyNNJ4EXWxSlLKc4WD6owmQdGs3XcQs0epJn
- +JHv2Doft88ydJBXCkvaCVffRFIvrTksl7Fz+9DKnioXkHB44dRPPFPfdp9ty+gyIIGD
- k6uXvezVrtRRduIz1M7h+bMOgNJYAt3mIAx3S7pySpGx3yShg/9Cq003mzw5OQrjEmSe
- 6ZrsOlBx/O8qaySkOTYemkvax8EuGAaLasD5zz1Lm0NF1IMgvwgDXsGFK4dmoJEH9BMv
- OKx2hz1aPKs3LQPkebKHtWllhR8vAwBaxeCl+xdUEmruimqB10KYM62tiGUmQwKTzHIZ
- nzYQ==
-X-Gm-Message-State: APjAAAU8IpUe9sUW9jaUZTo+9ldeVxWisusfRjFuqur+jHY08Z06cSgd
- 6i8/hkEjX8iuWYfftIWPHEVQlXJNITqukn/00n+d8A==
-X-Google-Smtp-Source: APXvYqyYfvXYeGxwgRhlHer3wZqydexi7OMg3bmionzBqAcC9FC14g8yI0FpQGD3oOHtECbO6pszlsHhjlixcea7+kE=
-X-Received: by 2002:a37:b2c5:: with SMTP id b188mr3467737qkf.30.1573662914121; 
- Wed, 13 Nov 2019 08:35:14 -0800 (PST)
+ (envelope-from <jag.raman@oracle.com>) id 1iUvbs-00040n-K8
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:35:14 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:40186)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
+ id 1iUvbq-0003zm-Ia
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:35:12 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADGOTH7180257;
+ Wed, 13 Nov 2019 16:35:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=V/dTZw0gWV8ji4lwJwg/OugmlNP4UkDg2a9CtzarUPo=;
+ b=Nbn/TQt7BmpU3DMAbE6UtztVskhgGT0lSPYv5fhwcs4Lez7povoL4HB3YlSbys1Bz9Hw
+ P4chbZPhHT+Kq1JX/U/CE2NaESnK/xA9fixcbRxV041rBfpHV7BfSlVSI8mKFFUgN2Tc
+ mzC0zhxoZi1+y6tOwFzHmOu1aBHPrh3n+7l0o9MrPLpkFTiEiqm38KfJKV0QssykE6xQ
+ WBag+nBsn7i9hnv/q02y1HhLzt+AX3XrefgKLZIwAI1XHLhuyTAFwwNf0GRR6kLGwFVE
+ qk4Yckhh4YImiKO1VAu4WP09vW8Tn3+bSFPnstjoVPJLtjJ+xgZkM8prBEhCZOcnfhTm 1w== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2120.oracle.com with ESMTP id 2w5p3qwjw3-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 13 Nov 2019 16:35:03 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADGR01d156170;
+ Wed, 13 Nov 2019 16:35:02 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by userp3030.oracle.com with ESMTP id 2w8g17smwg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 13 Nov 2019 16:35:02 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xADGYodZ017055;
+ Wed, 13 Nov 2019 16:34:50 GMT
+Received: from [10.152.34.2] (/10.152.34.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Wed, 13 Nov 2019 08:34:50 -0800
+Subject: Re: [RFC v4 PATCH 11/49] multi-process: setup memory manager for
+ remote device
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+ <5bfab4fa2f7f12137d0030e08a494d9ac3e11f04.1571905346.git.jag.raman@oracle.com>
+ <20191113163300.GF563983@stefanha-x1.localdomain>
+From: Jag Raman <jag.raman@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <2dcd1375-881d-4c53-1599-21ccf154e085@oracle.com>
+Date: Wed, 13 Nov 2019 11:34:49 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-References: <20191113091809.31365-1-kraxel@redhat.com>
- <84d3a1aa-bbb2-d831-0abc-fe1169f8a860@redhat.com>
- <20191113140057.2ocwfa3rqqfkbg3r@sirius.home.kraxel.org>
- <CAFr6bUn5W2-w3z4Ty9XD7mh+=kxVq2rQJ3ZUz5nXA13ZdxQtsg@mail.gmail.com>
- <ca6dadb1-fddf-5f6f-a6fc-f94eb02862b6@redhat.com>
-In-Reply-To: <ca6dadb1-fddf-5f6f-a6fc-f94eb02862b6@redhat.com>
-From: Sam Eiderman <sameid@google.com>
-Date: Wed, 13 Nov 2019 18:35:02 +0200
-Message-ID: <CAFr6bUkGrC64gXfLgeZ5hYEkzLF4J-NzNCG3X1deHEovyJ7qSw@mail.gmail.com>
-Subject: Re: [SeaBIOS] Re: [PATCH] ahci: zero-initialize port struct
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- seabios@seabios.org, 
- Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::741
+In-Reply-To: <20191113163300.GF563983@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9440
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1910280000 definitions=main-1911130146
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9440
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
+ definitions=main-1911130146
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,92 +110,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, thuth@redhat.com,
+ john.g.johnson@oracle.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
+ quintela@redhat.com, berrange@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, armbru@redhat.com, ross.lagerwall@citrix.com,
+ kanth.ghatraju@oracle.com, kraxel@redhat.com, kwolf@redhat.com,
+ pbonzini@redhat.com, liran.alon@oracle.com, marcandre.lureau@gmail.com,
+ mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sure,
 
-There are two issues here.
 
-The first issue is that my commits which applied to seabios master:
+On 11/13/2019 11:33 AM, Stefan Hajnoczi wrote:
+> On Thu, Oct 24, 2019 at 05:08:52AM -0400, Jagannathan Raman wrote:
+>> +static void remote_ram_destructor(MemoryRegion *mr)
+>> +{
+>> +    qemu_ram_free(mr->ram_block);
+>> +}
+>> +
+>> +static void remote_ram_init_from_fd(MemoryRegion *mr, int fd, uint64_t size,
+>> +                                    ram_addr_t offset, Error **errp)
+>> +{
+>> +    char *name = g_strdup_printf("%d", fd);
+>> +
+>> +    memory_region_init(mr, NULL, name, size);
+>> +    mr->ram = true;
+>> +    mr->terminates = true;
+>> +    mr->destructor = NULL;
+>> +    mr->align = 0;
+>> +    mr->ram_block = qemu_ram_alloc_from_fd(size, mr, RAM_SHARED, fd, offset,
+>> +                                           errp);
+>> +    mr->dirty_log_mask = tcg_enabled() ? (1 << DIRTY_MEMORY_CODE) : 0;
+>> +
+>> +    g_free(name);
+>> +}
+> 
+> This is not specific to remote/memory.c and could be shared in case
+> something else in QEMU wants to initialize from an fd.
+> 
+>> +
+>> +void remote_sysmem_reconfig(MPQemuMsg *msg, Error **errp)
+>> +{
+>> +    sync_sysmem_msg_t *sysmem_info = &msg->data1.sync_sysmem;
+> 
+> A possible security issue with MPQemuMsg: was the message size
+> validatedb before we access msg->data1.sync_sysmem?
+> 
+> If not, then we might access uninitialized data.  I didn't see if there
+> is a single place in the code that always zeroes msg, but I think the
+> answer is no.  Accessing uninitialized data could expose the old
+> contents of the stack/heap to the other process.  Information leaks like
+> this can be used to defeat address-space randomization because the other
+> process may learn about our memory layout if there are memory addresses
+> in the uninitialized data.
 
-* 9caa19b - geometry: Apply LCHS values for boot devices
-* cb56f61 - config: Add toggle for bootdevice information
-* ad29109 - geometry: Add boot_lchs_find_*() utility functions
-* b3d2120 - boot: Reorder functions in boot.c
-* 7c66a43 - geometry: Read LCHS from fw_cfg
+Thanks for the feedback. Will do.
 
-Are not from the latest version which was submitted to the mailing list (v4=
-)
-* fw_cfg key name has changed
-* The value and of the key has changed from binary (v1) to textual (v4)
-* Other fixes and variable name changes.
+--
+Jag
 
-So these commits need to be reverted and reapplied with the latest version =
-(v4)
-
-The second issue is that my commits, (in v4 too) will require this fix
-that Gerd added ([PATCH] ahci: zero-initialize port struct) since they
-change how SeaBIOS uses lchs.
-
-Previously, before any of my commits, drive.lchs could contain "random
-crap" since it was always set before being used in
-setup_translation().
-
-After my patches, get_translation() invokes overriden_lchs_supplied()
-which checks: "return drive->lchs.cylinder || drive->lchs.head ||
-drive->lchs.sector;"
-So there is an assumption that "drive->lchs" is zeroed when lchs is
-not supplied for the host.
-
-This was true for all devices using "drive->lchs" (all were memset to
-0) except ahci.
-(I used 'git grep "drive_s * drive"' to find them all).
-
-So Gerd fix is indeed needed and then all devices are covered
-(drive->lchs is memset to 0).
-
-Now only the first issue remains...
-
-Sam
-
-On Wed, Nov 13, 2019 at 6:12 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Hi Sam,
->
-> On 11/13/19 4:03 PM, Sam Eiderman wrote:
-> > Hi,
-> >
-> > Does this fix a bug that actually happened?
-> >
-> > I just noticed that in my lchs patches I assumed that lchs struct is
-> > zeroed out in all devices (not only ahci):
-> >
-> > 9caa19be0e53 (geometry: Apply LCHS values for boot devices)
-> >
-> > Seems like this is not the case but why only ahci is affected?
-> >
-> > The list of devices is at least:
-> >
-> >          * ata
-> >          * ahci
-> >          * scsi
-> >              * esp
-> >              * lsi
-> >              * megasas
-> >              * mpt
-> >              * pvscsi
-> >              * virtio
-> >          * virtio-blk
-> >
-> > As specified in the commit message.
-> >
-> > Also Gerd it seems that my lchs patches were not committed in the
-> > latest submitted version (v4)!!!
-> > The ABI of the fw config key is completely broken.
->
-> What do you mean? Can you be more specific?
->
+> 
 
