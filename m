@@ -2,86 +2,86 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62DF7C43141
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:06:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1007C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:31:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93BF4206D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:06:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F856206D7
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:31:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="lttokBwn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93BF4206D9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="lpaevlD4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F856206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUxyR-00086m-9f
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 14:06:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47807)
+	id 1iUyMu-0003vm-O6
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 14:31:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1iUxv9-0005yR-5o
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:03:17 -0500
+ (envelope-from <kwankhede@nvidia.com>) id 1iUyLJ-0003NE-1t
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:30:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1iUxv5-0000z4-S0
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:03:14 -0500
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:6102)
+ (envelope-from <kwankhede@nvidia.com>) id 1iUyLF-00047E-JB
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:30:15 -0500
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:19783)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1iUxv5-0000wu-C6
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:03:11 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5dcc53340001>; Wed, 13 Nov 2019 11:02:13 -0800
+ id 1iUyLB-00042D-Uq
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:30:12 -0500
+Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by
+ hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+ id <B5dcc59bb0000>; Wed, 13 Nov 2019 11:30:03 -0800
 Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Wed, 13 Nov 2019 11:03:08 -0800
+ by hqpgpgate102.nvidia.com (PGP Universal service);
+ Wed, 13 Nov 2019 11:30:04 -0800
 X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Wed, 13 Nov 2019 11:03:08 -0800
-Received: from [10.25.73.195] (172.20.13.39) by HQMAIL107.nvidia.com
+ by hqpgpgate102.nvidia.com on Wed, 13 Nov 2019 11:30:04 -0800
+Received: from [10.25.73.195] (10.124.1.5) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
- 2019 19:02:59 +0000
+ 2019 19:29:55 +0000
 Subject: Re: [PATCH v9 Kernel 1/5] vfio: KABI for migration interface for
  device state
-To: Yan Zhao <yan.y.zhao@intel.com>, Alex Williamson
- <alex.williamson@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>, Cornelia Huck
+ <cohuck@redhat.com>
 References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
  <1573578220-7530-2-git-send-email-kwankhede@nvidia.com>
- <20191112153005.53bf324c@x1.home> <20191113032332.GB18001@joy-OptiPlex-7040>
+ <20191112153005.53bf324c@x1.home> <20191113112417.6e40ce96.cohuck@redhat.com>
+ <20191113112733.49542ebc@x1.home>
 X-Nvconfidentiality: public
 From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <d0be166b-9ffe-645d-de74-b48855995326@nvidia.com>
-Date: Thu, 14 Nov 2019 00:32:55 +0530
+Message-ID: <94592507-fadb-0f10-ee17-f8d5678c70e5@nvidia.com>
+Date: Thu, 14 Nov 2019 00:59:52 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.2
 MIME-Version: 1.0
-In-Reply-To: <20191113032332.GB18001@joy-OptiPlex-7040>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
+In-Reply-To: <20191113112733.49542ebc@x1.home>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
  HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1573671733; bh=02IXtYJjC9MopIQU9j+hRxbcJ5sh+uG9/rjhEPOYkT4=;
+ t=1573673403; bh=HsjPqQ4hOxhZCs+uNJwnCnNVsu1nj8I3kIdkeampWXc=;
  h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
  Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
  X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
  Content-Transfer-Encoding;
- b=lttokBwno4E9QV9k6n9BaDQkd2ibZLPPBhOwU88+/8rwR9uhOkaZw6FJgW7H3ziWY
- R63EhFXp0c28nRK70BFjJ8ZD6E5n1M6V9BA3LYGKzV6PaVpsQ9FwUfKAZNO6BUYZfA
- YhmzYOyCmPxazwMPEiMd3oEfe4PDMh0m7cAcjiRG1pA90s6Sy6FIMdo5Qa7Ty+uTqH
- MgHxsMR71+UZNIbIIwVyefCzxeobSoBNK/C1qyiWkofdhDx0mL4FRjVdFWYfyRooXH
- OZ24VOGQs7uYMjZbyZNHz9kPzgsuKfP75/iYy9ax20zjQYt9SPY2sA5MKVNMX9BhoL
- v8X4rRT20yLoA==
+ b=lpaevlD4AFzX/IGXxo5IuXTJPwZnC+VKizPGPEHRf11mX9ZaXPiN/6+dKM1JK07sw
+ EeR5klgGSGE/KATTGmV2/tgeX/IgboOrbXBlQDPLS1VGayxoZ1le2exzcdzNVs1x+q
+ 0x6MbrNE/nEWS0vEHcx+Wxq79UgM9dAnSIlN7QFeQlV7XqeSooy0Xh7cqXGf5zSe4W
+ aUtiJlJLZBeWrBCVvfXZ+Xq7zohqco79Mhhki3s7+Az8I+lYC21F3DPFlnxgW+5Zbe
+ SH0auLF9g3vCc8EjD5yahSufDniJQgJfbHDsSI/Mi1MjkdH+TsUQHWSZFL0Q2hzmh8
+ P24KijOS6TMeQ==
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.65
+X-Received-From: 216.228.121.64
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,386 +93,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
- Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, 
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
- Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: kevin.tian@intel.com, yi.l.liu@intel.com, cjia@nvidia.com,
+ kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
+ qemu-devel@nongnu.org, Zhengxiao.zx@Alibaba-inc.com,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com,
+ felipe@nutanix.com, jonathan.davies@nutanix.com, yan.y.zhao@intel.com,
+ changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
 
-On 11/13/2019 8:53 AM, Yan Zhao wrote:
-> On Wed, Nov 13, 2019 at 06:30:05AM +0800, Alex Williamson wrote:
->> On Tue, 12 Nov 2019 22:33:36 +0530
->> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->>
->>> - Defined MIGRATION region type and sub-type.
->>> - Used 3 bits to define VFIO device states.
->>>      Bit 0 => _RUNNING
->>>      Bit 1 => _SAVING
->>>      Bit 2 => _RESUMING
->>>      Combination of these bits defines VFIO device's state during migration
->>>      _RUNNING => Normal VFIO device running state. When its reset, it
->>> 		indicates _STOPPED state. when device is changed to
->>> 		_STOPPED, driver should stop device before write()
->>> 		returns.
->>>      _SAVING | _RUNNING => vCPUs are running, VFIO device is running but
->>>                            start saving state of device i.e. pre-copy state
->>>      _SAVING  => vCPUs are stopped, VFIO device should be stopped, and
->>
->> s/should/must/
->>
->>>                  save device state,i.e. stop-n-copy state
->>>      _RESUMING => VFIO device resuming state.
->>>      _SAVING | _RESUMING and _RUNNING | _RESUMING => Invalid states
->>
->> A table might be useful here and in the uapi header to indicate valid
->> states:
->>
->> | _RESUMING | _SAVING | _RUNNING | Description
->> +-----------+---------+----------+------------------------------------------
->> |     0     |    0    |     0    | Stopped, not saving or resuming (a)
->> +-----------+---------+----------+------------------------------------------
->> |     0     |    0    |     1    | Running, default state
->> +-----------+---------+----------+------------------------------------------
->> |     0     |    1    |     0    | Stopped, migration interface in save mode
->> +-----------+---------+----------+------------------------------------------
->> |     0     |    1    |     1    | Running, save mode interface, iterative
->> +-----------+---------+----------+------------------------------------------
->> |     1     |    0    |     0    | Stopped, migration resume interface active
->> +-----------+---------+----------+------------------------------------------
->> |     1     |    0    |     1    | Invalid (b)
->> +-----------+---------+----------+------------------------------------------
->> |     1     |    1    |     0    | Invalid (c)
->> +-----------+---------+----------+------------------------------------------
->> |     1     |    1    |     1    | Invalid (d)
->>
->> I think we need to consider whether we define (a) as generally
->> available, for instance we might want to use it for diagnostics or a
->> fatal error condition outside of migration.
->>
-
-We have to set it as init state. I'll add this it.
-
->> Are there hidden assumptions between state transitions here or are
->> there specific next possible state diagrams that we need to include as
->> well?
->>
->> I'm curious if Intel agrees with the states marked invalid with their
->> push for post-copy support.
->>
-> hi Alex and Kirti,
-> Actually, for postcopy, I think we anyway need an extra POSTCOPY state
-> introduced. Reasons as below:
-> - in the target side, _RSESUMING state is set in the beginning of
->    migration. It cannot be used as a state to inform device of that
->    currently it's in postcopy state and device DMAs are to be trapped and
->    pre-faulted.
->    we also cannot use state (_RESUMING + _RUNNING) as an indicator of
->    postcopy, because before device & vm running in target side, some device
->    state are already loaded (e.g. page tables, pending workloads),
->    target side can do pre-pagefault at that period before target vm up.
-> - in the source side, after device is stopped, postcopy needs saving
->    device state only (as compared to device state + remaining dirty
->    pages in precopy). state (!_RUNNING + _SAVING) here again cannot
->    differentiate precopy and postcopy here.
+On 11/13/2019 11:57 PM, Alex Williamson wrote:
+> On Wed, 13 Nov 2019 11:24:17 +0100
+> Cornelia Huck <cohuck@redhat.com> wrote:
 > 
->>>      Bits 3 - 31 are reserved for future use. User should perform
->>>      read-modify-write operation on this field.
->>> - Defined vfio_device_migration_info structure which will be placed at 0th
->>>    offset of migration region to get/set VFIO device related information.
->>>    Defined members of structure and usage on read/write access:
->>>      * device_state: (read/write)
->>>          To convey VFIO device state to be transitioned to. Only 3 bits are
->>> 	used as of now, Bits 3 - 31 are reserved for future use.
->>>      * pending bytes: (read only)
->>>          To get pending bytes yet to be migrated for VFIO device.
->>>      * data_offset: (read only)
->>>          To get data offset in migration region from where data exist
->>> 	during _SAVING and from where data should be written by user space
->>> 	application during _RESUMING state.
->>>      * data_size: (read/write)
->>>          To get and set size in bytes of data copied in migration region
->>> 	during _SAVING and _RESUMING state.
->>>
->>> Migration region looks like:
->>>   ------------------------------------------------------------------
->>> |vfio_device_migration_info|    data section                      |
->>> |                          |     ///////////////////////////////  |
->>>   ------------------------------------------------------------------
->>>   ^                              ^
->>>   offset 0-trapped part        data_offset
->>>
->>> Structure vfio_device_migration_info is always followed by data section
->>> in the region, so data_offset will always be non-0. Offset from where data
->>> to be copied is decided by kernel driver, data section can be trapped or
->>> mapped depending on how kernel driver defines data section.
->>> Data section partition can be defined as mapped by sparse mmap capability.
->>> If mmapped, then data_offset should be page aligned, where as initial
->>> section which contain vfio_device_migration_info structure might not end
->>> at offset which is page aligned.
->>> Vendor driver should decide whether to partition data section and how to
->>> partition the data section. Vendor driver should return data_offset
->>> accordingly.
->>>
->>> For user application, data is opaque. User should write data in the same
->>> order as received.
->>>
->>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->>> Reviewed-by: Neo Jia <cjia@nvidia.com>
->>> ---
->>>   include/uapi/linux/vfio.h | 108 ++++++++++++++++++++++++++++++++++++++++++++++
->>>   1 file changed, 108 insertions(+)
->>>
->>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->>> index 9e843a147ead..35b09427ad9f 100644
->>> --- a/include/uapi/linux/vfio.h
->>> +++ b/include/uapi/linux/vfio.h
->>> @@ -305,6 +305,7 @@ struct vfio_region_info_cap_type {
->>>   #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
->>>   #define VFIO_REGION_TYPE_GFX                    (1)
->>>   #define VFIO_REGION_TYPE_CCW			(2)
->>> +#define VFIO_REGION_TYPE_MIGRATION              (3)
->>>   
->>>   /* sub-types for VFIO_REGION_TYPE_PCI_* */
->>>   
->>> @@ -379,6 +380,113 @@ struct vfio_region_gfx_edid {
->>>   /* sub-types for VFIO_REGION_TYPE_CCW */
->>>   #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
->>>   
->>> +/* sub-types for VFIO_REGION_TYPE_MIGRATION */
->>> +#define VFIO_REGION_SUBTYPE_MIGRATION           (1)
->>> +
->>> +/*
->>> + * Structure vfio_device_migration_info is placed at 0th offset of
->>> + * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
->>> + * information. Field accesses from this structure are only supported at their
->>> + * native width and alignment, otherwise the result is undefined and vendor
->>> + * drivers should return an error.
->>> + *
->>> + * device_state: (read/write)
->>> + *      To indicate vendor driver the state VFIO device should be transitioned
->>> + *      to. If device state transition fails, write on this field return error.
->>> + *      It consists of 3 bits:
->>> + *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
+>> On Tue, 12 Nov 2019 15:30:05 -0700
+>> Alex Williamson <alex.williamson@redhat.com> wrote:
 >>
->> Let's use set/cleared or 1/0 to indicate bit values, 'reset' is somewhat
->> ambiguous.
+>>> On Tue, 12 Nov 2019 22:33:36 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>    
+>>>> - Defined MIGRATION region type and sub-type.
+>>>> - Used 3 bits to define VFIO device states.
+>>>>      Bit 0 => _RUNNING
+>>>>      Bit 1 => _SAVING
+>>>>      Bit 2 => _RESUMING
+>>>>      Combination of these bits defines VFIO device's state during migration
+>>>>      _RUNNING => Normal VFIO device running state. When its reset, it
+>>>> 		indicates _STOPPED state. when device is changed to
+>>>> 		_STOPPED, driver should stop device before write()
+>>>> 		returns.
+>>>>      _SAVING | _RUNNING => vCPUs are running, VFIO device is running but
+>>>>                            start saving state of device i.e. pre-copy state
+>>>>      _SAVING  => vCPUs are stopped, VFIO device should be stopped, and
+>>>
+>>> s/should/must/
+>>>    
+>>>>                  save device state,i.e. stop-n-copy state
+>>>>      _RESUMING => VFIO device resuming state.
+>>>>      _SAVING | _RESUMING and _RUNNING | _RESUMING => Invalid states
+>>>
+>>> A table might be useful here and in the uapi header to indicate valid
+>>> states:
+>>
+>> I like that.
+>>
+>>>
+>>> | _RESUMING | _SAVING | _RUNNING | Description
+>>> +-----------+---------+----------+------------------------------------------
+>>> |     0     |    0    |     0    | Stopped, not saving or resuming (a)
+>>> +-----------+---------+----------+------------------------------------------
+>>> |     0     |    0    |     1    | Running, default state
+>>> +-----------+---------+----------+------------------------------------------
+>>> |     0     |    1    |     0    | Stopped, migration interface in save mode
+>>> +-----------+---------+----------+------------------------------------------
+>>> |     0     |    1    |     1    | Running, save mode interface, iterative
+>>> +-----------+---------+----------+------------------------------------------
+>>> |     1     |    0    |     0    | Stopped, migration resume interface active
+>>> +-----------+---------+----------+------------------------------------------
+>>> |     1     |    0    |     1    | Invalid (b)
+>>> +-----------+---------+----------+------------------------------------------
+>>> |     1     |    1    |     0    | Invalid (c)
+>>> +-----------+---------+----------+------------------------------------------
+>>> |     1     |    1    |     1    | Invalid (d)
+>>>
+>>> I think we need to consider whether we define (a) as generally
+>>> available, for instance we might want to use it for diagnostics or a
+>>> fatal error condition outside of migration.
+>>>
+>>> Are there hidden assumptions between state transitions here or are
+>>> there specific next possible state diagrams that we need to include as
+>>> well?
+>>
+>> Some kind of state-change diagram might be useful in addition to the
+>> textual description anyway. Let me try, just to make sure I understand
+>> this correctly:
+>>
 
-Ok. Updating it.
+During User application initialization, there is one more state change:
 
->>
->>> + *        _STOPPED state. When device is changed to _STOPPED, driver should stop
->>> + *        device before write() returns.
->>> + *      - If bit 1 set, indicates _SAVING state. When set, that indicates driver
->>> + *        should start gathering device state information which will be provided
->>> + *        to VFIO user space application to save device's state.
->>> + *      - If bit 2 set, indicates _RESUMING state. When set, that indicates
->>> + *        prepare to resume device, data provided through migration region
->>> + *        should be used to resume device.
->>> + *      Bits 3 - 31 are reserved for future use. User should perform
->>> + *      read-modify-write operation on this field.
->>> + *      _SAVING and _RESUMING bits set at the same time is invalid state.
->>> + *	Similarly _RUNNING and _RESUMING bits set is invalid state.
->>> + *
->>> + * pending bytes: (read only)
->>> + *      Number of pending bytes yet to be migrated from vendor driver
->>> + *
->>> + * data_offset: (read only)
->>> + *      User application should read data_offset in migration region from where
->>> + *      user application should read device data during _SAVING state or write
->>> + *      device data during _RESUMING state. See below for detail of sequence to
->>> + *      be followed.
->>> + *
->>> + * data_size: (read/write)
->>> + *      User application should read data_size to get size of data copied in
->>> + *      bytes in migration region during _SAVING state and write size of data
->>> + *      copied in bytes in migration region during _RESUMING state.
->>> + *
->>> + * Migration region looks like:
->>> + *  ------------------------------------------------------------------
->>> + * |vfio_device_migration_info|    data section                      |
->>> + * |                          |     ///////////////////////////////  |
->>> + * ------------------------------------------------------------------
->>> + *   ^                              ^
->>> + *  offset 0-trapped part        data_offset
->>> + *
->>> + * Structure vfio_device_migration_info is always followed by data section in
->>> + * the region, so data_offset will always be non-0. Offset from where data is
->>> + * copied is decided by kernel driver, data section can be trapped or mapped
->>> + * or partitioned, depending on how kernel driver defines data section.
->>> + * Data section partition can be defined as mapped by sparse mmap capability.
->>> + * If mmapped, then data_offset should be page aligned, where as initial section
->>> + * which contain vfio_device_migration_info structure might not end at offset
->>> + * which is page aligned.
->>
->> "The user is not required to to access via mmap regardless of the
->> region mmap capabilities."
->>
-> But once the user decides to access via mmap, it has to read data of
-> data_size each time, otherwise the vendor driver has no idea of how many
-> data are already read from user. Agree?
+0) 0/0/0 ---- stop to running -----> 0/0/1
+
+>> 1) 0/0/1 ---(trigger driver to start gathering state info)---> 0/1/1
+
+not just gathering state info, but also copy device state to be 
+transferred during pre-copy phase.
+
+Below 2 state are not just to tell driver to stop, those 2 differ.
+2) is device state changed from running to stop, this is when VM 
+shutdowns cleanly, no need to save device state
+
+>> 2) 0/0/1 ---(tell driver to stop)---> 0/0/0 
+
+>> 3) 0/1/1 ---(tell driver to stop)---> 0/1/0
+
+above is transition from pre-copy phase to stop-and-copy phase, where 
+device data should be made available to user to transfer to destination 
+or to save it to file in case of save VM or suspend.
+
+
+>> 4) 0/0/1 ---(tell driver to resume with provided info)---> 1/0/0
 > 
+> I think this is to switch into resuming mode, the data will follow >
+>> 5) 1/0/0 ---(driver is ready)---> 0/0/1
+>> 6) 0/1/1 ---(tell driver to stop saving)---> 0/0/1
+>
 
-that's right.
+above can occur on migration cancelled or failed.
 
->>> + * Vendor driver should decide whether to partition data section and how to
->>> + * partition the data section. Vendor driver should return data_offset
->>> + * accordingly.
->>> + *
->>> + * Sequence to be followed for _SAVING|_RUNNING device state or pre-copy phase
->>> + * and for _SAVING device state or stop-and-copy phase:
->>> + * a. read pending_bytes. If pending_bytes > 0, go through below steps.
->>> + * b. read data_offset, indicates kernel driver to write data to staging buffer.
->>> + *    Kernel driver should return this read operation only after writing data to
->>> + *    staging buffer is done.
-> May I know under what condition this data_offset will be changed per
-> each iteration from a-f ?
+
+> I think also:
 > 
+> 0/0/1 --> 0/1/0 If user chooses to go directly to stop and copy
 
-Its upto vendor driver, if vendor driver maintains multiple partitions 
-in data section.
+that's right, this happens in case of save VM or suspend VM.
 
->>
->> "staging buffer" implies a vendor driver implementation, perhaps we
->> could just state that data is available from (region + data_offset) to
->> (region + data_offset + data_size) upon return of this read operation.
->>
-
-Makes sense. Updating it.
-
->>> + * c. read data_size, amount of data in bytes written by vendor driver in
->>> + *    migration region.
->>> + * d. read data_size bytes of data from data_offset in the migration region.
->>> + * e. process data.
->>> + * f. Loop through a to e. Next read on pending_bytes indicates that read data
->>> + *    operation from migration region for previous iteration is done.
->>
->> I think this indicate that step (f) should be to read pending_bytes, the
->> read sequence is not complete until this step.  Optionally the user can
->> then proceed to step (b).  There are no read side-effects of (a) afaict.
->>
-
-I tried to reword this sequence to be more specific:
-
-* Sequence to be followed for _SAVING|_RUNNING device state or pre-copy 
-* phase and for _SAVING device state or stop-and-copy phase:
-* a. read pending_bytes, indicates start of new iteration to get device 
-*    data. If there was previous iteration, then this read operation
-*    indicates previous iteration is done. If pending_bytes > 0, go
-*    through below steps.
-* b. read data_offset, indicates kernel driver to make data available
-*    through data section. Kernel driver should return this read
-*    operation only after data is available from (region + data_offset)
-*    to (region + data_offset + data_size).
-* c. read data_size, amount of data in bytes available through migration
-*    region.
-* d. read data of data_size bytes from (region + data_offset) from
-*    migration region.
-* e. process data.
-* f. Loop through a to e.
-
-Hope this is more clear.
-
->> Is the use required to reach pending_bytes == 0 before changing
->> device_state, particularly transitioning to !_RUNNING?
-
-No, its not necessary to reach till pending_bytes==0 in pre-copy phase.
-
->>  Presumably the
->> user can exit this sequence at any time by clearing _SAVING.
-
-In that case device state data is not complete, which will result in not 
-able to resume device with that data.
-In stop-and-copy phase, user should iterate till pending_bytes is 0.
-
->>
->>> + *
->>> + * Sequence to be followed while _RESUMING device state:
->>> + * While data for this device is available, repeat below steps:
->>> + * a. read data_offset from where user application should write data.
-> before proceed to step b, need to read data_size from vendor driver to determine
-> the max len of data to write. I think it's necessary in such a condition
-> that source vendor driver and target vendor driver do not offer data sections of
-> the same size. e.g. in source side, the data section is of size 100M,
-> but in target side, the data section is only of 50M size.
-> rather than simply fail, loop and write seems better.
 > 
+> 0/0/0 and 0/0/1 should be reachable from any state, though I could see
+> that a vendor driver could fail transition from 1/0/0 -> 0/0/1 if the
+> received state is incomplete.  Somehow though a user always needs to
+> return the device to the initial state, so how does device_state
+> interact with the reset ioctl?  Would this automatically manipulate
+> device_state back to 0/0/1?
 
-Makes sense. Doing this change for next version.
+why would reset occur on 1/0/0 -> 0/0/1 failure?
 
-> Thanks
-> Yan
->>> + * b. write data of data_size to migration region from data_offset.
->>> + * c. write data_size which indicates vendor driver that data is written in
->>> + *    staging buffer. Vendor driver should read this data from migration
->>> + *    region and resume device's state.
->>
->> The device defaults to _RUNNING state, so a prerequisite is to set
->> _RESUMING and clear _RUNNING, right?
+1/0/0 -> 0/0/1 fails, then user should convey that to source that 
+migration has failed, then resume at source.
 
+>   
+>> Not sure about the usefulness of 2).
+
+I explained this above.
+
+>> Also, is 4) the only way to
+>> trigger resuming? 
 Yes.
 
+>> And is the change in 5) performed by the driver, or
+>> by userspace?
 >>
->>> + *
->>> + * For user application, data is opaque. User should write data in the same
->>> + * order as received.
->>> + */
->>> +
->>> +struct vfio_device_migration_info {
->>> +	__u32 device_state;         /* VFIO device state */
->>> +#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
->>> +#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
->>> +#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
->>> +#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
->>> +				     VFIO_DEVICE_STATE_SAVING |  \
->>> +				     VFIO_DEVICE_STATE_RESUMING)
->>> +
->>> +#define VFIO_DEVICE_STATE_INVALID_CASE1    (VFIO_DEVICE_STATE_SAVING | \
->>> +					    VFIO_DEVICE_STATE_RESUMING)
->>> +
->>> +#define VFIO_DEVICE_STATE_INVALID_CASE2    (VFIO_DEVICE_STATE_RUNNING | \
->>> +					    VFIO_DEVICE_STATE_RESUMING)
+By userspace.
+
+>> Are any other state transitions valid?
 >>
->> These seem difficult to use, maybe we just need a
->> VFIO_DEVICE_STATE_VALID macro?
+>> (...)
 >>
->> #define VFIO_DEVICE_STATE_VALID(state) \
->>    (state & VFIO_DEVICE_STATE_RESUMING ? \
->>    (state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_RESUMING : 1)
+>>>> + * Sequence to be followed for _SAVING|_RUNNING device state or pre-copy phase
+>>>> + * and for _SAVING device state or stop-and-copy phase:
+>>>> + * a. read pending_bytes. If pending_bytes > 0, go through below steps.
+>>>> + * b. read data_offset, indicates kernel driver to write data to staging buffer.
+>>>> + *    Kernel driver should return this read operation only after writing data to
+>>>> + *    staging buffer is done.
+>>>
+>>> "staging buffer" implies a vendor driver implementation, perhaps we
+>>> could just state that data is available from (region + data_offset) to
+>>> (region + data_offset + data_size) upon return of this read operation.
+>>>    
+>>>> + * c. read data_size, amount of data in bytes written by vendor driver in
+>>>> + *    migration region.
+>>>> + * d. read data_size bytes of data from data_offset in the migration region.
+>>>> + * e. process data.
+>>>> + * f. Loop through a to e. Next read on pending_bytes indicates that read data
+>>>> + *    operation from migration region for previous iteration is done.
+>>>
+>>> I think this indicate that step (f) should be to read pending_bytes, the
+>>> read sequence is not complete until this step.  Optionally the user can
+>>> then proceed to step (b).  There are no read side-effects of (a) afaict.
+>>>
+>>> Is the use required to reach pending_bytes == 0 before changing
+>>> device_state, particularly transitioning to !_RUNNING?  Presumably the
+>>> user can exit this sequence at any time by clearing _SAVING.
+>>
+>> That would be transition 6) above (abort saving and continue). I think
+>> it makes sense not to forbid this.
+>>
+>>>    
+>>>> + *
+>>>> + * Sequence to be followed while _RESUMING device state:
+>>>> + * While data for this device is available, repeat below steps:
+>>>> + * a. read data_offset from where user application should write data.
+>>>> + * b. write data of data_size to migration region from data_offset.
+>>>> + * c. write data_size which indicates vendor driver that data is written in
+>>>> + *    staging buffer. Vendor driver should read this data from migration
+>>>> + *    region and resume device's state.
+>>>
+>>> The device defaults to _RUNNING state, so a prerequisite is to set
+>>> _RESUMING and clear _RUNNING, right?
 >>
 
-This will not be work when use of other bits gets added in future. 
-That's the reason I preferred to add individual invalid states which 
-user should check.
+Sorry, I replied yes in my previous reply, but no. Default device state 
+is _STOPPED. During resume _STOPPED -> _RESUMING
+
+>> Transition 4) above. Do we need
+
+I think, its not required.
+
+>> 7) 0/0/0 ---(tell driver to resume with provided info)---> 1/0/0
+>> as well? (Probably depends on how sensible the 0/0/0 state is.)
+> 
+> I think we must unless we require the user to transition from 0/0/1 to
+> 1/0/0 in a single operation, but I'd prefer to make 0/0/0 generally
+> available.  Thanks,
+> 
+
+its 0/0/0 -> 1/0/0 while resuming.
 
 Thanks,
 Kirti
 
->> Thanks,
->> Alex
->>
->>> +	__u32 reserved;
->>> +	__u64 pending_bytes;
->>> +	__u64 data_offset;
->>> +	__u64 data_size;
->>> +} __attribute__((packed));
->>> +
->>>   /*
->>>    * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
->>>    * which allows direct access to non-MSIX registers which happened to be within
->>
+> Alex
+> 
 
