@@ -6,79 +6,79 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDA9C33CA1
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 551C8C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:22:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C4C923762
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:03:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F80D21A49
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:22:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="X1BJ6tun"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C4C923762
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LoFjasAu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F80D21A49
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUv74-0002eC-FK
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 11:03:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39502)
+	id 1iUvPD-0002vM-73
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 11:22:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42080)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1iUv5F-0001KN-15
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:01:30 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1iUvOW-0002SU-H0
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:21:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1iUv5C-0007u5-Rt
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:01:27 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:41266)
+ (envelope-from <jag.raman@oracle.com>) id 1iUvOV-0006wD-9H
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:21:24 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:51004)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1iUv5C-0007ti-HY
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:01:26 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADFxPG5184711;
- Wed, 13 Nov 2019 16:01:13 GMT
+ id 1iUvOV-0006vP-1N
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:21:23 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADGEQg1170265;
+ Wed, 13 Nov 2019 16:21:13 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=UrcrXeFYsAMWyvMKxJQHOi0fyGnqK04kJ29J94/VgLU=;
- b=X1BJ6tunUaIZUu7nFjGnOnCZ8Dro4vhBZnWMajtmeNmcSL2c0DJQp4T+waRA3JCqLDdm
- RGw+Zf0drFnyl345SpBKYK47cQYBOL5QjejndeaeXK5+jUhfb8i266KY5AgsQZ6mr/8M
- ukyxfEfBUvEAXaCsPAJn4maZVENYXLf+dgWfaj/4E6IBpTLisIawabZaYyd9hyspI5wq
- J9bjejnGYr/5v0RtQRo1/SQw4JVrOLQdtKW8BNlRXFgSVTGQJjCezwjIwbGjOOIAzHYi
- 2q0bW1zlqzhqn7exyO9DonUQJ5Fz275+C/BuHzq8HuG8vY8ea7CBr6nX8SXpq2PC2RtV 2g== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2130.oracle.com with ESMTP id 2w5mvtwfce-1
+ bh=GN+LIruyivakxoQC/wssjeaIwXQLXJ08uM6Tz3LXFeE=;
+ b=LoFjasAur1uThKBex2lz2cIkI+8I0Ux8rBn9s1UIFjBA7f4Wz3KrEcV1FZ9s3lhq9SuB
+ 3qTUC7paxQzNsHf1W3gyn9Sim8aufT3lr+1yZgW72APXX82c5nJEpQJy1/nBq8m0DsnA
+ fPSdLNYY0m/m80QlTofiQMHpMPV3odPzf5TpBef9uuhm9R5gmtJg+fJxb2Lznrm6iyon
+ oMITmZHjBW3h9AwkjkxgXtMg8l8TXVyA1e+czJIOGACL3JySNITzGCOf4guqg6TZKK+U
+ /TgsoA3INzXr6kNSRmQd0Dt93fYc+0MgsB+zn+Fja5hxOhyuXoRionzLLnHO7EOOU5dn 5Q== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+ by userp2120.oracle.com with ESMTP id 2w5p3qwfu9-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 13 Nov 2019 16:01:12 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADFxGrA152052;
- Wed, 13 Nov 2019 16:01:12 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3020.oracle.com with ESMTP id 2w7vbd3sqc-1
+ Wed, 13 Nov 2019 16:21:13 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+ by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADGIV8S075023;
+ Wed, 13 Nov 2019 16:21:13 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3020.oracle.com with ESMTP id 2w7j0829j1-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 13 Nov 2019 16:01:12 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xADG18Ax006571;
- Wed, 13 Nov 2019 16:01:09 GMT
+ Wed, 13 Nov 2019 16:21:12 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xADGLALY008075;
+ Wed, 13 Nov 2019 16:21:10 GMT
 Received: from [10.152.34.2] (/10.152.34.2)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 13 Nov 2019 08:01:08 -0800
-Subject: Re: [RFC v4 PATCH 30/49] multi-process: send heartbeat messages to
- remote
+ with ESMTP ; Wed, 13 Nov 2019 08:21:10 -0800
+Subject: Re: [RFC v4 PATCH 47/49] multi-process: Enable support for multiple
+ devices in remote
 To: Stefan Hajnoczi <stefanha@redhat.com>
 References: <cover.1571905346.git.jag.raman@oracle.com>
- <14c33104778e77fcf2e7f0df2a1dd96fbcaf49d7.1571905346.git.jag.raman@oracle.com>
- <20191111162750.GJ402228@stefanha-x1.localdomain>
+ <c67656abcd0e41278710460d2920036254ecffb7.1571905346.git.jag.raman@oracle.com>
+ <20191111161542.GF402228@stefanha-x1.localdomain>
 From: Jag Raman <jag.raman@oracle.com>
 Organization: Oracle Corporation
-Message-ID: <6f063381-c842-9c03-280f-1e9652a15881@oracle.com>
-Date: Wed, 13 Nov 2019 11:01:07 -0500
+Message-ID: <9529c2b2-7faf-1b1c-cb6e-a147930e24fb@oracle.com>
+Date: Wed, 13 Nov 2019 11:21:08 -0500
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20191111162750.GJ402228@stefanha-x1.localdomain>
+In-Reply-To: <20191111161542.GF402228@stefanha-x1.localdomain>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -88,17 +88,17 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
  malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911130144
+ engine=8.0.1-1910280000 definitions=main-1911130145
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9439
  signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
  priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911130144
+ definitions=main-1911130145
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+X-Received-From: 156.151.31.85
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,55 +123,40 @@ Sender: "Qemu-devel"
 
 
 
-On 11/11/2019 11:27 AM, Stefan Hajnoczi wrote:
-> On Thu, Oct 24, 2019 at 05:09:11AM -0400, Jagannathan Raman wrote:
->> +static void broadcast_msg(MPQemuMsg *msg, bool need_reply)
->> +{
->> +    PCIProxyDev *entry;
->> +    unsigned int pid;
->> +    int wait;
->> +
->> +    QLIST_FOREACH(entry, &proxy_dev_list.devices, next) {
->> +        if (need_reply) {
->> +            wait = eventfd(0, EFD_NONBLOCK);
->> +            msg->num_fds = 1;
->> +            msg->fds[0] = wait;
->> +        }
->> +
->> +        mpqemu_msg_send(entry->mpqemu_link, msg, entry->mpqemu_link->com);
->> +        if (need_reply) {
->> +            pid = (uint32_t)wait_for_remote(wait);
+On 11/11/2019 11:15 AM, Stefan Hajnoczi wrote:
+> On Thu, Oct 24, 2019 at 05:09:28AM -0400, Jagannathan Raman wrote:
+>> @@ -93,7 +94,8 @@ static void process_config_write(MPQemuMsg *msg)
+>>       struct conf_data_msg *conf = (struct conf_data_msg *)msg->data2;
+>>   
+>>       qemu_mutex_lock_iothread();
+>> -    pci_default_write_config(remote_pci_dev, conf->addr, conf->val, conf->l);
+>> +    pci_default_write_config(remote_pci_devs[msg->id], conf->addr, conf->val,
+>> +                             conf->l);
+>>       qemu_mutex_unlock_iothread();
+>>   }
+>>   
+>> @@ -106,7 +108,8 @@ static void process_config_read(MPQemuMsg *msg)
+>>       wait = msg->fds[0];
+>>   
+>>       qemu_mutex_lock_iothread();
+>> -    val = pci_default_read_config(remote_pci_dev, conf->addr, conf->l);
+>> +    val = pci_default_read_config(remote_pci_devs[msg->id], conf->addr,
+>> +                                  conf->l);
+>>       qemu_mutex_unlock_iothread();
+>>   
+>>       notify_proxy(wait, val);
 > 
-> Sometimes QEMU really needs to wait for the remote process before it can
-> make progress.  I think this is not one of those cases though.
-> 
-> Since QEMU is event-driven it's problematic to invoke blocking system
-> calls.  The remote process might not respond for a significant amount of
-> time.  Other QEMU threads will be held up waiting for the QEMU global
-> mutex in the meantime (because we hold it!).
+> msg->id was read from a socket and hasn't been validated before indexing
+> into remote_pci_devs[].
 
-There are places where we wait synchronously for the remote process.
-However, these synchronous waits carry a timeout to prevent the hang
-situation you described above.
+We see the common thread, w.r.t your concerns about security. Thanks for
+pointing them out.
 
-We will add an error recovery in the future. That is, we will respawn
-the remote process if the QEMU times out waiting for it.
+We will fix this and other similar issues in the future.
 
-> 
-> Please implement heartbeat/ping asynchronously.  The wait eventfd should
-> be read by an event loop fd handler instead.  That way QEMU can continue
-> with running the VM while waiting for the remote process.
-
-In the current implementation, the heartbeat/ping is asynchronous.
-start_heartbeat_timer() sets up a timer to perform the ping.
-
-Thanks!
+Thank you very much!
 --
 Jag
 
-> 
-> This will also improve guest performance because there will be less
-> jitter (random latency because the event loop is held up waiting for
-> remote processes for short periods of time).
 > 
 
