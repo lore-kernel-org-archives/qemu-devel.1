@@ -2,75 +2,97 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B53C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AD02C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:12:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39CB1206EF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:10:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E37CC206EF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:12:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kbxl38Yi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39CB1206EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="axCxgJJ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E37CC206EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUztn-0005JU-DL
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 16:09:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46103)
+	id 1iUzwQ-0006fE-4h
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 16:12:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47579)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crobinso@redhat.com>) id 1iUzsh-0004K3-AK
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:08:52 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iUzuO-0005q5-P9
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:10:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crobinso@redhat.com>) id 1iUzsg-0006Hk-6F
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:08:51 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37098
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crobinso@redhat.com>) id 1iUzsg-0006GP-2L
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:08:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573679329;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=eJCqJWR8acQwzfcefPriX5xuSEUaakfykNzq7QUKrVQ=;
- b=Kbxl38Yiv1YovIKOla82mpHyneAJuEwnn7dRA8ZwuSizdfRi6ATmWEZF5yQCpXLWr85Fwn
- URVKyUx1Mud44mEHyf+s/pmF56yXjp2W29o8NEyg4XHn4Nw14F8KmF2betJuG9ToDLV8Vk
- hK0U/+fOVM8U0K82cGV8czZY5P7ya14=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-92-iOGmqgjHMYuNgDAp_dSHhw-1; Wed, 13 Nov 2019 16:08:46 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71134835B63;
- Wed, 13 Nov 2019 21:08:45 +0000 (UTC)
-Received: from worklaptop.redhat.com (ovpn-125-32.rdu2.redhat.com
- [10.10.125.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B73431084192;
- Wed, 13 Nov 2019 21:08:41 +0000 (UTC)
-From: Cole Robinson <crobinso@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] tests: fix modules-test 'duplicate test case' error
-Date: Wed, 13 Nov 2019 16:09:35 -0500
-Message-Id: <d64c9aa098cc6e5c0b638438c4959eddfa7e24e2.1573679311.git.crobinso@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1iUzuM-0007vM-Hj
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:10:36 -0500
+Received: from mail-wr1-x433.google.com ([2a00:1450:4864:20::433]:37430)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iUzuK-0007ti-Hl
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:10:32 -0500
+Received: by mail-wr1-x433.google.com with SMTP id t1so4040233wrv.4
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 13:10:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=1Lne2vF/q8LO1oTs9cClK1bZe4proiP5e37Bhwd8bR8=;
+ b=axCxgJJ4bCT+0d6jXT1WUbSrc4TeE5LVrR/rBr+FjK0s46QibSQbuUhFm92lcZ6N+c
+ WmvUrMkjELP1kv5XgsBk8DrN904kB7erW38pPOzMB3Yxa0Qs8QbYifYTcn5oFWGtV3Hv
+ 9zX5eFXo1jw5AbOOyY8QITeVUV3gMwMxnHI5hLQ5BJAuTjitShJkswrvUe9Cves0QsqH
+ 9O1gzhRCyYZgBvftadsKu3m1KYrIzaKYhYXolTbmoLGzV9JH4ifoj18MyxH/RZfCYj3o
+ 0RORP9RzJH2ZDVrr3cHE2UrXyKznIP/WZZ5daIFcA04Oelrbw2SAQyKSGRyWlhGyFvhC
+ usjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1Lne2vF/q8LO1oTs9cClK1bZe4proiP5e37Bhwd8bR8=;
+ b=SJ7GDealUYbVhGR7825cvjIaOmibrsEVWt+hcReGZaPGM+LfGog6Jkd6Y5B99su68z
+ 2fKQXc2zzgpkxWFOMdVVVLSS6/bIRlMo0E+C0bqCWnMR8U5RFlSsBnOKdLhfT+HPwRNn
+ 4wHGnLKDj6dEb8tsSSUXNFM1CckQXZThRH43rG+QY3h9izSHM841ZqZj+LrTsRCaFC52
+ 2tde2r/pEjNjDVw2P+gr0bxh3vbsar68TeJa1kcTG6Q7QUfsEDxDR3RO/xrhisOvFvWi
+ ZH6UDJxC77idk485OwDpgRYPpW5AgV7cHSY4AvTGYDYWGa4NLPI/bUAtbvngOigx2MFn
+ TiYw==
+X-Gm-Message-State: APjAAAUWmsxacQpsWznukCxDL/LOltcfwM/U4Y35sv2aWR7v2xd6TOGR
+ wOXOPXD0D5EuaatkrDuUrRa1KA==
+X-Google-Smtp-Source: APXvYqx/vzKUcKHbQAICNRiSKOIELvGevtmye5ex+Cu+ir587PxZqrEtbiSX94mfXuUnirT45HPYRw==
+X-Received: by 2002:adf:fe0b:: with SMTP id n11mr4571315wrr.218.1573679430959; 
+ Wed, 13 Nov 2019 13:10:30 -0800 (PST)
+Received: from [192.168.8.102] (219.red-37-158-56.dynamicip.rima-tde.net.
+ [37.158.56.219])
+ by smtp.gmail.com with ESMTPSA id u18sm4355990wrp.14.2019.11.13.13.10.28
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 13 Nov 2019 13:10:30 -0800 (PST)
+Subject: Re: QEMU for Qualcomm Hexagon - KVM Forum talk and code available
+To: Taylor Simpson <tsimpson@quicinc.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <BYAPR02MB48863165DEE32E5C563E93F4DE650@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <CAL1e-=jvmJNiZR4iLDL-97qm=v+2s0cwn5YTzJQ=JZ_gwOe4tQ@mail.gmail.com>
+ <BYAPR02MB4886C8D82898F1E406C124F8DE7E0@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <BYAPR02MB48865884056A88B660B620FCDE770@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <87d0dw83uz.fsf@linaro.org>
+ <BYAPR02MB48866E2D82D9C76ABBECA842DE760@BYAPR02MB4886.namprd02.prod.outlook.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <ffe58977-f251-df34-4bd0-62e32f78cc1a@linaro.org>
+Date: Wed, 13 Nov 2019 22:10:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: iOGmqgjHMYuNgDAp_dSHhw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+In-Reply-To: <BYAPR02MB48866E2D82D9C76ABBECA842DE760@BYAPR02MB4886.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::433
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,47 +104,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial <qemu-trivial@nongnu.org>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Cole Robinson <crobinso@redhat.com>
+Cc: Alessandro Di Federico <ale@rev.ng>, "nizzo@rev.ng" <nizzo@rev.ng>,
+ =?UTF-8?Q?Niccol=c3=b2_Izzo?= <izzoniccolo@gmail.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-./configure --enable-sdl --audio-drv-list=3Dsdl --enable-modules
+On 11/13/19 8:31 PM, Taylor Simpson wrote:
+> [Taylor] Currently, I have the generator and the generated code sitting in the source tree.  I'm flexible on this if the decision is to regenerate it every time.
 
-Will generate two identical test names: /$arch/module/load/sdl
-Which generates an error like:
+I would prefer to regenerate every time, and not store the generated code in
+the source tree at all.  It makes it a no-brainer to modify the source and not
+have to remember how to regenerate, because the rules are right there in the
+makefile.
 
-(tests/modules-test:23814): GLib-ERROR **: 18:23:06.359: duplicate test cas=
-e path: /aarch64//module/load/sdl
 
-Add the subsystem prefix in the name as well, so instead we get:
-
-/$arch/module/load/audio-sdl
-/$arch/module/load/ui-sdl
-
-Signed-off-by: Cole Robinson <crobinso@redhat.com>
----
- tests/modules-test.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/tests/modules-test.c b/tests/modules-test.c
-index d1a6ace218..88217686e1 100644
---- a/tests/modules-test.c
-+++ b/tests/modules-test.c
-@@ -64,7 +64,8 @@ int main(int argc, char *argv[])
-     g_test_init(&argc, &argv, NULL);
-=20
-     for (i =3D 0; i < G_N_ELEMENTS(modules); i +=3D 2) {
--        char *testname =3D g_strdup_printf("/module/load/%s", modules[i + =
-1]);
-+        char *testname =3D g_strdup_printf("/module/load/%s%s",
-+                                         modules[i], modules[i + 1]);
-         qtest_add_data_func(testname, modules + i, test_modules_load);
-         g_free(testname);
-     }
---=20
-2.23.0
-
+r~
 
