@@ -7,78 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFFBC43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68413C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:41:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDCC62245B
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:41:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2FFAD222D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:41:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JA/121bL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDCC62245B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFgVDQT0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FFAD222D3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUtpL-0007Yj-Bq
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 09:40:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54457)
+	id 1iUtpR-0007jv-06
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 09:41:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54511)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnb-0005i5-P2
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:12 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnf-0005m1-OG
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iUtna-0006IX-Mo
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:11 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35909)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iUtne-0006KH-Jv
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:15 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35908)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iUtna-0006I4-Gg
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:10 -0500
-Received: by mail-wr1-x443.google.com with SMTP id r10so2658770wrx.3
- for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 06:39:10 -0800 (PST)
+ id 1iUtne-0006Jt-Dj
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:14 -0500
+Received: by mail-wr1-x441.google.com with SMTP id r10so2659016wrx.3
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 06:39:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=wetGOwL6w9T5KqZky8gH8g8gUVnF2w1GmxQs/cFXJ4g=;
- b=JA/121bL7xwyBhWiY7Vz+uiS9W1+Qdz7XpsqwRfsuE7oH61I8EQUwuhwsKW17uNac2
- WJmDbffmVIklxgVWG6XYdSR5btBVlyRn/1FqMyPL5g6/+yneMvtewa3AtmTQNC63NO2a
- VJSpbk4wVMrhSwe8vJissyhH0IFtwMARVO8NntgqM7OL4iw0bpKWHidjy9YE8aRPpkiQ
- cV4vWjopJoUDXWyLqjkUToxJoLm93MkRiwMaJUEeVHtAVYztmU5KWpG2/c7T8W994itB
- 9OhgEDsne1J0iRfFZ1uzTR40aBDWMtp5cWw7vMpeSdhpiO1p5GCTU7L0YqvtD8sAgiIa
- 02KQ==
+ bh=04DgeNC9vfzASWfCYcrOuTaV0nl4hE4YtksZoBBJzpM=;
+ b=mFgVDQT0R2WoA2hwT/zTC4fqohWKyBeYrk+M9RZ8g8/ggUav/aBzcVRDWXMnMGr8Tv
+ pqLOMzepX+E2hDjvoh/T7oXyPIl3f7tkE5//gNauYYyhSy1etsVVlHF2YwzHNg2+zcMF
+ iRlVNwHmiHqKP7GRaVJ7uRL6FoHYZ/kDhtzGR/HrTi2Newr80Eb1whTByOefV4icYadT
+ EEraEB5e/15S1xeYPUnVT9DamTA8m8ApoGVKNUHOoWhUXRJ8hlqfsuc8zmQ9KuHt4I8p
+ /qNBHySWE3ZkTkAkqKb7nJGB+R/dUu99orFznU2cB0Nve6n0Se07I68aYVikEDf8zwnz
+ 9Z2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=wetGOwL6w9T5KqZky8gH8g8gUVnF2w1GmxQs/cFXJ4g=;
- b=BwW49CUd6DK0J2itkoPEz+ieEIjDuHTIfedr8CTjayjmy1LoQLKMPX1OupU7+04jqH
- qBsI1IOZjwKPsbL2RJ4XlDoyKvOijYlgOSEMVT6aiFvImbCwGaWdVXo81E/KsJVUzQD/
- wpFVh5FA6yGJnrMKet2shVAo7YuFSUZJp9dIW5tA3BsPdeSWv0DpjIEc6oOU+qX7vjg2
- GH2A6jvI4H5F1W26MknVN5eEiw9cE3c62qlH97eKM80IahG9ohPujl6Bpp1Y0VKbe9A6
- 18IHzo8OxVl/F4WT0PVsxs8fvDMe7E5gVa4u4O97CISqZnuTbO7Oz8eCyQfudkPj27N7
- 8Lig==
-X-Gm-Message-State: APjAAAVYUxFkKNdrcfWo+NtZ+40EpODeuwWcwSDwwo/0eWeLknEZG74Q
- EGeUgjzyIg//ICxqKlUBE28AVCE2
-X-Google-Smtp-Source: APXvYqxo3kzQoLQTYvCv8BpHpYI37fs/h410Vy/RCwpcVTgwAjjJG7fhY4j+wSq9m3e8IFLmoXuy7g==
-X-Received: by 2002:a5d:526f:: with SMTP id l15mr3077923wrc.169.1573655949155; 
- Wed, 13 Nov 2019 06:39:09 -0800 (PST)
+ bh=04DgeNC9vfzASWfCYcrOuTaV0nl4hE4YtksZoBBJzpM=;
+ b=AzkYQXGk1EQcozzJ2ziiHDFCVpNFIJi7sCrdKz/v+Uhlk1gUPJ033GNLiyDRONLhfA
+ HHtFFrVZTPpowDgNmrEkkwL0PUe+kIUuIqu9FyETJP5wAeuNlDmg/+jFbh8UxEl9NO7R
+ hMlJhU+cxmfj34gulKSL5xwaU55MjhlbTSIAMhfic/U2TSGSv+GB67rxxvfClvQnMyWP
+ Qcrxnfn4C6tkrHcpP9BWVBsMvsZKLzxbvcaDmbgbn6OE5wLCCFRXt/Dc08FD3yGo8OFh
+ Kx3f2jWR2S63JW2FwtFbLbMdZBNZGk6SwMf7bkZdxlY8/DDdstFUKd/GwSYwuVTlwa39
+ 18Pg==
+X-Gm-Message-State: APjAAAWcdQBF6XGzkbMrRdgOrj0NLEPRpjlT+Wo0NnBKTs76tqpwhOpT
+ s9uw3QOrjE6lXaAugR/tIIs/wCgA
+X-Google-Smtp-Source: APXvYqzkbdvF6nahA7MzSMxfnYw7Ty4nmru8yvnOHdhpihtJz7hNUa8rB6FNoc01SXiWvwJHziPkxw==
+X-Received: by 2002:a5d:4810:: with SMTP id l16mr3010699wrq.127.1573655953255; 
+ Wed, 13 Nov 2019 06:39:13 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s11sm2965823wrr.43.2019.11.13.06.39.08
+ by smtp.gmail.com with ESMTPSA id s11sm2965823wrr.43.2019.11.13.06.39.12
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 13 Nov 2019 06:39:08 -0800 (PST)
+ Wed, 13 Nov 2019 06:39:12 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/16] vl: extract accelerator option processing to a separate
- function
-Date: Wed, 13 Nov 2019 15:38:51 +0100
-Message-Id: <1573655945-14912-3-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 07/16] vl: warn for unavailable accelerators, clarify messages
+Date: Wed, 13 Nov 2019 15:38:56 +0100
+Message-Id: <1573655945-14912-8-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
 References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,73 +94,48 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As a first step towards supporting multiple "-accel" options, push -icount
-and -accel semantics into a new function, and use qemu_opts_foreach to
-retrieve the key/value lists instead of stashing them into globals.
+So far, specifying an accelerator that was not compiled in did not result
+in an error; fix that.
+
+While at it, clarify the mysterious "Back to TCG" message.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- vl.c | 40 ++++++++++++++++++++++++++++------------
- 1 file changed, 28 insertions(+), 12 deletions(-)
+ vl.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/vl.c b/vl.c
-index 841fdae..5367f23 100644
+index dd895db..843b263 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -2827,6 +2827,33 @@ static void user_register_global_props(void)
-                       global_init_func, NULL, NULL);
- }
+@@ -2853,6 +2853,8 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
+     int ret;
  
-+static int do_configure_icount(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    if (tcg_enabled()) {
-+        configure_icount(opts, errp);
-+    } else {
-+        error_setg(errp, "-icount is not allowed with hardware virtualization");
-+    }
-+    return 0;
-+}
-+
-+static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
-+{
-+    if (tcg_enabled()) {
-+        qemu_tcg_configure(opts, &error_fatal);
-+    }
-+    return 0;
-+}
-+
-+static void configure_accelerators(void)
-+{
-+    qemu_opts_foreach(qemu_find_opts("icount"),
-+                      do_configure_icount, NULL, &error_fatal);
-+
-+    qemu_opts_foreach(qemu_find_opts("accel"),
-+                      do_configure_accelerator, NULL, &error_fatal);
-+}
-+
- int main(int argc, char **argv, char **envp)
- {
-     int i;
-@@ -4241,18 +4268,7 @@ int main(int argc, char **argv, char **envp)
-     qemu_spice_init();
+     if (!ac) {
++        *p_init_failed = true;
++        error_report("invalid accelerator %s", acc);
+         return 0;
+     }
+     ret = accel_init_machine(ac, current_machine);
+@@ -2907,6 +2909,9 @@ static void configure_accelerators(const char *progname)
+              */
+             if (accel_find(*tmp)) {
+                 qemu_opts_parse_noisily(qemu_find_opts("accel"), *tmp, true);
++            } else {
++                init_failed = true;
++                error_report("invalid accelerator %s", *tmp);
+             }
+         }
+     } else {
+@@ -2926,7 +2931,7 @@ static void configure_accelerators(const char *progname)
  
-     cpu_ticks_init();
--    if (icount_opts) {
--        if (!tcg_enabled()) {
--            error_report("-icount is not allowed with hardware virtualization");
--            exit(1);
--        }
--        configure_icount(icount_opts, &error_abort);
--        qemu_opts_del(icount_opts);
--    }
--
--    if (tcg_enabled()) {
--        qemu_tcg_configure(accel_opts, &error_fatal);
--    }
-+    configure_accelerators();
+     if (init_failed) {
+         AccelClass *ac = ACCEL_GET_CLASS(current_machine->accelerator);
+-        error_report("Back to %s accelerator", ac->name);
++        error_report("falling back to %s", ac->name);
+     }
  
-     if (default_net) {
-         QemuOptsList *net = qemu_find_opts("net");
+     if (!tcg_enabled() && use_icount) {
 -- 
 1.8.3.1
 
