@@ -7,74 +7,75 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D9CC43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 06:25:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 323D0C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 06:36:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93C692196E
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 06:25:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F214C222C1
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 06:36:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="0CzrvxMN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C692196E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ozlabs-ru.20150623.gappssmtp.com header.i=@ozlabs-ru.20150623.gappssmtp.com header.b="KTKBI7B4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F214C222C1
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ozlabs.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41650 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUm5O-0004S0-Nk
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 01:25:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54387)
+	id 1iUmGf-00077o-2K
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 01:36:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55288)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aik@ozlabs.ru>) id 1iUm4U-0003yo-03
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 01:24:07 -0500
+ (envelope-from <aik@ozlabs.ru>) id 1iUmFv-0006hV-1Z
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 01:35:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aik@ozlabs.ru>) id 1iUm4S-0001ly-FQ
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 01:24:05 -0500
-Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:35743)
+ (envelope-from <aik@ozlabs.ru>) id 1iUmFt-0006fw-AU
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 01:35:54 -0500
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:41163)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1iUm4R-0001lV-VL
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 01:24:04 -0500
-Received: by mail-pf1-x430.google.com with SMTP id q13so934134pff.2
- for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 22:24:03 -0800 (PST)
+ (Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1iUmFs-0006fW-US
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 01:35:53 -0500
+Received: by mail-pl1-x641.google.com with SMTP id d29so632666plj.8
+ for <qemu-devel@nongnu.org>; Tue, 12 Nov 2019 22:35:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=ozlabs-ru.20150623.gappssmtp.com; s=20150623;
- h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+ h=subject:from:to:cc:references:autocrypt:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=MZaw9kWiEHtrW3RznVu15ppN2jE4Ff2A3XBPlBE1uAo=;
- b=0CzrvxMNo/i1GVbyJ+VZ1QZvXFxvCszeDDDZhY+xVRnmpZzWb36SXpqztTM6/A892K
- pW9ChkSaKDnri2JL3WDRnP34Qv3XxOUmodE4Kfb+8NI9S1cm84j/EGeIVZm+suuIavHG
- yR1+FnUacn3tfYtyLcf8J+7/HRIG+Hku+cm/EQ6MlXVExygW1Kwxc/jKUuJUI0K3kY9g
- Xx7IPQHDbpA7BgRJR1fwJ2ZLVv/9NX/TuXRcd1tp6FGfOdamT5xMrrsZ++BKJ7XXIAl0
- InhMKB+dEp24q37S7/YpV+sQhENtMc1b53i67sh7U38BU0PEBQOme3H93g387aFih7XH
- SBAA==
+ bh=l9QAL58MXxVnJTn2itqSJ7jVOvG39E/psStpFYw/lVQ=;
+ b=KTKBI7B4Y2qXRzTDNeA/lY2FCkGUEyDEjytOCIZLm8+weIPwU+F7+2bxAvDKrFoN1y
+ AvFY9Wpppr2NfVkBhQFtxIovg8pPY4RjwGVbrPb1LS0o0M/aTOMsxT1CPbyUPTNBO980
+ /Wy+LcRgzunp+ixUPDQWlQ5g+6kjj4Yockl+LT/1yiSqdJOzf1wLxx5OAh6ttiinS6HU
+ 9iWkoLQpR20vrZO+J79sUF+yA6cdnsG2da8fc9kIucDz0SeeDDlnZ5z5euxtBE3Dha2f
+ nYUpkpXK1ziwuevayHlWItT54WQfCZdxds+TaMvfDcC6ka/km5JGyO4m9wBA+CBD0AsX
+ 0bug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ h=x-gm-message-state:subject:from:to:cc:references:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=MZaw9kWiEHtrW3RznVu15ppN2jE4Ff2A3XBPlBE1uAo=;
- b=PlVkvR86lNw30VYQCIvhnxYhPdPVRQJcUm8itY/Wzi8bmB2bC+O0QD26kabjLsvf9X
- m/ORKtfQCZat7+mCWNgqIPELO2t3XVR+UBnJRnPldJ0nmMl39rj4nqg8XAJlEsMqtGA8
- 7acwHjZu5KdmAPI7HtMderTSkPuyUVd2kJQysgwYb/cS+kRyge3wWZwdbnmzYBF0pHMO
- 3GrbRdLiaIn/EcyLllxvwN7UIw5e/JIGwbXYgQVJv75OjcNNX6ahbSrEg5EC1OgpXnjN
- g9VlBIMPn0ShfpxOweWztJ2oTtXqhOjAWkRscgIwDjzTThewwVNBOUWyBTwuX1GeJka9
- 4kKQ==
-X-Gm-Message-State: APjAAAU5USJT1ld3cyhJ6Fv0VBISMvF4zLrgqwB32TWlkwkluskJ8LxI
- 0J8spb899FVd9+TpExaK+Wz90w==
-X-Google-Smtp-Source: APXvYqyjJnYSc1tzHHz4D3oFEjVtRhC1pn6S/u9U0RTTUfbPbnx47mdt6x0cnKBvkLLmj4wdZYIxHw==
-X-Received: by 2002:a17:90a:37e4:: with SMTP id
- v91mr2628472pjb.8.1573626242602; 
- Tue, 12 Nov 2019 22:24:02 -0800 (PST)
+ bh=l9QAL58MXxVnJTn2itqSJ7jVOvG39E/psStpFYw/lVQ=;
+ b=tt7hVk21TLXFCtLQrttNJ75QVvXo37oPx32DFb8cHNkY3baSHsaTj2XSzn2pBhlLql
+ m3fqKaC6Ud+newCkFWxzjbv6z6nDKzHY+JfLP6uc0MZJqffC3YRFVpaSBMiz2XrjTqjY
+ v9mSHlfAp+uNzlARM6GkPj+xioP3UevRxoGzPOlNshmrQaLzeMXNOcpitCVZXY0aVp+s
+ LaNa7p1DQQh6Nbji7uAP7CRqyqzA50EiyI//2BNat94XW7rG9nUZ0Rw+m49U4SkNomhS
+ NkK/060uSYtN9kA87FuKXt5SxaLUUKkUr7XrGpnSlCqpzKl3Z2TKyRjNv7qAosXq/9xO
+ 8fxA==
+X-Gm-Message-State: APjAAAU1u3SYzMCqPGzm/UQ4fvi0k1fWp1y39NzyXISau523thMU6ixQ
+ Wi37KD48XlPBuBouLMNFTfk/Nw==
+X-Google-Smtp-Source: APXvYqyy3HFaDDupDqkq7binh+u3kn7v0Gms1adEoqhWXoMkVFEIPZEaJPc8biJLCWmyR4zX51EPDQ==
+X-Received: by 2002:a17:902:59ca:: with SMTP id
+ d10mr2047569plj.237.1573626951009; 
+ Tue, 12 Nov 2019 22:35:51 -0800 (PST)
 Received: from [10.61.2.175] ([122.99.82.10])
- by smtp.gmail.com with ESMTPSA id g10sm1266707pfk.79.2019.11.12.22.24.00
+ by smtp.gmail.com with ESMTPSA id 13sm1182948pgu.53.2019.11.12.22.35.48
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 12 Nov 2019 22:24:02 -0800 (PST)
+ Tue, 12 Nov 2019 22:35:50 -0800 (PST)
 Subject: Re: virtio,iommu_platform=on
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 References: <17da2769-1999-a0a3-590d-9f9bc6a9adc3@ozlabs.ru>
  <157362449788.24851.9129567746458175944@sif>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+ <e3d881ad-07e7-941a-7627-c8d9491d7029@ozlabs.ru>
 Autocrypt: addr=aik@ozlabs.ru; keydata=
  mQINBE+rT0sBEADFEI2UtPRsLLvnRf+tI9nA8T91+jDK3NLkqV+2DKHkTGPP5qzDZpRSH6mD
  EePO1JqpVuIow/wGud9xaPA5uvuVgRS1q7RU8otD+7VLDFzPRiRE4Jfr2CW89Ox6BF+q5ZPV
@@ -148,18 +149,18 @@ Autocrypt: addr=aik@ozlabs.ru; keydata=
  c7E5M+/NpslPCmYnDjs5qg0/3ihh6XuOGggZQOqrYPC3PnsNs3NxirwOkVPQgO6mXxpuifvJ
  DG9EMkK8IBXnLulqVk54kf7fE0jT/d8RTtJIA92GzsgdK2rpT1MBKKVffjRFGwN7nQVOzi4T
  XrB5p+6ML7Bd84xOEGsj/vdaXmz1esuH7BOZAGEZfLRCHJ0GVCSssg==
-Message-ID: <e3d881ad-07e7-941a-7627-c8d9491d7029@ozlabs.ru>
-Date: Wed, 13 Nov 2019 17:23:58 +1100
+Message-ID: <839811b0-bb20-1026-208f-adaf38e5ac03@ozlabs.ru>
+Date: Wed, 13 Nov 2019 17:35:47 +1100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.2
 MIME-Version: 1.0
-In-Reply-To: <157362449788.24851.9129567746458175944@sif>
+In-Reply-To: <e3d881ad-07e7-941a-7627-c8d9491d7029@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::430
+X-Received-From: 2607:f8b0:4864:20::641
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -179,43 +180,52 @@ Sender: "Qemu-devel"
 
 
 
-On 13/11/2019 16:54, Michael Roth wrote:
-> Quoting Alexey Kardashevskiy (2019-11-11 21:53:49)
->> Hi!
+On 13/11/2019 17:23, Alexey Kardashevskiy wrote:
+> 
+> 
+> On 13/11/2019 16:54, Michael Roth wrote:
+>> Quoting Alexey Kardashevskiy (2019-11-11 21:53:49)
+>>> Hi!
+>>>
+>>> I am enabling IOMMU for virtio in the pseries firmware (SLOF) and seeing
+>>> problems, one of them is SLOF does SCSI bus scan, then it stops the
+>>> virtio-scsi by clearing MMIO|IO|BUSMASTER from PCI_COMMAND (as SLOF
+>>> stopped using the devices) and when this happens, I see unassigned
+>>> memory access (see below) which happens because disabling busmaster
+>>> disables IOMMU and QEMU cannot access the rings to do some shutdown. And
+>>> when this happens, the device does not come back even if SLOF re-enables it.
+>>>
+>>> Hacking SLOF to not clear BUSMASTER makes virtio-scsi work but it is
+>>> hardly a right fix.
 >>
->> I am enabling IOMMU for virtio in the pseries firmware (SLOF) and seeing
->> problems, one of them is SLOF does SCSI bus scan, then it stops the
->> virtio-scsi by clearing MMIO|IO|BUSMASTER from PCI_COMMAND (as SLOF
->> stopped using the devices) and when this happens, I see unassigned
->> memory access (see below) which happens because disabling busmaster
->> disables IOMMU and QEMU cannot access the rings to do some shutdown. And
->> when this happens, the device does not come back even if SLOF re-enables it.
+>> I hit the same issue enabling IOMMU for virtio-blk using this branch:
 >>
->> Hacking SLOF to not clear BUSMASTER makes virtio-scsi work but it is
->> hardly a right fix.
-> 
-> I hit the same issue enabling IOMMU for virtio-blk using this branch:
-> 
->   https://github.com/mdroth/SLOF/commits/virtio-iommu
-> 
-> I just sent a tentative fix for QEMU as:
-> 
->   "virtio-pci: disable vring processing when bus-mastering is disabled"
-> 
-> It's an RFC since piggy-backing off dev->broken seems a bit hacky, but
-> it seems to fix the issue at least.
-> 
-> BTW, the SLOF branch above needs cleanup, but it's booting guests okay
-> and I was planning to post this week. Where are you at on yours? Maybe
-> we should sync up...
+>>   https://github.com/mdroth/SLOF/commits/virtio-iommu
+>>
+>> I just sent a tentative fix for QEMU as:
+>>
+>>   "virtio-pci: disable vring processing when bus-mastering is disabled"
+>>
+>> It's an RFC since piggy-backing off dev->broken seems a bit hacky, but
+>> it seems to fix the issue at least.
 
 
-Mine is here: github.com:aik/SLOF.git  virtio-iommu
+btw this fixes my issue with disabling bus master as well.
 
-Still have to debug a lot, right now virtio-net does not work :-/
 
-Want to take over? :)
-
+>>
+>> BTW, the SLOF branch above needs cleanup, but it's booting guests okay
+>> and I was planning to post this week. Where are you at on yours? Maybe
+>> we should sync up...
+> 
+> 
+> Mine is here: github.com:aik/SLOF.git  virtio-iommu
+> 
+> Still have to debug a lot, right now virtio-net does not work :-/
+> 
+> Want to take over? :)
+> 
+> 
 
 -- 
 Alexey
