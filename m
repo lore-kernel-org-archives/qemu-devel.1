@@ -2,118 +2,115 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E22C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 17:21:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DED7C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 17:39:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5C74206D9
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 17:21:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE1E9206EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 17:39:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="aI94VjV8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5C74206D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
+	dkim=pass (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="CeB20qbR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE1E9206EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUwL6-0001R8-AS
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 12:21:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50198)
+	id 1iUwby-0006Kt-6J
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 12:39:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57904)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sunilmut@microsoft.com>) id 1iUwKP-0000yo-3C
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 12:21:14 -0500
+ (envelope-from <amarkovic@wavecomp.com>) id 1iUwbH-0005sn-I4
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 12:38:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sunilmut@microsoft.com>) id 1iUwKN-00005H-LR
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 12:21:12 -0500
-Received: from mail-eopbgr720116.outbound.protection.outlook.com
- ([40.107.72.116]:26656 helo=NAM05-CO1-obe.outbound.protection.outlook.com)
+ (envelope-from <amarkovic@wavecomp.com>) id 1iUwbG-0000Sh-G0
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 12:38:39 -0500
+Received: from mail-eopbgr720100.outbound.protection.outlook.com
+ ([40.107.72.100]:58963 helo=NAM05-CO1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sunilmut@microsoft.com>)
- id 1iUwKN-0008WO-G2
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 12:21:11 -0500
+ (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
+ id 1iUwbG-0000S5-2N
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 12:38:38 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mXdnvZHGwLVrLemvWrww4/ikAPJPImcEAIHEOodTfR+WvS59LKEP2hBAjOMFmz1Q9bbnQgGcFbjsU+zQYooroEpIjBBg+QcyirhZuFIb8sW0xjaSgNBrWWiMfHOETSD/iKdZJZxUkI5h+bHRhtMdVV7VjRlUL5/kuH7NSAMaH9JdRkdPzIn1pFLaz98MkOCVLAk3CzuvFDrx+vhPnHaUOC0ETWRbxdDn88vT5YkXd1cii2SwAMV+n1YEXgh4Ul09gVnrHKXA7Fnq/LpENx47urdrG21aRrG++lFamyOQDaC8YT1hNn8bnIRbrfqdmL3HLLEr5t26/Wu2VQQPZgflWA==
+ b=iHjHhAECH9FSljA8Vfrb9oEffhiIHKNvdNM9Oz0AOXlLnBRkkIDsxkNsEg/0TcjdBymY7o6wDkZSSYCELiDnDF/3xjCULkEKZvuUDnvzkaU7kyqD87uZ9Y8cw3GqKlQ1iUxj9nsqccm2X0AX73HBpHSBIUPKb0kff2d3Vv/zaZywOLAD+eKGHmPjii17m6CqxxLz2fnOMuvA1KcLlwObnQVoyBsq6Az22pR5MWLwEwtH3R05U0ZQiQqOEGuxL0aksp05XTzZldrHpaAp//pjtu1JztzX3Xn8aTFaPalSihQCvIkc0Bqbt7p/SbAl45Goj34zaQTuMfxZw+4P+5mNGw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MJgbk87KGNjLXWQzZ2YKiogp92r41ufKE5Q7OlR8A/4=;
- b=Zg194B9gfdZrBW7JhE/PiWT5fni3NB/qoVX0PyIKs2DEoRu4V3V8WMgBL8Q6rE7DyrIEBTq4LDEdA5B720oRQyFvprRbEMM4msoLo0zy5aVJhx1XwOWHV8GsgvFDsnPSHxUXcbBpxShxAWONU6otFP/NwffCCHAQHhr6wHQ6/kpWFuGrLLGCMBsfgNHXg0VdT+cPaSw5SM2tdy+EktAtXN3IDm5NWoHokkjlTv1SarzfWh/QQSrrdz1mXMuV6iJfi4xuALXLnJ/kCN6IlPt+kIui0DELTZnM4vV3RJcZlbWDcVhjALUPAuaqCOZ3I1Tnt61sfiYwEMwRBYg0DoWSCw==
+ bh=vv87dftzMpwFSoTZxKLNCwSwWSL6cXDzWfsVHu5JDQw=;
+ b=YWieV5kk7rc5S1NL7FYLTdFncc4jsG5wHX9fJPFmgZzS9tIdDUDm8CnoXwkazKOF1l/hkJRXAO+gkvCu4v4DiLS2wOKXP5ypXx629jPUrAfepJGzTl0MXq++acpHWQPj1d3RYN3Gg76C3B/oL1MSnMEp0rEi9oLprJZJO5Y3PP5x5HSgVUYK0cekthnCHxpAWXsnvDRBY05qkWELUvN0EyGjcyK6tT7VZfQFE6ap8QxMKcyWKxHGXIMsO54L1/L65JR3wzkT+Zj3IrkYb3WKccVlWToN06hcYVHeWB1zZR9xKyGNNIqfEsN7JMfX5H1+ns7RjdCQd8brptr2xFFkeQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
+ dkim=pass header.d=wavecomp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MJgbk87KGNjLXWQzZ2YKiogp92r41ufKE5Q7OlR8A/4=;
- b=aI94VjV8d7eBk1GzJo7J2EwjNsay1HNjPE1lwgZU4kAoqfCFgSDzSOMmtKpYTsGO/rpjIx0kJ8gAHUISp5A8d86ksJC1femXKK73HxHp+BuwgqsPS9fKR3RcJVgSc47RtgU29OWCZnC16ZHH/Ym0oi0E0X0shfWtmKEdVOr4Pts=
-Received: from MW2PR2101MB1116.namprd21.prod.outlook.com (52.132.149.33) by
- MW2PR2101MB1132.namprd21.prod.outlook.com (52.132.146.17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.15; Wed, 13 Nov 2019 17:21:08 +0000
-Received: from MW2PR2101MB1116.namprd21.prod.outlook.com
- ([fe80::121:8a4f:76a8:fd9]) by MW2PR2101MB1116.namprd21.prod.outlook.com
- ([fe80::121:8a4f:76a8:fd9%6]) with mapi id 15.20.2474.008; Wed, 13 Nov 2019
- 17:21:08 +0000
-From: Sunil Muthuswamy <sunilmut@microsoft.com>
-To: Eduardo Habkost <ehabkost@redhat.com>,
- =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>, "Justin
- Terry (VM)" <juterry@microsoft.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
-Subject: RE: [PATCH] WHPX: refactor load library
-Thread-Topic: [PATCH] WHPX: refactor load library
-Thread-Index: AdWWczxfa/0gc1vPTEu6TOvflPR6ngDFYVqAAAJR6gAAK5kfgAAAd6gAAADf6PA=
-Date: Wed, 13 Nov 2019 17:21:08 +0000
-Message-ID: <MW2PR2101MB11169063EA5EEB4014000C81C0760@MW2PR2101MB1116.namprd21.prod.outlook.com>
-References: <MW2PR2101MB1116386CFE4628B6767D6CDBC07B0@MW2PR2101MB1116.namprd21.prod.outlook.com>
- <MW2PR2101MB1116C3DF422DB5E301B74AEEC0770@MW2PR2101MB1116.namprd21.prod.outlook.com>
- <20191112194738.GF3812@habkost.net>
- <017bdcd1-4058-c717-619a-d8362ac089b7@redhat.com>
- <20191113164922.GI3812@habkost.net>
-In-Reply-To: <20191113164922.GI3812@habkost.net>
+ bh=vv87dftzMpwFSoTZxKLNCwSwWSL6cXDzWfsVHu5JDQw=;
+ b=CeB20qbRZPHIrtilEr2YjVkoaQQsV9R7EMHfy/DpL+dTk5hV+FnHdl9O6qeoygDw49buVJvpT5aLVE9Xl05Q8zRfU6+7HD4hVp5GYZxWGZSswWrYWIz5zlmcPqB2mIbG3hfVSqG5svU2BZbxZtMEEz7loqIwhOFS1p1QJ3dPdCk=
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
+ BN6PR2201MB1716.namprd22.prod.outlook.com (10.161.154.152) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2430.25; Wed, 13 Nov 2019 17:38:25 +0000
+Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::302a:6e1a:7c8e:867]) by BN6PR2201MB1251.namprd22.prod.outlook.com
+ ([fe80::302a:6e1a:7c8e:867%11]) with mapi id 15.20.2430.027; Wed, 13 Nov 2019
+ 17:38:25 +0000
+From: Aleksandar Markovic <amarkovic@wavecomp.com>
+To: =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: Re: [EXTERNAL]Re: [PATCH v1 5/5] .travis.yml: drop 32 bit systems
+ from MAIN_SOFTMMU_TARGETS
+Thread-Topic: [EXTERNAL]Re: [PATCH v1 5/5] .travis.yml: drop 32 bit systems
+ from MAIN_SOFTMMU_TARGETS
+Thread-Index: AQHVmj+Cb/GAM+iMS0CnZ0mRQREU1qeJXF9H
+Date: Wed, 13 Nov 2019 17:38:25 +0000
+Message-ID: <BN6PR2201MB125185CB7DABA8AEE6888D92C6760@BN6PR2201MB1251.namprd22.prod.outlook.com>
+References: <20191113115952.775-1-alex.bennee@linaro.org>
+ <20191113115952.775-6-alex.bennee@linaro.org>,
+ <d58692dc-b94f-cd6a-c3dd-e9c76e68bdee@redhat.com>
+In-Reply-To: <d58692dc-b94f-cd6a-c3dd-e9c76e68bdee@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 authentication-results: spf=none (sender IP is )
- smtp.mailfrom=sunilmut@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:8:1cef:6b41:87e5:6afe]
+ smtp.mailfrom=amarkovic@wavecomp.com; 
+x-originating-ip: [82.117.201.26]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 362cabc8-eac7-4f73-f866-08d7685ddf54
-x-ms-traffictypediagnostic: MW2PR2101MB1132:|MW2PR2101MB1132:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MW2PR2101MB1132011E391171D46D602F17C0760@MW2PR2101MB1132.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-office365-filtering-correlation-id: fb3ff2a6-6083-4683-a85c-08d76860499b
+x-ms-traffictypediagnostic: BN6PR2201MB1716:
+x-microsoft-antispam-prvs: <BN6PR2201MB1716DE440556E6F8690E2036C6760@BN6PR2201MB1716.namprd22.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
 x-forefront-prvs: 0220D4B98D
 x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39860400002)(346002)(136003)(376002)(366004)(396003)(189003)(199004)(71200400001)(74316002)(52536014)(81156014)(71190400001)(186003)(316002)(7696005)(33656002)(86362001)(76176011)(11346002)(10090500001)(54906003)(81166006)(446003)(2906002)(25786009)(6436002)(22452003)(110136005)(4326008)(6116002)(99286004)(8676002)(6246003)(478600001)(8936002)(256004)(4744005)(46003)(6506007)(9686003)(229853002)(10290500003)(14454004)(5660300002)(66476007)(476003)(66446008)(64756008)(66556008)(102836004)(305945005)(55016002)(66946007)(8990500004)(76116006)(7736002)(486006);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MW2PR2101MB1132;
- H:MW2PR2101MB1116.namprd21.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-received-spf: None (protection.outlook.com: microsoft.com does not designate
+ SFS:(10019020)(346002)(366004)(396003)(136003)(39840400004)(376002)(199004)(189003)(54164003)(186003)(2906002)(66476007)(81156014)(4326008)(33656002)(229853002)(66446008)(6436002)(256004)(55016002)(14444005)(66556008)(9686003)(6246003)(81166006)(102836004)(26005)(8936002)(11346002)(446003)(66066001)(486006)(476003)(8676002)(64756008)(76176011)(55236004)(99286004)(6116002)(3846002)(6506007)(7696005)(74316002)(66946007)(76116006)(91956017)(7416002)(86362001)(110136005)(2501003)(54906003)(25786009)(52536014)(478600001)(4744005)(71190400001)(7736002)(305945005)(316002)(71200400001)(14454004)(5660300002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1716;
+ H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: wavecomp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 6ZY0IbPqRy43g1TOlNyWIZA31s7e3EGNFWrOkgMWJHgDO191AT0FpsHJNnKnl/CeghCkvdJFf+8So4Ty1XR9PvW8B4zh69jxzbx0AcNSNUP5dmv38NFq1axYBOFkE4kt9CfKMCAOgyR3ZDQfPCKfYfdekuSYgIlu3iGsLpHtO3jtgGiHwJyZ9pm1c8GjwY7iTd2W0rKxZw5+gteSg4Uy41y+Jme2xj0keRRUsgYwJ2325s+YMEVsoQQ4Uxl3TAMw6JnEcqaG6H854tFBaXXQMCeap/eL/EHlr3khK90iF5Gra+q+6z52YX1W9TMgMCcNjNUZeydu+CaYeExwHwxT10uyvBfW7+bhl6Ijl8VRxDYTGD+SMEIB1V1fqyUGYPJB355Qb0W/GxmYj0KDdOx9hZDLg8huZcJ2yn3GGUE9NmMxNvkjFy+ff5FC+YSDmmMs
+x-microsoft-antispam-message-info: svxgGvqYg366aYiYOfgieo/vypcdTLyDFiZW69pZbtHLa5LTf6ArBIVaHKCvUVAIZriyeSgYfKWunVAQxWNAhlMZ9ZXCwhyGIMvDi0zZ5Uq/L7sBzHqpo11IGkBd03Aaoy5WnJg28ojgkx9uRxjSgs9eVaVH3zJG6Ww6GVOFygab80TLDi/fQr/03ytmD7VDTSDr5VhDvLHs+pLaxqsNkEBAjoFUDXnIQ6F7JC/SmI0E4iK/2KPGBSMk6PISqCIjjo1mnhcqX8jJkpftGwtksJSWHo6PafzTMXiece3ZyS5Y3XiWKgxpFQh9I/jR6+ScVIm9/WRcSXhrCzPW8wqxCnozRoUY8iqSxDhml2os8lK9cKweMyjPujsFXJq7o3cX02vV/DSwQke+/juzuVd1JdCzKDZ43U9Bzw2E3sDK9OzyRMQ2APN4DjwMJD6BviR0
+x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 362cabc8-eac7-4f73-f866-08d7685ddf54
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Nov 2019 17:21:08.2430 (UTC)
+X-OriginatorOrg: wavecomp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fb3ff2a6-6083-4683-a85c-08d76860499b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Nov 2019 17:38:25.4382 (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uUdMsmy8weNXALvIOzKuULieM9I0SfNR2hETJXRdVy6uY6wpehX1uEpN2osCe+XrOVNTHeF9gP67teT4xR26WzYiTgLsvPh4Pdg8eoDmAh8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR2101MB1132
+X-MS-Exchange-CrossTenant-userprincipalname: glAjtd8rWNniA5eynlLb0pg4QgmcolnJpS1wF35THOy/SAClPPISnzeA+g5R5xpIohTFO3gvED3LBCOsXoS/zw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1716
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.72.116
+X-Received-From: 40.107.72.100
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,23 +122,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "fam@euphon.net" <fam@euphon.net>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "f4bug@amsat.org" <f4bug@amsat.org>, "cota@braap.org" <cota@braap.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-> Making it easier for other people to test WHPX would be nice.
-
-Yes, we understand the concerns and I generally agree here. I am
-trying to connect the different teams involved here (legal, SDK here)
-and connect the dots for them, to see what can be done here.
-
-> But in case this is not sorted out soon, I don't see a reason to
-> not merge WHPX changes if they are reviewed and approved by the
-> main author of that code (Justin).
->=20
-
-Justin is ready to review it, but is out for another week. Will have him
-review once he is back.
-
+> From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>=0A=
+> > -    - MAIN_SOFTMMU_TARGETS=3D"aarch64-softmmu,arm-softmmu,i386-softmmu=
+,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x8=
+6_64-softmmu"=0A=
+> > +    - MAIN_SOFTMMU_TARGETS=3D"aarch64-softmmu,mips64-softmmu,ppc64-sof=
+tmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"=0A=
+> =0A=
+> Aleksandar, since you mostly test 32-bit MIPS, are you OK we keep=0A=
+> mips-softmmu and drop mips64-softmmu here? Another job (acceptance-test)=
+=0A=
+> builds the mips64el-softmmu.=0A=
+=0A=
+Philippe, thanks for bringing this to my attention. Yes, 32-bit mips target=
+s are important to us, but, what can we do, time constraints are time const=
+raints, so I agree with Alex change, please go ahead, Alex. We can test 32-=
+bit mips targets via other acceptance tests (those that can run longer, so-=
+called "slow" group), and perhaps we can extend them to test more 32-bit mi=
+ps systems.=0A=
+=0A=
+Thanks to everybody,=0A=
+Aleksandar=
 
