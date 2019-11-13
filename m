@@ -2,123 +2,87 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,HTML_OBFUSCATE_05_10,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AABFC43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 09:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69773C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 09:57:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17F3520818
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 09:48:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23F8220818
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 09:57:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="pcjyo9VK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17F3520818
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QixUcNvO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23F8220818
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUpFw-0002r2-6I
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 04:48:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47189)
+	id 1iUpOh-000521-6I
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 04:57:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47687)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <rkagan@virtuozzo.com>) id 1iUpFG-0002KW-EI
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:47:27 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iUpNK-0004E4-Gt
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:55:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <rkagan@virtuozzo.com>) id 1iUpFE-0001tT-Ju
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:47:26 -0500
-Received: from mail-bgr052101131092.outbound.protection.outlook.com
- ([52.101.131.92]:59470 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
- id 1iUpFD-0001ru-Od
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:47:24 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Dll9iQrqB5wtuUOm69VTYtGM2Pp0zK0jiD7awj7W6dG61eMrpLd5EWo5sHC793sUMQcHatVXCvCQl7MbCZfTecsDI00MV0Ni1b8zB34OaVktj+h6db4qS4HjV2QytrbiJmUaUOWDcxp5d+C6VNtnkhXeBIrfrMtWg2slFRx+1x3wE0MQksz+F4n2nsqAK0qwsDW33PqSBLJ4ObF+fU1vGIoQ3uxfN5DuH22FnsiZ1zruB1kO08FaF5uR/JP7hweD4VZjQWWdfFgu8Y0yYQ5X6XjDIC2RFo9QyBwXKbyTcaCVJA7iFiUVzQQqZRSjMli7sVqIRRAById+uW7dInVE+A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VuJNqEKImry9VsRvZg6ctJ0Uqpoz1Qio/IQW3eYZeDE=;
- b=mTW63LC4w/08on/expfN7diHrGqFlwZqf4Y515/gC/ELHInm/FAurOtgZmUrUFzcCPF+tv9sx1wnGBS17dq2e2VorWN6kUhO3sEFXi5/ETTNHPMR+71U+5tB+jTyUZEBYRP1zObfsY/0qOrK/5tAw1KF2FEEsTr3phKd59uoa6r5CTc7TwJ1sfNWzZr4YSnHvopSyiaBmeeFU1JLrLIen8vS9tt4pWeFy4l1PAgdD3HSHsAcwauTNHnU1E+PHqGwYrjBXYLsEXSQWdMj9Ej1IvmHTV7R0Bmqy1iFi7t+2kEsoyk9S4uEUyuo/YUjIJ0yXwJnx03sLCZkEf0oTBo/Ww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VuJNqEKImry9VsRvZg6ctJ0Uqpoz1Qio/IQW3eYZeDE=;
- b=pcjyo9VKLxp+DDkm9JMoSLnc40cRkxcKtcv/aiPy/0gD5T8QE6cX05An5Be1nyg61ZHnNYm6TEv6ZXCxco2Wyjz1KvceLsj3EMYvCQHpY+FlAoKEl9OspFOjrmYYn/SpV7F8w+TC6lBstIsuv2wU1rELUSXP4pecj4i8/LBYTJo=
-Received: from VI1PR08MB4608.eurprd08.prod.outlook.com (20.178.80.22) by
- VI1PR08MB3856.eurprd08.prod.outlook.com (20.178.81.10) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2430.20; Wed, 13 Nov 2019 09:47:20 +0000
-Received: from VI1PR08MB4608.eurprd08.prod.outlook.com
- ([fe80::9465:ec66:befb:e8b5]) by VI1PR08MB4608.eurprd08.prod.outlook.com
- ([fe80::9465:ec66:befb:e8b5%3]) with mapi id 15.20.2430.027; Wed, 13 Nov 2019
- 09:47:20 +0000
-From: Roman Kagan <rkagan@virtuozzo.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: Re: [PATCH V4] target/i386/kvm: Add Hyper-V direct tlb flush support
-Thread-Topic: [PATCH V4] target/i386/kvm: Add Hyper-V direct tlb flush support
-Thread-Index: AQHVmQooMjAMF4hMsk+z5W7t6cZOKaeHnsGAgAE4ugCAAAUaAA==
-Date: Wed, 13 Nov 2019 09:47:19 +0000
-Message-ID: <20191113094716.GA57998@rkaganb.sw.ru>
-References: <20191112033427.7204-1-Tianyu.Lan@microsoft.com>
- <20191112144943.GD2397@rkaganb.sw.ru> <87eeycktur.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87eeycktur.fsf@vitty.brq.redhat.com>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mutt/1.12.1 (2019-06-15)
-mail-followup-to: Roman Kagan <rkagan@virtuozzo.com>,	Vitaly Kuznetsov
- <vkuznets@redhat.com>,	"lantianyu1986@gmail.com" <lantianyu1986@gmail.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,	"rth@twiddle.net"
- <rth@twiddle.net>,	"ehabkost@redhat.com" <ehabkost@redhat.com>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,	Tianyu Lan
- <Tianyu.Lan@microsoft.com>,	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-x-originating-ip: [185.231.240.5]
-x-clientproxiedby: HE1PR05CA0127.eurprd05.prod.outlook.com
- (2603:10a6:7:28::14) To VI1PR08MB4608.eurprd08.prod.outlook.com
- (2603:10a6:803:c0::22)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=rkagan@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e72a2892-6eeb-4454-d079-08d7681e79bd
-x-ms-traffictypediagnostic: VI1PR08MB3856:
-x-microsoft-antispam-prvs: <VI1PR08MB3856EDE137DCF2AED23FB438C9760@VI1PR08MB3856.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 0220D4B98D
-x-forefront-antispam-report: SFV:SPM;
- SFS:(10019020)(346002)(39840400004)(136003)(366004)(376002)(396003)(199004)(189003)(54094003)(71190400001)(6246003)(71200400001)(386003)(26005)(1076003)(6436002)(6486002)(6506007)(66446008)(64756008)(66476007)(66946007)(6116002)(3846002)(66556008)(5660300002)(58126008)(66066001)(316002)(86362001)(99286004)(54906003)(33656002)(6916009)(36756003)(4326008)(52116002)(478600001)(25786009)(14454004)(7736002)(305945005)(11346002)(446003)(6512007)(9686003)(2906002)(102836004)(186003)(229853002)(8676002)(8936002)(476003)(486006)(76176011)(81156014)(81166006)(256004)(14444005)(30126002);
- DIR:OUT; SFP:1501; SCL:5; SRVR:VI1PR08MB3856;
- H:VI1PR08MB4608.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-transport-forked: True
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: FcX5gGQjuxE291ov9yGODd6iSNQr/bRrC4rfL1R5bIChe07eQEjNJD5cyjK7nNn5aephmndvVkmAWQyyNtADMpMkI6VTp9uuB/mu+qo43LA7K4waH1AvzJX8loKqu4/uZEfFSmDCNSwy0AMPk186YwIc+Vrxgwk3abjIi9qJzOzqUV6y8rMKA0utwPTgAz5P4tidoLfTpr+8tZMlh2dBWsj/ljt+5zWl+jzOvySnerb4OLFMkQ5GbxVtG/MB8hSlNg0uWPuMy0EzwchTLId3Cmsr61rYocgNUJUW2xxIxQfckDlD+rf+TYz/EnYCNzPu2rdziXqiEIb/7yGNbnzMqwDAkGUc2yIDJ344fZM4yQcvNBm03G4s2YmR+CHxbUgI
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1091FA2C9698344088F3D49BC33E02D9@eurprd08.prod.outlook.com>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iUpNI-0007wZ-28
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:55:46 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:41706)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iUpNH-0007vv-P5
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:55:44 -0500
+Received: by mail-oi1-x242.google.com with SMTP id e9so1213157oif.8
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 01:55:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=GTxBpQ/5zRUvB1/VuPPs4IzWK9pcgjSztZVbTHyHaVo=;
+ b=QixUcNvOLbSUNuOv95kSddYZqVzFqbSONShaLdmbQ2+JOn0AeRgTdbxFi9FdnGBLmf
+ JOyqtT2YFqmVmclttykpzgSqGKRVazgEZ9QTTCveEHhp0yM5T/RzW8T5/J9T6FX1Jluk
+ rq7Of99SuUtToizId6pKMWR2PkM0ZVJQw2IC4xIxHftIFDKgKGFT0vhix3ePLz6F2oLB
+ oHp3PJkmX7jb+yUcl1eKORNY0lV0Oe92Q3U4oh1sMMr3cRPStQIlYlq84ncsTIB/GS3l
+ +aXZrT7Vu0Ay2uKtWIEEuZAbwcgH6sS7BtFAg3GDJkmMmVDtWcbG4ePDHCQPI1y85pfe
+ MokQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=GTxBpQ/5zRUvB1/VuPPs4IzWK9pcgjSztZVbTHyHaVo=;
+ b=d/VrGRMvQ/78F+7jQ13QgDD4wNwTYNVTijybpLZas5UqOlYXBkBFPVSrdRl55ZjFa2
+ LHNPUQewGLdaYMjbgRpYmGeqWB91DRy4GwvsVETo6wE8K8t63BEgvair+Njk/dk4+8WS
+ CMUavG+/E/h3Ad0fCH5JucOc7x5fHOY+pywwn97OUAobW9EWJGy8x8GNLah2v5WH1zYX
+ YyEgtDh/uA9m8pEthmwsPsPCMEti1bFLdNBsozv3t2rv/Fo00ujAqaMGeEW5MB+UTHSr
+ i58Y2VUT7VTTQWAlq/Y4r6L0P9swcPM+hU5YTFrKuwQQ4gLRIHAMbqZoM5gB66J0flne
+ HAjQ==
+X-Gm-Message-State: APjAAAUgfSXWC3U5bXYMaFoopA9ZudveXgZDM1VBfak8hlF7e3UELh+i
+ SkLWbXjtc4k2bUKuolD+Dw3r6zoZUOqXDeKClIg=
+X-Google-Smtp-Source: APXvYqwF7fIQYQTgwOHMerA5S+Xrwg08Jef+N4t9f6KrvrenALW3RWd6XSoHzZTuX1MAHoAJySuk3pbRYiRAkGKGVtM=
+X-Received: by 2002:a05:6808:90:: with SMTP id
+ s16mr2485980oic.62.1573638942720; 
+ Wed, 13 Nov 2019 01:55:42 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e72a2892-6eeb-4454-d079-08d7681e79bd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Nov 2019 09:47:20.0362 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TA3XZ2yHzT0on4wa6jOgA5M1umuvhOjP5RSNMJ8+CavRfQqHHwiItaeVnu7mifnyM3osgMgSczAykpzlNtWU0Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR08MB3856
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 52.101.131.92
+Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Wed, 13 Nov 2019 01:55:42
+ -0800 (PST)
+In-Reply-To: <7e108b25-565a-1047-4979-f29b3e930d1c@vivier.eu>
+References: <7fc7a64e-cb52-fab6-5739-807b40be9c1d@ziglang.org>
+ <66c80f5a-253a-722b-6f99-4e5b82078d1b@ziglang.org>
+ <CAL1e-=iemtSNCyS1O6vfe1QL5EYP5tbKhZPAYJF8YQ4USPMFww@mail.gmail.com>
+ <CAL1e-=hf6Z4cdZ-kfY=vg6fXWLX1Vo9R604AvDwxj7rFoXB2Tg@mail.gmail.com>
+ <7e108b25-565a-1047-4979-f29b3e930d1c@vivier.eu>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 13 Nov 2019 10:55:42 +0100
+Message-ID: <CAL1e-=hL1aDmw1q8sApbAyH=oGuzynpcW5M2DAaWV0rZgDtzFw@mail.gmail.com>
+Subject: [PATCH] enable translating statx syscalls on more arches
+To: Andrew Kelley <andrew@ziglang.org>
+Content-Type: multipart/alternative; boundary="0000000000002f882f0597375e88"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -130,92 +94,542 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tianyu Lan <Tianyu.Lan@microsoft.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "lantianyu1986@gmail.com" <lantianyu1986@gmail.com>,
- "rth@twiddle.net" <rth@twiddle.net>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 13, 2019 at 10:29:00AM +0100, Vitaly Kuznetsov wrote:
-> Roman Kagan <rkagan@virtuozzo.com> writes:
-> > On Tue, Nov 12, 2019 at 11:34:27AM +0800, lantianyu1986@gmail.com wrote:
-> >> From: Tianyu Lan <Tianyu.Lan@microsoft.com>
-> >> 
-> >> Hyper-V direct tlb flush targets KVM on Hyper-V guest.
-> >> Enable direct TLB flush for its guests meaning that TLB
-> >> flush hypercalls are handled by Level 0 hypervisor (Hyper-V)
-> >> bypassing KVM in Level 1. Due to the different ABI for hypercall
-> >> parameters between Hyper-V and KVM, KVM capabilities should be
-> >> hidden when enable Hyper-V direct tlb flush otherwise KVM
-> >> hypercalls may be intercepted by Hyper-V. Add new parameter
-> >> "hv-direct-tlbflush". Check expose_kvm and Hyper-V tlb flush
-> >> capability status before enabling the feature.
-> >> 
-> >> Signed-off-by: Tianyu Lan <Tianyu.Lan@microsoft.com>
-> >> ---
-> >> Change since v3:
-> >>        - Fix logic of Hyper-V passthrough mode with direct
-> >>        tlb flush.
-> >> 
-> >> Change sicne v2:
-> >>        - Update new feature description and name.
-> >>        - Change failure print log.
-> >> 
-> >> Change since v1:
-> >>        - Add direct tlb flush's Hyper-V property and use
-> >>        hv_cpuid_check_and_set() to check the dependency of tlbflush
-> >>        feature.
-> >>        - Make new feature work with Hyper-V passthrough mode.
-> >> ---
-> >>  docs/hyperv.txt   | 10 ++++++++++
-> >>  target/i386/cpu.c |  2 ++
-> >>  target/i386/cpu.h |  1 +
-> >>  target/i386/kvm.c | 24 ++++++++++++++++++++++++
-> >>  4 files changed, 37 insertions(+)
-> >> 
-> >> diff --git a/docs/hyperv.txt b/docs/hyperv.txt
-> >> index 8fdf25c829..140a5c7e44 100644
-> >> --- a/docs/hyperv.txt
-> >> +++ b/docs/hyperv.txt
-> >> @@ -184,6 +184,16 @@ enabled.
-> >>  
-> >>  Requires: hv-vpindex, hv-synic, hv-time, hv-stimer
-> >>  
-> >> +3.18. hv-direct-tlbflush
-> >> +=======================
-> >> +Enable direct TLB flush for KVM when it is running as a nested
-> >> +hypervisor on top Hyper-V. When enabled, TLB flush hypercalls from L2
-> >> +guests are being passed through to L0 (Hyper-V) for handling. Due to ABI
-> >> +differences between Hyper-V and KVM hypercalls, L2 guests will not be
-> >> +able to issue KVM hypercalls (as those could be mishanled by L0
-> >> +Hyper-V), this requires KVM hypervisor signature to be hidden.
+--0000000000002f882f0597375e88
+Content-Type: text/plain; charset="UTF-8"
+
+On Tuesday, November 12, 2019, Andrew Kelley <andrew@ziglang.org> wrote:
+
+> ping
+>
+>
+
+Hello, Andrew.
+
+I just want to advise you to send, if possible, a new version of the patch,
+addressing whatt said in his review. It is better if you send it sooner
+rather than later, given the stage of our dev cycle.
+
+For MIPS parts:
+
+Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+
+
+
+> On 10/16/19 5:01 PM, Andrew Kelley wrote:
+> > Signed-off-by: Andrew Kelley <andrew@ziglang.org>
+> > ---
+> >  linux-user/aarch64/syscall_nr.h | 13 ++++++++++
+> >  linux-user/arm/syscall_nr.h     | 38 ++++++++++++++++++++++++++++
+> >  linux-user/i386/syscall_nr.h    | 43 ++++++++++++++++++++++++++++++++
+> >  linux-user/mips/cpu_loop.c      |  6 +++++
+> >  linux-user/ppc/syscall_nr.h     | 44 +++++++++++++++++++++++++++++++++
+> >  5 files changed, 144 insertions(+)
 > >
-> > On a second thought, I wonder if this is the only conflict we have.
+> > diff --git a/linux-user/aarch64/syscall_nr.h
+> > b/linux-user/aarch64/syscall_nr.h
+> > index f00ffd7fb8..4e8d0bbb15 100644
+> > --- a/linux-user/aarch64/syscall_nr.h
+> > +++ b/linux-user/aarch64/syscall_nr.h
+> > @@ -276,5 +276,18 @@
+> >  #define TARGET_NR_membarrier 283
+> >  #define TARGET_NR_mlock2 284
+> >  #define TARGET_NR_copy_file_range 285
+> > +#define TARGET_NR_preadv2 286
+> > +#define TARGET_NR_pwritev2 287
+> > +#define TARGET_NR_pkey_mprotect 288
+> > +#define TARGET_NR_pkey_alloc 289
+> > +#define TARGET_NR_pkey_free 290
+> > +#define TARGET_NR_statx 291
+> > +#define TARGET_NR_io_pgetevents 292
+> > +#define TARGET_NR_rseq 293
+> > +#define TARGET_NR_kexec_file_load 294
+> > +#define TARGET_NR_pidfd_send_signal 424
+> > +#define TARGET_NR_io_uring_setup 425
+> > +#define TARGET_NR_io_uring_enter 426
+> > +#define TARGET_NR_io_uring_register 427
 > >
-> > In KVM, kvm_emulate_hypercall, when sees Hyper-V hypercalls enabled,
-> > just calls kvm_hv_hypercall and returns.  I.e. once the userspace
-> > enables Hyper-V hypercalls (which QEMU does when any of hv_* flags is
-> > given), KVM treats *all* hypercalls as Hyper-V ones and handles *no* KVM
-> > hypercalls.
-> 
-> Yes, but only after guest enables Hyper-V hypercalls by writing to
-> HV_X64_MSR_HYPERCALL. E.g. if you run a Linux guest and add a couple
-> hv_* flags on the QEMU command line the guest will still be able to use
-> KVM hypercalls normally becase Linux won't enable Hyper-V hypercall
-> page.
+> >  #endif
+> > diff --git a/linux-user/arm/syscall_nr.h b/linux-user/arm/syscall_nr.h
+> > index e7eda0d766..20afa3992a 100644
+> > --- a/linux-user/arm/syscall_nr.h
+> > +++ b/linux-user/arm/syscall_nr.h
+> > @@ -400,4 +400,42 @@
+> >  #define TARGET_NR_membarrier                   (389)
+> >  #define TARGET_NR_mlock2                       (390)
+> >
+> > +#define TARGET_NR_copy_file_range              (391)
+> > +#define TARGET_NR_preadv2                      (392)
+> > +#define TARGET_NR_pwritev2                     (393)
+> > +#define TARGET_NR_pkey_mprotect                (394)
+> > +#define TARGET_NR_pkey_alloc                   (395)
+> > +#define TARGET_NR_pkey_free                    (396)
+> > +#define TARGET_NR_statx                        (397)
+> > +#define TARGET_NR_rseq                         (398)
+> > +#define TARGET_NR_io_pgetevents                (399)
+> > +#define TARGET_NR_migrate_pages                (400)
+> > +
+> > +#define TARGET_NR_kexec_file_load              (401)
+> > +#define TARGET_NR_clock_gettime64              (403)
+> > +#define TARGET_NR_clock_settime64              (404)
+> > +#define TARGET_NR_clock_adjtime64              (405)
+> > +#define TARGET_NR_clock_getres_time64          (406)
+> > +#define TARGET_NR_clock_nanosleep_time64       (407)
+> > +#define TARGET_NR_timer_gettime64              (408)
+> > +#define TARGET_NR_timer_settime64              (409)
+> > +#define TARGET_NR_timerfd_gettime64            (410)
+> > +
+> > +#define TARGET_NR_timerfd_settime64            (411)
+> > +#define TARGET_NR_utimensat_time64             (412)
+> > +#define TARGET_NR_pselect6_time64              (413)
+> > +#define TARGET_NR_ppoll_time64                 (414)
+> > +#define TARGET_NR_io_pgetevents_time64         (416)
+> > +#define TARGET_NR_recvmmsg_time64              (417)
+> > +#define TARGET_NR_mq_timedsend_time64          (418)
+> > +#define TARGET_NR_mq_timedreceive_time64       (419)
+> > +#define TARGET_NR_semtimedop_time64            (420)
+> > +
+> > +#define TARGET_NR_rt_sigtimedwait_time64       (421)
+> > +#define TARGET_NR_futex_time64                 (422)
+> > +#define TARGET_NR_sched_rr_get_interval_time64 (423)
+> > +#define TARGET_NR_pidfd_send_signal            (424)
+> > +#define TARGET_NR_io_uring_setup               (425)
+> > +#define TARGET_NR_io_uring_enter               (426)
+> > +#define TARGET_NR_io_uring_register            (427)
+> >  #endif
+> > diff --git a/linux-user/i386/syscall_nr.h b/linux-user/i386/syscall_nr.h
+> > index 3234ec21c6..e641674daf 100644
+> > --- a/linux-user/i386/syscall_nr.h
+> > +++ b/linux-user/i386/syscall_nr.h
+> > @@ -383,5 +383,48 @@
+> >  #define TARGET_NR_membarrier            375
+> >  #define TARGET_NR_mlock2                376
+> >  #define TARGET_NR_copy_file_range       377
+> > +#define TARGET_NR_preadv2 378
+> > +#define TARGET_NR_pwritev2 379
+> > +#define TARGET_NR_pkey_mprotect 380
+> > +#define TARGET_NR_pkey_alloc 381
+> > +#define TARGET_NR_pkey_free 382
+> > +#define TARGET_NR_statx 383
+> > +#define TARGET_NR_arch_prctl 384
+> > +#define TARGET_NR_io_pgetevents 385
+> > +#define TARGET_NR_rseq 386
+> > +#define TARGET_NR_semget 393
+> > +#define TARGET_NR_semctl 394
+> > +#define TARGET_NR_shmget 395
+> > +#define TARGET_NR_shmctl 396
+> > +#define TARGET_NR_shmat 397
+> > +#define TARGET_NR_shmdt 398
+> > +#define TARGET_NR_msgget 399
+> > +#define TARGET_NR_msgsnd 400
+> > +#define TARGET_NR_msgrcv 401
+> > +#define TARGET_NR_msgctl 402
+> > +#define TARGET_NR_clock_gettime64 403
+> > +#define TARGET_NR_clock_settime64 404
+> > +#define TARGET_NR_clock_adjtime64 405
+> > +#define TARGET_NR_clock_getres_time64 406
+> > +#define TARGET_NR_clock_nanosleep_time64 407
+> > +#define TARGET_NR_timer_gettime64 408
+> > +#define TARGET_NR_timer_settime64 409
+> > +#define TARGET_NR_timerfd_gettime64 410
+> > +#define TARGET_NR_timerfd_settime64 411
+> > +#define TARGET_NR_utimensat_time64 412
+> > +#define TARGET_NR_pselect6_time64 413
+> > +#define TARGET_NR_ppoll_time64 414
+> > +#define TARGET_NR_io_pgetevents_time64 416
+> > +#define TARGET_NR_recvmmsg_time64 417
+> > +#define TARGET_NR_mq_timedsend_time64 418
+> > +#define TARGET_NR_mq_timedreceive_time64 419
+> > +#define TARGET_NR_semtimedop_time64 420
+> > +#define TARGET_NR_rt_sigtimedwait_time64 421
+> > +#define TARGET_NR_futex_time64 422
+> > +#define TARGET_NR_sched_rr_get_interval_time64 423
+> > +#define TARGET_NR_pidfd_send_signal 424
+> > +#define TARGET_NR_io_uring_setup 425
+> > +#define TARGET_NR_io_uring_enter 426
+> > +#define TARGET_NR_io_uring_register 427
+> >
+> >  #endif
+> > diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
+> > index 39915b3fde..044a00f531 100644
+> > --- a/linux-user/mips/cpu_loop.c
+> > +++ b/linux-user/mips/cpu_loop.c
+> > @@ -390,6 +390,12 @@ static const uint8_t mips_syscall_args[] = {
+> >          MIPS_SYS(sys_copy_file_range, 6) /* 360 */
+> >          MIPS_SYS(sys_preadv2, 6)
+> >          MIPS_SYS(sys_pwritev2, 6)
+> > +        MIPS_SYS(sys_pkey_mprotect, 4)
+> > +        MIPS_SYS(sys_pkey_alloc, 2)
+> > +        MIPS_SYS(sys_pkey_free, 1)
+> > +        MIPS_SYS(sys_statx, 5)
+> > +        MIPS_SYS(sys_rseq, 4)
+> > +        MIPS_SYS(sys_io_pgetevents, 5)
+> >  };
+> >  #  undef MIPS_SYS
+> >  # endif /* O32 */
+> > diff --git a/linux-user/ppc/syscall_nr.h b/linux-user/ppc/syscall_nr.h
+> > index b57a07b931..eea4056e3d 100644
+> > --- a/linux-user/ppc/syscall_nr.h
+> > +++ b/linux-user/ppc/syscall_nr.h
+> > @@ -398,5 +398,49 @@
+> >  #define TARGET_NR_shmget                376
+> >  #define TARGET_NR_shmctl                377
+> >  #define TARGET_NR_mlock2                378
+> > +#define TARGET_NR_copy_file_range       379
+> > +#define TARGET_NR_preadv2               380
+> > +#define TARGET_NR_pwritev2              381
+> > +#define TARGET_NR_kexec_file_load       382
+> > +#define TARGET_NR_statx                 383
+> > +#define TARGET_NR_pkey_alloc            384
+> > +#define TARGET_NR_pkey_free             385
+> > +#define TARGET_NR_pkey_mprotect         386
+> > +#define TARGET_NR_rseq                  387
+> > +#define TARGET_NR_io_pgetevents         388
+> > +#define TARGET_NR_semget                393
+> > +#define TARGET_NR_semctl                394
+> > +#define TARGET_NR_shmget                395
+> > +#define TARGET_NR_shmctl                396
+> > +#define TARGET_NR_shmat                 397
+> > +#define TARGET_NR_shmdt                 398
+> > +#define TARGET_NR_msgget                399
+> > +#define TARGET_NR_msgsnd                400
+> > +#define TARGET_NR_msgrcv                401
+> > +#define TARGET_NR_msgctl                402
+> > +#define TARGET_NR_clock_gettime64       403
+> > +#define TARGET_NR_clock_settime64       404
+> > +#define TARGET_NR_clock_adjtime64       405
+> > +#define TARGET_NR_clock_getres_time64   406
+> > +#define TARGET_NR_clock_nanosleep_time64 407
+> > +#define TARGET_NR_timer_gettime64       408
+> > +#define TARGET_NR_timer_settime64       409
+> > +#define TARGET_NR_timerfd_gettime64     410
+> > +#define TARGET_NR_timerfd_settime64     411
+> > +#define TARGET_NR_utimensat_time64      412
+> > +#define TARGET_NR_pselect6_time64       413
+> > +#define TARGET_NR_ppoll_time64          414
+> > +#define TARGET_NR_io_pgetevents_time64  416
+> > +#define TARGET_NR_recvmmsg_time64       417
+> > +#define TARGET_NR_mq_timedsend_time64   418
+> > +#define TARGET_NR_mq_timedreceive_time64 419
+> > +#define TARGET_NR_semtimedop_time64     420
+> > +#define TARGET_NR_rt_sigtimedwait_time64 421
+> > +#define TARGET_NR_futex_time64          422
+> > +#define TARGET_NR_sched_rr_get_interval_time64 423
+> > +#define TARGET_NR_pidfd_send_signal     424
+> > +#define TARGET_NR_io_uring_setup        425
+> > +#define TARGET_NR_io_uring_enter        426
+> > +#define TARGET_NR_io_uring_register     427
+> >
+> >  #endif
+> >
+>
+>
+>
 
-Ah, you're right.  There's no conflict indeed, the guest makes
-deliberate choice which hypercall ABI to use.
+--0000000000002f882f0597375e88
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Then QEMU (or KVM on its own?) should only activate this flag in evmcs
-if it sees that the guest has enabled Hyper-V hypercalls.  No need to
-hide KVM signature.
+<br><br>On Tuesday, November 12, 2019, Andrew Kelley &lt;<a href=3D"mailto:=
+andrew@ziglang.org" target=3D"_blank">andrew@ziglang.org</a>&gt; wrote:<br>=
+<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
+x #ccc solid;padding-left:1ex">ping<br>
+<br></blockquote><div><br></div><div><br></div><div>Hello, Andrew.</div><di=
+v><br></div><div>I just want to advise you to send, if possible, a new vers=
+ion of the patch, addressing whatt said in his review. It is better if you =
+send it sooner rather than later, given the stage of our dev cycle.</div><d=
+iv><br></div><div>For MIPS parts:</div><div><br></div><div>Reviewed-by: Ale=
+ksandar Markovic &lt;<a href=3D"mailto:amarkovic@wavecomp.com" target=3D"_b=
+lank">amarkovic@wavecomp.com</a>&gt;</div><div><br></div><div>=C2=A0</div><=
+blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px=
+ #ccc solid;padding-left:1ex">
+On 10/16/19 5:01 PM, Andrew Kelley wrote:<br>
+&gt; Signed-off-by: Andrew Kelley &lt;<a href=3D"mailto:andrew@ziglang.org"=
+ target=3D"_blank">andrew@ziglang.org</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 linux-user/aarch64/syscall_nr.<wbr>h | 13 ++++++++++<br>
+&gt;=C2=A0 linux-user/arm/syscall_nr.h=C2=A0 =C2=A0 =C2=A0| 38 ++++++++++++=
+++++++++++++++++<br>
+&gt;=C2=A0 linux-user/i386/syscall_nr.h=C2=A0 =C2=A0 | 43 +++++++++++++++++=
++++++++++++++<wbr>++<br>
+&gt;=C2=A0 linux-user/mips/cpu_loop.c=C2=A0 =C2=A0 =C2=A0 |=C2=A0 6 +++++<b=
+r>
+&gt;=C2=A0 linux-user/ppc/syscall_nr.h=C2=A0 =C2=A0 =C2=A0| 44 ++++++++++++=
+++++++++++++++++++<wbr>+++<br>
+&gt;=C2=A0 5 files changed, 144 insertions(+)<br>
+&gt; <br>
+&gt; diff --git a/linux-user/aarch64/syscall_n<wbr>r.h<br>
+&gt; b/linux-user/aarch64/syscall_n<wbr>r.h<br>
+&gt; index f00ffd7fb8..4e8d0bbb15 100644<br>
+&gt; --- a/linux-user/aarch64/syscall_n<wbr>r.h<br>
+&gt; +++ b/linux-user/aarch64/syscall_n<wbr>r.h<br>
+&gt; @@ -276,5 +276,18 @@<br>
+&gt;=C2=A0 #define TARGET_NR_membarrier 283<br>
+&gt;=C2=A0 #define TARGET_NR_mlock2 284<br>
+&gt;=C2=A0 #define TARGET_NR_copy_file_range 285<br>
+&gt; +#define TARGET_NR_preadv2 286<br>
+&gt; +#define TARGET_NR_pwritev2 287<br>
+&gt; +#define TARGET_NR_pkey_mprotect 288<br>
+&gt; +#define TARGET_NR_pkey_alloc 289<br>
+&gt; +#define TARGET_NR_pkey_free 290<br>
+&gt; +#define TARGET_NR_statx 291<br>
+&gt; +#define TARGET_NR_io_pgetevents 292<br>
+&gt; +#define TARGET_NR_rseq 293<br>
+&gt; +#define TARGET_NR_kexec_file_load 294<br>
+&gt; +#define TARGET_NR_pidfd_send_signal 424<br>
+&gt; +#define TARGET_NR_io_uring_setup 425<br>
+&gt; +#define TARGET_NR_io_uring_enter 426<br>
+&gt; +#define TARGET_NR_io_uring_register 427<br>
+&gt; <br>
+&gt;=C2=A0 #endif<br>
+&gt; diff --git a/linux-user/arm/syscall_nr.h b/linux-user/arm/syscall_nr.h=
+<br>
+&gt; index e7eda0d766..20afa3992a 100644<br>
+&gt; --- a/linux-user/arm/syscall_nr.h<br>
+&gt; +++ b/linux-user/arm/syscall_nr.h<br>
+&gt; @@ -400,4 +400,42 @@<br>
+&gt;=C2=A0 #define TARGET_NR_membarrier=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(389)<br>
+&gt;=C2=A0 #define TARGET_NR_mlock2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(390)<br>
+&gt; <br>
+&gt; +#define TARGET_NR_copy_file_range=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 (391)<br>
+&gt; +#define TARGET_NR_preadv2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (392)<br>
+&gt; +#define TARGET_NR_pwritev2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(393)<br>
+&gt; +#define TARGET_NR_pkey_mprotect=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 (394)<br>
+&gt; +#define TARGET_NR_pkey_alloc=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0(395)<br>
+&gt; +#define TARGET_NR_pkey_free=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 (396)<br>
+&gt; +#define TARGET_NR_statx=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 (397)<br>
+&gt; +#define TARGET_NR_rseq=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(398)<br>
+&gt; +#define TARGET_NR_io_pgetevents=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 (399)<br>
+&gt; +#define TARGET_NR_migrate_pages=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 (400)<br>
+&gt; +<br>
+&gt; +#define TARGET_NR_kexec_file_load=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 (401)<br>
+&gt; +#define TARGET_NR_clock_gettime64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 (403)<br>
+&gt; +#define TARGET_NR_clock_settime64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 (404)<br>
+&gt; +#define TARGET_NR_clock_adjtime64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 (405)<br>
+&gt; +#define TARGET_NR_clock_getres_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 (406)<br>
+&gt; +#define TARGET_NR_clock_nanosleep_time<wbr>64=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0(407)<br>
+&gt; +#define TARGET_NR_timer_gettime64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 (408)<br>
+&gt; +#define TARGET_NR_timer_settime64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 (409)<br>
+&gt; +#define TARGET_NR_timerfd_gettime64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 (410)<br>
+&gt; +<br>
+&gt; +#define TARGET_NR_timerfd_settime64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 (411)<br>
+&gt; +#define TARGET_NR_utimensat_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0(412)<br>
+&gt; +#define TARGET_NR_pselect6_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 (413)<br>
+&gt; +#define TARGET_NR_ppoll_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0(414)<br>
+&gt; +#define TARGET_NR_io_pgetevents_<wbr>time64=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0(416)<br>
+&gt; +#define TARGET_NR_recvmmsg_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 (417)<br>
+&gt; +#define TARGET_NR_mq_timedsend_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 (418)<br>
+&gt; +#define TARGET_NR_mq_timedreceive_time<wbr>64=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0(419)<br>
+&gt; +#define TARGET_NR_semtimedop_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 (420)<br>
+&gt; +<br>
+&gt; +#define TARGET_NR_rt_sigtimedwait_time<wbr>64=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0(421)<br>
+&gt; +#define TARGET_NR_futex_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0(422)<br>
+&gt; +#define TARGET_NR_sched_rr_get_interva<wbr>l_time64 (423)<br>
+&gt; +#define TARGET_NR_pidfd_send_signal=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 (424)<br>
+&gt; +#define TARGET_NR_io_uring_setup=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0(425)<br>
+&gt; +#define TARGET_NR_io_uring_enter=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0(426)<br>
+&gt; +#define TARGET_NR_io_uring_register=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 (427)<br>
+&gt;=C2=A0 #endif<br>
+&gt; diff --git a/linux-user/i386/syscall_nr.h b/linux-user/i386/syscall_nr=
+.h<br>
+&gt; index 3234ec21c6..e641674daf 100644<br>
+&gt; --- a/linux-user/i386/syscall_nr.h<br>
+&gt; +++ b/linux-user/i386/syscall_nr.h<br>
+&gt; @@ -383,5 +383,48 @@<br>
+&gt;=C2=A0 #define TARGET_NR_membarrier=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 375<br>
+&gt;=C2=A0 #define TARGET_NR_mlock2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 376<br>
+&gt;=C2=A0 #define TARGET_NR_copy_file_range=C2=A0 =C2=A0 =C2=A0 =C2=A0377<=
+br>
+&gt; +#define TARGET_NR_preadv2 378<br>
+&gt; +#define TARGET_NR_pwritev2 379<br>
+&gt; +#define TARGET_NR_pkey_mprotect 380<br>
+&gt; +#define TARGET_NR_pkey_alloc 381<br>
+&gt; +#define TARGET_NR_pkey_free 382<br>
+&gt; +#define TARGET_NR_statx 383<br>
+&gt; +#define TARGET_NR_arch_prctl 384<br>
+&gt; +#define TARGET_NR_io_pgetevents 385<br>
+&gt; +#define TARGET_NR_rseq 386<br>
+&gt; +#define TARGET_NR_semget 393<br>
+&gt; +#define TARGET_NR_semctl 394<br>
+&gt; +#define TARGET_NR_shmget 395<br>
+&gt; +#define TARGET_NR_shmctl 396<br>
+&gt; +#define TARGET_NR_shmat 397<br>
+&gt; +#define TARGET_NR_shmdt 398<br>
+&gt; +#define TARGET_NR_msgget 399<br>
+&gt; +#define TARGET_NR_msgsnd 400<br>
+&gt; +#define TARGET_NR_msgrcv 401<br>
+&gt; +#define TARGET_NR_msgctl 402<br>
+&gt; +#define TARGET_NR_clock_gettime64 403<br>
+&gt; +#define TARGET_NR_clock_settime64 404<br>
+&gt; +#define TARGET_NR_clock_adjtime64 405<br>
+&gt; +#define TARGET_NR_clock_getres_time64 406<br>
+&gt; +#define TARGET_NR_clock_nanosleep_time<wbr>64 407<br>
+&gt; +#define TARGET_NR_timer_gettime64 408<br>
+&gt; +#define TARGET_NR_timer_settime64 409<br>
+&gt; +#define TARGET_NR_timerfd_gettime64 410<br>
+&gt; +#define TARGET_NR_timerfd_settime64 411<br>
+&gt; +#define TARGET_NR_utimensat_time64 412<br>
+&gt; +#define TARGET_NR_pselect6_time64 413<br>
+&gt; +#define TARGET_NR_ppoll_time64 414<br>
+&gt; +#define TARGET_NR_io_pgetevents_time64 416<br>
+&gt; +#define TARGET_NR_recvmmsg_time64 417<br>
+&gt; +#define TARGET_NR_mq_timedsend_time64 418<br>
+&gt; +#define TARGET_NR_mq_timedreceive_time<wbr>64 419<br>
+&gt; +#define TARGET_NR_semtimedop_time64 420<br>
+&gt; +#define TARGET_NR_rt_sigtimedwait_time<wbr>64 421<br>
+&gt; +#define TARGET_NR_futex_time64 422<br>
+&gt; +#define TARGET_NR_sched_rr_get_interva<wbr>l_time64 423<br>
+&gt; +#define TARGET_NR_pidfd_send_signal 424<br>
+&gt; +#define TARGET_NR_io_uring_setup 425<br>
+&gt; +#define TARGET_NR_io_uring_enter 426<br>
+&gt; +#define TARGET_NR_io_uring_register 427<br>
+&gt; <br>
+&gt;=C2=A0 #endif<br>
+&gt; diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c<b=
+r>
+&gt; index 39915b3fde..044a00f531 100644<br>
+&gt; --- a/linux-user/mips/cpu_loop.c<br>
+&gt; +++ b/linux-user/mips/cpu_loop.c<br>
+&gt; @@ -390,6 +390,12 @@ static const uint8_t mips_syscall_args[] =3D {<br=
+>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_SYS(sys_copy_file_range, 6) /* =
+360 */<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_SYS(sys_preadv2, 6)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_SYS(sys_pwritev2, 6)<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_SYS(sys_pkey_mprotect, 4)<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_SYS(sys_pkey_alloc, 2)<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_SYS(sys_pkey_free, 1)<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_SYS(sys_statx, 5)<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_SYS(sys_rseq, 4)<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 MIPS_SYS(sys_io_pgetevents, 5)<br>
+&gt;=C2=A0 };<br>
+&gt;=C2=A0 #=C2=A0 undef MIPS_SYS<br>
+&gt;=C2=A0 # endif /* O32 */<br>
+&gt; diff --git a/linux-user/ppc/syscall_nr.h b/linux-user/ppc/syscall_nr.h=
+<br>
+&gt; index b57a07b931..eea4056e3d 100644<br>
+&gt; --- a/linux-user/ppc/syscall_nr.h<br>
+&gt; +++ b/linux-user/ppc/syscall_nr.h<br>
+&gt; @@ -398,5 +398,49 @@<br>
+&gt;=C2=A0 #define TARGET_NR_shmget=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 376<br>
+&gt;=C2=A0 #define TARGET_NR_shmctl=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 377<br>
+&gt;=C2=A0 #define TARGET_NR_mlock2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 378<br>
+&gt; +#define TARGET_NR_copy_file_range=C2=A0 =C2=A0 =C2=A0 =C2=A0379<br>
+&gt; +#define TARGET_NR_preadv2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0380<br>
+&gt; +#define TARGET_NR_pwritev2=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 381<br>
+&gt; +#define TARGET_NR_kexec_file_load=C2=A0 =C2=A0 =C2=A0 =C2=A0382<br>
+&gt; +#define TARGET_NR_statx=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0383<br>
+&gt; +#define TARGET_NR_pkey_alloc=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ 384<br>
+&gt; +#define TARGET_NR_pkey_free=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0385<br>
+&gt; +#define TARGET_NR_pkey_mprotect=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0386<=
+br>
+&gt; +#define TARGET_NR_rseq=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 387<br>
+&gt; +#define TARGET_NR_io_pgetevents=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0388<=
+br>
+&gt; +#define TARGET_NR_semget=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 393<br>
+&gt; +#define TARGET_NR_semctl=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 394<br>
+&gt; +#define TARGET_NR_shmget=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 395<br>
+&gt; +#define TARGET_NR_shmctl=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 396<br>
+&gt; +#define TARGET_NR_shmat=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0397<br>
+&gt; +#define TARGET_NR_shmdt=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0398<br>
+&gt; +#define TARGET_NR_msgget=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 399<br>
+&gt; +#define TARGET_NR_msgsnd=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 400<br>
+&gt; +#define TARGET_NR_msgrcv=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 401<br>
+&gt; +#define TARGET_NR_msgctl=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 402<br>
+&gt; +#define TARGET_NR_clock_gettime64=C2=A0 =C2=A0 =C2=A0 =C2=A0403<br>
+&gt; +#define TARGET_NR_clock_settime64=C2=A0 =C2=A0 =C2=A0 =C2=A0404<br>
+&gt; +#define TARGET_NR_clock_adjtime64=C2=A0 =C2=A0 =C2=A0 =C2=A0405<br>
+&gt; +#define TARGET_NR_clock_getres_time64=C2=A0 =C2=A0406<br>
+&gt; +#define TARGET_NR_clock_nanosleep_time<wbr>64 407<br>
+&gt; +#define TARGET_NR_timer_gettime64=C2=A0 =C2=A0 =C2=A0 =C2=A0408<br>
+&gt; +#define TARGET_NR_timer_settime64=C2=A0 =C2=A0 =C2=A0 =C2=A0409<br>
+&gt; +#define TARGET_NR_timerfd_gettime64=C2=A0 =C2=A0 =C2=A0410<br>
+&gt; +#define TARGET_NR_timerfd_settime64=C2=A0 =C2=A0 =C2=A0411<br>
+&gt; +#define TARGET_NR_utimensat_time64=C2=A0 =C2=A0 =C2=A0 412<br>
+&gt; +#define TARGET_NR_pselect6_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0413<br>
+&gt; +#define TARGET_NR_ppoll_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 414<=
+br>
+&gt; +#define TARGET_NR_io_pgetevents_<wbr>time64=C2=A0 416<br>
+&gt; +#define TARGET_NR_recvmmsg_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0417<br>
+&gt; +#define TARGET_NR_mq_timedsend_time64=C2=A0 =C2=A0418<br>
+&gt; +#define TARGET_NR_mq_timedreceive_time<wbr>64 419<br>
+&gt; +#define TARGET_NR_semtimedop_time64=C2=A0 =C2=A0 =C2=A0420<br>
+&gt; +#define TARGET_NR_rt_sigtimedwait_time<wbr>64 421<br>
+&gt; +#define TARGET_NR_futex_time64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 422<=
+br>
+&gt; +#define TARGET_NR_sched_rr_get_interva<wbr>l_time64 423<br>
+&gt; +#define TARGET_NR_pidfd_send_signal=C2=A0 =C2=A0 =C2=A0424<br>
+&gt; +#define TARGET_NR_io_uring_setup=C2=A0 =C2=A0 =C2=A0 =C2=A0 425<br>
+&gt; +#define TARGET_NR_io_uring_enter=C2=A0 =C2=A0 =C2=A0 =C2=A0 426<br>
+&gt; +#define TARGET_NR_io_uring_register=C2=A0 =C2=A0 =C2=A0427<br>
+&gt; <br>
+&gt;=C2=A0 #endif<br>
+&gt; <br>
+<br>
+<br>
+</blockquote>
 
-Roman.
+--0000000000002f882f0597375e88--
 
