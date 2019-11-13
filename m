@@ -4,62 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5437C17440
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 01:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B773C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 03:32:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A5AC222D4
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 01:56:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A5AC222D4
+	by mail.kernel.org (Postfix) with ESMTPS id 4F9BA222BD
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 03:32:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F9BA222BD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUhtG-0008E7-Ki
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 20:56:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58732)
+	id 1iUjOR-00054M-Fs
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 22:32:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39991)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yan.y.zhao@intel.com>) id 1iUhsH-0007do-U7
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 20:55:15 -0500
+ (envelope-from <yan.y.zhao@intel.com>) id 1iUjNl-0004ey-9K
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 22:31:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yan.y.zhao@intel.com>) id 1iUhsF-0007pv-I0
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 20:55:12 -0500
-Received: from mga02.intel.com ([134.134.136.20]:26878)
+ (envelope-from <yan.y.zhao@intel.com>) id 1iUjNg-0001Rl-NV
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 22:31:48 -0500
+Received: from mga09.intel.com ([134.134.136.24]:54071)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <yan.y.zhao@intel.com>)
- id 1iUhsF-0007mD-8U
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 20:55:11 -0500
+ id 1iUjNe-0001PW-UP
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 22:31:44 -0500
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 12 Nov 2019 17:55:02 -0800
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 12 Nov 2019 19:31:38 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,298,1569308400"; d="scan'208";a="355336868"
+X-IronPort-AV: E=Sophos;i="5.68,299,1569308400"; d="scan'208";a="235118128"
 Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
  ([10.239.13.9])
- by orsmga004.jf.intel.com with ESMTP; 12 Nov 2019 17:54:58 -0800
-Date: Tue, 12 Nov 2019 20:46:56 -0500
+ by fmsmga002.fm.intel.com with ESMTP; 12 Nov 2019 19:31:34 -0800
+Date: Tue, 12 Nov 2019 22:23:32 -0500
 From: Yan Zhao <yan.y.zhao@intel.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v9 QEMU 13/15] vfio: Add vfio_listener_log_sync to mark
- dirty pages
-Message-ID: <20191113014656.GA18001@joy-OptiPlex-7040>
-References: <1573578324-8389-1-git-send-email-kwankhede@nvidia.com>
- <1573578324-8389-14-git-send-email-kwankhede@nvidia.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v9 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+Message-ID: <20191113032332.GB18001@joy-OptiPlex-7040>
+References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
+ <1573578220-7530-2-git-send-email-kwankhede@nvidia.com>
+ <20191112153005.53bf324c@x1.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1573578324-8389-14-git-send-email-kwankhede@nvidia.com>
+In-Reply-To: <20191112153005.53bf324c@x1.home>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 134.134.136.20
+X-Received-From: 134.134.136.24
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,6 +76,7 @@ Reply-To: Yan Zhao <yan.y.zhao@intel.com>
 Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
  Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
  "cjia@nvidia.com" <cjia@nvidia.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
  Ziye" <ziye.yang@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  "cohuck@redhat.com" <cohuck@redhat.com>,
@@ -82,8 +84,7 @@ Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>, "Tian,
  "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang,
  Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
  "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "eauger@redhat.com" <eauger@redhat.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
  "felipe@nutanix.com" <felipe@nutanix.com>,
  "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Liu,
  Changpeng" <changpeng.liu@intel.com>, "Ken.Xue@amd.com" <Ken.Xue@amd.com>
@@ -91,185 +92,303 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 13, 2019 at 01:05:22AM +0800, Kirti Wankhede wrote:
-> vfio_listener_log_sync gets list of dirty pages from container using
-> VFIO_IOMMU_GET_DIRTY_BITMAP ioctl and mark those pages dirty when all
-> devices are stopped and saving state.
-> Return early for the RAM block section of mapped MMIO region.
+On Wed, Nov 13, 2019 at 06:30:05AM +0800, Alex Williamson wrote:
+> On Tue, 12 Nov 2019 22:33:36 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
 > 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  hw/vfio/common.c     | 103 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/trace-events |   1 +
->  2 files changed, 104 insertions(+)
+> > - Defined MIGRATION region type and sub-type.
+> > - Used 3 bits to define VFIO device states.
+> >     Bit 0 => _RUNNING
+> >     Bit 1 => _SAVING
+> >     Bit 2 => _RESUMING
+> >     Combination of these bits defines VFIO device's state during migration
+> >     _RUNNING => Normal VFIO device running state. When its reset, it
+> > 		indicates _STOPPED state. when device is changed to
+> > 		_STOPPED, driver should stop device before write()
+> > 		returns.
+> >     _SAVING | _RUNNING => vCPUs are running, VFIO device is running but
+> >                           start saving state of device i.e. pre-copy state
+> >     _SAVING  => vCPUs are stopped, VFIO device should be stopped, and
 > 
-> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-> index ade9839c28a3..66f1c64bf074 100644
-> --- a/hw/vfio/common.c
-> +++ b/hw/vfio/common.c
-> @@ -29,6 +29,7 @@
->  #include "hw/vfio/vfio.h"
->  #include "exec/address-spaces.h"
->  #include "exec/memory.h"
-> +#include "exec/ram_addr.h"
->  #include "hw/hw.h"
->  #include "qemu/error-report.h"
->  #include "qemu/main-loop.h"
-> @@ -38,6 +39,7 @@
->  #include "sysemu/reset.h"
->  #include "trace.h"
->  #include "qapi/error.h"
-> +#include "migration/migration.h"
->  
->  VFIOGroupList vfio_group_list =
->      QLIST_HEAD_INITIALIZER(vfio_group_list);
-> @@ -288,6 +290,28 @@ const MemoryRegionOps vfio_region_ops = {
->  };
->  
->  /*
-> + * Device state interfaces
-> + */
-> +
-> +static bool vfio_devices_are_stopped_and_saving(void)
-> +{
-> +    VFIOGroup *group;
-> +    VFIODevice *vbasedev;
-> +
-> +    QLIST_FOREACH(group, &vfio_group_list, next) {
-> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
-> +            if ((vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) &&
-> +                !(vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING)) {
-> +                continue;
-> +            } else {
-> +                return false;
-> +            }
-> +        }
-> +    }
-> +    return true;
-> +}
-> +
-> +/*
->   * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x86
->   */
->  static int vfio_dma_unmap(VFIOContainer *container,
-> @@ -813,9 +837,88 @@ static void vfio_listener_region_del(MemoryListener *listener,
->      }
->  }
->  
-> +static int vfio_get_dirty_bitmap(VFIOContainer *container,
-> +                                 MemoryRegionSection *section)
-> +{
-> +    struct vfio_iommu_type1_dirty_bitmap range;
-> +    uint64_t bitmap_size;
-> +    int ret;
-> +
-> +    range.argsz = sizeof(range);
-> +
-> +    if (memory_region_is_iommu(section->mr)) {
-> +        VFIOGuestIOMMU *giommu;
-> +        IOMMUTLBEntry iotlb;
-> +
-> +        QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
-> +            if (MEMORY_REGION(giommu->iommu) == section->mr &&
-> +                giommu->n.start == section->offset_within_region) {
-> +                break;
-> +            }
-> +        }
-> +
-> +        if (!giommu) {
-> +            return -EINVAL;
-> +        }
-> +
-> +        iotlb = address_space_get_iotlb_entry(container->space->as,
-> +                       TARGET_PAGE_ALIGN(section->offset_within_address_space),
-> +                       true, MEMTXATTRS_UNSPECIFIED);
-> +        range.iova = iotlb.iova + giommu->iommu_offset;
-> +        range.size = iotlb.addr_mask + 1;
-> +    } else {
-> +        range.iova = TARGET_PAGE_ALIGN(section->offset_within_address_space);
-> +        range.size = int128_get64(section->size);
-> +    }
-> +
-> +    bitmap_size = BITS_TO_LONGS(range.size >> TARGET_PAGE_BITS) *
-> +                                                             sizeof(uint64_t);
-> +
-> +    range.bitmap = g_try_malloc0(bitmap_size);
-> +    if (!range.bitmap) {
-> +        error_report("%s: Error allocating bitmap buffer of size 0x%lx",
-> +                     __func__, bitmap_size);
-> +        return -ENOMEM;
-> +    }
-> +
-> +    range.bitmap_size = bitmap_size;
-> +
-> +    ret = ioctl(container->fd, VFIO_IOMMU_GET_DIRTY_BITMAP, &range);
-> +
-From the implementation of ioctl VFIO_IOMMU_GET_DIRTY_BITMAP,
-this range.bitmap is indexed by iova, right?
-so if viommu is on, why cpu_physical_memory_set_dirty_lebitmap can be 
-called directly here without any viommu translation?
+> s/should/must/
+> 
+> >                 save device state,i.e. stop-n-copy state
+> >     _RESUMING => VFIO device resuming state.
+> >     _SAVING | _RESUMING and _RUNNING | _RESUMING => Invalid states
+> 
+> A table might be useful here and in the uapi header to indicate valid
+> states:
+> 
+> | _RESUMING | _SAVING | _RUNNING | Description
+> +-----------+---------+----------+------------------------------------------
+> |     0     |    0    |     0    | Stopped, not saving or resuming (a)
+> +-----------+---------+----------+------------------------------------------
+> |     0     |    0    |     1    | Running, default state
+> +-----------+---------+----------+------------------------------------------
+> |     0     |    1    |     0    | Stopped, migration interface in save mode
+> +-----------+---------+----------+------------------------------------------
+> |     0     |    1    |     1    | Running, save mode interface, iterative
+> +-----------+---------+----------+------------------------------------------
+> |     1     |    0    |     0    | Stopped, migration resume interface active
+> +-----------+---------+----------+------------------------------------------
+> |     1     |    0    |     1    | Invalid (b)
+> +-----------+---------+----------+------------------------------------------
+> |     1     |    1    |     0    | Invalid (c)
+> +-----------+---------+----------+------------------------------------------
+> |     1     |    1    |     1    | Invalid (d)
+> 
+> I think we need to consider whether we define (a) as generally
+> available, for instance we might want to use it for diagnostics or a
+> fatal error condition outside of migration.
+> 
+> Are there hidden assumptions between state transitions here or are
+> there specific next possible state diagrams that we need to include as
+> well?
+> 
+> I'm curious if Intel agrees with the states marked invalid with their
+> push for post-copy support.
+> 
+hi Alex and Kirti,
+Actually, for postcopy, I think we anyway need an extra POSTCOPY state
+introduced. Reasons as below:
+- in the target side, _RSESUMING state is set in the beginning of
+  migration. It cannot be used as a state to inform device of that
+  currently it's in postcopy state and device DMAs are to be trapped and
+  pre-faulted.
+  we also cannot use state (_RESUMING + _RUNNING) as an indicator of
+  postcopy, because before device & vm running in target side, some device
+  state are already loaded (e.g. page tables, pending workloads),
+  target side can do pre-pagefault at that period before target vm up.
+- in the source side, after device is stopped, postcopy needs saving
+  device state only (as compared to device state + remaining dirty
+  pages in precopy). state (!_RUNNING + _SAVING) here again cannot
+  differentiate precopy and postcopy here.
 
-> +    if (!ret) {
-> +        cpu_physical_memory_set_dirty_lebitmap((uint64_t *)range.bitmap,
-> +                       TARGET_PAGE_ALIGN(section->offset_within_address_space),
-> +                       bitmap_size >> TARGET_PAGE_BITS);
-> +    } else {
-> +        error_report("VFIO_IOMMU_GET_DIRTY_BITMAP: %d %d", ret, errno);
-> +    }
-> +
-> +    trace_vfio_get_dirty_bitmap(container->fd, range.iova, range.size,
-> +                                bitmap_size);
-> +
-> +    g_free(range.bitmap);
-> +    return ret;
-> +}
-> +
-> +static void vfio_listerner_log_sync(MemoryListener *listener,
-> +        MemoryRegionSection *section)
-> +{
-> +    VFIOContainer *container = container_of(listener, VFIOContainer, listener);
-> +
-> +    if (memory_region_is_ram_device(section->mr)) {
-> +        return;
-> +    }
-> +
-how about for those devices who need to sync dirty bitmap in RUNNING and
-SAVING state?
-> +    if (vfio_devices_are_stopped_and_saving()) {
-> +
-> +        vfio_get_dirty_bitmap(container, section);
-> +    }
-> +}
-> +
-when viommu is on, the address space registered for this MemoryListener
-is from VTDAddressSpace,
-in this address space, listener->log_sync(listener, &mrs) would not be
-called for lacking of dirty_log_mask.
+> >     Bits 3 - 31 are reserved for future use. User should perform
+> >     read-modify-write operation on this field.
+> > - Defined vfio_device_migration_info structure which will be placed at 0th
+> >   offset of migration region to get/set VFIO device related information.
+> >   Defined members of structure and usage on read/write access:
+> >     * device_state: (read/write)
+> >         To convey VFIO device state to be transitioned to. Only 3 bits are
+> > 	used as of now, Bits 3 - 31 are reserved for future use.
+> >     * pending bytes: (read only)
+> >         To get pending bytes yet to be migrated for VFIO device.
+> >     * data_offset: (read only)
+> >         To get data offset in migration region from where data exist
+> > 	during _SAVING and from where data should be written by user space
+> > 	application during _RESUMING state.
+> >     * data_size: (read/write)
+> >         To get and set size in bytes of data copied in migration region
+> > 	during _SAVING and _RESUMING state.
+> > 
+> > Migration region looks like:
+> >  ------------------------------------------------------------------
+> > |vfio_device_migration_info|    data section                      |
+> > |                          |     ///////////////////////////////  |
+> >  ------------------------------------------------------------------
+> >  ^                              ^
+> >  offset 0-trapped part        data_offset
+> > 
+> > Structure vfio_device_migration_info is always followed by data section
+> > in the region, so data_offset will always be non-0. Offset from where data
+> > to be copied is decided by kernel driver, data section can be trapped or
+> > mapped depending on how kernel driver defines data section.
+> > Data section partition can be defined as mapped by sparse mmap capability.
+> > If mmapped, then data_offset should be page aligned, where as initial
+> > section which contain vfio_device_migration_info structure might not end
+> > at offset which is page aligned.
+> > Vendor driver should decide whether to partition data section and how to
+> > partition the data section. Vendor driver should return data_offset
+> > accordingly.
+> > 
+> > For user application, data is opaque. User should write data in the same
+> > order as received.
+> > 
+> > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > ---
+> >  include/uapi/linux/vfio.h | 108 ++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 108 insertions(+)
+> > 
+> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> > index 9e843a147ead..35b09427ad9f 100644
+> > --- a/include/uapi/linux/vfio.h
+> > +++ b/include/uapi/linux/vfio.h
+> > @@ -305,6 +305,7 @@ struct vfio_region_info_cap_type {
+> >  #define VFIO_REGION_TYPE_PCI_VENDOR_MASK	(0xffff)
+> >  #define VFIO_REGION_TYPE_GFX                    (1)
+> >  #define VFIO_REGION_TYPE_CCW			(2)
+> > +#define VFIO_REGION_TYPE_MIGRATION              (3)
+> >  
+> >  /* sub-types for VFIO_REGION_TYPE_PCI_* */
+> >  
+> > @@ -379,6 +380,113 @@ struct vfio_region_gfx_edid {
+> >  /* sub-types for VFIO_REGION_TYPE_CCW */
+> >  #define VFIO_REGION_SUBTYPE_CCW_ASYNC_CMD	(1)
+> >  
+> > +/* sub-types for VFIO_REGION_TYPE_MIGRATION */
+> > +#define VFIO_REGION_SUBTYPE_MIGRATION           (1)
+> > +
+> > +/*
+> > + * Structure vfio_device_migration_info is placed at 0th offset of
+> > + * VFIO_REGION_SUBTYPE_MIGRATION region to get/set VFIO device related migration
+> > + * information. Field accesses from this structure are only supported at their
+> > + * native width and alignment, otherwise the result is undefined and vendor
+> > + * drivers should return an error.
+> > + *
+> > + * device_state: (read/write)
+> > + *      To indicate vendor driver the state VFIO device should be transitioned
+> > + *      to. If device state transition fails, write on this field return error.
+> > + *      It consists of 3 bits:
+> > + *      - If bit 0 set, indicates _RUNNING state. When its reset, that indicates
+> 
+> Let's use set/cleared or 1/0 to indicate bit values, 'reset' is somewhat
+> ambiguous.
+> 
+> > + *        _STOPPED state. When device is changed to _STOPPED, driver should stop
+> > + *        device before write() returns.
+> > + *      - If bit 1 set, indicates _SAVING state. When set, that indicates driver
+> > + *        should start gathering device state information which will be provided
+> > + *        to VFIO user space application to save device's state.
+> > + *      - If bit 2 set, indicates _RESUMING state. When set, that indicates
+> > + *        prepare to resume device, data provided through migration region
+> > + *        should be used to resume device.
+> > + *      Bits 3 - 31 are reserved for future use. User should perform
+> > + *      read-modify-write operation on this field.
+> > + *      _SAVING and _RESUMING bits set at the same time is invalid state.
+> > + *	Similarly _RUNNING and _RESUMING bits set is invalid state.
+> > + *
+> > + * pending bytes: (read only)
+> > + *      Number of pending bytes yet to be migrated from vendor driver
+> > + *
+> > + * data_offset: (read only)
+> > + *      User application should read data_offset in migration region from where
+> > + *      user application should read device data during _SAVING state or write
+> > + *      device data during _RESUMING state. See below for detail of sequence to
+> > + *      be followed.
+> > + *
+> > + * data_size: (read/write)
+> > + *      User application should read data_size to get size of data copied in
+> > + *      bytes in migration region during _SAVING state and write size of data
+> > + *      copied in bytes in migration region during _RESUMING state.
+> > + *
+> > + * Migration region looks like:
+> > + *  ------------------------------------------------------------------
+> > + * |vfio_device_migration_info|    data section                      |
+> > + * |                          |     ///////////////////////////////  |
+> > + * ------------------------------------------------------------------
+> > + *   ^                              ^
+> > + *  offset 0-trapped part        data_offset
+> > + *
+> > + * Structure vfio_device_migration_info is always followed by data section in
+> > + * the region, so data_offset will always be non-0. Offset from where data is
+> > + * copied is decided by kernel driver, data section can be trapped or mapped
+> > + * or partitioned, depending on how kernel driver defines data section.
+> > + * Data section partition can be defined as mapped by sparse mmap capability.
+> > + * If mmapped, then data_offset should be page aligned, where as initial section
+> > + * which contain vfio_device_migration_info structure might not end at offset
+> > + * which is page aligned.
+> 
+> "The user is not required to to access via mmap regardless of the
+> region mmap capabilities."
+>
+But once the user decides to access via mmap, it has to read data of
+data_size each time, otherwise the vendor driver has no idea of how many
+data are already read from user. Agree?
 
-If listener->log_sync still needs to be called, some special handlings
-are required.
+> > + * Vendor driver should decide whether to partition data section and how to
+> > + * partition the data section. Vendor driver should return data_offset
+> > + * accordingly.
+> > + *
+> > + * Sequence to be followed for _SAVING|_RUNNING device state or pre-copy phase
+> > + * and for _SAVING device state or stop-and-copy phase:
+> > + * a. read pending_bytes. If pending_bytes > 0, go through below steps.
+> > + * b. read data_offset, indicates kernel driver to write data to staging buffer.
+> > + *    Kernel driver should return this read operation only after writing data to
+> > + *    staging buffer is done.
+May I know under what condition this data_offset will be changed per
+each iteration from a-f ?
 
->  static const MemoryListener vfio_memory_listener = {
->      .region_add = vfio_listener_region_add,
->      .region_del = vfio_listener_region_del,
-> +    .log_sync = vfio_listerner_log_sync,
->  };
->  
+> 
+> "staging buffer" implies a vendor driver implementation, perhaps we
+> could just state that data is available from (region + data_offset) to
+> (region + data_offset + data_size) upon return of this read operation.
+> 
+> > + * c. read data_size, amount of data in bytes written by vendor driver in
+> > + *    migration region.
+> > + * d. read data_size bytes of data from data_offset in the migration region.
+> > + * e. process data.
+> > + * f. Loop through a to e. Next read on pending_bytes indicates that read data
+> > + *    operation from migration region for previous iteration is done.
+> 
+> I think this indicate that step (f) should be to read pending_bytes, the
+> read sequence is not complete until this step.  Optionally the user can
+> then proceed to step (b).  There are no read side-effects of (a) afaict.
+> 
+> Is the use required to reach pending_bytes == 0 before changing
+> device_state, particularly transitioning to !_RUNNING?  Presumably the
+> user can exit this sequence at any time by clearing _SAVING.
+> 
+> > + *
+> > + * Sequence to be followed while _RESUMING device state:
+> > + * While data for this device is available, repeat below steps:
+> > + * a. read data_offset from where user application should write data.
+before proceed to step b, need to read data_size from vendor driver to determine
+the max len of data to write. I think it's necessary in such a condition
+that source vendor driver and target vendor driver do not offer data sections of
+the same size. e.g. in source side, the data section is of size 100M,
+but in target side, the data section is only of 50M size.
+rather than simply fail, loop and write seems better.
+
 Thanks
 Yan
-
->  static void vfio_listener_release(VFIOContainer *container)
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index ac065b559f4e..0dd1f2ffe648 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -160,3 +160,4 @@ vfio_save_complete_precopy(char *name) " (%s)"
->  vfio_load_device_config_state(char *name) " (%s)"
->  vfio_load_state(char *name, uint64_t data) " (%s) data 0x%"PRIx64
->  vfio_load_state_device_data(char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
-> +vfio_get_dirty_bitmap(int fd, uint64_t iova, uint64_t size, uint64_t bitmap_size) "container fd=%d, iova=0x%"PRIx64" size= 0x%"PRIx64" bitmap_size=0x%"PRIx64
-> -- 
-> 2.7.0
+> > + * b. write data of data_size to migration region from data_offset.
+> > + * c. write data_size which indicates vendor driver that data is written in
+> > + *    staging buffer. Vendor driver should read this data from migration
+> > + *    region and resume device's state.
+> 
+> The device defaults to _RUNNING state, so a prerequisite is to set
+> _RESUMING and clear _RUNNING, right?
+> 
+> > + *
+> > + * For user application, data is opaque. User should write data in the same
+> > + * order as received.
+> > + */
+> > +
+> > +struct vfio_device_migration_info {
+> > +	__u32 device_state;         /* VFIO device state */
+> > +#define VFIO_DEVICE_STATE_RUNNING   (1 << 0)
+> > +#define VFIO_DEVICE_STATE_SAVING    (1 << 1)
+> > +#define VFIO_DEVICE_STATE_RESUMING  (1 << 2)
+> > +#define VFIO_DEVICE_STATE_MASK      (VFIO_DEVICE_STATE_RUNNING | \
+> > +				     VFIO_DEVICE_STATE_SAVING |  \
+> > +				     VFIO_DEVICE_STATE_RESUMING)
+> > +
+> > +#define VFIO_DEVICE_STATE_INVALID_CASE1    (VFIO_DEVICE_STATE_SAVING | \
+> > +					    VFIO_DEVICE_STATE_RESUMING)
+> > +
+> > +#define VFIO_DEVICE_STATE_INVALID_CASE2    (VFIO_DEVICE_STATE_RUNNING | \
+> > +					    VFIO_DEVICE_STATE_RESUMING)
+> 
+> These seem difficult to use, maybe we just need a
+> VFIO_DEVICE_STATE_VALID macro?
+> 
+> #define VFIO_DEVICE_STATE_VALID(state) \
+>   (state & VFIO_DEVICE_STATE_RESUMING ? \
+>   (state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_RESUMING : 1)
+> 
+> Thanks,
+> Alex
+> 
+> > +	__u32 reserved;
+> > +	__u64 pending_bytes;
+> > +	__u64 data_offset;
+> > +	__u64 data_size;
+> > +} __attribute__((packed));
+> > +
+> >  /*
+> >   * The MSIX mappable capability informs that MSIX data of a BAR can be mmapped
+> >   * which allows direct access to non-MSIX registers which happened to be within
 > 
 
