@@ -2,113 +2,92 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B2AEC432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 18:55:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8032FC432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3929220658
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 18:55:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC7EE206D4
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="ElU5uCVh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3929220658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=microsoft.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LO7kwe1X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC7EE206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUxny-0003S5-Vh
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 13:55:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43316)
+	id 1iUxvR-0005md-RP
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 14:03:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47244)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <sunilmut@microsoft.com>) id 1iUxmv-0002qC-9G
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 13:54:46 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iUxtS-0005D1-Jx
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:01:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <sunilmut@microsoft.com>) id 1iUxms-0003OS-Qz
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 13:54:44 -0500
-Received: from mail-eopbgr820109.outbound.protection.outlook.com
- ([40.107.82.109]:47392 helo=NAM01-SN1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <sunilmut@microsoft.com>)
- id 1iUxms-0003Mz-DC
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 13:54:42 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oUQ0oSjco8cQtOGc81+zLNVupzKXklqmnrkj/eduB5aQbCgptyCi1XlemHJFlES342G5Nb9qxq3bYxj+81yIwXVZ4gbxmqmdSCeFL7Z/JWvLqAM1j9E1fXgo9zVoSrswypOIHfmJSJSSNdxpuYiOP8U6jVTL9v2Id/fNNr4OG2Dj/SBL42osfRLvRldR8GwfxoQ5nVti9t7Y3Q6317GCM+gqGj0u42cHNW+VfbIHQe75fApOTCTDNoJYauA+JbufehFyP/4+a9s5steu3938HH/meB5yLdA+1C3tsK7LQ/6CN4330fyooqaZZB3qh9QplsZi4/k4S+atQOD+yj2CBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c0Fgw5bWLVeKwtICpTax3foBs9SEuMOQ1KecCnAc5rM=;
- b=Igtwly+6Alfkl5NRvbunryCoWvDYl6FydDh5p/WKi1yeHLKWCAOGeYqJ7albWGWJgLml0bpzll31esfOJvULHCGDdAUeD5puudQUSLsSQ9M1flK37OKpLzPfNQg92APELk/NS8DhXcgmjLoi+6s8kF4qY7R/hQ2EsVJPktmvxHeAxBO4U1JZLFzD6VZZI3yWOz+QAFtur/Fi4kmcajKEIGrQ1WoAglMaX4498EUeiXnG4/D7bjTQW8TUkksB9UXD4GCtdnMGCc7PV9fqqC/vd0UMuykCVnwLn9sdM2MBYzVVCi85iH+0PBHQIqelc7pNardIFQwAVOdnsJjlnLpmFg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c0Fgw5bWLVeKwtICpTax3foBs9SEuMOQ1KecCnAc5rM=;
- b=ElU5uCVhDtPwb+IMaq4Axnj0/BKgi5Vg3XAaZX408Acjb6wwwHxjNgX5shdQyihHgwAV3YjhmBWCKNtNhUY2smVTeirAEjEcHMiAdMClzdxJ3Q3jzWIXjRUkCODsTtM57HnTjVBAg5AhfIno1SIdksVH4950z0vwtPyEE5raRbc=
-Received: from MW2PR2101MB1116.namprd21.prod.outlook.com (52.132.149.33) by
- MW2PR2101MB1033.namprd21.prod.outlook.com (52.132.146.32) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.13; Wed, 13 Nov 2019 18:54:39 +0000
-Received: from MW2PR2101MB1116.namprd21.prod.outlook.com
- ([fe80::121:8a4f:76a8:fd9]) by MW2PR2101MB1116.namprd21.prod.outlook.com
- ([fe80::121:8a4f:76a8:fd9%6]) with mapi id 15.20.2474.008; Wed, 13 Nov 2019
- 18:54:39 +0000
-From: Sunil Muthuswamy <sunilmut@microsoft.com>
-To: Eduardo Habkost <ehabkost@redhat.com>,
- =?iso-8859-1?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>, Paolo Bonzini
- <pbonzini@redhat.com>, "Justin Terry (VM)" <juterry@microsoft.com>
-CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Richard Henderson
- <rth@twiddle.net>, Stefan Weil <sw@weilnetz.de>
-Subject: [PATCH V2] WHPX: refactor load library
-Thread-Topic: [PATCH V2] WHPX: refactor load library
-Thread-Index: AdWaUd8/6mEmp4uvSD+66MN6upFeBA==
-Date: Wed, 13 Nov 2019 18:54:39 +0000
-Message-ID: <MW2PR2101MB1116578040BE1F0C1B662318C0760@MW2PR2101MB1116.namprd21.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=sunilmut@microsoft.com; 
-x-originating-ip: [2001:4898:80e8:8:1cef:6b41:87e5:6afe]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 5a423fcd-46f8-42d7-5c6d-08d7686aefc7
-x-ms-traffictypediagnostic: MW2PR2101MB1033:|MW2PR2101MB1033:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MW2PR2101MB1033170549C6968670398BCCC0760@MW2PR2101MB1033.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:462;
-x-forefront-prvs: 0220D4B98D
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39860400002)(396003)(376002)(366004)(136003)(346002)(199004)(189003)(316002)(2906002)(8676002)(81166006)(81156014)(5660300002)(54906003)(110136005)(7736002)(8936002)(478600001)(305945005)(8990500004)(74316002)(99286004)(6636002)(33656002)(10290500003)(22452003)(256004)(55016002)(102836004)(9686003)(86362001)(186003)(71200400001)(71190400001)(6436002)(6506007)(1511001)(7696005)(14454004)(4326008)(476003)(46003)(76116006)(6116002)(66946007)(66476007)(66556008)(64756008)(66446008)(10090500001)(52536014)(486006)(25786009);
- DIR:OUT; SFP:1102; SCL:1; SRVR:MW2PR2101MB1033;
- H:MW2PR2101MB1116.namprd21.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: microsoft.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: xdzUjjK5IGXUmxMoy0pcLi6KqzYGG9ltQxfNZYKcRbw56SWN3SnDvW+RDxLmUapsXlAXs0eedrxuxD9aNmjgU4mUizBH2STxjIwqHSreIvh0dd5xH/Hta8lnkqsPXUAiTx1cOkTgKmnlAn4yvg6G9MRYPR7VbO55PV8znUbLNWKZcAsoEvsX3qXoGazdVvxRG0YxyfzRua/HEINN1R9CgBnrWN3O9cAiAC57+7b6hDfPmX5nKzTgzPHTcHP3Dm8zgRprBvtbUv4XXVr6ZcS8lHVAtALqRwAdtIQrngewcU/sG3FZ38ZKv8BEU39STlvQSUpL0W699xyT6FWHEVFNuYNSdLfdAGahsKYOmEe4PK5DbLw8UO9+pI263Vgd8hajPQAdswCdzeuj3if/5RGIKsSnw5t0u//jy/fEs0B6W7AmcnEKo9Ki7ap6ti2JyqGr
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <alex.bennee@linaro.org>) id 1iUxtR-0000L6-5a
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:01:30 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38229)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iUxtQ-0000KN-UD
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:01:29 -0500
+Received: by mail-wm1-x342.google.com with SMTP id z19so3249746wmk.3
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 11:01:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=I//FPJErWDOjPbaU6mFUmpdYlwsYCikmD0aTnhYe3MM=;
+ b=LO7kwe1X4ukq14Zu1n0niwgQKqUhyYgWDth2btrr4L19hLiPUoVmpNGJWdfQNVSo9F
+ MlWJze9KGS3CsWiRGSOYXAMejuu/WDyAvoh+ZJJSgdEehP9s0HAxrePN6L7syDMvJeff
+ H70fvnke+oR95UGVjM10JHxFGkxQE7scAiSXWE0E8ouqLdoZHCbO6Ad1HqviKZVw9sb3
+ 6RrHHFp2z60UosxqgXeL8wvBe/ztmmso9v/8jrYjsGjYE1Xx/wj2jMOUdbwANyF4nx46
+ cqg5t6ggxvKUwsqO/vu44tQDyxdwr706FV4hssbY/onH3lrQHRCVv84z6CvhHM6hwzum
+ IbSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=I//FPJErWDOjPbaU6mFUmpdYlwsYCikmD0aTnhYe3MM=;
+ b=TTJeDtHSMrUa2Jz84qc4mhZsnysQvGpbLCW+UbJSs4ahQ5djIas1TqLL2RYjHhsg81
+ MNc/8XoBMG0VrV93HqK3X6O1ELWUtqo9E9nwK7oi56kkdyhKUFqG55fwVckROlVVzXUC
+ r/T6/wfopz/cv32EzZc6ZyIetHkG3iDwTt/rCQg1GpoglgTVqVsdvAvr1HNuh3Bn31Tt
+ vC6v6Wpzo1DUeYFLrK1Jf8ri/Qr+Di1oUfOsUJEzHRfz6O8ikh+2tT8Ol56iStLmJVCM
+ tad73joPxB5YANSiN+feEvO7XN3fjTDY29pjS7av+MoTajEvnZk05LTf51dYjeYlb1kR
+ TgCw==
+X-Gm-Message-State: APjAAAVoXDSyt5EUcwBgbpw71ad3EiFKAmEwtR/I4oPcGOrfGJg2hZ0Z
+ 1kXg12Lky6IzFIqHvgdhfY274Q==
+X-Google-Smtp-Source: APXvYqzUYvFVKxgVfA/fDDKI0LhIRXRdOxR6zlP1+l5t9KJmC+FYdvqiM7SqkNk2lQg4gipVqIeBNA==
+X-Received: by 2002:a7b:c181:: with SMTP id y1mr4076869wmi.16.1573671687477;
+ Wed, 13 Nov 2019 11:01:27 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id w19sm3371438wmk.36.2019.11.13.11.01.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 13 Nov 2019 11:01:26 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 6A9161FF87;
+ Wed, 13 Nov 2019 19:01:25 +0000 (GMT)
+References: <20191113115952.775-1-alex.bennee@linaro.org>
+ <20191113115952.775-6-alex.bennee@linaro.org>
+ <d58692dc-b94f-cd6a-c3dd-e9c76e68bdee@redhat.com>
+ <BN6PR2201MB125185CB7DABA8AEE6888D92C6760@BN6PR2201MB1251.namprd22.prod.outlook.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Aleksandar Markovic <amarkovic@wavecomp.com>
+Subject: Re: [EXTERNAL]Re: [PATCH v1 5/5] .travis.yml: drop 32 bit systems
+ from MAIN_SOFTMMU_TARGETS
+In-reply-to: <BN6PR2201MB125185CB7DABA8AEE6888D92C6760@BN6PR2201MB1251.namprd22.prod.outlook.com>
+Date: Wed, 13 Nov 2019 19:01:25 +0000
+Message-ID: <87bltf7g8q.fsf@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a423fcd-46f8-42d7-5c6d-08d7686aefc7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Nov 2019 18:54:39.3397 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: /KRCyoDxLrbff3B+/5kNafS2JHHxzc824zvnhLe1uQd3LX7+brdPBES496WvLDbN9s9VBNF66OcU5euWPUUQXLKuRqKs8b16C7B7WMm64g8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR2101MB1033
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.82.109
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -120,165 +99,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "fam@euphon.net" <fam@euphon.net>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "stefanb@linux.vnet.ibm.com" <stefanb@linux.vnet.ibm.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "f4bug@amsat.org" <f4bug@amsat.org>, "cota@braap.org" <cota@braap.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "aurelien@aurel32.net" <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This refactors the load library of WHV libraries to make it more
-modular. It makes a helper routine that can be called on demand.
-This allows future expansion of load library/functions to support
-functionality that is dependent on some feature being available.
 
-Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
----
-Changes since v1:
-- Fixed typo of load_whp_dispatch_fns
-- Fixed free of the right handle
+Aleksandar Markovic <amarkovic@wavecomp.com> writes:
 
- target/i386/whp-dispatch.h |  4 +++
- target/i386/whpx-all.c     | 85 +++++++++++++++++++++++++++++++-----------=
-----
- 2 files changed, 62 insertions(+), 27 deletions(-)
+>> From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+>> > -    - MAIN_SOFTMMU_TARGETS=3D"aarch64-softmmu,arm-softmmu,i386-softmm=
+u,mips-softmmu,mips64-softmmu,ppc64-softmmu,riscv64-softmmu,s390x-softmmu,x=
+86_64-softmmu"
+>> > +    - MAIN_SOFTMMU_TARGETS=3D"aarch64-softmmu,mips64-softmmu,ppc64-so=
+ftmmu,riscv64-softmmu,s390x-softmmu,x86_64-softmmu"
+>>
+>> Aleksandar, since you mostly test 32-bit MIPS, are you OK we keep
+>> mips-softmmu and drop mips64-softmmu here? Another job (acceptance-test)
+>> builds the mips64el-softmmu.
+>
+> Philippe, thanks for bringing this to my attention. Yes, 32-bit mips
+> targets are important to us, but, what can we do, time constraints are
+> time constraints, so I agree with Alex change, please go ahead, Alex.
+> We can test 32-bit mips targets via other acceptance tests (those that
+> can run longer, so-called "slow" group), and perhaps we can extend
+> them to test more 32-bit mips systems.
 
-diff --git a/target/i386/whp-dispatch.h b/target/i386/whp-dispatch.h
-index 23791fbb47..87d049ceab 100644
---- a/target/i386/whp-dispatch.h
-+++ b/target/i386/whp-dispatch.h
-@@ -50,5 +50,9 @@ extern struct WHPDispatch whp_dispatch;
-=20
- bool init_whp_dispatch(void);
-=20
-+typedef enum WHPFunctionList {
-+    WINHV_PLATFORM_FNS_DEFAULT,
-+    WINHV_EMULATION_FNS_DEFAULT,
-+} WHPFunctionList;
-=20
- #endif /* WHP_DISPATCH_H */
-diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-index ed95105eae..f3c61fa5d8 100644
---- a/target/i386/whpx-all.c
-+++ b/target/i386/whpx-all.c
-@@ -1356,6 +1356,58 @@ static void whpx_handle_interrupt(CPUState *cpu, int=
- mask)
-     }
- }
-=20
-+/*
-+ * Load the functions from the given library, using the given handle. If a
-+ * handle is provided, it is used, otherwise the library is opened. The
-+ * handle will be updated on return with the opened one.
-+ */
-+static bool load_whp_dispatch_fns(HMODULE *handle,
-+    WHPFunctionList function_list)
-+{
-+    HMODULE hLib =3D *handle;
-+
-+    #define WINHV_PLATFORM_DLL "WinHvPlatform.dll"
-+    #define WINHV_EMULATION_DLL "WinHvEmulation.dll"
-+    #define WHP_LOAD_FIELD(return_type, function_name, signature) \
-+        whp_dispatch.function_name =3D \
-+            (function_name ## _t)GetProcAddress(hLib, #function_name); \
-+        if (!whp_dispatch.function_name) { \
-+            error_report("Could not load function %s", #function_name); \
-+            goto error; \
-+        } \
-+
-+    #define WHP_LOAD_LIB(lib_name, handle_lib) \
-+    if (!handle_lib) { \
-+        handle_lib =3D LoadLibrary(lib_name); \
-+        if (!handle_lib) { \
-+            error_report("Could not load library %s.", lib_name); \
-+            goto error; \
-+        } \
-+    } \
-+
-+    switch (function_list) {
-+    case WINHV_PLATFORM_FNS_DEFAULT:
-+        WHP_LOAD_LIB(WINHV_PLATFORM_DLL, hLib)
-+        LIST_WINHVPLATFORM_FUNCTIONS(WHP_LOAD_FIELD)
-+        break;
-+
-+    case WINHV_EMULATION_FNS_DEFAULT:
-+        WHP_LOAD_LIB(WINHV_EMULATION_DLL, hLib)
-+        LIST_WINHVEMULATION_FUNCTIONS(WHP_LOAD_FIELD)
-+        break;
-+    }
-+
-+    *handle =3D hLib;
-+    return true;
-+
-+error:
-+    if (hLib) {
-+        FreeLibrary(hLib);
-+    }
-+
-+    return false;
-+}
-+
- /*
-  * Partition support
-  */
-@@ -1491,51 +1543,30 @@ static void whpx_type_init(void)
-=20
- bool init_whp_dispatch(void)
- {
--    const char *lib_name;
--    HMODULE hLib;
--
-     if (whp_dispatch_initialized) {
-         return true;
-     }
-=20
--    #define WHP_LOAD_FIELD(return_type, function_name, signature) \
--        whp_dispatch.function_name =3D \
--            (function_name ## _t)GetProcAddress(hLib, #function_name); \
--        if (!whp_dispatch.function_name) { \
--            error_report("Could not load function %s from library %s.", \
--                         #function_name, lib_name); \
--            goto error; \
--        } \
--
--    lib_name =3D "WinHvPlatform.dll";
--    hWinHvPlatform =3D LoadLibrary(lib_name);
--    if (!hWinHvPlatform) {
--        error_report("Could not load library %s.", lib_name);
-+    if (!load_whp_dispatch_fns(&hWinHvPlatform, WINHV_PLATFORM_FNS_DEFAULT=
-)) {
-         goto error;
-     }
--    hLib =3D hWinHvPlatform;
--    LIST_WINHVPLATFORM_FUNCTIONS(WHP_LOAD_FIELD)
-=20
--    lib_name =3D "WinHvEmulation.dll";
--    hWinHvEmulation =3D LoadLibrary(lib_name);
--    if (!hWinHvEmulation) {
--        error_report("Could not load library %s.", lib_name);
-+    if (!load_whp_dispatch_fns(&hWinHvEmulation, WINHV_EMULATION_FNS_DEFAU=
-LT)) {
-         goto error;
-     }
--    hLib =3D hWinHvEmulation;
--    LIST_WINHVEMULATION_FUNCTIONS(WHP_LOAD_FIELD)
-=20
-     whp_dispatch_initialized =3D true;
--    return true;
--
--    error:
-=20
-+    return true;
-+error:
-     if (hWinHvPlatform) {
-         FreeLibrary(hWinHvPlatform);
-     }
-+
-     if (hWinHvEmulation) {
-         FreeLibrary(hWinHvEmulation);
-     }
-+
-     return false;
- }
-=20
---=20
-2.16.4
+To be clear both gcc and clang have rules that test:
 
+        - CONFIG=3D"--disable-user --target-list-exclude=3D${MAIN_SOFTMMU_T=
+ARGETS}"
+
+So the main targets which are reducing their coverage are:
+
+        - CONFIG=3D"--enable-debug --target-list=3D${MAIN_SOFTMMU_TARGETS}"
+
+        - CONFIG=3D"--enable-modules --target-list=3D${MAIN_SOFTMMU_TARGETS=
+}"
+
+        - CONFIG=3D"--target-list=3D${MAIN_SOFTMMU_TARGETS} "
+        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-clang-sanitize"
+      compiler: clang
+      before_script:
+        - ./configure ${CONFIG} --extra-cflags=3D"-fsanitize=3Dundefined -W=
+error" || { cat config.log && exit 1; }
+
+        - CONFIG=3D"--enable-gprof --enable-gcov --disable-pie --target-lis=
+t=3D${MAIN_SOFTMMU_TARGETS}"
+
+and the MacOSX 9.4 build:
+        # MacOSX builds
+        - env:
+            - CONFIG=3D"--target-list=3D${MAIN_SOFTMMU_TARGETS}"
+          os: osx
+          osx_image: xcode9.4
+          compiler: clang
+
+The Xcode 10.3 build is already a reduced list:
+        - CONFIG=3D"--target-list=3Di386-softmmu,ppc-softmmu,ppc64-softmmu,=
+m68k-softmmu,x86_64-softmmu"
+
+
+>
+> Thanks to everybody,
+> Aleksandar
+
+
+--
+Alex Benn=C3=A9e
 
