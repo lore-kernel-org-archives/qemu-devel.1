@@ -6,99 +6,75 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AC5AC33C8C
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:51:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26977C43141
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:51:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65A1A206D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:51:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9347E20637
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:51:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZqfIhjzT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65A1A206D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gzWYHweQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9347E20637
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUvbo-000139-KE
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 11:35:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43582)
+	id 1iUvgg-0006d4-Et
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 11:40:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44380)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1iUvaP-0008Si-A7
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:33:42 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iUvfQ-00057D-PX
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:38:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1iUvaM-0003g4-Pf
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:33:39 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:38132)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1iUvaM-0003fi-G4
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:33:38 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADGOK2e180167;
- Wed, 13 Nov 2019 16:33:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=VhUfnAv4kTjj2ZaGMjER91lusz/+pawYUIvZ/vkHdkE=;
- b=ZqfIhjzTAjaYUKJQ5y/dWQcG71RkkzdxMk3ZMWqLnFeO9dUM0SvCFN7lqr/mJ3OlQUm9
- 1Y6PyZMWYfc9jXriN33hdQX82dk2s7uYso1s+ZLsWCb98d364bVPzb4Bl2IvhmzlWeHx
- Y2I+j3OmaMlj/d39YOZgOEoY/25+OB/DpN0WXcj6mRR2vXCloHRvBqjhfX7VsvUbNxtj
- 21unBxZ375KPPulP16CotLFnnO58OXMSDfzVqUz1/Tq/xcDzpVx0KMk1jRwBVLAsTzKe
- ZAvz+/yR7M9NjcpHZuu4/Vv2f+BE75YcT/sPx4lTSBBdnLWHh7w0zUiqWI7ovm20Z63s uw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 2w5p3qwjft-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 13 Nov 2019 16:33:27 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADGQwfk156001;
- Wed, 13 Nov 2019 16:33:27 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3030.oracle.com with ESMTP id 2w8g17sgs0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 13 Nov 2019 16:33:27 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xADGXOo9019779;
- Wed, 13 Nov 2019 16:33:24 GMT
-Received: from [10.152.34.2] (/10.152.34.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 13 Nov 2019 08:33:24 -0800
-Subject: Re: [RFC v4 PATCH 45/49] multi-process/mig: Synchronize runstate of
- remote process
-To: Stefan Hajnoczi <stefanha@redhat.com>
+ (envelope-from <stefanha@redhat.com>) id 1iUvfO-0004s8-RD
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:38:52 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:48210
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iUvfL-0004rv-7t
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:38:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573663126;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=7K9qbPjJBUGQ9+IZ6IoeTgUCn0urUOjgPIFUaEJjzjs=;
+ b=gzWYHweQbqlOXo7WC7uRG1XoWfcPlvq9kD6NkjejiIsvwaEKfVWXKwPyJ0HVbjDNkjJSN3
+ LgBNDjppkKfsMbgVLtHZViP7u3skSF7nJyzaiv8Hw9d/YhM2dIfz9H6Jn4MBOj63kVcFBl
+ f+GK7jxEe4B37/1E9rxVTUtsfNIILD4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-DTqf8iamNPipA6f9AsqgCA-1; Wed, 13 Nov 2019 11:38:42 -0500
+X-MC-Unique: DTqf8iamNPipA6f9AsqgCA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 183781015E6F;
+ Wed, 13 Nov 2019 16:38:41 +0000 (UTC)
+Received: from localhost (ovpn-117-166.ams2.redhat.com [10.36.117.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4D2735F76F;
+ Wed, 13 Nov 2019 16:38:35 +0000 (UTC)
+Date: Wed, 13 Nov 2019 16:38:34 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Subject: Re: [RFC v4 PATCH 12/49] multi-process: remote process initialization
+Message-ID: <20191113163834.GG563983@stefanha-x1.localdomain>
 References: <cover.1571905346.git.jag.raman@oracle.com>
- <5ef7500148d9c15b236f551f6af7b8a4a8d6e81d.1571905346.git.jag.raman@oracle.com>
- <20191111161759.GG402228@stefanha-x1.localdomain>
-From: Jag Raman <jag.raman@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <278b1ff6-1291-ce05-115a-f1904aee3be0@oracle.com>
-Date: Wed, 13 Nov 2019 11:33:23 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ <a0550c5a6df8f294528393cfe3c031e194ba2188.1571905346.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20191111161759.GG402228@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9440
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911130146
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9440
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911130146
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+In-Reply-To: <a0550c5a6df8f294528393cfe3c031e194ba2188.1571905346.git.jag.raman@oracle.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="pE2VAHO2njSJCslu"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,49 +88,71 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: elena.ufimtseva@oracle.com, fam@euphon.net, thuth@redhat.com,
  john.g.johnson@oracle.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
- liran.alon@oracle.com, rth@twiddle.net, quintela@redhat.com,
+ quintela@redhat.com, berrange@redhat.com, mst@redhat.com,
  qemu-devel@nongnu.org, armbru@redhat.com, ross.lagerwall@citrix.com,
- mst@redhat.com, kraxel@redhat.com, kwolf@redhat.com, pbonzini@redhat.com,
- berrange@redhat.com, mreitz@redhat.com, kanth.ghatraju@oracle.com,
- dgilbert@redhat.com, marcandre.lureau@gmail.com
+ kanth.ghatraju@oracle.com, kraxel@redhat.com, kwolf@redhat.com,
+ pbonzini@redhat.com, liran.alon@oracle.com, marcandre.lureau@gmail.com,
+ mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--pE2VAHO2njSJCslu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Oct 24, 2019 at 05:08:53AM -0400, Jagannathan Raman wrote:
+>  int main(int argc, char *argv[])
+>  {
+> +    Error *err =3D NULL;
+> +
+>      module_call_init(MODULE_INIT_QOM);
+> =20
+> +    bdrv_init_with_whitelist();
+> +
+> +    if (qemu_init_main_loop(&err)) {
+> +        error_report_err(err);
+> +        return -EBUSY;
+> +    }
+> +
+> +    qemu_init_cpu_loop();
+> +
+> +    page_size_init();
+> +
+>      current_machine =3D MACHINE(REMOTE_MACHINE(object_new(TYPE_REMOTE_MA=
+CHINE)));
+> =20
+> +    mpqemu_link =3D mpqemu_link_create();
+> +    if (!mpqemu_link) {
+> +        printf("Could not create MPQemu link\n");
+> +        return -1;
+> +    }
+> +
+> +    mpqemu_init_channel(mpqemu_link, &mpqemu_link->com, STDIN_FILENO);
+> +    mpqemu_link_set_callback(mpqemu_link, process_msg);
+> +
+> +    mpqemu_start_coms(mpqemu_link);
 
-On 11/11/2019 11:17 AM, Stefan Hajnoczi wrote:
-> On Thu, Oct 24, 2019 at 05:09:26AM -0400, Jagannathan Raman wrote:
->> @@ -656,6 +657,19 @@ static void init_proxy(PCIDevice *dev, char *command, bool need_spawn, Error **e
->>       }
->>   }
->>   
->> +static void proxy_vm_state_change(void *opaque, int running, RunState state)
->> +{
->> +    PCIProxyDev *dev = opaque;
->> +    MPQemuMsg msg = { 0 };
->> +
->> +    msg.cmd = RUNSTATE_SET;
->> +    msg.bytestream = 0;
->> +    msg.size = sizeof(msg.data1);
->> +    msg.data1.runstate.state = state;
->> +
->> +    mpqemu_msg_send(dev->mpqemu_link, &msg, dev->mpqemu_link->com);
->> +}
-> 
-> Changing vm state is a barrier operation - devices must not dirty memory
-> afterwards.  This function doesn't have barrier semantics, it sends off
-> the message without waiting for the remote process to finish processing
-> it.  This means there is a race condition where QEMU has changes the vm
-> state but devices could still dirty memory.  Please wait for a reply to
-> prevent this.
+Can you use util/main-loop.c instead of an mpqemu-specific event loop?
+I think that file is needed anyway because lots of QEMU code depends on
+it.
 
-Got it, thanks! Will do.
+--pE2VAHO2njSJCslu
+Content-Type: application/pgp-signature; name="signature.asc"
 
---
-Jag
+-----BEGIN PGP SIGNATURE-----
 
-> 
-> Stefan
-> 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3MMYoACgkQnKSrs4Gr
+c8jFwgf/cp/YFcGf+fWF6uuDb6t0lFeTLR4iZwWoF59WCBGaaUlyYquP8EoT9rPY
+m9FrlvURkNl2IhGSiwyh+Mkj18wPTjHoD6849edPKordSe5nOYFfdgCe6OV8+Ni3
+9E9udLUHQlOEeyrqyHvRuX2RUcFh39EKb4Xa/+W8rtXY6cw5PsDu3OeM5zChaJ0g
+YM4veidnLy61kT+PCCij932mhn0TCJgutfMa7qZAP7NpOYpDFokTO1FwRY9yAus2
+/SZhufBie7UExgQh+/IL1qoxw9QcGCfae3HT2BSeUTVJw2hIt7Gl1pRb9vZ/68zn
+5vIKeqiWwGVQuAB8P9cpTtP0QGgSJw==
+=iEWJ
+-----END PGP SIGNATURE-----
+
+--pE2VAHO2njSJCslu--
+
 
