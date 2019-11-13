@@ -2,78 +2,86 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 176C9C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FA08C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:32:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4CC9206E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:29:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76CCB206E3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:32:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="EiT0PY9s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4CC9206E3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R7XG9Eui"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76CCB206E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iV0Ci-00045I-0c
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 16:29:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58954)
+	id 1iV0Fs-0005od-Cv
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 16:32:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34283)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lekiravi@yandex-team.ru>) id 1iV097-0001JG-3Y
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:25:52 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iV0E7-00051u-VY
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:31:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lekiravi@yandex-team.ru>) id 1iV095-0004QK-RF
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:25:49 -0500
-Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:38840)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lekiravi@yandex-team.ru>)
- id 1iV093-0004NT-Qa
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:25:46 -0500
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 826E42E0951;
- Thu, 14 Nov 2019 00:25:41 +0300 (MSK)
-Received: from vla1-5826f599457c.qloud-c.yandex.net
- (vla1-5826f599457c.qloud-c.yandex.net [2a02:6b8:c0d:35a1:0:640:5826:f599])
- by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- G84mh3mGGb-PcteMKMm; Thu, 14 Nov 2019 00:25:41 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1573680341; bh=LPUz0oDhexTDd3tx3l9GgCnARWld3cPZd5fQI7FZEvk=;
- h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=EiT0PY9shD+O9XzhjsJV2538aOshA+u7q8vNxc+uhnmkCmVgVWW8QP3Bq8iWVhwxf
- kqhLMVzrkf5gyw8G0gOzuJjYqcpzlWKkple4cl/IqP8cYYz0rH3jDxZ0/+c72o3a7Z
- 208zkQyfv2HnFMu8QkUjbD6fMVvDU8xv8V0JmrS4=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from unknown (unknown [2a02:6b8:b080:7204::1:11])
- by vla1-5826f599457c.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- dbNdL4rsWi-PcV8tkM4; Thu, 14 Nov 2019 00:25:38 +0300
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
- (Client certificate not present)
-From: Alexey Kirillov <lekiravi@yandex-team.ru>
-To: Jason Wang <jasowang@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH 2/2] tests: Add tests for query-netdevs command
-Date: Thu, 14 Nov 2019 00:25:16 +0300
-Message-Id: <20191113212516.13606-3-lekiravi@yandex-team.ru>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191113212516.13606-1-lekiravi@yandex-team.ru>
-References: <20191113212516.13606-1-lekiravi@yandex-team.ru>
+ (envelope-from <peter.maydell@linaro.org>) id 1iV0E5-0000xV-SQ
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:30:59 -0500
+Received: from mail-oi1-x234.google.com ([2607:f8b0:4864:20::234]:38643)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iV0E3-0000ug-SQ
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:30:57 -0500
+Received: by mail-oi1-x234.google.com with SMTP id a14so3233256oid.5
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 13:30:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=lrDyOei8USiE9vbmz3ztTpn5Ak87M4FF0I6TF+2m+VE=;
+ b=R7XG9EuiAzad2/wTwgp28A5XC5X1t0xeTEPEwDFjKAlnu72HcBtDrR6Wrd74haZj9N
+ TH8kg53a9AbSzypjYmwWHy2qKJqgtCXRurDY5b6JRg0YW24e7sqOAWV2zrIOW7zp6AaS
+ /9XLg7saxVleWe8OkSsShirrv3168a6MK36KJA6RP4Vp5WdyQLOPYU1tsxiyXUh2tGa3
+ 0UZRGYAyajQtD11+cJsBR1zzoaAy0+QNnmaksDDjczxaC2UDewxvNsKRzxcg66Kd+Fns
+ WcMKUVz9N+rfM1lflAYO0P/hNJmey0F44jFQvI7Ctds2JU73BzMxedI2qqUhS6urT8E9
+ I+Sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=lrDyOei8USiE9vbmz3ztTpn5Ak87M4FF0I6TF+2m+VE=;
+ b=LubwCbBhL/mMPhXTKBhsVA+/HZZrGKicEtAVeYjR9H1SyLo/OOWT7oACSdH4P0mP/F
+ 63WBeqv94dsA8iODZTaAk9uz4rak6/CKvBBQ6G/S7AfbdHtuZmpW/hBuAb1yQl7qeFNT
+ IfZ4GLAQg3XdsmcYrIxbNqYViFlyMYUrPAKGMGJ0+lV2efcx9ZDb/qSBKLC0yebXW8kq
+ A+px7E+O2oMGJViMi10N62qY1u6aHw7RSnvMlW5xB2s0CpwPcSGy8XegT5M0G40cW2xg
+ U1Wuw4sOEBAk8GMG+hsd7ZT3dhJFh9tNVcyTqotfYbV7K4qP0B6nCXhQV/+Uh550bH/I
+ GOaA==
+X-Gm-Message-State: APjAAAX/r8oaf6LZxgrJsZrsZh1KcCwIOXbhPLPV8CW/GzJ5zasWTz6O
+ INjCLs0yzyibIQnjKxFm9NH8qP6RKepqYy1tMd4PDQ==
+X-Google-Smtp-Source: APXvYqyudXboIiQ2e2m0CtZoGk2JBnubQ/kUq1hN3kfsYVSNbMkbLGM3xNngfz0EdTK2Nl5SYJQk8ep9oGM2zah/nhs=
+X-Received: by 2002:a05:6808:b04:: with SMTP id
+ s4mr624128oij.163.1573680652658; 
+ Wed, 13 Nov 2019 13:30:52 -0800 (PST)
+MIME-Version: 1.0
+References: <20191101085140.5205-1-peter.maydell@linaro.org>
+ <20191101085140.5205-5-peter.maydell@linaro.org>
+ <CAFEAcA-xYWLzsfDAWWmEk4DhXcO5zqKVZMrRp9=4t9MBAasaMA@mail.gmail.com>
+ <ac0c7520-2f6b-fb49-c725-37b46272c835@linaro.org>
+In-Reply-To: <ac0c7520-2f6b-fb49-c725-37b46272c835@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 13 Nov 2019 21:30:41 +0000
+Message-ID: <CAFEAcA9KwEzNoyugPNjqBmOb-F7EWWJ=0kf6ysD3mDk_R9v=DA@mail.gmail.com>
+Subject: Re: [PULL 04/11] target/arm/cpu64: max cpu: Introduce sve<N>
+ properties
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a02:6b8:0:1619::183
+X-Received-From: 2607:f8b0:4864:20::234
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,162 +90,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>,
- qemu-devel@nongnu.org, Vincenzo Maffione <v.maffione@gmail.com>,
- yc-core@yandex-team.ru, Alexey Kirillov <lekiravi@yandex-team.ru>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alexey Kirillov <lekiravi@yandex-team.ru>
----
- tests/Makefile.include     |   2 +
- tests/test-query-netdevs.c | 114 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 116 insertions(+)
- create mode 100644 tests/test-query-netdevs.c
+On Wed, 13 Nov 2019 at 20:17, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 11/12/19 11:23 AM, Peter Maydell wrote:
+> >> +static uint32_t sve_zcr_get_valid_len(ARMCPU *cpu, uint32_t start_len)
+> >> +{
+> >> +    uint32_t start_vq = (start_len & 0xf) + 1;
+> >> +
+> >> +    return arm_cpu_vq_map_next_smaller(cpu, start_vq + 1) - 1;
+> >
+> > "Subtract operation overflows on operands
+> > arm_cpu_vq_map_next_smaller(cpu, start_vq + 1U) and 1U"
+> >
+> > Certainly it looks as if arm_cpu_vq_map_next_smaller() can
+> > return 0, and claiming the valid length to be UINT_MAX
+> > seems a bit odd in that case.
+>
+> The lsb is always set in the map, the minimum number we send to next_smaller is
+> 2 -> so the minimum number returned from next_smaller is 1.
+>
+> We should never return UINT_MAX.
+>
+> >     return bitnum == vq - 1 ? 0 : bitnum + 1;
+>
+> But yes, this computation doesn't seem right.
+>
+> The beginning assert should probably be (vq >= 2 ...)
+> and here we should assert bitnum != vq - 1.
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 534ee48743..4d199e463b 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -297,6 +297,7 @@ check-qtest-s390x-y += tests/migration-test$(EXESUF)
- check-qtest-generic-y += tests/machine-none-test$(EXESUF)
- check-qtest-generic-y += tests/qom-test$(EXESUF)
- check-qtest-generic-y += tests/test-hmp$(EXESUF)
-+check-qtest-generic-y += tests/test-query-netdevs$(EXESUF)
- 
- qapi-schema += alternate-any.json
- qapi-schema += alternate-array.json
-@@ -844,6 +845,7 @@ tests/numa-test$(EXESUF): tests/numa-test.o
- tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
- tests/cdrom-test$(EXESUF): tests/cdrom-test.o tests/boot-sector.o $(libqos-obj-y)
- tests/arm-cpu-features$(EXESUF): tests/arm-cpu-features.o
-+tests/test-query-netdevs$(EXESUF): tests/test-query-netdevs.o
- 
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
-diff --git a/tests/test-query-netdevs.c b/tests/test-query-netdevs.c
-new file mode 100644
-index 0000000000..2afde36114
---- /dev/null
-+++ b/tests/test-query-netdevs.c
-@@ -0,0 +1,114 @@
-+/*
-+ * QTest testcase for the query-netdevs
-+ *
-+ * Copyright Yandex N.V., 2019
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2.  See
-+ * the COPYING file in the top-level directory.
-+ *
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "libqtest.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/qmp/qlist.h"
-+
-+/*
-+ * Events can get in the way of responses we are actually waiting for.
-+ */
-+GCC_FMT_ATTR(2, 3)
-+static QObject *wait_command(QTestState *who, const char *command, ...)
-+{
-+    va_list ap;
-+    QDict *response;
-+    QObject *result;
-+
-+    va_start(ap, command);
-+    qtest_qmp_vsend(who, command, ap);
-+    va_end(ap);
-+
-+    response = qtest_qmp_receive(who);
-+
-+    result = qdict_get(response, "return");
-+    g_assert(result);
-+    qobject_ref(result);
-+    qobject_unref(response);
-+
-+    return result;
-+}
-+
-+static void qmp_query_netdevs_no_error(QTestState *qts,
-+                                       size_t netdevs_count)
-+{
-+    QObject *resp;
-+    QList *netdevs;
-+
-+    resp = wait_command(qts, "{'execute': 'x-query-netdevs'}");
-+
-+    netdevs = qobject_to(QList, resp);
-+    g_assert(netdevs);
-+    g_assert(qlist_size(netdevs) == netdevs_count);
-+
-+    qobject_unref(resp);
-+}
-+
-+static void test_query_netdevs(void)
-+{
-+    const char *arch = qtest_get_arch();
-+    size_t correction = 0;
-+    QObject *resp;
-+    QTestState *state;
-+
-+    if (strcmp(arch, "arm") == 0 ||
-+        strcmp(arch, "aarch64") == 0 ||
-+        strcmp(arch, "tricore") == 0) {
-+        g_test_skip("Not supported without machine type");
-+        return;
-+    }
-+
-+    /* Archs with default not unpluggable netdev */
-+    if (strcmp(arch, "cris") == 0 ||
-+        strcmp(arch, "microblaze") == 0 ||
-+        strcmp(arch, "microblazeel") == 0 ||
-+        strcmp(arch, "sparc") == 0) {
-+        correction = 1;
-+    }
-+
-+    state = qtest_init(
-+        "-nodefaults "
-+        "-netdev user,id=slirp0");
-+    g_assert(state);
-+
-+    qmp_query_netdevs_no_error(state, 1 + correction);
-+
-+    resp = wait_command(state,
-+        "{'execute': 'netdev_add', 'arguments': {"
-+        " 'id': 'slirp1',"
-+        " 'type': 'user'}}");
-+    qobject_unref(resp);
-+
-+    qmp_query_netdevs_no_error(state, 2 + correction);
-+
-+    resp = wait_command(state,
-+        "{'execute': 'netdev_del', 'arguments': {"
-+        " 'id': 'slirp1'}}");
-+    qobject_unref(resp);
-+
-+    qmp_query_netdevs_no_error(state, 1 + correction);
-+
-+    qtest_quit(state);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret = 0;
-+    g_test_init(&argc, &argv, NULL);
-+
-+    qtest_add_func("/net/qapi/query_netdevs",
-+        test_query_netdevs);
-+
-+    ret = g_test_run();
-+
-+    return ret;
-+}
--- 
-2.17.1
+Coverity may also be looking at the case where
+TARGET_AARCH64 is not defined. The fallback definition
+of arm_cpu_vq_map_next_smaller() for that situation
+always returns 0.
 
+thanks
+-- PMM
 
