@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 542E7C43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30548C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:53:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F644222C9
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:52:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC633222CA
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:53:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efW/GEOn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F644222C9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GNR9J2DT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC633222CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUu0N-0004eE-9K
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 09:52:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54610)
+	id 1iUu1C-0005lB-55
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 09:53:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54585)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iUtno-00060c-02
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:25 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnm-0006NY-Ck
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnm-0005xq-Cs
  for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:23 -0500
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35619)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnk-0006MF-NC
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:22 -0500
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:55764)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iUtnm-0006Mt-5f
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:22 -0500
-Received: by mail-wm1-x344.google.com with SMTP id 8so2283473wmo.0
- for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 06:39:22 -0800 (PST)
+ id 1iUtnk-0006MB-Gm
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:20 -0500
+Received: by mail-wm1-x344.google.com with SMTP id b11so2251772wmb.5
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 06:39:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=KGzEFsoR5Ne9dc3BBeXqX8dzJn/ffqjieOFhjVDRthY=;
- b=efW/GEOnrwhahfd4461bZXJaLHNXb1y0YfZIqa5msGDz/8eL2+9YAIpzbTFC6tLHY0
- m6YQz3Jilil08mLM2e7/CvwIGNts8lh3qLGM1paA4DRmBMnSy7Lfq0Pnzzyd10R17TCP
- sqqywo5miSUhyeuQE1aT18EjgVL2OHVIe3Sf16hfyxdAVPyYPDi6MhaaxrX17mlVYHbH
- qIhPsV8TfVrTsGeSQylYF8FYLDUFDou/JR166XfmPkqg5TLWMacWC8oFwRaasmOnJWVf
- hpwHGKl7w6gWqV5mfedVPEBVsY5YQ0abG77NMD7a9EvBJR0hxnsSM70QSaTtTy0pTO68
- 5FuQ==
+ bh=ULr1B88jivXzON/4AKL4KiqnRt3/UYg4HZ/1tAz45Yc=;
+ b=GNR9J2DTrfJiHkoRzNc5hkVnZVwBpXY7KA9uFMIdVPuMkqhczZ3QIzNhumhA3NlMtW
+ O3a5E7AwjojSg4H8LB9dutY39Zz9lFqBQV8AriI6qDd5Ngn59zQhmNxgY8mfuvlKvydB
+ ja5DYN8fucuvanRceqwFZLNL28Es7Me/f3BBGU7pSk2c0bbC3LrrGb1IuNNud+w3noOE
+ hk5KU7zF3yEFpzPmZYD0OZgx9jeje5xIlkG60y+GaRNGlln5b550SOoq7e+MBomKBAvM
+ CjbI9TCCWwWYQx09nGMlo8r60OYh2CmzGuc64xgALBI15nr0MFJOb5koHIYrCy8iOPYH
+ 691g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=KGzEFsoR5Ne9dc3BBeXqX8dzJn/ffqjieOFhjVDRthY=;
- b=Q1MVpkr2sUEgw0pKfOvGLnsjLGzfri8EXA7EBD00j2A6gFpjaS22K1d5A+t6nFeg3J
- bZs+UFZ8SaPcW4oZI2+e88YA+y2f6WJa7chBo+nFJhTK+dTTLRnKFOaaxE6uF4rRSYkP
- ZG4vPDa1lm9PIRKDtjbV3CUjNjUv2U+LoTSg2liJq78wvBd/8Zc6jbZ+nrtpbwTDE1/u
- AnXShauAMk8p1/uAh46wOsEPL9NOWRUcSU4jyTpUM6u54vZf6d+yirJuErIc/zKuKFXe
- hJkdFjEK/9Znv+WYPQjorgYmXjHS8aZRNg3gSQaiztlIZ+kR0QebhxBCakFoOHZQr4xb
- iLWA==
-X-Gm-Message-State: APjAAAXleNXx6d8l9dEmsWHw0mnp/PAytEHEDloVmlxwKvYnqxjAqWaB
- qXL2CQMjYsCdwFhAPkKHxUq2w2Al
-X-Google-Smtp-Source: APXvYqyxflYY4ybjQHjeU+g3F3TG7P/JNRlSy903Rwk495iaL0nmgQs4bTQlhlstvwWE2tYqSYw1oA==
-X-Received: by 2002:a1c:6405:: with SMTP id y5mr3288827wmb.175.1573655960320; 
- Wed, 13 Nov 2019 06:39:20 -0800 (PST)
+ bh=ULr1B88jivXzON/4AKL4KiqnRt3/UYg4HZ/1tAz45Yc=;
+ b=hhEOSNWHyqxRtIgp8RU3eH/GujCf1YUeixOlL44/BcIIJ+rfnmXjl+zaVUFbcrYQOR
+ P5HSOwROAM8W05JKd+fu0Y9Zi3rmman45nTdNG054QPnTMTobVovpbJR7xfuMIm+CEzs
+ PQujkS+0EV25psFqyqWNfFMA7iQ5F+jUPeNRCVOy2B3Q4U4OjMH2IzfNNWVmWKnJXJrf
+ dsjzjAPSnvWAu13JD9q4cxULl82GTbFa2ZANQ9wphvmfiBcOdqpd4GGZ/5qF3RmSaqLD
+ W1AhA2T5FKvTrQ4qBxJ4fUTBA5wrKuU0JkfjcWmRwLL8qahu8tblihTGgTqSr1WjNSeb
+ NjEg==
+X-Gm-Message-State: APjAAAXPAf2K3DGoTFlWVXcwO3R+I/FRyiFRkprKf7ffDSuP0fNvP8Or
+ u1bMLKz870DD7NVe/u2uB+Jhb6kg
+X-Google-Smtp-Source: APXvYqy3bLdOAgl4z1iaCxKqubrOMFCyOUuaD55ryMBEw2//tET2W15bxZdM/tr4BPon+f5GZasApg==
+X-Received: by 2002:a1c:7d47:: with SMTP id y68mr3062538wmc.157.1573655958603; 
+ Wed, 13 Nov 2019 06:39:18 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s11sm2965823wrr.43.2019.11.13.06.39.19
+ by smtp.gmail.com with ESMTPSA id s11sm2965823wrr.43.2019.11.13.06.39.17
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 13 Nov 2019 06:39:19 -0800 (PST)
+ Wed, 13 Nov 2019 06:39:18 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 15/16] kvm: introduce kvm_kernel_irqchip_* functions
-Date: Wed, 13 Nov 2019 15:39:04 +0100
-Message-Id: <1573655945-14912-16-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 13/16] xen: convert "-machine igd-passthru" to an accelerator
+ property
+Date: Wed, 13 Nov 2019 15:39:02 +0100
+Message-Id: <1573655945-14912-14-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
 References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
@@ -94,240 +95,189 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The KVMState struct is opaque, so provide accessors for the fields
-that will be moved from current_machine to the accelerator.  For now
-they just forward to the machine object, but this will change.
+The first machine property to fall is Xen's Intel integrated graphics
+passthrough.  The "-machine igd-passthru" option does not set anymore
+a property on the machine object, but desugars to a GlobalProperty on
+accelerator objects.
+
+The setter is very simple, since the value ends up in a
+global variable, so this patch also provides an example before the more
+complicated cases that follow it.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/kvm/kvm-all.c  | 23 +++++++++++++++++++----
- hw/ppc/e500.c        |  4 ++--
- hw/ppc/spapr_irq.c   | 10 +++++-----
- include/sysemu/kvm.h |  7 +++++--
- target/arm/kvm.c     |  8 ++++----
- target/i386/kvm.c    |  4 ++--
- target/mips/kvm.c    |  2 +-
- target/ppc/kvm.c     |  2 +-
- target/s390x/kvm.c   |  2 +-
- 9 files changed, 40 insertions(+), 22 deletions(-)
+ hw/core/machine.c   | 20 --------------------
+ hw/xen/xen-common.c | 16 ++++++++++++++++
+ include/hw/boards.h |  1 -
+ qemu-options.hx     |  9 +++++----
+ vl.c                | 14 ++++----------
+ 5 files changed, 25 insertions(+), 35 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index c016319..a1c3b78 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1742,7 +1742,7 @@ void kvm_irqchip_set_qemuirq_gsi(KVMState *s, qemu_irq irq, int gsi)
-     g_hash_table_insert(s->gsimap, irq, GINT_TO_POINTER(gsi));
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 45ddfb6..d7a0356 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -412,20 +412,6 @@ static void machine_set_graphics(Object *obj, bool value, Error **errp)
+     ms->enable_graphics = value;
  }
  
--static void kvm_irqchip_create(MachineState *machine, KVMState *s)
-+static void kvm_irqchip_create(KVMState *s)
+-static bool machine_get_igd_gfx_passthru(Object *obj, Error **errp)
+-{
+-    MachineState *ms = MACHINE(obj);
+-
+-    return ms->igd_gfx_passthru;
+-}
+-
+-static void machine_set_igd_gfx_passthru(Object *obj, bool value, Error **errp)
+-{
+-    MachineState *ms = MACHINE(obj);
+-
+-    ms->igd_gfx_passthru = value;
+-}
+-
+ static char *machine_get_firmware(Object *obj, Error **errp)
  {
-     int ret;
+     MachineState *ms = MACHINE(obj);
+@@ -862,12 +848,6 @@ static void machine_class_init(ObjectClass *oc, void *data)
+     object_class_property_set_description(oc, "graphics",
+         "Set on/off to enable/disable graphics emulation", &error_abort);
  
-@@ -1760,9 +1760,9 @@ static void kvm_irqchip_create(MachineState *machine, KVMState *s)
+-    object_class_property_add_bool(oc, "igd-passthru",
+-        machine_get_igd_gfx_passthru, machine_set_igd_gfx_passthru,
+-        &error_abort);
+-    object_class_property_set_description(oc, "igd-passthru",
+-        "Set on/off to enable/disable igd passthrou", &error_abort);
+-
+     object_class_property_add_str(oc, "firmware",
+         machine_get_firmware, machine_set_firmware,
+         &error_abort);
+diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+index 5284b0d..6cba30c 100644
+--- a/hw/xen/xen-common.c
++++ b/hw/xen/xen-common.c
+@@ -124,6 +124,16 @@ static void xen_change_state_handler(void *opaque, int running,
+     }
+ }
  
-     /* First probe and see if there's a arch-specific hook to create the
-      * in-kernel irqchip for us */
--    ret = kvm_arch_irqchip_create(machine, s);
-+    ret = kvm_arch_irqchip_create(s);
-     if (ret == 0) {
--        if (machine_kernel_irqchip_split(machine)) {
-+        if (kvm_kernel_irqchip_split()) {
-             perror("Split IRQ chip mode not supported.");
++static bool xen_get_igd_gfx_passthru(Object *obj, Error **errp)
++{
++    return has_igd_gfx_passthru;
++}
++
++static void xen_set_igd_gfx_passthru(Object *obj, bool value, Error **errp)
++{
++    has_igd_gfx_passthru = value;
++}
++
+ static void xen_setup_post(MachineState *ms, AccelState *accel)
+ {
+     int rc;
+@@ -177,6 +187,12 @@ static void xen_accel_class_init(ObjectClass *oc, void *data)
+     ac->compat_props = g_ptr_array_new();
+ 
+     compat_props_add(ac->compat_props, compat, G_N_ELEMENTS(compat));
++
++    object_class_property_add_bool(oc, "igd-passthru",
++        xen_get_igd_gfx_passthru, xen_set_igd_gfx_passthru,
++        &error_abort);
++    object_class_property_set_description(oc, "igd-passthru",
++        "Set on/off to enable/disable igd passthrou", &error_abort);
+ }
+ 
+ #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 36fcbda..cdcf481 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -287,7 +287,6 @@ struct MachineState {
+     bool mem_merge;
+     bool usb;
+     bool usb_disabled;
+-    bool igd_gfx_passthru;
+     char *firmware;
+     bool iommu;
+     bool suppress_vmdesc;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 3931f90..5b43a83 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -37,7 +37,6 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+     "                kvm_shadow_mem=size of KVM shadow MMU in bytes\n"
+     "                dump-guest-core=on|off include guest memory in a core dump (default=on)\n"
+     "                mem-merge=on|off controls memory merge support (default: on)\n"
+-    "                igd-passthru=on|off controls IGD GFX passthrough support (default=off)\n"
+     "                aes-key-wrap=on|off controls support for AES key wrapping (default=on)\n"
+     "                dea-key-wrap=on|off controls support for DEA key wrapping (default=on)\n"
+     "                suppress-vmdesc=on|off disables self-describing migration (default=off)\n"
+@@ -71,8 +70,6 @@ more than one accelerator specified, the next one is used if the previous one
+ fails to initialize.
+ @item kernel_irqchip=on|off
+ Controls in-kernel irqchip support for the chosen accelerator when available.
+-@item gfx_passthru=on|off
+-Enables IGD GFX passthrough support for the chosen machine when available.
+ @item vmport=on|off|auto
+ Enables emulation of VMWare IO port, for vmmouse etc. auto says to select the
+ value based on accel. For accel=xen the default is off otherwise the default
+@@ -118,8 +115,9 @@ Select CPU model (@code{-cpu help} for list and additional feature selection)
+ ETEXI
+ 
+ DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+-    "-accel [accel=]accelerator[,thread=single|multi]\n"
++    "-accel [accel=]accelerator[,prop[=value][,...]]\n"
+     "                select accelerator (kvm, xen, hax, hvf, whpx or tcg; use 'help' for a list)\n"
++    "                igd-passthru=on|off (enable Xen integrated Intel graphics passthrough, default=off)\n"
+     "                tb-size=n (TCG translation block cache size)\n"
+     "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
+ STEXI
+@@ -130,6 +128,9 @@ kvm, xen, hax, hvf, whpx or tcg can be available. By default, tcg is used. If th
+ more than one accelerator specified, the next one is used if the previous one
+ fails to initialize.
+ @table @option
++@item igd-passthru=on|off
++When Xen is in use, this option controls whether Intel integrated graphics
++devices can be passed through to the guest (default=off)
+ @item tb-size=@var{n}
+ Controls the size (in MiB) of the TCG translation block cache.
+ @item thread=single|multi
+diff --git a/vl.c b/vl.c
+index 06c6ad9..7d8fed1 100644
+--- a/vl.c
++++ b/vl.c
+@@ -1256,13 +1256,6 @@ static void configure_msg(QemuOpts *opts)
+ }
+ 
+ 
+-/* Now we still need this for compatibility with XEN. */
+-bool has_igd_gfx_passthru;
+-static void igd_gfx_passthru(void)
+-{
+-    has_igd_gfx_passthru = current_machine->igd_gfx_passthru;
+-}
+-
+ /***********************************************************/
+ /* USB devices */
+ 
+@@ -2645,6 +2638,10 @@ static int machine_set_property(void *opaque,
+     if (g_str_equal(qom_name, "accel")) {
+         return 0;
+     }
++    if (g_str_equal(qom_name, "igd-passthru")) {
++        object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, value);
++        return 0;
++    }
+ 
+     r = object_parse_property_opt(opaque, name, value, "type", errp);
+     g_free(qom_name);
+@@ -4449,9 +4446,6 @@ int main(int argc, char **argv, char **envp)
              exit(1);
-         } else {
-@@ -2034,7 +2034,7 @@ static int kvm_init(MachineState *ms)
      }
  
-     if (machine_kernel_irqchip_allowed(ms)) {
--        kvm_irqchip_create(ms, s);
-+        kvm_irqchip_create(s);
-     }
- 
-     if (kvm_eventfds_allowed) {
-@@ -2951,6 +2951,21 @@ static void kvm_set_kvm_shadow_mem(Object *obj, Visitor *v,
-     s->kvm_shadow_mem = value;
- }
- 
-+bool kvm_kernel_irqchip_allowed(void)
-+{
-+    return machine_kernel_irqchip_allowed(current_machine);
-+}
-+
-+bool kvm_kernel_irqchip_required(void)
-+{
-+    return machine_kernel_irqchip_required(current_machine);
-+}
-+
-+bool kvm_kernel_irqchip_split(void)
-+{
-+    return machine_kernel_irqchip_split(current_machine);
-+}
-+
- static void kvm_accel_instance_init(Object *obj)
- {
-     KVMState *s = KVM_STATE(obj);
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index 91cd4c2..928efaa 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -801,10 +801,10 @@ static DeviceState *ppce500_init_mpic(PPCE500MachineState *pms,
-     if (kvm_enabled()) {
-         Error *err = NULL;
- 
--        if (machine_kernel_irqchip_allowed(machine)) {
-+        if (kvm_kernel_irqchip_allowed()) {
-             dev = ppce500_init_mpic_kvm(pmc, irqs, &err);
-         }
--        if (machine_kernel_irqchip_required(machine) && !dev) {
-+        if (kvm_kernel_irqchip_required() && !dev) {
-             error_reportf_err(err,
-                               "kernel_irqchip requested but unavailable: ");
-             exit(1);
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index b941608..8b66eb9 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -77,9 +77,9 @@ int spapr_irq_init_kvm(int (*fn)(SpaprInterruptController *, Error **),
-     MachineState *machine = MACHINE(qdev_get_machine());
-     Error *local_err = NULL;
- 
--    if (kvm_enabled() && machine_kernel_irqchip_allowed(machine)) {
-+    if (kvm_enabled() && kvm_kernel_irqchip_allowed()) {
-         if (fn(intc, &local_err) < 0) {
--            if (machine_kernel_irqchip_required(machine)) {
-+            if (kvm_kernel_irqchip_required()) {
-                 error_prepend(&local_err,
-                               "kernel_irqchip requested but unavailable: ");
-                 error_propagate(errp, local_err);
-@@ -184,7 +184,7 @@ static int spapr_irq_check(SpaprMachineState *spapr, Error **errp)
-      */
-     if (kvm_enabled() &&
-         spapr->irq == &spapr_irq_dual &&
--        machine_kernel_irqchip_required(machine) &&
-+        kvm_kernel_irqchip_required() &&
-         xics_kvm_has_broken_disconnect(spapr)) {
-         error_setg(errp, "KVM is too old to support ic-mode=dual,kernel-irqchip=on");
-         return -1;
-@@ -276,12 +276,12 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
-     MachineState *machine = MACHINE(spapr);
-     SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
- 
--    if (machine_kernel_irqchip_split(machine)) {
-+    if (kvm_enabled() && kvm_kernel_irqchip_split()) {
-         error_setg(errp, "kernel_irqchip split mode not supported on pseries");
-         return;
-     }
- 
--    if (!kvm_enabled() && machine_kernel_irqchip_required(machine)) {
-+    if (!kvm_enabled() && kvm_kernel_irqchip_required()) {
-         error_setg(errp,
-                    "kernel_irqchip requested but only available with KVM");
-         return;
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 9d14328..46a9f18 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -514,10 +514,13 @@ void kvm_pc_gsi_handler(void *opaque, int n, int level);
- void kvm_pc_setup_irq_routing(bool pci_enabled);
- void kvm_init_irq_routing(KVMState *s);
- 
-+bool kvm_kernel_irqchip_allowed(void);
-+bool kvm_kernel_irqchip_required(void);
-+bool kvm_kernel_irqchip_split(void);
-+
- /**
-  * kvm_arch_irqchip_create:
-  * @KVMState: The KVMState pointer
-- * @MachineState: The MachineState pointer
-  *
-  * Allow architectures to create an in-kernel irq chip themselves.
-  *
-@@ -525,7 +528,7 @@ void kvm_init_irq_routing(KVMState *s);
-  *            0: irq chip was not created
-  *          > 0: irq chip was created
-  */
--int kvm_arch_irqchip_create(MachineState *ms, KVMState *s);
-+int kvm_arch_irqchip_create(KVMState *s);
- 
- /**
-  * kvm_set_one_reg - set a register value in KVM via KVM_SET_ONE_REG ioctl
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index b473c63..d10383c 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -726,11 +726,11 @@ void kvm_arch_init_irq_routing(KVMState *s)
- {
- }
- 
--int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
-+int kvm_arch_irqchip_create(KVMState *s)
- {
--     if (machine_kernel_irqchip_split(ms)) {
--         perror("-machine kernel_irqchip=split is not supported on ARM.");
--         exit(1);
-+    if (kvm_kernel_irqchip_split()) {
-+        perror("-machine kernel_irqchip=split is not supported on ARM.");
-+        exit(1);
-     }
- 
-     /* If we can create the VGIC using the newer device control API, we
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 7dc05c6..72bb215 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -4473,10 +4473,10 @@ void kvm_arch_init_irq_routing(KVMState *s)
-     }
- }
- 
--int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
-+int kvm_arch_irqchip_create(KVMState *s)
- {
-     int ret;
--    if (machine_kernel_irqchip_split(ms)) {
-+    if (kvm_kernel_irqchip_split()) {
-         ret = kvm_vm_enable_cap(s, KVM_CAP_SPLIT_IRQCHIP, 0, 24);
-         if (ret) {
-             error_report("Could not enable split irqchip mode: %s",
-diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-index 578bc14..de3e26e 100644
---- a/target/mips/kvm.c
-+++ b/target/mips/kvm.c
-@@ -57,7 +57,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     return 0;
- }
- 
--int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
-+int kvm_arch_irqchip_create(KVMState *s)
- {
-     return 0;
- }
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 7d2e896..02face1 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -152,7 +152,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     return 0;
- }
- 
--int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
-+int kvm_arch_irqchip_create(KVMState *s)
- {
-     return 0;
- }
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 0c9d14b..f3a742b 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -374,7 +374,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     return 0;
- }
- 
--int kvm_arch_irqchip_create(MachineState *ms, KVMState *s)
-+int kvm_arch_irqchip_create(KVMState *s)
- {
-     return 0;
- }
+-    /* Check if IGD GFX passthrough. */
+-    igd_gfx_passthru();
+-
+     /* init generic devices */
+     rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
+     qemu_opts_foreach(qemu_find_opts("device"),
 -- 
 1.8.3.1
 
