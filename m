@@ -2,87 +2,94 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F149C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 20:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C614DC432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 20:19:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D41E4206EF
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 20:18:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A3C7206EF
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 20:19:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="czzAc6sv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D41E4206EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yFplq8a6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A3C7206EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUz5m-000859-9A
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 15:18:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34537)
+	id 1iUz7D-0000VC-OM
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 15:19:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35015)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1iUz4s-0007ck-71
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 15:17:24 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iUz5Q-0007um-8E
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 15:17:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1iUz4p-0002Vl-0l
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 15:17:20 -0500
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:4803)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1iUz4o-0002UI-IB
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 15:17:18 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5dcc64cf0000>; Wed, 13 Nov 2019 12:17:19 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Wed, 13 Nov 2019 12:17:16 -0800
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Wed, 13 Nov 2019 12:17:16 -0800
-Received: from [10.25.73.195] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
- 2019 20:17:08 +0000
-Subject: Re: [PATCH v9 Kernel 1/5] vfio: KABI for migration interface for
- device state
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
- <1573578220-7530-2-git-send-email-kwankhede@nvidia.com>
- <20191112153005.53bf324c@x1.home> <20191113112417.6e40ce96.cohuck@redhat.com>
- <20191113112733.49542ebc@x1.home>
- <94592507-fadb-0f10-ee17-f8d5678c70e5@nvidia.com>
- <20191113124818.2b5be89d@x1.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <f0673bfe-7db9-d54d-ce2a-c4b834543478@nvidia.com>
-Date: Thu, 14 Nov 2019 01:47:04 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+ (envelope-from <richard.henderson@linaro.org>) id 1iUz5O-00033Y-Nq
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 15:17:55 -0500
+Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:53884)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iUz5O-00031I-GA
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 15:17:54 -0500
+Received: by mail-wm1-x32b.google.com with SMTP id u18so3365321wmc.3
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 12:17:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=9lNDgQkDfCzQ/3MlGyJwzhb0EoaDDahlQMSOPxjM410=;
+ b=yFplq8a6ZgGqWj//YGa/xCWerTQyz39Ex7IBLs4WKaKsyklsG1ICH7++jwykzdTFZQ
+ v6dCFnnRxp4HJReq36JqaEhlyOS9P02TakQfObUFzMBJxuHwquOceY+JJNCCmJsricII
+ suLettqUklvumTePT3swoQWF/GRajVtY+G7wp5mz37T3ODxd7sHqUdBuBkqzl3IFpzIm
+ lMsrU7vlARf18OmMpFWHhE+vwRqdAy/+Nu9VtRHZIWg99xkwozYc6ed93WxrXhEnBWzW
+ txpkDWlkpb6UBi8wdyXxz1s6wZtLs6o6GLlrHGLX98ZG0RUrZ/y97VzYsPbnZsczacTE
+ DjhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9lNDgQkDfCzQ/3MlGyJwzhb0EoaDDahlQMSOPxjM410=;
+ b=d34+G0CUFU7wzVHf6WjbJ6gZOAEQ1cPhY6WJ783ZQvh8igJ/iEvvgEB3SgUxUkNYZN
+ nvYlVAxLQGS5S+cj028ni6bDm9dvLwTgMaDT5WA9UYkEOLKMk4PMD2lu/n+3alUSgV6x
+ 8NKEONhZSJ5jAEdQPomlvCkDd0aOwUEG3rNlt/koQI25yUQjmv+0Juw36AsWh+XynJcx
+ Ct9GDb/eYvPZNhSGs8xe2jiyV8eazmaaq51lGnh/AI7V16bSet4ryBjGZKhQVpTEwDRa
+ kajhUO416CUC/aOPZsqUBK2sQYTlS/MQij94dgy2HLM6YJnNve0AHwPOKzCwQsjum39y
+ cZ6Q==
+X-Gm-Message-State: APjAAAUVX8dvq0PTM7Z0kAdOn3ZoIGdgelHWph2LINR5zqZoRdVzu2s9
+ VOzRS33DkOD7W0AyF2hktZLfxtdoj246WQ==
+X-Google-Smtp-Source: APXvYqxeqmfW5SRDiR14WaZ+auR7RVfXP+xdnO25t/oOrIXwAjin88RO5Ja2tuGLTr2+opVixcRF9Q==
+X-Received: by 2002:a1c:46:: with SMTP id 67mr4761187wma.51.1573676272809;
+ Wed, 13 Nov 2019 12:17:52 -0800 (PST)
+Received: from [192.168.8.102] (219.red-37-158-56.dynamicip.rima-tde.net.
+ [37.158.56.219])
+ by smtp.gmail.com with ESMTPSA id a186sm3018233wmc.48.2019.11.13.12.17.51
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 13 Nov 2019 12:17:52 -0800 (PST)
+Subject: Re: [PULL 04/11] target/arm/cpu64: max cpu: Introduce sve<N>
+ properties
+To: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
+References: <20191101085140.5205-1-peter.maydell@linaro.org>
+ <20191101085140.5205-5-peter.maydell@linaro.org>
+ <CAFEAcA-xYWLzsfDAWWmEk4DhXcO5zqKVZMrRp9=4t9MBAasaMA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <ac0c7520-2f6b-fb49-c725-37b46272c835@linaro.org>
+Date: Wed, 13 Nov 2019 21:17:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191113124818.2b5be89d@x1.home>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+In-Reply-To: <CAFEAcA-xYWLzsfDAWWmEk4DhXcO5zqKVZMrRp9=4t9MBAasaMA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1573676240; bh=DHOHiB4ImG16t5YYfA/EGzbykv4Qjn/Uga8j+2nz0nA=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=czzAc6sv4BtazbPm4Rftnd4+v+o1JhYBUqno9ar4+HFqjDT8DoJZpVFfpZ/ikyShL
- OTnwQAzEMqhktT8JN5VKPREOWSGznLhpY0WdtLZAM2JcT0mY7GbGkzgpsWGklxoZSy
- 4gna/JsaSKNh1mdFgdqpKSEOwSVN8eHlSoDzUOTejawtHJ+O6WLb5AzHJ3gpiH+/eQ
- 1b4IZ2CjKkcMomm08vgn7kxnnCjrH9q/bY9s3DNOmJXl+Yh9s8Wgy6gFrslsukzCSE
- k/HDBKP7jodiFeVazS93lPBL2MN/BOby9yIuy9nT61c9qI4K8MFwnln3VyPWgfRJpC
- f7bWW7+x15twA==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.143
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::32b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,275 +101,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com,
- felipe@nutanix.com, jonathan.davies@nutanix.com, yan.y.zhao@intel.com,
- changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 11/12/19 11:23 AM, Peter Maydell wrote:
+>> +static uint32_t sve_zcr_get_valid_len(ARMCPU *cpu, uint32_t start_len)
+>> +{
+>> +    uint32_t start_vq = (start_len & 0xf) + 1;
+>> +
+>> +    return arm_cpu_vq_map_next_smaller(cpu, start_vq + 1) - 1;
+> 
+> "Subtract operation overflows on operands
+> arm_cpu_vq_map_next_smaller(cpu, start_vq + 1U) and 1U"
+> 
+> Certainly it looks as if arm_cpu_vq_map_next_smaller() can
+> return 0, and claiming the valid length to be UINT_MAX
+> seems a bit odd in that case.
+
+The lsb is always set in the map, the minimum number we send to next_smaller is
+2 -> so the minimum number returned from next_smaller is 1.
+
+We should never return UINT_MAX.
+
+>     return bitnum == vq - 1 ? 0 : bitnum + 1;
+
+But yes, this computation doesn't seem right.
+
+The beginning assert should probably be (vq >= 2 ...)
+and here we should assert bitnum != vq - 1.
 
 
-On 11/14/2019 1:18 AM, Alex Williamson wrote:
-> On Thu, 14 Nov 2019 00:59:52 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> On 11/13/2019 11:57 PM, Alex Williamson wrote:
->>> On Wed, 13 Nov 2019 11:24:17 +0100
->>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>    
->>>> On Tue, 12 Nov 2019 15:30:05 -0700
->>>> Alex Williamson <alex.williamson@redhat.com> wrote:
->>>>   
->>>>> On Tue, 12 Nov 2019 22:33:36 +0530
->>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->>>>>       
->>>>>> - Defined MIGRATION region type and sub-type.
->>>>>> - Used 3 bits to define VFIO device states.
->>>>>>       Bit 0 => _RUNNING
->>>>>>       Bit 1 => _SAVING
->>>>>>       Bit 2 => _RESUMING
->>>>>>       Combination of these bits defines VFIO device's state during migration
->>>>>>       _RUNNING => Normal VFIO device running state. When its reset, it
->>>>>> 		indicates _STOPPED state. when device is changed to
->>>>>> 		_STOPPED, driver should stop device before write()
->>>>>> 		returns.
->>>>>>       _SAVING | _RUNNING => vCPUs are running, VFIO device is running but
->>>>>>                             start saving state of device i.e. pre-copy state
->>>>>>       _SAVING  => vCPUs are stopped, VFIO device should be stopped, and
->>>>>
->>>>> s/should/must/
->>>>>       
->>>>>>                   save device state,i.e. stop-n-copy state
->>>>>>       _RESUMING => VFIO device resuming state.
->>>>>>       _SAVING | _RESUMING and _RUNNING | _RESUMING => Invalid states
->>>>>
->>>>> A table might be useful here and in the uapi header to indicate valid
->>>>> states:
->>>>
->>>> I like that.
->>>>   
->>>>>
->>>>> | _RESUMING | _SAVING | _RUNNING | Description
->>>>> +-----------+---------+----------+------------------------------------------
->>>>> |     0     |    0    |     0    | Stopped, not saving or resuming (a)
->>>>> +-----------+---------+----------+------------------------------------------
->>>>> |     0     |    0    |     1    | Running, default state
->>>>> +-----------+---------+----------+------------------------------------------
->>>>> |     0     |    1    |     0    | Stopped, migration interface in save mode
->>>>> +-----------+---------+----------+------------------------------------------
->>>>> |     0     |    1    |     1    | Running, save mode interface, iterative
->>>>> +-----------+---------+----------+------------------------------------------
->>>>> |     1     |    0    |     0    | Stopped, migration resume interface active
->>>>> +-----------+---------+----------+------------------------------------------
->>>>> |     1     |    0    |     1    | Invalid (b)
->>>>> +-----------+---------+----------+------------------------------------------
->>>>> |     1     |    1    |     0    | Invalid (c)
->>>>> +-----------+---------+----------+------------------------------------------
->>>>> |     1     |    1    |     1    | Invalid (d)
->>>>>
->>>>> I think we need to consider whether we define (a) as generally
->>>>> available, for instance we might want to use it for diagnostics or a
->>>>> fatal error condition outside of migration.
->>>>>
->>>>> Are there hidden assumptions between state transitions here or are
->>>>> there specific next possible state diagrams that we need to include as
->>>>> well?
->>>>
->>>> Some kind of state-change diagram might be useful in addition to the
->>>> textual description anyway. Let me try, just to make sure I understand
->>>> this correctly:
->>>>   
->>
->> During User application initialization, there is one more state change:
->>
->> 0) 0/0/0 ---- stop to running -----> 0/0/1
-> 
-> 0/0/0 cannot be the initial state of the device, that would imply that
-> a device supporting this migration interface breaks backwards
-> compatibility with all existing vfio userspace code and that code needs
-> to learn to set the device running as part of its initialization.
-> That's absolutely unacceptable.  The initial device state must be 0/0/1.
-> 
-
-There isn't any device state for all existing vfio userspace code right 
-now. So default its assumed to be always running.
-
-With migration support, device states are explicitly getting added. For 
-example, in case of QEMU, while device is getting initialized, i.e. from 
-vfio_realize(), device_state is set to 0/0/0, but not required to convey 
-it to vendor driver. Then with vfio_vmstate_change() notifier, device 
-state is changed to 0/0/1 when VM/vCPU are transitioned to running, at 
-this moment device state is conveyed to vendor driver. So vendor driver 
-doesn't see 0/0/0 state.
-
-While resuming, for userspace, for example QEMU, device state change is 
-from 0/0/0 to 1/0/0, vendor driver see 1/0/0 after device basic 
-initialization is done.
-
-
->>>> 1) 0/0/1 ---(trigger driver to start gathering state info)---> 0/1/1
->>
->> not just gathering state info, but also copy device state to be
->> transferred during pre-copy phase.
->>
->> Below 2 state are not just to tell driver to stop, those 2 differ.
->> 2) is device state changed from running to stop, this is when VM
->> shutdowns cleanly, no need to save device state
-> 
-> Userspace is under no obligation to perform this state change though,
-> backwards compatibility dictates this.
->   
->>>> 2) 0/0/1 ---(tell driver to stop)---> 0/0/0
->>
->>>> 3) 0/1/1 ---(tell driver to stop)---> 0/1/0
->>
->> above is transition from pre-copy phase to stop-and-copy phase, where
->> device data should be made available to user to transfer to destination
->> or to save it to file in case of save VM or suspend.
->>
->>
->>>> 4) 0/0/1 ---(tell driver to resume with provided info)---> 1/0/0
->>>
->>> I think this is to switch into resuming mode, the data will follow >
->>>> 5) 1/0/0 ---(driver is ready)---> 0/0/1
->>>> 6) 0/1/1 ---(tell driver to stop saving)---> 0/0/1
->>>   
->>
->> above can occur on migration cancelled or failed.
->>
->>
->>> I think also:
->>>
->>> 0/0/1 --> 0/1/0 If user chooses to go directly to stop and copy
->>
->> that's right, this happens in case of save VM or suspend VM.
->>
->>>
->>> 0/0/0 and 0/0/1 should be reachable from any state, though I could see
->>> that a vendor driver could fail transition from 1/0/0 -> 0/0/1 if the
->>> received state is incomplete.  Somehow though a user always needs to
->>> return the device to the initial state, so how does device_state
->>> interact with the reset ioctl?  Would this automatically manipulate
->>> device_state back to 0/0/1?
->>
->> why would reset occur on 1/0/0 -> 0/0/1 failure?
-> 
-> The question is whether the reset ioctl automatically puts the device
-> back into the initial state, 0/0/1.  A reset from 1/0/0 -> 0/0/1
-> presumably discards much of the device state we just restored, so
-> clearly that would be undesirable.
->   
->> 1/0/0 -> 0/0/1 fails, then user should convey that to source that
->> migration has failed, then resume at source.
-> 
-> In the scheme of the migration yet, but as far as the vfio interface is
-> concerned the user should have a path to make use of a device after
-> this point without closing it and starting over.  Thus, if a 1/0/0 ->
-> 0/0/1 transition fails, would we define the device reset ioctl as a
-> mechanism to flush the bogus state and place the device into the 0/0/1
-> initial state?
->
-
-Ok, userspace applications can be designed to do that. As of now with 
-QEMU, I don't see a way to reset device on 1/0/0-> 0/0/1 failure.
-
-
->>>      
->>>> Not sure about the usefulness of 2).
->>
->> I explained this above.
->>
->>>> Also, is 4) the only way to
->>>> trigger resuming?
->> Yes.
->>
->>>> And is the change in 5) performed by the driver, or
->>>> by userspace?
->>>>   
->> By userspace.
->>
->>>> Are any other state transitions valid?
->>>>
->>>> (...)
->>>>   
->>>>>> + * Sequence to be followed for _SAVING|_RUNNING device state or pre-copy phase
->>>>>> + * and for _SAVING device state or stop-and-copy phase:
->>>>>> + * a. read pending_bytes. If pending_bytes > 0, go through below steps.
->>>>>> + * b. read data_offset, indicates kernel driver to write data to staging buffer.
->>>>>> + *    Kernel driver should return this read operation only after writing data to
->>>>>> + *    staging buffer is done.
->>>>>
->>>>> "staging buffer" implies a vendor driver implementation, perhaps we
->>>>> could just state that data is available from (region + data_offset) to
->>>>> (region + data_offset + data_size) upon return of this read operation.
->>>>>       
->>>>>> + * c. read data_size, amount of data in bytes written by vendor driver in
->>>>>> + *    migration region.
->>>>>> + * d. read data_size bytes of data from data_offset in the migration region.
->>>>>> + * e. process data.
->>>>>> + * f. Loop through a to e. Next read on pending_bytes indicates that read data
->>>>>> + *    operation from migration region for previous iteration is done.
->>>>>
->>>>> I think this indicate that step (f) should be to read pending_bytes, the
->>>>> read sequence is not complete until this step.  Optionally the user can
->>>>> then proceed to step (b).  There are no read side-effects of (a) afaict.
->>>>>
->>>>> Is the use required to reach pending_bytes == 0 before changing
->>>>> device_state, particularly transitioning to !_RUNNING?  Presumably the
->>>>> user can exit this sequence at any time by clearing _SAVING.
->>>>
->>>> That would be transition 6) above (abort saving and continue). I think
->>>> it makes sense not to forbid this.
->>>>   
->>>>>       
->>>>>> + *
->>>>>> + * Sequence to be followed while _RESUMING device state:
->>>>>> + * While data for this device is available, repeat below steps:
->>>>>> + * a. read data_offset from where user application should write data.
->>>>>> + * b. write data of data_size to migration region from data_offset.
->>>>>> + * c. write data_size which indicates vendor driver that data is written in
->>>>>> + *    staging buffer. Vendor driver should read this data from migration
->>>>>> + *    region and resume device's state.
->>>>>
->>>>> The device defaults to _RUNNING state, so a prerequisite is to set
->>>>> _RESUMING and clear _RUNNING, right?
->>>>   
->>
->> Sorry, I replied yes in my previous reply, but no. Default device state
->> is _STOPPED. During resume _STOPPED -> _RESUMING
-> 
-> Nope, it can't be, it must be _RUNNING.
-> 
->>>> Transition 4) above. Do we need
->>
->> I think, its not required.
-> 
-> But above we say it's the only way to trigger resuming (4 was 0/0/1 ->
-> 1/0/0).
-> 
->>>> 7) 0/0/0 ---(tell driver to resume with provided info)---> 1/0/0
->>>> as well? (Probably depends on how sensible the 0/0/0 state is.)
->>>
->>> I think we must unless we require the user to transition from 0/0/1 to
->>> 1/0/0 in a single operation, but I'd prefer to make 0/0/0 generally
->>> available.  Thanks,
->>>    
->>
->> its 0/0/0 -> 1/0/0 while resuming.
-> 
-> I think we're starting with different initial states, IMO there is
-> absolutely no way around 0/0/1 being the initial device state.
-> Anything otherwise means that we cannot add migration support to an
-> existing device and maintain compatibility with existing userspace.
-> Thanks,
-> 
-Hope above explanation helps to resolve this concern.
-
-Thanks,
-Kirti
+r~
 
