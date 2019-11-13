@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C19C43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 671D7C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:44:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61ADB222D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:44:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31C36222CD
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:44:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ocU7YEdc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61ADB222D3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TnFge3x3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31C36222CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUtsm-0003e9-3S
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 09:44:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54481)
+	id 1iUtt3-00048T-UT
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 09:44:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54483)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnd-0005ia-T8
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:15 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnd-0005ih-WF
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnc-0006JK-EY
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnc-0006JU-Vk
  for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:13 -0500
-Received: from mail-wr1-x42e.google.com ([2a00:1450:4864:20::42e]:41953)
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33032)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iUtnc-0006Ix-8F
+ id 1iUtnc-0006JB-OX
  for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:12 -0500
-Received: by mail-wr1-x42e.google.com with SMTP id b18so1155319wrj.8
+Received: by mail-wr1-x441.google.com with SMTP id w9so2667432wrr.0
  for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 06:39:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=iszTbD52Pp95pGi+D6mfWjcoYn8y4e0DUxu7sGpWVv8=;
- b=ocU7YEdcWgUInMs8QTjOwNa8tyyTVUcEPaSdeDA0Gw0R6QO47jYGY9uKTHZXgiOjY8
- wG54mQQPoXOR/Wc/4Wse30XbZCtOBzgCdzpLU6Xe+mdibwFxyv8vZbVOXMR797QDrYyS
- tSn1Lt+oijU98DeHU0G9oQGy8hi3vU7H0Jr9aIscVF4pKKp0hcRllLdsiSt1G98122Ib
- 8ChCmm9hc9tiGcz35d/1ssbvx0xo8XTo3S/BHY1cO6CtPv8ZonexA/RHocxORFnRSKi+
- VEMYB59VBBGya2V9jDiUL60R/hRE64COG53cbJs90MDnapW3c80PvC+hFOOVCI8a2Pcd
- xm7A==
+ bh=BMoj3pLYyIvpZE90nhRpNRgweOStTA6dPJpbWeqyIqQ=;
+ b=TnFge3x3+IgpnvnFjoTBzC6C4TgEH73eBp9JvzN1Z+Log2Wks1dYzLUXF4qbkO0V0W
+ Qh+SfD6hrwB69FBBj4r3gpD7VsGpnRYY/+yLZQ5WM/uG/jVAICo933BuzltwN3tdIi+g
+ OOe9+bzfeTW1XgqlpE0mqNVX5uxNrc3OylpzHns2+5GFMRmUsXs+mxHfuSBVljt7U4qX
+ XkQNi1T1R5Bg0ZuuCHuAlRdCzu0UAeKWO+yE0JDp975/gPjSJGPr7b31GKS+ghniuIVx
+ 5p6zoZfEbbMM6J2p3CA77ulnPe+glSfrXw5eOiz70nOa3PSreb3tilY60dpA7WJFyWwE
+ ixZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=iszTbD52Pp95pGi+D6mfWjcoYn8y4e0DUxu7sGpWVv8=;
- b=Vc1KiL4G6ynNndssIWtRfaRuIVVn57KuTZhXvUObFnSLqaQAojZ9f3YjkymOM33b3d
- Zwk3zXIVeDJzV+wL559q975ZKPAiBT25jzJG9N6VDlcYwk8fh6/TMMQT1UxrqZr+LW/O
- hlsRFzJi2DjjyAd6fXxjJcTKivTw5mHiV99TJMNobAKx1yFxiL+XR7SAUeo6A4o8lGYH
- 7wxdROSB5lYJKLok89AAzQ7FtwQT5fXRm0w1CDMgu2H3gzekJLlEblmijB0g2C9VSDxQ
- f0s8BeDCWtavk2ZYgRQrQB3Cg6t7C549ALn4ZQTJhYXpP12FR4ueQC0sUG6mK729sIJ/
- AAbA==
-X-Gm-Message-State: APjAAAX94X8EYCTr9wBeWq7zNlplNqLTQVOzyLQIY+2UsRaVn2qjfEL2
- oKYR/P3ksgTmIVTMgKJpMnZubXhW
-X-Google-Smtp-Source: APXvYqwgMc+uvpb87z7h625e7xXIKMo3AkkxR3VPORNOPV09LQS88OHOfNz+fEykqzkLkjU+HDGErw==
-X-Received: by 2002:a5d:48c8:: with SMTP id p8mr3336952wrs.318.1573655950228; 
- Wed, 13 Nov 2019 06:39:10 -0800 (PST)
+ bh=BMoj3pLYyIvpZE90nhRpNRgweOStTA6dPJpbWeqyIqQ=;
+ b=r3em8jgcnZKCtf9gBk12MGvhQARflrD/JhXxNOjnET1XTW1o2taCnaQ0tHpKfCTWoF
+ MY0n6GVGZ0C2PG2egzjlEzlKnMP3HigJQGbEXd8kLJjflEnxS8bCrangiawjvqP1nF2K
+ Q0sb+Hqzy4HUbEA9uVOYkxXLE1VLTPgz2id7WyqGwvL6ovbe5qCrhoiZDCP7lOiP/EM4
+ Rg3hj0nWxpaivUMRxWHUdksxyDO53INLVbqkF9ik5yxeJ1Z8b+cKh621OgELMj01Ul51
+ Ly6itNXoFfybS5iN5n112Na43fAaXBMZLOtjwEiNKrIJhgf7+WPaITYM1L6jixLEaP7e
+ FIng==
+X-Gm-Message-State: APjAAAVFUN8agImoWV+7w/BQra0yerg7TtnKCvP2CXaKaHQti6ceI6Dn
+ VOJ/w5hzgU/98R/KiCKblx+N9+8S
+X-Google-Smtp-Source: APXvYqyU5bACf/fUSCh/UMDpw/ZTXwjkL+n/6PZA6pDio2/uZlRNeM/6FAkz70Qmrlte2HILhEAplw==
+X-Received: by 2002:adf:fa0b:: with SMTP id m11mr3365936wrr.279.1573655951103; 
+ Wed, 13 Nov 2019 06:39:11 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s11sm2965823wrr.43.2019.11.13.06.39.09
+ by smtp.gmail.com with ESMTPSA id s11sm2965823wrr.43.2019.11.13.06.39.10
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 13 Nov 2019 06:39:09 -0800 (PST)
+ Wed, 13 Nov 2019 06:39:10 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/16] vl: merge -accel processing into configure_accelerators
-Date: Wed, 13 Nov 2019 15:38:52 +0100
-Message-Id: <1573655945-14912-4-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 04/16] vl: move icount configuration earlier
+Date: Wed, 13 Nov 2019 15:38:53 +0100
+Message-Id: <1573655945-14912-5-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
 References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::42e
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,214 +94,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The next step is to move the parsing of "-machine accel=..." into vl.c,
-unifying it with the configure_accelerators() function that has just
-been introduced.  This way, we will be able to desugar it into multiple
-"-accel" options, without polluting accel/accel.c.
+Once qemu_tcg_configure is turned into a QOM property setter, it will not
+be able to set a default value for mttcg_enabled.  Setting the default will
+move to the TCG init_machine method, which currently runs after "-icount"
+is processed.
 
-The CONFIG_TCG and CONFIG_KVM symbols are not available in vl.c, but
-we can use accel_find instead to find their value at runtime.  Once we
-know that the binary has one of TCG or KVM, the default accelerator
-can be expressed simply as "tcg:kvm", because TCG never fails to initialize.
+However, it is harmless to do configure_icount for all accelerators; we will
+just fail later if a non-TCG accelerator being selected.  So do that.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- accel/accel.c          | 63 ++------------------------------------------------
- include/sysemu/accel.h |  4 +++-
- vl.c                   | 62 +++++++++++++++++++++++++++++++++++++++++++++----
- 3 files changed, 62 insertions(+), 67 deletions(-)
+ vl.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/accel/accel.c b/accel/accel.c
-index 5fa3171..74eda68 100644
---- a/accel/accel.c
-+++ b/accel/accel.c
-@@ -44,7 +44,7 @@ static const TypeInfo accel_type = {
- };
- 
- /* Lookup AccelClass from opt_name. Returns NULL if not found */
--static AccelClass *accel_find(const char *opt_name)
-+AccelClass *accel_find(const char *opt_name)
- {
-     char *class_name = g_strdup_printf(ACCEL_CLASS_NAME("%s"), opt_name);
-     AccelClass *ac = ACCEL_CLASS(object_class_by_name(class_name));
-@@ -52,7 +52,7 @@ static AccelClass *accel_find(const char *opt_name)
-     return ac;
- }
- 
--static int accel_init_machine(AccelClass *acc, MachineState *ms)
-+int accel_init_machine(AccelClass *acc, MachineState *ms)
- {
-     ObjectClass *oc = OBJECT_CLASS(acc);
-     const char *cname = object_class_get_name(oc);
-@@ -71,65 +71,6 @@ static int accel_init_machine(AccelClass *acc, MachineState *ms)
-     return ret;
- }
- 
--void configure_accelerator(MachineState *ms, const char *progname)
--{
--    const char *accel;
--    char **accel_list, **tmp;
--    int ret;
--    bool accel_initialised = false;
--    bool init_failed = false;
--    AccelClass *acc = NULL;
--
--    accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
--    if (accel == NULL) {
--        /* Select the default accelerator */
--        int pnlen = strlen(progname);
--        if (pnlen >= 3 && g_str_equal(&progname[pnlen - 3], "kvm")) {
--            /* If the program name ends with "kvm", we prefer KVM */
--            accel = "kvm:tcg";
--        } else {
--#if defined(CONFIG_TCG)
--            accel = "tcg";
--#elif defined(CONFIG_KVM)
--            accel = "kvm";
--#else
--            error_report("No accelerator selected and"
--                         " no default accelerator available");
--            exit(1);
--#endif
--        }
--    }
--
--    accel_list = g_strsplit(accel, ":", 0);
--
--    for (tmp = accel_list; !accel_initialised && tmp && *tmp; tmp++) {
--        acc = accel_find(*tmp);
--        if (!acc) {
--            continue;
--        }
--        ret = accel_init_machine(acc, ms);
--        if (ret < 0) {
--            init_failed = true;
--            error_report("failed to initialize %s: %s",
--                         acc->name, strerror(-ret));
--        } else {
--            accel_initialised = true;
--        }
--    }
--    g_strfreev(accel_list);
--
--    if (!accel_initialised) {
--        if (!init_failed) {
--            error_report("-machine accel=%s: No accelerator found", accel);
--        }
--        exit(1);
--    }
--
--    if (init_failed) {
--        error_report("Back to %s accelerator", acc->name);
--    }
--}
--
- void accel_setup_post(MachineState *ms)
- {
-     AccelState *accel = ms->accelerator;
-diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-index 8eb60b8..90b6213 100644
---- a/include/sysemu/accel.h
-+++ b/include/sysemu/accel.h
-@@ -66,7 +66,9 @@ typedef struct AccelClass {
- 
- extern unsigned long tcg_tb_size;
- 
--void configure_accelerator(MachineState *ms, const char *progname);
-+AccelClass *accel_find(const char *opt_name);
-+int accel_init_machine(AccelClass *acc, MachineState *ms);
-+
- /* Called just before os_setup_post (ie just before drop OS privs) */
- void accel_setup_post(MachineState *ms);
- 
 diff --git a/vl.c b/vl.c
-index 5367f23..fc9e70f 100644
+index fc9e70f..dbc99d7 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -2845,8 +2845,62 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
+@@ -2829,11 +2829,7 @@ static void user_register_global_props(void)
+ 
+ static int do_configure_icount(void *opaque, QemuOpts *opts, Error **errp)
+ {
+-    if (tcg_enabled()) {
+-        configure_icount(opts, errp);
+-    } else {
+-        error_setg(errp, "-icount is not allowed with hardware virtualization");
+-    }
++    configure_icount(opts, errp);
      return 0;
  }
  
--static void configure_accelerators(void)
-+static void configure_accelerators(const char *progname)
- {
-+    const char *accel;
-+    char **accel_list, **tmp;
-+    int ret;
-+    bool accel_initialised = false;
-+    bool init_failed = false;
-+    AccelClass *acc = NULL;
+@@ -2854,6 +2850,9 @@ static void configure_accelerators(const char *progname)
+     bool init_failed = false;
+     AccelClass *acc = NULL;
+ 
++    qemu_opts_foreach(qemu_find_opts("icount"),
++                      do_configure_icount, NULL, &error_fatal);
 +
-+    accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
-+    if (accel == NULL) {
-+        /* Select the default accelerator */
-+        if (!accel_find("tcg") && !accel_find("kvm")) {
-+            error_report("No accelerator selected and"
-+                         " no default accelerator available");
-+            exit(1);
-+        } else {
-+            int pnlen = strlen(progname);
-+            if (pnlen >= 3 && g_str_equal(&progname[pnlen - 3], "kvm")) {
-+                /* If the program name ends with "kvm", we prefer KVM */
-+                accel = "kvm:tcg";
-+            } else {
-+                accel = "tcg:kvm";
-+            }
-+        }
-+    }
+     accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
+     if (accel == NULL) {
+         /* Select the default accelerator */
+@@ -2901,11 +2900,13 @@ static void configure_accelerators(const char *progname)
+         error_report("Back to %s accelerator", acc->name);
+     }
+ 
+-    qemu_opts_foreach(qemu_find_opts("icount"),
+-                      do_configure_icount, NULL, &error_fatal);
+-
+     qemu_opts_foreach(qemu_find_opts("accel"),
+                       do_configure_accelerator, NULL, &error_fatal);
 +
-+    accel_list = g_strsplit(accel, ":", 0);
-+
-+    for (tmp = accel_list; !accel_initialised && tmp && *tmp; tmp++) {
-+        acc = accel_find(*tmp);
-+        if (!acc) {
-+            continue;
-+        }
-+        ret = accel_init_machine(acc, current_machine);
-+        if (ret < 0) {
-+            init_failed = true;
-+            error_report("failed to initialize %s: %s",
-+                         acc->name, strerror(-ret));
-+        } else {
-+            accel_initialised = true;
-+        }
-+    }
-+    g_strfreev(accel_list);
-+
-+    if (!accel_initialised) {
-+        if (!init_failed) {
-+            error_report("-machine accel=%s: No accelerator found", accel);
-+        }
++    if (!tcg_enabled() && use_icount) {
++        error_report("-icount is not allowed with hardware virtualization");
 +        exit(1);
 +    }
-+
-+    if (init_failed) {
-+        error_report("Back to %s accelerator", acc->name);
-+    }
-+
-     qemu_opts_foreach(qemu_find_opts("icount"),
-                       do_configure_icount, NULL, &error_fatal);
+ }
  
-@@ -4183,7 +4237,8 @@ int main(int argc, char **argv, char **envp)
-      * Note: uses machine properties such as kernel-irqchip, must run
-      * after machine_set_property().
-      */
--    configure_accelerator(current_machine, argv[0]);
-+    cpu_ticks_init();
-+    configure_accelerators(argv[0]);
- 
-     /*
-      * Beware, QOM objects created before this point miss global and
-@@ -4267,9 +4322,6 @@ int main(int argc, char **argv, char **envp)
-     /* spice needs the timers to be initialized by this point */
-     qemu_spice_init();
- 
--    cpu_ticks_init();
--    configure_accelerators();
--
-     if (default_net) {
-         QemuOptsList *net = qemu_find_opts("net");
-         qemu_opts_set(net, NULL, "type", "nic", &error_abort);
+ int main(int argc, char **argv, char **envp)
 -- 
 1.8.3.1
 
