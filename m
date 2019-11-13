@@ -2,85 +2,75 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F12CCC43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 09:35:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99145C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 09:37:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE1712196E
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 09:35:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fFzG8QIa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE1712196E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6D13D2196E
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 09:37:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D13D2196E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42464 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUp4A-0007Rp-Ue
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 04:35:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46098)
+	id 1iUp5D-0008Ms-Iz
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 04:37:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46140)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lersek@redhat.com>) id 1iUp3R-0006tY-Py
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:35:14 -0500
+ (envelope-from <bounces@canonical.com>) id 1iUp3p-0007EB-Sz
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:35:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lersek@redhat.com>) id 1iUp3Q-0008QF-Q4
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:35:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53803
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lersek@redhat.com>) id 1iUp3Q-0008On-Mw
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:35:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573637711;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UWAVBjO4TE8spENeGMJIe9SLcP/MQ3d38TnQilLPNhw=;
- b=fFzG8QIa9wPnAqbmzhG97wHYvFrvAnM8i2YoM3xPQLKFKLXf6tiG6V4bEExQkqCkf7v0J+
- YYut2Tb7tHG2F/aqSwlVt+Gs8xi4sXBY+oCs7dhcqWtgtOPAalJHXdSe7K2ieZlBsADquH
- LvsvvHCmw5ACpG8UFX2UfFYI8LTOxB4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-255-yd9Kk5IhN4maSE1aJEjwbQ-1; Wed, 13 Nov 2019 04:35:08 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFED9800590;
- Wed, 13 Nov 2019 09:35:07 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-116-243.ams2.redhat.com
- [10.36.116.243])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7CB9B28DCA;
- Wed, 13 Nov 2019 09:35:04 +0000 (UTC)
-Subject: Re: [PATCH] ahci: zero-initialize port struct
-To: Gerd Hoffmann <kraxel@redhat.com>, seabios@seabios.org
-References: <20191113091809.31365-1-kraxel@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <84d3a1aa-bbb2-d831-0abc-fe1169f8a860@redhat.com>
-Date: Wed, 13 Nov 2019 10:35:03 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ (envelope-from <bounces@canonical.com>) id 1iUp3o-0000Kf-LW
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:35:37 -0500
+Received: from indium.canonical.com ([91.189.90.7]:38718)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iUp3o-0000JK-F7
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 04:35:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iUp3m-0007eE-K2
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 09:35:34 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 9553E2E80C7
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 09:35:34 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20191113091809.31365-1-kraxel@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: yd9Kk5IhN4maSE1aJEjwbQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Wed, 13 Nov 2019 09:26:36 -0000
+From: Laurent Vivier <Laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: crobinso laurent-vivier pmaydell
+X-Launchpad-Bug-Reporter: Cole Robinson (crobinso)
+X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
+References: <157349721480.22191.14354362512617460510.malonedeb@soybean.canonical.com>
+Message-Id: <157363719710.21811.1266172365389136223.malone@soybean.canonical.com>
+Subject: [Bug 1852115] Re: qemu --static user build fails with fedora rawhide
+ glibc-2.30.9000
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 336fb9ae6640123e81aa681a9b20db253c083b0d
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,38 +79,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Reply-To: Bug 1852115 <1852115@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/13/19 10:18, Gerd Hoffmann wrote:
-> Specifically port->driver.lchs needs clearing, otherwise seabios will
+Fixed by 0f1f2d4596ae ("linux-user: remove host stime() syscall")
 
-s/driver/drive/
 
-> try interpret whatever random crap happens to be there as disk geometry,
-> which may or may not break boot depending on how lucky you are.
->=20
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  src/hw/ahci.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/src/hw/ahci.c b/src/hw/ahci.c
-> index 97a072a1ca81..d45b4307ec68 100644
-> --- a/src/hw/ahci.c
-> +++ b/src/hw/ahci.c
-> @@ -345,6 +345,7 @@ ahci_port_alloc(struct ahci_ctrl_s *ctrl, u32 pnr)
->          warn_noalloc();
->          return NULL;
->      }
-> +    memset(port, 0, sizeof(*port));
->      port->pnr =3D pnr;
->      port->ctrl =3D ctrl;
->      port->list =3D memalign_tmp(1024, 1024);
->=20
+** Changed in: qemu
+       Status: Confirmed =3D> Fix Committed
 
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1852115
+
+Title:
+  qemu --static user build fails with fedora rawhide glibc-2.30.9000
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  Building qemu latest git 654efcb511d on fedora rawhide fails with this
+  configure line:
+
+  ./configure \
+  	--static \
+  	--disable-system \
+  	--enable-linux-user \
+  	--disable-werror \
+  	--disable-tools \
+  	--disable-capstone
+
+  make fails with:
+
+  /usr/bin/ld: linux-user/syscall.o: in function `do_syscall1':
+  /root/qemu.git/linux-user/syscall.c:7769: undefined reference to `stime'
+  collect2: error: ld returned 1 exit status
+
+  Seems related to this glibc change:
+  https://sourceware.org/git/?p=3Dglibc.git;a=3Dcommit;h=3D12cbde1dae6fa4a9=
+a792b64564c7e0debf7544cc
+
+  ...
+
+  +* The obsolete function stime is no longer available to newly linked
+  +  binaries and it has been removed from <time.h> header.  This function
+  +  has been deprecated in favor of clock_settime.
+  +
+
+  # rpm -q glibc
+  glibc-2.30.9000-17.fc32.x86_64
+
+  =
+
+  FWIW there's some other messages but I don't think they are fatal:
+
+  /usr/bin/ld: /usr/lib/gcc/x86_64-redhat-linux/9/../../../../lib64/libglib=
+-2.0.a(gutils.c.o): in function `g_get_user_database_entry':
+  (.text+0x267): warning: Using 'getpwuid' in statically linked application=
+s requires at runtime the shared libraries from the glibc version used for =
+linking
+  /usr/bin/ld: (.text+0xe0): warning: Using 'getpwnam_r' in statically link=
+ed applications requires at runtime the shared libraries from the glibc ver=
+sion used for linking
+  /usr/bin/ld: (.text+0x11e): warning: Using 'getpwuid_r' in statically lin=
+ked applications requires at runtime the shared libraries from the glibc ve=
+rsion used for linking
+
+  =
+
+  Also, --disable-capstone is required to avoid this error, but it is pre-e=
+xisting, not sure if it's a bug, if so I can file a separate one:
+
+    LINK    aarch64-linux-user/qemu-aarch64
+  /usr/bin/ld: cannot find -lcapstone
+  collect2: error: ld returned 1 exit status
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1852115/+subscriptions
 
