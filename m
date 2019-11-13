@@ -2,84 +2,86 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A33C43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 00:54:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1CD6C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 00:55:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 79BCE21872
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 00:54:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D61C21872
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 00:55:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YdCkKLDl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79BCE21872
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lePXLF7A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D61C21872
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUgvm-0002x3-FY
-	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 19:54:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54238)
+	id 1iUgwA-0003Cg-M3
+	for qemu-devel@archiver.kernel.org; Tue, 12 Nov 2019 19:55:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54322)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <joel.stan@gmail.com>) id 1iUgtL-0001N4-5c
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 19:52:16 -0500
+ (envelope-from <joel.stan@gmail.com>) id 1iUgtT-0001VD-Vq
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 19:52:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel.stan@gmail.com>) id 1iUgtK-0005HQ-Ac
- for qemu-devel@nongnu.org; Tue, 12 Nov 2019 19:52:15 -0500
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:41626)
+ (envelope-from <joel.stan@gmail.com>) id 1iUgtT-0005K0-1P
+ for qemu-devel@nongnu.org; Tue, 12 Nov 2019 19:52:23 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:43754)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
- id 1iUgtI-0005Gx-Aq; Tue, 12 Nov 2019 19:52:12 -0500
-Received: by mail-pf1-x443.google.com with SMTP id p26so340987pfq.8;
- Tue, 12 Nov 2019 16:52:12 -0800 (PST)
+ id 1iUgtQ-0005JE-VB; Tue, 12 Nov 2019 19:52:21 -0500
+Received: by mail-pg1-x544.google.com with SMTP id l24so150809pgh.10;
+ Tue, 12 Nov 2019 16:52:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=m0HBsUHijHgIFgKZm6EaOmXclG6Mq1OAILNKtGWTkEo=;
- b=YdCkKLDlfhZ7DEoutIRY0whTzWTnnVTMNKC9DOU4MbEJxARyKdJrGxggCJezsGNnoN
- vRCR3qKFhGDtcUPfUNlHZDX6NXpxt0N2DhvRjrr15HCrb2CaZB+v4p4P3gZZq896wWUT
- EDFSPZSm7oCMuWLeXxvmrd3aSZ5+EEgcZla/rsN1A9svUIUcVQ42azydht1SVvUQs/Cy
- 8TLmf0ZKm5+wYjJbYfhCbMyXh6xMcqtXNAVnhHV62FSwyDQUmbEGBJIFqtUJYt7rdClE
- iIxmR0Bq+oCUfDesn7R0jSnntnBr0L5eKoXvHeW8pokviHzSRYS0TxRCKlOA8MNMI5Jo
- CxDA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=aNfFczhM8NYMoBpUcEwP04hyJCPiYk7J/QnyzWmI2l8=;
+ b=lePXLF7AcSFkiDMl6Or4EyDx6Sa5+DayZIMfs8WYoO61KhqXFZdHA2BYG+jWj6t87l
+ O/mtH/omXWKOtO2Ogig7yUxIj6Naq/nHLm1HmZGb4vCWyKrnE11m558QfaKmvdlTPey9
+ T8EHF42FPTUJRX/lPWYfuJbWyqTv672XJkC+elSQMZvGWJcy0yxl2VI0/SG+AJwB7ETH
+ Ul+zQFBO0w0x4VcxpRkP5aYxLkFnj4TIlfS+XoANp1BlJK/NvKqgaiwPwdXMyp8js4Y0
+ WOUJb0UgJghKvEyJAOw5UfvMW0NfZzq1sNR+HHdux8V0J9/JGdLzajnO46uBoIPN/snP
+ Na9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=m0HBsUHijHgIFgKZm6EaOmXclG6Mq1OAILNKtGWTkEo=;
- b=E26aJt9g/nW2RqbOP7Kdsgnz83lwam1cAHAJHZV9MkOsiZ/va0NCHBKve9KyEeIo6c
- /n4TAjuvIfMSH01eEefephTknyz4LqPtj2XcfvT7XgHTLFb5105xH1oU1b7nVqnZEB2D
- IRM98UFw1UfTIj4nJDLtVeFpfvO7umPG0EUW5jqaLY95DHe6EcbEZwb8Jn+x21gstJgv
- cLIWeYGflOjZ6aSMFDYrw6puBompzCYZTmnjtRVJ3ZvyRFcT6kHBjdXko6EAJgXVOyAM
- +fb/FNrAEwgpNBBwZMKDKpt+yFCTkZIPd/TvThSDwdMlfIns9DB0NAB7FU19q3dhaH1f
- 0L2Q==
-X-Gm-Message-State: APjAAAX7UW3UVePJKLgm6LgQwI450yZ2kH1xenyvc3IOle9yw/B4Z1n8
- JJ4dkvMgrz7+3JUwUwIzhV4=
-X-Google-Smtp-Source: APXvYqwRdtwXay8bJuzN8va72JlQTpVz1GC3aYrcrIAC8r7NxkN4vSKqy6ZKNa1WgIu4KqMDexlyEg==
-X-Received: by 2002:a17:90b:11cb:: with SMTP id
- gv11mr890469pjb.61.1573606330778; 
- Tue, 12 Nov 2019 16:52:10 -0800 (PST)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=aNfFczhM8NYMoBpUcEwP04hyJCPiYk7J/QnyzWmI2l8=;
+ b=Q1vbK9lK/Ch28B2KwpOTurG6wEWTOWBIvDjotey71hDJqLa/hUkYAsrN2MmX8oxsXe
+ bOXBgSo72TlRU/uAfk2XWXjw+McVtLMVabLymcex8/gtEugA7slz5Bk0sjMMxxBIuNYo
+ yLRUMKSumM54JhSEWSuTko49BvB6k9oOXYjHsUBIaQskpLK1u8lLXBPGAJp85v7jsYO0
+ ptGKpqMh+pZJR7l7fy9xtyWszGxWhPauypZV88iXdROykva2C/GFJWlUME4+61gd+lq1
+ /hwXRx8XpM1brb8e50LKqXzkSMPO/Q21tdRGp/a4h2U6DkLApYOKiRD5BLeD9Tczg6s4
+ 87Og==
+X-Gm-Message-State: APjAAAUBl5o/IzLpERqr5TXkryCdk4uJDQq4O1vfUqs/ec/sHSs8an9r
+ EPdR15AyQXvCFnqdSNHgTF8=
+X-Google-Smtp-Source: APXvYqzaZR0YirggX2ER41wzyMX4gPg5r9s+OsA6a96F3FNdJBFn5QwMH4cEhhdv8wBdx/9qQ67MVA==
+X-Received: by 2002:aa7:9314:: with SMTP id 20mr897065pfj.231.1573606339846;
+ Tue, 12 Nov 2019 16:52:19 -0800 (PST)
 Received: from voyager.ozlabs.ibm.com ([36.255.48.244])
- by smtp.gmail.com with ESMTPSA id i13sm169848pfo.39.2019.11.12.16.52.08
+ by smtp.gmail.com with ESMTPSA id i13sm169848pfo.39.2019.11.12.16.52.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 12 Nov 2019 16:52:10 -0800 (PST)
+ Tue, 12 Nov 2019 16:52:19 -0800 (PST)
 From: Joel Stanley <joel@jms.id.au>
 To: Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Subject: [PATCH v2 0/4] arm/aspeed: Watchdog and SDRAM fixes
-Date: Wed, 13 Nov 2019 11:21:57 +1030
-Message-Id: <20191113005201.19005-1-joel@jms.id.au>
+Subject: [PATCH v2 3/4] watchdog/aspeed: Improve watchdog timeout message
+Date: Wed, 13 Nov 2019 11:22:00 +1030
+Message-Id: <20191113005201.19005-4-joel@jms.id.au>
 X-Mailer: git-send-email 2.24.0
+In-Reply-To: <20191113005201.19005-1-joel@jms.id.au>
+References: <20191113005201.19005-1-joel@jms.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::443
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,25 +99,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Three of these are fixes for ast2600 models that I found when testing
-master. The forth is a usability improvement that is helpful when
-diagnosing why a watchdog is biting.
+Users benefit from knowing which watchdog timer has expired. The address
+of the watchdog's registers unambiguously indicates which has expired,
+so log that.
 
-v2 fixes some review comments from Cédric and adds his r-b.
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+---
+v2: Use HWADDR_PRIx
+---
+ hw/watchdog/wdt_aspeed.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-
-Joel Stanley (4):
-  aspeed/sdmc: Make ast2600 default 1G
-  aspeed/scu: Fix W1C behavior
-  watchdog/aspeed: Improve watchdog timeout message
-  watchdog/aspeed: Fix AST2600 frequency behaviour
-
- hw/misc/aspeed_scu.c             | 11 ++++++++---
- hw/misc/aspeed_sdmc.c            |  6 +++---
- hw/watchdog/wdt_aspeed.c         | 24 +++++++++++++++++++-----
- include/hw/watchdog/wdt_aspeed.h |  1 +
- 4 files changed, 31 insertions(+), 11 deletions(-)
-
+diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+index 145be6f99ce2..8787c5ad0f97 100644
+--- a/hw/watchdog/wdt_aspeed.c
++++ b/hw/watchdog/wdt_aspeed.c
+@@ -219,7 +219,8 @@ static void aspeed_wdt_timer_expired(void *dev)
+         return;
+     }
+ 
+-    qemu_log_mask(CPU_LOG_RESET, "Watchdog timer expired.\n");
++    qemu_log_mask(CPU_LOG_RESET, "Watchdog timer %" HWADDR_PRIx " expired.\n",
++            s->iomem.addr);
+     watchdog_perform_action();
+     timer_del(s->timer);
+ }
 -- 
 2.24.0
 
