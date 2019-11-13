@@ -2,86 +2,84 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B418C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:33:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB48C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:37:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66C3E206E3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:33:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CF001206E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 21:37:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="An8x9xWc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66C3E206E3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZODSdOix"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF001206E5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iV0GG-0006Et-EY
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 16:33:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34610)
+	id 1iV0KQ-0008C4-QS
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 16:37:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iV0ES-0005Cj-Sy
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:31:22 -0500
+ (envelope-from <eblake@redhat.com>) id 1iV0Fg-0005uH-SZ
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:32:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iV0EQ-0001JK-Jv
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:31:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54041
+ (envelope-from <eblake@redhat.com>) id 1iV0Ff-0002N2-Ub
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:32:36 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39322
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iV0EQ-0001J2-AI
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:31:18 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iV0Ff-0002LW-QU
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 16:32:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573680677;
+ s=mimecast20190719; t=1573680755;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7KBW1nGJyHu0aagMv80J6SqG8NLHQwHSxHCtzbR6g14=;
- b=An8x9xWceUJUopKaszLtbTM5vSaV1OymtMimRAvMvtzeP4TKgDifsUsRIW+jDUQ+RvQ5JC
- S4lbbPRogOki0tLq+nu5Og7eYJwDJszV1x3SpTtP1Vk/8448+paI/oFRcvvRznaGUmU8/C
- zr3mmgA06ICdLILM0hHKf6Z71T7tgxQ=
+ bh=QiZ70SSpZyBY6QtbyxaANW+/w1bsBLb4RtRjuvPREKo=;
+ b=ZODSdOix5lo3GsY6ehHAEWXMCVimZSIjSFowIEPjZKZfqlkAACTeIhCPLbSg0CHgGRE2mF
+ lSCPAJ5ACJeu7hHvS18TGIVzyjHL332P2rWcgAyDBzKsqEFJLkWEBFHq6+/2JmEp7clxdN
+ gXML2/Rkd/M8ifV+v6G32yVSw0gZQsQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-140-CSQ9T3D2OtOym6HzL2AZFg-1; Wed, 13 Nov 2019 16:31:14 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-79-CCxjtZ0QMpaxkBTsG5UWSQ-1; Wed, 13 Nov 2019 16:32:31 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B09B5A260C;
- Wed, 13 Nov 2019 21:31:12 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03F13800EBE;
+ Wed, 13 Nov 2019 21:32:30 +0000 (UTC)
 Received: from [10.3.116.242] (ovpn-116-242.phx2.redhat.com [10.3.116.242])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 821665ED25;
- Wed, 13 Nov 2019 21:31:08 +0000 (UTC)
-Subject: Re: [PATCH 1/2] qapi: net: Add query-netdevs command
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A69611036C64;
+ Wed, 13 Nov 2019 21:32:26 +0000 (UTC)
+Subject: Re: [PATCH 0/2] Introducing QMP query-netdevs command
 To: Alexey Kirillov <lekiravi@yandex-team.ru>,
  Jason Wang <jasowang@redhat.com>,
  Samuel Thibault <samuel.thibault@ens-lyon.org>,
  Markus Armbruster <armbru@redhat.com>
 References: <20191113212516.13606-1-lekiravi@yandex-team.ru>
- <20191113212516.13606-2-lekiravi@yandex-team.ru>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <92284c15-1019-01b8-80ed-a443a5f15972@redhat.com>
-Date: Wed, 13 Nov 2019 15:31:07 -0600
+Message-ID: <f906f303-54ec-79e2-1943-d172c81d7055@redhat.com>
+Date: Wed, 13 Nov 2019 15:32:26 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191113212516.13606-2-lekiravi@yandex-team.ru>
+In-Reply-To: <20191113212516.13606-1-lekiravi@yandex-team.ru>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: CSQ9T3D2OtOym6HzL2AZFg-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: CCxjtZ0QMpaxkBTsG5UWSQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,72 +100,15 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 11/13/19 3:25 PM, Alexey Kirillov wrote:
-> Add a qmp command that provides information about currently attached
-> network devices and their configuration.
->=20
-> Signed-off-by: Alexey Kirillov <lekiravi@yandex-team.ru>
-> ---
+> This patch introduces a new QMP command "query-netdevs" to get informatio=
+n
+> about currently attached network devices.
+> Potentially, this patch makes the "info_str" field of "struct NetClientSt=
+ate"
+> and HMP command "info network" obsolete as new command gives out more
+> information in a structured way.
 
-> +++ b/qapi/net.json
-> @@ -754,3 +754,88 @@
->   ##
->   { 'event': 'FAILOVER_NEGOTIATED',
->     'data': {'device-id': 'str'} }
-> +
-> +##
-> +# @NetdevInfo:
-> +#
-> +# Configuration of a network device.
-> +#
-> +# @id: Device identifier.
-> +#
-> +# @type: Specify the driver used for interpreting remaining arguments.
-> +#
-> +# @peer: Connected network device.
-> +#
-> +# @queues_count: Number of queues.
-
-Unless there is a strong reason otherwise, this should be 'queues-count'.
-
-> +#
-> +# @hub: hubid of hub, if connected to.
-> +#
-> +# Since: 4.2
-> +##
-> +{ 'union': 'NetdevInfo',
-> +  'base': { 'id': 'str',
-> +            'type': 'NetClientDriver',
-> +            '*peer': 'str',
-> +            'queues_count': 'int',
-> +            '*hub': 'int' },
-> +  'discriminator': 'type',
-> +  'data': {
-> +      'nic':        'NetLegacyNicOptions',
-> +      'user':       'NetdevUserOptions',
-> +      'tap':        'NetdevTapOptions',
-> +      'l2tpv3':     'NetdevL2TPv3Options',
-> +      'socket':     'NetdevSocketOptions',
-> +      'vde':        'NetdevVdeOptions',
-> +      'bridge':     'NetdevBridgeOptions',
-> +      'hubport':    'NetdevHubPortOptions',
-> +      'netmap':     'NetdevNetmapOptions',
-> +      'vhost-user': 'NetdevVhostUserOptions' } }
-> +
-> +##
-> +# @x-query-netdevs:
-
-What are the reasons for the x- prefix?  Are we planning on changing=20
-this interface down the road?  If so, what changes might we make?
-
-> +#
-> +# Get a list of @NetdevInfo for all virtual network devices.
-> +#
-> +# Returns: a list of @NetdevInfo describing each virtual network device.
-> +#
-> +# Since: 4.2
-
-This is a new feature; as such, it's too late to make it into 4.2;=20
-you'll want to change this to 5.0.
+Can we rewrite the existing HMP command to call into the new QMP command?
 
 --=20
 Eric Blake, Principal Software Engineer
