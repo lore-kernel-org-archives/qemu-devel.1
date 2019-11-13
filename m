@@ -2,100 +2,82 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C87C43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 15:00:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2FC9C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 15:05:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98A15222D3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 15:00:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA5B3222D3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 15:05:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h6E8Yowr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98A15222D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mt4jMJD6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA5B3222D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46122 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUu8P-0004d2-R7
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 10:00:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58585)
+	id 1iUuD6-0006eY-TZ
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 10:05:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59834)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iUu7g-00046C-No
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:59:57 -0500
+ (envelope-from <sameid@google.com>) id 1iUuBy-0006BR-Ja
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 10:04:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iUu7f-0005uw-Nh
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:59:56 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55787
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iUu7f-0005td-Jw
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:59:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573657195;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=Qw6/Y6nacXUxGs6BYNw2PKOW+ZOr5mHu7KC2FfY9Kfk=;
- b=h6E8YowrEzt1ioo4+p+NZw6UeucFwP82va0sAwbHYEf9ZljFF5/hwZnYSpGdVBCF342AxO
- +jHu6l8bq3UH3E2BlUOyPGtcSYUYz1sZS4L+G0RlEY6uKjktNWwgxEkNeJQTyK6I11VMpS
- mKr6QYrLFF+doF9pJaoovn7Kir2qBa0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-Tj3Wbcf0MiybMe8TbIl50g-1; Wed, 13 Nov 2019 09:59:54 -0500
-Received: by mail-wr1-f70.google.com with SMTP id l3so1736066wrx.21
- for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 06:59:53 -0800 (PST)
+ (envelope-from <sameid@google.com>) id 1iUuBs-0007np-CT
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 10:04:21 -0500
+Received: from mail-qv1-xf41.google.com ([2607:f8b0:4864:20::f41]:36501)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <sameid@google.com>) id 1iUuBs-0007mc-08
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 10:04:16 -0500
+Received: by mail-qv1-xf41.google.com with SMTP id cv8so772765qvb.3
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 07:04:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=9BzBQdGpdDldyAJp0pfSmKIoynEYxRw2R3kxt4neugk=;
+ b=mt4jMJD6WMdbir6vXTPqHeiy+dzhbI58QNZladSjKT5Kifh/V41EVMEY953FoPwWAp
+ AaBWzHiCZNbtMsxbU3jkDNWU3TFolpiMrT0iTeuBn3ER3lgC2ZjO/nTaPQ4HREMVpRtx
+ wiS456Wpa7styW9aokGoPMPyGQe+mnvsey6pQMZ/c1FwISFg0k2nZQ0VebRZizJdX7nR
+ UM8hZsJ67rsgPhe+ESK3A6OcBLXuLPNDqio6dpWqTyj1zRmWN2amZ7CBHj7vf0kNV0kG
+ KXhHmFoOXHHA/+7P4mCkvExvTF1b9+qmuRNjnRa7AYFPoFlhf3waNAuXzclquQidXC33
+ abHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WP+aEA5DGudkrsGvf3+tE1nJrpL33iHp1/3qYgtuQ40=;
- b=jOb22gvUzz1lZgBpARpu5QTi1sWFc3Ujo8hA0C1ZzCHeIJLPlSVwEDiDb19QBwXPJX
- p1rGquSswice8T4wdDs7NqCMq6tEerNiypjWlmoyqCuCFnEKSAhtkJ3BAjzECM1i3Nrp
- 31KWamGhrWcX0SBdf4EOb4TZOc3WMfhijoanCDGwNwtNN7uiszr6tVSBRErb6ha1XLSX
- i7xL0C9edeTY5CDxcbWxGLHy4KYFZ16n/GELekUdmoV1LTXPePSnNjeoJMMe7ouXNjGs
- OOWPxuo2QUsDrEhg5deHNvvYPOS0gnz+L4IpBQnK1XTH2dLQCGmZBURl9iPeNIApfAu4
- kmwA==
-X-Gm-Message-State: APjAAAVnnWXHR6QN93C9hz7k0g+g7QWyLFIVT74izjj7Glyoe3o//GMJ
- 5mmKsWEXV9b18RmRh5bYVFTFIxxZQn7fABzzCdhmYC+QimjzjbNLUht7aQpRvomOhn68f0/Xooh
- Yya36QFWHXSL4jlo=
-X-Received: by 2002:a5d:570f:: with SMTP id a15mr3144877wrv.316.1573657192755; 
- Wed, 13 Nov 2019 06:59:52 -0800 (PST)
-X-Google-Smtp-Source: APXvYqywAUQvD1txGtD0yIhIo7jDdFCEEIojaU8ZMwM29CxitXixCfe6aIPkSyoAECuk1eOWfcoKZQ==
-X-Received: by 2002:a5d:570f:: with SMTP id a15mr3144860wrv.316.1573657192466; 
- Wed, 13 Nov 2019 06:59:52 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:64a1:540d:6391:74a9?
- ([2001:b07:6468:f312:64a1:540d:6391:74a9])
- by smtp.gmail.com with ESMTPSA id y78sm2817359wmd.32.2019.11.13.06.59.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 13 Nov 2019 06:59:51 -0800 (PST)
-Subject: Re: [PATCH] WHPX: refactor load library
-To: Sunil Muthuswamy <sunilmut@microsoft.com>,
- Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>,
- Stefan Weil <sw@weilnetz.de>
-References: <MW2PR2101MB1116386CFE4628B6767D6CDBC07B0@MW2PR2101MB1116.namprd21.prod.outlook.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <4d20ec63-7eae-7c7f-167b-f87709adcd78@redhat.com>
-Date: Wed, 13 Nov 2019 15:59:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=9BzBQdGpdDldyAJp0pfSmKIoynEYxRw2R3kxt4neugk=;
+ b=FqcZEfZzD1MsbWVcwGRqW+RRsYfn2TneP8bixtsaRwbMtD2/4j6obyuy6MMPLH2l2Q
+ gRaVL0hT25Bana5ghnPcFQYt9f9ske2iDZK3AG7O/A5bLEtCk/K6wrwwiZUyNKGLnDCw
+ vDon6n/NCTcVnt2h8DddkhrlF96QTveEDq5OQn/e9eWC8CPZNnJCES4xZ1Ci3kH/RmUl
+ 5ywaTnLYPXJdHPxvUuHHQ3qH7LqEGFe1V8k2O+dJW1QRju7Czn9rK4qmGFWoPxmX+kzv
+ cO9LfbkxSnIBFNW3FXXT4IPuozSGdd5Z8K+fEk5yrA6R0LJ/dyrW0kQJmHkX8SJDyb0W
+ 0mFg==
+X-Gm-Message-State: APjAAAW/aDM2tZNauMHmEeJfDDMkNn3qas/ujVEVdz+710AfHg3eTMwZ
+ rRFFhf8ghtw3hf1/B+uvzq5OYOloRWX3SwSEh/hXZw==
+X-Google-Smtp-Source: APXvYqwwYozt2tyKkgeedoW75m9/KTbcIjod/oR3LCzA7SCU3dcXD1z/skn4fvIOidf34vSYqpSBMw/xIBUyjfCJc+0=
+X-Received: by 2002:ad4:4092:: with SMTP id l18mr3085552qvp.114.1573657451648; 
+ Wed, 13 Nov 2019 07:04:11 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <MW2PR2101MB1116386CFE4628B6767D6CDBC07B0@MW2PR2101MB1116.namprd21.prod.outlook.com>
-Content-Language: en-US
-X-MC-Unique: Tj3Wbcf0MiybMe8TbIl50g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <20191113091809.31365-1-kraxel@redhat.com>
+ <84d3a1aa-bbb2-d831-0abc-fe1169f8a860@redhat.com>
+ <20191113140057.2ocwfa3rqqfkbg3r@sirius.home.kraxel.org>
+In-Reply-To: <20191113140057.2ocwfa3rqqfkbg3r@sirius.home.kraxel.org>
+From: Sam Eiderman <sameid@google.com>
+Date: Wed, 13 Nov 2019 17:03:58 +0200
+Message-ID: <CAFr6bUn5W2-w3z4Ty9XD7mh+=kxVq2rQJ3ZUz5nXA13ZdxQtsg@mail.gmail.com>
+Subject: Re: [SeaBIOS] Re: [PATCH] ahci: zero-initialize port struct
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, seabios@seabios.org, 
+ Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::f41
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,40 +89,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Justin Terry \(VM\)" <juterry@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/11/19 21:31, Sunil Muthuswamy wrote:
->=20
-> +typedef enum WHPFunctionList {
-> +    WINHV_PLATFORM_FNS_DEFAULT,
-> +    WINHV_EMULATION_FNS_DEFAULT,
-> +} WHPFunctionList;
-> =20
+Hi,
 
-What does "default" stand for?  I assume you have more changes to this
-function in the future.
+Does this fix a bug that actually happened?
 
-> + * Load the functions from the given library, using the given handle. If=
- a
-> + * handle is provided, it is used, otherwise the library is opened. The
-> + * handle will be updated on return with the opened one.
-> + */
-> +static bool load_whp_dipatch_fns(HMODULE *handle, WHPFunctionList functi=
-on_list)
-> +{
+I just noticed that in my lchs patches I assumed that lchs struct is
+zeroed out in all devices (not only ahci):
 
-Typo, "dipatch" instead of "dispatch".
->=20
-> +    if (hLib) {
-> +        FreeLibrary(hWinHvEmulation);
-> +    }
+9caa19be0e53 (geometry: Apply LCHS values for boot devices)
 
-The argument to FreeLibrary should be hLib.
+Seems like this is not the case but why only ahci is affected?
 
-Paolo
+The list of devices is at least:
 
+        * ata
+        * ahci
+        * scsi
+            * esp
+            * lsi
+            * megasas
+            * mpt
+            * pvscsi
+            * virtio
+        * virtio-blk
+
+As specified in the commit message.
+
+Also Gerd it seems that my lchs patches were not committed in the
+latest submitted version (v4)!!!
+The ABI of the fw config key is completely broken.
+
+
+On Wed, Nov 13, 2019 at 4:02 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> On Wed, Nov 13, 2019 at 10:35:03AM +0100, Laszlo Ersek wrote:
+> > On 11/13/19 10:18, Gerd Hoffmann wrote:
+> > > Specifically port->driver.lchs needs clearing, otherwise seabios will
+> >
+> > s/driver/drive/
+>
+> > Reviewed-by: Laszlo Ersek <lersek@redhat.com>
+>
+> Typo fixed & pushed.
+>
+> thanks,
+>   Gerd
+> _______________________________________________
+> SeaBIOS mailing list -- seabios@seabios.org
+> To unsubscribe send an email to seabios-leave@seabios.org
 
