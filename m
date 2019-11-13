@@ -7,76 +7,75 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D71C43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 12:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9837C17449
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 12:05:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4363A22459
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 12:04:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 34F312245B
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 12:05:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pCNQqF9/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4363A22459
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WxoFSJlE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34F312245B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUrOA-0000we-EU
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 07:04:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33071)
+	id 1iUrP8-0001tO-6G
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 07:05:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33101)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iUrJY-00050U-9c
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 07:00:01 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iUrJb-00055Z-PL
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 07:00:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iUrJX-0004E6-6b
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 07:00:00 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35838)
+ (envelope-from <alex.bennee@linaro.org>) id 1iUrJa-0004GC-G3
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 07:00:03 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34040)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iUrJX-0004De-0p
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 06:59:59 -0500
-Received: by mail-wr1-x444.google.com with SMTP id s5so2061926wrw.2
- for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 03:59:58 -0800 (PST)
+ id 1iUrJa-0004FL-99
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 07:00:02 -0500
+Received: by mail-wr1-x441.google.com with SMTP id e6so2070071wrw.1
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 04:00:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=LLUdVSuPei6RAwTaPKVy6/3rq24iATJe7bkWNsh6uTU=;
- b=pCNQqF9/m0xFj0siyxMAgjxY47lz1d85wHe2FmDsJVgAWI6UEEaXZNn3dO6xloLRCA
- kEa8kLgYK0IepcSqjDfAK7XJ/4LQE74Yu4ro53r5zN5snIscTk8D4U0QFuRw+B2iQee/
- MYM9A2vq295bQCvo+Cn5drsOYw9cLdCKvui9tlws63DKkyphv7drWEkifzMjvVQUXsEM
- Y+vKIWjBNQIDGxl5VDRgiivsgfpLjaLG3rFkcW/CWJg/c613PZqcu34KgUEApYuRnbaD
- v0tj8+MNK4UpWfdbf1lAZlnnqMc9ticIKHUwmCNIVTqK2zd6+BrH7600TVoediHOHWUv
- qEAw==
+ bh=dAtTKvTGGLbgatjy9hszVeJW8BTJjLusZ3gELbhkEj4=;
+ b=WxoFSJlEj2PN5haYt/fN+QdjGnMogU4uXP9+eLqNngRW8W6VKaJiD34MZPW9lWFbNy
+ 0hAd1JcemYlOV7G+BPHEt+aNr7WosFzhGp7kSpisaYUpdc80NVkUkxSAXGKX/BgTWurW
+ ZDxlVvABf9GGjBnSNWlTKzoICPhca3e/1u1pa6/7ucvl4eUTrGy0ydy2E1PzlTo+Ng+W
+ o+iRmSb/geS/VshGO5Yxo6oMtqoRyPo2Jvtglfbnie3ecdjf1xXdacCPKLYn15FYfdMj
+ /MEU3cz9d3hvxTxJbJXZ9Ksd3hJhEvkgxx8RihVXe/hoLnezmPQArW+x6Qn6MvAFMFGo
+ TyXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=LLUdVSuPei6RAwTaPKVy6/3rq24iATJe7bkWNsh6uTU=;
- b=bZkQAiIpJQGxAIKYgA45trqfR/cWtu4M29daNplitkr9+0gMYdIoBKkrqqDzfkXvUf
- j+6WbgVS6U4ZxufTR+O+7BBG0KlRlvEvP23Dp2fVuiR6Pe6QGJgtsvgtUgiF6ojjrhjn
- dvW8pun8wZzTiRQeJ8TBxVV+etj5Qkjlmn3v0CX3LqFj/Nq9sI1mzOHyUWLYSjme1KwI
- +AJY5KnOLCpnP2W7AB250U2erkoE7HsNrCR6MijP2CzkFAVn4c7eJWi76BkRXbnAQUpp
- oJ0YRadzX+PuKturYn/x2i+N9VuGY3VLfJn7EKfGIa9dFGHqfAKyMuW5V+BqeSNYjEiN
- qvnA==
-X-Gm-Message-State: APjAAAUIgfSkf6fnj8OTCRtVhZUFWefy1SxGjB916Qxju2RjbKjmV0eU
- bXiJhJ2KpieqklthOvcZhQdsNw==
-X-Google-Smtp-Source: APXvYqy8fRBi/cqGcYgUKAmKaoTPeCDEPtLiFYN/CVJLjShe+/Yw7d/ENFCxKzSLESwWpiUxa9HzAw==
-X-Received: by 2002:a5d:48c8:: with SMTP id p8mr2617842wrs.318.1573646397870; 
- Wed, 13 Nov 2019 03:59:57 -0800 (PST)
+ bh=dAtTKvTGGLbgatjy9hszVeJW8BTJjLusZ3gELbhkEj4=;
+ b=TrQlQKbNGvYQhtCfmOoZFun+pNb0ZBry581K08Xcj8aDJL+LKxvb37sBz6t+MLva85
+ qNhVFaWjw/zb3HaJh5zpFtfy0uOCekkmWwmi6NIdY88eSLvPBSO5lvOYq9X2x2jbEOnH
+ hbk/47v7cSIWZu36NR/6xlPgvhA9bZvdfXterGqTT3xoe1LAqD6KBSFxYY1M8svBAbOX
+ NC8SGZrCZ9PV+HexcXc3QUbz8LgEQUVesR7i9x5zPfqBmAwYwU3LUkNJDl5hOQz4W9G9
+ ffZkSApZzLKTwG+a3rtlOozbL0BJ+OfCYsVq7YVNnMWkwN6AFK17oj/Cdc7JxWTX+BHY
+ 8bLA==
+X-Gm-Message-State: APjAAAVWeqp9hukRa5YryvavuGXML+5Wft3tT0GDxyGtzsjEWZtgdlqR
+ yc/72MX5SyweRqCiPyKkadb1mrJpX24=
+X-Google-Smtp-Source: APXvYqxs9LH3o+w8MIelf4F6m1mYuGQZ0xo5bEOmeQ4kBkS7cjJ6Iuk+vDApcjg7kOVETzhqqaqwIA==
+X-Received: by 2002:a5d:6746:: with SMTP id l6mr2433214wrw.349.1573646400980; 
+ Wed, 13 Nov 2019 04:00:00 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 200sm2432008wme.32.2019.11.13.03.59.52
+ by smtp.gmail.com with ESMTPSA id z4sm2181219wmf.36.2019.11.13.03.59.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
  Wed, 13 Nov 2019 03:59:56 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 6D0EB1FF90;
+ by zen.linaroharston (Postfix) with ESMTP id 860281FF91;
  Wed, 13 Nov 2019 11:59:52 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v1 3/5] docs/devel: update tcg-plugins.rst with API versioning
- details
-Date: Wed, 13 Nov 2019 11:59:50 +0000
-Message-Id: <20191113115952.775-4-alex.bennee@linaro.org>
+Subject: [PATCH v1 4/5] docs/devel: convert multi-thread-tcg to a .rst document
+Date: Wed, 13 Nov 2019 11:59:51 +0000
+Message-Id: <20191113115952.775-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191113115952.775-1-alex.bennee@linaro.org>
 References: <20191113115952.775-1-alex.bennee@linaro.org>
@@ -85,7 +84,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,68 +105,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-While we are at it fix up the quoted code sections with the inline ::
-approach.
-
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-
 ---
-v2
-  - fix grammar
-  - mention we also will fail to load outside the range
-  - clean-up code sections
----
- docs/devel/tcg-plugins.rst | 27 +++++++++++++++++++++------
- 1 file changed, 21 insertions(+), 6 deletions(-)
+ docs/devel/index.rst                          |  1 +
+ ...ti-thread-tcg.txt => multi-thread-tcg.rst} | 28 ++++++++++++-------
+ 2 files changed, 19 insertions(+), 10 deletions(-)
+ rename docs/devel/{multi-thread-tcg.txt => multi-thread-tcg.rst} (96%)
 
-diff --git a/docs/devel/tcg-plugins.rst b/docs/devel/tcg-plugins.rst
-index b18fb6729e3..718eef00f22 100644
---- a/docs/devel/tcg-plugins.rst
-+++ b/docs/devel/tcg-plugins.rst
-@@ -25,6 +25,23 @@ process. However the project reserves the right to change or break the
- API should it need to do so. The best way to avoid this is to submit
- your plugin upstream so they can be updated if/when the API changes.
+diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+index c86a3cdff2f..3e6624ec604 100644
+--- a/docs/devel/index.rst
++++ b/docs/devel/index.rst
+@@ -22,4 +22,5 @@ Contents:
+    decodetree
+    secure-coding-practices
+    tcg
++   multi-thread-tcg
+    tcg-plugins
+diff --git a/docs/devel/multi-thread-tcg.txt b/docs/devel/multi-thread-tcg.rst
+similarity index 96%
+rename from docs/devel/multi-thread-tcg.txt
+rename to docs/devel/multi-thread-tcg.rst
+index 782bebc28b4..4e914bacc0c 100644
+--- a/docs/devel/multi-thread-tcg.txt
++++ b/docs/devel/multi-thread-tcg.rst
+@@ -1,7 +1,10 @@
+-Copyright (c) 2015-2016 Linaro Ltd.
++.. Copyright (c) 2015-2016 Linaro Ltd.
++.. This work is licensed under the terms of the GNU GPL, version 2 or
++.. later. See the COPYING file in the top-level directory.
  
-+API versioning
-+--------------
+-This work is licensed under the terms of the GNU GPL, version 2 or
+-later. See the COPYING file in the top-level directory.
++==================
++Multi-threaded TCG
++==================
+ 
+ Introduction
+ ============
+@@ -40,7 +43,7 @@ Main Run Loop
+ Even when there is no code being generated there are a number of
+ structures associated with the hot-path through the main run-loop.
+ These are associated with looking up the next translation block to
+-execute. These include:
++execute. These include::
+ 
+     tb_jmp_cache (per-vCPU, cache of recent jumps)
+     tb_ctx.htable (global hash table, phys address->tb lookup)
+@@ -61,7 +64,9 @@ have their block-to-block jumps patched.
+ Global TCG State
+ ----------------
+ 
+-### User-mode emulation
++User-mode emulation
++~~~~~~~~~~~~~~~~~~~
 +
-+All plugins need to declare a symbol which exports the plugin API
-+version they were built against. This can be done simply by::
+ We need to protect the entire code generation cycle including any post
+ generation patching of the translated code. This also implies a shared
+ translation buffer which contains code running on all cores. Any
+@@ -78,7 +83,9 @@ patching.
+ 
+ Code generation is serialised with mmap_lock().
+ 
+-### !User-mode emulation
++System emulation
++~~~~~~~~~~~~~~~~
 +
-+  QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
-+The core code will refuse to load a plugin that doesn't export a
-+`qemu_plugin_version` symbol or if plugin version is outside of QEMU's
-+supported range of API versions.
-+
-+Additionally the `qemu_info_t` structure which is passed to the
-+`qemu_plugin_install` method of a plugin will detail the minimum and
-+current API versions supported by QEMU. The API version will be
-+incremented if new APIs are added. The minimum API version will be
-+incremented if existing APIs are changed or removed.
+ Each vCPU has its own TCG context and associated TCG region, thereby
+ requiring no locking.
  
- Exposure of QEMU internals
- --------------------------
-@@ -40,16 +57,14 @@ instructions and events are opaque to the plugins themselves.
- Usage
- =====
+@@ -125,10 +132,11 @@ linked list of all Translation Blocks in that page (see page_next).
+ Both the jump patching and the page cache involve linked lists that
+ the invalidated TranslationBlock needs to be removed from.
  
--The QEMU binary needs to be compiled for plugin support:
-+The QEMU binary needs to be compiled for plugin support::
+-DESIGN REQUIREMENT: Safely handle invalidation of TBs
+-                      - safely patch/revert direct jumps
+-                      - remove central PageDesc lookup entries
+-                      - ensure lookup caches/hashes are safely updated
++DESIGN REQUIREMENTS:
++  - Safely handle invalidation of TBs
++     - safely patch/revert direct jumps
++     - remove central PageDesc lookup entries
++     - ensure lookup caches/hashes are safely updated
  
--::
--    configure --enable-plugins
-+  configure --enable-plugins
- 
- Once built a program can be run with multiple plugins loaded each with
--their own arguments:
-+their own arguments::
- 
--::
--    $QEMU $OTHER_QEMU_ARGS \
-+  $QEMU $OTHER_QEMU_ARGS \
-       -plugin tests/plugin/libhowvec.so,arg=inline,arg=hint \
-       -plugin tests/plugin/libhotblocks.so
+ (Current solution)
  
 -- 
 2.20.1
