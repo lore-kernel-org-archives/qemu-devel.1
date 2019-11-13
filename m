@@ -2,103 +2,64 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61CAEC43215
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75EBAC47418
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:21:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F31F206BA
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:16:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GbWsNyWq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F31F206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 57ADB23667
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 16:03:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57ADB23667
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUvK6-0000WP-0n
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 11:16:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41141)
+	id 1iUv6m-0002O5-7V
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 11:03:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39433)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1iUvIb-00087E-G0
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:15:18 -0500
+ (envelope-from <groug@kaod.org>) id 1iUv4m-0000zZ-0T
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:01:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1iUvIZ-0003pD-6B
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:15:16 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:55986)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1iUvIX-0003nN-ET
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:15:15 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADGETcU191040;
- Wed, 13 Nov 2019 16:14:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=Gf82kvPB9o3AXSipIhQIpH9XV7z/RdTyFEKA74ZwzJA=;
- b=GbWsNyWq4lQxMofD5UTCzmYQ2GRN51QiqUAsuMVIzz9oM53ObUUgPdi4HMLpYl02+ld0
- /i9pNfzEFo4IiNa0pPLtFjRTZ8QEh7nsOckZM4iYndZHV/x6rdVXtqL7khjRcl1HRjaq
- NiFpG1wWUNqvajBZVYUuQUQKhxCK81L59RUYx65BFITYIMj/niaf1LhsU7/6zLbQjwY8
- CRSa+Qfq8iZVxtG9oUjRCqogF5y1D7/G92GvsGJgE59BDQw/LuSJbB2gO2NJt1LyQIop
- FlawMNkwxTUBXVTGUIgi4Cj/MiOgMwyi+qCIIWqCErUWurZF+YNvSegXB5Ik1XDtOiuh rQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 2w5ndqdjar-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 13 Nov 2019 16:14:54 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xADFwuBQ059244;
- Wed, 13 Nov 2019 16:14:53 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3030.oracle.com with ESMTP id 2w8g17rks5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 13 Nov 2019 16:14:53 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xADGEpHf001616;
- Wed, 13 Nov 2019 16:14:51 GMT
-Received: from [10.152.34.2] (/10.152.34.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 13 Nov 2019 08:14:51 -0800
-Subject: Re: [RFC v4 PATCH 32/49] multi-process: Use separate MMIO
- communication channel
-To: Stefan Hajnoczi <stefanha@redhat.com>
-References: <cover.1571905346.git.jag.raman@oracle.com>
- <b2594fdefb278f890762d12639524c4db7667393.1571905346.git.jag.raman@oracle.com>
- <20191111162132.GI402228@stefanha-x1.localdomain>
-From: Jag Raman <jag.raman@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <4a528246-f414-49af-170b-98306b9a0c96@oracle.com>
-Date: Wed, 13 Nov 2019 11:14:50 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ (envelope-from <groug@kaod.org>) id 1iUv4k-0007pr-Jq
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:00:59 -0500
+Received: from 10.mo68.mail-out.ovh.net ([46.105.79.203]:48723)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iUv4k-0007pJ-De
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 11:00:58 -0500
+Received: from player750.ha.ovh.net (unknown [10.108.57.95])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id BCB10147AF1
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 17:00:55 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player750.ha.ovh.net (Postfix) with ESMTPSA id 2FBB9C0B6FF6;
+ Wed, 13 Nov 2019 16:00:43 +0000 (UTC)
+Date: Wed, 13 Nov 2019 17:00:40 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH] spapr/kvm: Set default cpu model for all machine classes
+Message-ID: <20191113170040.7c62fcaf@bahia.lan>
+In-Reply-To: <CAFEAcA9+VzDC9N5vGcA9COUaPsSue9VWmtoaPneCqY7drtbVzA@mail.gmail.com>
+References: <20191030163243.10644-1-david@gibson.dropbear.id.au>
+ <20191113144344.GA4204@orkuz.int.mamuti.net>
+ <20191113160900.5f9f5415@bahia.lan>
+ <CAFEAcA9+VzDC9N5vGcA9COUaPsSue9VWmtoaPneCqY7drtbVzA@mail.gmail.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20191111162132.GI402228@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9439
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1910280000 definitions=main-1911130144
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9439
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1910280000
- definitions=main-1911130145
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 141.146.126.78
+X-Ovh-Tracer-Id: 2933813686143588625
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefuddgkeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeehtddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.79.203
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,38 +71,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, thuth@redhat.com,
- john.g.johnson@oracle.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
- liran.alon@oracle.com, rth@twiddle.net, quintela@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, ross.lagerwall@citrix.com,
- mst@redhat.com, kraxel@redhat.com, kwolf@redhat.com, pbonzini@redhat.com,
- berrange@redhat.com, mreitz@redhat.com, kanth.ghatraju@oracle.com,
- dgilbert@redhat.com, marcandre.lureau@gmail.com
+Cc: Laurent Vivier <lvivier@redhat.com>, David Hildenbrand <david@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-ppc <qemu-ppc@nongnu.org>,
+ =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+ Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 13 Nov 2019 15:31:58 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-
-On 11/11/2019 11:21 AM, Stefan Hajnoczi wrote:
-> On Thu, Oct 24, 2019 at 05:09:13AM -0400, Jagannathan Raman wrote:
->> Using a separate communication channel for MMIO helps
->> with improving Performance
+> On Wed, 13 Nov 2019 at 15:10, Greg Kurz <groug@kaod.org> wrote:
+> > David is away until the 19th of November, which is the release date
+> > of rc2 according to the planning [*]. Then we have rc3 the 26th, and
+> > final release (or rc4) the 3rd of December, so it should be ok.
 > 
-> Why?
-
-Typical initiation of IO operations involves multiple MMIO accesses per
-IO operation. In some legacy devices like LSI, the completion of the IO
-operations is also accomplished by polling on MMIO registers. Therefore,
-MMIO traffic can be hefty in some cases and contribute to Performance.
-
-Having a dedicated channel for MMIO ensures that it doesn't have to
-compete with other messages to the remote process, especially when there
-are multiple devices emulated by a single remote process.
-
-Thanks!
---
-Jag
-
+> Please don't actively plan to delay putting changes in
+> until later release candidates. The release process
+> involves steadily winding up the bar of whether it's
+> worth putting in and hopefully reducing the volume
+> of changes between rcs. In an ideal world rc3 would
+> have very few changes, and then there would be no
+> changes at all between rc3 and the final release.
 > 
+
+Right. I could discuss with Laurent: David should be back on Monday
+actually. Hopefully he can a send a PR before rc2.
+
+> thanks
+> -- PMM
+> 
+
 
