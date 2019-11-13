@@ -2,85 +2,85 @@ Return-Path: <SRS0=QD06=ZF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71B2CC432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:38:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D545C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:49:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAB4D206DC
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:38:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6A7B206ED
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 19:49:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="lINcAqrg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAB4D206DC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gIcD4KnB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6A7B206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUyTb-0006u7-Ew
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 14:38:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33497)
+	id 1iUyde-00014E-8U
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 14:49:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40382)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1iUySQ-0006Rz-An
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:37:39 -0500
+ (envelope-from <alex.williamson@redhat.com>) id 1iUycy-0000ca-GN
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:48:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1iUySO-00037E-Bh
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:37:37 -0500
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:2577)
+ (envelope-from <alex.williamson@redhat.com>) id 1iUycu-0006bn-Pk
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:48:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36087
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1iUySN-00034O-U8
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:37:36 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5dcc5b810000>; Wed, 13 Nov 2019 11:37:37 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Wed, 13 Nov 2019 11:37:34 -0800
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Wed, 13 Nov 2019 11:37:34 -0800
-Received: from [10.25.73.195] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 13 Nov
- 2019 19:37:25 +0000
-Subject: Re: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
- dirty pages bitmap.
-To: Alex Williamson <alex.williamson@redhat.com>
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1iUycu-0006aA-Ff
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 14:48:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573674507;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5jAC1zaaqf0m+/Pbfu75vtwtFHfb9H9Fk6sFkl/m//Q=;
+ b=gIcD4KnBde7/XYinrI39a1VbBI/RBsEiBDGROsYgGn5lVbalZJjUDPVs2eU5V6TVNLG3wZ
+ BIo+xJqUGSaFuRORyv1868Y6VnYyhmHGxzuvdvESNWLyGyv0T7zoEUGVuVTxPocB1Emq3S
+ hAA/5xDLmzr1bLsEbw3CvgJl34d5idU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-265-PpC07pgCNB6_0HfqP_P41Q-1; Wed, 13 Nov 2019 14:48:24 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF8658C8BBB;
+ Wed, 13 Nov 2019 19:48:21 +0000 (UTC)
+Received: from x1.home (ovpn-116-138.phx2.redhat.com [10.3.116.138])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 595F76B8EE;
+ Wed, 13 Nov 2019 19:48:19 +0000 (UTC)
+Date: Wed, 13 Nov 2019 12:48:18 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v9 Kernel 1/5] vfio: KABI for migration interface for
+ device state
+Message-ID: <20191113124818.2b5be89d@x1.home>
+In-Reply-To: <94592507-fadb-0f10-ee17-f8d5678c70e5@nvidia.com>
 References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
- <1573578220-7530-3-git-send-email-kwankhede@nvidia.com>
- <20191112153020.71406c44@x1.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <324ce4f8-d655-ee37-036c-fc9ef9045bef@nvidia.com>
-Date: Thu, 14 Nov 2019 01:07:21 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
+ <1573578220-7530-2-git-send-email-kwankhede@nvidia.com>
+ <20191112153005.53bf324c@x1.home>
+ <20191113112417.6e40ce96.cohuck@redhat.com>
+ <20191113112733.49542ebc@x1.home>
+ <94592507-fadb-0f10-ee17-f8d5678c70e5@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <20191112153020.71406c44@x1.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1573673857; bh=6fNZc2mHwEswrolJj1VDa99wf4sYflIbMrzvc45iAFs=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=lINcAqrguOlRieumuvDf33LJlToXpndTmzQVE7Umbdg2fukbs/FsQuO8LG09mLMbT
- dF/mhOYz0CbIHm+Z7Fldewq+TzeeQ4uaSRSgJ2wZ+3HEteE0hYnhBcXgZwlDo384yv
- Tw723jIeUDyHfCS19eTJtlCVaBedNHi3LPT+0PUCMruh4YkMQhNSimTKBdtFuuB4nw
- JSq6cWas/z26CqW2c31HLs9fS2vWKZGW78PEp4ssVBETLzLHpG1VuY7fs0XTc8aKyY
- PpaWTWRGSanA4VBu1VUlvGmtomCLNqtMmGucf3+E0BI8TQ09EikX3n2JPWbmL/NBY8
- uN1SsDxMiLAUQ==
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.143
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: PpC07pgCNB6_0HfqP_P41Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,102 +94,286 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
  cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+ qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com,
+ felipe@nutanix.com, jonathan.davies@nutanix.com, yan.y.zhao@intel.com,
+ changpeng.liu@intel.com, Ken.Xue@amd.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 14 Nov 2019 00:59:52 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
+> On 11/13/2019 11:57 PM, Alex Williamson wrote:
+> > On Wed, 13 Nov 2019 11:24:17 +0100
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> >  =20
+> >> On Tue, 12 Nov 2019 15:30:05 -0700
+> >> Alex Williamson <alex.williamson@redhat.com> wrote:
+> >> =20
+> >>> On Tue, 12 Nov 2019 22:33:36 +0530
+> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >>>     =20
+> >>>> - Defined MIGRATION region type and sub-type.
+> >>>> - Used 3 bits to define VFIO device states.
+> >>>>      Bit 0 =3D> _RUNNING
+> >>>>      Bit 1 =3D> _SAVING
+> >>>>      Bit 2 =3D> _RESUMING
+> >>>>      Combination of these bits defines VFIO device's state during mi=
+gration
+> >>>>      _RUNNING =3D> Normal VFIO device running state. When its reset,=
+ it
+> >>>> =09=09indicates _STOPPED state. when device is changed to
+> >>>> =09=09_STOPPED, driver should stop device before write()
+> >>>> =09=09returns.
+> >>>>      _SAVING | _RUNNING =3D> vCPUs are running, VFIO device is runni=
+ng but
+> >>>>                            start saving state of device i.e. pre-cop=
+y state
+> >>>>      _SAVING  =3D> vCPUs are stopped, VFIO device should be stopped,=
+ and =20
+> >>>
+> >>> s/should/must/
+> >>>     =20
+> >>>>                  save device state,i.e. stop-n-copy state
+> >>>>      _RESUMING =3D> VFIO device resuming state.
+> >>>>      _SAVING | _RESUMING and _RUNNING | _RESUMING =3D> Invalid state=
+s =20
+> >>>
+> >>> A table might be useful here and in the uapi header to indicate valid
+> >>> states: =20
+> >>
+> >> I like that.
+> >> =20
+> >>>
+> >>> | _RESUMING | _SAVING | _RUNNING | Description
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     0     |    0    |     0    | Stopped, not saving or resuming (a=
+)
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     0     |    0    |     1    | Running, default state
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     0     |    1    |     0    | Stopped, migration interface in sa=
+ve mode
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     0     |    1    |     1    | Running, save mode interface, iter=
+ative
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     1     |    0    |     0    | Stopped, migration resume interfac=
+e active
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     1     |    0    |     1    | Invalid (b)
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     1     |    1    |     0    | Invalid (c)
+> >>> +-----------+---------+----------+-----------------------------------=
+-------
+> >>> |     1     |    1    |     1    | Invalid (d)
+> >>>
+> >>> I think we need to consider whether we define (a) as generally
+> >>> available, for instance we might want to use it for diagnostics or a
+> >>> fatal error condition outside of migration.
+> >>>
+> >>> Are there hidden assumptions between state transitions here or are
+> >>> there specific next possible state diagrams that we need to include a=
+s
+> >>> well? =20
+> >>
+> >> Some kind of state-change diagram might be useful in addition to the
+> >> textual description anyway. Let me try, just to make sure I understand
+> >> this correctly:
+> >> =20
+>=20
+> During User application initialization, there is one more state change:
+>=20
+> 0) 0/0/0 ---- stop to running -----> 0/0/1
 
-On 11/13/2019 4:00 AM, Alex Williamson wrote:
-> On Tue, 12 Nov 2019 22:33:37 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> All pages pinned by vendor driver through vfio_pin_pages API should be
->> considered as dirty during migration. IOMMU container maintains a list of
->> all such pinned pages. Added an ioctl defination to get bitmap of such
-> 
-> definition
-> 
->> pinned pages for requested IO virtual address range.
-> 
-> Additionally, all mapped pages are considered dirty when physically
-> mapped through to an IOMMU, modulo we discussed devices opting in to
-> per page pinning to indicate finer granularity with a TBD mechanism to
-> figure out if any non-opt-in devices remain.
-> 
+0/0/0 cannot be the initial state of the device, that would imply that
+a device supporting this migration interface breaks backwards
+compatibility with all existing vfio userspace code and that code needs
+to learn to set the device running as part of its initialization.
+That's absolutely unacceptable.  The initial device state must be 0/0/1.
 
-You mean, in case of device direct assignment (device pass through)?
+> >> 1) 0/0/1 ---(trigger driver to start gathering state info)---> 0/1/1 =
+=20
+>=20
+> not just gathering state info, but also copy device state to be=20
+> transferred during pre-copy phase.
+>=20
+> Below 2 state are not just to tell driver to stop, those 2 differ.
+> 2) is device state changed from running to stop, this is when VM=20
+> shutdowns cleanly, no need to save device state
 
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> ---
->>   include/uapi/linux/vfio.h | 23 +++++++++++++++++++++++
->>   1 file changed, 23 insertions(+)
->>
->> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
->> index 35b09427ad9f..6fd3822aa610 100644
->> --- a/include/uapi/linux/vfio.h
->> +++ b/include/uapi/linux/vfio.h
->> @@ -902,6 +902,29 @@ struct vfio_iommu_type1_dma_unmap {
->>   #define VFIO_IOMMU_ENABLE	_IO(VFIO_TYPE, VFIO_BASE + 15)
->>   #define VFIO_IOMMU_DISABLE	_IO(VFIO_TYPE, VFIO_BASE + 16)
->>   
->> +/**
->> + * VFIO_IOMMU_GET_DIRTY_BITMAP - _IOWR(VFIO_TYPE, VFIO_BASE + 17,
->> + *                                     struct vfio_iommu_type1_dirty_bitmap)
->> + *
->> + * IOCTL to get dirty pages bitmap for IOMMU container during migration.
->> + * Get dirty pages bitmap of given IO virtual addresses range using
->> + * struct vfio_iommu_type1_dirty_bitmap. Caller sets argsz, which is size of
->> + * struct vfio_iommu_type1_dirty_bitmap. User should allocate memory to get
->> + * bitmap and should set size of allocated memory in bitmap_size field.
->> + * One bit is used to represent per page consecutively starting from iova
->> + * offset. Bit set indicates page at that offset from iova is dirty.
->> + */
->> +struct vfio_iommu_type1_dirty_bitmap {
->> +	__u32        argsz;
->> +	__u32        flags;
->> +	__u64        iova;                      /* IO virtual address */
->> +	__u64        size;                      /* Size of iova range */
->> +	__u64        bitmap_size;               /* in bytes */
-> 
-> This seems redundant.  We can calculate the size of the bitmap based on
-> the iova size.
->
+Userspace is under no obligation to perform this state change though,
+backwards compatibility dictates this.
+=20
+> >> 2) 0/0/1 ---(tell driver to stop)---> 0/0/0  =20
+>=20
+> >> 3) 0/1/1 ---(tell driver to stop)---> 0/1/0 =20
+>=20
+> above is transition from pre-copy phase to stop-and-copy phase, where=20
+> device data should be made available to user to transfer to destination=
+=20
+> or to save it to file in case of save VM or suspend.
+>=20
+>=20
+> >> 4) 0/0/1 ---(tell driver to resume with provided info)---> 1/0/0 =20
+> >=20
+> > I think this is to switch into resuming mode, the data will follow > =
+=20
+> >> 5) 1/0/0 ---(driver is ready)---> 0/0/1
+> >> 6) 0/1/1 ---(tell driver to stop saving)---> 0/0/1 =20
+> > =20
+>=20
+> above can occur on migration cancelled or failed.
+>=20
+>=20
+> > I think also:
+> >=20
+> > 0/0/1 --> 0/1/0 If user chooses to go directly to stop and copy =20
+>=20
+> that's right, this happens in case of save VM or suspend VM.
+>=20
+> >=20
+> > 0/0/0 and 0/0/1 should be reachable from any state, though I could see
+> > that a vendor driver could fail transition from 1/0/0 -> 0/0/1 if the
+> > received state is incomplete.  Somehow though a user always needs to
+> > return the device to the initial state, so how does device_state
+> > interact with the reset ioctl?  Would this automatically manipulate
+> > device_state back to 0/0/1? =20
+>=20
+> why would reset occur on 1/0/0 -> 0/0/1 failure?
 
-But in kernel space, we need to validate the size of memory allocated by 
-user instead of assuming user is always correct, right?
+The question is whether the reset ioctl automatically puts the device
+back into the initial state, 0/0/1.  A reset from 1/0/0 -> 0/0/1
+presumably discards much of the device state we just restored, so
+clearly that would be undesirable.
+=20
+> 1/0/0 -> 0/0/1 fails, then user should convey that to source that=20
+> migration has failed, then resume at source.
 
->> +	void __user *bitmap;                    /* one bit per page */
-> 
-> Should we define that as a __u64* to (a) help with the size
-> calculation, and (b) assure that we can use 8-byte ops on it?
-> 
-> However, who defines page size?  Is it necessarily the processor page
-> size?  A physical IOMMU may support page sizes other than the CPU page
-> size.  It might be more important to indicate the expected page size
-> than the bitmap size.  Thanks,
->
+In the scheme of the migration yet, but as far as the vfio interface is
+concerned the user should have a path to make use of a device after
+this point without closing it and starting over.  Thus, if a 1/0/0 ->
+0/0/1 transition fails, would we define the device reset ioctl as a
+mechanism to flush the bogus state and place the device into the 0/0/1
+initial state?
+=20
+> >    =20
+> >> Not sure about the usefulness of 2). =20
+>=20
+> I explained this above.
+>=20
+> >> Also, is 4) the only way to
+> >> trigger resuming?  =20
+> Yes.
+>=20
+> >> And is the change in 5) performed by the driver, or
+> >> by userspace?
+> >> =20
+> By userspace.
+>=20
+> >> Are any other state transitions valid?
+> >>
+> >> (...)
+> >> =20
+> >>>> + * Sequence to be followed for _SAVING|_RUNNING device state or pre=
+-copy phase
+> >>>> + * and for _SAVING device state or stop-and-copy phase:
+> >>>> + * a. read pending_bytes. If pending_bytes > 0, go through below st=
+eps.
+> >>>> + * b. read data_offset, indicates kernel driver to write data to st=
+aging buffer.
+> >>>> + *    Kernel driver should return this read operation only after wr=
+iting data to
+> >>>> + *    staging buffer is done. =20
+> >>>
+> >>> "staging buffer" implies a vendor driver implementation, perhaps we
+> >>> could just state that data is available from (region + data_offset) t=
+o
+> >>> (region + data_offset + data_size) upon return of this read operation=
+.
+> >>>     =20
+> >>>> + * c. read data_size, amount of data in bytes written by vendor dri=
+ver in
+> >>>> + *    migration region.
+> >>>> + * d. read data_size bytes of data from data_offset in the migratio=
+n region.
+> >>>> + * e. process data.
+> >>>> + * f. Loop through a to e. Next read on pending_bytes indicates tha=
+t read data
+> >>>> + *    operation from migration region for previous iteration is don=
+e. =20
+> >>>
+> >>> I think this indicate that step (f) should be to read pending_bytes, =
+the
+> >>> read sequence is not complete until this step.  Optionally the user c=
+an
+> >>> then proceed to step (b).  There are no read side-effects of (a) afai=
+ct.
+> >>>
+> >>> Is the use required to reach pending_bytes =3D=3D 0 before changing
+> >>> device_state, particularly transitioning to !_RUNNING?  Presumably th=
+e
+> >>> user can exit this sequence at any time by clearing _SAVING. =20
+> >>
+> >> That would be transition 6) above (abort saving and continue). I think
+> >> it makes sense not to forbid this.
+> >> =20
+> >>>     =20
+> >>>> + *
+> >>>> + * Sequence to be followed while _RESUMING device state:
+> >>>> + * While data for this device is available, repeat below steps:
+> >>>> + * a. read data_offset from where user application should write dat=
+a.
+> >>>> + * b. write data of data_size to migration region from data_offset.
+> >>>> + * c. write data_size which indicates vendor driver that data is wr=
+itten in
+> >>>> + *    staging buffer. Vendor driver should read this data from migr=
+ation
+> >>>> + *    region and resume device's state. =20
+> >>>
+> >>> The device defaults to _RUNNING state, so a prerequisite is to set
+> >>> _RESUMING and clear _RUNNING, right? =20
+> >> =20
+>=20
+> Sorry, I replied yes in my previous reply, but no. Default device state=
+=20
+> is _STOPPED. During resume _STOPPED -> _RESUMING
 
-I see in QEMU and in vfio_iommu_type1 module, page sizes considered for 
-mapping are CPU page size, 4K. Do we still need to have such argument?
+Nope, it can't be, it must be _RUNNING.
 
+> >> Transition 4) above. Do we need =20
+>=20
+> I think, its not required.
+
+But above we say it's the only way to trigger resuming (4 was 0/0/1 ->
+1/0/0).
+
+> >> 7) 0/0/0 ---(tell driver to resume with provided info)---> 1/0/0
+> >> as well? (Probably depends on how sensible the 0/0/0 state is.) =20
+> >=20
+> > I think we must unless we require the user to transition from 0/0/1 to
+> > 1/0/0 in a single operation, but I'd prefer to make 0/0/0 generally
+> > available.  Thanks,
+> >  =20
+>=20
+> its 0/0/0 -> 1/0/0 while resuming.
+
+I think we're starting with different initial states, IMO there is
+absolutely no way around 0/0/1 being the initial device state.
+Anything otherwise means that we cannot add migration support to an
+existing device and maintain compatibility with existing userspace.
 Thanks,
-Kirti
 
-> Alex
-> 
->> +};
->> +
->> +#define VFIO_IOMMU_GET_DIRTY_BITMAP             _IO(VFIO_TYPE, VFIO_BASE + 17)
->> +
->>   /* -------- Additional API for SPAPR TCE (Server POWERPC) IOMMU -------- */
->>   
->>   /*
-> 
+Alex
+
 
