@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC22C43331
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C54C43331
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:50:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04504222C9
-	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:49:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E180D222CA
+	for <qemu-devel@archiver.kernel.org>; Wed, 13 Nov 2019 14:50:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oEmLid5C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04504222C9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MYixFIYj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E180D222CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iUtxq-0000vd-QO
-	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 09:49:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54542)
+	id 1iUtyg-00023C-LN
+	for qemu-devel@archiver.kernel.org; Wed, 13 Nov 2019 09:50:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54575)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnh-0005q7-VC
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:19 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnl-0005wJ-FW
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iUtng-0006L2-Jp
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:17 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37638)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iUtnj-0006M3-Lb
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:21 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54749)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iUtng-0006Kn-Dd
- for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:16 -0500
-Received: by mail-wm1-x342.google.com with SMTP id b17so2280425wmj.2
- for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 06:39:16 -0800 (PST)
+ id 1iUtnj-0006Li-EU
+ for qemu-devel@nongnu.org; Wed, 13 Nov 2019 09:39:19 -0500
+Received: by mail-wm1-x342.google.com with SMTP id z26so2251302wmi.4
+ for <qemu-devel@nongnu.org>; Wed, 13 Nov 2019 06:39:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=WlKrofDa4j3N22AYaGt218mSvCaVNbM8UKHCQuejvbk=;
- b=oEmLid5CyqiWpYA7YnLFodz5JRkBBt6E2FSEOuJlUIwaQYzuyPjU9cTsfNoSLn1EJn
- A30ii760z3VHk3SfbQB28jR0uwdAbRitOboycqF7qrsc3V2djwwuld3dI52wREzCQH/1
- V6/YYEew5D28Q2+F7/ySFOp6Pk9S25d2050mhtexfxiJ+tktIXRF2s2TWi+D9INjRqvi
- OWK5n3fMqb8w+oUneo4w1QQA9tt7hTeHXHsvxisO/lVb7iohNy55F4dBSm8GFBITmAEr
- qCtHGOQwVouzEvdG0B5wPlrvFlgZmFULHRIN77Uo5F7X8RqGRFFOu/jtsZd2G2UWkYLq
- zl8A==
+ bh=Y+16lVLuNcBNpTOJq/xCtuQdbLbwB1u4ci4+zWS4pdw=;
+ b=MYixFIYjArAN4hDypeka4NMayAR15LwczewDBWt0t+x98jWLFupXWBQv6VCgVm8aRF
+ kAxX5WysQXyNYtHJgqq4CsQdNTLEphjwGyuCgLwv2dVE3SAFWL9vonUUALv+bOr3ATwi
+ U9dWYpmFlKhYkJCU4lYZOm2lLIojFZDbD/SyKmpNwGzn+sdxVAApwSHvNLb+PsnroOyO
+ ZFImwUFUfQAIHOsHKlleUqN1ENAnKpM+OMo7k8CY/TZ1DaEc1pOyDnl7IjpgQ7LKp71e
+ wFlLdhzYGBEjoyfdhg7eToWdG6O41op05PS+HYIoiy3T75MD08kliw8++nFr6cUi0uxk
+ NPEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=WlKrofDa4j3N22AYaGt218mSvCaVNbM8UKHCQuejvbk=;
- b=HwrfNtAMyXUlKR0hk8BvvGiMhLLZJk+zS5SYeUY3XesBY5dZRUvKnhVdgZku8u+gfI
- BLf+TUyuUK9LrFUbYE8RMCQl2W1kmH5LGy4k99SEPlPBcgHIvzuqrW4gvLisa84KW3lc
- co3heNB38v96OaeZp+4/0/pv/o4h0zoJeaGusyF2zFhlpVX8fZu6D4ByW5upyrwT49q8
- lMYQ4VGjcR6KsFGuHC3drb0ImgqCHuCNU8MNmZ1Z3uhDJw2Y1lOS6WKut2a9Hg20mdbP
- fq/nfAWdjaCLKyVf0Nj5CbSLQd+DPgfn1tUtU0RsMwbZ3dIMZnjZ/pYyn43rcvqxFloP
- WIYQ==
-X-Gm-Message-State: APjAAAUnel/7itPhBqli/fiZYwgPyLFTlplV71DyN9hJJaEVCS4qtENr
- UEt8dPxC6mRzMMN6wNCeog3iVrtO
-X-Google-Smtp-Source: APXvYqzrqEoZm9SIpdGzJInDCEHXo5WV9uklireTeOJNgI+dKw3xVZ3G/ENSYKMbjiMNUU+eXibRCw==
-X-Received: by 2002:a1c:1fca:: with SMTP id f193mr2874305wmf.173.1573655955073; 
- Wed, 13 Nov 2019 06:39:15 -0800 (PST)
+ bh=Y+16lVLuNcBNpTOJq/xCtuQdbLbwB1u4ci4+zWS4pdw=;
+ b=UyJpWQmU7rSUIFeuYvw/BJsAozLz4hxcYq/A9XFW7CyDdoBkO8x8oBAp8xM9tdZ9pL
+ ygZvR+7EcX04V1rHFcHrztlL+eatm8UJLRc+nQ90braLWqAe3GCGplUkDptGgn1tAmwy
+ HvNYbqhch9L0rYiPZrAKKSrP83k0eSpaHdAUIsqtSa1z7KT5f94gtEHnE7yUM+KII7ic
+ /cwF5bBFC6Xd8V2tpz4uRI4z0l0/sRsVtiT38om4Q3BpraPsQxRdFR2S0I+KbWywQnvE
+ HjMIDJ4v8z5GbyoqqaNx+cfgXOYjpiDcPda6GavALYNqw/VgRiAcom4gVd35fovpI2Re
+ tCBQ==
+X-Gm-Message-State: APjAAAU+qW4H+TTpfMJF0vmlLazn/66bQ99OAKgw0wL/ihAjtbCno448
+ p5JfzlhHuqkfreQGKhkVBQzymC81
+X-Google-Smtp-Source: APXvYqwv2S71mFbxxTNOzi3H25bI8Y1JX/i3hMuVEEDndOqFqc26A4P7EXU4zwMPNt4nrlEGGrnDUg==
+X-Received: by 2002:a1c:7209:: with SMTP id n9mr2735545wmc.9.1573655957158;
+ Wed, 13 Nov 2019 06:39:17 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id s11sm2965823wrr.43.2019.11.13.06.39.14
+ by smtp.gmail.com with ESMTPSA id s11sm2965823wrr.43.2019.11.13.06.39.16
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 13 Nov 2019 06:39:14 -0800 (PST)
+ Wed, 13 Nov 2019 06:39:16 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 09/16] qom: add object_new_with_class
-Date: Wed, 13 Nov 2019 15:38:58 +0100
-Message-Id: <1573655945-14912-10-git-send-email-pbonzini@redhat.com>
+Subject: [PATCH 11/16] tcg: convert "-accel threads" to a QOM property
+Date: Wed, 13 Nov 2019 15:39:00 +0100
+Message-Id: <1573655945-14912-12-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
 References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
@@ -94,135 +94,325 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Similar to CPU and machine classes, "-accel" class names are mangled,
-so we have to first get a class via accel_find and then instantiate it.
-Provide a new function to instantiate a class without going through
-object_class_get_name, and use it for CPUs and machines already.
+Replace the ad-hoc qemu_tcg_configure with generic code invoking
+QOM property getters and setters.  This will be extended in the
+next patches, which will turn accelerator-related "-machine"
+options into QOM properties as well.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/qom/object.h      | 12 ++++++++++++
- qom/object.c              |  5 +++++
- target/i386/cpu.c         |  8 ++++----
- target/s390x/cpu_models.c |  4 ++--
- vl.c                      |  3 +--
- 5 files changed, 24 insertions(+), 8 deletions(-)
+ accel/tcg/tcg-all.c   | 111 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ cpus.c                |  72 --------------------------------
+ include/sysemu/cpus.h |   2 -
+ vl.c                  |  32 ++++++++-------
+ 4 files changed, 126 insertions(+), 91 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index 230b18f..f9ad692 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -593,6 +593,18 @@ struct InterfaceClass
-                                              __FILE__, __LINE__, __func__))
- 
- /**
-+ * object_new_with_class:
-+ * @klass: The class to instantiate.
-+ *
-+ * This function will initialize a new object using heap allocated memory.
-+ * The returned object has a reference count of 1, and will be freed when
-+ * the last reference is dropped.
-+ *
-+ * Returns: The newly allocated and instantiated object.
-+ */
-+Object *object_new_with_class(ObjectClass *klass);
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index c59d5b0..7829f02 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -30,6 +30,21 @@
+ #include "cpu.h"
+ #include "sysemu/cpus.h"
+ #include "qemu/main-loop.h"
++#include "tcg/tcg.h"
++#include "include/qapi/error.h"
++#include "include/qemu/error-report.h"
++#include "include/hw/boards.h"
 +
-+/**
-  * object_new:
-  * @typename: The name of the type of the object to instantiate.
-  *
-diff --git a/qom/object.c b/qom/object.c
-index c7825dd..ee7708e 100644
---- a/qom/object.c
-+++ b/qom/object.c
-@@ -658,6 +658,11 @@ static Object *object_new_with_type(Type type)
-     return obj;
++typedef struct TCGState {
++    AccelState parent_obj;
++
++    bool mttcg_enabled;
++} TCGState;
++
++#define TYPE_TCG_ACCEL ACCEL_CLASS_NAME("tcg")
++
++#define TCG_STATE(obj) \
++        OBJECT_CHECK(TCGState, (obj), TYPE_TCG_ACCEL)
+ 
+ unsigned long tcg_tb_size;
+ 
+@@ -58,27 +73,119 @@ static void tcg_handle_interrupt(CPUState *cpu, int mask)
+     }
  }
  
-+Object *object_new_with_class(ObjectClass *klass)
++/*
++ * We default to false if we know other options have been enabled
++ * which are currently incompatible with MTTCG. Otherwise when each
++ * guest (target) has been updated to support:
++ *   - atomic instructions
++ *   - memory ordering primitives (barriers)
++ * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
++ *
++ * Once a guest architecture has been converted to the new primitives
++ * there are two remaining limitations to check.
++ *
++ * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
++ * - The host must have a stronger memory order than the guest
++ *
++ * It may be possible in future to support strong guests on weak hosts
++ * but that will require tagging all load/stores in a guest with their
++ * implicit memory order requirements which would likely slow things
++ * down a lot.
++ */
++
++static bool check_tcg_memory_orders_compatible(void)
 +{
-+    return object_new_with_type(klass->type);
++#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
++    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
++#else
++    return false;
++#endif
 +}
 +
- Object *object_new(const char *typename)
++static bool default_mttcg_enabled(void)
++{
++    if (use_icount || TCG_OVERSIZED_GUEST) {
++        return false;
++    } else {
++#ifdef TARGET_SUPPORTS_MTTCG
++        return check_tcg_memory_orders_compatible();
++#else
++        return false;
++#endif
++    }
++}
++
++static void tcg_accel_instance_init(Object *obj)
++{
++    TCGState *s = TCG_STATE(obj);
++
++    s->mttcg_enabled = default_mttcg_enabled();
++}
++
+ static int tcg_init(MachineState *ms)
  {
-     TypeImpl *ti = type_get_by_name(typename);
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index a624163..4742a0e 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3881,7 +3881,7 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
-         return;
-     }
++    TCGState *s = TCG_STATE(current_machine->accelerator);
++
+     tcg_exec_init(tcg_tb_size * 1024 * 1024);
+     cpu_interrupt_handler = tcg_handle_interrupt;
++    mttcg_enabled = s->mttcg_enabled;
+     return 0;
+ }
  
--    xc = X86_CPU(object_new(object_class_get_name(OBJECT_CLASS(xcc))));
-+    xc = X86_CPU(object_new_with_class(OBJECT_CLASS(xcc)));
- 
-     x86_cpu_expand_features(xc, &err);
-     if (err) {
-@@ -3952,7 +3952,7 @@ static GSList *get_sorted_cpu_model_list(void)
- 
- static char *x86_cpu_class_get_model_id(X86CPUClass *xc)
++static char *tcg_get_thread(Object *obj, Error **errp)
++{
++    TCGState *s = TCG_STATE(obj);
++
++    return g_strdup(s->mttcg_enabled ? "multi" : "single");
++}
++
++static void tcg_set_thread(Object *obj, const char *value, Error **errp)
++{
++    TCGState *s = TCG_STATE(obj);
++
++    if (strcmp(value, "multi") == 0) {
++        if (TCG_OVERSIZED_GUEST) {
++            error_setg(errp, "No MTTCG when guest word size > hosts");
++        } else if (use_icount) {
++            error_setg(errp, "No MTTCG when icount is enabled");
++        } else {
++#ifndef TARGET_SUPPORTS_MTTCG
++            warn_report("Guest not yet converted to MTTCG - "
++                        "you may get unexpected results");
++#endif
++            if (!check_tcg_memory_orders_compatible()) {
++                warn_report("Guest expects a stronger memory ordering "
++                            "than the host provides");
++                error_printf("This may cause strange/hard to debug errors\n");
++            }
++            s->mttcg_enabled = true;
++        }
++    } else if (strcmp(value, "single") == 0) {
++        s->mttcg_enabled = false;
++    } else {
++        error_setg(errp, "Invalid 'thread' setting %s", value);
++    }
++}
++
+ static void tcg_accel_class_init(ObjectClass *oc, void *data)
  {
--    Object *obj = object_new(object_class_get_name(OBJECT_CLASS(xc)));
-+    Object *obj = object_new_with_class(OBJECT_CLASS(xc));
-     char *r = object_property_get_str(obj, "model-id", &error_abort);
-     object_unref(obj);
-     return r;
-@@ -4333,7 +4333,7 @@ static X86CPU *x86_cpu_from_model(const char *model, QDict *props, Error **errp)
-         goto out;
-     }
+     AccelClass *ac = ACCEL_CLASS(oc);
+     ac->name = "tcg";
+     ac->init_machine = tcg_init;
+     ac->allowed = &tcg_allowed;
+-}
  
--    xc = X86_CPU(object_new(object_class_get_name(OBJECT_CLASS(xcc))));
-+    xc = X86_CPU(object_new_with_class(OBJECT_CLASS(xcc)));
-     if (props) {
-         object_apply_props(OBJECT(xc), props, &err);
-         if (err) {
-@@ -5177,7 +5177,7 @@ static void x86_cpu_apic_create(X86CPU *cpu, Error **errp)
-     APICCommonState *apic;
-     ObjectClass *apic_class = OBJECT_CLASS(apic_get_class());
+-#define TYPE_TCG_ACCEL ACCEL_CLASS_NAME("tcg")
++    object_class_property_add_str(oc, "thread",
++                                  tcg_get_thread,
++                                  tcg_set_thread,
++                                  NULL);
++}
  
--    cpu->apic_state = DEVICE(object_new(object_class_get_name(apic_class)));
-+    cpu->apic_state = DEVICE(object_new_with_class(apic_class));
+ static const TypeInfo tcg_accel_type = {
+     .name = TYPE_TCG_ACCEL,
+     .parent = TYPE_ACCEL,
++    .instance_init = tcg_accel_instance_init,
+     .class_init = tcg_accel_class_init,
++    .instance_size = sizeof(TCGState),
+ };
  
-     object_property_add_child(OBJECT(cpu), "lapic",
-                               OBJECT(cpu->apic_state), &error_abort);
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 7e92fb2..72cf48b 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -440,7 +440,7 @@ static void create_cpu_model_list(ObjectClass *klass, void *opaque)
-     if (cpu_list_data->model) {
-         Object *obj;
-         S390CPU *sc;
--        obj = object_new(object_class_get_name(klass));
-+        obj = object_new_with_class(klass);
-         sc = S390_CPU(obj);
-         if (sc->model) {
-             info->has_unavailable_features = true;
-@@ -501,7 +501,7 @@ static void cpu_model_from_info(S390CPUModel *model, const CpuModelInfo *info,
-         error_setg(errp, "The CPU definition '%s' requires KVM", info->name);
-         return;
-     }
--    obj = object_new(object_class_get_name(oc));
-+    obj = object_new_with_class(oc);
-     cpu = S390_CPU(obj);
+ static void register_accel_types(void)
+diff --git a/cpus.c b/cpus.c
+index fabbeca..69d4f6a 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -165,78 +165,6 @@ typedef struct TimersState {
+ static TimersState timers_state;
+ bool mttcg_enabled;
  
-     if (!cpu->model) {
+-/*
+- * We default to false if we know other options have been enabled
+- * which are currently incompatible with MTTCG. Otherwise when each
+- * guest (target) has been updated to support:
+- *   - atomic instructions
+- *   - memory ordering primitives (barriers)
+- * they can set the appropriate CONFIG flags in ${target}-softmmu.mak
+- *
+- * Once a guest architecture has been converted to the new primitives
+- * there are two remaining limitations to check.
+- *
+- * - The guest can't be oversized (e.g. 64 bit guest on 32 bit host)
+- * - The host must have a stronger memory order than the guest
+- *
+- * It may be possible in future to support strong guests on weak hosts
+- * but that will require tagging all load/stores in a guest with their
+- * implicit memory order requirements which would likely slow things
+- * down a lot.
+- */
+-
+-static bool check_tcg_memory_orders_compatible(void)
+-{
+-#if defined(TCG_GUEST_DEFAULT_MO) && defined(TCG_TARGET_DEFAULT_MO)
+-    return (TCG_GUEST_DEFAULT_MO & ~TCG_TARGET_DEFAULT_MO) == 0;
+-#else
+-    return false;
+-#endif
+-}
+-
+-static bool default_mttcg_enabled(void)
+-{
+-    if (use_icount || TCG_OVERSIZED_GUEST) {
+-        return false;
+-    } else {
+-#ifdef TARGET_SUPPORTS_MTTCG
+-        return check_tcg_memory_orders_compatible();
+-#else
+-        return false;
+-#endif
+-    }
+-}
+-
+-void qemu_tcg_configure(QemuOpts *opts, Error **errp)
+-{
+-    const char *t = qemu_opt_get(opts, "thread");
+-    if (t) {
+-        if (strcmp(t, "multi") == 0) {
+-            if (TCG_OVERSIZED_GUEST) {
+-                error_setg(errp, "No MTTCG when guest word size > hosts");
+-            } else if (use_icount) {
+-                error_setg(errp, "No MTTCG when icount is enabled");
+-            } else {
+-#ifndef TARGET_SUPPORTS_MTTCG
+-                warn_report("Guest not yet converted to MTTCG - "
+-                            "you may get unexpected results");
+-#endif
+-                if (!check_tcg_memory_orders_compatible()) {
+-                    warn_report("Guest expects a stronger memory ordering "
+-                                "than the host provides");
+-                    error_printf("This may cause strange/hard to debug errors\n");
+-                }
+-                mttcg_enabled = true;
+-            }
+-        } else if (strcmp(t, "single") == 0) {
+-            mttcg_enabled = false;
+-        } else {
+-            error_setg(errp, "Invalid 'thread' setting %s", t);
+-        }
+-    } else {
+-        mttcg_enabled = default_mttcg_enabled();
+-    }
+-}
+ 
+ /* The current number of executed instructions is based on what we
+  * originally budgeted minus the current state of the decrementing
+diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+index 32c05f2..3c1da6a 100644
+--- a/include/sysemu/cpus.h
++++ b/include/sysemu/cpus.h
+@@ -40,6 +40,4 @@ extern int smp_threads;
+ 
+ void list_cpus(const char *optarg);
+ 
+-void qemu_tcg_configure(QemuOpts *opts, Error **errp);
+-
+ #endif
 diff --git a/vl.c b/vl.c
-index cb993dd..6e406d4 100644
+index c8ec906..2ea94c7 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -3988,8 +3988,7 @@ int main(int argc, char **argv, char **envp)
-                       cleanup_add_fd, NULL, &error_fatal);
- #endif
+@@ -294,17 +294,12 @@ static QemuOptsList qemu_accel_opts = {
+     .implied_opt_name = "accel",
+     .head = QTAILQ_HEAD_INITIALIZER(qemu_accel_opts.head),
+     .desc = {
+-        {
+-            .name = "accel",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Select the type of accelerator",
+-        },
+-        {
+-            .name = "thread",
+-            .type = QEMU_OPT_STRING,
+-            .help = "Enable/disable multi-threaded TCG",
+-        },
+-        { /* end of list */ }
++        /*
++         * no elements => accept any
++         * sanity checking will happen later
++         * when setting accelerator properties
++         */
++        { }
+     },
+ };
  
--    current_machine = MACHINE(object_new(object_class_get_name(
--                          OBJECT_CLASS(machine_class))));
-+    current_machine = MACHINE(object_new_with_class(OBJECT_CLASS(machine_class)));
-     if (machine_help_func(qemu_get_machine_opts(), current_machine)) {
-         exit(0);
+@@ -2841,6 +2836,13 @@ static int do_configure_icount(void *opaque, QemuOpts *opts, Error **errp)
+     return 0;
+ }
+ 
++static int accelerator_set_property(void *opaque,
++                                const char *name, const char *value,
++                                Error **errp)
++{
++    return object_parse_property_opt(opaque, name, value, "accel", errp);
++}
++
+ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
+ {
+     bool *p_init_failed = opaque;
+@@ -2855,6 +2857,10 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
+         return 0;
      }
+     accel = ACCEL(object_new_with_class(OBJECT_CLASS(ac)));
++    qemu_opt_foreach(opts, accelerator_set_property,
++                     accel,
++                     &error_fatal);
++
+     ret = accel_init_machine(accel, current_machine);
+     if (ret < 0) {
+         *p_init_failed = true;
+@@ -2862,10 +2868,6 @@ static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error **errp)
+                      acc, strerror(-ret));
+         return 0;
+     }
+-
+-    if (tcg_enabled()) {
+-        qemu_tcg_configure(opts, &error_fatal);
+-    }
+     return 1;
+ }
+ 
 -- 
 1.8.3.1
 
