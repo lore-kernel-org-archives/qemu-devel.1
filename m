@@ -2,62 +2,102 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E0BEC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:57:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E075C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:59:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA600206D9
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:57:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA600206D9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id BCFC720715
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:59:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DLWJzRre"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCFC720715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVBsF-0001vl-Pb
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 04:57:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37391)
+	id 1iVBuD-0003l5-PF
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 04:59:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37867)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iVBhw-0007px-UX
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:46:34 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iVBjB-0000QU-38
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:47:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iVBhu-0004ZW-TG
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:46:32 -0500
-Received: from 15.mo7.mail-out.ovh.net ([87.98.180.21]:38563)
+ (envelope-from <pbonzini@redhat.com>) id 1iVBj9-0005hK-Cf
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:47:48 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35697
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVBhs-0004Ua-SU
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:46:29 -0500
-Received: from player737.ha.ovh.net (unknown [10.109.159.224])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id DA11F13E660
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 10:46:25 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player737.ha.ovh.net (Postfix) with ESMTPSA id 08BA02A78619;
- Thu, 14 Nov 2019 09:46:19 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 4/5] aspeed: Remove AspeedBoardConfig array and use
- AspeedMachineClass
-Date: Thu, 14 Nov 2019 10:45:43 +0100
-Message-Id: <20191114094544.30114-5-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191114094544.30114-1-clg@kaod.org>
-References: <20191114094544.30114-1-clg@kaod.org>
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iVBj9-0005gn-87
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:47:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573724866;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=ojOq2wu0mVLtGFE7nGG21vwE2WrVKKE8wMdSINZBWBU=;
+ b=DLWJzRreeCAjn5NcuQzufqOofnV3eeJYA8yBr1ws931omvl91cbvC50zbBvu+N9MGl5zDu
+ fe1H56J34GvkRaZ8rpQOJ+Bk+AOPSdRoVz5/JxuNbrLe7OXrMoWRWurAwU7jLD8+JXxxnj
+ +qSTmZQCqvZeTPpSWENz3ExGPrXI/P8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-114-w9qELwVqOQ2kjBQ-_q5HBw-1; Thu, 14 Nov 2019 04:47:45 -0500
+Received: by mail-wr1-f71.google.com with SMTP id j17so4087584wru.13
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 01:47:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=/ZQayYqt85CI2kT7kzP3q5CrsAdYdXt1NILertHaAPk=;
+ b=VHVwPb8T1WG0C9xm/tztkACL4SWS+ijtvChH3anlTLx1DfGTbF7SHdPzW2naP711AC
+ DQXUKNe+J4eUnC/BNgWmHmVo3+rYiYwgslVAV2FQOtHNnaUCf1UxMz5cJwTYqLsb/W9I
+ ECvWazyYqeIUE9Akv553xqR7tUPxEXKGgs4JQE69LL8m31zHV1N5NqW4sCc4rOztWEtg
+ Kz1xseKR1y8Jq2yb0A7I4A40YGCFd1alHNSj976mT+wggHdECcGGu+TBbsOGKUr0FO7u
+ RYZy10DBnHTedFf99tdn8ANzPswbOXPSUYdmjbcsoAH6kog73dWkCKDYBbJ8Sp334CFe
+ qhMQ==
+X-Gm-Message-State: APjAAAXmUBGQgillUuQVaH+eU6mP2SjDdjEIJAUqxJlycrdefn+d013R
+ KPWRUOqdh1GE42Mk48w7C5PReUW6K+K5p/gUfDFRq/YRj7dyBVnBI8vx9NUWhnar4Q6uiLbfUlu
+ PEW0uRm6wudeq5dY=
+X-Received: by 2002:adf:93e1:: with SMTP id 88mr7160613wrp.198.1573724863782; 
+ Thu, 14 Nov 2019 01:47:43 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwvvx4EEiPEEhfla6gzpjAcB2GVS1eFShzSLtkQcn/7XUE+V15PwBNpzhMXKAumEmsPgAA69w==
+X-Received: by 2002:adf:93e1:: with SMTP id 88mr7160586wrp.198.1573724863377; 
+ Thu, 14 Nov 2019 01:47:43 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc?
+ ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
+ by smtp.gmail.com with ESMTPSA id t13sm6160943wrr.88.2019.11.14.01.47.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 14 Nov 2019 01:47:42 -0800 (PST)
+Subject: Re: [PATCH 13/16] xen: convert "-machine igd-passthru" to an
+ accelerator property
+To: Paul Durrant <pdurrant@gmail.com>
+References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
+ <1573655945-14912-14-git-send-email-pbonzini@redhat.com>
+ <CACCGGhB=Sp8jcp+hhQjU0sXqhyQ8ug7nT-PuijS-eXPq4kog-w@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <3b5cbfb9-0de9-ae52-6695-12579bc42c09@redhat.com>
+Date: Thu, 14 Nov 2019 10:47:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <CACCGGhB=Sp8jcp+hhQjU0sXqhyQ8ug7nT-PuijS-eXPq4kog-w@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: w9qELwVqOQ2kjBQ-_q5HBw-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 2481764873567701777
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeffedgtdelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeef
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.180.21
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,383 +109,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ xen-devel <xen-devel@lists.xenproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-AspeedBoardConfig is a redundant way to define class attributes and it
-complexifies the machine definition and initialization.
+On 14/11/19 10:39, Paul Durrant wrote:
+> On Wed, 13 Nov 2019 at 14:53, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> The first machine property to fall is Xen's Intel integrated graphics
+>> passthrough.  The "-machine igd-passthru" option does not set anymore
+>> a property on the machine object, but desugars to a GlobalProperty on
+>> accelerator objects.
+>>
+>> The setter is very simple, since the value ends up in a
+>> global variable, so this patch also provides an example before the more
+>> complicated cases that follow it.
+>>
+>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>=20
+> Did something go wrong with get_maintainers here? The Xen maintainers
+> ought to have been cc-ed. The Xen toolstack will require consequent
+> modification.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/arm/aspeed.h |  24 ++---
- hw/arm/aspeed.c         | 231 ++++++++++++++++++++++------------------
- 2 files changed, 137 insertions(+), 118 deletions(-)
+No, I just didn't use getmaintainers, my bad.  But backwards-compatible
+syntactic sugar is provided, so no modifications are needed to Xen.  See
+here in the code:
 
-diff --git a/include/hw/arm/aspeed.h b/include/hw/arm/aspeed.h
-index f49bc7081e4d..4423cd0cda71 100644
---- a/include/hw/arm/aspeed.h
-+++ b/include/hw/arm/aspeed.h
-@@ -13,19 +13,6 @@
-=20
- typedef struct AspeedBoardState AspeedBoardState;
-=20
--typedef struct AspeedBoardConfig {
--    const char *name;
--    const char *desc;
--    const char *soc_name;
--    uint32_t hw_strap1;
--    uint32_t hw_strap2;
--    const char *fmc_model;
--    const char *spi_model;
--    uint32_t num_cs;
--    void (*i2c_init)(AspeedBoardState *bmc);
--    uint32_t ram;
--} AspeedBoardConfig;
--
- #define TYPE_ASPEED_MACHINE       MACHINE_TYPE_NAME("aspeed")
- #define ASPEED_MACHINE(obj) \
-     OBJECT_CHECK(AspeedMachine, (obj), TYPE_ASPEED_MACHINE)
-@@ -41,7 +28,16 @@ typedef struct AspeedMachine {
-=20
- typedef struct AspeedMachineClass {
-     MachineClass parent_obj;
--    const AspeedBoardConfig *board;
-+
-+    const char *name;
-+    const char *desc;
-+    const char *soc_name;
-+    uint32_t hw_strap1;
-+    uint32_t hw_strap2;
-+    const char *fmc_model;
-+    const char *spi_model;
-+    uint32_t num_cs;
-+    void (*i2c_init)(AspeedBoardState *bmc);
- } AspeedMachineClass;
-=20
-=20
-diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index 028191ff36fc..e34e6787430b 100644
---- a/hw/arm/aspeed.c
-+++ b/hw/arm/aspeed.c
-@@ -167,10 +167,10 @@ static void aspeed_board_init_flashes(AspeedSMCStat=
-e *s, const char *flashtype,
-     }
- }
-=20
--static void aspeed_board_init(MachineState *machine,
--                              const AspeedBoardConfig *cfg)
-+static void aspeed_machine_init(MachineState *machine)
- {
-     AspeedBoardState *bmc;
-+    AspeedMachineClass *amc =3D ASPEED_MACHINE_GET_CLASS(machine);
-     AspeedSoCClass *sc;
-     DriveInfo *drive0 =3D drive_get(IF_MTD, 0, 0);
-     ram_addr_t max_ram_size;
-@@ -182,18 +182,18 @@ static void aspeed_board_init(MachineState *machine=
-,
-                        UINT32_MAX);
-=20
-     object_initialize_child(OBJECT(machine), "soc", &bmc->soc,
--                            (sizeof(bmc->soc)), cfg->soc_name, &error_ab=
-ort,
-+                            (sizeof(bmc->soc)), amc->soc_name, &error_ab=
-ort,
-                             NULL);
-=20
-     sc =3D ASPEED_SOC_GET_CLASS(&bmc->soc);
-=20
-     object_property_set_uint(OBJECT(&bmc->soc), ram_size, "ram-size",
-                              &error_abort);
--    object_property_set_int(OBJECT(&bmc->soc), cfg->hw_strap1, "hw-strap=
-1",
-+    object_property_set_int(OBJECT(&bmc->soc), amc->hw_strap1, "hw-strap=
-1",
-                             &error_abort);
--    object_property_set_int(OBJECT(&bmc->soc), cfg->hw_strap2, "hw-strap=
-2",
-+    object_property_set_int(OBJECT(&bmc->soc), amc->hw_strap2, "hw-strap=
-2",
-                             &error_abort);
--    object_property_set_int(OBJECT(&bmc->soc), cfg->num_cs, "num-cs",
-+    object_property_set_int(OBJECT(&bmc->soc), amc->num_cs, "num-cs",
-                             &error_abort);
-     object_property_set_int(OBJECT(&bmc->soc), machine->smp.cpus, "num-c=
-pus",
-                             &error_abort);
-@@ -230,8 +230,8 @@ static void aspeed_board_init(MachineState *machine,
-                           "max_ram", max_ram_size  - ram_size);
-     memory_region_add_subregion(&bmc->ram_container, ram_size, &bmc->max=
-_ram);
-=20
--    aspeed_board_init_flashes(&bmc->soc.fmc, cfg->fmc_model, &error_abor=
-t);
--    aspeed_board_init_flashes(&bmc->soc.spi[0], cfg->spi_model, &error_a=
-bort);
-+    aspeed_board_init_flashes(&bmc->soc.fmc, amc->fmc_model, &error_abor=
-t);
-+    aspeed_board_init_flashes(&bmc->soc.spi[0], amc->spi_model, &error_a=
-bort);
-=20
-     /* Install first FMC flash content as a boot rom. */
-     if (drive0) {
-@@ -255,8 +255,8 @@ static void aspeed_board_init(MachineState *machine,
-     aspeed_board_binfo.loader_start =3D sc->memmap[ASPEED_SDRAM];
-     aspeed_board_binfo.nb_cpus =3D bmc->soc.num_cpus;
-=20
--    if (cfg->i2c_init) {
--        cfg->i2c_init(bmc);
-+    if (amc->i2c_init) {
-+        amc->i2c_init(bmc);
-     }
-=20
-     for (i =3D 0; i < ARRAY_SIZE(bmc->soc.sdhci.slots); i++) {
-@@ -383,118 +383,141 @@ static void witherspoon_bmc_i2c_init(AspeedBoardS=
-tate *bmc)
-                      0x60);
- }
-=20
--static void aspeed_machine_init(MachineState *machine)
--{
--    AspeedMachineClass *amc =3D ASPEED_MACHINE_GET_CLASS(machine);
--
--    aspeed_board_init(machine, amc->board);
--}
--
- static void aspeed_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc =3D MACHINE_CLASS(oc);
--    AspeedMachineClass *amc =3D ASPEED_MACHINE_CLASS(oc);
--    const AspeedBoardConfig *board =3D data;
-=20
--    mc->desc =3D board->desc;
-     mc->init =3D aspeed_machine_init;
-     mc->max_cpus =3D ASPEED_CPUS_NUM;
-     mc->no_floppy =3D 1;
-     mc->no_cdrom =3D 1;
-     mc->no_parallel =3D 1;
--    if (board->ram) {
--        mc->default_ram_size =3D board->ram;
--    }
--    amc->board =3D board;
- }
-=20
--static const TypeInfo aspeed_machine_type =3D {
--    .name =3D TYPE_ASPEED_MACHINE,
--    .parent =3D TYPE_MACHINE,
--    .instance_size =3D sizeof(AspeedMachine),
--    .class_size =3D sizeof(AspeedMachineClass),
--    .abstract =3D true,
-+static void aspeed_machine_palmetto_class_init(ObjectClass *oc, void *da=
-ta)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+    AspeedMachineClass *amc =3D ASPEED_MACHINE_CLASS(oc);
-+
-+    mc->desc       =3D "OpenPOWER Palmetto BMC (ARM926EJ-S)";
-+    amc->soc_name  =3D "ast2400-a1";
-+    amc->hw_strap1 =3D PALMETTO_BMC_HW_STRAP1;
-+    amc->fmc_model =3D "n25q256a";
-+    amc->spi_model =3D "mx25l25635e";
-+    amc->num_cs    =3D 1;
-+    amc->i2c_init  =3D palmetto_bmc_i2c_init;
-+    mc->default_ram_size       =3D 256 * MiB;
-+};
-+
-+static void aspeed_machine_ast2500_evb_class_init(ObjectClass *oc, void =
-*data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+    AspeedMachineClass *amc =3D ASPEED_MACHINE_CLASS(oc);
-+
-+    mc->desc       =3D "Aspeed AST2500 EVB (ARM1176)";
-+    amc->soc_name  =3D "ast2500-a1";
-+    amc->hw_strap1 =3D AST2500_EVB_HW_STRAP1;
-+    amc->fmc_model =3D "w25q256";
-+    amc->spi_model =3D "mx25l25635e";
-+    amc->num_cs    =3D 1;
-+    amc->i2c_init  =3D ast2500_evb_i2c_init;
-+    mc->default_ram_size       =3D 512 * MiB;
-+};
-+
-+static void aspeed_machine_romulus_class_init(ObjectClass *oc, void *dat=
-a)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+    AspeedMachineClass *amc =3D ASPEED_MACHINE_CLASS(oc);
-+
-+    mc->desc       =3D "OpenPOWER Romulus BMC (ARM1176)";
-+    amc->soc_name  =3D "ast2500-a1";
-+    amc->hw_strap1 =3D ROMULUS_BMC_HW_STRAP1;
-+    amc->fmc_model =3D "n25q256a";
-+    amc->spi_model =3D "mx66l1g45g";
-+    amc->num_cs    =3D 2;
-+    amc->i2c_init  =3D romulus_bmc_i2c_init;
-+    mc->default_ram_size       =3D 512 * MiB;
- };
-=20
--static const AspeedBoardConfig aspeed_boards[] =3D {
-+static void aspeed_machine_swift_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+    AspeedMachineClass *amc =3D ASPEED_MACHINE_CLASS(oc);
-+
-+    mc->desc       =3D "OpenPOWER Swift BMC (ARM1176)";
-+    amc->soc_name  =3D "ast2500-a1";
-+    amc->hw_strap1 =3D SWIFT_BMC_HW_STRAP1;
-+    amc->fmc_model =3D "mx66l1g45g";
-+    amc->spi_model =3D "mx66l1g45g";
-+    amc->num_cs    =3D 2;
-+    amc->i2c_init  =3D swift_bmc_i2c_init;
-+    mc->default_ram_size       =3D 512 * MiB;
-+};
-+
-+static void aspeed_machine_witherspoon_class_init(ObjectClass *oc, void =
-*data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+    AspeedMachineClass *amc =3D ASPEED_MACHINE_CLASS(oc);
-+
-+    mc->desc       =3D "OpenPOWER Witherspoon BMC (ARM1176)";
-+    amc->soc_name  =3D "ast2500-a1";
-+    amc->hw_strap1 =3D WITHERSPOON_BMC_HW_STRAP1;
-+    amc->fmc_model =3D "mx25l25635e";
-+    amc->spi_model =3D "mx66l1g45g";
-+    amc->num_cs    =3D 2;
-+    amc->i2c_init  =3D witherspoon_bmc_i2c_init;
-+    mc->default_ram_size =3D 512 * MiB;
-+};
-+
-+static void aspeed_machine_ast2600_evb_class_init(ObjectClass *oc, void =
-*data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+    AspeedMachineClass *amc =3D ASPEED_MACHINE_CLASS(oc);
-+
-+    mc->desc       =3D "Aspeed AST2600 EVB (Cortex A7)";
-+    amc->soc_name  =3D "ast2600-a0";
-+    amc->hw_strap1 =3D AST2600_EVB_HW_STRAP1;
-+    amc->hw_strap2 =3D AST2600_EVB_HW_STRAP2;
-+    amc->fmc_model =3D "w25q512jv";
-+    amc->spi_model =3D "mx66u51235f";
-+    amc->num_cs    =3D 1;
-+    amc->i2c_init  =3D ast2600_evb_i2c_init;
-+    mc->default_ram_size =3D 1 * GiB;
-+};
-+
-+static const TypeInfo aspeed_machine_types[] =3D {
-     {
--        .name      =3D MACHINE_TYPE_NAME("palmetto-bmc"),
--        .desc      =3D "OpenPOWER Palmetto BMC (ARM926EJ-S)",
--        .soc_name  =3D "ast2400-a1",
--        .hw_strap1 =3D PALMETTO_BMC_HW_STRAP1,
--        .fmc_model =3D "n25q256a",
--        .spi_model =3D "mx25l25635e",
--        .num_cs    =3D 1,
--        .i2c_init  =3D palmetto_bmc_i2c_init,
--        .ram       =3D 256 * MiB,
-+        .name          =3D MACHINE_TYPE_NAME("palmetto-bmc"),
-+        .parent        =3D TYPE_ASPEED_MACHINE,
-+        .class_init    =3D aspeed_machine_palmetto_class_init,
-     }, {
--        .name      =3D MACHINE_TYPE_NAME("ast2500-evb"),
--        .desc      =3D "Aspeed AST2500 EVB (ARM1176)",
--        .soc_name  =3D "ast2500-a1",
--        .hw_strap1 =3D AST2500_EVB_HW_STRAP1,
--        .fmc_model =3D "w25q256",
--        .spi_model =3D "mx25l25635e",
--        .num_cs    =3D 1,
--        .i2c_init  =3D ast2500_evb_i2c_init,
--        .ram       =3D 512 * MiB,
-+        .name          =3D MACHINE_TYPE_NAME("ast2500-evb"),
-+        .parent        =3D TYPE_ASPEED_MACHINE,
-+        .class_init    =3D aspeed_machine_ast2500_evb_class_init,
-     }, {
--        .name      =3D MACHINE_TYPE_NAME("romulus-bmc"),
--        .desc      =3D "OpenPOWER Romulus BMC (ARM1176)",
--        .soc_name  =3D "ast2500-a1",
--        .hw_strap1 =3D ROMULUS_BMC_HW_STRAP1,
--        .fmc_model =3D "n25q256a",
--        .spi_model =3D "mx66l1g45g",
--        .num_cs    =3D 2,
--        .i2c_init  =3D romulus_bmc_i2c_init,
--        .ram       =3D 512 * MiB,
-+        .name          =3D MACHINE_TYPE_NAME("romulus-bmc"),
-+        .parent        =3D TYPE_ASPEED_MACHINE,
-+        .class_init    =3D aspeed_machine_romulus_class_init,
-     }, {
--        .name      =3D MACHINE_TYPE_NAME("swift-bmc"),
--        .desc      =3D "OpenPOWER Swift BMC (ARM1176)",
--        .soc_name  =3D "ast2500-a1",
--        .hw_strap1 =3D SWIFT_BMC_HW_STRAP1,
--        .fmc_model =3D "mx66l1g45g",
--        .spi_model =3D "mx66l1g45g",
--        .num_cs    =3D 2,
--        .i2c_init  =3D swift_bmc_i2c_init,
--        .ram       =3D 512 * MiB,
-+        .name          =3D MACHINE_TYPE_NAME("swift-bmc"),
-+        .parent        =3D TYPE_ASPEED_MACHINE,
-+        .class_init    =3D aspeed_machine_swift_class_init,
-     }, {
--        .name      =3D MACHINE_TYPE_NAME("witherspoon-bmc"),
--        .desc      =3D "OpenPOWER Witherspoon BMC (ARM1176)",
--        .soc_name  =3D "ast2500-a1",
--        .hw_strap1 =3D WITHERSPOON_BMC_HW_STRAP1,
--        .fmc_model =3D "mx25l25635e",
--        .spi_model =3D "mx66l1g45g",
--        .num_cs    =3D 2,
--        .i2c_init  =3D witherspoon_bmc_i2c_init,
--        .ram       =3D 512 * MiB,
-+        .name          =3D MACHINE_TYPE_NAME("witherspoon-bmc"),
-+        .parent        =3D TYPE_ASPEED_MACHINE,
-+        .class_init    =3D aspeed_machine_witherspoon_class_init,
-     }, {
--        .name      =3D MACHINE_TYPE_NAME("ast2600-evb"),
--        .desc      =3D "Aspeed AST2600 EVB (Cortex A7)",
--        .soc_name  =3D "ast2600-a0",
--        .hw_strap1 =3D AST2600_EVB_HW_STRAP1,
--        .hw_strap2 =3D AST2600_EVB_HW_STRAP2,
--        .fmc_model =3D "w25q512jv",
--        .spi_model =3D "mx66u51235f",
--        .num_cs    =3D 1,
--        .i2c_init  =3D ast2600_evb_i2c_init,
--        .ram       =3D 1 * GiB,
--    },
--};
--
--static void aspeed_machine_types(void)
--{
--    int i;
--
--    type_register_static(&aspeed_machine_type);
--    for (i =3D 0; i < ARRAY_SIZE(aspeed_boards); ++i) {
--        TypeInfo ti =3D {
--            .name       =3D aspeed_boards[i].name,
--            .parent     =3D TYPE_ASPEED_MACHINE,
--            .class_init =3D aspeed_machine_class_init,
--            .class_data =3D (void *)&aspeed_boards[i],
--        };
--        type_register(&ti);
-+        .name          =3D MACHINE_TYPE_NAME("ast2600-evb"),
-+        .parent        =3D TYPE_ASPEED_MACHINE,
-+        .class_init    =3D aspeed_machine_ast2600_evb_class_init,
-+    }, {
-+        .name          =3D TYPE_ASPEED_MACHINE,
-+        .parent        =3D TYPE_MACHINE,
-+        .instance_size =3D sizeof(AspeedMachine),
-+        .class_size    =3D sizeof(AspeedMachineClass),
-+        .class_init    =3D aspeed_machine_class_init,
-+        .abstract      =3D true,
-     }
--}
-+};
-=20
--type_init(aspeed_machine_types)
-+DEFINE_TYPES(aspeed_machine_types)
---=20
-2.21.0
++    if (g_str_equal(qom_name, "igd-passthru")) {
++        object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, valu=
+e);
++        return 0;
++    }
+
+Paolo
+
+> Cc-ing (rest of) Xen maintainers and xen-devel manually.
+>=20
+>   Paul
+>=20
+>> ---
+>>  hw/core/machine.c   | 20 --------------------
+>>  hw/xen/xen-common.c | 16 ++++++++++++++++
+>>  include/hw/boards.h |  1 -
+>>  qemu-options.hx     |  9 +++++----
+>>  vl.c                | 14 ++++----------
+>>  5 files changed, 25 insertions(+), 35 deletions(-)
+>>
+>> diff --git a/hw/core/machine.c b/hw/core/machine.c
+>> index 45ddfb6..d7a0356 100644
+>> --- a/hw/core/machine.c
+>> +++ b/hw/core/machine.c
+>> @@ -412,20 +412,6 @@ static void machine_set_graphics(Object *obj, bool =
+value, Error **errp)
+>>      ms->enable_graphics =3D value;
+>>  }
+>>
+>> -static bool machine_get_igd_gfx_passthru(Object *obj, Error **errp)
+>> -{
+>> -    MachineState *ms =3D MACHINE(obj);
+>> -
+>> -    return ms->igd_gfx_passthru;
+>> -}
+>> -
+>> -static void machine_set_igd_gfx_passthru(Object *obj, bool value, Error=
+ **errp)
+>> -{
+>> -    MachineState *ms =3D MACHINE(obj);
+>> -
+>> -    ms->igd_gfx_passthru =3D value;
+>> -}
+>> -
+>>  static char *machine_get_firmware(Object *obj, Error **errp)
+>>  {
+>>      MachineState *ms =3D MACHINE(obj);
+>> @@ -862,12 +848,6 @@ static void machine_class_init(ObjectClass *oc, voi=
+d *data)
+>>      object_class_property_set_description(oc, "graphics",
+>>          "Set on/off to enable/disable graphics emulation", &error_abort=
+);
+>>
+>> -    object_class_property_add_bool(oc, "igd-passthru",
+>> -        machine_get_igd_gfx_passthru, machine_set_igd_gfx_passthru,
+>> -        &error_abort);
+>> -    object_class_property_set_description(oc, "igd-passthru",
+>> -        "Set on/off to enable/disable igd passthrou", &error_abort);
+>> -
+>>      object_class_property_add_str(oc, "firmware",
+>>          machine_get_firmware, machine_set_firmware,
+>>          &error_abort);
+>> diff --git a/hw/xen/xen-common.c b/hw/xen/xen-common.c
+>> index 5284b0d..6cba30c 100644
+>> --- a/hw/xen/xen-common.c
+>> +++ b/hw/xen/xen-common.c
+>> @@ -124,6 +124,16 @@ static void xen_change_state_handler(void *opaque, =
+int running,
+>>      }
+>>  }
+>>
+>> +static bool xen_get_igd_gfx_passthru(Object *obj, Error **errp)
+>> +{
+>> +    return has_igd_gfx_passthru;
+>> +}
+>> +
+>> +static void xen_set_igd_gfx_passthru(Object *obj, bool value, Error **e=
+rrp)
+>> +{
+>> +    has_igd_gfx_passthru =3D value;
+>> +}
+>> +
+>>  static void xen_setup_post(MachineState *ms, AccelState *accel)
+>>  {
+>>      int rc;
+>> @@ -177,6 +187,12 @@ static void xen_accel_class_init(ObjectClass *oc, v=
+oid *data)
+>>      ac->compat_props =3D g_ptr_array_new();
+>>
+>>      compat_props_add(ac->compat_props, compat, G_N_ELEMENTS(compat));
+>> +
+>> +    object_class_property_add_bool(oc, "igd-passthru",
+>> +        xen_get_igd_gfx_passthru, xen_set_igd_gfx_passthru,
+>> +        &error_abort);
+>> +    object_class_property_set_description(oc, "igd-passthru",
+>> +        "Set on/off to enable/disable igd passthrou", &error_abort);
+>>  }
+>>
+>>  #define TYPE_XEN_ACCEL ACCEL_CLASS_NAME("xen")
+>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+>> index 36fcbda..cdcf481 100644
+>> --- a/include/hw/boards.h
+>> +++ b/include/hw/boards.h
+>> @@ -287,7 +287,6 @@ struct MachineState {
+>>      bool mem_merge;
+>>      bool usb;
+>>      bool usb_disabled;
+>> -    bool igd_gfx_passthru;
+>>      char *firmware;
+>>      bool iommu;
+>>      bool suppress_vmdesc;
+>> diff --git a/qemu-options.hx b/qemu-options.hx
+>> index 3931f90..5b43a83 100644
+>> --- a/qemu-options.hx
+>> +++ b/qemu-options.hx
+>> @@ -37,7 +37,6 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+>>      "                kvm_shadow_mem=3Dsize of KVM shadow MMU in bytes\n=
+"
+>>      "                dump-guest-core=3Don|off include guest memory in a=
+ core dump (default=3Don)\n"
+>>      "                mem-merge=3Don|off controls memory merge support (=
+default: on)\n"
+>> -    "                igd-passthru=3Don|off controls IGD GFX passthrough=
+ support (default=3Doff)\n"
+>>      "                aes-key-wrap=3Don|off controls support for AES key=
+ wrapping (default=3Don)\n"
+>>      "                dea-key-wrap=3Don|off controls support for DEA key=
+ wrapping (default=3Don)\n"
+>>      "                suppress-vmdesc=3Don|off disables self-describing =
+migration (default=3Doff)\n"
+>> @@ -71,8 +70,6 @@ more than one accelerator specified, the next one is u=
+sed if the previous one
+>>  fails to initialize.
+>>  @item kernel_irqchip=3Don|off
+>>  Controls in-kernel irqchip support for the chosen accelerator when avai=
+lable.
+>> -@item gfx_passthru=3Don|off
+>> -Enables IGD GFX passthrough support for the chosen machine when availab=
+le.
+>>  @item vmport=3Don|off|auto
+>>  Enables emulation of VMWare IO port, for vmmouse etc. auto says to sele=
+ct the
+>>  value based on accel. For accel=3Dxen the default is off otherwise the =
+default
+>> @@ -118,8 +115,9 @@ Select CPU model (@code{-cpu help} for list and addi=
+tional feature selection)
+>>  ETEXI
+>>
+>>  DEF("accel", HAS_ARG, QEMU_OPTION_accel,
+>> -    "-accel [accel=3D]accelerator[,thread=3Dsingle|multi]\n"
+>> +    "-accel [accel=3D]accelerator[,prop[=3Dvalue][,...]]\n"
+>>      "                select accelerator (kvm, xen, hax, hvf, whpx or tc=
+g; use 'help' for a list)\n"
+>> +    "                igd-passthru=3Don|off (enable Xen integrated Intel=
+ graphics passthrough, default=3Doff)\n"
+>>      "                tb-size=3Dn (TCG translation block cache size)\n"
+>>      "                thread=3Dsingle|multi (enable multi-threaded TCG)\=
+n", QEMU_ARCH_ALL)
+>>  STEXI
+>> @@ -130,6 +128,9 @@ kvm, xen, hax, hvf, whpx or tcg can be available. By=
+ default, tcg is used. If th
+>>  more than one accelerator specified, the next one is used if the previo=
+us one
+>>  fails to initialize.
+>>  @table @option
+>> +@item igd-passthru=3Don|off
+>> +When Xen is in use, this option controls whether Intel integrated graph=
+ics
+>> +devices can be passed through to the guest (default=3Doff)
+>>  @item tb-size=3D@var{n}
+>>  Controls the size (in MiB) of the TCG translation block cache.
+>>  @item thread=3Dsingle|multi
+>> diff --git a/vl.c b/vl.c
+>> index 06c6ad9..7d8fed1 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -1256,13 +1256,6 @@ static void configure_msg(QemuOpts *opts)
+>>  }
+>>
+>>
+>> -/* Now we still need this for compatibility with XEN. */
+>> -bool has_igd_gfx_passthru;
+>> -static void igd_gfx_passthru(void)
+>> -{
+>> -    has_igd_gfx_passthru =3D current_machine->igd_gfx_passthru;
+>> -}
+>> -
+>>  /***********************************************************/
+>>  /* USB devices */
+>>
+>> @@ -2645,6 +2638,10 @@ static int machine_set_property(void *opaque,
+>>      if (g_str_equal(qom_name, "accel")) {
+>>          return 0;
+>>      }
+>> +    if (g_str_equal(qom_name, "igd-passthru")) {
+>> +        object_register_sugar_prop(ACCEL_CLASS_NAME("xen"), qom_name, v=
+alue);
+>> +        return 0;
+>> +    }
+>>
+>>      r =3D object_parse_property_opt(opaque, name, value, "type", errp);
+>>      g_free(qom_name);
+>> @@ -4449,9 +4446,6 @@ int main(int argc, char **argv, char **envp)
+>>              exit(1);
+>>      }
+>>
+>> -    /* Check if IGD GFX passthrough. */
+>> -    igd_gfx_passthru();
+>> -
+>>      /* init generic devices */
+>>      rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
+>>      qemu_opts_foreach(qemu_find_opts("device"),
+>> --
+>> 1.8.3.1
+>>
+>>
+>>
+>=20
 
 
