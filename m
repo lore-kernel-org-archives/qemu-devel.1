@@ -2,81 +2,102 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98081C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7776BC43141
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:33:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67A1120409
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:24:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4728120675
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:33:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F9fExeWL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67A1120409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CT2LBYQc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4728120675
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVCIb-0003oy-Gu
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:24:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46406)
+	id 1iVCRS-0006oh-DL
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:33:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48928)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iVCG8-0002rX-CK
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:21:53 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iVCQK-00068c-1Z
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:32:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iVCG7-0002B5-8p
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:21:52 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:32991)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iVCG7-0002AM-3x
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:21:51 -0500
-Received: by mail-oi1-x243.google.com with SMTP id m193so4803964oig.0
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 02:21:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=OciApt82aTzB42BZpSEc3G5TI1Pt9KV/blSFY+IdHjQ=;
- b=F9fExeWLEqmzWsnY2w0xTnUWw+Y9EJZLKPqYjavN5mcumMnu8LNucayw9FRXOgRoS+
- nbD6ErzyLs2JGAi+biLN5CbAbAVVzXdbmyHYgr6O85p+30Lp7szSHJKVDS/ehrmqUEn7
- /pJQ2R4YZmrrU2IkrTNgwAKzqwPhTDNHT9xoibi4T7pwT/T5RKoN6twkW1V1w0GviAzK
- BnOI+Q2nu0T9mSa0NsOWg2xtSKzWL35QQFW1ESlWO/QN2r8ELRQHta51sb5KgSLTRvBL
- BbSkB4wDck8LDc6mJYNmppJDR/pKH5ne+S3ELWdFlYNEMYMGBJnFfttmrk1aASYbrzYv
- cIAA==
+ (envelope-from <pbonzini@redhat.com>) id 1iVCQH-00040R-Q5
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:32:22 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46938
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iVCQH-0003zT-Hk
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:32:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573727540;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=JdeCRICYAytjHNBaajV54M+eq1HpNXAdbvQQvVmphu4=;
+ b=CT2LBYQcFUcaGqMTQLuzgCHfpJ8R4VC7aij/iclFL61SGbqpaRPfUkLe/VypJ/pIzrY5zq
+ gZgXnjE257VE7XSlc1BnRPw94jRc/ZaMGZWxieftre/BQH5DjOqb2X67EskJ2l2GcT2Zx8
+ DRsdkBwiIFyvFoFhllhhH6dd3/GFWxU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-205-IwJTaLJgOieUJc7llbGK-A-1; Thu, 14 Nov 2019 05:32:19 -0500
+Received: by mail-wm1-f69.google.com with SMTP id z3so3120939wmk.1
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 02:32:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=OciApt82aTzB42BZpSEc3G5TI1Pt9KV/blSFY+IdHjQ=;
- b=K4vdvYl3/j7CfRSzhh92gaj5jn+yH6T1zZApfDRamVJmcVMKDfcZEGqM/Psfb1XgJe
- fyFBbgpzorPm+wt/aT8UM0+gJJFFoxWIKrC83Z4b+doU8O5rARm0Z2TX3OIyb0IpmulD
- SKA9tYQ7XUIUS8UFLSHw3vWfPiIFKX1qY6KD51nb38MZDwGHbohy1tNIL0N7Lp9wBZNu
- zurxDV6g8bTg6B7XPNi+xZEmHEGHN8CJ/bC1HT8xZEMGkDta/ICDdE30EAHqU5hWPfd9
- x7kz9DGziUacoiqOikWRTXv88L80c83DjK3LnZ7wRitqm0zpPhBSDEenq2oBkQgYuQks
- 2DlQ==
-X-Gm-Message-State: APjAAAWt5A030eU9oHZ71qQ4SI5EHwS5yyhP/JYopbguB2UqB+NLYr41
- dKcJSeZIKJ9wVP1h12e7+oETAY5DnFO6g946GAm8xg==
-X-Google-Smtp-Source: APXvYqy+6aub0QqgfgnbhYDcuv77J28J8TuK8Q/MTpREnuVy3OnlHwD3PqIZ/keUHudsitDSksM2AylwS5IkPai+D9A=
-X-Received: by 2002:aca:cf12:: with SMTP id f18mr2770231oig.48.1573726909683; 
- Thu, 14 Nov 2019 02:21:49 -0800 (PST)
-MIME-Version: 1.0
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=uW3cEj6mgyWenmN3DRcbtYLRhxZwu1ixo9QdUR2cgY0=;
+ b=byuLViTP7k2eJ8zHcbMKnWnemMqSovPcbaVvwsmzhPty0YvgNpozQb506q2X3RxrbE
+ PAqFmMhFdQmPewzwrGz84Is0oAa+kiqvztOFa/c8WUsn1cSIxpiGa8AsJhBnVlEE1z3f
+ talyln0gJNlVyrDJwNNYtnUO/+cPbkW6NIcDz2Jd3QaPINAsFet5aoC7DAzXdMwE7YlS
+ e0BWuA8WTTMLVz/LZSLFLQ0fZZ/hg22vZPrLjIoRxoBKOcBomnQrvNEJFZxleCDVP6jp
+ vKq1m4kEMggixE3Cud7DdOjjwH+ra+1vRnJmJWeRpNM549R/Tu5oqp4M7KGyt6SclAzM
+ zjcg==
+X-Gm-Message-State: APjAAAXkPOLPpPK00BUG3UpTrmYFyNr2cHQ54eFhYLk2SwHNjDSQozqY
+ 9qyPFICteTpDf7yx/E//NWLEFUZdXLoM+BmQiEIGnZFbZ+Bqf89UpX6djmuGc1MZramtVccdoE/
+ iyo7qKpuhLLmFUP8=
+X-Received: by 2002:a1c:2b82:: with SMTP id r124mr7297037wmr.112.1573727538191; 
+ Thu, 14 Nov 2019 02:32:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz3nMQ1iA8uY8CgJcuwhFQyRMXRO03928a1YRsoKr1rYGvWxSqBBnJM2IGgJZlZix3JaMO1ng==
+X-Received: by 2002:a1c:2b82:: with SMTP id r124mr7297005wmr.112.1573727537928; 
+ Thu, 14 Nov 2019 02:32:17 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc?
+ ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
+ by smtp.gmail.com with ESMTPSA id a186sm5195563wmc.48.2019.11.14.02.32.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 14 Nov 2019 02:32:17 -0800 (PST)
+Subject: Re: [PATCH 01/16] memory: do not look at current_machine->accel
+To: Peter Maydell <peter.maydell@linaro.org>
 References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
  <1573655945-14912-2-git-send-email-pbonzini@redhat.com>
  <2db4f901-65ad-4b80-d309-b8b63330492f@redhat.com>
  <4783e606-19b8-c3c0-08ab-ac84b02af6f4@redhat.com>
-In-Reply-To: <4783e606-19b8-c3c0-08ab-ac84b02af6f4@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Nov 2019 10:21:38 +0000
-Message-ID: <CAFEAcA_FnfJx=oae5e_KGcmqwyUtM01KeywjpSSa09fu9++sMw@mail.gmail.com>
-Subject: Re: [PATCH 01/16] memory: do not look at current_machine->accel
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+ <CAFEAcA_FnfJx=oae5e_KGcmqwyUtM01KeywjpSSa09fu9++sMw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <07c6a4ea-1d5b-da75-9fed-3b9e7bb1d193@redhat.com>
+Date: Thu, 14 Nov 2019 11:32:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_FnfJx=oae5e_KGcmqwyUtM01KeywjpSSa09fu9++sMw@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: IwJTaLJgOieUJc7llbGK-A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,33 +115,22 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 14 Nov 2019 at 09:36, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 14/11/19 10:10, Thomas Huth wrote:
-> >> "info mtree" prints the wrong accelerator name if used with for example
-> >> "-machine accel=kvm:tcg".
-> > I had a quick look at the output of "info mtree" with and without
-> > "accel=kvm:tcg", but I could not spot any obvious places where it's
-> > wrong. Could you give an example?
->
-> Indeed the commit message should say "info mtree -f".
->
-> $ x86_64-softmmu/qemu-system-x86_64 -M microvm -enable-kvm -machine accel=kvm:tcg -monitor stdio
-> QEMU 4.1.50 monitor - type 'help' for more information
-> (qemu) info mtree -f
-> ...
-> FlatView #1
->  AS "memory", root: system
->  AS "cpu-memory-0", root: system
->  Root memory region: system
->   0000000000000000-00000000000effff (prio 0, ram): microvm.ram kvm:tcg
->   00000000000f0000-00000000000fffff (prio 0, ram): pc.bios kvm:tcg
->   0000000000100000-0000000007ffffff (prio 0, ram): microvm.ram @0000000000100000 kvm:tcg
+On 14/11/19 11:21, Peter Maydell wrote:
+>> FlatView #1
+>>  AS "memory", root: system
+>>  AS "cpu-memory-0", root: system
+>>  Root memory region: system
+>>   0000000000000000-00000000000effff (prio 0, ram): microvm.ram kvm:tcg
+>>   00000000000f0000-00000000000fffff (prio 0, ram): pc.bios kvm:tcg
+>>   0000000000100000-0000000007ffffff (prio 0, ram): microvm.ram @00000000=
+00100000 kvm:tcg
+> Why do we need to print the accelerator name for every
+> memory region? Isn't it just a global property, or at
+> least a property of the CPU ?
 
-Why do we need to print the accelerator name for every
-memory region? Isn't it just a global property, or at
-least a property of the CPU ?
+Not all regions are registered with the accelerator, in particular not
+for devices.  So we print it next to regions that are registered.
 
-thanks
--- PMM
+Paolo
+
 
