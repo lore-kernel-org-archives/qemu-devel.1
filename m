@@ -2,100 +2,61 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB2BBC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23057C43141
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:49:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B87DF20409
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:49:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ky/7uPyN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B87DF20409
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id F3EED20409
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:49:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3EED20409
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVBl0-0001Wb-Dd
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 04:49:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37291)
+	id 1iVBl1-0001Ya-IQ
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 04:49:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37340)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iVBhk-0007jC-KV
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:46:22 -0500
+ (envelope-from <clg@kaod.org>) id 1iVBhq-0007lT-Lw
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:46:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iVBhg-0004PX-CD
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:46:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55968
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iVBho-0004Tz-9N
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:46:26 -0500
+Received: from 3.mo3.mail-out.ovh.net ([46.105.44.175]:42328)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iVBhe-0004Oc-T6
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:46:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573724774;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=zICw5eLZfmIB3BUjXqdb65ADKqKmDwiMxhfFqAFOq8Q=;
- b=Ky/7uPyN1dv0uxrei298b0f0hcQZf8wQx/LXb/AZ4pLIo9ezySJu8rIwwTyyCh6IC2l1E8
- yOmQj0q3D0mRS3y9ts0dfgQb9lRwZIiN/5E0Wy3HNGT5ANnyG/dZQFqIuXSAwcGEP0Dx5F
- MB/fNr6hDKSwTekMEGi01ErkIslZHzo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-v9vXbkH0On-MnrcmxItfkA-1; Thu, 14 Nov 2019 04:46:12 -0500
-Received: by mail-wr1-f70.google.com with SMTP id u2so4088153wrm.7
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 01:46:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xmihgrI/kHFhHndcbN1Or8vYbgGOUUeRxmw/Wa1VIQw=;
- b=WJ4yp0JuUP7bBfz3OszeooIzc3OgBxWzovgmWSVSKf8sRF26XfSRdCaJsgd0qmB9iY
- gP5FahYIsyCzYkw2pRUrJo6Fcyy0ev/UeijeGVjJtdxxIrG1gK3rdP5a2tOnC14yRneN
- gTr3eWTvs5cKmBPvGVOLXJJkIPlaY+F9Of3ERWlSBCmXx7AV+OBMFWLKT2gWBDzm/MTw
- ABNBkdCZMcs+s8D3RSH5hXsPSi+258sRPybrPjK/En5OlLDVDAB10L8dVr+TV0Xk9zYM
- CT7uLG2c63BbrhMAYbq2wRm690oGX6o8pymOYPAczS+xeoZ1wxII2QwdP7y6cWWTl5mw
- Zsyw==
-X-Gm-Message-State: APjAAAU8zeb5lYiDQIGVXAgqprAxnn0/Xyp9BLVYF2pEX9gL5b3loyOJ
- VaJVg+gTgpprt/2H+MJgbMIfsDYC3SslVRNvtQqxajRbJgFJSFaUxLLt6Edx+UxmkvTq7pIChHS
- AoDgZ03GlyHezqtY=
-X-Received: by 2002:adf:f6d1:: with SMTP id y17mr6894049wrp.255.1573724771705; 
- Thu, 14 Nov 2019 01:46:11 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx2BoF8QhxxWDlFMu/4XxFT1+WM5WT+SPQrO2TTY+PXKiWYaIqcfvftV/J1fIsgP+nUryGhtA==
-X-Received: by 2002:adf:f6d1:: with SMTP id y17mr6894025wrp.255.1573724771418; 
- Thu, 14 Nov 2019 01:46:11 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc?
- ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
- by smtp.gmail.com with ESMTPSA id i13sm6189405wrp.12.2019.11.14.01.46.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 14 Nov 2019 01:46:11 -0800 (PST)
-Subject: Re: [PATCH 05/16] vl: introduce object_parse_property_opt
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
- <1573655945-14912-6-git-send-email-pbonzini@redhat.com>
- <CAJ+F1CL=m8WfLW2vJ73UTGNpbXBdww7zEtRGt+ri+TjoPd4auA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <c6bfdc22-56b8-b3d7-a402-9f4659e49742@redhat.com>
-Date: Thu, 14 Nov 2019 10:46:11 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVBhm-0004RB-7m
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:46:24 -0500
+Received: from player737.ha.ovh.net (unknown [10.108.42.119])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id 45F36231631
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 10:46:19 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player737.ha.ovh.net (Postfix) with ESMTPSA id 211D92A78516;
+ Thu, 14 Nov 2019 09:46:12 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PATCH 3/5] aspeed/smc: Add AST2600 timings registers
+Date: Thu, 14 Nov 2019 10:45:42 +0100
+Message-Id: <20191114094544.30114-4-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191114094544.30114-1-clg@kaod.org>
+References: <20191114094544.30114-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CL=m8WfLW2vJ73UTGNpbXBdww7zEtRGt+ri+TjoPd4auA@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: v9vXbkH0On-MnrcmxItfkA-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 2479794547653380881
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeffedgtdelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.105.44.175
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,19 +68,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14/11/19 09:23, Marc-Andr=C3=A9 Lureau wrote:
->> +{
->> +    char *qom_name =3D g_strdup(name);
-> Could use g_autofree, and thus return directly without r.
+Each CS has its own Read Timing Compensation Register on newer SoCs.
 
-And avoid a bunch of memory leaks in the rest of the series.
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ include/hw/ssi/aspeed_smc.h |  1 +
+ hw/ssi/aspeed_smc.c         | 17 ++++++++++++++---
+ 2 files changed, 15 insertions(+), 3 deletions(-)
 
-Paolo
+diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
+index 684d16e33613..6fbbb238f158 100644
+--- a/include/hw/ssi/aspeed_smc.h
++++ b/include/hw/ssi/aspeed_smc.h
+@@ -40,6 +40,7 @@ typedef struct AspeedSMCController {
+     uint8_t r_ce_ctrl;
+     uint8_t r_ctrl0;
+     uint8_t r_timings;
++    uint8_t nregs_timings;
+     uint8_t conf_enable_w0;
+     uint8_t max_slaves;
+     const AspeedSegments *segments;
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index 86cadbe4cc00..7755eca34976 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -137,7 +137,7 @@
+ /* Checksum Calculation Result */
+ #define R_DMA_CHECKSUM    (0x90 / 4)
+=20
+-/* Misc Control Register #2 */
++/* Read Timing Compensation Register */
+ #define R_TIMINGS         (0x94 / 4)
+=20
+ /* SPI controller registers and bits (AST2400) */
+@@ -256,6 +256,7 @@ static const AspeedSMCController controllers[] =3D {
+         .r_ce_ctrl         =3D R_CE_CTRL,
+         .r_ctrl0           =3D R_CTRL0,
+         .r_timings         =3D R_TIMINGS,
++        .nregs_timings     =3D 1,
+         .conf_enable_w0    =3D CONF_ENABLE_W0,
+         .max_slaves        =3D 5,
+         .segments          =3D aspeed_segments_legacy,
+@@ -271,6 +272,7 @@ static const AspeedSMCController controllers[] =3D {
+         .r_ce_ctrl         =3D R_CE_CTRL,
+         .r_ctrl0           =3D R_CTRL0,
+         .r_timings         =3D R_TIMINGS,
++        .nregs_timings     =3D 1,
+         .conf_enable_w0    =3D CONF_ENABLE_W0,
+         .max_slaves        =3D 5,
+         .segments          =3D aspeed_segments_fmc,
+@@ -288,6 +290,7 @@ static const AspeedSMCController controllers[] =3D {
+         .r_ce_ctrl         =3D 0xff,
+         .r_ctrl0           =3D R_SPI_CTRL0,
+         .r_timings         =3D R_SPI_TIMINGS,
++        .nregs_timings     =3D 1,
+         .conf_enable_w0    =3D SPI_CONF_ENABLE_W0,
+         .max_slaves        =3D 1,
+         .segments          =3D aspeed_segments_spi,
+@@ -303,6 +306,7 @@ static const AspeedSMCController controllers[] =3D {
+         .r_ce_ctrl         =3D R_CE_CTRL,
+         .r_ctrl0           =3D R_CTRL0,
+         .r_timings         =3D R_TIMINGS,
++        .nregs_timings     =3D 1,
+         .conf_enable_w0    =3D CONF_ENABLE_W0,
+         .max_slaves        =3D 3,
+         .segments          =3D aspeed_segments_ast2500_fmc,
+@@ -320,6 +324,7 @@ static const AspeedSMCController controllers[] =3D {
+         .r_ce_ctrl         =3D R_CE_CTRL,
+         .r_ctrl0           =3D R_CTRL0,
+         .r_timings         =3D R_TIMINGS,
++        .nregs_timings     =3D 1,
+         .conf_enable_w0    =3D CONF_ENABLE_W0,
+         .max_slaves        =3D 2,
+         .segments          =3D aspeed_segments_ast2500_spi1,
+@@ -335,6 +340,7 @@ static const AspeedSMCController controllers[] =3D {
+         .r_ce_ctrl         =3D R_CE_CTRL,
+         .r_ctrl0           =3D R_CTRL0,
+         .r_timings         =3D R_TIMINGS,
++        .nregs_timings     =3D 1,
+         .conf_enable_w0    =3D CONF_ENABLE_W0,
+         .max_slaves        =3D 2,
+         .segments          =3D aspeed_segments_ast2500_spi2,
+@@ -350,6 +356,7 @@ static const AspeedSMCController controllers[] =3D {
+         .r_ce_ctrl         =3D R_CE_CTRL,
+         .r_ctrl0           =3D R_CTRL0,
+         .r_timings         =3D R_TIMINGS,
++        .nregs_timings     =3D 1,
+         .conf_enable_w0    =3D CONF_ENABLE_W0,
+         .max_slaves        =3D 3,
+         .segments          =3D aspeed_segments_ast2600_fmc,
+@@ -365,6 +372,7 @@ static const AspeedSMCController controllers[] =3D {
+         .r_ce_ctrl         =3D R_CE_CTRL,
+         .r_ctrl0           =3D R_CTRL0,
+         .r_timings         =3D R_TIMINGS,
++        .nregs_timings     =3D 2,
+         .conf_enable_w0    =3D CONF_ENABLE_W0,
+         .max_slaves        =3D 2,
+         .segments          =3D aspeed_segments_ast2600_spi1,
+@@ -380,6 +388,7 @@ static const AspeedSMCController controllers[] =3D {
+         .r_ce_ctrl         =3D R_CE_CTRL,
+         .r_ctrl0           =3D R_CTRL0,
+         .r_timings         =3D R_TIMINGS,
++        .nregs_timings     =3D 3,
+         .conf_enable_w0    =3D CONF_ENABLE_W0,
+         .max_slaves        =3D 3,
+         .segments          =3D aspeed_segments_ast2600_spi2,
+@@ -951,7 +960,8 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr =
+addr, unsigned int size)
+     addr >>=3D 2;
+=20
+     if (addr =3D=3D s->r_conf ||
+-        addr =3D=3D s->r_timings ||
++        (addr >=3D s->r_timings &&
++         addr < s->r_timings + s->ctrl->nregs_timings) ||
+         addr =3D=3D s->r_ce_ctrl ||
+         addr =3D=3D R_INTR_CTRL ||
+         addr =3D=3D R_DUMMY_DATA ||
+@@ -1216,7 +1226,8 @@ static void aspeed_smc_write(void *opaque, hwaddr a=
+ddr, uint64_t data,
+     addr >>=3D 2;
+=20
+     if (addr =3D=3D s->r_conf ||
+-        addr =3D=3D s->r_timings ||
++        (addr >=3D s->r_timings &&
++         addr < s->r_timings + s->ctrl->nregs_timings) ||
+         addr =3D=3D s->r_ce_ctrl) {
+         s->regs[addr] =3D value;
+     } else if (addr >=3D s->r_ctrl0 && addr < s->r_ctrl0 + s->num_cs) {
+--=20
+2.21.0
 
 
