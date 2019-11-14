@@ -2,98 +2,81 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C47C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 13:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3B1C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 13:45:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70C7B206CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 13:41:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5E8C206F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 13:45:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WtRs2y3I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70C7B206CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KYp4YTq4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5E8C206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVFNV-00041G-GQ
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 08:41:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35631)
+	id 1iVFQi-0006bf-D8
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 08:45:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36094)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iVFMO-0002xu-J3
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:40:38 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iVFOC-0004th-GN
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:42:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iVFMN-0001bD-JK
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:40:32 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:33528
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iVFMN-0001ai-Fz
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:40:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573738830;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=p3wjVOAJ1ygdRiLEUMd96LVQIl1MKM0n79HQLwkNNqk=;
- b=WtRs2y3IBW7gD5f6CSKIJB98ylHs64skkmLZZppE43c3Uur5BiLJZ0228RTKtGasILnfIG
- SC4oWoq2sTRBV3+GCiIGnfMp7izxZ6DcZ/4ajIILU0IHeH78/gXDBb57yP58He1fclDso0
- LVEXbH7Wc5F7xsHv/JJFlc5K14UcOEo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-RIQ-Tl5KOR-Wu6CJaMII6Q-1; Thu, 14 Nov 2019 08:40:29 -0500
-Received: by mail-wr1-f70.google.com with SMTP id w9so4471300wrn.9
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 05:40:29 -0800 (PST)
+ (envelope-from <peter.maydell@linaro.org>) id 1iVFOB-0002XL-5x
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:42:24 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39573)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iVFOA-0002Wk-R5
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:42:23 -0500
+Received: by mail-ot1-x344.google.com with SMTP id w24so4381118otk.6
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 05:42:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=4GAnBww2X6cSXG0HbjYAqPKGo6hRQcAfSHD72VPTYQ4=;
+ b=KYp4YTq4x3brN9zCcjIeUbtg9BhpH104DSnRlYMeVabuwbXp8YBG0tSZ48kqVAI9aq
+ sRQAfV70uDk/Ucumc3CbwWooC6FZqE1KeIotRQ+K6x5ejgfUBoP6Vj2bgqdhWJTGWbJ4
+ 52B60jiYT/+Xh2bvCDDFLOyvdRbLVA2hCGtyltUOmhgPTx59+BGN7SP5yqNv2o13vkMv
+ Y519gQts8SZBZzfAVOxAmrb0H88F/rAagE7xk7ciy1MTv9sSNgCM14gi2hYi5uFIu9vK
+ WpXuTAM4LeoTw96R2JqPdmp+slxeZvltMxblIxjtYCTV69wsHuMj4H8FKMNf6/oKYieL
+ cuNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ZQSzkiSSI9tXF2L6vCtMwTYX0VEOyct32evvsNpECnM=;
- b=OZij57IwUuQhUjbzVwL1/c9tqSi0CY3aLmsQKr+AgOvsPgiUANRvgKs2FYuXjZA0pg
- Fo4ZsXZq0wR8k6OQtkNu38VqwgGPFrHXsC7eqMRUyV9TtgayxAKtxFNPMrIMwkwS9T+8
- pOPGTMHl9y2dduFbOmrSoBDZCEa7VVH78+7VIjWIA2oCoG9rg+NJw4Ldyfdzbnr5Qyb1
- 7j6dFEsDW/JHC2lGUOSVcV8mu3dATASGbs9MUMKKu291dVNN7khQ+DqO39JyuNyFe41N
- U0hl6u6Sq4Ly6vmbhmMSEBG9yCXUyenlw5oUeRfq1/aL9YHyrSOeRdVpXBaoXsmXW6to
- O+hA==
-X-Gm-Message-State: APjAAAVKJyQ59chQ1lfNonHgWnAaGnGOsoziwXJF75IaO/6BqpVYlTx1
- zIdv2dpSlFAp+Jhn2KAxlErycs1/BgFgbSUG9Q+KbrQkPx//NTOjQTGp/ZLKLeiSv0kAEbK5RRI
- 7ebuiG9H1t9oq+4k=
-X-Received: by 2002:a5d:522e:: with SMTP id i14mr9191079wra.27.1573738827763; 
- Thu, 14 Nov 2019 05:40:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxVVBEH+10GZV8Pjh4vCKHLGpcVhS5gzt0v9TOgbiRYRzKThJJYd4QMTvflYzm5mDQ8gRjAUQ==
-X-Received: by 2002:a5d:522e:: with SMTP id i14mr9191068wra.27.1573738827604; 
- Thu, 14 Nov 2019 05:40:27 -0800 (PST)
-Received: from [192.168.1.35] (170.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.170])
- by smtp.gmail.com with ESMTPSA id i25sm2830829wmd.25.2019.11.14.05.40.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 14 Nov 2019 05:40:27 -0800 (PST)
-Subject: Re: [PATCH] tests: fix modules-test 'duplicate test case' error
-To: Cole Robinson <crobinso@redhat.com>, qemu-devel@nongnu.org
-References: <d64c9aa098cc6e5c0b638438c4959eddfa7e24e2.1573679311.git.crobinso@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <82e8271c-0bed-5c42-adbd-f140371d3f82@redhat.com>
-Date: Thu, 14 Nov 2019 14:40:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=4GAnBww2X6cSXG0HbjYAqPKGo6hRQcAfSHD72VPTYQ4=;
+ b=KKU0F56yH5EAMUmg7vy1KhzCVW8+MX6yO8CTCt++eL5wHDgL6YpYr12Uv3LoDjS3wL
+ b2SwhlUxM1oalamw1AxDk8cE1nEIc2y/sZxTpjoWkNhI+Z65l4RdWj2m2o8G9oKJ2UGE
+ 9jUPQuiFLcvLlqg8uqHoHjreRR9+vYO3JKCQYg5NRAwm5fsCOyFyQPm+6X4Xfh/U8nrD
+ LJOWypTHXiRKvtUXBORsZQzmDXfybCoKaRaqWLF911HjpDiUQRSIcM9n7aw4zYbzIVh+
+ LqpCIw3bhGdpPxigEk1Gl3UASMPnnFYO4k1VPTF9edDHl/BZOe8PPc5xqtuY1mLzxm2U
+ /Rpg==
+X-Gm-Message-State: APjAAAWmwksLfRvM6ZRQo+Mpo082mxXYC3nk0WOHTVTqkR9yks7QUl2t
+ b6jiL9ODTGwX5A+FQ8cwtrvdXsC1UVv6LejseYY+jQ==
+X-Google-Smtp-Source: APXvYqwnJAobQXpf9sTudr+vXOxZkOd1zAas3fJYXxBx0aBejwLLc2ysXHuC+46wK7E471EeROrEa6g6R5s8w02aTWs=
+X-Received: by 2002:a9d:68cc:: with SMTP id i12mr6755559oto.97.1573738941582; 
+ Thu, 14 Nov 2019 05:42:21 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <d64c9aa098cc6e5c0b638438c4959eddfa7e24e2.1573679311.git.crobinso@redhat.com>
-Content-Language: en-US
-X-MC-Unique: RIQ-Tl5KOR-Wu6CJaMII6Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+References: <20191104115228.30745-1-graf@amazon.com>
+ <CAFEAcA8zkR_MZ-28Nc=x4j05U9MsFYfzQtkHxTf65ZwacK020w@mail.gmail.com>
+ <246a7cd4-7c39-c92e-05c3-1045bca2c114@amazon.com>
+ <CAFEAcA_kwscZRqK5wTRu5WLkixGYbdV0c7mZMV6n+40DOS0-Mg@mail.gmail.com>
+In-Reply-To: <CAFEAcA_kwscZRqK5wTRu5WLkixGYbdV0c7mZMV6n+40DOS0-Mg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Nov 2019 13:42:10 +0000
+Message-ID: <CAFEAcA8HwRNd+Mg91RJ1DpiyoNJKBWHjFT_Te16xTV5P7wV_ug@mail.gmail.com>
+Subject: Re: [PATCH] pl031: Expose RTCICR as proper WC register
+To: Alexander Graf <graf@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,48 +88,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial <qemu-trivial@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: Hendrik Borghorst <hborghor@amazon.de>, qemu-arm <qemu-arm@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/13/19 10:09 PM, Cole Robinson wrote:
-> ./configure --enable-sdl --audio-drv-list=3Dsdl --enable-modules
->=20
-> Will generate two identical test names: /$arch/module/load/sdl
-> Which generates an error like:
->=20
-> (tests/modules-test:23814): GLib-ERROR **: 18:23:06.359: duplicate test c=
-ase path: /aarch64//module/load/sdl
->=20
-> Add the subsystem prefix in the name as well, so instead we get:
->=20
-> /$arch/module/load/audio-sdl
-> /$arch/module/load/ui-sdl
->=20
-> Signed-off-by: Cole Robinson <crobinso@redhat.com>
-> ---
->   tests/modules-test.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/tests/modules-test.c b/tests/modules-test.c
-> index d1a6ace218..88217686e1 100644
-> --- a/tests/modules-test.c
-> +++ b/tests/modules-test.c
-> @@ -64,7 +64,8 @@ int main(int argc, char *argv[])
->       g_test_init(&argc, &argv, NULL);
->  =20
->       for (i =3D 0; i < G_N_ELEMENTS(modules); i +=3D 2) {
-> -        char *testname =3D g_strdup_printf("/module/load/%s", modules[i =
-+ 1]);
-> +        char *testname =3D g_strdup_printf("/module/load/%s%s",
-> +                                         modules[i], modules[i + 1]);
->           qtest_add_data_func(testname, modules + i, test_modules_load);
->           g_free(testname);
->       }
->=20
+On Tue, 12 Nov 2019 at 11:57, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On Tue, 12 Nov 2019 at 07:28, Alexander Graf <graf@amazon.com> wrote:
+> > I still think that being consistent with the actual PL031 spec is
+> > preferable though. If any real world guest breaks because of this, we
+> > can still revert this patch and document the exact breakage in the
+> > comment instead.
+>
+> Yeah, I agree; I'm essentially just gathering material
+> for the commit message here. (The gold standard would be
+> to go find some hardware with a real pl031 and prod it
+> to confirm behaviour, but that's more effort than really
+> seems justified to me.)
 
-Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+I propose to put this in for 4.2 with an updated commit message:
 
+===begin===
+    pl031: Expose RTCICR as proper WC register
+
+    The current PL031 RTCICR register implementation always clears the
+    IRQ pending status on a register write, regardless of the value the
+    guest writes.
+
+    To justify that behavior, it references the ARM926EJ-S Development
+    Chip Reference Manual (DDI0287B) and indicates that said document
+    states that any write clears the internal IRQ state.  It is indeed
+    true that in section 11.1 this document says:
+
+      "The interrupt is cleared by writing any data value to the
+       interrupt clear register RTCICR".
+
+    However, later in section 11.2.2 it contradicts itself by saying:
+
+      "Writing 1 to bit 0 of RTCICR clears the RTCINTR flag."
+
+    The latter statement matches the PL031 TRM (DDI0224C), which says:
+
+      "Writing 1 to bit position 0 clears the corresponding interrupt.
+       Writing 0 has no effect."
+
+    Let's assume that the self-contradictory DDI0287B is in error, and
+    follow the reference manual for the device itself, by making the
+    register write-one-to-clear.
+===endit===
+
+Is that OK?
+
+thanks
+-- PMM
 
