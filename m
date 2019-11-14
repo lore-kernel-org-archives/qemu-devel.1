@@ -2,80 +2,81 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FC3C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 14:13:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B6C8C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 14:14:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 512C62070E
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 14:13:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 150DB2070E
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 14:14:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r0lh7Jpi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 512C62070E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D+/u1fOl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 150DB2070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVFsb-0003PQ-EG
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 09:13:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42409)
+	id 1iVFtV-0004T6-5z
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 09:14:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42459)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iVFre-0002Ti-5N
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:12:51 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iVFs2-0002vj-S1
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:13:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iVFrc-0003Xx-NC
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:12:49 -0500
-Received: from mail-oi1-x233.google.com ([2607:f8b0:4864:20::233]:33073)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iVFra-0003X4-Vu
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:12:48 -0500
-Received: by mail-oi1-x233.google.com with SMTP id m193so5383726oig.0
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 06:12:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=OS+6uvsUt/UkzNZHFNyjVUrxiK4cIAWaNyZ8P22cX+g=;
- b=r0lh7JpiyE8DMnVyvudVlPsH5tAez+4UT+VuOhGHGoJXRylWyt4oCOXtCl9qZBqMyn
- zULixM77TgN9yWosHMpj5+4fUE2I71pRl18i8IAwANcvUb6T0KCb8hiIXpMK8RvQjp++
- nQwxTYP0YE3qbKeJNpu5UTtXGtK874L5KwKyBRtjTxX+V+K8SZfdkYa+Aq217w4P1Uz3
- SV+M9VPMct471uPUG5p3kzBAwSiBd0Xg2j18/SB9o9F+LJ2UVWFh/zAfHQSwdtKcedU+
- 9MAmrZn7Hu1S3s5aay4paLkPOtAJossfzPrgagmqmAuY3Z71S+BZQZSYf0tLlCow5LVw
- 3CwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=OS+6uvsUt/UkzNZHFNyjVUrxiK4cIAWaNyZ8P22cX+g=;
- b=k4mmfT/80gE3qm9bCXKlv/dOESzLeMx6PjBzFxrtotHh1DxxS6ksP5W9YrF3C7mgic
- HmU3zHEQ+Y+qkWGCqzfDw4pcYgVO5EGFULxh6wz9jeh57c/Hvst5jzrqV7ZsZFds9sah
- WytTVy72PXAlbRmv+w0gxTrHybiBQP9Jg8gXznjvHhIA3aBd3u2nV0dQ6jJiK4kdGwGL
- 1S5u17/m35engyK0p3YovUoPyDQu2lc05PVUGlNnbCIUBThWKxNE/aFcOPINATpk7wht
- MnUtpDYCUzXrrxWljBaZ1T1hWhrZkuIIeTaqd0UtlGNKpORTyH9vgQcWig9rTR3HGIJB
- nk5w==
-X-Gm-Message-State: APjAAAV4lgwNUsOIwbv5jWeX2gzKhbdYeyOXr7MvATv8jkQwjvLpmJeV
- 8pDzpW19apHBW+FS2v9pcHukVtLhIY66Gzzadkjf5w==
-X-Google-Smtp-Source: APXvYqzsZchpwdKvW1AIDmdFxGOle1/CLaJfI9c9ftsIY3ie+1x4gK9dQ7P/HCsHEvcuAVMfob18T56hVUQTgJ7i3gY=
-X-Received: by 2002:a05:6808:b04:: with SMTP id
- s4mr3711030oij.163.1573740765372; 
- Thu, 14 Nov 2019 06:12:45 -0800 (PST)
+ (envelope-from <stefanha@redhat.com>) id 1iVFs0-0003f2-G9
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:13:13 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58062
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iVFs0-0003eu-7c
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:13:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573740790;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=afQY2mkX8raKtVeJCB1KgS8X6yBGBW6wYCPBWbNcnTE=;
+ b=D+/u1fOlmgd40T7h1gHOyV3OM+SJQeg0GchGdGLaaBUORteluOGSJ3VarlieNeLEG7feVt
+ CdUfdfRPUHeNF5+QpQYlhEnvE2QdF5NTakWQ6+3SsqREEqREfxS1vowC/Q7Bkh+RLUh34e
+ xEJMCFCI7NkP2oF4noz0ld4462JNSrQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-289-PfnrM7a8P8Oq-BabfTi5ng-1; Thu, 14 Nov 2019 09:13:07 -0500
+X-MC-Unique: PfnrM7a8P8Oq-BabfTi5ng-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D747801E7E;
+ Thu, 14 Nov 2019 14:13:06 +0000 (UTC)
+Received: from localhost (unknown [10.33.36.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9BEFF5C1C3;
+ Thu, 14 Nov 2019 14:13:02 +0000 (UTC)
+Date: Thu, 14 Nov 2019 14:13:01 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 17/30] virtiofsd: Add main virtio loop
+Message-ID: <20191114141301.GA592348@stefanha-x1.localdomain>
+References: <20191021105832.36574-1-dgilbert@redhat.com>
+ <20191021105832.36574-18-dgilbert@redhat.com>
+ <CAJ+F1CKmujLfL=n-UPLeps7BcQ=WcibHzsCWt+Pff3zLbSwvYA@mail.gmail.com>
+ <20191022110725.GF2815@work-vm>
 MIME-Version: 1.0
-References: <20191113140341.27977-1-kraxel@redhat.com>
-In-Reply-To: <20191113140341.27977-1-kraxel@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Nov 2019 14:12:34 +0000
-Message-ID: <CAFEAcA_SkJjoVynteSo0=oUOPgC2bprQyN7Dm2xRqm-PyXLB6Q@mail.gmail.com>
-Subject: Re: [PULL 0/1] Seabios 20191113 patches
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::233
+In-Reply-To: <20191022110725.GF2815@work-vm>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="ReaqsoxgOBHFXBhH"
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,35 +88,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ piaojun@huawei.com,
+ =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>,
+ eguan@linux.alibaba.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 13 Nov 2019 at 14:05, Gerd Hoffmann <kraxel@redhat.com> wrote:
->
-> The following changes since commit 9f2ce35dfa4ea4a31dbb765dd02bed2500891887:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20191111' into staging (2019-11-11 16:54:16 +0000)
->
-> are available in the Git repository at:
->
->   git://git.kraxel.org/qemu tags/seabios-20191113-pull-request
->
-> for you to fetch changes up to 0221d73ce6a8e075adaa0a35a6ef853d2652b855:
->
->   seabios: update to pre-1.13 snapshot (2019-11-13 15:02:21 +0100)
->
-> ----------------------------------------------------------------
-> seabios: update to pre-1.13 snapshot (with ahci fix included).
->
-> ----------------------------------------------------------------
+--ReaqsoxgOBHFXBhH
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Oct 22, 2019 at 12:07:25PM +0100, Dr. David Alan Gilbert wrote:
+> * Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
+> > On Mon, Oct 21, 2019 at 1:26 PM Dr. David Alan Gilbert (git)
+> > <dgilbert@redhat.com> wrote:
+> > >
+> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > >
+> > > Processes incoming requests on the vhost-user fd.
+> >=20
+> > Is there a reason to avoid using glib & its main loop?
+>=20
+> Not particularly;  would it actually work out any easier?
+> Is there an easy way to get the glib loop to check something like
+> the fuse_session_exited at each iteration.
+>=20
+> I probably didn't originally because I wasn't sure if this code
+> was going back into libfuse or staying here; and libfuse doesn't
+> use glib.
 
-Applied, thanks.
+I tried to convert this to glib a few months ago, but stopped because
+libvhost-user-glib.c is difficult to use from multiple threads.  If I
+remember correctly we'd need to change it quite a bit to make
+multi-threaded vhost-user device backends possible and I gave up.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
+Stefan
 
--- PMM
+--ReaqsoxgOBHFXBhH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3NYO0ACgkQnKSrs4Gr
+c8hDuAgAjJwzyJqJM9lRE+R5g8bALa61fL/3aAVvsUliWfSujkZrJtazf9Pq1vnK
+PT202+GIZTchNF1J6GM6/MyeEpsJeHbyMNbSqR31IXn/0NpP9iRRotxqLFcGaYam
+Nz+HyX+Gwnv9N69AaOMGVYtwgQ3MFlNr7Dy1iScHrrCVcroIfjaJ5U3/pbBshugq
+R81h8ueT6UtRGs9TlHPW/FCK7JvEj7NUfys1W8CE4ijaQTCzxg9/ZR9mcVf/B1eV
+HCf+CTVlhP3/HxsWW4N2ILeHL5GUE+SvP2Rqpy6lDompnZ3GR8xpdWXThmEGinsm
+3cd0ioqP13aImRq1ka2xlkteqyAzjw==
+=ZbTj
+-----END PGP SIGNATURE-----
+
+--ReaqsoxgOBHFXBhH--
+
 
