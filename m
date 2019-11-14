@@ -7,77 +7,79 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B249C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 12:06:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69F28C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 12:34:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53CB0206DB
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 12:06:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3ADE620709
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 12:34:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UHXMlslU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53CB0206DB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VXR90Obs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ADE620709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVDto-0004VJ-FX
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 07:06:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42045)
+	id 1iVEKa-0004Hf-2t
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 07:34:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49453)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iVDsq-0003gW-V0
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:06:02 -0500
+ (envelope-from <thuth@redhat.com>) id 1iVEJR-0003V8-VB
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:33:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iVDso-0006RB-IZ
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:05:56 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38584
+ (envelope-from <thuth@redhat.com>) id 1iVEJP-0007jY-N5
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:33:25 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58865
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iVDso-0006Ox-4s
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:05:54 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iVEJP-0007i1-K3
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:33:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573733153;
+ s=mimecast20190719; t=1573734802;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rTum6zVf+69iriC2PGlHB2azntPShiyeCSjnZ77HP/g=;
- b=UHXMlslUJ9j4LHsOfJHA9DrcvEyQhG15zHyKwElBYJzKhoRgpgtAOjFZwya1JW3Dik9HCt
- qxQagEwtEsjoz5MA5nY0L9pvhNjkDXKQzzPHJBhEDkvte6o8KfrUBNWPV/3kQFsO3MQH1k
- WQDl3RRyqB3w1HcaOjQvb36T/pt5GiA=
+ bh=eUtOATTOpM0HsoehESrNmMHioeExkEOVwZK4rLoGy1k=;
+ b=VXR90ObsJWO+H2qTrD4SIGWwdLULAYgnAh0W63N1DVa1QDQgh5K2IR0tk7G/jw9YeI0W+L
+ YS8iEPVWD/PmKBjFgkryQWacQMz7ABxuwBWDOvDDt4xm9E6xJtNBjLufH+CkKp1nbwNm5s
+ OfTeg58434ZgLtrAGVpxQdiLLxSNB0I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-RHFNjEnrMYmkIai-AJ6UhQ-1; Thu, 14 Nov 2019 07:05:51 -0500
+ us-mta-45-ttsV_3YCOOq-9icbw9XxNg-1; Thu, 14 Nov 2019 07:33:19 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 56EE980451E;
- Thu, 14 Nov 2019 12:05:50 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-103.ams2.redhat.com [10.36.117.103])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DE0BA106F95C;
- Thu, 14 Nov 2019 12:05:48 +0000 (UTC)
-Date: Thu, 14 Nov 2019 13:05:47 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [RFC PATCH 02/18] qemu-storage-daemon: Add --object option
-Message-ID: <20191114120547.GB5735@linux.fritz.box>
-References: <20191017130204.16131-1-kwolf@redhat.com>
- <20191017130204.16131-3-kwolf@redhat.com>
- <87o8xns9t9.fsf@dusky.pond.sub.org>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68E0810CE7B8;
+ Thu, 14 Nov 2019 12:33:18 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-89.ams2.redhat.com
+ [10.36.116.89])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D3E2310013D9;
+ Thu, 14 Nov 2019 12:33:14 +0000 (UTC)
+Subject: Re: [PATCH v1] s390x: kvm-unit-tests: a PONG device for Sub Channels
+ tests
+To: Cornelia Huck <cohuck@redhat.com>, Pierre Morel <pmorel@linux.ibm.com>
+References: <1573671753-15115-1-git-send-email-pmorel@linux.ibm.com>
+ <20191114113823.5d752648.cohuck@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b103f51b-f304-cf71-15f9-5fd456a6fcfe@redhat.com>
+Date: Thu, 14 Nov 2019 13:33:11 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <87o8xns9t9.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191114113823.5d752648.cohuck@redhat.com>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: RHFNjEnrMYmkIai-AJ6UhQ-1
+X-MC-Unique: ttsV_3YCOOq-9icbw9XxNg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,252 +91,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- mreitz@redhat.com
+Cc: qemu-s390x@nongnu.org, david@redhat.com, qemu-devel@nongnu.org,
+ frankja@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 07.11.2019 um 21:36 hat Markus Armbruster geschrieben:
-> Kevin Wolf <kwolf@redhat.com> writes:
+On 14/11/2019 11.38, Cornelia Huck wrote:
+> On Wed, 13 Nov 2019 20:02:33 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
 >=20
-> > Add a command line option to create user-creatable QOM objects.
-> >
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >  qemu-storage-daemon.c | 35 +++++++++++++++++++++++++++++++++++
-> >  1 file changed, 35 insertions(+)
-> >
-> > diff --git a/qemu-storage-daemon.c b/qemu-storage-daemon.c
-> > index a251dc255c..48d6af43a6 100644
-> > --- a/qemu-storage-daemon.c
-> > +++ b/qemu-storage-daemon.c
-> > @@ -35,6 +35,8 @@
-> >  #include "qemu/log.h"
-> >  #include "qemu/main-loop.h"
-> >  #include "qemu/module.h"
-> > +#include "qemu/option.h"
-> > +#include "qom/object_interfaces.h"
-> > =20
-> >  #include "trace/control.h"
-> > =20
-> > @@ -51,10 +53,26 @@ static void help(void)
-> >  "                         specify tracing options\n"
-> >  "  -V, --version          output version information and exit\n"
-> >  "\n"
-> > +"  --object <properties>  define a QOM object such as 'secret' for\n"
-> > +"                         passwords and/or encryption keys\n"
+> Minor nit for $SUBJECT: this isn't a kvm-unit-tests patch, that's just
+> one consumer :)
 >=20
-> This is less helpful than qemu-system-FOO's help:
+>> The PONG device accept two commands: PONG_READ and PONG_WRITE
+>> which allow to read from and write to an internal buffer of
+>> 1024 bytes.
+>>
+>> The QEMU device is named ccw-pong.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>  hw/s390x/Makefile.objs  |   1 +
+>>  hw/s390x/ccw-pong.c     | 186 +++++++++++++++++++++++++++++++++++++++++=
++++++++
+>>  include/hw/s390x/pong.h |  47 ++++++++++++
+>>  3 files changed, 234 insertions(+)
+>>  create mode 100644 hw/s390x/ccw-pong.c
+>>  create mode 100644 include/hw/s390x/pong.h
+>>
+>> diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+>> index ee91152..3a83438 100644
+>> --- a/hw/s390x/Makefile.objs
+>> +++ b/hw/s390x/Makefile.objs
+>> @@ -32,6 +32,7 @@ obj-$(CONFIG_KVM) +=3D tod-kvm.o
+>>  obj-$(CONFIG_KVM) +=3D s390-skeys-kvm.o
+>>  obj-$(CONFIG_KVM) +=3D s390-stattrib-kvm.o s390-mchk.o
+>>  obj-y +=3D s390-ccw.o
+>> +obj-y +=3D ccw-pong.o
 >=20
-> -object TYPENAME[,PROP1=3DVALUE1,...]
->                 create a new object of type TYPENAME setting properties
->                 in the order they are specified.  Note that the 'id'
->                 property must be set.  These objects are placed in the
->                 '/objects' path.
+> Not sure if unconditionally introducing a test device is a good idea.
 
-Hm, yes. I took the description from the tools. I can switch to the vl.c
-one (should the tools, too?).
+This definitely needs a CONFIG switch (which can be "y" by default, but
+still we should provide a possibility to disable it)
 
-But honestly, neither of the two is enough to tell anyone how to
-actually use this... Considering how many different objects there are,
-maybe the best we can do is referring to the man page for details.
+>>  obj-y +=3D ap-device.o
+>>  obj-y +=3D ap-bridge.o
+>>  obj-y +=3D s390-sei.o
+>> diff --git a/hw/s390x/ccw-pong.c b/hw/s390x/ccw-pong.c
+>> new file mode 100644
+>> index 0000000..e7439d5
+>> --- /dev/null
+>> +++ b/hw/s390x/ccw-pong.c
+>> @@ -0,0 +1,186 @@
+>> +/*
+>> + * CCW PING-PONG
 
-> > +"\n"
-> >  QEMU_HELP_BOTTOM "\n",
-> >      error_get_progname());
-> >  }
-> > =20
-> > +enum {
-> > +    OPTION_OBJECT =3D 256,
-> > +};
-> > +
-> > +static QemuOptsList qemu_object_opts =3D {
-> > +    .name =3D "object",
-> > +    .implied_opt_name =3D "qom-type",
-> > +    .head =3D QTAILQ_HEAD_INITIALIZER(qemu_object_opts.head),
-> > +    .desc =3D {
-> > +        { }
-> > +    },
-> > +};
-> > +
->=20
-> Note for later: copied from vl.c.
->=20
-> >  static int process_options(int argc, char *argv[], Error **errp)
-> >  {
-> >      int c;
-> > @@ -63,6 +81,7 @@ static int process_options(int argc, char *argv[], Er=
-ror **errp)
-> > =20
-> >      static const struct option long_options[] =3D {
-> >          {"help", no_argument, 0, 'h'},
-> > +        {"object", required_argument, 0, OPTION_OBJECT},
-> >          {"version", no_argument, 0, 'V'},
-> >          {"trace", required_argument, NULL, 'T'},
-> >          {0, 0, 0, 0}
-> > @@ -88,6 +107,22 @@ static int process_options(int argc, char *argv[], =
-Error **errp)
-> >              g_free(trace_file);
-> >              trace_file =3D trace_opt_parse(optarg);
-> >              break;
-> > +        case OPTION_OBJECT:
-> > +            {
-> > +                QemuOpts *opts;
-> > +                const char *type;
-> > +
-> > +                opts =3D qemu_opts_parse(&qemu_object_opts,
-> > +                                       optarg, true, &error_fatal);
-> > +                type =3D qemu_opt_get(opts, "qom-type");
-> > +
-> > +                if (user_creatable_print_help(type, opts)) {
-> > +                    exit(EXIT_SUCCESS);
-> > +                }
-> > +                user_creatable_add_opts(opts, &error_fatal);
-> > +                qemu_opts_del(opts);
-> > +                break;
-> > +            }
-> >          }
-> >      }
-> >      if (optind !=3D argc) {
->=20
-> PATCH 01 duplicates case QEMU_OPTION_trace pretty much verbatim.  Makes
-> sense, as qemu-storage-daemon is basically qemu-system-FOO with "FOO"
-> and most "system" cut away.
->=20
-> This patch adds vl.c's case QEMU_OPTION_object in a much simpler form.
-> This is one of my least favourite options, and I'll tell you why below.
-> Let's compare the two versions.
->=20
-> vl.c:
->=20
->             case QEMU_OPTION_object:
->                 opts =3D qemu_opts_parse_noisily(qemu_find_opts("object")=
-,
->                                                optarg, true);
->                 if (!opts) {
->                     exit(1);
->                 }
->                 break;
->=20
-> Further down:
->=20
->     qemu_opts_foreach(qemu_find_opts("object"),
->                       user_creatable_add_opts_foreach,
->                       object_create_initial, &error_fatal);
->=20
-> Still further down:
->=20
->     qemu_opts_foreach(qemu_find_opts("object"),
->                       user_creatable_add_opts_foreach,
->                       object_create_delayed, &error_fatal);
->=20
-> These are basically
->=20
->     for opts in qemu_object_opts {
->         type =3D qemu_opt_get(opts, "qom-type");
->         if (type) {
->             if (user_creatable_print_help(type, opts)) {
->                 exit(0);
->             }
->             if (!predicate(type)) {
->                 continue;
->             }
->         }
->         obj =3D user_creatable_add_opts(opts, &error_fatal);
->         object_unref(obj);
->     }
->=20
-> where predicate(type) is true in exactly one of the two places for each
-> QOM type.
->=20
-> The reason for these gymnastics is to create objects at the right time
-> during startup, except there is no right time, but two.
->=20
-> Differences:
->=20
-> * Options are processed left to right without gymnastics.  Getting their
->   order right is the user's problem.  I consider this an improvement.
->=20
-> * You use &qemu_object_opts instead of qemu_find_opts("object").  Also
->   an improvement.
->=20
-> * You use qemu_opts_parse() instead of qemu_opts_parse_noisily().
->   The latter can print help.  I failed to find a case where we lose help
->   compared to qemu-system-FOO.  I didn't try very hard.
+Please add a short description here what this device is all about.
 
-I tried to reuse that code from qemu_opts_parse_noisily(), until I
-realised that it wasn't even used for -object.
+>> + * Copyright 2019 IBM Corp.
+>> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or (=
+at
+>> + * your option) any later version. See the COPYING file in the top-leve=
+l
+>> + * directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qapi/error.h"
+>> +#include "qemu/module.h"
+>> +#include "cpu.h"
+>> +#include "exec/address-spaces.h"
+>> +#include "hw/s390x/css.h"
+>> +#include "hw/s390x/css-bridge.h"
+>> +#include "hw/qdev-properties.h"
+>> +#include "hw/s390x/pong.h"
+>> +
+>> +#define PONG_BUF_SIZE 0x1000
+>> +static char buf[PONG_BUF_SIZE] =3D "Hello world\n";
+>> +
+>> +static inline int pong_rw(CCW1 *ccw, char *p, int len, bool dir)
+>> +{
+>> +    int ret;
+>> +
+>> +    ret =3D address_space_rw(&address_space_memory, ccw->cda,
+>> +                           MEMTXATTRS_UNSPECIFIED,
+>> +                           (unsigned char *)buf, len, dir);
+>> +
+>> +    return (ret =3D=3D MEMTX_OK) ? -EIO : 0;
 
-I don't remember the details why qemu_opts_print_help() wasn't even
-called, but it's obvious that we can't lose anything from it:
-qemu_object_opts has an empty list of properties, it accepts anything.
-QemuOpts can't print any useful help when this is all the information it
-has.
+If return code was OK, then you return an EIO error? That looks weird?
 
-> * You neglect to guard user_creatable_print_help():
+>> +}
+>> +
+>> +/* Handle READ ccw commands from guest */
+>> +static int handle_payload_read(CcwPONGDevice *dev, CCW1 *ccw)
+>> +{
+>> +    CcwDevice *ccw_dev =3D CCW_DEVICE(dev);
+>> +    int len;
+>> +
+>> +    if (!ccw->cda) {
+>> +        return -EFAULT;
+>> +    }
+>> +
+>> +    if (ccw->count > PONG_BUF_SIZE) {
+>> +        len =3D PONG_BUF_SIZE;
+>> +        ccw_dev->sch->curr_status.scsw.count =3D ccw->count - PONG_BUF_=
+SIZE;
+>> +    } else {
+>> +        len =3D ccw->count;
+>> +        ccw_dev->sch->curr_status.scsw.count =3D 0;
+>> +    }
+>> +
+>> +    return pong_rw(ccw, buf, len, 1);
+>> +}
+>> +
+>> +/*
+>> + * Handle WRITE ccw commands to write data to client
+>> + * The SCSW count is set to the number of bytes not transfered.
+>> + */
+>> +static int handle_payload_write(CcwPONGDevice *dev, CCW1 *ccw)
+>> +{
+>> +    CcwDevice *ccw_dev =3D CCW_DEVICE(dev);
+>> +    int len;
+>> +
+>> +    if (!ccw->cda) {
+>> +        ccw_dev->sch->curr_status.scsw.count =3D ccw->count;
+>> +        return -EFAULT;
+>> +    }
+>> +
+>> +    if (ccw->count > PONG_BUF_SIZE) {
+>> +        len =3D PONG_BUF_SIZE;
+>> +        ccw_dev->sch->curr_status.scsw.count =3D ccw->count - PONG_BUF_=
+SIZE;
+>> +    } else {
+>> +        len =3D ccw->count;
+>> +        ccw_dev->sch->curr_status.scsw.count =3D 0;
+>> +    }
+>> +
+>> +    return pong_rw(ccw, buf, len, 0);
 >=20
->     $ qemu-storage-daemon --object wrong=3D1,help
->     Segmentation fault (core dumped)
-
-Thanks for catching this. (You don't even need the ",help" part, just
---object wrong=3D1 is enough.)
-
-> * You neglect to object_unref().  I just double-checked the final
->   reference count: it's 2.
-
-Hm, yes. Weird interface, no caller actually needs this reference.
-
-> These bugs shouldn't be hard to fix.
+> Can you please use the dstream infrastructure for read/write handling?
 >=20
+> You also seem to miss some basic checks e.g. for short reads/writes
+> with and without SLI set.
 >=20
-> At this point you might wonder why I dislike this option so much.
-> vl.c's gymnastics are ugly, but not unusually ugly, and they're gone
-> here.  To explain my distaste, I have to go back a little bit.
+>> +}
+>> +
+>> +static int pong_ccw_cb(SubchDev *sch, CCW1 ccw)
+>> +{
+>> +    int rc =3D 0;
+>> +    CcwPONGDevice *dev =3D sch->driver_data;
+>> +
+>> +    switch (ccw.cmd_code) {
+>> +    case PONG_WRITE:
+>> +        rc =3D handle_payload_write(dev, &ccw);
+>> +        break;
+>> +    case PONG_READ:
+>> +        rc =3D handle_payload_read(dev, &ccw);
+>> +        break;
+>> +    default:
+>> +        rc =3D -ENOSYS;
+>> +        break;
+>> +    }
+>> +
+>> +    if (rc =3D=3D -EIO) {
+>> +        /* I/O error, specific devices generate specific conditions */
+>> +        SCHIB *schib =3D &sch->curr_status;
+>> +
+>> +        sch->curr_status.scsw.dstat =3D SCSW_DSTAT_UNIT_CHECK;
+>> +        sch->sense_data[0] =3D 0x40;    /* intervention-req */
 >=20
-> Like quite a few options, --object is paired with QMP command, namely
-> object-add.  Both have the same parameters: QOM type, object ID, and
-> additional type-specific object properties.  There's a difference,
-> though: object-add wraps the latter in a 'props' object, while --object
-> does not.
+> This is really odd. If it succeeds, you generate a unit check with
+> intervention required? Confused. At the very least, this requires some
+> description as to how this device is supposed to interact with the
+> driver.
 >=20
-> QAPI schema:
->=20
->     { 'command': 'object-add',
->       'data': {'qom-type': 'str', 'id': 'str', '*props': 'any'} }
->=20
-> QAPIfying this part of the CLI isn't easy.
->=20
-> The obvious QAPIfied CLI buddy of object-add is incompatible to current
-> --object.  That's not a concern for the storage daemon.  But it's also
-> ugly, because object-add's nesting of the type-specific properties
-> within @props is.  In QMP, it's merely yet another pair of curlies.  In
-> the CLI, we get to prefix props. to each type-specific property.
->=20
-> If we want to give the storage daemon a QAPIfied command line from the
-> start (and I think we do), we'll have to decide how to address this
-> issue, and possibly more (I'm only at PATCH 02/18).
->=20
-> We have a long history of rather careless interface design, and now some
-> of these chickens come home to roost.
+>> +        schib->scsw.ctrl &=3D ~SCSW_ACTL_START_PEND;
+>> +        schib->scsw.ctrl &=3D ~SCSW_CTRL_MASK_STCTL;
+>> +        schib->scsw.ctrl |=3D SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY=
+ |
+>> +                   SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
+>> +    }
+>> +    return rc;
+>> +}
+[...]
+>> +
+>> +static Property pong_ccw_properties[] =3D {
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>> +
+>> +static void pong_ccw_class_init(ObjectClass *klass, void *data)
+>> +{
+>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+>> +
+>> +    dc->props =3D pong_ccw_properties;
 
-On IRC, we discussed last week that we could turn object-add into a
-'gen': false command and accept things both as options in props and as
-flat options on the top level.
+As long as there are no properties, I think you can simply drop that line.
 
-However, looking at this again, I'm afraid we forgot the context while
-discussing specifics: How would this be used in a command line parser?
-
-We don't start with a QDict here, but with a string. Getting a QDict
-that could serve as an input to a modified qmp_object_add() would still
-involve going through QemuOpts for parsing the option string, and then
-converting it to a QDict. Using a visitor isn't possible with '*props':
-'any' and even less so with 'gen': false.
-
-So would this really improve things? Or do we have to wait until we have
-an actual schema for object-add before calling qmp_object_add() actually
-makes sense?
-
-Kevin
+ Thomas
 
 
