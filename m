@@ -2,90 +2,76 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3F8FC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 14:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92CD3C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 14:50:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D1D72070E
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 14:47:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5CC192070E
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 14:50:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="BU5gOX2G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D1D72070E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TwSDotmQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CC192070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVGPR-00006S-I3
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 09:47:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52166)
+	id 1iVGSV-0002ew-7u
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 09:50:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52662)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1iVGLq-0006Nx-Lw
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:44:04 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iVGPM-0000EJ-VI
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:47:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1iVGLo-0003v3-MH
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:44:02 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:46242)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iVGPJ-0004jA-Nw
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:47:39 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:46108
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1iVGLm-0003ow-Jb
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:44:00 -0500
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 94B8F96EF0;
- Thu, 14 Nov 2019 14:43:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1573742635;
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1iVGPJ-0004hq-He
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 09:47:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573742856;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JSVPUAxHqBpvl3GZyzNjbpozmg6Os1gmUEmn1/rfajM=;
- b=BU5gOX2G/6zljp6lnT/+yYVT0M4DfwTGA1chi79PdiYqYXwAx33+T6JjJ9qcB8pLnUHOa+
- ZLrM+kKmGtTroX22XiHhg5Hz/d7DeZmDRlRLLHx6sTjmnaVkFHPuSbN6RbIBSuxTM60Dfp
- tBT1KDWQ4v6JpyGvaPnjl6PXXxkuwI0=
-Subject: Re: [PATCH] gdbstub: Fix buffer overflow in handle_read_all_regs
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20191108125534.114474-1-damien.hedde@greensocs.com>
- <877e4ah32n.fsf@linaro.org>
- <7aa732a4-b67f-855f-0432-290580fc239d@greensocs.com>
- <87v9rufh2z.fsf@linaro.org>
- <78291aad-5c91-32a3-f0d8-f74f3a75dfbf@greensocs.com>
- <875zjm7eob.fsf@linaro.org>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <ec16e919-3e75-b6c7-3583-abd1b4542bcc@greensocs.com>
-Date: Thu, 14 Nov 2019 15:43:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Sda8jhAYFmaT4wNFwT/2rbIqomRyFRvTlCBB/wU359U=;
+ b=TwSDotmQySD1vUvPY/oTyP5QpFpXpSdgoQGgsR3b/f4Xsoxuxj9jlLq985WfdRjIhh1oha
+ qLygAjzpJ1t2AK/euPw2g/wRioo+9tzjuaZyFSHjkAjRtK7dIEXo4wmn4vyEUCVlXr3amg
+ YWQZdt16Pm82uSaJzRFecGANHZhsLRU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-285-1zTNCVlFOAinLNgcF3RHKQ-1; Thu, 14 Nov 2019 09:47:35 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 814531005511
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 14:47:34 +0000 (UTC)
+Received: from localhost (ovpn-112-38.ams2.redhat.com [10.36.112.38])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 227195C1C3;
+ Thu, 14 Nov 2019 14:47:29 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3] qemu-gdb: add an Object pretty printer
+Date: Thu, 14 Nov 2019 18:47:25 +0400
+Message-Id: <20191114144725.2310-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <875zjm7eob.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1573742636;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JSVPUAxHqBpvl3GZyzNjbpozmg6Os1gmUEmn1/rfajM=;
- b=TQ9wcffMqc5dYCXCSkiAOFw0BQcTqVk1wcDkLQWaj4vDtLS4J0KIoAe1gutDgDGXYV9vCC
- d8V4QQmUBjG7fsLdPT8EKWEiZJ4x9ymbELM0K1z17P3sZKBRSRTMt3zuxKC2pMI3PC666/
- mkMCNqSTY4Jux+qw6ihngMxdweAv9Bo=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1573742636; a=rsa-sha256; cv=none;
- b=SxGwecb9H/pA4HuEmFkTVBtCZvGy+mYVfInZcYii4lq8Z+lE3sVUA0O1RELIGVXsBU3ufq
- lmhNFA3dwFUa6v8XGe3Kyqz47Ev6L0jcTPgEJLlMCBVeGYSSIpZjN5Bf5cn56pqzPLwi7Y
- 1gz+tJT0QxVr+kRBzyX+XVaOgL2H1J8=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 1zTNCVlFOAinLNgcF3RHKQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.135.226.135
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,155 +83,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, qemu-devel@nongnu.org,
- Luc Michel <luc.michel@greensocs.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ ehabkost@redhat.com, crosa@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Inspired by GObject/GType pretty printer.
 
+Example:
+machine_set_accel (obj=3D0x555556807550 [pc-i440fx-4.0-machine],...
 
-On 11/14/19 2:47 PM, Alex Benn=C3=A9e wrote:
->=20
-> Damien Hedde <damien.hedde@greensocs.com> writes:
->=20
->> On 11/8/19 5:50 PM, Alex Benn=C3=A9e wrote:
->>>
->>> Damien Hedde <damien.hedde@greensocs.com> writes:
->>>
->>>> On 11/8/19 3:09 PM, Alex Benn=C3=A9e wrote:
->>>>>
->>>>> Damien Hedde <damien.hedde@greensocs.com> writes:
->>>>>
->>>>>> Ensure we don't put too much register data in buffers. This avoids
->>>>>> a buffer overflow (and stack corruption) when a target has lots
->>>>>> of registers.
->>>>>>
->>>>>> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
->>>>>> ---
->>>>>>
->>>>>> Hi all,
->>>>>>
->>>>>> While working on a target with many registers. I found out the gdb=
-stub
->>>>>> may do buffer overflows when receiving a 'g' query (to read genera=
-l
->>>>>> registers). This patch prevents that.
->>>>>>
->>>>>> Gdb is pretty happy with a partial set of registers and queries
->>>>>> remaining registers one by one when needed.
->>>>>
->>>>> Heh I was just looking at this code with regards to SVE (which can =
-get
->>>>> quite big).
->>>>
->>>> SVE ?
->>>
->>> ARM's Scalable Vector Registers which currently can get upto 16 vecto=
-r
->>> quads (256 bytes) but are likely to get bigger.
->>>
->>>>
->>>>>
->>>>>>
->>>>>> Regards,
->>>>>> Damien
->>>>>> ---
->>>>>>  gdbstub.c | 13 +++++++++++--
->>>>>>  1 file changed, 11 insertions(+), 2 deletions(-)
->>>>>>
->>>>>> diff --git a/gdbstub.c b/gdbstub.c
->>>>>> index 4cf8af365e..dde0cfe0fe 100644
->>>>>> --- a/gdbstub.c
->>>>>> +++ b/gdbstub.c
->>>>>> @@ -1810,8 +1810,17 @@ static void handle_read_all_regs(GdbCmdCont=
-ext *gdb_ctx, void *user_ctx)
->>>>>>      cpu_synchronize_state(gdb_ctx->s->g_cpu);
->>>>>>      len =3D 0;
->>>>>>      for (addr =3D 0; addr < gdb_ctx->s->g_cpu->gdb_num_g_regs; ad=
-dr++) {
->>>>>> -        len +=3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx->me=
-m_buf + len,
->>>>>> -                                 addr);
->>>>>> +        int size =3D gdb_read_register(gdb_ctx->s->g_cpu, gdb_ctx=
-->mem_buf + len,
->>>>>> +                                     addr);
->>>>>> +        if (len + size > MAX_PACKET_LENGTH / 2) {
->>>>>> +            /*
->>>>>> +             * Prevent gdb_ctx->str_buf overflow in memtohex() be=
-low.
->>>>>> +             * As a consequence, send only the first registers co=
-ntent.
->>>>>> +             * Gdb will query remaining ones if/when needed.
->>>>>> +             */
->>>>>
->>>>> Haven't we already potentially overflowed gdb_ctx->mem_buf though? =
-I
->>>>> suspect the better fix is for str_buf is to make it growable with
->>>>> g_string and be able to handle arbitrary size conversions (unless t=
-he
->>>>> spec limits us). But we still don't want a hostile gdbstub to be ab=
-le to
->>>>> spam memory by asking for registers that might be bigger than
->>>>> MAX_PACKET_LENGTH bytes.
->>>>
->>>> For gdb_ctx->mem_buf  it's ok because it has also a size of
->>>> MAX_PACKET_LENGTH. (assuming no single register can be bigger than
->>>> MAX_PACKET_LENGTH)
->>>> str_buf has a size of MAX_PACKET_LENGTH + 1
->>>
->>> Are these limits of the protocol rather than our own internal limits?
->>
->> gdb has a dynamic sized packet buffer. Remote protocol doc says:
->>
->> =E2=80=98qSupported [:gdbfeature [;gdbfeature]=E2=80=A6 ]=E2=80=99
->>     [...] Any GDB which sends a =E2=80=98qSupported=E2=80=99 packet su=
-pports receiving
->> packets of unlimited length (earlier versions of GDB may reject overly
->> long responses).
->=20
-> OK so it seems worth cleaning this up. I'm currently putting together a
-> patch set to support these large SVE registers and I'm cleaning up the
-> core gdbstub code while I go. If you are interested the current WIP
-> branch is:
->=20
->   https://github.com/stsquad/qemu/commits/gdbstub/sve-registers
->=20
-> but I can include you on the review CC when I post (hopefully this
-> week)?
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ scripts/qemu-gdb.py | 58 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 58 insertions(+)
+ mode change 100644 =3D> 100755 scripts/qemu-gdb.py
 
-Sure. I will review what I can.
->=20
->>
->>
->>>
->>>> I'm not sure I've understood the second part but if we increase the =
-size
->>>> of str_buf then we will need also a bigger packet buffer.
->>>
->>> Glib provides some nice functions for managing arbitrary sized string=
-s
->>> in a nice flexible way which grow on demand. There is also a nice
->>> growable GByteArray type which we can use for the packet buffer. I th=
-ink
->>> I'd started down this road of re-factoring but never got around to
->>> posting the patches.
->>>
->>>> The size here only depends on what are the target declared registers=
-, so
->>>> it depends only on the cpu target code.
->>>
->>> Sure - but guest registers are growing all the time!
->>>
->>> --
->>> Alex Benn=C3=A9e
->>>
->=20
->=20
-> --
-> Alex Benn=C3=A9e
->=20
+diff --git a/scripts/qemu-gdb.py b/scripts/qemu-gdb.py
+old mode 100644
+new mode 100755
+index f2a305c42e..b9fc1d10d4
+--- a/scripts/qemu-gdb.py
++++ b/scripts/qemu-gdb.py
+@@ -18,6 +18,9 @@ import gdb
+=20
+ import os, sys
+=20
++if sys.version_info[0] < 3:
++    int =3D long
++
+ # Annoyingly, gdb doesn't put the directory of scripts onto the
+ # module search path. Do it manually.
+=20
+@@ -44,3 +47,58 @@ coroutine.CoroutinePCFunction()
+ # Default to silently passing through SIGUSR1, because QEMU sends it
+ # to itself a lot.
+ gdb.execute('handle SIGUSR1 pass noprint nostop')
++
++
++def is_object(val):
++    def is_object_helper(type):
++        if str(type) =3D=3D "Object":
++            return True
++
++        while type.code =3D=3D gdb.TYPE_CODE_TYPEDEF:
++            type =3D type.target()
++
++        if type.code !=3D gdb.TYPE_CODE_STRUCT:
++            return False
++
++        fields =3D type.fields()
++        if len (fields) < 1:
++            return False
++
++        first_field =3D fields[0]
++        return is_object_helper(first_field.type)
++
++    type =3D val.type
++    if type.code !=3D gdb.TYPE_CODE_PTR:
++        return False
++    type =3D type.target()
++    return is_object_helper (type)
++
++
++def object_class_name(instance):
++    try:
++        inst =3D instance.cast(gdb.lookup_type("Object").pointer())
++        klass =3D inst["class"]
++        typ =3D klass["type"]
++        return typ["name"].string()
++    except RuntimeError:
++        pass
++
++
++class ObjectPrinter:
++    def __init__(self, val):
++        self.val =3D val
++
++    def to_string(self):
++        name =3D object_class_name(self.val)
++        if name:
++            return ("0x%x [%s]")% (int(self.val), name)
++        return  ("0x%x") % (int(self.val))
++
++
++def lookup_type(val):
++    if is_object(val):
++        return ObjectPrinter(val)
++    return None
++
++
++gdb.pretty_printers.append(lookup_type)
+--=20
+2.24.0
 
---
-Damien
 
