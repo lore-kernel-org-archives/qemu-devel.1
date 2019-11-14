@@ -2,83 +2,86 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EBC0C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 21:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6448C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 21:05:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C25720709
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 21:02:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A3EDC20709
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 21:05:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eioyA5ae"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C25720709
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S0N/dNKb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3EDC20709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVMG0-00060h-Fb
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 16:02:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44743)
+	id 1iVMJO-0007IM-Rs
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 16:05:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45150)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iVMF9-0005Qi-Ue
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:01:32 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iVMIa-0006la-Sm
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:05:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iVMF8-0004Of-SE
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:01:31 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37298)
+ (envelope-from <peter.maydell@linaro.org>) id 1iVMIZ-0006Fi-Jf
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:05:04 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:44263)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iVMF8-0004Nw-NJ
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:01:30 -0500
-Received: by mail-oi1-x242.google.com with SMTP id y194so6640439oie.4
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 13:01:30 -0800 (PST)
+ id 1iVMIZ-0006FC-7H
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:05:03 -0500
+Received: by mail-oi1-x243.google.com with SMTP id s71so6595343oih.11
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 13:05:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=SKkCEwXFwbZmbzc7S9qEOq9pI514UvvN5FVNw3ZSjB8=;
- b=eioyA5aerfLPynUJ5id/moMDEDJNUx6ic1RLp3lBPy5miJCtOvwOe6d9tZF0kjNLjs
- EUVDtPAiq4E1RDAJigZIMvLYv4o5b8AAqWjWKLu3B6pj+6tmP5x9Z6xhzTHCZIcXlYiR
- ambgLzrgIe6rOQ2r5BGkCMKPHlMZDJPmUmyni7LiSgdccZOmvG06R8r+4cyXUpdp97a+
- KomrTr0Y5uId+TUX2XBD/sz7G+hKd1fNzwMCvVjEkgwNJxU/NHhVg3agbeqt5JV4lMuH
- QX2D66MXZl0vAXJYqFzPbuHdi5k5VRzBmGDmWHiC00F8N3c17PUI5WLwYKVTOX6GK7x2
- RgWQ==
+ :cc; bh=MrlfJgV1YzNY/Mum1y4mnjGWmktbU/EzuAc6NF4tCNY=;
+ b=S0N/dNKbxVBtCDvEbTCS9OISJPb3VmXLTGp2RYdnuadxnRWdELKlMOsS4ZSrlVa5h/
+ /2xWjAZDPyFwn4cio+XG1kuol0ps+6Jitn/4QdsM0L1wW5GzeDnYJ7wjvFVoxLLJ7Nzd
+ GeSvCtiK/aEA33s5X/yRBQSdAOYw89TsE0Ms7mA4Nq23C0OcW0XeD6Wy/GCparwDldFl
+ 4kL+wvprFl9KeAuRA9UtT3qPWLfnuMEaodgUVZ5k4Kv0n8u0TRejOcAyvtCNFv2cJ5Vl
+ ztNLiwqnGcHJFnOZyF3VWpP+8E9VDaUUeEPYMamKiyDCesqfkyeYlfT+j/OfFOcFhsnx
+ CCsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=SKkCEwXFwbZmbzc7S9qEOq9pI514UvvN5FVNw3ZSjB8=;
- b=s0QuDN7wKEtRhIT+9HPaPlAmfyeuzykvvJASVFk2cJWD/HDLQyTN807cAcOHc4KewN
- VQ4mF7YesC3TLCGeiXuBDM3BGx/Lrn2zPjoP4Dkz8DzU0qcNDWlijF/n9Du8dGoF3ZC/
- 7eWptSE3H/+GFKFdDUUCK9gaNIjgUvJL/Y2xdE/jj+vLW4O9U2Q6sbt2L4Wn4q/U1rEB
- MiIjkd8qhY+CkaFS0Cg1gjJA4oUk6TSmQoGP9JCkR+VCUwNjX766T2t08D8LFW0gDIZV
- WabYkwbw3I99Zz/GwFCvMVbQ0ALjoAzBEuGAr7oLaGea5Al9sW2Eomk+HrlSzIQJ71a1
- cOrg==
-X-Gm-Message-State: APjAAAUdbjsr+JFKQVr78qJd8fHvXgx9XLYFoSWJKLEjNWFHguUUTulW
- Kd5M4Qhq71PakULeAd8EsqyLF2px8XpElJjNlRqvfA==
-X-Google-Smtp-Source: APXvYqwBOv4jH3vGFz9Yg6lowA5by1oE1px6ORa7uSbSvTlJ9cYbfC/7JjhZd+LuLum2gtnSwGuf0G1SzDMWUvZHP7A=
-X-Received: by 2002:aca:451:: with SMTP id 78mr5375158oie.170.1573765289704;
- Thu, 14 Nov 2019 13:01:29 -0800 (PST)
+ bh=MrlfJgV1YzNY/Mum1y4mnjGWmktbU/EzuAc6NF4tCNY=;
+ b=E5oFJq+wl6gnlZX/7kyyiy+JPf2wB8EjI28uoZ/h4hSEKWgb6cczdDB3W33WkDLtG4
+ fFS3EQL1k5xVu4w6TCiVWoqXUXs/m7QpyTafYb5wNi8xuX4hReGuXc8UC3fePEU/9wzi
+ cMNeupHXDskaHntRDpaaF1bvDW49jMiF0XcveKSqlZBWtYd1jgQ3B3uMCqgRQRFRvYq8
+ u38eT4wFrbCxdETVjAdAuel0S67B7HIXwIF90tSnHXpE6V6zMkcApbhdICoWzV66klYe
+ Ib6Lmw6Jod0YXwWovpIZdvkhF9aUEXpzcFGurYD5MIEq5qvZnhuhlB0cOcT5fAIel3XX
+ /VpA==
+X-Gm-Message-State: APjAAAWJwrmvLzxeMwK0g6vSp6UgJ4750IPaOZJJmH1u2IDAt6BpxVRf
+ GtzdsMOapodyeV2M6U8UD1R22kTKZK1mwOrB8JPyFA==
+X-Google-Smtp-Source: APXvYqwgs9sFGyKD+yMW0jKnBB91gRE1Kq7ljZoS5xEEQOxOzNXQdj/feye1LWMDPlvPNYZhrO74mLlkJgTjwxDqt8o=
+X-Received: by 2002:aca:451:: with SMTP id 78mr5388549oie.170.1573765502253;
+ Thu, 14 Nov 2019 13:05:02 -0800 (PST)
 MIME-Version: 1.0
-References: <20191104115228.30745-1-graf@amazon.com>
- <CAFEAcA8zkR_MZ-28Nc=x4j05U9MsFYfzQtkHxTf65ZwacK020w@mail.gmail.com>
- <246a7cd4-7c39-c92e-05c3-1045bca2c114@amazon.com>
- <CAFEAcA_kwscZRqK5wTRu5WLkixGYbdV0c7mZMV6n+40DOS0-Mg@mail.gmail.com>
- <CAFEAcA8HwRNd+Mg91RJ1DpiyoNJKBWHjFT_Te16xTV5P7wV_ug@mail.gmail.com>
- <a3b96c16-4d92-87ea-32a4-f36a62cc857e@amazon.com>
-In-Reply-To: <a3b96c16-4d92-87ea-32a4-f36a62cc857e@amazon.com>
+References: <89ada4b1-ee3d-a512-07c2-9bc1ba5806da@redhat.com>
+ <20191024224622.12371-1-keithp@keithp.com> <8736fhm9tw.fsf@linaro.org>
+ <87pnik4w9n.fsf@keithp.com>
+ <CAFEAcA-g+RkvYjseDE=1Z=gnLum0Cjvn_7bqB3ti+cBq9UZ3Eg@mail.gmail.com>
+ <87mudo4owu.fsf@keithp.com>
+ <CAFEAcA-MRtr9WUpqqwJiX9kc+ybGdgfv7ZB5Tc6_q9xwHwebsQ@mail.gmail.com>
+ <d4baa0c3-694a-293a-385a-b3eba7d52d0d@linaro.org>
+ <CAFEAcA-yc9oBfsj1uvbYVCc8kivOE9k2QBGdKs8HZ-vj2iv-pw@mail.gmail.com>
+ <79acf595-5cc3-b795-24c9-e4511071c6c8@linaro.org>
+In-Reply-To: <79acf595-5cc3-b795-24c9-e4511071c6c8@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Nov 2019 21:01:18 +0000
-Message-ID: <CAFEAcA8KyiSvW0c2gM3muM9i-CNSt9qjH0rTDZY8yGcKq0J+5g@mail.gmail.com>
-Subject: Re: [PATCH] pl031: Expose RTCICR as proper WC register
-To: Alexander Graf <graf@amazon.com>
+Date: Thu, 14 Nov 2019 21:04:51 +0000
+Message-ID: <CAFEAcA-BFoi00BWmXjEHGyML5FGdYF3eQnUiWUZrqFNtbP34Xw@mail.gmail.com>
+Subject: Re: [PATCH] Semihost SYS_READC implementation (v4)
+To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,19 +93,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hendrik Borghorst <hborghor@amazon.de>, qemu-arm <qemu-arm@nongnu.org>,
+Cc: Keith Packard <keithp@keithp.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
  QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 14 Nov 2019 at 20:45, Alexander Graf <graf@amazon.com> wrote:
-> On 14.11.19 15:42, Peter Maydell wrote:
-> > Is that OK?
+On Thu, 14 Nov 2019 at 20:52, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Yet another reason why I prefer any semi-hosting call to use an encoding that
+> is otherwise reserved illegal.
 >
-> It's much better. Will you just fix it up inline for me please? :)
+> For this, you have to make up your mind: is it important to execute the
+> instructions as specified by the ISA, or as specified by the semi-hosting spec?
+>
+> In this case, semi-hosting defines an "entry nop" that begins the sequence, and
+> I think that we are well within our rights to ignore the validity of "insn1
+> insn2 || other-insn".
 
-Sure :-)
+Perhaps. I think you get the same issue with
+  insn1 || insn2
+vs
+  insn1 || some-other-insn
+
+though. (And the spec has wording that explicitly wants the
+latter to be handled with the normal "I'm a hint instruction"
+behaviour of insn1.)
 
 -- PMM
 
