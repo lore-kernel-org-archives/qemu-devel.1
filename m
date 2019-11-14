@@ -2,68 +2,98 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D72C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 17:40:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAB25C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 17:43:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA34E206DC
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 17:40:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA34E206DC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=keithp.com
+	by mail.kernel.org (Postfix) with ESMTPS id B2187206DC
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 17:43:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2187206DC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVJ6a-0004L1-18
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 12:40:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37813)
+	id 1iVJ9j-0005VZ-Nv
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 12:43:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38472)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <keithp@keithp.com>) id 1iVJ5p-0003s9-Qo
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 12:39:42 -0500
+ (envelope-from <pmorel@linux.ibm.com>) id 1iVJ8m-000514-K4
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 12:42:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <keithp@keithp.com>) id 1iVJ5o-0006n7-Qy
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 12:39:41 -0500
-Received: from home.keithp.com ([63.227.221.253]:37702 helo=elaine.keithp.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <keithp@keithp.com>) id 1iVJ5o-0006kh-Kj
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 12:39:40 -0500
-Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id 6EA913F29ADC;
- Thu, 14 Nov 2019 09:39:37 -0800 (PST)
-X-Virus-Scanned: Debian amavisd-new at keithp.com
-Received: from elaine.keithp.com ([127.0.0.1])
- by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id DgqACPdh-RiR; Thu, 14 Nov 2019 09:39:37 -0800 (PST)
-Received: from keithp.com (koto.keithp.com [10.0.0.2])
- by elaine.keithp.com (Postfix) with ESMTPSA id 2D0433F29ADB;
- Thu, 14 Nov 2019 09:39:37 -0800 (PST)
-Received: by keithp.com (Postfix, from userid 1000)
- id C7432158212B; Thu, 14 Nov 2019 09:39:36 -0800 (PST)
-From: "Keith Packard" <keithp@keithp.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] Semihost SYS_READC implementation (v4)
-In-Reply-To: <CAFEAcA9rSS8jwSOSFjHd7GZ0gNywEDDJPBJhJ4FxhyqqtjU6OQ@mail.gmail.com>
-References: <89ada4b1-ee3d-a512-07c2-9bc1ba5806da@redhat.com>
- <20191024224622.12371-1-keithp@keithp.com> <8736fhm9tw.fsf@linaro.org>
- <87pnik4w9n.fsf@keithp.com>
- <CAFEAcA-g+RkvYjseDE=1Z=gnLum0Cjvn_7bqB3ti+cBq9UZ3Eg@mail.gmail.com>
- <87mudo4owu.fsf@keithp.com>
- <CAFEAcA-nnkHuj4y8+vFu5=virUoxwarg=kqQvUWeN73SDs+TzA@mail.gmail.com>
- <87eeymx603.fsf@keithp.com>
- <CAFEAcA9rSS8jwSOSFjHd7GZ0gNywEDDJPBJhJ4FxhyqqtjU6OQ@mail.gmail.com>
-Date: Thu, 14 Nov 2019 09:39:36 -0800
-Message-ID: <875zjmuzl3.fsf@keithp.com>
+ (envelope-from <pmorel@linux.ibm.com>) id 1iVJ8l-00088b-Lw
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 12:42:44 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5832)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pmorel@linux.ibm.com>)
+ id 1iVJ8l-00088M-DS
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 12:42:43 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ xAEHYLxT071016
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 12:42:42 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2w99e2weaj-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 12:42:42 -0500
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <pmorel@linux.ibm.com>;
+ Thu, 14 Nov 2019 17:42:40 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 14 Nov 2019 17:42:37 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAEHgaDu53412084
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 14 Nov 2019 17:42:36 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id F08E35204E;
+ Thu, 14 Nov 2019 17:42:35 +0000 (GMT)
+Received: from oc3016276355.ibm.com (unknown [9.152.222.27])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id AE85F5204F;
+ Thu, 14 Nov 2019 17:42:35 +0000 (GMT)
+Subject: Re: [PATCH v1] s390x: kvm-unit-tests: a PONG device for Sub Channels
+ tests
+To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>
+References: <1573671753-15115-1-git-send-email-pmorel@linux.ibm.com>
+ <20191114113823.5d752648.cohuck@redhat.com>
+ <20191114140235.30a788d6.pasic@linux.ibm.com>
+ <20191114141915.6dd5b9c8.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.ibm.com>
+Date: Thu, 14 Nov 2019 18:42:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 63.227.221.253
+In-Reply-To: <20191114141915.6dd5b9c8.cohuck@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19111417-0028-0000-0000-000003B6EC0D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111417-0029-0000-0000-00002479FAA4
+Message-Id: <2c10ed4f-2b9e-89e7-0e3e-704355523239@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-11-14_05:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911140152
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,53 +105,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org, frankja@linux.ibm.com, thuth@redhat.com,
+ qemu-s390x@nongnu.org, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> That defines the instruction sequence used to make a semihosting
-> call, but not the specification of what the calls are:
->  * what call numbers perform which functions
->  * how arguments are passed to the call (registers? parameter
->    blocks in memory? other?)
->  * the semantics of each function supported (number of arguments,
->    behaviour, error handling)
+On 2019-11-14 14:19, Cornelia Huck wrote:
+> On Thu, 14 Nov 2019 14:02:35 +0100
+> Halil Pasic <pasic@linux.ibm.com> wrote:
 >
-> That's really what I had in mind by the overall semihosting spec.
+>> On Thu, 14 Nov 2019 11:38:23 +0100
+>> Cornelia Huck <cohuck@redhat.com> wrote:
+>>
+>>> On Wed, 13 Nov 2019 20:02:33 +0100
+>>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+>>>
+...snip...
+>> We made some different design decisions, while aiming essentially for the
+>> same. Maybe it's due to different scope, maybe not. For instance one
+>> can't test IDA with PONG, I guess.
+> Now that I saw this again, I also recall the discussion of comparing it
+> with the "testdev" for pci/isa. Anybody knows if these are used by
+> kvm-unit-tests?
 
-There isn't anything more provided by the RISC-V foundation at this
-point. I'm not sure what else they *should* provide as the goal is to
-match the ARM design, which does specify all of the above.
+Only by X.
 
-=2D-=20
-=2Dkeith
+Regards,
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+Pierre
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl3NkVgACgkQ2yIaaQAA
-ABH93Q/+IWPQsKBCVY7ALbsl1yPHshI7Elocap5L+rxsXWIqs+G72ExObaSezUu7
-21xBm6epfmjDQCVyIdizRf3gBhovdM8A3hCjAWQzLAkYt1+dRXpFYsKC1YMYAfmg
-YcQq1NLnfIyyemWz93uo22ovJ46bPi17golQuv1yYOMjKdIxxEXGUWhHke/wzsk4
-83ZS1vTb+URRL3zqd0DiBMuyVdjQlWsQERjoF9KIMRyKfXssK4MSNI86qGi+eU3Z
-gvTaQ6D/1mfk0jXb/vACTM+oqjmAbdM6uF0kqtfzyRVu1ia6gcoBDZkw9wLd77u2
-9DpzV9F/rvf4DAbH/v45xgp+PTQ/pWeqtulq3u6n8snZLiqFKblgtqop9Gv9DxZP
-x9c/Ec5kshQMBFrVMwrhbOdDmnDbdx6RFFzh4uVfIQ7pJhVtrqRm6TXSR8svw6y5
-eAk9TAWhLh0chE5UT00ddSdNd0wRtyZ4EjmKC7QiDugpuATkXEvkOsuw41/WU7P2
-1nVwhS390B+X9qxUVZhpU30Hso0n95YroEi+85OSIZ0d/oL20+6aUF7Hs+RRiVP+
-lEgWUb3vsfHfdPRAr1QSy1ZLmXyhEdxMZWflJ8dVlRhhywy8D7Z1g9zm9bwccSn5
-+8KIbzqM2PQ3dMV93qyKvoEaexwTP5eysY7aBmgxvDwqWT2sb1I=
-=NwD9
------END PGP SIGNATURE-----
---=-=-=--
+-- 
+Pierre Morel
+IBM Lab Boeblingen
+
 
