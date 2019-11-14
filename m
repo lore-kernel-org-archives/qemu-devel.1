@@ -2,86 +2,84 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B1DCC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 15:24:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB52AC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 15:36:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA6F5206DC
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 15:24:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6301F206F0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 15:36:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iXoS07Yd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA6F5206DC
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rWbYdotP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6301F206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58690 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVGyb-0005gi-Pt
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 10:24:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55974)
+	id 1iVHAN-0002rC-Ft
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 10:36:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42775)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <zltjiangshi@gmail.com>) id 1iVElY-0002sP-SC
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:02:33 -0500
+ (envelope-from <teemu.kuusisto@gmail.com>) id 1iVDwA-0005HN-0G
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:09:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <zltjiangshi@gmail.com>) id 1iVElW-0005ib-HG
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:02:28 -0500
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:35062)
+ (envelope-from <teemu.kuusisto@gmail.com>) id 1iVDw8-0000i4-LK
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:09:21 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:35170)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <zltjiangshi@gmail.com>)
- id 1iVElW-0005i3-7b
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:02:26 -0500
-Received: by mail-lj1-x243.google.com with SMTP id r7so6605919ljg.2
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 05:02:25 -0800 (PST)
+ (Exim 4.71) (envelope-from <teemu.kuusisto@gmail.com>)
+ id 1iVDw8-0000hZ-AS
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:09:20 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id s5so6202381wrw.2
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 04:09:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=xY858FZhltXf8u/Fe2p5BTnW1HQp3BVSAzz9nIgvRMY=;
- b=iXoS07YdD3iooiv0Qb8LrLlc+eamN/DONg+7x6cnv9fyBqUS0TShjnJ76ITF+yjhGr
- oPaTe/xRLzmu0F9v3MvF3TvB0i1R8TqbgCVZnAZtj/maCPbqS7SAs2zwwEUfSouNwqd2
- 82ekMcTJnYIE05UFQnWQpZ1KNi1on4B3Gm/KQUlbjDH4Z/Piep9Sdn92O87yfU7JHjJU
- JpdfySAl9neTrfo/sFPXSF4J814Z/ha4e4r1PewkCPR0EqzEagN59qDP6hHgoZwjWmKW
- iiFDNabw5yeK7P3qZVlndAloJILk5etFlh4G+EruH22/ZW9z2TUGOKyorQvK8cNM6ZiX
- TuXw==
+ h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+ :user-agent; bh=62ETJS+gaqrGC7EP26bg+n7vv+D7wUKd2Eb4H4GhNUA=;
+ b=rWbYdotPtmGBVCWHeoydI2TBaPCFFMHxRsoUFeod7wc5h4tnk/FZf8hvr3uTrEqU8h
+ kyn57tkcFgNpb8EiW//cUyNe6canIcv3FvxotTzetwz7CyWehqlHsEvo00Qj3Hu+w0rR
+ i1w8RbuuNBzpMrwHaJ1Ow5ETko1Gh/tFVpXKz2N3nNNSIapQOiNOCVCyWxydRxJJzx27
+ XqWk2iMEPhdgmKN1CcmOEQcXWIa3uu1XS11iOsZRL1sKS21q3RDorkdWm7b9/C4Mq1CY
+ HIuK+EVc949QPfehF0KLDTpBBaRXrn9CSIYXkrKW2eBbdVMw+7BTIPFXaQQArFjiThNU
+ QMFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=xY858FZhltXf8u/Fe2p5BTnW1HQp3BVSAzz9nIgvRMY=;
- b=M+KedoNkU6r0CPu7mcq+dPnWoQlIQch0rFpuXJutWIYY1GL+Ko0FKHldq40o11aWbf
- aa2Kzcd2r1knd+3YQy0/QkW/8TsuKCXfLb9yj+7joj597eeIHaFQXbCq2bF7VUf7q7ya
- hlpbnQGxgM9ciev1yQyXdZ1ZGyru6Hl8+8QNGK5fJYQaGNF0fY0VDsCUWK4E0WYha/h4
- 5WX1nA8ogvja+fzX0RLc3VzQYIsxrfNllc+qHbFsyUV9Z0Zmw8V/z++BHDsXObHfJipL
- qC/YEdwqYqnS6/aXA9twKvki4u79Cjbe8/SzlRRhsz5vbgXEoVYO2LwRXLS9g2xEgV1H
- 3i4A==
-X-Gm-Message-State: APjAAAXOty0bg+m/H4Gq9JKpNGzODAMnoKvGRfQ3ymmTavG5gRx59yJ/
- m/QOOMa1grsgH2S43vbtxRYmI3aAR9ODcHIXuQk=
-X-Google-Smtp-Source: APXvYqyZz5E2jI63QY+3gNDprqyOgsbBjF5OQ5QDOVb/zG8OtILzMs0aUgbYzLqhKtYndbBN1iA/ik5bLHnfvnnfyB4=
-X-Received: by 2002:a2e:890a:: with SMTP id d10mr105096lji.33.1573736542692;
- Thu, 14 Nov 2019 05:02:22 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition:user-agent;
+ bh=62ETJS+gaqrGC7EP26bg+n7vv+D7wUKd2Eb4H4GhNUA=;
+ b=TFthaoQIprgr1o2CEL7UTk1W52JqRCEO3Z8dP6pLsjVys84w2yxZjJDKIkitPABbhN
+ 1Hm5kbAFog7R1vtnU7DiKinVYRNsCKpu8JqhBwO6SP9rcZSJ2EcfgoyGz/+NKX9bm4N/
+ hGXCY8FrOQqustOM/GfU5wChZLiFSDp8br9wHn9KWANfcIwOCxFMoS0xS9NcE7OY89fE
+ H+ATBe7f1+UuThdc+e4zEQHYfB7BlSpN9mvTYcCpmtFFXLfpcBBuFqzbugQmut7t9w+p
+ k4e6pbtVodqoIsoH5FH+wzfuGK8ytQxECrjVQile8bPlp/enmu55cLJlnHFRPEENEHi8
+ JGTQ==
+X-Gm-Message-State: APjAAAUCosRRRHt/l4KFqMw/JZODaqtOZTgnphqnI8ufGyEsFxHTzzzt
+ 9AUv0ZAVTV+pyxVC4qBFuvEZyWpY
+X-Google-Smtp-Source: APXvYqznmdlrnTihTNG14ugFdd5DRZQ+i1eehzdABTwhOUtrzLmVvxcpL7O7qDiFcm5vr0ogdwRPdA==
+X-Received: by 2002:adf:f445:: with SMTP id f5mr8206325wrp.193.1573733358198; 
+ Thu, 14 Nov 2019 04:09:18 -0800 (PST)
+Received: from valhalla (guest.anygraaf.fi. [62.44.192.148])
+ by smtp.gmail.com with ESMTPSA id t5sm6661259wro.76.2019.11.14.04.09.17
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 14 Nov 2019 04:09:17 -0800 (PST)
+Date: Thu, 14 Nov 2019 14:09:15 +0200
+From: Teemu Kuusisto <teemu.kuusisto@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: Braille device (chardev/baum.c) is unable to detect the TTY
+ correctly and does not act on graphic console connect/disconnect
+Message-ID: <20191114120915.GA31365@valhalla>
 MIME-Version: 1.0
-References: <1573652826-23987-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1573652826-23987-3-git-send-email-aleksandar.markovic@rt-rk.com>
- <c053c16c-c6f4-4f73-7383-7b66e54ad696@redhat.com>
- <BN6PR2201MB12512B977314BCFCA202449DC6710@BN6PR2201MB1251.namprd22.prod.outlook.com>
-In-Reply-To: <BN6PR2201MB12512B977314BCFCA202449DC6710@BN6PR2201MB1251.namprd22.prod.outlook.com>
-From: chen huacai <zltjiangshi@gmail.com>
-Date: Thu, 14 Nov 2019 21:08:17 +0800
-Message-ID: <CABDp7VoVpZsQpDc7U4uJ1B7ZVCc8A2KO5qNaOucHQH6xUdX8tQ@mail.gmail.com>
-Subject: Re: [EXTERNAL]Re: [PATCH v2 2/5] MAINTAINERS: Adjust maintainership
- for Fulong 2E board
-To: Aleksandar Markovic <amarkovic@wavecomp.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::243
+X-Received-From: 2a00:1450:4864:20::42d
 X-Mailman-Approved-At: Thu, 14 Nov 2019 10:21:44 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,145 +92,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- "hpoussin@reactos.org" <hpoussin@reactos.org>, Huacai Chen <chenhc@lemote.com>,
- "aleksandar.rikalo@rt-rk.com" <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- "aurelien@aurel32.net" <aurelien@aurel32.net>
+Cc: Samuel Thibault <samuel.thibault@ens-lyon.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, all,
+Hello,
 
-On Thu, Nov 14, 2019 at 8:34 PM Aleksandar Markovic
-<amarkovic@wavecomp.com> wrote:
->
-> Hi, Philippe,
->
-> > From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >
-> > Hi Aleksandar,
-> >
-> > On 11/13/19 2:47 PM, Aleksandar Markovic wrote:
-> > > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > >
-> > > Change the maintainership for Fulong 2E board to improve its quality.
-> >
-> > IIRC you told me once this board is named Fuloong, and its CPU is a
-> =E2=80=8E> Loongson, both with 2x 'o' :) I have a patch renaming the vari=
-ous
-> > occurrences.
-> >
->
-> I still think that the oficial name is "Fuloong 2E", however, it is
-> shortened to "Fulong 2E" quite often in communication, and, it seems,
-> sometimes even in various docs/app notes etc.
->
-> Can perhaps Huacai Chen enlighten us regarding the right spelling?
-The right spelling is Fuloong.
+As a blind developer I would be very happy to use QEMU's baum chardev for a braille display. Unfortunately, this device fails to detect the tty in which 
+the spice client is running. I would like to improve this device but I don't yet know how to achieve a better solution.
 
->
-> > > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > > ---
-> > >   MAINTAINERS | 7 ++++---
-> > >   1 file changed, 4 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > index fd9ba32..3bf2144 100644
-> > > --- a/MAINTAINERS
-> > > +++ b/MAINTAINERS
-> > > @@ -976,9 +976,10 @@ S: Maintained
-> > >   F: hw/mips/mips_r4k.c
-> > >
-> > >   Fulong 2E
-> > > -M: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > > -R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-> > > -S: Odd Fixes
-> > > +M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >
-> > I am happy to keep the Fuloong working, but this will be on my personal
-> > (hobbyist) time. This area is not a priority for my employer, so I'll
-> > use my personal email: f4bug@amsat.org.
-> >
->
-> OK.
->
-> > The original author is active on the Linux kernel, let ask him if he'd
-> > be OK to keep an eye on his work.
-> >
-> > Huacai, would you agree to be listed as a reviewer on the Fuloong
-> > related QEMU files? You don't have to worry about the generic QEMU code
-> > plate (like keeping API up to date) I'll manage that, but I'd like to
-> > have you listed to assert the hardware is properly modeled.
-> >
-> > You would appear as:
-> > R: Huacai Chen <chenhc@lemote.com>
-> >
->
-> That is a great idea!
->
-> Please, Chen, get involved, you would be very welcomed, there is a place
-> for you in QEMU community!
-I'm sorry that I'm busy now, but I think I will do something in QEMU
-in the next year.
+The current code calls qemu_console_get_window_id() to get the tty. This function returns zero, which causes the code to skip even the default behavior 
+of brlapi's brlapi__enterTtyMode() (including checcking some env variables such as CONTROLVT). Furthermore, window id sounds like something different 
+than a tty number, maybe a number of X display? The code does not currently consider the fact that the lifetime of the connected graphical consoles is 
+not the same as the lifetime of the VM.
 
->
->
-> > > +R: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
-> >
-> > I don't think Herv=C3=A9 is interested by this board, he has not modifi=
-ed the
-> > code.
-> >
-> > > +R: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > > +S: Maintained
-> >
-> > Let keep it as "Odd Fixes" :)
-> >
->
-> OK.
->
-> >    Odd Fixes:   It has a maintainer but they don't have
-> >                 time to do much other than throw the odd
-> >                 patch in.
-> >
-> > >   F: hw/mips/mips_fulong2e.c
-> > >   F: hw/isa/vt82c686.c
-> > >   F: hw/pci-host/bonito.c
-> > >
-> >
-> > So the patch would be:
-> >
-> > -- 8< --
-> >   Fulong 2E
-> > -M: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > -R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-> > +M: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > +R: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > +R: Huacai Chen <chenhc@lemote.com>
-> >   S: Odd Fixes
-> >   F: hw/mips/mips_fulong2e.c
-> >   F: hw/isa/vt82c686.c
->
-> Plus possible s/Fulong 2E/Fuloong 2E/
->
-> > ---
-> >
-> > But let's wait to see what Huacai Chen thinks of it, before posting it.
-> >
-> > Thanks for taking care of those changes!
-> >
-> > Phil.
-> >
-> >
->
-> Thank you!
->
-> Aleksandar
-Thanks,
+I hardcoded a tty number to the sources of QEMU version 3.0.0 to gladly verify that the device is working besides these problems.
 
-Huacai
+So, I have a handful of open questions to start with: Is it possible to get callbacks for connect and disconnect of a graphical console (like spice and 
+vnc)? How? Is it further possible to get any information of the connected client to determine the tty, and possibly sub-windows too (see 
+brlapi__enterTtyModeWithPath), in which the client is running? Such events should lead to calls of brlapi__EnterTtyMode() and brlapi__leaveTtyMode().
+
+To get this device working properly would be a life changing lifehack for me so I highly appreciate any help!
+It would allow the use of Linux side by side with Windows and ChromiumOS, which is a big leap in this rather poorly accessible world.
+If this is successful, I'm looking forward to spreading the word and helping others too!
+
+With kind regards and informally on behalf of the Finnish braille authority,
+-- Teemu Kuusisto
 
