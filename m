@@ -2,86 +2,102 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70DF0C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 21:09:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C13BC43215
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 21:25:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F6E2206E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 21:09:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C46C20715
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 21:25:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ma7N64UA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F6E2206E1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ffblgbnj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C46C20715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVMN7-0001c1-ED
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 16:09:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45550)
+	id 1iVMcD-0005tp-8B
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 16:25:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47872)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iVMLx-0000jn-Dl
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:08:34 -0500
+ (envelope-from <philmd@redhat.com>) id 1iVMao-00051J-Tv
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:23:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iVMLv-0007w9-V0
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:08:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36109
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iVMal-0001Dq-K4
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:23:52 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52383
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iVMLv-0007vz-RY
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:08:31 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iVMal-0001DD-Fv
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:23:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573765711;
+ s=mimecast20190719; t=1573766630;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5pDDzLjSI9qqUSPbYB+psol3zH7V2uqbHtghDpsPPfw=;
- b=Ma7N64UAjPXSZb0I1kK/hH14vp419Y/4hVl6LL6fMutlXZrxE6rJ3QRrUZzQwPOapcAWbO
- St/AasopnWSDxZwQDrgXd8yAJpwiP+u0zvZLx1UcPrZwdY8ac8ojFk+iPV7nHj6i4AM0sz
- T5EjbH7NTqmbG9qaIYz0bCnfHzuYlfE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-vveDkcKHPMmtyIMiyhPKmg-1; Thu, 14 Nov 2019 16:08:29 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D071800C77;
- Thu, 14 Nov 2019 21:08:27 +0000 (UTC)
-Received: from x1.home (ovpn-116-138.phx2.redhat.com [10.3.116.138])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E88355C1D4;
- Thu, 14 Nov 2019 21:08:25 +0000 (UTC)
-Date: Thu, 14 Nov 2019 14:08:25 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v9 Kernel 3/5] vfio iommu: Add ioctl defination to unmap
- IOVA and return dirty bitmap
-Message-ID: <20191114140825.7472970d@x1.home>
-In-Reply-To: <1f8fc51f-8bdc-7c0c-43ce-1b252f429260@nvidia.com>
-References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
- <1573578220-7530-4-git-send-email-kwankhede@nvidia.com>
- <20191112153017.3c792673@x1.home>
- <a148c5e2-ad34-6973-de50-eab472ed38fb@nvidia.com>
- <20191113132219.5075b32e@x1.home>
- <1f8fc51f-8bdc-7c0c-43ce-1b252f429260@nvidia.com>
-Organization: Red Hat
+ bh=0eHq0mz4mC866HwNq98KkGr4PEGPxv48Ee9tDYk4AWY=;
+ b=ffblgbnjq2r/wUa6er+r4kSrEIkjp0+fAyS71U7RTc1k9Hfm3iUYZxOkPs40046M0lTQ2U
+ 6e6c1WeAv1EwIAtxPSL9xSWOgabIeNrGP2aa8Z3YwX53H7y8ZUcEQsMvSzMT1ly3VzSuk5
+ boAzjBnglSQOTIQA9E1PvByi9CsNnDY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-414-LhGSZQvAN_el08-gJJ8jHw-1; Thu, 14 Nov 2019 16:23:46 -0500
+Received: by mail-wm1-f69.google.com with SMTP id l184so5036927wmf.6
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 13:23:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bqtmwZd47Ou10AgipkGQ2+PY/FRsQ/Hq0sL9a94Udlc=;
+ b=nsl9Iy3QawJizlnap7dsgajbgH5AqtfZhcDZEcUshNI5ZI4fHcTkGzkXc59VS5eW2x
+ HwTCToQPH8DXOvlQ9+WhlJlOlZqyMiJ4wFJgHX3e28qmPEk7xrFIXEpAfIW6PFvOcLx8
+ 8DUqoEb3O3JIDswbvabOhtuVRi+LUonZ0YkRLjPGu3zd5efRR/BCw43SqiYmlsdqQIXr
+ vJpcnI5Ec1Ic0/cok5PVwTVaJD0bZNio5EOyT9bgKBG174kPlypvTqeRN0vaV2zlwYVv
+ KS4iRgChHP39BOKZxZ3XvGLJHgAtSODiRMaS1vX1+mx6i+5ov8qOu3URbXv73K+Njf6K
+ oboQ==
+X-Gm-Message-State: APjAAAX5VShCxb9McwkE849MrBTbsPriXEoouSPEjc2RTLoMat6BHImA
+ 9vQoQE3nKmd38O5acWZxu5NBlwOusQwPYPV41jFBBRpkIvYDzAN5pDkEi6mQOh6kUjB/dHNzUQh
+ xlB8JgtDmYkg1z1c=
+X-Received: by 2002:a05:600c:3cf:: with SMTP id
+ z15mr10551746wmd.76.1573766625758; 
+ Thu, 14 Nov 2019 13:23:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxDvWVEmJeGVq+TntCm/Sn6vYZhFjQKlhCjpcpf6aGjwJQzy9VBc9IwfBph7fFMonSg5DHVfw==
+X-Received: by 2002:a05:600c:3cf:: with SMTP id
+ z15mr10551709wmd.76.1573766625501; 
+ Thu, 14 Nov 2019 13:23:45 -0800 (PST)
+Received: from [192.168.1.35] (170.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.170])
+ by smtp.gmail.com with ESMTPSA id p14sm8947400wrq.72.2019.11.14.13.23.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 14 Nov 2019 13:23:44 -0800 (PST)
+Subject: Re: [PATCH v2 3/5] MAINTAINERS: Adjust maintainership for Malta board
+To: Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
+ qemu-devel@nongnu.org, Paul Burton <pburton@wavecomp.com>
+References: <1573652826-23987-1-git-send-email-aleksandar.markovic@rt-rk.com>
+ <1573652826-23987-4-git-send-email-aleksandar.markovic@rt-rk.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <b2bdb632-7f17-85e5-5c8c-079316fe38bd@redhat.com>
+Date: Thu, 14 Nov 2019 22:23:43 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: vveDkcKHPMmtyIMiyhPKmg-1
+In-Reply-To: <1573652826-23987-4-git-send-email-aleksandar.markovic@rt-rk.com>
+Content-Language: en-US
+X-MC-Unique: LhGSZQvAN_el08-gJJ8jHw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,179 +109,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, cohuck@redhat.com, shuangtai.tst@alibaba-inc.com,
- dgilbert@redhat.com, zhi.a.wang@intel.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com, felipe@nutanix.com,
- jonathan.davies@nutanix.com, yan.y.zhao@intel.com, changpeng.liu@intel.com,
- Ken.Xue@amd.com
+Cc: peter.maydell@linaro.org, aleksandar.rikalo@rt-rk.com, hpoussin@reactos.org,
+ amarkovic@wavecomp.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 Nov 2019 00:26:26 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
++Paul Burton
 
-> On 11/14/2019 1:52 AM, Alex Williamson wrote:
-> > On Thu, 14 Nov 2019 01:22:39 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >  =20
-> >> On 11/13/2019 4:00 AM, Alex Williamson wrote: =20
-> >>> On Tue, 12 Nov 2019 22:33:38 +0530
-> >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >>>     =20
-> >>>> With vIOMMU, during pre-copy phase of migration, while CPUs are stil=
-l
-> >>>> running, IO virtual address unmap can happen while device still keep=
-ing
-> >>>> reference of guest pfns. Those pages should be reported as dirty bef=
-ore
-> >>>> unmap, so that VFIO user space application can copy content of those=
- pages
-> >>>> from source to destination.
-> >>>>
-> >>>> IOCTL defination added here add bitmap pointer, size and flag. If fl=
-ag =20
-> >>>
-> >>> definition, adds
-> >>>     =20
-> >>>> VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP is set and bitmap memory is all=
-ocated
-> >>>> and bitmap_size of set, then ioctl will create bitmap of pinned page=
-s and =20
-> >>>
-> >>> s/of/is/
-> >>>     =20
-> >>>> then unmap those.
-> >>>>
-> >>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >>>> ---
-> >>>>    include/uapi/linux/vfio.h | 33 +++++++++++++++++++++++++++++++++
-> >>>>    1 file changed, 33 insertions(+)
-> >>>>
-> >>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> >>>> index 6fd3822aa610..72fd297baf52 100644
-> >>>> --- a/include/uapi/linux/vfio.h
-> >>>> +++ b/include/uapi/linux/vfio.h
-> >>>> @@ -925,6 +925,39 @@ struct vfio_iommu_type1_dirty_bitmap {
-> >>>>   =20
-> >>>>    #define VFIO_IOMMU_GET_DIRTY_BITMAP             _IO(VFIO_TYPE, VF=
-IO_BASE + 17)
-> >>>>   =20
-> >>>> +/**
-> >>>> + * VFIO_IOMMU_UNMAP_DMA_GET_BITMAP - _IOWR(VFIO_TYPE, VFIO_BASE + 1=
-8,
-> >>>> + *=09=09=09=09      struct vfio_iommu_type1_dma_unmap_bitmap)
-> >>>> + *
-> >>>> + * Unmap IO virtual addresses using the provided struct
-> >>>> + * vfio_iommu_type1_dma_unmap_bitmap.  Caller sets argsz.
-> >>>> + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP should be set to get dirty =
-bitmap
-> >>>> + * before unmapping IO virtual addresses. If this flag is not set, =
-only IO
-> >>>> + * virtual address are unmapped without creating pinned pages bitma=
-p, that
-> >>>> + * is, behave same as VFIO_IOMMU_UNMAP_DMA ioctl.
-> >>>> + * User should allocate memory to get bitmap and should set size of=
- allocated
-> >>>> + * memory in bitmap_size field. One bit in bitmap is used to repres=
-ent per page
-> >>>> + * consecutively starting from iova offset. Bit set indicates page =
-at that
-> >>>> + * offset from iova is dirty.
-> >>>> + * The actual unmapped size is returned in the size field and bitma=
-p of pages
-> >>>> + * in the range of unmapped size is returned in bitmap if flag
-> >>>> + * VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP is set.
-> >>>> + *
-> >>>> + * No guarantee is made to the user that arbitrary unmaps of iova o=
-r size
-> >>>> + * different from those used in the original mapping call will succ=
-eed.
-> >>>> + */
-> >>>> +struct vfio_iommu_type1_dma_unmap_bitmap {
-> >>>> +=09__u32        argsz;
-> >>>> +=09__u32        flags;
-> >>>> +#define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
-> >>>> +=09__u64        iova;                        /* IO virtual address =
-*/
-> >>>> +=09__u64        size;                        /* Size of mapping (by=
-tes) */
-> >>>> +=09__u64        bitmap_size;                 /* in bytes */
-> >>>> +=09void __user *bitmap;                      /* one bit per page */
-> >>>> +};
-> >>>> +
-> >>>> +#define VFIO_IOMMU_UNMAP_DMA_GET_BITMAP _IO(VFIO_TYPE, VFIO_BASE + =
-18)
-> >>>> + =20
-> >>>
-> >>> Why not extend VFIO_IOMMU_UNMAP_DMA to support this rather than add a=
-n
-> >>> ioctl that duplicates the functionality and extends it?? =20
-> >>
-> >> We do want old userspace applications to work with new kernel and
-> >> vice-versa, right?
-> >>
-> >> If I try to change existing VFIO_IOMMU_UNMAP_DMA ioctl structure, say =
-if
-> >> add 'bitmap_size' and 'bitmap' after 'size', with below code in old
-> >> kernel, old kernel & new userspace will work.
-> >>
-> >>           minsz =3D offsetofend(struct vfio_iommu_type1_dma_unmap, siz=
-e);
-> >>
-> >>           if (copy_from_user(&unmap, (void __user *)arg, minsz))
-> >>                   return -EFAULT;
-> >>
-> >>           if (unmap.argsz < minsz || unmap.flags)
-> >>                   return -EINVAL;
-> >>
-> >>
-> >> With new kernel it would change to:
-> >>           minsz =3D offsetofend(struct vfio_iommu_type1_dma_unmap, bit=
-map); =20
-> >=20
-> > No, the minimum structure size still ends at size, we interpret flags
-> > and argsz to learn if the user understands those fields and optionally
-> > include them.  Therefore old userspace on new kernel continues to work.
-> >  =20
-> >>           if (copy_from_user(&unmap, (void __user *)arg, minsz))
-> >>                   return -EFAULT;
-> >>
-> >>           if (unmap.argsz < minsz || unmap.flags)
-> >>                   return -EINVAL;
-> >>
-> >> Then old userspace app will fail because unmap.argsz < minsz and might
-> >> be copy_from_user would cause seg fault because userspace sdk doesn't
-> >> contain new member variables.
-> >> We can't change the sequence to keep 'size' as last member, because th=
-en
-> >> new userspace app on old kernel will interpret it wrong. =20
-> >=20
-> > If we have new userspace on old kernel, that userspace needs to be able
-> > to learn that this feature exists (new flag in the
-> > vfio_iommu_type1_info struct as suggested below) and only make use of i=
-t
-> > when available.  This is why the old kernel checks argsz against minsz.
-> > So long as the user passes something at least minsz in size, we have
-> > compatibility.  The old kernel doesn't understand the GET_DIRTY_BITMAP
-> > flag and will return an error if the user attempts to use it.  Thanks,
-> >  =20
+On 11/13/19 2:47 PM, Aleksandar Markovic wrote:
+> From: Aleksandar Markovic <amarkovic@wavecomp.com>
 >=20
-> Ok. So then VFIO_IOMMU_UNMAP_DMA_GET_BITMAP ioctl is not needed. I'll do=
-=20
-> the change. Again bitmap will be created considering smallest page size=
-=20
-> of iova_pgsizes
+> Change the maintainership for Malta board to improve its quality.
 >=20
-> But VFIO_IOMMU_GET_DIRTY_BITMAP ioctl will still required, right?
+> Acked-by: Aurelien Jarno <aurelien@aurel32.net>
+> Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+> ---
+>   MAINTAINERS | 5 +++--
+>   1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3bf2144..6afec32 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -955,8 +955,9 @@ F: hw/display/jazz_led.c
+>   F: hw/dma/rc4030.c
+>  =20
+>   Malta
+> -M: Aurelien Jarno <aurelien@aurel32.net>
+ > +R: Aurelien Jarno <aurelien@aurel32.net>
 
-Yes, I'm not willing to suggest a flag on an unmap ioctl that
-eliminates the unmap just so we can re-use it for retrieving a dirty
-page bitmap.  That'd be ugly.  Thanks,
+Aurelien, do you want to stay co-maintainer with this one?
+Else, thanks for staying listed as designated reviewer :)
 
-Alex
+> -R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
+> +M: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+
+I'm happy to continue Aurelien work with this board :)
+Similarly to the Fuloong board, I mostly use the Malta as a hobby, so=20
+I'll use my personal email.
+
+Paul, do you mind being co-maintainer or at least listed as designated=20
+reviewer here?
+
+> +R: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+
+I don't see commits from Herv=C3=A9 with this board, so he is probably not=
+=20
+interested.
+
+>   S: Maintained
+
+Until Paul is interested in co-maintenance, let's change this board=20
+status to 'Odd Fixes'.
+
+>   F: hw/mips/mips_malta.c
+>   F: hw/mips/gt64xxx_pci.c
 
 
