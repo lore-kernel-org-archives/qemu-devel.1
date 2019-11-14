@@ -2,71 +2,75 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 024C4C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 22:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C231DC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 23:02:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC6B02071B
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 22:27:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC6B02071B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=keithp.com
+	by mail.kernel.org (Postfix) with ESMTPS id 939B220706
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 23:02:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 939B220706
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVNai-0003Yz-VW
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 17:27:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58292)
+	id 1iVO8S-0001lH-HN
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 18:02:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34619)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <keithp@keithp.com>) id 1iVNZx-00036Z-V4
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 17:27:06 -0500
+ (envelope-from <bounces@canonical.com>) id 1iVO6l-0001HO-3s
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 18:01:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <keithp@keithp.com>) id 1iVNZw-0000K6-Ve
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 17:27:05 -0500
-Received: from home.keithp.com ([63.227.221.253]:40382 helo=elaine.keithp.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <keithp@keithp.com>) id 1iVNZw-0000Jn-OB
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 17:27:04 -0500
-Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id 8BD3E3F29AE2;
- Thu, 14 Nov 2019 14:27:02 -0800 (PST)
-X-Virus-Scanned: Debian amavisd-new at keithp.com
-Received: from elaine.keithp.com ([127.0.0.1])
- by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id LZ4mzEtEqH_s; Thu, 14 Nov 2019 14:27:02 -0800 (PST)
-Received: from keithp.com (97-120-143-1.ptld.qwest.net [97.120.143.1])
- by elaine.keithp.com (Postfix) with ESMTPSA id 1F0333F29A4A;
- Thu, 14 Nov 2019 14:27:02 -0800 (PST)
-Received: by keithp.com (Postfix, from userid 1000)
- id 59EFA158212B; Thu, 14 Nov 2019 14:27:00 -0800 (PST)
-From: "Keith Packard" <keithp@keithp.com>
-To: Richard Henderson <richard.henderson@linaro.org>,
- Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] Semihost SYS_READC implementation (v4)
-In-Reply-To: <d4baa0c3-694a-293a-385a-b3eba7d52d0d@linaro.org>
-References: <89ada4b1-ee3d-a512-07c2-9bc1ba5806da@redhat.com>
- <20191024224622.12371-1-keithp@keithp.com> <8736fhm9tw.fsf@linaro.org>
- <87pnik4w9n.fsf@keithp.com>
- <CAFEAcA-g+RkvYjseDE=1Z=gnLum0Cjvn_7bqB3ti+cBq9UZ3Eg@mail.gmail.com>
- <87mudo4owu.fsf@keithp.com>
- <CAFEAcA-MRtr9WUpqqwJiX9kc+ybGdgfv7ZB5Tc6_q9xwHwebsQ@mail.gmail.com>
- <d4baa0c3-694a-293a-385a-b3eba7d52d0d@linaro.org>
-Date: Thu, 14 Nov 2019 14:26:59 -0800
-Message-ID: <87r22at7po.fsf@keithp.com>
+ (envelope-from <bounces@canonical.com>) id 1iVO6j-000106-88
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 18:00:59 -0500
+Received: from indium.canonical.com ([91.189.90.7]:49222)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iVO6h-0000va-Ae
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 18:00:57 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iVO6d-00048u-PI
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 23:00:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 8CD232E80CF
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 23:00:51 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 14 Nov 2019 22:50:41 -0000
+From: Matti Hameister <1846427@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h kwolf-redhat lersek mattihami
+ michael-weiser psyhomb sej7278
+X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
+X-Launchpad-Bug-Modifier: Matti Hameister (mattihami)
+References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
+Message-Id: <157377184133.23007.9931607921351456459.malone@chaenomeles.canonical.com>
+Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 8c636591af2174523febfc3f322fa3aa0645e124
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 63.227.221.253
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,63 +79,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1846427 <1846427@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+I tried the ArchLinux package that includes three patches applied to
+qemu 4.1 ( see
+https://git.archlinux.org/svntogit/packages.git/commit/trunk/PKGBUILD?h=3Dp=
+ackages/qemu&id=3De9707066408de26aa04f8d0ddebe5556aa87e662
+). My Windows 10 qcow2 image got corrupted again after a short time of
+use. Host filesystem is ext4.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+"OFLAG_COPIED data cluster: l2_entry=3D382c70000 refcount=3D1"
 
-> For semi-hosting, it seems even better if the semi-hosting syscall instru=
-ction
-> is not "real", because you're explicitly requesting services from "unreal"
-> hardware.  It should be specified to generate a SIGILL type of exception
-> anywhere semi-hosting is not enabled.
+The Windows installation seems to be fine after repair. At least Windows
+did not found anything wrong.
 
-In the QEMU case, yes, it's virtual hardware. However, the other common case
-for semihosting is when doing hardware bringup using JTAG or other
-remote debugging link -- having an instruction which safely traps to the
-debugger is required to make semihosting usable there. Reading through
-the history of the current RISC-V semihosting mechanism, there were many
-designs considered and rejected because they wouldn't work in the JTAG
-environment.
+-- =
 
-> With that in mind, it may be simpler to handle all of this not in the
-> translator, but in the function that delivers the ebreak exception.  At t=
-hat
-> point one can arrange to read memory without raising additional
-> exceptions.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1846427
 
-I'll go explore and see if I can figure any of this out.
+Title:
+  4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
 
-I'd still like to get the non-RISC-V SYS_READC patch landed someday :-)
+Status in QEMU:
+  Fix Committed
 
-=2D-=20
-=2Dkeith
+Bug description:
+  I'm seeing massive corruption of qcow2 images with qemu 4.1.0 and git
+  master as of 7f21573c822805a8e6be379d9bcf3ad9effef3dc after a few
+  savevm/quit/loadvm cycles. I've narrowed it down to the following
+  reproducer (further notes below):
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+  # qemu-img check debian.qcow2
+  No errors were found on the image.
+  251601/327680 =3D 76.78% allocated, 1.63% fragmented, 0.00% compressed cl=
+usters
+  Image end offset: 18340446208
+  # bin/qemu/bin/qemu-system-x86_64 -machine pc-q35-4.0.1,accel=3Dkvm -m 40=
+96 -chardev stdio,id=3Dcharmonitor -mon chardev=3Dcharmonitor -drive file=
+=3Ddebian.qcow2,id=3Dd -S
+  qemu-system-x86_64: warning: dbind: Couldn't register with accessibility =
+bus: Did not receive a reply. Possible causes include: the remote applicati=
+on did not send a reply, the message bus security policy blocked the reply,=
+ the reply timeout expired, or the network connection was broken.
+  QEMU 4.1.50 monitor - type 'help' for more information
+  (qemu) loadvm foo
+  (qemu) c
+  (qemu) qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  quit
+  [m@nargothrond:~] qemu-img check debian.qcow2
+  Leaked cluster 85179 refcount=3D2 reference=3D1
+  Leaked cluster 85180 refcount=3D2 reference=3D1
+  ERROR cluster 266150 refcount=3D0 reference=3D2
+  [...]
+  ERROR OFLAG_COPIED data cluster: l2_entry=3D422840000 refcount=3D1
 
------BEGIN PGP SIGNATURE-----
+  9493 errors were found on the image.
+  Data may be corrupted, or further writes to the image may corrupt it.
 
-iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl3N1LQACgkQ2yIaaQAA
-ABGVjQ//cmvC3RtxjCNm0SfBzXPK1adrMxjm/36PjTAtsUSdIuYZjU5URAjvvAS3
-L3y6UIldSf/TVU/uzPUDaIfBoUDxKZOm1QOS0ITHigQV4DLZYswpdXgqzYt0u9j8
-5S8JRw/lM5y0BG58cIUjY2fBRhZsSnEgu2Gzb2EFl2YDb0yWDEnwmVOeYh1YSCUf
-xk+nGQcmBnLepzajqZzTbKelG4ZGfnrKW2hfht2WgIx9GeRbhcGZXUysbOPk7L4p
-puXDAS30M07a4esOwDag0d0lZjuX3nVKutC3Ol2QMNdowpNq07YEZ9i+bRyoLUv5
-W1lrv7odyfUMc5Kfdf1tOu9q/4dPAva7U7ImkpxvNrsG83wQnq8516vN0Vdz6MUT
-Ivx9EkYJR7rRViRdZUN1/si+hWwXN2jqQSVi/Ef4xTPJsz75l+w1wJMbNrCqMoIA
-l+G+kEuJZZhZJGGiv2HeAoWSCQ3t5Y4s3LV/NcM+6YJXKlehoVTBEhXRpY0C2sat
-H6ezRdpDZDn9DcDvhnUHd54zQmToj5H1u6OjQJCQSHyAWVIATmQeTLYRBNY/P8Av
-zkxg9ZoP7oJ3UNT50pdwQis82O5Hf2PfaEL6sfTlkUI3x+bYCYhgR3Lr1ZRvcWTs
-tRgABc667Cz1JcjOYP2HgoPu8MlrGGgXbDW47/FjbBGlYCnG7mQ=
-=Hj7q
------END PGP SIGNATURE-----
---=-=-=--
+  2 leaked clusters were found on the image.
+  This means waste of disk space, but no harm to data.
+  259266/327680 =3D 79.12% allocated, 1.67% fragmented, 0.00% compressed cl=
+usters
+  Image end offset: 18340446208
+
+  This is on a x86_64 Linux 5.3.1 Gentoo host with qemu-system-x86_64
+  and accel=3Dkvm. The compiler is gcc-9.2.0 with the rest of the system
+  similarly current.
+
+  Reproduced with qemu-4.1.0 from distribution package as well as
+  vanilla git checkout of tag v4.1.0 and commit
+  7f21573c822805a8e6be379d9bcf3ad9effef3dc (today's master). Does not
+  happen with qemu compiled from vanilla checkout of tag v4.0.0. Build
+  sequence:
+
+  ./configure --prefix=3D$HOME/bin/qemu-bisect --target-list=3Dx86_64-softm=
+mu --disable-werror --disable-docs
+  [...]
+  CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
+  [...] (can provide full configure output if helpful)
+  make -j8 install
+
+  The kind of guest OS does not matter: seen with Debian testing 64bit,
+  Windows 7 x86/x64 BIOS and Windows 7 x64 EFI.
+
+  The virtual storage controller does not seem to matter: seen with
+  VirtIO SCSI, emulated SCSI and emulated SATA AHCI.
+
+  Caching modes (none, directsync, writeback), aio mode (threads,
+  native) or discard (ignore, unmap) or detect-zeroes (off, unmap) does
+  not influence occurence either.
+
+  Having more RAM in the guest seems to increase odds of corruption:
+  With 512MB to the Debian guest problem hardly occurs at all, with 4GB
+  RAM it happens almost instantly.
+
+  An automated reproducer works as follows:
+
+  - the guest *does* mount its root fs and swap with option discard and
+  my testing leaves me with the impression that file deletion rather
+  than reading is causing the issue
+
+  - foo is a snapshot of the running Debian VM which is already running
+  command
+
+  # while true ; do dd if=3D/dev/zero of=3Dfoo bs=3D10240k count=3D400 ; do=
+ne
+
+  to produce some I/O to the disk (4GB file with 4GB of RAM).
+
+  - on the host a loop continuously resumes and saves the guest state
+  and quits qemu inbetween:
+
+  # while true ; do (echo loadvm foo ; echo c ; sleep 10 ; echo stop ;
+  echo savevm foo ; echo quit ) | bin/qemu-bisect/bin/qemu-system-x86_64
+  -machine pc-q35-3.1,accel=3Dkvm -m 4096 -chardev stdio,id=3Dcharmonitor
+  -mon chardev=3Dcharmonitor -drive file=3Ddebian.qcow2,id=3Dd -S -display
+  none ; done
+
+  - quitting qemu inbetween saves and loads seems to be necessary for
+  the problem to occur. Just continusouly in one session saving and
+  loading guest state does not trigger it.
+
+  - For me, after about 2 to 6 iterations of above loop the image is
+  corrupted.
+
+  - corruption manifests with other messages from qemu as well, e.g.:
+
+  (qemu) loadvm foo
+  Error: Device 'd' does not have the requested snapshot 'foo'
+
+  Using above reproducer I have to the be best of my ability bisected
+  the introduction of the problem to commit
+  69f47505ee66afaa513305de0c1895a224e52c45 (block: avoid recursive
+  block_status call if possible). qemu compiled from the commit before
+  does not exhibit the issue, from that commit on it does and reverting
+  the commit off of current master makes it disappear.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1846427/+subscriptions
 
