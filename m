@@ -2,98 +2,83 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AB4C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 20:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EBC0C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 21:02:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 828FB20715
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 20:53:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C25720709
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 21:02:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X2cRNhFI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 828FB20715
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eioyA5ae"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C25720709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33558 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVM7d-0003Tn-Nf
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 15:53:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43693)
+	id 1iVMG0-00060h-Fb
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 16:02:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44743)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iVM6g-00030R-1P
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 15:52:47 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iVMF9-0005Qi-Ue
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:01:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iVM6c-0000Kc-0A
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 15:52:45 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45886)
+ (envelope-from <peter.maydell@linaro.org>) id 1iVMF8-0004Of-SE
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:01:31 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:37298)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iVM6b-0000Jg-Lk
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 15:52:41 -0500
-Received: by mail-wr1-x442.google.com with SMTP id z10so8274310wrs.12
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 12:52:41 -0800 (PST)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iVMF8-0004Nw-NJ
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 16:01:30 -0500
+Received: by mail-oi1-x242.google.com with SMTP id y194so6640439oie.4
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 13:01:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=G8WNVahWv/LvqUP+pc1VBdTRja74wJ9fG/jTdsO2AhA=;
- b=X2cRNhFI+07pdy2xCXaqk/VLoTbLuUjdYYi1ySkDaI/8NkcZATmU7XjcKz4xe2ldig
- YwZd1AqTP7WQliKPe8PwKYv3XBpTyRI+ThQvu471rU3tTlmva/ce80/D3VNO2jVR9x/5
- WVREnpKmpKFNF4SvKe/bd7eMoDvePf+tWPpbC1XqKepqvd06nCb6Iokto36XzIx/ba/X
- haBh+BfqBOQQ2tXtkafDVh5rRZecuvzz90x841zB3kV5+7mRqxy9ZocLmzVwmKZcddJ1
- y28Ql/RX/Wil2Fu8bt07LL6kixTNkSDFnumaS758bIPaQc6kH4uvQ4stwdebtEZJATfl
- EzWA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=SKkCEwXFwbZmbzc7S9qEOq9pI514UvvN5FVNw3ZSjB8=;
+ b=eioyA5aerfLPynUJ5id/moMDEDJNUx6ic1RLp3lBPy5miJCtOvwOe6d9tZF0kjNLjs
+ EUVDtPAiq4E1RDAJigZIMvLYv4o5b8AAqWjWKLu3B6pj+6tmP5x9Z6xhzTHCZIcXlYiR
+ ambgLzrgIe6rOQ2r5BGkCMKPHlMZDJPmUmyni7LiSgdccZOmvG06R8r+4cyXUpdp97a+
+ KomrTr0Y5uId+TUX2XBD/sz7G+hKd1fNzwMCvVjEkgwNJxU/NHhVg3agbeqt5JV4lMuH
+ QX2D66MXZl0vAXJYqFzPbuHdi5k5VRzBmGDmWHiC00F8N3c17PUI5WLwYKVTOX6GK7x2
+ RgWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=G8WNVahWv/LvqUP+pc1VBdTRja74wJ9fG/jTdsO2AhA=;
- b=EiS5lduZ19VCnTwKbK9flzXHd1liUTp89fKSFPSa8c/IwjTRW+FDIpzFJBEbk5r2I0
- QgJctdfahN9BiFRjrDjPDmkrnnnrYwW/0brr4hNo/sKpYb1Qew05MbycnrwMNnOU3+54
- U6kGJmuCatjyiEerFRh/9stGzXZoVy3GBqVJvGvg9mazhibYwage3hPpqC7ks2pCBDBh
- RSk0cE3cH+C8k8fjFLA/cpgSg1AiySwMy4QtOkUMaltazlkYJTHyArCJkKPSP2fKkqju
- YnVGOHK69QcHZ6sJQ0quEPmODrRG+6Zqy9dCYWa6jnOfviAbAb66XhK4pBn68//ilTK9
- 5QqA==
-X-Gm-Message-State: APjAAAVrDQdgQtADAXW/HUxRAigQt/Hh1Ts9pTyrUlyuparkLvNTcZ5/
- MxggZ7f5faBjpZ7OyjfM4PP7Z9Cs0HAr2A==
-X-Google-Smtp-Source: APXvYqyITZ9G+Fax9KYXgoxTvkm8k6E52yBAeYgo0Db7DyXzLEaYdFnP5DW/xbUSI6ZgdLzMKZy6DQ==
-X-Received: by 2002:a5d:460b:: with SMTP id t11mr11172276wrq.185.1573764759548; 
- Thu, 14 Nov 2019 12:52:39 -0800 (PST)
-Received: from [192.168.8.102] (184.red-37-158-56.dynamicip.rima-tde.net.
- [37.158.56.184])
- by smtp.gmail.com with ESMTPSA id q15sm8769530wrs.91.2019.11.14.12.52.37
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 14 Nov 2019 12:52:38 -0800 (PST)
-Subject: Re: [PATCH] Semihost SYS_READC implementation (v4)
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <89ada4b1-ee3d-a512-07c2-9bc1ba5806da@redhat.com>
- <20191024224622.12371-1-keithp@keithp.com> <8736fhm9tw.fsf@linaro.org>
- <87pnik4w9n.fsf@keithp.com>
- <CAFEAcA-g+RkvYjseDE=1Z=gnLum0Cjvn_7bqB3ti+cBq9UZ3Eg@mail.gmail.com>
- <87mudo4owu.fsf@keithp.com>
- <CAFEAcA-MRtr9WUpqqwJiX9kc+ybGdgfv7ZB5Tc6_q9xwHwebsQ@mail.gmail.com>
- <d4baa0c3-694a-293a-385a-b3eba7d52d0d@linaro.org>
- <CAFEAcA-yc9oBfsj1uvbYVCc8kivOE9k2QBGdKs8HZ-vj2iv-pw@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <79acf595-5cc3-b795-24c9-e4511071c6c8@linaro.org>
-Date: Thu, 14 Nov 2019 21:52:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=SKkCEwXFwbZmbzc7S9qEOq9pI514UvvN5FVNw3ZSjB8=;
+ b=s0QuDN7wKEtRhIT+9HPaPlAmfyeuzykvvJASVFk2cJWD/HDLQyTN807cAcOHc4KewN
+ VQ4mF7YesC3TLCGeiXuBDM3BGx/Lrn2zPjoP4Dkz8DzU0qcNDWlijF/n9Du8dGoF3ZC/
+ 7eWptSE3H/+GFKFdDUUCK9gaNIjgUvJL/Y2xdE/jj+vLW4O9U2Q6sbt2L4Wn4q/U1rEB
+ MiIjkd8qhY+CkaFS0Cg1gjJA4oUk6TSmQoGP9JCkR+VCUwNjX766T2t08D8LFW0gDIZV
+ WabYkwbw3I99Zz/GwFCvMVbQ0ALjoAzBEuGAr7oLaGea5Al9sW2Eomk+HrlSzIQJ71a1
+ cOrg==
+X-Gm-Message-State: APjAAAUdbjsr+JFKQVr78qJd8fHvXgx9XLYFoSWJKLEjNWFHguUUTulW
+ Kd5M4Qhq71PakULeAd8EsqyLF2px8XpElJjNlRqvfA==
+X-Google-Smtp-Source: APXvYqwBOv4jH3vGFz9Yg6lowA5by1oE1px6ORa7uSbSvTlJ9cYbfC/7JjhZd+LuLum2gtnSwGuf0G1SzDMWUvZHP7A=
+X-Received: by 2002:aca:451:: with SMTP id 78mr5375158oie.170.1573765289704;
+ Thu, 14 Nov 2019 13:01:29 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-yc9oBfsj1uvbYVCc8kivOE9k2QBGdKs8HZ-vj2iv-pw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20191104115228.30745-1-graf@amazon.com>
+ <CAFEAcA8zkR_MZ-28Nc=x4j05U9MsFYfzQtkHxTf65ZwacK020w@mail.gmail.com>
+ <246a7cd4-7c39-c92e-05c3-1045bca2c114@amazon.com>
+ <CAFEAcA_kwscZRqK5wTRu5WLkixGYbdV0c7mZMV6n+40DOS0-Mg@mail.gmail.com>
+ <CAFEAcA8HwRNd+Mg91RJ1DpiyoNJKBWHjFT_Te16xTV5P7wV_ug@mail.gmail.com>
+ <a3b96c16-4d92-87ea-32a4-f36a62cc857e@amazon.com>
+In-Reply-To: <a3b96c16-4d92-87ea-32a4-f36a62cc857e@amazon.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Nov 2019 21:01:18 +0000
+Message-ID: <CAFEAcA8KyiSvW0c2gM3muM9i-CNSt9qjH0rTDZY8yGcKq0J+5g@mail.gmail.com>
+Subject: Re: [PATCH] pl031: Expose RTCICR as proper WC register
+To: Alexander Graf <graf@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,45 +90,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Keith Packard <keithp@keithp.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+Cc: Hendrik Borghorst <hborghor@amazon.de>, qemu-arm <qemu-arm@nongnu.org>,
  QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/14/19 8:29 PM, Peter Maydell wrote:
-> On Thu, 14 Nov 2019 at 19:18, Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>   - If the sequence crosses a page, then so be it.  Because of
->>     step 1, this only happens when we *must* cross a page, and
->>     will have recognized any paging exception anyway.
->>     The generic parts of qemu will handle proper invalidation of
->>     a TB that crosses a page boundary.
-> 
-> I'm not sure this would work. If you have
->   insn1 insn2 || other-insn
-> (where || is the page boundary and page 2 is non-executable)
-> then the required behaviour is "execute insn1 and insn2 with
-> normal behaviour, then fault trying to read other-insn, with
-> the fault address being that of other-insn".
-> Whereas for
->   insn1 insn2 || insn3
-> you want to treat it as a semihosting sequence. But you can't distinguish
-> the two because trying to read the word in page 2 will cause us to
-> generate a fault with the fault address being that of insn1. Or
-> have I forgotten how the page-crossing handling works ?
+On Thu, 14 Nov 2019 at 20:45, Alexander Graf <graf@amazon.com> wrote:
+> On 14.11.19 15:42, Peter Maydell wrote:
+> > Is that OK?
+>
+> It's much better. Will you just fix it up inline for me please? :)
 
-Yet another reason why I prefer any semi-hosting call to use an encoding that
-is otherwise reserved illegal.
+Sure :-)
 
-For this, you have to make up your mind: is it important to execute the
-instructions as specified by the ISA, or as specified by the semi-hosting spec?
-
-In this case, semi-hosting defines an "entry nop" that begins the sequence, and
-I think that we are well within our rights to ignore the validity of "insn1
-insn2 || other-insn".
-
-
-r~
+-- PMM
 
