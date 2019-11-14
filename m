@@ -2,84 +2,100 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD601C43141
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:32:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 662FEC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:36:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F4E4206C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:32:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32CAF206C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:36:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R0g7Mpv/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F4E4206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A5HHFJYI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32CAF206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVBUg-00034V-O6
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 04:32:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33955)
+	id 1iVBXk-0004FQ-Cb
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 04:36:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35091)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iVBTi-0002UT-Ea
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:31:51 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iVBX1-0003i5-1g
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:35:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iVBTh-0005CG-I9
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:31:50 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:37809)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iVBTh-0005AN-CD
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:31:49 -0500
-Received: by mail-wr1-x443.google.com with SMTP id t1so5615915wrv.4
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 01:31:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=88L5zRsJrM3Y01ROq4JyPItU7KZg+cXae9DWnup5tjg=;
- b=R0g7Mpv/RCvhQyZwEB6bOpIheEg3rlyWp7qT4vw2hP9jyIci68Gf8t90PqWrIxabAM
- L9aUXZRIEKMPkgfnuiKxPqM/nLq97vRPXkv8BQyiBbIxdrrIUPjts4f7MY541MD+Dh7k
- SRCdzM7CVJKj1hC0zYh21BPDCJiELgHW6JSMbE8wAmtxU3LA4kOLtNIQcDtEbO0UNikP
- r3m+ri5M98ge7g0ewp6OKXUlPApAwN1hg4a0phgQU7G+sGIMdxDVdr39rbLlzQ8UTo/h
- V21GsreSYTEJaq1fXyKxwpT34+Oz1EKp290qhXzhMRHgr1hF7jPpw7pHay6qLQtren7x
- EagA==
+ (envelope-from <pbonzini@redhat.com>) id 1iVBWz-0007ev-MF
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:35:14 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32326
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iVBWz-0007ej-Hm
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:35:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573724112;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=E896oExkGxJDYqZFrYPQcQ4KqYQe0zOTxKrxWcNKok0=;
+ b=A5HHFJYIvbGS/lNEmG2HVnK9WxgitUYE/LQLwdlDLDUQCvc6H/RJ/9Vaj75oQww3oFe5vg
+ m0iSDrjg8xWKPJorKgg9sRKcEktd+njiyVNoNTWEvPSTKjNIkwEBxEfL2AnGR40DIPu66g
+ AUfWzLkmCqE/VWxdGOmg2RptmRWgKiI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-407-L-mm-iV3NNeESPkBspkMHw-1; Thu, 14 Nov 2019 04:35:11 -0500
+Received: by mail-wm1-f70.google.com with SMTP id d140so3843342wmd.1
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 01:35:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=88L5zRsJrM3Y01ROq4JyPItU7KZg+cXae9DWnup5tjg=;
- b=NAJ99MsZCPWhmpClFox0vpDVN+e3mHjV2FdZMqbPkDmgoraWacThwSugAvTX4US06X
- oVq6fE8pqfHmzwZEtPolNByaKhzf95i3uwG5NnqHRNaaAechH29BDfSx0CLeuEeEgLPF
- I6ze2Gbn+hNm0fZszG+0gq1BLBSozImxY4UKYyf720kg2vGDYo2XiJ8ctUNZzObJ1TEg
- djdfkmyDOvLPc1Ri1t4WHAhMNUf5Ql46xo/MhUARQX0X8O+Wf6ONH7W3NzVj58myTfl4
- SJhM+hRPYWVVtYjD6s5qXtkcbSwFa9V3RwWw9oloko8GosdHSDJm8qzLDJQy7WuVG4X8
- 4/CQ==
-X-Gm-Message-State: APjAAAUpvJmRKF/WzjKmP3No9Q18nOEEis3ShCem5gEu5cQhMFatg8Ub
- CbRKxPNMCNbC8+etbQlgAeR+2B553t288a6vpoE=
-X-Google-Smtp-Source: APXvYqwx1+d5o7dKz8+hRo7ovoDqVOov1ujcLC8xVXLtbx1OTncBtq8kF4s1oqh8k3Oiw/s2U0KSsgVydSapTFBPZiU=
-X-Received: by 2002:adf:ed4e:: with SMTP id u14mr7457751wro.132.1573723908241; 
- Thu, 14 Nov 2019 01:31:48 -0800 (PST)
-MIME-Version: 1.0
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=QYKPu3fVw4Ep5LiBbn800fKqeBk0FGEB/k/8u06E5o8=;
+ b=bhgU0xdoCWN4YfhY3jbSZ8YkvQ6dpYlilur5uhgi7brvl52e+oLYhbe/UUslgO3CO4
+ jlNIMpWIjsO7U2FEGeWzxbkeIMwgBiNS06lG6E6JM9Zx2EOapURl8Y/RNbnAfBfrNEaD
+ bO4olqXBSFgGDw/SzFvatsJEopLiZk/NeB8U32gee1QPJTkIhOLU0FwELYykmeWshm4t
+ tIn1tbyys+/aSNADT2056vtYDnbHkPi0wHw4Qwxt5IoAH0rc0Xs80F4SFeNjAB6z3CUS
+ 0d7aCre4RevqOr+sHFGuhTHYanW84OW+bRdndd6xXn8Lhzreoc6GJFPMIEyH6LaLA+9+
+ 296g==
+X-Gm-Message-State: APjAAAWA2FZbFhv4g1uh8q/V1g1dHNbLYmYhbjkeNz6Fh4SXYD4Wh0W+
+ 3WNAW21pBeaOKQHF4t75Hlsbi7tDa5BdazMV1nURM+MKV62NadV+vARM3aaOCEo1s5gfo5Anthf
+ SEHpLshJhZSGDJJI=
+X-Received: by 2002:a5d:518c:: with SMTP id k12mr7214542wrv.104.1573724110704; 
+ Thu, 14 Nov 2019 01:35:10 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwTkXrWmhbJ/VjyEFicbQB/n+nQFKupKMIGGa8NF1D+UAnfDomY58qs7qR7ISy8P/EFBOuE3w==
+X-Received: by 2002:a5d:518c:: with SMTP id k12mr7214515wrv.104.1573724110425; 
+ Thu, 14 Nov 2019 01:35:10 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc?
+ ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
+ by smtp.gmail.com with ESMTPSA id s17sm5000772wmh.41.2019.11.14.01.35.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 14 Nov 2019 01:35:09 -0800 (PST)
+Subject: Re: [PATCH 01/16] memory: do not look at current_machine->accel
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
  <1573655945-14912-2-git-send-email-pbonzini@redhat.com>
- <CAJ+F1CKaxddkwtE6GGQMxhrUxbFaw8EaokU=Q4VLQH6Y66DqVw@mail.gmail.com>
- <a69fbac4-aec4-da6a-b6db-39d27785406e@redhat.com>
-In-Reply-To: <a69fbac4-aec4-da6a-b6db-39d27785406e@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 14 Nov 2019 13:31:35 +0400
-Message-ID: <CAJ+F1CJBsaGY6g4rfMrMhTO2Os7ji=804dRkLhNT2-g_Qr6MFQ@mail.gmail.com>
-Subject: Re: [PATCH 01/16] memory: do not look at current_machine->accel
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+ <2db4f901-65ad-4b80-d309-b8b63330492f@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <4783e606-19b8-c3c0-08ab-ac84b02af6f4@redhat.com>
+Date: Thu, 14 Nov 2019 10:35:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <2db4f901-65ad-4b80-d309-b8b63330492f@redhat.com>
+Content-Language: en-US
+X-MC-Unique: L-mm-iV3NNeESPkBspkMHw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,25 +107,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Nov 14, 2019 at 1:27 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 14/11/19 09:56, Marc-Andr=C3=A9 Lureau wrote:
-> >> +                    qemu_printf(" %s", fvi->ac->name);
-> >
-> > There was a discussion on the original patch that this will have
-> > -accel appended.
->
-> This is not the class name, it's the name member of AccelClass.
->
+On 14/11/19 10:10, Thomas Huth wrote:
+>> "info mtree" prints the wrong accelerator name if used with for example
+>> "-machine accel=3Dkvm:tcg".
+> I had a quick look at the output of "info mtree" with and without
+> "accel=3Dkvm:tcg", but I could not spot any obvious places where it's
+> wrong. Could you give an example?
 
-right, thanks
+Indeed the commit message should say "info mtree -f".
 
---=20
-Marc-Andr=C3=A9 Lureau
+$ x86_64-softmmu/qemu-system-x86_64 -M microvm -enable-kvm -machine accel=
+=3Dkvm:tcg -monitor stdio
+QEMU 4.1.50 monitor - type 'help' for more information
+(qemu) info mtree -f
+...
+FlatView #1
+ AS "memory", root: system
+ AS "cpu-memory-0", root: system
+ Root memory region: system
+  0000000000000000-00000000000effff (prio 0, ram): microvm.ram kvm:tcg
+  00000000000f0000-00000000000fffff (prio 0, ram): pc.bios kvm:tcg
+  0000000000100000-0000000007ffffff (prio 0, ram): microvm.ram @00000000001=
+00000 kvm:tcg
+
+Paolo
+
 
