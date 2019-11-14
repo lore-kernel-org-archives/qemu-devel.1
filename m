@@ -2,107 +2,100 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B124C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9849FC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:05:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED730206D9
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:03:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 55C14206D9
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:05:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gN3THK5w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED730206D9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fd0mnPUe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C14206D9
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVByJ-0008GE-0c
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:03:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38481)
+	id 1iVC0M-0001Qp-Bd
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:05:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41440)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iVBle-000380-Dv
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:50:24 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iVByn-0000IU-PR
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:03:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iVBlc-0007IF-3a
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:50:22 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49915
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1iVByl-0000ZM-4N
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:03:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47193
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iVBlb-0007H6-TS
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:50:20 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iVByl-0000Yb-0m
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:03:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573725018;
+ s=mimecast20190719; t=1573725834;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=PSMrPiqCb9br3g2nOFUtJc0oA3/IGdib9/8MGCrZWX0=;
- b=gN3THK5wRDqWZVodbinkzRvibolg4dXenYrXgZCalgQd8GfgcWWGVZNRSVsOlkpeQOaWXo
- yiGQVkbLauyIrpCl9pjaeCTOqtv3td/ES/jLq5hOCgzo4G7o+vMAEsGiCdHMZe4nwuIodo
- qTWdLjCE5iP7a4nhEIIiR9b4jfLHI7s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-8oJLk1mhPQau7d_li7hK-w-1; Thu, 14 Nov 2019 04:50:16 -0500
-X-MC-Unique: 8oJLk1mhPQau7d_li7hK-w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16F0E107ACC8;
- Thu, 14 Nov 2019 09:50:15 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-160.ams2.redhat.com
- [10.36.117.160])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EF6905E258;
- Thu, 14 Nov 2019 09:50:12 +0000 (UTC)
-Subject: Re: [Qemu-devel] [PATCH v4 01/14] qapi: Parse numeric values
-To: Markus Armbruster <armbru@redhat.com>
-References: <20190624173935.25747-1-mreitz@redhat.com>
- <20190624173935.25747-2-mreitz@redhat.com>
- <87mucyq0mp.fsf@dusky.pond.sub.org>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f42afeb3-422a-16f0-5f7e-be885f1132ff@redhat.com>
-Date: Thu, 14 Nov 2019 10:50:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=V+HpgZ0izySaZwjH5Kez1WXrOu6XKCOqPwKaJ6S/W2k=;
+ b=fd0mnPUeMik0Jmf+gkNBFAIs0m4JA4tOZKAv6S/T3seOF6HEcD+vH42teM+jgyxKNoyrxy
+ m1F2MfBKzW77G0e937dX5cXri8cJHZHpyha163fUAa2WSsXASzEHB9ye5ES5J2R5ANuCSJ
+ 2GbiKTRdYwALye7Sw8ewb2iEwPQnjdk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-148-q1kp-j3rO_i2GgOUjYHuAA-1; Thu, 14 Nov 2019 05:03:52 -0500
+Received: by mail-wm1-f70.google.com with SMTP id g13so3866801wme.0
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 02:03:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=s3mrhYi5USE47zqjcJbZk3/QjwY7g17f0COfc6haMkc=;
+ b=JX5g0MttoWjV/UdftCcykch+wzkeY2a6WPgSApRUjrixceADJNKw6Y6XAk2baU4Z9N
+ nMXQRAPYONSzOBlOTOgzgpKw3WB6LK2fiy5E3XUh+OcZolpiqGoxRQ+V+bIw0C1AUW7l
+ ohJ9TlCgYpmI6RpOr7n6WgXIs17UYN3tjuL2if0pmkSxLZTbT/KCznzIQIUNa516b9SE
+ AhVlMMJ0q+Jk/L15bf0fIV5WmceKy6petUw3TbylT0v346Lat6xM/D5Sw0AoXs99nJbC
+ S9KivTekQ1IvrSlQ0AAmmpUap1NghhOSqyYzuDYcZvfsSkW2OwkY8341Fm8RbDIE9j5j
+ Hn/A==
+X-Gm-Message-State: APjAAAVHQwrmuYI2GzXIVNq/yNmQ1HEmukrEzDStD8yh0+IGRtx9qDFg
+ UiFm4by6FOHX8AF2/9mSLHlMXVQfNrnpEdfwpHWgJ7Z1vSMB8KMwPhkZK9hWIeKd8LlaBtMh3Fk
+ TnsNpAt8qfKaWavQ=
+X-Received: by 2002:a7b:c768:: with SMTP id x8mr7365880wmk.26.1573725831665;
+ Thu, 14 Nov 2019 02:03:51 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzP86zHEXXIeZB5H1BMMkBYMInedLI7gZymxhqBydoevsNOD5b2cBhZWGZDIW7WyJqHwK5e3A==
+X-Received: by 2002:a7b:c768:: with SMTP id x8mr7365848wmk.26.1573725831287;
+ Thu, 14 Nov 2019 02:03:51 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc?
+ ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
+ by smtp.gmail.com with ESMTPSA id y2sm6120027wmy.2.2019.11.14.02.03.50
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 14 Nov 2019 02:03:50 -0800 (PST)
+Subject: Re: [PATCH 08/16] qom: introduce object_register_sugar_prop
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
+ <1573655945-14912-9-git-send-email-pbonzini@redhat.com>
+ <CAJ+F1CLJhFZhu4RJOnwQ=RjJwP=U_xGU-15J0BO_3CEfys7aZg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <de9bc045-1eb5-ab77-136e-859a1d4a0e98@redhat.com>
+Date: Thu, 14 Nov 2019 11:03:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <87mucyq0mp.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <CAJ+F1CLJhFZhu4RJOnwQ=RjJwP=U_xGU-15J0BO_3CEfys7aZg@mail.gmail.com>
+Content-Language: en-US
+X-MC-Unique: q1kp-j3rO_i2GgOUjYHuAA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="lLTlRknFjJbeaQfME8LQQ6fMkATAbuwDw"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -114,302 +107,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lLTlRknFjJbeaQfME8LQQ6fMkATAbuwDw
-Content-Type: multipart/mixed; boundary="qGXBiv7TiXnx1hXbUmZqcvhjKHqyJle4u"
-
---qGXBiv7TiXnx1hXbUmZqcvhjKHqyJle4u
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 14.11.19 10:15, Markus Armbruster wrote:
-> Max Reitz <mreitz@redhat.com> writes:
->=20
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/qapi-schema/bad-type-int.json      |  1 -
->>  tests/qapi-schema/enum-int-member.json   |  1 -
->>  scripts/qapi/common.py                   | 25 ++++++++++++++++++++----
->>  scripts/qapi/introspect.py               |  2 ++
->>  tests/qapi-schema/bad-type-int.err       |  2 +-
->>  tests/qapi-schema/enum-int-member.err    |  2 +-
->>  tests/qapi-schema/leading-comma-list.err |  2 +-
->>  7 files changed, 26 insertions(+), 9 deletions(-)
+On 14/11/19 10:53, Marc-Andr=C3=A9 Lureau wrote:
+>>  include/qom/object.h |  1 +
+>>  qom/object.c         | 23 +++++++++++++++++++++--
+>>  vl.c                 | 10 +++-------
+>>  3 files changed, 25 insertions(+), 9 deletions(-)
 >>
->> diff --git a/tests/qapi-schema/bad-type-int.json b/tests/qapi-schema/bad=
--type-int.json
->> index 56fc6f8126..81355eb196 100644
->> --- a/tests/qapi-schema/bad-type-int.json
->> +++ b/tests/qapi-schema/bad-type-int.json
->> @@ -1,3 +1,2 @@
->>  # we reject an expression with a metatype that is not a string
->> -# FIXME: once the parser understands integer inputs, improve the error =
-message
->>  { 'struct': 1, 'data': { } }
->> diff --git a/tests/qapi-schema/enum-int-member.json b/tests/qapi-schema/=
-enum-int-member.json
->> index 6c9c32e149..6958440c6d 100644
->> --- a/tests/qapi-schema/enum-int-member.json
->> +++ b/tests/qapi-schema/enum-int-member.json
->> @@ -1,3 +1,2 @@
->>  # we reject any enum member that is not a string
->> -# FIXME: once the parser understands integer inputs, improve the error =
-message
->>  { 'enum': 'MyEnum', 'data': [ 1 ] }
->> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
->> index d61bfdc526..3396ea4a09 100644
->> --- a/scripts/qapi/common.py
->> +++ b/scripts/qapi/common.py
->> @@ -498,6 +498,8 @@ class QAPISchemaParser(object):
->>              raise QAPISemError(info, "Unknown pragma '%s'" % name)
->> =20
->>      def accept(self, skip_comment=3DTrue):
->> +        num_match =3D re.compile(r'([-+]?inf|nan|[-+0-9.][0-9a-f.ex]*)'=
-)
->> +
->>          while True:
->>              self.tok =3D self.src[self.cursor]
->>              self.pos =3D self.cursor
+>> diff --git a/include/qom/object.h b/include/qom/object.h
+>> index 128d00c..230b18f 100644
+>> --- a/include/qom/object.h
+>> +++ b/include/qom/object.h
+>> @@ -679,6 +679,7 @@ void object_apply_global_props(Object *obj, const GP=
+trArray *props,
+>>                                 Error **errp);
+>>  void object_set_machine_compat_props(GPtrArray *compat_props);
+>>  void object_set_accelerator_compat_props(GPtrArray *compat_props);
+>> +void object_register_sugar_prop(const char *driver, const char *prop, c=
+onst char *value);
 >=20
-> This is yet another extension over plain JSON.  RFC 8259:
+> Or simply
 >=20
->       number =3D [ minus ] int [ frac ] [ exp ]
->       decimal-point =3D %x2E       ; .
->       digit1-9 =3D %x31-39         ; 1-9
->       e =3D %x65 / %x45            ; e E
->       exp =3D e [ minus / plus ] 1*DIGIT
->       frac =3D decimal-point 1*DIGIT
->       int =3D zero / ( digit1-9 *DIGIT )
->       minus =3D %x2D               ; -
->       plus =3D %x2B                ; +
->       zero =3D %x30                ; 0
+> void object_add_global_prop(const char *typename, ...) ?
+
+This is actually how I called it first, but I didn't like it because
+it's prioritized _below_ -global, and it's easy to confuse it with
+object_add_global_prop.
+
+>>  /*
+>>   * Set machine's global property defaults to @compat_props.
+>> @@ -445,7 +464,7 @@ void object_apply_compat_props(Object *obj)
+>>
+>>      for (i =3D 0; i < ARRAY_SIZE(object_compat_props); i++) {
+>>          object_apply_global_props(obj, object_compat_props[i],
+>> -                                  &error_abort);
+>> +                                  i =3D=3D 2 ? &error_fatal : &error_ab=
+ort);
 >=20
-> Extensions are acceptable when we have an actual use for it, and we
-> document them properly.
+> Isn't error_abort() appropriate in all cases?
 
-Well, it isn=E2=80=99t really an extension, because this isn=E2=80=99t a JS=
-ON parser but
-just something that accepts anything that looks like a number and then
-lets Python try a conversion on it.
-
-> Isn't the parenthesis in your regular expression redundant?
-
-You=E2=80=99re right, but on second thought, maybe I should surround it by =
-\<
-and \>.
-
-> What use do you have in mind for 'inf' and 'nan'?
-
-I could imagine inf being a useful default value, actually.  nan,
-probably not so much.
-
-> Why accept leading '+' as in '+123'?
->=20
-> Why accept empty integral part as in '.123'?
->=20
-> Why accept '.xe.'?  Kidding you, that must be a bug in your regexp.
-
-Well, kind of.
-
-I wanted to accept anything that looks in any way like a number and then
-let Python try to convert it.  That=E2=80=99s also the reason why the case =
-comes
-last.
-
-For that reason, I decided to keep the regex as simple as possible,
-because the attempted conversions would reject anything that isn=E2=80=99t =
-(to
-Python) a valid number later.
-
-It was my impression that the QAPI schema isn=E2=80=99t really JSON anyway =
-and
-that our QAPI schema parser isn=E2=80=99t a JSON parser.  Under that assump=
-tion
-it simply seemed useful to me to accept anything that could potentially
-be a number to Python and convert it.
-
-Now, honestly, I still don=E2=80=99t see the point of having a strict JSON
-=E2=80=9Cparser=E2=80=9D here, but if you insist.  Seems possible to do in =
-a regex.
-
-Though I do think it makes sense to support hex integers as an extension.
-
-> Please decide what number syntax you'd like to accept, then specify it
-> in docs/devel/qapi-code-gen.txt, so we can first discuss the
-> specification, and then check the regexp implements it.
->=20
-> docs/devel/qapi-code-gen.txt update goes here:
->=20
->     =3D=3D=3D Schema syntax =3D=3D=3D
->=20
->     Syntax is loosely based on JSON (http://www.ietf.org/rfc/rfc8259.txt)=
+Unfortunately not, because otherwise "-accel tcg,tb-size=3Dfoo" would crash=
 .
->     Differences:
+
+>>      }
+>>  }
+>>
+>> diff --git a/vl.c b/vl.c
+>> index 843b263..cb993dd 100644
+>> --- a/vl.c
+>> +++ b/vl.c
+>> @@ -896,13 +896,9 @@ static void configure_rtc(QemuOpts *opts)
+>>      value =3D qemu_opt_get(opts, "driftfix");
+>>      if (value) {
+>>          if (!strcmp(value, "slew")) {
+>> -            static GlobalProperty slew_lost_ticks =3D {
+>> -                .driver   =3D "mc146818rtc",
+>> -                .property =3D "lost_tick_policy",
+>> -                .value    =3D "slew",
+>> -            };
+>> -
+>> -            qdev_prop_register_global(&slew_lost_ticks);
+>> +            object_register_sugar_prop("mc146818rtc",
+>> +                                       "lost_tick_policy",
+>> +                                       "slew");
 >=20
->     * Comments: start with a hash character (#) that is not part of a
->       string, and extend to the end of the line.
->=20
->     * Strings are enclosed in 'single quotes', not "double quotes".
->=20
->     * Strings are restricted to printable ASCII, and escape sequences to
->       just '\\'.
->=20
-> --> * Numbers and null are not supported.
+> Why do you convert this since it's a device?
 
-OK.
+Not strictly necessary, but it's more compact and it more or less
+matches the usecase for this function.
 
-> Hrmm, commit 9d55380b5a "qapi: Remove null from schema language" left
-> two instances in error messages behind.  I'll fix them.
->=20
->> @@ -584,7 +586,22 @@ class QAPISchemaParser(object):
->>                      return
->>                  self.line +=3D 1
->>                  self.line_pos =3D self.cursor
->> -            elif not self.tok.isspace():
->> +            elif self.tok.isspace():
->> +                pass
->> +            elif num_match.match(self.src[self.pos:]):
->> +                match =3D num_match.match(self.src[self.pos:]).group(0)
->=20
-> Sadly, the walrus operator is Python 3.8.
->=20
->> +                try:
->> +                    self.val =3D int(match, 0)
->> +                except ValueError:
->> +                    try:
->> +                        self.val =3D float(match)
->> +                    except ValueError:
->> +                        raise QAPIParseError(self,
->> +                                '"%s" is not a valid integer or float' =
-% match)
->> +
->> +                self.cursor +=3D len(match) - 1
->> +                return
->> +            else:
->>                  raise QAPIParseError(self, 'Stray "%s"' % self.tok)
->=20
-> Any particular reason for putting the number case last?
-
-Because the match is so broad.
-
->> =20
->>      def get_members(self):
->> @@ -617,9 +634,9 @@ class QAPISchemaParser(object):
->>          if self.tok =3D=3D ']':
->>              self.accept()
->>              return expr
->> -        if self.tok not in "{['tfn":
->> +        if self.tok not in "{['tfn-+0123456789.i":
->=20
-> This is getting a bit ugly.  Let's not worry about it now.
->=20
->>              raise QAPIParseError(self, 'Expected "{", "[", "]", string,=
- '
->> -                                 'boolean or "null"')
->> +                                 'boolean, number or "null"')
->>          while True:
->>              expr.append(self.get_expr(True))
->>              if self.tok =3D=3D ']':
->> @@ -638,7 +655,7 @@ class QAPISchemaParser(object):
->>          elif self.tok =3D=3D '[':
->>              self.accept()
->>              expr =3D self.get_values()
->> -        elif self.tok in "'tfn":
->> +        elif self.tok in "'tfn-+0123456789.i":
->>              expr =3D self.val
->>              self.accept()
->>          else:
->> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
->> index f62cf0a2e1..6a61dd831f 100644
->> --- a/scripts/qapi/introspect.py
->> +++ b/scripts/qapi/introspect.py
->> @@ -57,6 +57,8 @@ def to_qlit(obj, level=3D0, suppress_first_indent=3DFa=
-lse):
->>          ret +=3D indent(level) + '}))'
->>      elif isinstance(obj, bool):
->>          ret +=3D 'QLIT_QBOOL(%s)' % ('true' if obj else 'false')
->> +    elif isinstance(obj, int) and obj >=3D -(2 ** 63) and obj < 2 ** 63=
-:
->> +        ret +=3D 'QLIT_QNUM(%i)' % obj
->=20
-> Please explain the range check.
-
-Will do.
-
->>      else:
->>          assert False                # not implemented
->>      if level > 0:
->> diff --git a/tests/qapi-schema/bad-type-int.err b/tests/qapi-schema/bad-=
-type-int.err
->> index da89895404..e22fb4f655 100644
->> --- a/tests/qapi-schema/bad-type-int.err
->> +++ b/tests/qapi-schema/bad-type-int.err
->> @@ -1 +1 @@
->> -tests/qapi-schema/bad-type-int.json:3:13: Stray "1"
->> +tests/qapi-schema/bad-type-int.json:2: 'struct' key must have a string =
-value
->=20
-> Test needs a rename, assuming it's not redundant now.
-
-I=E2=80=99m not adding a test here, it=E2=80=99s just the value has changed=
- in
-4d42815587063d.
-
-Thanks for reviewing!
-
-Max
-
->> diff --git a/tests/qapi-schema/enum-int-member.err b/tests/qapi-schema/e=
-num-int-member.err
->> index 071c5213d8..112175f79d 100644
->> --- a/tests/qapi-schema/enum-int-member.err
->> +++ b/tests/qapi-schema/enum-int-member.err
->> @@ -1 +1 @@
->> -tests/qapi-schema/enum-int-member.json:3:31: Stray "1"
->> +tests/qapi-schema/enum-int-member.json:2: Member of enum 'MyEnum' requi=
-res a string name
->=20
-> This one's name is still good.
->=20
->> diff --git a/tests/qapi-schema/leading-comma-list.err b/tests/qapi-schem=
-a/leading-comma-list.err
->> index f5c870bb9c..fa9c80aa57 100644
->> --- a/tests/qapi-schema/leading-comma-list.err
->> +++ b/tests/qapi-schema/leading-comma-list.err
->> @@ -1 +1 @@
->> -tests/qapi-schema/leading-comma-list.json:2:13: Expected "{", "[", "]",=
- string, boolean or "null"
->> +tests/qapi-schema/leading-comma-list.json:2:13: Expected "{", "[", "]",=
- string, boolean, number or "null"
-
-
-
---qGXBiv7TiXnx1hXbUmZqcvhjKHqyJle4u--
-
---lLTlRknFjJbeaQfME8LQQ6fMkATAbuwDw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3NI1IACgkQ9AfbAGHV
-z0CgYwf/dIMAsJBt6HvmH1qkcH4Od3brCIXd8Tchs4PWM5PSKhVoBQgpZm7XHXdP
-kAx27wfiol6aRCHugd9Addz0aoKy633vjcuokU61FBtiA9LqTBee7MDivRsdXx+L
-Nl4UjUYbxNIiJeCK7908mxbM8ARtTfxNGNBWGlqSnHtfi6LoxSx2rhp0s6e7lYfJ
-4DjfdFLd4PSIVnke3QdkASEIzJAPEBadxGdClE4wzfQhVl3/Z/FkBLdoptLDoTrO
-2XtB3xjnzZIDKppvSVEZ6TgsjqRgCp7XwgwYNopGbLyyKdbAhygSaZp7obaXMyUk
-FxbpJKutqzjO8ah1JVx8tjIrdtux9Q==
-=T0KG
------END PGP SIGNATURE-----
-
---lLTlRknFjJbeaQfME8LQQ6fMkATAbuwDw--
+Paolo
 
 
