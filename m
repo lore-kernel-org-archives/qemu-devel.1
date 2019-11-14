@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF2F8C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 05:07:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28ECBC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 05:08:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8DBD205C9
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 05:07:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0316A206D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 05:08:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="asocK2Uz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8DBD205C9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YOajecPC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0316A206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53466 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iV7Lk-0000XF-Or
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 00:07:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42939)
+	id 1iV7Mn-0001So-VA
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 00:08:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43555)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iV7K0-0007bd-GM
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 00:05:34 -0500
+ (envelope-from <alex.williamson@redhat.com>) id 1iV7Kf-0008JU-BU
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 00:06:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iV7Jy-0005lj-QS
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 00:05:32 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32999
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <alex.williamson@redhat.com>) id 1iV7Kd-0006UM-TQ
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 00:06:13 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45686
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iV7Jy-0005ko-JY
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 00:05:30 -0500
+ id 1iV7Kd-0006TZ-OD
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 00:06:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573707930;
+ s=mimecast20190719; t=1573707971;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Xju6/LHK7cg1llGg3H1tqYKFFgDIGbZ6M/w2nZ4ZT1g=;
- b=asocK2Uz9Q7HAYQTgnvwgax8fHkm5SScH4WdYRIwdt5fT03fpYKfIn5vqt/gZ9LhdE3v+N
- taIXC28fqWT4b8eGDkqImyJb426uX9JY55WnX5PKfq1lRG/QSJBH/+ElyQ+5BtYFGVTVr6
- QcyRLHFyFDufpk88aIiYIRg6a0kPhbQ=
+ bh=lNpElcnHoG09rAyJXXNdkKcrPQV4qT63e8TRXxSuiDQ=;
+ b=YOajecPCrtx2YB8PNUe8q7ExuL+e4IBNnzyubf5Tj0xysf/dtmclx/mC1Q9Q42XmX/+1vm
+ 9Pv2O0KK4FAn+5+Bl4E70tHMjm3h9xct+WuCn075XGpE7NNgaZ3M6VbL6pFYqfQRHZtUDT
+ 9ReK+x3WKk8tElHcTanjyr8rJiUsrvA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-203-ec35bA9iP4WMubd1z6v8SQ-1; Thu, 14 Nov 2019 00:05:26 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-362-atUQ3-NdPO6zZpLltkCgXg-1; Thu, 14 Nov 2019 00:06:08 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 12E90107ACC5;
- Thu, 14 Nov 2019 05:05:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B93F9800686;
+ Thu, 14 Nov 2019 05:06:05 +0000 (UTC)
 Received: from x1.home (ovpn-116-138.phx2.redhat.com [10.3.116.138])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B6C2B1059FDF;
- Thu, 14 Nov 2019 05:05:21 +0000 (UTC)
-Date: Wed, 13 Nov 2019 22:05:21 -0700
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4BCDA5F787;
+ Thu, 14 Nov 2019 05:06:04 +0000 (UTC)
+Date: Wed, 13 Nov 2019 22:06:03 -0700
 From: Alex Williamson <alex.williamson@redhat.com>
 To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v9 QEMU 12/15] vfio: Add load state functions to
- SaveVMHandlers
-Message-ID: <20191113220521.21df2ec1@x1.home>
-In-Reply-To: <1573578324-8389-13-git-send-email-kwankhede@nvidia.com>
+Subject: Re: [PATCH v9 QEMU 13/15] vfio: Add vfio_listener_log_sync to mark
+ dirty pages
+Message-ID: <20191113220603.274548cc@x1.home>
+In-Reply-To: <1573578324-8389-14-git-send-email-kwankhede@nvidia.com>
 References: <1573578324-8389-1-git-send-email-kwankhede@nvidia.com>
- <1573578324-8389-13-git-send-email-kwankhede@nvidia.com>
+ <1573578324-8389-14-git-send-email-kwankhede@nvidia.com>
 Organization: Red Hat
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: ec35bA9iP4WMubd1z6v8SQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: atUQ3-NdPO6zZpLltkCgXg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,266 +100,200 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 12 Nov 2019 22:35:21 +0530
+On Tue, 12 Nov 2019 22:35:22 +0530
 Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-> Sequence  during _RESUMING device state:
-> While data for this device is available, repeat below steps:
-> a. read data_offset from where user application should write data.
-> b. write data of data_size to migration region from data_offset.
-> c. write data_size which indicates vendor driver that data is written in
->    staging buffer.
->=20
-> For user, data is opaque. User should write data in the same order as
-> received.
+> vfio_listener_log_sync gets list of dirty pages from container using
+> VFIO_IOMMU_GET_DIRTY_BITMAP ioctl and mark those pages dirty when all
+> devices are stopped and saving state.
+> Return early for the RAM block section of mapped MMIO region.
 >=20
 > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 > Reviewed-by: Neo Jia <cjia@nvidia.com>
 > ---
->  hw/vfio/migration.c  | 170 +++++++++++++++++++++++++++++++++++++++++++++=
+>  hw/vfio/common.c     | 103 +++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
->  hw/vfio/trace-events |   3 +
->  2 files changed, 173 insertions(+)
+>  hw/vfio/trace-events |   1 +
+>  2 files changed, 104 insertions(+)
 >=20
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index f890e864e174..16e12586fe8b 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -251,6 +251,33 @@ static int vfio_save_device_config_state(QEMUFile *f=
-, void *opaque)
->      return qemu_file_get_error(f);
->  }
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index ade9839c28a3..66f1c64bf074 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -29,6 +29,7 @@
+>  #include "hw/vfio/vfio.h"
+>  #include "exec/address-spaces.h"
+>  #include "exec/memory.h"
+> +#include "exec/ram_addr.h"
+>  #include "hw/hw.h"
+>  #include "qemu/error-report.h"
+>  #include "qemu/main-loop.h"
+> @@ -38,6 +39,7 @@
+>  #include "sysemu/reset.h"
+>  #include "trace.h"
+>  #include "qapi/error.h"
+> +#include "migration/migration.h"
 > =20
-> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
-> +{
-> +    VFIODevice *vbasedev =3D opaque;
-> +    uint64_t data;
-> +
-> +    if (vbasedev->ops && vbasedev->ops->vfio_load_config) {
-> +        int ret;
-> +
-> +        ret =3D vbasedev->ops->vfio_load_config(vbasedev, f);
-> +        if (ret) {
-> +            error_report("%s: Failed to load device config space",
-> +                         vbasedev->name);
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    data =3D qemu_get_be64(f);
-> +    if (data !=3D VFIO_MIG_FLAG_END_OF_STATE) {
-> +        error_report("%s: Failed loading device config space, "
-> +                     "end flag incorrect 0x%"PRIx64, vbasedev->name, dat=
-a);
-> +        return -EINVAL;
-> +    }
-> +
-> +    trace_vfio_load_device_config_state(vbasedev->name);
-> +    return qemu_file_get_error(f);
-> +}
-> +
->  /* ---------------------------------------------------------------------=
-- */
-> =20
->  static int vfio_save_setup(QEMUFile *f, void *opaque)
-> @@ -410,12 +437,155 @@ static int vfio_save_complete_precopy(QEMUFile *f,=
- void *opaque)
->      return ret;
->  }
-> =20
-> +static int vfio_load_setup(QEMUFile *f, void *opaque)
-> +{
-> +    VFIODevice *vbasedev =3D opaque;
-> +    VFIOMigration *migration =3D vbasedev->migration;
-> +    int ret =3D 0;
-> +
-> +    if (migration->region.mmaps) {
-> +        ret =3D vfio_region_mmap(&migration->region);
-> +        if (ret) {
-> +            error_report("%s: Failed to mmap VFIO migration region %d: %=
-s",
-> +                         vbasedev->name, migration->region.nr,
-> +                         strerror(-ret));
-> +            return ret;
-> +        }
-> +    }
-> +
-> +    ret =3D vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_RESUMIN=
-G, 0);
-> +    if (ret) {
-> +        error_report("%s: Failed to set state RESUMING", vbasedev->name)=
-;
-> +    }
-> +    return ret;
-> +}
-> +
-> +static int vfio_load_cleanup(void *opaque)
-> +{
-> +    vfio_save_cleanup(opaque);
-> +    return 0;
-> +}
-> +
-> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
-> +{
-> +    VFIODevice *vbasedev =3D opaque;
-> +    VFIOMigration *migration =3D vbasedev->migration;
-> +    int ret =3D 0;
-> +    uint64_t data, data_size;
-> +
-> +    data =3D qemu_get_be64(f);
-> +    while (data !=3D VFIO_MIG_FLAG_END_OF_STATE) {
-> +
-> +        trace_vfio_load_state(vbasedev->name, data);
-> +
-> +        switch (data) {
-> +        case VFIO_MIG_FLAG_DEV_CONFIG_STATE:
-> +        {
-> +            ret =3D vfio_load_device_config_state(f, opaque);
-> +            if (ret) {
-> +                return ret;
-> +            }
-> +            break;
-> +        }
-> +        case VFIO_MIG_FLAG_DEV_SETUP_STATE:
-> +        {
-> +            data =3D qemu_get_be64(f);
-> +            if (data =3D=3D VFIO_MIG_FLAG_END_OF_STATE) {
-> +                return ret;
-> +            } else {
-> +                error_report("%s: SETUP STATE: EOS not found 0x%"PRIx64,
-> +                             vbasedev->name, data);
-> +                return -EINVAL;
-> +            }
-> +            break;
-> +        }
-> +        case VFIO_MIG_FLAG_DEV_DATA_STATE:
-> +        {
-> +            VFIORegion *region =3D &migration->region;
-> +            void *buf =3D NULL;
-> +            bool buffer_mmaped =3D false;
-> +            uint64_t data_offset =3D 0;
-> +
-> +            data_size =3D qemu_get_be64(f);
-> +            if (data_size =3D=3D 0) {
-> +                break;
-
-We're not writing data_size =3D 0 to the migration region, so these
-aren't used to synchronization, why are we writing them into the
-migration stream?
-
-> +            }
-> +
-> +            ret =3D pread(vbasedev->fd, &data_offset, sizeof(data_offset=
-),
-> +                        region->fd_offset +
-> +                        offsetof(struct vfio_device_migration_info,
-> +                        data_offset));
-> +            if (ret !=3D sizeof(data_offset)) {
-> +                error_report("%s:Failed to get migration buffer data off=
-set %d",
-> +                             vbasedev->name, ret);
-> +                return -EINVAL;
-> +            }
-> +
-> +            if (region->mmaps) {
-> +                buf =3D find_data_region(region, data_offset, data_size)=
-;
-> +            }
-> +
-> +            buffer_mmaped =3D (buf !=3D NULL) ? true : false;
-> +
-> +            if (!buffer_mmaped) {
-> +                buf =3D g_try_malloc0(data_size);
-> +                if (!buf) {
-> +                    error_report("%s: Error allocating buffer ", __func_=
-_);
-> +                    return -ENOMEM;
-> +                }
-> +            }
-> +
-> +            qemu_get_buffer(f, buf, data_size);
-> +
-> +            if (!buffer_mmaped) {
-> +                ret =3D pwrite(vbasedev->fd, buf, data_size,
-> +                             region->fd_offset + data_offset);
-> +                g_free(buf);
-> +
-> +                if (ret !=3D data_size) {
-> +                    error_report("%s: Failed to set migration buffer %d"=
-,
-> +                                 vbasedev->name, ret);
-> +                    return -EINVAL;
-> +                }
-> +            }
-
-Also assumes the entire data chunk with either mmap'd or not mmap'd,
-which is not specified in our API.  Also susceptible to potentially
-massive allocations.  The vendor driver can dictate the sequence of
-writing data to the device, but it cannot dictate that QEMU sends an
-arbitrarily sized contiguous chunk of data.  I think this gives the
-vendor driver too much control of the migration responsiveness.  For
-instance, QEMU should be able to say this device only gets a 100MB
-chunk in the data stream at a time in order to play fairly with other
-devices and have a deterministic iteration interval.
-
-> +
-> +            ret =3D pwrite(vbasedev->fd, &data_size, sizeof(data_size),
-> +                         region->fd_offset +
-> +                       offsetof(struct vfio_device_migration_info, data_=
-size));
-> +            if (ret !=3D sizeof(data_size)) {
-> +                error_report("%s: Failed to set migration buffer data si=
-ze %d",
-> +                             vbasedev->name, ret);
-> +                if (!buffer_mmaped) {
-> +                    g_free(buf);
-> +                }
-> +                return -EINVAL;
-> +            }
-> +
-> +            trace_vfio_load_state_device_data(vbasedev->name, data_offse=
-t,
-> +                                              data_size);
-> +            break;
-> +        }
-> +        }
-> +
-> +        ret =3D qemu_file_get_error(f);
-> +        if (ret) {
-> +            return ret;
-> +        }
-> +        data =3D qemu_get_be64(f);
-> +    }
-> +
-> +    return ret;
-> +}
-> +
->  static SaveVMHandlers savevm_vfio_handlers =3D {
->      .save_setup =3D vfio_save_setup,
->      .save_cleanup =3D vfio_save_cleanup,
->      .save_live_pending =3D vfio_save_pending,
->      .save_live_iterate =3D vfio_save_iterate,
->      .save_live_complete_precopy =3D vfio_save_complete_precopy,
-> +    .load_setup =3D vfio_load_setup,
-> +    .load_cleanup =3D vfio_load_cleanup,
-> +    .load_state =3D vfio_load_state,
+>  VFIOGroupList vfio_group_list =3D
+>      QLIST_HEAD_INITIALIZER(vfio_group_list);
+> @@ -288,6 +290,28 @@ const MemoryRegionOps vfio_region_ops =3D {
 >  };
 > =20
->  /* ---------------------------------------------------------------------=
-- */
+>  /*
+> + * Device state interfaces
+> + */
+> +
+> +static bool vfio_devices_are_stopped_and_saving(void)
+> +{
+> +    VFIOGroup *group;
+> +    VFIODevice *vbasedev;
+> +
+> +    QLIST_FOREACH(group, &vfio_group_list, next) {
+> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
+> +            if ((vbasedev->device_state & VFIO_DEVICE_STATE_SAVING) &&
+> +                !(vbasedev->device_state & VFIO_DEVICE_STATE_RUNNING)) {
+
+(device_state & MASK) =3D=3D SAVING
+
+> +                continue;
+
+Kind of silly to have a continue rather than just changing the polarity
+of the test so that we only branch into the return case.
+
+> +            } else {
+> +                return false;
+> +            }
+> +        }
+> +    }
+> +    return true;
+> +}
+> +
+> +/*
+>   * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x=
+86
+>   */
+>  static int vfio_dma_unmap(VFIOContainer *container,
+> @@ -813,9 +837,88 @@ static void vfio_listener_region_del(MemoryListener =
+*listener,
+>      }
+>  }
+> =20
+> +static int vfio_get_dirty_bitmap(VFIOContainer *container,
+> +                                 MemoryRegionSection *section)
+> +{
+> +    struct vfio_iommu_type1_dirty_bitmap range;
+> +    uint64_t bitmap_size;
+> +    int ret;
+> +
+> +    range.argsz =3D sizeof(range);
+> +
+> +    if (memory_region_is_iommu(section->mr)) {
+> +        VFIOGuestIOMMU *giommu;
+> +        IOMMUTLBEntry iotlb;
+> +
+> +        QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+> +            if (MEMORY_REGION(giommu->iommu) =3D=3D section->mr &&
+> +                giommu->n.start =3D=3D section->offset_within_region) {
+> +                break;
+> +            }
+> +        }
+> +
+> +        if (!giommu) {
+> +            return -EINVAL;
+> +        }
+> +
+> +        iotlb =3D address_space_get_iotlb_entry(container->space->as,
+> +                       TARGET_PAGE_ALIGN(section->offset_within_address_=
+space),
+> +                       true, MEMTXATTRS_UNSPECIFIED);
+> +        range.iova =3D iotlb.iova + giommu->iommu_offset;
+> +        range.size =3D iotlb.addr_mask + 1;
+> +    } else {
+> +        range.iova =3D TARGET_PAGE_ALIGN(section->offset_within_address_=
+space);
+> +        range.size =3D int128_get64(section->size);
+> +    }
+> +
+> +    bitmap_size =3D BITS_TO_LONGS(range.size >> TARGET_PAGE_BITS) *
+> +                                                             sizeof(uint=
+64_t);
+> +
+> +    range.bitmap =3D g_try_malloc0(bitmap_size);
+> +    if (!range.bitmap) {
+> +        error_report("%s: Error allocating bitmap buffer of size 0x%lx",
+> +                     __func__, bitmap_size);
+> +        return -ENOMEM;
+
+We could certainly iterate with a smaller bitmap rather than use a
+single ioctl.  This doesn't seem like it scales well as VM memory size
+increases.
+
+> +    }
+> +
+> +    range.bitmap_size =3D bitmap_size;
+> +
+> +    ret =3D ioctl(container->fd, VFIO_IOMMU_GET_DIRTY_BITMAP, &range);
+> +
+> +    if (!ret) {
+> +        cpu_physical_memory_set_dirty_lebitmap((uint64_t *)range.bitmap,
+> +                       TARGET_PAGE_ALIGN(section->offset_within_address_=
+space),
+> +                       bitmap_size >> TARGET_PAGE_BITS);
+
+
+Like Yan, I think this is relative to the iova address space and needs
+a translation for the vIOMMU case.
+
+> +    } else {
+> +        error_report("VFIO_IOMMU_GET_DIRTY_BITMAP: %d %d", ret, errno);
+> +    }
+> +
+> +    trace_vfio_get_dirty_bitmap(container->fd, range.iova, range.size,
+> +                                bitmap_size);
+> +
+> +    g_free(range.bitmap);
+> +    return ret;
+> +}
+> +
+> +static void vfio_listerner_log_sync(MemoryListener *listener,
+> +        MemoryRegionSection *section)
+> +{
+> +    VFIOContainer *container =3D container_of(listener, VFIOContainer, l=
+istener);
+> +
+> +    if (memory_region_is_ram_device(section->mr)) {
+> +        return;
+> +    }
+> +
+> +    if (vfio_devices_are_stopped_and_saving()) {
+
+I think a comment is necessary here indicating why we're not
+participating in an iterative dirty bitmap sync.  Additionally, how
+will the kernel indicate that we can support real dirty tracking?
+
+> +
+> +        vfio_get_dirty_bitmap(container, section);
+> +    }
+> +}
+> +
+>  static const MemoryListener vfio_memory_listener =3D {
+>      .region_add =3D vfio_listener_region_add,
+>      .region_del =3D vfio_listener_region_del,
+> +    .log_sync =3D vfio_listerner_log_sync,
+>  };
+> =20
+>  static void vfio_listener_release(VFIOContainer *container)
 > diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index bdf40ba368c7..ac065b559f4e 100644
+> index ac065b559f4e..0dd1f2ffe648 100644
 > --- a/hw/vfio/trace-events
 > +++ b/hw/vfio/trace-events
-> @@ -157,3 +157,6 @@ vfio_save_device_config_state(char *name) " (%s)"
->  vfio_save_pending(char *name, uint64_t precopy, uint64_t postcopy, uint6=
-4_t compatible) " (%s) precopy 0x%"PRIx64" postcopy 0x%"PRIx64" compatible =
-0x%"PRIx64
->  vfio_save_iterate(char *name, int data_size) " (%s) data_size %d"
->  vfio_save_complete_precopy(char *name) " (%s)"
-> +vfio_load_device_config_state(char *name) " (%s)"
-> +vfio_load_state(char *name, uint64_t data) " (%s) data 0x%"PRIx64
-> +vfio_load_state_device_data(char *name, uint64_t data_offset, uint64_t d=
+> @@ -160,3 +160,4 @@ vfio_save_complete_precopy(char *name) " (%s)"
+>  vfio_load_device_config_state(char *name) " (%s)"
+>  vfio_load_state(char *name, uint64_t data) " (%s) data 0x%"PRIx64
+>  vfio_load_state_device_data(char *name, uint64_t data_offset, uint64_t d=
 ata_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
+> +vfio_get_dirty_bitmap(int fd, uint64_t iova, uint64_t size, uint64_t bit=
+map_size) "container fd=3D%d, iova=3D0x%"PRIx64" size=3D 0x%"PRIx64" bitmap=
+_size=3D0x%"PRIx64
 
 
