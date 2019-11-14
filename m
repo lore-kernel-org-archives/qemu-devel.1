@@ -2,82 +2,81 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BBCC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:50:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37059C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:55:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85228206D9
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:50:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09CD7206EF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:55:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q7rvV9Uj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85228206D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JaJJJShi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09CD7206EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVCi7-0007c0-Mv
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:50:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53192)
+	id 1iVCmK-0000RK-5d
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:55:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54482)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iVCgR-0006J2-Ud
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:49:05 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iVCle-0008Kx-UG
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:54:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iVCgQ-0000lZ-27
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:49:03 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40440)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iVCgO-0000k9-Ji
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:49:02 -0500
-Received: by mail-wm1-x343.google.com with SMTP id f3so5327300wmc.5
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 02:48:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=sCNrM0KUewjPnIJTZYAPWChoUyattevKxkICTRD/0Wk=;
- b=q7rvV9UjLJeojW3F04vVz1/anaag64AQBrquxctFf/s4ng5z1jSUuEk+c6pKwW9rpX
- 4MG03S70fRCrICrQ1IsKxJp/ioXSDW37IA7gYTEIyo7QXH7VdZ++vpHaLjQw0vL1g0kB
- GqpiukpdtL1HvTDSZiMgSlbRqaad2t5t9eIpKqwsJjxQSV7LkjnM2wk3+jLr5kIplBG9
- gNiN6ZJj30nV2mQra6zKByL6NxLhIHJzR4fuhyFPSS2Xm831Hh8Ql7yU0pyYgs39Ol2S
- 3iadj+pLZoYgly9xPC88GbMbRtCwFdk5aeer6yFzez24qoCFq0ZX0UZMC5zZlc5o8IIb
- D48w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=sCNrM0KUewjPnIJTZYAPWChoUyattevKxkICTRD/0Wk=;
- b=mELB/6yOMRCnjj+6YIT+LW4+BbDsc+LaNNAIFleHo52nBXa1rgXnTZy8My3SfYZotx
- /Lg3KdZ2Jv7UttIRnOdCIyrhP3k+ujAVNmUyP4MFcpQAWjvXgwa4A+tUpJHLvtSFqCle
- 2ff1bY4tRZikP8tswMhIImMtlKQMJ/cecXOKiMt7GGbynExdIOped6et3yxhFBWqXHK5
- E29LoX3slUImXuW3VRX3oMIbWpmG3YjnaXoyV43mwalwViwuNLvFNEa2VFi7dtQPkPbL
- jKey1xsfCiEIrmkg1daIcuB/5UMlj5S7g+oIq2GkRf/g2Fas5MXLUV4nVwDy8lYwVTFn
- 1jNA==
-X-Gm-Message-State: APjAAAXEJ87sTxedAfSACRbruK7mOgkYw5Tg4xgYBl1PWgvPdk3JpJio
- jTsrgnjMGFdvhdLnyhE2dP7swfuZXgIgPR8hOPFLdWfXGHE=
-X-Google-Smtp-Source: APXvYqw6U7xntobzh8dig00GW71aIg3KDucAn82xt8qZvNecynTh1Tx3wRTapiF8CwJzF/vCAnvTg2GfcKAuN76VxMM=
-X-Received: by 2002:a1c:9e10:: with SMTP id h16mr7089306wme.91.1573728537872; 
- Thu, 14 Nov 2019 02:48:57 -0800 (PST)
-MIME-Version: 1.0
-References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
- <1573655945-14912-11-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1573655945-14912-11-git-send-email-pbonzini@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 14 Nov 2019 14:48:45 +0400
-Message-ID: <CAJ+F1CJf_uu0g2T+OYbdv=Yme6Ca_ZGPMM365rp_i2rrk51cuw@mail.gmail.com>
-Subject: Re: [PATCH 10/16] accel: pass object to accel_init_machine
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+ (envelope-from <mlevitsk@redhat.com>) id 1iVCld-0003lk-9n
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:54:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47986
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iVCld-0003l6-2x
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:54:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573728864;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gAWcFBj50Enc2VC3bUrFoF95FC5XConkQl/HifRxdxQ=;
+ b=JaJJJShi94/8v4qR4VmS5onxJWWayAwhrLbzPTuj/qvYp7yBqa+9vrn00pmW21+E1uQdT3
+ yC6GvqoSAjz4dIQK/0hoI3gqyPbcRoZxGAFRFbTHdZzp22nmJi++jWiNMsIKX5ZedW1k4A
+ jihTvs4PcMmCaTii7KEPJDyJF84D3wA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-iJ_DPPqtN9-_UpPe67szYg-1; Thu, 14 Nov 2019 05:54:23 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 024A7800052;
+ Thu, 14 Nov 2019 10:54:22 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 26A55F6E0;
+ Thu, 14 Nov 2019 10:54:16 +0000 (UTC)
+Message-ID: <eec4be0933c4f3e3831f2c574bc237ae77a1fb85.camel@redhat.com>
+Subject: Re: API definition for LUKS key management
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>, Kevin
+ Wolf <kwolf@redhat.com>
+Date: Thu, 14 Nov 2019 12:54:16 +0200
+In-Reply-To: <20191112110227.GN2366658@redhat.com>
+References: <122fc70c802b9a1185e008bf13fb7f078fe70af7.camel@redhat.com>
+ <20191111183424.GR814211@redhat.com>
+ <20191112091245.GB5364@linux.fritz.box>
+ <20191112110227.GN2366658@redhat.com>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: iJ_DPPqtN9-_UpPe67szYg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,93 +88,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ John Ferlan <jferlan@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 13, 2019 at 6:45 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> We will have to set QOM properties before accel_init_machine, based on th=
+On Tue, 2019-11-12 at 11:02 +0000, Daniel P. Berrang=C3=A9 wrote:
+> On Tue, Nov 12, 2019 at 10:12:45AM +0100, Kevin Wolf wrote:
+> > Am 11.11.2019 um 19:34 hat Daniel P. Berrang=C3=A9 geschrieben:
+> > > On Mon, Nov 11, 2019 at 05:58:20PM +0200, Maxim Levitsky wrote:
+> > > > One of the concerns that was raised during the review was that amen=
+d interface for luks that I propose is
+> > > > different from the amend inteface used currently for qcow2.
+> > > >=20
+> > > > qcow2 amend interface specifies all the format options, thus overwr=
+ites the existing options.
+> > > > Thus it seems natural to make the luks amend interface work the sam=
+e way, that it receive an array
+> > > > of 8 slots, and for each slot specify if it is active, and if true =
+what password to put in it.
+> > > > This does allow to add and erase the keyslots, but it doesn't allow=
+:
+> > > >=20
+> > > >    * add a password without knowing all other passwords that exist =
+in existing keyslots
+> > > >      this can be mitigated by specifying which keyslots to modify f=
+or example by omitting the
+> > > >      keyslots that shouldn't be touched from the array (passing nul=
+l placeholder instead)
+> > > >      but then it already doesn't follow the 'specify all the option=
+s each time' principle.
+> > >=20
+> > > I think this is highly undesirable, as we must not assume that the
+> > > mgmt app has access to all the passwords currently set.
+> >=20
+> > And I think this shows the problem that we realy have with the crypto
+> > driver and amend: For every other driver, if you must, you can query th=
 e
-> options provided to -accel.  Construct the object outside it so that it
-> will be possible to insert the iteration between object_new_with_class
-> and accel_init_machine.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > current settings and just write them back.
+> >=20
+> > The difference here is that crypto doesn't allow to directly query or
+> > specify the content of some options (the keyslots), but provides only a
+> > way to derives that content from a secret, and obviously there is no wa=
+y
+> > back from the stored data to the secret (that's what it's for).
+> >=20
+> > I think we have two options here:
+> >=20
+> > 1. Add a special "don't touch this" value for keyslots. Normally, just
+> >    leaving out the value would be suitable syntax for this. Here,
+> >    however, we have a list of keyslots, so we can't leave anything out.
+> >=20
+> >    We could use something like an alternate between str (new secret ID)=
+,
+> >    null (erase keyslot) and empty dict (leave it alone) - the latter
+> >    feels a bit hackish, but maybe it's not too bad. If the list is
+> >    shorter than 8 entries, the rest is assumed to mean "leave it alone"=
+,
+> >    too.
+>=20
+> I'd be very wary of having a "null" vs "empty dict" distinction to
+> mean "erase" vs "don't touch".
+>=20
+> It feels like that is designed to maximise the chances of someone
+> shooting themselves in the foot by accidentally using "null" instead
+> of an "empty dict".
+>=20
+> The reason for the use of "active=3Dyes" / "active=3Dno" is because that
+> was reasonable explicit about wanting to erase a keyslot, and it does
+> does actually map to the key slot on disk which has an "active" field
+> taking two magic values.
+>=20
+> > 2. Allow to query and set the raw key, which doesn't require a password
+>=20
+> I don't think I understand what you mean here. If you don't have a
+> password the only change you can make is to erase key slots.
+Well in the theory the keyslot has the hash of the password, the salt, the =
+hash function
+iteration count and the active field.=20
+
+In theory you can let the user read these values directly and write them ba=
+ck=20
+as is without knowing the password.
+This is very ugly IMHO but will fit the classical amend definition.
 
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>=20
+> > > >    * erase all keyslots matching a password - this is really hard t=
+o do using this approach,
+> > > >      unless we give user some kind of api to try each keyslot with =
+given password,
+> > > >      which is kind of ugly and might be racy as well.
+> > > > So what do you think?
+> > >=20
+> > > The point of using "amend" is that we already have some of the boiler=
+plate
+> > > supporting framework around that, so it saves effort for both QEMU an=
+d
+> > > our users. If the semantics of "amend" don't fit nicely though, then =
+the
+> > > benefit of re-using "amend" is cancelled out and we should go back to
+> > > considering a separate "key-manage" command.
+> >=20
+> > This wouldn't solve the fundamental problem that the crypto block
+> > driver, as it currently is, isn't able to provide a blockdev-amend
+> > callback. It's worse for qcow2 because qcow2 already implements amend.
+> >=20
+> > I think we need to find a solution for the amend API.
+I also think so. Amend interface can be *ahem* amended to be more generic :=
+-)
+Currently it is designed for just one use case.
 
-> ---
->  accel/accel.c          | 6 ++----
->  include/sysemu/accel.h | 2 +-
->  vl.c                   | 4 +++-
->  3 files changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/accel/accel.c b/accel/accel.c
-> index 74eda68..822e945 100644
-> --- a/accel/accel.c
-> +++ b/accel/accel.c
-> @@ -52,11 +52,9 @@ AccelClass *accel_find(const char *opt_name)
->      return ac;
->  }
->
-> -int accel_init_machine(AccelClass *acc, MachineState *ms)
-> +int accel_init_machine(AccelState *accel, MachineState *ms)
->  {
-> -    ObjectClass *oc =3D OBJECT_CLASS(acc);
-> -    const char *cname =3D object_class_get_name(oc);
-> -    AccelState *accel =3D ACCEL(object_new(cname));
-> +    AccelClass *acc =3D ACCEL_GET_CLASS(accel);
->      int ret;
->      ms->accelerator =3D accel;
->      *(acc->allowed) =3D true;
-> diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-> index 90b6213..22cac0f 100644
-> --- a/include/sysemu/accel.h
-> +++ b/include/sysemu/accel.h
-> @@ -67,7 +67,7 @@ typedef struct AccelClass {
->  extern unsigned long tcg_tb_size;
->
->  AccelClass *accel_find(const char *opt_name);
-> -int accel_init_machine(AccelClass *acc, MachineState *ms);
-> +int accel_init_machine(AccelState *accel, MachineState *ms);
->
->  /* Called just before os_setup_post (ie just before drop OS privs) */
->  void accel_setup_post(MachineState *ms);
-> diff --git a/vl.c b/vl.c
-> index 6e406d4..c8ec906 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2846,6 +2846,7 @@ static int do_configure_accelerator(void *opaque, Q=
-emuOpts *opts, Error **errp)
->      bool *p_init_failed =3D opaque;
->      const char *acc =3D qemu_opt_get(opts, "accel");
->      AccelClass *ac =3D accel_find(acc);
-> +    AccelState *accel;
->      int ret;
->
->      if (!ac) {
-> @@ -2853,7 +2854,8 @@ static int do_configure_accelerator(void *opaque, Q=
-emuOpts *opts, Error **errp)
->          error_report("invalid accelerator %s", acc);
->          return 0;
->      }
-> -    ret =3D accel_init_machine(ac, current_machine);
-> +    accel =3D ACCEL(object_new_with_class(OBJECT_CLASS(ac)));
-> +    ret =3D accel_init_machine(accel, current_machine);
->      if (ret < 0) {
->          *p_init_failed =3D true;
->          error_report("failed to initialize %s: %s",
-> --
-> 1.8.3.1
->
->
->
+>=20
+>=20
+> BTW, looking forward to the future, if we ever implement LUKS version 2
+> support there are a bunch more things can be tweaked at runtime. Most
+> notable is that it is possible to change the master key, and change the
+> encryption algorithm choices. Both of these then need to trigger a bulk
+> re-encrypt of the entire disk contents, which takes a long time.
+This is good to know, and would mean that I was right to make blockdev-amen=
+d
+a block job.
+
+This also means that when user wants to tweak some setting, he might not
+want to pass all the keyslots again.
+
+BTW, I guess that to change the master key, user ought to know all password=
+s,
+since each keyslot is basically an encrypted master key. I didn't read the =
+LUKS v2
+spec though.
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+>=20
+> I doubt we'll do this in the near term, but we should consider how this
+> might fit into whatever scheme we pick for updates.
+We might have to since LUKS v2 becomes default in more and more distros,
+so users will eventually expect it be used by us as well.
+
+
+Best regards,
+=09Maxim Levitsky
+
 
