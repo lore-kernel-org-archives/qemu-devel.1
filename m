@@ -2,79 +2,80 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC287C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FB3C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B5C4206EF
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:57:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F2FF206EF
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:58:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oan/iMYB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B5C4206EF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FQvRGwbD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F2FF206EF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVCom-0002uk-MV
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:57:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55052)
+	id 1iVCpz-0003yA-6x
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:58:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55328)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iVCnr-0001ry-8N
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:56:44 -0500
+ (envelope-from <mlevitsk@redhat.com>) id 1iVCpI-0003RI-RL
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:58:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iVCnq-00059B-6J
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:56:43 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34256
+ (envelope-from <mlevitsk@redhat.com>) id 1iVCpH-0005rz-GL
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:58:12 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32367
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iVCnq-00058X-2f
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:56:42 -0500
+ (Exim 4.71) (envelope-from <mlevitsk@redhat.com>) id 1iVCpH-0005rc-D4
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:58:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573729001;
+ s=mimecast20190719; t=1573729091;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2YtrN/VVOUlWCJkOfiVDQ00QtneK6qOyPaV7+Xw8CZ0=;
- b=Oan/iMYBp9eVkIW5Sp7CMIkR8wEFs3sriihN611RUh35H1ccfzJhC/WdrHg66eUkk4470B
- CUn56vj1AQh/Kf1jwNahcebFygAI7EcXmzSTdCSqVV9oLC2m0HFBufu8FKHUSlJD0QFWtj
- w+20VOe+WV9XMfgQZjcKo07XISolSFI=
+ bh=5hrpnXes6d6ykTr9S1TgPkHYSolZ1yNdGO/fi+PjEKY=;
+ b=FQvRGwbDgt734Cr3S0LWH0hAmGmknJ2BPxN36cOTi5Y2VhJFAC2PgPcoXF+4jYEIHefu4P
+ XhL6vVN6VcjEVLJ25/9lQYdWZhE4eEcfKd7aARYvOQQbxHQwah3t1caUoq1vv8MvWSnuvj
+ cUN7rDw1989C+vxhRSwzrXkG9nwlTB0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-M1NzSR3GMLKFjMAWA0uFHg-1; Thu, 14 Nov 2019 05:56:40 -0500
-X-MC-Unique: M1NzSR3GMLKFjMAWA0uFHg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-5-T5zmQ8gENj2pKJupjJp9RA-1; Thu, 14 Nov 2019 05:58:07 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 16E31106BBE2;
- Thu, 14 Nov 2019 10:56:39 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 53A04108F81B;
- Thu, 14 Nov 2019 10:56:37 +0000 (UTC)
-Date: Thu, 14 Nov 2019 10:56:36 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: Status of "vhost-user-blk device backend" mentioned on QEMU wiki
-Message-ID: <20191114105636.GA580024@stefanha-x1.localdomain>
-References: <ac9a9332-4089-f4e0-16e8-43bb165d6310@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <ac9a9332-4089-f4e0-16e8-43bb165d6310@gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D146A186E6E3;
+ Thu, 14 Nov 2019 10:58:06 +0000 (UTC)
+Received: from maximlenovopc.usersys.redhat.com (unknown [10.35.206.33])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3420C60BFB;
+ Thu, 14 Nov 2019 10:58:02 +0000 (UTC)
+Message-ID: <5218a8db9c6abfc0f9102a6e0b693eaf09e57f0e.camel@redhat.com>
+Subject: Re: API definition for LUKS key management
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, "Daniel P." =?ISO-8859-1?Q?Berrang=E9?=
+ <berrange@redhat.com>
+Date: Thu, 14 Nov 2019 12:58:00 +0200
+In-Reply-To: <20191112091245.GB5364@linux.fritz.box>
+References: <122fc70c802b9a1185e008bf13fb7f078fe70af7.camel@redhat.com>
+ <20191111183424.GR814211@redhat.com>
+ <20191112091245.GB5364@linux.fritz.box>
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: T5zmQ8gENj2pKJupjJp9RA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="LZvS9be/3tNcYl/X"
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,44 +87,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bharat Singh <bharatlkmlkvm@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ John Ferlan <jferlan@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---LZvS9be/3tNcYl/X
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Tue, 2019-11-12 at 10:12 +0100, Kevin Wolf wrote:
+> Am 11.11.2019 um 19:34 hat Daniel P. Berrang=C3=A9 geschrieben:
+> > On Mon, Nov 11, 2019 at 05:58:20PM +0200, Maxim Levitsky wrote:
+> > > One of the concerns that was raised during the review was that amend =
+interface for luks that I propose is
+> > > different from the amend inteface used currently for qcow2.
+> > >=20
+> > > qcow2 amend interface specifies all the format options, thus overwrit=
+es the existing options.
+> > > Thus it seems natural to make the luks amend interface work the same =
+way, that it receive an array
+> > > of 8 slots, and for each slot specify if it is active, and if true wh=
+at password to put in it.
+> > > This does allow to add and erase the keyslots, but it doesn't allow:
+> > >=20
+> > >    * add a password without knowing all other passwords that exist in=
+ existing keyslots
+> > >      this can be mitigated by specifying which keyslots to modify for=
+ example by omitting the
+> > >      keyslots that shouldn't be touched from the array (passing null =
+placeholder instead)
+> > >      but then it already doesn't follow the 'specify all the options =
+each time' principle.
+> >=20
+> > I think this is highly undesirable, as we must not assume that the
+> > mgmt app has access to all the passwords currently set.
+>=20
+> And I think this shows the problem that we realy have with the crypto
+> driver and amend: For every other driver, if you must, you can query the
+> current settings and just write them back.
+>=20
+> The difference here is that crypto doesn't allow to directly query or
+> specify the content of some options (the keyslots), but provides only a
+> way to derives that content from a secret, and obviously there is no way
+> back from the stored data to the secret (that's what it's for).
+>=20
+> I think we have two options here:
+>=20
+> 1. Add a special "don't touch this" value for keyslots. Normally, just
+>    leaving out the value would be suitable syntax for this. Here,
+>    however, we have a list of keyslots, so we can't leave anything out.
+>=20
+>    We could use something like an alternate between str (new secret ID),
+>    null (erase keyslot) and empty dict (leave it alone) - the latter
+>    feels a bit hackish, but maybe it's not too bad. If the list is
+>    shorter than 8 entries, the rest is assumed to mean "leave it alone",
+>    too.
+>=20
+> 2. Allow to query and set the raw key, which doesn't require a password
+>=20
+> > The two key use cases for having multiple key slots are
+> >=20
+> >   - To enable a two-phase change of passwords to ensure new password
+> >     is safely written out before erasing the old password
+> >    =20
+> >   - To allow for multiple access passwords with different controls
+> >     or access to when each password is made available.
+> >=20
+> >     eg each VM may have a separate "backup password" securely
+> >     stored off host that is only made available for use when
+> >     doing disaster recovery.
+> >=20
+> > the second use case is doomed if you need to always provide all
+> > current passwords when changing any key slots.
+>=20
+> That providing all current passwords doesn't work is obvious.
 
-On Thu, Nov 14, 2019 at 02:21:44PM +0530, Bharat Singh wrote:
-> I wanted to ask about the status (as in, is someone working on it or is it
-> completed) of "vhost-user-blk device backend" project mentioned on QEMU
-> wiki. If it isn't assigned to anyone, then I'd like to work on it.
+I also want to *emphasise* that not being able to provide all the keyslots
+is the smaller problem here, since it is relatively easy to omit slots that
+should be left untouched.
+The bigger problem is supporting the 'erase all keyslots that match the pas=
+sword'
+That doesn't fit into current amend definition at all.
 
-https://wiki.qemu.org/Internships/ProjectIdeas/VhostUserBlkDeviceBackend
+>=20
+> > >    * erase all keyslots matching a password - this is really hard to =
+do using this approach,
+> > >      unless we give user some kind of api to try each keyslot with gi=
+ven password,
+> > >      which is kind of ugly and might be racy as well.
+> > > So what do you think?
+> >=20
+> > The point of using "amend" is that we already have some of the boilerpl=
+ate
+> > supporting framework around that, so it saves effort for both QEMU and
+> > our users. If the semantics of "amend" don't fit nicely though, then th=
+e
+> > benefit of re-using "amend" is cancelled out and we should go back to
+> > considering a separate "key-manage" command.
+>=20
+> This wouldn't solve the fundamental problem that the crypto block
+> driver, as it currently is, isn't able to provide a blockdev-amend
+> callback. It's worse for qcow2 because qcow2 already implements amend.
+>=20
+> I think we need to find a solution for the amend API.
+>=20
+> Kevin
 
-Kevin: Is this project idea available for someone to work on?
-qemu-storage-daemon seems to be at a stage where your or a colleague
-would be working on vhost-user-blk support, so maybe this idea is
-already taken.
+Best regards,
+=09Maxim Levitsky
 
-Stefan
-
---LZvS9be/3tNcYl/X
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3NMuQACgkQnKSrs4Gr
-c8hytgf+K8u5zyytqz9UpNRB/tvSGaHeMu4x/r66qxJiIxTzY2Yo7NSK6Q3pBpGC
-wOCdtYbKGZhA9Kr6bHYtw8XTLZ7kE/0nqWVwZ0mVvpi/N8crJWKJCwBj9drjBB0k
-K6X/RW70JdePpMYHQi6yExeIW4QnfDLv7MucS+iDe4rRsH1hgGJGvjX/lWeD8u2o
-YYTd1wkFVsqjtvAc0+k99cJFWZkBStd7UiaZA+a2GtqmVX3xzZaajLNmnREsUyHr
-u0J1L65s8EaOQz5GnjxkRvnHkcl0pNe10mKUn+CHbmntGFVvj/WS9Mt0Bh+6klqg
-xh08tpsFqM+fAmrpZ0wU7W5S+p1JFA==
-=jEK9
------END PGP SIGNATURE-----
-
---LZvS9be/3tNcYl/X--
 
 
