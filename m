@@ -2,83 +2,108 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A23C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 16:16:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F44DC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 16:23:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F50D20672
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 16:16:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30249206DA
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 16:23:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jQQhqisF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F50D20672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFT3DwXs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30249206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVHnC-0004rk-EL
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 11:16:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42577)
+	id 1iVHuB-0007Yc-9j
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 11:23:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44525)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iVHm0-0003sl-Mx
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 11:15:09 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iVHtX-00073u-G0
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 11:22:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iVHlz-00037R-43
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 11:15:08 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45897)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iVHly-00036e-RC
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 11:15:07 -0500
-Received: by mail-ot1-x341.google.com with SMTP id r24so5304884otk.12
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 08:15:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=VwL8QfY+UNehgVpcATaUCRif3W2irHX5KXIWSic+YOI=;
- b=jQQhqisFHaqoHMgogLS2QC4nY8pdITfnqAo1qIgsoP7Qa3gP1QlK9MFMQrS+xKEw2g
- i3ui6k541BETz9T4VGuIAYPEGczhBbkZ2MNt9Cza7vva7VZwjXOb5BDl6PXyrMlp8E65
- cUDD0Ger5QvFNcbzwhO1Hfga2DezelY2BQy6y8JEg1P9QU93vZc2grxik2COYDssBVPu
- 8/J/r41rjHjHEctXihINyIsr4vl8497Mdd8GVLAWt81aBkT+x5yFianYiCJe/U0bIliP
- 1ZBK3MZm8+zurs+MVEbFQIZnVTBphq0SMFDLSfYQxKjBuyuGYCQjxDREvVmoLFtIqSL9
- /SoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=VwL8QfY+UNehgVpcATaUCRif3W2irHX5KXIWSic+YOI=;
- b=t5EOabw8c9/0PKcnunRRjPgq0wZaC5NlDQTHutpGz/4sUKGeUS6VH7XCtFVZdPr7ka
- rQ8w7e1R5qYnuFkJXYxYfttJ4y9O4ZmHoEqfdGDwjw0GFbe/yLN3861fPl6aVjcl9HPa
- hZYszN2+2G3PbrF5yD0/zly6ptBCzyW3lNMij1+amLWaMU9Jn+dzMFGW+TrD/MmsV29h
- TQ2ZTWBDxhmxxKlFscKbH8KL8s9xFie0k1NHZCamMj4GkGM4bX+tBCMsojdJ6WDTxWqc
- 5bvK9v62ewZTgNwDbq1MRZeIWOVt0dYZWiYGgLoXm5ElddYqpwbrDS2L6ePo+RiDCsfV
- WLsg==
-X-Gm-Message-State: APjAAAWxUOS1KHpXy1ji6uQBbP9plCWDm3ZPTPZFWFEJqF9aRAL30Jgl
- J2HVVNnZS/pqFL9R3ZztYZhSJRexgeFLcEMOtPEs2A==
-X-Google-Smtp-Source: APXvYqyeo6X5oTRc7ysuWDBjSOH2MBci27ou1FGmdYAlRQYMrwqeLcqGia/s1dbtkqET9trOpKwMZv3XWelFQI2XZh4=
-X-Received: by 2002:a9d:7ac2:: with SMTP id m2mr8209841otn.135.1573748105609; 
- Thu, 14 Nov 2019 08:15:05 -0800 (PST)
+ (envelope-from <mreitz@redhat.com>) id 1iVHtV-00068T-FH
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 11:22:54 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41606
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iVHtV-00067i-0V
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 11:22:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573748572;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=CxvPVD4ecKDmaSD+HIyK/+qSPSTHAvJZTUrHHaityNI=;
+ b=SFT3DwXsECi2GWJtzBIwQ3t5Vq8htzlmRK9jzxN8bbyjiXzDTE/GiFtYo0tkbn+J9fduH9
+ XoxDy6NwfyiN9TzUwSSCcaBBbsPijfbkXAsO1dQFk0Z7XNmN8a0xy/fCV4qA4lw3igj/VX
+ 5tepOPVf7fq/LzNqsmFJeipF2GimKKg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-rT5vIw9EO9KP6e65P0CRzg-1; Thu, 14 Nov 2019 11:22:48 -0500
+X-MC-Unique: rT5vIw9EO9KP6e65P0CRzg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29F00104ED2B;
+ Thu, 14 Nov 2019 16:22:47 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-117-160.ams2.redhat.com
+ [10.36.117.160])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 519495D6AE;
+ Thu, 14 Nov 2019 16:22:44 +0000 (UTC)
+Subject: Re: [RFC PATCH v2 16/26] qcow2: Add subcluster support to
+ discard_in_l2_slice()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1572125022.git.berto@igalia.com>
+ <8a87fb9b6e73f06dfc1a8aa9f3c0b4c01f2c9fbd.1572125022.git.berto@igalia.com>
+ <814afb3a-c534-f7f9-2366-65c77756cce6@redhat.com>
+ <w51sgmqeals.fsf@maestria.local.igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <876ac3f6-13f4-54bf-3afd-e176528fa7d6@redhat.com>
+Date: Thu, 14 Nov 2019 17:22:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <89ada4b1-ee3d-a512-07c2-9bc1ba5806da@redhat.com>
- <20191024224622.12371-1-keithp@keithp.com> <8736fhm9tw.fsf@linaro.org>
- <87pnik4w9n.fsf@keithp.com>
- <CAFEAcA-g+RkvYjseDE=1Z=gnLum0Cjvn_7bqB3ti+cBq9UZ3Eg@mail.gmail.com>
- <87mudo4owu.fsf@keithp.com>
-In-Reply-To: <87mudo4owu.fsf@keithp.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Nov 2019 16:14:54 +0000
-Message-ID: <CAFEAcA-MRtr9WUpqqwJiX9kc+ybGdgfv7ZB5Tc6_q9xwHwebsQ@mail.gmail.com>
-Subject: Re: [PATCH] Semihost SYS_READC implementation (v4)
-To: Keith Packard <keithp@keithp.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+In-Reply-To: <w51sgmqeals.fsf@maestria.local.igalia.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ahLrnTy0HzgUKd3q498LwK7CgEdw5aeat"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,56 +115,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
+ qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 25 Oct 2019 at 20:15, Keith Packard <keithp@keithp.com> wrote:
-> There seems to be convergence on a pretty simple interface which uses
-> ebreak surrounded by a couple of specific no-ops:
->
->       slli x0, x0, 0x1f
->       ebreak
->       srai x0, x0, 0x7
->
-> There are implementations in rust and openocd, and I've got one for
-> picolibc. The risc-v semihosting code is sitting on a branch in my repo
-> on github:
->
->         https://github.com/keith-packard/qemu/tree/riscv-semihost
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ahLrnTy0HzgUKd3q498LwK7CgEdw5aeat
+Content-Type: multipart/mixed; boundary="NinrSZBmx9xxYXTq2D4aQDkzaGYN5oFfl"
 
-I had an idle glance at this implementation, and this:
+--NinrSZBmx9xxYXTq2D4aQDkzaGYN5oFfl
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-   uint32_t pre = opcode_at(&ctx->base, ctx->base.pc_next - 4);
-   uint32_t ebreak = opcode_at(&ctx->base, ctx->base.pc_next);
-   uint32_t post = opcode_at(&ctx->base, ctx->base.pc_next + 4);
+On 14.11.19 16:33, Alberto Garcia wrote:
+> On Mon 04 Nov 2019 04:07:35 PM CET, Max Reitz wrote:
+>>>          /* First remove L2 entries */
+>>>          qcow2_cache_entry_mark_dirty(s->l2_table_cache, l2_slice);
+>>> -        if (!full_discard && s->qcow_version >=3D 3) {
+>>> +        if (has_subclusters(s)) {
+>>> +            set_l2_entry(s, l2_slice, l2_index + i, 0);
+>>> +            set_l2_bitmap(s, l2_slice, l2_index + i,
+>>> +                          full_discard ? 0 : QCOW_L2_BITMAP_ALL_ZEROES=
+);
+>>
+>> But only for !full_discard, right?
+>=20
+> Hence the conditional operator in my patch, maybe you didn't see it?
 
-(where opcode_at() is a wrapper for cpu_ldl_code()) has
-some unfortunate side effects: if the previous instruction
-is in the previous MMU page, or the following instruction
-is in the next MMU page, you might incorrectly trigger
-an exception (where QEMU will just longjmp straight out of
-the cpu_ldl_code()) if that other page isn't actually mapped
-in the guest's page table. You need to be careful not to access
-code outside the page you're actually on unless you're really
-going to execute it and are OK with it faulting.
+Oops, yep, I was just hung up on the if conditional.
 
-I'm not sure what the best way on QEMU to identify this kind
-of multiple-instruction-sequence is -- Richard might have an
-idea. One approach would be to always take an exception
-(or call a helper function) for the 'ebreak', and then
-distinguish semihosting from other kinds of ebreak by doing
-the load of the preceding/succeeding instructions at runtime
-rather than translate time.
+Max
 
-Does your semihosting spec expect to have the semihosting
-call work if the sequence crosses a page boundary, the
-code is being executed by a userspace process, and one of
-the two pages has been paged out by the OS ?
 
-thanks
--- PMM
+--NinrSZBmx9xxYXTq2D4aQDkzaGYN5oFfl--
+
+--ahLrnTy0HzgUKd3q498LwK7CgEdw5aeat
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3Nf1IACgkQ9AfbAGHV
+z0BWGwf9HU+6hvypH1gTIZpvAueeEstLNMcNAQkA5tV4tZyBsgWynfTNJtkqN9wv
+25p9NEfp43GLzyY/owUDFTi3sIHvK9T9t6EE9UBYZhG7SrlZ9CajMEo8QVf0j4+w
+G7/cMFMWrzldYEa+laQDjJ2s7dnoxv4iiij20I3a7YKH9z0HT4iTtVTtWqOcugom
+yOLCoUt5jZFFkGrQV5y606ZY33afcKzA7ULN3OPIQ0Ykc8nsnNmh72ebG6ovIQXG
+RgUCEvSpPenzB00uUAxmFV5n2h8ZeVZFvO/lr1NSoyhlidUymwlGy34pdzH5Ydrn
+KjYBe3yYd/BGaO6cGa+LYpqVNaI0/w==
+=g3Wy
+-----END PGP SIGNATURE-----
+
+--ahLrnTy0HzgUKd3q498LwK7CgEdw5aeat--
+
 
