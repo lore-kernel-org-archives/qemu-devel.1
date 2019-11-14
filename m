@@ -2,83 +2,80 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20142C43141
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:42:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B35F1C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:46:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E15DD206F0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:42:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 817CD206D9
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:46:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IV9lFwir"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E15DD206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tzf2jT9j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 817CD206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVCZb-0003OZ-Vz
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:42:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51518)
+	id 1iVCdp-0004rt-K8
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:46:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52378)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iVCYa-0002WM-Qk
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:40:57 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iVCcY-0004Fu-QF
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:45:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iVCYZ-0001ix-J4
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:40:56 -0500
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:37311)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iVCYZ-0001iT-Do
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:40:55 -0500
-Received: by mail-ot1-x343.google.com with SMTP id d5so4438571otp.4
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 02:40:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NAcFoLpm2lY8PWtLIZ7Bv4A7T1cwx/EQN8HAql7QP6w=;
- b=IV9lFwir7eY0CFnmXOXejuNc2cQiw4D74E4/DPRFWoSP8coF/RBx8R7NV+6Gn3lTqi
- h3KkNgNQRQJCMdem6VMwQAeTZhUnP9R+ocQyMU8TmEBl+r7la1GGqtfuSI23BbVhXsWo
- 7cNykYHkL+HTmfzvVGkEKt38UtBcSC6a2erLWmqJu82vE6K9VQAnEhWMreQooDRzsQRM
- efatqs2q7oNMEeDBTzcgpyhPxUB250sZo1HJf9bT382bmG9s3+f4cL2oQ1p95GfzjuNi
- qknwQAAZ/+w8YdQAbHYFwumXVgd7r+PJzdN+P8Lsw80hVN2hP1Glyb9l/s7PTbuXcc7D
- 3KgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NAcFoLpm2lY8PWtLIZ7Bv4A7T1cwx/EQN8HAql7QP6w=;
- b=JxpuUZBdXpo9OV/l5IeBUbMixfk4EyH9zWWssrN4jy3DabzvePuDATwmO6hmPj5YlR
- a6wx20/pQRMz0dYcykOYrTgBL+xY5thX80FYslcSHbdZ1VeopX9bfZUi7kJsc5ospiUF
- 5fKYZmcfClhx91iL1iR0DCcUCXsawBSck+at6HQ218i4FFjwAXUy/3Gc72xWAXj4n3so
- /YrWYSaECLTdJu5aW2WAs3QHCZphMtNe5y/ok7n7q1+kd7jPg+VnGZXeE5A0Mw/1pJIf
- UakiccEXu7xCmbhN/IgbksojhUJEOIlgPRm5aM3CpO1IlIBee2A3cReQLwh15n++n0pd
- ux9Q==
-X-Gm-Message-State: APjAAAVZqH4Hc0XTuVhvdElCl6nj38ZCHZuC8kyp7FHxz3TF7Bb/Hgtf
- hQWWthjqDPKwDV26tMEx9KEraKmVcz6QhbOV89GFrg==
-X-Google-Smtp-Source: APXvYqzhecN14jmVhglPmCY23qXkqy0lfbcUMUTbVxhk9bb7CLaA0cwn9tJyGGmMMv50YjUOv75TbeqEVGD7gEB/auQ=
-X-Received: by 2002:a9d:68cc:: with SMTP id i12mr6227962oto.97.1573728054300; 
- Thu, 14 Nov 2019 02:40:54 -0800 (PST)
+ (envelope-from <kwolf@redhat.com>) id 1iVCcX-0006BB-MU
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:45:02 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27937
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iVCcX-00069q-IJ
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:45:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573728300;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8Nt+L7AyynlHy9T0nz927XxE9rIrPjXOPM2Z4p6H8Ts=;
+ b=Tzf2jT9jgOk19uY+bNZPSwCnxUAt/y86o8A337DoL/95irDcEjOuy+KiToRDjpUe6qBkma
+ e+G0ufWIdugMs1Do4eqNwl8R9O9UFmHRbL9jRgNw4W2o6kvLW+EYRmj/c4snYTXMHxxxgb
+ KzZ7disWeIp7DzNGCzXDCMHNCrVufK0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-296-DuUh-PPMPimbBNl6Kza8UA-1; Thu, 14 Nov 2019 05:44:58 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BA70107ACE6;
+ Thu, 14 Nov 2019 10:44:57 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-103.ams2.redhat.com [10.36.117.103])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 82ADF5F762;
+ Thu, 14 Nov 2019 10:44:55 +0000 (UTC)
+Date: Thu, 14 Nov 2019 11:44:54 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [RFC PATCH 00/18] Add qemu-storage-daemon
+Message-ID: <20191114104454.GA5735@linux.fritz.box>
+References: <20191017130204.16131-1-kwolf@redhat.com>
+ <45be7a0c-f6ae-5d18-7297-697311046fbd@virtuozzo.com>
 MIME-Version: 1.0
-References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
- <1573655945-14912-2-git-send-email-pbonzini@redhat.com>
- <2db4f901-65ad-4b80-d309-b8b63330492f@redhat.com>
- <4783e606-19b8-c3c0-08ab-ac84b02af6f4@redhat.com>
- <CAFEAcA_FnfJx=oae5e_KGcmqwyUtM01KeywjpSSa09fu9++sMw@mail.gmail.com>
- <07c6a4ea-1d5b-da75-9fed-3b9e7bb1d193@redhat.com>
-In-Reply-To: <07c6a4ea-1d5b-da75-9fed-3b9e7bb1d193@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Nov 2019 10:40:43 +0000
-Message-ID: <CAFEAcA-9n38=Zg1YuFfy1pS-8Vc8EZD82nPdfYUf2gBAJY8tBA@mail.gmail.com>
-Subject: Re: [PATCH 01/16] memory: do not look at current_machine->accel
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::343
+In-Reply-To: <45be7a0c-f6ae-5d18-7297-697311046fbd@virtuozzo.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: DuUh-PPMPimbBNl6Kza8UA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,31 +87,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: "mreitz@redhat.com" <mreitz@redhat.com>,
+ "pkrempa@redhat.com" <pkrempa@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "armbru@redhat.com" <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 14 Nov 2019 at 10:32, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 14/11/19 11:21, Peter Maydell wrote:
-> >> FlatView #1
-> >>  AS "memory", root: system
-> >>  AS "cpu-memory-0", root: system
-> >>  Root memory region: system
-> >>   0000000000000000-00000000000effff (prio 0, ram): microvm.ram kvm:tcg
-> >>   00000000000f0000-00000000000fffff (prio 0, ram): pc.bios kvm:tcg
-> >>   0000000000100000-0000000007ffffff (prio 0, ram): microvm.ram @0000000000100000 kvm:tcg
-> > Why do we need to print the accelerator name for every
-> > memory region? Isn't it just a global property, or at
-> > least a property of the CPU ?
->
-> Not all regions are registered with the accelerator, in particular not
-> for devices.  So we print it next to regions that are registered.
+Am 24.10.2019 um 15:55 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> This reflects our idea of using qemu binary instead of qemu-img for doing
+> block-layer operations offline.
+>=20
+> What is the practical difference between qemu-storage-daemon and starting
+> qemu binary in stopped state?
 
-Ah, I see -- so it's really saying "this is a kvm memslot"?
+If I'm doing things right, QEMU should be able to do the exact same
+things as the storage daemon (and more). So functionality isn't what
+makes the daemon desirable.
 
-thanks
--- PMM
+One point to consider is that the QEMU binary with a full system
+emulator is (and has to be) relatively heavyweight compared to the
+daemon.
+
+I think libvirt once said they didn't want to use the qemu binary on the
+grounds that it takes too long to start, though I'm not sure if that's
+really an argument. I just did a quick test (qemu with -M none
+-nodefaults -display none) and it's 30 vs. 60 ms on my laptop. I get the
+same factor 2 for RSS.
+
+More interesting is maybe the overhead in terms of binary size and
+dependencies, especially if you need only either the storage daemon _or_
+the QEMU binary (e.g. consider a case where the storage daemon runs in
+one container and the VM in another).
+
+Having two binaries allows to cut down the dependencies, and to some
+extent also the binary size, for both binaries: The storage daemon
+doesn't need anything related to system emulation, UI, network etc., and
+in QEMU we can probably compile out most of the block layer then, which
+gets rid of dependencies like libiscsi, librbd, libgfapi, etc.
+
+As a bonus, this might even reduce the attack surface a little.
+
+So yes, I agree that the storage daemon doesn't offer any functionality
+that QEMU can't offer and we don't have a clear-cut requirement that
+unambiguously calls for a separate storage daemon, but I still see some
+advantage in having two separate binaries.
+
+Another thing to mention is that on IRC, Stefan suggested the other day
+to export block devices from the storage daemon not as vhost-user, but
+using muser instead (i.e. providing a whole PCI device) and exporting
+the existing virtio-blk-pci implementation. This would pull qdev and
+device emulations into the storage daemon. I think that would be the
+point where using the QEMU binary instead might make more sense (and
+maybe compile it twice with different options if need be).
+
+Kevin
+
 
