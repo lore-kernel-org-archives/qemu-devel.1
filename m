@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE75AC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 08:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39B09C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 08:25:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDD182071B
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 08:24:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B0F620715
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 08:25:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dG+R3ipH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDD182071B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjMjaYxi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B0F620715
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVAQW-0005lE-RV
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 03:24:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45298)
+	id 1iVARh-0006kk-3s
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 03:25:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45593)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iVAPn-0005KT-KP
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 03:23:44 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iVAR4-0006HK-Ej
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 03:25:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iVAPm-00042D-Ji
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 03:23:43 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42659)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iVAR3-0004uy-C2
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 03:25:02 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36950)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iVAPm-000422-By
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 03:23:42 -0500
-Received: by mail-wr1-x443.google.com with SMTP id a15so5356080wrf.9
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 00:23:42 -0800 (PST)
+ id 1iVAR3-0004uK-5p
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 03:25:01 -0500
+Received: by mail-wr1-x441.google.com with SMTP id t1so5382747wrv.4
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 00:25:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=GNyxYXtilU5UDYiGiqnRu9UepTLxlAsq7L9c8hYd89I=;
- b=dG+R3ipH2hWcO3rodakJu9JmHC6DGVhrBfOCSOXhlb9ZMAPKOLkkk/JI/+jzga6BjC
- G+LBFVjPcIQsQFvYEVcHsAWz0GOoyMfefdBY7WsnCEqNIJSjQH+47R2pXR6sHlQRfWH/
- 2jmvuAjkeKx3TvItphceQeq8pBxWmHwonD9fcWHpRWe95GZoRQ17lTUBCXRMrZerXUbW
- IcOtvvf63Fey0KhXdMvGeGq2OZ8FKRLTIFpyxPDtsexWHonQFaaLL91EVKSXGLDsFMbs
- AhSoxXFLizcxwpU9Y09gg82mwmuFuq4qCH2aKYwaQsu9aQrg89AV5tWO5U9lKSudEE0M
- TwjQ==
+ bh=r3hSQEjjEKkpLvTQd4S5ltTyv5/WMOj1XCGltmUQwDY=;
+ b=BjMjaYxi/BbF5MJdPSkewQxeP5KNo+jdbT1i9RrVTYL4WMJrxHkzX3E2xElSa1WGhz
+ AOjC0WulTtXT/wzj0UTjw5STWC9jT8l7EPtuVURpiAF3Uyutia8gm5hPRMM5/AFzbruE
+ eoQZSuc+tsV+R0uw1mV2D5L8hLv8fHfeOvDBtddPMK3FTXA8YhAWenPuXZlnxUqrHRgB
+ Yz+1IuRxJBlhLr6OucAootgbXknXNAkkx51OXneIm2/DnT0Pk99b/nnum0s1LCaPOsK0
+ TSKnEnnKy5G0c9XhNBmgefI48Ge/TQe+uUvI7IxkEjxQBAoN7VfA9CWL8W1VHqHyp53v
+ AZXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=GNyxYXtilU5UDYiGiqnRu9UepTLxlAsq7L9c8hYd89I=;
- b=Djh4Kaij6xd5WHI+DYY9HxBZCOdw+cnNZWNRxIhIBVYcpWavmOHnI667yLY6h9SLEN
- 8frRXpquW08M+iiuwxOYTeAFo1vbUTrcSaagcmC7E1iekcmh9RiOcvF6Z78xwvbz39+m
- emqvtPqXF96VUXR6xAQByCVuHeUNbMUrqR02DPLOqgMep4cZT5YyL40V3XqOI7XGNvPz
- JyMDunwTKypWA/J34Axwf1+tsA6m9MXiH1zXr2Ncr9Ves0f2XufMpM2kFZRYcBrQ1cku
- qkcg81h86m43P7LNBYAAM947nGG+pCY0xq65RvdkPg3ewrdlbJTHYwREhxGnQQ9n5Fgm
- vbNQ==
-X-Gm-Message-State: APjAAAVO17geNz1uW/25J9Zz03GBoyriWp34Egb/kV9IJRqqn5EEcvJy
- PTd3dPAGYIrru4o4lmijBzBVG9IYcI3xAuoeKkQ=
-X-Google-Smtp-Source: APXvYqzCGGG9XWmkSJDyHfHpeS4rAdn1EPjamW3AfqDys65yql2UVnfqz8RyDM+o64FfDq7QbOiafwHzKQO6c7anIqI=
-X-Received: by 2002:a5d:6cc3:: with SMTP id c3mr6893192wrc.202.1573719821140; 
- Thu, 14 Nov 2019 00:23:41 -0800 (PST)
+ bh=r3hSQEjjEKkpLvTQd4S5ltTyv5/WMOj1XCGltmUQwDY=;
+ b=YhFlERtqzwo5wpnAiKW5zIMI+P9zrqaqeX35ci+XCZ2RuaFwVrEBW2TUdY0OCrgta4
+ 5Q7GADb81txu52LgQHCh+/NwOrhj3+tIr2vA/GINzMbkPqkA+Qc5nzm8bbO7UZKitnoH
+ RyEQWWueDmgNuDx13Cd9iyqNMP85sVuvDbC7fSVgugKk1FPKJ2u1K0LsANmc6iPTtHGy
+ UTHFnL1Hj8BuPjeEUg1ZXh1j9yhbXtYk0dUFUKpnyhoexy1JSqFCRUggqdknsiDG5thc
+ aXLgydApmgaIOxEPY439OODxbizCxj3Nrq2RkehcmRNAXmWUErxTv15i5Vg0JND3CN9Z
+ My7g==
+X-Gm-Message-State: APjAAAU6ssDbp/YesyW0vqVpAlOoNTt45ZSLmV60KG8CkSvkD1SQ5UMP
+ v/In2xeKXdTOkS9/MT/Im4ATcfwDd7D4zoSpFgvnMjB2
+X-Google-Smtp-Source: APXvYqzu+3KImPBowIOp+i8d8tersVJc5TGLniH1ws3pJmzFki7vH/DmnlpKb0MkVcp/geHLHL4uuUA9Z4BbuNcm0iM=
+X-Received: by 2002:a5d:670a:: with SMTP id o10mr7276362wru.312.1573719900061; 
+ Thu, 14 Nov 2019 00:25:00 -0800 (PST)
 MIME-Version: 1.0
 References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
- <1573655945-14912-6-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1573655945-14912-6-git-send-email-pbonzini@redhat.com>
+ <1573655945-14912-5-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1573655945-14912-5-git-send-email-pbonzini@redhat.com>
 From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Thu, 14 Nov 2019 12:23:28 +0400
-Message-ID: <CAJ+F1CL=m8WfLW2vJ73UTGNpbXBdww7zEtRGt+ri+TjoPd4auA@mail.gmail.com>
-Subject: Re: [PATCH 05/16] vl: introduce object_parse_property_opt
+Date: Thu, 14 Nov 2019 12:24:48 +0400
+Message-ID: <CAJ+F1C+LbrQNhOn7Vhr+9Q9NjW8NPHmjrxqdnGJzAUZ2OfS3WA@mail.gmail.com>
+Subject: Re: [PATCH 04/16] vl: move icount configuration earlier
 To: Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::443
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,91 +95,76 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 13, 2019 at 6:42 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Wed, Nov 13, 2019 at 6:43 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> We will reuse the parsing loop of machine_set_property soon for "-accel",
-> but we do not want the "_" -> "-" conversion since "-accel" can just
-> standardize on dashes.  We will also add a bunch of legacy option handlin=
-g
-> to keep the QOM machine object clean.  Extract the loop into a separate
-> function, and keep the legacy handling in machine_set_property.
+> Once qemu_tcg_configure is turned into a QOM property setter, it will not
+> be able to set a default value for mttcg_enabled.  Setting the default wi=
+ll
+> move to the TCG init_machine method, which currently runs after "-icount"
+> is processed.
+>
+> However, it is harmless to do configure_icount for all accelerators; we w=
+ill
+> just fail later if a non-TCG accelerator being selected.  So do that.
 >
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+
+
 > ---
->  vl.c | 38 +++++++++++++++++++++++---------------
->  1 file changed, 23 insertions(+), 15 deletions(-)
+>  vl.c | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
 >
 > diff --git a/vl.c b/vl.c
-> index dbc99d7..b93217d 100644
+> index fc9e70f..dbc99d7 100644
 > --- a/vl.c
 > +++ b/vl.c
-> @@ -2617,27 +2617,17 @@ static MachineClass *select_machine(void)
->      return machine_class;
->  }
+> @@ -2829,11 +2829,7 @@ static void user_register_global_props(void)
 >
-> -static int machine_set_property(void *opaque,
-> -                                const char *name, const char *value,
-> -                                Error **errp)
-> +static int object_parse_property_opt(Object *obj,
-> +                                     const char *name, const char *value=
-,
-> +                                     const char *skip, Error **errp)
+>  static int do_configure_icount(void *opaque, QemuOpts *opts, Error **err=
+p)
 >  {
-> -    Object *obj =3D OBJECT(opaque);
->      Error *local_err =3D NULL;
-> -    char *p, *qom_name;
->
-> -    if (strcmp(name, "type") =3D=3D 0) {
-> +    if (g_str_equal(name, skip)) {
->          return 0;
->      }
->
-> -    qom_name =3D g_strdup(name);
-> -    for (p =3D qom_name; *p; p++) {
-> -        if (*p =3D=3D '_') {
-> -            *p =3D '-';
-> -        }
+> -    if (tcg_enabled()) {
+> -        configure_icount(opts, errp);
+> -    } else {
+> -        error_setg(errp, "-icount is not allowed with hardware virtualiz=
+ation");
 > -    }
-> -
-> -    object_property_parse(obj, value, qom_name, &local_err);
-> -    g_free(qom_name);
-> +    object_property_parse(obj, value, name, &local_err);
->
->      if (local_err) {
->          error_propagate(errp, local_err);
-> @@ -2647,6 +2637,24 @@ static int machine_set_property(void *opaque,
+> +    configure_icount(opts, errp);
 >      return 0;
 >  }
 >
-> +static int machine_set_property(void *opaque,
-> +                                const char *name, const char *value,
-> +                                Error **errp)
-> +{
-> +    char *qom_name =3D g_strdup(name);
-
-Could use g_autofree, and thus return directly without r.
-
-
-
-> +    char *p;
-> +    int r;
-> +
-> +    for (p =3D qom_name; *p; p++) {
-> +        if (*p =3D=3D '_') {
-> +            *p =3D '-';
-> +        }
-> +    }
-> +
-> +    r =3D object_parse_property_opt(opaque, name, value, "type", errp);
-
-You want to pass qom_name, I guess
-
-> +    g_free(qom_name);
-> +    return r;
-> +}
+> @@ -2854,6 +2850,9 @@ static void configure_accelerators(const char *prog=
+name)
+>      bool init_failed =3D false;
+>      AccelClass *acc =3D NULL;
 >
->  /*
->   * Initial object creation happens before all other
+> +    qemu_opts_foreach(qemu_find_opts("icount"),
+> +                      do_configure_icount, NULL, &error_fatal);
+> +
+>      accel =3D qemu_opt_get(qemu_get_machine_opts(), "accel");
+>      if (accel =3D=3D NULL) {
+>          /* Select the default accelerator */
+> @@ -2901,11 +2900,13 @@ static void configure_accelerators(const char *pr=
+ogname)
+>          error_report("Back to %s accelerator", acc->name);
+>      }
+>
+> -    qemu_opts_foreach(qemu_find_opts("icount"),
+> -                      do_configure_icount, NULL, &error_fatal);
+> -
+>      qemu_opts_foreach(qemu_find_opts("accel"),
+>                        do_configure_accelerator, NULL, &error_fatal);
+> +
+> +    if (!tcg_enabled() && use_icount) {
+> +        error_report("-icount is not allowed with hardware virtualizatio=
+n");
+> +        exit(1);
+> +    }
+>  }
+>
+>  int main(int argc, char **argv, char **envp)
 > --
 > 1.8.3.1
 >
