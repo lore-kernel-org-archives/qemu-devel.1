@@ -7,93 +7,78 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A077C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C67DFC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:17:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0877D206C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:13:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 94BE5206C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 09:17:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iZVOrCck"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0877D206C0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cAuuBD2A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94BE5206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVBCI-0005Jo-6p
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 04:13:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57767)
+	id 1iVBFV-0006vg-K2
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 04:17:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58652)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iVBAh-0003LN-Fs
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:12:13 -0500
+ (envelope-from <armbru@redhat.com>) id 1iVBEY-0006OH-A8
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:16:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iVBAf-0005LP-9u
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:12:11 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32951
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <armbru@redhat.com>) id 1iVBES-0006qI-I6
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:16:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45963
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iVBAf-0005KS-4O
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:12:09 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iVBES-0006q1-Dr
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 04:16:04 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573722727;
+ s=mimecast20190719; t=1573722963;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=W56fz7o7jbEKWc3kRzshq8PY6o3Mvo664Maqk680iks=;
- b=iZVOrCckcsPV6EO+0z79VOktJ4oBXvj4QqP2s4O1DFvakRpPM6WdLRbdcGNcFT+0tIA1A2
- 7v+8fIbS2mv+oNrQahN4EsxLgLlMXCXLH0IR3ynQxKJWhkVAgJ0a4EYxJb9m95KJwTrOqi
- bFMyYmL9EAiK/Hp+hsFffJW8WiBbGuY=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-195-DaX5DEoCNMGTxpeohVnSzA-1; Thu, 14 Nov 2019 04:12:06 -0500
-Received: by mail-qk1-f198.google.com with SMTP id x186so3537678qke.13
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 01:12:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=isNtA0IYg/N18++IW5AY/QA+c+xkdBeRJ7LtqVbPdDY=;
- b=eWS+s8dfMkSOckJcbgQ/rwCBjeLu5zFvMtTzcMOxaR1rfymk83E3MmT0+DqOtztrfL
- VB/VDfNAcszM0I8Y+ouvQbl8GQam8e8TLx2XW7BUC8VYwpTK2dqa2DLd208e69DZTuJ/
- jzfM/3ce1yTu7nKx/JhtJzfA4edwhLTfkNjC519foJvj/cxYDfPKBWYF6+HC1DFOeK/K
- 5tXZdvbGqdNABBGHZJ/crGJxJwOOKjIHJZmfhgFjNS90SzCQBwrwWYMMDr0nxNEa9+cA
- 6HeQ8F3lGI5qO6/Ap2/395S9xD/JyIkmkaIo0aFSG3qfc8bCwHt0X8eZKFw24ECG8d2V
- 1dZQ==
-X-Gm-Message-State: APjAAAXtiPF4l7NOginuMqPCeXTXitbm3WBJ9glXU4ixBJdkYCAYH3Lt
- ZFX15sjCfOCW5Rvp3Kz5MVjCVwmZBesEUN28aEVXe3HEckEKPiJQlBv6dFMwEVm3tFIG7WcI1zx
- UPueGRrnDspaXj/M=
-X-Received: by 2002:ac8:2e57:: with SMTP id s23mr7176459qta.204.1573722726106; 
- Thu, 14 Nov 2019 01:12:06 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy1NX3LYkW0eWLqXOM9GVrohWSR3MEQfIDpzcsCpzJ0CWT7q1tqWTO0LZUbbwZncPXn/exAkw==
-X-Received: by 2002:ac8:2e57:: with SMTP id s23mr7176444qta.204.1573722725797; 
- Thu, 14 Nov 2019 01:12:05 -0800 (PST)
-Received: from redhat.com (bzq-79-176-6-42.red.bezeqint.net. [79.176.6.42])
- by smtp.gmail.com with ESMTPSA id 50sm2990379qtv.88.2019.11.14.01.12.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 14 Nov 2019 01:12:05 -0800 (PST)
-Date: Thu, 14 Nov 2019 04:12:00 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Subject: Re: [PATCH RFC] virtio-pci: disable vring processing when
- bus-mastering is disabled
-Message-ID: <20191114041049-mutt-send-email-mst@kernel.org>
-References: <20191113054301.31529-1-mdroth@linux.vnet.ibm.com>
- <20191113050402-mutt-send-email-mst@kernel.org>
- <157369365636.3335.3099930975683371802@sif>
- <20191114034532-mutt-send-email-mst@kernel.org>
+ bh=xAJbj8VqOT8Z0MJ0eqHMqWI3V+z3oVEWj0LyHM6uBu4=;
+ b=cAuuBD2AX/3WUh9oL4wpagPJJwjBdZxdbSwmDGd7H8NTjc2cSysAI4BqNjCDvZshJ20+wl
+ ZIjDtmdi2BeSZvvXPOWEOjqaiQhAJ8X7xBIgjDek2a5QtiJQLTefHeQppSgOOaoAPfDKCX
+ 3MJvSoh9t0zYz4AcZcvupzTjm3z5w9M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-212-iAphpDCzNJqMrPA3xFO2TA-1; Thu, 14 Nov 2019 04:16:01 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E1569125E;
+ Thu, 14 Nov 2019 09:16:00 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.36.118.123])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D83615C1C3;
+ Thu, 14 Nov 2019 09:15:59 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 637E41138648; Thu, 14 Nov 2019 10:15:58 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 01/14] qapi: Parse numeric values
+References: <20190624173935.25747-1-mreitz@redhat.com>
+ <20190624173935.25747-2-mreitz@redhat.com>
+Date: Thu, 14 Nov 2019 10:15:58 +0100
+In-Reply-To: <20190624173935.25747-2-mreitz@redhat.com> (Max Reitz's message
+ of "Mon, 24 Jun 2019 19:39:21 +0200")
+Message-ID: <87mucyq0mp.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20191114034532-mutt-send-email-mst@kernel.org>
-X-MC-Unique: DaX5DEoCNMGTxpeohVnSzA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: iAphpDCzNJqMrPA3xFO2TA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,377 +90,214 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Nov 14, 2019 at 04:10:36AM -0500, Michael S. Tsirkin wrote:
-> On Wed, Nov 13, 2019 at 07:07:36PM -0600, Michael Roth wrote:
-> > Quoting Michael S. Tsirkin (2019-11-13 04:09:02)
-> > > On Tue, Nov 12, 2019 at 11:43:01PM -0600, Michael Roth wrote:
-> > > > Currently the SLOF firmware for pseries guests will disable/re-enab=
-le
-> > > > a PCI device multiple times via IO/MEM/MASTER bits of PCI_COMMAND
-> > > > register after the initial probe/feature negotiation, as it tends t=
-o
-> > > > work with a single device at a time at various stages like probing
-> > > > and running block/network bootloaders without doing a full reset
-> > > > in-between.
-> > > >=20
-> > > > In QEMU, when PCI_COMMAND_MASTER is disabled we disable the
-> > > > corresponding IOMMU memory region, so DMA accesses (including to vr=
-ing
-> > > > fields like idx/flags) will no longer undergo the necessary
-> > > > translation. Normally we wouldn't expect this to happen since it wo=
-uld
-> > > > be misbehavior on the driver side to continue driving DMA requests.
-> > > >=20
-> > > > However, in the case of pseries, with iommu_platform=3Don, we trigg=
-er the
-> > > > following sequence when tearing down the virtio-blk dataplane ioeve=
-ntfd
-> > > > in response to the guest unsetting PCI_COMMAND_MASTER:
-> > > >=20
-> > > >   #2  0x0000555555922651 in virtqueue_map_desc (vdev=3Dvdev@entry=
-=3D0x555556dbcfb0, p_num_sg=3Dp_num_sg@entry=3D0x7fffe657e1a8, addr=3Daddr@=
-entry=3D0x7fffe657e240, iov=3Diov@entry=3D0x7fffe6580240, max_num_sg=3Dmax_=
-num_sg@entry=3D1024, is_write=3Dis_write@entry=3Dfalse, pa=3D0, sz=3D0)
-> > > >       at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:757
-> > > >   #3  0x0000555555922a89 in virtqueue_pop (vq=3Dvq@entry=3D0x555556=
-dc8660, sz=3Dsz@entry=3D184)
-> > > >       at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:950
-> > > >   #4  0x00005555558d3eca in virtio_blk_get_request (vq=3D0x555556dc=
-8660, s=3D0x555556dbcfb0)
-> > > >       at /home/mdroth/w/qemu.git/hw/block/virtio-blk.c:255
-> > > >   #5  0x00005555558d3eca in virtio_blk_handle_vq (s=3D0x555556dbcfb=
-0, vq=3D0x555556dc8660)
-> > > >       at /home/mdroth/w/qemu.git/hw/block/virtio-blk.c:776
-> > > >   #6  0x000055555591dd66 in virtio_queue_notify_aio_vq (vq=3Dvq@ent=
-ry=3D0x555556dc8660)
-> > > >       at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:1550
-> > > >   #7  0x000055555591ecef in virtio_queue_notify_aio_vq (vq=3D0x5555=
-56dc8660)
-> > > >       at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:1546
-> > > >   #8  0x000055555591ecef in virtio_queue_host_notifier_aio_poll (op=
-aque=3D0x555556dc86c8)
-> > > >       at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:2527
-> > > >   #9  0x0000555555d02164 in run_poll_handlers_once (ctx=3Dctx@entry=
-=3D0x55555688bfc0, timeout=3Dtimeout@entry=3D0x7fffe65844a8)
-> > > >       at /home/mdroth/w/qemu.git/util/aio-posix.c:520
-> > > >   #10 0x0000555555d02d1b in try_poll_mode (timeout=3D0x7fffe65844a8=
-, ctx=3D0x55555688bfc0)
-> > > >       at /home/mdroth/w/qemu.git/util/aio-posix.c:607
-> > > >   #11 0x0000555555d02d1b in aio_poll (ctx=3Dctx@entry=3D0x55555688b=
-fc0, blocking=3Dblocking@entry=3Dtrue)
-> > > >       at /home/mdroth/w/qemu.git/util/aio-posix.c:639
-> > > >   #12 0x0000555555d0004d in aio_wait_bh_oneshot (ctx=3D0x55555688bf=
-c0, cb=3Dcb@entry=3D0x5555558d5130 <virtio_blk_data_plane_stop_bh>, opaque=
-=3Dopaque@entry=3D0x555556de86f0)
-> > > >       at /home/mdroth/w/qemu.git/util/aio-wait.c:71
-> > > >   #13 0x00005555558d59bf in virtio_blk_data_plane_stop (vdev=3D<opt=
-imized out>)
-> > > >       at /home/mdroth/w/qemu.git/hw/block/dataplane/virtio-blk.c:28=
-8
-> > > >   #14 0x0000555555b906a1 in virtio_bus_stop_ioeventfd (bus=3Dbus@en=
-try=3D0x555556dbcf38)
-> > > >       at /home/mdroth/w/qemu.git/hw/virtio/virtio-bus.c:245
-> > > >   #15 0x0000555555b90dbb in virtio_bus_stop_ioeventfd (bus=3Dbus@en=
-try=3D0x555556dbcf38)
-> > > >       at /home/mdroth/w/qemu.git/hw/virtio/virtio-bus.c:237
-> > > >   #16 0x0000555555b92a8e in virtio_pci_stop_ioeventfd (proxy=3D0x55=
-5556db4e40)
-> > > >       at /home/mdroth/w/qemu.git/hw/virtio/virtio-pci.c:292
-> > > >   #17 0x0000555555b92a8e in virtio_write_config (pci_dev=3D0x555556=
-db4e40, address=3D<optimized out>, val=3D1048832, len=3D<optimized out>)
-> > > >       at /home/mdroth/w/qemu.git/hw/virtio/virtio-pci.c:613
-> > > >=20
-> > > > I.e. the calling code is only scheduling a one-shot BH for
-> > > > virtio_blk_data_plane_stop_bh, but somehow we end up trying to proc=
-ess
-> > > > an additional virtqueue entry before we get there. This is likely d=
-ue
-> > > > to the following check in virtio_queue_host_notifier_aio_poll:
-> > > >=20
-> > > >   static bool virtio_queue_host_notifier_aio_poll(void *opaque)
-> > > >   {
-> > > >       EventNotifier *n =3D opaque;
-> > > >       VirtQueue *vq =3D container_of(n, VirtQueue, host_notifier);
-> > > >       bool progress;
-> > > >=20
-> > > >       if (!vq->vring.desc || virtio_queue_empty(vq)) {
-> > > >           return false;
-> > > >       }
-> > > >=20
-> > > >       progress =3D virtio_queue_notify_aio_vq(vq);
-> > > >=20
-> > > > namely the call to virtio_queue_empty(). In this case, since no new
-> > > > requests have actually been issued, shadow_avail_idx =3D=3D last_av=
-ail_idx,
-> > > > so we actually try to access the vring via vring_avail_idx() to get
-> > > > the latest non-shadowed idx:
-> > > >=20
-> > > >   int virtio_queue_empty(VirtQueue *vq)
-> > > >   {
-> > > >       bool empty;
-> > > >       ...
-> > > >=20
-> > > >       if (vq->shadow_avail_idx !=3D vq->last_avail_idx) {
-> > > >           return 0;
-> > > >       }
-> > > >=20
-> > > >       rcu_read_lock();
-> > > >       empty =3D vring_avail_idx(vq) =3D=3D vq->last_avail_idx;
-> > > >       rcu_read_unlock();
-> > > >       return empty;
-> > > >=20
-> > > > but since the IOMMU region has been disabled we get a bogus value (=
-0
-> > > > usually), which causes virtio_queue_empty() to falsely report that
-> > > > there are entries to be processed, which causes errors such as:
-> > > >=20
-> > > >   "virtio: zero sized buffers are not allowed"
-> > > >=20
-> > > > or
-> > > >=20
-> > > >   "virtio-blk missing headers"
-> > > >=20
-> > > > and puts the device in an error state.
-> > > >=20
-> > > > This patch works around the issue by introducing virtio_set_disable=
-d(),
-> > > > which piggy-backs off the vdev->broken flag we already use to bypas=
-s
-> > > > checks like virtio_queue_empty(), and sets/unsets it in response to
-> > > > enabling/disabling bus-mastering.
-> > > >=20
-> > > > NOTES:
-> > > >=20
-> > > >  - It's possible we could also work around this in SLOF by doing a
-> > > >    full reset instead of relying on PCI_COMMAND to enable/disable, =
-but
-> > > >    in any case the QEMU behavior seems wrong.
-> > > >  - This leaves some other oddities in play, like the fact that
-> > > >    DRIVER_OK also gets unset in response to bus-mastering being
-> > > >    disabled, but not restored (however the device seems to continue
-> > > >    working)
-> > > >  - Similarly, we disable the host notifier via
-> > > >    virtio_bus_stop_ioeventfd(), which seems to move the handling ou=
-t
-> > > >    of virtio-blk dataplane and back into the main IO thread, and it
-> > > >    ends up staying there till a reset (but otherwise continues work=
-ing
-> > > >    normally)
-> > > >=20
-> > > > Cc: David Gibson <david@gibson.dropbear.id.au>,
-> > > > Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-> > > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> > > > ---
-> > > >  hw/virtio/virtio-pci.c     | 12 ++++++++----
-> > > >  hw/virtio/virtio.c         |  7 ++++++-
-> > > >  include/hw/virtio/virtio.h |  1 +
-> > > >  3 files changed, 15 insertions(+), 5 deletions(-)
-> > > >=20
-> > > > diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-> > > > index c6b47a9c73..394d409fb9 100644
-> > > > --- a/hw/virtio/virtio-pci.c
-> > > > +++ b/hw/virtio/virtio-pci.c
-> > > > @@ -608,10 +608,14 @@ static void virtio_write_config(PCIDevice *pc=
-i_dev, uint32_t address,
-> > > >          pcie_cap_flr_write_config(pci_dev, address, val, len);
-> > > >      }
-> > > > =20
-> > > > -    if (range_covers_byte(address, len, PCI_COMMAND) &&
-> > > > -        !(pci_dev->config[PCI_COMMAND] & PCI_COMMAND_MASTER)) {
-> > > > -        virtio_pci_stop_ioeventfd(proxy);
-> > > > -        virtio_set_status(vdev, vdev->status & ~VIRTIO_CONFIG_S_DR=
-IVER_OK);
-> > > > +    if (range_covers_byte(address, len, PCI_COMMAND)) {
-> > > > +        if (!(pci_dev->config[PCI_COMMAND] & PCI_COMMAND_MASTER)) =
-{
-> > > > +            virtio_set_disabled(vdev, true);
-> > > > +            virtio_pci_stop_ioeventfd(proxy);
-> > > > +            virtio_set_status(vdev, vdev->status & ~VIRTIO_CONFIG_=
-S_DRIVER_OK);
-> > > > +        } else {
-> > > > +            virtio_set_disabled(vdev, false);
-> > > > +        }
-> > > >      }
-> > > > =20
-> > > >      if (proxy->config_cap &&
-> > > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> > > > index 527df03bfd..46580c357d 100644
-> > > > --- a/hw/virtio/virtio.c
-> > > > +++ b/hw/virtio/virtio.c
-> > > > @@ -2575,6 +2575,11 @@ void virtio_device_set_child_bus_name(VirtIO=
-Device *vdev, char *bus_name)
-> > > >      vdev->bus_name =3D g_strdup(bus_name);
-> > > >  }
-> > > > =20
-> > > > +void virtio_set_disabled(VirtIODevice *vdev, bool disable)
-> > > > +{
-> > > > +    vdev->broken =3D disable;
-> > > > +}
-> > > > +
-> > > >  void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODevice *vdev, const cha=
-r *fmt, ...)
-> > > >  {
-> > > >      va_list ap;
-> > >=20
-> > > Hmm. I think just clear and immediate set of bus master while device =
-was
-> > > not doing any DMA actually should be fine and should not require a
-> > > reset.  Now it's true that right now guests reset first thing which w=
-ill
-> > > clear the broken flag, but I'd say it's wrong to require this specifi=
-c
-> > > order.
-> > > I think the easiest thing is to add a "disabled" flag.
-> >=20
-> > Agreed. Some comments on that below.
-> >=20
-> > >=20
-> > >=20
-> > > > @@ -2588,7 +2593,7 @@ void GCC_FMT_ATTR(2, 3) virtio_error(VirtIODe=
-vice *vdev, const char *fmt, ...)
-> > > >          virtio_notify_config(vdev);
-> > > >      }
-> > > > =20
-> > > > -    vdev->broken =3D true;
-> > > > +    virtio_set_disabled(vdev, true);
-> > > >  }
-> > > > =20
-> > > >  static void virtio_memory_listener_commit(MemoryListener *listener=
-)
-> > > > diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.=
-h
-> > > > index 48e8d04ff6..921945b7e8 100644
-> > > > --- a/include/hw/virtio/virtio.h
-> > > > +++ b/include/hw/virtio/virtio.h
-> > > > @@ -168,6 +168,7 @@ void virtio_init(VirtIODevice *vdev, const char=
- *name,
-> > > >                           uint16_t device_id, size_t config_size);
-> > > >  void virtio_cleanup(VirtIODevice *vdev);
-> > > > =20
-> > > > +void virtio_set_disabled(VirtIODevice *vdev, bool disable);
-> > > >  void virtio_error(VirtIODevice *vdev, const char *fmt, ...) GCC_FM=
-T_ATTR(2, 3);
-> > > > =20
-> > > >  /* Set the child bus name. */
-> > >=20
-> > >=20
-> > > One open question here is cross version migration.
-> > > What exactly happens if we migrate to an old qemu?
-> > > from an old qemu?
-> >=20
-> > Currently vdev->broken is already migrated via a subsection if it is se=
-t.
-> >=20
-> > So, with the current proposed patch I would expect the following:
-> >=20
-> >  old -> new:
-> >    dev->broken set due to proposed virtio_set_disabled():
-> >      - N/A
-> >    dev->broken set due to other/existing reasons:
-> >      - value is migrated, migration succeeds
-> >      - device continues not working until a reset, or bus-mastering
-> >        enabled/re-enabled. (which is good, but also makes me realize
-> >        that a device that was put into broken state for reasons
-> >        other than virtio_set_disabled() should not get 'unbroken'
-> >        simply because bus-master bit was cycled. a separate flag
-> >        is probably needed)
-> >      - PASS
-> >    dev->broken not set:
-> >      - not migrated
-> >      - PASS
-> >  new -> old:
-> >    dev->broken set due to proposed virtio_set_disabled():
-> >      - migration succeeds to any QEMU that already has handling for
-> >        dev->broken.
-> >      - migration fails for any QEMU that doesn't have handling for
-> >        dev->broken as it does now, but will a higher chance of
-> >        triggering
-> >      - device won't work until it is reset. for most guests we will
-> >        probably get a reset before the device is used again anyway. for
-> >        the SLOF case the device will stay broken after bus-mastering
-> >        re-enabled, but that's the case for existing QEMU now anyway
-> >      - PASS, but with increased chance of migration breakage for
-> >        QEMU's that don't have handling for dev->broken.
-> >    dev->broken set due to other/existing reasons:
-> >      - migration succeeds to any QEMU that already has handling for
-> >        dev->broken. device will require a reset as it does now.
-> >      - migration fails for any QEMU that doesn't have handling for
-> >        dev->broken as it does now
-> >      - PASS
-> >    dev->broken not set:
-> >      - not migrated
-> >      - PASS
-> >=20
-> > With a new dev->disabled flag, which we'd likely send using a subsectio=
-n
-> > like with dev->broken, I would expect the following:
-> >=20
-> >  old -> new:
-> >    dev->disabled set:
-> >      - N/A
-> >    dev->disabled not set:
-> >      - not migrated
-> >      - if source disables BM just before migration we will likely go
-> >        into an error state that either sets dev->broken or puts the
-> >        device in some other possibly bad state. either case would requi=
-re
-> >        subsequent reset, just as they would without migration
-> >      - PASS
-> >  new -> old:
-> >    dev->disabled set:
-> >      - migration stream fails
-> >      - FAIL, but as expected, and doesn't seem common currently outside
-> >        of SLOF early-boot else we'd probably have more reports of
-> >        breakage from vring access while BM isn't set.
-> >    dev->broken not set:
-> >      - not migrated
-> >      - PASS
-> >=20
-> > So re-using 'broken' is slightly better from a migration standpoint, bu=
-t
-> > as noted above it is probably wrong to unset 'broken' just because BM b=
-it
-> > gets cycled, so a new 'disabled' flag is probably needed.
-> >=20
-> > We could probably get by with just adding a check for dev->disabled in=
-=20
-> > virtio_queue_empty(), or even earlier in
-> > virtio_queue_host_notifier_aio_poll(), but it seems more proper to also
-> > add it in most of the same places we currently check for dev->broken.
-> >=20
-> > That seems somewhat redundant though, so I think maybe the best approac=
-h
-> > is to:
-> >=20
-> >  - replace most dev->broken checks with checks for dev->disabled
->=20
-> I propose calling an inline functions so we are not tied to a specific
-> field.
->=20
-> >  - set dev->disabled whenever dev->broken gets set
-> >  - add a check in virtio_set_disabled() that only allows us to re-enabl=
-e if
-> >    dev->broken hasn't also been set.
-> >=20
-> > I'll work on a follow-up using that approach if it seems reasonable to
-> > you.
+Max Reitz <mreitz@redhat.com> writes:
 
+> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> ---
+>  tests/qapi-schema/bad-type-int.json      |  1 -
+>  tests/qapi-schema/enum-int-member.json   |  1 -
+>  scripts/qapi/common.py                   | 25 ++++++++++++++++++++----
+>  scripts/qapi/introspect.py               |  2 ++
+>  tests/qapi-schema/bad-type-int.err       |  2 +-
+>  tests/qapi-schema/enum-int-member.err    |  2 +-
+>  tests/qapi-schema/leading-comma-list.err |  2 +-
+>  7 files changed, 26 insertions(+), 9 deletions(-)
+>
+> diff --git a/tests/qapi-schema/bad-type-int.json b/tests/qapi-schema/bad-=
+type-int.json
+> index 56fc6f8126..81355eb196 100644
+> --- a/tests/qapi-schema/bad-type-int.json
+> +++ b/tests/qapi-schema/bad-type-int.json
+> @@ -1,3 +1,2 @@
+>  # we reject an expression with a metatype that is not a string
+> -# FIXME: once the parser understands integer inputs, improve the error m=
+essage
+>  { 'struct': 1, 'data': { } }
+> diff --git a/tests/qapi-schema/enum-int-member.json b/tests/qapi-schema/e=
+num-int-member.json
+> index 6c9c32e149..6958440c6d 100644
+> --- a/tests/qapi-schema/enum-int-member.json
+> +++ b/tests/qapi-schema/enum-int-member.json
+> @@ -1,3 +1,2 @@
+>  # we reject any enum member that is not a string
+> -# FIXME: once the parser understands integer inputs, improve the error m=
+essage
+>  { 'enum': 'MyEnum', 'data': [ 1 ] }
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index d61bfdc526..3396ea4a09 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -498,6 +498,8 @@ class QAPISchemaParser(object):
+>              raise QAPISemError(info, "Unknown pragma '%s'" % name)
+> =20
+>      def accept(self, skip_comment=3DTrue):
+> +        num_match =3D re.compile(r'([-+]?inf|nan|[-+0-9.][0-9a-f.ex]*)')
+> +
+>          while True:
+>              self.tok =3D self.src[self.cursor]
+>              self.pos =3D self.cursor
 
-Also, since the new field is not migrated anyway, how about a flag
-that old machine types set, and behave the way we do now?
-> >=20
-> > Thanks!
-> >=20
-> > >=20
-> > > > --=20
-> > > > 2.17.1
-> > >=20
+This is yet another extension over plain JSON.  RFC 8259:
+
+      number =3D [ minus ] int [ frac ] [ exp ]
+      decimal-point =3D %x2E       ; .
+      digit1-9 =3D %x31-39         ; 1-9
+      e =3D %x65 / %x45            ; e E
+      exp =3D e [ minus / plus ] 1*DIGIT
+      frac =3D decimal-point 1*DIGIT
+      int =3D zero / ( digit1-9 *DIGIT )
+      minus =3D %x2D               ; -
+      plus =3D %x2B                ; +
+      zero =3D %x30                ; 0
+
+Extensions are acceptable when we have an actual use for it, and we
+document them properly.
+
+Isn't the parenthesis in your regular expression redundant?
+
+What use do you have in mind for 'inf' and 'nan'?
+
+Why accept leading '+' as in '+123'?
+
+Why accept empty integral part as in '.123'?
+
+Why accept '.xe.'?  Kidding you, that must be a bug in your regexp.
+Please decide what number syntax you'd like to accept, then specify it
+in docs/devel/qapi-code-gen.txt, so we can first discuss the
+specification, and then check the regexp implements it.
+
+docs/devel/qapi-code-gen.txt update goes here:
+
+    =3D=3D=3D Schema syntax =3D=3D=3D
+
+    Syntax is loosely based on JSON (http://www.ietf.org/rfc/rfc8259.txt).
+    Differences:
+
+    * Comments: start with a hash character (#) that is not part of a
+      string, and extend to the end of the line.
+
+    * Strings are enclosed in 'single quotes', not "double quotes".
+
+    * Strings are restricted to printable ASCII, and escape sequences to
+      just '\\'.
+
+--> * Numbers and null are not supported.
+
+Hrmm, commit 9d55380b5a "qapi: Remove null from schema language" left
+two instances in error messages behind.  I'll fix them.
+
+> @@ -584,7 +586,22 @@ class QAPISchemaParser(object):
+>                      return
+>                  self.line +=3D 1
+>                  self.line_pos =3D self.cursor
+> -            elif not self.tok.isspace():
+> +            elif self.tok.isspace():
+> +                pass
+> +            elif num_match.match(self.src[self.pos:]):
+> +                match =3D num_match.match(self.src[self.pos:]).group(0)
+
+Sadly, the walrus operator is Python 3.8.
+
+> +                try:
+> +                    self.val =3D int(match, 0)
+> +                except ValueError:
+> +                    try:
+> +                        self.val =3D float(match)
+> +                    except ValueError:
+> +                        raise QAPIParseError(self,
+> +                                '"%s" is not a valid integer or float' %=
+ match)
+> +
+> +                self.cursor +=3D len(match) - 1
+> +                return
+> +            else:
+>                  raise QAPIParseError(self, 'Stray "%s"' % self.tok)
+
+Any particular reason for putting the number case last?
+
+> =20
+>      def get_members(self):
+> @@ -617,9 +634,9 @@ class QAPISchemaParser(object):
+>          if self.tok =3D=3D ']':
+>              self.accept()
+>              return expr
+> -        if self.tok not in "{['tfn":
+> +        if self.tok not in "{['tfn-+0123456789.i":
+
+This is getting a bit ugly.  Let's not worry about it now.
+
+>              raise QAPIParseError(self, 'Expected "{", "[", "]", string, =
+'
+> -                                 'boolean or "null"')
+> +                                 'boolean, number or "null"')
+>          while True:
+>              expr.append(self.get_expr(True))
+>              if self.tok =3D=3D ']':
+> @@ -638,7 +655,7 @@ class QAPISchemaParser(object):
+>          elif self.tok =3D=3D '[':
+>              self.accept()
+>              expr =3D self.get_values()
+> -        elif self.tok in "'tfn":
+> +        elif self.tok in "'tfn-+0123456789.i":
+>              expr =3D self.val
+>              self.accept()
+>          else:
+> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+> index f62cf0a2e1..6a61dd831f 100644
+> --- a/scripts/qapi/introspect.py
+> +++ b/scripts/qapi/introspect.py
+> @@ -57,6 +57,8 @@ def to_qlit(obj, level=3D0, suppress_first_indent=3DFal=
+se):
+>          ret +=3D indent(level) + '}))'
+>      elif isinstance(obj, bool):
+>          ret +=3D 'QLIT_QBOOL(%s)' % ('true' if obj else 'false')
+> +    elif isinstance(obj, int) and obj >=3D -(2 ** 63) and obj < 2 ** 63:
+> +        ret +=3D 'QLIT_QNUM(%i)' % obj
+
+Please explain the range check.
+
+>      else:
+>          assert False                # not implemented
+>      if level > 0:
+> diff --git a/tests/qapi-schema/bad-type-int.err b/tests/qapi-schema/bad-t=
+ype-int.err
+> index da89895404..e22fb4f655 100644
+> --- a/tests/qapi-schema/bad-type-int.err
+> +++ b/tests/qapi-schema/bad-type-int.err
+> @@ -1 +1 @@
+> -tests/qapi-schema/bad-type-int.json:3:13: Stray "1"
+> +tests/qapi-schema/bad-type-int.json:2: 'struct' key must have a string v=
+alue
+
+Test needs a rename, assuming it's not redundant now.
+
+> diff --git a/tests/qapi-schema/enum-int-member.err b/tests/qapi-schema/en=
+um-int-member.err
+> index 071c5213d8..112175f79d 100644
+> --- a/tests/qapi-schema/enum-int-member.err
+> +++ b/tests/qapi-schema/enum-int-member.err
+> @@ -1 +1 @@
+> -tests/qapi-schema/enum-int-member.json:3:31: Stray "1"
+> +tests/qapi-schema/enum-int-member.json:2: Member of enum 'MyEnum' requir=
+es a string name
+
+This one's name is still good.
+
+> diff --git a/tests/qapi-schema/leading-comma-list.err b/tests/qapi-schema=
+/leading-comma-list.err
+> index f5c870bb9c..fa9c80aa57 100644
+> --- a/tests/qapi-schema/leading-comma-list.err
+> +++ b/tests/qapi-schema/leading-comma-list.err
+> @@ -1 +1 @@
+> -tests/qapi-schema/leading-comma-list.json:2:13: Expected "{", "[", "]", =
+string, boolean or "null"
+> +tests/qapi-schema/leading-comma-list.json:2:13: Expected "{", "[", "]", =
+string, boolean, number or "null"
 
 
