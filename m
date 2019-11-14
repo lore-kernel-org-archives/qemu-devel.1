@@ -2,81 +2,96 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3B1C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 13:45:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A514C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 13:45:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5E8C206F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 13:45:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KYp4YTq4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5E8C206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3064A206F4
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 13:45:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3064A206F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVFQi-0006bf-D8
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 08:45:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36094)
+	id 1iVFRF-00078K-Pr
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 08:45:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36211)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iVFOC-0004th-GN
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:42:25 -0500
+ (envelope-from <pasic@linux.ibm.com>) id 1iVFOf-0005K7-EF
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:42:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iVFOB-0002XL-5x
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:42:24 -0500
-Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:39573)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iVFOA-0002Wk-R5
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:42:23 -0500
-Received: by mail-ot1-x344.google.com with SMTP id w24so4381118otk.6
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 05:42:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=4GAnBww2X6cSXG0HbjYAqPKGo6hRQcAfSHD72VPTYQ4=;
- b=KYp4YTq4x3brN9zCcjIeUbtg9BhpH104DSnRlYMeVabuwbXp8YBG0tSZ48kqVAI9aq
- sRQAfV70uDk/Ucumc3CbwWooC6FZqE1KeIotRQ+K6x5ejgfUBoP6Vj2bgqdhWJTGWbJ4
- 52B60jiYT/+Xh2bvCDDFLOyvdRbLVA2hCGtyltUOmhgPTx59+BGN7SP5yqNv2o13vkMv
- Y519gQts8SZBZzfAVOxAmrb0H88F/rAagE7xk7ciy1MTv9sSNgCM14gi2hYi5uFIu9vK
- WpXuTAM4LeoTw96R2JqPdmp+slxeZvltMxblIxjtYCTV69wsHuMj4H8FKMNf6/oKYieL
- cuNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=4GAnBww2X6cSXG0HbjYAqPKGo6hRQcAfSHD72VPTYQ4=;
- b=KKU0F56yH5EAMUmg7vy1KhzCVW8+MX6yO8CTCt++eL5wHDgL6YpYr12Uv3LoDjS3wL
- b2SwhlUxM1oalamw1AxDk8cE1nEIc2y/sZxTpjoWkNhI+Z65l4RdWj2m2o8G9oKJ2UGE
- 9jUPQuiFLcvLlqg8uqHoHjreRR9+vYO3JKCQYg5NRAwm5fsCOyFyQPm+6X4Xfh/U8nrD
- LJOWypTHXiRKvtUXBORsZQzmDXfybCoKaRaqWLF911HjpDiUQRSIcM9n7aw4zYbzIVh+
- LqpCIw3bhGdpPxigEk1Gl3UASMPnnFYO4k1VPTF9edDHl/BZOe8PPc5xqtuY1mLzxm2U
- /Rpg==
-X-Gm-Message-State: APjAAAWmwksLfRvM6ZRQo+Mpo082mxXYC3nk0WOHTVTqkR9yks7QUl2t
- b6jiL9ODTGwX5A+FQ8cwtrvdXsC1UVv6LejseYY+jQ==
-X-Google-Smtp-Source: APXvYqwnJAobQXpf9sTudr+vXOxZkOd1zAas3fJYXxBx0aBejwLLc2ysXHuC+46wK7E471EeROrEa6g6R5s8w02aTWs=
-X-Received: by 2002:a9d:68cc:: with SMTP id i12mr6755559oto.97.1573738941582; 
- Thu, 14 Nov 2019 05:42:21 -0800 (PST)
+ (envelope-from <pasic@linux.ibm.com>) id 1iVFOd-0002vA-HT
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:42:53 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60924)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1iVFOc-0002uc-6l
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:42:50 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ xAEDg2xZ101417
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 08:42:49 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2w92jm2ad0-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 08:42:47 -0500
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+ Thu, 14 Nov 2019 13:42:40 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 14 Nov 2019 13:42:38 -0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAEDgbZQ52625610
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 14 Nov 2019 13:42:37 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4765052050;
+ Thu, 14 Nov 2019 13:42:37 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.41])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E9E235204E;
+ Thu, 14 Nov 2019 13:42:36 +0000 (GMT)
+Date: Thu, 14 Nov 2019 14:42:35 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v1] s390x: kvm-unit-tests: a PONG device for Sub
+ Channels tests
+In-Reply-To: <20191114141915.6dd5b9c8.cohuck@redhat.com>
+References: <1573671753-15115-1-git-send-email-pmorel@linux.ibm.com>
+ <20191114113823.5d752648.cohuck@redhat.com>
+ <20191114140235.30a788d6.pasic@linux.ibm.com>
+ <20191114141915.6dd5b9c8.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20191104115228.30745-1-graf@amazon.com>
- <CAFEAcA8zkR_MZ-28Nc=x4j05U9MsFYfzQtkHxTf65ZwacK020w@mail.gmail.com>
- <246a7cd4-7c39-c92e-05c3-1045bca2c114@amazon.com>
- <CAFEAcA_kwscZRqK5wTRu5WLkixGYbdV0c7mZMV6n+40DOS0-Mg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_kwscZRqK5wTRu5WLkixGYbdV0c7mZMV6n+40DOS0-Mg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Nov 2019 13:42:10 +0000
-Message-ID: <CAFEAcA8HwRNd+Mg91RJ1DpiyoNJKBWHjFT_Te16xTV5P7wV_ug@mail.gmail.com>
-Subject: Re: [PATCH] pl031: Expose RTCICR as proper WC register
-To: Alexander Graf <graf@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::344
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19111413-0008-0000-0000-0000032EFE3C
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111413-0009-0000-0000-00004A4E0D16
+Message-Id: <20191114144235.3bec510e.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-11-14_03:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911140127
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,58 +103,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Hendrik Borghorst <hborghor@amazon.de>, qemu-arm <qemu-arm@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: thuth@redhat.com, frankja@linux.ibm.com,
+ Pierre Morel <pmorel@linux.ibm.com>, david@redhat.com, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 12 Nov 2019 at 11:57, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On Tue, 12 Nov 2019 at 07:28, Alexander Graf <graf@amazon.com> wrote:
-> > I still think that being consistent with the actual PL031 spec is
-> > preferable though. If any real world guest breaks because of this, we
-> > can still revert this patch and document the exact breakage in the
-> > comment instead.
->
-> Yeah, I agree; I'm essentially just gathering material
-> for the commit message here. (The gold standard would be
-> to go find some hardware with a real pl031 and prod it
-> to confirm behaviour, but that's more effort than really
-> seems justified to me.)
+On Thu, 14 Nov 2019 14:19:15 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-I propose to put this in for 4.2 with an updated commit message:
+> On Thu, 14 Nov 2019 14:02:35 +0100
+> Halil Pasic <pasic@linux.ibm.com> wrote:
+> 
+> > On Thu, 14 Nov 2019 11:38:23 +0100
+> > Cornelia Huck <cohuck@redhat.com> wrote:
+> > 
+> > > On Wed, 13 Nov 2019 20:02:33 +0100
+> > > Pierre Morel <pmorel@linux.ibm.com> wrote:
+> > > 
+> > > Minor nit for $SUBJECT: this isn't a kvm-unit-tests patch, that's just
+> > > one consumer :)  
+> > 
+> > And subchannel is one word in s390-speak.
+> > 
+> > >   
+> > 
+> > [..]
+> > 
+> > > Some questions regarding this device and its intended usage:
+> > > 
+> > > - What are you trying to test? Basic ccw processing, or something more
+> > >   specific? Is there any way you can use the kvm-unit-test
+> > >   infrastructure to test basic processing with an existing device?  
+> > 
+> > I'm also curious about the big picture (what is in scope and what out
+> > of scope). Your design should be evaluated in the light of intended
+> > usage.
+> > 
+> > BTW have you had a look at this abandoned patch-set of mine:
+> > 
+> > https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04220.html
+> 
+> Do you recall why it was abandoned? Or did we just forget to follow up
+> on it?
+> 
 
-===begin===
-    pl031: Expose RTCICR as proper WC register
+I think I do remember. Priorities. Some colleagues were supposed to take
+over the job of making proper tests for this device -- the part that is
+now intended to be played by kvm-uni-tests. But they never got to
+actually start working on it. And my tests for IDA are just a kernel
+module -- i.e. nothing sustainable. So without proper exploitation, and
+with no time to do a proper test suite myself, I decided to not invest
+any more for the time beeing. 
 
-    The current PL031 RTCICR register implementation always clears the
-    IRQ pending status on a register write, regardless of the value the
-    guest writes.
+> > 
+> > We made some different design decisions, while aiming essentially for the
+> > same. Maybe it's due to different scope, maybe not. For instance one
+> > can't test IDA with PONG, I guess.
+> 
+> Now that I saw this again, I also recall the discussion of comparing it
+> with the "testdev" for pci/isa. Anybody knows if these are used by
+> kvm-unit-tests?
+> 
 
-    To justify that behavior, it references the ARM926EJ-S Development
-    Chip Reference Manual (DDI0287B) and indicates that said document
-    states that any write clears the internal IRQ state.  It is indeed
-    true that in section 11.1 this document says:
+I don't.
 
-      "The interrupt is cleared by writing any data value to the
-       interrupt clear register RTCICR".
+Regards,
+Halil
 
-    However, later in section 11.2.2 it contradicts itself by saying:
+> > 
+> > Regards,
+> > Halil
+> > 
+> > > - Who is instantiating this device? Only the kvm-unit-test?
+> > > - Can you instantiate multiple instances? Does that make sense? If yes,
+> > >   it should probably not request a new chpid every time :)
+> > > - What happens if someone instantiates this by hand? The only drawback
+> > >   is that it uses up a subchannel and a chpid, right?
+> > > - Do you plan to make this hotpluggable later?
+> > > 
+> > >   
+> > 
+> 
+> 
 
-      "Writing 1 to bit 0 of RTCICR clears the RTCINTR flag."
-
-    The latter statement matches the PL031 TRM (DDI0224C), which says:
-
-      "Writing 1 to bit position 0 clears the corresponding interrupt.
-       Writing 0 has no effect."
-
-    Let's assume that the self-contradictory DDI0287B is in error, and
-    follow the reference manual for the device itself, by making the
-    register write-one-to-clear.
-===endit===
-
-Is that OK?
-
-thanks
--- PMM
 
