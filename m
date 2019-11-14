@@ -2,89 +2,117 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD24C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 18:51:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CC1C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 18:53:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 998BB206CC
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 18:51:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EFC12071B
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 18:53:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="pANpBAAZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 998BB206CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="AwxxUWRS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EFC12071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVKDI-00018I-P7
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 13:51:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50020)
+	id 1iVKEq-0002sz-Pz
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 13:53:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50616)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwankhede@nvidia.com>) id 1iVKBk-0000Wk-L5
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 13:49:54 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVKDt-00020t-4e
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 13:52:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwankhede@nvidia.com>) id 1iVKBh-0003PL-E6
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 13:49:51 -0500
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:15709)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwankhede@nvidia.com>)
- id 1iVKBf-0003Kx-HM
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 13:49:49 -0500
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by
- hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
- id <B5dcda1cb0000>; Thu, 14 Nov 2019 10:49:47 -0800
-Received: from hqmail.nvidia.com ([172.20.161.6])
- by hqpgpgate101.nvidia.com (PGP Universal service);
- Thu, 14 Nov 2019 10:49:44 -0800
-X-PGP-Universal: processed;
- by hqpgpgate101.nvidia.com on Thu, 14 Nov 2019 10:49:44 -0800
-Received: from [10.25.73.195] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 14 Nov
- 2019 18:49:35 +0000
-Subject: Re: [PATCH v9 Kernel 1/5] vfio: KABI for migration interface for
- device state
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
- <1573578220-7530-2-git-send-email-kwankhede@nvidia.com>
- <20191112153005.53bf324c@x1.home> <20191113112417.6e40ce96.cohuck@redhat.com>
- <20191113112733.49542ebc@x1.home>
- <94592507-fadb-0f10-ee17-f8d5678c70e5@nvidia.com>
- <20191113124818.2b5be89d@x1.home>
- <f0673bfe-7db9-d54d-ce2a-c4b834543478@nvidia.com>
- <20191113134004.528063a9@x1.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <16ecc96d-b88a-1c51-495e-ed7840c50e15@nvidia.com>
-Date: Fri, 15 Nov 2019 00:19:31 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.2
-MIME-Version: 1.0
-In-Reply-To: <20191113134004.528063a9@x1.home>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVKDq-0005J8-PU
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 13:52:04 -0500
+Received: from mail-he1eur04on072b.outbound.protection.outlook.com
+ ([2a01:111:f400:fe0d::72b]:12272
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iVKDo-0005Cx-HM; Thu, 14 Nov 2019 13:52:01 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FH7MUtxQw9U1iYJ4bobmBDct0xNBgsg413eFc3X/Vf++0RyBDScHxljhjfTaFaW7LkZW4JWwu1w6SpK5cdnwDDuVbOCcnX6qMhVO+gYJVezF7A4Rp6jxME7cqmYwyYlsY9mYDIGQv1kenjCFzPhxWrhdLh5UdT/gwkzk9K/vijwoUq0RrypuvDF8PB9xnZ/CHalhGTTjqaQzs61FQU3f82iFl2tMu0xtfPgfNILsa8ls+946zoBPqeqT7b0xXHOajUmwNh4qa7yDMowgwzWCQ+pvpci66O37RRUcHmFZdp5nZGs3D/gu6nnLmhur6kA+fExCcE1jsJufEFiUsBCYTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jbwY32a0gw5/LS7wglPnpg4RGAcvlDZ3qrE/AsQfcZo=;
+ b=ns+UFoVgG9Z43DPJAC9qq5xomSTDcnSdtYNlccd4+PdX28hG/ltPLezJzKQZkuVRknGnL72GwgPejVEHdilc+EDWj1zL5NF7FvmJ8lnK9XBbdg3MQy4SNpe3bthSaZ60p4X/yWErPt0+/bNvU7Iu+MYlEPGQDdhCSlsGOH4VV6pG0Ay48HKhpLjN2b04Mdy9NkMZRh3boxLK6Ggq+wATmZoDjY7xJIVWvN1tsM6wFheKDZSdjnA8uMn3VywXfLOFWZGOVcuzbCTmIBQQOcCmJrMgv6dIHhA1iWc08/cyp5WMzcSTM79ebM/ItMqaf2bzY4pIKULbQiTtfludoxmfNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jbwY32a0gw5/LS7wglPnpg4RGAcvlDZ3qrE/AsQfcZo=;
+ b=AwxxUWRSIdMvDjABKtQkBBtWFOUQMmqcgpRXJvxCmZBdUptoBjznMJk2lyX8u7pmmph75cJSSWfX0vaMjFrTV2nfj1+QGW4b6O2DA8AgxOZRg979wlj9ztuL8lkfWvBfoy36L+12tLUoWjwRsI/ndY/yk5+GYISerSHuTst5xRo=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3352.eurprd08.prod.outlook.com (52.135.167.22) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2430.22; Thu, 14 Nov 2019 18:51:57 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.024; Thu, 14 Nov 2019
+ 18:51:57 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH v2 00/10] Further bitmaps improvements
+Thread-Topic: [PATCH v2 00/10] Further bitmaps improvements
+Thread-Index: AQHViNhxBdlNGPIt3E6XFSYoHa8CdaeLJkuAgAABLYA=
+Date: Thu, 14 Nov 2019 18:51:57 +0000
+Message-ID: <d0039f5d-9877-59f0-218d-a3a8f41e096f@virtuozzo.com>
+References: <20191022125839.12633-1-vsementsov@virtuozzo.com>
+ <4aec835a-a894-03a0-11e4-0407e0f18a84@redhat.com>
+In-Reply-To: <4aec835a-a894-03a0-11e4-0407e0f18a84@redhat.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1573757387; bh=yfdNM4gq1i0ukQQNHQg9PQbNJNOOVRjH78crgJkAs6A=;
- h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
- Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
- X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
- Content-Transfer-Encoding;
- b=pANpBAAZkfeioj/jNBLFraitHv0fp/W975maFpiYnBrzHbJ0ujPWA9WFh4byG9Glm
- 7zipQapWa3CG00H10N8e2LxInlLtCE2oET0MZkr5OwTLeqGMQAFOAtjVSe976WZV25
- 4l1knO73OaBg5UR+mXSiGxQ1KZrDCmeaaTWgXq2ZTSfjl/wK+cEXRSo/onQ9wtDg1v
- UthWrsLDnSIzglbJnXiIBNj3YFR3NMh0CHRSBDwxwWhgeKJHNI7+prVU9r0lQOG8gg
- YxYGjGEvWf44wKLQmu/CjpXvD+/V4u6zOsi3OA42IY3I3qdr9hhmMqYYb7fDYanzFM
- qXpqBSAom1ziw==
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0213.eurprd05.prod.outlook.com
+ (2603:10a6:3:fa::13) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191114215153827
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: bd6b5efd-40c9-46ff-5456-08d76933b977
+x-ms-traffictypediagnostic: AM6PR08MB3352:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB3352E23840EBCACE68606C06C1710@AM6PR08MB3352.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:949;
+x-forefront-prvs: 02213C82F8
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(136003)(396003)(366004)(346002)(39850400004)(199004)(189003)(81156014)(6486002)(81166006)(8936002)(31696002)(6436002)(14454004)(316002)(386003)(6506007)(478600001)(107886003)(53546011)(6512007)(6246003)(36756003)(186003)(52116002)(6116002)(99286004)(86362001)(3846002)(25786009)(4326008)(5660300002)(26005)(7736002)(2906002)(8676002)(31686004)(66556008)(64756008)(66446008)(66946007)(305945005)(66476007)(102836004)(256004)(446003)(486006)(110136005)(54906003)(229853002)(2501003)(476003)(11346002)(2616005)(14444005)(71190400001)(71200400001)(66066001)(76176011);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3352;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Z2hT5jxcwyeB75NpKTX6lonwImp4wZEUox3TkAWl9uQviCtUnlx88L/5jMRD82Ni1F0HuMwWBy1G3oA+oD57ra1APU8gCE+bn0BCS5QZLNS2dmM37NZAkVSIvoNRsTAfQ+kGV7w8Lo2NoIOooPdLeBGvYbWGFPXdzV63wu6lyFeSSBQ+7Cf/kEK1OxaOYcVFl5IR49ivAikUicF/BjAdY8b47nJ05t+dz+jXfbePfG8AyDT79Ad2646wJFM065tqf5P3QGcB9kESf+LC2Z9Su0/KAzGnnoptaBMkTmi9t+jKPLkrH5TC2ImRpFZez3bcPf/yNBhHCGseAli7v+k3OlRN42t+g4TR/RT/iMz+tbTgXSqK0gOboJxUuFoPhXSSo3TpK/wfbMefut1zswwLognjcyh6NgwAdhGd+Gu4s/TH134Z7y3pKMDGBu2K/2nG
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <E756C8957473A0498CDE1432415267C5@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd6b5efd-40c9-46ff-5456-08d76933b977
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Nov 2019 18:51:57.3517 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jfBv9zu/ldxbr9l0zMdyOc+dZ4al4ca9BBf8muNfFnqzoIwTMAc69+mJ3eqIjT46ZVdoR7a1ANTbbHIJ/7o1rLqpQ/Fuodcs1nSG71OWtUo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3352
 X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 216.228.121.143
+X-Received-From: 2a01:111:f400:fe0d::72b
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,315 +124,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengxiao.zx@Alibaba-inc.com, kevin.tian@intel.com, yi.l.liu@intel.com,
- cjia@nvidia.com, kvm@vger.kernel.org, eskultet@redhat.com, ziye.yang@intel.com,
- qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
- shuangtai.tst@alibaba-inc.com, dgilbert@redhat.com, zhi.a.wang@intel.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, aik@ozlabs.ru, eauger@redhat.com,
- felipe@nutanix.com, jonathan.davies@nutanix.com, yan.y.zhao@intel.com,
- changpeng.liu@intel.com, Ken.Xue@amd.com
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "jsnow@redhat.com" <jsnow@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 11/14/2019 2:10 AM, Alex Williamson wrote:
-> On Thu, 14 Nov 2019 01:47:04 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> On 11/14/2019 1:18 AM, Alex Williamson wrote:
->>> On Thu, 14 Nov 2019 00:59:52 +0530
->>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->>>    
->>>> On 11/13/2019 11:57 PM, Alex Williamson wrote:
->>>>> On Wed, 13 Nov 2019 11:24:17 +0100
->>>>> Cornelia Huck <cohuck@redhat.com> wrote:
->>>>>       
->>>>>> On Tue, 12 Nov 2019 15:30:05 -0700
->>>>>> Alex Williamson <alex.williamson@redhat.com> wrote:
->>>>>>      
->>>>>>> On Tue, 12 Nov 2019 22:33:36 +0530
->>>>>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
->>>>>>>          
->>>>>>>> - Defined MIGRATION region type and sub-type.
->>>>>>>> - Used 3 bits to define VFIO device states.
->>>>>>>>        Bit 0 => _RUNNING
->>>>>>>>        Bit 1 => _SAVING
->>>>>>>>        Bit 2 => _RESUMING
->>>>>>>>        Combination of these bits defines VFIO device's state during migration
->>>>>>>>        _RUNNING => Normal VFIO device running state. When its reset, it
->>>>>>>> 		indicates _STOPPED state. when device is changed to
->>>>>>>> 		_STOPPED, driver should stop device before write()
->>>>>>>> 		returns.
->>>>>>>>        _SAVING | _RUNNING => vCPUs are running, VFIO device is running but
->>>>>>>>                              start saving state of device i.e. pre-copy state
->>>>>>>>        _SAVING  => vCPUs are stopped, VFIO device should be stopped, and
->>>>>>>
->>>>>>> s/should/must/
->>>>>>>          
->>>>>>>>                    save device state,i.e. stop-n-copy state
->>>>>>>>        _RESUMING => VFIO device resuming state.
->>>>>>>>        _SAVING | _RESUMING and _RUNNING | _RESUMING => Invalid states
->>>>>>>
->>>>>>> A table might be useful here and in the uapi header to indicate valid
->>>>>>> states:
->>>>>>
->>>>>> I like that.
->>>>>>      
->>>>>>>
->>>>>>> | _RESUMING | _SAVING | _RUNNING | Description
->>>>>>> +-----------+---------+----------+------------------------------------------
->>>>>>> |     0     |    0    |     0    | Stopped, not saving or resuming (a)
->>>>>>> +-----------+---------+----------+------------------------------------------
->>>>>>> |     0     |    0    |     1    | Running, default state
->>>>>>> +-----------+---------+----------+------------------------------------------
->>>>>>> |     0     |    1    |     0    | Stopped, migration interface in save mode
->>>>>>> +-----------+---------+----------+------------------------------------------
->>>>>>> |     0     |    1    |     1    | Running, save mode interface, iterative
->>>>>>> +-----------+---------+----------+------------------------------------------
->>>>>>> |     1     |    0    |     0    | Stopped, migration resume interface active
->>>>>>> +-----------+---------+----------+------------------------------------------
->>>>>>> |     1     |    0    |     1    | Invalid (b)
->>>>>>> +-----------+---------+----------+------------------------------------------
->>>>>>> |     1     |    1    |     0    | Invalid (c)
->>>>>>> +-----------+---------+----------+------------------------------------------
->>>>>>> |     1     |    1    |     1    | Invalid (d)
->>>>>>>
->>>>>>> I think we need to consider whether we define (a) as generally
->>>>>>> available, for instance we might want to use it for diagnostics or a
->>>>>>> fatal error condition outside of migration.
->>>>>>>
->>>>>>> Are there hidden assumptions between state transitions here or are
->>>>>>> there specific next possible state diagrams that we need to include as
->>>>>>> well?
->>>>>>
->>>>>> Some kind of state-change diagram might be useful in addition to the
->>>>>> textual description anyway. Let me try, just to make sure I understand
->>>>>> this correctly:
->>>>>>      
->>>>
->>>> During User application initialization, there is one more state change:
->>>>
->>>> 0) 0/0/0 ---- stop to running -----> 0/0/1
->>>
->>> 0/0/0 cannot be the initial state of the device, that would imply that
->>> a device supporting this migration interface breaks backwards
->>> compatibility with all existing vfio userspace code and that code needs
->>> to learn to set the device running as part of its initialization.
->>> That's absolutely unacceptable.  The initial device state must be 0/0/1.
->>>    
->>
->> There isn't any device state for all existing vfio userspace code right
->> now. So default its assumed to be always running.
-> 
-> Exactly, there is no representation of device state, therefore it's
-> assumed to be running, therefore when adding a representation of device
-> state it must default to running.
-> 
->> With migration support, device states are explicitly getting added. For
->> example, in case of QEMU, while device is getting initialized, i.e. from
->> vfio_realize(), device_state is set to 0/0/0, but not required to convey
->> it to vendor driver.
-> 
-> But we have a 0/0/0 state, why would we intentionally keep an internal
-> state that's inconsistent with the device?
-> 
->> Then with vfio_vmstate_change() notifier, device
->> state is changed to 0/0/1 when VM/vCPU are transitioned to running, at
->> this moment device state is conveyed to vendor driver. So vendor driver
->> doesn't see 0/0/0 state.
-> 
-> But the running state is the state of the device, not the VM or the
-> vCPU.  Sure we might want to stop the device if the VM/vCPU state is
-> stopped, but we must accept that the device is running when it's opened
-> and we shouldn't intentionally maintain inconsistent state.
->   
->> While resuming, for userspace, for example QEMU, device state change is
->> from 0/0/0 to 1/0/0, vendor driver see 1/0/0 after device basic
->> initialization is done.
-> 
-> I don't see why this matters, all device_state transitions are written
-> directly to the vendor driver.  The device is initially in 0/0/1 and
-> can be set to 1/0/0 for resuming with an optional transition through
-> 0/0/0 and the vendor driver can see each state change.
-> 
->>>>>> 1) 0/0/1 ---(trigger driver to start gathering state info)---> 0/1/1
->>>>
->>>> not just gathering state info, but also copy device state to be
->>>> transferred during pre-copy phase.
->>>>
->>>> Below 2 state are not just to tell driver to stop, those 2 differ.
->>>> 2) is device state changed from running to stop, this is when VM
->>>> shutdowns cleanly, no need to save device state
->>>
->>> Userspace is under no obligation to perform this state change though,
->>> backwards compatibility dictates this.
->>>      
->>>>>> 2) 0/0/1 ---(tell driver to stop)---> 0/0/0
->>>>   
->>>>>> 3) 0/1/1 ---(tell driver to stop)---> 0/1/0
->>>>
->>>> above is transition from pre-copy phase to stop-and-copy phase, where
->>>> device data should be made available to user to transfer to destination
->>>> or to save it to file in case of save VM or suspend.
->>>>
->>>>   
->>>>>> 4) 0/0/1 ---(tell driver to resume with provided info)---> 1/0/0
->>>>>
->>>>> I think this is to switch into resuming mode, the data will follow >
->>>>>> 5) 1/0/0 ---(driver is ready)---> 0/0/1
->>>>>> 6) 0/1/1 ---(tell driver to stop saving)---> 0/0/1
->>>>>      
->>>>
->>>> above can occur on migration cancelled or failed.
->>>>
->>>>   
->>>>> I think also:
->>>>>
->>>>> 0/0/1 --> 0/1/0 If user chooses to go directly to stop and copy
->>>>
->>>> that's right, this happens in case of save VM or suspend VM.
->>>>   
->>>>>
->>>>> 0/0/0 and 0/0/1 should be reachable from any state, though I could see
->>>>> that a vendor driver could fail transition from 1/0/0 -> 0/0/1 if the
->>>>> received state is incomplete.  Somehow though a user always needs to
->>>>> return the device to the initial state, so how does device_state
->>>>> interact with the reset ioctl?  Would this automatically manipulate
->>>>> device_state back to 0/0/1?
->>>>
->>>> why would reset occur on 1/0/0 -> 0/0/1 failure?
->>>
->>> The question is whether the reset ioctl automatically puts the device
->>> back into the initial state, 0/0/1.  A reset from 1/0/0 -> 0/0/1
->>> presumably discards much of the device state we just restored, so
->>> clearly that would be undesirable.
->>>      
->>>> 1/0/0 -> 0/0/1 fails, then user should convey that to source that
->>>> migration has failed, then resume at source.
->>>
->>> In the scheme of the migration yet, but as far as the vfio interface is
->>> concerned the user should have a path to make use of a device after
->>> this point without closing it and starting over.  Thus, if a 1/0/0 ->
->>> 0/0/1 transition fails, would we define the device reset ioctl as a
->>> mechanism to flush the bogus state and place the device into the 0/0/1
->>> initial state?
->>>   
->>
->> Ok, userspace applications can be designed to do that. As of now with
->> QEMU, I don't see a way to reset device on 1/0/0-> 0/0/1 failure.
-> 
-> It's simply an ioctl, we must already have access to the device file
-> descriptor to perform the device_state transition.  QEMU is not
-> necessarily the consumer of this behavior though, if transition 1/0/0
-> -> 0/0/1 fails in QEMU, it very well may just exit.  The vfio API
-> should support a defined mechanism to recover the device from this
-> state though, which I propose is the existing reset ioctl, which
-> logically implies that any device reset returns the device_state to
-> 0/0/1.
-> 
-
-Ok.
-
->>> >>> Not sure about the usefulness of 2).
->>>>
->>>> I explained this above.
->>>>   
->>>>>> Also, is 4) the only way to
->>>>>> trigger resuming?
->>>> Yes.
->>>>   
->>>>>> And is the change in 5) performed by the driver, or
->>>>>> by userspace?
->>>>>>      
->>>> By userspace.
->>>>   
->>>>>> Are any other state transitions valid?
->>>>>>
->>>>>> (...)
->>>>>>      
->>>>>>>> + * Sequence to be followed for _SAVING|_RUNNING device state or pre-copy phase
->>>>>>>> + * and for _SAVING device state or stop-and-copy phase:
->>>>>>>> + * a. read pending_bytes. If pending_bytes > 0, go through below steps.
->>>>>>>> + * b. read data_offset, indicates kernel driver to write data to staging buffer.
->>>>>>>> + *    Kernel driver should return this read operation only after writing data to
->>>>>>>> + *    staging buffer is done.
->>>>>>>
->>>>>>> "staging buffer" implies a vendor driver implementation, perhaps we
->>>>>>> could just state that data is available from (region + data_offset) to
->>>>>>> (region + data_offset + data_size) upon return of this read operation.
->>>>>>>          
->>>>>>>> + * c. read data_size, amount of data in bytes written by vendor driver in
->>>>>>>> + *    migration region.
->>>>>>>> + * d. read data_size bytes of data from data_offset in the migration region.
->>>>>>>> + * e. process data.
->>>>>>>> + * f. Loop through a to e. Next read on pending_bytes indicates that read data
->>>>>>>> + *    operation from migration region for previous iteration is done.
->>>>>>>
->>>>>>> I think this indicate that step (f) should be to read pending_bytes, the
->>>>>>> read sequence is not complete until this step.  Optionally the user can
->>>>>>> then proceed to step (b).  There are no read side-effects of (a) afaict.
->>>>>>>
->>>>>>> Is the use required to reach pending_bytes == 0 before changing
->>>>>>> device_state, particularly transitioning to !_RUNNING?  Presumably the
->>>>>>> user can exit this sequence at any time by clearing _SAVING.
->>>>>>
->>>>>> That would be transition 6) above (abort saving and continue). I think
->>>>>> it makes sense not to forbid this.
->>>>>>      
->>>>>>>          
->>>>>>>> + *
->>>>>>>> + * Sequence to be followed while _RESUMING device state:
->>>>>>>> + * While data for this device is available, repeat below steps:
->>>>>>>> + * a. read data_offset from where user application should write data.
->>>>>>>> + * b. write data of data_size to migration region from data_offset.
->>>>>>>> + * c. write data_size which indicates vendor driver that data is written in
->>>>>>>> + *    staging buffer. Vendor driver should read this data from migration
->>>>>>>> + *    region and resume device's state.
->>>>>>>
->>>>>>> The device defaults to _RUNNING state, so a prerequisite is to set
->>>>>>> _RESUMING and clear _RUNNING, right?
->>>>>>      
->>>>
->>>> Sorry, I replied yes in my previous reply, but no. Default device state
->>>> is _STOPPED. During resume _STOPPED -> _RESUMING
->>>
->>> Nope, it can't be, it must be _RUNNING.
->>>    
->>>>>> Transition 4) above. Do we need
->>>>
->>>> I think, its not required.
->>>
->>> But above we say it's the only way to trigger resuming (4 was 0/0/1 ->
->>> 1/0/0).
->>>    
->>>>>> 7) 0/0/0 ---(tell driver to resume with provided info)---> 1/0/0
->>>>>> as well? (Probably depends on how sensible the 0/0/0 state is.)
->>>>>
->>>>> I think we must unless we require the user to transition from 0/0/1 to
->>>>> 1/0/0 in a single operation, but I'd prefer to make 0/0/0 generally
->>>>> available.  Thanks,
->>>>>       
->>>>
->>>> its 0/0/0 -> 1/0/0 while resuming.
->>>
->>> I think we're starting with different initial states, IMO there is
->>> absolutely no way around 0/0/1 being the initial device state.
->>> Anything otherwise means that we cannot add migration support to an
->>> existing device and maintain compatibility with existing userspace.
->>> Thanks,
->>>    
->> Hope above explanation helps to resolve this concern.
-> 
-> Not really, I stand by that the default state must reflect previous
-> assumptions and therefore it must be 0/0/1 and additionally we should
-> not maintain state in QEMU intentionally inconsistent with the device
-> state.  Thanks,
-> 
-
-Ok. Will change that
-
-Thanks,
-Kirti
+MTQuMTEuMjAxOSAyMTo0NywgRXJpYyBCbGFrZSB3cm90ZToNCj4gT24gMTAvMjIvMTkgNzo1OCBB
+TSwgVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IEhpIQ0KPj4NCj4+IFRo
+ZSBtYWluIGZlYXR1cmUgaGVyZSBpcyBpbXByb3ZlbWVudCBvZiBfbmV4dF9kaXJ0eV9hcmVhIEFQ
+SSwgd2hpY2ggSSdtDQo+PiBnb2luZyB0byB1c2UgdGhlbiBmb3IgYmFja3VwIC8gYmxvY2stY29w
+eS4NCj4+DQo+PiB2MjoNCj4+IDAxOiBqdXN0IHVzZSBJTlQ2NF9NQVggaW5zdGVhZCBvZiBhZGRp
+bmcgbmV3IGNvbnN0YW50DQo+PiAwODogYWRkIHNlcGFyYXRlIGZ1bmN0aW9uIG5iZF9leHRlbnRf
+YXJyYXlfY29udmVydF90b19iZSBhbmQgY29udmVydGVkDQo+PiDCoMKgwqDCoCBzdGF0ZSBvZiBO
+QkRFeHRlbnRBcnJheSwgdG8gbWFrZSB0aGVzZSB0aGluZ3MgZXhwbGljaXQsIGFuZCBhdm9pZA0K
+Pj4gwqDCoMKgwqAgZXh0cmEgbWVtZHVwLg0KPj4gMDk6IFNhdmUgcGFydCBvZiBjb21tZW50IGZv
+ciBiaXRtYXBfdG9fZXh0ZW50cygpLCBhZGQgRXJpYydzIHItYg0KPiANCj4gSXMgYW55IG9mIHRo
+aXMgc2VyaWVzIGEgYnVnIGZpeCBpbXBvcnRhbnQgdG8gZ2V0IGludG8gLXJjMj8NCg0KTm90aGlu
+Zw0KDQo+IE9yIGlzIGl0IHNhZmUgdG8gZGVmZXIgdG8gdGhlIDUuMCB0aW1lZnJhbWU/DQoNClll
+cywgbm8gZG91YnRzLg0KDQo+IA0KPj4NCj4+IFZsYWRpbWlyIFNlbWVudHNvdi1PZ2lldnNraXkg
+KDEwKToNCj4+IMKgwqAgaGJpdG1hcDogYXNzZXJ0IHRoYXQgd2UgZG9uJ3QgY3JlYXRlIGJpdG1h
+cCBsYXJnZXIgdGhhbiBJTlQ2NF9NQVgNCj4+IMKgwqAgaGJpdG1hcDogbW92ZSBoYml0bWFwX2l0
+ZXJfbmV4dF93b3JkIHRvIGhiaXRtYXAuYw0KPj4gwqDCoCBoYml0bWFwOiB1bnB1Ymxpc2ggaGJp
+dG1hcF9pdGVyX3NraXBfd29yZHMNCj4+IMKgwqAgaGJpdG1hcDogZHJvcCBtZXRhIGJpdG1hcHMg
+YXMgdGhleSBhcmUgdW51c2VkDQo+PiDCoMKgIGJsb2NrL2RpcnR5LWJpdG1hcDogc3dpdGNoIF9u
+ZXh0X2RpcnR5X2FyZWEgYW5kIF9uZXh0X3plcm8gdG8gaW50NjRfdA0KPj4gwqDCoCBibG9jay9k
+aXJ0eS1iaXRtYXA6IGFkZCBfbmV4dF9kaXJ0eSBBUEkNCj4+IMKgwqAgYmxvY2svZGlydHktYml0
+bWFwOiBpbXByb3ZlIF9uZXh0X2RpcnR5X2FyZWEgQVBJDQo+PiDCoMKgIG5iZC9zZXJ2ZXI6IGlu
+dHJvZHVjZSBOQkRFeHRlbnRBcnJheQ0KPj4gwqDCoCBuYmQvc2VydmVyOiB1c2UgYmRydl9kaXJ0
+eV9iaXRtYXBfbmV4dF9kaXJ0eV9hcmVhDQo+PiDCoMKgIGJsb2NrL3Fjb3cyLWJpdG1hcDogdXNl
+IGJkcnZfZGlydHlfYml0bWFwX25leHRfZGlydHkNCj4+DQo+IA0KDQoNCi0tIA0KQmVzdCByZWdh
+cmRzLA0KVmxhZGltaXINCg==
 
