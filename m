@@ -2,74 +2,67 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFA1C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 16:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BBAC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 16:32:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22FB420718
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 16:29:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D49DA2071B
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 16:32:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="flFfE3Dq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22FB420718
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="FnVuxjsj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D49DA2071B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59557 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVHzU-0001fS-6F
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 11:29:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45475)
- by lists.gnu.org with esmtp (Exim 4.90_1) (envelope-from
- <BATV+8b5ce803d49b55f6f817+5926+infradead.org+hch@bombadil.srs.infradead.org>)
- id 1iVHyT-00015F-8d
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 11:28:02 -0500
+	id 1iVI2Q-0003Ie-HG
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 11:32:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46049)
+ by lists.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <berto@igalia.com>) id 1iVI1H-0002lh-Rt
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 11:30:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from
- <BATV+8b5ce803d49b55f6f817+5926+infradead.org+hch@bombadil.srs.infradead.org>)
- id 1iVHyS-0007gS-8z
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 11:28:01 -0500
-Received: from bombadil.infradead.org ([2607:7c80:54:e::133]:41156)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from
- <BATV+8b5ce803d49b55f6f817+5926+infradead.org+hch@bombadil.srs.infradead.org>)
- id 1iVHyN-0007ff-V4; Thu, 14 Nov 2019 11:27:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
- :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
- Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
- Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
- List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
- bh=WWu+wEg4w0nzy/sbweOFWdxSYY/TkiMTJL70/76I1A0=; b=flFfE3Dq+JJgZxp6NjMw265HR
- WQoPKptzI8MBeJNNTzA1GFayPw3+DEAerbuZugbLtkNz29YsL09+Jldypv4EUVDWO04VSRdAB804c
- j2NiUuUqfwmIUnURuCYQUDaAAeOfbCzrxMGEAm2PvAjrEoSD0LCSnR79W6VRQ6S2uUhm6J3jS08tP
- oE5ilLn0AAL2ZBX0n1dVqDllZ118YZqdiTq58yscFLC22ky0ogQqjp5KXaW8cOyoa19K+MjCIDnWX
- J3VaUGeBq+OQCdkiwdWugeCr9t7b2nzUFsRbuzoiD5SO9UuEkrF//Gv/uddu5gAY3qeL7oody9RVP
- mLJjuewug==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red
- Hat Linux)) id 1iVHyJ-0008UN-Rc; Thu, 14 Nov 2019 16:27:51 +0000
-Date: Thu, 14 Nov 2019 08:27:51 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH for-4.2 v2 3/3] block/file-posix: Let post-EOF fallocate
- serialize
-Message-ID: <20191114162751.GA29976@infradead.org>
-References: <20191101152510.11719-1-mreitz@redhat.com>
- <20191101152510.11719-4-mreitz@redhat.com>
+ (envelope-from <berto@igalia.com>) id 1iVI1G-0008Uj-Q6
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 11:30:55 -0500
+Received: from fanzine.igalia.com ([178.60.130.6]:45938)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <berto@igalia.com>)
+ id 1iVI1G-0008UX-8j; Thu, 14 Nov 2019 11:30:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=f1RirJvvUeLJsnKNfUMaLgYUeQF0wiRTlL9EblNuzKg=; 
+ b=FnVuxjsjTHJulSaxNRcykbA7+JQLce54J/ea5BZybO1tvkYW0kJAGqA/bf2l1Wb3a3hyBvimpyZLuUo6VmgfCrUSTktGvzbvzJ4ycYvmEos/h4FPL4NNKTHLI5Qa0pL602EpRgSWsFWBf/+IqmDpffZN1QSTAgZokFavmhmeZ1OlNI20NQGehu8pjSBClPONItArrM2rFdWL0/83f2JOgk9dlnRBg4lZZMXhrJeV5mTGUj5kzzVBWyx8pMr91SpaXyo/sOWUR8Bc7mxidcDQ78ClJjl4Teu/zvyKjq65SDdTXOdISID7zYYXwZwwLjAzPPNoXYfLvW5VLhJsauAXYQ==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1iVI1D-0002OC-OH; Thu, 14 Nov 2019 17:30:51 +0100
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1iVI1D-0002hX-L3; Thu, 14 Nov 2019 17:30:51 +0100
+From: Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [RFC PATCH v2 20/26] qcow2: Update L2 bitmap in
+ qcow2_alloc_cluster_link_l2()
+In-Reply-To: <389b5cbb-2278-86c1-034a-05621a7b4c71@redhat.com>
+References: <cover.1572125022.git.berto@igalia.com>
+ <289ea5edc3f1530787c8fe905b1a524cc48945a9.1572125022.git.berto@igalia.com>
+ <389b5cbb-2278-86c1-034a-05621a7b4c71@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Thu, 14 Nov 2019 17:30:51 +0100
+Message-ID: <w51mucye7yc.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191101152510.11719-4-mreitz@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by
- bombadil.infradead.org. See http://www.infradead.org/rpr.html
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:7c80:54:e::133
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
+ timestamps) [generic] [fuzzy]
+X-Received-From: 178.60.130.6
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -82,19 +75,21 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Anton Nefedov <anton.nefedov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-stable@nongnu.org, qemu-devel@nongnu.org,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Denis V . Lunev" <den@openvz.org>
+ qemu-block@nongnu.org, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Denis V . Lunev" <den@openvz.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 01, 2019 at 04:25:10PM +0100, Max Reitz wrote:
-> The XFS kernel driver has a bug that may cause data corruption for qcow2
-> images as of qemu commit c8bb23cbdbe32f.  We can work around it by
-> treating post-EOF fallocates as serializing up until infinity (INT64_MAX
-> in practice).
+On Tue 05 Nov 2019 12:43:16 PM CET, Max Reitz wrote:
 
-This has been fixed in the kernel a while ago.  I don't think it makes
-sense to work around it in qemu.
+> Speaking of handle_copied(); both elements of Qcow2COWRegion are of
+> type unsigned.  handle_copied() doesn=E2=80=99t look like it takes any
+> precautions to limit the range to even UINT_MAX (and it should
+> probably limit it to INT_MAX).
+
+Or rather, both handle_copied() and handle_alloc() should probably limit
+it to BDRV_REQUEST_MAX_BYTES.
+
+Berto
 
