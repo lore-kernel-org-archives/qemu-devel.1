@@ -2,117 +2,98 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D02ABC43141
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 12:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2886CC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 13:04:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EB2820709
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 12:35:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=wavecomp.com header.i=@wavecomp.com header.b="LaLDx5uE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EB2820709
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=wavecomp.com
+	by mail.kernel.org (Postfix) with ESMTPS id 022D4206E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 13:04:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 022D4206E1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVELd-0005os-Nq
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 07:35:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49699)
+	id 1iVEne-0003YI-1q
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 08:04:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56290)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <amarkovic@wavecomp.com>) id 1iVEK8-000450-77
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:34:10 -0500
+ (envelope-from <pasic@linux.ibm.com>) id 1iVEmj-00035P-48
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:03:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <amarkovic@wavecomp.com>) id 1iVEK4-0008Af-Oi
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:34:07 -0500
-Received: from mail-eopbgr800123.outbound.protection.outlook.com
- ([40.107.80.123]:60840 helo=NAM03-DM3-obe.outbound.protection.outlook.com)
+ (envelope-from <pasic@linux.ibm.com>) id 1iVEmh-0006AD-T3
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:03:41 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24092
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <amarkovic@wavecomp.com>)
- id 1iVEK2-00087j-H4
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 07:34:04 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MQILEE6eAOXJgXvljbad4zI/DUWirzBpFqFfB6h1hLftP1oGn5B/iJZ2qW3RUqxEMKEBTCPYfGDH1S5RPJ/gAwMCrMYlZN4Kwnxg/GW0g/xR/oT2OsAw0BheqUu0YG2PfDlKu309N7z0JFEO9r6TMBV3ulu+69/s/1/d8rusIyTvOhXeCPHEDbsIg+Cg9PBYTTUNJ4ffN5i1ejRezInhOpxStu9t6gXexU7ZNZpKvUUhgAl9DeUB4C3X/oQJYxRwR3uFXWlEu17ZTC3/Ih4gAlD4Hdxbo41JYDQZUWIp+kSmmQwLEW8HVZ4boOuIjDjfwNWDTzGM4pYh5mZUYThC6g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1ykEm5qyJK/WFl7VLafPEaOpi2aXWgo7Y/G1GFVqnBs=;
- b=eaiswVR/lIAHkiLPYT2HT9HxStYB4AxPnTSay3Nkmjd3qu+8UqzqNO6nfwk0VS9TfpA5fyIyEHN4VMs71kgrLMZ9UEtCQ1eEOoW5Wz34bn84tzuvO+K7Y/TNTJEgldCtgEQYH6cl39zv0Ns1pWkLvCrT7tZdZsF+UXvitfW3Iz8LVh9zRt1C1krScnRy4WEFlUY4IXVfiXA7xMSOTmSc2jl6HSdjWinNFr+zohb+R/QrM/I/AAHgmVEe9TcFDizgs8YvEvt7oYJy/Q2xr0KwWBCXTPTXcv43I3MkeCGXWR0LvSDhGMESsScl5dx6SbN4LuAZ6fPFmhzvCMEHhbzEFQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wavecomp.com; dmarc=pass action=none header.from=wavecomp.com;
- dkim=pass header.d=wavecomp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wavecomp.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1ykEm5qyJK/WFl7VLafPEaOpi2aXWgo7Y/G1GFVqnBs=;
- b=LaLDx5uEXbJeCmI/vpYN6TGhzGXLFeYnaS6I5KjHe3VmgX6F91Zl1SbdgCW1XcqB4fqWN1URQe49CdtkYCApXdtvtvKoVsApJvCp7LcfbAsXhsT+zIEXBUuOIfBc65jm7F+DfUMHfpQc+G8V+j6LeZ/QJWGzkCglnBTmFYu3iv0=
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com (10.174.81.139) by
- BN6PR2201MB1508.namprd22.prod.outlook.com (10.174.85.138) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2430.26; Thu, 14 Nov 2019 12:33:57 +0000
-Received: from BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::302a:6e1a:7c8e:867]) by BN6PR2201MB1251.namprd22.prod.outlook.com
- ([fe80::302a:6e1a:7c8e:867%11]) with mapi id 15.20.2430.027; Thu, 14 Nov 2019
- 12:33:57 +0000
-From: Aleksandar Markovic <amarkovic@wavecomp.com>
-To: =?windows-1256?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, Huacai Chen <chenhc@lemote.com>, Huacai Chen
- <zltjiangshi@gmail.com>
-Subject: Re: [EXTERNAL]Re: [PATCH v2 2/5] MAINTAINERS: Adjust maintainership
- for Fulong 2E board
-Thread-Topic: [EXTERNAL]Re: [PATCH v2 2/5] MAINTAINERS: Adjust maintainership
- for Fulong 2E board
-Thread-Index: AQHVmuGOIzx1v7lzjk6+/PRRo+xr1aeKlvkQ
-Date: Thu, 14 Nov 2019 12:33:57 +0000
-Message-ID: <BN6PR2201MB12512B977314BCFCA202449DC6710@BN6PR2201MB1251.namprd22.prod.outlook.com>
-References: <1573652826-23987-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1573652826-23987-3-git-send-email-aleksandar.markovic@rt-rk.com>,
- <c053c16c-c6f4-4f73-7383-7b66e54ad696@redhat.com>
-In-Reply-To: <c053c16c-c6f4-4f73-7383-7b66e54ad696@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=amarkovic@wavecomp.com; 
-x-originating-ip: [82.117.201.26]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e794155e-7a6a-47de-1696-08d768feeb7d
-x-ms-traffictypediagnostic: BN6PR2201MB1508:
-x-microsoft-antispam-prvs: <BN6PR2201MB1508D43D326DE8A6FEDADBC9C6710@BN6PR2201MB1508.namprd22.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 02213C82F8
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(376002)(346002)(366004)(39840400004)(136003)(396003)(199004)(189003)(53546011)(229853002)(4326008)(5660300002)(7696005)(6506007)(52536014)(26005)(71190400001)(71200400001)(76176011)(446003)(316002)(76116006)(91956017)(66946007)(102836004)(9686003)(55016002)(478600001)(25786009)(186003)(6246003)(6436002)(55236004)(256004)(2501003)(66476007)(66446008)(66556008)(64756008)(86362001)(305945005)(7736002)(74316002)(486006)(33656002)(6116002)(3846002)(81156014)(54906003)(99286004)(476003)(14454004)(11346002)(81166006)(8936002)(110136005)(8676002)(2906002)(66066001)(498294003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BN6PR2201MB1508;
- H:BN6PR2201MB1251.namprd22.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: wavecomp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: EEqVF8XfbnwHGUMGt8EfFUV8RVFInbw4/buSuqic8rABEs2igfo3P/kYEKw0zCljlzq9vJQU8d6AUHIL9t6Gj/DXfaP3jPqvwQTmmwEGdeBXSw1fhOraI5X/2WVQ0zwHoemBj6M/QhACiPswoDS7E16v254+kkQNFyNKGSKxcpsaTj8XyWAYVfclV1AFTV6P/xnK5MIJGlJNDKVmN3CXBLMUOH+hDlhD5KzSJ5Atg74SvVxgxJXgxO/tB0kW9JvagfSy5Dqt9tuoNTxiZEwNvmzad86+qzgadUhz8FDsK4111xgIoMg6hLrpXAMLazy0JkTB21XuqTi9F4JCdi0eaQW84Jzm0wT8NIng64XzYf0nGcfWO8zyO/dSgd335XwRXqdyKBHZbLC000ENvzWwSUCcfHFV1xBIKRKK3v0kOidiucp497mhz4q2HDiPPCdA
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="windows-1256"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <pasic@linux.ibm.com>) id 1iVEmh-0006A1-OT
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 08:03:39 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id
+ xAECuhTe177984
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 08:03:39 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2w95qbmn71-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 08:03:35 -0500
+Received: from localhost
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <pasic@linux.ibm.com>;
+ Thu, 14 Nov 2019 13:02:41 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 14 Nov 2019 13:02:38 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAED2bup48824554
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 14 Nov 2019 13:02:37 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 01850AE05A;
+ Thu, 14 Nov 2019 13:02:37 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B8DEFAE056;
+ Thu, 14 Nov 2019 13:02:36 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.152.224.41])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 14 Nov 2019 13:02:36 +0000 (GMT)
+Date: Thu, 14 Nov 2019 14:02:35 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH v1] s390x: kvm-unit-tests: a PONG device for Sub
+ Channels tests
+In-Reply-To: <20191114113823.5d752648.cohuck@redhat.com>
+References: <1573671753-15115-1-git-send-email-pmorel@linux.ibm.com>
+ <20191114113823.5d752648.cohuck@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-OriginatorOrg: wavecomp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e794155e-7a6a-47de-1696-08d768feeb7d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Nov 2019 12:33:57.6940 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 463607d3-1db3-40a0-8a29-970c56230104
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iTwWrJwew3yLFYEfKPxem4oBIEVTyGABtaPx5GfwdGNybWGQ4yxzLT4LCrWH7uY6oAiUsQ0W2y1j+Hvbzl4o8A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR2201MB1508
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.80.123
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19111413-0016-0000-0000-000002C39AB9
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111413-0017-0000-0000-000033253C91
+Message-Id: <20191114140235.30a788d6.pasic@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:, ,
+ definitions=2019-11-14_03:, , signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1910280000 definitions=main-1911140121
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -124,132 +105,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "aleksandar.rikalo@rt-rk.com" <aleksandar.rikalo@rt-rk.com>,
- "hpoussin@reactos.org" <hpoussin@reactos.org>,
- "aurelien@aurel32.net" <aurelien@aurel32.net>
+Cc: thuth@redhat.com, frankja@linux.ibm.com,
+ Pierre Morel <pmorel@linux.ibm.com>, david@redhat.com, qemu-devel@nongnu.org,
+ qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Philippe,=0A=
-=0A=
-> From: Philippe Mathieu-Daud=E9 <philmd@redhat.com>=0A=
-> =0A=
-> Hi Aleksandar,=0A=
-> =0A=
-> On 11/13/19 2:47 PM, Aleksandar Markovic wrote:=0A=
-> > From: Aleksandar Markovic <amarkovic@wavecomp.com>=0A=
-> >=0A=
-> > Change the maintainership for Fulong 2E board to improve its quality.=
-=0A=
-> =0A=
-> IIRC you told me once this board is named Fuloong, and its CPU is a=0A=
-=FD> Loongson, both with 2x 'o' :) I have a patch renaming the various=0A=
-> occurrences.=0A=
-> =0A=
-=0A=
-I still think that the oficial name is "Fuloong 2E", however, it is=0A=
-shortened to "Fulong 2E" quite often in communication, and, it seems,=0A=
-sometimes even in various docs/app notes etc.=0A=
-=0A=
-Can perhaps Huacai Chen enlighten us regarding the right spelling?=0A=
-=0A=
-> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>=0A=
-> > ---=0A=
-> >   MAINTAINERS | 7 ++++---=0A=
-> >   1 file changed, 4 insertions(+), 3 deletions(-)=0A=
-> >=0A=
-> > diff --git a/MAINTAINERS b/MAINTAINERS=0A=
-> > index fd9ba32..3bf2144 100644=0A=
-> > --- a/MAINTAINERS=0A=
-> > +++ b/MAINTAINERS=0A=
-> > @@ -976,9 +976,10 @@ S: Maintained=0A=
-> >   F: hw/mips/mips_r4k.c=0A=
-> >=0A=
-> >   Fulong 2E=0A=
-> > -M: Aleksandar Markovic <amarkovic@wavecomp.com>=0A=
-> > -R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>=0A=
-> > -S: Odd Fixes=0A=
-> > +M: Philippe Mathieu-Daud=E9 <philmd@redhat.com>=0A=
-> =0A=
-> I am happy to keep the Fuloong working, but this will be on my personal=
-=0A=
-> (hobbyist) time. This area is not a priority for my employer, so I'll=0A=
-> use my personal email: f4bug@amsat.org.=0A=
-> =0A=
-=0A=
-OK.=0A=
-=0A=
-> The original author is active on the Linux kernel, let ask him if he'd=0A=
-> be OK to keep an eye on his work.=0A=
-> =0A=
-> Huacai, would you agree to be listed as a reviewer on the Fuloong=0A=
-> related QEMU files? You don't have to worry about the generic QEMU code=
-=0A=
-> plate (like keeping API up to date) I'll manage that, but I'd like to=0A=
-> have you listed to assert the hardware is properly modeled.=0A=
-> =0A=
-> You would appear as:=0A=
-> R: Huacai Chen <chenhc@lemote.com>=0A=
-> =0A=
-=0A=
-That is a great idea!=0A=
-=0A=
-Please, Chen, get involved, you would be very welcomed, there is a place=0A=
-for you in QEMU community!=0A=
-=0A=
-=0A=
-> > +R: Herv=E9 Poussineau <hpoussin@reactos.org>=0A=
-> =0A=
-> I don't think Herv=E9 is interested by this board, he has not modified th=
-e=0A=
-> code.=0A=
-> =0A=
-> > +R: Aleksandar Markovic <amarkovic@wavecomp.com>=0A=
-> > +S: Maintained=0A=
-> =0A=
-> Let keep it as "Odd Fixes" :)=0A=
-> =0A=
-=0A=
-OK.=0A=
-=0A=
->    Odd Fixes:   It has a maintainer but they don't have=0A=
->                 time to do much other than throw the odd=0A=
->                 patch in.=0A=
-> =0A=
-> >   F: hw/mips/mips_fulong2e.c=0A=
-> >   F: hw/isa/vt82c686.c=0A=
-> >   F: hw/pci-host/bonito.c=0A=
-> >=0A=
-> =0A=
-> So the patch would be:=0A=
-> =0A=
-> -- 8< --=0A=
->   Fulong 2E=0A=
-> -M: Aleksandar Markovic <amarkovic@wavecomp.com>=0A=
-> -R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>=0A=
-> +M: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>=0A=
-> +R: Aleksandar Markovic <amarkovic@wavecomp.com>=0A=
-> +R: Huacai Chen <chenhc@lemote.com>=0A=
->   S: Odd Fixes=0A=
->   F: hw/mips/mips_fulong2e.c=0A=
->   F: hw/isa/vt82c686.c=0A=
-=0A=
-Plus possible s/Fulong 2E/Fuloong 2E/=0A=
-=0A=
-> ---=0A=
-> =0A=
-> But let's wait to see what Huacai Chen thinks of it, before posting it.=
-=0A=
-> =0A=
-> Thanks for taking care of those changes!=0A=
-> =0A=
-> Phil.=0A=
-> =0A=
-> =0A=
-=0A=
-Thank you!=0A=
-=0A=
-Aleksandar=
+On Thu, 14 Nov 2019 11:38:23 +0100
+Cornelia Huck <cohuck@redhat.com> wrote:
+
+> On Wed, 13 Nov 2019 20:02:33 +0100
+> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> 
+> Minor nit for $SUBJECT: this isn't a kvm-unit-tests patch, that's just
+> one consumer :)
+
+And subchannel is one word in s390-speak.
+
+> 
+
+[..]
+
+> Some questions regarding this device and its intended usage:
+> 
+> - What are you trying to test? Basic ccw processing, or something more
+>   specific? Is there any way you can use the kvm-unit-test
+>   infrastructure to test basic processing with an existing device?
+
+I'm also curious about the big picture (what is in scope and what out
+of scope). Your design should be evaluated in the light of intended
+usage.
+
+BTW have you had a look at this abandoned patch-set of mine:
+
+https://lists.gnu.org/archive/html/qemu-devel/2017-11/msg04220.html
+
+We made some different design decisions, while aiming essentially for the
+same. Maybe it's due to different scope, maybe not. For instance one
+can't test IDA with PONG, I guess.
+
+Regards,
+Halil
+
+> - Who is instantiating this device? Only the kvm-unit-test?
+> - Can you instantiate multiple instances? Does that make sense? If yes,
+>   it should probably not request a new chpid every time :)
+> - What happens if someone instantiates this by hand? The only drawback
+>   is that it uses up a subchannel and a chpid, right?
+> - Do you plan to make this hotpluggable later?
+> 
+> 
+
 
