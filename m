@@ -2,104 +2,82 @@ Return-Path: <SRS0=NHD5=ZG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FF80C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BBCC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:50:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2F58206D9
-	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:49:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85228206D9
+	for <qemu-devel@archiver.kernel.org>; Thu, 14 Nov 2019 10:50:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kj9GSECt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2F58206D9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q7rvV9Uj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85228206D9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVCgY-00067Z-Md
-	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:49:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52985)
+	id 1iVCi7-0007c0-Mv
+	for qemu-devel@archiver.kernel.org; Thu, 14 Nov 2019 05:50:47 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53192)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iVCfG-0005WB-Fl
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:47:55 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iVCgR-0006J2-Ud
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:49:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iVCfF-0000Ib-6k
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:47:50 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24095
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iVCfF-0000IN-34
- for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:47:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573728468;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=fzOlYy6h7VsmWs67bBTOooJ/a+ugTtnWlEf5027GEbA=;
- b=Kj9GSECtIMbtMguIdznfZ1aSOLzNzWkXtRiYbCfKiNqBlWlY0QBY6upqVBo7Uw5iZ+ZEM2
- eha1RPTSZVV9+oZkAdmHQOUUMSwOrcbzsi/EjwcifhvWmpdDdymN3uhiX3Ai+Dz7jAa2pI
- mCdAmlsdu7jpKzazrvfaHvDROyg2JiE=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-RHH-wY5JPjWvy-6Pfd7MCA-1; Thu, 14 Nov 2019 05:47:45 -0500
-Received: by mail-wm1-f70.google.com with SMTP id g14so3646754wmk.9
- for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 02:47:45 -0800 (PST)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iVCgQ-0000lZ-27
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:49:03 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40440)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iVCgO-0000k9-Ji
+ for qemu-devel@nongnu.org; Thu, 14 Nov 2019 05:49:02 -0500
+Received: by mail-wm1-x343.google.com with SMTP id f3so5327300wmc.5
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 02:48:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=sCNrM0KUewjPnIJTZYAPWChoUyattevKxkICTRD/0Wk=;
+ b=q7rvV9UjLJeojW3F04vVz1/anaag64AQBrquxctFf/s4ng5z1jSUuEk+c6pKwW9rpX
+ 4MG03S70fRCrICrQ1IsKxJp/ioXSDW37IA7gYTEIyo7QXH7VdZ++vpHaLjQw0vL1g0kB
+ GqpiukpdtL1HvTDSZiMgSlbRqaad2t5t9eIpKqwsJjxQSV7LkjnM2wk3+jLr5kIplBG9
+ gNiN6ZJj30nV2mQra6zKByL6NxLhIHJzR4fuhyFPSS2Xm831Hh8Ql7yU0pyYgs39Ol2S
+ 3iadj+pLZoYgly9xPC88GbMbRtCwFdk5aeer6yFzez24qoCFq0ZX0UZMC5zZlc5o8IIb
+ D48w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pG43dw39Vf5xaVxHJxC0S8P0fzBrCu1zHRzg9iHxAhQ=;
- b=LXClRoCgQ9VwhrztpN1enTkT/VfoadzSJbPg5GihRZT1dU5gUT+kPn2mDWkSWihtG8
- vf9eqxOTBCdjuho8WEXNS69ZJ/7F4iVkLyKJTAVMFP8yH4U4XiD1UMlWtlVbryDXVLQ9
- fPL6J+N1ZNpGdg/MRd+B14CpY1xQJ4F2nc0xs3JDuskRJHMTlkXXza9JMYbxJ72q2elP
- jYI69Vf/v5BQnVwVZjR15L3HcUOHFFanb8wIDHEFX188MT6nZaslWmKeAo4bEqthBK3n
- ajO+JefstMPcO8ruY8rc6FCyk3j41dazBM+5yOmx38WuGGIPl+2QEGQsiwuyMeBeX76S
- CBHw==
-X-Gm-Message-State: APjAAAULcrWphL63FOQV7ge8glRIsS0Wxxh7h0barC5KIECBccdkGZXQ
- /KaaeSCEKZaM8okcQM88W78bCP0SbcJtv9a9uQUgv3JC9Bvt51GqbGIpPIdl0lBVuOFCvAKAA1M
- m0VcXLpZvUGJyRro=
-X-Received: by 2002:adf:f50b:: with SMTP id q11mr7510691wro.343.1573728464475; 
- Thu, 14 Nov 2019 02:47:44 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxlB5HTk7mOcAtMVIOwgliy/TCh4oLKqY8wI6BgaOm6huUlj21h2o4wQp+szlWPv4wHHSdJWg==
-X-Received: by 2002:adf:f50b:: with SMTP id q11mr7510670wro.343.1573728464182; 
- Thu, 14 Nov 2019 02:47:44 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc?
- ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
- by smtp.gmail.com with ESMTPSA id w7sm6393412wru.62.2019.11.14.02.47.43
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 14 Nov 2019 02:47:43 -0800 (PST)
-Subject: Re: [PATCH 01/16] memory: do not look at current_machine->accel
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
- <1573655945-14912-2-git-send-email-pbonzini@redhat.com>
- <2db4f901-65ad-4b80-d309-b8b63330492f@redhat.com>
- <4783e606-19b8-c3c0-08ab-ac84b02af6f4@redhat.com>
- <CAFEAcA_FnfJx=oae5e_KGcmqwyUtM01KeywjpSSa09fu9++sMw@mail.gmail.com>
- <07c6a4ea-1d5b-da75-9fed-3b9e7bb1d193@redhat.com>
- <CAFEAcA-9n38=Zg1YuFfy1pS-8Vc8EZD82nPdfYUf2gBAJY8tBA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <3f1478bc-ef78-23eb-122c-3f9912ba250e@redhat.com>
-Date: Thu, 14 Nov 2019 11:47:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=sCNrM0KUewjPnIJTZYAPWChoUyattevKxkICTRD/0Wk=;
+ b=mELB/6yOMRCnjj+6YIT+LW4+BbDsc+LaNNAIFleHo52nBXa1rgXnTZy8My3SfYZotx
+ /Lg3KdZ2Jv7UttIRnOdCIyrhP3k+ujAVNmUyP4MFcpQAWjvXgwa4A+tUpJHLvtSFqCle
+ 2ff1bY4tRZikP8tswMhIImMtlKQMJ/cecXOKiMt7GGbynExdIOped6et3yxhFBWqXHK5
+ E29LoX3slUImXuW3VRX3oMIbWpmG3YjnaXoyV43mwalwViwuNLvFNEa2VFi7dtQPkPbL
+ jKey1xsfCiEIrmkg1daIcuB/5UMlj5S7g+oIq2GkRf/g2Fas5MXLUV4nVwDy8lYwVTFn
+ 1jNA==
+X-Gm-Message-State: APjAAAXEJ87sTxedAfSACRbruK7mOgkYw5Tg4xgYBl1PWgvPdk3JpJio
+ jTsrgnjMGFdvhdLnyhE2dP7swfuZXgIgPR8hOPFLdWfXGHE=
+X-Google-Smtp-Source: APXvYqw6U7xntobzh8dig00GW71aIg3KDucAn82xt8qZvNecynTh1Tx3wRTapiF8CwJzF/vCAnvTg2GfcKAuN76VxMM=
+X-Received: by 2002:a1c:9e10:: with SMTP id h16mr7089306wme.91.1573728537872; 
+ Thu, 14 Nov 2019 02:48:57 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-9n38=Zg1YuFfy1pS-8Vc8EZD82nPdfYUf2gBAJY8tBA@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: RHH-wY5JPjWvy-6Pfd7MCA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
+ <1573655945-14912-11-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <1573655945-14912-11-git-send-email-pbonzini@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 14 Nov 2019 14:48:45 +0400
+Message-ID: <CAJ+F1CJf_uu0g2T+OYbdv=Yme6Ca_ZGPMM365rp_i2rrk51cuw@mail.gmail.com>
+Subject: Re: [PATCH 10/16] accel: pass object to accel_init_machine
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,35 +89,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+Cc: Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>,
  Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14/11/19 11:40, Peter Maydell wrote:
-> On Thu, 14 Nov 2019 at 10:32, Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 14/11/19 11:21, Peter Maydell wrote:
->>>> FlatView #1
->>>>  AS "memory", root: system
->>>>  AS "cpu-memory-0", root: system
->>>>  Root memory region: system
->>>>   0000000000000000-00000000000effff (prio 0, ram): microvm.ram kvm:tcg
->>>>   00000000000f0000-00000000000fffff (prio 0, ram): pc.bios kvm:tcg
->>>>   0000000000100000-0000000007ffffff (prio 0, ram): microvm.ram @000000=
-0000100000 kvm:tcg
->>> Why do we need to print the accelerator name for every
->>> memory region? Isn't it just a global property, or at
->>> least a property of the CPU ?
->>
->> Not all regions are registered with the accelerator, in particular not
->> for devices.  So we print it next to regions that are registered.
->=20
-> Ah, I see -- so it's really saying "this is a kvm memslot"?
+On Wed, Nov 13, 2019 at 6:45 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> We will have to set QOM properties before accel_init_machine, based on th=
+e
+> options provided to -accel.  Construct the object outside it so that it
+> will be possible to insert the iteration between object_new_with_class
+> and accel_init_machine.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Yes, exactly.
 
-Paolo
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
+> ---
+>  accel/accel.c          | 6 ++----
+>  include/sysemu/accel.h | 2 +-
+>  vl.c                   | 4 +++-
+>  3 files changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/accel/accel.c b/accel/accel.c
+> index 74eda68..822e945 100644
+> --- a/accel/accel.c
+> +++ b/accel/accel.c
+> @@ -52,11 +52,9 @@ AccelClass *accel_find(const char *opt_name)
+>      return ac;
+>  }
+>
+> -int accel_init_machine(AccelClass *acc, MachineState *ms)
+> +int accel_init_machine(AccelState *accel, MachineState *ms)
+>  {
+> -    ObjectClass *oc =3D OBJECT_CLASS(acc);
+> -    const char *cname =3D object_class_get_name(oc);
+> -    AccelState *accel =3D ACCEL(object_new(cname));
+> +    AccelClass *acc =3D ACCEL_GET_CLASS(accel);
+>      int ret;
+>      ms->accelerator =3D accel;
+>      *(acc->allowed) =3D true;
+> diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+> index 90b6213..22cac0f 100644
+> --- a/include/sysemu/accel.h
+> +++ b/include/sysemu/accel.h
+> @@ -67,7 +67,7 @@ typedef struct AccelClass {
+>  extern unsigned long tcg_tb_size;
+>
+>  AccelClass *accel_find(const char *opt_name);
+> -int accel_init_machine(AccelClass *acc, MachineState *ms);
+> +int accel_init_machine(AccelState *accel, MachineState *ms);
+>
+>  /* Called just before os_setup_post (ie just before drop OS privs) */
+>  void accel_setup_post(MachineState *ms);
+> diff --git a/vl.c b/vl.c
+> index 6e406d4..c8ec906 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2846,6 +2846,7 @@ static int do_configure_accelerator(void *opaque, Q=
+emuOpts *opts, Error **errp)
+>      bool *p_init_failed =3D opaque;
+>      const char *acc =3D qemu_opt_get(opts, "accel");
+>      AccelClass *ac =3D accel_find(acc);
+> +    AccelState *accel;
+>      int ret;
+>
+>      if (!ac) {
+> @@ -2853,7 +2854,8 @@ static int do_configure_accelerator(void *opaque, Q=
+emuOpts *opts, Error **errp)
+>          error_report("invalid accelerator %s", acc);
+>          return 0;
+>      }
+> -    ret =3D accel_init_machine(ac, current_machine);
+> +    accel =3D ACCEL(object_new_with_class(OBJECT_CLASS(ac)));
+> +    ret =3D accel_init_machine(accel, current_machine);
+>      if (ret < 0) {
+>          *p_init_failed =3D true;
+>          error_report("failed to initialize %s: %s",
+> --
+> 1.8.3.1
+>
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
