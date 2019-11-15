@@ -2,71 +2,52 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 480E6C43215
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 638A3C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:35:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FEA620733
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:35:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FEA620733
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 39F872073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:35:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39F872073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVcgg-0000qf-VM
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:35:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33395)
+	id 1iVch0-0001Kj-8T
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:35:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59031)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gengdongjiu@huawei.com>) id 1iVcej-0007Qd-NB
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:33:02 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNL-0004e8-9w
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gengdongjiu@huawei.com>) id 1iVcei-0004OC-EH
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:33:01 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2050 helo=huawei.com)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNJ-0001xn-NR
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:03 -0500
+Received: from relay.sw.ru ([185.231.240.75]:47442)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
- id 1iVcef-0004C3-KE; Fri, 15 Nov 2019 09:32:57 -0500
-Received: from lhreml705-cah.china.huawei.com (unknown [172.18.7.107])
- by Forcepoint Email with ESMTP id EC45E68D6C269495430B;
- Fri, 15 Nov 2019 14:32:51 +0000 (GMT)
-Received: from lhreml712-chm.china.huawei.com (10.201.108.63) by
- lhreml705-cah.china.huawei.com (10.201.108.46) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Fri, 15 Nov 2019 14:32:51 +0000
-Received: from dggeme755-chm.china.huawei.com (10.3.19.101) by
- lhreml712-chm.china.huawei.com (10.201.108.63) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.1713.5; Fri, 15 Nov 2019 14:32:50 +0000
-Received: from dggeme755-chm.china.huawei.com ([10.7.64.71]) by
- dggeme755-chm.china.huawei.com ([10.7.64.71]) with mapi id 15.01.1713.004;
- Fri, 15 Nov 2019 22:32:47 +0800
-From: gengdongjiu <gengdongjiu@huawei.com>
-To: Igor Mammedov <imammedo@redhat.com>, "zhengxiang (A)"
- <zhengxiang9@huawei.com>
-Subject: Re: [RESEND PATCH v21 3/6] ACPI: Add APEI GHES table generation
- support
-Thread-Topic: [RESEND PATCH v21 3/6] ACPI: Add APEI GHES table generation
- support
-Thread-Index: AdWbwWSZ/1gyxkpeREeYn2g+7NgH+g==
-Date: Fri, 15 Nov 2019 14:32:47 +0000
-Message-ID: <19b1b4b9ceb24aad9f34ab4e58bccab3@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.148.208.87]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iVcNG-0001rr-Db; Fri, 15 Nov 2019 09:14:58 -0500
+Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
+ by relay.sw.ru with esmtp (Exim 4.92.3)
+ (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iVcNB-0006WW-0n; Fri, 15 Nov 2019 17:14:53 +0300
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Subject: [RFC 14/24] block/block-copy: More explicit call_state
+Date: Fri, 15 Nov 2019 17:14:34 +0300
+Message-Id: <20191115141444.24155-15-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191115141444.24155-1-vsementsov@virtuozzo.com>
+References: <20191115141444.24155-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 185.176.76.210
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 185.231.240.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -78,84 +59,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
- "Wanghaibin \(D\)" <wanghaibin.wang@huawei.com>,
- "mtosatti@redhat.com" <mtosatti@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Linuxarm <linuxarm@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "james.morse@arm.com" <james.morse@arm.com>, "xuwei \(O\)" <xuwei5@huawei.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "lersek@redhat.com" <lersek@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, ehabkost@redhat.com,
+ wencongyang2@huawei.com, xiechanglong.d@gmail.com, armbru@redhat.com,
+ qemu-devel@nongnu.org, jsnow@redhat.com, crosa@redhat.com, den@openvz.org,
+ mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> > + */
-> > +static void acpi_ghes_build_notify(GArray *table, const uint8_t type)
->=20
-> typically format should be build_WHAT(), so
->  build_ghes_hw_error_notification()
->=20
-> And I'd move this out into its own patch.
-> this applies to other trivial in-depended sub-tables, that take all data =
-needed to construct them from supplied arguments.
+Refactor common path to use BlockCopyCallState pointer as parameter, to
+prepare it for use in asynchronous block-copy (at least, we'll need to
+run block-copy in a coroutine, passing the whole parameters as one
+pointer).
 
-I very used your suggested method in previous series[1], but other maintain=
-er suggested to move this function to this file, because he think only GHES=
- used it
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/block-copy.c | 50 +++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 38 insertions(+), 12 deletions(-)
 
-[1]:
-https://patchwork.ozlabs.org/cover/1099428/
-
->=20
-> > +{
-> > +        /* Type */
-> > +        build_append_int_noprefix(table, type, 1);
-> > +        /*
-> > +         * Length:
-> > +         * Total length of the structure in bytes
-> > +         */
-> > +        build_append_int_noprefix(table, 28, 1);
-> > +        /* Configuration Write Enable */
-> > +        build_append_int_noprefix(table, 0, 2);
-> > +        /* Poll Interval */
-> > +        build_append_int_noprefix(table, 0, 4);
-> > +        /* Vector */
-> > +        build_append_int_noprefix(table, 0, 4);
-> > +        /* Switch To Polling Threshold Value */
-> > +        build_append_int_noprefix(table, 0, 4);
-> > +        /* Switch To Polling Threshold Window */
-> > +        build_append_int_noprefix(table, 0, 4);
-> > +        /* Error Threshold Value */
-> > +        build_append_int_noprefix(table, 0, 4);
-> > +        /* Error Threshold Window */
-> > +        build_append_int_noprefix(table, 0, 4); }
-> > +
->=20
-> /*
->   Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fwcfg b=
-lobs.
->   See docs/specs/acpi_hest_ghes.rst for blobs format */
-> > +void acpi_ghes_build_error_table(GArray *hardware_errors, BIOSLinker
-> > +*linker)
-> build_ghes_error_table()
->=20
-> also I'd move this function into its own patch along with other related c=
-ode that initializes and wires it into virt board.
-
-I ever use your suggested method[1], but other maintainer, it seems Michael=
-, suggested to move these functions to this file that used it, because he t=
-hink only GHES used it.
-
-[1]:
-https://patchwork.ozlabs.org/patch/1099424/
-https://patchwork.ozlabs.org/patch/1099425/
-https://patchwork.ozlabs.org/patch/1099430/
-
+diff --git a/block/block-copy.c b/block/block-copy.c
+index b2e7825b53..4b1a0cecbd 100644
+--- a/block/block-copy.c
++++ b/block/block-copy.c
+@@ -28,7 +28,15 @@
+ #define BLOCK_COPY_MAX_WORKERS 64
+ 
+ typedef struct BlockCopyCallState {
++    /* IN parameters */
++    BlockCopyState *s;
++    int64_t offset;
++    int64_t bytes;
++
++    /* State */
+     bool failed;
++
++    /* OUT parameters */
+     bool error_is_read;
+ } BlockCopyCallState;
+ 
+@@ -514,14 +522,16 @@ int64_t block_copy_reset_unallocated(BlockCopyState *s,
+  * Returns 1 if dirty clusters found and successfully copied, 0 if no dirty
+  * clusters found and -errno on failure.
+  */
+-static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
+-                                                  int64_t offset, int64_t bytes,
+-                                                  bool *error_is_read)
++static int coroutine_fn
++block_copy_dirty_clusters(BlockCopyCallState *call_state)
+ {
++    BlockCopyState *s = call_state->s;
++    int64_t offset = call_state->offset;
++    int64_t bytes = call_state->bytes;
++
+     int ret = 0;
+     bool found_dirty = false;
+     AioTaskPool *aio = NULL;
+-    BlockCopyCallState call_state = {false, false};
+ 
+     /*
+      * block_copy() user is responsible for keeping source and target in same
+@@ -546,7 +556,7 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
+ 
+         found_dirty = true;
+ 
+-        task = block_copy_task_create(s, &call_state, offset, bytes);
++        task = block_copy_task_create(s, call_state, offset, bytes);
+ 
+         ret = block_copy_block_status(s, offset, task->bytes, &status_bytes);
+         block_copy_task_shrink(task, status_bytes);
+@@ -586,18 +596,14 @@ out:
+         }
+         g_free(aio);
+     }
+-    if (error_is_read && ret < 0) {
+-        *error_is_read = call_state.error_is_read;
+-    }
+ 
+     return ret < 0 ? ret : found_dirty;
+ }
+ 
+-int coroutine_fn block_copy(BlockCopyState *s, int64_t start, uint64_t bytes,
+-                            bool *error_is_read)
++static int coroutine_fn block_copy_common(BlockCopyCallState *call_state)
+ {
+     while (true) {
+-        int ret = block_copy_dirty_clusters(s, start, bytes, error_is_read);
++        int ret = block_copy_dirty_clusters(call_state);
+ 
+         if (ret < 0) {
+             /*
+@@ -620,7 +626,9 @@ int coroutine_fn block_copy(BlockCopyState *s, int64_t start, uint64_t bytes,
+          * requested region.
+          */
+ 
+-        if (!block_copy_wait_one(s, start, bytes)) {
++        if (!block_copy_wait_one(call_state->s, call_state->offset,
++                                 call_state->bytes))
++        {
+             /* No dirty bits and nothing to wait: the whole request is done */
+             break;
+         }
+@@ -629,6 +637,24 @@ int coroutine_fn block_copy(BlockCopyState *s, int64_t start, uint64_t bytes,
+     return 0;
+ }
+ 
++int coroutine_fn block_copy(BlockCopyState *s, int64_t start, uint64_t bytes,
++                            bool *error_is_read)
++{
++    BlockCopyCallState call_state = {
++        .s = s,
++        .offset = start,
++        .bytes = bytes,
++    };
++
++    int ret = block_copy_common(&call_state);
++
++    if (error_is_read && ret < 0) {
++        *error_is_read = call_state.error_is_read;
++    }
++
++    return ret;
++}
++
+ BdrvDirtyBitmap *block_copy_dirty_bitmap(BlockCopyState *s)
+ {
+     return s->copy_bitmap;
+-- 
+2.21.0
 
 
