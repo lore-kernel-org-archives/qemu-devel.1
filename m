@@ -2,83 +2,86 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91199C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 13:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD102C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 13:12:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 584CF2073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 13:12:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9DF562073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 13:12:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R8GkTNlO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 584CF2073A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cd6e2128"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DF562073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVbP4-0005aQ-63
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 08:12:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49393)
+	id 1iVbP8-0005fs-Lj
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 08:12:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49403)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1iVbNv-0004No-GW
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 08:11:36 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1iVbNw-0004Ns-9m
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 08:11:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1iVbNu-0004No-BA
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 08:11:35 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:36637)
+ (envelope-from <robert.foley@linaro.org>) id 1iVbNv-0004O9-CL
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 08:11:36 -0500
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:36676)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1iVbNu-0004NP-21
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 08:11:34 -0500
-Received: by mail-pg1-x542.google.com with SMTP id k13so6014750pgh.3
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 05:11:33 -0800 (PST)
+ id 1iVbNv-0004Nu-7N
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 08:11:35 -0500
+Received: by mail-pf1-x444.google.com with SMTP id b19so6673833pfd.3
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 05:11:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=wI02htXvbaCF/QBVlfvNuM25qEJJGrUPkf5so08TzqY=;
- b=R8GkTNlObqdMjoNPQEN0c994wbzQhcbz+h9v0vxQFyZa7KXXvxM0WW4nj1P2ymZZeZ
- aw4tcHcWA8YRGkvZbIt6HIyjOc3wYDWFganONoOv+qjkATdyqxWNAiW9zNYHXfBDNUiQ
- 6rvlhDflZrX5XbOaWI3oTo7BdKskAqpvb8uf6t1Bylwa44/5ZBn+MDhywAi0lS8//PBY
- 9aAAVDht9vdXMihmnDvQ9STRvjFXvSXtF0Ys2FoMX7AHaet5UxGcrAsyZ3UykAtZPyVr
- PrZKtMJreGf9FegxzEmYz8xoooUi3dTMsGZfWY+qiIizjYTr7x19WWnK4rr4AylMBTxr
- fIRQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=diXnF1IPkkxinXlGIqTBKK6HjgFjUcsfRfseHjAG8V0=;
+ b=cd6e2128QvkQXDsV9YD8foQDT+InMB8+/EC8yNh5eodUOIOk46ov2fxlrC+Rga724A
+ 0eMaAEnLcc18PQIqTYUj8DLuT3btXEuJHiFbHurp/AV4jQfzlOKNRtg8i0YNbGewu8Ne
+ SGk4KzfftSfi19UBpr1BV17IZsj7/U1d89Ua400q+aY4kVO5DAvConKmWLgQN+BZEnxS
+ jpsYNtbfC0lymsaj2ku5k9nozilZLoiQMsivwAPpvFHvo684hOr8UW4bte5mN/VbR8Hr
+ bbElEXLyo+edAk0n7m71zOM7dt/ilwtKT+vMH1gGtSBi+qUDDmnqb38ZvxCpVxYMQQw8
+ 2VeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=wI02htXvbaCF/QBVlfvNuM25qEJJGrUPkf5so08TzqY=;
- b=L4VBeeJr+zZ5bZn5BAdQU6iF8yFJqWcIXbSYPA6YRRgm2qnzvaLm4kExqN0Y1ng+FU
- afjER6+XkBE+3ZXaXkGgED2cSEbhigMe09geG1W72cKjrhs0QFrTerWEaRxN190TPzL1
- NcoIJrDrfMkzrDvBTb42dUr5OT5ydlYNFNViO6ZpzgGzqRfUbPOUmmVYGcHkQlESk9Fo
- Y12lFLMB+PviVSAbNkHXi/VxVgF+S0y0n+3YEbdRkjkBUAXoB/3/g949K8fIgoXV+hhK
- 7RT0wlYd1LItIVbv4VgAtejNFKRcoNuHnMUyB5C8ySDs6ROc/b1raiNmClxXPljymPI8
- MkRw==
-X-Gm-Message-State: APjAAAXHQuqXmChfYLqpWLSdkltvjCgWgrK8P/FHBdI4xfyIZC8/SDcl
- uHgLqprV56Kr1IkVY/k777O9drlDDl8=
-X-Google-Smtp-Source: APXvYqwQ4gG6P8C7CQrmAfABWsRv7szyZdgk/YiEVTT62M+BL53WnfLEBIB1jBSMYMQuxRkOVj8vrw==
-X-Received: by 2002:a62:1bd0:: with SMTP id b199mr17611326pfb.44.1573823492158; 
- Fri, 15 Nov 2019 05:11:32 -0800 (PST)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=diXnF1IPkkxinXlGIqTBKK6HjgFjUcsfRfseHjAG8V0=;
+ b=MWXHgV8y1c9yF1NnFf5zm3cUBpzX934xKpyCI/zxgNJi5imlZkZRkrRh0IyInSxoCy
+ BJyuNNCgj5LwT2giGeZLicLYgQr+vExa+6rJvH34X+r4nXOV02fjeYWLmDPyIG4YqQtf
+ HIkrR9VXlonAPnEWguJXBIiCJGlYp1ddTe+GG0G3esJAYx/aPQy/sItrTeBJJuRh0z/5
+ F7i44vwJrflwS4oWdOoF4b5CR9lfzjR1xLwVj8zM1nkusaTFhoOMPoMcOfO7GtxO6lS8
+ q8WGlodHCqtOMQcrDkEmbSpPoGa9HHHeNxgHz0+Gu94SiIIuqpsDr2w4WfI+Bl3qfBEl
+ wQdA==
+X-Gm-Message-State: APjAAAVQKPfn6UVJBg7O8oda7bsWmzcLA5xh3U2Gg5pxYWx4u0Zz7Lju
+ cTrDEIAQYZE4PON36mOqdvxtYO8NIS0=
+X-Google-Smtp-Source: APXvYqzYh86OPnfKTXwOx5xsSrZjjdf7vDEALFp2r2B5zizglkngToqonsr+KnJhwEWDWc2OGc+jKQ==
+X-Received: by 2002:a63:201b:: with SMTP id g27mr14642133pgg.56.1573823493901; 
+ Fri, 15 Nov 2019 05:11:33 -0800 (PST)
 Received: from Rfoley-MA01.usrd.futurewei.com ([12.111.81.71])
- by smtp.gmail.com with ESMTPSA id w138sm12007249pfc.68.2019.11.15.05.11.30
+ by smtp.gmail.com with ESMTPSA id w138sm12007249pfc.68.2019.11.15.05.11.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 Nov 2019 05:11:31 -0800 (PST)
+ Fri, 15 Nov 2019 05:11:33 -0800 (PST)
 From: Robert Foley <robert.foley@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/6] Make the qemu_logfile handle thread safe.
-Date: Fri, 15 Nov 2019 08:10:34 -0500
-Message-Id: <20191115131040.2834-1-robert.foley@linaro.org>
+Subject: [PATCH v2 1/6] Fix double free issue in qemu_set_log_filename().
+Date: Fri, 15 Nov 2019 08:10:35 -0500
+Message-Id: <20191115131040.2834-2-robert.foley@linaro.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191115131040.2834-1-robert.foley@linaro.org>
+References: <20191115131040.2834-1-robert.foley@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+X-Received-From: 2607:f8b0:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,64 +98,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds thread safety to the qemu_logfile handle.  This now
-allows changing the logfile while logging is active, and also solves 
-the issue of a seg fault while changing the logfile.
+After freeing the logfilename, we set logfilename to NULL, in case of an
+error which returns without setting logfilename.
 
-This patch adds use of RCU for handling the swap out of the 
-old qemu_logfile file descriptor.
-
-Also added a few tests for logfile including changing the logfile
-and closing the logfile.
-
-One change also added for a pre-existing double free issue in 
-qemu_set_log_filename() uncovered with the new test.
-
-We also cleaned up the flow of code in qemu_set_log().
-
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
 v2
-    - This version of the patch adds some cleanup of code in
-      qemu_set_log().
-    - Also changed the order of patches to move our fix for the
-      double free issue in qemu_set_log_filename() up to the beginning
-      of the patch.
+    - moved this change to the beginning of the patch series.
 ---
 v1
-    - This version of the patch incorporates changes 
-      from the first round of review.  
-    - It also includes a fix for an issue in
-      qemu_set_log_filename().  This issue was uncovered 
-      by the test added for this patch.
+    - This is new in the patch v1.
 ---
-Robert Foley (6):
-  Fix double free issue in qemu_set_log_filename().
-  Cleaned up flow of code in qemu_set_log(), to simplify and clarify.
-  Add a mutex to guarantee single writer to qemu_logfile handle.
-  qemu_log_lock/unlock now preserves the qemu_logfile handle.
-  Add use of RCU for qemu_logfile.
-  Added tests for close and change of logfile.
+ util/log.c | 1 +
+ 1 file changed, 1 insertion(+)
 
- accel/tcg/cpu-exec.c          |   4 +-
- accel/tcg/translate-all.c     |   4 +-
- accel/tcg/translator.c        |   4 +-
- exec.c                        |   4 +-
- hw/net/can/can_sja1000.c      |   4 +-
- include/exec/log.h            |  33 +++++++++--
- include/qemu/log.h            |  49 +++++++++++++---
- net/can/can_socketcan.c       |   5 +-
- target/cris/translate.c       |   4 +-
- target/i386/translate.c       |   5 +-
- target/lm32/translate.c       |   4 +-
- target/microblaze/translate.c |   4 +-
- target/nios2/translate.c      |   4 +-
- target/tilegx/translate.c     |   7 ++-
- target/unicore32/translate.c  |   4 +-
- tcg/tcg.c                     |  28 ++++++----
- tests/test-logging.c          |  80 ++++++++++++++++++++++++++
- util/log.c                    | 102 ++++++++++++++++++++++++++--------
- 18 files changed, 275 insertions(+), 74 deletions(-)
-
+diff --git a/util/log.c b/util/log.c
+index 1ca13059ee..4316fe74ee 100644
+--- a/util/log.c
++++ b/util/log.c
+@@ -113,6 +113,7 @@ void qemu_set_log_filename(const char *filename, Error **errp)
+ {
+     char *pidstr;
+     g_free(logfilename);
++    logfilename = NULL;
+ 
+     pidstr = strstr(filename, "%");
+     if (pidstr) {
 -- 
 2.17.1
 
