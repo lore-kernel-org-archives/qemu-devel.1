@@ -2,62 +2,86 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F0CCC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:50:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDAB4C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:50:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0451C2072D
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:50:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0451C2072D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id BC89920723
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:50:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAK61XmL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC89920723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVenN-0001Ut-9e
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:50:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52758)
+	id 1iVeo8-0002R3-Lg
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:50:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53825)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iVeR0-0001xp-HG
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:59 -0500
+ (envelope-from <eblake@redhat.com>) id 1iVeXG-0000Po-8Z
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:33:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iVeQz-0001QI-4I
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:58 -0500
-Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:34546)
+ (envelope-from <eblake@redhat.com>) id 1iVeXF-0005OR-2J
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:33:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35729
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVeQy-0001Pl-UB
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:57 -0500
-Received: from player787.ha.ovh.net (unknown [10.108.35.124])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 6D9C614C8B8
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:26:55 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player787.ha.ovh.net (Postfix) with ESMTPSA id 0A9EEC444ED5;
- Fri, 15 Nov 2019 16:26:50 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH for-5.0 v5 23/23] ppc/pnv: Extend XiveRouter with a
- get_block_id() handler
-Date: Fri, 15 Nov 2019 17:24:36 +0100
-Message-Id: <20191115162436.30548-24-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191115162436.30548-1-clg@kaod.org>
-References: <20191115162436.30548-1-clg@kaod.org>
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iVeXE-0005Nq-UQ
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:33:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573835604;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=C0egKsDNYyaAsKZw2Aoql8Q0HQfoDcgXVU0JgdBJdHk=;
+ b=KAK61XmLH1SnhYLrAmjiX+XzdXbiG3XuSp3ACyhu+EJnvUa9oNKXkQew+jsgYZhvOEO5+x
+ g+8UdGutVC7uHewk6fXZcYvJPRnuQsNEb2V5rpHpJnBuomwuoSpaCUu5TS+xWTmcTelsUW
+ 3Y+qHvtaICprSFg2iD/3s2F5J/LpJzs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-efPNeMcxOOm0m11iViw4zQ-1; Fri, 15 Nov 2019 11:33:21 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 285B51095A9B;
+ Fri, 15 Nov 2019 16:33:20 +0000 (UTC)
+Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 385666013C;
+ Fri, 15 Nov 2019 16:33:16 +0000 (UTC)
+Subject: Re: [PATCH v3 2/4] bitmap: Enforce maximum bitmap name length
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <20191114024635.11363-1-eblake@redhat.com>
+ <20191114024635.11363-3-eblake@redhat.com>
+ <0a25974f-f9cd-07a1-4cb7-2bbd4dfe4375@virtuozzo.com>
+ <6d54c6eb-4f28-6a5d-81e1-a175e34f3cf8@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <8461437b-8991-3725-308d-68e054c7f3a8@redhat.com>
+Date: Fri, 15 Nov 2019 10:33:15 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 15118302474313501670
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeei
+In-Reply-To: <6d54c6eb-4f28-6a5d-81e1-a175e34f3cf8@virtuozzo.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: efPNeMcxOOm0m11iViw4zQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.63.230
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,166 +93,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When doing CAM line compares, fetch the block id from the interrupt
-controller which can have set the PC_TCTXT_CHIPID field.
+On 11/15/19 9:47 AM, Vladimir Sementsov-Ogievskiy wrote:
+> 15.11.2019 18:03, Vladimir Sementsov-Ogievskiy wrote:
+>> 14.11.2019 5:46, Eric Blake wrote:
+>>> We document that for qcow2 persistent bitmaps, the name cannot exceed
+>>> 1023 bytes.=A0 It is inconsistent if transient bitmaps do not have to
+>>> abide by the same limit, and it is unlikely that any existing client
+>>> even cares about using bitmap names this long.=A0 It's time to codify
+>>> that ALL bitmaps managed by qemu (whether persistent in qcow2 or not)
+>>> have a documented maximum length.
+>>>
+>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>
+>>
+>=20
+> One doubt:
+>=20
+> Is it good idea to include string larger than 4K into error message
+> (in next patch too)? I doubt that such message would be
+> readable, and I think that most possible source of such message is
+> some kind of memory corruption, so the whole message would be garbage,
+> which may contain special symbols which may look bad or even break
+> output.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ppc/xive.h |  2 +-
- hw/intc/pnv_xive.c    |  6 ++++++
- hw/intc/spapr_xive.c  |  6 ++++++
- hw/intc/xive.c        | 21 ++++++++++++++++-----
- 4 files changed, 29 insertions(+), 6 deletions(-)
+The string was provided by the user. You are correct that it results in=20
+a lot of output on stderr, but it is no more garbage than what the user=20
+provided in the first place. If we wanted, we could truncate (list only=20
+the first 256 or so bytes and then output "..."), but it's such a corner=20
+case error that I don't think it's worth the effort to worry about it.
 
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 9c0bf2c301e2..1b7b89098f71 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -351,6 +351,7 @@ typedef struct XiveRouterClass {
-                    XiveNVT *nvt);
-     int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx=
-,
-                      XiveNVT *nvt, uint8_t word_number);
-+    uint8_t (*get_block_id)(XiveRouter *xrtr);
- } XiveRouterClass;
-=20
- int xive_router_get_eas(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_=
-idx,
-@@ -431,7 +432,6 @@ typedef struct XiveENDSource {
-     DeviceState parent;
-=20
-     uint32_t        nr_ends;
--    uint8_t         block_id;
-=20
-     /* ESB memory region */
-     uint32_t        esb_shift;
-diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index 93c27cce568b..c7c2fe3a7b5f 100644
---- a/hw/intc/pnv_xive.c
-+++ b/hw/intc/pnv_xive.c
-@@ -466,6 +466,11 @@ static int pnv_xive_match_nvt(XivePresenter *xptr, u=
-int8_t format,
-     return count;
- }
-=20
-+static uint8_t pnv_xive_get_block_id(XiveRouter *xrtr)
-+{
-+    return pnv_xive_block_id(PNV_XIVE(xrtr));
-+}
-+
- /*
-  * The TIMA MMIO space is shared among the chips and to identify the
-  * chip from which the access is being done, we extract the chip id
-@@ -1926,6 +1931,7 @@ static void pnv_xive_class_init(ObjectClass *klass,=
- void *data)
-     xrc->write_end =3D pnv_xive_write_end;
-     xrc->get_nvt =3D pnv_xive_get_nvt;
-     xrc->write_nvt =3D pnv_xive_write_nvt;
-+    xrc->get_block_id =3D pnv_xive_get_block_id;
-=20
-     xnc->notify =3D pnv_xive_notify;
-     xpc->match_nvt  =3D pnv_xive_match_nvt;
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 1542cef91878..daa0656859a3 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -473,6 +473,11 @@ static int spapr_xive_match_nvt(XivePresenter *xptr,=
- uint8_t format,
-     return count;
- }
-=20
-+static uint8_t spapr_xive_get_block_id(XiveRouter *xrtr)
-+{
-+    return SPAPR_XIVE_BLOCK_ID;
-+}
-+
- static const VMStateDescription vmstate_spapr_xive_end =3D {
-     .name =3D TYPE_SPAPR_XIVE "/end",
-     .version_id =3D 1,
-@@ -764,6 +769,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     xrc->write_end =3D spapr_xive_write_end;
-     xrc->get_nvt =3D spapr_xive_get_nvt;
-     xrc->write_nvt =3D spapr_xive_write_nvt;
-+    xrc->get_block_id =3D spapr_xive_get_block_id;
-=20
-     sicc->activate =3D spapr_xive_activate;
-     sicc->deactivate =3D spapr_xive_deactivate;
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index ce904b0b5ab4..e5159466f088 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -1371,17 +1371,25 @@ int xive_router_write_nvt(XiveRouter *xrtr, uint8=
-_t nvt_blk, uint32_t nvt_idx,
-    return xrc->write_nvt(xrtr, nvt_blk, nvt_idx, nvt, word_number);
- }
-=20
-+static int xive_router_get_block_id(XiveRouter *xrtr)
-+{
-+   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
-+
-+   return xrc->get_block_id(xrtr);
-+}
-+
- /*
-  * Encode the HW CAM line in the block group mode format :
-  *
-  *   chip << 19 | 0000000 0 0001 thread (7Bit)
-  */
--static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tctx)
-+static uint32_t xive_tctx_hw_cam_line(XivePresenter *xptr, XiveTCTX *tct=
-x)
- {
-     CPUPPCState *env =3D &POWERPC_CPU(tctx->cs)->env;
-     uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
-+    uint8_t blk =3D xive_router_get_block_id(XIVE_ROUTER(xptr));
-=20
--    return xive_nvt_cam_line((pir >> 8) & 0xf, 1 << 7 | (pir & 0x7f));
-+    return xive_nvt_cam_line(blk, 1 << 7 | (pir & 0x7f));
- }
-=20
- /*
-@@ -1418,7 +1426,7 @@ int xive_presenter_tctx_match(XivePresenter *xptr, =
-XiveTCTX *tctx,
-=20
-         /* PHYS ring */
-         if ((be32_to_cpu(qw3w2) & TM_QW3W2_VT) &&
--            cam =3D=3D xive_tctx_hw_cam_line(tctx)) {
-+            cam =3D=3D xive_tctx_hw_cam_line(xptr, tctx)) {
-             return TM_QW3_HV_PHYS;
-         }
-=20
-@@ -1755,7 +1763,11 @@ static uint64_t xive_end_source_read(void *opaque,=
- hwaddr addr, unsigned size)
-     uint8_t pq;
-     uint64_t ret =3D -1;
-=20
--    end_blk =3D xsrc->block_id;
-+    /*
-+     * The block id should be deduced from the load address on the END
-+     * ESB MMIO but our model only supports a single block per XIVE chip=
-.
-+     */
-+    end_blk =3D xive_router_get_block_id(xsrc->xrtr);
-     end_idx =3D addr >> (xsrc->esb_shift + 1);
-=20
-     if (xive_router_get_end(xsrc->xrtr, end_blk, end_idx, &end)) {
-@@ -1855,7 +1867,6 @@ static void xive_end_source_realize(DeviceState *de=
-v, Error **errp)
- }
-=20
- static Property xive_end_source_properties[] =3D {
--    DEFINE_PROP_UINT8("block-id", XiveENDSource, block_id, 0),
-     DEFINE_PROP_UINT32("nr-ends", XiveENDSource, nr_ends, 0),
-     DEFINE_PROP_UINT32("shift", XiveENDSource, esb_shift, XIVE_ESB_64K),
-     DEFINE_PROP_LINK("xive", XiveENDSource, xrtr, TYPE_XIVE_ROUTER,
 --=20
-2.21.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
