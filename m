@@ -2,61 +2,75 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABBF5C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:35:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E4EAC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:51:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FFC520723
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:35:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FFC520723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 43AA820715
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:51:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43AA820715
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVX4a-0007Vd-Ko
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 03:35:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43647)
+	id 1iVXKW-0002lY-7s
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 03:51:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45498)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iVX3J-0006Vd-Ke
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:34:02 -0500
+ (envelope-from <bounces@canonical.com>) id 1iVXJs-0002Lj-Mo
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:51:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iVX3H-0000tR-NG
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:34:00 -0500
-Received: from mga05.intel.com ([192.55.52.43]:38727)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iVX3H-0000sI-Dr
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:33:59 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
- by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 15 Nov 2019 00:33:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,307,1569308400"; d="scan'208";a="230390059"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga004.fm.intel.com with ESMTP; 15 Nov 2019 00:33:54 -0800
-From: Tao Xu <tao3.xu@intel.com>
-To: pbonzini@redhat.com,
-	rth@twiddle.net,
-	ehabkost@redhat.com
-Subject: [PATCH] target/i386: Remove monitor from some CPU model
-Date: Fri, 15 Nov 2019 16:33:45 +0800
-Message-Id: <20191115083345.22638-1-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
+ (envelope-from <bounces@canonical.com>) id 1iVXJq-0000m1-U6
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:51:08 -0500
+Received: from indium.canonical.com ([91.189.90.7]:47336)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iVXJq-0000kn-OK
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:51:06 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iVXJp-0005YZ-3I
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 08:51:05 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 13E1E2E80C3
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 08:51:05 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.43
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 15 Nov 2019 08:43:37 -0000
+From: Kevin Wolf <1846427@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h kwolf-redhat lersek mattihami
+ michael-weiser psyhomb sej7278
+X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
+X-Launchpad-Bug-Modifier: Kevin Wolf (kwolf-redhat)
+References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
+Message-Id: <157380741727.31178.6072020043965035553.malone@wampee.canonical.com>
+Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: acaacbedfb59f0b5ff9d1d26b64a612cc82657c5
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -65,121 +79,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tao Xu <tao3.xu@intel.com>, qemu-devel@nongnu.org
+Reply-To: Bug 1846427 <1846427@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add new version of Snowridge, Denverton, Opteron_G3, EPYC, and Dhyana
-CPU model to remove MONITOR/MWAIT feature.
+Is this a fresh image or is it possible that it already had some latent
+corruption from a previous run with an unfixed version? If it wasn't
+fresh, did you run qemu-img check after upgrading QEMU and it still was
+clean, so we know the corruption was introduced by the new version?
 
-After QEMU/KVM use "-overcommit cpu-pm=on" to expose MONITOR/MWAIT
-(commit id 6f131f13e68d648a8e4f083c667ab1acd88ce4cd), the MONITOR/MWAIT
-feature in these CPU model is unused.
+Is the problem easily reproducible or do you hit it only randomly so
+far? If it is reproducible, can you reproduce it on current qemu.git
+master or is it only with the Arch package?
 
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
- target/i386/cpu.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
+-- =
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index a624163ac2..7c5f1e8fe0 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2770,6 +2770,19 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             MSR_ARCH_CAP_RDCL_NO | MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY,
-         .xlevel = 0x80000008,
-         .model_id = "Intel Atom Processor (Denverton)",
-+        .versions = (X86CPUVersionDefinition[]) {
-+            { .version = 1 },
-+            {
-+                .version = 2,
-+                .props = (PropValue[]) {
-+                    { "monitor", "off" },
-+                    { "model-id",
-+                      "Intel Atom Processor (Denverton, no MONITOR)" },
-+                    { /* end of list */ },
-+                },
-+            },
-+            { /* end of list */ },
-+        },
-     },
-     {
-         .name = "Snowridge",
-@@ -2850,6 +2863,16 @@ static X86CPUDefinition builtin_x86_defs[] = {
-                     { /* end of list */ },
-                 },
-             },
-+            {
-+                .version = 3,
-+                .props = (PropValue[]) {
-+                    /* mpx was already removed by -v2 above */
-+                    { "monitor", "off" },
-+                    { "model-id",
-+                      "Intel Atom Processor (Snowridge, no MPX, no MONITOR)" },
-+                    { /* end of list */ },
-+                },
-+            },
-             { /* end of list */ },
-         },
-     },
-@@ -2961,6 +2984,19 @@ static X86CPUDefinition builtin_x86_defs[] = {
-             CPUID_EXT3_ABM | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM,
-         .xlevel = 0x80000008,
-         .model_id = "AMD Opteron 23xx (Gen 3 Class Opteron)",
-+        .versions = (X86CPUVersionDefinition[]) {
-+            { .version = 1 },
-+            {
-+                .version = 2,
-+                .props = (PropValue[]) {
-+                    { "monitor", "off" },
-+                    { "model-id",
-+                      "AMD Opteron 23xx (Gen 3 Class Opteron, no MONITOR)" },
-+                    { /* end of list */ },
-+                },
-+            },
-+            { /* end of list */ },
-+        },
-     },
-     {
-         .name = "Opteron_G4",
-@@ -3085,6 +3121,16 @@ static X86CPUDefinition builtin_x86_defs[] = {
-                     { /* end of list */ }
-                 }
-             },
-+            {
-+                .version = 3,
-+                .props = (PropValue[]) {
-+                    /* ibpb was already enabled by -v2 above */
-+                    { "monitor", "off" },
-+                    { "model-id",
-+                      "AMD EPYC Processor (with IBPB, no MONITOR)" },
-+                    { /* end of list */ },
-+                },
-+            },
-             { /* end of list */ }
-         }
-     },
-@@ -3137,6 +3183,18 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .xlevel = 0x8000001E,
-         .model_id = "Hygon Dhyana Processor",
-         .cache_info = &epyc_cache_info,
-+        .versions = (X86CPUVersionDefinition[]) {
-+            { .version = 1 },
-+            {
-+                .version = 2,
-+                .props = (PropValue[]) {
-+                    { "monitor", "off" },
-+                    { "model-id", "Hygon Dhyana Processor (no MONITOR)" },
-+                    { /* end of list */ },
-+                },
-+            },
-+            { /* end of list */ },
-+        },
-     },
- };
- 
--- 
-2.20.1
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1846427
 
+Title:
+  4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
+
+Status in QEMU:
+  Fix Committed
+
+Bug description:
+  I'm seeing massive corruption of qcow2 images with qemu 4.1.0 and git
+  master as of 7f21573c822805a8e6be379d9bcf3ad9effef3dc after a few
+  savevm/quit/loadvm cycles. I've narrowed it down to the following
+  reproducer (further notes below):
+
+  # qemu-img check debian.qcow2
+  No errors were found on the image.
+  251601/327680 =3D 76.78% allocated, 1.63% fragmented, 0.00% compressed cl=
+usters
+  Image end offset: 18340446208
+  # bin/qemu/bin/qemu-system-x86_64 -machine pc-q35-4.0.1,accel=3Dkvm -m 40=
+96 -chardev stdio,id=3Dcharmonitor -mon chardev=3Dcharmonitor -drive file=
+=3Ddebian.qcow2,id=3Dd -S
+  qemu-system-x86_64: warning: dbind: Couldn't register with accessibility =
+bus: Did not receive a reply. Possible causes include: the remote applicati=
+on did not send a reply, the message bus security policy blocked the reply,=
+ the reply timeout expired, or the network connection was broken.
+  QEMU 4.1.50 monitor - type 'help' for more information
+  (qemu) loadvm foo
+  (qemu) c
+  (qemu) qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  quit
+  [m@nargothrond:~] qemu-img check debian.qcow2
+  Leaked cluster 85179 refcount=3D2 reference=3D1
+  Leaked cluster 85180 refcount=3D2 reference=3D1
+  ERROR cluster 266150 refcount=3D0 reference=3D2
+  [...]
+  ERROR OFLAG_COPIED data cluster: l2_entry=3D422840000 refcount=3D1
+
+  9493 errors were found on the image.
+  Data may be corrupted, or further writes to the image may corrupt it.
+
+  2 leaked clusters were found on the image.
+  This means waste of disk space, but no harm to data.
+  259266/327680 =3D 79.12% allocated, 1.67% fragmented, 0.00% compressed cl=
+usters
+  Image end offset: 18340446208
+
+  This is on a x86_64 Linux 5.3.1 Gentoo host with qemu-system-x86_64
+  and accel=3Dkvm. The compiler is gcc-9.2.0 with the rest of the system
+  similarly current.
+
+  Reproduced with qemu-4.1.0 from distribution package as well as
+  vanilla git checkout of tag v4.1.0 and commit
+  7f21573c822805a8e6be379d9bcf3ad9effef3dc (today's master). Does not
+  happen with qemu compiled from vanilla checkout of tag v4.0.0. Build
+  sequence:
+
+  ./configure --prefix=3D$HOME/bin/qemu-bisect --target-list=3Dx86_64-softm=
+mu --disable-werror --disable-docs
+  [...]
+  CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
+  [...] (can provide full configure output if helpful)
+  make -j8 install
+
+  The kind of guest OS does not matter: seen with Debian testing 64bit,
+  Windows 7 x86/x64 BIOS and Windows 7 x64 EFI.
+
+  The virtual storage controller does not seem to matter: seen with
+  VirtIO SCSI, emulated SCSI and emulated SATA AHCI.
+
+  Caching modes (none, directsync, writeback), aio mode (threads,
+  native) or discard (ignore, unmap) or detect-zeroes (off, unmap) does
+  not influence occurence either.
+
+  Having more RAM in the guest seems to increase odds of corruption:
+  With 512MB to the Debian guest problem hardly occurs at all, with 4GB
+  RAM it happens almost instantly.
+
+  An automated reproducer works as follows:
+
+  - the guest *does* mount its root fs and swap with option discard and
+  my testing leaves me with the impression that file deletion rather
+  than reading is causing the issue
+
+  - foo is a snapshot of the running Debian VM which is already running
+  command
+
+  # while true ; do dd if=3D/dev/zero of=3Dfoo bs=3D10240k count=3D400 ; do=
+ne
+
+  to produce some I/O to the disk (4GB file with 4GB of RAM).
+
+  - on the host a loop continuously resumes and saves the guest state
+  and quits qemu inbetween:
+
+  # while true ; do (echo loadvm foo ; echo c ; sleep 10 ; echo stop ;
+  echo savevm foo ; echo quit ) | bin/qemu-bisect/bin/qemu-system-x86_64
+  -machine pc-q35-3.1,accel=3Dkvm -m 4096 -chardev stdio,id=3Dcharmonitor
+  -mon chardev=3Dcharmonitor -drive file=3Ddebian.qcow2,id=3Dd -S -display
+  none ; done
+
+  - quitting qemu inbetween saves and loads seems to be necessary for
+  the problem to occur. Just continusouly in one session saving and
+  loading guest state does not trigger it.
+
+  - For me, after about 2 to 6 iterations of above loop the image is
+  corrupted.
+
+  - corruption manifests with other messages from qemu as well, e.g.:
+
+  (qemu) loadvm foo
+  Error: Device 'd' does not have the requested snapshot 'foo'
+
+  Using above reproducer I have to the be best of my ability bisected
+  the introduction of the problem to commit
+  69f47505ee66afaa513305de0c1895a224e52c45 (block: avoid recursive
+  block_status call if possible). qemu compiled from the commit before
+  does not exhibit the issue, from that commit on it does and reverting
+  the commit off of current master makes it disappear.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1846427/+subscriptions
 
