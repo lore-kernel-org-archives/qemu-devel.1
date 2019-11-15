@@ -2,90 +2,96 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D68AC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:27:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4082DC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:31:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69AD42072B
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:27:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BED42072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:31:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T0QLyewF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69AD42072B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MBj2fhNX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BED42072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36602 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVWxQ-00048U-Jw
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 03:27:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42900)
+	id 1iVX0S-0005R0-VG
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 03:31:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43139)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <teemu.kuusisto@gmail.com>) id 1iVWwl-0003cQ-JX
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:27:16 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iVWzV-0004uP-7d
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:30:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <teemu.kuusisto@gmail.com>) id 1iVWwk-0006Rg-Ja
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:27:15 -0500
-Received: from mail-lf1-x136.google.com ([2a00:1450:4864:20::136]:39543)
+ (envelope-from <richard.henderson@linaro.org>) id 1iVWzT-0007UQ-LY
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:30:04 -0500
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:52073)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <teemu.kuusisto@gmail.com>)
- id 1iVWwk-0006RI-9P
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:27:14 -0500
-Received: by mail-lf1-x136.google.com with SMTP id j14so7358118lfk.6
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 00:27:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=x3N3pfWAuR0wfYqlvml+CllinbXTcYh8KS49S6oDEqY=;
- b=T0QLyewFL1LbpCsfn8s2LJBdlOWmY4txaGBHT1XvHmeSGAjQFxSxORgoY+AsNnDEGz
- BS1KxejhS3kVrgC4xrtGSdGR0/Sm506bLlSpOHchKf7coSovW/mJd7ediGL8ASDXLL5F
- OyKn8/fYfl9takf5f9EDgUB8ClyfSVf/yBiClm7PLUaPLfIBZXdRGOVUBM+QUuC0TiYo
- mYH6RCM3XwXmvD7JNhiNPH0IiMUyNzt+UzNKUkbIndfOwgmWW8R7PVdbMZoa8l1dPR+f
- rMxcFrS7TRg4ve/MqReMIccwYGi5UTOGSnlvrGikEJqGyewc0fKFRa9h9gF8i9n9ZwPO
- hzwA==
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iVWzT-0007TA-Dx
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:30:03 -0500
+Received: by mail-wm1-x329.google.com with SMTP id q70so8749053wme.1
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 00:30:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=tcosUfNUBVjsaD6V10vasBr4arbhp7KrufrEmE2Xmeg=;
+ b=MBj2fhNX3XvKS9wJPLciZLvsXWC9u5ZdWcETgonuExgw4sSNCiGlvTXO2e1WMq2Jy0
+ E94h2gOPw1IWqe37LiUocwsFWqgTFb2Fh3YHmRbKRRNh1644+wcQtTqNB8vh0uYXARS7
+ mjQ2g2+NELq+by8wQt+e3GV6i4cdsECAo8V8Cloi9xarLvRwpRaK/h7STeFhWxlra5Vy
+ j34lajF0avmySd08HFPIYuPUjJ/Bld8FreQwsn8HPRxOvjItRjro0TwVmxzLNugG3JNM
+ xfa8VYdKForFr87yU607NCDh9Zb4Nrt0BRPc1xPJ8OSEcjJD64XNOiIy8/sph5cbVvFo
+ 1ljQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=x3N3pfWAuR0wfYqlvml+CllinbXTcYh8KS49S6oDEqY=;
- b=hXQutluKN2+Y4IWIbdDMNcxsoxPWMWv/dygnBJw4QtoBtY/EBwSt++U1Vps5HlVq6S
- wgRBdsoFOcARJzPqVH9QkNX/JispVfLofri1y/A0DA5tgPbt1WTPZV0f743Po6AXDFdo
- vxdTwbUCQfF76PjvWMr6ofRSHnQBwhg38F67BLCeGVnBxRcHV800HY6lvGEkqJzcsGiO
- Bxmqhbs9BDxzM0K7i2swtQRL7v9YupOvIiQ7h3vqJcI2As1OJae2awOdgNu/FyPxkPRX
- u/Axye2K2DJLvBS/iztlbHo2yT1orVqnVXci1Eu99kuTkExQIos4Hvx+XkG7T3GI14/N
- 6kDQ==
-X-Gm-Message-State: APjAAAV3qk8JrrsLbvYzQuhsbsToHV0CJhSN40euT4E0hl+yO+HB4Esc
- rgtO6Rd7TUAmHk32iPLUIwo=
-X-Google-Smtp-Source: APXvYqyqGGfWMncG7E2rlXEPCA4ltMp2Ay+3f5vhTDThGpIeA3q/HDKtundGYfSRHxRyhuA3PqtVaA==
-X-Received: by 2002:a19:5f44:: with SMTP id a4mr9675992lfj.45.1573806431924;
- Fri, 15 Nov 2019 00:27:11 -0800 (PST)
-Received: from valhalla (guest.anygraaf.fi. [62.44.192.148])
- by smtp.gmail.com with ESMTPSA id n133sm4199738lfd.88.2019.11.15.00.27.10
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Fri, 15 Nov 2019 00:27:11 -0800 (PST)
-Date: Fri, 15 Nov 2019 10:27:09 +0200
-From: Teemu Kuusisto <teemu.kuusisto@gmail.com>
-To: Samuel Thibault <samuel.thibault@gnu.org>
-Subject: Re: Braille device (chardev/baum.c) is unable to detect the TTY
- correctly and does not act on graphic console connect/disconnect
-Message-ID: <20191115082709.GB11020@valhalla>
-References: <20191114120915.GA31365@valhalla>
- <20191114130841.kxgorkvtinyaahdm@function>
- <20191114132712.rpqzq7jvl32beduu@function>
- <20191114133125.o7bc27kdvkduygrt@function>
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tcosUfNUBVjsaD6V10vasBr4arbhp7KrufrEmE2Xmeg=;
+ b=K0LDxEBS/YDNCJsB66JBbTtcRjOlmMIj2W1RNhuGFetfQ9nPbT2Q7hMS+cwKcy8VY0
+ Qr6xdhZ8RbKNcGKxCf1HeyObs1JCzEQUsZn/b00t9zNde9rXDJBIUDunf1ksm5aQuqiv
+ mjkaCCvEsIwb0SiwGTO8zhaUn57c7i2pfqKiNpsFzB8JylRoQXD4ugOsgRMIIHR4WJfD
+ V27c4IcyFIBqDptBPQtW27nc7yO08eemJQ5NQliQ07kh1M8ytDT2JLAF7kH7Qa0rwS11
+ I84Vsp2h3NhCtG9MZaOhjP+leW2LemxR2gt6P2R7WKiwuU4l6CC2le2z3QqYNRKy9m6i
+ /pKA==
+X-Gm-Message-State: APjAAAVZuZyRME2h5OkMMan71gWfQerTuq/HdeklOpbxTQWNKS6UDner
+ 5TNU3tSVgzQb6Ob8nxoTmR7a50nC0B+Y7Q==
+X-Google-Smtp-Source: APXvYqw6rmBhOlF29KwK40BALoRK8dz9EcRVw2pitZSNyRWSJ8A1PHZ1SBdiG/BkBbrrWxZS9dK7CA==
+X-Received: by 2002:a05:600c:2919:: with SMTP id
+ i25mr13014927wmd.158.1573806601825; 
+ Fri, 15 Nov 2019 00:30:01 -0800 (PST)
+Received: from [192.168.8.102] (56.red-213-99-189.dynamicip.rima-tde.net.
+ [213.99.189.56])
+ by smtp.gmail.com with ESMTPSA id j63sm9223257wmj.46.2019.11.15.00.30.00
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 15 Nov 2019 00:30:01 -0800 (PST)
+Subject: Re: [PULL 04/11] target/arm/cpu64: max cpu: Introduce sve<N>
+ properties
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191101085140.5205-1-peter.maydell@linaro.org>
+ <20191101085140.5205-5-peter.maydell@linaro.org>
+ <CAFEAcA-xYWLzsfDAWWmEk4DhXcO5zqKVZMrRp9=4t9MBAasaMA@mail.gmail.com>
+ <ac0c7520-2f6b-fb49-c725-37b46272c835@linaro.org>
+ <CAFEAcA9KwEzNoyugPNjqBmOb-F7EWWJ=0kf6ysD3mDk_R9v=DA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <0955b4bf-87fc-b77a-d5b9-f07293059487@linaro.org>
+Date: Fri, 15 Nov 2019 09:29:57 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191114133125.o7bc27kdvkduygrt@function>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <CAFEAcA9KwEzNoyugPNjqBmOb-F7EWWJ=0kf6ysD3mDk_R9v=DA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::136
+X-Received-From: 2a00:1450:4864:20::329
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,14 +103,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I totally agree with everything you said! That would allow accessible use of remote virtual machines, which I initially thought of as rather unnecessary but it definitely is not. I just did not dare to even think of the new possibilities it would offer!
+On 11/13/19 10:30 PM, Peter Maydell wrote:
+> Coverity may also be looking at the case where
+> TARGET_AARCH64 is not defined. The fallback definition
+> of arm_cpu_vq_map_next_smaller() for that situation
+> always returns 0.
 
-Brlapi already has a file descriptor. Could spice just grab that and proxy its contents as a channel? Only brlapi's open/close connection and enter/leave tty needs to be called by spice. That does not sound of too much maintenane for spice. I just took a look at the header files of brlapi and noticed that you are involved in that project too, Samuel.
+Yeah, that makes more sense.
+I think we can make the fallback g_assert_not_reached().
 
--- Teemu
+Testing a patch for all this.
+
+
+r~
 
