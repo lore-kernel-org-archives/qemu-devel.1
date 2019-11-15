@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C6BC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 12:36:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D2FC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 12:37:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8994E2053B
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 12:36:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8994E2053B
+	by mail.kernel.org (Postfix) with ESMTPS id 0C5BE2053B
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 12:37:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C5BE2053B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=rt-rk.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVaqQ-0003Vq-AO
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 07:36:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45255)
+	id 1iVaqS-0003aa-NJ
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 07:37:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45261)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iVan4-0007p3-Fd
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iVan4-0007pD-Ix
  for qemu-devel@nongnu.org; Fri, 15 Nov 2019 07:33:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iVan3-0003Jd-90
+ (envelope-from <Filip.Bozuta@rt-rk.com>) id 1iVan3-0003Jj-AW
  for qemu-devel@nongnu.org; Fri, 15 Nov 2019 07:33:30 -0500
-Received: from mx2.rt-rk.com ([89.216.37.149]:50548 helo=mail.rt-rk.com)
+Received: from mx2.rt-rk.com ([89.216.37.149]:50437 helo=mail.rt-rk.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <Filip.Bozuta@rt-rk.com>)
- id 1iVan2-00030b-Ui
+ id 1iVan2-00030Z-Vi
  for qemu-devel@nongnu.org; Fri, 15 Nov 2019 07:33:29 -0500
 Received: from localhost (localhost [127.0.0.1])
- by mail.rt-rk.com (Postfix) with ESMTP id C3F401A225F;
+ by mail.rt-rk.com (Postfix) with ESMTP id AD16C1A207A;
  Fri, 15 Nov 2019 13:32:23 +0100 (CET)
 X-Virus-Scanned: amavisd-new at rt-rk.com
 Received: from rtrkw493-lin.domain.local (rtrkw493-lin.domain.local
  [10.10.14.93])
- by mail.rt-rk.com (Postfix) with ESMTPSA id 86A1E1A20BF;
+ by mail.rt-rk.com (Postfix) with ESMTPSA id 67D011A1E3D;
  Fri, 15 Nov 2019 13:32:23 +0100 (CET)
 From: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 for 5.0 4/6] linux-user: Add support for get/set RTC wakeup
- alarm using ioctls
-Date: Fri, 15 Nov 2019 13:32:14 +0100
-Message-Id: <1573821136-30219-5-git-send-email-Filip.Bozuta@rt-rk.com>
+Subject: [PATCH v3 for 5.0 1/6] linux-user: Add support for enable/disable RTC
+ features using ioctls
+Date: Fri, 15 Nov 2019 13:32:11 +0100
+Message-Id: <1573821136-30219-2-git-send-email-Filip.Bozuta@rt-rk.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1573821136-30219-1-git-send-email-Filip.Bozuta@rt-rk.com>
 References: <1573821136-30219-1-git-send-email-Filip.Bozuta@rt-rk.com>
@@ -73,89 +73,106 @@ Sender: "Qemu-devel"
 
 This patch implements functionalities of following ioctls:
 
-RTC_WKALM_SET, RTC_WKALM_GET - Get/Set wakeup alarm
+RTC_AIE_ON, RTC_AIE_OFF - Alarm interrupt enable on/off
 
-    Some RTCs support a more powerful alarm interface, using these
-    ioctls to read or write the RTC's alarm time (respectively)
-    with this structure:
+    Enable or disable the alarm interrupt, for RTCs that support
+    alarms.  The third ioctl's argument is ignored.
 
-        struct rtc_wkalrm {
-            unsigned char enabled;
-            unsigned char pending;
-            struct rtc_time time;
-        };
+RTC_UIE_ON, RTC_UIE_OFF - Update interrupt enable on/off
 
-    The enabled flag is used to enable or disable the alarm inter=E2=80=90
-    rupt, or to read its current status; when using these calls,
-    RTC_AIE_ON and RTC_AIE_OFF are not used.  The pending flag is
-    used by RTC_WKALM_RD to report a pending interrupt (so it's
-    mostly useless on Linux, except when talking to the RTC man=E2=80=90
-    aged by EFI firmware).  The time field is as used with
-    RTC_ALM_READ and RTC_ALM_SET except that the tm_mday, tm_mon,
-    and tm_year fields are also valid.  A pointer to this struc=E2=80=90
-    ture should be passed as the third ioctl's argument.
+    Enable or disable the interrupt on every clock update, for
+    RTCs that support this once-per-second interrupt.  The third
+    ioctl's argument is ignored.
+
+RTC_PIE_ON, RTC_PIE_OFF - Periodic interrupt enable on/off
+
+    Enable or disable the periodic interrupt, for RTCs that sup=E2=80=90
+    port these periodic interrupts.  The third ioctl's argument
+    is ignored.  Only a privileged process (i.e., one having the
+    CAP_SYS_RESOURCE capability) can enable the periodic interrupt
+    if the frequency is currently set above the value specified in
+    /proc/sys/dev/rtc/max-user-freq.
+
+RTC_WIE_ON, RTC_WIE_OFF - Watchdog interrupt enable on/off
+
+    Enable or disable the Watchdog interrupt, for RTCs that sup-
+    port this Watchdog interrupt. The third ioctl's argument is
+    ignored.
 
 Implementation notes:
 
-    All ioctls in this patch have pointer to a structure rtc_wkalrm
-    as their third argument. That is the reason why corresponding
-    definition is added in linux-user/syscall_types.h. Since all
-    elements of this structure are either of type 'unsigned char'
-    or 'struct rtc_time' (that was covered in one of previous
-    patches), the rest of the implementation is straightforward.
+    Since all of involved ioctls have NULL as their third argument,
+    their implementation was straightforward.
+
+    The line '#include <linux/rtc.h>' was added to recognize
+    preprocessor definitions for these ioctls.  This needs to be
+    done only once in this series of commits.  Also, the content
+    of this file (with respect to ioctl definitions) remained
+    unchanged for a long time, therefore there is no need to
+    worry about supporting older Linux kernel version.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@rt-rk.com>
 ---
- linux-user/ioctls.h        | 2 ++
- linux-user/syscall_defs.h  | 2 ++
- linux-user/syscall_types.h | 5 +++++
- 3 files changed, 9 insertions(+)
+ linux-user/ioctls.h       |  9 +++++++++
+ linux-user/syscall.c      |  1 +
+ linux-user/syscall_defs.h | 10 ++++++++++
+ 3 files changed, 20 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index accbdee..b09396e 100644
+index c6b9d6a..97741c7 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -85,6 +85,8 @@
-      IOCTL(RTC_IRQP_SET, IOC_W, TYPE_ULONG)
-      IOCTL(RTC_EPOCH_READ, IOC_R, MK_PTR(TYPE_ULONG))
-      IOCTL(RTC_EPOCH_SET, IOC_W, TYPE_ULONG)
-+     IOCTL(RTC_WKALM_RD, IOC_R, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
-+     IOCTL(RTC_WKALM_SET, IOC_W, MK_PTR(MK_STRUCT(STRUCT_rtc_wkalrm)))
+@@ -69,6 +69,15 @@
+      IOCTL(KDSETLED, 0, TYPE_INT)
+      IOCTL_SPECIAL(KDSIGACCEPT, 0, do_ioctl_kdsigaccept, TYPE_INT)
 =20
++     IOCTL(RTC_AIE_ON, 0, TYPE_NULL)
++     IOCTL(RTC_AIE_OFF, 0, TYPE_NULL)
++     IOCTL(RTC_UIE_ON, 0, TYPE_NULL)
++     IOCTL(RTC_UIE_OFF, 0, TYPE_NULL)
++     IOCTL(RTC_PIE_ON, 0, TYPE_NULL)
++     IOCTL(RTC_PIE_OFF, 0, TYPE_NULL)
++     IOCTL(RTC_WIE_ON, 0, TYPE_NULL)
++     IOCTL(RTC_WIE_OFF, 0, TYPE_NULL)
++
       IOCTL(BLKROSET, IOC_W, MK_PTR(TYPE_INT))
       IOCTL(BLKROGET, IOC_R, MK_PTR(TYPE_INT))
+      IOCTL(BLKRRPART, 0, TYPE_NULL)
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index ce399a5..74c3c08 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -107,6 +107,7 @@
+ #include <netpacket/packet.h>
+ #include <linux/netlink.h>
+ #include <linux/if_alg.h>
++#include <linux/rtc.h>
+ #include "linux_loop.h"
+ #include "uname.h"
+=20
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index bbfa935..37504a2 100644
+index 98c2119..f91579a 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -780,6 +780,8 @@ struct target_pollfd {
- #define TARGET_RTC_IRQP_SET         TARGET_IOW('p', 0x0c, abi_ulong)
- #define TARGET_RTC_EPOCH_READ       TARGET_IOR('p', 0x0d, abi_ulong)
- #define TARGET_RTC_EPOCH_SET        TARGET_IOW('p', 0x0e, abi_ulong)
-+#define TARGET_RTC_WKALM_RD         TARGET_IOR('p', 0x10, struct rtc_wka=
-lrm)
-+#define TARGET_RTC_WKALM_SET        TARGET_IOW('p', 0x0f, struct rtc_wka=
-lrm)
+@@ -763,6 +763,16 @@ struct target_pollfd {
+ #define TARGET_KDSETLED        0x4B32	/* set led state [lights, not flag=
+s] */
+ #define TARGET_KDSIGACCEPT     0x4B4E
 =20
++/* real time clock ioctls */
++#define TARGET_RTC_AIE_ON           TARGET_IO('p', 0x01)
++#define TARGET_RTC_AIE_OFF          TARGET_IO('p', 0x02)
++#define TARGET_RTC_UIE_ON           TARGET_IO('p', 0x03)
++#define TARGET_RTC_UIE_OFF          TARGET_IO('p', 0x04)
++#define TARGET_RTC_PIE_ON           TARGET_IO('p', 0x05)
++#define TARGET_RTC_PIE_OFF          TARGET_IO('p', 0x06)
++#define TARGET_RTC_WIE_ON           TARGET_IO('p', 0x0f)
++#define TARGET_RTC_WIE_OFF          TARGET_IO('p', 0x10)
++
  #if defined(TARGET_ALPHA) || defined(TARGET_MIPS) || defined(TARGET_SH4)=
  ||    \
         defined(TARGET_XTENSA)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index a35072a..820bc8e 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -266,6 +266,11 @@ STRUCT(rtc_time,
-        TYPE_INT, /* tm_yday */
-        TYPE_INT) /* tm_isdst */
-=20
-+STRUCT(rtc_wkalrm,
-+       TYPE_CHAR, /* enabled */
-+       TYPE_CHAR, /* pending */
-+       MK_STRUCT(STRUCT_rtc_time)) /* time */
-+
- STRUCT(blkpg_ioctl_arg,
-        TYPE_INT, /* op */
-        TYPE_INT, /* flags */
+ #define TARGET_FIOGETOWN       TARGET_IOR('f', 123, int)
 --=20
 2.7.4
 
