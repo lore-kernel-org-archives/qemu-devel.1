@@ -6,42 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CCCCC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:37:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA85C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:38:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70DED2073B
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:37:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70DED2073B
+	by mail.kernel.org (Postfix) with ESMTPS id B10692073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:38:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B10692073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVcj3-0003pZ-IN
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:37:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59345)
+	id 1iVcjf-0004mq-JB
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:38:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59400)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNj-0005B4-Kh
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:30 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNo-0005Dq-8w
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNe-0002BQ-13
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:26 -0500
-Received: from relay.sw.ru ([185.231.240.75]:47412)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNm-0002LC-Sf
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:32 -0500
+Received: from relay.sw.ru ([185.231.240.75]:47574)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcNa-0001rw-6b; Fri, 15 Nov 2019 09:15:18 -0500
+ id 1iVcNd-0001wi-Ox; Fri, 15 Nov 2019 09:15:21 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcN4-0006WW-Am; Fri, 15 Nov 2019 17:14:46 +0300
+ id 1iVcNI-0006WW-CQ; Fri, 15 Nov 2019 17:15:00 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [RFC 04/24] block/block-copy: refactor interfaces to use bytes
- instead of end
-Date: Fri, 15 Nov 2019 17:14:24 +0300
-Message-Id: <20191115141444.24155-5-vsementsov@virtuozzo.com>
+Subject: [RFC 24/24] python: benchmark new backup architecture
+Date: Fri, 15 Nov 2019 17:14:44 +0300
+Message-Id: <20191115141444.24155-25-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191115141444.24155-1-vsementsov@virtuozzo.com>
 References: <20191115141444.24155-1-vsementsov@virtuozzo.com>
@@ -68,196 +67,128 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We have a lot of "chunk_end - start" invocations, let's switch to
-bytes/cur_bytes scheme instead.
+Benchmark test for the series. This patch is RFC, it would be strange
+to commit it as is.. On the other hand I feel that we should commit
+some example to show usage of simplebench and bench_block_job.
+
+May be I should add some simple example to compare backup and mirror..
+Any ideas?
+
+Anyway, this patch is here to show, how I produced the table in the
+series cover-letter.
+
+Note that all used images are 1000M files filled by ones, including
+images exported by two running NBD servers, and NBD servers are running
+as:
+
+qemu-nbd --persistent --nocache -p 10810 ones1000M-source
+qemu-nbd --persistent --nocache -p 10809 ones1000M-target
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/block-copy.h |  4 +--
- block/block-copy.c         | 68 ++++++++++++++++++++------------------
- 2 files changed, 37 insertions(+), 35 deletions(-)
+ python/bench-example.py | 93 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 93 insertions(+)
+ create mode 100755 python/bench-example.py
 
-diff --git a/include/block/block-copy.h b/include/block/block-copy.h
-index 0a161724d7..7321b3d305 100644
---- a/include/block/block-copy.h
-+++ b/include/block/block-copy.h
-@@ -19,8 +19,8 @@
- #include "qemu/co-shared-resource.h"
- 
- typedef struct BlockCopyInFlightReq {
--    int64_t start_byte;
--    int64_t end_byte;
-+    int64_t start;
-+    int64_t bytes;
-     QLIST_ENTRY(BlockCopyInFlightReq) list;
-     CoQueue wait_queue; /* coroutines blocked on this request */
- } BlockCopyInFlightReq;
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 94e7e855ef..cc273b6cb8 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -26,12 +26,12 @@
- 
- static BlockCopyInFlightReq *block_copy_find_inflight_req(BlockCopyState *s,
-                                                           int64_t start,
--                                                          int64_t end)
-+                                                          int64_t bytes)
- {
-     BlockCopyInFlightReq *req;
- 
-     QLIST_FOREACH(req, &s->inflight_reqs, list) {
--        if (end > req->start_byte && start < req->end_byte) {
-+        if (start + bytes > req->start && start < req->start + req->bytes) {
-             return req;
-         }
-     }
-@@ -41,21 +41,21 @@ static BlockCopyInFlightReq *block_copy_find_inflight_req(BlockCopyState *s,
- 
- static void coroutine_fn block_copy_wait_inflight_reqs(BlockCopyState *s,
-                                                        int64_t start,
--                                                       int64_t end)
-+                                                       int64_t bytes)
- {
-     BlockCopyInFlightReq *req;
- 
--    while ((req = block_copy_find_inflight_req(s, start, end))) {
-+    while ((req = block_copy_find_inflight_req(s, start, bytes))) {
-         qemu_co_queue_wait(&req->wait_queue, NULL);
-     }
- }
- 
- static void block_copy_inflight_req_begin(BlockCopyState *s,
-                                           BlockCopyInFlightReq *req,
--                                          int64_t start, int64_t end)
-+                                          int64_t start, int64_t bytes)
- {
--    req->start_byte = start;
--    req->end_byte = end;
-+    req->start = start;
-+    req->bytes = bytes;
-     qemu_co_queue_init(&req->wait_queue);
-     QLIST_INSERT_HEAD(&s->inflight_reqs, req, list);
- }
-@@ -150,24 +150,26 @@ void block_copy_set_callbacks(
- /*
-  * block_copy_do_copy
-  *
-- * Do copy of cluser-aligned chunk. @end is allowed to exceed s->len only to
-- * cover last cluster when s->len is not aligned to clusters.
-+ * Do copy of cluser-aligned chunk. Requested region is allowed to exceed s->len
-+ * only to cover last cluster when s->len is not aligned to clusters.
-  *
-  * No sync here: nor bitmap neighter intersecting requests handling, only copy.
-  *
-  * Returns 0 on success.
-  */
- static int coroutine_fn block_copy_do_copy(BlockCopyState *s,
--                                           int64_t start, int64_t end,
-+                                           int64_t start, int64_t bytes,
-                                            bool zeroes, bool *error_is_read)
- {
-     int ret;
--    int nbytes = MIN(end, s->len) - start;
-+    int nbytes = MIN(start + bytes, s->len) - start;
-     void *bounce_buffer = NULL;
- 
-+    assert(start >= 0 && bytes > 0 && INT64_MAX - start >= bytes);
-     assert(QEMU_IS_ALIGNED(start, s->cluster_size));
--    assert(QEMU_IS_ALIGNED(end, s->cluster_size));
--    assert(end < s->len || end == QEMU_ALIGN_UP(s->len, s->cluster_size));
-+    assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
-+    assert(start + bytes <= s->len ||
-+           start + bytes == QEMU_ALIGN_UP(s->len, s->cluster_size));
- 
-     if (zeroes) {
-         ret = bdrv_co_pwrite_zeroes(s->target, start, nbytes, s->write_flags &
-@@ -347,7 +349,6 @@ int coroutine_fn block_copy(BlockCopyState *s,
-                             bool *error_is_read)
- {
-     int ret = 0;
--    int64_t end = bytes + start; /* bytes */
-     BlockCopyInFlightReq req;
- 
-     /*
-@@ -358,58 +359,59 @@ int coroutine_fn block_copy(BlockCopyState *s,
-            bdrv_get_aio_context(s->target->bs));
- 
-     assert(QEMU_IS_ALIGNED(start, s->cluster_size));
--    assert(QEMU_IS_ALIGNED(end, s->cluster_size));
-+    assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
- 
-     block_copy_wait_inflight_reqs(s, start, bytes);
--    block_copy_inflight_req_begin(s, &req, start, end);
-+    block_copy_inflight_req_begin(s, &req, start, bytes);
- 
--    while (start < end) {
--        int64_t next_zero, chunk_end, status_bytes;
-+    while (bytes) {
-+        int64_t next_zero, cur_bytes, status_bytes;
- 
-         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, start)) {
-             trace_block_copy_skip(s, start);
-             start += s->cluster_size;
-+            bytes -= s->cluster_size;
-             continue; /* already copied */
-         }
- 
--        chunk_end = MIN(end, start + s->copy_size);
-+        cur_bytes = MIN(bytes, s->copy_size);
- 
-         next_zero = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, start,
--                                                chunk_end - start);
-+                                                cur_bytes);
-         if (next_zero >= 0) {
-             assert(next_zero > start); /* start is dirty */
--            assert(next_zero < chunk_end); /* no need to do MIN() */
--            chunk_end = next_zero;
-+            assert(next_zero < start + cur_bytes); /* no need to do MIN() */
-+            cur_bytes = next_zero - start;
-         }
- 
--        ret = block_copy_block_status(s, start, chunk_end - start,
--                                      &status_bytes);
-+        ret = block_copy_block_status(s, start, cur_bytes, &status_bytes);
-         if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
-             bdrv_reset_dirty_bitmap(s->copy_bitmap, start, status_bytes);
-             s->progress_reset_callback(s->progress_opaque);
-             trace_block_copy_skip_range(s, start, status_bytes);
-             start += status_bytes;
-+            bytes -= status_bytes;
-             continue;
-         }
- 
--        chunk_end = MIN(chunk_end, start + status_bytes);
-+        cur_bytes = MIN(cur_bytes, status_bytes);
- 
-         trace_block_copy_process(s, start);
- 
--        bdrv_reset_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
-+        bdrv_reset_dirty_bitmap(s->copy_bitmap, start, cur_bytes);
- 
--        co_get_from_shres(s->mem, chunk_end - start);
--        ret = block_copy_do_copy(s, start, chunk_end, ret & BDRV_BLOCK_ZERO,
-+        co_get_from_shres(s->mem, cur_bytes);
-+        ret = block_copy_do_copy(s, start, cur_bytes, ret & BDRV_BLOCK_ZERO,
-                                  error_is_read);
--        co_put_to_shres(s->mem, chunk_end - start);
-+        co_put_to_shres(s->mem, cur_bytes);
-         if (ret < 0) {
--            bdrv_set_dirty_bitmap(s->copy_bitmap, start, chunk_end - start);
-+            bdrv_set_dirty_bitmap(s->copy_bitmap, start, cur_bytes);
-             break;
-         }
- 
--        s->progress_bytes_callback(chunk_end - start, s->progress_opaque);
--        start = chunk_end;
--        ret = 0;
-+        s->progress_bytes_callback(cur_bytes, s->progress_opaque);
-+        start += cur_bytes;
-+        bytes -= cur_bytes;
-     }
- 
-     block_copy_inflight_req_end(&req);
+diff --git a/python/bench-example.py b/python/bench-example.py
+new file mode 100755
+index 0000000000..fb4c61c968
+--- /dev/null
++++ b/python/bench-example.py
+@@ -0,0 +1,93 @@
++#!/usr/bin/env python3
++
++import simplebench
++from qemu.bench_block_job import bench_block_copy, drv_file, drv_nbd
++
++
++def bench_func(env, case):
++    return bench_block_copy(env['qemu_binary'], env['cmd'],
++                            case['source'], case['target'])
++
++
++test_cases = [
++    {
++        'id': 'ssd -> ssd',
++        'source': drv_file('/ssd/ones1000M-source'),
++        'target': drv_file('/ssd/ones1000M-target')
++    },
++    {
++        'id': 'ssd -> hdd',
++        'source': drv_file('/ssd/ones1000M-source'),
++        'target': drv_file('/test-a/ones1000M-target')
++    },
++    {
++        'id': 'hdd -> hdd',
++        'source': drv_file('/test-a/ones1000M-source'),
++        'target': drv_file('/test-a/ones1000M-target')
++    }
++]
++
++test_envs = [
++    {
++        'id': 'backup-old',
++        'cmd': 'blockdev-backup',
++        'qemu_binary': '/work/src/qemu/up-block-copy-block-status--before/x86_64-softmmu/qemu-system-x86_64'
++    },
++    {
++        'id': 'backup-old(no CR)',
++        'cmd': 'blockdev-backup',
++        'qemu_binary': '/work/src/qemu/up-block-copy-block-status--before--no-copy-range/x86_64-softmmu/qemu-system-x86_64'
++    },
++    {
++        'id': 'backup-new',
++        'cmd': 'blockdev-backup',
++        'qemu_binary': '/work/src/qemu/up-block-copy-block-status/x86_64-softmmu/qemu-system-x86_64'
++    },
++    {
++        'id': 'backup-new(no CR)',
++        'cmd': 'blockdev-backup',
++        'qemu_binary': '/work/src/qemu/up-block-copy-block-status--no-copy_range/x86_64-softmmu/qemu-system-x86_64'
++    },
++    {
++        'id': 'mirror',
++        'cmd': 'blockdev-mirror',
++        'qemu_binary': '/work/src/qemu/up-block-copy-block-status/x86_64-softmmu/qemu-system-x86_64'
++    }
++]
++
++result = simplebench.bench(bench_func, test_envs, test_cases, count=3)
++print(simplebench.ascii(result))
++
++test_cases = [
++    {
++        'id': 'nbd -> ssd',
++        'source': drv_nbd('172.16.24.200', '10810'),
++        'target': drv_file('/ssd/ones1000M-target')
++    },
++    {
++        'id': 'ssd -> nbd',
++        'source': drv_file('/ssd/ones1000M-target'),
++        'target': drv_nbd('172.16.24.200', '10809')
++    },
++]
++
++test_envs = [
++    {
++        'id': 'backup-old',
++        'cmd': 'blockdev-backup',
++        'qemu_binary': '/work/src/qemu/up-block-copy-block-status--before/x86_64-softmmu/qemu-system-x86_64'
++    },
++    {
++        'id': 'backup-new',
++        'cmd': 'blockdev-backup',
++        'qemu_binary': '/work/src/qemu/up-block-copy-block-status/x86_64-softmmu/qemu-system-x86_64'
++    },
++    {
++        'id': 'mirror',
++        'cmd': 'blockdev-mirror',
++        'qemu_binary': '/work/src/qemu/up-block-copy-block-status/x86_64-softmmu/qemu-system-x86_64'
++    }
++]
++
++result = simplebench.bench(bench_func, test_envs, test_cases, count=2)
++print(simplebench.ascii(result))
 -- 
 2.21.0
 
