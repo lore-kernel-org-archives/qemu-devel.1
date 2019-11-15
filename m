@@ -2,139 +2,121 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A21DFC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 10:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52C10C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 10:53:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CE6F20748
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 10:44:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CFB82072B
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 10:53:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I1YEoQh5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CE6F20748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="P25BhW4T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CFB82072B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37560 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVZ60-0004bQ-Fx
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 05:44:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60082)
+	id 1iVZE2-0006KA-56
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 05:53:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60889)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iVZ5I-00049N-7H
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 05:44:13 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVZDH-0005o9-6g
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 05:52:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iVZ5G-0007ek-Re
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 05:44:11 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:43065
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iVZ5G-0007eY-M2
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 05:44:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573814650;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=67mQNAHiL+vZmOGjwhLig6+s2f+hybFhtX2PSzDn4gg=;
- b=I1YEoQh5d8gt/RdcM4BidMxM02/m7fBbdELJADL4W5ZfOryjxc2hw8j5kc/0oZ0Qi0k/fr
- +ZCepWOsD/RbYRLaoiT+eIcNoMAU9Zhzgj6lED+qaez9Iehbc2grbyomKA8LGA46K/kcuU
- IoChWCMnM3KW/xX2B9qGrqYfuVj43cI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-LJYrnRPAP5SC_xJLdAF8dQ-1; Fri, 15 Nov 2019 05:43:00 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E43981802CE3;
- Fri, 15 Nov 2019 10:42:58 +0000 (UTC)
-Received: from [10.36.116.194] (ovpn-116-194.ams2.redhat.com [10.36.116.194])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9E7225C1B0;
- Fri, 15 Nov 2019 10:42:53 +0000 (UTC)
-Subject: Re: [PATCH] spapr/kvm: Set default cpu model for all machine classes
-To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
-References: <20191030163243.10644-1-david@gibson.dropbear.id.au>
- <20191113144344.GA4204@orkuz.int.mamuti.net>
- <20191113160900.5f9f5415@bahia.lan>
- <CAFEAcA9+VzDC9N5vGcA9COUaPsSue9VWmtoaPneCqY7drtbVzA@mail.gmail.com>
- <20191113170040.7c62fcaf@bahia.lan> <20191115092003.GC2134@umbus.fritz.box>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCNMYXVyZW50IFZp
- dmllciA8bHZpdmllckByZWRoYXQuY29tPokCOAQTAQIAIgUCVgVQgAIbAwYLCQgHAwIGFQgC
- CQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjwpgg//fSGy0Rs/t8cPFuzoY1cex4limJQfReLr
- SJXCANg9NOWy/bFK5wunj+h/RCFxIFhZcyXveurkBwYikDPUrBoBRoOJY/BHK0iZo7/WQkur
- 6H5losVZtrotmKOGnP/lJYZ3H6OWvXzdz8LL5hb3TvGOP68K8Bn8UsIaZJoeiKhaNR0sOJyI
- YYbgFQPWMHfVwHD/U+/gqRhD7apVysxv5by/pKDln1I5v0cRRH6hd8M8oXgKhF2+rAOL7gvh
- jEHSSWKUlMjC7YwwjSZmUkL+TQyE18e2XBk85X8Da3FznrLiHZFHQ/NzETYxRjnOzD7/kOVy
- gKD/o7asyWQVU65mh/ECrtjfhtCBSYmIIVkopoLaVJ/kEbVJQegT2P6NgERC/31kmTF69vn8
- uQyW11Hk8tyubicByL3/XVBrq4jZdJW3cePNJbTNaT0d/bjMg5zCWHbMErUib2Nellnbg6bc
- 2HLDe0NLVPuRZhHUHM9hO/JNnHfvgiRQDh6loNOUnm9Iw2YiVgZNnT4soUehMZ7au8PwSl4I
- KYE4ulJ8RRiydN7fES3IZWmOPlyskp1QMQBD/w16o+lEtY6HSFEzsK3o0vuBRBVp2WKnssVH
- qeeV01ZHw0bvWKjxVNOksP98eJfWLfV9l9e7s6TaAeySKRRubtJ+21PRuYAxKsaueBfUE7ZT
- 7ze0LUxhdXJlbnQgVml2aWVyIChSZWQgSGF0KSA8bHZpdmllckByZWRoYXQuY29tPokCOAQT
- AQIAIgUCVgUmGQIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjxtNBAA
- o2xGmbXl9vJQALkj7MVlsMlgewQ1rdoZl+bZ6ythTSBsqwwtl1BUTQGA1GF2LAchRVYca5bJ
- lw4ai5OdZ/rc5dco2XgrRFtj1np703BzNEhGU1EFxtms/Y9YOobq/GZpck5rK8jV4osEb8oc
- 3xEgCm/xFwI/2DOe0/s2cHKzRkvdmKWEDhT1M+7UhtSCnloX776zCsrofYiHP2kasFyMa/5R
- 9J1Rt9Ax/jEAX5vFJ8+NPf68497nBfrAtLM3Xp03YJSr/LDxer44Mevhz8dFw7IMRLhnuSfr
- 8jP93lr6Wa8zOe3pGmFXZWpNdkV/L0HaeKwTyDKKdUDH4U7SBnE1gcDfe9x08G+oDfVhqED8
- qStKCxPYxRUKIdUjGPF3f5oj7N56Q5zZaZkfxeLNTQ13LDt3wGbVHyZxzFc81B+qT8mkm74y
- RbeVSuviPTYjbBQ66GsUgiZZpDUyJ6s54fWqQdJf4VFwd7M/mS8WEejbSjglGHMxMGiBeRik
- Y0+ur5KAF7z0D1KfW1kHO9ImQ0FbEbMbTMf9u2+QOCrSWOz/rj23EwPrCQ2TSRI2fWakMJZ+
- zQZvy+ei3D7lZ09I9BT/GfFkTIONgtNfDxwyMc4v4XyP0IvvZs/YZqt7j3atyTZM0S2HSaZ9
- rXmQYkBt1/u691cZfvy+Tr2xZaDpFcjPkci5Ag0EVgUmGQEQALxSQRbl/QOnmssVDxWhHM5T
- Gxl7oLNJms2zmBpcmlrIsn8nNz0rRyxT460k2niaTwowSRK8KWVDeAW6ZAaWiYjLlTunoKwv
- F8vP3JyWpBz0diTxL5o+xpvy/Q6YU3BNefdq8Vy3rFsxgW7mMSrI/CxJ667y8ot5DVugeS2N
- yHfmZlPGE0Nsy7hlebS4liisXOrN3jFzasKyUws3VXek4V65lHwB23BVzsnFMn/bw/rPliqX
- Gcwl8CoJu8dSyrCcd1Ibs0/Inq9S9+t0VmWiQWfQkz4rvEeTQkp/VfgZ6z98JRW7S6l6eoph
- oWs0/ZyRfOm+QVSqRfFZdxdP2PlGeIFMC3fXJgygXJkFPyWkVElr76JTbtSHsGWbt6xUlYHK
- XWo+xf9WgtLeby3cfSkEchACrxDrQpj+Jt/JFP+q997dybkyZ5IoHWuPkn7uZGBrKIHmBunT
- co1+cKSuRiSCYpBIXZMHCzPgVDjk4viPbrV9NwRkmaOxVvye0vctJeWvJ6KA7NoAURplIGCq
- kCRwg0MmLrfoZnK/gRqVJ/f6adhU1oo6z4p2/z3PemA0C0ANatgHgBb90cd16AUxpdEQmOCm
- dNnNJF/3Zt3inzF+NFzHoM5Vwq6rc1JPjfC3oqRLJzqAEHBDjQFlqNR3IFCIAo4SYQRBdAHB
- CzkM4rWyRhuVABEBAAGJAh8EGAECAAkFAlYFJhkCGwwACgkQ8ww4vT8vvjwg9w//VQrcnVg3
- TsjEybxDEUBm8dBmnKqcnTBFmxN5FFtIWlEuY8+YMiWRykd8Ln9RJ/98/ghABHz9TN8TRo2b
- 6WimV64FmlVn17Ri6FgFU3xNt9TTEChqAcNg88eYryKsYpFwegGpwUlaUaaGh1m9OrTzcQy+
- klVfZWaVJ9Nw0keoGRGb8j4XjVpL8+2xOhXKrM1fzzb8JtAuSbuzZSQPDwQEI5CKKxp7zf76
- J21YeRrEW4WDznPyVcDTa+tz++q2S/BpP4W98bXCBIuQgs2m+OflERv5c3Ojldp04/S4NEjX
- EYRWdiCxN7ca5iPml5gLtuvhJMSy36glU6IW9kn30IWuSoBpTkgV7rLUEhh9Ms82VWW/h2Tx
- L8enfx40PrfbDtWwqRID3WY8jLrjKfTdR3LW8BnUDNkG+c4FzvvGUs8AvuqxxyHbXAfDx9o/
- jXfPHVRmJVhSmd+hC3mcQ+4iX5bBPBPMoDqSoLt5w9GoQQ6gDVP2ZjTWqwSRMLzNr37rJjZ1
- pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
- XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <f69212b5-7e12-3009-c812-39176c4e6cde@redhat.com>
-Date: Fri, 15 Nov 2019 11:42:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <20191115092003.GC2134@umbus.fritz.box>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVZDD-0003tF-EE
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 05:52:26 -0500
+Received: from mail-eopbgr30096.outbound.protection.outlook.com
+ ([40.107.3.96]:19758 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iVZD6-0003r4-5o; Fri, 15 Nov 2019 05:52:16 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OYtp7HuM6e4NpbbBPAAPJ60Pfu7gq0F1JoeKGFa7C5Q+jjnDhdD1y56Ebjj+w6QTYwEiiwcXILnfjPJwx4XwfZdZb6DJTEkYTuAhITRQECOoLB/j2GzFMenjyoScL6rGzd0zM5a1Lv7y65NNVGDmjhEapD/MHBsRf8mf3dcoIjlo/buH67hcrfyhLfKxuGt4w9Zg597AV/Hb991VZ8tq9l8GvQfcwsZvtRH6sbIWmT5f/Pg4ot9Ik6xrRjjsTp8pDObc9DEMc04stlBqb5UZ4K9Z/anOj1B8BV1ROJ/5YxHym45rlXQnX8h3s5w4vdUKSoIOEva9VtPBO8SXPe0lxA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0w4T4frHghiDFTh6nIg+oNbVjr/XsdVDrZdlBne7XsI=;
+ b=OPM0ruonekELBHqhqIUDJ+acLTbUmINhG25ix6poU5AqzjtxEmm3meXXS5H3IWMlRDmaoUENyB56iYOQMzaJ+9NqnLb+pUnV7A9/3KG6I0KttBG/MugjgLmInuu+VqRhpZ7sApqvjwzS2fwXkNvbkvUpcOWpmJZA4H+oFA+iSGwL+iTkvnnfHr9XamX1j6vAk/xT55XdfVDvI94/fxuXLFLRcnv1oWEIC1fN+tki4vY1II3gVXv/aOAN8MtBL67AY0ql8J/nkg7B2ZR76HxhPZ8eiQ/ELQU9ENsXb+HM63uffH+tZGp9Ubyt6SyFTUm9/KAuhzeNvLhE3/LAxBXg7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0w4T4frHghiDFTh6nIg+oNbVjr/XsdVDrZdlBne7XsI=;
+ b=P25BhW4Tc/ur+0pbepO/xUBYzlzBB3Hd34ygWjTLLklx155CUEIEaKC5NjzyYpOhNcCnPks7igZxJ/1ZyaGcN1+nm9ZRTj0v8sF8UPLVnu6ybVarqzSjiMMMxnJX5h61MV7DaDexzvBXaYbHCRzelwQWDLr0jyCjUUV984glJfM=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB2998.eurprd08.prod.outlook.com (52.135.168.12) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.26; Fri, 15 Nov 2019 10:52:13 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.029; Fri, 15 Nov 2019
+ 10:52:13 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Max Reitz <mreitz@redhat.com>, Andrey Shinkevich
+ <andrey.shinkevich@virtuozzo.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: Re: [PATCH v7 1/3] block: introduce compress filter driver
+Thread-Topic: [PATCH v7 1/3] block: introduce compress filter driver
+Thread-Index: AQHVmlI7eO4+ta1idUecy2WkuY5gm6eKiHMAgAAI8QCAAWlEgIAAFikA
+Date: Fri, 15 Nov 2019 10:52:13 +0000
+Message-ID: <36394cc3-9d68-5f56-7d44-ca56ff3cf7e3@virtuozzo.com>
+References: <1573670589-229357-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1573670589-229357-2-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <a5dd3514-a804-6c63-2158-0dff9ac37ab3@redhat.com>
+ <96bda153-8923-41fb-5374-10711098901d@virtuozzo.com>
+ <dcc46a1b-cd8a-78e3-6353-bf9fb2210d9b@redhat.com>
+In-Reply-To: <dcc46a1b-cd8a-78e3-6353-bf9fb2210d9b@redhat.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: LJYrnRPAP5SC_xJLdAF8dQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0102CA0034.eurprd01.prod.exchangelabs.com
+ (2603:10a6:7:14::47) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191115135210214
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fd21a135-0014-48fa-8511-08d769b9df1e
+x-ms-traffictypediagnostic: AM6PR08MB2998:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB2998EF2216EFD58927DA3D37C1700@AM6PR08MB2998.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 02229A4115
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(366004)(136003)(346002)(39850400004)(396003)(189003)(199004)(5024004)(305945005)(71200400001)(71190400001)(14454004)(36756003)(99286004)(2501003)(7736002)(66066001)(81166006)(4326008)(107886003)(6246003)(486006)(81156014)(25786009)(86362001)(2616005)(476003)(8676002)(446003)(11346002)(8936002)(52116002)(76176011)(966005)(229853002)(186003)(31686004)(31696002)(386003)(6512007)(102836004)(53546011)(6506007)(6306002)(6486002)(478600001)(6436002)(2201001)(26005)(5660300002)(6116002)(3846002)(2906002)(66946007)(64756008)(66446008)(66476007)(66556008)(256004)(54906003)(110136005)(316002)(2004002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB2998;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: BjuAFtr81msI7ukhGJ2MINdtJR/ezIUZ0Ome7nAE4QoJIaBogngO+pmSt6YJWMlHUBQso6puFYjYRUv3RvKAAfFPMbWT8PQziDMxaDpn/U9tvHNkk4PUhF7iRStmyrBtWCvstFiWrpflYH/jFqQIHE07cxfBEbGnZGyhMzpiiECklCORz94nRbkj/YKb98vniRo333WWDyDkk+SCvqL+UJvVw9CMB0pWcoZz3yX/cArGhd+/8TOXVP5v+I0Pm+U29rI2FN/Z4Sh5WxVA+XgIT7wYTG84IHB4LnoufHS73FWdEsVPCfLROodeXQFh0S/RPIe+3570QEk+LdmlyWDueJnRAxRnsLVsePdO0o5aNTgFV9wVFDpMySc7OQ0HdhBa/gNN2/r3WNVdW/lOO7Raa5Q6l6WBnwDVuFNTrdb2AHr6aGgb+fErAA1b23eyDpXH
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <55692AB67E4F0148B4C9CDD5344D7EB8@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd21a135-0014-48fa-8511-08d769b9df1e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Nov 2019 10:52:13.1468 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BhvX5E8d34u5dT4MLgqyQGJiXrPdyP8VhtRuCorC+wKuMJ5HEWBQZx2JIVOfrHYTVStLWzLcuZNne7HuIMq4n0E05T5l5IDy2vQqBZxrsPQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2998
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.96
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -146,46 +128,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-ppc <qemu-ppc@nongnu.org>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ "armbru@redhat.com" <armbru@redhat.com>, Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/11/2019 10:20, David Gibson wrote:
-> On Wed, Nov 13, 2019 at 05:00:40PM +0100, Greg Kurz wrote:
->> On Wed, 13 Nov 2019 15:31:58 +0000
->> Peter Maydell <peter.maydell@linaro.org> wrote:
->>
->>> On Wed, 13 Nov 2019 at 15:10, Greg Kurz <groug@kaod.org> wrote:
->>>> David is away until the 19th of November, which is the release date
->>>> of rc2 according to the planning [*]. Then we have rc3 the 26th, and
->>>> final release (or rc4) the 3rd of December, so it should be ok.
+15.11.2019 12:32, Max Reitz wrote:
+> On 14.11.19 12:59, Vladimir Sementsov-Ogievskiy wrote:
+>> 14.11.2019 14:27, Max Reitz wrote:
+>>> On 13.11.19 19:43, Andrey Shinkevich wrote:
+>>>> Allow writing all the data compressed through the filter driver.
+>>>> The written data will be aligned by the cluster size.
+>>>> Based on the QEMU current implementation, that data can be written to
+>>>> unallocated clusters only. May be used for a backup job.
+>>>>
+>>>> Suggested-by: Max Reitz <mreitz@redhat.com>
+>>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>>> ---
+>>>>    block/Makefile.objs     |   1 +
+>>>>    block/filter-compress.c | 201 +++++++++++++++++++++++++++++++++++++=
++++++++++++
+>>>>    qapi/block-core.json    |  10 ++-
+>>>>    3 files changed, 208 insertions(+), 4 deletions(-)
+>>>>    create mode 100644 block/filter-compress.c
+>>>>
+>>>> diff --git a/block/Makefile.objs b/block/Makefile.objs
+>>>> index e394fe0..330529b 100644
+>>>> --- a/block/Makefile.objs
+>>>> +++ b/block/Makefile.objs
+>>>> @@ -43,6 +43,7 @@ block-obj-y +=3D crypto.o
+>>>>   =20
+>>>>    block-obj-y +=3D aio_task.o
+>>>>    block-obj-y +=3D backup-top.o
+>>>> +block-obj-y +=3D filter-compress.o
+>>>>   =20
+>>>>    common-obj-y +=3D stream.o
+>>>>   =20
+>>>> diff --git a/block/filter-compress.c b/block/filter-compress.c
+>>>> new file mode 100644
+>>>> index 0000000..64b1ee5
+>>>> --- /dev/null
+>>>> +++ b/block/filter-compress.c
+>>>> @@ -0,0 +1,201 @@
+>>>> +/*
+>>>> + * Compress filter block driver
+>>>> + *
+>>>> + * Copyright (c) 2019 Virtuozzo International GmbH
+>>>> + *
+>>>> + * Author:
+>>>> + *   Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>>> + *   (based on block/copy-on-read.c by Max Reitz)
+>>>> + *
+>>>> + * This program is free software; you can redistribute it and/or
+>>>> + * modify it under the terms of the GNU General Public License as
+>>>> + * published by the Free Software Foundation; either version 2 or
+>>>> + * (at your option) any later version of the License.
+>>>> + *
+>>>> + * This program is distributed in the hope that it will be useful,
+>>>> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>>> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>>>> + * GNU General Public License for more details.
+>>>> + *
+>>>> + * You should have received a copy of the GNU General Public License
+>>>> + * along with this program; if not, see <http://www.gnu.org/licenses/=
+>.
+>>>> + */
+>>>> +
+>>>> +#include "qemu/osdep.h"
+>>>> +#include "block/block_int.h"
+>>>> +#include "qemu/module.h"
+>>>> +
+>>>> +
+>>>> +static int compress_open(BlockDriverState *bs, QDict *options, int fl=
+ags,
+>>>> +                         Error **errp)
+>>>> +{
+>>>> +    bs->backing =3D bdrv_open_child(NULL, options, "file", bs, &child=
+_file, false,
+>>>> +                                  errp);
 >>>
->>> Please don't actively plan to delay putting changes in
->>> until later release candidates. The release process
->>> involves steadily winding up the bar of whether it's
->>> worth putting in and hopefully reducing the volume
->>> of changes between rcs. In an ideal world rc3 would
->>> have very few changes, and then there would be no
->>> changes at all between rc3 and the final release.
+>>> Please don=92t attach something that the QAPI schema calls =93file=94 a=
+s
+>>> bs->backing.
+>>
+>>
+>> Agree, it's a mistake. If we want backing and user set backing in option=
+s, it's opened automatically, I think..
+>>
+>>>
+>>> Yes, attaching it as bs->file would break backing chains.  That=92s a b=
+ug
+>>> in the block layer.  I=92ve been working on a fix for a long time.
+>>>
+>>> Please don=92t introduce more weirdness just because we have a bug in t=
+he
+>>> block layer.
+>>>
+>>> (Note that I=92d strongly oppose calling the child =93backing=94 in the=
+ QAPI
+>>> schema, as this would go against what all other user-creatable filters =
+do.)
 >>>
 >>
->> Right. I could discuss with Laurent: David should be back on Monday
->> actually. Hopefully he can a send a PR before rc2.
+>> So, are you opposite to correct backing-based user-creatable filter (wit=
+h backing both
+>> in QAPI and code)?
 >=20
-> I'm back home now, back to work on Monday.  It'll probably take me a
-> full day of catching up on email and whatnot, so the earliest I'd be
-> likely to do the PR is Tuesday.  If you can get it ready before that,
-> please go ahead.
+> I=92m not opposed to fixing it, but I don=92t think the fix is to make al=
+l
+> filters use bs->backing.
 >=20
-I'm going to take your ppc-for-4.2 branch to build and test, and then I
-will do the PR, probably today.
+>> Do you think, that if we make backup-top to be user-creatable, we should=
+ move it to be
+>> file-child-based, or support both backing and file child?
+>=20
+> I definitely don=92t think it would be wrong.
+>=20
+> It depends on how difficult it is.  I=92m currently working on (more
+> groundwork for the filter series v7) a series to rework BdrvChildRole so
+> we can see from it what a child is used for (data, metadata, filter,
+> COW).  I can already see that it won=91t work out perfectly because
+> whenever we attach "backing", the question is whether that=92s a COW chil=
+d
+> now or whether it=92s a filtered child.  I suppose I=92m going to guess C=
+OW
+> when there=92s no way to get the information, and maybe sometimes be wron=
+g.
+>=20
+> In my honest opinion, reusing bs->backing for filters was wrong.  I=92m
+> not saying that bs->file was any better.  But I have a bit of a gripe
+> with filters using bs->backing, because it=92s acknowledging a bug but no=
+t
+> fixing it at the same time.  Had we fixed the bug when we first noticed
+> it with the introduction of the mirror filter, maybe we wouldn=92t be in
+> this position now.  Or maybe we should have just added a bs->filtered lin=
+k.
+>=20
+> But maybes aside, it still means that using bs->backing instead of
+> bs->file is not really better.  Right now it=92s both wrong, and we need
+> to fix the block layer so it isn=92t.
+>=20
+> So what to do for new filters?  Sure, bs->backing works around a bug
+> now.  But it=92ll be weird once the bug is fixed.  Then we=92ll have filt=
+ers
+> that use @file and others will use @backing.  I don=92t think we want
+> that, I think we want a uniform interface for all filters.
+>=20
+> And yes, that implies we probably should change backup-top to use file
+> instead of backing once it gets an external interface.
+>=20
+> (Compare
+> https://lists.nongnu.org/archive/html/qemu-block/2017-09/msg00380.html
+> )
+>=20
+> Max
+>=20
 
-Thanks,
-Laurent
+OK, got your point. Let's use file child in compress filter. Hope for your =
+series!
 
+--=20
+Best regards,
+Vladimir
 
