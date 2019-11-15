@@ -2,76 +2,83 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87C56C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 10:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B93AC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 10:36:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FA0E20718
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 10:26:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB3D5206C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 10:36:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CP1wXIOr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FA0E20718
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ALMuAjbD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB3D5206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVYnj-00066i-Gs
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 05:26:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57474)
+	id 1iVYxS-00029N-0I
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 05:36:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59095)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kchamart@redhat.com>) id 1iVYmV-0005GT-P5
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 05:24:49 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iVYwp-0001Xi-2G
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 05:35:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kchamart@redhat.com>) id 1iVYmS-0003n6-Jv
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 05:24:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51622
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <cohuck@redhat.com>) id 1iVYwm-0002hU-Vi
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 05:35:26 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48275
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1iVYmS-0003mq-Be
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 05:24:44 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iVYwm-0002gc-Fk
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 05:35:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573813483;
+ s=mimecast20190719; t=1573814123;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=nfAB9Zed0H7DcyEI8Pa8jdvxIaFfePwGRmq9xWT1yO8=;
- b=CP1wXIOrzoaN3DmWDSVxEl9n9NZqUAdlysrLDKfmXv2Xd9P4KIlb2/pdHjlqvskTUe8XYw
- +l+2kdoQ/Vb+KozkThHJ3ZSlWGRzZMpbFhTyv7XWFjNMA5IwJJvYL7QacaGZ/lyvvpeoYD
- tJ/Zoi2w4k//CvPA2ygJ4b+kK84KzLg=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xp+3mPnIe6Jgr36FirKPvyGuu++eZ0SjGE/i96JmlD8=;
+ b=ALMuAjbDRPCHqsrjvh54cv6r/13KVn+qPrg+qsGqFvb0yU7Bg2d+PTkjFhkwdHrWc5db9u
+ A1ha52I05lCt/47KUuL+6+NBfoThIVLR4IOs4SNc7j43wPxsPSNsdYiWj+7mAMmUA8sFBi
+ 2BX9hG2cpkjvc8mmqhtzCYaGdVpDw20=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-19-eOlz11jRPkiHtiGc4iqYLg-1; Fri, 15 Nov 2019 05:24:42 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-132-WwzaNCBuPCOEYDuVUsBCsg-1; Fri, 15 Nov 2019 05:35:19 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CAD71005512
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 10:24:41 +0000 (UTC)
-Received: from paraplu.localdomain (ovpn-116-237.ams2.redhat.com
- [10.36.116.237])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A94FD75E32;
- Fri, 15 Nov 2019 10:24:11 +0000 (UTC)
-From: Kashyap Chamarthy <kchamart@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] Add a blog post on "Micro-Optimizing KVM VM-Exits"
-Date: Fri, 15 Nov 2019 11:24:06 +0100
-Message-Id: <20191115102406.31316-1-kchamart@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83F44107ACC4;
+ Fri, 15 Nov 2019 10:35:18 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A8BE969185;
+ Fri, 15 Nov 2019 10:35:14 +0000 (UTC)
+Date: Fri, 15 Nov 2019 11:35:12 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Pierre Morel <pmorel@linux.ibm.com>
+Subject: Re: [PATCH v1] s390x: kvm-unit-tests: a PONG device for Sub
+ Channels tests
+Message-ID: <20191115113512.2b9be20e.cohuck@redhat.com>
+In-Reply-To: <2c10ed4f-2b9e-89e7-0e3e-704355523239@linux.ibm.com>
+References: <1573671753-15115-1-git-send-email-pmorel@linux.ibm.com>
+ <20191114113823.5d752648.cohuck@redhat.com>
+ <20191114140235.30a788d6.pasic@linux.ibm.com>
+ <20191114141915.6dd5b9c8.cohuck@redhat.com>
+ <2c10ed4f-2b9e-89e7-0e3e-704355523239@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: eOlz11jRPkiHtiGc4iqYLg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: WwzaNCBuPCOEYDuVUsBCsg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,151 +90,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aarcange@redhat.com, Kashyap Chamarthy <kchamart@redhat.com>,
- dgilbert@redhat.com, rjones@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, vkuznets@redhat.com
+Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com,
+ qemu-devel@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
+ qemu-s390x@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This blog post summarizes the talk "Micro-Optimizing KVM VM-Exits"[1],
-given by Andrea Arcangeli at the recently concluded KVM Forum 2019.
+On Thu, 14 Nov 2019 18:42:35 +0100
+Pierre Morel <pmorel@linux.ibm.com> wrote:
 
-[1] https://kvmforum2019.sched.com/event/Tmwr/micro-optimizing-kvm-vm-exits=
--andrea-arcangeli-red-hat-inc
+> On 2019-11-14 14:19, Cornelia Huck wrote:
+> > On Thu, 14 Nov 2019 14:02:35 +0100
+> > Halil Pasic <pasic@linux.ibm.com> wrote:
+> > =20
+> >> On Thu, 14 Nov 2019 11:38:23 +0100
+> >> Cornelia Huck <cohuck@redhat.com> wrote:
+> >> =20
+> >>> On Wed, 13 Nov 2019 20:02:33 +0100
+> >>> Pierre Morel <pmorel@linux.ibm.com> wrote:
+> >>> =20
+> ...snip...
+> >> We made some different design decisions, while aiming essentially for =
+the
+> >> same. Maybe it's due to different scope, maybe not. For instance one
+> >> can't test IDA with PONG, I guess. =20
+> > Now that I saw this again, I also recall the discussion of comparing it
+> > with the "testdev" for pci/isa. Anybody knows if these are used by
+> > kvm-unit-tests? =20
+>=20
+> Only by X.
 
-Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
----
-v2: Address Rich W.M Jones' feedback
----
- ...019-11-06-micro-optimizing-kvm-vmexits.txt | 115 ++++++++++++++++++
- 1 file changed, 115 insertions(+)
- create mode 100644 _posts/2019-11-06-micro-optimizing-kvm-vmexits.txt
+If they use it, it might make sense for s390 to use a comparable
+approach.
 
-diff --git a/_posts/2019-11-06-micro-optimizing-kvm-vmexits.txt b/_posts/20=
-19-11-06-micro-optimizing-kvm-vmexits.txt
-new file mode 100644
-index 0000000000000000000000000000000000000000..f4a28d58ddb40103dd599fdfd86=
-1eeb4c41ed976
---- /dev/null
-+++ b/_posts/2019-11-06-micro-optimizing-kvm-vmexits.txt
-@@ -0,0 +1,115 @@
-+---
-+layout: post
-+title: "Micro-Optimizing KVM VM-Exits"
-+date:   2019-11-08
-+categories: [kvm, optimization]
-+---
-+
-+Background on VM-Exits
-+----------------------
-+
-+KVM (Kernel-based Virtual Machine) is the Linux kernel module that
-+allows a host to run virtualized guests (Linux, Windows, etc).  The KVM
-+"guest execution loop", with QEMU (the open source emulator and
-+virtualizer) as its user space, is roughly as follows: QEMU issues the
-+ioctl(), KVM_RUN, to tell KVM to prepare to enter the CPU's "Guest Mode"
-+-- a special processor mode which allows guest code to safely run
-+directly on the physical CPU.  The guest code, which is inside a "jail"
-+and thus cannot interfere with the rest of the system, keeps running on
-+the hardware until it encounters a request it cannot handle.  Then the
-+processor gives the control back (referred to as "VM-Exit") either to
-+kernel space, or to the user space to handle the request.  Once the
-+request is handled, native execution of guest code on the processor
-+resumes again.  And the loop goes on.
-+
-+There are dozens of reasons for VM-Exits (Intel's Software Developer
-+Manual outlines 64 "Basic Exit Reasons").  For example, when a guest
-+needs to emulate the CPUID instruction, it causes a "light-weight exit"
-+to kernel space, because CPUID (among a few others) is emulated in the
-+kernel itself, for performance reasons.  But when the kernel _cannot_
-+handle a request, e.g. to emulate certain hardware, it results in a
-+"heavy-weight exit" to QEMU, to perform the emulation.  These VM-Exits
-+and subsequent re-entries ("VM-Enters"), even the light-weight ones, can
-+be expensive.  What can be done about it?
-+
-+Guest workloads that are hard to virtualize
-+-------------------------------------------
-+
-+At the 2019 edition of the KVM Forum in Lyon, kernel developer, Andrea
-+Arcangeli, attempted to address the kernel part of minimizing VM-Exits.
-+
-+His talk touched on the cost of VM-Exits into the kernel, especially for
-+guest workloads (e.g. enterprise databases) that are sensitive to their
-+performance penalty.  However, these workloads cannot avoid triggering
-+VM-Exits with a high frequency.  Andrea then outlined some of the
-+optimizations he's been working on to improve the VM-Exit performance in
-+the KVM code path -- especially in light of applying mitigations for
-+speculative execution flaws (Spectre v2, MDS, L1TF).
-+
-+Andrea gave a brief recap of the different kinds of speculative
-+execution attacks (retpolines, IBPB, PTI, SSBD, etc).  Followed by that
-+he outlined the performance impact of Spectre-v2 mitigations in context
-+of KVM.
-+
-+The microbechmark: CPUID in a one million loop
-+----------------------------------------------
-+
-+The synthetic microbenchmark (meaning, focus on measuring the
-+performance of a specific area of code) Andrea used was to run the CPUID
-+instruction one million times, without any GCC optimizations or caching.
-+This was done to test the latency of VM-Exits.
-+
-+While stressing that the results of these microbenchmarks do not
-+represent real-world workloads, he had two goals in mind with it: (a)
-+explain how the software mitigation works; and (b) to justify to the
-+broader community the value of the software optimizations he's working
-+on in KVM.
-+
-+Andrea then reasoned through several interesting graphs that show how
-+CPU computation time gets impacted when you disable or enable the
-+various kernel-space mitigations for Spectre v2, L1TF, MDS, et al.
-+
-+The proposal: "KVM Monolithic"
-+------------------------------
-+
-+Based on his investigation, Andrea proposed a patch series, ["KVM
-+monolithc"](https://lwn.net/Articles/800870/), to get rid of the KVM
-+common module, 'kvm.ko'.  Instead the KVM common code gets linked twice
-+into each of the vendor-specific KVM modules, 'kvm-intel.ko' and
-+'kvm-amd.ko'.
-+
-+The reason for doing this is that the 'kvm.ko' module indirectly calls
-+(via the "retpoline" technique) the vendor-specific KVM modules at every
-+VM-Exit, several times.  These indirect calls were not optimal before,
-+but the "retpoline" mitigation (which isolates indirect branches, that
-+allow a CPU to execute code from arbitrary locations, from speculative
-+execution) for Spectre v2 compounds the problem, as it degrades
-+performance.
-+
-+This approach will result in a few MiB of increased disk space for
-+'kvm-intel.ko' and 'kvm-amd.ko', but the upside in saved indirect calls,
-+and the elimination of "retpoline" overhead at run-time more than
-+compensate for it.
-+
-+With the "KVM Monolithic" patch series applied, Andrea's microbenchmarks
-+show a double-digit improvement in performance with default mitigations
-+(for Spectre v2, et al) enabled on both Intel 'VMX' and AMD 'SVM'.  And
-+with 'spectre_v2=3Doff' or for CPUs with IBRS_ALL in ARCH_CAPABILITIES
-+"KVM monolithic" still improve[s] performance, albiet it's on the order
-+of 1%.
-+
-+Conclusion
-+----------
-+
-+Removal of the common KVM module has a non-negligible positive
-+performance impact.  And the "KVM Monolitic" patch series is still
-+actively being reviewed, modulo some pending clean-ups.  Based on the
-+upstream review discussion, KVM Maintainer, Paolo Bonzini, and other
-+reviewers seemed amenable to merge the series.
-+
-+Although, we still have to deal with mitigations for 'indirect branch
-+prediction' for a long time, reducing the VM-Exit latency is important
-+in general; and more specifically, for guest workloads that happen to
-+trigger frequent VM-Exits, without having to disable Spectre v2
-+mitigations on the host, as Andrea stated in the cover letter of his
-+patch series.
---=20
-2.21.0
+Btw, I created https://wiki.qemu.org/Testing/CCWTestDevice back then;
+might make sense to collect ideas there?
+
+>=20
+> Regards,
+>=20
+> Pierre
+>=20
+>=20
 
 
