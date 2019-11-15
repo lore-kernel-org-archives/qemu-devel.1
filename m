@@ -2,60 +2,106 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0743DC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:09:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0656C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:10:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD03220729
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:09:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD03220729
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5881B20729
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:10:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EgRnyfcy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5881B20729
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36505 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVWfV-0004NM-Rw
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 03:09:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39243)
+	id 1iVWgJ-00050y-8B
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 03:10:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40584)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iVWRE-0006Ni-BD
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 02:54:41 -0500
+ (envelope-from <mreitz@redhat.com>) id 1iVWe7-0002mQ-El
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:08:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iVWRD-00030a-3s
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 02:54:40 -0500
-Received: from mga07.intel.com ([134.134.136.100]:48001)
+ (envelope-from <mreitz@redhat.com>) id 1iVWe5-0002FN-0j
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:07:58 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52771
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iVWRC-0002Zs-SX
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 02:54:39 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
- by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 14 Nov 2019 23:54:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,307,1569308400"; d="scan'208";a="235987310"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga002.fm.intel.com with ESMTP; 14 Nov 2019 23:54:26 -0800
-From: Tao Xu <tao3.xu@intel.com>
-To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
- ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
- mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
-Subject: [PATCH v16 13/14] tests/numa: Add case for QMP build HMAT
-Date: Fri, 15 Nov 2019 15:53:51 +0800
-Message-Id: <20191115075352.17734-14-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191115075352.17734-1-tao3.xu@intel.com>
-References: <20191115075352.17734-1-tao3.xu@intel.com>
+ (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iVWe4-0002D6-Kh
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 03:07:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573805273;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=rrvg7CgO7jlaQY7fHcK9rWZ8NGrl8vk+08jktZnHHYI=;
+ b=EgRnyfcyhLH4v6Hqj3Q0OA7886XW4ciQzgoE4zoOwZd3jrxIR8Z5ska+QvM9vJvu0H0N0s
+ IhU8xxKLRppcIh2xSkHXSJbulX6qnnD4ClgibPtEff7003NwrkqHgC42b1yOhhGeQK/Do+
+ JmvCAEOKa6Ox46J0ohN/f952hjvL110=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-6LopJdKrMhqfynA3Rhlt3A-1; Fri, 15 Nov 2019 03:07:50 -0500
+X-MC-Unique: 6LopJdKrMhqfynA3Rhlt3A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46E1A1005500;
+ Fri, 15 Nov 2019 08:07:49 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-116-227.ams2.redhat.com
+ [10.36.116.227])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1BA3E101E3CB;
+ Fri, 15 Nov 2019 08:07:47 +0000 (UTC)
+Subject: Re: Convert VMDK to RAW
+To: janine.schneider@fau.de
+References: <009201d59b06$475883f0$d6098bd0$@fau.de>
+ <97e53c9c-7d3d-75e7-8227-7a1ff186f52e@redhat.com>
+ <000401d59b12$8024ce30$806e6a90$@fau.de>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <a58d3266-4e7a-f651-7dba-0381ddd35038@redhat.com>
+Date: Fri, 15 Nov 2019 09:07:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.100
+In-Reply-To: <000401d59b12$8024ce30$806e6a90$@fau.de>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="hhXRofxlm1xBcIPaanr95f2TjqFmOfONQ"
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,93 +113,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, jonathan.cameron@huawei.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Check configuring HMAT usecase
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--hhXRofxlm1xBcIPaanr95f2TjqFmOfONQ
+Content-Type: multipart/mixed; boundary="JysJtWR3vTNzwshA5XwuXQKSDBtzeU38Q"
 
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
+--JysJtWR3vTNzwshA5XwuXQKSDBtzeU38Q
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-New patch in v16.
----
- tests/numa-test.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+On 14.11.19 18:39, janine.schneider@fau.de wrote:
+> Hello,
+>=20
+> thank you for the quick feedback. I am sorry that I expressed myself so
+> unclearly. I don't want to use qemu but want to know how qemu converts vm=
+dk
+> to raw. So how exactly is the conversion programmed? How are the sparse
+> grains put together to get an uncompressed virtual disk? I am a programme=
+r
+> and would like to reimplement this function. I already looked at the qemu
+> code, but couldn't figure out how the conversion works.
 
-diff --git a/tests/numa-test.c b/tests/numa-test.c
-index 8de8581231..15889c26c0 100644
---- a/tests/numa-test.c
-+++ b/tests/numa-test.c
-@@ -327,6 +327,56 @@ static void pc_dynamic_cpu_cfg(const void *data)
-     qtest_quit(qs);
- }
- 
-+static void pc_build_hmat_cfg(const void *data)
-+{
-+    QTestState *qs;
-+
-+    qs = qtest_initf("%s -nodefaults --preconfig -machine hmat=on "
-+                     "-smp 2,sockets=2 "
-+                     "-m 128M,slots=2,maxmem=1G "
-+                     "-object memory-backend-ram,size=64M,id=m0 "
-+                     "-object memory-backend-ram,size=64M,id=m1 "
-+                     "-numa node,nodeid=0,memdev=m0 "
-+                     "-numa node,nodeid=1,memdev=m1,initiator=0 "
-+                     "-numa cpu,node-id=0,socket-id=0 "
-+                     "-numa cpu,node-id=0,socket-id=1",
-+                     data ? (char *)data : "");
-+
-+    /* Configuring HMAT bandwidth and latency details */
-+    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-+        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 0,"
-+        " 'hierarchy': \"memory\", 'data-type': \"access-latency\","
-+        " 'latency': 5 } }")));
-+    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-+        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 0,"
-+        " 'hierarchy': \"memory\", 'data-type': \"access-bandwidth\","
-+        " 'bandwidth': 524288000 } }")));
-+    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-+        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 1,"
-+        " 'hierarchy': \"memory\", 'data-type': \"access-latency\","
-+        " 'latency': 10 } }")));
-+    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-+        " 'arguments': { 'type': 'hmat-lb', 'initiator': 0, 'target': 1,"
-+        " 'hierarchy': \"memory\", 'data-type': \"access-bandwidth\","
-+        " 'bandwidth': 104857600 } }")));
-+
-+    /* Configuring HMAT memory side cache attributes */
-+    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-+        " 'arguments': { 'type': 'hmat-cache', 'node-id': 0, 'size': 10240,"
-+        " 'level': 1, 'assoc': \"direct\", 'policy': \"write-back\","
-+        " 'line': 8 } }")));
-+    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'set-numa-node',"
-+        " 'arguments': { 'type': 'hmat-cache', 'node-id': 1, 'size': 10240,"
-+        " 'level': 1, 'assoc': \"direct\", 'policy': \"write-back\","
-+        " 'line': 8 } }")));
-+
-+    /* let machine initialization to complete and run */
-+    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'x-exit-preconfig' }")));
-+    qtest_qmp_eventwait(qs, "RESUME");
-+
-+    qtest_quit(qs);
-+}
-+
- int main(int argc, char **argv)
- {
-     const char *args = NULL;
-@@ -346,6 +396,7 @@ int main(int argc, char **argv)
-     if (!strcmp(arch, "i386") || !strcmp(arch, "x86_64")) {
-         qtest_add_data_func("/numa/pc/cpu/explicit", args, pc_numa_cpu);
-         qtest_add_data_func("/numa/pc/dynamic/cpu", args, pc_dynamic_cpu_cfg);
-+        qtest_add_data_func("/numa/pc/build/hmat", args, pc_build_hmat_cfg);
-     }
- 
-     if (!strcmp(arch, "ppc64")) {
--- 
-2.20.1
+Oh, OK.  Well, even (or maybe especially) programmers sometimes want to
+reuse existing functionality, so I assumed it would be sufficient for
+you to just use qemu tools. ;-)  (For example, qemu-nbd allows
+presenting a VMDK image as a local block device that you can randomly
+access.)
+
+The code to interpret the VMDK format is in block/vmdk.c.  The function
+to read an arbitrary guest offset of the disk image is vmdk_co_preadv().
+ The conversion just iterates over the whole image and copies everything
+read with that function to the output image, so I don=92t think you need
+to look at anything but block/vmdk.c.
+
+vmdk_open() opens the image and thus parses the description file.  I
+suppose (I=92m no expert in the VMDK code) of particular interest are
+vmdk_parse_extents() and anything that calls vmdk_add_extent().  These
+code paths create a list of all extent files.
+
+From a quick look at vmdk_co_preadv(), find_extent() then looks up the
+corresponding extent file based on the guest offset;
+get_cluster_offset() looks up the file offset in that extent file for
+the respective guest offset; and vmdk_read_extent() then reads from the
+file at that offset, decompressing the data if necessary.
+
+(Note that
+https://www.vmware.com/support/developer/vddk/vmdk_50_technote.pdf
+probably understands the concepts of VMDK much better than I do *cough*)
+
+Max
+
+
+--JysJtWR3vTNzwshA5XwuXQKSDBtzeU38Q--
+
+--hhXRofxlm1xBcIPaanr95f2TjqFmOfONQ
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3OXNEACgkQ9AfbAGHV
+z0CxOwf6A9Q0QrNbk/8+2AdXUUnx/u77RDeoMWe5D/AJ5EwLYm+CH/cRp9wnnag3
+6zEALDmeMzRXkSqI7BjDeiw31DwkAQfsh76rYkL1kikTMdud5l5qsqV1fLY7Fd++
+IrvFg73R8O6E+Wdrwh09RqBXVoO9b3nwqlX8ut0BVnlpHTE30ctIdfkA3HT064y1
+UFAz9coIEbhkYQxLh4VpqXx/W2ze992VYVnvOUhR3GppbvbVbK7ZeHh9T8PSUZ0P
+3jOqbAy7c3TaViGkyogrPw1ms040iXs2sdiO+tf4MYc2u0mUVgXmfwTlg6YFayzv
+WrTfToxCXk17VidKVs9vzOASCFYweQ==
+=KOZT
+-----END PGP SIGNATURE-----
+
+--hhXRofxlm1xBcIPaanr95f2TjqFmOfONQ--
 
 
