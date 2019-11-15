@@ -6,58 +6,58 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54297C43141
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:37:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4DE8C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:38:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CC2920718
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:37:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CC2920718
+	by mail.kernel.org (Postfix) with ESMTPS id 9A09120718
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:38:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A09120718
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVeai-0004WW-LJ
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:37:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52257)
+	id 1iVecb-0006r0-7m
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:38:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52619)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iVePr-0000Ba-DW
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:48 -0500
+ (envelope-from <clg@kaod.org>) id 1iVeQf-0001Qx-1r
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iVePq-0000qs-3r
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:47 -0500
-Received: from 3.mo6.mail-out.ovh.net ([178.33.253.26]:50037)
+ (envelope-from <clg@kaod.org>) id 1iVeQd-0001G5-Ln
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:36 -0500
+Received: from 5.mo4.mail-out.ovh.net ([188.165.44.50]:39863)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVePp-0000qi-Tz
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:46 -0500
-Received: from player787.ha.ovh.net (unknown [10.108.35.159])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 53B171ECA1F
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:25:44 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVeQd-0001FT-Fd
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:35 -0500
+Received: from player787.ha.ovh.net (unknown [10.109.159.90])
+ by mo4.mail-out.ovh.net (Postfix) with ESMTP id C97DD20842A
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:26:33 +0100 (CET)
 Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
  (Authenticated sender: clg@kaod.org)
- by player787.ha.ovh.net (Postfix) with ESMTPSA id DB0C8C444A69;
- Fri, 15 Nov 2019 16:25:38 +0000 (UTC)
+ by player787.ha.ovh.net (Postfix) with ESMTPSA id DFB12C444E05;
+ Fri, 15 Nov 2019 16:26:27 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH for-5.0 v5 10/23] ppc/pnv: Loop on the threads of the chip to
- find a matching NVT
-Date: Fri, 15 Nov 2019 17:24:23 +0100
-Message-Id: <20191115162436.30548-11-clg@kaod.org>
+Subject: [PATCH for-5.0 v5 19/23] ppc/xive: Remove the get_tctx() XiveRouter
+ handler
+Date: Fri, 15 Nov 2019 17:24:32 +0100
+Message-Id: <20191115162436.30548-20-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191115162436.30548-1-clg@kaod.org>
 References: <20191115162436.30548-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 15098317754299157478
+X-Ovh-Tracer-Id: 15112110028020616166
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedu
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedv
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.253.26
+X-Received-From: 188.165.44.50
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,126 +75,120 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-CPU_FOREACH() loops on all the CPUs of the machine which is incorrect.
-Each XIVE Presenter should scan only the HW threads of the chip it
-belongs to.
+It is now unused.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/pnv.h |  2 ++
- hw/intc/pnv_xive.c   | 63 ++++++++++++++++++++++++++------------------
- hw/ppc/pnv.c         |  2 +-
- 3 files changed, 40 insertions(+), 27 deletions(-)
+ include/hw/ppc/xive.h |  2 --
+ hw/intc/pnv_xive.c    | 13 -------------
+ hw/intc/spapr_xive.c  |  8 --------
+ hw/intc/xive.c        |  7 -------
+ 4 files changed, 30 deletions(-)
 
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 07c56c05ad30..58f4dcc0b71d 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -150,6 +150,8 @@ typedef struct PnvChipClass {
-  */
- #define PNV_CHIP_HWID(i) ((((i) & 0x3e) << 3) | ((i) & 0x1))
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index dcf897451589..24315480e7c2 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -351,7 +351,6 @@ typedef struct XiveRouterClass {
+                    XiveNVT *nvt);
+     int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx=
+,
+                      XiveNVT *nvt, uint8_t word_number);
+-    XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs);
+ } XiveRouterClass;
 =20
-+const char *pnv_chip_core_typename(const PnvChip *chip);
-+
+ int xive_router_get_eas(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_=
+idx,
+@@ -364,7 +363,6 @@ int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt=
+_blk, uint32_t nvt_idx,
+                         XiveNVT *nvt);
+ int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nv=
+t_idx,
+                           XiveNVT *nvt, uint8_t word_number);
+-XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs);
+ void xive_router_notify(XiveNotifier *xn, uint32_t lisn);
+=20
  /*
-  * Converts back a HW chip id to an index. This is useful to calculate
-  * the MMIO addresses of some controllers which depend on the chip id.
 diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index 087cbfbaad48..71ca4961b6b1 100644
+index 4501c671d8df..2e568721b44e 100644
 --- a/hw/intc/pnv_xive.c
 +++ b/hw/intc/pnv_xive.c
-@@ -377,34 +377,45 @@ static int pnv_xive_match_nvt(XivePresenter *xptr, =
-uint8_t format,
-                               bool cam_ignore, uint8_t priority,
-                               uint32_t logic_serv, XiveTCTXMatch *match)
- {
--    CPUState *cs;
-+    PnvXive *xive =3D PNV_XIVE(xptr);
-+    PnvChip *chip =3D xive->chip;
-+    const char *typename =3D pnv_chip_core_typename(chip);
-+    size_t typesize =3D object_type_get_instance_size(typename);
-     int count =3D 0;
--
--    CPU_FOREACH(cs) {
--        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--        XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
--        int ring;
--
--        /*
--         * Check the thread context CAM lines and record matches.
--         */
--        ring =3D xive_presenter_tctx_match(xptr, tctx, format, nvt_blk, =
-nvt_idx,
--                                         cam_ignore, logic_serv);
--        /*
--         * Save the context and follow on to catch duplicates, that we
--         * don't support yet.
--         */
--        if (ring !=3D -1) {
--            if (match->tctx) {
--                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a "
--                              "thread context NVT %x/%x\n",
--                              nvt_blk, nvt_idx);
--                return -1;
-+    int i, j;
-+
-+    for (i =3D 0; i < chip->nr_cores; i++) {
-+        PnvCore *pc =3D PNV_CORE(chip->cores + i * typesize);
-+        CPUCore *cc =3D CPU_CORE(pc);
-+
-+        for (j =3D 0; j < cc->nr_threads; j++) {
-+            PowerPCCPU *cpu =3D pc->threads[j];
-+            XiveTCTX *tctx;
-+            int ring;
-+
-+            tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
-+
-+            /*
-+             * Check the thread context CAM lines and record matches.
-+             */
-+            ring =3D xive_presenter_tctx_match(xptr, tctx, format, nvt_b=
-lk,
-+                                             nvt_idx, cam_ignore, logic_=
-serv);
-+            /*
-+             * Save the context and follow on to catch duplicates, that =
-we
-+             * don't support yet.
-+             */
-+            if (ring !=3D -1) {
-+                if (match->tctx) {
-+                    qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found =
-a "
-+                                  "thread context NVT %x/%x\n",
-+                                  nvt_blk, nvt_idx);
-+                    return -1;
-+                }
-+
-+                match->ring =3D ring;
-+                match->tctx =3D tctx;
-+                count++;
-             }
--
--            match->ring =3D ring;
--            match->tctx =3D tctx;
--            count++;
-         }
-     }
+@@ -467,18 +467,6 @@ static PnvXive *pnv_xive_tm_get_xive(PowerPCCPU *cpu=
+)
+     return xive;
+ }
 =20
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index 57f924ba0466..94c9f536413f 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -64,7 +64,7 @@
- #define INITRD_LOAD_ADDR        0x60000000
- #define INITRD_MAX_SIZE         (256 * MiB)
+-static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
+-{
+-    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
+-
+-    if (!xive) {
+-        return NULL;
+-    }
+-
+-    return XIVE_TCTX(pnv_cpu_state(cpu)->intc);
+-}
+-
+ /*
+  * The internal sources (IPIs) of the interrupt controller have no
+  * knowledge of the XIVE chip on which they reside. Encode the block
+@@ -1936,7 +1924,6 @@ static void pnv_xive_class_init(ObjectClass *klass,=
+ void *data)
+     xrc->write_end =3D pnv_xive_write_end;
+     xrc->get_nvt =3D pnv_xive_get_nvt;
+     xrc->write_nvt =3D pnv_xive_write_nvt;
+-    xrc->get_tctx =3D pnv_xive_get_tctx;
 =20
--static const char *pnv_chip_core_typename(const PnvChip *o)
-+const char *pnv_chip_core_typename(const PnvChip *o)
- {
-     const char *chip_type =3D object_class_get_name(object_get_class(OBJ=
-ECT(o)));
-     int len =3D strlen(chip_type) - strlen(PNV_CHIP_TYPE_SUFFIX);
+     xnc->notify =3D pnv_xive_notify;
+     xpc->match_nvt  =3D pnv_xive_match_nvt;
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 6292da58f62c..1542cef91878 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -427,13 +427,6 @@ static int spapr_xive_write_nvt(XiveRouter *xrtr, ui=
+nt8_t nvt_blk,
+     g_assert_not_reached();
+ }
+=20
+-static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
+-{
+-    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+-
+-    return spapr_cpu_state(cpu)->tctx;
+-}
+-
+ static int spapr_xive_match_nvt(XivePresenter *xptr, uint8_t format,
+                                 uint8_t nvt_blk, uint32_t nvt_idx,
+                                 bool cam_ignore, uint8_t priority,
+@@ -771,7 +764,6 @@ static void spapr_xive_class_init(ObjectClass *klass,=
+ void *data)
+     xrc->write_end =3D spapr_xive_write_end;
+     xrc->get_nvt =3D spapr_xive_get_nvt;
+     xrc->write_nvt =3D spapr_xive_write_nvt;
+-    xrc->get_tctx =3D spapr_xive_get_tctx;
+=20
+     sicc->activate =3D spapr_xive_activate;
+     sicc->deactivate =3D spapr_xive_deactivate;
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index ab779c4c2a0f..e576a1e4ba9c 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -1317,13 +1317,6 @@ int xive_router_write_nvt(XiveRouter *xrtr, uint8_=
+t nvt_blk, uint32_t nvt_idx,
+    return xrc->write_nvt(xrtr, nvt_blk, nvt_idx, nvt, word_number);
+ }
+=20
+-XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs)
+-{
+-    XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
+-
+-    return xrc->get_tctx(xrtr, cs);
+-}
+-
+ /*
+  * Encode the HW CAM line in the block group mode format :
+  *
 --=20
 2.21.0
 
