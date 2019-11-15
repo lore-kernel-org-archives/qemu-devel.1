@@ -2,76 +2,79 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90ADFC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 22:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88B62C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 22:35:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59D0E20733
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 22:35:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54FB720733
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 22:35:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KYalicSp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59D0E20733
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WmRjAF0k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54FB720733
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVkBl-0005WT-6Q
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 17:35:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56608)
+	id 1iVkBo-0005bE-Vv
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 17:35:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56648)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iVk9a-0003hA-OO
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 17:33:23 -0500
+ (envelope-from <lvivier@redhat.com>) id 1iVk9d-0003iP-G3
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 17:33:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iVk9Y-0000gX-AY
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 17:33:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29494
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <lvivier@redhat.com>) id 1iVk9c-0000lL-A5
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 17:33:25 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:32900
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iVk9Y-0000fM-70
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 17:33:20 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iVk9c-0000l2-7E
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 17:33:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573857199;
+ s=mimecast20190719; t=1573857203;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=64WVrzDZ62NONk0zWq6JXWWrJ/svFtlrpVXVGoXMmbI=;
- b=KYalicSpMP0XS3Yyx0uO2VvtyQwiQ1kgdbpMteEzlGfk75zBxFP2jvdJO9eULF5wznTf3o
- IDxLiZotDeS+y9bnb+3MNHL6FZft0QDZVDf6vFSmjBOTa8YkSF5vENOfXn/I72L5UaGfbN
- 3MYHkZ5kM4LakiW24kssuu5GbmK+Sx0=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LE+/wVr4p6NjNVOjx41d0Zol9m8QWVM27Ffs17tDDwQ=;
+ b=WmRjAF0kmkUQA3TpU0PFltacFzYrKVABm2NvgQIV6hhxSMnIs5fOUIcc/+xWJsshcx5nq3
+ ydFG27qWZI17L0bj+2o/c9CcVrw5AguTmHY/y2uqi5HWJRVTwEkJm4748jDSD6x+Ihcd1Z
+ xcgAw7rGLBxOs1lCjRmCYy/itL+vuus=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-vGrkxYYcOKavcavckoJw7A-1; Fri, 15 Nov 2019 17:33:16 -0500
+ us-mta-401-vUiUiVRXOlKjFWG3b1Zp3A-1; Fri, 15 Nov 2019 17:33:20 -0500
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32AFD477;
- Fri, 15 Nov 2019 22:33:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2ADA2107ACC4;
+ Fri, 15 Nov 2019 22:33:19 +0000 (UTC)
 Received: from thinkpad.redhat.com (ovpn-116-194.ams2.redhat.com
  [10.36.116.194])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0A4D766835;
- Fri, 15 Nov 2019 22:33:12 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A192075E39;
+ Fri, 15 Nov 2019 22:33:17 +0000 (UTC)
 From: Laurent Vivier <lvivier@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/6] ppc-for-4.2 queue 2019-11-15
-Date: Fri, 15 Nov 2019 23:33:06 +0100
-Message-Id: <20191115223312.204979-1-lvivier@redhat.com>
+Subject: [PULL 2/6] xive, xics: Fix reference counting on CPU objects
+Date: Fri, 15 Nov 2019 23:33:08 +0100
+Message-Id: <20191115223312.204979-3-lvivier@redhat.com>
+In-Reply-To: <20191115223312.204979-1-lvivier@redhat.com>
+References: <20191115223312.204979-1-lvivier@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: vGrkxYYcOKavcavckoJw7A-1
+X-MC-Unique: vUiUiVRXOlKjFWG3b1Zp3A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,7 +86,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org,
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
  David Gibson <david@gibson.dropbear.id.au>
@@ -91,64 +94,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 36609b4fa36f0ac934874371874416f7533a5408=
-:
+From: Greg Kurz <groug@kaod.org>
 
-  Merge remote-tracking branch 'remotes/palmer/tags/palmer-for-master-4.2-s=
-f1' into staging (2019-11-02 17:59:03 +0000)
+When a VCPU gets connected to the XIVE interrupt controller, we add a
+const link targetting the CPU object to the TCTX object. Similar links
+are added to the ICP object when using the XICS interrupt controller.
 
-are available in the Git repository at:
+As explained in <qom/object.h>:
 
-  https://github.com/vivier/qemu.git tags/ppc-for-4.2-pull-request
+ * The caller must ensure that @target stays alive as long as
+ * this property exists.  In the case @target is a child of @obj,
+ * this will be the case.  Otherwise, the caller is responsible for
+ * taking a reference.
 
-for you to fetch changes up to 140fce75367a2bd8ef50681896a15f34952d9b85:
+We're in the latter case for both XICS and XIVE. Add the missing
+calls to object_ref() and object_unref().
 
-  mos6522: fix T1 and T2 timers (2019-11-03 20:09:59 +0100)
+This doesn't fix any known issue because the life cycle of the TCTX or
+ICP happens to be shorter than the one of the CPU or XICS fabric, but
+better safe than sorry.
 
-----------------------------------------------------------------
-ppc patch queue 2019-11-15
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <157192724770.3146912.15400869269097231255.stgit@bahia.lan>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/intc/xics.c | 8 +++++++-
+ hw/intc/xive.c | 6 +++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-Several fixes for 4.2.0-rc2:
-
-fix mos6522 performance issue,
-xive/xics issues,
-fix /chosen device-tree on reset
-and KVM default cpu-model for all machine classes
-
-----------------------------------------------------------------
-
-Alexey Kardashevskiy (1):
-  spapr: Add /chosen to FDT only at reset time to preserve kernel and
-    initramdisk
-
-David Gibson (1):
-  spapr/kvm: Set default cpu model for all machine classes
-
-Greg Kurz (3):
-  ppc: Add intc_destroy() handlers to SpaprInterruptController/PnvChip
-  xive, xics: Fix reference counting on CPU objects
-  ppc: Skip partially initialized vCPUs in 'info pic'
-
-Laurent Vivier (1):
-  mos6522: fix T1 and T2 timers
-
- hw/intc/spapr_xive.c       | 10 ++++++
- hw/intc/xics.c             | 22 ++++++++++++-
- hw/intc/xics_spapr.c       | 10 ++++++
- hw/intc/xive.c             | 20 +++++++++++-
- hw/misc/mos6522.c          | 67 +++++++++++++++++++++++++++++---------
- hw/ppc/pnv.c               | 21 ++++++++++++
- hw/ppc/pnv_core.c          |  7 ++--
- hw/ppc/spapr.c             | 25 ++++++++------
- hw/ppc/spapr_cpu_core.c    |  7 +---
- hw/ppc/spapr_irq.c         | 14 ++++++++
- include/hw/ppc/pnv.h       |  1 +
- include/hw/ppc/spapr_irq.h |  2 ++
- include/hw/ppc/xics.h      |  1 +
- include/hw/ppc/xive.h      |  1 +
- target/ppc/kvm.c           | 21 +++++++-----
- 15 files changed, 185 insertions(+), 44 deletions(-)
-
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index 935f325749cb..5f746079be46 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -388,8 +388,10 @@ Object *icp_create(Object *cpu, const char *type, XICS=
+Fabric *xi, Error **errp)
+     obj =3D object_new(type);
+     object_property_add_child(cpu, type, obj, &error_abort);
+     object_unref(obj);
++    object_ref(OBJECT(xi));
+     object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
+                                    &error_abort);
++    object_ref(cpu);
+     object_property_add_const_link(obj, ICP_PROP_CPU, cpu, &error_abort);
+     object_property_set_bool(obj, true, "realized", &local_err);
+     if (local_err) {
+@@ -403,7 +405,11 @@ Object *icp_create(Object *cpu, const char *type, XICS=
+Fabric *xi, Error **errp)
+=20
+ void icp_destroy(ICPState *icp)
+ {
+-    object_unparent(OBJECT(icp));
++    Object *obj =3D OBJECT(icp);
++
++    object_unref(object_property_get_link(obj, ICP_PROP_CPU, &error_abort)=
+);
++    object_unref(object_property_get_link(obj, ICP_PROP_XICS, &error_abort=
+));
++    object_unparent(obj);
+ }
+=20
+ /*
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 38257aa02083..952a461d5329 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -682,6 +682,7 @@ Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr,=
+ Error **errp)
+     obj =3D object_new(TYPE_XIVE_TCTX);
+     object_property_add_child(cpu, TYPE_XIVE_TCTX, obj, &error_abort);
+     object_unref(obj);
++    object_ref(cpu);
+     object_property_add_const_link(obj, "cpu", cpu, &error_abort);
+     object_property_set_bool(obj, true, "realized", &local_err);
+     if (local_err) {
+@@ -698,7 +699,10 @@ error:
+=20
+ void xive_tctx_destroy(XiveTCTX *tctx)
+ {
+-    object_unparent(OBJECT(tctx));
++    Object *obj =3D OBJECT(tctx);
++
++    object_unref(object_property_get_link(obj, "cpu", &error_abort));
++    object_unparent(obj);
+ }
+=20
+ /*
 --=20
 2.23.0
 
