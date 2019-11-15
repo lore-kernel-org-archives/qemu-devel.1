@@ -2,64 +2,89 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5197C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 12:18:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F0DC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 12:20:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E33B20748
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 12:18:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E33B20748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 8D06520740
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 12:20:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ykft8NQ+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D06520740
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVaY8-000857-MH
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 07:18:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42910)
+	id 1iVaa1-00014Z-Jk
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 07:20:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43058)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iVaWo-0007PA-O9
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 07:16:43 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iVaXc-0007v8-3H
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 07:17:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iVaWm-0002RO-Fo
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 07:16:42 -0500
-Received: from 8.mo179.mail-out.ovh.net ([46.105.75.26]:33322)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVaWk-0002PO-GR
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 07:16:38 -0500
-Received: from player711.ha.ovh.net (unknown [10.109.146.5])
- by mo179.mail-out.ovh.net (Postfix) with ESMTP id B2545145419
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 13:16:28 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player711.ha.ovh.net (Postfix) with ESMTPSA id 89C13C09FA87;
- Fri, 15 Nov 2019 12:16:23 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 0/8] ppc: Consolidate QOM links and pointers to
- the same object
-To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
-References: <157381880498.136087.3775284829737989585.stgit@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <59f7978d-0c34-cc92-f0bd-e72a1a7e9d8f@kaod.org>
-Date: Fri, 15 Nov 2019 13:16:22 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <alex.bennee@linaro.org>) id 1iVaXa-0002z0-Sw
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 07:17:31 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51019)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iVaXa-0002yR-82
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 07:17:30 -0500
+Received: by mail-wm1-x342.google.com with SMTP id l17so9442389wmh.0
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 04:17:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=aB0UTNSlNIdFk8672z6gWnJR2gKZda/tkrYuL7bXYo4=;
+ b=ykft8NQ+xEzcw6q8jRQ8Gg5ivCV4svfeoQZufBSPWgQbHSLuvWv3Ee37bV/s6l3bLH
+ CsQFNeCTSx6vY9G84yYLw09V6LgDeFkvXJI6aeSnhOqu8AOrbNhbSnDcUHgmNoRrq+Hx
+ cpPunKlbS8ViR2zhtEKKpcIyM93VBIpGuFOOpU7XmjFfDPX0PDNtImfl6KLI1yOsTsnV
+ LLM4K/xLozg3s/2BgObad/CkGsmFTcL4wt1ot+Rq7MHB8IVlo2C1VIXhToedGUaKOPwi
+ Kp4Zyzp+PBL0NGL3ZVNs7vjjXui9Xo2Gva2l/Tpv0J4QsyKERtM7N07YZ5zvv+4kF13x
+ VJxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=aB0UTNSlNIdFk8672z6gWnJR2gKZda/tkrYuL7bXYo4=;
+ b=o3SXN1ouy3RFUJ88jy/3GJeDSa6d/ubeXzPNYb2emfs2yS79rXiHBKA2o0yH9uAaAS
+ LhKYwMq/wTmgQiX/mzbxjo32XDxCBhtOLqwVQuOBYRUO68TkSiSDONMEvNfflKCnlyMb
+ obMqSa4HaYvZmRiLCdgFslbRsa7IOmaPaCILpAfZzpSTXUGpvM9bIEs/yHJg8pcrV4wc
+ X+/Y3aD0rao6hxka+LYTIl7Dkt1lJRZYprGPVhSfiRijdzHYdVUFfEvgLLyvKuT0/GCz
+ qzCrUfGKHfo04GAMQP7UVeoM8bRHkSRvy1KHZtpcTopm/d1VkczsPi1ZtQGkCycZAI2g
+ gFdg==
+X-Gm-Message-State: APjAAAVuZ/vBgy8kz+V8raQGnlYQO7XJX+kDxD6o4gT0jjk8v3fHS3Ty
+ AQF6p0GUNYYwjtb+nY0S1zYhZKgR384=
+X-Google-Smtp-Source: APXvYqwSdaX8o0powwS+KP/aax2tg9QwQEG0dzoPm3Idq4thoQY+hbEWixS/Zgz3BMZSOgBQt2PooQ==
+X-Received: by 2002:a1c:dc09:: with SMTP id t9mr13849868wmg.65.1573820247679; 
+ Fri, 15 Nov 2019 04:17:27 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u7sm12579016wre.59.2019.11.15.04.17.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 15 Nov 2019 04:17:26 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 904DD1FF87;
+ Fri, 15 Nov 2019 12:17:25 +0000 (GMT)
+References: <1573792691-398-1-git-send-email-tsimpson@quicinc.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Taylor Simpson <tsimpson@quicinc.com>
+Subject: Re: [PATCH] Modify tests to work with clang
+In-reply-to: <1573792691-398-1-git-send-email-tsimpson@quicinc.com>
+Date: Fri, 15 Nov 2019 12:17:25 +0000
+Message-ID: <8736ep72qy.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <157381880498.136087.3775284829737989585.stgit@bahia.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 10888578000738880339
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgfeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthejredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejuddurdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.75.26
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,79 +96,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/11/2019 12:53, Greg Kurz wrote:
-> There's a recurring pattern in the code where a const link is added to a
-> newly instanciated object and the link is then used in the object's realize
-> function to keep a pointer to the QOM entity which the link points to.
-> 
-> void create_obj_B(Object *obj_a)
-> {
->     Object *obj_b;
-> 
->     obj_b = object_new(TYPE_B);
->     object_property_add_const_link(obj_b, "link-to-a", obj_a, &error_abort);
-> }
-> 
-> void object_B_realize(DeviceState *dev, Error **errp)
-> {
->     Object *obj_a;
-> 
->     obj_a = object_property_get_link(OBJECT(dev), "link-to-a", errp);
->     if (!obj_a) {
->         return;
->     }
-> 
->     obj_b->obj_a = A(obj_a); // If obj_b->obj_a is changed, the link property
->                              // still points to the original obj_a that was
->                              // passed to object_property_add_const_link()
-> }
-> 
-> Confusing bugs could arise if the pointer and the link go out of sync for
-> some reason. This can be avoided if the property is defined to directly use
-> the pointer with object_property_add_link() and object_property_set_link().
-> 
-> This series just does that for all occurences of the fragile pattern in
-> the XIVE and PNV code.
 
-Can we use DEFINE_PROP_LINK() instead ?
+Taylor Simpson <tsimpson@quicinc.com> writes:
 
-C. 
-
-
-> 
-> --
-> Greg
-> 
+> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
 > ---
-> 
-> Greg Kurz (8):
->       xive: Link "cpu" property to XiveTCTX::cs pointer
->       xive: Link "xive" property to XiveSource::xive pointer
->       xive: Link "xive" property to XiveEndSource::xrtr pointer
->       ppc/pnv: Link "psi" property to PnvLpc::psi pointer
->       ppc/pnv: Link "psi" property to PnvOCC::psi pointer
->       ppc/pnv: Link "chip" property to PnvHomer::chip pointer
->       ppc/pnv: Link "chip" property to PnvCore::chip pointer
->       ppc/pnv: Link "chip" property to PnvXive::chip pointer
-> 
-> 
->  hw/intc/pnv_xive.c        |   29 +++++++++-----------
->  hw/intc/spapr_xive.c      |    8 +++---
->  hw/intc/xive.c            |   65 ++++++++++++++++++++++-----------------------
->  hw/ppc/pnv.c              |   32 +++++++++++-----------
->  hw/ppc/pnv_core.c         |   18 +++++++-----
->  hw/ppc/pnv_homer.c        |   24 +++++++++--------
->  hw/ppc/pnv_lpc.c          |   23 ++++++++--------
->  hw/ppc/pnv_occ.c          |   23 ++++++++--------
->  hw/ppc/pnv_psi.c          |    3 +-
->  include/hw/ppc/pnv.h      |    2 +
->  include/hw/ppc/pnv_core.h |    2 +
->  11 files changed, 115 insertions(+), 114 deletions(-)
-> 
+>  tests/tcg/multiarch/float_helpers.c | 13 ++++++++++++-
+>  tests/tcg/multiarch/linux-test.c    |  2 +-
+>  2 files changed, 13 insertions(+), 2 deletions(-)
+>
+> diff --git a/tests/tcg/multiarch/float_helpers.c b/tests/tcg/multiarch/fl=
+oat_helpers.c
+> index 8ee7903..437247c 100644
+> --- a/tests/tcg/multiarch/float_helpers.c
+> +++ b/tests/tcg/multiarch/float_helpers.c
+<snip>
+> diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux=
+-test.c
+> index 673d7c8..edfc02c 100644
+> --- a/tests/tcg/multiarch/linux-test.c
+> +++ b/tests/tcg/multiarch/linux-test.c
+> @@ -485,7 +485,7 @@ static void test_signal(void)
+>      act.sa_flags =3D SA_SIGINFO;
+>      chk_error(sigaction(SIGSEGV, &act, NULL));
+>      if (setjmp(jmp_env) =3D=3D 0) {
+> -        *(uint8_t *)0 =3D 0;
+> +        *(volatile uint8_t *)0 =3D 0;
 
+This looks suspicious - volatile is almost never the answer to a
+question. What are we trying to achieve here?
+
+>      }
+>
+>      act.sa_handler =3D SIG_DFL;
+
+
+--
+Alex Benn=C3=A9e
 
