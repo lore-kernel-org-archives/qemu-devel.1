@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE88FC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93926C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:40:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3B5F2073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:38:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3B5F2073A
+	by mail.kernel.org (Postfix) with ESMTPS id 655FC2073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:40:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 655FC2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVckG-0005j3-0l
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:38:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59349)
+	id 1iVcli-0007A9-BG
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:40:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59399)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNj-0005B7-Lk
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:30 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNo-0005Dg-5T
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNe-0002CX-QI
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:27 -0500
-Received: from relay.sw.ru ([185.231.240.75]:47490)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNm-0002KQ-Ff
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:31 -0500
+Received: from relay.sw.ru ([185.231.240.75]:47560)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcNb-0001tW-DY; Fri, 15 Nov 2019 09:15:19 -0500
+ id 1iVcNd-0001wW-Hk; Fri, 15 Nov 2019 09:15:21 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcNA-0006WW-EX; Fri, 15 Nov 2019 17:14:52 +0300
+ id 1iVcND-0006WW-4C; Fri, 15 Nov 2019 17:14:55 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [RFC 13/24] block/block-copy: use aio-task-pool API
-Date: Fri, 15 Nov 2019 17:14:33 +0300
-Message-Id: <20191115141444.24155-14-vsementsov@virtuozzo.com>
+Subject: [RFC 22/24] python: add simplebench.py
+Date: Fri, 15 Nov 2019 17:14:42 +0300
+Message-Id: <20191115141444.24155-23-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191115141444.24155-1-vsementsov@virtuozzo.com>
 References: <20191115141444.24155-1-vsementsov@virtuozzo.com>
@@ -67,200 +67,142 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Run block_copy iterations in parallel in aio tasks.
+Add simple benchmark table creator.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/block-copy.c | 102 +++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 90 insertions(+), 12 deletions(-)
+ python/simplebench.py | 122 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 122 insertions(+)
+ create mode 100644 python/simplebench.py
 
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 4e8c64a45d..b2e7825b53 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -19,15 +19,27 @@
- #include "block/block-copy.h"
- #include "sysemu/block-backend.h"
- #include "qemu/units.h"
-+#include "qemu/coroutine.h"
-+#include "block/aio_task.h"
- 
- #define BLOCK_COPY_MAX_COPY_RANGE (16 * MiB)
- #define BLOCK_COPY_MAX_BUFFER (1 * MiB)
- #define BLOCK_COPY_MAX_MEM (128 * MiB)
-+#define BLOCK_COPY_MAX_WORKERS 64
+diff --git a/python/simplebench.py b/python/simplebench.py
+new file mode 100644
+index 0000000000..b09c2cf40b
+--- /dev/null
++++ b/python/simplebench.py
+@@ -0,0 +1,122 @@
++#!/usr/bin/env python
++#
++# Simple benchmarking framework
++#
++# Copyright (c) 2019 Virtuozzo International GmbH.
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
 +
-+typedef struct BlockCopyCallState {
-+    bool failed;
-+    bool error_is_read;
-+} BlockCopyCallState;
- 
- typedef struct BlockCopyTask {
-+    AioTask task;
 +
-     BlockCopyState *s;
-+    BlockCopyCallState *call_state;
-     int64_t offset;
-     int64_t bytes;
-+    bool zeroes;
-     QLIST_ENTRY(BlockCopyTask) list;
-     CoQueue wait_queue; /* coroutines blocked on this task */
- } BlockCopyTask;
-@@ -217,6 +229,30 @@ void block_copy_set_callbacks(
-     s->progress_opaque = progress_opaque;
- }
- 
-+/* Takes ownership on @task */
-+static coroutine_fn int block_copy_task_run(AioTaskPool *pool,
-+                                            BlockCopyTask *task)
-+{
-+    if (!pool) {
-+        int ret = task->task.func(&task->task);
++def bench_one(test_func, test_env, test_case, count=5, initial_run=True):
++    """Benchmark one test-case
 +
-+        g_free(task);
-+        return ret;
++    test_func   -- benchmarking function with prototype
++                   test_func(env, case), which takes test_env and test_case
++                   arguments and returns {'seconds': int} (which is benchmark
++                   result) on success and {'error': str} on error. Returned
++                   dict may contain any other additional fields.
++    test_env    -- test environment - opaque first argument for test_func
++    test_case   -- test case - opaque second argument for test_func
++    count       -- how many times to call test_func, to calculate average
++    initial_run -- do initial run of test_func, which don't get into result
++
++    Returns dict with the following fields:
++        'runs':     list of test_func results
++        'average':  average seconds per run (exists only if at least one run
++                    succeeded)
++        'delta':    maximum delta between test_func result and the average
++                    (exists only if at least one run succeeded)
++        'n-failed': number of failed runs (exists only if at least one run
++                    failed)
++    """
++    if initial_run:
++        test_func(test_env, test_case)
++
++    runs = [test_func(test_env, test_case) for _ in range(count)]
++
++    result = {'runs': runs}
++
++    successed = [r for r in runs if ('seconds' in r)]
++    if successed:
++        avg = sum(r['seconds'] for r in successed) / len(successed)
++        result['average'] = avg
++        result['delta'] = max(abs(r['seconds'] - avg) for r in successed)
++
++    if len(successed) < count:
++        result['n-failed'] = count - len(successed)
++
++    return result
++
++
++def ascii_one(result):
++    """Return ASCII representation of bench_one() returned dict."""
++    if 'average' in result:
++        s = '{:.2f} +- {:.2f}'.format(result['average'], result['delta'])
++        if 'n-failed' in result:
++            s += '\n({} failed)'.format(result['n-failed'])
++        return s
++    else:
++        return 'FAILED'
++
++
++def bench(test_func, test_envs, test_cases, *args, **vargs):
++    """Fill benchmark table
++
++    test_func -- benchmarking function, see bench_one for description
++    test_envs -- list of test environments, see bench_one
++    test_cases -- list of test cases, see bench_one
++    args, vargs -- additional arguments for bench_one
++
++    Returns dict with the following fields:
++        'envs':  test_envs
++        'cases': test_cases
++        'tab':   filled 2D array, where cell [i][j] is bench_one result for
++                 test_cases[i] for test_envs[j] (i.e., rows are test cases and
++                 columns are test environments)
++    """
++    tab = {}
++    results = {
++        'envs': test_envs,
++        'cases': test_cases,
++        'tab': tab
 +    }
++    n = 1
++    n_tests = len(test_envs) * len(test_cases)
++    for env in test_envs:
++        for case in test_cases:
++            print('Testing {}/{}: {} :: {}'.format(n, n_tests,
++                                                   env['id'], case['id']))
++            if case['id'] not in tab:
++                tab[case['id']] = {}
++            tab[case['id']][env['id']] = bench_one(test_func, env, case,
++                                                   *args, **vargs)
++            n += 1
 +
-+    aio_task_pool_wait_slot(pool);
-+    if (aio_task_pool_status(pool) < 0) {
-+        co_put_to_shres(task->s->mem, task->bytes);
-+        block_copy_task_end(task, -EAGAIN);
-+        g_free(task);
-+        return aio_task_pool_status(pool);
-+    }
++    print('Done')
++    return results
 +
-+    aio_task_pool_start_task(pool, &task->task);
 +
-+    return 0;
-+}
++def ascii(results):
++    """Return ASCII representation of bench() returned dict."""
++    from tabulate import tabulate
 +
- /*
-  * block_copy_do_copy
-  *
-@@ -316,8 +352,31 @@ out:
-     return ret;
- }
- 
-+static coroutine_fn int block_copy_task_entry(AioTask *task)
-+{
-+    BlockCopyTask *t = container_of(task, BlockCopyTask, task);
-+    bool error_is_read;
-+    int ret;
++    tab = [[""] + [c['id'] for c in results['envs']]]
++    for case in results['cases']:
++        row = [case['id']]
++        for env in results['envs']:
++            row.append(ascii_one(results['tab'][case['id']][env['id']]))
++        tab.append(row)
 +
-+    ret = block_copy_do_copy(t->s, t->offset, t->bytes, t->zeroes,
-+                             &error_is_read);
-+    if (ret < 0 && !t->call_state->failed) {
-+        t->call_state->failed = true;
-+        t->call_state->error_is_read = error_is_read;
-+    } else {
-+        t->s->progress_bytes_callback(t->bytes, t->s->progress_opaque);
-+    }
-+    co_put_to_shres(t->s->mem, t->bytes);
-+    block_copy_task_end(t, ret);
-+
-+    return ret;
-+}
-+
-+/* Called only on full-dirty region */
- static BlockCopyTask *block_copy_task_create(BlockCopyState *s,
--                                             int64_t offset, int64_t bytes)
-+                                             BlockCopyCallState *call_state,
-+                                             int64_t offset,
-+                                             int64_t bytes)
- {
-     int64_t next_zero;
-     BlockCopyTask *task = g_new(BlockCopyTask, 1);
-@@ -338,7 +397,9 @@ static BlockCopyTask *block_copy_task_create(BlockCopyState *s,
-     bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
- 
-     *task = (BlockCopyTask) {
-+        .task.func = block_copy_task_entry,
-         .s = s,
-+        .call_state = call_state,
-         .offset = offset,
-         .bytes = bytes,
-     };
-@@ -459,6 +520,8 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
- {
-     int ret = 0;
-     bool found_dirty = false;
-+    AioTaskPool *aio = NULL;
-+    BlockCopyCallState call_state = {false, false};
- 
-     /*
-      * block_copy() user is responsible for keeping source and target in same
-@@ -470,8 +533,8 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
-     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
-     assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
- 
--    while (bytes) {
--        g_autofree BlockCopyTask *task = NULL;
-+    while (bytes && aio_task_pool_status(aio) == 0) {
-+        BlockCopyTask *task;
-         int64_t status_bytes;
- 
-         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, offset)) {
-@@ -483,36 +546,51 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
- 
-         found_dirty = true;
- 
--        task = block_copy_task_create(s, offset, bytes);
-+        task = block_copy_task_create(s, &call_state, offset, bytes);
- 
-         ret = block_copy_block_status(s, offset, task->bytes, &status_bytes);
-         block_copy_task_shrink(task, status_bytes);
-         if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
-             block_copy_task_end(task, 0);
-+            g_free(task);
-             s->progress_reset_callback(s->progress_opaque);
-             trace_block_copy_skip_range(s, offset, status_bytes);
-             offset += status_bytes;
-             bytes -= status_bytes;
-             continue;
-         }
-+        task->zeroes = ret & BDRV_BLOCK_ZERO;
- 
-         trace_block_copy_process(s, offset);
- 
-         co_get_from_shres(s->mem, task->bytes);
--        ret = block_copy_do_copy(s, offset, task->bytes, ret & BDRV_BLOCK_ZERO,
--                                 error_is_read);
--        co_put_to_shres(s->mem, task->bytes);
--        block_copy_task_end(task, ret);
--        if (ret < 0) {
--            return ret;
-+
-+        if (!aio && task->bytes != bytes) {
-+            aio = aio_task_pool_new(BLOCK_COPY_MAX_WORKERS);
-         }
- 
--        s->progress_bytes_callback(task->bytes, s->progress_opaque);
-         offset += task->bytes;
-         bytes -= task->bytes;
-+
-+        ret = block_copy_task_run(aio, task);
-+        if (ret < 0) {
-+            goto out;
-+        }
-+    }
-+
-+out:
-+    if (aio) {
-+        aio_task_pool_wait_all(aio);
-+        if (ret == 0) {
-+            ret = aio_task_pool_status(aio);
-+        }
-+        g_free(aio);
-+    }
-+    if (error_is_read && ret < 0) {
-+        *error_is_read = call_state.error_is_read;
-     }
- 
--    return found_dirty;
-+    return ret < 0 ? ret : found_dirty;
- }
- 
- int coroutine_fn block_copy(BlockCopyState *s, int64_t start, uint64_t bytes,
++    return tabulate(tab)
 -- 
 2.21.0
 
