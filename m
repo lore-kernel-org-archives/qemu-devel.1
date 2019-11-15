@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B49A8C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:33:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C57BCC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:35:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AE4E20733
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:33:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AE4E20733
+	by mail.kernel.org (Postfix) with ESMTPS id 918FD20733
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:35:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 918FD20733
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVceq-00078L-13
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:33:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59041)
+	id 1iVcgf-0000nh-9O
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:35:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59350)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNL-0004eR-Jx
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:05 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNj-0005B8-Ke
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNK-0001yK-2E
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:03 -0500
-Received: from relay.sw.ru ([185.231.240.75]:47464)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNe-0002CR-Pj
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:27 -0500
+Received: from relay.sw.ru ([185.231.240.75]:47474)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcNG-0001rt-K4; Fri, 15 Nov 2019 09:14:58 -0500
+ id 1iVcNb-0001t6-0R; Fri, 15 Nov 2019 09:15:19 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcND-0006WW-8I; Fri, 15 Nov 2019 17:14:55 +0300
+ id 1iVcN4-0006WW-II; Fri, 15 Nov 2019 17:14:46 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [RFC 23/24] python: add qemu/bench_block_job.py
-Date: Fri, 15 Nov 2019 17:14:43 +0300
-Message-Id: <20191115141444.24155-24-vsementsov@virtuozzo.com>
+Subject: [RFC 06/24] block/block-copy: reduce intersecting request lock
+Date: Fri, 15 Nov 2019 17:14:26 +0300
+Message-Id: <20191115141444.24155-7-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191115141444.24155-1-vsementsov@virtuozzo.com>
 References: <20191115141444.24155-1-vsementsov@virtuozzo.com>
@@ -67,134 +67,217 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add block-job benchmarking helper functions.
+Currently, block_copy operation lock the whole requested region. But
+there is no reason to lock clusters, which are already copied, it will
+disturb other parallel block_copy requests for no reason.
+
+Let's instead do the following:
+
+Lock only sub-region, which we are going to operate on. Then, after
+copying all dirty sub-regions, we should wait for intersecting
+requests block-copy, if they failed, we should retry these new dirty
+clusters.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- python/qemu/bench_block_job.py | 114 +++++++++++++++++++++++++++++++++
- 1 file changed, 114 insertions(+)
- create mode 100755 python/qemu/bench_block_job.py
+ block/block-copy.c | 116 +++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 95 insertions(+), 21 deletions(-)
 
-diff --git a/python/qemu/bench_block_job.py b/python/qemu/bench_block_job.py
-new file mode 100755
-index 0000000000..6a72be9ba2
---- /dev/null
-+++ b/python/qemu/bench_block_job.py
-@@ -0,0 +1,114 @@
-+#!/usr/bin/env python
-+#
-+# Benchmark block jobs
-+#
-+# Copyright (c) 2019 Virtuozzo International GmbH.
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
+diff --git a/block/block-copy.c b/block/block-copy.c
+index 20068cd699..aca44b13fb 100644
+--- a/block/block-copy.c
++++ b/block/block-copy.c
+@@ -39,29 +39,62 @@ static BlockCopyInFlightReq *block_copy_find_inflight_req(BlockCopyState *s,
+     return NULL;
+ }
+ 
+-static void coroutine_fn block_copy_wait_inflight_reqs(BlockCopyState *s,
+-                                                       int64_t offset,
+-                                                       int64_t bytes)
++/*
++ * If there are no intersecting requests return false. Otherwise, wait for the
++ * first found intersecting request to finish and return true.
++ */
++static bool coroutine_fn block_copy_wait_one(BlockCopyState *s, int64_t start,
++                                             int64_t end)
+ {
+-    BlockCopyInFlightReq *req;
++    BlockCopyInFlightReq *req = block_copy_find_inflight_req(s, start, end);
+ 
+-    while ((req = block_copy_find_inflight_req(s, offset, bytes))) {
+-        qemu_co_queue_wait(&req->wait_queue, NULL);
++    if (!req) {
++        return false;
+     }
 +
++    qemu_co_queue_wait(&req->wait_queue, NULL);
 +
-+import socket
-+import json
-+from .machine import QEMUMachine
++    return true;
+ }
+ 
++/* Called only on full-dirty region */
+ static void block_copy_inflight_req_begin(BlockCopyState *s,
+                                           BlockCopyInFlightReq *req,
+                                           int64_t offset, int64_t bytes)
+ {
++    assert(!block_copy_find_inflight_req(s, offset, bytes));
 +
++    bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
 +
-+def bench_block_job(cmd, cmd_args, qemu_args):
-+    """Benchmark block-job
+     req->offset = offset;
+     req->bytes = bytes;
+     qemu_co_queue_init(&req->wait_queue);
+     QLIST_INSERT_HEAD(&s->inflight_reqs, req, list);
+ }
+ 
+-static void coroutine_fn block_copy_inflight_req_end(BlockCopyInFlightReq *req)
++static void coroutine_fn block_copy_inflight_req_shrink(BlockCopyState *s,
++        BlockCopyInFlightReq *req, int64_t new_bytes)
+ {
++    if (new_bytes == req->bytes) {
++        return;
++    }
 +
-+    cmd       -- qmp command to run block-job (like blockdev-backup)
-+    cmd_args  -- dict of qmp command arguments
-+    qemu_args -- list of Qemu command line arguments, including path to Qemu
-+                 binary
++    assert(new_bytes > 0 && new_bytes < req->bytes);
 +
-+    Returns {'seconds': int} on success and {'error': str} on failure, dict may
-+    contain addional 'vm-log' field. Return value is compatible with
-+    simplebench lib.
-+    """
++    bdrv_set_dirty_bitmap(s->copy_bitmap,
++                          req->offset + new_bytes, req->bytes - new_bytes);
 +
-+    vm = QEMUMachine(qemu_args[0], args=qemu_args[1:])
++    req->bytes = new_bytes;
++    qemu_co_queue_restart_all(&req->wait_queue);
++}
 +
-+    try:
-+        vm.launch()
-+    except OSError as e:
-+        return {'error': 'popen failed: ' + str(e)}
-+    except socket.timeout:
-+        return {'error': 'qemu failed: ' + str(vm.get_log())}
++static void coroutine_fn block_copy_inflight_req_end(BlockCopyState *s,
++                                                     BlockCopyInFlightReq *req,
++                                                     int ret)
++{
++    if (ret < 0) {
++        bdrv_set_dirty_bitmap(s->copy_bitmap, req->offset, req->bytes);
++    }
+     QLIST_REMOVE(req, list);
+     qemu_co_queue_restart_all(&req->wait_queue);
+ }
+@@ -344,12 +377,19 @@ int64_t block_copy_reset_unallocated(BlockCopyState *s,
+     return ret;
+ }
+ 
+-int coroutine_fn block_copy(BlockCopyState *s,
+-                            int64_t offset, uint64_t bytes,
+-                            bool *error_is_read)
++/*
++ * block_copy_dirty_clusters
++ *
++ * Copy dirty clusters in @start/@bytes range.
++ * Returns 1 if dirty clusters found and successfully copied, 0 if no dirty
++ * clusters found and -errno on failure.
++ */
++static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
++                                                  int64_t offset, int64_t bytes,
++                                                  bool *error_is_read)
+ {
+     int ret = 0;
+-    BlockCopyInFlightReq req;
++    bool found_dirty = false;
+ 
+     /*
+      * block_copy() user is responsible for keeping source and target in same
+@@ -361,10 +401,8 @@ int coroutine_fn block_copy(BlockCopyState *s,
+     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+     assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
+ 
+-    block_copy_wait_inflight_reqs(s, offset, bytes);
+-    block_copy_inflight_req_begin(s, &req, offset, bytes);
+-
+     while (bytes) {
++        BlockCopyInFlightReq req;
+         int64_t next_zero, cur_bytes, status_bytes;
+ 
+         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, offset)) {
+@@ -374,6 +412,8 @@ int coroutine_fn block_copy(BlockCopyState *s,
+             continue; /* already copied */
+         }
+ 
++        found_dirty = true;
 +
-+    try:
-+        res = vm.qmp(cmd, **cmd_args)
-+        if res != {'return': {}}:
-+            vm.shutdown()
-+            return {'error': '"{}" command failed: {}'.format(cmd, str(res))}
+         cur_bytes = MIN(bytes, s->copy_size);
+ 
+         next_zero = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, offset,
+@@ -383,10 +423,12 @@ int coroutine_fn block_copy(BlockCopyState *s,
+             assert(next_zero < offset + cur_bytes); /* no need to do MIN() */
+             cur_bytes = next_zero - offset;
+         }
++        block_copy_inflight_req_begin(s, &req, offset, cur_bytes);
+ 
+         ret = block_copy_block_status(s, offset, cur_bytes, &status_bytes);
++        block_copy_inflight_req_shrink(s, &req, status_bytes);
+         if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
+-            bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, status_bytes);
++            block_copy_inflight_req_end(s, &req, 0);
+             s->progress_reset_callback(s->progress_opaque);
+             trace_block_copy_skip_range(s, offset, status_bytes);
+             offset += status_bytes;
+@@ -398,15 +440,13 @@ int coroutine_fn block_copy(BlockCopyState *s,
+ 
+         trace_block_copy_process(s, offset);
+ 
+-        bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, cur_bytes);
+-
+         co_get_from_shres(s->mem, cur_bytes);
+         ret = block_copy_do_copy(s, offset, cur_bytes, ret & BDRV_BLOCK_ZERO,
+                                  error_is_read);
+         co_put_to_shres(s->mem, cur_bytes);
++        block_copy_inflight_req_end(s, &req, ret);
+         if (ret < 0) {
+-            bdrv_set_dirty_bitmap(s->copy_bitmap, offset, cur_bytes);
+-            break;
++            return ret;
+         }
+ 
+         s->progress_bytes_callback(cur_bytes, s->progress_opaque);
+@@ -414,7 +454,41 @@ int coroutine_fn block_copy(BlockCopyState *s,
+         bytes -= cur_bytes;
+     }
+ 
+-    block_copy_inflight_req_end(&req);
++    return found_dirty;
++}
+ 
+-    return ret;
++int coroutine_fn block_copy(BlockCopyState *s, int64_t start, uint64_t bytes,
++                            bool *error_is_read)
++{
++    while (true) {
++        int ret = block_copy_dirty_clusters(s, start, bytes, error_is_read);
 +
-+        e = vm.event_wait('JOB_STATUS_CHANGE')
-+        assert e['data']['status'] == 'created'
-+        start_ms = e['timestamp']['seconds'] * 1000000 + \
-+            e['timestamp']['microseconds']
++        if (ret < 0) {
++            /*
++             * IO operation failed, which means the whole block_copy request
++             * failed.
++             */
++            return ret;
++        }
++        if (ret) {
++            /*
++             * Something was copied, which means that there were yield points
++             * and some new dirty bits may appered (due to failed parallel
++             * block-copy requests).
++             */
++            continue;
++        }
 +
-+        e = vm.events_wait((('BLOCK_JOB_READY', None),
-+                            ('BLOCK_JOB_COMPLETED', None),
-+                            ('BLOCK_JOB_FAILED', None)), timeout=True)
-+        if e['event'] not in ('BLOCK_JOB_READY', 'BLOCK_JOB_COMPLETED'):
-+            vm.shutdown()
-+            return {'error': 'block-job failed: ' + str(e),
-+                    'vm-log': vm.get_log()}
-+        end_ms = e['timestamp']['seconds'] * 1000000 + \
-+            e['timestamp']['microseconds']
-+    finally:
-+        vm.shutdown()
++        /*
++         * Here ret == 0, which means that there is no dirty clusters in
++         * requested region.
++         */
 +
-+    return {'seconds': (end_ms - start_ms) / 1000000.0}
++        if (!block_copy_wait_one(s, start, bytes)) {
++            /* No dirty bits and nothing to wait: the whole request is done */
++            break;
++        }
++    }
 +
-+
-+# Bench backup or mirror
-+def bench_block_copy(qemu_binary, cmd, source, target):
-+    """Helper to run bench_block_job() for mirror or backup"""
-+    assert cmd in ('blockdev-backup', 'blockdev-mirror')
-+
-+    source['node-name'] = 'source'
-+    target['node-name'] = 'target'
-+
-+    return bench_block_job(cmd,
-+                           {'job-id': 'job0', 'device': 'source',
-+                            'target': 'target', 'sync': 'full'},
-+                           [qemu_binary,
-+                            '-blockdev', json.dumps(source),
-+                            '-blockdev', json.dumps(target)])
-+
-+
-+def drv_file(filename):
-+    return {'driver': 'file', 'filename': filename,
-+            'cache': {'direct': True}, 'aio': 'native'}
-+
-+
-+def drv_nbd(host, port):
-+    return {'driver': 'nbd',
-+            'server': {'type': 'inet', 'host': host, 'port': port}}
-+
-+
-+if __name__ == '__main__':
-+    import sys
-+
-+    if len(sys.argv) < 4:
-+        print('USAGE: {} <qmp block-job command name> '
-+              '<json string of arguments for the command> '
-+              '<qemu binary path and arguments>'.format(sys.argv[0]))
-+        exit(1)
-+
-+    res = bench_block_job(sys.argv[1], json.loads(sys.argv[2]), sys.argv[3:])
-+    if 'seconds' in res:
-+        print('{:.2f}'.format(res['seconds']))
-+    else:
-+        print(res)
++    return 0;
+ }
 -- 
 2.21.0
 
