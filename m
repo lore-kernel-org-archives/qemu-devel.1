@@ -2,83 +2,89 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50DF2C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:28:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D17AC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:30:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 184D72073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:28:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28BD420732
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:30:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b19LtwkN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 184D72073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pdEsBTG1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28BD420732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVdWO-00040e-5v
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 10:28:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43333)
+	id 1iVdYT-0005jd-9M
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 10:30:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43599)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kchamart@redhat.com>) id 1iVdVm-0003ay-5E
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:27:51 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iVdXf-0005EG-8M
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:29:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kchamart@redhat.com>) id 1iVdVj-0008C3-Im
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:27:48 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26272
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kchamart@redhat.com>) id 1iVdVj-0008BA-4I
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:27:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573831666;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QiCnlWumJgTyd2jDeJfFZ8DVe01VAYOASeeJXABtG9I=;
- b=b19LtwkNcg4rhEuMA7gi4bnP0KBfri7k3GWz2D5Vo8Oj8WL8VWO0ry/7ECOmCK+8VfxGm5
- Ex6zVNHwsF1+ExwhqnC6DO4mbbgz9zxj3CRMxvooaZulfKmffRYG/7f23LrpFgbJ31nV2Z
- d8zrS+m5LpU0rL08dWwox++d/0esYwg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-sy_7heD6MeiukL2U8QxeHA-1; Fri, 15 Nov 2019 10:27:44 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDF308C5EF0
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 15:27:43 +0000 (UTC)
-Received: from paraplu.localdomain (ovpn-117-60.ams2.redhat.com [10.36.117.60])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 330081BC6E;
- Fri, 15 Nov 2019 15:27:41 +0000 (UTC)
-Received: by paraplu.localdomain (Postfix, from userid 1001)
- id AF3523E0483; Fri, 15 Nov 2019 16:27:39 +0100 (CET)
-Date: Fri, 15 Nov 2019 16:27:39 +0100
-From: Kashyap Chamarthy <kchamart@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH qemu-web] Add a blog post on "Micro-Optimizing KVM
- VM-Exits"
-Message-ID: <20191115152739.GV7754@paraplu>
-References: <20191108092247.16207-1-kchamart@redhat.com>
- <5c1e9646-2e76-7429-95e6-c78afe9e93be@redhat.com>
+ (envelope-from <alex.bennee@linaro.org>) id 1iVdXd-0000HL-S1
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:29:46 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45969)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iVdXd-0000Gm-Jp
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:29:45 -0500
+Received: by mail-wr1-x441.google.com with SMTP id z10so11403659wrs.12
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 07:29:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=p+KJN6w9Lw0Sogc64X+XNrKaC4BrvFqMXa1bERRbuLs=;
+ b=pdEsBTG1mdI8qQRuKcFILjBxDLeTQ5IApIqLp7qhq8fyJOvWtq/SCxodG63YtUhzYx
+ lgUd1MdCPOTUmiVaSOOGIYl98pyUQFiAJBF7J1AxdK1MJr6x4qhNaU4rfFlhYsHnKH/g
+ q2v900iBuUYv2ld/PbUNrnOj2QnbOMlVJXCm1TQ26WqHYtDeYzNg4P9ywo2NDcisU22T
+ qiBPQrx1VqXtd6QWzeoGmQv9RVxwfKP5cOA+Fk2vZyyMrlnMJql/B+9DaktfeKSCYXvV
+ 28t0I8iW5ScpqRddqANoy/JW1yOR9p/qeiAXPw0u/pJDDtMt5Zs/0GGNjtRzYGyUmDAs
+ Eslw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=p+KJN6w9Lw0Sogc64X+XNrKaC4BrvFqMXa1bERRbuLs=;
+ b=QFnXa6RAyo9xcPuhgjHEQjIhAyhgIqhFam1vgHBnDfek3JSfAWXWiu6iSxUL48q+/3
+ k8xkO35OhHYK1VJq1Doru4wNeRkF6jbH3DZNRqav1UA4XWELPaHB2wN0JqypIlpDrTJQ
+ L8NwmmEo1WxaWNP4o4ShmE1yVymZXg59K7HbIXdpIw+Ir6Z5vrD2PCRi1edJdiqzQHlM
+ JuJGQ+PnJnGLycI8B7d3hFQkF/65tYwCCpe7OYCDCPtVV2lp9hghUcPlCRvjx//ezGT8
+ 0EKrBEmTUpeF4h7F3Jaq3ShXr1kXH/rENLcWltuCU0SiQG61lWSzLZPeJULToHpGsLxT
+ plrA==
+X-Gm-Message-State: APjAAAVbfPilAnosKC24g9CPVmerLfM553aFJ5VLcdlcvKiu0i62IhBo
+ +0rXdOHXy01p4eUdVtNYszjP8g==
+X-Google-Smtp-Source: APXvYqxDWcZofeCFRXaUsuH9eWJvqTQt8rJ4fzWmMtUn5IZJfipA6nyVBVVnuTI58xMra757iSI1mQ==
+X-Received: by 2002:adf:fe0b:: with SMTP id n11mr15193079wrr.218.1573831783040; 
+ Fri, 15 Nov 2019 07:29:43 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id y19sm10883376wmd.29.2019.11.15.07.29.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 15 Nov 2019 07:29:41 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 8930C1FF87;
+ Fri, 15 Nov 2019 15:29:40 +0000 (GMT)
+References: <20191115131623.322-1-richard.henderson@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH] target/arm: Clean up arm_cpu_vq_map_next_smaller asserts
+In-reply-to: <20191115131623.322-1-richard.henderson@linaro.org>
+Date: Fri, 15 Nov 2019 15:29:40 +0000
+Message-ID: <87tv755fa3.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <5c1e9646-2e76-7429-95e6-c78afe9e93be@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: sy_7heD6MeiukL2U8QxeHA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,101 +96,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aarcange@redhat.com, qemu-devel@nongnu.org, dgilbert@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, vkuznets@redhat.com
+Cc: peter.maydell@linaro.org, drjones@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 15, 2019 at 01:45:51PM +0100, Laszlo Ersek wrote:
-> On 11/08/19 10:22, Kashyap Chamarthy wrote:
 
-[...]
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> > +Guest workloads that are hard to virtualize
-> > +-------------------------------------------
-> > +
-> > +At the 2019 edition of the KVM Forum in Lyon, kernel developer, Andrea
-> > +Arcangeli, attempted to address the kernel part of minimizing VM-Exits=
-.
->=20
-> I'd suggest "addressed", not "attempted to address".
+> Coverity reports, in sve_zcr_get_valid_len,
+>
+> "Subtract operation overflows on operands
+> arm_cpu_vq_map_next_smaller(cpu, start_vq + 1U) and 1U"
+>
+> First, fix the aarch32 stub version to not return 0, but to
+> simply assert unreachable.  Because that nonsense return value
+> does exactly what Coverity reports.
+>
+> Second, 1 is the minimum value that can be returned from the
+> aarch64 version of arm_cpu_vq_map_next_smaller, but that is
+> non-obvious from the set of asserts in the function.  Begin by
+> asserting that 2 is the minimum input, and finish by asserting
+> that we did in fact find a set bit in the bitmap.  Bit 0 is
+> always set, so we must be able to find that.
+>
+> Reported-by: Coverity (CID 1407217)
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Will fix in next iteration.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-[...]
+> ---
+>  target/arm/cpu.h   |  4 +++-
+>  target/arm/cpu64.c | 11 +++++++++--
+>  2 files changed, 12 insertions(+), 3 deletions(-)
+>
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index e1a66a2d1c..d89e727d7b 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -190,7 +190,9 @@ uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uin=
+t32_t vq);
+>  # define ARM_MAX_VQ    1
+>  static inline void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp) { }
+>  static inline uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t=
+ vq)
+> -{ return 0; }
+> +{
+> +    g_assert_not_reached();
+> +}
+>  #endif
+>
+>  typedef struct ARMVectorReg {
+> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+> index 68baf0482f..83ff8c8713 100644
+> --- a/target/arm/cpu64.c
+> +++ b/target/arm/cpu64.c
+> @@ -466,11 +466,18 @@ uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, u=
+int32_t vq)
+>       * We allow vq =3D=3D ARM_MAX_VQ + 1 to be input because the caller =
+may want
+>       * to find the maximum vq enabled, which may be ARM_MAX_VQ, but this
+>       * function always returns the next smaller than the input.
+> +     *
+> +     * Similarly, vq =3D=3D 2 is the minimum input because 1 is the mini=
+mum
+> +     * output that makes sense.
+>       */
+> -    assert(vq && vq <=3D ARM_MAX_VQ + 1);
+> +    assert(vq >=3D 2 && vq <=3D ARM_MAX_VQ + 1);
+>
+>      bitnum =3D find_last_bit(cpu->sve_vq_map, vq - 1);
+> -    return bitnum =3D=3D vq - 1 ? 0 : bitnum + 1;
+> +
+> +    /* We always have vq =3D=3D 1 present in sve_vq_map.  */
+> +    assert(bitnum < vq - 1);
+> +
+> +    return bitnum + 1;
+>  }
+>
+>  static void cpu_max_get_sve_max_vq(Object *obj, Visitor *v, const char *=
+name,
 
-> > +Conclusion
-> > +----------
 
-[...]
-
-> > +Although, we still have to deal with mitigations for 'indirect branch
-> > +prediction' for a long time, reducing the VM-Exit latency is important
-> > +in general; and more specifically, for guest workloads that happen to
-> > +trigger frequent VM-Exits, without having to disable Spectre v2
-> > +mitigations on the host, as Andrea stated in the cover letter of his
-> > +patch series.
-> >=20
->=20
-> This article refers to "indirect calls" and "indirect branches" quite a
-> few times.
->=20
-> I suggest mentioning "function pointers" at least once...
->=20
-> (AIUI, the core of the issue is that kvm.ko calls kvm-intel.ko and
-> kvm-amd.ko through function pointers. Such calls are the target of
-> malicious branch predictor mis-training, and therefore, as a
-> counter-measure, they are compiled into retpolines, rather than the
-> directly corresponding indirect call assembly instructions. But
-> retpolines run slowly, in comparison. Calling the functions in question
-> by name, in the C source code, rather than via function pointers,
-> eliminates the indirect call assembly instructions, and obviates the
-> need for retpolines. The resultant C source code is less abstract and
-> less dynamic at runtime, but the original indirection isn't inherently
-> necessary at runtime.)
->=20
-> I couldn't attend Andrea's presentation, nor have I seen the slides, or
-> a recording thereof, or the patchset; so I could easily be off.=20
-
-I think your above explanation is indeed correct (which I couldn't have
-articulated so well; thanks!), based on my understanding, and reading
-Andrea's patch[*] and its commit message:
-
-    "This [patch] replaces all kvm_x86_ops pointer to functions with
-    regular external functions that don't require indirect calls.
-
-    "[...] The pointer to function virtual template model cannot provide
-    any runtime benefit because kvm-intel and kvm-amd can't be loaded at
-    the same time. [...]"
-
-
-[*] https://lkml.org/lkml/2019/9/20/932 --  [PATCH 02/17] KVM:
-    monolithic: x86: convert the kvm_x86_ops methods to external functions
-
-> My point is, *if* the expression "function pointers" applies in this
-> context, please do mention it; otherwise "indirect calls" just hangs
-> in the air, IMHO.
->=20
-> It might be as simple as replacing
->=20
->   These indirect calls were not optimal before,
->=20
-> with
->=20
->   These indirect calls -- via function pointers in the C source code
->   -- were not optimal before,
-
-Will fix; thanks for the thorough review.
-
-If you want to read Andrea's slides, here they are:
-
-    https://static.sched.com/hosted_files/kvmforum2019/3b/kvm-monolithic.pd=
-f
-
-Thanks for the review!
-
---=20
-/kashyap
-
+--
+Alex Benn=C3=A9e
 
