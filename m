@@ -6,57 +6,58 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9DE0C43141
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:47:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F0CCC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:50:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82BB220728
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:47:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82BB220728
+	by mail.kernel.org (Postfix) with ESMTPS id 0451C2072D
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:50:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0451C2072D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41756 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVel2-0007VJ-F4
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:47:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52364)
+	id 1iVenN-0001Ut-9e
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:50:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52758)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iVeQ2-0000SX-IK
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:59 -0500
+ (envelope-from <clg@kaod.org>) id 1iVeR0-0001xp-HG
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iVeQ1-0000yy-9N
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:58 -0500
-Received: from 11.mo6.mail-out.ovh.net ([188.165.38.119]:37428)
+ (envelope-from <clg@kaod.org>) id 1iVeQz-0001QI-4I
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:58 -0500
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:34546)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVeQ0-0000yP-VK
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:57 -0500
-Received: from player787.ha.ovh.net (unknown [10.108.54.94])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id 17DA31EC944
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:25:55 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVeQy-0001Pl-UB
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:57 -0500
+Received: from player787.ha.ovh.net (unknown [10.108.35.124])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id 6D9C614C8B8
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:26:55 +0100 (CET)
 Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
  (Authenticated sender: clg@kaod.org)
- by player787.ha.ovh.net (Postfix) with ESMTPSA id A26E3C444B26;
- Fri, 15 Nov 2019 16:25:49 +0000 (UTC)
+ by player787.ha.ovh.net (Postfix) with ESMTPSA id 0A9EEC444ED5;
+ Fri, 15 Nov 2019 16:26:50 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH for-5.0 v5 12/23] ppc/xive: Introduce a XiveFabric interface
-Date: Fri, 15 Nov 2019 17:24:25 +0100
-Message-Id: <20191115162436.30548-13-clg@kaod.org>
+Subject: [PATCH for-5.0 v5 23/23] ppc/pnv: Extend XiveRouter with a
+ get_block_id() handler
+Date: Fri, 15 Nov 2019 17:24:36 +0100
+Message-Id: <20191115162436.30548-24-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191115162436.30548-1-clg@kaod.org>
 References: <20191115162436.30548-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 15101132504234494950
+X-Ovh-Tracer-Id: 15118302474313501670
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeef
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeei
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.38.119
+X-Received-From: 46.105.63.230
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,78 +75,159 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The XiveFabric QOM interface acts as the PowerBUS interface between
-the interrupt controller and the system and should be implemented by
-the QEMU machine. On HW, the XIVE sub-engine is responsible for the
-communication with the other chip is the Common Queue (CQ) bridge
-unit.
-
-This interface offers a 'match_nvt' handler to perform the CAM line
-matching when looking for a XIVE Presenter with a dispatched NVT.
+When doing CAM line compares, fetch the block id from the interrupt
+controller which can have set the PC_TCTXT_CHIPID field.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/xive.h | 22 ++++++++++++++++++++++
- hw/intc/xive.c        | 10 ++++++++++
- 2 files changed, 32 insertions(+)
+ include/hw/ppc/xive.h |  2 +-
+ hw/intc/pnv_xive.c    |  6 ++++++
+ hw/intc/spapr_xive.c  |  6 ++++++
+ hw/intc/xive.c        | 21 ++++++++++++++++-----
+ 4 files changed, 29 insertions(+), 6 deletions(-)
 
 diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index f9aa0fa0dac3..b00af988779b 100644
+index 9c0bf2c301e2..1b7b89098f71 100644
 --- a/include/hw/ppc/xive.h
 +++ b/include/hw/ppc/xive.h
-@@ -399,6 +399,28 @@ int xive_presenter_tctx_match(XivePresenter *xptr, X=
-iveTCTX *tctx,
-                               uint8_t nvt_blk, uint32_t nvt_idx,
-                               bool cam_ignore, uint32_t logic_serv);
+@@ -351,6 +351,7 @@ typedef struct XiveRouterClass {
+                    XiveNVT *nvt);
+     int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx=
+,
+                      XiveNVT *nvt, uint8_t word_number);
++    uint8_t (*get_block_id)(XiveRouter *xrtr);
+ } XiveRouterClass;
 =20
-+/*
-+ * XIVE Fabric (Interface between Interrupt Controller and Machine)
-+ */
-+
-+typedef struct XiveFabric XiveFabric;
-+
-+#define TYPE_XIVE_FABRIC "xive-fabric"
-+#define XIVE_FABRIC(obj)                                     \
-+    INTERFACE_CHECK(XiveFabric, (obj), TYPE_XIVE_FABRIC)
-+#define XIVE_FABRIC_CLASS(klass)                                     \
-+    OBJECT_CLASS_CHECK(XiveFabricClass, (klass), TYPE_XIVE_FABRIC)
-+#define XIVE_FABRIC_GET_CLASS(obj)                                   \
-+    OBJECT_GET_CLASS(XiveFabricClass, (obj), TYPE_XIVE_FABRIC)
-+
-+typedef struct XiveFabricClass {
-+    InterfaceClass parent;
-+    int (*match_nvt)(XiveFabric *xfb, uint8_t format,
-+                     uint8_t nvt_blk, uint32_t nvt_idx,
-+                     bool cam_ignore, uint8_t priority,
-+                     uint32_t logic_serv, XiveTCTXMatch *match);
-+} XiveFabricClass;
+ int xive_router_get_eas(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_=
+idx,
+@@ -431,7 +432,6 @@ typedef struct XiveENDSource {
+     DeviceState parent;
+=20
+     uint32_t        nr_ends;
+-    uint8_t         block_id;
+=20
+     /* ESB memory region */
+     uint32_t        esb_shift;
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index 93c27cce568b..c7c2fe3a7b5f 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -466,6 +466,11 @@ static int pnv_xive_match_nvt(XivePresenter *xptr, u=
+int8_t format,
+     return count;
+ }
+=20
++static uint8_t pnv_xive_get_block_id(XiveRouter *xrtr)
++{
++    return pnv_xive_block_id(PNV_XIVE(xrtr));
++}
 +
  /*
-  * XIVE END ESBs
-  */
+  * The TIMA MMIO space is shared among the chips and to identify the
+  * chip from which the access is being done, we extract the chip id
+@@ -1926,6 +1931,7 @@ static void pnv_xive_class_init(ObjectClass *klass,=
+ void *data)
+     xrc->write_end =3D pnv_xive_write_end;
+     xrc->get_nvt =3D pnv_xive_get_nvt;
+     xrc->write_nvt =3D pnv_xive_write_nvt;
++    xrc->get_block_id =3D pnv_xive_get_block_id;
+=20
+     xnc->notify =3D pnv_xive_notify;
+     xpc->match_nvt  =3D pnv_xive_match_nvt;
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index 1542cef91878..daa0656859a3 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -473,6 +473,11 @@ static int spapr_xive_match_nvt(XivePresenter *xptr,=
+ uint8_t format,
+     return count;
+ }
+=20
++static uint8_t spapr_xive_get_block_id(XiveRouter *xrtr)
++{
++    return SPAPR_XIVE_BLOCK_ID;
++}
++
+ static const VMStateDescription vmstate_spapr_xive_end =3D {
+     .name =3D TYPE_SPAPR_XIVE "/end",
+     .version_id =3D 1,
+@@ -764,6 +769,7 @@ static void spapr_xive_class_init(ObjectClass *klass,=
+ void *data)
+     xrc->write_end =3D spapr_xive_write_end;
+     xrc->get_nvt =3D spapr_xive_get_nvt;
+     xrc->write_nvt =3D spapr_xive_write_nvt;
++    xrc->get_block_id =3D spapr_xive_get_block_id;
+=20
+     sicc->activate =3D spapr_xive_activate;
+     sicc->deactivate =3D spapr_xive_deactivate;
 diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index da6196ca958f..1c9e58f8deac 100644
+index ce904b0b5ab4..e5159466f088 100644
 --- a/hw/intc/xive.c
 +++ b/hw/intc/xive.c
-@@ -1893,8 +1893,18 @@ static const TypeInfo xive_presenter_info =3D {
-     .class_size =3D sizeof(XivePresenterClass),
- };
+@@ -1371,17 +1371,25 @@ int xive_router_write_nvt(XiveRouter *xrtr, uint8=
+_t nvt_blk, uint32_t nvt_idx,
+    return xrc->write_nvt(xrtr, nvt_blk, nvt_idx, nvt, word_number);
+ }
 =20
-+/*
-+ * XIVE Fabric
-+ */
-+static const TypeInfo xive_fabric_info =3D {
-+    .name =3D TYPE_XIVE_FABRIC,
-+    .parent =3D TYPE_INTERFACE,
-+    .class_size =3D sizeof(XiveFabricClass),
-+};
++static int xive_router_get_block_id(XiveRouter *xrtr)
++{
++   XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
 +
- static void xive_register_types(void)
++   return xrc->get_block_id(xrtr);
++}
++
+ /*
+  * Encode the HW CAM line in the block group mode format :
+  *
+  *   chip << 19 | 0000000 0 0001 thread (7Bit)
+  */
+-static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tctx)
++static uint32_t xive_tctx_hw_cam_line(XivePresenter *xptr, XiveTCTX *tct=
+x)
  {
-+    type_register_static(&xive_fabric_info);
-     type_register_static(&xive_source_info);
-     type_register_static(&xive_notifier_info);
-     type_register_static(&xive_presenter_info);
+     CPUPPCState *env =3D &POWERPC_CPU(tctx->cs)->env;
+     uint32_t pir =3D env->spr_cb[SPR_PIR].default_value;
++    uint8_t blk =3D xive_router_get_block_id(XIVE_ROUTER(xptr));
+=20
+-    return xive_nvt_cam_line((pir >> 8) & 0xf, 1 << 7 | (pir & 0x7f));
++    return xive_nvt_cam_line(blk, 1 << 7 | (pir & 0x7f));
+ }
+=20
+ /*
+@@ -1418,7 +1426,7 @@ int xive_presenter_tctx_match(XivePresenter *xptr, =
+XiveTCTX *tctx,
+=20
+         /* PHYS ring */
+         if ((be32_to_cpu(qw3w2) & TM_QW3W2_VT) &&
+-            cam =3D=3D xive_tctx_hw_cam_line(tctx)) {
++            cam =3D=3D xive_tctx_hw_cam_line(xptr, tctx)) {
+             return TM_QW3_HV_PHYS;
+         }
+=20
+@@ -1755,7 +1763,11 @@ static uint64_t xive_end_source_read(void *opaque,=
+ hwaddr addr, unsigned size)
+     uint8_t pq;
+     uint64_t ret =3D -1;
+=20
+-    end_blk =3D xsrc->block_id;
++    /*
++     * The block id should be deduced from the load address on the END
++     * ESB MMIO but our model only supports a single block per XIVE chip=
+.
++     */
++    end_blk =3D xive_router_get_block_id(xsrc->xrtr);
+     end_idx =3D addr >> (xsrc->esb_shift + 1);
+=20
+     if (xive_router_get_end(xsrc->xrtr, end_blk, end_idx, &end)) {
+@@ -1855,7 +1867,6 @@ static void xive_end_source_realize(DeviceState *de=
+v, Error **errp)
+ }
+=20
+ static Property xive_end_source_properties[] =3D {
+-    DEFINE_PROP_UINT8("block-id", XiveENDSource, block_id, 0),
+     DEFINE_PROP_UINT32("nr-ends", XiveENDSource, nr_ends, 0),
+     DEFINE_PROP_UINT32("shift", XiveENDSource, esb_shift, XIVE_ESB_64K),
+     DEFINE_PROP_LINK("xive", XiveENDSource, xrtr, TYPE_XIVE_ROUTER,
 --=20
 2.21.0
 
