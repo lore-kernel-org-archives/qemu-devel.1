@@ -2,62 +2,87 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E52C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:44:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67F62C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:44:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 369B720723
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:44:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 369B720723
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3274620723
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:44:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CZ3tkNsz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3274620723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVehT-0003Rk-Fu
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:43:59 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52544)
+	id 1iVehr-0003lN-LV
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:44:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52301)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iVeQT-0001AE-KP
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:26 -0500
+ (envelope-from <thuth@redhat.com>) id 1iVePw-0000Ik-CX
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iVeQS-0001BW-9k
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:25 -0500
-Received: from 15.mo5.mail-out.ovh.net ([178.33.107.29]:52210)
+ (envelope-from <thuth@redhat.com>) id 1iVePv-0000uu-84
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:52 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:53955
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVeQS-0001BA-3E
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:24 -0500
-Received: from player787.ha.ovh.net (unknown [10.109.146.137])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id 76D8925A31F
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:26:22 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player787.ha.ovh.net (Postfix) with ESMTPSA id 156EAC444D2C;
- Fri, 15 Nov 2019 16:26:17 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH for-5.0 v5 17/23] ppc/pnv: Clarify how the TIMA is accessed on
- a multichip system
-Date: Fri, 15 Nov 2019 17:24:30 +0100
-Message-Id: <20191115162436.30548-18-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191115162436.30548-1-clg@kaod.org>
-References: <20191115162436.30548-1-clg@kaod.org>
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iVePv-0000uZ-43
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573835150;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=otxzYIfpCWpsQYyEylcULtfWltAjZadyTN7OYl8t4YQ=;
+ b=CZ3tkNszIiHUhttJpGGrmzz3QES8T+BqtO0AGtCR+MXt3016YV4l5DAJaAK9taGdGvil8h
+ EJlqAqa0qm2ntO2olQ5VnqsLq4hwZr/2hfzhHFZzzK/10JUmXFeLQrJYC6TSxZ2vxC3c+G
+ SWsZeYGWlcCya5cpTrxeenA//NmUnwU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-384-_8dLqASWPEy5trTUSo89_Q-1; Fri, 15 Nov 2019 11:25:49 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4CEB8C980E;
+ Fri, 15 Nov 2019 16:25:47 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-84.ams2.redhat.com
+ [10.36.117.84])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B815A1036C81;
+ Fri, 15 Nov 2019 16:25:39 +0000 (UTC)
+Subject: Re: [PATCH for-4.2] hw/i386: Fix compiler warning when CONFIG_IDE_ISA
+ is disabled
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+References: <20191115145049.26868-1-thuth@redhat.com>
+ <CAFEAcA-EuQVBtr=BCE5sdHo+LMv8XchHUSPM=CgSYxPVryWKZg@mail.gmail.com>
+ <273a3123-9eef-c78e-5b83-833a21e3988c@redhat.com>
+ <c7c45aed-76c0-9c17-72fb-6abceb9e5ff4@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <be453a76-d5fe-62c3-6954-447be7fe646a@redhat.com>
+Date: Fri, 15 Nov 2019 17:13:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
+In-Reply-To: <c7c45aed-76c0-9c17-72fb-6abceb9e5ff4@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: _8dLqASWPEy5trTUSo89_Q-1
+X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 15109013802862939110
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedu
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.107.29
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,130 +94,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The TIMA region gives access to the thread interrupt context registers
-of a CPU. It is mapped at the same address on all chips and can be
-accessed by any CPU of the system. To identify the chip from which the
-access is being done, the PowerBUS uses a 'chip' field in the
-load/store messages. QEMU does not model these messages, instead, we
-extract the chip id from the CPU PIR and do a lookup at the machine
-level to fetch the targeted interrupt controller.
+On 15/11/2019 17.13, Paolo Bonzini wrote:
+> On 15/11/19 16:54, Thomas Huth wrote:
+>> On 15/11/2019 16.54, Peter Maydell wrote:
+>>> On Fri, 15 Nov 2019 at 15:10, Thomas Huth <thuth@redhat.com> wrote:
+>>>>
+>>>> When CONFIG_IDE_ISA is disabled, compilation currently fails:
+>>>>
+>>>>  hw/i386/pc_piix.c: In function =E2=80=98pc_init1=E2=80=99:
+>>>>  hw/i386/pc_piix.c:81:9: error: unused variable =E2=80=98i=E2=80=99 [-=
+Werror=3Dunused-variable]
+>>>>
+>>>> Move the variable declaration to the right code block to avoid
+>>>> this problem.
+>>>>
+>>>> Fixes: 4501d317b50e ("hw/i386/pc: Extract pc_i8259_create()")
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>> ---
+>>>>  hw/i386/pc_piix.c | 3 +--
+>>>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+>>>> index 2aefa3b8df..d187db761c 100644
+>>>> --- a/hw/i386/pc_piix.c
+>>>> +++ b/hw/i386/pc_piix.c
+>>>> @@ -78,7 +78,6 @@ static void pc_init1(MachineState *machine,
+>>>>      X86MachineState *x86ms =3D X86_MACHINE(machine);
+>>>>      MemoryRegion *system_memory =3D get_system_memory();
+>>>>      MemoryRegion *system_io =3D get_system_io();
+>>>> -    int i;
+>>>>      PCIBus *pci_bus;
+>>>>      ISABus *isa_bus;
+>>>>      PCII440FXState *i440fx_state;
+>>>> @@ -253,7 +252,7 @@ static void pc_init1(MachineState *machine,
+>>>>      }
+>>>>  #ifdef CONFIG_IDE_ISA
+>>>>  else {
+>>>> -        for(i =3D 0; i < MAX_IDE_BUS; i++) {
+>>>> +        for (int i =3D 0; i < MAX_IDE_BUS; i++) {
+>>>>              ISADevice *dev;
+>>>>              char busname[] =3D "ide.0";
+>>>>              dev =3D isa_ide_init(isa_bus, ide_iobase[i], ide_iobase2[=
+i],
+>>>
+>>> Don't put variable declarations inside 'for' statements,
+>>> please. They should go at the start of a {} block.
+>>
+>> Why? We're using -std=3Dgnu99 now, so this should not be an issue anymor=
+e.
+>=20
+> For now I can squash the following while we discuss coding standards. :)
+>=20
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index fa62244f4d..0130b8fb4e 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -244,7 +244,8 @@ static void pc_init1(MachineState *machine,
+>      }
+>  #ifdef CONFIG_IDE_ISA
+>  else {
+> -        for (int i =3D 0; i < MAX_IDE_BUS; i++) {
+> +        int i;
+> +        for (i =3D 0; i < MAX_IDE_BUS; i++) {
+>              ISADevice *dev;
+>              char busname[] =3D "ide.0";
+>              dev =3D isa_ide_init(isa_bus, ide_iobase[i], ide_iobase2[i],
 
-Introduce pnv_get_chip() and pnv_xive_tm_get_xive() helpers to clarify
-this process in pnv_xive_get_tctx(). The latter will be removed in the
-subsequent patches but the same principle will be kept.
+Yes, please do. I guess we won't update CODING_STYLE.rst during the hard
+freeze anymore ;-)
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ppc/pnv.h | 13 +++++++++++++
- hw/intc/pnv_xive.c   | 46 ++++++++++++++++++++++++++++----------------
- 2 files changed, 42 insertions(+), 17 deletions(-)
-
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 58f4dcc0b71d..9b98b6afa31b 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -192,6 +192,19 @@ static inline bool pnv_is_power9(PnvMachineState *pn=
-v)
-     return pnv_chip_is_power9(pnv->chips[0]);
- }
-=20
-+static inline PnvChip *pnv_get_chip(PnvMachineState *pnv, uint32_t chip_=
-id)
-+{
-+    int i;
-+
-+    for (i =3D 0; i < pnv->num_chips; i++) {
-+        PnvChip *chip =3D pnv->chips[i];
-+        if (chip->chip_id =3D=3D chip_id) {
-+            return chip;
-+        }
-+    }
-+    return NULL;
-+}
-+
- #define PNV_FDT_ADDR          0x01000000
- #define PNV_TIMEBASE_FREQ     512000000ULL
-=20
-diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index 3ee28f00694a..d75053d0baad 100644
---- a/hw/intc/pnv_xive.c
-+++ b/hw/intc/pnv_xive.c
-@@ -378,6 +378,12 @@ static int cpu_pir(PowerPCCPU *cpu)
-     return env->spr_cb[SPR_PIR].default_value;
- }
-=20
-+static int cpu_chip_id(PowerPCCPU *cpu)
-+{
-+    int pir =3D cpu_pir(cpu);
-+    return (pir >> 8) & 0x7f;
-+}
-+
- static bool pnv_xive_is_cpu_enabled(PnvXive *xive, PowerPCCPU *cpu)
- {
-     int pir =3D cpu_pir(cpu);
-@@ -440,31 +446,37 @@ static int pnv_xive_match_nvt(XivePresenter *xptr, =
-uint8_t format,
-     return count;
- }
-=20
-+/*
-+ * The TIMA MMIO space is shared among the chips and to identify the
-+ * chip from which the access is being done, we extract the chip id
-+ * from the PIR.
-+ */
-+static PnvXive *pnv_xive_tm_get_xive(PowerPCCPU *cpu)
-+{
-+    PnvMachineState *pnv =3D PNV_MACHINE(qdev_get_machine());
-+    PnvChip *chip;
-+    PnvXive *xive;
-+
-+    chip =3D pnv_get_chip(pnv, cpu_chip_id(cpu));
-+    assert(chip);
-+    xive =3D &PNV9_CHIP(chip)->xive;
-+
-+    if (!pnv_xive_is_cpu_enabled(xive, cpu)) {
-+        xive_error(xive, "IC: CPU %x is not enabled", cpu_pir(cpu));
-+    }
-+    return xive;
-+}
-+
- static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
- {
-     PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
--    PnvXive *xive =3D NULL;
--    CPUPPCState *env =3D &cpu->env;
--    int pir =3D env->spr_cb[SPR_PIR].default_value;
-+    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
-=20
--    /*
--     * Perform an extra check on the HW thread enablement.
--     *
--     * The TIMA is shared among the chips and to identify the chip
--     * from which the access is being done, we extract the chip id
--     * from the PIR.
--     */
--    xive =3D pnv_xive_get_ic((pir >> 8) & 0xf);
-     if (!xive) {
-         return NULL;
-     }
-=20
--    if (!(xive->regs[PC_THREAD_EN_REG0 >> 3] & PPC_BIT(pir & 0x3f))) {
--        xive_error(PNV_XIVE(xrtr), "IC: CPU %x is not enabled", pir);
--    }
--
--    return tctx;
-+    return XIVE_TCTX(pnv_cpu_state(cpu)->intc);
- }
-=20
- /*
---=20
-2.21.0
+ Thomas
 
 
