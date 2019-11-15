@@ -6,41 +6,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF5AC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB5A3C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:23:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 200472072D
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:22:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 200472072D
+	by mail.kernel.org (Postfix) with ESMTPS id 83CDD2072D
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:23:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83CDD2072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVcUH-0002ei-UW
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:22:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59013)
+	id 1iVcVC-0003jR-0a
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:23:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59291)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNK-0004dQ-Tr
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:03 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNf-00058e-Li
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNJ-0001xu-QZ
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:02 -0500
-Received: from relay.sw.ru ([185.231.240.75]:47416)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNe-0002Bs-7m
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:23 -0500
+Received: from relay.sw.ru ([185.231.240.75]:47476)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcNG-0001ru-GU; Fri, 15 Nov 2019 09:14:59 -0500
+ id 1iVcNb-0001tB-0w; Fri, 15 Nov 2019 09:15:19 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcNC-0006WW-Dg; Fri, 15 Nov 2019 17:14:54 +0300
+ id 1iVcN5-0006WW-78; Fri, 15 Nov 2019 17:14:47 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [RFC 19/24] blockjob: add set_speed to BlockJobDriver
-Date: Fri, 15 Nov 2019 17:14:39 +0300
-Message-Id: <20191115141444.24155-20-vsementsov@virtuozzo.com>
+Subject: [RFC 11/24] block/block-copy: move task size initial calculation to
+ _task_create
+Date: Fri, 15 Nov 2019 17:14:31 +0300
+Message-Id: <20191115141444.24155-12-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191115141444.24155-1-vsementsov@virtuozzo.com>
 References: <20191115141444.24155-1-vsementsov@virtuozzo.com>
@@ -67,52 +68,105 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to use async block-copy call in backup, so we'll need to
-passthrough setting backup speed to block-copy call.
+Comment "Called only on full-dirty region" without corresponding
+assertion is a very unsafe thing. Adding assertion means call
+bdrv_dirty_bitmap_next_zero twice. Instead, let's move
+bdrv_dirty_bitmap_next_zero call to block_copy_task_create. It also
+allows to drop cur_bytes variable which partly duplicate task->bytes.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/blockjob_int.h | 2 ++
- blockjob.c                   | 6 ++++++
- 2 files changed, 8 insertions(+)
+ block/block-copy.c | 42 +++++++++++++++++++++---------------------
+ 1 file changed, 21 insertions(+), 21 deletions(-)
 
-diff --git a/include/block/blockjob_int.h b/include/block/blockjob_int.h
-index e2824a36a8..6633d83da2 100644
---- a/include/block/blockjob_int.h
-+++ b/include/block/blockjob_int.h
-@@ -52,6 +52,8 @@ struct BlockJobDriver {
-      * besides job->blk to the new AioContext.
-      */
-     void (*attached_aio_context)(BlockJob *job, AioContext *new_context);
-+
-+    void (*set_speed)(BlockJob *job, int64_t speed);
- };
+diff --git a/block/block-copy.c b/block/block-copy.c
+index 7652b4afc5..0525a9fcd5 100644
+--- a/block/block-copy.c
++++ b/block/block-copy.c
+@@ -111,12 +111,23 @@ static bool coroutine_fn block_copy_wait_one(BlockCopyState *s, int64_t start,
+     return true;
+ }
  
- /**
-diff --git a/blockjob.c b/blockjob.c
-index c6e20e2fcd..3b827d420d 100644
---- a/blockjob.c
-+++ b/blockjob.c
-@@ -255,6 +255,7 @@ static bool job_timer_pending(Job *job)
- 
- void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
+-/* Called only on full-dirty region */
+ static BlockCopyTask *block_copy_task_create(BlockCopyState *s,
+                                              int64_t offset, int64_t bytes)
  {
-+    const BlockJobDriver *drv = block_job_driver(job);
-     int64_t old_speed = job->speed;
++    int64_t next_zero;
+     BlockCopyTask *task = g_new(BlockCopyTask, 1);
  
-     if (job_apply_verb(&job->job, JOB_VERB_SET_SPEED, errp)) {
-@@ -268,6 +269,11 @@ void block_job_set_speed(BlockJob *job, int64_t speed, Error **errp)
-     ratelimit_set_speed(&job->limit, speed, BLOCK_JOB_SLICE_TIME);
- 
-     job->speed = speed;
++    assert(bdrv_dirty_bitmap_get(s->copy_bitmap, offset));
 +
-+    if (drv->set_speed) {
-+        drv->set_speed(job, speed);
++    bytes = MIN(bytes, s->copy_size);
++    next_zero = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, offset, bytes);
++    if (next_zero >= 0) {
++        assert(next_zero > offset); /* offset is dirty */
++        assert(next_zero < offset + bytes); /* no need to do MIN() */
++        bytes = next_zero - offset;
 +    }
 +
-     if (speed && speed <= old_speed) {
-         return;
++    /* region is dirty, so no existent tasks possible in it */
+     assert(!block_copy_find_task(s, offset, bytes));
+ 
+     bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
+@@ -461,7 +472,7 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
+ 
+     while (bytes) {
+         g_autofree BlockCopyTask *task = NULL;
+-        int64_t next_zero, cur_bytes, status_bytes;
++        int64_t status_bytes;
+ 
+         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, offset)) {
+             trace_block_copy_skip(s, offset);
+@@ -472,18 +483,9 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
+ 
+         found_dirty = true;
+ 
+-        cur_bytes = MIN(bytes, s->copy_size);
++        task = block_copy_task_create(s, offset, bytes);
+ 
+-        next_zero = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, offset,
+-                                                cur_bytes);
+-        if (next_zero >= 0) {
+-            assert(next_zero > offset); /* offset is dirty */
+-            assert(next_zero < offset + cur_bytes); /* no need to do MIN() */
+-            cur_bytes = next_zero - offset;
+-        }
+-        task = block_copy_task_create(s, offset, cur_bytes);
+-
+-        ret = block_copy_block_status(s, offset, cur_bytes, &status_bytes);
++        ret = block_copy_block_status(s, offset, task->bytes, &status_bytes);
+         block_copy_task_shrink(task, status_bytes);
+         if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
+             block_copy_task_end(task, 0);
+@@ -494,22 +496,20 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
+             continue;
+         }
+ 
+-        cur_bytes = MIN(cur_bytes, status_bytes);
+-
+         trace_block_copy_process(s, offset);
+ 
+-        co_get_from_shres(s->mem, cur_bytes);
+-        ret = block_copy_do_copy(s, offset, cur_bytes, ret & BDRV_BLOCK_ZERO,
++        co_get_from_shres(s->mem, task->bytes);
++        ret = block_copy_do_copy(s, offset, task->bytes, ret & BDRV_BLOCK_ZERO,
+                                  error_is_read);
+-        co_put_to_shres(s->mem, cur_bytes);
++        co_put_to_shres(s->mem, task->bytes);
+         block_copy_task_end(task, ret);
+         if (ret < 0) {
+             return ret;
+         }
+ 
+-        s->progress_bytes_callback(cur_bytes, s->progress_opaque);
+-        offset += cur_bytes;
+-        bytes -= cur_bytes;
++        s->progress_bytes_callback(task->bytes, s->progress_opaque);
++        offset += task->bytes;
++        bytes -= task->bytes;
      }
+ 
+     return found_dirty;
 -- 
 2.21.0
 
