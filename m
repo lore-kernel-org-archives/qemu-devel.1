@@ -2,86 +2,62 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDAB4C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D17C1C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:51:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC89920723
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:50:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAK61XmL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC89920723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A4CD220718
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:51:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4CD220718
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVeo8-0002R3-Lg
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:50:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53825)
+	id 1iVep7-0003NV-AP
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:51:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52576)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iVeXG-0000Po-8Z
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:33:27 -0500
+ (envelope-from <clg@kaod.org>) id 1iVeQY-0001HU-OD
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iVeXF-0005OR-2J
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:33:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35729
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iVeQX-0001Df-9Z
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:30 -0500
+Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:49513)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iVeXE-0005Nq-UQ
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:33:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573835604;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=C0egKsDNYyaAsKZw2Aoql8Q0HQfoDcgXVU0JgdBJdHk=;
- b=KAK61XmLH1SnhYLrAmjiX+XzdXbiG3XuSp3ACyhu+EJnvUa9oNKXkQew+jsgYZhvOEO5+x
- g+8UdGutVC7uHewk6fXZcYvJPRnuQsNEb2V5rpHpJnBuomwuoSpaCUu5TS+xWTmcTelsUW
- 3Y+qHvtaICprSFg2iD/3s2F5J/LpJzs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-efPNeMcxOOm0m11iViw4zQ-1; Fri, 15 Nov 2019 11:33:21 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 285B51095A9B;
- Fri, 15 Nov 2019 16:33:20 +0000 (UTC)
-Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 385666013C;
- Fri, 15 Nov 2019 16:33:16 +0000 (UTC)
-Subject: Re: [PATCH v3 2/4] bitmap: Enforce maximum bitmap name length
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <20191114024635.11363-1-eblake@redhat.com>
- <20191114024635.11363-3-eblake@redhat.com>
- <0a25974f-f9cd-07a1-4cb7-2bbd4dfe4375@virtuozzo.com>
- <6d54c6eb-4f28-6a5d-81e1-a175e34f3cf8@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <8461437b-8991-3725-308d-68e054c7f3a8@redhat.com>
-Date: Fri, 15 Nov 2019 10:33:15 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVeQX-0001DM-37
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:29 -0500
+Received: from player787.ha.ovh.net (unknown [10.108.57.183])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id E2FD410DDC3
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:26:27 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player787.ha.ovh.net (Postfix) with ESMTPSA id 7884CC444DA6;
+ Fri, 15 Nov 2019 16:26:22 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH for-5.0 v5 18/23] ppc/xive: Move the TIMA operations to the
+ controller model
+Date: Fri, 15 Nov 2019 17:24:31 +0100
+Message-Id: <20191115162436.30548-19-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191115162436.30548-1-clg@kaod.org>
+References: <20191115162436.30548-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <6d54c6eb-4f28-6a5d-81e1-a175e34f3cf8@virtuozzo.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: efPNeMcxOOm0m11iViw4zQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 15110421177047944166
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeef
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 46.105.61.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,48 +69,208 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/15/19 9:47 AM, Vladimir Sementsov-Ogievskiy wrote:
-> 15.11.2019 18:03, Vladimir Sementsov-Ogievskiy wrote:
->> 14.11.2019 5:46, Eric Blake wrote:
->>> We document that for qcow2 persistent bitmaps, the name cannot exceed
->>> 1023 bytes.=A0 It is inconsistent if transient bitmaps do not have to
->>> abide by the same limit, and it is unlikely that any existing client
->>> even cares about using bitmap names this long.=A0 It's time to codify
->>> that ALL bitmaps managed by qemu (whether persistent in qcow2 or not)
->>> have a documented maximum length.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>
->> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>
->>
->=20
-> One doubt:
->=20
-> Is it good idea to include string larger than 4K into error message
-> (in next patch too)? I doubt that such message would be
-> readable, and I think that most possible source of such message is
-> some kind of memory corruption, so the whole message would be garbage,
-> which may contain special symbols which may look bad or even break
-> output.
+On the P9 Processor, the thread interrupt context registers of a CPU
+can be accessed "directly" when by load/store from the CPU or
+"indirectly" by the IC through an indirect TIMA page. This requires to
+configure first the PC_TCTXT_INDIRx registers.
 
-The string was provided by the user. You are correct that it results in=20
-a lot of output on stderr, but it is no more garbage than what the user=20
-provided in the first place. If we wanted, we could truncate (list only=20
-the first 256 or so bytes and then output "..."), but it's such a corner=20
-case error that I don't think it's worth the effort to worry about it.
+Today, we rely on the get_tctx() handler to deduce from the CPU PIR
+the chip from which the TIMA access is being done. By handling the
+TIMA memory ops under the interrupt controller model of each machine,
+we can uniformize the TIMA direct and indirect ops under PowerNV. We
+can also check that the CPUs have been enabled in the XIVE controller.
 
+This prepares ground for the future versions of XIVE.
+
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ include/hw/ppc/xive.h |  1 -
+ hw/intc/pnv_xive.c    | 35 ++++++++++++++++++++++++++++++++++-
+ hw/intc/spapr_xive.c  | 33 +++++++++++++++++++++++++++++++--
+ hw/intc/xive.c        | 29 -----------------------------
+ 4 files changed, 65 insertions(+), 33 deletions(-)
+
+diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+index 97bbcddb381d..dcf897451589 100644
+--- a/include/hw/ppc/xive.h
++++ b/include/hw/ppc/xive.h
+@@ -462,7 +462,6 @@ typedef struct XiveENDSource {
+ #define XIVE_TM_OS_PAGE         0x2
+ #define XIVE_TM_USER_PAGE       0x3
+=20
+-extern const MemoryRegionOps xive_tm_ops;
+ void xive_tctx_tm_write(XivePresenter *xptr, XiveTCTX *tctx, hwaddr offs=
+et,
+                         uint64_t value, unsigned size);
+ uint64_t xive_tctx_tm_read(XivePresenter *xptr, XiveTCTX *tctx, hwaddr o=
+ffset,
+diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+index d75053d0baad..4501c671d8df 100644
+--- a/hw/intc/pnv_xive.c
++++ b/hw/intc/pnv_xive.c
+@@ -1473,6 +1473,39 @@ static const MemoryRegionOps xive_tm_indirect_ops =
+=3D {
+     },
+ };
+=20
++static void pnv_xive_tm_write(void *opaque, hwaddr offset,
++                              uint64_t value, unsigned size)
++{
++    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
++    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
++    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
++
++    xive_tctx_tm_write(XIVE_PRESENTER(xive), tctx, offset, value, size);
++}
++
++static uint64_t pnv_xive_tm_read(void *opaque, hwaddr offset, unsigned s=
+ize)
++{
++    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
++    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
++    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
++
++    return xive_tctx_tm_read(XIVE_PRESENTER(xive), tctx, offset, size);
++}
++
++const MemoryRegionOps pnv_xive_tm_ops =3D {
++    .read =3D pnv_xive_tm_read,
++    .write =3D pnv_xive_tm_write,
++    .endianness =3D DEVICE_BIG_ENDIAN,
++    .valid =3D {
++        .min_access_size =3D 1,
++        .max_access_size =3D 8,
++    },
++    .impl =3D {
++        .min_access_size =3D 1,
++        .max_access_size =3D 8,
++    },
++};
++
+ /*
+  * Interrupt controller XSCOM region.
+  */
+@@ -1845,7 +1878,7 @@ static void pnv_xive_realize(DeviceState *dev, Erro=
+r **errp)
+                           "xive-pc", PNV9_XIVE_PC_SIZE);
+=20
+     /* Thread Interrupt Management Area (Direct) */
+-    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops,
++    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &pnv_xive_tm_ops=
+,
+                           xive, "xive-tima", PNV9_XIVE_TM_SIZE);
+=20
+     qemu_register_reset(pnv_xive_reset, dev);
+diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+index bb3b2dfdb77f..6292da58f62c 100644
+--- a/hw/intc/spapr_xive.c
++++ b/hw/intc/spapr_xive.c
+@@ -205,6 +205,35 @@ void spapr_xive_mmio_set_enabled(SpaprXive *xive, bo=
+ol enable)
+     memory_region_set_enabled(&xive->end_source.esb_mmio, false);
+ }
+=20
++static void spapr_xive_tm_write(void *opaque, hwaddr offset,
++                          uint64_t value, unsigned size)
++{
++    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tctx;
++
++    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, size=
+);
++}
++
++static uint64_t spapr_xive_tm_read(void *opaque, hwaddr offset, unsigned=
+ size)
++{
++    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tctx;
++
++    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size)=
+;
++}
++
++const MemoryRegionOps spapr_xive_tm_ops =3D {
++    .read =3D spapr_xive_tm_read,
++    .write =3D spapr_xive_tm_write,
++    .endianness =3D DEVICE_BIG_ENDIAN,
++    .valid =3D {
++        .min_access_size =3D 1,
++        .max_access_size =3D 8,
++    },
++    .impl =3D {
++        .min_access_size =3D 1,
++        .max_access_size =3D 8,
++    },
++};
++
+ static void spapr_xive_end_reset(XiveEND *end)
+ {
+     memset(end, 0, sizeof(*end));
+@@ -314,8 +343,8 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
+r **errp)
+     qemu_register_reset(spapr_xive_reset, dev);
+=20
+     /* TIMA initialization */
+-    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
+ve,
+-                          "xive.tima", 4ull << TM_SHIFT);
++    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &spapr_xive_tm_o=
+ps,
++                          xive, "xive.tima", 4ull << TM_SHIFT);
+     sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
+=20
+     /*
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index a9298783e7d2..ab779c4c2a0f 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -523,35 +523,6 @@ uint64_t xive_tctx_tm_read(XivePresenter *xptr, Xive=
+TCTX *tctx, hwaddr offset,
+     return xive_tm_raw_read(tctx, offset, size);
+ }
+=20
+-static void xive_tm_write(void *opaque, hwaddr offset,
+-                          uint64_t value, unsigned size)
+-{
+-    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
+_cpu);
+-
+-    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, size=
+);
+-}
+-
+-static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned size)
+-{
+-    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
+_cpu);
+-
+-    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size)=
+;
+-}
+-
+-const MemoryRegionOps xive_tm_ops =3D {
+-    .read =3D xive_tm_read,
+-    .write =3D xive_tm_write,
+-    .endianness =3D DEVICE_BIG_ENDIAN,
+-    .valid =3D {
+-        .min_access_size =3D 1,
+-        .max_access_size =3D 8,
+-    },
+-    .impl =3D {
+-        .min_access_size =3D 1,
+-        .max_access_size =3D 8,
+-    },
+-};
+-
+ static char *xive_tctx_ring_print(uint8_t *ring)
+ {
+     uint32_t w2 =3D xive_tctx_word2(ring);
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.21.0
 
 
