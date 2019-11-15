@@ -2,80 +2,117 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83940C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:04:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5526AC43141
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:05:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4FAEE20674
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:04:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2225220674
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:05:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GYg0r/F2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FAEE20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="rIxmJfDK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2225220674
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVd9J-0007UR-TT
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 10:04:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40572)
+	id 1iVdAD-0000Sk-Bj
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 10:05:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39498)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <michael.goffioul@gmail.com>) id 1iVaFi-00078k-Ij
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 06:59:03 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVd8q-0007OF-BP
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:04:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <michael.goffioul@gmail.com>) id 1iVaFg-0000gJ-Ii
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 06:59:02 -0500
-Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:44344)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <michael.goffioul@gmail.com>)
- id 1iVaFY-0000bG-3u; Fri, 15 Nov 2019 06:58:53 -0500
-Received: by mail-pg1-x532.google.com with SMTP id f19so5900811pgk.11;
- Fri, 15 Nov 2019 03:58:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3PiXi4UBRQ42F3qaUYYPAcpUcWadxVQHnItxf83NNYw=;
- b=GYg0r/F2LWcu9GlU8ZnUHD0vuhPJDzmIrxV14bPET1GJI8z+r5ILDY00t21eiRw5a3
- 7J2VbDN3m17gavW1jtf+mTHfxPvXyzVTY0PKnr/YdwAEHAast5c+g72wZKlmnciEFkja
- ewZvEGc4vsBFIO1Z6hWlI+8aLJRo5/MtAY/wbJf/LIzS5rIwv9wxbR6NERnCbCWeacXq
- kGJyZ1FV5E3Hpf9W+7BN/bRwfuZpZJBBnJbwitLEKChyzYeu015AxYaxyxlddaoQnrmX
- N0TR0l6sQRp6oudCOnFkJTdH+ae9WTBOkASZk9EjWJ+Xl4XRdS7G6u+rAyksIvGfhe0E
- elWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3PiXi4UBRQ42F3qaUYYPAcpUcWadxVQHnItxf83NNYw=;
- b=jj87UdKTJYg8mFext9iw0A4bBwnjbExidsA3Klabbf08XsJFQ6CYzoaBcpiBAuzRBS
- nWBIfM3iRfv3tMXY+zgyv90LUQsTfS5/3qEnEB0apLtni7pIp9mUdVIZjL8M/G8Du0p3
- WNw/olulbwFAVRy0o8OfAX9ydkk7BjL94G+WKdUBzUpXqABk2CCiubhHRPyxFM8i73TM
- //onr2XuuLY/pzAPwCQZ2mS3LWyfAQfuf2p0L0z1ne9J+diL/14fLXESMTjBKpR5mR9y
- UnqiQ7VDN3v5qF6TMTha8ckSik9E3Q7nMt6dp2NoShFPJfutBilrTwmGOFsizQmOeVIK
- 3q0Q==
-X-Gm-Message-State: APjAAAXpM1+9b7m9cBmYMSjWIz0FKIHW4P03Qs6aLNzBH0Ka1Gh9FRs2
- ZYH1Fra46iqIFVEaLqDFOFgfZiuo3K16OcpiSCI=
-X-Google-Smtp-Source: APXvYqyTaqHfbuGerDofyIHlaMPVSRan4zxEhFIJN1BT8TE+e1Ii0UPQWwc/Gjqh+a7KMiMH3W6BBzqMreCdvYYKeIM=
-X-Received: by 2002:a62:e914:: with SMTP id j20mr17339797pfh.245.1573819125984; 
- Fri, 15 Nov 2019 03:58:45 -0800 (PST)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVd8p-0006PM-72
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:04:08 -0500
+Received: from mail-eopbgr70122.outbound.protection.outlook.com
+ ([40.107.7.122]:2757 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iVd8m-0006Ng-1A; Fri, 15 Nov 2019 10:04:04 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q4a3j450fW/vcHNklzZcZSkpwpugc1tzC8bqGNj2ZhuHa5jcfoPU9p+ercjTpy8iCqhu/zDmY+vL/JjzQ0m/hBfWlA5b4prYyfXNLdbQbhFSVQLNf4WVLMa+e/nGJKsk9XBu6jlb5Btwl4QpMiu9smaWBJjCsHas/tTt9ERE6pWnwYqvmTG+x6pQPtbxnBJJZnerWo0I1KllPGq01ErWDYylKzknwU3Ww/zSZg9tM/ZNk7A/5acpPlyJc2QGW9OxxyW6IlR9ffckWIHwgsNGU3ICEUu9OXgn2F43pGnA7Gd9Kz1HIYNZTTJsE5qUhwFSgKZtvQEgZEaXcIxfVpmiYw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LODlAqlaUsxOFVNBKXugCFb8yjTJpPZDasSxs7k+CY8=;
+ b=N53T8ejvT8QwuKHQaQSqTDRDl9lxSJYzb05iAR62KsGVyOSbfkgSd6AIRY2urFIA07cHXTDTHKcFz1RZrH0xC4JbeLVpymbUqoGNPyygAUP8opUII24SxBIhg/9H15614IHkJmT/7mlUtEO3EIIhEUwYX6/pB5MJ1N8k1gF7H7l4+bRiwAHlzIifm2S4PgfTq682AM79CFkZjciAv0OZZgVTB6awLtjgJuAsB8IIY7O1kjsDVoZKj7/4kggCEqa3j0aYV+s+Wx8BYRGrSbAYaPG2eUpmW68gViwdWs9xFDhXvXo1xw8Lfo2b6vDVS6a5j4WM/rgaeekg5hfRmv1Zsw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LODlAqlaUsxOFVNBKXugCFb8yjTJpPZDasSxs7k+CY8=;
+ b=rIxmJfDKOryr8pwQ4qxh00vxc9lhCRRs1tSZJtGCDHCJlAhFKtr9qzR1gy3ppeIPMt6LvjjA7FSitdE6linP+ANIZG/VPAkZuUDm1QAVXBthZCEzSkLWBi2Z5zBJ8BofxmORlC2tA5q/Xqkt//YgS2a0JoUuoCzHTHHiMlzyTHk=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3174.eurprd08.prod.outlook.com (52.135.163.145) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.23; Fri, 15 Nov 2019 15:04:01 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.029; Fri, 15 Nov 2019
+ 15:04:01 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: Re: [PATCH v3 2/4] bitmap: Enforce maximum bitmap name length
+Thread-Topic: [PATCH v3 2/4] bitmap: Enforce maximum bitmap name length
+Thread-Index: AQHVmpXQlrP7gvUJk0eiM4XXWoXbLqeMVqWA
+Date: Fri, 15 Nov 2019 15:04:01 +0000
+Message-ID: <0a25974f-f9cd-07a1-4cb7-2bbd4dfe4375@virtuozzo.com>
+References: <20191114024635.11363-1-eblake@redhat.com>
+ <20191114024635.11363-3-eblake@redhat.com>
+In-Reply-To: <20191114024635.11363-3-eblake@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1P191CA0022.EURP191.PROD.OUTLOOK.COM (2603:10a6:3:cf::32)
+ To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191115180359613
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 06398316-7110-4424-09e7-08d769dd0c4a
+x-ms-traffictypediagnostic: AM6PR08MB3174:
+x-microsoft-antispam-prvs: <AM6PR08MB317442E74C1A144958B35A6FC1700@AM6PR08MB3174.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 02229A4115
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(979002)(366004)(346002)(376002)(39840400004)(136003)(396003)(199004)(189003)(66946007)(110136005)(4326008)(26005)(66556008)(66476007)(36756003)(66446008)(64756008)(7736002)(6486002)(186003)(476003)(305945005)(5660300002)(11346002)(3846002)(6116002)(14454004)(71190400001)(71200400001)(31686004)(8676002)(81166006)(81156014)(76176011)(2616005)(386003)(52116002)(6506007)(31696002)(486006)(14444005)(8936002)(6512007)(256004)(4744005)(102836004)(229853002)(478600001)(2501003)(6246003)(446003)(66066001)(99286004)(6436002)(25786009)(316002)(54906003)(86362001)(2906002)(969003)(989001)(999001)(1009001)(1019001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3174;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /Alzc8LQgjh66fgLIerEfuylyBKrwAle79mS5VhivY9JNjhrbkzk+mZTLaVavdooQRLrCeXLA0dOxS3ArVmPSwwp4Nv9J353ja/ZQqoo+z6RdZmfreW6FViGNtODmKvnQhyefR+i/asWKRIrMqVxY9NsDv5SIVUNXqNjy5L22YH5A6ksGwXZ59DpPOxP7aYj2u0sQ4toenosFHwOrg0tgN1XE25/3Ddh21G1ep22qW1WcYc8262jKMaM8iB4gHnoIpDgDU0XKF7v6UlVxc5RPZXc3L4G+3o+OiFjwgnAXMYfyiGeTU0QwYEfKof4qheWxX4H9PI9AyebLoYAFNaYvNU8llhYxrSwCDS5T+tPXFNNHuIBEMKdlAIIb5yDVV/LIFtDOIScQxwRAru1LuoAT8snZlCMXZwsX59EwtYkBql+l3GOS/kKx8q7IICO/kho
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <6739B6651DC0594A8CDE793800DDE4C4@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <CAB-99Lv3LySps4MOoKEj7Sp0CBouv-KgZp2osbiokSq_Gdfj5Q@mail.gmail.com>
- <CAFEAcA-RXurz2OB24i1wypumCDWf5s__mC33mFzBA3SCsm4_VA@mail.gmail.com>
-In-Reply-To: <CAFEAcA-RXurz2OB24i1wypumCDWf5s__mC33mFzBA3SCsm4_VA@mail.gmail.com>
-From: Michael Goffioul <michael.goffioul@gmail.com>
-Date: Fri, 15 Nov 2019 06:58:34 -0500
-Message-ID: <CAB-99Ls6YfRv7zYLMCAmQ1jj6=2As9YtmgHwucvr5d5_eaCOPA@mail.gmail.com>
-Subject: Re: Invalid ARM instruction for clang-compiled Android code
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000f1f1d40597615187"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::532
-X-Mailman-Approved-At: Fri, 15 Nov 2019 10:01:37 -0500
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 06398316-7110-4424-09e7-08d769dd0c4a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Nov 2019 15:04:01.3510 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: iWZheDqaiQHmi4FGoWWRWRB6zuoO22dpyW/OnDOow8ZQBr8jc9dEw1QLUz6S4ESmPSHS1SHIfj8m6lhogiK+CfsKmSJXP8ks3xP0yyJxgm8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3174
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.7.122
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,80 +124,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- qemu-discuss <qemu-discuss@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ "mlevitsk@redhat.com" <mlevitsk@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f1f1d40597615187
-Content-Type: text/plain; charset="UTF-8"
+14.11.2019 5:46, Eric Blake wrote:
+> We document that for qcow2 persistent bitmaps, the name cannot exceed
+> 1023 bytes.  It is inconsistent if transient bitmaps do not have to
+> abide by the same limit, and it is unlikely that any existing client
+> even cares about using bitmap names this long.  It's time to codify
+> that ALL bitmaps managed by qemu (whether persistent in qcow2 or not)
+> have a documented maximum length.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-On Fri, Nov 15, 2019 at 6:03 AM Peter Maydell <peter.maydell@linaro.org>
-wrote:
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-> On Fri, 15 Nov 2019 at 05:03, Michael Goffioul
-> <michael.goffioul@gmail.com> wrote:
-> > When running QEMU user mode on some code compiled by clang (dynamic
-> linker from AOSP-10), the emulator chokes on this instruction:
-> >
-> >    9aa92:       e8c0 2277       strexd  r7, r2, r2, [r0]
->
-> I think that ought to be a valid insn...
->
-> > From debugging, I determined that op_strex() calls
-> unallocated_encoding(), which I think leads to the SIGILL signal generated.
-> >
-> > I run the emulator without specifying the ARM cpu type, I think it then
-> defaults to "any", which should support all instructions, if I'm not
-> mistaken.
-> >
-> > Is this instruction really invalid? Or am I doing something wrong?
->
-> Which version of QEMU are you using? (Looking at the code I
-> suspect we still have this bug in master, but it's always
-> useful to specify what version you're using in a bug report.)
->
 
-Yes sorry, I forgot to mention it. I'm using master branch
-at 187f35512106501fe9a11057f4d8705431e0026d
 
---000000000000f1f1d40597615187
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">On Fri, Nov 15, 2019 at 6:03 AM Peter May=
-dell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@linaro.o=
-rg</a>&gt; wrote:<br></div><div class=3D"gmail_quote"><blockquote class=3D"=
-gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(20=
-4,204,204);padding-left:1ex">On Fri, 15 Nov 2019 at 05:03, Michael Goffioul=
-<br>
-&lt;<a href=3D"mailto:michael.goffioul@gmail.com" target=3D"_blank">michael=
-.goffioul@gmail.com</a>&gt; wrote:<br>
-&gt; When running QEMU user mode on some code compiled by clang (dynamic li=
-nker from AOSP-10), the emulator chokes on this instruction:<br>
-&gt;<br>
-&gt;=C2=A0 =C2=A0 9aa92:=C2=A0 =C2=A0 =C2=A0 =C2=A0e8c0 2277=C2=A0 =C2=A0 =
-=C2=A0 =C2=A0strexd=C2=A0 r7, r2, r2, [r0]<br>
-<br>
-I think that ought to be a valid insn...<br>
-<br>
-&gt; From debugging, I determined that op_strex() calls unallocated_encodin=
-g(), which I think leads to the SIGILL signal generated.<br>
-&gt;<br>
-&gt; I run the emulator without specifying the ARM cpu type, I think it the=
-n defaults to &quot;any&quot;, which should support all instructions, if I&=
-#39;m not mistaken.<br>
-&gt;<br>
-&gt; Is this instruction really invalid? Or am I doing something wrong?<br>
-<br>
-Which version of QEMU are you using? (Looking at the code I<br>
-suspect we still have this bug in master, but it&#39;s always<br>
-useful to specify what version you&#39;re using in a bug report.)<br></bloc=
-kquote><div><br></div><div>Yes sorry, I forgot to mention it. I&#39;m using=
- master branch at=C2=A0187f35512106501fe9a11057f4d8705431e0026d</div><div><=
-br></div></div></div>
-
---000000000000f1f1d40597615187--
+--=20
+Best regards,
+Vladimir
 
