@@ -6,48 +6,49 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77C77C432C3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F3E1C43215
 	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:00:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E5722073C
+	by mail.kernel.org (Postfix) with ESMTPS id 0E0012072D
 	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 08:00:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E5722073C
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E0012072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVWWV-0003Gt-Nj
+	id 1iVWWV-0003Fj-9T
 	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 03:00:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39111)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39174)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iVWQm-0005p4-PG
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 02:54:14 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1iVWQz-000605-OU
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 02:54:26 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iVWQl-0002eg-Ct
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 02:54:12 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1iVWQy-0002vC-5C
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 02:54:25 -0500
 Received: from mga07.intel.com ([134.134.136.100]:48001)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iVWQl-0002Zs-2f
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 02:54:11 -0500
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iVWQx-0002Zs-TX
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 02:54:24 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 14 Nov 2019 23:54:10 -0800
+ 14 Nov 2019 23:54:23 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,307,1569308400"; d="scan'208";a="235987237"
+X-IronPort-AV: E=Sophos;i="5.68,307,1569308400"; d="scan'208";a="235987289"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by fmsmga002.fm.intel.com with ESMTP; 14 Nov 2019 23:54:08 -0800
+ by fmsmga002.fm.intel.com with ESMTP; 14 Nov 2019 23:54:21 -0800
 From: Tao Xu <tao3.xu@intel.com>
 To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
  ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
  mdroth@linux.vnet.ibm.com, thuth@redhat.com, lvivier@redhat.com
-Subject: [PATCH v16 06/14] tests: Add test for QAPI builtin type time
-Date: Fri, 15 Nov 2019 15:53:44 +0800
-Message-Id: <20191115075352.17734-7-tao3.xu@intel.com>
+Subject: [PATCH v16 11/14] hmat acpi: Build System Locality Latency and
+ Bandwidth Information Structure(s)
+Date: Fri, 15 Nov 2019 15:53:49 +0800
+Message-Id: <20191115075352.17734-12-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191115075352.17734-1-tao3.xu@intel.com>
 References: <20191115075352.17734-1-tao3.xu@intel.com>
@@ -73,177 +74,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add tests for time input such as zero, around limit of precision,
-signed upper limit, actual upper limit, beyond limits, time suffixes,
-and etc.
+From: Liu Jingqi <jingqi.liu@intel.com>
 
+This structure describes the memory access latency and bandwidth
+information from various memory access initiator proximity domains.
+The latency and bandwidth numbers represented in this structure
+correspond to rated latency and bandwidth for the platform.
+The software could use this information as hint for optimization.
+
+Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
 
 Changes in v16:
-    - Update the test cases
+    - Add more description for lb_length (Igor)
+    - Drop entry_list and calculate entries in this patch (Igor)
 
-Changes in v14:
-    - Drop time unit picosecond (Eric)
+Changes in v13:
+    - Calculate the entries in a new patch.
 ---
- tests/test-keyval.c                | 89 ++++++++++++++++++++++++++++++
- tests/test-qobject-input-visitor.c | 29 ++++++++++
- 2 files changed, 118 insertions(+)
+ hw/acpi/hmat.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 104 insertions(+), 1 deletion(-)
 
-diff --git a/tests/test-keyval.c b/tests/test-keyval.c
-index fad941fcb8..39443f7e0c 100644
---- a/tests/test-keyval.c
-+++ b/tests/test-keyval.c
-@@ -457,6 +457,94 @@ static void test_keyval_visit_size(void)
-     visit_free(v);
+diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+index 9ff79308a4..ed19ebed2f 100644
+--- a/hw/acpi/hmat.c
++++ b/hw/acpi/hmat.c
+@@ -25,8 +25,10 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/units.h"
+ #include "sysemu/numa.h"
+ #include "hw/acpi/hmat.h"
++#include "qemu/error-report.h"
+ 
+ /*
+  * ACPI 6.3:
+@@ -67,11 +69,89 @@ static void build_hmat_mpda(GArray *table_data, uint16_t flags,
+     build_append_int_noprefix(table_data, 0, 8);
  }
  
-+static void test_keyval_visit_time(void)
++/*
++ * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
++ * Structure: Table 5-146
++ */
++static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
++                          uint32_t num_initiator, uint32_t num_target,
++                          uint32_t *initiator_list)
 +{
-+    Error *err = NULL;
-+    Visitor *v;
-+    QDict *qdict;
-+    uint64_t time;
++    int i, index;
++    HMAT_LB_Data *lb_data;
++    uint16_t *entry_list;
++    uint32_t base;
++    /* Length in bytes for entire structure */
++    uint32_t lb_length
++        = 32 /* Table length upto and including Entry Base Unit */
++        + 4 * num_initiator /* Initiator Proximity Domain List */
++        + 4 * num_target /* Target Proximity Domain List */
++        + 2 * num_initiator * num_target; /* Latency or Bandwidth Entries */
 +
-+    /* Lower limit zero */
-+    qdict = keyval_parse("time1=0", NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmpuint(time, ==, 0);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++    /* Type */
++    build_append_int_noprefix(table_data, 1, 2);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Length */
++    build_append_int_noprefix(table_data, lb_length, 4);
++    /* Flags: Bits [3:0] Memory Hierarchy, Bits[7:4] Reserved */
++    assert(!(hmat_lb->hierarchy >> 4));
++    build_append_int_noprefix(table_data, hmat_lb->hierarchy, 1);
++    /* Data Type */
++    build_append_int_noprefix(table_data, hmat_lb->data_type, 1);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 2);
++    /* Number of Initiator Proximity Domains (s) */
++    build_append_int_noprefix(table_data, num_initiator, 4);
++    /* Number of Target Proximity Domains (t) */
++    build_append_int_noprefix(table_data, num_target, 4);
++    /* Reserved */
++    build_append_int_noprefix(table_data, 0, 4);
 +
-+    /* Around limit of precision: UINT64_MAX - 1, UINT64_MAX */
-+    qdict = keyval_parse("time1=18446744073709551614,"
-+                         "time2=18446744073709551615",
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0xfffffffffffffffe);
-+    visit_type_time(v, "time2", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 0xffffffffffffffff);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++    /* Entry Base Unit */
++    if (hmat_lb->data_type <= HMAT_LB_DATA_WRITE_LATENCY) {
++        /* Convert latency base from nanoseconds to picosecond */
++        base = hmat_lb->base * 1000;
++    } else {
++        /* Convert bandwidth base from Byte to Megabyte */
++        base = hmat_lb->base / MiB;
++    }
++    build_append_int_noprefix(table_data, base, 8);
 +
-+    /* Beyond limits */
-+    qdict = keyval_parse("time1=-1,"
-+                         "time2=18446744073709551616", /* 2^64 */
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_type_time(v, "time2", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++    /* Initiator Proximity Domain List */
++    for (i = 0; i < num_initiator; i++) {
++        build_append_int_noprefix(table_data, initiator_list[i], 4);
++    }
 +
-+    /* Suffixes */
-+    qdict = keyval_parse("time1=2ns,time2=3.4us,time3=5ms,time4=600s",
-+                         NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &error_abort);
-+    g_assert_cmpuint(time, ==, 2);
-+    visit_type_time(v, "time2", &time, &error_abort);
-+    g_assert_cmpuint(time, ==, 3400);
-+    visit_type_time(v, "time3", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 5 * 1000 * 1000);
-+    visit_type_time(v, "time4", &time, &error_abort);
-+    g_assert_cmphex(time, ==, 600 * 1000000000LL);
-+    visit_check_struct(v, &error_abort);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++    /* Target Proximity Domain List */
++    for (i = 0; i < num_target; i++) {
++        build_append_int_noprefix(table_data, i, 4);
++    }
 +
-+    /* Beyond limit with suffix */
-+    qdict = keyval_parse("time1=1844674407370955s", NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++    /* Latency or Bandwidth Entries */
++    entry_list = g_malloc0(hmat_lb->list->len * sizeof(uint16_t));
++    for (i = 0; i < hmat_lb->list->len; i++) {
++        lb_data = &g_array_index(hmat_lb->list, HMAT_LB_Data, i);
++        index = lb_data->initiator * num_target + lb_data->target;
 +
-+    /* Trailing crap */
-+    qdict = keyval_parse("time1=89ks,time2=ns", NULL, &error_abort);
-+    v = qobject_input_visitor_new_keyval(QOBJECT(qdict));
-+    qobject_unref(qdict);
-+    visit_start_struct(v, NULL, NULL, 0, &error_abort);
-+    visit_type_time(v, "time1", &time, &err);
-+    error_free_or_abort(&err);
-+    visit_type_time(v, "time2", &time, &err);;
-+    error_free_or_abort(&err);
-+    visit_end_struct(v, NULL);
-+    visit_free(v);
++        entry_list[index] = (uint16_t)(lb_data->data / hmat_lb->base);
++    }
++
++    for (i = 0; i < num_initiator * num_target; i++) {
++        build_append_int_noprefix(table_data, entry_list[i], 2);
++    }
++
++    g_free(entry_list);
 +}
 +
- static void test_keyval_visit_dict(void)
+ /* Build HMAT sub table structures */
+ static void hmat_build_table_structs(GArray *table_data, NumaState *numa_state)
  {
-     Error *err = NULL;
-@@ -645,6 +733,7 @@ int main(int argc, char *argv[])
-     g_test_add_func("/keyval/visit/bool", test_keyval_visit_bool);
-     g_test_add_func("/keyval/visit/number", test_keyval_visit_number);
-     g_test_add_func("/keyval/visit/size", test_keyval_visit_size);
-+    g_test_add_func("/keyval/visit/time", test_keyval_visit_time);
-     g_test_add_func("/keyval/visit/dict", test_keyval_visit_dict);
-     g_test_add_func("/keyval/visit/list", test_keyval_visit_list);
-     g_test_add_func("/keyval/visit/optional", test_keyval_visit_optional);
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 6bacabf063..55138042b8 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -366,6 +366,31 @@ static void test_visitor_in_size_str_fail(TestInputVisitorData *data,
-     error_free_or_abort(&err);
+     uint16_t flags;
+-    int i;
++    uint32_t num_initiator = 0;
++    uint32_t initiator_list[MAX_NODES];
++    int i, hierarchy, type;
++    HMAT_LB_Info *hmat_lb;
+ 
+     for (i = 0; i < numa_state->num_nodes; i++) {
+         flags = 0;
+@@ -82,6 +162,29 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *numa_state)
+ 
+         build_hmat_mpda(table_data, flags, numa_state->nodes[i].initiator, i);
+     }
++
++    for (i = 0; i < numa_state->num_nodes; i++) {
++        if (numa_state->nodes[i].has_cpu) {
++            initiator_list[num_initiator++] = i;
++        }
++    }
++
++    /*
++     * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
++     * Structure: Table 5-146
++     */
++    for (hierarchy = HMAT_LB_MEM_MEMORY;
++         hierarchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hierarchy++) {
++        for (type = HMAT_LB_DATA_ACCESS_LATENCY;
++             type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
++            hmat_lb = numa_state->hmat_lb[hierarchy][type];
++
++            if (hmat_lb) {
++                build_hmat_lb(table_data, hmat_lb, num_initiator,
++                              numa_state->num_nodes, initiator_list);
++            }
++        }
++    }
  }
  
-+static void test_visitor_in_time_str_keyval(TestInputVisitorData *data,
-+                                            const void *unused)
-+{
-+    uint64_t res, value = 265 * 1000 * 1000;
-+    Visitor *v;
-+
-+    v = visitor_input_test_init_full(data, true, "\"265ms\"");
-+
-+    visit_type_time(v, NULL, &res, &error_abort);
-+    g_assert_cmpfloat(res, ==, value);
-+}
-+
-+static void test_visitor_in_time_str_fail(TestInputVisitorData *data,
-+                                          const void *unused)
-+{
-+    uint64_t res = 0;
-+    Visitor *v;
-+    Error *err = NULL;
-+
-+    v = visitor_input_test_init(data, "\"265ms\"");
-+
-+    visit_type_time(v, NULL, &res, &err);
-+    error_free_or_abort(&err);
-+}
-+
- static void test_visitor_in_string(TestInputVisitorData *data,
-                                    const void *unused)
- {
-@@ -1311,6 +1336,10 @@ int main(int argc, char **argv)
-                            NULL, test_visitor_in_size_str_keyval);
-     input_visitor_test_add("/visitor/input/size_str_fail",
-                            NULL, test_visitor_in_size_str_fail);
-+    input_visitor_test_add("/visitor/input/time_str_keyval",
-+                           NULL, test_visitor_in_time_str_keyval);
-+    input_visitor_test_add("/visitor/input/time_str_fail",
-+                           NULL, test_visitor_in_time_str_fail);
-     input_visitor_test_add("/visitor/input/string",
-                            NULL, test_visitor_in_string);
-     input_visitor_test_add("/visitor/input/enum",
+ void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_state)
 -- 
 2.20.1
 
