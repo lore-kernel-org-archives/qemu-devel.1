@@ -2,85 +2,59 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C8BEC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3722C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:26:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EB7A20730
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:26:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/0608e6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EB7A20730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C988C2072D
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:26:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C988C2072D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41498 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVeQC-0008Uz-L5
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:26:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51732)
+	id 1iVeQY-0000fG-8p
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:26:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51812)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iVeOn-0006x1-Ox
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:24:42 -0500
+ (envelope-from <clg@kaod.org>) id 1iVeP0-0007Eh-7t
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:24:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iVeOl-0000Pm-IE
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:24:40 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52799
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iVeOy-0000VT-Nz
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:24:54 -0500
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:36996)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iVeOl-0000PR-EJ
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:24:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573835078;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rVekyxgN4bMiTsZH/4w84/56lmlCAIprnqv5e2wLqAE=;
- b=R/0608e62GBknF6UB9wipVhJcoVhcnO+XWRr8yDNBcikv2G+N9spLMVqW+0/ttAghcXcGW
- MQz4We0zRJK9G43Ivo96Ha7irWd67aVqMKmniUBamc35F/hfQ4aaJWx5yCEF2L3SX6LPrd
- Q54MLvAYcZV2+YIN4F6kDx1hnaAjuSM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-6SrWiY4qPBmPr32446gpQA-1; Fri, 15 Nov 2019 11:24:37 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18D291858F1D;
- Fri, 15 Nov 2019 16:24:36 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-84.ams2.redhat.com
- [10.36.117.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BC671036C81;
- Fri, 15 Nov 2019 16:24:29 +0000 (UTC)
-Subject: Re: [PATCH for-4.2] hw/i386: Fix compiler warning when CONFIG_IDE_ISA
- is disabled
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20191115145049.26868-1-thuth@redhat.com>
- <CAFEAcA-EuQVBtr=BCE5sdHo+LMv8XchHUSPM=CgSYxPVryWKZg@mail.gmail.com>
- <273a3123-9eef-c78e-5b83-833a21e3988c@redhat.com>
- <CAFEAcA9N+T=M=5-xb3ahRMqD6oxhm5Lx55-1Mtk1vXsRJEomwA@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <85b5fbcc-e06b-7ce2-0a97-7fdc156915cd@redhat.com>
-Date: Fri, 15 Nov 2019 17:12:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVeOy-0000Uo-HG
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:24:52 -0500
+Received: from player787.ha.ovh.net (unknown [10.108.35.185])
+ by mo2.mail-out.ovh.net (Postfix) with ESMTP id 1C20D1B589E
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:24:49 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player787.ha.ovh.net (Postfix) with ESMTPSA id 14CB7C444543;
+ Fri, 15 Nov 2019 16:24:44 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH for-5.0 v5 00/23] ppc/pnv: add XIVE support for KVM guests
+Date: Fri, 15 Nov 2019 17:24:13 +0100
+Message-Id: <20191115162436.30548-1-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9N+T=M=5-xb3ahRMqD6oxhm5Lx55-1Mtk1vXsRJEomwA@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 6SrWiY4qPBmPr32446gpQA-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 15082836629394328550
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffogggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeekjedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 46.105.58.226
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,59 +66,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/11/2019 17.15, Peter Maydell wrote:
-> On Fri, 15 Nov 2019 at 16:08, Thomas Huth <thuth@redhat.com> wrote:
->>
->> On 15/11/2019 16.54, Peter Maydell wrote:
->>> On Fri, 15 Nov 2019 at 15:10, Thomas Huth <thuth@redhat.com> wrote:
->>>> --- a/hw/i386/pc_piix.c
->>>> +++ b/hw/i386/pc_piix.c
->>>> @@ -78,7 +78,6 @@ static void pc_init1(MachineState *machine,
->>>>      X86MachineState *x86ms =3D X86_MACHINE(machine);
->>>>      MemoryRegion *system_memory =3D get_system_memory();
->>>>      MemoryRegion *system_io =3D get_system_io();
->>>> -    int i;
->>>>      PCIBus *pci_bus;
->>>>      ISABus *isa_bus;
->>>>      PCII440FXState *i440fx_state;
->>>> @@ -253,7 +252,7 @@ static void pc_init1(MachineState *machine,
->>>>      }
->>>>  #ifdef CONFIG_IDE_ISA
->>>>  else {
->>>> -        for(i =3D 0; i < MAX_IDE_BUS; i++) {
->>>> +        for (int i =3D 0; i < MAX_IDE_BUS; i++) {
->>>>              ISADevice *dev;
->>>>              char busname[] =3D "ide.0";
->>>>              dev =3D isa_ide_init(isa_bus, ide_iobase[i], ide_iobase2[=
-i],
->>>
->>> Don't put variable declarations inside 'for' statements,
->>> please. They should go at the start of a {} block.
->>
->> Why? We're using -std=3Dgnu99 now, so this should not be an issue anymor=
-e.
->=20
-> Consistency with the rest of the code base, which mostly
-> avoids this particular trick.
+Hello,
 
-We've also got a few spots that use it...
-(run e.g.: grep -r 'for (int ' hw/* )
+The QEMU PowerNV machine emulates a baremetal OpenPOWER system and
+acts as an hypervisor (L0). Supporting emulation of KVM to run guests
+(L1) requires a few more extensions, among which guest support for the
+XIVE interrupt controller on POWER9 processor.
 
-> See the 'Declarations' section of CODING_STYLE.rst.
+The following changes extend the XIVE models with the new XiveFabric
+and XivePresenter interfaces to provide support for XIVE escalations
+and interrupt resend. This mechanism is used by XIVE to notify the
+hypervisor that a vCPU is not dispatched on a HW thread. Tested on a
+QEMU PowerNV machine and a simple QEMU pseries guest doing network on
+a local bridge.
 
-OK, that's a point. But since this gnu99 is a rather new option that we
-just introduced less than a year ago, we should maybe think of whether
-we want to allow this for for-loops now, too (since IMHO it's quite a
-nice feature in gnu99).
+The XIVE interrupt controller offers a way to increase the XIVE
+resources per chip by configuring multiple XIVE blocks on a chip. This
+is not currently supported by the model. However, some configurations,
+such as OPAL/skiboot, use one block-per-chip configuration with some
+optimizations. One of them is to override the hardwired chip ID by the
+block id in the PowerBUS operations and for CAM line compares. This
+patchset improves the support for this setup. Tested with 4 chips.
 
- Thomas
+A series from Suraj adding guest support in the Radix MMU model of the
+QEMU PowerNV machine is still required and will be send later. The
+whole patchset can be found under :
+
+  https://github.com/legoater/qemu/tree/powernv-4.2
+
+Based on top of Greg's patchset "ppc: Consolidate QOM links and
+pointers to the same object".
+
+Thanks,
+
+C.
+
+Changes since v4:
+
+ - rebased on QEMU 4.2-rc1
+ - better commit logs
+ - moved fixes at the beginning of the patchset
+ - reworked pnv_xive_match_nvt() handler to loop on the all threads of
+   a PnvChip
+
+Changes since v3:
+
+ - reworked the patches introducing the XiveFabric and XivePresenter
+   interfaces
+ - moved the get_block_id() handler to the XiveRouter
+ - new small addons related to the format of the trigger data
+=20
+Changes since v2:
+
+ - introduced the XiveFabric and XivePresenter interfaces
+ - removed the need of a XiveRouter pointer under XiveTCTX
+
+Changes since v1:
+
+ - minor extra fixes=20
+ - split the escalation support in different patches
+ - kept the XiveRouter type for XiveTCTX back pointer (will address
+   this in P10)
+ - removed pnv_xive_vst_size(). Really broken on indirect tables.
+ - improved the dump of the NVT table
+ - introduce pnv_xive_get_block_id()
+
+C=C3=A9dric Le Goater (23):
+  ppc/xive: Record the IPB in the associated NVT
+  ppc/xive: Introduce helpers for the NVT id
+  ppc/pnv: Remove pnv_xive_vst_size() routine
+  ppc/pnv: Dump the XIVE NVT table
+  ppc/pnv: Quiesce some XIVE errors
+  ppc/xive: Introduce OS CAM line helpers
+  ppc/xive: Check V bit in TM_PULL_POOL_CTX
+  ppc/xive: Introduce a XivePresenter interface
+  ppc/xive: Implement the XivePresenter interface
+  ppc/pnv: Loop on the threads of the chip to find a matching NVT
+  ppc/pnv: Introduce a pnv_xive_is_cpu_enabled() helper
+  ppc/xive: Introduce a XiveFabric interface
+  ppc/pnv: Implement the XiveFabric interface
+  ppc/spapr: Implement the XiveFabric interface
+  ppc/xive: Use the XiveFabric and XivePresenter interfaces
+  ppc/xive: Extend the TIMA operation with a XivePresenter parameter
+  ppc/pnv: Clarify how the TIMA is accessed on a multichip system
+  ppc/xive: Move the TIMA operations to the controller model
+  ppc/xive: Remove the get_tctx() XiveRouter handler
+  ppc/xive: Introduce a xive_tctx_ipb_update() helper
+  ppc/xive: Synthesize interrupt from the saved IPB in the NVT
+  ppc/pnv: Introduce a pnv_xive_block_id() helper
+  ppc/pnv: Extend XiveRouter with a get_block_id() handler
+
+ include/hw/ppc/pnv.h       |  15 ++
+ include/hw/ppc/pnv_xive.h  |   3 -
+ include/hw/ppc/xive.h      |  72 ++++++--
+ include/hw/ppc/xive_regs.h |  24 +++
+ hw/intc/pnv_xive.c         | 360 ++++++++++++++++++++++++-------------
+ hw/intc/spapr_xive.c       |  88 ++++++++-
+ hw/intc/xive.c             | 350 ++++++++++++++++++++----------------
+ hw/ppc/pnv.c               |  37 +++-
+ hw/ppc/spapr.c             |  36 ++++
+ 9 files changed, 691 insertions(+), 294 deletions(-)
+
+--=20
+2.21.0
 
 
