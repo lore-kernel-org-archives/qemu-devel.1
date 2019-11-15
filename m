@@ -2,89 +2,97 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D17AC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:30:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 690B0C43215
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:35:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28BD420732
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:30:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3850220715
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 15:35:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pdEsBTG1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28BD420732
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N8d+tlFG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3850220715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVdYT-0005jd-9M
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 10:30:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43599)
+	id 1iVddH-0008JP-9E
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 10:35:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44310)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.bennee@linaro.org>) id 1iVdXf-0005EG-8M
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:29:48 -0500
+ (envelope-from <mst@redhat.com>) id 1iVdcP-0007bJ-WA
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:34:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.bennee@linaro.org>) id 1iVdXd-0000HL-S1
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:29:46 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45969)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
- id 1iVdXd-0000Gm-Jp
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:29:45 -0500
-Received: by mail-wr1-x441.google.com with SMTP id z10so11403659wrs.12
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 07:29:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=p+KJN6w9Lw0Sogc64X+XNrKaC4BrvFqMXa1bERRbuLs=;
- b=pdEsBTG1mdI8qQRuKcFILjBxDLeTQ5IApIqLp7qhq8fyJOvWtq/SCxodG63YtUhzYx
- lgUd1MdCPOTUmiVaSOOGIYl98pyUQFiAJBF7J1AxdK1MJr6x4qhNaU4rfFlhYsHnKH/g
- q2v900iBuUYv2ld/PbUNrnOj2QnbOMlVJXCm1TQ26WqHYtDeYzNg4P9ywo2NDcisU22T
- qiBPQrx1VqXtd6QWzeoGmQv9RVxwfKP5cOA+Fk2vZyyMrlnMJql/B+9DaktfeKSCYXvV
- 28t0I8iW5ScpqRddqANoy/JW1yOR9p/qeiAXPw0u/pJDDtMt5Zs/0GGNjtRzYGyUmDAs
- Eslw==
+ (envelope-from <mst@redhat.com>) id 1iVdcO-0002Vo-VZ
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:34:41 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30143
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iVdcO-0002VZ-SF
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 10:34:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573832080;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TxQN2ykuPzWY1WWuzKCGPYzXoWDwWAklpvKcneRm7NU=;
+ b=N8d+tlFG4M8WveLYY2WC2GSu47lqM0h8VLmQtUZ+OW7+qX+u3hrEnzGirqDaIDBXgyde3z
+ Umu139qLRjdvlAn/8yFgD6OzpNG5x267GSCl7NjZZnWWIpn3PQgj0wna0kolYtqd4AQPJV
+ 2Vph/gF/0tTKxZXiIB0yg4cSpF/g73w=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-299-Y6iyDEW4Njexsgo0JJKiPQ-1; Fri, 15 Nov 2019 10:34:38 -0500
+Received: by mail-qv1-f69.google.com with SMTP id w2so6812468qvz.10
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 07:34:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=p+KJN6w9Lw0Sogc64X+XNrKaC4BrvFqMXa1bERRbuLs=;
- b=QFnXa6RAyo9xcPuhgjHEQjIhAyhgIqhFam1vgHBnDfek3JSfAWXWiu6iSxUL48q+/3
- k8xkO35OhHYK1VJq1Doru4wNeRkF6jbH3DZNRqav1UA4XWELPaHB2wN0JqypIlpDrTJQ
- L8NwmmEo1WxaWNP4o4ShmE1yVymZXg59K7HbIXdpIw+Ir6Z5vrD2PCRi1edJdiqzQHlM
- JuJGQ+PnJnGLycI8B7d3hFQkF/65tYwCCpe7OYCDCPtVV2lp9hghUcPlCRvjx//ezGT8
- 0EKrBEmTUpeF4h7F3Jaq3ShXr1kXH/rENLcWltuCU0SiQG61lWSzLZPeJULToHpGsLxT
- plrA==
-X-Gm-Message-State: APjAAAVbfPilAnosKC24g9CPVmerLfM553aFJ5VLcdlcvKiu0i62IhBo
- +0rXdOHXy01p4eUdVtNYszjP8g==
-X-Google-Smtp-Source: APXvYqxDWcZofeCFRXaUsuH9eWJvqTQt8rJ4fzWmMtUn5IZJfipA6nyVBVVnuTI58xMra757iSI1mQ==
-X-Received: by 2002:adf:fe0b:: with SMTP id n11mr15193079wrr.218.1573831783040; 
- Fri, 15 Nov 2019 07:29:43 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y19sm10883376wmd.29.2019.11.15.07.29.41
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=jXuZvRCxs4H7wEEmJhLwwDotj+6kIvzITkOyqqDQOWU=;
+ b=A2IOADv+4BehkwXZwl48ZmUs2JYNQMf/tnDwzE+/FBohjXBwkGOdC5GNu+CZlS/iXA
+ jcZN/bmx6jSMNw7YCE4T3zvZVVgVerPU/SazmRbcKkt4ZIYY895jh+F0lCMT7q+mUt2s
+ JGCOyASpaxMfvP0aYBJwaAUwmRt833v+bttnmvunskdcAq5j1x7bxBo4cZdldH5TzurX
+ 1oT4mlQkVpSpoLUUPqDE+SIg+rJrBro3MyuC9PoVUZXL08ftTrRIAYtQZZUs7BjCsluV
+ Zeq5e/mO9YY0D+JGclQHH+gQnuD9X9ZkA9rgvOJybKDJVXRj+vrzdDoXx0oFRxQqr/hn
+ p7mA==
+X-Gm-Message-State: APjAAAX7M6GLM5bqI2lPhrAhCgu58ESR29BYDd2jkh2iI/uRztQEXNhd
+ 5CDshmUSH1H89a5WttYgl9JvmsxRq3QmP5C0e37cVsBaNhw4aRviAdmFkqjyoSMYHJdyVMyp/39
+ abunJRfnOqb0I17U=
+X-Received: by 2002:a05:620a:110f:: with SMTP id
+ o15mr12703169qkk.127.1573832077248; 
+ Fri, 15 Nov 2019 07:34:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxo7BpSfa8lh2X5mXpDSvekynyzwR7AxSyihG0mFZD6PZqmRuL0mFs/cw2wK97xTB0XiYREOg==
+X-Received: by 2002:a05:620a:110f:: with SMTP id
+ o15mr12703048qkk.127.1573832075823; 
+ Fri, 15 Nov 2019 07:34:35 -0800 (PST)
+Received: from redhat.com (bzq-79-176-6-42.red.bezeqint.net. [79.176.6.42])
+ by smtp.gmail.com with ESMTPSA id h24sm3072394qtn.36.2019.11.15.07.34.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 Nov 2019 07:29:41 -0800 (PST)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8930C1FF87;
- Fri, 15 Nov 2019 15:29:40 +0000 (GMT)
-References: <20191115131623.322-1-richard.henderson@linaro.org>
-User-agent: mu4e 1.3.5; emacs 27.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: Re: [PATCH] target/arm: Clean up arm_cpu_vq_map_next_smaller asserts
-In-reply-to: <20191115131623.322-1-richard.henderson@linaro.org>
-Date: Fri, 15 Nov 2019 15:29:40 +0000
-Message-ID: <87tv755fa3.fsf@linaro.org>
+ Fri, 15 Nov 2019 07:34:34 -0800 (PST)
+Date: Fri, 15 Nov 2019 10:34:29 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH for-4.2] hw/i386: Fix compiler warning when
+ CONFIG_IDE_ISA is disabled
+Message-ID: <20191115103335-mutt-send-email-mst@kernel.org>
+References: <20191115145049.26868-1-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191115145049.26868-1-thuth@redhat.com>
+X-MC-Unique: Y6iyDEW4Njexsgo0JJKiPQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,88 +104,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-trivial@nongnu.org,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, Nov 15, 2019 at 03:50:49PM +0100, Thomas Huth wrote:
+> When CONFIG_IDE_ISA is disabled, compilation currently fails:
+>=20
+>  hw/i386/pc_piix.c: In function =E2=80=98pc_init1=E2=80=99:
+>  hw/i386/pc_piix.c:81:9: error: unused variable =E2=80=98i=E2=80=99 [-Wer=
+ror=3Dunused-variable]
+>=20
+> Move the variable declaration to the right code block to avoid
+> this problem.
+>=20
+> Fixes: 4501d317b50e ("hw/i386/pc: Extract pc_i8259_create()")
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Coverity reports, in sve_zcr_get_valid_len,
->
-> "Subtract operation overflows on operands
-> arm_cpu_vq_map_next_smaller(cpu, start_vq + 1U) and 1U"
->
-> First, fix the aarch32 stub version to not return 0, but to
-> simply assert unreachable.  Because that nonsense return value
-> does exactly what Coverity reports.
->
-> Second, 1 is the minimum value that can be returned from the
-> aarch64 version of arm_cpu_vq_map_next_smaller, but that is
-> non-obvious from the set of asserts in the function.  Begin by
-> asserting that 2 is the minimum input, and finish by asserting
-> that we did in fact find a set bit in the bitmap.  Bit 0 is
-> always set, so we must be able to find that.
->
-> Reported-by: Coverity (CID 1407217)
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
 > ---
->  target/arm/cpu.h   |  4 +++-
->  target/arm/cpu64.c | 11 +++++++++--
->  2 files changed, 12 insertions(+), 3 deletions(-)
->
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index e1a66a2d1c..d89e727d7b 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -190,7 +190,9 @@ uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uin=
-t32_t vq);
->  # define ARM_MAX_VQ    1
->  static inline void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp) { }
->  static inline uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t=
- vq)
-> -{ return 0; }
-> +{
-> +    g_assert_not_reached();
-> +}
->  #endif
->
->  typedef struct ARMVectorReg {
-> diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> index 68baf0482f..83ff8c8713 100644
-> --- a/target/arm/cpu64.c
-> +++ b/target/arm/cpu64.c
-> @@ -466,11 +466,18 @@ uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, u=
-int32_t vq)
->       * We allow vq =3D=3D ARM_MAX_VQ + 1 to be input because the caller =
-may want
->       * to find the maximum vq enabled, which may be ARM_MAX_VQ, but this
->       * function always returns the next smaller than the input.
-> +     *
-> +     * Similarly, vq =3D=3D 2 is the minimum input because 1 is the mini=
-mum
-> +     * output that makes sense.
->       */
-> -    assert(vq && vq <=3D ARM_MAX_VQ + 1);
-> +    assert(vq >=3D 2 && vq <=3D ARM_MAX_VQ + 1);
->
->      bitnum =3D find_last_bit(cpu->sve_vq_map, vq - 1);
-> -    return bitnum =3D=3D vq - 1 ? 0 : bitnum + 1;
-> +
-> +    /* We always have vq =3D=3D 1 present in sve_vq_map.  */
-> +    assert(bitnum < vq - 1);
-> +
-> +    return bitnum + 1;
->  }
->
->  static void cpu_max_get_sve_max_vq(Object *obj, Visitor *v, const char *=
-name,
+>  hw/i386/pc_piix.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 2aefa3b8df..d187db761c 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -78,7 +78,6 @@ static void pc_init1(MachineState *machine,
+>      X86MachineState *x86ms =3D X86_MACHINE(machine);
+>      MemoryRegion *system_memory =3D get_system_memory();
+>      MemoryRegion *system_io =3D get_system_io();
+> -    int i;
+>      PCIBus *pci_bus;
+>      ISABus *isa_bus;
+>      PCII440FXState *i440fx_state;
+> @@ -253,7 +252,7 @@ static void pc_init1(MachineState *machine,
+>      }
+>  #ifdef CONFIG_IDE_ISA
+>  else {
+> -        for(i =3D 0; i < MAX_IDE_BUS; i++) {
+> +        for (int i =3D 0; i < MAX_IDE_BUS; i++) {
+>              ISADevice *dev;
+>              char busname[] =3D "ide.0";
+>              dev =3D isa_ide_init(isa_bus, ide_iobase[i], ide_iobase2[i],
+> --=20
+> 2.23.0
 
-
---
-Alex Benn=C3=A9e
 
