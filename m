@@ -6,58 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4DE8C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:38:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F909C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:39:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A09120718
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:38:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A09120718
+	by mail.kernel.org (Postfix) with ESMTPS id 72DD120718
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:39:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72DD120718
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVecb-0006r0-7m
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:38:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52619)
+	id 1iVedR-0007w9-Ul
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:39:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52198)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iVeQf-0001Qx-1r
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:38 -0500
+ (envelope-from <clg@kaod.org>) id 1iVePg-0008LH-Ro
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iVeQd-0001G5-Ln
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:36 -0500
-Received: from 5.mo4.mail-out.ovh.net ([188.165.44.50]:39863)
+ (envelope-from <clg@kaod.org>) id 1iVePf-0000o1-Cn
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:36 -0500
+Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:39668)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVeQd-0001FT-Fd
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:35 -0500
-Received: from player787.ha.ovh.net (unknown [10.109.159.90])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id C97DD20842A
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:26:33 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVePf-0000nf-6X
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:25:35 -0500
+Received: from player787.ha.ovh.net (unknown [10.109.146.19])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 79ABD113EF0
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:25:33 +0100 (CET)
 Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
  (Authenticated sender: clg@kaod.org)
- by player787.ha.ovh.net (Postfix) with ESMTPSA id DFB12C444E05;
- Fri, 15 Nov 2019 16:26:27 +0000 (UTC)
+ by player787.ha.ovh.net (Postfix) with ESMTPSA id 1EF60C44499C;
+ Fri, 15 Nov 2019 16:25:28 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH for-5.0 v5 19/23] ppc/xive: Remove the get_tctx() XiveRouter
- handler
-Date: Fri, 15 Nov 2019 17:24:32 +0100
-Message-Id: <20191115162436.30548-20-clg@kaod.org>
+Subject: [PATCH for-5.0 v5 08/23] ppc/xive: Introduce a XivePresenter interface
+Date: Fri, 15 Nov 2019 17:24:21 +0100
+Message-Id: <20191115162436.30548-9-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191115162436.30548-1-clg@kaod.org>
 References: <20191115162436.30548-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 15112110028020616166
+X-Ovh-Tracer-Id: 15095221527823813606
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedv
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedu
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.44.50
+X-Received-From: 46.105.61.149
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -75,120 +74,151 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It is now unused.
+When the XIVE IVRE sub-engine (XiveRouter) looks for a Notification
+Virtual Target (NVT) to notify, it broadcasts a message on the
+PowerBUS to find an XIVE IVPE sub-engine (Presenter) with the NVT
+dispatched on one of its HW threads, and then forwards the
+notification if any response was received.
+
+The current XIVE presenter model is sufficient for the pseries machine
+because it has a single interrupt controller device, but the PowerNV
+machine can have multiple chips each having its own interrupt
+controller. In this case, the XIVE presenter model is too simple and
+the CAM line matching should scan all chips of the system.
+
+To start fixing this issue, we first extend the XIVE Router model with
+a new XivePresenter QOM interface representing the XIVE IVPE
+sub-engine. This interface exposes a 'match_nvt' handler which the
+sPAPR and PowerNV XIVE Router models will need to implement to perform
+the CAM line matching.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- include/hw/ppc/xive.h |  2 --
- hw/intc/pnv_xive.c    | 13 -------------
- hw/intc/spapr_xive.c  |  8 --------
- hw/intc/xive.c        |  7 -------
- 4 files changed, 30 deletions(-)
+ include/hw/ppc/xive.h | 32 ++++++++++++++++++++++++++++++++
+ hw/intc/xive.c        | 26 +++++++++++++++++---------
+ 2 files changed, 49 insertions(+), 9 deletions(-)
 
 diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index dcf897451589..24315480e7c2 100644
+index fa7adf87feb2..f9aa0fa0dac3 100644
 --- a/include/hw/ppc/xive.h
 +++ b/include/hw/ppc/xive.h
-@@ -351,7 +351,6 @@ typedef struct XiveRouterClass {
-                    XiveNVT *nvt);
-     int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx=
-,
-                      XiveNVT *nvt, uint8_t word_number);
--    XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs);
- } XiveRouterClass;
-=20
- int xive_router_get_eas(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_=
-idx,
-@@ -364,7 +363,6 @@ int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt=
-_blk, uint32_t nvt_idx,
-                         XiveNVT *nvt);
- int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nv=
-t_idx,
-                           XiveNVT *nvt, uint8_t word_number);
--XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs);
+@@ -367,6 +367,38 @@ int xive_router_write_nvt(XiveRouter *xrtr, uint8_t =
+nvt_blk, uint32_t nvt_idx,
+ XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs);
  void xive_router_notify(XiveNotifier *xn, uint32_t lisn);
 =20
++/*
++ * XIVE Presenter
++ */
++
++typedef struct XiveTCTXMatch {
++    XiveTCTX *tctx;
++    uint8_t ring;
++} XiveTCTXMatch;
++
++typedef struct XivePresenter XivePresenter;
++
++#define TYPE_XIVE_PRESENTER "xive-presenter"
++#define XIVE_PRESENTER(obj)                                     \
++    INTERFACE_CHECK(XivePresenter, (obj), TYPE_XIVE_PRESENTER)
++#define XIVE_PRESENTER_CLASS(klass)                                     =
+\
++    OBJECT_CLASS_CHECK(XivePresenterClass, (klass), TYPE_XIVE_PRESENTER)
++#define XIVE_PRESENTER_GET_CLASS(obj)                                   =
+\
++    OBJECT_GET_CLASS(XivePresenterClass, (obj), TYPE_XIVE_PRESENTER)
++
++typedef struct XivePresenterClass {
++    InterfaceClass parent;
++    int (*match_nvt)(XivePresenter *xptr, uint8_t format,
++                     uint8_t nvt_blk, uint32_t nvt_idx,
++                     bool cam_ignore, uint8_t priority,
++                     uint32_t logic_serv, XiveTCTXMatch *match);
++} XivePresenterClass;
++
++int xive_presenter_tctx_match(XivePresenter *xptr, XiveTCTX *tctx,
++                              uint8_t format,
++                              uint8_t nvt_blk, uint32_t nvt_idx,
++                              bool cam_ignore, uint32_t logic_serv);
++
  /*
-diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index 4501c671d8df..2e568721b44e 100644
---- a/hw/intc/pnv_xive.c
-+++ b/hw/intc/pnv_xive.c
-@@ -467,18 +467,6 @@ static PnvXive *pnv_xive_tm_get_xive(PowerPCCPU *cpu=
-)
-     return xive;
- }
-=20
--static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
--{
--    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
--
--    if (!xive) {
--        return NULL;
--    }
--
--    return XIVE_TCTX(pnv_cpu_state(cpu)->intc);
--}
--
- /*
-  * The internal sources (IPIs) of the interrupt controller have no
-  * knowledge of the XIVE chip on which they reside. Encode the block
-@@ -1936,7 +1924,6 @@ static void pnv_xive_class_init(ObjectClass *klass,=
- void *data)
-     xrc->write_end =3D pnv_xive_write_end;
-     xrc->get_nvt =3D pnv_xive_get_nvt;
-     xrc->write_nvt =3D pnv_xive_write_nvt;
--    xrc->get_tctx =3D pnv_xive_get_tctx;
-=20
-     xnc->notify =3D pnv_xive_notify;
-     xpc->match_nvt  =3D pnv_xive_match_nvt;
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 6292da58f62c..1542cef91878 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -427,13 +427,6 @@ static int spapr_xive_write_nvt(XiveRouter *xrtr, ui=
-nt8_t nvt_blk,
-     g_assert_not_reached();
- }
-=20
--static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
--{
--    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
--
--    return spapr_cpu_state(cpu)->tctx;
--}
--
- static int spapr_xive_match_nvt(XivePresenter *xptr, uint8_t format,
-                                 uint8_t nvt_blk, uint32_t nvt_idx,
-                                 bool cam_ignore, uint8_t priority,
-@@ -771,7 +764,6 @@ static void spapr_xive_class_init(ObjectClass *klass,=
- void *data)
-     xrc->write_end =3D spapr_xive_write_end;
-     xrc->get_nvt =3D spapr_xive_get_nvt;
-     xrc->write_nvt =3D spapr_xive_write_nvt;
--    xrc->get_tctx =3D spapr_xive_get_tctx;
-=20
-     sicc->activate =3D spapr_xive_activate;
-     sicc->deactivate =3D spapr_xive_deactivate;
+  * XIVE END ESBs
+  */
 diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index ab779c4c2a0f..e576a1e4ba9c 100644
+index 511e1a936347..344bb3f3bc4b 100644
 --- a/hw/intc/xive.c
 +++ b/hw/intc/xive.c
-@@ -1317,13 +1317,6 @@ int xive_router_write_nvt(XiveRouter *xrtr, uint8_=
-t nvt_blk, uint32_t nvt_idx,
-    return xrc->write_nvt(xrtr, nvt_blk, nvt_idx, nvt, word_number);
+@@ -1363,9 +1363,10 @@ static uint32_t xive_tctx_hw_cam_line(XiveTCTX *tc=
+tx)
+ /*
+  * The thread context register words are in big-endian format.
+  */
+-static int xive_presenter_tctx_match(XiveTCTX *tctx, uint8_t format,
+-                                     uint8_t nvt_blk, uint32_t nvt_idx,
+-                                     bool cam_ignore, uint32_t logic_ser=
+v)
++int xive_presenter_tctx_match(XivePresenter *xptr, XiveTCTX *tctx,
++                              uint8_t format,
++                              uint8_t nvt_blk, uint32_t nvt_idx,
++                              bool cam_ignore, uint32_t logic_serv)
+ {
+     uint32_t cam =3D xive_nvt_cam_line(nvt_blk, nvt_idx);
+     uint32_t qw3w2 =3D xive_tctx_word2(&tctx->regs[TM_QW3_HV_PHYS]);
+@@ -1422,11 +1423,6 @@ static int xive_presenter_tctx_match(XiveTCTX *tct=
+x, uint8_t format,
+     return -1;
  }
 =20
--XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs)
--{
--    XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
+-typedef struct XiveTCTXMatch {
+-    XiveTCTX *tctx;
+-    uint8_t ring;
+-} XiveTCTXMatch;
 -
--    return xrc->get_tctx(xrtr, cs);
--}
--
- /*
-  * Encode the HW CAM line in the block group mode format :
-  *
+ static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format,
+                                  uint8_t nvt_blk, uint32_t nvt_idx,
+                                  bool cam_ignore, uint8_t priority,
+@@ -1460,7 +1456,8 @@ static bool xive_presenter_match(XiveRouter *xrtr, =
+uint8_t format,
+          * Check the thread context CAM lines and record matches. We
+          * will handle CPU exception delivery later
+          */
+-        ring =3D xive_presenter_tctx_match(tctx, format, nvt_blk, nvt_id=
+x,
++        ring =3D xive_presenter_tctx_match(XIVE_PRESENTER(xrtr), tctx, f=
+ormat,
++                                         nvt_blk, nvt_idx,
+                                          cam_ignore, logic_serv);
+         /*
+          * Save the context and follow on to catch duplicates, that we
+@@ -1754,6 +1751,7 @@ static const TypeInfo xive_router_info =3D {
+     .class_init    =3D xive_router_class_init,
+     .interfaces    =3D (InterfaceInfo[]) {
+         { TYPE_XIVE_NOTIFIER },
++        { TYPE_XIVE_PRESENTER },
+         { }
+     }
+ };
+@@ -1923,10 +1921,20 @@ static const TypeInfo xive_notifier_info =3D {
+     .class_size =3D sizeof(XiveNotifierClass),
+ };
+=20
++/*
++ * XIVE Presenter
++ */
++static const TypeInfo xive_presenter_info =3D {
++    .name =3D TYPE_XIVE_PRESENTER,
++    .parent =3D TYPE_INTERFACE,
++    .class_size =3D sizeof(XivePresenterClass),
++};
++
+ static void xive_register_types(void)
+ {
+     type_register_static(&xive_source_info);
+     type_register_static(&xive_notifier_info);
++    type_register_static(&xive_presenter_info);
+     type_register_static(&xive_router_info);
+     type_register_static(&xive_end_source_info);
+     type_register_static(&xive_tctx_info);
 --=20
 2.21.0
 
