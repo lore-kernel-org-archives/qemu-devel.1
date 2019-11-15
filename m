@@ -2,69 +2,87 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73AFDC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 05:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58EF4C43141
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 06:10:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 404FC20715
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 05:53:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 404FC20715
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 27CA0207DD
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 06:10:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rg5bxtpI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 27CA0207DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVUXe-0002IR-BT
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 00:53:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57034)
+	id 1iVUoL-0004yM-9z
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 01:10:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58397)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iVUWo-0001np-OJ
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 00:52:19 -0500
+ (envelope-from <chanmickyyun@gmail.com>) id 1iVUnd-0004VJ-PA
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 01:09:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iVUWn-0001mJ-7G
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 00:52:18 -0500
-Resent-Date: Fri, 15 Nov 2019 00:52:18 -0500
-Resent-Message-Id: <E1iVUWn-0001mJ-7G@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21431)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iVUWm-0001lG-Vq
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 00:52:17 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1573797119; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=Nz/c7H9jqj0WdDXz0P0FzTFv8SH4PV4oZaHcAr5PsbK24LHHsDaUPWCLG31EPUzVFYUr0x3SnNunUeU9R3mYMm+dicGlJEI2uM91CIDWnB/c1FbTLAIs/gwBR4rwZh6YGurWH2N21Hiyzv+nl6mcRW9TtnFDLv7ajk1dj9z5zlk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1573797119;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=IiSM/WwjpakNxQ4RsttutZrE2n/y5cK9AF/6y4pdfcE=; 
- b=GzdHCPFK8KiX/Tj6iIeiC2W3u8XPx0zHTXDO+e6CKTBvVGlBM1uNCTmTDYQOHs8nkj9ejriP1ae2hTWKEfD0z0BAsBSdU5UlwBJ5attAkf0WHMO2k8j/7RnuKq5Ei+X/00+61Tlgf1JydYDv3EVIS02MqgpYqaGEtTibn8pHW98=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1573797118298669.0102631317333;
- Thu, 14 Nov 2019 21:51:58 -0800 (PST)
-In-Reply-To: <1573792691-398-1-git-send-email-tsimpson@quicinc.com>
-Subject: Re: [PATCH] Modify tests to work with clang
-Message-ID: <157379711710.4715.5068757074759451357@37313f22b938>
+ (envelope-from <chanmickyyun@gmail.com>) id 1iVUnc-0005do-HZ
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 01:09:41 -0500
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:33185)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <chanmickyyun@gmail.com>)
+ id 1iVUnc-0005dT-BU
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 01:09:40 -0500
+Received: by mail-pl1-x643.google.com with SMTP id ay6so3911611plb.0
+ for <qemu-devel@nongnu.org>; Thu, 14 Nov 2019 22:09:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=LVqzV8tLnk+0CWhsZn8dhcU+MYaathjQ0Eug+EgFAcQ=;
+ b=Rg5bxtpIuWh0laJscM3MEGgO5D/mYa/5ssQTDfJo2wNaDth5lS5hra6gpzB80k5IgK
+ 4/pKozrFqmwuJUrdHPxPmSPeHwQNHxCl5vE6KfK/gJ1uGZ3LEq7ayr/fxkI9iI/Hyazv
+ Pz+2VvtTdWug0EcITPiOpsLV0OJt0GziqAxSaEv5B0ORtlNjrcV3djD5XnBoJZTQjeWp
+ otx3m+OMpdNo58FoX5UZjdaRj0RdaVxJIwr0eskaSH37nLkZauC7qG1o2DkNjhsdbSJA
+ FSoUpTez/d+oBc8UdtifYVaTPbRDCVo/8bye8OTXYWj33oKYhz9lUjB0+pJiLMBDbg7b
+ R32A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=LVqzV8tLnk+0CWhsZn8dhcU+MYaathjQ0Eug+EgFAcQ=;
+ b=IGBbl/zrJofqTC7aCu/S2ydArUDjTSf0kgFqz4EKP5XpgCP5KvV+SVBVjmkoc/SgI4
+ /QjwCCDLKt6xbTApP0IhEHqiCx1Fgi7sLwWk18l2iJ8AmhXQn5ICbg6cOWMvK0d6CkwX
+ Nz0HEwopSSwwjqriiGhcsao6BvdyT3uGPC11E08aIY9mCXmAe03RvIBSvBbM9UwaOrZD
+ Xjb7Ggqay3JjvPhi8qXLvajQ/NQzwM3ygDv+qWJcsdlyQu1aATdLFUteu6m9yOiJJIJo
+ jWD55pX4wHIU6TDQZFa13HZylkV5lvfWIh6/VwXkcOSQTjqwlxKixmF00sWlq5qZd1S/
+ 7OaQ==
+X-Gm-Message-State: APjAAAXU21/VWZigf6QJehhMzpNwRHxJL8/3rt6v9QH9jD6mglSnQeoW
+ S4zjL7wjHfcLVAmxaH953KZc0W/Ot2/xoA==
+X-Google-Smtp-Source: APXvYqzcZHnH4zaTiz88f4Fvl/L4Ps4Ag9Y2J9bpMbUYSHOfHdESSMOiuHQtvtCJFpyOZEIANH239w==
+X-Received: by 2002:a17:90a:ff02:: with SMTP id
+ ce2mr17594828pjb.117.1573798178122; 
+ Thu, 14 Nov 2019 22:09:38 -0800 (PST)
+Received: from localhost.localdomain.com ([209.132.188.80])
+ by smtp.googlemail.com with ESMTPSA id r24sm10644284pgu.36.2019.11.14.22.09.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 14 Nov 2019 22:09:37 -0800 (PST)
+From: Micky Yun Chan <chanmickyyun@gmail.com>
+X-Google-Original-From: Micky Yun Chan <michan@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] Implement backend program convention command for
+ vhost-user-blk
+Date: Fri, 15 Nov 2019 14:09:25 +0800
+Message-Id: <20191115060925.12346-1-michan@redhat.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: tsimpson@quicinc.com
-Date: Thu, 14 Nov 2019 21:51:58 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::643
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,53 +94,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: tsimpson@quicinc.com, alex.bennee@linaro.org, qemu-devel@nongnu.org
+Cc: michan <michan@redhat.com>, Micky Yun Chan <chanmickyyun@gmail.com>,
+ stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTczNzkyNjkxLTM5OC0xLWdp
-dC1zZW5kLWVtYWlsLXRzaW1wc29uQHF1aWNpbmMuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNl
-ZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cg
-Zm9yCm1vcmUgaW5mb3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0hdIE1vZGlmeSB0ZXN0cyB0byB3
-b3JrIHdpdGggY2xhbmcKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDE1NzM3OTI2OTEtMzk4LTEt
-Z2l0LXNlbmQtZW1haWwtdHNpbXBzb25AcXVpY2luYy5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJ
-TiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2Nh
-bCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlz
-dG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKNDBmYTVjMCBNb2RpZnkg
-dGVzdHMgdG8gd29yayB3aXRoIGNsYW5nCgo9PT0gT1VUUFVUIEJFR0lOID09PQpXQVJOSU5HOiBC
-bG9jayBjb21tZW50cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTg6IEZJ
-TEU6IHRlc3RzL3RjZy9tdWx0aWFyY2gvZmxvYXRfaGVscGVycy5jOjI5OgorLyotLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tCgpXQVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgKiBvbiBzdWJzZXF1ZW50IGxp
-bmVzCiMxOTogRklMRTogdGVzdHMvdGNnL211bHRpYXJjaC9mbG9hdF9oZWxwZXJzLmM6MzA6Cisv
-Ki0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0KK3wgVGhlIG1hY3JvIFFFTVVfR05VQ19QUkVSRVEgdGVzdHMg
-Zm9yIG1pbmltdW0gdmVyc2lvbiBvZiB0aGUgR05VIEMgY29tcGlsZXIuCgpXQVJOSU5HOiBCbG9j
-ayBjb21tZW50cyB1c2UgYSB0cmFpbGluZyAqLyBvbiBhIHNlcGFyYXRlIGxpbmUKIzIxOiBGSUxF
-OiB0ZXN0cy90Y2cvbXVsdGlhcmNoL2Zsb2F0X2hlbHBlcnMuYzozMjoKKyotLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tKi8KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBi
-ZSBhdm9pZGVkCiMyMjogRklMRTogdGVzdHMvdGNnL211bHRpYXJjaC9mbG9hdF9oZWxwZXJzLmM6
-MzM6CisjaWYgZGVmaW5lZChfX0dOVUNfXykgJiYgZGVmaW5lZChfX0dOVUNfTUlOT1JfXykKCldB
-Uk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiMz
-NzogRklMRTogdGVzdHMvdGNnL211bHRpYXJjaC9mbG9hdF9oZWxwZXJzLmM6OTM6CisjIGlmIGRl
-ZmluZWQoX19jbGFuZ19fKSB8fCBRRU1VX0dOVUNfUFJFUkVRKDMsIDMpCgpFUlJPUjogVXNlIG9m
-IHZvbGF0aWxlIGlzIHVzdWFsbHkgd3JvbmcsIHBsZWFzZSBhZGQgYSBjb21tZW50CiM1MDogRklM
-RTogdGVzdHMvdGNnL211bHRpYXJjaC9saW51eC10ZXN0LmM6NDg4OgorICAgICAgICAqKHZvbGF0
-aWxlIHVpbnQ4X3QgKikwID0gMDsKCnRvdGFsOiAxIGVycm9ycywgNSB3YXJuaW5ncywgMzMgbGlu
-ZXMgY2hlY2tlZAoKQ29tbWl0IDQwZmE1YzBkN2ExYiAoTW9kaWZ5IHRlc3RzIHRvIHdvcmsgd2l0
-aCBjbGFuZykgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpU
-ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
-bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU3Mzc5MjY5MS0zOTgtMS1naXQtc2VuZC1l
-bWFpbC10c2ltcHNvbkBxdWljaW5jLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2Fn
-ZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8v
-cGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVs
-QHJlZGhhdC5jb20=
+From: michan <michan@redhat.com>
+
+Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
+---
+ contrib/vhost-user-blk/vhost-user-blk.c | 95 +++++++++++++++----------
+ 1 file changed, 57 insertions(+), 38 deletions(-)
+
+diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
+index ae61034656..435ddc46b2 100644
+--- a/contrib/vhost-user-blk/vhost-user-blk.c
++++ b/contrib/vhost-user-blk/vhost-user-blk.c
+@@ -576,70 +576,89 @@ vub_new(char *blk_file)
+     return vdev_blk;
+ }
+ 
++static int opt_fdnum = -1;
++static char *opt_socket_path;
++static char *opt_blk_file;
++static gboolean opt_print_caps;
++static gboolean opt_read_only;
++
++
++static GOptionEntry entries[] = {
++    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
++      "Print capabilities", NULL },
++    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
++      "Use inherited fd socket", "FDNUM" },
++    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
++      "Use UNIX socket path", "PATH" },
++    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
++     "block device or file path", "PATH"},
++    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
++      "Enable read-only", NULL }
++};
++
+ int main(int argc, char **argv)
+-{
+-    int opt;
+-    char *unix_socket = NULL;
+-    char *blk_file = NULL;
+-    bool enable_ro = false;
++{   
+     int lsock = -1, csock = -1;
+     VubDev *vdev_blk = NULL;
++    GError *error = NULL;
++    GOptionContext *context;
+ 
+-    while ((opt = getopt(argc, argv, "b:rs:h")) != -1) {
+-        switch (opt) {
+-        case 'b':
+-            blk_file = g_strdup(optarg);
+-            break;
+-        case 's':
+-            unix_socket = g_strdup(optarg);
+-            break;
+-        case 'r':
+-            enable_ro = true;
+-            break;
+-        case 'h':
+-        default:
+-            printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
+-                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+-            return 0;
+-        }
++    context = g_option_context_new(NULL);
++    g_option_context_add_main_entries(context, entries, NULL);
++    if (!g_option_context_parse(context, &argc, &argv, &error)) {
++        g_printerr("Option parsing failed: %s\n", error->message);
++        exit(EXIT_FAILURE);
++    }
++    if (opt_print_caps) {
++        g_print("{\n");
++        g_print("  \"type\": \"blk\",\n");
++        g_print("  \"features\": [\n");
++        g_print("    \"blk-file\",\n");
++        g_print("    \"read-only\"\n");
++        g_print("  ]\n");
++        g_print("}\n");
++        exit(EXIT_SUCCESS);
+     }
+ 
+-    if (!unix_socket || !blk_file) {
++    if (!opt_blk_file) {
+         printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
+                " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+         return -1;
+     }
+ 
+-    lsock = unix_sock_new(unix_socket);
+-    if (lsock < 0) {
+-        goto err;
++    if (opt_socket_path) {
++        lsock = unix_sock_new(opt_socket_path);
++        if (lsock < 0) {
++           exit(EXIT_FAILURE);
++        }
++    } else {
++        lsock = opt_fdnum;
+     }
+ 
+-    csock = accept(lsock, (void *)0, (void *)0);
++    csock = accept(lsock, NULL, NULL);
+     if (csock < 0) {
+-        fprintf(stderr, "Accept error %s\n", strerror(errno));
+-        goto err;
++        g_printerr("Accept error %s\n", strerror(errno));
++        exit(EXIT_FAILURE);
+     }
+ 
+-    vdev_blk = vub_new(blk_file);
++    vdev_blk = vub_new(opt_blk_file);
+     if (!vdev_blk) {
+-        goto err;
++        exit(EXIT_FAILURE);
+     }
+-    if (enable_ro) {
++    if (opt_read_only) {
+         vdev_blk->enable_ro = true;
+     }
+ 
+     if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
+                   vub_panic_cb, &vub_iface)) {
+-        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
+-        goto err;
++        g_printerr("Failed to initialized libvhost-user-glib\n");
++        exit(EXIT_FAILURE);
+     }
+ 
+     g_main_loop_run(vdev_blk->loop);
++    g_main_loop_unref(vdev_blk->loop);
+ 
+     vug_deinit(&vdev_blk->parent);
+-
+-err:
+     vub_free(vdev_blk);
+     if (csock >= 0) {
+         close(csock);
+@@ -647,8 +666,8 @@ err:
+     if (lsock >= 0) {
+         close(lsock);
+     }
+-    g_free(unix_socket);
+-    g_free(blk_file);
++    g_free(opt_socket_path);
++    g_free(opt_blk_file);
+ 
+     return 0;
+ }
+-- 
+2.21.0
+
 
