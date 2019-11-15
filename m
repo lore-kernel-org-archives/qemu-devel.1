@@ -2,81 +2,85 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7893BC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C8BEC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:26:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4330120730
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:20:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EB7A20730
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:26:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p64ci8sT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4330120730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/0608e6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EB7A20730
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41498 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVeL3-0005pl-Ex
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:20:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50432)
+	id 1iVeQC-0008Uz-L5
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:26:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51732)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iVeFt-0000H8-El
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:15:30 -0500
+ (envelope-from <thuth@redhat.com>) id 1iVeOn-0006x1-Ox
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:24:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iVeFs-0003Wn-05
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:15:28 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:42570)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iVeFr-0003WK-Ry
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:15:27 -0500
-Received: by mail-ot1-x341.google.com with SMTP id b16so8437587otk.9
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 08:15:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=UiU14tuo2Z+Fw3fwdTXdL3cwTjgYED6vsPEkPTAXsNU=;
- b=p64ci8sT6hrRtWG1QUYvLwxorbFnW1571L48ZvA3lPiHDEf2rnDRsRrWGJGH2iYqyO
- sYwhToIwdr3tQ35Ttq8eLzWHLiVhGjhGGWOKu7xuoiJSXAq0gdBArfDaPkoNsJeVxbek
- NeiYrDJRToxg5WCJ69HRC8/zD6zNtG0vPFXh5w49TF++beVFgkLrJIgbQBiPRypBSBt+
- Vf8pnYPx1ajiSrkolCADSf1m2Qx4E+bEjP4NVapAivwfHtmQSRjH7niG/tgQhTS311Yd
- T4E9Vlcy5E9KdVgPNh1h5yITSD0V9rJiHRJcotbQZE1QDO70/lLcKk0wJwzuPS5hDEPB
- K6Lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=UiU14tuo2Z+Fw3fwdTXdL3cwTjgYED6vsPEkPTAXsNU=;
- b=e55vuig0v54lVwQTFFMaxgCqBs+Ql/vEj+iOwaPUHtr+aq40yHUrSmwcCmJdbVTtgd
- GPB/dVV3+9h9ivWZ5m4W9lpT4VVtgOf1dKbGGry3hR98fOThDIeB8K6WyR23RPsFZk8N
- TjEy7jffRIt59X+VSJj1E2qT3m3Q/u0Pk9B158IR8245JiF62Lx2PGj2nb3chnYVzYfF
- 79V9Gq+SDjkmbp93rlch7CoKAwW+ABCx5OJ4pwJkBSRQzRiW40FwwNMRpVyr7pzeEx2L
- oLxDdFm3wi8tKMy1MWw81H3EuAGxUDf5w4q0GQqDXUdUtM7fxMX/s9F/u/eJUNmu6/Mh
- j/1A==
-X-Gm-Message-State: APjAAAVte/huiOBiMjWhY1TgQXflxcYJbGoCubCi+eDl/7Eh6j7zuJ/r
- x+BLP4VtRDgNvIHgiyHMbO3LhGN2B5hgzxMt0RZqrw==
-X-Google-Smtp-Source: APXvYqwUmeKm+p8xsuo+aZV7WnTBtauZLjrYUygKNlB1JQWTDLeD3nGcX48D+8ZbBdBY6gdXAp1/WdQ1RgpurtyvF3c=
-X-Received: by 2002:a9d:7f12:: with SMTP id j18mr10887156otq.221.1573834526578; 
- Fri, 15 Nov 2019 08:15:26 -0800 (PST)
-MIME-Version: 1.0
+ (envelope-from <thuth@redhat.com>) id 1iVeOl-0000Pm-IE
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:24:40 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:52799
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iVeOl-0000PR-EJ
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:24:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573835078;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rVekyxgN4bMiTsZH/4w84/56lmlCAIprnqv5e2wLqAE=;
+ b=R/0608e62GBknF6UB9wipVhJcoVhcnO+XWRr8yDNBcikv2G+N9spLMVqW+0/ttAghcXcGW
+ MQz4We0zRJK9G43Ivo96Ha7irWd67aVqMKmniUBamc35F/hfQ4aaJWx5yCEF2L3SX6LPrd
+ Q54MLvAYcZV2+YIN4F6kDx1hnaAjuSM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-440-6SrWiY4qPBmPr32446gpQA-1; Fri, 15 Nov 2019 11:24:37 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18D291858F1D;
+ Fri, 15 Nov 2019 16:24:36 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-117-84.ams2.redhat.com
+ [10.36.117.84])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BC671036C81;
+ Fri, 15 Nov 2019 16:24:29 +0000 (UTC)
+Subject: Re: [PATCH for-4.2] hw/i386: Fix compiler warning when CONFIG_IDE_ISA
+ is disabled
+To: Peter Maydell <peter.maydell@linaro.org>
 References: <20191115145049.26868-1-thuth@redhat.com>
  <CAFEAcA-EuQVBtr=BCE5sdHo+LMv8XchHUSPM=CgSYxPVryWKZg@mail.gmail.com>
  <273a3123-9eef-c78e-5b83-833a21e3988c@redhat.com>
-In-Reply-To: <273a3123-9eef-c78e-5b83-833a21e3988c@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 15 Nov 2019 16:15:15 +0000
-Message-ID: <CAFEAcA9N+T=M=5-xb3ahRMqD6oxhm5Lx55-1Mtk1vXsRJEomwA@mail.gmail.com>
-Subject: Re: [PATCH for-4.2] hw/i386: Fix compiler warning when CONFIG_IDE_ISA
- is disabled
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+ <CAFEAcA9N+T=M=5-xb3ahRMqD6oxhm5Lx55-1Mtk1vXsRJEomwA@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <85b5fbcc-e06b-7ce2-0a97-7fdc156915cd@redhat.com>
+Date: Fri, 15 Nov 2019 17:12:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9N+T=M=5-xb3ahRMqD6oxhm5Lx55-1Mtk1vXsRJEomwA@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 6SrWiY4qPBmPr32446gpQA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,48 +95,56 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Eduardo Habkost <ehabkost@redhat.com>,
  "Michael S. Tsirkin" <mst@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
  QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 Nov 2019 at 16:08, Thomas Huth <thuth@redhat.com> wrote:
->
-> On 15/11/2019 16.54, Peter Maydell wrote:
-> > On Fri, 15 Nov 2019 at 15:10, Thomas Huth <thuth@redhat.com> wrote:
-> >> --- a/hw/i386/pc_piix.c
-> >> +++ b/hw/i386/pc_piix.c
-> >> @@ -78,7 +78,6 @@ static void pc_init1(MachineState *machine,
-> >>      X86MachineState *x86ms = X86_MACHINE(machine);
-> >>      MemoryRegion *system_memory = get_system_memory();
-> >>      MemoryRegion *system_io = get_system_io();
-> >> -    int i;
-> >>      PCIBus *pci_bus;
-> >>      ISABus *isa_bus;
-> >>      PCII440FXState *i440fx_state;
-> >> @@ -253,7 +252,7 @@ static void pc_init1(MachineState *machine,
-> >>      }
-> >>  #ifdef CONFIG_IDE_ISA
-> >>  else {
-> >> -        for(i = 0; i < MAX_IDE_BUS; i++) {
-> >> +        for (int i = 0; i < MAX_IDE_BUS; i++) {
-> >>              ISADevice *dev;
-> >>              char busname[] = "ide.0";
-> >>              dev = isa_ide_init(isa_bus, ide_iobase[i], ide_iobase2[i],
-> >
-> > Don't put variable declarations inside 'for' statements,
-> > please. They should go at the start of a {} block.
->
-> Why? We're using -std=gnu99 now, so this should not be an issue anymore.
+On 15/11/2019 17.15, Peter Maydell wrote:
+> On Fri, 15 Nov 2019 at 16:08, Thomas Huth <thuth@redhat.com> wrote:
+>>
+>> On 15/11/2019 16.54, Peter Maydell wrote:
+>>> On Fri, 15 Nov 2019 at 15:10, Thomas Huth <thuth@redhat.com> wrote:
+>>>> --- a/hw/i386/pc_piix.c
+>>>> +++ b/hw/i386/pc_piix.c
+>>>> @@ -78,7 +78,6 @@ static void pc_init1(MachineState *machine,
+>>>>      X86MachineState *x86ms =3D X86_MACHINE(machine);
+>>>>      MemoryRegion *system_memory =3D get_system_memory();
+>>>>      MemoryRegion *system_io =3D get_system_io();
+>>>> -    int i;
+>>>>      PCIBus *pci_bus;
+>>>>      ISABus *isa_bus;
+>>>>      PCII440FXState *i440fx_state;
+>>>> @@ -253,7 +252,7 @@ static void pc_init1(MachineState *machine,
+>>>>      }
+>>>>  #ifdef CONFIG_IDE_ISA
+>>>>  else {
+>>>> -        for(i =3D 0; i < MAX_IDE_BUS; i++) {
+>>>> +        for (int i =3D 0; i < MAX_IDE_BUS; i++) {
+>>>>              ISADevice *dev;
+>>>>              char busname[] =3D "ide.0";
+>>>>              dev =3D isa_ide_init(isa_bus, ide_iobase[i], ide_iobase2[=
+i],
+>>>
+>>> Don't put variable declarations inside 'for' statements,
+>>> please. They should go at the start of a {} block.
+>>
+>> Why? We're using -std=3Dgnu99 now, so this should not be an issue anymor=
+e.
+>=20
+> Consistency with the rest of the code base, which mostly
+> avoids this particular trick.
 
-Consistency with the rest of the code base, which mostly
-avoids this particular trick. See the 'Declarations' section
-of CODING_STYLE.rst.
+We've also got a few spots that use it...
+(run e.g.: grep -r 'for (int ' hw/* )
 
-As Paolo points out, there's a nice convenient block
-here already, so there's not much to be gained from
-putting the declaration in the middle of the for statement.
+> See the 'Declarations' section of CODING_STYLE.rst.
 
-thanks
--- PMM
+OK, that's a point. But since this gnu99 is a rather new option that we
+just introduced less than a year ago, we should maybe think of whether
+we want to allow this for for-loops now, too (since IMHO it's quite a
+nice feature in gnu99).
+
+ Thomas
+
 
