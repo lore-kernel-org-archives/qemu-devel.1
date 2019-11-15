@@ -2,72 +2,78 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1FBBC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 18:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 470FEC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 18:13:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97CF62073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 18:13:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97CF62073A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 1644C2073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 18:13:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hIH1PqxV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1644C2073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVg5s-0005a3-Ot
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 13:13:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45966)
+	id 1iVg5y-0005hi-5k
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 13:13:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45755)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iVg3T-0003Ao-L8
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 13:10:48 -0500
+ (envelope-from <wainersm@redhat.com>) id 1iVg1S-0000av-V0
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 13:08:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iVg3S-0005Dn-8J
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 13:10:47 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51026)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iVg3S-0005DI-1v
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 13:10:46 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iVg3Q-0003uB-NA
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 18:10:44 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A76EF2E80C0
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 18:10:44 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Nov 2019 18:00:47 -0000
-From: Colin Ian King <1852781@bugs.launchpad.net>
+ (envelope-from <wainersm@redhat.com>) id 1iVg1R-00022N-BO
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 13:08:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21017
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <wainersm@redhat.com>) id 1iVg1R-00021i-6k
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 13:08:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573841320;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=yRrqDu5FThD9Ne62Ck5Qnx/6kWisiS5hV1UUaSebfFM=;
+ b=hIH1PqxVsWH2+3b1Trn0YVzUxnhTC2yzh9wsAzP7lgWnp2jkaTDUBhLXnClyCawCkD3OF6
+ eTEFXyWjtFXdZ3wwIzjXF4i/Dd0pA/nLYOdq68LqktmWJFRd1ryMGAay4g5MzWf6B8qpPu
+ JqXsBY8xH00Rw9GJvwPdVoOEQgjfFlI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-17-98HIxdaJOxuiUEBnxTYagQ-1; Fri, 15 Nov 2019 13:08:38 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4546718B5F6A;
+ Fri, 15 Nov 2019 18:08:36 +0000 (UTC)
+Received: from virtlab501.virt.lab.eng.bos.redhat.com
+ (virtlab501.virt.lab.eng.bos.redhat.com [10.19.152.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0134E60490;
+ Fri, 15 Nov 2019 18:08:29 +0000 (UTC)
+From: Wainer dos Santos Moschetta <wainersm@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: colin-king
-X-Launchpad-Bug-Reporter: Colin Ian King (colin-king)
-X-Launchpad-Bug-Modifier: Colin Ian King (colin-king)
-Message-Id: <157384084797.7162.9983011521410421204.malonedeb@gac.canonical.com>
-Subject: [Bug 1852781] [NEW] qemu s390x on focal - applications breaking
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: a8581d662ee900ac544fccf35130bcca67cc4125
+Subject: [PATCH 0/4] python/qemu: New accel module and improvements
+Date: Fri, 15 Nov 2019 13:08:25 -0500
+Message-Id: <20191115180829.10275-1-wainersm@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: 98HIxdaJOxuiUEBnxTYagQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,106 +82,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1852781 <1852781@bugs.launchpad.net>
+Cc: fam@euphon.net, ehabkost@redhat.com, philmd@redhat.com, jsnow@redhat.com,
+ crosa@redhat.com, alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On commit abf0bf998dcb John Snow moved some code out of __init__.py
+to machine.py. kvm_available() remained in though. So on patch 01
+I continue his work by creating a home for that method (the new
+'accel' module). Honestly I was unsure about whether move the code
+to any existing module or make a new, but since I am adding more
+methods related with accelerators then I thought they would=20
+deserve a module.
 
-Running qemu-system-s390x (1:4.0+dfsg-0ubuntu10) on an x86-64 Focal host
-with an upgrade of a Eoan s390x VM to a Focal s390x is triggering random
-breakage, for example:
+The patches 02-04 introduce new helpers and make improvements. Later
+I intend to use those methods on the acceptance tests such as
+to automatically set the accelerator in QEMUMachine VM via Avocado
+tags, and skip the test if the accelerator is not available.
 
-sudo apt-get update && sudo apt-get dist-upgrade
+Git:
+ - Tree: https://github.com/wainersm/qemu
+ - Branch: python_accel
 
-...
-...
+CI:
+ - Travis (FAIL): https://travis-ci.org/wainersm/qemu/builds/612382935
+   Non-related fail due build timeout
 
-Unpacking debianutils (4.9) over (4.8.6.3) ...
-Setting up debianutils (4.9) ...
-Use of uninitialized value $ARGV[0] in string ne at /usr/sbin/update-mime l=
-ine 43.
-(Reading database ... 83640 files and directories currently installed.)
-Preparing to unpack .../bash_5.0-5ubuntu1_s390x.deb ...
-Unpacking bash (5.0-5ubuntu1) over (5.0-4ubuntu1) ...
-Setting up bash (5.0-5ubuntu1) ...
-[12124.788618] User process fault: interruption code 0007 ilc:3 in bash[2aa=
-3d780000+149000]
-dpkg: error processing package bash (--configure):
- installed bash package post-installation script subprocess was killed by s=
-ignal (Floating point exception), core du
-mped
-Errors were encountered while processing:
- bash
-E: Sub-process /usr/bin/dpkg returned an error code (1)
+Wainer dos Santos Moschetta (4):
+  python/qemu: Move kvm_available() to its own module
+  python/qemu: accel: Add list_accel() method
+  python/qemu: accel: Strengthen kvm_available() checks
+  python/qemu: accel: Add tcg_available() method
 
-And now bash is completely broken:
+ python/qemu/__init__.py | 20 +----------
+ python/qemu/accel.py    | 79 +++++++++++++++++++++++++++++++++++++++++
+ tests/vm/basevm.py      |  2 +-
+ 3 files changed, 81 insertions(+), 20 deletions(-)
+ create mode 100644 python/qemu/accel.py
 
-cking@eoan-s390x:~$ bash
-[12676.204389] User process fault: interruption code 0007 ilc:3 in bash[2aa=
-14780000+149000]
+--=20
+2.18.1
 
-Floating point exception (core dumped)
-
-The upgrade works OK on a s390x, so I'm assuming it's something to do
-with the qemu emulation.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1852781
-
-Title:
-  qemu s390x on focal - applications breaking
-
-Status in QEMU:
-  New
-
-Bug description:
-  Running qemu-system-s390x (1:4.0+dfsg-0ubuntu10) on an x86-64 Focal
-  host with an upgrade of a Eoan s390x VM to a Focal s390x is triggering
-  random breakage, for example:
-
-  sudo apt-get update && sudo apt-get dist-upgrade
-
-  ...
-  ...
-
-  Unpacking debianutils (4.9) over (4.8.6.3) ...
-  Setting up debianutils (4.9) ...
-  Use of uninitialized value $ARGV[0] in string ne at /usr/sbin/update-mime=
- line 43.
-  (Reading database ... 83640 files and directories currently installed.)
-  Preparing to unpack .../bash_5.0-5ubuntu1_s390x.deb ...
-  Unpacking bash (5.0-5ubuntu1) over (5.0-4ubuntu1) ...
-  Setting up bash (5.0-5ubuntu1) ...
-  [12124.788618] User process fault: interruption code 0007 ilc:3 in bash[2=
-aa3d780000+149000]
-  dpkg: error processing package bash (--configure):
-   installed bash package post-installation script subprocess was killed by=
- signal (Floating point exception), core du
-  mped
-  Errors were encountered while processing:
-   bash
-  E: Sub-process /usr/bin/dpkg returned an error code (1)
-
-  And now bash is completely broken:
-
-  cking@eoan-s390x:~$ bash
-  [12676.204389] User process fault: interruption code 0007 ilc:3 in bash[2=
-aa14780000+149000]
-
-  Floating point exception (core dumped)
-
-  The upgrade works OK on a s390x, so I'm assuming it's something to do
-  with the qemu emulation.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1852781/+subscriptions
 
