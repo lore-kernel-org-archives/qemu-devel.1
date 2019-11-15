@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B07A8C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:26:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4145BC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:27:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 895D82073A
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:26:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 895D82073A
+	by mail.kernel.org (Postfix) with ESMTPS id 1777E2073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:27:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1777E2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39896 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVcYd-0000Dc-6p
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:26:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59007)
+	id 1iVcZN-000184-Or
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:27:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59006)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNK-0004dL-RA
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNK-0004dJ-Qq
  for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNJ-0001xb-Jy
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNJ-0001xg-KQ
  for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:02 -0500
-Received: from relay.sw.ru ([185.231.240.75]:47422)
+Received: from relay.sw.ru ([185.231.240.75]:47410)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcNG-0001ro-Iz; Fri, 15 Nov 2019 09:14:58 -0500
+ id 1iVcNG-0001rv-IL; Fri, 15 Nov 2019 09:14:58 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcN4-0006WW-Sp; Fri, 15 Nov 2019 17:14:46 +0300
+ id 1iVcNC-0006WW-5k; Fri, 15 Nov 2019 17:14:54 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [RFC 09/24] block/block-copy: alloc task on each iteration
-Date: Fri, 15 Nov 2019 17:14:29 +0300
-Message-Id: <20191115141444.24155-10-vsementsov@virtuozzo.com>
+Subject: [RFC 18/24] block/block-copy: add block_copy_cancel
+Date: Fri, 15 Nov 2019 17:14:38 +0300
+Message-Id: <20191115141444.24155-19-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191115141444.24155-1-vsementsov@virtuozzo.com>
 References: <20191115141444.24155-1-vsementsov@virtuozzo.com>
@@ -67,76 +67,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to use aio-task-pool API, so tasks will be handled in
-parallel. We need therefore separate allocated task on each iteration.
-Introduce this logic now.
+Add function to cancel running async block-copy call. It will be used
+in backup.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/block-copy.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ include/block/block-copy.h |  7 +++++++
+ block/block-copy.c         | 20 ++++++++++++++++++--
+ 2 files changed, 25 insertions(+), 2 deletions(-)
 
+diff --git a/include/block/block-copy.h b/include/block/block-copy.h
+index 3f9cdc5eb2..fbbee094e6 100644
+--- a/include/block/block-copy.h
++++ b/include/block/block-copy.h
+@@ -67,6 +67,13 @@ BlockCopyCallState *block_copy_async(BlockCopyState *s,
+ void block_copy_set_speed(BlockCopyState *s, BlockCopyCallState *call_state,
+                           uint64_t speed);
+ 
++/*
++ * Cancel running block-copy call.
++ * Cancel leaves block-copy state valid: dirty bits are correct and you may use
++ * cancel + <run block_copy with same parameters> to emulate pause/resume.
++ */
++void block_copy_cancel(BlockCopyCallState *call_state);
++
+ BdrvDirtyBitmap *block_copy_dirty_bitmap(BlockCopyState *s);
+ void block_copy_set_skip_unallocated(BlockCopyState *s, bool skip);
+ 
 diff --git a/block/block-copy.c b/block/block-copy.c
-index b00cbfc841..956b4b55e7 100644
+index 091bc044de..d11c744320 100644
 --- a/block/block-copy.c
 +++ b/block/block-copy.c
-@@ -111,9 +111,11 @@ static bool coroutine_fn block_copy_wait_one(BlockCopyState *s, int64_t start,
- }
+@@ -42,6 +42,8 @@ typedef struct BlockCopyCallState {
+     bool failed;
+     bool finished;
+     QemuCoSleepState *sleep_state;
++    bool cancelled;
++    Coroutine *canceller;
  
- /* Called only on full-dirty region */
--static void block_copy_task_begin(BlockCopyState *s, BlockCopyTask *task,
--                                  int64_t offset, int64_t bytes)
-+static BlockCopyTask *block_copy_task_create(BlockCopyState *s,
-+                                             int64_t offset, int64_t bytes)
- {
-+    BlockCopyTask *task = g_new(BlockCopyTask, 1);
-+
-     assert(!block_copy_find_task(s, offset, bytes));
- 
-     bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
-@@ -122,6 +124,8 @@ static void block_copy_task_begin(BlockCopyState *s, BlockCopyTask *task,
-     task->bytes = bytes;
-     qemu_co_queue_init(&task->wait_queue);
-     QLIST_INSERT_HEAD(&s->tasks, task, list);
-+
-+    return task;
- }
- 
- static void coroutine_fn block_copy_task_shrink(BlockCopyState *s,
-@@ -454,7 +458,7 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
+     /* OUT parameters */
+     bool error_is_read;
+@@ -553,7 +555,7 @@ block_copy_dirty_clusters(BlockCopyCallState *call_state)
+     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
      assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
  
-     while (bytes) {
--        BlockCopyTask task;
-+        g_autofree BlockCopyTask *task = NULL;
-         int64_t next_zero, cur_bytes, status_bytes;
+-    while (bytes && aio_task_pool_status(aio) == 0) {
++    while (bytes && aio_task_pool_status(aio) == 0 && !call_state->cancelled) {
+         BlockCopyTask *task;
+         int64_t status_bytes;
  
-         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, offset)) {
-@@ -475,12 +479,12 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
-             assert(next_zero < offset + cur_bytes); /* no need to do MIN() */
-             cur_bytes = next_zero - offset;
-         }
--        block_copy_task_begin(s, &task, offset, cur_bytes);
-+        task = block_copy_task_create(s, offset, cur_bytes);
+@@ -639,7 +641,7 @@ static int coroutine_fn block_copy_common(BlockCopyCallState *call_state)
+     while (true) {
+         ret = block_copy_dirty_clusters(call_state);
  
-         ret = block_copy_block_status(s, offset, cur_bytes, &status_bytes);
--        block_copy_task_shrink(s, &task, status_bytes);
-+        block_copy_task_shrink(s, task, status_bytes);
-         if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
--            block_copy_task_end(s, &task, 0);
-+            block_copy_task_end(s, task, 0);
-             s->progress_reset_callback(s->progress_opaque);
-             trace_block_copy_skip_range(s, offset, status_bytes);
-             offset += status_bytes;
-@@ -496,7 +500,7 @@ static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
-         ret = block_copy_do_copy(s, offset, cur_bytes, ret & BDRV_BLOCK_ZERO,
-                                  error_is_read);
-         co_put_to_shres(s->mem, cur_bytes);
--        block_copy_task_end(s, &task, ret);
-+        block_copy_task_end(s, task, ret);
-         if (ret < 0) {
-             return ret;
-         }
+-        if (ret < 0) {
++        if (ret < 0 || call_state->cancelled) {
+             /*
+              * IO operation failed, which means the whole block_copy request
+              * failed.
+@@ -673,6 +675,11 @@ static int coroutine_fn block_copy_common(BlockCopyCallState *call_state)
+                        call_state->s->progress_opaque);
+     }
+ 
++    if (call_state->canceller) {
++        aio_co_wake(call_state->canceller);
++        call_state->canceller = NULL;
++    }
++
+     call_state->finished = true;
+ 
+     return ret;
+@@ -731,6 +738,15 @@ BlockCopyCallState *block_copy_async(BlockCopyState *s,
+ 
+     return call_state;
+ }
++
++void block_copy_cancel(BlockCopyCallState *call_state)
++{
++    call_state->cancelled = true;
++    call_state->canceller = qemu_coroutine_self();
++    block_copy_kick(call_state);
++    qemu_coroutine_yield();
++}
++
+ BdrvDirtyBitmap *block_copy_dirty_bitmap(BlockCopyState *s)
+ {
+     return s->copy_bitmap;
 -- 
 2.21.0
 
