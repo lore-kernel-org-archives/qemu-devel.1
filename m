@@ -2,83 +2,62 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD0CC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E134C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:56:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 39A8720730
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:55:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZCWACbD9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39A8720730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E38C220730
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:56:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E38C220730
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVesS-0008VK-VH
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:55:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54994)
+	id 1iVetW-0001ss-83
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:56:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52704)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iVeeN-0000vM-PI
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:40:48 -0500
+ (envelope-from <clg@kaod.org>) id 1iVeQq-0001hU-2d
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iVeeM-0001c3-HK
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:40:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42336
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iVeQo-0001Lh-Pz
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:47 -0500
+Received: from 6.mo173.mail-out.ovh.net ([46.105.43.93]:36347)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iVeeM-0001bA-Do
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:40:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1573836045;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=bsa92Q1oLaeg2Ly1mFURdZAQKOoOIkCvfQlosZkOli0=;
- b=ZCWACbD9CypUmtY60BtEkCrhE5/lHD0ksQeNW0bHqNh0s6HLv5sq+jk6g6M7H14iH77/VY
- kQ04SbSnzYbCnzq7kG/VsRnCrpTPL+gKB/ZolmAc6UlCJOm0KVWOAHCECLkt5oM5U8AhcE
- T7k1riWa2cAEqJK5tPz+A4qTxUwqwMQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-DuPW1Eg4MKa6C2ePq5XJbw-1; Fri, 15 Nov 2019 11:40:42 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CFC748034E0
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 16:40:40 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-84.ams2.redhat.com
- [10.36.117.84])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 604C96055E;
- Fri, 15 Nov 2019 16:40:36 +0000 (UTC)
-Subject: Re: [qemu-web PATCH v3] Add a blog post on "Micro-Optimizing KVM
- VM-Exits"
-To: Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org
-References: <20191115162441.27302-1-kchamart@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <cc5b77d2-e152-c87b-a84c-38212c1e5811@redhat.com>
-Date: Fri, 15 Nov 2019 17:29:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVeQo-0001KB-3G
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:46 -0500
+Received: from player787.ha.ovh.net (unknown [10.109.143.210])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id AA3C111DAB6
+ for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:26:44 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player787.ha.ovh.net (Postfix) with ESMTPSA id 3BED8C444E7D;
+ Fri, 15 Nov 2019 16:26:39 +0000 (UTC)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: [PATCH for-5.0 v5 21/23] ppc/xive: Synthesize interrupt from the
+ saved IPB in the NVT
+Date: Fri, 15 Nov 2019 17:24:34 +0100
+Message-Id: <20191115162436.30548-22-clg@kaod.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191115162436.30548-1-clg@kaod.org>
+References: <20191115162436.30548-1-clg@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20191115162441.27302-1-kchamart@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: DuPW1Eg4MKa6C2ePq5XJbw-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
+X-Ovh-Tracer-Id: 15115206252426333158
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeef
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.105.43.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,20 +69,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aarcange@redhat.com, dgilbert@redhat.com, rjones@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, vkuznets@redhat.com
+Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/11/2019 17.24, Kashyap Chamarthy wrote:
-> This blog post summarizes the talk "Micro-Optimizing KVM VM-Exits"[1],
-> given by Andrea Arcangeli at the recently concluded KVM Forum 2019.
+When a vCPU is dispatched on a HW thread, its context is pushed in the
+thread registers and it is activated by setting the VO bit in the CAM
+line word2. The HW grabs the associated NVT, pulls the IPB bits and
+merges them with the IPB of the new context. If interrupts were missed
+while the vCPU was not dispatched, these are synthesized in this
+sequence.
 
-Thanks, pushed now:
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/intc/xive.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
-https://www.qemu.org/2019/11/15/micro-optimizing-kvm-vmexits/
-
- Thomas
+diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+index 840ab2a555e1..ce904b0b5ab4 100644
+--- a/hw/intc/xive.c
++++ b/hw/intc/xive.c
+@@ -393,6 +393,57 @@ static uint64_t xive_tm_pull_os_ctx(XivePresenter *x=
+ptr, XiveTCTX *tctx,
+     return qw1w2;
+ }
+=20
++static void xive_tctx_need_resend(XiveRouter *xrtr, XiveTCTX *tctx,
++                                  uint8_t nvt_blk, uint32_t nvt_idx)
++{
++    XiveNVT nvt;
++    uint8_t ipb;
++
++    /*
++     * Grab the associated NVT to pull the pending bits, and merge
++     * them with the IPB of the thread interrupt context registers
++     */
++    if (xive_router_get_nvt(xrtr, nvt_blk, nvt_idx, &nvt)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid NVT %x/%x\n",
++                          nvt_blk, nvt_idx);
++        return;
++    }
++
++    ipb =3D xive_get_field32(NVT_W4_IPB, nvt.w4);
++
++    if (ipb) {
++        /* Reset the NVT value */
++        nvt.w4 =3D xive_set_field32(NVT_W4_IPB, nvt.w4, 0);
++        xive_router_write_nvt(xrtr, nvt_blk, nvt_idx, &nvt, 4);
++
++        /* Merge in current context */
++        xive_tctx_ipb_update(tctx, TM_QW1_OS, ipb);
++    }
++}
++
++/*
++ * Updating the OS CAM line can trigger a resend of interrupt
++ */
++static void xive_tm_push_os_ctx(XivePresenter *xptr, XiveTCTX *tctx,
++                                hwaddr offset, uint64_t value, unsigned =
+size)
++{
++    uint32_t cam =3D value;
++    uint32_t qw1w2 =3D cpu_to_be32(cam);
++    uint8_t nvt_blk;
++    uint32_t nvt_idx;
++    bool vo;
++
++    xive_os_cam_decode(cam, &nvt_blk, &nvt_idx, &vo);
++
++    /* First update the registers */
++    xive_tctx_set_os_cam(tctx, qw1w2);
++
++    /* Check the interrupt pending bits */
++    if (vo) {
++        xive_tctx_need_resend(XIVE_ROUTER(xptr), tctx, nvt_blk, nvt_idx)=
+;
++    }
++}
++
+ /*
+  * Define a mapping of "special" operations depending on the TIMA page
+  * offset and the size of the operation.
+@@ -414,6 +465,7 @@ static const XiveTmOp xive_tm_operations[] =3D {
+      * effects
+      */
+     { XIVE_TM_OS_PAGE, TM_QW1_OS + TM_CPPR,   1, xive_tm_set_os_cppr, NU=
+LL },
++    { XIVE_TM_HV_PAGE, TM_QW1_OS + TM_WORD2,     4, xive_tm_push_os_ctx,=
+ NULL },
+     { XIVE_TM_HV_PAGE, TM_QW3_HV_PHYS + TM_CPPR, 1, xive_tm_set_hv_cppr,=
+ NULL },
+     { XIVE_TM_HV_PAGE, TM_QW3_HV_PHYS + TM_WORD2, 1, xive_tm_vt_push, NU=
+LL },
+     { XIVE_TM_HV_PAGE, TM_QW3_HV_PHYS + TM_WORD2, 1, NULL, xive_tm_vt_po=
+ll },
+--=20
+2.21.0
 
 
