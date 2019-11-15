@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 634C9C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:25:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 604B1C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:26:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 042762072D
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:25:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 042762072D
+	by mail.kernel.org (Postfix) with ESMTPS id 362022073A
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:26:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 362022073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVcXs-0007Wt-Jh
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:25:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59501)
+	id 1iVcYa-00009n-UZ
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:26:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59347)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcO9-0005kp-Ts
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:16:04 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNj-0005B5-Le
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNz-0002U8-Oc
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:53 -0500
-Received: from relay.sw.ru ([185.231.240.75]:47554)
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNe-0002Cr-WB
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:27 -0500
+Received: from relay.sw.ru ([185.231.240.75]:47472)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcNd-0001wS-FB; Fri, 15 Nov 2019 09:15:22 -0500
+ id 1iVcNb-0001t5-18; Fri, 15 Nov 2019 09:15:19 -0500
 Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
  by relay.sw.ru with esmtp (Exim 4.92.3)
  (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcNC-0006WW-RY; Fri, 15 Nov 2019 17:14:55 +0300
+ id 1iVcN4-0006WW-EH; Fri, 15 Nov 2019 17:14:46 +0300
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
-Subject: [RFC 21/24] backup: move to block-copy
-Date: Fri, 15 Nov 2019 17:14:41 +0300
-Message-Id: <20191115141444.24155-22-vsementsov@virtuozzo.com>
+Subject: [RFC 05/24] block/block-copy: rename start to offset in interfaces
+Date: Fri, 15 Nov 2019 17:14:25 +0300
+Message-Id: <20191115141444.24155-6-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191115141444.24155-1-vsementsov@virtuozzo.com>
 References: <20191115141444.24155-1-vsementsov@virtuozzo.com>
@@ -67,1579 +67,230 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This brings async request handling and block-status driven chunk sizes
-to backup out of the box, which improves backup performance.
+offset/bytes pair is more usual naming in block layer, let's use it.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- qapi/block-core.json       |   9 +-
- include/block/block_int.h  |   7 +
- block/backup.c             | 159 +++++++++++--------
- block/replication.c        |   1 +
- blockdev.c                 |   5 +
- tests/qemu-iotests/129     |   3 +-
- tests/qemu-iotests/185     |   3 +-
- tests/qemu-iotests/219     |   1 +
- tests/qemu-iotests/257     |   1 +
- tests/qemu-iotests/257.out | 306 ++++++++++++++++++-------------------
- 10 files changed, 276 insertions(+), 219 deletions(-)
+ include/block/block-copy.h |  2 +-
+ block/block-copy.c         | 80 +++++++++++++++++++-------------------
+ 2 files changed, 41 insertions(+), 41 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index aa97ee2641..065098007f 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1455,6 +1455,12 @@
- #                    above node specified by @drive. If this option is not given,
- #                    a node name is autogenerated. (Since: 4.2)
- #
-+# @x-max-workers: maximum of parallel requests for static data backup. This
-+#                 doesn't influence copy-before-write operations. (Since: 4.3)
-+#
-+# @x-max-chunk: maximum chunk length for static data backup. This doesn't
-+#               influence copy-before-write operations. (Since: 4.3)
-+#
- # Note: @on-source-error and @on-target-error only affect background
- # I/O.  If an error occurs during a guest write request, the device's
- # rerror/werror actions will be used.
-@@ -1469,7 +1475,8 @@
-             '*on-source-error': 'BlockdevOnError',
-             '*on-target-error': 'BlockdevOnError',
-             '*auto-finalize': 'bool', '*auto-dismiss': 'bool',
--            '*filter-node-name': 'str' } }
-+            '*filter-node-name': 'str', '*x-max-workers': 'int',
-+            '*x-max-chunk': 'int64' } }
+diff --git a/include/block/block-copy.h b/include/block/block-copy.h
+index 7321b3d305..d96b097267 100644
+--- a/include/block/block-copy.h
++++ b/include/block/block-copy.h
+@@ -19,7 +19,7 @@
+ #include "qemu/co-shared-resource.h"
  
- ##
- # @DriveBackup:
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index dd033d0b37..55772f1591 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1193,6 +1193,11 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-  * @sync_mode: What parts of the disk image should be copied to the destination.
-  * @sync_bitmap: The dirty bitmap if sync_mode is 'bitmap' or 'incremental'
-  * @bitmap_mode: The bitmap synchronization policy to use.
-+ * @max_workers: The limit for parallel requests for main backup loop.
-+ *               Must be >= 1.
-+ * @max_chunk: The limit for one IO operation length in main backup loop.
-+ *             Must be not less than job cluster size or zero. Zero means no
-+ *             specific limit.
-  * @on_source_error: The action to take upon error reading from the source.
-  * @on_target_error: The action to take upon error writing to the target.
-  * @creation_flags: Flags that control the behavior of the Job lifetime.
-@@ -1211,6 +1216,8 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-                             BitmapSyncMode bitmap_mode,
-                             bool compress,
-                             const char *filter_node_name,
-+                            int max_workers,
-+                            int64_t max_chunk,
-                             BlockdevOnError on_source_error,
-                             BlockdevOnError on_target_error,
-                             int creation_flags,
-diff --git a/block/backup.c b/block/backup.c
-index acab0d08da..606e4d8725 100644
---- a/block/backup.c
-+++ b/block/backup.c
-@@ -44,11 +44,16 @@ typedef struct BackupBlockJob {
-     BlockdevOnError on_source_error;
-     BlockdevOnError on_target_error;
-     uint64_t len;
--    uint64_t bytes_read;
-     int64_t cluster_size;
-+    int max_workers;
-+    int64_t max_chunk;
+ typedef struct BlockCopyInFlightReq {
+-    int64_t start;
++    int64_t offset;
+     int64_t bytes;
+     QLIST_ENTRY(BlockCopyInFlightReq) list;
+     CoQueue wait_queue; /* coroutines blocked on this request */
+diff --git a/block/block-copy.c b/block/block-copy.c
+index cc273b6cb8..20068cd699 100644
+--- a/block/block-copy.c
++++ b/block/block-copy.c
+@@ -25,13 +25,13 @@
+ #define BLOCK_COPY_MAX_MEM (128 * MiB)
  
-     BlockCopyState *bcs;
-     BdrvDirtyBitmap *bcs_bitmap;
-+
-+    BlockCopyCallState *bcs_call;
-+    int ret;
-+    bool error_is_read;
- } BackupBlockJob;
- 
- static const BlockJobDriver backup_job_driver;
-@@ -57,7 +62,6 @@ static void backup_progress_bytes_callback(int64_t bytes, void *opaque)
+ static BlockCopyInFlightReq *block_copy_find_inflight_req(BlockCopyState *s,
+-                                                          int64_t start,
++                                                          int64_t offset,
+                                                           int64_t bytes)
  {
-     BackupBlockJob *s = opaque;
+     BlockCopyInFlightReq *req;
  
--    s->bytes_read += bytes;
-     job_progress_update(&s->common.job, bytes);
+     QLIST_FOREACH(req, &s->inflight_reqs, list) {
+-        if (start + bytes > req->start && start < req->start + req->bytes) {
++        if (offset + bytes > req->offset && offset < req->offset + req->bytes) {
+             return req;
+         }
+     }
+@@ -40,21 +40,21 @@ static BlockCopyInFlightReq *block_copy_find_inflight_req(BlockCopyState *s,
  }
  
-@@ -69,25 +73,6 @@ static void backup_progress_reset_callback(void *opaque)
-     job_progress_set_remaining(&s->common.job, estimate);
- }
- 
--static int coroutine_fn backup_do_cow(BackupBlockJob *job,
--                                      int64_t offset, uint64_t bytes,
--                                      bool *error_is_read)
--{
--    int ret = 0;
--    int64_t start, end; /* bytes */
--
--    start = QEMU_ALIGN_DOWN(offset, job->cluster_size);
--    end = QEMU_ALIGN_UP(bytes + offset, job->cluster_size);
--
--    trace_backup_do_cow_enter(job, start, offset, bytes);
--
--    ret = block_copy(job->bcs, start, end - start, error_is_read);
--
--    trace_backup_do_cow_return(job, offset, bytes, ret);
--
--    return ret;
--}
--
- static void backup_cleanup_sync_bitmap(BackupBlockJob *job, int ret)
+ static void coroutine_fn block_copy_wait_inflight_reqs(BlockCopyState *s,
+-                                                       int64_t start,
++                                                       int64_t offset,
+                                                        int64_t bytes)
  {
-     BdrvDirtyBitmap *bm;
-@@ -166,54 +151,58 @@ static BlockErrorAction backup_error_action(BackupBlockJob *job,
+     BlockCopyInFlightReq *req;
+ 
+-    while ((req = block_copy_find_inflight_req(s, start, bytes))) {
++    while ((req = block_copy_find_inflight_req(s, offset, bytes))) {
+         qemu_co_queue_wait(&req->wait_queue, NULL);
      }
  }
  
--static bool coroutine_fn yield_and_check(BackupBlockJob *job)
-+static void coroutine_fn backup_block_copy_callback(int ret, bool error_is_read,
-+                                                    void *opaque)
+ static void block_copy_inflight_req_begin(BlockCopyState *s,
+                                           BlockCopyInFlightReq *req,
+-                                          int64_t start, int64_t bytes)
++                                          int64_t offset, int64_t bytes)
  {
--    uint64_t delay_ns;
--
--    if (job_is_cancelled(&job->common.job)) {
--        return true;
--    }
--
--    /*
--     * We need to yield even for delay_ns = 0 so that bdrv_drain_all() can
--     * return. Without a yield, the VM would not reboot.
--     */
--    delay_ns = block_job_ratelimit_get_delay(&job->common, job->bytes_read);
--    job->bytes_read = 0;
--    job_sleep_ns(&job->common.job, delay_ns);
--
--    if (job_is_cancelled(&job->common.job)) {
--        return true;
--    }
-+    BackupBlockJob *s = opaque;
- 
--    return false;
-+    s->bcs_call = NULL;
-+    s->ret = ret;
-+    s->error_is_read = error_is_read;
-+    job_enter(&s->common.job);
- }
- 
- static int coroutine_fn backup_loop(BackupBlockJob *job)
+-    req->start = start;
++    req->offset = offset;
+     req->bytes = bytes;
+     qemu_co_queue_init(&req->wait_queue);
+     QLIST_INSERT_HEAD(&s->inflight_reqs, req, list);
+@@ -158,24 +158,24 @@ void block_copy_set_callbacks(
+  * Returns 0 on success.
+  */
+ static int coroutine_fn block_copy_do_copy(BlockCopyState *s,
+-                                           int64_t start, int64_t bytes,
++                                           int64_t offset, int64_t bytes,
+                                            bool zeroes, bool *error_is_read)
  {
--    bool error_is_read;
--    int64_t offset;
--    BdrvDirtyBitmapIter *bdbi;
--    int ret = 0;
-+    while (true) { /* retry loop */
-+        assert(!job->bcs_call);
-+        job->bcs_call = block_copy_async(job->bcs, 0,
-+                                         QEMU_ALIGN_UP(job->len,
-+                                                       job->cluster_size),
-+                                         true, job->max_workers, job->max_chunk,
-+                                         backup_block_copy_callback);
+     int ret;
+-    int nbytes = MIN(start + bytes, s->len) - start;
++    int nbytes = MIN(offset + bytes, s->len) - offset;
+     void *bounce_buffer = NULL;
  
--    bdbi = bdrv_dirty_iter_new(job->bcs_bitmap);
--    while ((offset = bdrv_dirty_iter_next(bdbi)) != -1) {
--        do {
--            if (yield_and_check(job)) {
--                goto out;
-+        while (job->bcs_call && !job->common.job.cancelled) {
-+            /* wait and handle pauses */
-+
-+            job_pause_point(&job->common.job);
-+
-+            if (job->bcs_call && !job->common.job.cancelled) {
-+                job_yield(&job->common.job);
+-    assert(start >= 0 && bytes > 0 && INT64_MAX - start >= bytes);
+-    assert(QEMU_IS_ALIGNED(start, s->cluster_size));
++    assert(offset >= 0 && bytes > 0 && INT64_MAX - offset >= bytes);
++    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+     assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
+-    assert(start + bytes <= s->len ||
+-           start + bytes == QEMU_ALIGN_UP(s->len, s->cluster_size));
++    assert(offset + bytes <= s->len ||
++           offset + bytes == QEMU_ALIGN_UP(s->len, s->cluster_size));
+ 
+     if (zeroes) {
+-        ret = bdrv_co_pwrite_zeroes(s->target, start, nbytes, s->write_flags &
++        ret = bdrv_co_pwrite_zeroes(s->target, offset, nbytes, s->write_flags &
+                                     ~BDRV_REQ_WRITE_COMPRESSED);
+         if (ret < 0) {
+-            trace_block_copy_write_zeroes_fail(s, start, ret);
++            trace_block_copy_write_zeroes_fail(s, offset, ret);
+             if (error_is_read) {
+                 *error_is_read = false;
              }
--            ret = backup_do_cow(job, offset, job->cluster_size, &error_is_read);
--            if (ret < 0 && backup_error_action(job, error_is_read, -ret) ==
--                           BLOCK_ERROR_ACTION_REPORT)
--            {
--                goto out;
-+        }
-+
-+        if (!job->bcs_call && job->ret == 0) {
-+            /* Success */
-+            return 0;
-+        }
-+
-+        if (job->common.job.cancelled) {
-+            if (job->bcs_call) {
-+                block_copy_cancel(job->bcs_call);
-             }
--        } while (ret < 0);
-+            return 0;
-+        }
-+
-+        if (!job->bcs_call && job->ret < 0 &&
-+            (backup_error_action(job, job->error_is_read, -job->ret) ==
-+             BLOCK_ERROR_ACTION_REPORT))
-+        {
-+            return job->ret;
-+        }
+@@ -184,10 +184,10 @@ static int coroutine_fn block_copy_do_copy(BlockCopyState *s,
      }
  
-- out:
--    bdrv_dirty_iter_free(bdbi);
--    return ret;
-+    g_assert_not_reached();
- }
+     if (s->use_copy_range) {
+-        ret = bdrv_co_copy_range(s->source, start, s->target, start, nbytes,
++        ret = bdrv_co_copy_range(s->source, offset, s->target, offset, nbytes,
+                                  0, s->write_flags);
+         if (ret < 0) {
+-            trace_block_copy_copy_range_fail(s, start, ret);
++            trace_block_copy_copy_range_fail(s, offset, ret);
+             s->use_copy_range = false;
+             s->copy_size = MAX(s->cluster_size, BLOCK_COPY_MAX_BUFFER);
+             /* Fallback to read+write with allocated buffer */
+@@ -221,19 +221,19 @@ static int coroutine_fn block_copy_do_copy(BlockCopyState *s,
  
- static void backup_init_bcs_bitmap(BackupBlockJob *job)
-@@ -253,9 +242,14 @@ static int coroutine_fn backup_run(Job *job, Error **errp)
-         int64_t count;
+     bounce_buffer = qemu_blockalign(s->source->bs, nbytes);
  
-         for (offset = 0; offset < s->len; ) {
--            if (yield_and_check(s)) {
--                ret = -ECANCELED;
--                goto out;
-+            if (job_is_cancelled(job)) {
-+                return -ECANCELED;
-+            }
-+
-+            job_pause_point(job);
-+
-+            if (job_is_cancelled(job)) {
-+                return -ECANCELED;
-             }
- 
-             ret = block_copy_reset_unallocated(s->bcs, offset, &count);
-@@ -288,6 +282,25 @@ static int coroutine_fn backup_run(Job *job, Error **errp)
-     return ret;
- }
- 
-+static void coroutine_fn backup_pause(Job *job)
-+{
-+    BackupBlockJob *s = container_of(job, BackupBlockJob, common.job);
-+
-+    if (s->bcs_call) {
-+        block_copy_cancel(s->bcs_call);
-+    }
-+}
-+
-+static void coroutine_fn backup_set_speed(BlockJob *job, int64_t speed)
-+{
-+    BackupBlockJob *s = container_of(job, BackupBlockJob, common);
-+
-+    if (s->bcs) {
-+        /* In block_job_create we yet don't have bcs */
-+        block_copy_set_speed(s->bcs, s->bcs_call, speed);
-+    }
-+}
-+
- static const BlockJobDriver backup_job_driver = {
-     .job_driver = {
-         .instance_size          = sizeof(BackupBlockJob),
-@@ -298,7 +311,9 @@ static const BlockJobDriver backup_job_driver = {
-         .commit                 = backup_commit,
-         .abort                  = backup_abort,
-         .clean                  = backup_clean,
--    }
-+        .pause                  = backup_pause,
-+    },
-+    .set_speed = backup_set_speed,
- };
- 
- static int64_t backup_calculate_cluster_size(BlockDriverState *target,
-@@ -343,6 +358,8 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-                   BitmapSyncMode bitmap_mode,
-                   bool compress,
-                   const char *filter_node_name,
-+                  int max_workers,
-+                  int64_t max_chunk,
-                   BlockdevOnError on_source_error,
-                   BlockdevOnError on_target_error,
-                   int creation_flags,
-@@ -363,6 +380,16 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     assert(sync_mode != MIRROR_SYNC_MODE_INCREMENTAL);
-     assert(sync_bitmap || sync_mode != MIRROR_SYNC_MODE_BITMAP);
- 
-+    if (max_workers < 1) {
-+        error_setg(errp, "At least one worker needed");
-+        return NULL;
-+    }
-+
-+    if (max_chunk < 0) {
-+        error_setg(errp, "max-chunk is negative");
-+        return NULL;
-+    }
-+
-     if (bs == target) {
-         error_setg(errp, "Source and target cannot be the same");
-         return NULL;
-@@ -418,6 +445,11 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     if (cluster_size < 0) {
-         goto error;
-     }
-+    if (max_chunk && max_chunk < cluster_size) {
-+        error_setg(errp, "Required max-chunk (%" PRIi64") is less than backup "
-+                   "cluster size (%" PRIi64 ")", max_chunk, cluster_size);
-+        return NULL;
-+    }
- 
-     /*
-      * If source is in backing chain of target assume that target is going to be
-@@ -461,9 +493,12 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
-     job->bcs_bitmap = block_copy_dirty_bitmap(bcs);
-     job->cluster_size = cluster_size;
-     job->len = len;
-+    job->max_workers = max_workers;
-+    job->max_chunk = max_chunk;
- 
-     block_copy_set_callbacks(bcs, backup_progress_bytes_callback,
-                              backup_progress_reset_callback, job);
-+    block_copy_set_speed(bcs, NULL, speed);
- 
-     /* Required permissions are already taken by backup-top target */
-     block_job_add_bdrv(&job->common, "target", target, 0, BLK_PERM_ALL,
-diff --git a/block/replication.c b/block/replication.c
-index 99532ce521..6ca47b616f 100644
---- a/block/replication.c
-+++ b/block/replication.c
-@@ -544,6 +544,7 @@ static void replication_start(ReplicationState *rs, ReplicationMode mode,
-         s->backup_job = backup_job_create(
-                                 NULL, s->secondary_disk->bs, s->hidden_disk->bs,
-                                 0, MIRROR_SYNC_MODE_NONE, NULL, 0, false, NULL,
-+                                0, 0,
-                                 BLOCKDEV_ON_ERROR_REPORT,
-                                 BLOCKDEV_ON_ERROR_REPORT, JOB_INTERNAL,
-                                 backup_job_completed, bs, NULL, &local_err);
-diff --git a/blockdev.c b/blockdev.c
-index 8e029e9c01..8b1dc6782d 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3502,6 +3502,9 @@ static BlockJob *do_backup_common(BackupCommon *backup,
-     if (!backup->has_compress) {
-         backup->compress = false;
-     }
-+    if (!backup->has_x_max_workers) {
-+        backup->x_max_workers = 64;
-+    }
- 
-     ret = bdrv_try_set_aio_context(target_bs, aio_context, errp);
+-    ret = bdrv_co_pread(s->source, start, nbytes, bounce_buffer, 0);
++    ret = bdrv_co_pread(s->source, offset, nbytes, bounce_buffer, 0);
      if (ret < 0) {
-@@ -3581,6 +3584,8 @@ static BlockJob *do_backup_common(BackupCommon *backup,
-                             backup->sync, bmap, backup->bitmap_mode,
-                             backup->compress,
-                             backup->filter_node_name,
-+                            backup->x_max_workers,
-+                            backup->x_max_chunk,
-                             backup->on_source_error,
-                             backup->on_target_error,
-                             job_flags, NULL, NULL, txn, errp);
-diff --git a/tests/qemu-iotests/129 b/tests/qemu-iotests/129
-index cd6b9e9ce7..4a4a3760de 100755
---- a/tests/qemu-iotests/129
-+++ b/tests/qemu-iotests/129
-@@ -66,7 +66,6 @@ class TestStopWithBlockJob(iotests.QMPTestCase):
-         result = self.vm.qmp("stop")
-         self.assert_qmp(result, 'return', {})
-         result = self.vm.qmp("query-block-jobs")
--        self.assert_qmp(result, 'return[0]/busy', True)
-         self.assert_qmp(result, 'return[0]/ready', False)
- 
-     def test_drive_mirror(self):
-@@ -77,7 +76,7 @@ class TestStopWithBlockJob(iotests.QMPTestCase):
-     def test_drive_backup(self):
-         self.do_test_stop("drive-backup", device="drive0",
-                           target=self.target_img,
--                          sync="full")
-+                          sync="full", speed=1024)
- 
-     def test_block_commit(self):
-         self.do_test_stop("block-commit", device="drive0")
-diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-index 454ff600cc..7cd79052d9 100755
---- a/tests/qemu-iotests/185
-+++ b/tests/qemu-iotests/185
-@@ -182,7 +182,8 @@ _send_qemu_cmd $h \
-                       'target': '$TEST_IMG.copy',
-                       'format': '$IMGFMT',
-                       'sync': 'full',
--                      'speed': 65536 } }" \
-+                      'speed': 65536,
-+                      'x-max-chunk': 65536 } }" \
-     "return"
- 
- # If we don't sleep here 'quit' command races with disk I/O
-diff --git a/tests/qemu-iotests/219 b/tests/qemu-iotests/219
-index e0c51662c0..e77ccf1b1b 100755
---- a/tests/qemu-iotests/219
-+++ b/tests/qemu-iotests/219
-@@ -223,6 +223,7 @@ with iotests.FilePath('disk.img') as disk_path, \
-                 'target': copy_path,
-                 'sync': 'full',
-                 'speed': 262144,
-+                'x-max-chunk': 65536,
-                 'auto-finalize': auto_finalize,
-                 'auto-dismiss': auto_dismiss,
-             })
-diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
-index a9828251cf..e86bd3d639 100755
---- a/tests/qemu-iotests/257
-+++ b/tests/qemu-iotests/257
-@@ -191,6 +191,7 @@ def blockdev_backup(vm, device, target, sync, **kwargs):
-                         target=target,
-                         sync=sync,
-                         filter_node_name='backup-top',
-+                        x_max_workers=1,
-                         **kwargs)
-     return result
- 
-diff --git a/tests/qemu-iotests/257.out b/tests/qemu-iotests/257.out
-index 64dd460055..6997b56567 100644
---- a/tests/qemu-iotests/257.out
-+++ b/tests/qemu-iotests/257.out
-@@ -30,7 +30,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -78,7 +78,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -92,7 +92,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -205,7 +205,7 @@ expecting 15 dirty sectors; have 15. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -219,7 +219,7 @@ expecting 15 dirty sectors; have 15. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -290,7 +290,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -338,7 +338,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -354,7 +354,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"action": "report", "device": "backup_1", "operation": "read"}, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- {"data": {"device": "backup_1", "error": "Input/output error", "len": 393216, "offset": 65536, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-@@ -416,7 +416,7 @@ expecting 14 dirty sectors; have 14. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -430,7 +430,7 @@ expecting 14 dirty sectors; have 14. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -501,7 +501,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -549,7 +549,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -563,7 +563,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -676,7 +676,7 @@ expecting 15 dirty sectors; have 15. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -690,7 +690,7 @@ expecting 15 dirty sectors; have 15. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -761,7 +761,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -809,7 +809,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -823,7 +823,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -936,7 +936,7 @@ expecting 15 dirty sectors; have 15. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -950,7 +950,7 @@ expecting 15 dirty sectors; have 15. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -1021,7 +1021,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1069,7 +1069,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1085,7 +1085,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"action": "report", "device": "backup_1", "operation": "read"}, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- {"data": {"device": "backup_1", "error": "Input/output error", "len": 393216, "offset": 65536, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-@@ -1147,7 +1147,7 @@ expecting 14 dirty sectors; have 14. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1161,7 +1161,7 @@ expecting 14 dirty sectors; have 14. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -1232,7 +1232,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1280,7 +1280,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1294,7 +1294,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -1407,7 +1407,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1421,7 +1421,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -1492,7 +1492,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1540,7 +1540,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1554,7 +1554,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -1667,7 +1667,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1681,7 +1681,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -1752,7 +1752,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1800,7 +1800,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1816,7 +1816,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"action": "report", "device": "backup_1", "operation": "read"}, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- {"data": {"device": "backup_1", "error": "Input/output error", "len": 393216, "offset": 65536, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-@@ -1878,7 +1878,7 @@ expecting 13 dirty sectors; have 13. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -1892,7 +1892,7 @@ expecting 13 dirty sectors; have 13. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -1963,7 +1963,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2011,7 +2011,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2025,7 +2025,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "bitmap", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -2138,7 +2138,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2152,7 +2152,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -2223,7 +2223,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2271,7 +2271,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2285,7 +2285,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -2398,7 +2398,7 @@ expecting 15 dirty sectors; have 15. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2412,7 +2412,7 @@ expecting 15 dirty sectors; have 15. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -2483,7 +2483,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2531,7 +2531,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2547,7 +2547,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"action": "report", "device": "backup_1", "operation": "read"}, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- {"data": {"device": "backup_1", "error": "Input/output error", "len": 67108864, "offset": 983040, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-@@ -2609,7 +2609,7 @@ expecting 14 dirty sectors; have 14. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2623,7 +2623,7 @@ expecting 14 dirty sectors; have 14. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -2694,7 +2694,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2742,7 +2742,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2756,7 +2756,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -2869,7 +2869,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -2883,7 +2883,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -2954,7 +2954,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3002,7 +3002,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3016,7 +3016,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -3129,7 +3129,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3143,7 +3143,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -3214,7 +3214,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3262,7 +3262,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3278,7 +3278,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"action": "report", "device": "backup_1", "operation": "read"}, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- {"data": {"device": "backup_1", "error": "Input/output error", "len": 67108864, "offset": 983040, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-@@ -3340,7 +3340,7 @@ expecting 1014 dirty sectors; have 1014. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3354,7 +3354,7 @@ expecting 1014 dirty sectors; have 1014. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -3425,7 +3425,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3473,7 +3473,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3487,7 +3487,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "full", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -3600,7 +3600,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3614,7 +3614,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -3685,7 +3685,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3733,7 +3733,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3747,7 +3747,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -3860,7 +3860,7 @@ expecting 15 dirty sectors; have 15. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3874,7 +3874,7 @@ expecting 15 dirty sectors; have 15. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -3945,7 +3945,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -3993,7 +3993,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4009,7 +4009,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"action": "report", "device": "backup_1", "operation": "read"}, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- {"data": {"device": "backup_1", "error": "Input/output error", "len": 458752, "offset": 65536, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-@@ -4071,7 +4071,7 @@ expecting 14 dirty sectors; have 14. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4085,7 +4085,7 @@ expecting 14 dirty sectors; have 14. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -4156,7 +4156,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4204,7 +4204,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4218,7 +4218,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -4331,7 +4331,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4345,7 +4345,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -4416,7 +4416,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4464,7 +4464,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4478,7 +4478,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -4591,7 +4591,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4605,7 +4605,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -4676,7 +4676,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4724,7 +4724,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4740,7 +4740,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"action": "report", "device": "backup_1", "operation": "read"}, "event": "BLOCK_JOB_ERROR", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- {"data": {"device": "backup_1", "error": "Input/output error", "len": 458752, "offset": 65536, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
-@@ -4802,7 +4802,7 @@ expecting 14 dirty sectors; have 14. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4816,7 +4816,7 @@ expecting 14 dirty sectors; have 14. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -4887,7 +4887,7 @@ write -P0x76 0x3ff0000 0x10000
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_0", "sync": "full", "target": "ref_target_0", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_0", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4935,7 +4935,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_1", "sync": "full", "target": "ref_target_1", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_1", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -4949,7 +4949,7 @@ expecting 6 dirty sectors; have 6. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_1", "sync": "top", "target": "backup_target_1", "x-max-workers": 1}}
- {"return": {}}
- 
- --- Write #2 ---
-@@ -5062,7 +5062,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "ref_backup_2", "sync": "full", "target": "ref_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"data": {"device": "ref_backup_2", "len": 67108864, "offset": 67108864, "speed": 0, "type": "backup"}, "event": "BLOCK_JOB_COMPLETED", "timestamp": {"microseconds": "USECS", "seconds": "SECS"}}
- 
-@@ -5076,7 +5076,7 @@ expecting 12 dirty sectors; have 12. OK!
- {"execute": "job-dismiss", "arguments": {"id": "bdc-fmt-job"}}
- {"return": {}}
- {}
--{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2"}}
-+{"execute": "blockdev-backup", "arguments": {"auto-finalize": false, "bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "backup_2", "sync": "bitmap", "target": "backup_target_2", "x-max-workers": 1}}
- {"return": {}}
- {"execute": "job-finalize", "arguments": {"id": "backup_2"}}
- {"return": {}}
-@@ -5139,155 +5139,155 @@ qemu_img compare "TEST_DIR/PID-img" "TEST_DIR/PID-fbackup2" ==> Identical, OK!
- 
- -- Sync mode incremental tests --
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "must provide a valid bitmap name for 'incremental' sync mode"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "must provide a valid bitmap name for 'incremental' sync mode"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "must provide a valid bitmap name for 'incremental' sync mode"}}
- 
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "must provide a valid bitmap name for 'incremental' sync mode"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'on-success' when using sync mode 'incremental'"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'on-success' when using sync mode 'incremental'"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'on-success' when using sync mode 'incremental'"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "incremental", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap sync mode must be 'on-success' when using sync mode 'incremental'"}}
- 
- -- Sync mode bitmap tests --
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "must provide a valid bitmap name for 'bitmap' sync mode"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "must provide a valid bitmap name for 'bitmap' sync mode"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "must provide a valid bitmap name for 'bitmap' sync mode"}}
- 
--{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "must provide a valid bitmap name for 'bitmap' sync mode"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "bitmap", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap sync mode must be given when providing a bitmap"}}
- 
- -- Sync mode full tests --
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Cannot specify bitmap sync mode without a bitmap"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Cannot specify bitmap sync mode without a bitmap"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Cannot specify bitmap sync mode without a bitmap"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap sync mode 'never' has no meaningful effect when combined with sync mode 'full'"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "full", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap sync mode must be given when providing a bitmap"}}
- 
- -- Sync mode top tests --
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Cannot specify bitmap sync mode without a bitmap"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Cannot specify bitmap sync mode without a bitmap"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Cannot specify bitmap sync mode without a bitmap"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap sync mode 'never' has no meaningful effect when combined with sync mode 'top'"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "top", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap sync mode must be given when providing a bitmap"}}
- 
- -- Sync mode none tests --
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Cannot specify bitmap sync mode without a bitmap"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Cannot specify bitmap sync mode without a bitmap"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Cannot specify bitmap sync mode without a bitmap"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap404", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap 'bitmap404' could not be found"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "on-success", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "sync mode 'none' does not produce meaningful bitmap outputs"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "always", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "sync mode 'none' does not produce meaningful bitmap outputs"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "bitmap-mode": "never", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "sync mode 'none' does not produce meaningful bitmap outputs"}}
- 
--{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target"}}
-+{"execute": "blockdev-backup", "arguments": {"bitmap": "bitmap0", "device": "drive0", "filter-node-name": "backup-top", "job-id": "api_job", "sync": "none", "target": "backup_target", "x-max-workers": 1}}
- {"error": {"class": "GenericError", "desc": "Bitmap sync mode must be given when providing a bitmap"}}
+-        trace_block_copy_read_fail(s, start, ret);
++        trace_block_copy_read_fail(s, offset, ret);
+         if (error_is_read) {
+             *error_is_read = true;
+         }
+         goto out;
+     }
+ 
+-    ret = bdrv_co_pwrite(s->target, start, nbytes, bounce_buffer,
++    ret = bdrv_co_pwrite(s->target, offset, nbytes, bounce_buffer,
+                          s->write_flags);
+     if (ret < 0) {
+-        trace_block_copy_write_fail(s, start, ret);
++        trace_block_copy_write_fail(s, offset, ret);
+         if (error_is_read) {
+             *error_is_read = false;
+         }
+@@ -345,7 +345,7 @@ int64_t block_copy_reset_unallocated(BlockCopyState *s,
+ }
+ 
+ int coroutine_fn block_copy(BlockCopyState *s,
+-                            int64_t start, uint64_t bytes,
++                            int64_t offset, uint64_t bytes,
+                             bool *error_is_read)
+ {
+     int ret = 0;
+@@ -358,59 +358,59 @@ int coroutine_fn block_copy(BlockCopyState *s,
+     assert(bdrv_get_aio_context(s->source->bs) ==
+            bdrv_get_aio_context(s->target->bs));
+ 
+-    assert(QEMU_IS_ALIGNED(start, s->cluster_size));
++    assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
+     assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
+ 
+-    block_copy_wait_inflight_reqs(s, start, bytes);
+-    block_copy_inflight_req_begin(s, &req, start, bytes);
++    block_copy_wait_inflight_reqs(s, offset, bytes);
++    block_copy_inflight_req_begin(s, &req, offset, bytes);
+ 
+     while (bytes) {
+         int64_t next_zero, cur_bytes, status_bytes;
+ 
+-        if (!bdrv_dirty_bitmap_get(s->copy_bitmap, start)) {
+-            trace_block_copy_skip(s, start);
+-            start += s->cluster_size;
++        if (!bdrv_dirty_bitmap_get(s->copy_bitmap, offset)) {
++            trace_block_copy_skip(s, offset);
++            offset += s->cluster_size;
+             bytes -= s->cluster_size;
+             continue; /* already copied */
+         }
+ 
+         cur_bytes = MIN(bytes, s->copy_size);
+ 
+-        next_zero = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, start,
++        next_zero = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, offset,
+                                                 cur_bytes);
+         if (next_zero >= 0) {
+-            assert(next_zero > start); /* start is dirty */
+-            assert(next_zero < start + cur_bytes); /* no need to do MIN() */
+-            cur_bytes = next_zero - start;
++            assert(next_zero > offset); /* offset is dirty */
++            assert(next_zero < offset + cur_bytes); /* no need to do MIN() */
++            cur_bytes = next_zero - offset;
+         }
+ 
+-        ret = block_copy_block_status(s, start, cur_bytes, &status_bytes);
++        ret = block_copy_block_status(s, offset, cur_bytes, &status_bytes);
+         if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
+-            bdrv_reset_dirty_bitmap(s->copy_bitmap, start, status_bytes);
++            bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, status_bytes);
+             s->progress_reset_callback(s->progress_opaque);
+-            trace_block_copy_skip_range(s, start, status_bytes);
+-            start += status_bytes;
++            trace_block_copy_skip_range(s, offset, status_bytes);
++            offset += status_bytes;
+             bytes -= status_bytes;
+             continue;
+         }
+ 
+         cur_bytes = MIN(cur_bytes, status_bytes);
+ 
+-        trace_block_copy_process(s, start);
++        trace_block_copy_process(s, offset);
+ 
+-        bdrv_reset_dirty_bitmap(s->copy_bitmap, start, cur_bytes);
++        bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, cur_bytes);
+ 
+         co_get_from_shres(s->mem, cur_bytes);
+-        ret = block_copy_do_copy(s, start, cur_bytes, ret & BDRV_BLOCK_ZERO,
++        ret = block_copy_do_copy(s, offset, cur_bytes, ret & BDRV_BLOCK_ZERO,
+                                  error_is_read);
+         co_put_to_shres(s->mem, cur_bytes);
+         if (ret < 0) {
+-            bdrv_set_dirty_bitmap(s->copy_bitmap, start, cur_bytes);
++            bdrv_set_dirty_bitmap(s->copy_bitmap, offset, cur_bytes);
+             break;
+         }
+ 
+         s->progress_bytes_callback(cur_bytes, s->progress_opaque);
+-        start += cur_bytes;
++        offset += cur_bytes;
+         bytes -= cur_bytes;
+     }
  
 -- 
 2.21.0
