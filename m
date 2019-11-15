@@ -2,62 +2,79 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D17C1C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B82CCC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4CD220718
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:51:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4CD220718
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7F8242072A
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 16:52:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MRawGxc+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F8242072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41820 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVep7-0003NV-AP
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:51:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52576)
+	id 1iVepN-0003pQ-CU
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 11:52:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54203)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iVeQY-0001HU-OD
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:32 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iVeZn-0003hv-0B
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:36:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iVeQX-0001Df-9Z
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:30 -0500
-Received: from 7.mo177.mail-out.ovh.net ([46.105.61.149]:49513)
+ (envelope-from <stefanha@redhat.com>) id 1iVeZl-00076u-S0
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:36:02 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38618
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iVeQX-0001DM-37
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:26:29 -0500
-Received: from player787.ha.ovh.net (unknown [10.108.57.183])
- by mo177.mail-out.ovh.net (Postfix) with ESMTP id E2FD410DDC3
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 17:26:27 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player787.ha.ovh.net (Postfix) with ESMTPSA id 7884CC444DA6;
- Fri, 15 Nov 2019 16:26:22 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH for-5.0 v5 18/23] ppc/xive: Move the TIMA operations to the
- controller model
-Date: Fri, 15 Nov 2019 17:24:31 +0100
-Message-Id: <20191115162436.30548-19-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191115162436.30548-1-clg@kaod.org>
-References: <20191115162436.30548-1-clg@kaod.org>
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iVeZl-00076K-NA
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 11:36:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1573835760;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=pJWkQq07D9FyveHY6DKhA9fp3MyBnIGG1kulEmk+b2E=;
+ b=MRawGxc+i5ou8qiYdBXtbpmquUtn/FQJ7Hcfp82yenMSeaM6FrpTS2FyveQiao+Ls7X/SC
+ s+gjgmtNyImHPsyh1oZIGWYj3HaoW6wk1C3XmMHP0/7ovb8tHeMRL2eqh+HZ+xy3s7R7Kr
+ UDv01TjXo2GTTl/5e362bB+Oj23I7fg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-44-kbz2Lt3VN7-j5x6heH90vg-1; Fri, 15 Nov 2019 11:35:57 -0500
+X-MC-Unique: kbz2Lt3VN7-j5x6heH90vg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C81AD1005511;
+ Fri, 15 Nov 2019 16:35:56 +0000 (UTC)
+Received: from localhost (ovpn-116-253.ams2.redhat.com [10.36.116.253])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9B17D67E5F;
+ Fri, 15 Nov 2019 16:35:50 +0000 (UTC)
+Date: Fri, 15 Nov 2019 16:35:49 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Micky Yun Chan <chanmickyyun@gmail.com>
+Subject: Re: [PATCH] Implement backend program convention command for
+ vhost-user-blk
+Message-ID: <20191115163549.GC47045@stefanha-x1.localdomain>
+References: <20191115060925.12346-1-michan@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 15110421177047944166
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudefhedgkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeejrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeef
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191115060925.12346-1-michan@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="eHhjakXzOLJAF9wJ"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.61.149
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -69,208 +86,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-ppc@nongnu.org,
- Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ michan <michan@redhat.com>, qemu-devel@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On the P9 Processor, the thread interrupt context registers of a CPU
-can be accessed "directly" when by load/store from the CPU or
-"indirectly" by the IC through an indirect TIMA page. This requires to
-configure first the PC_TCTXT_INDIRx registers.
+--eHhjakXzOLJAF9wJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Today, we rely on the get_tctx() handler to deduce from the CPU PIR
-the chip from which the TIMA access is being done. By handling the
-TIMA memory ops under the interrupt controller model of each machine,
-we can uniformize the TIMA direct and indirect ops under PowerNV. We
-can also check that the CPUs have been enabled in the XIVE controller.
+On Fri, Nov 15, 2019 at 02:09:25PM +0800, Micky Yun Chan wrote:
 
-This prepares ground for the future versions of XIVE.
+Thanks for the patch!
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ppc/xive.h |  1 -
- hw/intc/pnv_xive.c    | 35 ++++++++++++++++++++++++++++++++++-
- hw/intc/spapr_xive.c  | 33 +++++++++++++++++++++++++++++++--
- hw/intc/xive.c        | 29 -----------------------------
- 4 files changed, 65 insertions(+), 33 deletions(-)
+> +    context =3D g_option_context_new(NULL);
 
-diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-index 97bbcddb381d..dcf897451589 100644
---- a/include/hw/ppc/xive.h
-+++ b/include/hw/ppc/xive.h
-@@ -462,7 +462,6 @@ typedef struct XiveENDSource {
- #define XIVE_TM_OS_PAGE         0x2
- #define XIVE_TM_USER_PAGE       0x3
-=20
--extern const MemoryRegionOps xive_tm_ops;
- void xive_tctx_tm_write(XivePresenter *xptr, XiveTCTX *tctx, hwaddr offs=
-et,
-                         uint64_t value, unsigned size);
- uint64_t xive_tctx_tm_read(XivePresenter *xptr, XiveTCTX *tctx, hwaddr o=
-ffset,
-diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-index d75053d0baad..4501c671d8df 100644
---- a/hw/intc/pnv_xive.c
-+++ b/hw/intc/pnv_xive.c
-@@ -1473,6 +1473,39 @@ static const MemoryRegionOps xive_tm_indirect_ops =
-=3D {
-     },
- };
-=20
-+static void pnv_xive_tm_write(void *opaque, hwaddr offset,
-+                              uint64_t value, unsigned size)
-+{
-+    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
-+    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
-+    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
-+
-+    xive_tctx_tm_write(XIVE_PRESENTER(xive), tctx, offset, value, size);
-+}
-+
-+static uint64_t pnv_xive_tm_read(void *opaque, hwaddr offset, unsigned s=
-ize)
-+{
-+    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
-+    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
-+    XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
-+
-+    return xive_tctx_tm_read(XIVE_PRESENTER(xive), tctx, offset, size);
-+}
-+
-+const MemoryRegionOps pnv_xive_tm_ops =3D {
-+    .read =3D pnv_xive_tm_read,
-+    .write =3D pnv_xive_tm_write,
-+    .endianness =3D DEVICE_BIG_ENDIAN,
-+    .valid =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 8,
-+    },
-+    .impl =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 8,
-+    },
-+};
-+
- /*
-  * Interrupt controller XSCOM region.
-  */
-@@ -1845,7 +1878,7 @@ static void pnv_xive_realize(DeviceState *dev, Erro=
-r **errp)
-                           "xive-pc", PNV9_XIVE_PC_SIZE);
-=20
-     /* Thread Interrupt Management Area (Direct) */
--    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops,
-+    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &pnv_xive_tm_ops=
-,
-                           xive, "xive-tima", PNV9_XIVE_TM_SIZE);
-=20
-     qemu_register_reset(pnv_xive_reset, dev);
-diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index bb3b2dfdb77f..6292da58f62c 100644
---- a/hw/intc/spapr_xive.c
-+++ b/hw/intc/spapr_xive.c
-@@ -205,6 +205,35 @@ void spapr_xive_mmio_set_enabled(SpaprXive *xive, bo=
-ol enable)
-     memory_region_set_enabled(&xive->end_source.esb_mmio, false);
- }
-=20
-+static void spapr_xive_tm_write(void *opaque, hwaddr offset,
-+                          uint64_t value, unsigned size)
-+{
-+    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tctx;
-+
-+    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, size=
-);
-+}
-+
-+static uint64_t spapr_xive_tm_read(void *opaque, hwaddr offset, unsigned=
- size)
-+{
-+    XiveTCTX *tctx =3D spapr_cpu_state(POWERPC_CPU(current_cpu))->tctx;
-+
-+    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size)=
-;
-+}
-+
-+const MemoryRegionOps spapr_xive_tm_ops =3D {
-+    .read =3D spapr_xive_tm_read,
-+    .write =3D spapr_xive_tm_write,
-+    .endianness =3D DEVICE_BIG_ENDIAN,
-+    .valid =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 8,
-+    },
-+    .impl =3D {
-+        .min_access_size =3D 1,
-+        .max_access_size =3D 8,
-+    },
-+};
-+
- static void spapr_xive_end_reset(XiveEND *end)
- {
-     memset(end, 0, sizeof(*end));
-@@ -314,8 +343,8 @@ static void spapr_xive_realize(DeviceState *dev, Erro=
-r **errp)
-     qemu_register_reset(spapr_xive_reset, dev);
-=20
-     /* TIMA initialization */
--    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &xive_tm_ops, xi=
-ve,
--                          "xive.tima", 4ull << TM_SHIFT);
-+    memory_region_init_io(&xive->tm_mmio, OBJECT(xive), &spapr_xive_tm_o=
-ps,
-+                          xive, "xive.tima", 4ull << TM_SHIFT);
-     sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xive->tm_mmio);
-=20
-     /*
-diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index a9298783e7d2..ab779c4c2a0f 100644
---- a/hw/intc/xive.c
-+++ b/hw/intc/xive.c
-@@ -523,35 +523,6 @@ uint64_t xive_tctx_tm_read(XivePresenter *xptr, Xive=
-TCTX *tctx, hwaddr offset,
-     return xive_tm_raw_read(tctx, offset, size);
- }
-=20
--static void xive_tm_write(void *opaque, hwaddr offset,
--                          uint64_t value, unsigned size)
--{
--    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
-_cpu);
--
--    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, size=
-);
--}
--
--static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned size)
--{
--    XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
-_cpu);
--
--    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size)=
-;
--}
--
--const MemoryRegionOps xive_tm_ops =3D {
--    .read =3D xive_tm_read,
--    .write =3D xive_tm_write,
--    .endianness =3D DEVICE_BIG_ENDIAN,
--    .valid =3D {
--        .min_access_size =3D 1,
--        .max_access_size =3D 8,
--    },
--    .impl =3D {
--        .min_access_size =3D 1,
--        .max_access_size =3D 8,
--    },
--};
--
- static char *xive_tctx_ring_print(uint8_t *ring)
- {
-     uint32_t w2 =3D xive_tctx_word2(ring);
---=20
-2.21.0
+Missing g_option_context_free() later in this function.  g_auto() is the
+easiest way to ensure that.
+
+> +    g_option_context_add_main_entries(context, entries, NULL);
+> +    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+> +        g_printerr("Option parsing failed: %s\n", error->message);
+> +        exit(EXIT_FAILURE);
+> +    }
+> +    if (opt_print_caps) {
+> +        g_print("{\n");
+> +        g_print("  \"type\": \"blk\",\n");
+> +        g_print("  \"features\": [\n");
+> +        g_print("    \"blk-file\",\n");
+> +        g_print("    \"read-only\"\n");
+> +        g_print("  ]\n");
+> +        g_print("}\n");
+> +        exit(EXIT_SUCCESS);
+>      }
+> =20
+> -    if (!unix_socket || !blk_file) {
+> +    if (!opt_blk_file) {
+>          printf("Usage: %s [ -b block device or file, -s UNIX domain sock=
+et"
+>                 " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+
+g_option_context_get_help() can be used instead.  That way the help text
+is consistent.
+
+>          return -1;
+
+A good opportunity to switch to exit(EXIT_FAILURE) since main() should
+not return -1.
+
+>      }
+> =20
+> -    lsock =3D unix_sock_new(unix_socket);
+> -    if (lsock < 0) {
+> -        goto err;
+> +    if (opt_socket_path) {
+> +        lsock =3D unix_sock_new(opt_socket_path);
+> +        if (lsock < 0) {
+> +           exit(EXIT_FAILURE);
+> +        }
+> +    } else {
+
+  } else if (opt_fd < 0) {
+      ...print usage because neither --socket-path nor --fd were given...
+  }
+
+--eHhjakXzOLJAF9wJ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3O0+UACgkQnKSrs4Gr
+c8jL1wf/Qp+s2uHiJQiVpULC4qq1z64WhxBmzdipbYuinpbVmV329h31I+H5xchv
+jn5n+Lx+otVTm/qCANwzrIJl5R66nhXLa9E/ym1mli8l3zHKkWpkJZAfElNrXEsS
+IpxGc72ebwY/un20ud96kTJ+VQRTx5AhEdHkJAIDx65DOx74SwP3OocKZCoRFnh3
+oMaU3sxWAyXtRMZID2hhXV612uLB1JkU2o7aGbCg47HYLYFvjBiRmf9e/eV+PVW8
+7sm5GEWRFuw6qeM6xFKD2mXQtVETnFzq9Kkp8HtxGsMTAOD/1eyBfqB8JhXbsNsj
+i+oJXEzdTGvHnmwHXRj+Z32eVlxpzA==
+=XHKD
+-----END PGP SIGNATURE-----
+
+--eHhjakXzOLJAF9wJ--
 
 
