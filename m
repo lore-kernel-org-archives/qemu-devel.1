@@ -2,52 +2,71 @@ Return-Path: <SRS0=pQgJ=ZH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C57BCC432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 480E6C43215
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:35:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 918FD20733
-	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:35:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 918FD20733
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1FEA620733
+	for <qemu-devel@archiver.kernel.org>; Fri, 15 Nov 2019 14:35:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FEA620733
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVcgf-0000nh-9O
-	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:35:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59350)
+	id 1iVcgg-0000qf-VM
+	for qemu-devel@archiver.kernel.org; Fri, 15 Nov 2019 09:35:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33395)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNj-0005B8-Ke
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:30 -0500
+ (envelope-from <gengdongjiu@huawei.com>) id 1iVcej-0007Qd-NB
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:33:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVcNe-0002CR-Pj
- for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:15:27 -0500
-Received: from relay.sw.ru ([185.231.240.75]:47474)
+ (envelope-from <gengdongjiu@huawei.com>) id 1iVcei-0004OC-EH
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 09:33:01 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2050 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcNb-0001t6-0R; Fri, 15 Nov 2019 09:15:19 -0500
-Received: from vovaso.qa.sw.ru ([10.94.3.0] helo=kvm.qa.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVcN4-0006WW-II; Fri, 15 Nov 2019 17:14:46 +0300
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Subject: [RFC 06/24] block/block-copy: reduce intersecting request lock
-Date: Fri, 15 Nov 2019 17:14:26 +0300
-Message-Id: <20191115141444.24155-7-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191115141444.24155-1-vsementsov@virtuozzo.com>
-References: <20191115141444.24155-1-vsementsov@virtuozzo.com>
+ (Exim 4.71) (envelope-from <gengdongjiu@huawei.com>)
+ id 1iVcef-0004C3-KE; Fri, 15 Nov 2019 09:32:57 -0500
+Received: from lhreml705-cah.china.huawei.com (unknown [172.18.7.107])
+ by Forcepoint Email with ESMTP id EC45E68D6C269495430B;
+ Fri, 15 Nov 2019 14:32:51 +0000 (GMT)
+Received: from lhreml712-chm.china.huawei.com (10.201.108.63) by
+ lhreml705-cah.china.huawei.com (10.201.108.46) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Fri, 15 Nov 2019 14:32:51 +0000
+Received: from dggeme755-chm.china.huawei.com (10.3.19.101) by
+ lhreml712-chm.china.huawei.com (10.201.108.63) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.1713.5; Fri, 15 Nov 2019 14:32:50 +0000
+Received: from dggeme755-chm.china.huawei.com ([10.7.64.71]) by
+ dggeme755-chm.china.huawei.com ([10.7.64.71]) with mapi id 15.01.1713.004;
+ Fri, 15 Nov 2019 22:32:47 +0800
+From: gengdongjiu <gengdongjiu@huawei.com>
+To: Igor Mammedov <imammedo@redhat.com>, "zhengxiang (A)"
+ <zhengxiang9@huawei.com>
+Subject: Re: [RESEND PATCH v21 3/6] ACPI: Add APEI GHES table generation
+ support
+Thread-Topic: [RESEND PATCH v21 3/6] ACPI: Add APEI GHES table generation
+ support
+Thread-Index: AdWbwWSZ/1gyxkpeREeYn2g+7NgH+g==
+Date: Fri, 15 Nov 2019 14:32:47 +0000
+Message-ID: <19b1b4b9ceb24aad9f34ab4e58bccab3@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.148.208.87]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 185.176.76.210
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -59,226 +78,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, ehabkost@redhat.com,
- wencongyang2@huawei.com, xiechanglong.d@gmail.com, armbru@redhat.com,
- qemu-devel@nongnu.org, jsnow@redhat.com, crosa@redhat.com, den@openvz.org,
- mreitz@redhat.com
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "Wanghaibin \(D\)" <wanghaibin.wang@huawei.com>,
+ "mtosatti@redhat.com" <mtosatti@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Linuxarm <linuxarm@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "james.morse@arm.com" <james.morse@arm.com>, "xuwei \(O\)" <xuwei5@huawei.com>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "lersek@redhat.com" <lersek@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, block_copy operation lock the whole requested region. But
-there is no reason to lock clusters, which are already copied, it will
-disturb other parallel block_copy requests for no reason.
+> > + */
+> > +static void acpi_ghes_build_notify(GArray *table, const uint8_t type)
+>=20
+> typically format should be build_WHAT(), so
+>  build_ghes_hw_error_notification()
+>=20
+> And I'd move this out into its own patch.
+> this applies to other trivial in-depended sub-tables, that take all data =
+needed to construct them from supplied arguments.
 
-Let's instead do the following:
+I very used your suggested method in previous series[1], but other maintain=
+er suggested to move this function to this file, because he think only GHES=
+ used it
 
-Lock only sub-region, which we are going to operate on. Then, after
-copying all dirty sub-regions, we should wait for intersecting
-requests block-copy, if they failed, we should retry these new dirty
-clusters.
+[1]:
+https://patchwork.ozlabs.org/cover/1099428/
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/block-copy.c | 116 +++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 95 insertions(+), 21 deletions(-)
+>=20
+> > +{
+> > +        /* Type */
+> > +        build_append_int_noprefix(table, type, 1);
+> > +        /*
+> > +         * Length:
+> > +         * Total length of the structure in bytes
+> > +         */
+> > +        build_append_int_noprefix(table, 28, 1);
+> > +        /* Configuration Write Enable */
+> > +        build_append_int_noprefix(table, 0, 2);
+> > +        /* Poll Interval */
+> > +        build_append_int_noprefix(table, 0, 4);
+> > +        /* Vector */
+> > +        build_append_int_noprefix(table, 0, 4);
+> > +        /* Switch To Polling Threshold Value */
+> > +        build_append_int_noprefix(table, 0, 4);
+> > +        /* Switch To Polling Threshold Window */
+> > +        build_append_int_noprefix(table, 0, 4);
+> > +        /* Error Threshold Value */
+> > +        build_append_int_noprefix(table, 0, 4);
+> > +        /* Error Threshold Window */
+> > +        build_append_int_noprefix(table, 0, 4); }
+> > +
+>=20
+> /*
+>   Initialize "etc/hardware_errors" and "etc/hardware_errors_addr" fwcfg b=
+lobs.
+>   See docs/specs/acpi_hest_ghes.rst for blobs format */
+> > +void acpi_ghes_build_error_table(GArray *hardware_errors, BIOSLinker
+> > +*linker)
+> build_ghes_error_table()
+>=20
+> also I'd move this function into its own patch along with other related c=
+ode that initializes and wires it into virt board.
 
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 20068cd699..aca44b13fb 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -39,29 +39,62 @@ static BlockCopyInFlightReq *block_copy_find_inflight_req(BlockCopyState *s,
-     return NULL;
- }
- 
--static void coroutine_fn block_copy_wait_inflight_reqs(BlockCopyState *s,
--                                                       int64_t offset,
--                                                       int64_t bytes)
-+/*
-+ * If there are no intersecting requests return false. Otherwise, wait for the
-+ * first found intersecting request to finish and return true.
-+ */
-+static bool coroutine_fn block_copy_wait_one(BlockCopyState *s, int64_t start,
-+                                             int64_t end)
- {
--    BlockCopyInFlightReq *req;
-+    BlockCopyInFlightReq *req = block_copy_find_inflight_req(s, start, end);
- 
--    while ((req = block_copy_find_inflight_req(s, offset, bytes))) {
--        qemu_co_queue_wait(&req->wait_queue, NULL);
-+    if (!req) {
-+        return false;
-     }
-+
-+    qemu_co_queue_wait(&req->wait_queue, NULL);
-+
-+    return true;
- }
- 
-+/* Called only on full-dirty region */
- static void block_copy_inflight_req_begin(BlockCopyState *s,
-                                           BlockCopyInFlightReq *req,
-                                           int64_t offset, int64_t bytes)
- {
-+    assert(!block_copy_find_inflight_req(s, offset, bytes));
-+
-+    bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, bytes);
-+
-     req->offset = offset;
-     req->bytes = bytes;
-     qemu_co_queue_init(&req->wait_queue);
-     QLIST_INSERT_HEAD(&s->inflight_reqs, req, list);
- }
- 
--static void coroutine_fn block_copy_inflight_req_end(BlockCopyInFlightReq *req)
-+static void coroutine_fn block_copy_inflight_req_shrink(BlockCopyState *s,
-+        BlockCopyInFlightReq *req, int64_t new_bytes)
- {
-+    if (new_bytes == req->bytes) {
-+        return;
-+    }
-+
-+    assert(new_bytes > 0 && new_bytes < req->bytes);
-+
-+    bdrv_set_dirty_bitmap(s->copy_bitmap,
-+                          req->offset + new_bytes, req->bytes - new_bytes);
-+
-+    req->bytes = new_bytes;
-+    qemu_co_queue_restart_all(&req->wait_queue);
-+}
-+
-+static void coroutine_fn block_copy_inflight_req_end(BlockCopyState *s,
-+                                                     BlockCopyInFlightReq *req,
-+                                                     int ret)
-+{
-+    if (ret < 0) {
-+        bdrv_set_dirty_bitmap(s->copy_bitmap, req->offset, req->bytes);
-+    }
-     QLIST_REMOVE(req, list);
-     qemu_co_queue_restart_all(&req->wait_queue);
- }
-@@ -344,12 +377,19 @@ int64_t block_copy_reset_unallocated(BlockCopyState *s,
-     return ret;
- }
- 
--int coroutine_fn block_copy(BlockCopyState *s,
--                            int64_t offset, uint64_t bytes,
--                            bool *error_is_read)
-+/*
-+ * block_copy_dirty_clusters
-+ *
-+ * Copy dirty clusters in @start/@bytes range.
-+ * Returns 1 if dirty clusters found and successfully copied, 0 if no dirty
-+ * clusters found and -errno on failure.
-+ */
-+static int coroutine_fn block_copy_dirty_clusters(BlockCopyState *s,
-+                                                  int64_t offset, int64_t bytes,
-+                                                  bool *error_is_read)
- {
-     int ret = 0;
--    BlockCopyInFlightReq req;
-+    bool found_dirty = false;
- 
-     /*
-      * block_copy() user is responsible for keeping source and target in same
-@@ -361,10 +401,8 @@ int coroutine_fn block_copy(BlockCopyState *s,
-     assert(QEMU_IS_ALIGNED(offset, s->cluster_size));
-     assert(QEMU_IS_ALIGNED(bytes, s->cluster_size));
- 
--    block_copy_wait_inflight_reqs(s, offset, bytes);
--    block_copy_inflight_req_begin(s, &req, offset, bytes);
--
-     while (bytes) {
-+        BlockCopyInFlightReq req;
-         int64_t next_zero, cur_bytes, status_bytes;
- 
-         if (!bdrv_dirty_bitmap_get(s->copy_bitmap, offset)) {
-@@ -374,6 +412,8 @@ int coroutine_fn block_copy(BlockCopyState *s,
-             continue; /* already copied */
-         }
- 
-+        found_dirty = true;
-+
-         cur_bytes = MIN(bytes, s->copy_size);
- 
-         next_zero = bdrv_dirty_bitmap_next_zero(s->copy_bitmap, offset,
-@@ -383,10 +423,12 @@ int coroutine_fn block_copy(BlockCopyState *s,
-             assert(next_zero < offset + cur_bytes); /* no need to do MIN() */
-             cur_bytes = next_zero - offset;
-         }
-+        block_copy_inflight_req_begin(s, &req, offset, cur_bytes);
- 
-         ret = block_copy_block_status(s, offset, cur_bytes, &status_bytes);
-+        block_copy_inflight_req_shrink(s, &req, status_bytes);
-         if (s->skip_unallocated && !(ret & BDRV_BLOCK_ALLOCATED)) {
--            bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, status_bytes);
-+            block_copy_inflight_req_end(s, &req, 0);
-             s->progress_reset_callback(s->progress_opaque);
-             trace_block_copy_skip_range(s, offset, status_bytes);
-             offset += status_bytes;
-@@ -398,15 +440,13 @@ int coroutine_fn block_copy(BlockCopyState *s,
- 
-         trace_block_copy_process(s, offset);
- 
--        bdrv_reset_dirty_bitmap(s->copy_bitmap, offset, cur_bytes);
--
-         co_get_from_shres(s->mem, cur_bytes);
-         ret = block_copy_do_copy(s, offset, cur_bytes, ret & BDRV_BLOCK_ZERO,
-                                  error_is_read);
-         co_put_to_shres(s->mem, cur_bytes);
-+        block_copy_inflight_req_end(s, &req, ret);
-         if (ret < 0) {
--            bdrv_set_dirty_bitmap(s->copy_bitmap, offset, cur_bytes);
--            break;
-+            return ret;
-         }
- 
-         s->progress_bytes_callback(cur_bytes, s->progress_opaque);
-@@ -414,7 +454,41 @@ int coroutine_fn block_copy(BlockCopyState *s,
-         bytes -= cur_bytes;
-     }
- 
--    block_copy_inflight_req_end(&req);
-+    return found_dirty;
-+}
- 
--    return ret;
-+int coroutine_fn block_copy(BlockCopyState *s, int64_t start, uint64_t bytes,
-+                            bool *error_is_read)
-+{
-+    while (true) {
-+        int ret = block_copy_dirty_clusters(s, start, bytes, error_is_read);
-+
-+        if (ret < 0) {
-+            /*
-+             * IO operation failed, which means the whole block_copy request
-+             * failed.
-+             */
-+            return ret;
-+        }
-+        if (ret) {
-+            /*
-+             * Something was copied, which means that there were yield points
-+             * and some new dirty bits may appered (due to failed parallel
-+             * block-copy requests).
-+             */
-+            continue;
-+        }
-+
-+        /*
-+         * Here ret == 0, which means that there is no dirty clusters in
-+         * requested region.
-+         */
-+
-+        if (!block_copy_wait_one(s, start, bytes)) {
-+            /* No dirty bits and nothing to wait: the whole request is done */
-+            break;
-+        }
-+    }
-+
-+    return 0;
- }
--- 
-2.21.0
+I ever use your suggested method[1], but other maintainer, it seems Michael=
+, suggested to move these functions to this file that used it, because he t=
+hink only GHES used it.
+
+[1]:
+https://patchwork.ozlabs.org/patch/1099424/
+https://patchwork.ozlabs.org/patch/1099425/
+https://patchwork.ozlabs.org/patch/1099430/
+
 
 
