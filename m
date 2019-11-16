@@ -2,72 +2,67 @@ Return-Path: <SRS0=i/12=ZI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=CHARSET_FARAWAY_HEADER,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3889C432C3
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 Nov 2019 05:29:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E2C0C432C3
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 Nov 2019 08:39:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73B4C20730
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 Nov 2019 05:29:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73B4C20730
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maskray.me
+	by mail.kernel.org (Postfix) with ESMTPS id D48A820723
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 Nov 2019 08:39:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="bU47Gr8R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D48A820723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVqe2-0002YP-Lr
-	for qemu-devel@archiver.kernel.org; Sat, 16 Nov 2019 00:29:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42536)
+	id 1iVtca-0004DR-Td
+	for qemu-devel@archiver.kernel.org; Sat, 16 Nov 2019 03:39:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58720)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <emacsray@gmail.com>) id 1iVqdA-00026z-Ar
- for qemu-devel@nongnu.org; Sat, 16 Nov 2019 00:28:21 -0500
+ (envelope-from <yanminhui163@163.com>) id 1iVo6h-0007V7-3o
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 21:46:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <emacsray@gmail.com>) id 1iVqd8-000625-VN
- for qemu-devel@nongnu.org; Sat, 16 Nov 2019 00:28:20 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:44266)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <emacsray@gmail.com>) id 1iVqd8-00061q-Pa
- for qemu-devel@nongnu.org; Sat, 16 Nov 2019 00:28:18 -0500
-Received: by mail-pf1-f194.google.com with SMTP id q26so7642472pfn.11
- for <qemu-devel@nongnu.org>; Fri, 15 Nov 2019 21:28:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition:user-agent;
- bh=r3g7HUON5sc/j7shXGegavmfWXmQJz6lr0xbcS0w7No=;
- b=onFC+fV/L21/nwu3zAAfoRgbyh+RBawGgoVYJAj438BNc7I+nU8sehka+gxGjgNxdt
- bpUM1inJHOpTzBZeuz8plucegf7YRfyq2U4+XKw80Mer/+dStGEmsUTBv224M4uwucp4
- SKQilBcRMyyStyYkvnLOB4rW9EEIdd4P9qmstCSedK5jF5mSC42r6OqthlEPrlMqDI0v
- s1BKEHvwBBpD9VxMQ70knII83NkqnSUK98cJ0ZC41iTBrfOkgFWgSL+dTXUiJi7uQcS4
- fQeBtjSF1fub28LS/iLqYlj8ma4z4HGvFQ5InphM6dX4y2Awv06WfEi+6k0H0Qz1UUQP
- 2MTA==
-X-Gm-Message-State: APjAAAW40NPxneAAKxcF/28LKXCwBQbghC6hSmtUyj08jrZM1o9rl7Lt
- 49H+WRY+5HIahf7iW3/+OJx3ayWV3Rs=
-X-Google-Smtp-Source: APXvYqx1vpRXpoP5ceS9dc2V3atK0DN+/GqoWZDgAHWyGkZ02bYXCm5iSeD4i1s7y5wkT7SiC/4zWw==
-X-Received: by 2002:a63:f006:: with SMTP id k6mr20159903pgh.380.1573882097284; 
- Fri, 15 Nov 2019 21:28:17 -0800 (PST)
-Received: from localhost (c-71-204-169-238.hsd1.ca.comcast.net.
- [71.204.169.238])
- by smtp.gmail.com with ESMTPSA id c13sm11617304pfo.5.2019.11.15.21.28.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 15 Nov 2019 21:28:16 -0800 (PST)
-Date: Fri, 15 Nov 2019 21:28:15 -0800
-From: Fangrui Song <i@maskray.me>
+ (envelope-from <yanminhui163@163.com>) id 1iVo6d-0001uh-EB
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 21:46:36 -0500
+Received: from m12-15.163.com ([220.181.12.15]:53538)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <yanminhui163@163.com>)
+ id 1iVo6b-0001nE-6n
+ for qemu-devel@nongnu.org; Fri, 15 Nov 2019 21:46:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=From:Mime-Version:Subject:Message-Id:Date; bh=qPzj4
+ 1RDt4hto8evY5bhWfELvs3ScEfxppgzaqRPRLo=; b=bU47Gr8RKmMkP5RLmi18q
+ vIyDvCCHRl96zFQVW1q8k2SW9P55ahTyWdA49m4AbVZCHq6NSEv3iiK30e6Ywc6W
+ O2l01iwALZnU9ShODXSMgqUCm7M+yFC91e+MxTUERKXcinLHd496GyPQTtwssyVq
+ uNwZEQH3OhGNxx8Yvf+Lxk=
+Received: from [192.168.1.101] (unknown [113.18.255.205])
+ by smtp11 (Coremail) with SMTP id D8CowABXnSr3Ys9dnZN0AA--.10023S3;
+ Sat, 16 Nov 2019 10:46:16 +0800 (CST)
+From: =?gb2312?B?0dXD9rvU?= <yanminhui163@163.com>
+Content-Type: multipart/alternative;
+ boundary="Apple-Mail=_84C52CB5-B189-4A46-AFBB-CBA36C370A76"
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: ui/gtk: fix gettext message's charset. #85
+Message-Id: <CBC44ED0-976E-4CDA-9E7B-C7E0B86B2873@163.com>
+Date: Sat, 16 Nov 2019 10:46:15 +0800
 To: qemu-devel@nongnu.org
-Subject: [PATCH] configure: Use lld --image-base for --disable-pie user mode
- binaries
-Message-ID: <20191116052815.nop3xkmd4umqsdsb@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: NeoMutt/20180223-112-0c5bf3
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.210.194
+X-Mailer: Apple Mail (2.3445.104.11)
+X-CM-TRANSID: D8CowABXnSr3Ys9dnZN0AA--.10023S3
+X-Coremail-Antispam: 1Uf129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+ VFW2AGmfu7bjvjm3AaLaJ3UbIYCTnIWIevJa73UjIFyTuYvjxUrZ2TUUUUU
+X-Originating-IP: [113.18.255.205]
+X-CM-SenderInfo: 51dqzx5qkxxiiwt6il2tof0z/xtbB0gJvwlUMS2R4KwABsZ
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
+X-Received-From: 220.181.12.15
+X-Mailman-Approved-At: Sat, 16 Nov 2019 03:39:02 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -79,97 +74,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For lld, --image-base is the preferred way to set the base address.
-lld does not actually implement -Ttext-segment, but treats it as an alias for
--Ttext. -Ttext-segment=0x60000000 combined with --no-rosegment can
-create a 1.6GB executable.
 
-Fix the problem by using --image-base for lld. GNU ld and gold will
-still get -Ttext-segment. Also delete the ld --verbose fallback introduced
-in 2013, which is no longer relevant or correct (the default linker
-script has changed).
+--Apple-Mail=_84C52CB5-B189-4A46-AFBB-CBA36C370A76
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=us-ascii
 
-Signed-off-by: Fangrui Song <i@maskray.me>
----
-  configure | 33 ++++++++++++---------------------
-  1 file changed, 12 insertions(+), 21 deletions(-)
+Detail see: https://github.com/qemu/qemu/pull/85 =
+<https://github.com/qemu/qemu/pull/85>
 
-diff --git a/configure b/configure
-index 6099be1d84..2d45af0d09 100755
---- a/configure
-+++ b/configure
-@@ -6336,43 +6336,34 @@ fi
-  
-  # Probe for the need for relocating the user-only binary.
-  if ( [ "$linux_user" = yes ] || [ "$bsd_user" = yes ] ) && [ "$pie" = no ]; then
--  textseg_addr=
-+  image_base=
-    case "$cpu" in
-      arm | i386 | ppc* | s390* | sparc* | x86_64 | x32)
--      # ??? Rationale for choosing this address
--      textseg_addr=0x60000000
-+      # An arbitrary address that makes it unlikely to collide with user
-+      # programs.
-+      image_base=0x60000000
-        ;;
-      mips)
-        # A 256M aligned address, high in the address space, with enough
-        # room for the code_gen_buffer above it before the stack.
--      textseg_addr=0x60000000
-+      image_base=0x60000000
-        ;;
-    esac
--  if [ -n "$textseg_addr" ]; then
-+  if [ -n "$image_base" ]; then
-      cat > $TMPC <<EOF
-      int main(void) { return 0; }
-  EOF
--    textseg_ldflags="-Wl,-Ttext-segment=$textseg_addr"
--    if ! compile_prog "" "$textseg_ldflags"; then
--      # In case ld does not support -Ttext-segment, edit the default linker
--      # script via sed to set the .text start addr.  This is needed on FreeBSD
--      # at least.
--      if ! $ld --verbose >/dev/null 2>&1; then
-+    image_base_ldflags="-Wl,--image-base=$image_base"
-+    if ! compile_prog "" "$image_base_ldflags"; then
-+      image_base_ldflags="-Wl,-Ttext-segment=$image_base"
-+      if ! compile_prog "" "$image_base_ldflags"; then
-          error_exit \
-              "We need to link the QEMU user mode binaries at a" \
-              "specific text address. Unfortunately your linker" \
--            "doesn't support either the -Ttext-segment option or" \
--            "printing the default linker script with --verbose." \
-+            "supports neither --image-base nor -Ttext-segment. " \
-              "If you don't want the user mode binaries, pass the" \
-              "--disable-user option to configure."
-        fi
--
--      $ld --verbose | sed \
--        -e '1,/==================================================/d' \
--        -e '/==================================================/,$d' \
--        -e "s/[.] = [0-9a-fx]* [+] SIZEOF_HEADERS/. = $textseg_addr + SIZEOF_HEADERS/" \
--        -e "s/__executable_start = [0-9a-fx]*/__executable_start = $textseg_addr/" > config-host.ld
--      textseg_ldflags="-Wl,-T../config-host.ld"
-      fi
-    fi
-  fi
-@@ -7945,7 +7936,7 @@ if test "$gprof" = "yes" ; then
-  fi
-  
-  if test "$target_linux_user" = "yes" || test "$target_bsd_user" = "yes" ; then
--  ldflags="$ldflags $textseg_ldflags"
-+  ldflags="$ldflags $image_base_ldflags"
-  fi
-  
-  # Newer kernels on s390 check for an S390_PGSTE program header and
--- 
-2.24.0
+
+--Apple-Mail=_84C52CB5-B189-4A46-AFBB-CBA36C370A76
+Content-Type: multipart/mixed;
+	boundary="Apple-Mail=_9CC71966-D944-4F65-86FA-1513755BB411"
+
+
+--Apple-Mail=_9CC71966-D944-4F65-86FA-1513755BB411
+Content-Transfer-Encoding: 7bit
+Content-Type: text/html;
+	charset=us-ascii
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=us-ascii"></head><body style="word-wrap: break-word; -webkit-nbsp-mode: space; line-break: after-white-space;" class=""><div class="">Detail see: <a href="https://github.com/qemu/qemu/pull/85" class="">https://github.com/qemu/qemu/pull/85</a></div><div class=""><br class=""></div></body></html>
+--Apple-Mail=_9CC71966-D944-4F65-86FA-1513755BB411
+Content-Disposition: attachment;
+	filename=0001-ui-gtk-fix-gettext-message-s-charset.patch
+Content-Type: application/octet-stream;
+	x-unix-mode=0644;
+	name="0001-ui-gtk-fix-gettext-message-s-charset.patch"
+Content-Transfer-Encoding: quoted-printable
+
+=46rom=20861c284b6f27c722d452bcd893613b4e28e93fdf=20Mon=20Sep=2017=20=
+00:00:00=202001=0AFrom:=20yanminhui=20<yanminhui163@163.com>=0ADate:=20=
+Fri,=2015=20Nov=202019=2021:13:53=20+0800=0ASubject:=20[PATCH]=20ui/gtk:=20=
+fix=20gettext=20message's=20charset.=0A=0A---=0A=20po/zh_CN.po=20|=202=20=
++-=0A=20ui/gtk.c=20=20=20=20|=201=20+=0A=202=20files=20changed,=202=20=
+insertions(+),=201=20deletion(-)=0A=0Adiff=20--git=20a/po/zh_CN.po=20=
+b/po/zh_CN.po=0Aindex=20b25e8e3c02..38de6a4f2a=20100644=0A---=20=
+a/po/zh_CN.po=0A+++=20b/po/zh_CN.po=0A@@=20-66,7=20+66,7=20@@=20msgid=20=
+"Detach=20Tab"=0A=20msgstr=20"=E5=88=86=E7=A6=BB=E6=A0=87=E7=AD=BE=E9=A1=B5=
+"=0A=20=0A=20msgid=20"Show=20Menubar"=0A-msgstr=20""=0A+msgstr=20=
+"=E6=98=BE=E7=A4=BA=E8=8F=9C=E5=8D=95=E6=A0=8F"=0A=20=0A=20msgid=20=
+"_Machine"=0A=20msgstr=20"=E8=99=9A=E6=8B=9F=E6=9C=BA(_M)"=0Adiff=20=
+--git=20a/ui/gtk.c=20b/ui/gtk.c=0Aindex=202f23922afc..692ccc7bbb=20=
+100644=0A---=20a/ui/gtk.c=0A+++=20b/ui/gtk.c=0A@@=20-2215,6=20+2215,7=20=
+@@=20static=20void=20gtk_display_init(DisplayState=20*ds,=20=
+DisplayOptions=20*opts)=0A=20=20=20=20=20setlocale(LC_MESSAGES,=20"");=0A=
+=20=20=20=20=20setlocale(LC_CTYPE,=20"C.UTF-8");=0A=20=20=20=20=20=
+bindtextdomain("qemu",=20CONFIG_QEMU_LOCALEDIR);=0A+=20=20=20=20=
+bind_textdomain_codeset("qemu",=20"UTF-8");=0A=20=20=20=20=20=
+textdomain("qemu");=0A=20=0A=20=20=20=20=20window_display=20=3D=20=
+gtk_widget_get_display(s->window);=0A--=20=0A2.22.0=0A=0A=
+
+--Apple-Mail=_9CC71966-D944-4F65-86FA-1513755BB411
+Content-Transfer-Encoding: 7bit
+Content-Type: text/html;
+	charset=us-ascii
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=us-ascii"></head><body style="word-wrap: break-word; -webkit-nbsp-mode: space; line-break: after-white-space;" class=""><div class=""></div></body></html>
+--Apple-Mail=_9CC71966-D944-4F65-86FA-1513755BB411--
+
+--Apple-Mail=_84C52CB5-B189-4A46-AFBB-CBA36C370A76--
 
 
