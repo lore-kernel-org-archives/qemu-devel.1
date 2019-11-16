@@ -2,120 +2,81 @@ Return-Path: <SRS0=i/12=ZI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8785EC432C3
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 Nov 2019 09:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0907AC432C3
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 Nov 2019 11:07:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 527B620723
-	for <qemu-devel@archiver.kernel.org>; Sat, 16 Nov 2019 09:42:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8BC9206E1
+	for <qemu-devel@archiver.kernel.org>; Sat, 16 Nov 2019 11:07:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="q0vEjpyf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 527B620723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EmBxhjx8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8BC9206E1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iVubD-0000qb-Hq
-	for qemu-devel@archiver.kernel.org; Sat, 16 Nov 2019 04:42:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49244)
+	id 1iVvve-0003D9-TR
+	for qemu-devel@archiver.kernel.org; Sat, 16 Nov 2019 06:07:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57168)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVuaQ-0000O3-3m
- for qemu-devel@nongnu.org; Sat, 16 Nov 2019 04:41:47 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iVvv1-0002n9-DS
+ for qemu-devel@nongnu.org; Sat, 16 Nov 2019 06:07:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iVuaO-0001ep-6H
- for qemu-devel@nongnu.org; Sat, 16 Nov 2019 04:41:45 -0500
-Received: from mail-eopbgr70128.outbound.protection.outlook.com
- ([40.107.7.128]:1845 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iVuaN-0001Zu-VD; Sat, 16 Nov 2019 04:41:44 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G701vfdKomLmzn//wwOjT6nf5QLKTmMqj5Xgh+6OTL/ALRdChva3VSi5exl5dI11u2ZtJ+xwoevaFrAQahWh6923VaP/eV1kPD3qsFHW35gCRb4sMO6RDdvCQlZ/p0dySA2nMnf3QZhfphVx0UJbi1za6zpxzi5jYSHm3SLSlNqKaN4fxlTPMXl2SqmgflMClik+Rn+VNGoUMREyAkxhU+LmYvyvFn59QfUitzMiBo6tVZH0G7gBM+SXYwcXz2Od64z7hDT/KyQM7o/e9R9KSGTua2BbD0k5bKA5/xXG7Xg4TS0FoFJnXzfaF0mXyndskp4rjKqGiZ/nO9dOhuIC6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IdZeYt0qoug7zdGfZoEEzfdRKmqogSv+CjOrsz3cxIQ=;
- b=MyKZp5nnb2asYk6biGSio1GD9bbKmfWxqJI0nWBnRwe2LwxbgwJ7ytsWP9pIbBkch6cmWE86gzjU971GIp07TpByH4c1wfZb1JXcOtSUbjAznPGIDlNcOwvqCtTbKtaCpWwOYKUmTt9oY7vR+r67kHlt3yJ33ucJocPb5J1uPGXFp3o49oJZuiV3fd5evpK6q16F8KaeaweLFTiv0W6f+3CQrPJsKgmG0+o5MErHaDiEXOoDFdzfUVfgqOjyigPxlmN/tzOzCeeRMcP7CKnsTs2LWIgjLdytqC6uWuPJGV76F2WLNBNNExf+1r4BN2m+CU/gAKI1SY32OQvj8M8ExQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IdZeYt0qoug7zdGfZoEEzfdRKmqogSv+CjOrsz3cxIQ=;
- b=q0vEjpyfb7jIHcgAoA4DNl92PdhOzeRBNX2dgYKvrXuB88IiZIfpsSZh8YZNZqOuDKfo35jZwliaBRFsnBdVxrBKc18sEjlfLtSqevc+QcEqfSDzTpHQ0f1yGtlrSZI9//lWPPM2YuHa3E2LAbeoeJ2LUzvHm9g8g1alP7SkzUQ=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3702.eurprd08.prod.outlook.com (20.178.91.80) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.26; Sat, 16 Nov 2019 09:41:40 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.029; Sat, 16 Nov 2019
- 09:41:40 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH v2 2/2] iotests: add 269 to check maximum of bitmaps in
- qcow2
-Thread-Topic: [PATCH v2 2/2] iotests: add 269 to check maximum of bitmaps in
- qcow2
-Thread-Index: AQHVgoW58e4TWXzHz0Wfj9uBdN7ACqdrZsOAgCJYRoA=
-Date: Sat, 16 Nov 2019 09:41:39 +0000
-Message-ID: <7eba6b5d-529d-c7ac-edfc-547361ef0123@virtuozzo.com>
-References: <20191014115126.15360-1-vsementsov@virtuozzo.com>
- <20191014115126.15360-3-vsementsov@virtuozzo.com>
- <7c9e6d62-fc5e-204e-778d-0320833e9b00@redhat.com>
-In-Reply-To: <7c9e6d62-fc5e-204e-778d-0320833e9b00@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P192CA0019.EURP192.PROD.OUTLOOK.COM (2603:10a6:3:fe::29)
- To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191116124137907
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fd9b2cc4-576f-4b53-ea0b-08d76a792e5c
-x-ms-traffictypediagnostic: AM6PR08MB3702:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB3702F0F980FC3BFB863537F0C1730@AM6PR08MB3702.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 02234DBFF6
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(39840400004)(396003)(346002)(366004)(376002)(136003)(199004)(189003)(316002)(110136005)(53546011)(76176011)(386003)(5660300002)(66446008)(52116002)(99286004)(478600001)(25786009)(6506007)(102836004)(66946007)(476003)(11346002)(446003)(486006)(66476007)(86362001)(31686004)(64756008)(66556008)(2501003)(54906003)(186003)(14454004)(6116002)(6246003)(8676002)(31696002)(26005)(2616005)(8936002)(4326008)(107886003)(3846002)(81156014)(2906002)(71190400001)(256004)(6512007)(229853002)(36756003)(6436002)(6486002)(71200400001)(66066001)(81166006)(7736002)(305945005);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3702;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: VPQGVSCAdrEQr4sBpr2ESmVxDRJ95D+O2EkBTr/UjnVswf4FnPrGwmWZKkn4aHR1rkvgquMWWScvTQP4ta9QCSEQZx4Yhws/cF9r4FgYAKcKYM6s1HgUfrbYXZ3UmEmAX1oTaOqyxOqCjDx3JaL2LTVg3UkbXqe4t/6SIeUc2xiXUo/UFvA2Qfc7AgWe+OcNlHtMTnFdVJugL8/g2+wt0vaSEErMAzt0cC6fqAlPIW+H7OmqyVfjuGESjrW0LPjZmKtz0l3CWNxgScbXoxogdWjdo0K11sGnH125ivXQ6XQhNDJAYq+wyi+pSnj6PO9yE7PUmuFj1HV44/EncFCrfMx6M4q2iAiBWXiu3enMoiD2Ah8hIMsuzjs2CTuGlbIr5IZB1jreXCRCIYsChyjxsxQ+TWrm/qLsOHjd27iRJ/xCjaM7kV7l/9a/PBm4p6O/
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DA6C2AED04D572418B77E5D0D86C0107@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd9b2cc4-576f-4b53-ea0b-08d76a792e5c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Nov 2019 09:41:39.9451 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: g6yrBsmGtGwSIrwsc9iEozjSta3IQl7wRWu5ZhH0mJFJZ+QjSKIgEAR3C8kwdD6dgWXi3aa3i2M2XWs1/NG2XKxoED6LVJZUMMH8k/M3u6E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3702
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.7.128
+ (envelope-from <richard.henderson@linaro.org>) id 1iVvv0-0006DD-38
+ for qemu-devel@nongnu.org; Sat, 16 Nov 2019 06:07:07 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36759)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iVvuz-0006C8-Ry
+ for qemu-devel@nongnu.org; Sat, 16 Nov 2019 06:07:06 -0500
+Received: by mail-wr1-x444.google.com with SMTP id r10so13722561wrx.3
+ for <qemu-devel@nongnu.org>; Sat, 16 Nov 2019 03:07:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=r5/4/U12EWC18Vtj87MOva04DZB5a9pp9lqOfXjV2j8=;
+ b=EmBxhjx8LpxI2pIQeBDMXrlcIVjEaOYEaIQHbrRyWJO2fQ6GcrJoatP0GUXYfqMnCL
+ bw2lecejSGTnOs909IZSY7SOZ96mpNXDYNcBtu0mG86uX+CutRAl9bR3JQgsvgOisfML
+ 0OwhrCY5UBf2pbcvQLf9Anfcb11w7My46q5kcnvHK9Ac1+9VV2NPwc/x12gfBLdnfEak
+ LK5BIiBSbHhPAKRytlBspsuXADtgpOJTa1DgPj75fmOr1R3EJcCAFYaHEdYLqD8dUmds
+ ezKtN1R1pwSCCzkT/xHe9fl7yt9O8mSUGsBbgZsRQIN7Q70e0cgoDhEX60wrk3ARlfqr
+ nSLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=r5/4/U12EWC18Vtj87MOva04DZB5a9pp9lqOfXjV2j8=;
+ b=KDAIM3gUa3oBVHhCWYlSPH0weIqPDWkf4CYmwQDkYrMkV/R9qX8tj6YZNeSKj8scpf
+ J/FPSCyZWC5c8CegJWYGyWzzkiG5ZxPdk9WDy6QGTsnQ52FoGoxx2/zYwZ460AuBpB47
+ ZQCTtbNQLCep24uupZ9uCiZEw+uUEmJ5aMpyBEsFdhR4aG75bc/SBFmGN9HPq3Gw0zUV
+ Ijm2eXDQruI9mZGKAZrlsydj5WoXmvT00p8plKynJpjOhr9Vig9i2qP2jjSUDlEf1gzH
+ XmgxFbEkgeQkmUmtgCKZShvl/WIHYcokzhxGB0jovfkajsMrenMYQfxUcPwC/r5KfWnV
+ /EaQ==
+X-Gm-Message-State: APjAAAWSVcCHuH2biMukkm2x4XS5ud9NvwwlQGqhiq54STEBEoXlp2kU
+ GBDny/AfeZBxsps3VZ8ep0wNMEK/y2lgPA==
+X-Google-Smtp-Source: APXvYqzrc3OEtVngO63Z5t7+XPJL9NlTILLdIC5uOWYvtj4Yfn2eK8Nivg6zesBMgNCOQPAWUyKAwA==
+X-Received: by 2002:adf:cf10:: with SMTP id o16mr21341181wrj.334.1573902423642; 
+ Sat, 16 Nov 2019 03:07:03 -0800 (PST)
+Received: from localhost.localdomain (87.red-176-87-99.dynamicip.rima-tde.net.
+ [176.87.99.87])
+ by smtp.gmail.com with ESMTPSA id k14sm15766980wrw.46.2019.11.16.03.07.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 16 Nov 2019 03:07:02 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] target/arm: Merge arm_cpu_vq_map_next_smaller into sole
+ caller
+Date: Sat, 16 Nov 2019 12:06:42 +0100
+Message-Id: <20191116110642.12454-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,34 +88,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Denis Lunev <den@virtuozzo.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MjUuMTAuMjAxOSAxNjoxMiwgTWF4IFJlaXR6IHdyb3RlOg0KPiBPbiAxNC4xMC4xOSAxMzo1MSwg
-VmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSB3cm90ZToNCj4+IENoZWNrIHRoYXQgaXQncyBp
-bXBvc3NpYmxlIHRvIGNyZWF0ZSBtb3JlIHBlcnNpc3RlbnQgYml0bWFwcyB0aGFuIHFjb3cyDQo+
-PiBzdXBwb3J0cy4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dp
-ZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+DQo+PiAtLS0NCj4+ICAgdGVzdHMvcWVt
-dS1pb3Rlc3RzLzI2OSAgICAgfCA0NyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKw0KPj4gICB0ZXN0cy9xZW11LWlvdGVzdHMvMjY5Lm91dCB8ICAzICsrKw0KPj4gICB0ZXN0
-cy9xZW11LWlvdGVzdHMvZ3JvdXAgICB8ICAxICsNCj4+ICAgMyBmaWxlcyBjaGFuZ2VkLCA1MSBp
-bnNlcnRpb25zKCspDQo+PiAgIGNyZWF0ZSBtb2RlIDEwMDc1NSB0ZXN0cy9xZW11LWlvdGVzdHMv
-MjY5DQo+PiAgIGNyZWF0ZSBtb2RlIDEwMDY0NCB0ZXN0cy9xZW11LWlvdGVzdHMvMjY5Lm91dA0K
-PiANCj4gSXMgdGhlcmUgbm8gd2F5IHRvIG1ha2UgdGhpcyB0ZXN0IGFueSBmYXN0ZXIsIGUuZy4g
-YnkgY3JlYXRpbmcgbGlrZQ0KPiA2NTUzNCBiaXRtYXBzIHdpdGggZGQgYW5kIGEgYmluYXJ5IGJs
-b2I/ICAoU2ltaWxhcmx5IHRvIHdoYXQgSSBkbyBpbg0KPiDigJxpb3Rlc3RzOiBUZXN0IHFjb3cy
-J3Mgc25hcHNob3QgdGFibGUgaGFuZGxpbmfigJ0pDQoNClNlZW1zLCB0aGF0J3Mgbm90IHNpbXBs
-ZS4uIEVhY2ggYml0bWFwIHNob3VsZCBoYXZlIHBlcnNvbmFsIG5hbWUgYW5kDQpiaXRtYXAgdGFi
-bGUuLg0KDQpMZXQncyBtZXJnZSBvbmx5IHBhdGNoIDAxIGFuZCBmb3JnZXQgYWJvdXQgdGhpcyBv
-bmUuDQoNCj4gDQo+IFRoaXMgaXMgc3VjaCBhbiBlZGdlIGNhc2UsIGJ1dCBydW5uaW5nIHRoZSB0
-ZXN0IHRvb2sgMzo0NiBtaW4gYmVmb3JlDQo+IHBhdGNoIDEgKHdoaWNoIEkgYWxyZWFkeSBmaW5k
-IG11Y2ggdG9vIGxvbmcpLCBhbmQgODoxMyBtaW4gYWZ0ZXJ3YXJkcw0KPiAob24gbXkgbWFjaGlu
-ZSkuDQo+IA0KPiAoVG8gYmUgaG9uZXN0LCBpZiB3ZSB0YWtlIHRoaXMgdGVzdCBhcy1pcywgSeKA
-mW0gcHJvYmFibHkganVzdCBuZXZlciBnb2luZw0KPiB0byBydW4gaXQuKQ0KPiANCj4gTWF4DQo+
-IA0KDQoNCi0tIA0KQmVzdCByZWdhcmRzLA0KVmxhZGltaXINCg==
+Coverity reports, in sve_zcr_get_valid_len,
+
+"Subtract operation overflows on operands
+arm_cpu_vq_map_next_smaller(cpu, start_vq + 1U) and 1U"
+
+First, the aarch32 stub version of arm_cpu_vq_map_next_smaller,
+returning 0, does exactly what Coverity reports.  Remove it.
+
+Second, the aarch64 version of arm_cpu_vq_map_next_smaller has
+a set of asserts, but they don't cover the case in question.
+Further, there is a fair amount of extra arithmetic needed to
+convert from the 0-based zcr register, to the 1-base vq form,
+to the 0-based bitmap, and back again.  This can be simplified
+by leaving the value in the 0-based form.
+
+Finally, use test_bit to simplify the common case, where the
+length in the zcr registers is in fact a supported length.
+
+Reported-by: Coverity (CID 1407217)
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+
+v2: Merge arm_cpu_vq_map_next_smaller into sve_zcr_get_valid_len,
+    as suggested by Andrew Jones.
+
+    Use test_bit to make the code even more obvious; the
+    current_length + 1 thing to let us find current_length in the
+    bitmap seemed unnecessarily clever.
+
+---
+ target/arm/cpu.h    |  3 ---
+ target/arm/cpu64.c  | 15 ---------------
+ target/arm/helper.c |  8 ++++++--
+ 3 files changed, 6 insertions(+), 20 deletions(-)
+
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e1a66a2d1c..47d24a5375 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -185,12 +185,9 @@ typedef struct {
+ #ifdef TARGET_AARCH64
+ # define ARM_MAX_VQ    16
+ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp);
+-uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq);
+ #else
+ # define ARM_MAX_VQ    1
+ static inline void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp) { }
+-static inline uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq)
+-{ return 0; }
+ #endif
+ 
+ typedef struct ARMVectorReg {
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 68baf0482f..a39d6fcea3 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -458,21 +458,6 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+     cpu->sve_max_vq = max_vq;
+ }
+ 
+-uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq)
+-{
+-    uint32_t bitnum;
+-
+-    /*
+-     * We allow vq == ARM_MAX_VQ + 1 to be input because the caller may want
+-     * to find the maximum vq enabled, which may be ARM_MAX_VQ, but this
+-     * function always returns the next smaller than the input.
+-     */
+-    assert(vq && vq <= ARM_MAX_VQ + 1);
+-
+-    bitnum = find_last_bit(cpu->sve_vq_map, vq - 1);
+-    return bitnum == vq - 1 ? 0 : bitnum + 1;
+-}
+-
+ static void cpu_max_get_sve_max_vq(Object *obj, Visitor *v, const char *name,
+                                    void *opaque, Error **errp)
+ {
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index be67e2c66d..b5ee35a174 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5363,9 +5363,13 @@ int sve_exception_el(CPUARMState *env, int el)
+ 
+ static uint32_t sve_zcr_get_valid_len(ARMCPU *cpu, uint32_t start_len)
+ {
+-    uint32_t start_vq = (start_len & 0xf) + 1;
++    uint32_t end_len;
+ 
+-    return arm_cpu_vq_map_next_smaller(cpu, start_vq + 1) - 1;
++    start_len &= 0xf;
++    end_len = find_last_bit(cpu->sve_vq_map, start_len + 1);
++
++    assert(end_len <= start_len);
++    return end_len;
+ }
+ 
+ /*
+-- 
+2.17.1
+
 
