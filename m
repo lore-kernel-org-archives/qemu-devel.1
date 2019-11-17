@@ -2,69 +2,93 @@ Return-Path: <SRS0=ZAHP=ZJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D574C432C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 Nov 2019 23:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78CC1C432C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 Nov 2019 23:22:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E55C420729
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 Nov 2019 23:16:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hNs8oD5+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E55C420729
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 45BE52071E
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 Nov 2019 23:22:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45BE52071E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWTmI-0003u4-VD
-	for qemu-devel@archiver.kernel.org; Sun, 17 Nov 2019 18:16:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48939)
+	id 1iWTsB-0007yE-PE
+	for qemu-devel@archiver.kernel.org; Sun, 17 Nov 2019 18:22:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49767)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@qualcomm.com>) id 1iWTkf-0002Qj-S0
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 18:14:42 -0500
+ (envelope-from <groug@kaod.org>) id 1iWTqX-0006Qt-9z
+ for qemu-devel@nongnu.org; Sun, 17 Nov 2019 18:20:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@qualcomm.com>) id 1iWTke-0005Is-8T
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 18:14:41 -0500
-Received: from alexa-out-sd-01.qualcomm.com ([199.106.114.38]:45041)
+ (envelope-from <groug@kaod.org>) id 1iWTqW-0007Py-Ba
+ for qemu-devel@nongnu.org; Sun, 17 Nov 2019 18:20:45 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1956
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tsimpson@qualcomm.com>)
- id 1iWTkd-0005Hk-UH
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 18:14:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1574032479; x=1605568479;
- h=from:to:cc:subject:date:message-id;
- bh=CCcz3lwT2Jw/rmh/2nariZEL4qmLojSeowjro3iQfk4=;
- b=hNs8oD5+/ZBSnWjqMlXYt5NaRxyvJp4sXUqjn3RPXa6mUz0D8gC8cHCu
- U3FZYfjC0h79c3xMkgCDXiOrhcZlFY21nKPyoz5AiL8JRGD168EqyCQG6
- PN3jSeU3zuS6B9HrBuTScbJL2jMjhfC57WUbvROGIs321Yc+kCV0XDWXY w=;
-Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
- by alexa-out-sd-01.qualcomm.com with ESMTP; 17 Nov 2019 15:14:36 -0800
-IronPort-SDR: 80NMW66ZcbRe4Zb7L36lNoO42XOpShmNNYq4ngk9a3io+5jMV5dZt217jDc7igg/DFzMIzhP/q
- d6qaWk9dg3s3gL3Y6pHja8Th0D519krNCbBqeEZTIXR8dWD60JTB199Dyc9V/6XPZELCan83h6
- b0qp+HdR8RU57SiDKtFlsILrb7zF4w1yJILz0M+sYJCF1HIeRskPxxL0mW79ma88eBnhX8CqQA
- cO1EKaeaVv11rLTN+BRHisBZxCQINEHY6kPm0LPXzAFaz2Vd7W8UtmxzxffOYyPZkBQZ+KPj6o
- ETeW6esz5yCtGfZUoKi4xmDf
-Received: from vu-tsimpson-aus.qualcomm.com (HELO
- vu-tsimpson1-aus.qualcomm.com) ([10.222.150.1])
- by ironmsg02-sd.qualcomm.com with ESMTP; 17 Nov 2019 15:14:35 -0800
-Received: by vu-tsimpson1-aus.qualcomm.com (Postfix, from userid 47164)
- id 96D5E3DD; Sun, 17 Nov 2019 17:14:35 -0600 (CST)
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: alex.bennee@linaro.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH] Modify tests to work with clang
-Date: Sun, 17 Nov 2019 17:14:25 -0600
-Message-Id: <1574032465-12186-1-git-send-email-tsimpson@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.38
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iWTqW-0007KP-7b
+ for qemu-devel@nongnu.org; Sun, 17 Nov 2019 18:20:44 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAHNCQ41003570
+ for <qemu-devel@nongnu.org>; Sun, 17 Nov 2019 18:20:35 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2way68wfe0-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Sun, 17 Nov 2019 18:20:35 -0500
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <groug@kaod.org>;
+ Sun, 17 Nov 2019 23:20:33 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Sun, 17 Nov 2019 23:20:31 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
+ [9.149.105.60])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAHNKVPt57344144
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Sun, 17 Nov 2019 23:20:31 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id EB7054203F;
+ Sun, 17 Nov 2019 23:20:30 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BAF1442041;
+ Sun, 17 Nov 2019 23:20:30 +0000 (GMT)
+Received: from bahia.lan (unknown [9.145.70.126])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Sun, 17 Nov 2019 23:20:30 +0000 (GMT)
+Subject: [PATCH for-5.0 0/4] ppc: Some more QOM cleanup for XICS
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Date: Mon, 18 Nov 2019 00:20:30 +0100
+User-Agent: StGit/unknown-version
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19111723-0012-0000-0000-000003662F4D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19111723-0013-0000-0000-000021A1B25B
+Message-Id: <157403283036.409804.13586263493813758117.stgit@bahia.lan>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-17_05:2019-11-15,2019-11-17 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 phishscore=0
+ impostorscore=0 priorityscore=1501 clxscore=1034 spamscore=0 adultscore=0
+ lowpriorityscore=0 suspectscore=0 mlxlogscore=501 mlxscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-1911170222
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,51 +100,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Taylor Simpson <tsimpson@quicinc.com>
+Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
----
- tests/tcg/multiarch/float_helpers.c | 2 --
- tests/tcg/multiarch/linux-test.c    | 6 +++++-
- 2 files changed, 5 insertions(+), 3 deletions(-)
+This series consolidates some more QOM links and pointers that point to
+the same object. While here also simplify the XICS interrupt controller
+init in the machine code.
 
-diff --git a/tests/tcg/multiarch/float_helpers.c b/tests/tcg/multiarch/float_helpers.c
-index 8ee7903..bc530e5 100644
---- a/tests/tcg/multiarch/float_helpers.c
-+++ b/tests/tcg/multiarch/float_helpers.c
-@@ -79,11 +79,9 @@ char *fmt_16(uint16_t num)
- 
- #ifndef SNANF
- /* Signaling NaN macros, if supported.  */
--# if __GNUC_PREREQ(3, 3)
- #  define SNANF (__builtin_nansf (""))
- #  define SNAN (__builtin_nans (""))
- #  define SNANL (__builtin_nansl (""))
--# endif
- #endif
- 
- static float f32_numbers[] = {
-diff --git a/tests/tcg/multiarch/linux-test.c b/tests/tcg/multiarch/linux-test.c
-index 673d7c8..8a7c15c 100644
---- a/tests/tcg/multiarch/linux-test.c
-+++ b/tests/tcg/multiarch/linux-test.c
-@@ -485,7 +485,11 @@ static void test_signal(void)
-     act.sa_flags = SA_SIGINFO;
-     chk_error(sigaction(SIGSEGV, &act, NULL));
-     if (setjmp(jmp_env) == 0) {
--        *(uint8_t *)0 = 0;
-+        /*
-+         * clang requires volatile or it will turn this into a
-+         * call to abort() instead of forcing a SIGSEGV.
-+         */
-+        *(volatile uint8_t *)0 = 0;
-     }
- 
-     act.sa_handler = SIG_DFL;
--- 
-2.7.4
+--
+Greg
+
+---
+
+Greg Kurz (4):
+      xics: Link ICS_PROP_XICS property to ICSState::xics pointer
+      xics: Link ICP_PROP_XICS property to ICPState::xics pointer
+      xics: Link ICP_PROP_CPU property to ICPState::cs pointer
+      spapr: Abort if XICS interrupt controller cannot be initialized
+
+
+ hw/intc/xics.c     |   54 +++++++++++++++-------------------------------------
+ hw/ppc/pnv_psi.c   |    3 +--
+ hw/ppc/spapr_irq.c |   22 ++++-----------------
+ 3 files changed, 21 insertions(+), 58 deletions(-)
 
 
