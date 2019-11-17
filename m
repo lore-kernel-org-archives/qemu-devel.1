@@ -2,84 +2,75 @@ Return-Path: <SRS0=ZAHP=ZJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5586C432C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 Nov 2019 18:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C2BC432C0
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 Nov 2019 19:56:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8334E20674
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 Nov 2019 18:33:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aJv7xEdI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8334E20674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3020D20730
+	for <qemu-devel@archiver.kernel.org>; Sun, 17 Nov 2019 19:56:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3020D20730
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWPMm-0003kl-Jn
-	for qemu-devel@archiver.kernel.org; Sun, 17 Nov 2019 13:33:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46773)
+	id 1iWQel-0001Ef-7R
+	for qemu-devel@archiver.kernel.org; Sun, 17 Nov 2019 14:56:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56867)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <alex.williamson@redhat.com>) id 1iWPLY-0003Fe-C7
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 13:32:29 -0500
+ (envelope-from <bounces@canonical.com>) id 1iWQe8-0000bV-6f
+ for qemu-devel@nongnu.org; Sun, 17 Nov 2019 14:55:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <alex.williamson@redhat.com>) id 1iWPLV-0006Ft-8q
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 13:32:26 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54111
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
- id 1iWPLV-0006FF-4s
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 13:32:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574015543;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SW1nwKgZ8NRu2KeWu1a7Vy4vH1Nav+Zm9LfJ9uUloqg=;
- b=aJv7xEdIMGpTDbv/CI16ZIH4zpx8nFXGchn6X9fBP2I2pZdMTZg+2fNJf9/upuZ6rgcOxs
- WVYCvJWppCCSuE88eTKQ++eWK8r73t2x30nbX19t2wDza/1VMWBffQhK6srJxoOA724/Fq
- KPnBSLIQHe1G+QLj595dfIxfEDwkjG0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-vbNjmzRjMbuQLP9g330mHQ-1; Sun, 17 Nov 2019 13:32:20 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2FC611005500;
- Sun, 17 Nov 2019 18:32:19 +0000 (UTC)
-Received: from x1.home (ovpn-116-56.phx2.redhat.com [10.3.116.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A5100627D7;
- Sun, 17 Nov 2019 18:32:18 +0000 (UTC)
-Date: Sun, 17 Nov 2019 11:32:18 -0700
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] mc146818rtc: fix timer interrupt reinjection
-Message-ID: <20191117113218.3fb53864@x1.home>
-In-Reply-To: <3ba4e29d-3436-9d7b-ebc0-5e1ae566e760@redhat.com>
-References: <20191010123008.GA19158@amt.cnet> <20191116135855.5e16bb7c@x1.home>
- <20191117032015.GA4568@amt.cnet> <20191116213115.611d8028@x1.home>
- <3ba4e29d-3436-9d7b-ebc0-5e1ae566e760@redhat.com>
-Organization: Red Hat
+ (envelope-from <bounces@canonical.com>) id 1iWQe6-0001hp-Ks
+ for qemu-devel@nongnu.org; Sun, 17 Nov 2019 14:55:44 -0500
+Received: from indium.canonical.com ([91.189.90.7]:52542)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iWQe6-0001gh-FF
+ for qemu-devel@nongnu.org; Sun, 17 Nov 2019 14:55:42 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iWQe4-0004yO-7N
+ for <qemu-devel@nongnu.org>; Sun, 17 Nov 2019 19:55:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 35A832E8005
+ for <qemu-devel@nongnu.org>; Sun, 17 Nov 2019 19:55:40 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: vbNjmzRjMbuQLP9g330mHQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Sun, 17 Nov 2019 19:49:28 -0000
+From: Matti Hameister <1846427@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h kwolf-redhat lersek mattihami
+ michael-weiser psyhomb sej7278
+X-Launchpad-Bug-Reporter: Michael Weiser (michael-weiser)
+X-Launchpad-Bug-Modifier: Matti Hameister (mattihami)
+References: <157005622285.15919.12087374175062502233.malonedeb@gac.canonical.com>
+Message-Id: <157402016867.22769.13903133770787527472.malone@chaenomeles.canonical.com>
+Subject: [Bug 1846427] Re: 4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 5371171d0459490abe0eb62a73cc4dacbe3d00b3
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,162 +79,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marcelo Tosatti <mtosatti@redhat.com>,
- Xiao Guangrong <guangrong.xiao@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
- Vadim Rozenfeld <vrozenfe@redhat.com>
+Reply-To: Bug 1846427 <1846427@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 17 Nov 2019 11:12:43 +0100
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+The image was fine before upgrading qemu. I rechecked the image after
+the first use and it was fine. But after the larger Windows 1903 -> 1909
+upgrade done in qemu 4.1.0 the image was damaged. I will try the git
+master version of qemu in the coming days and report back.
 
-> On 17/11/19 05:31, Alex Williamson wrote:
-> > The 'merge' option gives me a similar error.  The 'delay' option is
-> > the only other choice where I can actually start the VM, but this
-> > results in the commandline:
-> >=20
-> > -rtc base=3Dlocaltime
-> >=20
-> > (no driftfix specified) =20
->=20
-> none is the default, so that's okay.
->=20
-> > This does appear to resolve the issue, but of course compatibility
-> > with existing configurations has regressed. Thanks, =20
->=20
-> Yeah, I guess this was just a suggestion to double-check the cause of=20
-> the regression.
->=20
-> The problem could be that periodic_timer_update is using old_period =3D=
-=3D 0=20
-> for two cases: no period change, and old period was 0 (periodic timer=20
-> off).
->=20
-> Something like the following distinguishes the two cases by always using
-> s->period (currently it was only used for driftfix=3Dslew) and passing
-> s->period instead of 0 when there is no period change.
->=20
-> More cleanups are possible, but this is the smallest patch that implement=
-s
-> the idea.  The first patch is big but, indentation changes aside, it's
-> moving a single closed brace.
->=20
-> Alex/Marcelo, can you check if it fixes both of your test cases?
+-- =
 
-It resolves the majority of the regression, but I think there's still a
-performance issue.  Passmark PerformanceTest in the guest shows a 5+%
-decrease versus a straight revert.  Thanks,
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1846427
 
-Alex
+Title:
+  4.1.0: qcow2 corruption on savevm/quit/loadvm cycle
 
-> ------------- 8< ---------------
-> From 48dc9d140c636067b8de1ab8e25b819151c83162 Mon Sep 17 00:00:00 2001
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> Date: Sun, 17 Nov 2019 10:07:38 +0100
-> Subject: [PATCH 1/2] Revert "mc146818rtc: fix timer interrupt reinjection=
-"
->=20
-> This reverts commit b429de730174b388ea5760e3debb0d542ea3c261, except
-> that the reversal of the outer "if (period)" is left in.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/rtc/mc146818rtc.c | 67 ++++++++++++++++++++++----------------------
->  1 file changed, 33 insertions(+), 34 deletions(-)
->=20
-> diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
-> index ee6bf82b40..9869dc5031 100644
-> --- a/hw/rtc/mc146818rtc.c
-> +++ b/hw/rtc/mc146818rtc.c
-> @@ -174,7 +174,6 @@ periodic_timer_update(RTCState *s, int64_t current_ti=
-me, uint32_t old_period)
->      int64_t cur_clock, next_irq_clock, lost_clock =3D 0;
-> =20
->      period =3D rtc_periodic_clock_ticks(s);
-> -
->      if (!period) {
->          s->irq_coalesced =3D 0;
->          timer_del(s->periodic_timer);
-> @@ -197,42 +196,42 @@ periodic_timer_update(RTCState *s, int64_t current_=
-time, uint32_t old_period)
->          last_periodic_clock =3D next_periodic_clock - old_period;
->          lost_clock =3D cur_clock - last_periodic_clock;
->          assert(lost_clock >=3D 0);
-> +    }
-> =20
-> +    /*
-> +     * s->irq_coalesced can change for two reasons:
-> +     *
-> +     * a) if one or more periodic timer interrupts have been lost,
-> +     *    lost_clock will be more that a period.
-> +     *
-> +     * b) when the period may be reconfigured, we expect the OS to
-> +     *    treat delayed tick as the new period.  So, when switching
-> +     *    from a shorter to a longer period, scale down the missing,
-> +     *    because the OS will treat past delayed ticks as longer
-> +     *    (leftovers are put back into lost_clock).  When switching
-> +     *    to a shorter period, scale up the missing ticks since the
-> +     *    OS handler will treat past delayed ticks as shorter.
-> +     */
-> +    if (s->lost_tick_policy =3D=3D LOST_TICK_POLICY_SLEW) {
-> +        uint32_t old_irq_coalesced =3D s->irq_coalesced;
-> +
-> +        s->period =3D period;
-> +        lost_clock +=3D old_irq_coalesced * old_period;
-> +        s->irq_coalesced =3D lost_clock / s->period;
-> +        lost_clock %=3D s->period;
-> +        if (old_irq_coalesced !=3D s->irq_coalesced ||
-> +            old_period !=3D s->period) {
-> +            DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, "
-> +                      "period scaled from %d to %d\n", old_irq_coalesced=
-,
-> +                      s->irq_coalesced, old_period, s->period);
-> +            rtc_coalesced_timer_update(s);
-> +        }
-> +    } else {
->          /*
-> -         * s->irq_coalesced can change for two reasons:
-> -         *
-> -         * a) if one or more periodic timer interrupts have been lost,
-> -         *    lost_clock will be more that a period.
-> -         *
-> -         * b) when the period may be reconfigured, we expect the OS to
-> -         *    treat delayed tick as the new period.  So, when switching
-> -         *    from a shorter to a longer period, scale down the missing,
-> -         *    because the OS will treat past delayed ticks as longer
-> -         *    (leftovers are put back into lost_clock).  When switching
-> -         *    to a shorter period, scale up the missing ticks since the
-> -         *    OS handler will treat past delayed ticks as shorter.
-> +         * no way to compensate the interrupt if LOST_TICK_POLICY_SLEW
-> +         * is not used, we should make the time progress anyway.
->           */
-> -        if (s->lost_tick_policy =3D=3D LOST_TICK_POLICY_SLEW) {
-> -            uint32_t old_irq_coalesced =3D s->irq_coalesced;
-> -
-> -            s->period =3D period;
-> -            lost_clock +=3D old_irq_coalesced * old_period;
-> -            s->irq_coalesced =3D lost_clock / s->period;
-> -            lost_clock %=3D s->period;
-> -            if (old_irq_coalesced !=3D s->irq_coalesced ||
-> -                old_period !=3D s->period) {
-> -                DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, "
-> -                          "period scaled from %d to %d\n", old_irq_coale=
-sced,
-> -                          s->irq_coalesced, old_period, s->period);
-> -                rtc_coalesced_timer_update(s);
-> -            }
-> -        } else {
-> -            /*
-> -             * no way to compensate the interrupt if LOST_TICK_POLICY_SL=
-EW
-> -             * is not used, we should make the time progress anyway.
-> -             */
-> -            lost_clock =3D MIN(lost_clock, period);
-> -        }
-> +        lost_clock =3D MIN(lost_clock, period);
->      }
-> =20
->      assert(lost_clock >=3D 0 && lost_clock <=3D period);
+Status in QEMU:
+  Fix Committed
 
+Bug description:
+  I'm seeing massive corruption of qcow2 images with qemu 4.1.0 and git
+  master as of 7f21573c822805a8e6be379d9bcf3ad9effef3dc after a few
+  savevm/quit/loadvm cycles. I've narrowed it down to the following
+  reproducer (further notes below):
+
+  # qemu-img check debian.qcow2
+  No errors were found on the image.
+  251601/327680 =3D 76.78% allocated, 1.63% fragmented, 0.00% compressed cl=
+usters
+  Image end offset: 18340446208
+  # bin/qemu/bin/qemu-system-x86_64 -machine pc-q35-4.0.1,accel=3Dkvm -m 40=
+96 -chardev stdio,id=3Dcharmonitor -mon chardev=3Dcharmonitor -drive file=
+=3Ddebian.qcow2,id=3Dd -S
+  qemu-system-x86_64: warning: dbind: Couldn't register with accessibility =
+bus: Did not receive a reply. Possible causes include: the remote applicati=
+on did not send a reply, the message bus security policy blocked the reply,=
+ the reply timeout expired, or the network connection was broken.
+  QEMU 4.1.50 monitor - type 'help' for more information
+  (qemu) loadvm foo
+  (qemu) c
+  (qemu) qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  qcow2_free_clusters failed: Invalid argument
+  quit
+  [m@nargothrond:~] qemu-img check debian.qcow2
+  Leaked cluster 85179 refcount=3D2 reference=3D1
+  Leaked cluster 85180 refcount=3D2 reference=3D1
+  ERROR cluster 266150 refcount=3D0 reference=3D2
+  [...]
+  ERROR OFLAG_COPIED data cluster: l2_entry=3D422840000 refcount=3D1
+
+  9493 errors were found on the image.
+  Data may be corrupted, or further writes to the image may corrupt it.
+
+  2 leaked clusters were found on the image.
+  This means waste of disk space, but no harm to data.
+  259266/327680 =3D 79.12% allocated, 1.67% fragmented, 0.00% compressed cl=
+usters
+  Image end offset: 18340446208
+
+  This is on a x86_64 Linux 5.3.1 Gentoo host with qemu-system-x86_64
+  and accel=3Dkvm. The compiler is gcc-9.2.0 with the rest of the system
+  similarly current.
+
+  Reproduced with qemu-4.1.0 from distribution package as well as
+  vanilla git checkout of tag v4.1.0 and commit
+  7f21573c822805a8e6be379d9bcf3ad9effef3dc (today's master). Does not
+  happen with qemu compiled from vanilla checkout of tag v4.0.0. Build
+  sequence:
+
+  ./configure --prefix=3D$HOME/bin/qemu-bisect --target-list=3Dx86_64-softm=
+mu --disable-werror --disable-docs
+  [...]
+  CFLAGS            -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=3D2 -g
+  [...] (can provide full configure output if helpful)
+  make -j8 install
+
+  The kind of guest OS does not matter: seen with Debian testing 64bit,
+  Windows 7 x86/x64 BIOS and Windows 7 x64 EFI.
+
+  The virtual storage controller does not seem to matter: seen with
+  VirtIO SCSI, emulated SCSI and emulated SATA AHCI.
+
+  Caching modes (none, directsync, writeback), aio mode (threads,
+  native) or discard (ignore, unmap) or detect-zeroes (off, unmap) does
+  not influence occurence either.
+
+  Having more RAM in the guest seems to increase odds of corruption:
+  With 512MB to the Debian guest problem hardly occurs at all, with 4GB
+  RAM it happens almost instantly.
+
+  An automated reproducer works as follows:
+
+  - the guest *does* mount its root fs and swap with option discard and
+  my testing leaves me with the impression that file deletion rather
+  than reading is causing the issue
+
+  - foo is a snapshot of the running Debian VM which is already running
+  command
+
+  # while true ; do dd if=3D/dev/zero of=3Dfoo bs=3D10240k count=3D400 ; do=
+ne
+
+  to produce some I/O to the disk (4GB file with 4GB of RAM).
+
+  - on the host a loop continuously resumes and saves the guest state
+  and quits qemu inbetween:
+
+  # while true ; do (echo loadvm foo ; echo c ; sleep 10 ; echo stop ;
+  echo savevm foo ; echo quit ) | bin/qemu-bisect/bin/qemu-system-x86_64
+  -machine pc-q35-3.1,accel=3Dkvm -m 4096 -chardev stdio,id=3Dcharmonitor
+  -mon chardev=3Dcharmonitor -drive file=3Ddebian.qcow2,id=3Dd -S -display
+  none ; done
+
+  - quitting qemu inbetween saves and loads seems to be necessary for
+  the problem to occur. Just continusouly in one session saving and
+  loading guest state does not trigger it.
+
+  - For me, after about 2 to 6 iterations of above loop the image is
+  corrupted.
+
+  - corruption manifests with other messages from qemu as well, e.g.:
+
+  (qemu) loadvm foo
+  Error: Device 'd' does not have the requested snapshot 'foo'
+
+  Using above reproducer I have to the be best of my ability bisected
+  the introduction of the problem to commit
+  69f47505ee66afaa513305de0c1895a224e52c45 (block: avoid recursive
+  block_status call if possible). qemu compiled from the commit before
+  does not exhibit the issue, from that commit on it does and reverting
+  the commit off of current master makes it disappear.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1846427/+subscriptions
 
