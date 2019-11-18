@@ -2,88 +2,60 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7874BC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B636C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:56:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 442DE2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:47:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VtbH4NWP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 442DE2073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 62ADD2071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:56:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62ADD2071E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWaof-0003jw-9A
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 01:47:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38937)
+	id 1iWaxV-0005au-I2
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 01:56:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39896)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chanmickyyun@gmail.com>) id 1iWan6-0002q3-8Z
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:45:42 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1iWawm-00051i-FP
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:55:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chanmickyyun@gmail.com>) id 1iWan3-00076n-Uv
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:45:40 -0500
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:33195)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chanmickyyun@gmail.com>)
- id 1iWan3-000762-MB
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:45:37 -0500
-Received: by mail-pj1-x1044.google.com with SMTP id o14so1191773pjr.0
- for <qemu-devel@nongnu.org>; Sun, 17 Nov 2019 22:45:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=fZsQl1hYGdy1hKrVBKT30eUn/K34Ho3m0CAeILgYaYo=;
- b=VtbH4NWPOswC5VSTAkWzMRsKEehqejzA7/MRzxhDfX6MAXCRo0dBU7CqcVHM0Htltk
- Nydkq0/UcNu9cEFjlI+Zqde5N5xlNoJlTBC1rx+8u7pm+AiXMCO7dv9H1rDdRP77gupS
- lv8QPXI+KtkOiXYwdeSoZvBcAn0dzF8tjAAusUMmOHwcTflk7/KIvhTF3Djg0/rcydWq
- o2173ytMvCQhmEazzfwNZ9cr3O427B310SXxLmlCf1tBHxDQOmBZ3riGsgGi1m/WPRZc
- w/Dpc8X9hoIg0HmDZOIESJf3vorSc2fr84lO2ctovgoYOQX+PPHThjWkdN4rfr4PL9UE
- qbfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=fZsQl1hYGdy1hKrVBKT30eUn/K34Ho3m0CAeILgYaYo=;
- b=a95gi4gd4SdkwBdWNlNXXBvp7HxGfV7zPwDcq5Ck9XxE4z5w+CdUFaKULlGMEeXMel
- Y34juWnJbe+SerIx7wXfmDlJB45CP7LiEfekId5OCQE2ZXOtkImKlVQuru7SBOya5Nx0
- Ih1x4b5UfCyz+AeSIApwzK1AF0QJCU6xq4teaV9g3dQf92JVKbbwUvbOo4d69aeN3Sf5
- 6NDaLFEcGKXPrOeUISMoSm7h4NlLYQp/ULyp74v1qsPg+cvTYQsg/BOpy05jIPANyVil
- QOgSTTyGA27tlKSoTQg/x5y+1/7T1lkq9YG5mSVCB8xSSk85uf5xihM4r3KRrOaqmY02
- OpoQ==
-X-Gm-Message-State: APjAAAWlNslwJWPddYjq1+tF1p/WbCH87qJOVFasbWDkRq8QQFuWJl5G
- Sc7DTdDMR7XUC4bjQw8rSuY8+trPuQ56BGOM
-X-Google-Smtp-Source: APXvYqxN1zaWB3+DQgVQMVLoPFldTu5z2PknbpYqIsNwTFQ+WMXOqmINOQykaHLWbPCYoAtI2TzPWw==
-X-Received: by 2002:a17:902:a508:: with SMTP id
- s8mr27533294plq.26.1574059534741; 
- Sun, 17 Nov 2019 22:45:34 -0800 (PST)
-Received: from localhost.localdomain.com ([209.132.188.80])
- by smtp.googlemail.com with ESMTPSA id
- x192sm21891082pfd.96.2019.11.17.22.45.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 17 Nov 2019 22:45:33 -0800 (PST)
-From: Micky Yun Chan <chanmickyyun@gmail.com>
-X-Google-Original-From: Micky Yun Chan <michan@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] Implement backend program convention command for
- vhost-user-blk
-Date: Mon, 18 Nov 2019 14:45:19 +0800
-Message-Id: <20191118064519.16072-1-michan@redhat.com>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <guoheyi@huawei.com>) id 1iWawk-0001SY-TF
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:55:40 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:36528 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1iWawh-0001Or-AU; Mon, 18 Nov 2019 01:55:35 -0500
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id C2AAD672B27508F4C875;
+ Mon, 18 Nov 2019 14:55:29 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Mon, 18 Nov 2019
+ 14:55:21 +0800
+Subject: Re: [RFC v2 00/14] Add SDEI support for arm64
+To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>, Peter Maydell
+ <peter.maydell@linaro.org>
+References: <20191105091056.9541-1-guoheyi@huawei.com>
+From: Guoheyi <guoheyi@huawei.com>
+Message-ID: <9d7a2c5d-df78-ef67-87af-3860fcb7aee8@huawei.com>
+Date: Mon, 18 Nov 2019 14:55:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::1044
+In-Reply-To: <20191105091056.9541-1-guoheyi@huawei.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.32
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,162 +67,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: michan <michan@redhat.com>, Micky Yun Chan <chanmickyyun@gmail.com>,
- stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Mark Rutland <mark.rutland@arm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Marc Zyngier <marc.zyngier@arm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
+ James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: michan <michan@redhat.com>
+Hi Peter,
 
-Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
----
- contrib/vhost-user-blk/vhost-user-blk.c | 102 ++++++++++++++----------
- 1 file changed, 58 insertions(+), 44 deletions(-)
+Could you spare some time to review the framework and provide comments 
+and advice?
 
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-index ae61034656..8759b6a5d0 100644
---- a/contrib/vhost-user-blk/vhost-user-blk.c
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -576,70 +576,84 @@ vub_new(char *blk_file)
-     return vdev_blk;
- }
- 
-+static int opt_fdnum = -1;
-+static char *opt_socket_path;
-+static char *opt_blk_file;
-+static gboolean opt_print_caps;
-+static gboolean opt_read_only;
-+
-+
-+static GOptionEntry entries[] = {
-+    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
-+      "Print capabilities", NULL },
-+    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
-+      "Use inherited fd socket", "FDNUM" },
-+    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
-+      "Use UNIX socket path", "PATH" },
-+    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
-+     "block device or file path", "PATH"},
-+    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
-+      "Enable read-only", NULL }
-+};
-+
- int main(int argc, char **argv)
- {
--    int opt;
--    char *unix_socket = NULL;
--    char *blk_file = NULL;
--    bool enable_ro = false;
-     int lsock = -1, csock = -1;
-     VubDev *vdev_blk = NULL;
-+    GError *error = NULL;
-+    GOptionContext *context;
- 
--    while ((opt = getopt(argc, argv, "b:rs:h")) != -1) {
--        switch (opt) {
--        case 'b':
--            blk_file = g_strdup(optarg);
--            break;
--        case 's':
--            unix_socket = g_strdup(optarg);
--            break;
--        case 'r':
--            enable_ro = true;
--            break;
--        case 'h':
--        default:
--            printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
--                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
--            return 0;
-+    context = g_option_context_new(NULL);
-+    g_option_context_add_main_entries(context, entries, NULL);
-+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-+        g_printerr("Option parsing failed: %s\n", error->message);
-+        exit(EXIT_FAILURE);
-+    }
-+    if (opt_print_caps) {
-+        g_option_context_get_help(context, true, NULL);
-+        exit(EXIT_SUCCESS);
-+    }
-+
-+    if (!opt_blk_file) {
-+        g_option_context_get_help(context, true, NULL);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (opt_socket_path) {
-+        lsock = unix_sock_new(opt_socket_path);
-+        if (lsock < 0) {
-+           exit(EXIT_FAILURE);
-         }
-+    } else if(opt_fdnum < 0){
-+        g_option_context_get_help(context, true, NULL);
-+    } else {
-+        lsock = opt_fdnum;
-     }
- 
--    if (!unix_socket || !blk_file) {
--        printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
--               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
--        return -1;
--    }
--
--    lsock = unix_sock_new(unix_socket);
--    if (lsock < 0) {
--        goto err;
--    }
--
--    csock = accept(lsock, (void *)0, (void *)0);
-+    csock = accept(lsock, NULL, NULL);
-     if (csock < 0) {
--        fprintf(stderr, "Accept error %s\n", strerror(errno));
--        goto err;
-+        g_printerr("Accept error %s\n", strerror(errno));
-+        exit(EXIT_FAILURE);
-     }
- 
--    vdev_blk = vub_new(blk_file);
-+    vdev_blk = vub_new(opt_blk_file);
-     if (!vdev_blk) {
--        goto err;
-+        exit(EXIT_FAILURE);
-     }
--    if (enable_ro) {
-+    if (opt_read_only) {
-         vdev_blk->enable_ro = true;
-     }
- 
-     if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
-                   vub_panic_cb, &vub_iface)) {
--        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
--        goto err;
-+        g_printerr("Failed to initialized libvhost-user-glib\n");
-+        exit(EXIT_FAILURE);
-     }
- 
-     g_main_loop_run(vdev_blk->loop);
--
-+    g_main_loop_unref(vdev_blk->loop);
-+    g_option_context_free(context);
-     vug_deinit(&vdev_blk->parent);
--
--err:
-     vub_free(vdev_blk);
-     if (csock >= 0) {
-         close(csock);
-@@ -647,8 +661,8 @@ err:
-     if (lsock >= 0) {
-         close(lsock);
-     }
--    g_free(unix_socket);
--    g_free(blk_file);
-+    g_free(opt_socket_path);
-+    g_free(opt_blk_file);
- 
-     return 0;
- }
--- 
-2.21.0
+Thanks,
+
+HG
+
+
+On 2019/11/5 17:10, Heyi Guo wrote:
+> SDEI is for ARM "Software Delegated Exception Interface". AS ARM64 doesn't have
+> native non-maskable interrupt (NMI), we rely on higher privileged (larger
+> exception level) software to change the execution flow of lower privileged
+> (smaller exception level) software when certain events occur, to emulate NMI
+> mechanism, and SDEI is the standard interfaces between the two levels of
+> privileged software. It is based on SMC/HVC calls.
+>
+> The higher privileged software implements an SDEI dispatcher to handle SDEI
+> related SMC/HVC calls and trigger SDEI events; the lower privileged software
+> implements an SDEI client to request SDEI services and handle SDEI events.
+>
+> Core interfaces provided by SDEI include:
+>
+> 1. interrupt bind: client can request to bind an interrupt to an SDEI event, so
+> the interrupt will be a non-maskable event and the event number will be returned
+> to the caller. Only PPI and SPI can be bound to SDEI events.
+>
+> 2. register: client can request to register a handler to an SDEI event, so
+> dispatcher will change PC of lower privileged software to this handler when
+> certain event occurs.
+>
+> 3. complete: client notifies dispatcher that it has completed the event
+> handling, so dispatcher will restore the context of guest when it is
+> interrupted.
+>
+> In virtualization situation, guest OS is the lower privileged software and
+> hypervisor is the higher one.
+>
+> KVM is supposed to pass SMC/HVC calls to qemu, and qemu will emulate an SDEI
+> dispatcher to serve the SDEI requests and trigger the events. If an interrupt is
+> requested to be bound to an event, qemu should not inject the interrupt to guest
+> any more; instead, it should save the context of VCPU and change the PC to event
+> handler which is registered by guest, and then return to guest.
+>
+> To make the conversion of interrupt to SDEI event transparent to other modules
+> in qemu, we used qemu_irq and qemu_irq_intercept_in() to override the default
+> irq handler with SDEI event trigger. I saw qemu_irq_intercept_in() should be
+> only used in qemu MST, but it seemed fit to override interrupt injection with
+> event trigger after guest requests to bind interrupt to SDEI event.
+>
+> This patchset is trying to implement the whole SDEI framework in qemu with KVM
+> enabled, including all SDEI v1.0 interfaces, as well as event trigger conduit
+> from other qemu devices after interrupt binding.
+>
+> Key points:
+> - We propose to only support kvm enabled arm64 virtual machines, for
+>    non-kvm VMs can emulate EL3 and have Trusted Firmware run on it,
+>    which has a builtin SDEI dispatcher.
+> - New kvm capability KVM_CAP_FORWARD_HYPERCALL is added to probe if
+>    kvm supports forwarding hypercalls, and the capability should be
+>    enabled explicitly.
+> - We make the dispatcher as a logical device, to save the states
+>    during migration or save/restore operation; only one instance is
+>    allowed in one VM.
+> - We use qemu_irq as the bridge for other qemu modules to switch from
+>    irq injection to SDEI event trigger after VM binds the interrupt to
+>    SDEI event. We use qemu_irq_intercept_in() to override qemu_irq
+>    handler with SDEI event trigger, and a new interface
+>    qemu_irq_remove_intercept() is added to restore the handler to
+>    default one (i.e. ARM GIC).
+>
+> More details are in the commit message of each patch.
+>
+> Basic tests are done by emulating a watchdog timer and triggering SDEI
+> event in every 10s.
+>
+> Please focus on the interfaces and framework first. We can refine the code for
+> several rounds after the big things have been determined.
+>
+> Any comment or suggestion is welcome.
+>
+> Thanks,
+>
+> HG
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Dave Martin <Dave.Martin@arm.com>
+> Cc: Marc Zyngier <marc.zyngier@arm.com>
+> Cc: Mark Rutland <mark.rutland@arm.com>
+> Cc: James Morse <james.morse@arm.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+>
+> v2:
+> - Import import linux/arm_sdei.h to standard-headers
+> - Drop SDEI table definition and add comments
+> - Some bugfix and code refinement
+>
+> Heyi Guo (14):
+>    update-linux-headers.sh: import linux/arm_sdei.h to standard-headers
+>    standard-headers: import arm_sdei.h
+>    arm/sdei: add virtual device framework
+>    arm: add CONFIG_SDEI build flag
+>    arm/sdei: add support to handle SDEI requests from guest
+>    arm/sdei: add system reset callback
+>    arm/sdei: add support to trigger event by GIC interrupt ID
+>    core/irq: add qemu_irq_remove_intercept interface
+>    arm/sdei: override qemu_irq handler when binding interrupt
+>    arm/sdei: add support to register interrupt bind notifier
+>    linux-headers/kvm.h: add capability to forward hypercall
+>    arm/sdei: add stub to fix build failure when SDEI is not enabled
+>    arm/kvm: handle guest exit of hypercall
+>    virt/acpi: add SDEI table if SDEI is enabled
+>
+>   default-configs/arm-softmmu.mak           |    1 +
+>   hw/arm/Kconfig                            |    4 +
+>   hw/arm/virt-acpi-build.c                  |   26 +
+>   hw/core/irq.c                             |   11 +
+>   include/hw/irq.h                          |    8 +-
+>   include/standard-headers/linux/arm_sdei.h |   73 +
+>   linux-headers/linux/kvm.h                 |    1 +
+>   scripts/update-linux-headers.sh           |    1 +
+>   target/arm/Makefile.objs                  |    4 +
+>   target/arm/kvm.c                          |   17 +
+>   target/arm/sdei-stub.c                    |   49 +
+>   target/arm/sdei.c                         | 1576 +++++++++++++++++++++
+>   target/arm/sdei.h                         |   60 +
+>   target/arm/sdei_int.h                     |  121 ++
+>   14 files changed, 1950 insertions(+), 2 deletions(-)
+>   create mode 100644 include/standard-headers/linux/arm_sdei.h
+>   create mode 100644 target/arm/sdei-stub.c
+>   create mode 100644 target/arm/sdei.c
+>   create mode 100644 target/arm/sdei.h
+>   create mode 100644 target/arm/sdei_int.h
+>
+
 
 
