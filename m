@@ -2,85 +2,75 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7601C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 441A5C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:16:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3F932067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:15:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s0UXfX9V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3F932067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 18E032067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:16:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18E032067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59654 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWd7n-0002gF-Nt
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 04:15:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56069)
+	id 1iWd9E-00042s-9Q
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 04:16:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56271)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iWd79-0002Gk-OP
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:14:32 -0500
+ (envelope-from <bounces@canonical.com>) id 1iWd8E-0003Hx-2O
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:15:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iWd78-00039T-6G
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:14:31 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55164)
+ (envelope-from <bounces@canonical.com>) id 1iWd8C-0003gL-TD
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:15:38 -0500
+Received: from indium.canonical.com ([91.189.90.7]:58722)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iWd77-00038l-WD
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:14:30 -0500
-Received: by mail-wm1-x341.google.com with SMTP id z26so16458652wmi.4
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 01:14:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id;
- bh=tJk3+iTUR48YALvjXNfn4QnMHtBeVqze3Y5HOPt2s4c=;
- b=s0UXfX9VCMvwMi9CVUSJgWnUfXLTNUkaQfAQCrlnDWildcyLnKZsa3cFmw+T4hdXXM
- Pc2yPzvyyQw0h6hk1x0zS6Vk26S0fXOU6BSWukfeA3QSAdGIMfNxbP8ZgbNGN2W2E16Y
- 5bMkY5Lon4sJ9+C42kscV2X1MZyyvtE9u83RkZZ6sNBpCJctZGjN0z+0KQdA9QncFBe5
- LkzG5GySWDFQ+7QOVkcsN/6JoE7rcftQ3PR3pOjrwwE8+9drTWmaqykHEHfIiDztNRDn
- iNfjw6aHLlm7HdwGYX0iFyRoxGsqCdpvNgPwL1tGpfmZ3HniZGCFaNPaG8wbWtO+AT3O
- jZ+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=tJk3+iTUR48YALvjXNfn4QnMHtBeVqze3Y5HOPt2s4c=;
- b=CoYS0CA/ov3CNt7rgTLCyaTAn0Vi1uO/OC5sZKY7Onw42i5q1htCWhBhi1IPBWolDZ
- EZ5vH4rRVg4Hr5hIVXiheud9Alqaf6q/nUd5d+dX4X2WlR6OZ+gLnJhIlQNpym2GZXpz
- GeOv1jeDMYCrlBd3LnVEJCGiQZKsbohyV1gh8uslYD8I0kquak3etgcnDJG33qFHTQ8o
- 4IpzdkdRyWQcsusaYpKOqzKtF8ZO4cze9s3aL6jArQJj+qnq1UD61WHCgOLngOzgeE/J
- 8W5eIM+nYeSG1bb+/f5z9dpog+7D7ccjggCpDouWiZc1dPMaS++wCoI9NpN1fwyP2IVY
- YbZg==
-X-Gm-Message-State: APjAAAVtBZInJ4XEdPyoJvVcgF2PoIMsVXnZjU4AkrAhXp5vdWzh9tbt
- t/dNeeT3HANg1zZ3xOF+EzPDgapRWb3Q0A==
-X-Google-Smtp-Source: APXvYqwaLAv4htzAL4zouhywgXdxxhqHQ3XmO1i3INgbSL6L/TMQWRRjjZyHlFBH7yJ1lejR2NTcPA==
-X-Received: by 2002:a1c:8086:: with SMTP id
- b128mr27492095wmd.104.1574068468287; 
- Mon, 18 Nov 2019 01:14:28 -0800 (PST)
-Received: from localhost.localdomain (65.red-79-149-41.dynamicip.rima-tde.net.
- [79.149.41.65])
- by smtp.gmail.com with ESMTPSA id z2sm10202655wrs.89.2019.11.18.01.14.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 Nov 2019 01:14:27 -0800 (PST)
-From: Richard Henderson <richard.henderson@linaro.org>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iWd8C-0003fk-NL
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:15:36 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iWd8B-00077h-FL
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 09:15:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 4ABF22E80C9
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 09:15:35 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 18 Nov 2019 09:09:14 -0000
+From: Frank Heimes <1852781@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3] target/arm: Merge arm_cpu_vq_map_next_smaller into sole
- caller
-Date: Mon, 18 Nov 2019 10:14:14 +0100
-Message-Id: <20191118091414.19440-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.17.1
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: s390x
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: colin-king paelzer th-huth
+X-Launchpad-Bug-Reporter: Colin Ian King (colin-king)
+X-Launchpad-Bug-Modifier: Frank Heimes (frank-heimes)
+References: <157384084797.7162.9983011521410421204.malonedeb@gac.canonical.com>
+Message-Id: <157406815822.31102.4153512872150506274.launchpad@wampee.canonical.com>
+Subject: [Bug 1852781] Re: qemu s390x on focal - applications breaking
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: c10b57a12916c45a118678887483b7c336fff605
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,111 +79,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com
+Reply-To: Bug 1852781 <1852781@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Coverity reports, in sve_zcr_get_valid_len,
+** Tags added: s390x
 
-"Subtract operation overflows on operands
-arm_cpu_vq_map_next_smaller(cpu, start_vq + 1U) and 1U"
+-- =
 
-First, the aarch32 stub version of arm_cpu_vq_map_next_smaller,
-returning 0, does exactly what Coverity reports.  Remove it.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1852781
 
-Second, the aarch64 version of arm_cpu_vq_map_next_smaller has
-a set of asserts, but they don't cover the case in question.
-Further, there is a fair amount of extra arithmetic needed to
-convert from the 0-based zcr register, to the 1-base vq form,
-to the 0-based bitmap, and back again.  This can be simplified
-by leaving the value in the 0-based form.
+Title:
+  qemu s390x on focal - applications breaking
 
-Finally, use test_bit to simplify the common case, where the
-length in the zcr registers is in fact a supported length.
+Status in QEMU:
+  Incomplete
 
-Reported-by: Coverity (CID 1407217)
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
+Bug description:
+  Running qemu-system-s390x (1:4.0+dfsg-0ubuntu10) on an x86-64 Focal
+  host with an upgrade of a Eoan s390x VM to a Focal s390x is triggering
+  random breakage, for example:
 
-v2: Merge arm_cpu_vq_map_next_smaller into sve_zcr_get_valid_len,
-    as suggested by Andrew Jones.
+  sudo apt-get update && sudo apt-get dist-upgrade
 
-v3: Use test_bit to make the code even more obvious; the
-    current_length + 1 thing to let us find current_length in the
-    bitmap seemed unnecessarily clever.  (For real this time).
+  ...
+  ...
 
----
- target/arm/cpu.h    |  3 ---
- target/arm/cpu64.c  | 15 ---------------
- target/arm/helper.c |  9 +++++++--
- 3 files changed, 7 insertions(+), 20 deletions(-)
+  Unpacking debianutils (4.9) over (4.8.6.3) ...
+  Setting up debianutils (4.9) ...
+  Use of uninitialized value $ARGV[0] in string ne at /usr/sbin/update-mime=
+ line 43.
+  (Reading database ... 83640 files and directories currently installed.)
+  Preparing to unpack .../bash_5.0-5ubuntu1_s390x.deb ...
+  Unpacking bash (5.0-5ubuntu1) over (5.0-4ubuntu1) ...
+  Setting up bash (5.0-5ubuntu1) ...
+  [12124.788618] User process fault: interruption code 0007 ilc:3 in bash[2=
+aa3d780000+149000]
+  dpkg: error processing package bash (--configure):
+   installed bash package post-installation script subprocess was killed by=
+ signal (Floating point exception), core du
+  mped
+  Errors were encountered while processing:
+   bash
+  E: Sub-process /usr/bin/dpkg returned an error code (1)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index e1a66a2d1c..47d24a5375 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -185,12 +185,9 @@ typedef struct {
- #ifdef TARGET_AARCH64
- # define ARM_MAX_VQ    16
- void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp);
--uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq);
- #else
- # define ARM_MAX_VQ    1
- static inline void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp) { }
--static inline uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq)
--{ return 0; }
- #endif
- 
- typedef struct ARMVectorReg {
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 68baf0482f..a39d6fcea3 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -458,21 +458,6 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
-     cpu->sve_max_vq = max_vq;
- }
- 
--uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq)
--{
--    uint32_t bitnum;
--
--    /*
--     * We allow vq == ARM_MAX_VQ + 1 to be input because the caller may want
--     * to find the maximum vq enabled, which may be ARM_MAX_VQ, but this
--     * function always returns the next smaller than the input.
--     */
--    assert(vq && vq <= ARM_MAX_VQ + 1);
--
--    bitnum = find_last_bit(cpu->sve_vq_map, vq - 1);
--    return bitnum == vq - 1 ? 0 : bitnum + 1;
--}
--
- static void cpu_max_get_sve_max_vq(Object *obj, Visitor *v, const char *name,
-                                    void *opaque, Error **errp)
- {
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index be67e2c66d..a089fb5a69 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -5363,9 +5363,14 @@ int sve_exception_el(CPUARMState *env, int el)
- 
- static uint32_t sve_zcr_get_valid_len(ARMCPU *cpu, uint32_t start_len)
- {
--    uint32_t start_vq = (start_len & 0xf) + 1;
-+    uint32_t end_len;
- 
--    return arm_cpu_vq_map_next_smaller(cpu, start_vq + 1) - 1;
-+    end_len = start_len &= 0xf;
-+    if (!test_bit(start_len, cpu->sve_vq_map)) {
-+        end_len = find_last_bit(cpu->sve_vq_map, start_len);
-+        assert(end_len < start_len);
-+    }
-+    return end_len;
- }
- 
- /*
--- 
-2.17.1
+  And now bash is completely broken:
 
+  cking@eoan-s390x:~$ bash
+  [12676.204389] User process fault: interruption code 0007 ilc:3 in bash[2=
+aa14780000+149000]
+
+  Floating point exception (core dumped)
+
+  The upgrade works OK on a s390x, so I'm assuming it's something to do
+  with the qemu emulation.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1852781/+subscriptions
 
