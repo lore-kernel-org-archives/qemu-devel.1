@@ -2,81 +2,90 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83C89C432C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 18:55:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D849AC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 18:56:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50EC7222ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 18:55:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA33E222AA
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 18:56:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XpFWtRJ4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50EC7222ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ftESPiX0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA33E222AA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWmBp-00077G-Ee
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 13:55:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42304)
+	id 1iWmBu-0007Hf-SQ
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 13:56:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42342)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iWmAu-00060U-9D
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:55:01 -0500
+ (envelope-from <mlureau@redhat.com>) id 1iWmAx-000622-CT
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:55:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iWmAt-00054W-4o
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:55:00 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36358
+ (envelope-from <mlureau@redhat.com>) id 1iWmAw-00055c-6N
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:55:03 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60578
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iWmAt-00054P-0V
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:54:59 -0500
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iWmAw-00055M-26
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:55:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574103298;
+ s=mimecast20190719; t=1574103301;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lLJaR17OdpMM/MSrxIrdIGLU/eZlORloLpviZq+sMEU=;
- b=XpFWtRJ4F8IikqRdphb485bqWavPQ2W2JjLJnOGEisYk7nD1o6kv/MnAYY8pLm8TRY7Woz
- hQI88iC6E3oKNVvyfqp3XF9ttv6YkXLjGE3ivnZ1v8DjNOnsGnL8vygUjXHP8/JCaknNjr
- ipANDDUPVwh7FtrcQa3/Ss95NbAvIIo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-3YlGJxrRM2SPDYL5hM1OsQ-1; Mon, 18 Nov 2019 13:54:56 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA70A1883525;
- Mon, 18 Nov 2019 18:54:55 +0000 (UTC)
-Received: from localhost (ovpn-116-6.gru2.redhat.com [10.97.116.6])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0EC7F19C4F;
- Mon, 18 Nov 2019 18:54:54 +0000 (UTC)
-Date: Mon, 18 Nov 2019 15:54:53 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Denis Plotnikov <dplotnikov@virtuozzo.com>
-Subject: Re: [PATCH v0 1/2] qdev-properties-system: extend set_pionter for
- unrealized devices
-Message-ID: <20191118185453.GC3812@habkost.net>
-References: <20191110190310.19799-1-dplotnikov@virtuozzo.com>
- <20191110190310.19799-2-dplotnikov@virtuozzo.com>
+ bh=2wuC6zZgRTcwujJGj51sXk4BJT33h+rRfRk2wdXELLE=;
+ b=ftESPiX0C9CxgE0Bil8i5MvhODMovrhs1EDuFtLkY6qcNOxFiyIHlj+Iw8f7ct9YY6594r
+ A6bA5J1HXfXubCysFHmjwcEphLN6LBfa71xqgB6CN9lDBQ/MytWG3Qosi41FlAXnqSxXYK
+ a3judA5cGJqOSLbQI3QNeYgH9RQdjdo=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-171-Hc5APrXTMq6FI_pSV-KEPg-1; Mon, 18 Nov 2019 13:55:00 -0500
+Received: by mail-oi1-f199.google.com with SMTP id w20so9203362oie.17
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 10:55:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=2wuC6zZgRTcwujJGj51sXk4BJT33h+rRfRk2wdXELLE=;
+ b=lJxZbjcBCh87MiEuvgbICn3ihEfs4AZGGsBD6rTT6+p0Ea+nf+JMbP1qhXSpKyjsT4
+ dp6MEpxnOY6xyNgwrjnfgZBbEMdmdf/ViVlgqXIMMArzX63zTNDgbI8IY8jcj495MPG1
+ 5bMqxkMjQD2Og6zwalQ/2NW/sp71oi1QXL2OyBNtTTVa/V9Y7ZJTXkdxxluXxL2HFups
+ uKm/fcSsDh7yKzqEYd0foX5s5sWM6whxVeLxpkUxkA7yJWDfF+SFruk0KlOFPgUVMVT+
+ xYhQv/bBrcm4lFXXgV13RExKD2k9ckBe801wM4yw90RFYpMPJLKgE0H68s6Pk55NeT7t
+ J9Cw==
+X-Gm-Message-State: APjAAAVeufrDZyaBXYl6zoo7gpz3USpKw4s6B7tEgtbvMxSS2/QvVy8l
+ 0jxyA0iG/6VnmQo6IsQL4go96DNQOYouFFoEqJI71kAoynhmIFpHtp/fOpKMsY9yCen1dc7l7S9
+ P4GFazXle9En6pT/sm5+JFif9RvL30RM=
+X-Received: by 2002:a9d:67ce:: with SMTP id c14mr575267otn.38.1574103299667;
+ Mon, 18 Nov 2019 10:54:59 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy+m3Ulvccx90jH6CTULFlaQC9UOEploe9KkG9u7UiA9yeFKuUicNs4koGcxnKFpJzwoNUIqU/SEGoUN5YJY3k=
+X-Received: by 2002:a9d:67ce:: with SMTP id c14mr575242otn.38.1574103299298;
+ Mon, 18 Nov 2019 10:54:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191110190310.19799-2-dplotnikov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 3YlGJxrRM2SPDYL5hM1OsQ-1
+References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
+ <20191023173154.30051-5-marcandre.lureau@redhat.com>
+ <CAFEAcA9oV-fHLmh3uJTwJrQW60=HFQmRb_brkRpB5BYYVDqF+g@mail.gmail.com>
+In-Reply-To: <CAFEAcA9oV-fHLmh3uJTwJrQW60=HFQmRb_brkRpB5BYYVDqF+g@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Mon, 18 Nov 2019 22:54:48 +0400
+Message-ID: <CAMxuvaxLKUYWjJTY0HN0zyFU-tFQk3_qTtvaQ9S9zDN6Xvg+Bw@mail.gmail.com>
+Subject: Re: [PATCH v3 04/33] chardev: generate an internal id when none given
+To: Peter Maydell <peter.maydell@linaro.org>
+X-MC-Unique: Hc5APrXTMq6FI_pSV-KEPg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,114 +97,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, berrange@redhat.com,
- den@virtuozzo.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, pbonzini@redhat.com
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paul Burton <pburton@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Nov 10, 2019 at 10:03:09PM +0300, Denis Plotnikov wrote:
-> Some device's property can be changed if the device has been already
-> realized. For example, it could be "drive" property of a scsi disk device=
-.
->=20
-> So far, set_pointer could operate only on a relized device. The patch
-> extends its interface for operation on an unrealized device.
->=20
-> Signed-off-by: Denis Plotnikov <dplotnikov@virtuozzo.com>
-> ---
->  hw/core/qdev-properties-system.c | 32 +++++++++++++++++++++-----------
->  1 file changed, 21 insertions(+), 11 deletions(-)
->=20
-> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-s=
-ystem.c
-> index ba412dd2ca..c534590dcd 100644
-> --- a/hw/core/qdev-properties-system.c
-> +++ b/hw/core/qdev-properties-system.c
-> @@ -38,9 +38,14 @@ static void get_pointer(Object *obj, Visitor *v, Prope=
-rty *prop,
->  }
-> =20
->  static void set_pointer(Object *obj, Visitor *v, Property *prop,
-> -                        void (*parse)(DeviceState *dev, const char *str,
-> -                                      void **ptr, const char *propname,
-> -                                      Error **errp),
-> +                        void (*parse_realized)(DeviceState *dev,
-> +                                               const char *str, void **p=
-tr,
-> +                                               const char *propname,
-> +                                               Error **errp),
-> +                        void (*parse_unrealized)(DeviceState *dev,
-> +                                                 const char *str, void *=
-*ptr,
-> +                                                 const char *propname,
-> +                                                 Error **errp),
->                          const char *name, Error **errp)
+Hi
 
-Wouldn't it be simpler to just add a PropertyInfo::allow_set_after_realize
-bool field, and call the same setter function?  Then you can
-simply change do_parse_drive() to check if realized is true.
+On Mon, Nov 18, 2019 at 6:12 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> On Wed, 23 Oct 2019 at 18:33, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+> >
+> > Internally, qemu may create chardev without ID. Those will not be
+> > looked up with qemu_chr_find(), which prevents using qdev_prop_set_chr(=
+).
+> >
+> > Use id_generate(), to generate an internal name (prefixed with #), so
+> > no conflict exist with user-named chardev.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> > -Chardev *qemu_chardev_new(const char *id, const char *typename,
+> > -                          ChardevBackend *backend,
+> > -                          GMainContext *gcontext,
+> > -                          Error **errp)
+> > +static Chardev *chardev_new(const char *id, const char *typename,
+> > +                            ChardevBackend *backend,
+> > +                            GMainContext *gcontext,
+> > +                            Error **errp)
+> >  {
+> >      Object *obj;
+> >      Chardev *chr =3D NULL;
+> > @@ -991,6 +992,21 @@ end:
+> >      return chr;
+> >  }
+> >
+> > +Chardev *qemu_chardev_new(const char *id, const char *typename,
+> > +                          ChardevBackend *backend,
+> > +                          GMainContext *gcontext,
+> > +                          Error **errp)
+> > +{
+> > +    g_autofree char *genid =3D NULL;
+> > +
+> > +    if (!id) {
+> > +        genid =3D id_generate(ID_CHR);
+> > +        id =3D genid;
+> > +    }
+> > +
+> > +    return chardev_new(id, typename, backend, gcontext, errp);
+> > +}
+>
+> So presumably the idea is that chardev_new() now must be
+> called with a non-NULL id (should it assert() that?),
 
->  {
->      DeviceState *dev =3D DEVICE(obj);
-> @@ -48,11 +53,6 @@ static void set_pointer(Object *obj, Visitor *v, Prope=
-rty *prop,
->      void **ptr =3D qdev_get_prop_ptr(dev, prop);
->      char *str;
-> =20
-> -    if (dev->realized) {
-> -        qdev_prop_set_after_realize(dev, name, errp);
-> -        return;
-> -    }
-> -
->      visit_type_str(v, name, &str, &local_err);
->      if (local_err) {
->          error_propagate(errp, local_err);
-> @@ -63,7 +63,17 @@ static void set_pointer(Object *obj, Visitor *v, Prope=
-rty *prop,
->          *ptr =3D NULL;
->          return;
->      }
-> -    parse(dev, str, ptr, prop->name, errp);
-> +
-> +    if (dev->realized) {
-> +        if (parse_realized) {
-> +            parse_realized(dev, str, ptr, prop->name, errp);
-> +        } else {
-> +            qdev_prop_set_after_realize(dev, name, errp);
-> +        }
-> +    } else {
-> +        parse_unrealized(dev, str, ptr, prop->name, errp);
-> +    }
-> +
->      g_free(str);
->  }
-> =20
-> @@ -178,13 +188,13 @@ static void get_drive(Object *obj, Visitor *v, cons=
-t char *name, void *opaque,
->  static void set_drive(Object *obj, Visitor *v, const char *name, void *o=
-paque,
->                        Error **errp)
->  {
-> -    set_pointer(obj, v, opaque, parse_drive, name, errp);
-> +    set_pointer(obj, v, opaque, NULL, parse_drive, name, errp);
->  }
-> =20
->  static void set_drive_iothread(Object *obj, Visitor *v, const char *name=
+Not, it can still be called with NULL (mostly for qmp_chardev_change()).
+
+> and qemu_chardev_new() can be called with a NULL id, in
+> which case it will create one ?
+
+Right
+
+>
+> > +
+> >  ChardevReturn *qmp_chardev_add(const char *id, ChardevBackend *backend=
 ,
->                                 void *opaque, Error **errp)
->  {
-> -    set_pointer(obj, v, opaque, parse_drive_iothread, name, errp);
-> +    set_pointer(obj, v, opaque, NULL, parse_drive_iothread, name, errp);
->  }
-> =20
->  const PropertyInfo qdev_prop_drive =3D {
-> --=20
-> 2.17.0
->=20
+> >                                 Error **errp)
+> >  {
+> > @@ -1003,8 +1019,8 @@ ChardevReturn *qmp_chardev_add(const char *id, Ch=
+ardevBackend *backend,
+> >          return NULL;
+> >      }
+> >
+> > -    chr =3D qemu_chardev_new(id, object_class_get_name(OBJECT_CLASS(cc=
+)),
+> > -                           backend, NULL, errp);
+> > +    chr =3D chardev_new(id, object_class_get_name(OBJECT_CLASS(cc)),
+> > +                      backend, NULL, errp);
+> >      if (!chr) {
+> >          return NULL;
+> >      }
+> > @@ -1061,8 +1077,8 @@ ChardevReturn *qmp_chardev_change(const char *id,=
+ ChardevBackend *backend,
+> >          return NULL;
+> >      }
+> >
+> > -    chr_new =3D qemu_chardev_new(NULL, object_class_get_name(OBJECT_CL=
+ASS(cc)),
+> > -                               backend, chr->gcontext, errp);
+> > +    chr_new =3D chardev_new(NULL, object_class_get_name(OBJECT_CLASS(c=
+c)),
+> > +                          backend, chr->gcontext, errp);
+>
+> ...but if that's so, why are we calling chardev_new() here
+> and passing a NULL pointer ?
 
---=20
-Eduardo
+Because it's qmp_chardev_change(), it's a transient state, the id is
+set after, and reparenting too. The code could probably be structured
+differently.
+
+>
+> How many callsites actually pass NULL, anyway? My grep
+> seems to show:
+>  * this qmp_chardev_change() call
+>  * gdbstub.c
+>  * hw/bt/hci-csr.c
+>  * tests/test-char.c
+>
+> Maybe we should just make them all pass in ID strings instead ?
+
+Well, in this case, we must be sure it doesn't conflict with user ID
+(presumably with # prefix), or duplicate etc. Why not leave it to
+id_generate() then?
 
 
