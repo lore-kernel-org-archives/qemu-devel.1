@@ -2,80 +2,85 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94820C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B2CC432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:17:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 608C9208CE
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:08:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D358B22310
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:17:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OkzQ0Ipi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 608C9208CE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OApvwaXL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D358B22310
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWoGU-0004ZO-JL
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 16:08:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33988)
+	id 1iWoOM-0001GM-LY
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 16:17:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35664)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iWoDG-0000kG-SS
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:05:38 -0500
+ (envelope-from <eblake@redhat.com>) id 1iWoMm-00085B-9v
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iWoDC-0000SA-S4
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:05:34 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48018
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eblake@redhat.com>) id 1iWoMk-0005Ty-NP
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:23 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52158
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iWoDC-0000RT-Oe
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:05:30 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iWoMk-0005Tp-KN
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574111130;
+ s=mimecast20190719; t=1574111722;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qM1nb36WuoLn5iPpv5w4jChgKX8iZnVU50qCjKMKGUE=;
- b=OkzQ0IpitUwU7yjpmdh2Lm2W3BVpxTp2VDsDeNuwkIrRkrc8wtED3CfPIr88qJqUTkBO5I
- 3cjWgYj85iQ329aF3T+kd5l7m8YJmc4QNx7FfkZloOPkK0D7Cd2fF0dE/moH7lIhZXQepR
- qwpwTFOl+npNMvPfjC8hrqikM0UMNL4=
+ bh=O2UsfxAmTPLYL+cGfqfSn8DXxf2oW74nMHRcKoQdDmk=;
+ b=OApvwaXLtJ4NIQjyJYN7Olrbc2BnowGUBSNBjtAVzNdkRKQ5NNiN6bIqy+kzar0CZZO10a
+ nxkwcwA0ASewGEESUjfMdOOV/VfXHpKTjD2K3RRh4XUrSlSiroFCA/RxeQF1n3r1+GP5qB
+ 2cGjlioXg2EPrAjB49YjyYXvND+zQ+k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-znd8cBw2N-KFvJlsNK483w-1; Mon, 18 Nov 2019 16:05:29 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-133-ekjv9PHaPNuYZiIljLbk6w-1; Mon, 18 Nov 2019 16:15:18 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDDBA1802CEB;
- Mon, 18 Nov 2019 21:05:27 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.206.9])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CAA7960BE2;
- Mon, 18 Nov 2019 21:05:21 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Eric Blake <eblake@redhat.com>,
-	qemu-devel@nongnu.org
-Subject: [PATCH-for-4.2 v3 3/3] trace: Forbid dynamic field width in event
- format
-Date: Mon, 18 Nov 2019 22:04:58 +0100
-Message-Id: <20191118210458.11959-4-philmd@redhat.com>
-In-Reply-To: <20191118210458.11959-1-philmd@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D715107B103;
+ Mon, 18 Nov 2019 21:15:16 +0000 (UTC)
+Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 877721BC76;
+ Mon, 18 Nov 2019 21:15:10 +0000 (UTC)
+Subject: Re: [PATCH-for-4.2 v3 1/3] hw/block/pflash: Remove dynamic field
+ width from trace events
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 References: <20191118210458.11959-1-philmd@redhat.com>
+ <20191118210458.11959-2-philmd@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <833a3e22-2bbb-f646-eb9b-5c56dfeb43e6@redhat.com>
+Date: Mon, 18 Nov 2019 15:15:09 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: znd8cBw2N-KFvJlsNK483w-1
+In-Reply-To: <20191118210458.11959-2-philmd@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: ekjv9PHaPNuYZiIljLbk6w-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,87 +96,36 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
  qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since not all trace backends support dynamic field width in
-format (dtrace via stap does not), forbid them.
+On 11/18/19 3:04 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Since not all trace backends support dynamic field width in
+> format (dtrace via stap does not), replace by a static field
+> width instead.
+>=20
+> We previously passed to the trace API 'width << 1' as the number
+> of hex characters to display (the dynamic field width). We don't
+> need this anymore. Instead, display the size of bytes accessed.
+>=20
+> Reported-by: Eric Blake <eblake@redhat.com>
+> Buglink: https://bugs.launchpad.net/qemu/+bug/1844817
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Add a check to refuse field width in new formats:
+Is it worth a Fixes: XXX calling out the commit that introduced the '*'?
 
-  $ make
-  [...]
-    GEN     hw/block/trace.h
-  Traceback (most recent call last):
-    File "scripts/tracetool.py", line 152, in <module>
-      main(sys.argv)
-    File "scripts/tracetool.py", line 143, in main
-      events.extend(tracetool.read_events(fh, arg))
-    File "scripts/tracetool/__init__.py", line 371, in read_events
-      event =3D Event.build(line)
-    File "scripts/tracetool/__init__.py", line 285, in build
-      raise ValueError("Event format must not contain field width '%*'")
-  ValueError: Error at hw/block/trace-events:11: Event format must not cont=
-ain field width '%*'
+/me goes and searches
 
-Reported-by: Eric Blake <eblake@redhat.com>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1844817
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v3:
-- use better regex provided by Eric,
-- instead of re.match(), use re.search() which takes unanchored regex,
-- added a comment in tracing.txt
----
- docs/devel/tracing.txt        | 3 ++-
- scripts/tracetool/__init__.py | 3 +++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+Fixes: e8aa2d95ea
+Fixes: c1474acd5d
 
-diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
-index 8c0376fefa..6c01ce801e 100644
---- a/docs/devel/tracing.txt
-+++ b/docs/devel/tracing.txt
-@@ -113,7 +113,8 @@ Format strings should reflect the types defined in the =
-trace event.  Take
- special care to use PRId64 and PRIu64 for int64_t and uint64_t types,
- respectively.  This ensures portability between 32- and 64-bit platforms.
- Format strings must not end with a newline character.  It is the responsib=
-ility
--of backends to adapt line ending for proper logging.
-+of backends to adapt line ending for proper logging.  Format strings must =
-not
-+use numeric field width dynamic precision (SystemTap does not support them=
-).
-=20
- Each event declaration will start with the event name, then its arguments,
- finally a format string for pretty-printing. For example:
-diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
-index 44c118bc2a..ec7fe9fa4a 100644
---- a/scripts/tracetool/__init__.py
-+++ b/scripts/tracetool/__init__.py
-@@ -206,6 +206,7 @@ class Event(object):
-                       "\s*"
-                       "(?:(?:(?P<fmt_trans>\".+),)?\s*(?P<fmt>\".+))?"
-                       "\s*")
-+    _DFWRE =3D re.compile(r"%[\d\.\- +#']*\*") # dynamic width precision
-=20
-     _VALID_PROPS =3D set(["disable", "tcg", "tcg-trans", "tcg-exec", "vcpu=
-"])
-=20
-@@ -280,6 +281,8 @@ class Event(object):
-         if fmt.endswith(r'\n"'):
-             raise ValueError("Event format must not end with a newline "
-                              "character")
-+        if Event._DFWRE.search(fmt):
-+            raise ValueError("Event format must not contain field width '%=
-*'")
-=20
-         if len(fmt_trans) > 0:
-             fmt =3D [fmt_trans, fmt]
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 --=20
-2.21.0
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
