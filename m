@@ -2,85 +2,86 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B2CC432C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:17:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17660C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:18:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D358B22310
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:17:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB95C22311
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:18:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OApvwaXL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D358B22310
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h+2Qho2v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB95C22311
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWoOM-0001GM-LY
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 16:17:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35664)
+	id 1iWoPL-0001p9-HT
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 16:18:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35764)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iWoMm-00085B-9v
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:25 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1iWoN8-0008R6-Rn
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iWoMk-0005Ty-NP
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:23 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52158
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iWoMk-0005Tp-KN
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574111722;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=O2UsfxAmTPLYL+cGfqfSn8DXxf2oW74nMHRcKoQdDmk=;
- b=OApvwaXLtJ4NIQjyJYN7Olrbc2BnowGUBSNBjtAVzNdkRKQ5NNiN6bIqy+kzar0CZZO10a
- nxkwcwA0ASewGEESUjfMdOOV/VfXHpKTjD2K3RRh4XUrSlSiroFCA/RxeQF1n3r1+GP5qB
- 2cGjlioXg2EPrAjB49YjyYXvND+zQ+k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-133-ekjv9PHaPNuYZiIljLbk6w-1; Mon, 18 Nov 2019 16:15:18 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D715107B103;
- Mon, 18 Nov 2019 21:15:16 +0000 (UTC)
-Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 877721BC76;
- Mon, 18 Nov 2019 21:15:10 +0000 (UTC)
-Subject: Re: [PATCH-for-4.2 v3 1/3] hw/block/pflash: Remove dynamic field
- width from trace events
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20191118210458.11959-1-philmd@redhat.com>
- <20191118210458.11959-2-philmd@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <833a3e22-2bbb-f646-eb9b-5c56dfeb43e6@redhat.com>
-Date: Mon, 18 Nov 2019 15:15:09 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <robert.foley@linaro.org>) id 1iWoN5-0005iU-1c
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:46 -0500
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:33983)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1iWoN4-0005hz-Sj
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:42 -0500
+Received: by mail-pg1-x544.google.com with SMTP id z188so10239807pgb.1
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 13:15:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=diXnF1IPkkxinXlGIqTBKK6HjgFjUcsfRfseHjAG8V0=;
+ b=h+2Qho2vTpunhRLfbyinfHSPOa+YoaWCod/ZWn6WgkDrMlTjLAmIGN/bNzgia5xPpk
+ YRk7BKwtye0qLaJijKZ+PfGxmnzlLWXYqbsv0Bk3hwxphR7kSPhEUt3+nyK3w3Z/p1fL
+ 1WtJMn6s0cGQ+pfsZW5C0KmmJ+QNXfbbQq/JRVQGl8Ao5WBxAlibD1bk+vnlpfMDAqn+
+ wlgj9DEZe0ZqnxsboGd8Qh/X+qVvbXWyAs765Mem3hW5tAGlbWn2YaX/kuDhEdjeAJGa
+ jXnnDaES1oFauz2IQ50oizgSXt+2az0+WcGe5Y4GDpUFm2nW35DUOhbo+ob1ucfi1Sp7
+ nHRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=diXnF1IPkkxinXlGIqTBKK6HjgFjUcsfRfseHjAG8V0=;
+ b=Kt4hV26hjg51C4Pes0FkFZ30FKMR5GgshlenpSDinP9elN29Wq+h1jMvEU1XhuoMyY
+ xrPsiVJ0MKejaF9TOPognr9IB8/86/p/F2k3Gb+4PVYb1+JmB0APVuB4+C2QIlSqCDUn
+ Fw/e4tqbchS5Ke5ZZ93anbFFMn/JNfXj/vDIoaj34EHj5szbZGfoig6qU3FrtchN/pEU
+ EUnz+LPezvSirQVkeIqYCkPQz4KXcgMmjZoC6AJoaA0MUqF6+harEIENvyJ5oruiOlfP
+ chiju0tN+XedjgFZcQoUVeyc8NIUDphZPHVuAQV5XCsDmPme4oLcVJoeZACmgXEn/FQs
+ pFeA==
+X-Gm-Message-State: APjAAAWmCFfZ3gA8TtTiJ622D9f4Tf9qZoJVwYFjt4cXsXZDCfrkXTOu
+ Xuivo/zW79dst4aVyx4FE9aVglbKrko=
+X-Google-Smtp-Source: APXvYqy+2N1iB+YkTEY1Jy2gp5MiS4ziTHhcp2pczMV9uYFIrZPhC8TlbLsoA4y6y+5U9hJVQQ0m2A==
+X-Received: by 2002:a62:e914:: with SMTP id j20mr1510186pfh.245.1574111741581; 
+ Mon, 18 Nov 2019 13:15:41 -0800 (PST)
+Received: from Rfoley-MA01.usrd.futurewei.com ([12.111.81.71])
+ by smtp.gmail.com with ESMTPSA id v15sm22301728pfe.44.2019.11.18.13.15.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 Nov 2019 13:15:41 -0800 (PST)
+From: Robert Foley <robert.foley@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 1/6] Fix double free issue in qemu_set_log_filename().
+Date: Mon, 18 Nov 2019 16:15:23 -0500
+Message-Id: <20191118211528.3221-2-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191118211528.3221-1-robert.foley@linaro.org>
+References: <20191118211528.3221-1-robert.foley@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191118210458.11959-2-philmd@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: ekjv9PHaPNuYZiIljLbk6w-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::544
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,40 +93,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: richard.henderson@linaro.org, alex.bennee@linaro.org,
+ robert.foley@linaro.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/18/19 3:04 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Since not all trace backends support dynamic field width in
-> format (dtrace via stap does not), replace by a static field
-> width instead.
->=20
-> We previously passed to the trace API 'width << 1' as the number
-> of hex characters to display (the dynamic field width). We don't
-> need this anymore. Instead, display the size of bytes accessed.
->=20
-> Reported-by: Eric Blake <eblake@redhat.com>
-> Buglink: https://bugs.launchpad.net/qemu/+bug/1844817
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+After freeing the logfilename, we set logfilename to NULL, in case of an
+error which returns without setting logfilename.
 
-Is it worth a Fixes: XXX calling out the commit that introduced the '*'?
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+---
+v2
+    - moved this change to the beginning of the patch series.
+---
+v1
+    - This is new in the patch v1.
+---
+ util/log.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-/me goes and searches
-
-Fixes: e8aa2d95ea
-Fixes: c1474acd5d
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+diff --git a/util/log.c b/util/log.c
+index 1ca13059ee..4316fe74ee 100644
+--- a/util/log.c
++++ b/util/log.c
+@@ -113,6 +113,7 @@ void qemu_set_log_filename(const char *filename, Error **errp)
+ {
+     char *pidstr;
+     g_free(logfilename);
++    logfilename = NULL;
+ 
+     pidstr = strstr(filename, "%");
+     if (pidstr) {
+-- 
+2.17.1
 
 
