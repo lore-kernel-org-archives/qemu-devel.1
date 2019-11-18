@@ -2,80 +2,98 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C800C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 22:32:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86958C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 22:34:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14F5C22309
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 22:32:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 508CB22309
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 22:34:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PBhkQEmc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14F5C22309
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dZMAGLDV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 508CB22309
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWpZR-00050e-9h
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 17:32:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44557)
+	id 1iWpbT-00069Z-Hs
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 17:34:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iWpVK-0001qe-Ld
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 17:28:22 -0500
+ (envelope-from <philmd@redhat.com>) id 1iWpWy-0003HK-22
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 17:30:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iWpVI-0006zw-JG
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 17:28:18 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:20299
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iWpWw-0007c6-1l
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 17:29:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44315
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iWpVG-0006zF-Gw
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 17:28:16 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iWpWv-0007bl-Uj
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 17:29:57 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574116094;
+ s=mimecast20190719; t=1574116197;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=s3cor6biQmpqn+tnJ2B55PoWtsVtFws5bfkkg9apAew=;
- b=PBhkQEmc1IV0DDh4fP0g4uXEfjvPQLB2aSwWzeTLbVZJpAHAQUOC+n7UWt+1HPav7GiSON
- T4eXjd+j3O1FNJb4ROOg7zfETLXcONJnwkGtM4z7COD6YLNYR2Z9OTzmZn7RDIUId/Lx7/
- XtdlbwhnImHW18KB3yikux6rnjw7jpM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-FFQvbAFaNp2tf0DGhSjv0Q-1; Mon, 18 Nov 2019 17:28:10 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DBAA107ACC7;
- Mon, 18 Nov 2019 22:28:09 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.206.9])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB58A27067;
- Mon, 18 Nov 2019 22:28:05 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: Eric Blake <eblake@redhat.com>,
-	qemu-devel@nongnu.org
-Subject: [PATCH v4 2/2] hw/mips/gt64xxx: Remove dynamic field width from trace
+ bh=0zgYrd1RDY7yMbwX/8pum+cR7F3LacLrQiBELhZA6OY=;
+ b=dZMAGLDVGzqJkWOymlBy2PKvRaVMG4y+eqAOfwYejl+vIxjvJ+3XVu27fW+kLw2n0DUEg4
+ QB6k+MNQ4SAiIVyXT5J2owPbXL65M13aNWgKWSrMWvNEpSjreDPGQJi731X3Rms0OX35pV
+ 99pJgQYINW5UD0jhiT/pe5004S2Lt/s=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-HI3EYUsrPvKkGW0HhMoBXQ-1; Mon, 18 Nov 2019 17:29:54 -0500
+Received: by mail-wr1-f70.google.com with SMTP id b4so16857041wrn.8
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 14:29:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=zvJkwaO2rd0InAQv7m0WZmhIMtP3vXxJWq90jY36iXU=;
+ b=qIWLH9hG/P4Yh3Kjem9/Sc0dqkPoma2HKVLo4kFuH6XQlAMhxJc0ttNpYVIg3NL/Rg
+ yeVAfmpp53ika7tC+MSXv3HJPhgGHDakqc5oKH08YsiXqv0/AKytW0bi9h2DUFeV5xqN
+ oHY2rG8Cvx9ukK3ukkEa/ioPmnPWWOY5hmnL/1V8Fss5arJiWGi47U1mg2Egj1LQn5G0
+ qoSxTR8khBnRfPMFfLgfEUKwE64MMdnuj4AsOTv3YXTRpMLu4mvP1+1dB2upBsBu4ldM
+ 43/UDTrhxIn74L3hgDf5gC+QZymtBRW8pgCY4STnWFKgfPQFqjwto5bR5L5cuGBRE+mt
+ IYEQ==
+X-Gm-Message-State: APjAAAVwh349cmtoGck+0ApEcIYwthKBe61iGNeesuOJIHGR040kISVL
+ Z87HeCLyJ79T9HIuSXkY5QIwahQh23wcEUG2kIeYJQwEQP9nN/nzZBHQ6/wvDuA/cLhSFqpR4Cc
+ nJNxXGBlG1jHoI6o=
+X-Received: by 2002:adf:f0c4:: with SMTP id x4mr30497886wro.217.1574116193235; 
+ Mon, 18 Nov 2019 14:29:53 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxv9c3H4HrbTHwa8NiCvBiAo/ZvHo/HkJVQI2Z9P78wyZiutj2x7zs+AP6SIEGPZfDBpMiP+w==
+X-Received: by 2002:adf:f0c4:: with SMTP id x4mr30497857wro.217.1574116192939; 
+ Mon, 18 Nov 2019 14:29:52 -0800 (PST)
+Received: from [192.168.1.35] (131.red-88-21-102.staticip.rima-tde.net.
+ [88.21.102.131])
+ by smtp.gmail.com with ESMTPSA id k1sm25206184wrp.29.2019.11.18.14.29.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 18 Nov 2019 14:29:52 -0800 (PST)
+Subject: Re: [PATCH-for-4.2 v4 0/2] hw: Remove dynamic field width from trace
  events
-Date: Mon, 18 Nov 2019 23:27:46 +0100
-Message-Id: <20191118222746.31467-3-philmd@redhat.com>
-In-Reply-To: <20191118222746.31467-1-philmd@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 References: <20191118222746.31467-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <7b8db299-0d00-d8d2-8612-7f7beccb84bb@redhat.com>
+Date: Mon, 18 Nov 2019 23:29:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: FFQvbAFaNp2tf0DGhSjv0Q-1
+In-Reply-To: <20191118222746.31467-1-philmd@redhat.com>
+Content-Language: en-US
+X-MC-Unique: HI3EYUsrPvKkGW0HhMoBXQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,104 +109,27 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
  qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
  Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since not all trace backends support dynamic field width in
-format (dtrace via stap does not), replace by a static field
-width instead.
+This is material for 4.2-rc2.
 
-We previously passed to the trace API 'width << 1' as the number
-of hex characters to display (the dynamic field width). We don't
-need this anymore. Instead, display the size of bytes accessed.
-
-Fixes: ab6bff424f (gt64xxx_pci: Convert debug printf to trace events)
-Reported-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1844817
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
-v2: Do not update qemu_log_mask()
-v3: display size (in byte)
-v4: added Fixes/Reviewed-by
----
- hw/mips/gt64xxx_pci.c | 16 ++++++++--------
- hw/mips/trace-events  |  4 ++--
- 2 files changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
-index 5cab9c1ee1..f1af840d8e 100644
---- a/hw/mips/gt64xxx_pci.c
-+++ b/hw/mips/gt64xxx_pci.c
-@@ -642,19 +642,19 @@ static void gt64120_writel(void *opaque, hwaddr addr,
-         /* not really implemented */
-         s->regs[saddr] =3D ~(~(s->regs[saddr]) | ~(val & 0xfffffffe));
-         s->regs[saddr] |=3D !!(s->regs[saddr] & 0xfffffffe);
--        trace_gt64120_write("INTRCAUSE", size << 1, val);
-+        trace_gt64120_write("INTRCAUSE", size, val);
-         break;
-     case GT_INTRMASK:
-         s->regs[saddr] =3D val & 0x3c3ffffe;
--        trace_gt64120_write("INTRMASK", size << 1, val);
-+        trace_gt64120_write("INTRMASK", size, val);
-         break;
-     case GT_PCI0_ICMASK:
-         s->regs[saddr] =3D val & 0x03fffffe;
--        trace_gt64120_write("ICMASK", size << 1, val);
-+        trace_gt64120_write("ICMASK", size, val);
-         break;
-     case GT_PCI0_SERR0MASK:
-         s->regs[saddr] =3D val & 0x0000003f;
--        trace_gt64120_write("SERR0MASK", size << 1, val);
-+        trace_gt64120_write("SERR0MASK", size, val);
-         break;
-=20
-     /* Reserved when only PCI_0 is configured. */
-@@ -930,19 +930,19 @@ static uint64_t gt64120_readl(void *opaque,
-     /* Interrupts */
-     case GT_INTRCAUSE:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("INTRCAUSE", size << 1, val);
-+        trace_gt64120_read("INTRCAUSE", size, val);
-         break;
-     case GT_INTRMASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("INTRMASK", size << 1, val);
-+        trace_gt64120_read("INTRMASK", size, val);
-         break;
-     case GT_PCI0_ICMASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("ICMASK", size << 1, val);
-+        trace_gt64120_read("ICMASK", size, val);
-         break;
-     case GT_PCI0_SERR0MASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("SERR0MASK", size << 1, val);
-+        trace_gt64120_read("SERR0MASK", size, val);
-         break;
-=20
-     /* Reserved when only PCI_0 is configured. */
-diff --git a/hw/mips/trace-events b/hw/mips/trace-events
-index 75d4c73f2e..321933283f 100644
---- a/hw/mips/trace-events
-+++ b/hw/mips/trace-events
-@@ -1,4 +1,4 @@
- # gt64xxx.c
--gt64120_read(const char *regname, int width, uint64_t value) "gt64120 read=
- %s value:0x%0*" PRIx64
--gt64120_write(const char *regname, int width, uint64_t value) "gt64120 wri=
-te %s value:0x%0*" PRIx64
-+gt64120_read(const char *regname, unsigned size, uint64_t value) "gt64120 =
-read %s size:%u value:0x%08" PRIx64
-+gt64120_write(const char *regname, unsigned size, uint64_t value) "gt64120=
- write %s size:%u value:0x%08" PRIx64
- gt64120_isd_remap(uint64_t from_length, uint64_t from_addr, uint64_t to_le=
-ngth, uint64_t to_addr) "ISD: 0x%08" PRIx64 "@0x%08" PRIx64 " -> 0x%08" PRI=
-x64 "@0x%08" PRIx64
---=20
-2.21.0
+On 11/18/19 11:27 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> This series fixes LP#1844817 [2].
+>=20
+> (Eric noted in [1] the dtrace via stap backend can not support
+> the dynamic '*' width format.)
+>=20
+> If they are trivial/block/tracing pull in preparation, this
+> series will be happy to be taken, else it will go via mips-next.
+>=20
+> Thanks,
+>=20
+> Phil.
+>=20
+> [1] https://lists.gnu.org/archive/html/qemu-devel/2019-09/msg04720.html
+> [2] https://bugs.launchpad.net/qemu/+bug/1844817
 
 
