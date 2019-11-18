@@ -2,87 +2,85 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8382C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:24:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A649C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:25:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83E07222DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:24:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1EDF222DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:25:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dad+0U01"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83E07222DD
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lfg/nDRe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1EDF222DD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWoVo-0002Hg-Jw
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 16:24:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35832)
+	id 1iWoWk-0003MP-To
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 16:25:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36907)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <robert.foley@linaro.org>) id 1iWoNI-0000F5-6L
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:16:00 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iWoTW-00080S-Sw
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:22:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <robert.foley@linaro.org>) id 1iWoNE-0005nz-AR
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:56 -0500
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:40687)
+ (envelope-from <peter.maydell@linaro.org>) id 1iWoTU-0001nQ-UV
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:22:22 -0500
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:38550)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
- id 1iWoNE-0005ne-4w
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:52 -0500
-Received: by mail-pj1-x1041.google.com with SMTP id ep1so1854423pjb.7
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 13:15:52 -0800 (PST)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iWoTT-0001mO-1F
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:22:20 -0500
+Received: by mail-oi1-x242.google.com with SMTP id a14so16764399oid.5
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 13:22:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=nB9UJp1tY01vA+O7nUtpyswqmIH2jEdG/Vc4ku6hyfs=;
- b=Dad+0U01jzs2l4tt+VDm7bNGm06VFMSN2gcaWsVewISGT50ZsTxtEMmdJoMNOBdLME
- 14wjs6q6YKCuP0/aS2uAlHSHbrJpmoXXG+m4oqjsRJr+LT2eGgIQ/eI3zdVRaBCfBeCU
- T6uVavywPilx9/22qrtXaVjThUjH67zAFdYRkoTfRFbAQehB2YeUghi5xhmV4S4eEQZE
- 3evmP65xUAmD7o2IaTnz35RkO8VVzmQvNqboJGZ57p4G/8QmcuroaGvjLNPp6IAt3xsm
- vE/ynRBl3wtJdw8Um/bo53S6L9eEzLSIvmM3OALDhEWB0dbiSncEsIDo3glWeNlewovV
- dAtg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=jRDi7HYnf8c4TF3RQNVQKw+I2dKGd0rVFRaPLUds7no=;
+ b=Lfg/nDReTI+tpyP7sixHXhbL9lQAxCgx0jA+8oUGK9/zUO/tuaxZhAnkavQvbohn24
+ n6EgBDjblqU7n8Cp4wKA0uMHv+SDQqfMiaSZ7/RxOZy/f6RzBRsBuRFK8qqbnWgdDbeA
+ JWlylXIp2cwETXyChmDYLPihCx8hwqNh7TaTIcDWXaXbrbCRb4FIrgrAsFGTVuzKyZZF
+ HgS2eZyskUDnrIl8hskmqNT/dnihK9/rD5QVaf01fufjhOi+VHsvNulVLNsml1Pw+eNz
+ Lwz+14ao2+Z5CHlJvS+Cy+W54XZpxlAQlh9fsUBDougu2++JmLMx/cXJJXt1RvUmbyzQ
+ DC1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=nB9UJp1tY01vA+O7nUtpyswqmIH2jEdG/Vc4ku6hyfs=;
- b=sQzpIcJOugrSKlag5rwSYQTDDe196/ChKazlpWI7co15+iUT7vMpA/5YRrwIP0mglW
- xOlyGgOrA5pWR/4z3WqpQRV56q+AGUinrJefAxwrw+zzcjpxq8Eu4fDhaRDY6+ltDGYL
- tYlJZFcsg3vRQmSi5dwIxWfb4XqwEuPO0bYE44RED/9u0QxIFZMSg3gIlPQ2rGiH3VoC
- DBJDULfq4Zi9VfRYUTy/9AWCwylRlWyjLvClN3ZkZ9BRZnWqyyDVye9/UAHfXatzz6s/
- KJS+9zGydmqOgXF+oFOvAxmKqmsyVnWQOVhf20ollQoIF8Q5IYvz4K62VPfoUHp7ucAT
- avIw==
-X-Gm-Message-State: APjAAAWBSJgT8udLscB0NrhZ38rTlhCmWO7lw6ZGTlkWXiU25FAXmrYk
- rETyMhpKVJnGjTmrXpBKeW88O+nJ4tU=
-X-Google-Smtp-Source: APXvYqyVtr2sZWVI2ooQO2n9rEbDfeDy8xJIbUlQkz5AY9NBYyNkxCyseL2TzspWPrZRhGvpPZV/sw==
-X-Received: by 2002:a17:90a:a405:: with SMTP id
- y5mr1439885pjp.102.1574111750942; 
- Mon, 18 Nov 2019 13:15:50 -0800 (PST)
-Received: from Rfoley-MA01.usrd.futurewei.com ([12.111.81.71])
- by smtp.gmail.com with ESMTPSA id v15sm22301728pfe.44.2019.11.18.13.15.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 Nov 2019 13:15:50 -0800 (PST)
-From: Robert Foley <robert.foley@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 6/6] Added tests for close and change of logfile.
-Date: Mon, 18 Nov 2019 16:15:28 -0500
-Message-Id: <20191118211528.3221-7-robert.foley@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191118211528.3221-1-robert.foley@linaro.org>
-References: <20191118211528.3221-1-robert.foley@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=jRDi7HYnf8c4TF3RQNVQKw+I2dKGd0rVFRaPLUds7no=;
+ b=WnYutsQaxzZwqc1wyQ4knOSRVQSOcasRiZoP3mJzqpymIBykUnAhJ4NP2MueZPnGd1
+ Dc7IyM0MDnPN3P05k8MlGsEPk2RYoAN5NIE83lE/T92NdieeHMm84d9zVcjOjqF89E0B
+ q710h6TmfZGjqRNjicFerIrIP0Svo4XwknzmkIRiyobekriUcABIxFtyixPHyCepkVki
+ vCQY9m2dfMM1O/4hqV0Ib0qdNFYYieRQ6LMH64ErKeu/YzguacanJnBpHiMGvLfhpyPp
+ lTVa1+WhrftrohelNvA37iGh0sA0ii3yPtwNMiufKXO/3VkbAMdbnx8VG4D4om0OWjQ0
+ dOTQ==
+X-Gm-Message-State: APjAAAWTFtM9FN/30912Gwmx6cjfOb6toOM7071FcSW/bFde++B8qdn/
+ UCif7MVaO+WEO0mGVNgGi3a7zHbj3QrF91xQtFqK3A==
+X-Google-Smtp-Source: APXvYqziMH9C1DI+STIDdxTRJhSXecI4wF6Z04VvjRtwyAbYAygNSUT2d/g+cYRqP/xLgKitHoNhpJM7FSK5IFpXyNc=
+X-Received: by 2002:a05:6808:8c2:: with SMTP id
+ k2mr911291oij.163.1574112138024; 
+ Mon, 18 Nov 2019 13:22:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20191117090621.32425-1-richard.henderson@linaro.org>
+ <20191117090621.32425-3-richard.henderson@linaro.org>
+ <CAFEAcA8FdT8R4_nwUQ1QLBMBST_K0xuHABER3f8kt6JY1vYojw@mail.gmail.com>
+ <f8071794-cb5f-d987-0e7d-11a70ba4d2bc@linaro.org>
+ <CAFEAcA_qF6e_4_7syRVomag31pMgX02=R7JJ7a5pW_r+MU-aaQ@mail.gmail.com>
+ <59a944f9-45f0-b78f-6ec3-5e96fe804767@linaro.org>
+In-Reply-To: <59a944f9-45f0-b78f-6ec3-5e96fe804767@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 18 Nov 2019 21:22:10 +0000
+Message-ID: <CAFEAcA_f9bqh-d3=kZem_=SCokGgr-ZDeJnGkirBojYy58xExw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] target/arm: Relax r13 restriction for ldrex/strex for
+ v8.0
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::1041
+X-Received-From: 2607:f8b0:4864:20::242
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,127 +92,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: richard.henderson@linaro.org, alex.bennee@linaro.org,
- robert.foley@linaro.org, peter.puhov@linaro.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-One test ensures that the logfile handle is still valid even if
-the logfile is changed during logging.
-The other test validates that the logfile handle remains valid under
-the logfile lock even if the logfile is closed.
+On Mon, 18 Nov 2019 at 20:02, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 11/18/19 6:53 PM, Peter Maydell wrote:
+> > On Mon, 18 Nov 2019 at 13:16, Richard Henderson
+> > <richard.henderson@linaro.org> wrote:
+> >>
+> >> On 11/18/19 2:10 PM, Peter Maydell wrote:
+> >>>>      /* We UNDEF for these UNPREDICTABLE cases.  */
+> >>>>      if (a->rn == 15 || a->rt == 15
+> >>>> -        || (s->thumb && a->rt == 13)
+> >>>> +        || (!ENABLE_ARCH_8 && s->thumb && a->rt == 13)
+> >>>>          || (mop == MO_64
+> >>>>              && (a->rt2 == 15 || a->rt == a->rt2
+> >>>> -                || (s->thumb && a->rt2 == 13)))) {
+> >>>> +                || (!ENABLE_ARCH_8 && s->thumb && a->rt2 == 13)))) {
+> >>>>          unallocated_encoding(s);
+> >>>>          return true;
+> >>>>      }
+> >>>
+> >>> These cases for r13 are indeed no longer UNPREDICTABLE in
+> >>> v8A, but they are still marked as UNPREDICTABLE for v8M...
+> >>
+> >> Ho hum.  I knew I should have looked at that doc as well...
+> >
+> > I would like to get this in for rc2 tomorrow, so I propose
+> > to squash in changes to give the following result (basically
+> > turning the ENABLE_ARCH_8 checks into checks on a new bool 'v8a'):
+> >
+> >
+> > diff --git a/target/arm/translate.c b/target/arm/translate.c
+> > index b285b23858e..4d5d4bd8886 100644
+> > --- a/target/arm/translate.c
+> > +++ b/target/arm/translate.c
+> > @@ -8927,15 +8927,17 @@ static bool trans_SWPB(DisasContext *s, arg_SWP *a)
+> >  static bool op_strex(DisasContext *s, arg_STREX *a, MemOp mop, bool rel)
+> >  {
+> >      TCGv_i32 addr;
+> > +    /* Some cases stopped being UNPREDICTABLE in v8A (but not v8M) */
+> > +    bool v8a = ENABLE_ARCH_8 && !arm_dc_feature(s, ARM_FEATURE_M);
+>
+> Sorry, I wrote the patch but got distracted with other bugs without getting
+> around to posting.  I had solved this with a new ENABLE_ARCH_8A, but this
+> version works for me as well.
 
-Signed-off-by: Robert Foley <robert.foley@linaro.org>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
----
-v1
-    - Changes for first round of code review comments.
-    - Added in use of g_autofree, removed the g_free()s.
-    - Added in use of logfile2 and changed sequence of asserts.
----
- tests/test-logging.c | 80 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
+At some point we should decide whether we prefer these ENABLE
+macros or just to open-code arm_dc_feature() calls, because the
+current mix is a bit odd... (for code I've written I've tended to the
+arm_dc_feature() approach).
 
-diff --git a/tests/test-logging.c b/tests/test-logging.c
-index a12585f70a..1e646f045d 100644
---- a/tests/test-logging.c
-+++ b/tests/test-logging.c
-@@ -108,6 +108,82 @@ static void test_parse_path(gconstpointer data)
-     error_free_or_abort(&err);
- }
- 
-+static void test_logfile_write(gconstpointer data)
-+{
-+    QemuLogFile *logfile;
-+    QemuLogFile *logfile2;
-+    gchar const *dir = data;
-+    Error *err = NULL;
-+    g_autofree gchar *file_path;
-+    g_autofree gchar *file_path1;
-+    FILE *orig_fd;
-+
-+    /*
-+     * Before starting test, set log flags, to ensure the file gets
-+     * opened below with the call to qemu_set_log_filename().
-+     * In cases where a logging backend other than log is used,
-+     * this is needed.
-+     */
-+    qemu_set_log(CPU_LOG_TB_OUT_ASM);
-+    file_path = g_build_filename(dir, "qemu_test_log_write0.log", NULL);
-+    file_path1 = g_build_filename(dir, "qemu_test_log_write1.log", NULL);
-+
-+    /*
-+     * Test that even if an open file handle is changed,
-+     * our handle remains valid due to RCU.
-+     */
-+    qemu_set_log_filename(file_path, &err);
-+    g_assert(!err);
-+    rcu_read_lock();
-+    logfile = atomic_rcu_read(&qemu_logfile);
-+    orig_fd = logfile->fd;
-+    g_assert(logfile && logfile->fd);
-+    fprintf(logfile->fd, "%s 1st write to file\n", __func__);
-+    fflush(logfile->fd);
-+
-+    /* Change the logfile and ensure that the handle is still valid. */
-+    qemu_set_log_filename(file_path1, &err);
-+    g_assert(!err);
-+    logfile2 = atomic_rcu_read(&qemu_logfile);
-+    g_assert(logfile->fd == orig_fd);
-+    g_assert(logfile2->fd != logfile->fd);
-+    fprintf(logfile->fd, "%s 2nd write to file\n", __func__);
-+    fflush(logfile->fd);
-+    rcu_read_unlock();
-+}
-+
-+static void test_logfile_lock(gconstpointer data)
-+{
-+    FILE *logfile;
-+    gchar const *dir = data;
-+    Error *err = NULL;
-+    g_autofree gchar *file_path;
-+
-+    file_path = g_build_filename(dir, "qemu_test_logfile_lock0.log", NULL);
-+
-+    /*
-+     * Test the use of the logfile lock, such
-+     * that even if an open file handle is closed,
-+     * our handle remains valid for use due to RCU.
-+     */
-+    qemu_set_log_filename(file_path, &err);
-+    logfile = qemu_log_lock();
-+    g_assert(logfile);
-+    fprintf(logfile, "%s 1st write to file\n", __func__);
-+    fflush(logfile);
-+
-+    /*
-+     * Initiate a close file and make sure our handle remains
-+     * valid since we still have the logfile lock.
-+     */
-+    qemu_log_close();
-+    fprintf(logfile, "%s 2nd write to file\n", __func__);
-+    fflush(logfile);
-+    qemu_log_unlock(logfile);
-+
-+    g_assert(!err);
-+}
-+
- /* Remove a directory and all its entries (non-recursive). */
- static void rmdir_full(gchar const *root)
- {
-@@ -134,6 +210,10 @@ int main(int argc, char **argv)
- 
-     g_test_add_func("/logging/parse_range", test_parse_range);
-     g_test_add_data_func("/logging/parse_path", tmp_path, test_parse_path);
-+    g_test_add_data_func("/logging/logfile_write_path",
-+                         tmp_path, test_logfile_write);
-+    g_test_add_data_func("/logging/logfile_lock_path",
-+                         tmp_path, test_logfile_lock);
- 
-     rc = g_test_run();
- 
--- 
-2.17.1
-
+thanks
+-- PMM
 
