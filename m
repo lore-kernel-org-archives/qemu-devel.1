@@ -2,82 +2,62 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19CB3C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:19:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14826C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:46:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8FDD2071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:19:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PePEmBFJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8FDD2071E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id DA7172073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:46:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA7172073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWaNy-0007ki-0K
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 01:19:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36184)
+	id 1iWao3-00031F-QF
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 01:46:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38858)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <joel.stan@gmail.com>) id 1iWaMX-00071W-GM
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:18:14 -0500
+ (envelope-from <guoheyi@huawei.com>) id 1iWamZ-0002Kf-62
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:45:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel.stan@gmail.com>) id 1iWaMW-0005zE-0b
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:18:13 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:35027)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
- id 1iWaMS-0005u0-7k; Mon, 18 Nov 2019 01:18:08 -0500
-Received: by mail-pg1-x542.google.com with SMTP id k32so3408275pgl.2;
- Sun, 17 Nov 2019 22:18:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=JykI96YRsis8dgCEg/shW1vRhmHTLEtMbhdBgs5yPxU=;
- b=PePEmBFJ9ddf4opsptO/b+fwxkwxeQx887M9wvI3czpv8q+BQ9ytHFT/k4IqazdzCr
- pU387EzF0vxctAuhN3c+M/6TN/hc58v7YfNbeKhD1cYG6FzzC8GbDTkwtkPnwKTO1sWj
- L2j8cgO7G8HPkEgZHA8QzZwZdK4X+QJKkOBrFGUdf4vhN9s791p15gpqJty401ufZsnz
- 9wa0w5sbMwfADwPPDK1whap688Zs7nh9D8lAwFti0pIOWnU1bH/V4S86/djDxnmfUpHn
- p1GM3Pf05ci4V+IeQtQemQUa96MZ1Il99I15u4h5Tbn1fM0n9APUqMdgcvuQefeJC/tP
- oPPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=JykI96YRsis8dgCEg/shW1vRhmHTLEtMbhdBgs5yPxU=;
- b=RicD7fpBKIDyQ7rdsnULBmQU7FNllJDiD3bZ/TuJ49EUqqsiTZLlL0mtm+7nyK2TeD
- yNkc8W7jorg7nQYS/PmALeZpLT2WTzdCKVTb0c6RiHKKRQXPjAjmQJUrlIyeZsZ3Kkaz
- k3l6JMORU0E6u9J5eHF+SAjT20e1d5e4fvLvLh34aKFZnQGtsaI9tdTl5J5ksg4Rpkmd
- yHFyDU4CLZZEsO4E+nGL1GR6qyKIcAcGZ4IlXb9PBCjNQRQa7VK3h+VABn5mc6G9Kqi/
- IzyDx1crNqISDE81hNdZxO3CavqNd0C5xczD8FyazkIk5njX0l4IrT30xcxLDeMq+oID
- MF+g==
-X-Gm-Message-State: APjAAAX6IybGn2xGs5VedOuD/omhCB9vv8sCazdLCvcT6is3aajKWXT6
- 93HhZ9bdhG5YABtXn2O4liU=
-X-Google-Smtp-Source: APXvYqzKVrqppKp0vLUeWakdH558Eh9BqolQiKsIJmg2NuAUxLexjownvSXj8pJzcr+bO19NtFgUdQ==
-X-Received: by 2002:a63:7218:: with SMTP id n24mr19354968pgc.100.1574057885950; 
- Sun, 17 Nov 2019 22:18:05 -0800 (PST)
-Received: from voyager.ibm.com ([36.255.48.244])
- by smtp.gmail.com with ESMTPSA id u7sm16602843pjx.19.2019.11.17.22.18.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 17 Nov 2019 22:18:05 -0800 (PST)
-From: Joel Stanley <joel@jms.id.au>
-To: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Subject: [PATCH] misc/pca9552: Add qom set and get
-Date: Mon, 18 Nov 2019 16:47:57 +1030
-Message-Id: <20191118061757.52550-1-joel@jms.id.au>
-X-Mailer: git-send-email 2.24.0
+ (envelope-from <guoheyi@huawei.com>) id 1iWamX-0006s9-Ue
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:45:07 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2265 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
+ id 1iWamU-0006ny-Dy; Mon, 18 Nov 2019 01:45:02 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 94E87DE79A226FC2095D;
+ Mon, 18 Nov 2019 14:44:52 +0800 (CST)
+Received: from [127.0.0.1] (10.133.216.73) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Mon, 18 Nov 2019
+ 14:44:37 +0800
+Subject: Re: [RFC v2 14/14] virt/acpi: add SDEI table if SDEI is enabled
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20191105091056.9541-1-guoheyi@huawei.com>
+ <20191105091056.9541-15-guoheyi@huawei.com>
+ <20191112155253.543e15ad@redhat.com>
+From: Guoheyi <guoheyi@huawei.com>
+Message-ID: <9f032ccc-ae43-3710-daa8-445c6069903e@huawei.com>
+Date: Mon, 18 Nov 2019 14:44:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+In-Reply-To: <20191112155253.543e15ad@redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.133.216.73]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.191
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,209 +69,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- Rashmica Gupta <rashmica.g@gmail.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>, "Michael
+ S. Tsirkin" <mst@redhat.com>, Marc Zyngier <marc.zyngier@arm.com>,
+ qemu-devel@nongnu.org, Shannon
+ Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
+ James Morse <james.morse@arm.com>, wanghaibin.wang@huawei.com,
+ Dave Martin <Dave.Martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Following the pattern of the work recently done with the ASPEED GPIO
-model, this adds support for inspecting and modifying the PCA9552 LEDs
-from the monitor.
 
- (qemu) qom-set  /machine/unattached/device[17] led0 on
- (qemu) qom-get  /machine/unattached/device[17] led0
- "on"
 
- (qemu) qom-set  /machine/unattached/device[17] led0 off
- (qemu) qom-get  /machine/unattached/device[17] led0
- "off"
+On 2019/11/12 22:52, Igor Mammedov wrote:
+> On Tue, 5 Nov 2019 17:10:56 +0800
+> Heyi Guo <guoheyi@huawei.com> wrote:
+>
+>> Add SDEI table if SDEI is enabled, so that guest OS can get aware and
+>> utilize the interfaces.
+>>
+>> Signed-off-by: Heyi Guo <guoheyi@huawei.com>
+>> Cc: Peter Maydell <peter.maydell@linaro.org>
+>> Cc: Dave Martin <Dave.Martin@arm.com>
+>> Cc: Marc Zyngier <marc.zyngier@arm.com>
+>> Cc: Mark Rutland <mark.rutland@arm.com>
+>> Cc: James Morse <james.morse@arm.com>
+>> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
+>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>> Cc: Igor Mammedov <imammedo@redhat.com>
+>> ---
+>>
+>> Notes:
+>>      v2:
+>>      - Drop SDEI table definition and add comments
+>>
+>>   hw/arm/virt-acpi-build.c | 26 ++++++++++++++++++++++++++
+>>   1 file changed, 26 insertions(+)
+>>
+>> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+>> index 4cd50175e0..73d3f8cd15 100644
+>> --- a/hw/arm/virt-acpi-build.c
+>> +++ b/hw/arm/virt-acpi-build.c
+>> @@ -32,6 +32,7 @@
+>>   #include "trace.h"
+>>   #include "hw/core/cpu.h"
+>>   #include "target/arm/cpu.h"
+>> +#include "target/arm/sdei.h"
+>>   #include "hw/acpi/acpi-defs.h"
+>>   #include "hw/acpi/acpi.h"
+>>   #include "hw/nvram/fw_cfg.h"
+>> @@ -475,6 +476,26 @@ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>>                    "IORT", table_data->len - iort_start, 0, NULL, NULL);
+>>   }
+>>   
+>> +/*
+>> + * ACPI spec 6.2 Software Delegated Exception Interface (SDEI).
+>> + * (Revision 1.0)
+>> + * "SDEI" was reserved in ACPI 6.2. See "Links to ACPI-Related Documents"
+>> + * (http://uefi.org/acpi) under the heading "Software
+>> + * Delegated Exceptions Interface." The definition is under
+>> + * "10 Appendix C: ACPI table definitions for SDEI" in the linked document.
+>> + *
+>> + * This is a dummy table to expose platform SDEI capbility to OS.
+>> + */
+>> +static void
+>> +build_sdei(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>> +{
+>> +    int sdei_start = table_data->len;
+>> +
+>> +    (void)acpi_data_push(table_data, sizeof(AcpiTableHeader));
+>> +    build_header(linker, table_data, (void *)(table_data->data + sdei_start),
+>> +                 "SDEI", table_data->len - sdei_start, 1, NULL, NULL);
+>> +}
+>> +
+>>   static void
+>>   build_spcr(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>>   {
+>> @@ -825,6 +846,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+>>       acpi_add_table(table_offsets, tables_blob);
+>>       build_spcr(tables_blob, tables->linker, vms);
+>>   
+>> +    if (sdei_enabled) {
+> globals shouldn't be introduced in new code
+OK. For this feature depends on KVM, does it make sense to add a flag to 
+struct VirtMachineState?
 
- (qemu) qom-set  /machine/unattached/device[17] led0 pwm0
- (qemu) qom-get  /machine/unattached/device[17] led0
- "pwm0"
+Thanks,
+HG
+>
+>> +        acpi_add_table(table_offsets, tables_blob);
+>> +        build_sdei(tables_blob, tables->linker, vms);
+>> +    }
+>> +
+>>       if (ms->numa_state->num_nodes > 0) {
+>>           acpi_add_table(table_offsets, tables_blob);
+>>           build_srat(tables_blob, tables->linker, vms);
+>
+> .
+>
 
- (qemu) qom-set  /machine/unattached/device[17] led0 pwm1
- (qemu) qom-get  /machine/unattached/device[17] led0
- "pwm1"
-
-Signed-off-by: Joel Stanley <joel@jms.id.au>
----
-The qom device in mainline qemu is a different path. Using the monitor
-examine `info qom-tree /machine/unattached/` to discover it.
-
-This can be tested with a Witherspoon image.
-
-$ wget https://openpower.xyz/job/openbmc-build/distro=ubuntu,label=builder,target=witherspoon/lastSuccessfulBuild/artifact/deploy/images/witherspoon/obmc-phosphor-image-witherspoon.ubi.mtd
-
-$ qemu-system-arm -M witherspoon-bmc -serial pty -monitor pty -nographic \
- -drive file=obmc-phosphor-image-witherspoon.ubi.mtd,format=raw,if=mtd
-char device redirected to /dev/pts/5 (label compat_monitor0)
-char device redirected to /dev/pts/10 (label serial0)
-
-$ screen /dev/pts/5
-QEMU 4.1.91 monitor - type 'help' for more information
-(qemu) qom-get  /machine/unattached/device[17] led0
-"off"
-
-$ screen /dev/pts/19
-root@witherspoon:~# cd /sys/class/gpio/
-root@witherspoon:/sys/class/gpio# echo 248 > export
-root@witherspoon:/sys/class/gpio# cat gpio248/value
-0
-
-(qemu) qom-set  /machine/unattached/device[17] led0 on
-
-root@witherspoon:/sys/class/gpio# echo out > gpio248/direction
-root@witherspoon:/sys/class/gpio# cat gpio248/value
-1
-
-(qemu) qom-get  /machine/unattached/device[17] led0
-"on"
-
-(qemu) qom-set  /machine/unattached/device[17] led0 off
-(qemu) qom-get  /machine/unattached/device[17] led0
-"off"
-
-root@witherspoon:/sys/class/gpio# cat gpio248/value
-0
-
-Signed-off-by: Joel Stanley <joel@jms.id.au>
----
- hw/misc/pca9552.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 91 insertions(+)
-
-diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
-index 73be28d9369c..0362aac8c862 100644
---- a/hw/misc/pca9552.c
-+++ b/hw/misc/pca9552.c
-@@ -15,12 +15,16 @@
- #include "hw/misc/pca9552.h"
- #include "hw/misc/pca9552_regs.h"
- #include "migration/vmstate.h"
-+#include "qapi/error.h"
-+#include "qapi/visitor.h"
- 
- #define PCA9552_LED_ON   0x0
- #define PCA9552_LED_OFF  0x1
- #define PCA9552_LED_PWM0 0x2
- #define PCA9552_LED_PWM1 0x3
- 
-+static const char *led_state[] = {"on", "off", "pwm0", "pwm1"};
-+
- static uint8_t pca9552_pin_get_config(PCA9552State *s, int pin)
- {
-     uint8_t reg   = PCA9552_LS0 + (pin / 4);
-@@ -169,6 +173,84 @@ static int pca9552_event(I2CSlave *i2c, enum i2c_event event)
-     return 0;
- }
- 
-+static void pca9552_get_led(Object *obj, Visitor *v, const char *name,
-+                            void *opaque, Error **errp)
-+{
-+    PCA9552State *s = PCA9552(obj);
-+    int led, rc, reg;
-+    char *str;
-+    uint8_t state;
-+
-+    rc = sscanf(name, "led%2d", &led);
-+    if (rc != 1) {
-+        error_setg(errp, "%s: error reading %s", __func__, name);
-+        return;
-+    }
-+    if (led < 0 || led > s->nr_leds) {
-+        error_setg(errp, "%s invalid led %s", __func__, name);
-+        return;
-+    }
-+    /*
-+     * Get the LSx register as the qom interface should expose the device
-+     * state, not the modeled 'input line' behaviour which would come from
-+     * reading the INPUTx reg
-+     */
-+    reg = PCA9552_LS0 + led / 4;
-+    state = (pca9552_read(s, reg) >> (led % 8)) & 0x3;
-+    str = g_strdup(led_state[state]);
-+    visit_type_str(v, name, &str, errp);
-+}
-+
-+/*
-+ * Return an LED selector register value based on an existing one, with
-+ * the appropriate 2-bit state value set for the given LED number (0-3).
-+ */
-+static inline uint8_t pca955x_ledsel(uint8_t oldval, int led_num, int state)
-+{
-+        return (oldval & (~(0x3 << (led_num << 1)))) |
-+                ((state & 0x3) << (led_num << 1));
-+}
-+
-+static void pca9552_set_led(Object *obj, Visitor *v, const char *name,
-+                            void *opaque, Error **errp)
-+{
-+    PCA9552State *s = PCA9552(obj);
-+    Error *local_err = NULL;
-+    int led, rc, reg, val;
-+    uint8_t state;
-+    char *state_str;
-+
-+    visit_type_str(v, name, &state_str, &local_err);
-+    if (local_err) {
-+        error_propagate(errp, local_err);
-+        return;
-+    }
-+    rc = sscanf(name, "led%2d", &led);
-+    if (rc != 1) {
-+        error_setg(errp, "%s: error reading %s", __func__, name);
-+        return;
-+    }
-+    if (led < 0 || led > s->nr_leds) {
-+        error_setg(errp, "%s invalid led %s", __func__, name);
-+        return;
-+    }
-+
-+    for (state = 0; state < ARRAY_SIZE(led_state); state++) {
-+        if (!strcmp(state_str, led_state[state])) {
-+            break;
-+        }
-+    }
-+    if (state >= ARRAY_SIZE(led_state)) {
-+        error_setg(errp, "%s invalid led state %s", __func__, state_str);
-+        return;
-+    }
-+
-+    reg = PCA9552_LS0 + led / 4;
-+    val = pca9552_read(s, reg);
-+    val = pca955x_ledsel(val, led % 4, state);
-+    pca9552_write(s, reg, val);
-+}
-+
- static const VMStateDescription pca9552_vmstate = {
-     .name = "PCA9552",
-     .version_id = 0,
-@@ -204,6 +286,7 @@ static void pca9552_reset(DeviceState *dev)
- static void pca9552_initfn(Object *obj)
- {
-     PCA9552State *s = PCA9552(obj);
-+    int led;
- 
-     /* If support for the other PCA955X devices are implemented, these
-      * constant values might be part of class structure describing the
-@@ -211,6 +294,14 @@ static void pca9552_initfn(Object *obj)
-      */
-     s->max_reg = PCA9552_LS3;
-     s->nr_leds = 16;
-+
-+    for (led = 0; led < s->nr_leds; led++) {
-+        char *name;
-+
-+        name = g_strdup_printf("led%d", led);
-+        object_property_add(obj, name, "bool", pca9552_get_led, pca9552_set_led,
-+                            NULL, NULL, NULL);
-+    }
- }
- 
- static void pca9552_class_init(ObjectClass *klass, void *data)
--- 
-2.24.0
 
 
