@@ -2,98 +2,92 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 681CDC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 13:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 023ADC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 13:25:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 30F8D20748
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 13:23:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0F0F206D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 13:25:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ib98Jpgk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30F8D20748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nuqvh1mI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0F0F206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWh0A-0005XP-C7
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 08:23:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40366)
+	id 1iWh2T-0006nN-RO
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 08:25:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43175)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iWgyC-0004Z7-V1
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 08:21:34 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iWh1K-0006G3-4x
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 08:24:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iWgyA-0007Fn-Nu
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 08:21:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41351
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iWgyA-0007F4-0b
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 08:21:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574083289;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aDt0kz5uoG+Wvoc+FOMxPI8N9nsBIvdXSRfwD1DTFEU=;
- b=Ib98JpgkVDE6To+FetRlGAWJ7GETiSEew4WyadIeJq6rHnhgaqVnmqeZpF/NyMzCGE0JHb
- D0UFZ5oGAv9ka2qwK6QoWKzkA6w2w+MRsBHfwY6g0dPlnW7pSY935PAx9NWarPDKgXqY/u
- CKzCWVTLUI+cnp/E+j25xP9GRhWl/JE=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-LnQFtjI7MT25Zt7nGCEG2g-1; Mon, 18 Nov 2019 08:21:27 -0500
-Received: by mail-qk1-f198.google.com with SMTP id 64so11466485qkm.5
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 05:21:27 -0800 (PST)
+ (envelope-from <alex.bennee@linaro.org>) id 1iWh1H-0001Cl-VI
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 08:24:45 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38154)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iWh02-0000MP-HB
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 08:23:28 -0500
+Received: by mail-wr1-x444.google.com with SMTP id i12so19462809wro.5
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 05:23:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=2jAHYetA5KW/zKbA5ZqRVkpeJs2a7Me7zmfuVMCIdyI=;
+ b=Nuqvh1mIv7bA4JBDiwBVxKQKU035LNyY2b2BmvuSHl/QNBeC3mZO0Jke33C5AyrzrI
+ mwBPxNwOFItWcrt5LKgFMuHF5nA1spF0Q73mN3CuC+NSUKoTVpYMH/V+tnWqCM5DHqPA
+ HKIzUtko9uh+IYVtLV89UJ8cK6FzOeaz78bZtO87KVyZpit7CbvnM+rZC2NhU9pFlBdO
+ aBdJyC3Gm7aByZzqszQOjKOSG8o8RDmg8k1OvmgJUv30dLfvOxMOe4ZHZ42mvi/jXhX9
+ 1z7rfA0qPdJKVr3jrKFNLNr1Vpvh7wvTlWsTehw8jA7H6qU40veyiIoRgvrcCwbYRYZU
+ dR6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=q9+IKFPWhISyaYV00Tog4e8K2FzhfF9OCbbQXzCjBFw=;
- b=Jp+MSUHEn3ZhTQEm6+gwe3N8fNHeuhAD5suL9JpaUnyADmETa8/S8t5er4lLDgCqCt
- zQkzvXMQHNsoKxUgIxcXZOa9amrHPDRjnIuBMvXNmKkV7/SVZXS0GZTf4qOkTf7iz8vc
- dEaWIcHuOhI+OiMRMu94lfnaPIY9FjSAvHEWUnRqNzzfjw3xZlBxkgaV+Rttygmi/pz5
- DaBaxcEN+bsBU1GtdhswIBnfgLtHU29mI3u6xF9ufrL7VL0COX86RG/VEGwluvcgQGBb
- w0lTofX1eYZjWnV5bl3BELrfiEwtjvWMNIsfoYwpRLn6TW9GqfAPjARSpxQL+71LvXBD
- 9+FQ==
-X-Gm-Message-State: APjAAAW/gh8CvvW11DfRNazcoX+LJ94w3sZNmWQdY8fEm9ltPStufaM2
- caJ9lRo1vscn++uHg81wwxJziFR4civ2cNDTEBXLGWNeGAwZX3WTHCF/U1KSZlZAC3mfviDdb0P
- Ey8Hh1WWcJb4ujhc=
-X-Received: by 2002:ac8:13ca:: with SMTP id i10mr25764988qtj.214.1574083287505; 
- Mon, 18 Nov 2019 05:21:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyg2fO6T3H3YLS5WBC+X8LieZNM8Tgl3Rc4RrZGwUyU1/5RAkrJEWaL4BfmLzoP5T+X12Q76A==
-X-Received: by 2002:ac8:13ca:: with SMTP id i10mr25764951qtj.214.1574083287214; 
- Mon, 18 Nov 2019 05:21:27 -0800 (PST)
-Received: from redhat.com (bzq-79-176-6-42.red.bezeqint.net. [79.176.6.42])
- by smtp.gmail.com with ESMTPSA id a2sm8410998qkl.71.2019.11.18.05.21.21
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=2jAHYetA5KW/zKbA5ZqRVkpeJs2a7Me7zmfuVMCIdyI=;
+ b=qiN053jRTVQg6fWRFcUTj1hd4cmu9o/NoKM5UMG75n7iGf4WLqLtjzZX7hFrr+z+XQ
+ DlchUDyr3R/kX9hr4heMcnjeZ80ZC2Vx8mxdLbU9LP1DyYaFb4pICiPWnpCYxc0M/DdN
+ w7N4oq8QF6tMKUinX1gTBqs8lxvg1KNeYaouv8f2UplOf3wuVF6hjOpwxS177AbZE8J4
+ 3hQSfoccVJcpGM+t+tFptG5ABxFju9S9dgd1B/XjPqnak9Oru1qcv9j+oHqgrrpe652H
+ 50PrF5VNk1DAQ7XLWDvk/SLy1FqXh7vrAF4o0D8g7gikr4gMkZ1OhULNkP1fZngbAcT8
+ gkiw==
+X-Gm-Message-State: APjAAAVGk3u6oO9KlW8YLD6MsLExytKyMZI7TXrz7bv6cjJNEOimo1zN
+ y1UcnQ5WPD/5Fxlt2rcsrO3X0g==
+X-Google-Smtp-Source: APXvYqzyGQNOEjBZ3GvbFGqBteFlzj6Kvc4qPxzB4aDuTCI3N6QLUS4GJ0Gxfi8j1Fi+dEtEsNrMyg==
+X-Received: by 2002:adf:df09:: with SMTP id y9mr31287167wrl.25.1574083404853; 
+ Mon, 18 Nov 2019 05:23:24 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x205sm22628148wmb.5.2019.11.18.05.23.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 Nov 2019 05:21:26 -0800 (PST)
-Date: Mon, 18 Nov 2019 08:21:18 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: gengdongjiu <gengdongjiu@huawei.com>
-Subject: Re: [RESEND PATCH v21 3/6] ACPI: Add APEI GHES table generation
- support
-Message-ID: <20191118082036-mutt-send-email-mst@kernel.org>
-References: <20191111014048.21296-1-zhengxiang9@huawei.com>
- <20191111014048.21296-4-zhengxiang9@huawei.com>
- <20191115103801.547fc84d@redhat.com>
- <cf5e5aa4-2283-6cf9-70d0-278d167e3a13@huawei.com>
- <87758ec2-c242-71c3-51f8-a5d348f8e7fd@huawei.com>
+ Mon, 18 Nov 2019 05:23:23 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id F2D971FF87;
+ Mon, 18 Nov 2019 13:23:22 +0000 (GMT)
+References: <20191115131040.2834-1-robert.foley@linaro.org>
+ <20191115131040.2834-6-robert.foley@linaro.org>
+ <87a78tgyr1.fsf@linaro.org>
+ <CAEyhzFtAnUATVLGRfG_RkCzfjacw5m9TK4HCjvUg5YWpiV+Ajw@mail.gmail.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v2 5/6] Add use of RCU for qemu_logfile.
+In-reply-to: <CAEyhzFtAnUATVLGRfG_RkCzfjacw5m9TK4HCjvUg5YWpiV+Ajw@mail.gmail.com>
+Date: Mon, 18 Nov 2019 13:23:22 +0000
+Message-ID: <877e3xgvxx.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87758ec2-c242-71c3-51f8-a5d348f8e7fd@huawei.com>
-X-MC-Unique: LnQFtjI7MT25Zt7nGCEG2g-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,78 +99,470 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, ehabkost@redhat.com, kvm@vger.kernel.org,
- wanghaibin.wang@huawei.com, mtosatti@redhat.com, qemu-devel@nongnu.org,
- linuxarm@huawei.com, shannon.zhaosl@gmail.com,
- Xiang Zheng <zhengxiang9@huawei.com>, qemu-arm@nongnu.org, james.morse@arm.com,
- jonathan.cameron@huawei.com, pbonzini@redhat.com,
- Igor Mammedov <imammedo@redhat.com>, xuwei5@huawei.com, lersek@redhat.com,
- rth@twiddle.net
+Cc: Peter Puhov <peter.puhov@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 18, 2019 at 09:18:01PM +0800, gengdongjiu wrote:
-> On 2019/11/18 20:49, gengdongjiu wrote:
-> >>> +     */
-> >>> +    build_append_int_noprefix(table_data, source_id, 2);
-> >>> +    /* Related Source Id */
-> >>> +    build_append_int_noprefix(table_data, 0xffff, 2);
-> >>> +    /* Flags */
-> >>> +    build_append_int_noprefix(table_data, 0, 1);
-> >>> +    /* Enabled */
-> >>> +    build_append_int_noprefix(table_data, 1, 1);
-> >>> +
-> >>> +    /* Number of Records To Pre-allocate */
-> >>> +    build_append_int_noprefix(table_data, 1, 4);
-> >>> +    /* Max Sections Per Record */
-> >>> +    build_append_int_noprefix(table_data, 1, 4);
-> >>> +    /* Max Raw Data Length */
-> >>> +    build_append_int_noprefix(table_data, ACPI_GHES_MAX_RAW_DATA_LEN=
-GTH, 4);
-> >>> +
-> >>> +    /* Error Status Address */
-> >>> +    build_append_gas(table_data, AML_AS_SYSTEM_MEMORY, 0x40, 0,
-> >>> +                     4 /* QWord access */, 0);
-> >>> +    bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
-> >>> +        ACPI_GHES_ERROR_STATUS_ADDRESS_OFFSET(hest_start, source_id)=
-,
-> >> it's fine only if GHESv2 is the only entries in HEST, but once
-> >> other types are added this macro will silently fall apart and
-> >> cause table corruption.
->    why  silently fall?
->    I think the acpi_ghes.c only support GHESv2 type, not support other ty=
-pe.
->=20
-> >>
-> >> Instead of offset from hest_start, I suggest to use offset relative
-> >> to GAS structure, here is an idea>>
-> >> #define GAS_ADDR_OFFSET 4
-> >>
-> >>     off =3D table->len
-> >>     build_append_gas()
-> >>     bios_linker_loader_add_pointer(...,
-> >>         off + GAS_ADDR_OFFSET, ...
->=20
-> If use offset relative to GAS structure, the code does not easily extend =
-to support more Generic Hardware Error Source.
-> if use offset relative to hest_start, just use a loop, the code can suppo=
-rt  more error source, for example:
-> for (source_id =3D 0; i<n; source_id++)
+
+Robert Foley <robert.foley@linaro.org> writes:
+
+> On Mon, 18 Nov 2019 at 07:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>
+>>
+>> > +    if (logfile) {
+>> > +        qemu_flockfile(logfile->fd);
+>> > +        return logfile->fd;
+>> > +    } else {
+>> > +        rcu_read_unlock();
+>>
+>> As qemu_log_lock() and unlock should be paired we can drop the unlock
+>> here and do an unconditional unlock bellow even if a null fd is passed.
+>>
+>> Otherwise:
+>>
+>> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>
+> Sounds reasonable.  It sounds like we should change it to be something
+> like this.
+>
+> static inline FILE *qemu_log_lock(void)
 > {
->    ......
->     bios_linker_loader_add_pointer(linker, ACPI_BUILD_TABLE_FILE,
->         ACPI_GHES_ERROR_STATUS_ADDRESS_OFFSET(hest_start, source_id),
->         sizeof(uint64_t), ACPI_GHES_ERRORS_FW_CFG_FILE,
->         source_id * sizeof(uint64_t));
->   .......
+>     QemuLogFile *logfile;
+>     rcu_read_lock();
+>     logfile =3D atomic_rcu_read(&qemu_logfile);
+>     if (logfile) {
+>         qemu_flockfile(logfile->fd);
+>         return logfile->fd;
+>     }
+>     rcu_read_unlock();
+>     return NULL;
 > }
->=20
-> My previous series patch support 2 error sources, but now only enable 'SE=
-A' type Error Source
+> I will make the changes.
 
-I'd try to merge this, worry about extending things later.
-This is at v21 and the simpler you can keep things,
-the faster it'll go in.
+No I mean as you have to call qemu_log_unlock() you can to the unlock
+there. You have to hold the lock over the usage of the resource:
 
+  static inline FILE *qemu_log_lock(void)
+  {
+      QemuLogFile *logfile;
+      rcu_read_lock();
+      logfile =3D atomic_rcu_read(&qemu_logfile);
+      if (logfile) {
+          qemu_flockfile(logfile->fd);
+          return logfile->fd;
+      } else {
+          return NULL;
+      }
+  }
+
+  static inline void qemu_log_unlock(FILE *fd)
+  {
+      if (fd) {
+          qemu_funlockfile(fd);
+      }
+      rcu_read_unlock();
+  }
+
+
+>
+> Thanks,
+> -Rob
+> On Mon, 18 Nov 2019 at 07:22, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>
+>>
+>> Robert Foley <robert.foley@linaro.org> writes:
+>>
+>> > This now allows changing the logfile while logging is active,
+>> > and also solves the issue of a seg fault while changing the logfile.
+>> >
+>> > Any read access to the qemu_logfile handle will use
+>> > the rcu_read_lock()/unlock() around the use of the handle.
+>> > To fetch the handle we will use atomic_rcu_read().
+>> > We also in many cases do a check for validity of the
+>> > logfile handle before using it to deal with the case where the
+>> > file is closed and set to NULL.
+>> >
+>> > The cases where we write to the qemu_logfile will use atomic_rcu_set().
+>> > Writers will also use call_rcu() with a newly added qemu_logfile_free
+>> > function for freeing/closing when readers have finished.
+>> >
+>> > Signed-off-by: Robert Foley <robert.foley@linaro.org>
+>> > ---
+>> > v2
+>> >     - No specific changes, just merging in cleanup changes in qemu_set=
+_log().
+>> > ---
+>> > v1
+>> >     - Changes for review comments.
+>> >     - Minor changes to definition of QemuLogFile.
+>> >     - Changed qemu_log_separate() to fix unbalanced and
+>> >       remove qemu_log_enabled() check.
+>> >     - changed qemu_log_lock() to include else.
+>> >     - make qemu_logfile_free static.
+>> >     - use g_assert(logfile) in qemu_logfile_free.
+>> >     - Relocated unlock out of if/else in qemu_log_close(), and
+>> >       in qemu_set_log().
+>> > ---
+>> >  include/qemu/log.h | 42 +++++++++++++++++++++++----
+>> >  util/log.c         | 72 ++++++++++++++++++++++++++++++++--------------
+>> >  include/exec/log.h | 33 ++++++++++++++++++---
+>> >  tcg/tcg.c          | 12 ++++++--
+>> >  4 files changed, 126 insertions(+), 33 deletions(-)
+>> >
+>> > diff --git a/include/qemu/log.h b/include/qemu/log.h
+>> > index a7c5b01571..528e1f9dd7 100644
+>> > --- a/include/qemu/log.h
+>> > +++ b/include/qemu/log.h
+>> > @@ -3,9 +3,16 @@
+>> >
+>> >  /* A small part of this API is split into its own header */
+>> >  #include "qemu/log-for-trace.h"
+>> > +#include "qemu/rcu.h"
+>> > +
+>> > +typedef struct QemuLogFile {
+>> > +    struct rcu_head rcu;
+>> > +    FILE *fd;
+>> > +} QemuLogFile;
+>> >
+>> >  /* Private global variable, don't use */
+>> > -extern FILE *qemu_logfile;
+>> > +extern QemuLogFile *qemu_logfile;
+>> > +
+>> >
+>> >  /*
+>> >   * The new API:
+>> > @@ -25,7 +32,16 @@ static inline bool qemu_log_enabled(void)
+>> >   */
+>> >  static inline bool qemu_log_separate(void)
+>> >  {
+>> > -    return qemu_logfile !=3D NULL && qemu_logfile !=3D stderr;
+>> > +    QemuLogFile *logfile;
+>> > +    bool res =3D false;
+>> > +
+>> > +    rcu_read_lock();
+>> > +    logfile =3D atomic_rcu_read(&qemu_logfile);
+>> > +    if (logfile && logfile->fd !=3D stderr) {
+>> > +        res =3D true;
+>> > +    }
+>> > +    rcu_read_unlock();
+>> > +    return res;
+>> >  }
+>> >
+>> >  #define CPU_LOG_TB_OUT_ASM (1 << 0)
+>> > @@ -55,14 +71,23 @@ static inline bool qemu_log_separate(void)
+>> >
+>> >  static inline FILE *qemu_log_lock(void)
+>> >  {
+>> > -    qemu_flockfile(qemu_logfile);
+>> > -    return logfile->fd;
+>> > +    QemuLogFile *logfile;
+>> > +    rcu_read_lock();
+>> > +    logfile =3D atomic_rcu_read(&qemu_logfile);
+>> > +    if (logfile) {
+>> > +        qemu_flockfile(logfile->fd);
+>> > +        return logfile->fd;
+>> > +    } else {
+>> > +        rcu_read_unlock();
+>>
+>> As qemu_log_lock() and unlock should be paired we can drop the unlock
+>> here and do an unconditional unlock bellow even if a null fd is passed.
+>>
+>> Otherwise:
+>>
+>> Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>>
+>> > +        return NULL;
+>> > +    }
+>> >  }
+>> >
+>> >  static inline void qemu_log_unlock(FILE *fd)
+>> >  {
+>> >      if (fd) {
+>> >          qemu_funlockfile(fd);
+>> > +        rcu_read_unlock();
+>> >      }
+>> >  }
+>> >
+>> > @@ -73,9 +98,14 @@ static inline void qemu_log_unlock(FILE *fd)
+>> >  static inline void GCC_FMT_ATTR(1, 0)
+>> >  qemu_log_vprintf(const char *fmt, va_list va)
+>> >  {
+>> > -    if (qemu_logfile) {
+>> > -        vfprintf(qemu_logfile, fmt, va);
+>> > +    QemuLogFile *logfile;
+>> > +
+>> > +    rcu_read_lock();
+>> > +    logfile =3D atomic_rcu_read(&qemu_logfile);
+>> > +    if (logfile) {
+>> > +        vfprintf(logfile->fd, fmt, va);
+>> >      }
+>> > +    rcu_read_unlock();
+>> >  }
+>> >
+>> >  /* log only if a bit is set on the current loglevel mask:
+>> > diff --git a/util/log.c b/util/log.c
+>> > index 91ebb5c924..9f9b6b74b7 100644
+>> > --- a/util/log.c
+>> > +++ b/util/log.c
+>> > @@ -28,7 +28,7 @@
+>> >
+>> >  static char *logfilename;
+>> >  static QemuMutex qemu_logfile_mutex;
+>> > -FILE *qemu_logfile;
+>> > +QemuLogFile *qemu_logfile;
+>> >  int qemu_loglevel;
+>> >  static int log_append =3D 0;
+>> >  static GArray *debug_regions;
+>> > @@ -37,10 +37,14 @@ static GArray *debug_regions;
+>> >  int qemu_log(const char *fmt, ...)
+>> >  {
+>> >      int ret =3D 0;
+>> > -    if (qemu_logfile) {
+>> > +    QemuLogFile *logfile;
+>> > +
+>> > +    rcu_read_lock();
+>> > +    logfile =3D atomic_rcu_read(&qemu_logfile);
+>> > +    if (logfile) {
+>> >          va_list ap;
+>> >          va_start(ap, fmt);
+>> > -        ret =3D vfprintf(qemu_logfile, fmt, ap);
+>> > +        ret =3D vfprintf(logfile->fd, fmt, ap);
+>> >          va_end(ap);
+>> >
+>> >          /* Don't pass back error results.  */
+>> > @@ -48,6 +52,7 @@ int qemu_log(const char *fmt, ...)
+>> >              ret =3D 0;
+>> >          }
+>> >      }
+>> > +    rcu_read_unlock();
+>> >      return ret;
+>> >  }
+>> >
+>> > @@ -56,12 +61,24 @@ static void __attribute__((__constructor__)) qemu_=
+logfile_init(void)
+>> >      qemu_mutex_init(&qemu_logfile_mutex);
+>> >  }
+>> >
+>> > +static void qemu_logfile_free(QemuLogFile *logfile)
+>> > +{
+>> > +    g_assert(logfile);
+>> > +
+>> > +    if (logfile->fd !=3D stderr) {
+>> > +        fclose(logfile->fd);
+>> > +    }
+>> > +    g_free(logfile);
+>> > +}
+>> > +
+>> >  static bool log_uses_own_buffers;
+>> >
+>> >  /* enable or disable low levels log */
+>> >  void qemu_set_log(int log_flags)
+>> >  {
+>> >      bool need_to_open_file =3D false;
+>> > +    QemuLogFile *logfile;
+>> > +
+>> >      qemu_loglevel =3D log_flags;
+>> >  #ifdef CONFIG_TRACE_LOG
+>> >      qemu_loglevel |=3D LOG_TRACE;
+>> > @@ -80,43 +97,47 @@ void qemu_set_log(int log_flags)
+>> >      g_assert(qemu_logfile_mutex.initialized);
+>> >      qemu_mutex_lock(&qemu_logfile_mutex);
+>> >      if (qemu_logfile && !need_to_open_file) {
+>> > -        qemu_mutex_unlock(&qemu_logfile_mutex);
+>> > -        qemu_log_close();
+>> > +        logfile =3D qemu_logfile;
+>> > +        atomic_rcu_set(&qemu_logfile, NULL);
+>> > +        call_rcu(logfile, qemu_logfile_free, rcu);
+>> >      } else if (!qemu_logfile && need_to_open_file) {
+>> > +        logfile =3D g_new0(QemuLogFile, 1);
+>> >          if (logfilename) {
+>> > -            qemu_logfile =3D fopen(logfilename, log_append ? "a" : "w=
+");
+>> > -            if (!qemu_logfile) {
+>> > +            logfile->fd =3D fopen(logfilename, log_append ? "a" : "w"=
+);
+>> > +            if (!logfile->fd) {
+>> > +                g_free(logfile);
+>> >                  perror(logfilename);
+>> >                  _exit(1);
+>> >              }
+>> >              /* In case we are a daemon redirect stderr to logfile */
+>> >              if (is_daemonized()) {
+>> > -                dup2(fileno(qemu_logfile), STDERR_FILENO);
+>> > -                fclose(qemu_logfile);
+>> > +                dup2(fileno(logfile->fd), STDERR_FILENO);
+>> > +                fclose(logfile->fd);
+>> >                  /* This will skip closing logfile in qemu_log_close()=
+ */
+>> > -                qemu_logfile =3D stderr;
+>> > +                logfile->fd =3D stderr;
+>> >              }
+>> >          } else {
+>> >              /* Default to stderr if no log file specified */
+>> >              assert(!is_daemonized());
+>> > -            qemu_logfile =3D stderr;
+>> > +            logfile->fd =3D stderr;
+>> >          }
+>> >          /* must avoid mmap() usage of glibc by setting a buffer "by h=
+and" */
+>> >          if (log_uses_own_buffers) {
+>> >              static char logfile_buf[4096];
+>> >
+>> > -            setvbuf(qemu_logfile, logfile_buf, _IOLBF, sizeof(logfile=
+_buf));
+>> > +            setvbuf(logfile->fd, logfile_buf, _IOLBF, sizeof(logfile_=
+buf));
+>> >          } else {
+>> >  #if defined(_WIN32)
+>> >              /* Win32 doesn't support line-buffering, so use unbuffere=
+d output. */
+>> > -            setvbuf(qemu_logfile, NULL, _IONBF, 0);
+>> > +            setvbuf(logfile->fd, NULL, _IONBF, 0);
+>> >  #else
+>> > -            setvbuf(qemu_logfile, NULL, _IOLBF, 0);
+>> > +            setvbuf(logfile->fd, NULL, _IOLBF, 0);
+>> >  #endif
+>> >              log_append =3D 1;
+>> >          }
+>> > -        qemu_mutex_unlock(&qemu_logfile_mutex);
+>> > +        atomic_rcu_set(&qemu_logfile, logfile);
+>> >      }
+>> > +    qemu_mutex_unlock(&qemu_logfile_mutex);
+>> >  }
+>> >
+>> >  void qemu_log_needs_buffers(void)
+>> > @@ -245,19 +266,28 @@ out:
+>> >  /* fflush() the log file */
+>> >  void qemu_log_flush(void)
+>> >  {
+>> > -    fflush(qemu_logfile);
+>> > +    QemuLogFile *logfile;
+>> > +
+>> > +    rcu_read_lock();
+>> > +    logfile =3D atomic_rcu_read(&qemu_logfile);
+>> > +    if (logfile) {
+>> > +        fflush(logfile->fd);
+>> > +    }
+>> > +    rcu_read_unlock();
+>> >  }
+>> >
+>> >  /* Close the log file */
+>> >  void qemu_log_close(void)
+>> >  {
+>> > +    QemuLogFile *logfile;
+>> > +
+>> >      g_assert(qemu_logfile_mutex.initialized);
+>> >      qemu_mutex_lock(&qemu_logfile_mutex);
+>> > -    if (qemu_logfile) {
+>> > -        if (qemu_logfile !=3D stderr) {
+>> > -            fclose(qemu_logfile);
+>> > -        }
+>> > -        qemu_logfile =3D NULL;
+>> > +    logfile =3D qemu_logfile;
+>> > +
+>> > +    if (logfile) {
+>> > +        atomic_rcu_set(&qemu_logfile, NULL);
+>> > +        call_rcu(logfile, qemu_logfile_free, rcu);
+>> >      }
+>> >      qemu_mutex_unlock(&qemu_logfile_mutex);
+>> >  }
+>> >  diff --git a/include/exec/log.h b/include/exec/log.h
+>> > index e2cfd436e6..9bd1e4aa20 100644
+>> > --- a/include/exec/log.h
+>> > +++ b/include/exec/log.h
+>> > @@ -15,8 +15,15 @@
+>> >   */
+>> >  static inline void log_cpu_state(CPUState *cpu, int flags)
+>> >  {
+>> > +    QemuLogFile *logfile;
+>> > +
+>> >      if (qemu_log_enabled()) {
+>> > -        cpu_dump_state(cpu, qemu_logfile, flags);
+>> > +        rcu_read_lock();
+>> > +        logfile =3D atomic_rcu_read(&qemu_logfile);
+>> > +        if (logfile) {
+>> > +            cpu_dump_state(cpu, logfile->fd, flags);
+>> > +        }
+>> > +        rcu_read_unlock();
+>> >      }
+>> >  }
+>> >
+>> > @@ -40,19 +47,37 @@ static inline void log_cpu_state_mask(int mask, CP=
+UState *cpu, int flags)
+>> >  static inline void log_target_disas(CPUState *cpu, target_ulong start,
+>> >                                      target_ulong len)
+>> >  {
+>> > -    target_disas(qemu_logfile, cpu, start, len);
+>> > +    QemuLogFile *logfile;
+>> > +    rcu_read_lock();
+>> > +    logfile =3D atomic_rcu_read(&qemu_logfile);
+>> > +    if (logfile) {
+>> > +        target_disas(logfile->fd, cpu, start, len);
+>> > +    }
+>> > +    rcu_read_unlock();
+>> >  }
+>> >
+>> >  static inline void log_disas(void *code, unsigned long size)
+>> >  {
+>> > -    disas(qemu_logfile, code, size);
+>> > +    QemuLogFile *logfile;
+>> > +    rcu_read_lock();
+>> > +    logfile =3D atomic_rcu_read(&qemu_logfile);
+>> > +    if (logfile) {
+>> > +        disas(logfile->fd, code, size);
+>> > +    }
+>> > +    rcu_read_unlock();
+>> >  }
+>> >
+>> >  #if defined(CONFIG_USER_ONLY)
+>> >  /* page_dump() output to the log file: */
+>> >  static inline void log_page_dump(void)
+>> >  {
+>> > -    page_dump(qemu_logfile);
+>> > +    QemuLogFile *logfile;
+>> > +    rcu_read_lock();
+>> > +    logfile =3D atomic_rcu_read(&qemu_logfile);
+>> > +    if (logfile) {
+>> > +        page_dump(logfile->fd);
+>> > +    }
+>> > +    rcu_read_unlock();
+>> >  }
+>> >  #endif
+>> >  #endif
+>> > diff --git a/tcg/tcg.c b/tcg/tcg.c
+>> > index 0511266d85..4f616ba38b 100644
+>> > --- a/tcg/tcg.c
+>> > +++ b/tcg/tcg.c
+>> > @@ -2114,9 +2114,17 @@ static void tcg_dump_ops(TCGContext *s, bool ha=
+ve_prefs)
+>> >          }
+>> >
+>> >          if (have_prefs || op->life) {
+>> > -            for (; col < 40; ++col) {
+>> > -                putc(' ', qemu_logfile);
+>> > +
+>> > +            QemuLogFile *logfile;
+>> > +
+>> > +            rcu_read_lock();
+>> > +            logfile =3D atomic_rcu_read(&qemu_logfile);
+>> > +            if (logfile) {
+>> > +                for (; col < 40; ++col) {
+>> > +                    putc(' ', logfile->fd);
+>> > +                }
+>> >              }
+>> > +            rcu_read_unlock();
+>> >          }
+>> >
+>> >          if (op->life) {
+>>
+>>
+>> --
+>> Alex Benn=C3=A9e
+
+
+--
+Alex Benn=C3=A9e
 
