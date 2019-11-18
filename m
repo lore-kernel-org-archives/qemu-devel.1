@@ -2,99 +2,91 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D47C1C43215
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 12:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 561B1C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 12:19:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A482C20692
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 12:18:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 198C920692
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 12:19:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F4d6hNzl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A482C20692
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Danb90nL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 198C920692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWfzS-0008P0-CH
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 07:18:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56835)
+	id 1iWfzh-0000F8-Qg
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 07:19:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56879)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iWfx4-00077v-Ff
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 07:16:19 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iWfxN-0007Nw-WF
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 07:16:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iWfx1-0006mY-4y
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 07:16:16 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25252
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iWfx0-0006mG-W1
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 07:16:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574079373;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qpJmHCJLwI+GJzftrBwi8liCiJI0Eu/V/kfq0IRJK9Q=;
- b=F4d6hNzlnuCPeTm8I2bYOSHlqoqM5fRosm2fbr8Gfg2WKWg3AkZdcyUeGK0IAuOXBPgR9u
- CmbrW5Pk4thyXQVtlzISPOzQX2ZYR/FfHEodXv8qeReavw+8uzqfZx7o/DKI5oRuGkD3Ea
- Zk+YlS/qVWH/0pFTeRLICjtzKSkBE84=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-173-xvIduL1rMQmc7q-ALmifog-1; Mon, 18 Nov 2019 07:16:09 -0500
-Received: by mail-wm1-f72.google.com with SMTP id y133so11188270wmd.8
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 04:16:09 -0800 (PST)
+ (envelope-from <alex.bennee@linaro.org>) id 1iWfxL-0006ss-PT
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 07:16:36 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39417)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iWfxL-0006sf-Hi
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 07:16:35 -0500
+Received: by mail-wr1-x444.google.com with SMTP id l7so19179148wrp.6
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 04:16:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=ci9rctQr59fYtG57m5ibGqrGJ0nO3wWyz1FApX0JlXk=;
+ b=Danb90nLlegl41JrxWJfMzoc5Vkz8g2r/uBkuT6lehh9ddPZVleMTqkOvlPUokXQTO
+ uYKzNv79KoK5G+o9vMO9s+vTmPOsJoEeQLHcLkhx1rJrUMgjSNU7FF5u+J6YwZsDuGYH
+ XqC7ER+yygs4XCYPgHgjAfk8M5URBdBWNt1nF89QrWfwLMUQyLN3q7nTdBcKRUBXNA2U
+ p+5NxHj7eu9LQhG142JZYRc68OzPf+ZFuZAI1pVLGxa0J6DWVTNYryEuup4IpxfcJ2jN
+ 4AlsXpMYReDnpc1oCveRUdbaEY66ev/8SNsvv6arapk7i7EKXIGpuD0hVChrj4n0IkjY
+ mgpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=U9u6kZ1kf6lQ3GtzsvpO6o+5pG+cEfp5/vD28JkDxBc=;
- b=AWRh+BSYItbiORgFQTlHLyzjHlP4/6+l3S0nBOZzUAHwBGcr2KdUbsQA9vp+Gffa8X
- tGNebqvlMkiAoUsHbEjT+12B6P2I53OPQyoTpDCkbmfaN3swU/AvwN+HNzXOQk23RX7k
- TTB2j+d2bMuRqtltTksm+ObSPbL4qJ/mfawJccavkvjxXMVIuHhweyS5N3gIWGtWGxoh
- eLAP7WKJpVAruX37y2kQCOflQgIpIRErMHXsufnH8pJuiY2XuOR9+BvekjrIeNjrJMZ0
- RHjktZbTs6Jyu8F/MZLIjRxWo+Fxs1MsdFvL/uYe4ttHqViajzDIASXzALbTjpXLiIUN
- dXMA==
-X-Gm-Message-State: APjAAAUQ4DPOvEL8qi33Wl6S/WQe26BmUcieEWqnYvwkCKGbyb9TRamc
- L8KDEoaSn0dDSpU1w0NALJ849vk5F8GAoIm3T/TiR+9n5sAdwTTzhCpWo0sgfxNeHymtcCZe/Qp
- X7/P5CWh7xPskftY=
-X-Received: by 2002:a5d:50c3:: with SMTP id f3mr16908661wrt.14.1574079368684; 
- Mon, 18 Nov 2019 04:16:08 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwLpN2seeqFH9RiljhnQTqRHmXjs2UfFkaEkh52QkmnIDmstvlGlF5K3ckTEPEU3T/CqmqJDA==
-X-Received: by 2002:a5d:50c3:: with SMTP id f3mr16908626wrt.14.1574079368491; 
- Mon, 18 Nov 2019 04:16:08 -0800 (PST)
-Received: from [192.168.1.35] (131.red-88-21-102.staticip.rima-tde.net.
- [88.21.102.131])
- by smtp.gmail.com with ESMTPSA id a26sm11873208wmm.14.2019.11.18.04.16.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 18 Nov 2019 04:16:07 -0800 (PST)
-Subject: Re: [PATCH 08/26] tests/acceptance: Introduce LinuxUserTest base class
-To: qemu-devel@nongnu.org, Laurent Vivier <laurent@vivier.eu>
-References: <20191028073441.6448-1-philmd@redhat.com>
- <20191028073441.6448-9-philmd@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0eb2299b-62e2-14c4-072e-35886e3b524e@redhat.com>
-Date: Mon, 18 Nov 2019 13:16:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=ci9rctQr59fYtG57m5ibGqrGJ0nO3wWyz1FApX0JlXk=;
+ b=ovcX+v4xYsLp2rzdTzqbbnaNqm6e492DI3V3s5CbsK1PFMgkA8SR/VaW4uLhpUi/kz
+ KHJNMTD0troRjcMmPNg+/MxBgsIzyIbBVDZLZMnCyODvqLLS0+xOlTQ89GLi65awAdUb
+ /6OqCxzhXWcg3uCCshoHjZq57Mdnmo/H92H1N2C7QVQfSM/cHOQC9+FJJ/g27Ldc1w3k
+ Jgte6FUYDaR1ESHFmF3XHNbXP4TNyN9KKh0d+tAydEt/sJR0Cel8AkNyUiOIhPus4R4d
+ wRfWoC6LO8hLVqa5baUdOazMPApQz+7up8NdcwEgrG2AbdqGYNMANVREgjjgcWx+md9E
+ Jutg==
+X-Gm-Message-State: APjAAAVtPbInwhXnBueOklM16yA3rSro5Xu3l26B6fKXEt48iMxNDcQF
+ 0M7STjtY+ErvP2s1AyEf2S3Gl9pmNgw=
+X-Google-Smtp-Source: APXvYqwaZztouW+SMnbrGEvS5CKser6rR4Csq6lT+GuAzZd/IbzwDTqVxxbMu2HB7nLibY5YsxUB2w==
+X-Received: by 2002:adf:c649:: with SMTP id u9mr1416823wrg.20.1574079394035;
+ Mon, 18 Nov 2019 04:16:34 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id z11sm27089589wrg.0.2019.11.18.04.16.32
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 Nov 2019 04:16:32 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 36FA41FF87;
+ Mon, 18 Nov 2019 12:16:32 +0000 (GMT)
+References: <20191115131040.2834-1-robert.foley@linaro.org>
+ <20191115131040.2834-4-robert.foley@linaro.org>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Robert Foley <robert.foley@linaro.org>
+Subject: Re: [PATCH v2 3/6] Add a mutex to guarantee single writer to
+ qemu_logfile handle.
+In-reply-to: <20191115131040.2834-4-robert.foley@linaro.org>
+Date: Mon, 18 Nov 2019 12:16:32 +0000
+Message-ID: <87d0dpgz1b.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191028073441.6448-9-philmd@redhat.com>
-Content-Language: en-US
-X-MC-Unique: xvIduL1rMQmc7q-ALmifog-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,57 +98,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Fabien Chouteau <chouteau@adacore.com>, Kamil Rytarowski <kamil@netbsd.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: peter.puhov@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Laurent, you weren't Cc'ed on this series, you might find it helpful to=20
-test linux-user code. The next patch (09/26 Add bFLT loader linux-user=20
-test) is provided as an example, and tests a STM32 BusyBox.
 
-On 10/28/19 8:34 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> Similarly to the MachineTest base class, this class contains
-> methods common to linux-user tests.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Robert Foley <robert.foley@linaro.org> writes:
+
+> Also added qemu_logfile_init() for initializing the logfile mutex.
+>
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
 > ---
->   tests/acceptance/avocado_qemu/__init__.py | 9 +++++++++
->   1 file changed, 9 insertions(+)
->=20
-> diff --git a/tests/acceptance/avocado_qemu/__init__.py b/tests/acceptance=
-/avocado_qemu/__init__.py
-> index d23681818d..2611a5146c 100644
-> --- a/tests/acceptance/avocado_qemu/__init__.py
-> +++ b/tests/acceptance/avocado_qemu/__init__.py
-> @@ -14,6 +14,7 @@ import sys
->   import uuid
->  =20
->   import avocado
-> +from avocado.utils import process
->  =20
->   SRC_ROOT_DIR =3D os.path.join(os.path.dirname(__file__), '..', '..', '.=
-.')
->   sys.path.append(os.path.join(SRC_ROOT_DIR, 'python'))
-> @@ -138,3 +139,11 @@ class MachineTest(Test):
->       def tearDown(self):
->           for vm in self._vms.values():
->               vm.shutdown()
+> v2
+>     - In qemu_set_log() moved location of mutex lock/unlock
+>       due to cleanup changes.
+> ---
+> v1
+>     - changed qemu_logfile_init() to use __constructor__.
+> ---
+>  util/log.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>
+> diff --git a/util/log.c b/util/log.c
+> index 417d16ec66..91ebb5c924 100644
+> --- a/util/log.c
+> +++ b/util/log.c
+> @@ -24,8 +24,10 @@
+>  #include "qapi/error.h"
+>  #include "qemu/cutils.h"
+>  #include "trace/control.h"
+> +#include "qemu/thread.h"
+>
+>  static char *logfilename;
+> +static QemuMutex qemu_logfile_mutex;
+>  FILE *qemu_logfile;
+>  int qemu_loglevel;
+>  static int log_append =3D 0;
+> @@ -49,6 +51,11 @@ int qemu_log(const char *fmt, ...)
+>      return ret;
+>  }
+>
+> +static void __attribute__((__constructor__)) qemu_logfile_init(void)
+> +{
+> +    qemu_mutex_init(&qemu_logfile_mutex);
+> +}
 > +
-> +
-> +class LinuxUserTest(Test):
-> +    def setUp(self):
-> +        self.base_setUp("%s-linux-user", "qemu-%s")
-> +
-> +    def run(self, cmd):
-> +        return process.run("%s %s" % (self.qemu_bin, cmd))
->=20
+>  static bool log_uses_own_buffers;
+>
+>  /* enable or disable low levels log */
+> @@ -70,7 +77,10 @@ void qemu_set_log(int log_flags)
+>      if (qemu_loglevel && (!is_daemonized() || logfilename)) {
+>          need_to_open_file =3D true;
+>      }
+> +    g_assert(qemu_logfile_mutex.initialized);
+> +    qemu_mutex_lock(&qemu_logfile_mutex);
+>      if (qemu_logfile && !need_to_open_file) {
+> +        qemu_mutex_unlock(&qemu_logfile_mutex);
+>          qemu_log_close();
+>      } else if (!qemu_logfile && need_to_open_file) {
+>          if (logfilename) {
+> @@ -105,6 +115,7 @@ void qemu_set_log(int log_flags)
+>  #endif
+>              log_append =3D 1;
+>          }
+> +        qemu_mutex_unlock(&qemu_logfile_mutex);
+>      }
+>  }
 
+This looks a bit odd. I can see it's fixed up in a later patch but I
+guess the reason is to avoid a double lock when we get to
+qemu_log_close(). In the cases of unavoidable temporary ugliness in a
+patch series it is best to note the problem and mention it will be
+cleaned up by a later patch in the series.
+
+With an extra comment in the commit message:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+>
+> @@ -240,12 +251,15 @@ void qemu_log_flush(void)
+>  /* Close the log file */
+>  void qemu_log_close(void)
+>  {
+> +    g_assert(qemu_logfile_mutex.initialized);
+> +    qemu_mutex_lock(&qemu_logfile_mutex);
+>      if (qemu_logfile) {
+>          if (qemu_logfile !=3D stderr) {
+>              fclose(qemu_logfile);
+>          }
+>          qemu_logfile =3D NULL;
+>      }
+> +    qemu_mutex_unlock(&qemu_logfile_mutex);
+>  }
+>
+>  const QEMULogItem qemu_log_items[] =3D {
+
+
+--
+Alex Benn=C3=A9e
 
