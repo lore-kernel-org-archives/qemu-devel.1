@@ -2,78 +2,82 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8DF4C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 22:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AE55C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 23:29:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CFA120715
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 22:46:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECBCE22303
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 23:29:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="HQyNT+jg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CFA120715
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M3TeRiZT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECBCE22303
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWpnH-0002FJ-1e
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 17:46:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46474)
+	id 1iWqSR-0005Kx-5D
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 18:29:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51829)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <joel.stan@gmail.com>) id 1iWpgn-000063-3r
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 17:40:10 -0500
+ (envelope-from <alex.williamson@redhat.com>) id 1iWqRc-0004v2-4u
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 18:28:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <joel.stan@gmail.com>) id 1iWpgl-0004ub-JA
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 17:40:09 -0500
-Received: from mail-qv1-xf43.google.com ([2607:f8b0:4864:20::f43]:36941)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
- id 1iWpgi-0004tD-BJ; Mon, 18 Nov 2019 17:40:04 -0500
-Received: by mail-qv1-xf43.google.com with SMTP id s18so7315502qvr.4;
- Mon, 18 Nov 2019 14:40:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=sqhRvTdW9tIzYywKH5Qy5cpb0/nS0XorlZQnNo7WIpU=;
- b=HQyNT+jgSbnSw0VF+NM6QDpJWvwOX87mzW09cLdw9uGjWPEkP5P4uN5gXBfylrBu0D
- b4AdWx6J9Kl/QfDLzu1Yl8pMUldcQrIF3PcuGyde9Lkr9C1hDaR5Og4N05ncBojyynGa
- DgoHl6GjCDwUtCwts6vdUCbBR0fTXcxk4Chik=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=sqhRvTdW9tIzYywKH5Qy5cpb0/nS0XorlZQnNo7WIpU=;
- b=K6HUh0plj+KMEN90FhftC84whyPi+xDKjGrkOiEmyEAB+h7BoCI9H1DdwyoK5fVhjG
- 95G6G1tyJv32tKB3CdEDidItrAb/vZMas70UEyYb2Bs2TbZ9n1T4fYC2aOqTDdAu2E06
- P3Exmq5kI2PiLe4GUIwXXoVb7OzBK2ut8kY1R40QPeewrB9VaEDA+YOttO01ccpV03OB
- EWPyVI5fJx4WxAK49iOdQBvl+dVGLEUusvBHx4hH1uE8Ko/1hOcWc/XGvNFrWmI9oH7h
- EVp2sIYKLd30HgGRABEurNpvl300PPBjl4hjm5nrJVcVKAnUtI+dXwiTq6YVIeBgnYIQ
- expg==
-X-Gm-Message-State: APjAAAV9iMs5OaR56Jnn2GeTAfn7mvVHe4J64jZKdSE1phgPb9EKLeOO
- m6qNtxMtOPG4iFTlzkF5b03J9ffJkz3oVBrWWRyi53PUAfE=
-X-Google-Smtp-Source: APXvYqz+ASRrsobjzO8sWKpqA+7iqkmQV8H9KbPYyHYCoPlVl+aoQXEJ1efXTNPtZQ7eOYKPbDKQ0LDpdNqdesm6Zho=
-X-Received: by 2002:a0c:edcc:: with SMTP id i12mr5981585qvr.20.1574116803434; 
- Mon, 18 Nov 2019 14:40:03 -0800 (PST)
+ (envelope-from <alex.williamson@redhat.com>) id 1iWqRY-0000Vb-1x
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 18:28:29 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31751
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+ id 1iWqRW-0000TW-Hi
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 18:28:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574119703;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=KLfF9HDxN++9cz3Zg/f/3Byzkkj3Ks7BllDOAl0eDfs=;
+ b=M3TeRiZT94rqrZquEL+9AV7kOg07ZFkZSW9vgGUwsmI+DOUUTPRyCbEFyPgD3xVMdl//CE
+ fUs3iygZ4/HUi7ev2PFoCYYFzEf+GBi9hZzKgBFGnwcRhYHcZBBNFsOPeXgMCg0Oi9iJcu
+ 10kLsWZYw6fi/awHp+443VNODhtL7n0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-44-Ka18Hme6Msihge5bXf8bOw-1; Mon, 18 Nov 2019 18:28:22 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E215107ACC6;
+ Mon, 18 Nov 2019 23:28:21 +0000 (UTC)
+Received: from x1.home (ovpn-116-56.phx2.redhat.com [10.3.116.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BC0F35D9E5;
+ Mon, 18 Nov 2019 23:28:20 +0000 (UTC)
+Date: Mon, 18 Nov 2019 16:28:20 -0700
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Marcelo Tosatti <mtosatti@redhat.com>
+Subject: Re: [PATCH v2] mc146818rtc: fix timer interrupt reinjection
+Message-ID: <20191118162820.76691082@x1.home>
+In-Reply-To: <20191118214428.GA15341@amt.cnet>
+References: <20191010123008.GA19158@amt.cnet> <20191116135855.5e16bb7c@x1.home>
+ <20191117032015.GA4568@amt.cnet> <20191116213115.611d8028@x1.home>
+ <3ba4e29d-3436-9d7b-ebc0-5e1ae566e760@redhat.com>
+ <20191118214428.GA15341@amt.cnet>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20191118161712.6712-1-clg@kaod.org>
- <20191118161712.6712-2-clg@kaod.org>
-In-Reply-To: <20191118161712.6712-2-clg@kaod.org>
-From: Joel Stanley <joel@jms.id.au>
-Date: Mon, 18 Nov 2019 22:39:51 +0000
-Message-ID: <CACPK8XfkL5Uk_ruFri_D=Ww2Dx05Mvzza0j3QJh3H8+OmQZMDQ@mail.gmail.com>
-Subject: Re: [PATCH for-5.0 1/2] aspeed: change the "scu" property definition
-To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: Ka18Hme6Msihge5bXf8bOw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::f43
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,223 +89,150 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm <qemu-arm@nongnu.org>, Greg Kurz <groug@kaod.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Xiao Guangrong <guangrong.xiao@gmail.com>, qemu-devel <qemu-devel@nongnu.org>,
+ Vadim Rozenfeld <vrozenfe@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 18 Nov 2019 at 16:17, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->
-> The Aspeed Watchdog and Timer models have a link pointing to the SCU
-> controller model of the machine.
->
-> Change the "scu" property definition so that it explicitly sets the
-> pointer. The property isn't optional : not being able to set the link
-> is a bug and QEMU should rather abort than exit in this case.
->
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+On Mon, 18 Nov 2019 19:44:30 -0200
+Marcelo Tosatti <mtosatti@redhat.com> wrote:
 
-Reviewed-by: Joel Stanley <joel@jms.id.au>
+> On Sun, Nov 17, 2019 at 11:12:43AM +0100, Paolo Bonzini wrote:
+> > On 17/11/19 05:31, Alex Williamson wrote: =20
+> > > The 'merge' option gives me a similar error.  The 'delay' option is
+> > > the only other choice where I can actually start the VM, but this
+> > > results in the commandline:
+> > >=20
+> > > -rtc base=3Dlocaltime
+> > >=20
+> > > (no driftfix specified) =20
+> >=20
+> > none is the default, so that's okay.
+> >  =20
+> > > This does appear to resolve the issue, but of course compatibility
+> > > with existing configurations has regressed. Thanks, =20
+> >=20
+> > Yeah, I guess this was just a suggestion to double-check the cause of=
+=20
+> > the regression.
+> >=20
+> > The problem could be that periodic_timer_update is using old_period =3D=
+=3D 0=20
+> > for two cases: no period change, and old period was 0 (periodic timer=
+=20
+> > off). =20
+>=20
+>=20
+> > Something like the following distinguishes the two cases by always usin=
+g
+> > s->period (currently it was only used for driftfix=3Dslew) and passing
+> > s->period instead of 0 when there is no period change.
+> >=20
+> > More cleanups are possible, but this is the smallest patch that impleme=
+nts
+> > the idea.  The first patch is big but, indentation changes aside, it's
+> > moving a single closed brace.
+> >=20
+> > Alex/Marcelo, can you check if it fixes both of your test cases? =20
+>=20
+> Second patch blocks NTPd from synchronizing to a source at all
+> (can't even confirm if it fails to synchronize after a while).
+>=20
+> Problem seems to be that calling from timer interrupt path:
+>=20
+>    /*
+>      * if the periodic timer's update is due to period re-configuration,
+>      * we should count the clock since last interrupt.
+>      */
+>     if (old_period) {
+>         int64_t last_periodic_clock, next_periodic_clock;
+>=20
+>         next_periodic_clock =3D muldiv64(s->next_periodic_time,
+>                                 RTC_CLOCK_RATE, NANOSECONDS_PER_SECOND);
+>         last_periodic_clock =3D next_periodic_clock - old_period;
+>         lost_clock =3D cur_clock - last_periodic_clock;
+>         assert(lost_clock >=3D 0);
+>     }
+>=20
+> Adds the difference between when the timer interrupt actually executed=20
+> (cur_clock) and when it should have executed (last_periodic_clock)=20
+> as reinject time (which will end up injecting more timer interrupts=20
+> than necessary, so the clock runs faster than it should).
+>=20
+> Perhaps this is the reason for the 5%+ performance delta?
+>=20
+> The following, on top of Paolo's two patches, fixes it for me
+> (and NTPd is able to maintain clock synchronized while playing video on W=
+indows 7).
+>=20
+> Alex perhaps you can give it a try?
 
-> ---
->  hw/arm/aspeed_ast2600.c  |  8 ++++----
->  hw/arm/aspeed_soc.c      |  8 ++++----
->  hw/timer/aspeed_timer.c  | 17 +++++++++--------
->  hw/watchdog/wdt_aspeed.c | 17 ++++++++---------
->  4 files changed, 25 insertions(+), 25 deletions(-)
->
-> diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
-> index 0881eb25983e..810fd7de0c06 100644
-> --- a/hw/arm/aspeed_ast2600.c
-> +++ b/hw/arm/aspeed_ast2600.c
-> @@ -146,8 +146,6 @@ static void aspeed_soc_ast2600_init(Object *obj)
->      snprintf(typename, sizeof(typename), "aspeed.timer-%s", socname);
->      sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
->                            sizeof(s->timerctrl), typename);
-> -    object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
-> -                                   OBJECT(&s->scu), &error_abort);
->
->      snprintf(typename, sizeof(typename), "aspeed.i2c-%s", socname);
->      sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
-> @@ -177,8 +175,6 @@ static void aspeed_soc_ast2600_init(Object *obj)
->          snprintf(typename, sizeof(typename), "aspeed.wdt-%s", socname);
->          sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
->                                sizeof(s->wdt[i]), typename);
-> -        object_property_add_const_link(OBJECT(&s->wdt[i]), "scu",
-> -                                       OBJECT(&s->scu), &error_abort);
->      }
->
->      for (i =3D 0; i < sc->macs_num; i++) {
-> @@ -323,6 +319,8 @@ static void aspeed_soc_ast2600_realize(DeviceState *d=
-ev, Error **errp)
->                         aspeed_soc_get_irq(s, ASPEED_RTC));
->
->      /* Timer */
-> +    object_property_set_link(OBJECT(&s->timerctrl),
-> +                             OBJECT(&s->scu), "scu", &error_abort);
->      object_property_set_bool(OBJECT(&s->timerctrl), true, "realized", &e=
-rr);
->      if (err) {
->          error_propagate(errp, err);
-> @@ -415,6 +413,8 @@ static void aspeed_soc_ast2600_realize(DeviceState *d=
-ev, Error **errp)
->      for (i =3D 0; i < sc->wdts_num; i++) {
->          AspeedWDTClass *awc =3D ASPEED_WDT_GET_CLASS(&s->wdt[i]);
->
-> +        object_property_set_link(OBJECT(&s->wdt[i]),
-> +                                 OBJECT(&s->scu), "scu", &error_abort);
->          object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized", &=
-err);
->          if (err) {
->              error_propagate(errp, err);
-> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
-> index b01c97744196..a6237e594017 100644
-> --- a/hw/arm/aspeed_soc.c
-> +++ b/hw/arm/aspeed_soc.c
-> @@ -163,8 +163,6 @@ static void aspeed_soc_init(Object *obj)
->      snprintf(typename, sizeof(typename), "aspeed.timer-%s", socname);
->      sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
->                            sizeof(s->timerctrl), typename);
-> -    object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
-> -                                   OBJECT(&s->scu), &error_abort);
->
->      snprintf(typename, sizeof(typename), "aspeed.i2c-%s", socname);
->      sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
-> @@ -194,8 +192,6 @@ static void aspeed_soc_init(Object *obj)
->          snprintf(typename, sizeof(typename), "aspeed.wdt-%s", socname);
->          sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
->                                sizeof(s->wdt[i]), typename);
-> -        object_property_add_const_link(OBJECT(&s->wdt[i]), "scu",
-> -                                       OBJECT(&s->scu), &error_abort);
->      }
->
->      for (i =3D 0; i < sc->macs_num; i++) {
-> @@ -291,6 +287,8 @@ static void aspeed_soc_realize(DeviceState *dev, Erro=
-r **errp)
->                         aspeed_soc_get_irq(s, ASPEED_RTC));
->
->      /* Timer */
-> +    object_property_set_link(OBJECT(&s->timerctrl),
-> +                             OBJECT(&s->scu), "scu", &error_abort);
->      object_property_set_bool(OBJECT(&s->timerctrl), true, "realized", &e=
-rr);
->      if (err) {
->          error_propagate(errp, err);
-> @@ -376,6 +374,8 @@ static void aspeed_soc_realize(DeviceState *dev, Erro=
-r **errp)
->      for (i =3D 0; i < sc->wdts_num; i++) {
->          AspeedWDTClass *awc =3D ASPEED_WDT_GET_CLASS(&s->wdt[i]);
->
-> +        object_property_set_link(OBJECT(&s->wdt[i]),
-> +                                 OBJECT(&s->scu), "scu", &error_abort);
->          object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized", &=
-err);
->          if (err) {
->              error_propagate(errp, err);
-> diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
-> index bcce2192a92a..a8c38cc1189b 100644
-> --- a/hw/timer/aspeed_timer.c
-> +++ b/hw/timer/aspeed_timer.c
-> @@ -19,6 +19,7 @@
->  #include "qemu/timer.h"
->  #include "qemu/log.h"
->  #include "qemu/module.h"
-> +#include "hw/qdev-properties.h"
->  #include "trace.h"
->
->  #define TIMER_NR_REGS 4
-> @@ -603,15 +604,8 @@ static void aspeed_timer_realize(DeviceState *dev, E=
-rror **errp)
->      int i;
->      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
->      AspeedTimerCtrlState *s =3D ASPEED_TIMER(dev);
-> -    Object *obj;
-> -    Error *err =3D NULL;
->
-> -    obj =3D object_property_get_link(OBJECT(dev), "scu", &err);
-> -    if (!obj) {
-> -        error_propagate_prepend(errp, err, "required link 'scu' not foun=
-d: ");
-> -        return;
-> -    }
-> -    s->scu =3D ASPEED_SCU(obj);
-> +    assert(s->scu);
->
->      for (i =3D 0; i < ASPEED_TIMER_NR_TIMERS; i++) {
->          aspeed_init_one_timer(s, i);
-> @@ -677,6 +671,12 @@ static const VMStateDescription vmstate_aspeed_timer=
-_state =3D {
->      }
->  };
->
-> +static Property aspeed_timer_properties[] =3D {
-> +    DEFINE_PROP_LINK("scu", AspeedTimerCtrlState, scu, TYPE_ASPEED_SCU,
-> +                     AspeedSCUState *),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static void timer_class_init(ObjectClass *klass, void *data)
+Yes, Paolo's two patches plus this seems to resolve both the functional
+and performance issues.  Thanks,
+
+Alex
+=20
+> --- hw/rtc/mc146818rtc.c.orig=092019-11-18 19:16:49.077479836 -0200
+> +++ hw/rtc/mc146818rtc.c=092019-11-18 19:22:35.706803090 -0200
+> @@ -168,7 +168,7 @@
+>   * is just due to period adjustment.
+>   */
+>  static void
+> -periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_pe=
+riod)
+> +periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_pe=
+riod, bool period_change)
 >  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -685,6 +685,7 @@ static void timer_class_init(ObjectClass *klass, void=
- *data)
->      dc->reset =3D aspeed_timer_reset;
->      dc->desc =3D "ASPEED Timer";
->      dc->vmsd =3D &vmstate_aspeed_timer_state;
-> +    dc->props =3D aspeed_timer_properties;
->  }
->
->  static const TypeInfo aspeed_timer_info =3D {
-> diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
-> index 122aa8daaadf..f50dab922e0f 100644
-> --- a/hw/watchdog/wdt_aspeed.c
-> +++ b/hw/watchdog/wdt_aspeed.c
-> @@ -241,16 +241,8 @@ static void aspeed_wdt_realize(DeviceState *dev, Err=
-or **errp)
+>      uint32_t period;
+>      int64_t cur_clock, next_irq_clock, lost_clock =3D 0;
+> @@ -190,7 +190,7 @@
+>       * if the periodic timer's update is due to period re-configuration,
+>       * we should count the clock since last interrupt.
+>       */
+> -    if (old_period) {
+> +    if (old_period && period_change) {
+>          int64_t last_periodic_clock, next_periodic_clock;
+> =20
+>          next_periodic_clock =3D muldiv64(s->next_periodic_time,
+> @@ -246,7 +246,7 @@
 >  {
->      SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
->      AspeedWDTState *s =3D ASPEED_WDT(dev);
-> -    Error *err =3D NULL;
-> -    Object *obj;
->
-> -    obj =3D object_property_get_link(OBJECT(dev), "scu", &err);
-> -    if (!obj) {
-> -        error_propagate(errp, err);
-> -        error_prepend(errp, "required link 'scu' not found: ");
-> -        return;
-> -    }
-> -    s->scu =3D ASPEED_SCU(obj);
-> +    assert(s->scu);
->
->      s->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, aspeed_wdt_timer_expir=
-ed, dev);
->
-> @@ -264,6 +256,12 @@ static void aspeed_wdt_realize(DeviceState *dev, Err=
-or **errp)
->      sysbus_init_mmio(sbd, &s->iomem);
->  }
->
-> +static Property aspeed_wdt_properties[] =3D {
-> +    DEFINE_PROP_LINK("scu", AspeedWDTState, scu, TYPE_ASPEED_SCU,
-> +                     AspeedSCUState *),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
->  static void aspeed_wdt_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc =3D DEVICE_CLASS(klass);
-> @@ -273,6 +271,7 @@ static void aspeed_wdt_class_init(ObjectClass *klass,=
- void *data)
->      dc->reset =3D aspeed_wdt_reset;
->      set_bit(DEVICE_CATEGORY_MISC, dc->categories);
->      dc->vmsd =3D &vmstate_aspeed_wdt;
-> +    dc->props =3D aspeed_wdt_properties;
->  }
->
->  static const TypeInfo aspeed_wdt_info =3D {
-> --
-> 2.21.0
->
+>      RTCState *s =3D opaque;
+> =20
+> -    periodic_timer_update(s, s->next_periodic_time, s->period);
+> +    periodic_timer_update(s, s->next_periodic_time, s->period, false);
+>      s->cmos_data[RTC_REG_C] |=3D REG_C_PF;
+>      if (s->cmos_data[RTC_REG_B] & REG_B_PIE) {
+>          s->cmos_data[RTC_REG_C] |=3D REG_C_IRQF;
+> @@ -512,7 +512,7 @@
+> =20
+>              if (update_periodic_timer) {
+>                  periodic_timer_update(s, qemu_clock_get_ns(rtc_clock),
+> -                                      old_period);
+> +                                      old_period, true);
+>              }
+> =20
+>              check_update_timer(s);
+> @@ -551,7 +551,7 @@
+> =20
+>              if (update_periodic_timer) {
+>                  periodic_timer_update(s, qemu_clock_get_ns(rtc_clock),
+> -                                      old_period);
+> +                                      old_period, true);
+>              }
+> =20
+>              check_update_timer(s);
+> @@ -805,7 +805,7 @@
+>          uint64_t now =3D qemu_clock_get_ns(rtc_clock);
+>          if (now < s->next_periodic_time ||
+>              now > (s->next_periodic_time + get_max_clock_jump())) {
+> -            periodic_timer_update(s, qemu_clock_get_ns(rtc_clock), s->pe=
+riod);
+> +            periodic_timer_update(s, qemu_clock_get_ns(rtc_clock), s->pe=
+riod, false);
+>          }
+>      }
+> =20
+
 
