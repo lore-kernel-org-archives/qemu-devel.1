@@ -6,97 +6,97 @@ X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EB2C43215
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:39:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6102CC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:41:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A1A42073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:39:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30F2920727
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:41:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aT/tS4XD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A1A42073A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gP17jQPj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30F2920727
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWfNs-0007ST-GD
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 06:39:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51973)
+	id 1iWfP7-0000QI-9B
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 06:41:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52098)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iWfNH-00072K-51
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:39:20 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iWfNs-0007cv-Vp
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:39:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iWfNF-0007NV-KE
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:39:18 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:27895
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <pbonzini@redhat.com>) id 1iWfNr-0007Yv-VJ
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:39:56 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37181
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iWfNF-0007N7-GL
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:39:17 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iWfNr-0007YH-RC
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:39:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574077156;
+ s=mimecast20190719; t=1574077195;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=vHUMAQKCLe8UWzE/y+vJwqFFRM4wn2NCBwxJ9+8Lqno=;
- b=aT/tS4XDz4adeTXyS5/VV6udLAocfoYn0l9inhK4oM32ou6W587ZzcP81zcadDSy3khgLW
- 6XwfRwRzfYM4PGFKixsMDSz/Of97g8OaT7gfxfEYpbjCKIf4gy39fjl6na/nEFKHuBR+1K
- lX/3vsQUZWhsXlMKfbrfllGi5q9gw4U=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-n92zAP-xMc-tY2cg0-wyvw-1; Mon, 18 Nov 2019 06:39:11 -0500
-Received: by mail-wr1-f70.google.com with SMTP id e3so15165090wrs.17
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 03:39:11 -0800 (PST)
+ bh=HCiNPJK5K/6ImtDdczshCqsvQJzhMwbFVAvNEy0gSX8=;
+ b=gP17jQPjmH8eoEdDTEhO4IqHrCcdG325hqBfTSQStK4JGttGkAzahvy+s0ckLzM6Y9H5lV
+ sWI5+ufnVeck+gRExkK35sAcDKn/h3n/JTWHCxQ5TjpqH3RnqaA1rir+MfYfymuJPO6Hj/
+ mAEe1+LqUJeRMeMESQPP5N0pUntoGbI=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-357-wD9bLCMdOySlRDHXFeQcKg-1; Mon, 18 Nov 2019 06:39:50 -0500
+Received: by mail-wr1-f71.google.com with SMTP id y3so15138082wrm.12
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 03:39:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=/mOorNYGp9pVaAlNrI0hu6lFGwcVN8SAHmsKUjGEoWA=;
- b=JSNSg2L9Fr3kpanuok9pe7gJxfM7i0xXynStFaG8pXoG3pseaIBtpcicDAMc0xb8EX
- 5Xj1Lgdm9gNBbNz28MjbpgnUDhFep+f2QLGOkwJoWYRevAKQkwueVjxBG75xjx+VkCUi
- AJllpBr48L9xFU26EetlECZHwe++jNQ5C5CxfaGj9Xe8FPX6SBCeH8p940kSKYbOEj9x
- o1DPkAclGwioNzVZYWgVcEXO6mQYoACL8hiZTqbDEcNClysdDIAAbiw8VaiBUUyvodbZ
- G/8lXlcXbCKwms6QXgPx10lBrCeWdI3MZO4LXid5z3u0D4C9gZ8ebV8dxAO3CsTDYRFG
- k4qQ==
-X-Gm-Message-State: APjAAAVuki7jTYb4jLFajQz2ItWVkk2wirLtWxXzkJxVk+M7HZs+FECE
- P+OVw0Eq1PlJ9b8mlcvbO1S0sRjvd4DCuPcp8u9hbAJJbbigHQZ3JdVQKy+fIiiGqk+6alx4WS+
- i5Ua+GKYKW0V3dKU=
-X-Received: by 2002:adf:edc5:: with SMTP id v5mr14248033wro.322.1574077150304; 
- Mon, 18 Nov 2019 03:39:10 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyp6Xv+TcQjbPleUK6XcuLBLb6Zs9crZxdAd63ey6t+b6ueOBVmwf+WyE22xyJnh1Jo8hHJRA==
-X-Received: by 2002:adf:edc5:: with SMTP id v5mr14248006wro.322.1574077150023; 
- Mon, 18 Nov 2019 03:39:10 -0800 (PST)
+ bh=xhrJrjU8Sb08VpuF7TCXlJtzglRFNis7wSjpksv502A=;
+ b=NjknnSSa5sPzAT4BoXfm2LTfiRfBdiCz6hSpFrrG8dsWo0BrAWY6KeSqw6+2Bq3kX0
+ juIOl8ZcO0j6QP58bkNt63q0TVsXxYtKvfyoBjyFwqrmvGIlrWgGAXEeSIyjVc0UmCgl
+ vUz5Lkuwx2fS7H/8Bgv6m/5w8V+pHcyy0Gzyd8U753xwnjbYF7R2e1s03vgbyW+nfkBa
+ QIsOpID+Xj79EJ4Qbm7decjP3Bz7CC73DSjyf38qv+Bj+6dj5fQlYDwIAZ1heV2u221z
+ FT3FZ+CLmT+M4o8Q33mBb7at0d9GAM73lMWssl/fpTrBcc2I0aGz24tf0XdHYGTajVXj
+ MT1w==
+X-Gm-Message-State: APjAAAVrijWuzDSdZJktJJKk1XSYITR7PKg/FabaWv6HXr0bYcZfgKO/
+ kJ/fAg2HEGGNphMHF6NULwq+QlT/031ufR+Q4oDD9RIGQVxCMtqi0kPHQHRNaGA6SCuAmzQ2bBd
+ pJJt3enRos0Ojw3I=
+X-Received: by 2002:adf:8543:: with SMTP id 61mr20961968wrh.171.1574077189681; 
+ Mon, 18 Nov 2019 03:39:49 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz++Feiutme8gCZgXvbdDwiIqm9Zj2SPZJYb+VXKhWO6Z2DaOBjEAJDpz1Mj2VTZsOkOgDayw==
+X-Received: by 2002:adf:8543:: with SMTP id 61mr20961939wrh.171.1574077189344; 
+ Mon, 18 Nov 2019 03:39:49 -0800 (PST)
 Received: from ?IPv6:2001:b07:6468:f312:a15b:f753:1ac4:56dc?
  ([2001:b07:6468:f312:a15b:f753:1ac4:56dc])
- by smtp.gmail.com with ESMTPSA id y67sm20984213wmy.31.2019.11.18.03.39.09
+ by smtp.gmail.com with ESMTPSA id z11sm26951444wrg.0.2019.11.18.03.39.48
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 18 Nov 2019 03:39:09 -0800 (PST)
-Subject: Re: [PATCH 03/16] vl: merge -accel processing into
- configure_accelerators
+ Mon, 18 Nov 2019 03:39:48 -0800 (PST)
+Subject: Re: [PATCH 02/16] vl: extract accelerator option processing to a
+ separate function
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
- <1573655945-14912-4-git-send-email-pbonzini@redhat.com>
- <4a330f6c-84ed-3f02-60f8-bd34314ad85d@redhat.com>
+ <1573655945-14912-3-git-send-email-pbonzini@redhat.com>
+ <5e5a4b1e-4ada-11f6-c551-c15de2404e7f@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Openpgp: preference=signencrypt
-Message-ID: <990d1694-dc06-b19b-c390-4dc5fe511e83@redhat.com>
-Date: Mon, 18 Nov 2019 12:39:12 +0100
+Message-ID: <941e7b95-8125-00b3-ab63-29b1697070bf@redhat.com>
+Date: Mon, 18 Nov 2019 12:39:54 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <4a330f6c-84ed-3f02-60f8-bd34314ad85d@redhat.com>
+In-Reply-To: <5e5a4b1e-4ada-11f6-c551-c15de2404e7f@redhat.com>
 Content-Language: en-US
-X-MC-Unique: n92zAP-xMc-tY2cg0-wyvw-1
+X-MC-Unique: wD9bLCMdOySlRDHXFeQcKg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,25 +113,22 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/11/19 12:27, Thomas Huth wrote:
->>       * Note: uses machine properties such as kernel-irqchip, must run
->>       * after machine_set_property().
->>       */
->> -    configure_accelerator(current_machine, argv[0]);
->> +    cpu_ticks_init();
->> +    configure_accelerators(argv[0]);
-> The comment about kernel-irqchip obviously rather belongs to
-> configure_accelerators() instead of cpu_ticks_init(), so maybe you
-> should move the cpu_ticks_init() before the comment now?
+On 18/11/19 11:58, Thomas Huth wrote:
+>> +static void configure_accelerators(void)
+>> +{
+>> +    qemu_opts_foreach(qemu_find_opts("icount"),
+>> +                      do_configure_icount, NULL, &error_fatal);
+>> +
+>> +    qemu_opts_foreach(qemu_find_opts("accel"),
+>> +                      do_configure_accelerator, NULL, &error_fatal);
+>> +}
+>
+> vl.c is already quite overcrowded ... maybe you could add the new code
+> to accel/accel.c instead? Just my 0.02 =80.
 
-Ok.
-
-> (does it need
-> to be moved here at all? ... it looks pretty independent at a first glanc=
-e)
-
-No, it doesn't.  Whether to move it or not is a matter of personal
-preference, so I can certainly move it back.
+I liked the idea of keeping all command line parsing in vl.c, especially
+because all the ugliness for backwards compatibility can then be
+confined there.
 
 Paolo
 
