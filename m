@@ -1,96 +1,62 @@
-Return-Path: <SRS0=ZAHP=ZJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 876D7C432C0
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 Nov 2019 23:24:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5439EC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 01:49:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5527B2071E
-	for <qemu-devel@archiver.kernel.org>; Sun, 17 Nov 2019 23:24:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5527B2071E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 26B52206D6
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 01:49:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26B52206D6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57048 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWTuK-0002kF-Ho
-	for qemu-devel@archiver.kernel.org; Sun, 17 Nov 2019 18:24:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49865)
+	id 1iWWAW-0002tq-7s
+	for qemu-devel@archiver.kernel.org; Sun, 17 Nov 2019 20:49:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34692)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iWTqp-0006j2-6k
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 18:21:05 -0500
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iWW9p-0002Si-8u
+ for qemu-devel@nongnu.org; Sun, 17 Nov 2019 20:48:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iWTqm-0007Ux-Un
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 18:21:02 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42672)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iWTqm-0007Ua-D2
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 18:21:00 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xAHNCRi6028978
- for <qemu-devel@nongnu.org>; Sun, 17 Nov 2019 18:20:59 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wayf4dgs7-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Sun, 17 Nov 2019 18:20:59 -0500
-Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <groug@kaod.org>;
- Sun, 17 Nov 2019 23:20:57 -0000
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Sun, 17 Nov 2019 23:20:54 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xAHNKrj429360226
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Sun, 17 Nov 2019 23:20:53 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 28E3CAE053;
- Sun, 17 Nov 2019 23:20:53 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 03E43AE051;
- Sun, 17 Nov 2019 23:20:53 +0000 (GMT)
-Received: from bahia.lan (unknown [9.145.70.126])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Sun, 17 Nov 2019 23:20:52 +0000 (GMT)
-Subject: [PATCH for-5.0 4/4] spapr: Abort if XICS interrupt controller
- cannot be initialized
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 18 Nov 2019 00:20:52 +0100
-In-Reply-To: <157403283036.409804.13586263493813758117.stgit@bahia.lan>
-References: <157403283036.409804.13586263493813758117.stgit@bahia.lan>
-User-Agent: StGit/unknown-version
+ (envelope-from <richardw.yang@linux.intel.com>) id 1iWW9n-0006PB-VR
+ for qemu-devel@nongnu.org; Sun, 17 Nov 2019 20:48:49 -0500
+Received: from mga14.intel.com ([192.55.52.115]:4778)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
+ id 1iWW9n-0006ON-Nq
+ for qemu-devel@nongnu.org; Sun, 17 Nov 2019 20:48:47 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+ by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 17 Nov 2019 17:48:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,318,1569308400"; d="scan'208";a="195977620"
+Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
+ by orsmga007.jf.intel.com with ESMTP; 17 Nov 2019 17:48:39 -0800
+Date: Mon, 18 Nov 2019 09:48:29 +0800
+From: Wei Yang <richardw.yang@linux.intel.com>
+To: Wei Yang <richardw.yang@linux.intel.com>
+Subject: Re: [PATCH 0/2] not use multifd during postcopy
+Message-ID: <20191118014829.GA4382@richard>
+References: <20191025232000.25857-1-richardw.yang@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19111723-0012-0000-0000-000003662F5E
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111723-0013-0000-0000-000021A1B26D
-Message-Id: <157403285265.409804.8683093665795248192.stgit@bahia.lan>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-17_05:2019-11-15,2019-11-17 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 clxscore=1034
- mlxscore=0 malwarescore=0 impostorscore=0 phishscore=0 bulkscore=0
- mlxlogscore=988 priorityscore=1501 spamscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911170222
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191025232000.25857-1-richardw.yang@linux.intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -102,56 +68,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, =?utf-8?q?C=C3=A9dric?= Le Goater <clg@kaod.org>,
- qemu-devel@nongnu.org
+Reply-To: Wei Yang <richardw.yang@linux.intel.com>
+Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Failing to set any of the ICS property should really never happen:
-- object_property_add_child() always succeed unless the child object
-  already has a parent, which isn't the case here obviously since the
-  ICS has just been created with object_new()
-- the ICS has an "nr-irqs" property than can be set as long as the ICS
-  isn't realized
+Ping for comments.
 
-In both cases, an error indicates there is a bug in QEMU. Propagating the
-error, ie. exiting QEMU since spapr_irq_init() is called with &error_fatal
-doesn't make much sense. Abort instead. This is consistent with what is
-done with XIVE : both qdev_create() and qdev_prop_set_uint32() abort QEMU
-on error.
+On Sat, Oct 26, 2019 at 07:19:58AM +0800, Wei Yang wrote:
+>We don't support multifd during postcopy, but user still could enable
+>both multifd and postcopy. This leads to migration failure.
+>
+>Patch 1 does proper cleanup, otherwise we may have data corruption.
+>Patch 2 does the main job.
+>
+>BTW, current multifd synchronization method needs a cleanup. Will send another
+>patch set.
+>
+>Wei Yang (2):
+>  migration/multifd: clean pages after filling packet
+>  migration/multifd: not use multifd during postcopy
+>
+> migration/ram.c | 15 ++++++++++-----
+> 1 file changed, 10 insertions(+), 5 deletions(-)
+>
+>-- 
+>2.17.1
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr_irq.c |   13 ++-----------
- 1 file changed, 2 insertions(+), 11 deletions(-)
-
-diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
-index 487c8ceb35a3..37f65dac9ca8 100644
---- a/hw/ppc/spapr_irq.c
-+++ b/hw/ppc/spapr_irq.c
-@@ -313,20 +313,11 @@ void spapr_irq_init(SpaprMachineState *spapr, Error **errp)
-         Object *obj;
- 
-         obj = object_new(TYPE_ICS_SPAPR);
--        object_property_add_child(OBJECT(spapr), "ics", obj, &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
--            return;
--        }
- 
-+        object_property_add_child(OBJECT(spapr), "ics", obj, &error_abort);
-         object_property_set_link(obj, OBJECT(spapr), ICS_PROP_XICS,
-                                  &error_abort);
--        object_property_set_int(obj, smc->nr_xirqs, "nr-irqs", &local_err);
--        if (local_err) {
--            error_propagate(errp, local_err);
--            return;
--        }
--
-+        object_property_set_int(obj, smc->nr_xirqs, "nr-irqs", &error_abort);
-         object_property_set_bool(obj, true, "realized", &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-
+-- 
+Wei Yang
+Help you, Help me
 
