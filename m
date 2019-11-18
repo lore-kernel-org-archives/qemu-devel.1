@@ -2,63 +2,93 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9DAEC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32D5CC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:21:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EB5C20726
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:01:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EB5C20726
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id F17942071B
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:21:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pZUgrpV4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F17942071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWdqt-0006O5-G1
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:01:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34341)
+	id 1iWeAN-000597-VC
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:21:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37305)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iWdpg-0005hw-F8
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:00:34 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iWe9b-0004Ss-Nv
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:21:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iWdpb-0004oP-0V
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:00:32 -0500
-Received: from 8.mo1.mail-out.ovh.net ([178.33.110.239]:57134)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iWdpa-0004nH-PT
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:00:26 -0500
-Received: from player793.ha.ovh.net (unknown [10.109.160.39])
- by mo1.mail-out.ovh.net (Postfix) with ESMTP id AA58119BA18
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 11:00:23 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player793.ha.ovh.net (Postfix) with ESMTPSA id 3FEC9C32F05A;
- Mon, 18 Nov 2019 10:00:15 +0000 (UTC)
-Subject: Re: [PATCH] misc/pca9552: Add qom set and get
-To: Joel Stanley <joel@jms.id.au>
-References: <20191118061757.52550-1-joel@jms.id.au>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <42f378d5-e7ea-11ce-11d5-9589fe7194d2@kaod.org>
-Date: Mon, 18 Nov 2019 11:00:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <stefanha@gmail.com>) id 1iWe9a-0001FJ-7g
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:21:07 -0500
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:44152)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iWe9a-0001Es-40
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:21:06 -0500
+Received: by mail-qk1-x744.google.com with SMTP id m16so13862206qki.11
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 02:21:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=p9A0HQCTWo8IkEueIZ8gvaKdgMnDvJwnr6rC9+7dHTk=;
+ b=pZUgrpV46Ejm0ly4g2aa4VANJRCg3njcAsKTWBbzIkV7v9jrgEa/PHjr/+JzVDC8XX
+ xoXyCSlhJE0y1crHp0Q5hKtD3Md0iRErVhRhpa/5F7yWbVv4QN/kqYwuZkcDOAyc+6lX
+ KIhrHYNvx9YB/+5SrEffvrOHh9LtC9awGCoJwh2KTULBsXA0Bgs4167r9HXcoIfvKzdL
+ ppOh4RO1J6+dHQS4xGdYKEicbzBI1I7fRTame0sJT1y613dkEEB28MEMh12MUmCWrfTt
+ PIKw2rYNgqGh1eU9ZNGBpo5WNmqblA0HGiqysXDym0ap0j1STzqEaSSoMU3lUXu8NMlN
+ p8HQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=p9A0HQCTWo8IkEueIZ8gvaKdgMnDvJwnr6rC9+7dHTk=;
+ b=mC7asxcYBM3Hju5jcpNlKvN934YdzY2GIJX8uD6fwC++6iSsqaaOD4FWgx88vINAGI
+ 5B4XN2Phg/08p9OSMtJOABYJOIAheqxuXL+JIMbRrXQQ8+oiajwFRmsfEsHLeMf6LClH
+ w8SDpa7IfWAdkKU4zmlab99PvTkPryWfrUtTo/w3zR3/o7EyV7bTT6kgMY6+9X+QAueY
+ tzQBiQQjWM+Fe+O7oN2qR9ewKqINUj2SSj8b3h5C59HBwL3nGW+r7GOA3xniHOLzzdM5
+ +Xg+Rh5aUav8uGL+CB22c9Np20W1GWO4BULffeNCvR09HXbX64Wsa/qcVx2C3538+2/T
+ pbUw==
+X-Gm-Message-State: APjAAAU2Oq8KoCV2//Go58xQ9hsw2Azv51JRHmh1LmU43O2kvbyzm9r/
+ nh68aG0tYp59SJpKnn3DHgKIq2kVY6HFZnjIOQ4=
+X-Google-Smtp-Source: APXvYqz48LbupXsRKsNJSGUqZn5aPb6LZVEB2oQg4AmlOsDZF8A3gLq6CbqzGhMwrDu+IyOPXG6rlv01vOsPaMddWxA=
+X-Received: by 2002:a05:620a:14a2:: with SMTP id
+ x2mr23572703qkj.236.1574072465398; 
+ Mon, 18 Nov 2019 02:21:05 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191118061757.52550-1-joel@jms.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 7761672485206723345
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -83
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudeghedguddvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegfrhhlucfvnfffucdludejmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuffhomhgrihhnpehophgvnhhpohifvghrrdighiiipdhoiihlrggsshdrohhrghenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejleefrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 178.33.110.239
+References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
+ <20191106084344.GB189998@stefanha-x1.localdomain>
+ <20191106095122.jju7eo57scfoat6a@sirius.home.kraxel.org>
+ <CAJSP0QUJBkqtVJq17tfX5O-JuvEGcZQviP0C3tv9qSDy-P-hcg@mail.gmail.com>
+ <20191106125023.uhdhtqisybilxasr@sirius.home.kraxel.org>
+ <CAJSP0QXG5Z3zCnPL+Y7EQfCeey2Fb9OdPdx531Jz2Ofk63wndg@mail.gmail.com>
+ <20191108072210.ywyneaoc2y4slth6@sirius.home.kraxel.org>
+ <CAJSP0QWZc=z56CHEKa8WVe9Cw2-EhDFU+7NeGgL+g-Go5q3K5Q@mail.gmail.com>
+ <CADMs+9ZrfEt4QfCM9pC243KTejvbORQ-Nzo0eHjU0FJ8y-2kwQ@mail.gmail.com>
+ <CAJSP0QUF1YA0c7b2ENeDLo1T9OsfeTJbonOYug5Fc56--YqZJQ@mail.gmail.com>
+ <CAAFQd5C6mVEUQUP8-=GevM+rV1ksFg68kyWAjCj+cjB-iQiXaA@mail.gmail.com>
+ <CAJSP0QXk9XkrOeiMZ=yQCbStkXATv+AUwqqGDfcSbqL05j1kbg@mail.gmail.com>
+ <CAAFQd5DBiUta9HWYZX3N06J8bSqa=zBQvL5kdCLfWUfsf9s9Vw@mail.gmail.com>
+In-Reply-To: <CAAFQd5DBiUta9HWYZX3N06J8bSqa=zBQvL5kdCLfWUfsf9s9Vw@mail.gmail.com>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Mon, 18 Nov 2019 10:20:54 +0000
+Message-ID: <CAJSP0QX6ajvKpU6k6i6uBFwc9gFWoYGa6HZn7AfbGr9+975=WQ@mail.gmail.com>
+Subject: Re: guest / host buffer sharing ...
+To: Tomasz Figa <tfiga@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::744
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,229 +100,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-arm@nongnu.org, Rashmica Gupta <rashmica.g@gmail.com>
+Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
+ Alex Lau <alexlau@chromium.org>, Alexandre Courbot <acourbot@chromium.org>,
+ qemu-devel <qemu-devel@nongnu.org>,
+ Gurchetan Singh <gurchetansingh@chromium.org>,
+ Keiichi Watanabe <keiichiw@chromium.org>, Gerd Hoffmann <kraxel@redhat.com>,
+ Daniel Vetter <daniel@ffwll.ch>,
+ =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>,
+ Hans Verkuil <hverkuil@xs4all.nl>,
+ Dmitry Morozov <dmitry.morozov@opensynergy.com>,
+ Pawel Osciak <posciak@chromium.org>, David Stevens <stevensd@chromium.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 18/11/2019 07:17, Joel Stanley wrote:
-> Following the pattern of the work recently done with the ASPEED GPIO
-> model, this adds support for inspecting and modifying the PCA9552 LEDs
-> from the monitor.
-> 
->  (qemu) qom-set  /machine/unattached/device[17] led0 on
->  (qemu) qom-get  /machine/unattached/device[17] led0
->  "on"
-> 
->  (qemu) qom-set  /machine/unattached/device[17] led0 off
->  (qemu) qom-get  /machine/unattached/device[17] led0
->  "off"
-> 
->  (qemu) qom-set  /machine/unattached/device[17] led0 pwm0
->  (qemu) qom-get  /machine/unattached/device[17] led0
->  "pwm0"
-> 
->  (qemu) qom-set  /machine/unattached/device[17] led0 pwm1
->  (qemu) qom-get  /machine/unattached/device[17] led0
->  "pwm1"
+On Sat, Nov 9, 2019 at 3:12 PM Tomasz Figa <tfiga@chromium.org> wrote:
+>
+> On Sat, Nov 9, 2019 at 9:08 PM Stefan Hajnoczi <stefanha@gmail.com> wrote=
+:
+> >
+> > On Sat, Nov 9, 2019 at 12:17 PM Tomasz Figa <tfiga@chromium.org> wrote:
+> > > On Sat, Nov 9, 2019 at 7:12 PM Stefan Hajnoczi <stefanha@gmail.com> w=
+rote:
+> > > > On Sat, Nov 9, 2019 at 2:41 AM St=C3=A9phane Marchesin <marcheu@chr=
+omium.org> wrote:
+> > > > > On Thu, Nov 7, 2019 at 11:35 PM Stefan Hajnoczi <stefanha@gmail.c=
+om> wrote:
+> > > > > > On Fri, Nov 8, 2019 at 8:22 AM Gerd Hoffmann <kraxel@redhat.com=
+> wrote:
+> > > > > > > > > Adding a list of common properties to the spec certainly =
+makes sense,
+> > > > > > > > > so everybody uses the same names.  Adding struct-ed prope=
+rties for
+> > > > > > > > > common use cases might be useful too.
+> > > > > > > >
+> > > > > > > > Why not define VIRTIO devices for wayland and friends?
+> > > > > > >
+> > > > > > > There is an out-of-tree implementation of that, so yes, that =
+surely is
+> > > > > > > an option.
+> > > > > > >
+> > > > > > > Wayland needs (a) shared buffers, mostly for gfx data, and (b=
+) a stream
+> > > > > > > pipe as control channel.  Pretty much the same for X11, excep=
+t that
+> > > > > > > shared buffers are optional because the X protocol can also s=
+queeze all
+> > > > > > > display updates through the stream pipe.
+> > > > > > >
+> > > > > > > So, if you want allow guests talk to the host display server =
+you can run
+> > > > > > > the stream pipe over vsock.  But there is nothing for the sha=
+red
+> > > > > > > buffers ...
+> > > > > > >
+> > > > > > > We could replicate vsock functionality elsewhere.  I think th=
+at happened
+> > > > > > > in the out-of-tree virtio-wayland implementation.  There also=
+ was some
+> > > > > > > discussion about adding streams to virtio-gpu, slightly pimpe=
+d up so you
+> > > > > > > can easily pass around virtio-gpu resource references for buf=
+fer
+> > > > > > > sharing.  But given that getting vsock right isn't exactly tr=
+ivial
+> > > > > > > (consider all the fairness issues when multiplexing multiple =
+streams
+> > > > > > > over a virtqueue for example) I don't think this is a good pl=
+an.
+> > > > > >
+> > > > > > I also think vsock isn't the right fit.
+> > > > > >
+> > > > >
+> > > > > +1 we are using vsock right now and we have a few pains because o=
+f it.
+> > > > >
+> > > > > I think the high-level problem is that because it is a side chann=
+el,
+> > > > > we don't see everything that happens to the buffer in one place
+> > > > > (rendering + display) and we can't do things like reallocate the
+> > > > > format accordingly if needed, or we can't do flushing etc. on tha=
+t
+> > > > > buffer where needed.
+> > > >
+> > > > Do you think a VIRTIO device designed for your use case is an
+> > > > appropriate solution?
+> > > >
+> > > > I have been arguing that these use cases should be addressed with
+> > > > dedicated VIRTIO devices, but I don't understand the use cases of
+> > > > everyone on the CC list so maybe I'm missing something :).  If ther=
+e
+> > > > are reasons why having a VIRTIO device for your use case does not m=
+ake
+> > > > sense then it would be good to discuss them.  Blockers like "VIRTIO=
+ is
+> > > > too heavyweight/complex for us because ...", "Our application can't
+> > > > make use of VIRTIO devices because ...", etc would be important to
+> > > > hear.
+> > >
+> > > Do you have any idea on how to model Wayland as a VIRTIO device?
+> > >
+> > > Stephane mentioned that we use vsock, but in fact we have our own
+> > > VIRTIO device, except that it's semantically almost the same as vsock=
+,
+> > > with a difference being the ability to pass buffers and pipes across
+> > > the VM boundary.
+> >
+> > I know neither Wayland nor your use case :).
+> >
+> > But we can discuss the design of your VIRTIO device.  Please post a
+> > link to the code.
+>
+> The guest-side driver:
+> https://chromium.googlesource.com/chromiumos/third_party/kernel/+/chromeo=
+s-4.19/drivers/virtio/virtio_wl.c
+>
+> Protocol definitions:
+> https://chromium.googlesource.com/chromiumos/third_party/kernel/+/chromeo=
+s-4.19/include/uapi/linux/virtio_wl.h
+>
+> crosvm device implementation:
+> https://chromium.googlesource.com/chromiumos/platform/crosvm/+/refs/heads=
+/master/devices/src/virtio/wl.rs
 
-It would be nice to revive the QOM get patchset from David. 
+Thanks, Tomasz!
 
-	http://patchwork.ozlabs.org/patch/666458/
+Unfortunately I haven't had a chance to look or catch up on this email
+thread due to other work that will keep me away for at least another
+week :(.
 
-Did we reach some consensus ? 
-
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-
-Some comments below.
-
-> ---
-> The qom device in mainline qemu is a different path. Using the monitor
-> examine `info qom-tree /machine/unattached/` to discover it.
-> 
-> This can be tested with a Witherspoon image.
-> 
-> $ wget https://openpower.xyz/job/openbmc-build/distro=ubuntu,label=builder,target=witherspoon/lastSuccessfulBuild/artifact/deploy/images/witherspoon/obmc-phosphor-image-witherspoon.ubi.mtd
-> 
-> $ qemu-system-arm -M witherspoon-bmc -serial pty -monitor pty -nographic \
->  -drive file=obmc-phosphor-image-witherspoon.ubi.mtd,format=raw,if=mtd
-> char device redirected to /dev/pts/5 (label compat_monitor0)
-> char device redirected to /dev/pts/10 (label serial0)
-> 
-> $ screen /dev/pts/5
-> QEMU 4.1.91 monitor - type 'help' for more information
-> (qemu) qom-get  /machine/unattached/device[17] led0
-> "off"
-> 
-> $ screen /dev/pts/19
-> root@witherspoon:~# cd /sys/class/gpio/
-> root@witherspoon:/sys/class/gpio# echo 248 > export
-> root@witherspoon:/sys/class/gpio# cat gpio248/value
-> 0
-> 
-> (qemu) qom-set  /machine/unattached/device[17] led0 on
-> 
-> root@witherspoon:/sys/class/gpio# echo out > gpio248/direction
-> root@witherspoon:/sys/class/gpio# cat gpio248/value
-> 1
-> 
-> (qemu) qom-get  /machine/unattached/device[17] led0
-> "on"
-> 
-> (qemu) qom-set  /machine/unattached/device[17] led0 off
-> (qemu) qom-get  /machine/unattached/device[17] led0
-> "off"
-> 
-> root@witherspoon:/sys/class/gpio# cat gpio248/value
-> 0
-> 
-> Signed-off-by: Joel Stanley <joel@jms.id.au>
-> ---
->  hw/misc/pca9552.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 91 insertions(+)
-> 
-> diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
-> index 73be28d9369c..0362aac8c862 100644
-> --- a/hw/misc/pca9552.c
-> +++ b/hw/misc/pca9552.c
-> @@ -15,12 +15,16 @@
->  #include "hw/misc/pca9552.h"
->  #include "hw/misc/pca9552_regs.h"
->  #include "migration/vmstate.h"
-> +#include "qapi/error.h"
-> +#include "qapi/visitor.h"
->  
->  #define PCA9552_LED_ON   0x0
->  #define PCA9552_LED_OFF  0x1
->  #define PCA9552_LED_PWM0 0x2
->  #define PCA9552_LED_PWM1 0x3
->  
-> +static const char *led_state[] = {"on", "off", "pwm0", "pwm1"};
-> +
->  static uint8_t pca9552_pin_get_config(PCA9552State *s, int pin)
->  {
->      uint8_t reg   = PCA9552_LS0 + (pin / 4);
-> @@ -169,6 +173,84 @@ static int pca9552_event(I2CSlave *i2c, enum i2c_event event)
->      return 0;
->  }
->  
-> +static void pca9552_get_led(Object *obj, Visitor *v, const char *name,
-> +                            void *opaque, Error **errp)
-> +{
-> +    PCA9552State *s = PCA9552(obj);
-> +    int led, rc, reg;
-> +    char *str;
-> +    uint8_t state;
-> +
-> +    rc = sscanf(name, "led%2d", &led);
-> +    if (rc != 1) {
-> +        error_setg(errp, "%s: error reading %s", __func__, name);
-> +        return;
-> +    }
-> +    if (led < 0 || led > s->nr_leds) {
-> +        error_setg(errp, "%s invalid led %s", __func__, name);
-> +        return;
-> +    }
-> +    /*
-> +     * Get the LSx register as the qom interface should expose the device
-> +     * state, not the modeled 'input line' behaviour which would come from
-> +     * reading the INPUTx reg
-> +     */
-> +    reg = PCA9552_LS0 + led / 4;
-> +    state = (pca9552_read(s, reg) >> (led % 8)) & 0x3;
-
-Could we add accessors to extract the register fields and to clarify 
-the layout ? 
-
-> +    str = g_strdup(led_state[state]);
-> +    visit_type_str(v, name, &str, errp);
-> +}
-> +
-> +/*
-> + * Return an LED selector register value based on an existing one, with
-> + * the appropriate 2-bit state value set for the given LED number (0-3).
-> + */
-> +static inline uint8_t pca955x_ledsel(uint8_t oldval, int led_num, int state)
-> +{
-> +        return (oldval & (~(0x3 << (led_num << 1)))) |
-> +                ((state & 0x3) << (led_num << 1));
-> +}
-> +
-> +static void pca9552_set_led(Object *obj, Visitor *v, const char *name,
-> +                            void *opaque, Error **errp)
-> +{
-> +    PCA9552State *s = PCA9552(obj);
-> +    Error *local_err = NULL;
-> +    int led, rc, reg, val;
-> +    uint8_t state;
-> +    char *state_str;
-> +
-> +    visit_type_str(v, name, &state_str, &local_err);
-> +    if (local_err) {
-> +        error_propagate(errp, local_err);
-> +        return;
-> +    }
-> +    rc = sscanf(name, "led%2d", &led);
-> +    if (rc != 1) {
-> +        error_setg(errp, "%s: error reading %s", __func__, name);
-> +        return;
-> +    }
-> +    if (led < 0 || led > s->nr_leds) {
-> +        error_setg(errp, "%s invalid led %s", __func__, name);
-> +        return;
-> +    }
-> +
-> +    for (state = 0; state < ARRAY_SIZE(led_state); state++) {
-> +        if (!strcmp(state_str, led_state[state])) {
-> +            break;
-> +        }
-> +    }
-> +    if (state >= ARRAY_SIZE(led_state)) {
-> +        error_setg(errp, "%s invalid led state %s", __func__, state_str);
-> +        return;
-> +    }
-> +
-> +    reg = PCA9552_LS0 + led / 4;
-> +    val = pca9552_read(s, reg);
-> +    val = pca955x_ledsel(val, led % 4, state);
-> +    pca9552_write(s, reg, val);
-> +}
-> +
->  static const VMStateDescription pca9552_vmstate = {
->      .name = "PCA9552",
->      .version_id = 0,
-> @@ -204,6 +286,7 @@ static void pca9552_reset(DeviceState *dev)
->  static void pca9552_initfn(Object *obj)
->  {
->      PCA9552State *s = PCA9552(obj);
-> +    int led;
->  
->      /* If support for the other PCA955X devices are implemented, these
->       * constant values might be part of class structure describing the
-> @@ -211,6 +294,14 @@ static void pca9552_initfn(Object *obj)
->       */
->      s->max_reg = PCA9552_LS3;
->      s->nr_leds = 16;
-> +
-> +    for (led = 0; led < s->nr_leds; led++) {
-> +        char *name;
-> +
-> +        name = g_strdup_printf("led%d", led);
-> +        object_property_add(obj, name, "bool", pca9552_get_led, pca9552_set_led,
-> +                            NULL, NULL, NULL);
-
-It misses a :
-
-   g_free(name)
-
-C.
-
-> +    }
->  }
->  
->  static void pca9552_class_init(ObjectClass *klass, void *data)
-> 
-
+Stefan
 
