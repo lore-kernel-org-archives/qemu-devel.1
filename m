@@ -2,94 +2,118 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03448C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7078C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:51:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFD532067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:50:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9222920726
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:51:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Vlfk9/vX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFD532067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="lifX2DWv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9222920726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWecT-0008AC-2f
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:50:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41743)
+	id 1iWedP-0000fg-Ob
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:51:55 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41909)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liam.merwick@oracle.com>) id 1iWeaw-0007JZ-Kg
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:49:24 -0500
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iWecC-000856-1t
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:50:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liam.merwick@oracle.com>) id 1iWeau-0003Ed-SA
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:49:22 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:33640)
+ (envelope-from <dplotnikov@virtuozzo.com>) id 1iWec9-0003jW-Ay
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:50:39 -0500
+Received: from mail-eopbgr140138.outbound.protection.outlook.com
+ ([40.107.14.138]:14375 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liam.merwick@oracle.com>)
- id 1iWeau-0003E2-JM
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:49:20 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAIAijgQ187429;
- Mon, 18 Nov 2019 10:49:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id; s=corp-2019-08-05;
- bh=imViwlW0duU3DcTSN+yoSZghpa4F0XQs7Bun2X82+oY=;
- b=Vlfk9/vXz6E7/MIOJWU/rLO/GWiNY28XYu27GQoSXdP6osjmukqsixmizk1XNygFWfmz
- pF6f2NIwsuBfDttXywlOISuSH2aD+OG4sM+BSn0SOnAAw/ethbPmKHRLsenL+5uaeHOK
- OJtPCUdbuZ2dUMW/pX3bB/Z0u547Os5GTJxQkIzFwOj2m/8EZvTMzmI8z0aG4/S1XRn+
- SUUUUdSA8oo6nvjYbTvVOlHYiDjuKoTd1uuCtWOxYvlHnzcUOlZiHmKAK7GKbfdysECg
- bz2T465616gxCNUEnvma/miJ8umkc5prGRcgOlPr/fE+AVWg5gU7LR8MLMqHkfPSBicG Hw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 2wa9rq790e-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 18 Nov 2019 10:49:15 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAIAmtso092582;
- Mon, 18 Nov 2019 10:49:14 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3030.oracle.com with ESMTP id 2wau94ck0y-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 18 Nov 2019 10:49:14 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAIAnCmx020033;
- Mon, 18 Nov 2019 10:49:12 GMT
-Received: from ol7.nl.oracle.com (/10.175.20.22)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 18 Nov 2019 02:49:12 -0800
-From: Liam Merwick <liam.merwick@oracle.com>
-To: slp@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, 
- mst@redhat.com, marcel.apfelbaum@gmail.com
-Subject: [PATCH] hw/i386: Move save_tsc_khz from PCMachineClass to
- X86MachineClass
-Date: Mon, 18 Nov 2019 10:49:06 +0000
-Message-Id: <1574074146-22942-1-git-send-email-liam.merwick@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9444
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911180098
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9444
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911180097
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.85
+ (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
+ id 1iWec4-0003ih-V6; Mon, 18 Nov 2019 05:50:35 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fV4BrbeYnutW6DAqqQbLUZ/aic9+CTk7nxfrfmn/P+gPm45iTyGeIJhBaw4xwb9PNGVGDcPV9C6+moQiP0+6+LUwJkMd/x2Qj9zB/2hT+Ya3/yR6XbzaPW/vRFvPOg4V+pksp+Q0tZXVpPFti7dw7h+wk6nU2QlQSpgYBlY5ffkCmBhkbc3z0wlDkFo2mFcFPeaENx5KHEAixKgh4BM/UIJgD8zSjJJasLtliw+01/OvH72HxMBLPP8w5g4T4tHN9wffVD13n0J5wIKycUkuVR3wTO3h9vw3tJDLKS1LqQoA90AcGF/wGUmfjjikWedKY/znbm7soHZUQZFV6+ZKrQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sZN3oIJPTZ4Rlta4ZWMhfPvkV3ZQSnTdIIaFCMS0G1c=;
+ b=U8LNFZrqmpqw7bZtQ6SGInyKG60nU5bqqObOzFah7qhFAEIo4Sqj0Zk8VPeejeCUxrbFWOOPQqC1Rkim5GLbs7qFNKCRphojrX8vXOcbWMXU4YYMaM2NkpTGiofg3z2k7+Ypmvio/Ldrp0FFRxCvg7t+FtIiIxf9fu1Gy3EjPDZwLSIruZLIIhJDgn+a/SnI1DP5p2s7NqWEjEtBS0Rf+iflkS3NYsgnp4yXvJCB9GFx3zSaDFV1LVKCQJYSEE3DehENSMfMgHmw3J9Ip90u+WIMazyPQwyG72Ou9eYKt3QrwF/oLO4uJZDHZRZ/jFyLgL1NA7LcGJ+hoLRpQ2OsiQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sZN3oIJPTZ4Rlta4ZWMhfPvkV3ZQSnTdIIaFCMS0G1c=;
+ b=lifX2DWvMc0lcVqKxQv8O0RlLHTFhEyWTvfyceV44Wbv01pDbvuS2bNyr/zaXIaw6bTIUoiagc0yFeqfHpQ9uyBQ7WEV5sVGlghdFCBzf7xOBmb0LJfy2pCkvK0xK+R3YMdPCnVtKvRpCuh8hEoRI3XrprEYXRjBzJF8PBMLwZg=
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
+ AM0PR08MB3411.eurprd08.prod.outlook.com (20.177.109.141) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.23; Mon, 18 Nov 2019 10:50:30 +0000
+Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::e8bf:705f:f64d:4aa]) by AM0PR08MB3745.eurprd08.prod.outlook.com
+ ([fe80::e8bf:705f:f64d:4aa%4]) with mapi id 15.20.2451.029; Mon, 18 Nov 2019
+ 10:50:30 +0000
+From: Denis Plotnikov <dplotnikov@virtuozzo.com>
+To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>
+Subject: Re: [PATCH v0 2/2] block: allow to set 'drive' property on a realized
+ block device
+Thread-Topic: [PATCH v0 2/2] block: allow to set 'drive' property on a
+ realized block device
+Thread-Index: AQHVl/muMyF4ca4YdU2Ub7M+IU0rR6eE9tyAgAvVKAA=
+Date: Mon, 18 Nov 2019 10:50:30 +0000
+Message-ID: <c38c1301-a28f-baf1-d441-ae8c7205feb1@virtuozzo.com>
+References: <20191110190310.19799-1-dplotnikov@virtuozzo.com>
+ <20191110190310.19799-3-dplotnikov@virtuozzo.com>
+ <c19343f9-73b2-89a4-2b7d-b101a0b20016@virtuozzo.com>
+In-Reply-To: <c19343f9-73b2-89a4-2b7d-b101a0b20016@virtuozzo.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1P195CA0020.EURP195.PROD.OUTLOOK.COM (2603:10a6:3:fd::30)
+ To AM0PR08MB3745.eurprd08.prod.outlook.com
+ (2603:10a6:208:ff::27)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=dplotnikov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [178.34.163.116]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 9f739a63-9fa8-4380-da1b-08d76c15211b
+x-ms-traffictypediagnostic: AM0PR08MB3411:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR08MB3411177BFD5F0ECD622CA3E1CF4D0@AM0PR08MB3411.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2000;
+x-forefront-prvs: 0225B0D5BC
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(376002)(39840400004)(366004)(136003)(346002)(396003)(199004)(189003)(102836004)(2906002)(316002)(7736002)(8936002)(478600001)(54906003)(14454004)(8676002)(25786009)(6116002)(99286004)(3846002)(71200400001)(71190400001)(81166006)(31696002)(446003)(486006)(2616005)(476003)(256004)(14444005)(5024004)(11346002)(86362001)(26005)(305945005)(386003)(6506007)(52116002)(53546011)(66066001)(81156014)(5660300002)(186003)(31686004)(2501003)(5640700003)(6436002)(2351001)(66946007)(66446008)(64756008)(66556008)(66476007)(6486002)(76176011)(6246003)(107886003)(6916009)(229853002)(4326008)(36756003)(6512007);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3411;
+ H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 2cXeea5ez3DpRhwo3HZRDDymRweQKrfrfaYSADKy7UapedClamWQkHt141g0lKEoLiOb9lrG3YAYKhMPLyY6VHtI5wxS4Q+HoC4Jn18S6Ncxs3I5418FukLhfGmWG6yz0TjC3dId4H+CYWsfsmjuCy65fPjkdlvTaRpYIjGRJjiesHJlXW5Asp+5+F3fBGifsFX6i1oXoagTEg1U8Eaec8ig82etY/NUTbugvlDHvBjDuLvmnbOIUwgmj73PlZM50Hpzt0e4+TDqznfNONW0+pJDOeSD+riT9QaN2vQJsyNeWDybjHc4E2kXH0d7JTqw+xp7lbxXvXwEkNVlpwxFXqykSCeiWS+aHIBQlKfCE9K56aGQadoytmhgaIt2i2m3TD7vr90Pkfsn4zMhZ7/hCw56WjzcePcMYtbAohL/Wm+Ma19N7I1mruso/PKWjRp/
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <7FF54CAD8ACC8B498F43A9C1AF04CE16@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f739a63-9fa8-4380-da1b-08d76c15211b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Nov 2019 10:50:30.2780 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kyQko/S+HzoRf+y1T1K/fjjaK3Kdeo8idLtQGyt+oeubIt95Iu6GoJfqd9ezUCLZqcZGiBf+YzOpFbZHuZC6vkusDooB0bHagcJwafX+b2I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3411
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.14.138
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,150 +125,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "berrange@redhat.com" <berrange@redhat.com>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Attempting to migrate a VM using the microvm machine class results in the source
-QEMU aborting with the following message/backtrace:
-
-target/i386/machine.c:955:tsc_khz_needed: Object 0x555556608fa0 is not an
-instance of type generic-pc-machine
-
-abort()
-object_class_dynamic_cast_assert()
-vmstate_save_state_v()
-vmstate_save_state()
-vmstate_save()
-qemu_savevm_state_complete_precopy()
-migration_thread()
-migration_thread()
-migration_thread()
-qemu_thread_start()
-start_thread()
-clone()
-
-The access to the machine class returned by MACHINE_GET_CLASS() in
-tsc_khz_needed() is crashing as it is trying to dereference a different
-type of machine class object (TYPE_PC_MACHINE) to that of this microVM.
-
-This can be resolved by extending the changes in the following commit
-46bf71657c56 ("hw/i386: split PCMachineState deriving X86MachineState from it")
-and moving the save_tsc_khz field in PCMachineClass to X86MachineClass.
-
-Fixes: 46bf71657c56 ("hw/i386: split PCMachineState deriving X86MachineState from it")
-Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
----
- hw/i386/pc.c          | 1 -
- hw/i386/pc_piix.c     | 4 ++--
- hw/i386/pc_q35.c      | 4 ++--
- hw/i386/x86.c         | 1 +
- include/hw/i386/pc.h  | 2 --
- include/hw/i386/x86.h | 2 ++
- target/i386/machine.c | 4 ++--
- 7 files changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 96715f8a3f99..ac08e6360437 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2195,7 +2195,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     /* BIOS ACPI tables: 128K. Other BIOS datastructures: less than 4K reported
-      * to be used at the moment, 32K should be enough for a while.  */
-     pcmc->acpi_data_size = 0x20000 + 0x8000;
--    pcmc->save_tsc_khz = true;
-     pcmc->linuxboot_dma_enabled = true;
-     pcmc->pvh_enabled = true;
-     assert(!mc->get_hotplug_handler);
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 2aefa3b8dfe3..0548c259dc74 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -567,10 +567,10 @@ DEFINE_I440FX_MACHINE(v2_6, "pc-i440fx-2.6", NULL,
- 
- static void pc_i440fx_2_5_machine_options(MachineClass *m)
- {
--    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+    X86MachineClass *x86mc = X86_MACHINE_CLASS(m);
- 
-     pc_i440fx_2_6_machine_options(m);
--    pcmc->save_tsc_khz = false;
-+    x86mc->save_tsc_khz = false;
-     m->legacy_fw_cfg_order = 1;
-     compat_props_add(m->compat_props, hw_compat_2_5, hw_compat_2_5_len);
-     compat_props_add(m->compat_props, pc_compat_2_5, pc_compat_2_5_len);
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index d51f5247276d..385e5cffb167 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -508,10 +508,10 @@ DEFINE_Q35_MACHINE(v2_6, "pc-q35-2.6", NULL,
- 
- static void pc_q35_2_5_machine_options(MachineClass *m)
- {
--    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+    X86MachineClass *x86mc = X86_MACHINE_CLASS(m);
- 
-     pc_q35_2_6_machine_options(m);
--    pcmc->save_tsc_khz = false;
-+    x86mc->save_tsc_khz = false;
-     m->legacy_fw_cfg_order = 1;
-     compat_props_add(m->compat_props, hw_compat_2_5, hw_compat_2_5_len);
-     compat_props_add(m->compat_props, pc_compat_2_5, pc_compat_2_5_len);
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index fd84b23124e6..394edc2f7209 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -763,6 +763,7 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
-     mc->get_default_cpu_node_id = x86_get_default_cpu_node_id;
-     mc->possible_cpu_arch_ids = x86_possible_cpu_arch_ids;
-     x86mc->compat_apic_id_mode = false;
-+    x86mc->save_tsc_khz = true;
-     nc->nmi_monitor_handler = x86_nmi;
- 
-     object_class_property_add(oc, X86_MACHINE_MAX_RAM_BELOW_4G, "size",
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index e6fa8418ca61..1f86eba3f998 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -116,8 +116,6 @@ typedef struct PCMachineClass {
-     bool enforce_aligned_dimm;
-     bool broken_reserved_end;
- 
--    /* TSC rate migration: */
--    bool save_tsc_khz;
-     /* generate legacy CPU hotplug AML */
-     bool legacy_cpu_hotplug;
- 
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-index 82d09fd7d099..4b8491788526 100644
---- a/include/hw/i386/x86.h
-+++ b/include/hw/i386/x86.h
-@@ -30,6 +30,8 @@ typedef struct {
- 
-     /*< public >*/
- 
-+    /* TSC rate migration: */
-+    bool save_tsc_khz;
-     /* Enables contiguous-apic-ID mode */
-     bool compat_apic_id_mode;
- } X86MachineClass;
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 6481f846f6e9..7bdeb7815755 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -988,8 +988,8 @@ static bool tsc_khz_needed(void *opaque)
-     X86CPU *cpu = opaque;
-     CPUX86State *env = &cpu->env;
-     MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
--    PCMachineClass *pcmc = PC_MACHINE_CLASS(mc);
--    return env->tsc_khz && pcmc->save_tsc_khz;
-+    X86MachineClass *x86mc = X86_MACHINE_CLASS(mc);
-+    return env->tsc_khz && x86mc->save_tsc_khz;
- }
- 
- static const VMStateDescription vmstate_tsc_khz = {
--- 
-1.8.3.1
-
+DQoNCk9uIDEwLjExLjIwMTkgMjI6MDgsIERlbmlzIFBsb3RuaWtvdiB3cm90ZToNCj4NCj4gT24g
+MTAuMTEuMjAxOSAyMjowMywgRGVuaXMgUGxvdG5pa292IHdyb3RlOg0KPj4gVGhpcyBhbGxvd3Mg
+dG8gY2hhbmdlIChyZXBsYWNlKSB0aGUgZmlsZSBvbiBhIGJsb2NrIGRldmljZSBhbmQgaXMgdXNl
+ZnVsDQo+PiB0byB3b3JrYXJvdW5kIGV4Y2x1c2l2ZSBmaWxlIGFjY2VzcyByZXN0cmljdGlvbnMs
+IGUuZy4gdG8gaW1wbGVtZW50IFZNDQo+PiBtaWdyYXRpb24gd2l0aCBhIHNoYXJlZCBkaXNrIHN0
+b3JlZCBvbiBzb21lIHN0b3JhZ2Ugd2l0aCB0aGUgZXhjbHVzaXZlDQo+PiBmaWxlIG9wZW5pbmcg
+bW9kZWw6IGEgZGVzdGluYXRpb24gVk0gaXMgc3RhcnRlZCB3YWl0aW5nIGZvciBpbmNvbW1pbmcN
+Cj4+IG1pZ3JhdGlvbiB3aXRoIGEgZmFrZSBpbWFnZSBkcml2ZSwgYW5kIGxhdGVyLCBvbiB0aGUg
+bGFzdCBtaWdyYXRpb24NCj4+IHBoYXNlLCB0aGUgZmFrZSBpbWFnZSBmaWxlIGlzIHJlcGxhY2Vk
+IHdpdGggdGhlIHJlYWwgb25lLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IERlbmlzIFBsb3RuaWtv
+diA8ZHBsb3RuaWtvdkB2aXJ0dW96em8uY29tPg0KPj4gLS0tDQo+PiDCoCBody9jb3JlL3FkZXYt
+cHJvcGVydGllcy1zeXN0ZW0uYyB8IDg5ICsrKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0t
+DQo+PiDCoCAxIGZpbGUgY2hhbmdlZCwgNzcgaW5zZXJ0aW9ucygrKSwgMTIgZGVsZXRpb25zKC0p
+DQo+Pg0KPj4gZGlmZiAtLWdpdCBhL2h3L2NvcmUvcWRldi1wcm9wZXJ0aWVzLXN5c3RlbS5jIA0K
+Pj4gYi9ody9jb3JlL3FkZXYtcHJvcGVydGllcy1zeXN0ZW0uYw0KPj4gaW5kZXggYzUzNDU5MGRj
+ZC4uYWFhYjEzNzBhNCAxMDA2NDQNCj4+IC0tLSBhL2h3L2NvcmUvcWRldi1wcm9wZXJ0aWVzLXN5
+c3RlbS5jDQo+PiArKysgYi9ody9jb3JlL3FkZXYtcHJvcGVydGllcy1zeXN0ZW0uYw0KPj4gQEAg
+LTc5LDggKzc5LDU1IEBAIHN0YXRpYyB2b2lkIHNldF9wb2ludGVyKE9iamVjdCAqb2JqLCBWaXNp
+dG9yICp2LCANCj4+IFByb3BlcnR5ICpwcm9wLA0KPj4gwqAgwqAgLyogLS0tIGRyaXZlIC0tLSAq
+Lw0KPj4gwqAgLXN0YXRpYyB2b2lkIGRvX3BhcnNlX2RyaXZlKERldmljZVN0YXRlICpkZXYsIGNv
+bnN0IGNoYXIgKnN0ciwgdm9pZCANCj4+ICoqcHRyLA0KPj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgY29uc3QgY2hhciAqcHJvcG5hbWUsIGJv
+b2wgaW90aHJlYWQsIA0KPj4gRXJyb3IgKiplcnJwKQ0KPj4gK3N0YXRpYyB2b2lkIGRvX3BhcnNl
+X2RyaXZlX3JlYWxpemVkKERldmljZVN0YXRlICpkZXYsIGNvbnN0IGNoYXIgKnN0ciwNCj4+ICvC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIHZvaWQgKipwdHIsIGNvbnN0IGNoYXIgKnByb3BuYW1lLA0KPj4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgYm9vbCBpb3RocmVhZCwgRXJyb3IgKiplcnJwKQ0KPj4gK3sNCj4+ICvCoMKgwqAg
+QmxvY2tCYWNrZW5kICpibGsgPSAqcHRyOw0KPj4gK8KgwqDCoCBCbG9ja0RyaXZlclN0YXRlICpi
+cyA9IGJkcnZfbG9va3VwX2JzKE5VTEwsIHN0ciwgTlVMTCk7DQo+PiArwqDCoMKgIGludCByZXQ7
+DQo+PiArwqDCoMKgIGJvb2wgYmxrX2NyZWF0ZWQgPSBmYWxzZTsNCj4+ICsNCj4+ICvCoMKgwqAg
+aWYgKCFicykgew0KPj4gK8KgwqDCoMKgwqDCoMKgIGVycm9yX3NldGcoZXJycCwgIkNhbid0IGZp
+bmQgYmxvY2tkZXYgJyVzJyIsIHN0cik7DQo+PiArwqDCoMKgwqDCoMKgwqAgcmV0dXJuOw0KPj4g
+K8KgwqDCoCB9DQo+PiArDQo+PiArwqDCoMKgIGlmICghYmxrKSB7DQo+PiArwqDCoMKgwqDCoMKg
+wqAgQWlvQ29udGV4dCAqY3R4ID0gaW90aHJlYWQgPyBiZHJ2X2dldF9haW9fY29udGV4dChicykg
+Og0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBxZW11X2dldF9haW9fY29udGV4dCgpOw0KPj4gK8KgwqDC
+oMKgwqDCoMKgIGJsayA9IGJsa19uZXcoY3R4LCBCTEtfUEVSTV9BTEwsIEJMS19QRVJNX0FMTCk7
+DQo+PiArwqDCoMKgwqDCoMKgwqAgYmxrX2NyZWF0ZWQgPSB0cnVlOw0KPg0KPiBBY3R1YWxseSwg
+SSBoYXZlIGNvbmNlcm5zIGFib3V0IHNpdHVhdGlvbiB3aGVyZSBibGs9bnVsbC4NCj4NCj4gSXMg
+dGhlcmUgYW55IGNhc2Ugd2hlbiBzY3NpLWhkIChvciBvdGhlcnMpIGRvZXNuJ3QgaGF2ZSBhIGJs
+ayBhc3NpZ25lZCANCj4gYW5kIGl0J3MgbGVnYWw/DQo+DQo+PiArwqDCoMKgIH0gZWxzZSB7DQo+
+PiArwqDCoMKgwqDCoMKgwqAgaWYgKGJsa19icyhibGspKSB7DQo+PiArwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBibGtfcmVtb3ZlX2JzKGJsayk7DQo+PiArwqDCoMKgwqDCoMKgwqAgfQ0KPj4gK8Kg
+wqDCoCB9DQo+PiArDQo+PiArwqDCoMKgIHJldCA9IGJsa19pbnNlcnRfYnMoYmxrLCBicywgZXJy
+cCk7DQo+PiArDQo+PiArwqDCoMKgIGlmICghcmV0ICYmIGJsa19jcmVhdGVkKSB7DQo+PiArwqDC
+oMKgwqDCoMKgwqAgaWYgKGJsa19hdHRhY2hfZGV2KGJsaywgZGV2KSA8IDApIHsNCj4+ICvCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIC8qDQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICogU2hv
+dWxkbid0IGJlIGFueSBlcnJvcnMgaGVyZSBzaW5jZSB3ZSBqdXN0IGNyZWF0ZWQNCj4+ICvCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAgKiB0aGUgbmV3IGJsayBiZWNhdXNlIHRoZSBkZXZpY2UgZG9l
+c24ndCBoYXZlIGFueS4NCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiBMZWF2ZSB0aGUg
+bWVzc2FnZSBoZXJlIGluIGNhc2UgYmxrX2F0dGFjaF9kZXYgaXMgY2hhbmdlZA0KPj4gK8KgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCAqLw0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnJv
+cl9zZXRnKGVycnAsICJDYW4ndCBhdHRhY2ggZHJpdmUgJyVzJyB0byBkZXZpY2UgJyVzJyIsDQo+
+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzdHIsIG9i
+amVjdF9nZXRfdHlwZW5hbWUoT0JKRUNUKGRldikpKTsNCj4+ICvCoMKgwqDCoMKgwqDCoCB9IGVs
+c2Ugew0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKnB0ciA9IGJsazsNCj4+ICvCoMKgwqDC
+oMKgwqDCoCB9DQo+PiArwqDCoMKgIH0NCkFub3RoZXIgcHJvYmxlbSBoZXJlLCBpcyB0aGF0IHRo
+ZSAic2l6ZSIgb2YgdGhlIGRldmljZSBkZXYgbWF5IG5vdCBtYXRjaCANCmFmdGVyIHNldHRpbmcg
+YSBkcml2ZS4NClNvLCB3ZSBzaG91bGQgdXBkYXRlIGl0IGFmdGVyIHRoZSBkcml2ZSBzZXR0aW5n
+Lg0KSXQgd2FzIGZvdW5kLCB0aGF0IGl0IGNvdWxkIGJlIGRvbmUgYnkgY2FsbGluZyANCkJsb2Nr
+RGV2T3BzLmJkcnZfcGFyZW50X2NiX3Jlc2l6ZS4NCg0KQnV0IEkgaGF2ZSBzb21lIGNvbmNlcm5z
+IGFib3V0IGRvaW5nIGl0IHNvLiBJbiB0aGUgY2FzZSBvZiB2aXJ0aW8gc2NzaSANCmRpc2sgd2Ug
+aGF2ZSB0aGUgZm9sbG93aW5nIGNhbGxzdGFjaw0KDQogwqDCoMKgIGJkcnZfcGFyZW50X2NiX3Jl
+c2l6ZSBjYWxscygpIC0+DQogwqAgwqDCoMKgwqDCoCBzY3NpX2RldmljZV9yZXBvcnRfY2hhbmdl
+KGRldiwgU0VOU0VfQ09ERShDQVBBQ0lUWV9DSEFOR0VEKSkgLT4NCiDCoCDCoCDCoCDCoCDCoCDC
+oCB2aXJ0aW9fc2NzaV9jaGFuZ2UgLT4NCiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+dmlydGlvX3Njc2lfcHVzaF9ldmVudChzLCBkZXYsIFZJUlRJT19TQ1NJX1RfUEFSQU1fQ0hBTkdF
+LA0KIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
+oCDCoCDCoCDCoCDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBzZW5zZS5hc2MgfCANCihzZW5z
+ZS5hc2NxIDw8IDgpKTsNCg0KDQp2aXJ0aW9fc2NzaV9jaGFuZ2XCoCBwdXNoZXMgdGhlIGV2ZW50
+IHRvIHRoZSBndWVzdCB0byBtYWtlIHRoZSBndWVzdCBhc2sgDQpmb3Igc2l6ZSByZWZyZXNoaW5n
+Lg0KSWYgSSdtIG5vdCBtaXN0YWtlbiwgaGVyZSB3ZSBjYW4gZ2V0IGEgcmFjZSBjb25kaXRpb24g
+d2hlbiBzb21lIGFub3RoZXIgDQpyZXF1ZXN0IGlzIHByb2Nlc3NlZCB3aXRoIGFuIHVuY2hhbmdl
+ZA0Kc2l6ZSBhbmQgdGhlbiB0aGUgc2l6ZSBjaGFuZ2luZyByZXF1ZXN0IGlzIHByb2Nlc3NlZC4N
+Cg0KSSBkaWRuJ3QgZmluZCBhIGJldHRlciB3YXkgdG8gdXBkYXRlIGRldmljZSBzaXplIHNvIGFu
+eSBjb21tZW50cyBhcmUgDQp3ZWxjb21lLg0KDQpUaGFua3MhDQoNCkRlbmlzDQo+PiArDQo+PiAr
+wqDCoMKgIGlmIChibGtfY3JlYXRlZCkgew0KPj4gK8KgwqDCoMKgwqDCoMKgIGJsa191bnJlZihi
+bGspOw0KPj4gK8KgwqDCoCB9DQo+PiArfQ0KPj4gKw0KPj4gK3N0YXRpYyB2b2lkIGRvX3BhcnNl
+X2RyaXZlX3VucmVhbGl6ZWQoRGV2aWNlU3RhdGUgKmRldiwgY29uc3QgY2hhciANCj4+ICpzdHIs
+DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdm9pZCAqKnB0ciwgY29uc3QgY2hhciAqcHJvcG5hbWUs
+DQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYm9vbCBpb3RocmVhZCwgRXJyb3IgKiplcnJwKQ0KPj4g
+wqAgew0KPj4gwqDCoMKgwqDCoCBCbG9ja0JhY2tlbmQgKmJsazsNCj4+IMKgwqDCoMKgwqAgYm9v
+bCBibGtfY3JlYXRlZCA9IGZhbHNlOw0KPj4gQEAgLTEzNywxOCArMTg0LDM0IEBAIGZhaWw6DQo+
+PiDCoMKgwqDCoMKgIH0NCj4+IMKgIH0NCj4+IMKgIC1zdGF0aWMgdm9pZCBwYXJzZV9kcml2ZShE
+ZXZpY2VTdGF0ZSAqZGV2LCBjb25zdCBjaGFyICpzdHIsIHZvaWQgDQo+PiAqKnB0ciwNCj4+IC3C
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnN0IGNoYXIg
+KnByb3BuYW1lLCBFcnJvciAqKmVycnApDQo+PiAtew0KPj4gLcKgwqDCoCBkb19wYXJzZV9kcml2
+ZShkZXYsIHN0ciwgcHRyLCBwcm9wbmFtZSwgZmFsc2UsIGVycnApOw0KPj4gLX0NCj4+IC0NCj4+
+IC1zdGF0aWMgdm9pZCBwYXJzZV9kcml2ZV9pb3RocmVhZChEZXZpY2VTdGF0ZSAqZGV2LCBjb25z
+dCBjaGFyICpzdHIsIA0KPj4gdm9pZCAqKnB0ciwNCj4+ICtzdGF0aWMgdm9pZCBwYXJzZV9kcml2
+ZV9yZWFsaXplZChEZXZpY2VTdGF0ZSAqZGV2LCBjb25zdCBjaGFyICpzdHIsIA0KPj4gdm9pZCAq
+KnB0ciwNCj4+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgIGNvbnN0IGNoYXIgKnByb3BuYW1lLCBFcnJvciAqKmVycnAp
+DQo+PiDCoCB7DQo+PiAtwqDCoMKgIGRvX3BhcnNlX2RyaXZlKGRldiwgc3RyLCBwdHIsIHByb3Bu
+YW1lLCB0cnVlLCBlcnJwKTsNCj4+ICvCoMKgwqAgZG9fcGFyc2VfZHJpdmVfcmVhbGl6ZWQoZGV2
+LCBzdHIsIHB0ciwgcHJvcG5hbWUsIGZhbHNlLCBlcnJwKTsNCj4+IMKgIH0NCj4+IMKgICtzdGF0
+aWMgdm9pZCBwYXJzZV9kcml2ZV9yZWFsaXplZF9pb3RocmVhZChEZXZpY2VTdGF0ZSAqZGV2LCBj
+b25zdCANCj4+IGNoYXIgKnN0ciwNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZvaWQg
+KipwdHIsIGNvbnN0IGNoYXIgDQo+PiAqcHJvcG5hbWUsDQo+PiArwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoCBFcnJvciAqKmVycnApDQo+PiArew0KPj4gK8KgwqDCoCBkb19wYXJzZV9kcml2ZV9y
+ZWFsaXplZChkZXYsIHN0ciwgcHRyLCBwcm9wbmFtZSwgdHJ1ZSwgZXJycCk7DQo+PiArfQ0KPj4g
+Kw0KPj4gK3N0YXRpYyB2b2lkIHBhcnNlX2RyaXZlX3VucmVhbGl6ZWQoRGV2aWNlU3RhdGUgKmRl
+diwgY29uc3QgY2hhciAqc3RyLA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZvaWQgKipwdHIsIGNvbnN0IGNo
+YXIgKnByb3BuYW1lLA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEVycm9yICoqZXJycCkNCj4+ICt7DQo+PiAr
+wqDCoMKgIGRvX3BhcnNlX2RyaXZlX3VucmVhbGl6ZWQoZGV2LCBzdHIsIHB0ciwgcHJvcG5hbWUs
+IGZhbHNlLCBlcnJwKTsNCj4+ICt9DQo+PiArDQo+PiArc3RhdGljIHZvaWQgcGFyc2VfZHJpdmVf
+dW5yZWFsaXplZF9pb3RocmVhZChEZXZpY2VTdGF0ZSAqZGV2LCBjb25zdCANCj4+IGNoYXIgKnN0
+ciwNCj4+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB2b2lkICoqcHRyLCBjb25zdCBj
+aGFyIA0KPj4gKnByb3BuYW1lLA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIEVy
+cm9yICoqZXJycCkNCj4+ICt7DQo+PiArwqDCoMKgIGRvX3BhcnNlX2RyaXZlX3VucmVhbGl6ZWQo
+ZGV2LCBzdHIsIHB0ciwgcHJvcG5hbWUsIHRydWUsIGVycnApOw0KPj4gK30NCj4+ICsNCj4+ICsN
+Cj4+IMKgIHN0YXRpYyB2b2lkIHJlbGVhc2VfZHJpdmUoT2JqZWN0ICpvYmosIGNvbnN0IGNoYXIg
+Km5hbWUsIHZvaWQgKm9wYXF1ZSkNCj4+IMKgIHsNCj4+IMKgwqDCoMKgwqAgRGV2aWNlU3RhdGUg
+KmRldiA9IERFVklDRShvYmopOw0KPj4gQEAgLTE4OCwxMyArMjUxLDE1IEBAIHN0YXRpYyB2b2lk
+IGdldF9kcml2ZShPYmplY3QgKm9iaiwgVmlzaXRvciAqdiwgDQo+PiBjb25zdCBjaGFyICpuYW1l
+LCB2b2lkICpvcGFxdWUsDQo+PiDCoCBzdGF0aWMgdm9pZCBzZXRfZHJpdmUoT2JqZWN0ICpvYmos
+IFZpc2l0b3IgKnYsIGNvbnN0IGNoYXIgKm5hbWUsIA0KPj4gdm9pZCAqb3BhcXVlLA0KPj4gwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBFcnJvciAqKmVycnAp
+DQo+PiDCoCB7DQo+PiAtwqDCoMKgIHNldF9wb2ludGVyKG9iaiwgdiwgb3BhcXVlLCBOVUxMLCBw
+YXJzZV9kcml2ZSwgbmFtZSwgZXJycCk7DQo+PiArwqDCoMKgIHNldF9wb2ludGVyKG9iaiwgdiwg
+b3BhcXVlLCBwYXJzZV9kcml2ZV9yZWFsaXplZCwgDQo+PiBwYXJzZV9kcml2ZV91bnJlYWxpemVk
+LA0KPj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBuYW1lLCBlcnJwKTsNCj4+IMKg
+IH0NCj4+IMKgIMKgIHN0YXRpYyB2b2lkIHNldF9kcml2ZV9pb3RocmVhZChPYmplY3QgKm9iaiwg
+VmlzaXRvciAqdiwgY29uc3QgDQo+PiBjaGFyICpuYW1lLA0KPj4gwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB2b2lkICpvcGFx
+dWUsIEVycm9yICoqZXJycCkNCj4+IMKgIHsNCj4+IC3CoMKgwqAgc2V0X3BvaW50ZXIob2JqLCB2
+LCBvcGFxdWUsIE5VTEwsIHBhcnNlX2RyaXZlX2lvdGhyZWFkLCBuYW1lLCANCj4+IGVycnApOw0K
+Pj4gK8KgwqDCoCBzZXRfcG9pbnRlcihvYmosIHYsIG9wYXF1ZSwgcGFyc2VfZHJpdmVfcmVhbGl6
+ZWRfaW90aHJlYWQsDQo+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHBhcnNlX2Ry
+aXZlX3VucmVhbGl6ZWRfaW90aHJlYWQsIG5hbWUsIGVycnApOw0KPj4gwqAgfQ0KPj4gwqAgwqAg
+Y29uc3QgUHJvcGVydHlJbmZvIHFkZXZfcHJvcF9kcml2ZSA9IHsNCg0K
 
