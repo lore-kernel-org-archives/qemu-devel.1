@@ -2,83 +2,82 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E81C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:14:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7601C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:15:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3019A2067D
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:14:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3F932067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:15:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WZwLT0pa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3019A2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s0UXfX9V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3F932067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWd6g-0001nU-AF
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 04:14:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55841)
+	id 1iWd7n-0002gF-Nt
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 04:15:11 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56069)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iWd62-0001HZ-S9
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:13:23 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iWd79-0002Gk-OP
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:14:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iWd61-0002Kp-RE
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:13:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35785
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iWd61-0002KX-Nr
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:13:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574068401;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4SXqocHGGObICQ0noNgGOSAzBTIvED8fRj2EMrEWyXg=;
- b=WZwLT0palhCcPsT8+GE83yG9XEB8jMs2yzxXh+3cxxDFYKcna9jLk2PJANS43tTO/5Di1Q
- W99Pb7g1TQjAEDPOqTMpFOd7e3j1GA6CLR9d5rhl7fJm80220pujiBJEfNnULx4tpktwnW
- G7tNV+IY4cCMAeGO3T35lSjouNx9Gls=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-BbM8Zn0nNXmZ9F_Wp-UfGA-1; Mon, 18 Nov 2019 04:13:20 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45C9880268A;
- Mon, 18 Nov 2019 09:13:19 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-97.ams2.redhat.com
- [10.36.116.97])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9767760856;
- Mon, 18 Nov 2019 09:13:16 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 4300C1138648; Mon, 18 Nov 2019 10:13:15 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Laszlo Ersek <lersek@redhat.com>
-Subject: Re: [PATCH] buildfix: update texinfo menu
-References: <20191023101956.19120-1-kraxel@redhat.com>
- <ba8b74e7-8c37-dc76-a77e-33448b698777@redhat.com>
-Date: Mon, 18 Nov 2019 10:13:15 +0100
-In-Reply-To: <ba8b74e7-8c37-dc76-a77e-33448b698777@redhat.com> (Laszlo Ersek's
- message of "Sat, 16 Nov 2019 20:12:34 +0100")
-Message-ID: <87blt9y2c4.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: BbM8Zn0nNXmZ9F_Wp-UfGA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+ (envelope-from <richard.henderson@linaro.org>) id 1iWd78-00039T-6G
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:14:31 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55164)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iWd77-00038l-WD
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:14:30 -0500
+Received: by mail-wm1-x341.google.com with SMTP id z26so16458652wmi.4
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 01:14:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id;
+ bh=tJk3+iTUR48YALvjXNfn4QnMHtBeVqze3Y5HOPt2s4c=;
+ b=s0UXfX9VCMvwMi9CVUSJgWnUfXLTNUkaQfAQCrlnDWildcyLnKZsa3cFmw+T4hdXXM
+ Pc2yPzvyyQw0h6hk1x0zS6Vk26S0fXOU6BSWukfeA3QSAdGIMfNxbP8ZgbNGN2W2E16Y
+ 5bMkY5Lon4sJ9+C42kscV2X1MZyyvtE9u83RkZZ6sNBpCJctZGjN0z+0KQdA9QncFBe5
+ LkzG5GySWDFQ+7QOVkcsN/6JoE7rcftQ3PR3pOjrwwE8+9drTWmaqykHEHfIiDztNRDn
+ iNfjw6aHLlm7HdwGYX0iFyRoxGsqCdpvNgPwL1tGpfmZ3HniZGCFaNPaG8wbWtO+AT3O
+ jZ+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=tJk3+iTUR48YALvjXNfn4QnMHtBeVqze3Y5HOPt2s4c=;
+ b=CoYS0CA/ov3CNt7rgTLCyaTAn0Vi1uO/OC5sZKY7Onw42i5q1htCWhBhi1IPBWolDZ
+ EZ5vH4rRVg4Hr5hIVXiheud9Alqaf6q/nUd5d+dX4X2WlR6OZ+gLnJhIlQNpym2GZXpz
+ GeOv1jeDMYCrlBd3LnVEJCGiQZKsbohyV1gh8uslYD8I0kquak3etgcnDJG33qFHTQ8o
+ 4IpzdkdRyWQcsusaYpKOqzKtF8ZO4cze9s3aL6jArQJj+qnq1UD61WHCgOLngOzgeE/J
+ 8W5eIM+nYeSG1bb+/f5z9dpog+7D7ccjggCpDouWiZc1dPMaS++wCoI9NpN1fwyP2IVY
+ YbZg==
+X-Gm-Message-State: APjAAAVtBZInJ4XEdPyoJvVcgF2PoIMsVXnZjU4AkrAhXp5vdWzh9tbt
+ t/dNeeT3HANg1zZ3xOF+EzPDgapRWb3Q0A==
+X-Google-Smtp-Source: APXvYqwaLAv4htzAL4zouhywgXdxxhqHQ3XmO1i3INgbSL6L/TMQWRRjjZyHlFBH7yJ1lejR2NTcPA==
+X-Received: by 2002:a1c:8086:: with SMTP id
+ b128mr27492095wmd.104.1574068468287; 
+ Mon, 18 Nov 2019 01:14:28 -0800 (PST)
+Received: from localhost.localdomain (65.red-79-149-41.dynamicip.rima-tde.net.
+ [79.149.41.65])
+ by smtp.gmail.com with ESMTPSA id z2sm10202655wrs.89.2019.11.18.01.14.26
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 Nov 2019 01:14:27 -0800 (PST)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3] target/arm: Merge arm_cpu_vq_map_next_smaller into sole
+ caller
+Date: Mon, 18 Nov 2019 10:14:14 +0100
+Message-Id: <20191118091414.19440-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.17.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,42 +89,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, drjones@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Laszlo Ersek <lersek@redhat.com> writes:
+Coverity reports, in sve_zcr_get_valid_len,
 
-> On 10/23/19 12:19, Gerd Hoffmann wrote:
->> Build error message:
->> qemu-doc.texi:34: node `Top' lacks menu item for `Recently removed featu=
-res' despite being its Up target
->>=20
->> Fixes: 3264ffced3d0 ("dirty-bitmaps: remove deprecated autoload paramete=
-r")
->> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
->> ---
->>  qemu-doc.texi | 1 +
->>  1 file changed, 1 insertion(+)
->>=20
->> diff --git a/qemu-doc.texi b/qemu-doc.texi
->> index 3c5022050f0f..3ddf5c0a6865 100644
->> --- a/qemu-doc.texi
->> +++ b/qemu-doc.texi
->> @@ -44,6 +44,7 @@
->>  * Security::
->>  * Implementation notes::
->>  * Deprecated features::
->> +* Recently removed features::
->>  * Supported build platforms::
->>  * License::
->>  * Index::
->>=20
->
-> Can this patch be included in v4.2.0-rc2 please?
+"Subtract operation overflows on operands
+arm_cpu_vq_map_next_smaller(cpu, start_vq + 1U) and 1U"
 
-Cc'ing qemu-trivial again, might be a workable path into -rc2.
+First, the aarch32 stub version of arm_cpu_vq_map_next_smaller,
+returning 0, does exactly what Coverity reports.  Remove it.
+
+Second, the aarch64 version of arm_cpu_vq_map_next_smaller has
+a set of asserts, but they don't cover the case in question.
+Further, there is a fair amount of extra arithmetic needed to
+convert from the 0-based zcr register, to the 1-base vq form,
+to the 0-based bitmap, and back again.  This can be simplified
+by leaving the value in the 0-based form.
+
+Finally, use test_bit to simplify the common case, where the
+length in the zcr registers is in fact a supported length.
+
+Reported-by: Coverity (CID 1407217)
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+
+v2: Merge arm_cpu_vq_map_next_smaller into sve_zcr_get_valid_len,
+    as suggested by Andrew Jones.
+
+v3: Use test_bit to make the code even more obvious; the
+    current_length + 1 thing to let us find current_length in the
+    bitmap seemed unnecessarily clever.  (For real this time).
+
+---
+ target/arm/cpu.h    |  3 ---
+ target/arm/cpu64.c  | 15 ---------------
+ target/arm/helper.c |  9 +++++++--
+ 3 files changed, 7 insertions(+), 20 deletions(-)
+
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index e1a66a2d1c..47d24a5375 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -185,12 +185,9 @@ typedef struct {
+ #ifdef TARGET_AARCH64
+ # define ARM_MAX_VQ    16
+ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp);
+-uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq);
+ #else
+ # define ARM_MAX_VQ    1
+ static inline void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp) { }
+-static inline uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq)
+-{ return 0; }
+ #endif
+ 
+ typedef struct ARMVectorReg {
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 68baf0482f..a39d6fcea3 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -458,21 +458,6 @@ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp)
+     cpu->sve_max_vq = max_vq;
+ }
+ 
+-uint32_t arm_cpu_vq_map_next_smaller(ARMCPU *cpu, uint32_t vq)
+-{
+-    uint32_t bitnum;
+-
+-    /*
+-     * We allow vq == ARM_MAX_VQ + 1 to be input because the caller may want
+-     * to find the maximum vq enabled, which may be ARM_MAX_VQ, but this
+-     * function always returns the next smaller than the input.
+-     */
+-    assert(vq && vq <= ARM_MAX_VQ + 1);
+-
+-    bitnum = find_last_bit(cpu->sve_vq_map, vq - 1);
+-    return bitnum == vq - 1 ? 0 : bitnum + 1;
+-}
+-
+ static void cpu_max_get_sve_max_vq(Object *obj, Visitor *v, const char *name,
+                                    void *opaque, Error **errp)
+ {
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index be67e2c66d..a089fb5a69 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -5363,9 +5363,14 @@ int sve_exception_el(CPUARMState *env, int el)
+ 
+ static uint32_t sve_zcr_get_valid_len(ARMCPU *cpu, uint32_t start_len)
+ {
+-    uint32_t start_vq = (start_len & 0xf) + 1;
++    uint32_t end_len;
+ 
+-    return arm_cpu_vq_map_next_smaller(cpu, start_vq + 1) - 1;
++    end_len = start_len &= 0xf;
++    if (!test_bit(start_len, cpu->sve_vq_map)) {
++        end_len = find_last_bit(cpu->sve_vq_map, start_len);
++        assert(end_len < start_len);
++    }
++    return end_len;
+ }
+ 
+ /*
+-- 
+2.17.1
 
 
