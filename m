@@ -4,79 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA04C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 14:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 332D3C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 14:04:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7B2D20722
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 14:02:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F387020722
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 14:04:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="czZYA1o+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7B2D20722
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DfGPNMW2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F387020722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34408 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34456 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWhcC-0008Ov-LH
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 09:02:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51196)
+	id 1iWhdZ-0001b7-0m
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 09:04:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51437)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iWhb3-0007gr-2O
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:01:42 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iWhc6-0008Ul-Sb
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:02:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iWhay-00036i-5x
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:01:40 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35111)
+ (envelope-from <peter.maydell@linaro.org>) id 1iWhc5-00040I-VH
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:02:46 -0500
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:35127)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iWhay-00035b-0V
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:01:36 -0500
-Received: by mail-ot1-x342.google.com with SMTP id c14so7579190oth.2
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 06:01:32 -0800 (PST)
+ id 1iWhc5-0003zR-R2
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:02:45 -0500
+Received: by mail-ot1-x344.google.com with SMTP id c14so7583451oth.2
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 06:02:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=WhTJ+1f501vkUHUKKPATnM7Xp5Jofmh8PwlYt2xJv04=;
- b=czZYA1o+/tXtCZsPfFRxRlnAC8tk0E4LRhadp7zcBnSjx1/WLCUIHb2UU96/SPKu7t
- SFnmBhstG/ShVi3YogsViVEe8FSzAStDpCpSDc9SUJWfGlATY+CAMAVJHbD7tVbwRC0k
- 6qZ7VbT6jMh28+P5AI36CiCXQJW3R3Mb0n7AVK0VMgu9HypeHGU+KpViqPQgXC4zuDU6
- roW/AzhMd2+zLhiGBmcFgfkYviXEHjDAY/JZ5pOE3rWB3oqlHX9PFM83KVkmvBbGU4Td
- 0EPmqn++9ygbhjTxypSZsPk76nSXDQjVmqqAH9rHKZdb/Cxsvvlf527gP4DZSO2n8lZA
- FeDw==
+ bh=/T65KmuUv9KdpGF5zOQDRozywkHbk0CrYcHeiYnnPBg=;
+ b=DfGPNMW2gRBbzB0k4kr56zhYtd98ylHty1567A2VSisu/DJBsOVweuUK0gI3dNCbDM
+ CRfs4xMG9VtoEpfhP9F2lgkGl4h8pY6xDiFYS4o0a+NwEIOub9RzQ0Bkw1uQciwjuMTS
+ dgIWDFCLY4qvy5IoLGb8dR2BrV3y/2pvELKHbixWCkYPlLr3ybRJW0HByrs0j2ZGRaVv
+ EUF+McO0FVYSlfO7RCM5H8eO1Dfc9UieUSPg2IpzRwCbBIKfepojh+W5Tkx63EU2smef
+ xlibInvSG5SlvKg6nRc7DD7lOfrRySKnKF9NisrlX5GdMbYgfsVIREPyATxMJsQrKb7r
+ 7IxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=WhTJ+1f501vkUHUKKPATnM7Xp5Jofmh8PwlYt2xJv04=;
- b=g3sEy7pJNfBy1NzYzLOK/pOHmrRAab4cYdaPGYAXuDDn1rA6UgpJ8mAGD1rpUkG84A
- HX4/h177FMta2v4hGUQer54TlZkiOo9GHIpfGUvsMXvF1EWya1TQ6Dx3uuM5ODu98QUk
- ae39B4hCNW58/X4Gb8coQEzU8CJvWTQ97237dDdfORkRi2NEgnyEmnZUVeOLu4h3NHqJ
- WKLVO/KzwNO9zW+m0hyWXOKyp3jyJ+IonUS7w/FwB4QNpU4itY9etCgeE+l/53ssfRxH
- IrxJrNyMqDKdYeYcTOipiWxme1+1bB4UFsgmHEvCVJsXYFHkIGVKJJ3JkpUdumey1sU9
- 7CNw==
-X-Gm-Message-State: APjAAAVrAMUzdaFs+8geW/n/R43euqEekklSZeRad9P4YmuErZN+Zv/v
- KIJr9zwqvXEgayYIRvn5g+QcHDHbDYkouVFtnEdthA==
-X-Google-Smtp-Source: APXvYqzGdczXBndLKbT1wkM1hT98jm8wECN3io64fUaT3H61mNm1/UVsQUgro8tDN3uptj4/irqiZLA3iTIQVuorXWE=
-X-Received: by 2002:a9d:7ac2:: with SMTP id m2mr22636654otn.135.1574085690697; 
- Mon, 18 Nov 2019 06:01:30 -0800 (PST)
+ bh=/T65KmuUv9KdpGF5zOQDRozywkHbk0CrYcHeiYnnPBg=;
+ b=g864ac8azMJLzwMI24kmtQg6fSnkbQSVwjraNLy/sNoCGUz4ku+zsXydBt2gm+0y/9
+ QjA3V1G4d1xNaMRR74y+LOyPWtS6TqgIM3MWiZUJn7IYzJAOfJfst7Wc0tCD97eAE5UH
+ sfjua/FetKjTv1TV75SaD4IhSDR/filDGGYkM2SQynpD5Wj68EzT1seu40QqNzEi9fsm
+ gakyUsO38h/HSY+lt+q0Dsb+sZSqR+2JFW8N522r4ngLil/pe34sThJ+KyJIsGR+svqx
+ e3b//w0wZMdLBGTkf1jPLePu2zmPBm8YP0alySZHHOLIvWvXrSBEAm2pcbOt0S5pmaCu
+ fRDw==
+X-Gm-Message-State: APjAAAW0vq8u2vX2lZqJ8NK3m0hJtkxfN9yvEg2oU50qwhUXoxw0y4yu
+ Y0NSM0gqsMLzIlSjQtv0u+tg3zd1CaEhu1aIHfb4cg==
+X-Google-Smtp-Source: APXvYqx5w1BwvHF1ENLqV9UQuSPy8ce0uvykdtzjunZN94UK478yYn4bV2c7YhsjFxIMKR7eElgwU0VbDAGiYxWbRBs=
+X-Received: by 2002:a9d:68cc:: with SMTP id i12mr20742749oto.97.1574085764633; 
+ Mon, 18 Nov 2019 06:02:44 -0800 (PST)
 MIME-Version: 1.0
 References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-2-marcandre.lureau@redhat.com>
-In-Reply-To: <20191023173154.30051-2-marcandre.lureau@redhat.com>
+ <20191023173154.30051-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20191023173154.30051-3-marcandre.lureau@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Nov 2019 14:01:16 +0000
-Message-ID: <CAFEAcA_k9TqzRJZ4=Q1jQP46SajiaMLEciSHZ83_CicMv__oiA@mail.gmail.com>
-Subject: Re: [PATCH v3 01/33] qdev: remove unused qdev_prop_int64
+Date: Mon, 18 Nov 2019 14:02:30 +0000
+Message-ID: <CAFEAcA8q7AHR2Azsy9C7_xynoGVtbX+nRPhJaq4iiu6krvuDiQ@mail.gmail.com>
+Subject: Re: [PATCH v3 02/33] sysbus: remove unused sysbus_try_create*
 To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+X-Received-From: 2607:f8b0:4864:20::344
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,15 +112,13 @@ On Wed, 23 Oct 2019 at 18:32, Marc-Andr=C3=A9 Lureau
 >
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  hw/core/qdev-properties.c    | 32 --------------------------------
->  include/hw/qdev-properties.h |  3 ---
->  2 files changed, 35 deletions(-)
+>  hw/core/sysbus.c    | 32 --------------------------------
+>  hw/i386/pc.c        |  1 -
+>  include/hw/sysbus.h |  9 +--------
+>  3 files changed, 1 insertion(+), 41 deletions(-)
+>
 
-I think I'd rather keep this. It's weird to not have a symmetric
-set of properties for the common integer types, and annoying
-for whoever next runs into a need for an int64 property to
-have to reinstate the deleted code. (Yes, I know we don't
-currently have int8 or int16.)
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
 thanks
 -- PMM
