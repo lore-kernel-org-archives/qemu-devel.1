@@ -2,101 +2,87 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6006C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:23:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8382C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:24:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81827222DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:23:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83E07222DD
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:24:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xg0fDgG+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81827222DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Dad+0U01"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83E07222DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWoV4-0001S1-OL
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 16:23:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36521)
+	id 1iWoVo-0002Hg-Jw
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 16:24:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35832)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iWoRU-0005Ey-Ed
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:20:19 -0500
+ (envelope-from <robert.foley@linaro.org>) id 1iWoNI-0000F5-6L
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:16:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iWoRQ-0000n7-Ss
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:20:16 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47625
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iWoRQ-0000mt-P9
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:20:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574112012;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XEQc9GGzVfCgyalPiZuLfcDhEacdHWuMQLAmd9twLL0=;
- b=Xg0fDgG+uIEj7X1xxs0WdasgCfGyj8akOQ5/j5a4HI2TLmShM6ijlP3ZKIB1vhBlmb63h8
- 2SH/IbueBvwEj5SmPWMEoYsgpTRfkAedCDZLyrwFS9g0ncjnZh/lyU7l6hOSvyWmgbmjAv
- I0MDSzKgdcuf7UfQAxk3ptYRgaia3qs=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-69-a_Ynj4_2P_ubmKxW7EcAXw-1; Mon, 18 Nov 2019 16:20:09 -0500
-Received: by mail-wr1-f71.google.com with SMTP id b4so16586506wrn.8
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 13:20:08 -0800 (PST)
+ (envelope-from <robert.foley@linaro.org>) id 1iWoNE-0005nz-AR
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:56 -0500
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:40687)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <robert.foley@linaro.org>)
+ id 1iWoNE-0005ne-4w
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:15:52 -0500
+Received: by mail-pj1-x1041.google.com with SMTP id ep1so1854423pjb.7
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 13:15:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=nB9UJp1tY01vA+O7nUtpyswqmIH2jEdG/Vc4ku6hyfs=;
+ b=Dad+0U01jzs2l4tt+VDm7bNGm06VFMSN2gcaWsVewISGT50ZsTxtEMmdJoMNOBdLME
+ 14wjs6q6YKCuP0/aS2uAlHSHbrJpmoXXG+m4oqjsRJr+LT2eGgIQ/eI3zdVRaBCfBeCU
+ T6uVavywPilx9/22qrtXaVjThUjH67zAFdYRkoTfRFbAQehB2YeUghi5xhmV4S4eEQZE
+ 3evmP65xUAmD7o2IaTnz35RkO8VVzmQvNqboJGZ57p4G/8QmcuroaGvjLNPp6IAt3xsm
+ vE/ynRBl3wtJdw8Um/bo53S6L9eEzLSIvmM3OALDhEWB0dbiSncEsIDo3glWeNlewovV
+ dAtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=UE6EDNxk6yJJwC1ODVz8xYg0z0mT9tmWkRSkmchqceI=;
- b=L9FjCSUzp1UCCXFKUdigmHL3Elx0OyRoD83BSG+2wfF731WwRzZJTYjbXu9qi2wKdL
- kT3nEeFcWLzLDIPmGEC07det7fawt88OGSYXQcSqW/Jj8ME+dIYNguC+DwvNhajG7fBM
- wZLazlCjIguwjXQ9ic1C9RCnr3YNfVv5AfBzgTLmEqXtKUvWHv90WP/eS2HTlZXZ9Grn
- pJYPBiAwgoDvA/FTRuXOQF32fZjMzT9DlzAR/LWlRTe9SPq0Ncap1L4u/h9DiyosZoDH
- Cq4rhd0mzBxJsAhudeS5QtbXOcvBOibRsFwWCRbmKW5yhTRR3RapgHlwM0N5QQ5f4clJ
- 8a9Q==
-X-Gm-Message-State: APjAAAX73V/dByqJqoZBd0WxyCqef/s9FKVQ48s07VRHM5K+ZYzNqk7K
- ALC4EcSJK4TQcwT01Wse79asrxFFkAgG43ilJ8sOvAtDlfBmeLa+oawZS1YcqAYkDSwvpWLXEUV
- mDJoxVYxU+dZeoW0=
-X-Received: by 2002:a5d:558e:: with SMTP id i14mr32392317wrv.140.1574112008059; 
- Mon, 18 Nov 2019 13:20:08 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwcXhU9edVPeNF/1OGXCQZgO02XAnD+EBjs31Ku5IKPG7GjUemOTZtDBiR6qhu3IDqtZXFjmg==
-X-Received: by 2002:a5d:558e:: with SMTP id i14mr32392291wrv.140.1574112007809; 
- Mon, 18 Nov 2019 13:20:07 -0800 (PST)
-Received: from [192.168.1.35] (131.red-88-21-102.staticip.rima-tde.net.
- [88.21.102.131])
- by smtp.gmail.com with ESMTPSA id c4sm24623432wrp.86.2019.11.18.13.20.06
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 18 Nov 2019 13:20:07 -0800 (PST)
-Subject: Re: [PATCH-for-4.2 v3 1/3] hw/block/pflash: Remove dynamic field
- width from trace events
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-References: <20191118210458.11959-1-philmd@redhat.com>
- <20191118210458.11959-2-philmd@redhat.com>
- <833a3e22-2bbb-f646-eb9b-5c56dfeb43e6@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <4a859ab8-a717-6b92-fb63-92ac6bb19fe8@redhat.com>
-Date: Mon, 18 Nov 2019 22:20:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=nB9UJp1tY01vA+O7nUtpyswqmIH2jEdG/Vc4ku6hyfs=;
+ b=sQzpIcJOugrSKlag5rwSYQTDDe196/ChKazlpWI7co15+iUT7vMpA/5YRrwIP0mglW
+ xOlyGgOrA5pWR/4z3WqpQRV56q+AGUinrJefAxwrw+zzcjpxq8Eu4fDhaRDY6+ltDGYL
+ tYlJZFcsg3vRQmSi5dwIxWfb4XqwEuPO0bYE44RED/9u0QxIFZMSg3gIlPQ2rGiH3VoC
+ DBJDULfq4Zi9VfRYUTy/9AWCwylRlWyjLvClN3ZkZ9BRZnWqyyDVye9/UAHfXatzz6s/
+ KJS+9zGydmqOgXF+oFOvAxmKqmsyVnWQOVhf20ollQoIF8Q5IYvz4K62VPfoUHp7ucAT
+ avIw==
+X-Gm-Message-State: APjAAAWBSJgT8udLscB0NrhZ38rTlhCmWO7lw6ZGTlkWXiU25FAXmrYk
+ rETyMhpKVJnGjTmrXpBKeW88O+nJ4tU=
+X-Google-Smtp-Source: APXvYqyVtr2sZWVI2ooQO2n9rEbDfeDy8xJIbUlQkz5AY9NBYyNkxCyseL2TzspWPrZRhGvpPZV/sw==
+X-Received: by 2002:a17:90a:a405:: with SMTP id
+ y5mr1439885pjp.102.1574111750942; 
+ Mon, 18 Nov 2019 13:15:50 -0800 (PST)
+Received: from Rfoley-MA01.usrd.futurewei.com ([12.111.81.71])
+ by smtp.gmail.com with ESMTPSA id v15sm22301728pfe.44.2019.11.18.13.15.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 Nov 2019 13:15:50 -0800 (PST)
+From: Robert Foley <robert.foley@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 6/6] Added tests for close and change of logfile.
+Date: Mon, 18 Nov 2019 16:15:28 -0500
+Message-Id: <20191118211528.3221-7-robert.foley@linaro.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20191118211528.3221-1-robert.foley@linaro.org>
+References: <20191118211528.3221-1-robert.foley@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <833a3e22-2bbb-f646-eb9b-5c56dfeb43e6@redhat.com>
-Content-Language: en-US
-X-MC-Unique: a_Ynj4_2P_ubmKxW7EcAXw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::1041
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,43 +94,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: richard.henderson@linaro.org, alex.bennee@linaro.org,
+ robert.foley@linaro.org, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/18/19 10:15 PM, Eric Blake wrote:
-> On 11/18/19 3:04 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> Since not all trace backends support dynamic field width in
->> format (dtrace via stap does not), replace by a static field
->> width instead.
->>
->> We previously passed to the trace API 'width << 1' as the number
->> of hex characters to display (the dynamic field width). We don't
->> need this anymore. Instead, display the size of bytes accessed.
->>
->> Reported-by: Eric Blake <eblake@redhat.com>
->> Buglink: https://bugs.launchpad.net/qemu/+bug/1844817
->> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
->=20
-> Is it worth a Fixes: XXX calling out the commit that introduced the '*'?
+One test ensures that the logfile handle is still valid even if
+the logfile is changed during logging.
+The other test validates that the logfile handle remains valid under
+the logfile lock even if the logfile is closed.
 
-Yes, good idea.
+Signed-off-by: Robert Foley <robert.foley@linaro.org>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+---
+v1
+    - Changes for first round of code review comments.
+    - Added in use of g_autofree, removed the g_free()s.
+    - Added in use of logfile2 and changed sequence of asserts.
+---
+ tests/test-logging.c | 80 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 80 insertions(+)
 
->=20
-> /me goes and searches
->=20
-> Fixes: e8aa2d95ea
-> Fixes: c1474acd5d
-
-Similarly the next patch (hw/mips/gt64xxx_pci.c) fixes ab6bff424f4.
-
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-
-Thanks!
+diff --git a/tests/test-logging.c b/tests/test-logging.c
+index a12585f70a..1e646f045d 100644
+--- a/tests/test-logging.c
++++ b/tests/test-logging.c
+@@ -108,6 +108,82 @@ static void test_parse_path(gconstpointer data)
+     error_free_or_abort(&err);
+ }
+ 
++static void test_logfile_write(gconstpointer data)
++{
++    QemuLogFile *logfile;
++    QemuLogFile *logfile2;
++    gchar const *dir = data;
++    Error *err = NULL;
++    g_autofree gchar *file_path;
++    g_autofree gchar *file_path1;
++    FILE *orig_fd;
++
++    /*
++     * Before starting test, set log flags, to ensure the file gets
++     * opened below with the call to qemu_set_log_filename().
++     * In cases where a logging backend other than log is used,
++     * this is needed.
++     */
++    qemu_set_log(CPU_LOG_TB_OUT_ASM);
++    file_path = g_build_filename(dir, "qemu_test_log_write0.log", NULL);
++    file_path1 = g_build_filename(dir, "qemu_test_log_write1.log", NULL);
++
++    /*
++     * Test that even if an open file handle is changed,
++     * our handle remains valid due to RCU.
++     */
++    qemu_set_log_filename(file_path, &err);
++    g_assert(!err);
++    rcu_read_lock();
++    logfile = atomic_rcu_read(&qemu_logfile);
++    orig_fd = logfile->fd;
++    g_assert(logfile && logfile->fd);
++    fprintf(logfile->fd, "%s 1st write to file\n", __func__);
++    fflush(logfile->fd);
++
++    /* Change the logfile and ensure that the handle is still valid. */
++    qemu_set_log_filename(file_path1, &err);
++    g_assert(!err);
++    logfile2 = atomic_rcu_read(&qemu_logfile);
++    g_assert(logfile->fd == orig_fd);
++    g_assert(logfile2->fd != logfile->fd);
++    fprintf(logfile->fd, "%s 2nd write to file\n", __func__);
++    fflush(logfile->fd);
++    rcu_read_unlock();
++}
++
++static void test_logfile_lock(gconstpointer data)
++{
++    FILE *logfile;
++    gchar const *dir = data;
++    Error *err = NULL;
++    g_autofree gchar *file_path;
++
++    file_path = g_build_filename(dir, "qemu_test_logfile_lock0.log", NULL);
++
++    /*
++     * Test the use of the logfile lock, such
++     * that even if an open file handle is closed,
++     * our handle remains valid for use due to RCU.
++     */
++    qemu_set_log_filename(file_path, &err);
++    logfile = qemu_log_lock();
++    g_assert(logfile);
++    fprintf(logfile, "%s 1st write to file\n", __func__);
++    fflush(logfile);
++
++    /*
++     * Initiate a close file and make sure our handle remains
++     * valid since we still have the logfile lock.
++     */
++    qemu_log_close();
++    fprintf(logfile, "%s 2nd write to file\n", __func__);
++    fflush(logfile);
++    qemu_log_unlock(logfile);
++
++    g_assert(!err);
++}
++
+ /* Remove a directory and all its entries (non-recursive). */
+ static void rmdir_full(gchar const *root)
+ {
+@@ -134,6 +210,10 @@ int main(int argc, char **argv)
+ 
+     g_test_add_func("/logging/parse_range", test_parse_range);
+     g_test_add_data_func("/logging/parse_path", tmp_path, test_parse_path);
++    g_test_add_data_func("/logging/logfile_write_path",
++                         tmp_path, test_logfile_write);
++    g_test_add_data_func("/logging/logfile_lock_path",
++                         tmp_path, test_logfile_lock);
+ 
+     rc = g_test_run();
+ 
+-- 
+2.17.1
 
 
