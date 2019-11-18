@@ -6,77 +6,77 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BC46C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F706C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:25:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26D282071C
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:17:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECE2420722
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:25:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JAyc5Q+S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26D282071C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="izKpNSJm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE2420722
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35590 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWimh-0007UM-9f
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 10:17:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35934)
+	id 1iWiuS-00016C-4J
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 10:25:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36845)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iWiln-0006by-Hz
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:16:52 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iWiti-0000Oc-IW
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:25:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iWilm-000729-3c
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:16:51 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38278)
+ (envelope-from <peter.maydell@linaro.org>) id 1iWith-00018W-CC
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:25:02 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:36808)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iWill-00071q-QF
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:16:49 -0500
-Received: by mail-oi1-x244.google.com with SMTP id a14so15621288oid.5
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 07:16:49 -0800 (PST)
+ id 1iWith-000187-6G
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:25:01 -0500
+Received: by mail-ot1-x342.google.com with SMTP id f10so14838890oto.3
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 07:25:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=opeqQ1By8GVGE1cHT+yBFuirg4hVOSqG/qOLZIMdCQA=;
- b=JAyc5Q+SSR/R8qko0HfW5lWMD5NK7N7X0ZDSqqMJ7nR2ilupyhAAgukZyMUP9yVjqw
- QmA9uzqrC+/jyuy2OvI8zs+AQ5BZqmW07zuNMOQ3ED7L8oevk5c5Iy86GT+C0e2rT/b+
- +Vs8XBHIzCwaNwLxLy/MVZgLpY4d4hsF324i8UCMyCbDCN0vPRKd9i2CLDQCrY5iDmgv
- uV0A1xOhKvxH1A9RGzBUMbRdYlAKJS5O4kKoIvfRDZelgSqj1f3kzspA8xEBAdfo8QF1
- QJF0iiXL07ppAKrZjxG33hnX70sHgdBViHPDXch68v40TtXwPcD530zx3fIcGryFTwXU
- 1dbA==
+ bh=v7RaaOkRSyWZc/HxElBd8d+wilmynyFLH1nO8DU7E/Y=;
+ b=izKpNSJmP+2ovI/frmu5W5BbvQZ0fqs2hx+UJgjkXhuHl3NAOhJ+/sOOOsn6deyqA4
+ B3m/hRdzmB1r4noXJ+v9XSJnVoRr5Lq67c/p7EVsNNaWipyl+FFnFgTx8TRjbykmhZCK
+ 7u2Nl/qFcR8Mjeld1KDq/RCxFk79C1SzHeSGwDkzHZdWCoccwjISuIfkVwZDRs7izNVW
+ sPCOJ0Qr6m0Dg5K3ESsZBwVNXBfcMFDIhiN9R2q7KJKHaolJ8J9BugNw9/4lhGKiReSe
+ 4KAqVLZKEb/rTuitMJfnc8g7HoNvYz3p4bjbo9vtEBupw/Ckpl9tbSAxo3ffwUTK3mFs
+ nHIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=opeqQ1By8GVGE1cHT+yBFuirg4hVOSqG/qOLZIMdCQA=;
- b=IuPV6pydzB922UKaF00XM1RLODOuCBbNEAWs1S4lhaNfJPY7L2fTbXK3lfHoweVeOv
- +iJqpTwuAgUxd9SSlexqjEukSpD3Vnc3MYhnL/QEsMz0mqm8dsDIWNnP+aj3897sUvMK
- 1C2vRY0a6SAZnLPviIiTat7JTMlg6S6SgXlJZfH+YXewbHSvGdWHPjUV91zIw/HIgA+M
- axCwBjJPzrGXW6mCA+m+q4V9HmcfI6OwSeCnNo6C3eywcWzoIQu59ECQwUTjJEd2CFSG
- pA27UsKTDHgjNdRsJC0hMNy9WtFoGL0ZvC16EfL5Q1/7+Zb2Q+LC1ujAfAfD1aylcx+c
- FEXg==
-X-Gm-Message-State: APjAAAWBSkKEZtWca/LDVa/HREssOSRAlXMqEHo19KnO3LxxFUMRBrPD
- zddkdKQfHMCGElThSewPWd9ImYiziuduqivFevmXDA==
-X-Google-Smtp-Source: APXvYqzEo3yX3K05bCOvoHHzy6fjfjwPXNVqByEPwWJqyTqhw7FinPY+Un58yUP5zwpPIAxKzuF9tpgMLwNrrBUMyjE=
-X-Received: by 2002:aca:cf12:: with SMTP id f18mr19632781oig.48.1574090208750; 
- Mon, 18 Nov 2019 07:16:48 -0800 (PST)
+ bh=v7RaaOkRSyWZc/HxElBd8d+wilmynyFLH1nO8DU7E/Y=;
+ b=lyBAk0zwp7uT0ogKn8axvjMqgxAxcf7mNXq1jwMRx621uyXm79Uq/tvQJ8+ETcnhM6
+ NSxVZWYOO9F2x3sewmRVDTlb3SBqis1UVhNGKN0N3APQc87iUIddqVyjr+NEYnteuFoM
+ E0wnddqXPxcNWEnwb0ZXwlQ3Um8te7T2pUvTYwAVTQw9QFsGeaOPgI+U2ygTTNIER82f
+ 4ijb5y8QUzQh+YxEktHGiz4Hf4aYOFl5GQcoQJ0n39fx/qPBmCA80vbmHYwCDtH7KIT8
+ iQ9IZ7nn4SeW5arHPzUfAJ2GfZ+YWon0vZXRXDzG7PL8o2OphOs+RT3q48JXMkk41KWL
+ /f7w==
+X-Gm-Message-State: APjAAAV+Q6dMpq0za7BXJKM5L2YdCUtrnJ67c9/dfnCP1zklKjI1KgMJ
+ 1ZqOw1ukcFcUKsdRPDNCJA+a346a4mJqmmS5gLAx/Q==
+X-Google-Smtp-Source: APXvYqxzG4bjh091Q64IJGz25V1c0bMeXi+82lcjLw2+fjMdfT3ohEDJMbZxqRUYaP3rFH0ynErIyrR8e1d+vi//+TQ=
+X-Received: by 2002:a9d:12d2:: with SMTP id g76mr23597811otg.232.1574090700192; 
+ Mon, 18 Nov 2019 07:25:00 -0800 (PST)
 MIME-Version: 1.0
 References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-18-marcandre.lureau@redhat.com>
-In-Reply-To: <20191023173154.30051-18-marcandre.lureau@redhat.com>
+ <20191023173154.30051-19-marcandre.lureau@redhat.com>
+In-Reply-To: <20191023173154.30051-19-marcandre.lureau@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Nov 2019 15:16:37 +0000
-Message-ID: <CAFEAcA-raK3HOjQjQCaOpqo0QQdT8WChx-njh_8-26R15tunaA@mail.gmail.com>
-Subject: Re: [PATCH v3 17/33] serial: make SerialIO a sysbus device
+Date: Mon, 18 Nov 2019 15:24:48 +0000
+Message-ID: <CAFEAcA8WacEjmNT93MYyheqh8U=+7zrDbrQ1jzVO+dWdrNkVyw@mail.gmail.com>
+Subject: Re: [PATCH v3 18/33] mips: inline serial_init
 To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,100 +109,88 @@ Sender: "Qemu-devel"
 On Wed, 23 Oct 2019 at 18:34, Marc-Andr=C3=A9 Lureau
 <marcandre.lureau@redhat.com> wrote:
 >
-> Make serial IO a proper sysbus device, similar to serial MM.
+> The function is specific to mipssim, let's inline it.
 >
 > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  hw/char/serial.c         | 58 ++++++++++++++++++++++++++++++++--------
->  include/hw/char/serial.h | 13 +++++++--
->  2 files changed, 58 insertions(+), 13 deletions(-)
+>  hw/char/serial.c         | 16 ----------------
+>  hw/mips/mips_mipssim.c   | 13 ++++++++++---
+>  include/hw/char/serial.h |  2 --
+>  3 files changed, 10 insertions(+), 21 deletions(-)
 >
 > diff --git a/hw/char/serial.c b/hw/char/serial.c
-> index a40bc3ab81..84de2740a7 100644
+> index 84de2740a7..ca95e09ec9 100644
 > --- a/hw/char/serial.c
 > +++ b/hw/char/serial.c
-> @@ -986,22 +986,57 @@ const MemoryRegionOps serial_io_ops =3D {
->      .endianness =3D DEVICE_LITTLE_ENDIAN,
+> @@ -1023,22 +1023,6 @@ static const TypeInfo serial_io_info =3D {
+>      .class_init =3D serial_io_class_init,
 >  };
 >
-> -SerialState *serial_init(int base, qemu_irq irq, int baudbase,
+> -SerialIO *serial_init(int base, qemu_irq irq, int baudbase,
 > -                         Chardev *chr, MemoryRegion *system_io)
-> +static void serial_io_realize(DeviceState *dev, Error **errp)
->  {
-> -    DeviceState *dev =3D DEVICE(object_new(TYPE_SERIAL));
-> -    SerialState *s =3D SERIAL(dev);
-> +    SerialIO *self =3D SERIAL_IO(dev);
+> -{
+> -    SerialIO *self =3D SERIAL_IO(qdev_create(NULL, TYPE_SERIAL_IO));
+> -
+> -    qdev_prop_set_uint32(DEVICE(self), "baudbase", baudbase);
+> -    qdev_prop_set_chr(DEVICE(self), "chardev", chr);
+> -    qdev_prop_set_int32(DEVICE(self), "instance-id", base);
+> -    qdev_init_nofail(DEVICE(self));
+> -
+> -    sysbus_connect_irq(SYS_BUS_DEVICE(self), 0, irq);
+> -    memory_region_add_subregion(system_io, base, &self->serial.io);
+> -
+> -    return self;
+> -}
+> -
+>  static Property serial_properties[] =3D {
+>      DEFINE_PROP_CHR("chardev", SerialState, chr),
+>      DEFINE_PROP_UINT32("baudbase", SerialState, baudbase, 115200),
+> diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
+> index 282bbecb24..26fb8fa4de 100644
+> --- a/hw/mips/mips_mipssim.c
+> +++ b/hw/mips/mips_mipssim.c
+> @@ -40,6 +40,7 @@
+>  #include "hw/loader.h"
+>  #include "elf.h"
+>  #include "hw/sysbus.h"
+> +#include "hw/qdev-properties.h"
+>  #include "exec/address-spaces.h"
+>  #include "qemu/error-report.h"
+>  #include "sysemu/qtest.h"
+> @@ -219,9 +220,15 @@ mips_mipssim_init(MachineState *machine)
+>       * A single 16450 sits at offset 0x3f8. It is attached to
+>       * MIPS CPU INT2, which is interrupt 4.
+>       */
+> -    if (serial_hd(0))
+> -        serial_init(0x3f8, env->irq[4], 115200, serial_hd(0),
+> -                    get_system_io());
+> +    if (serial_hd(0)) {
+> +        DeviceState *dev =3D qdev_create(NULL, TYPE_SERIAL_IO);
+> +
+> +        qdev_prop_set_chr(dev, "chardev", serial_hd(0));
+> +        qdev_prop_set_int32(dev, "instance-id", 0x3f8);
+> +        qdev_init_nofail(dev);
+> +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
+> +        sysbus_add_io(SYS_BUS_DEVICE(dev), 0x3f8, &SERIAL_IO(dev)->seria=
+l.io);
+> +    }
 
-"sio" or something rather than "self".
+The code being inlined here doesn't seem to be identical to the
+code in the function above (it uses sysbus_add_io() rather than
+memory_region_add_subregion()).
 
-> +    SerialState *s =3D &self->serial;
->
-> -    s->irq =3D irq;
-> -    qdev_prop_set_uint32(dev, "baudbase", baudbase);
-> -    qdev_prop_set_chr(dev, "chardev", chr);
-> -    qdev_prop_set_int32(dev, "instance-id", base);
-> -    qdev_init_nofail(dev);
-> +    qdev_init_nofail(DEVICE(s));
->
->      memory_region_init_io(&s->io, NULL, &serial_io_ops, s, "serial", 8);
-> -    memory_region_add_subregion(system_io, base, &s->io);
-> +    sysbus_init_irq(SYS_BUS_DEVICE(self), &self->serial.irq);
+It's also a bit ugly that the code has to reach into the
+internals of the device to get the MemoryRegion pointer.
+Would it work to have the device use sysbus_init_mmio()
+in its init or realize method to register the IO port MemoryRegion,
+and then we could use sysbus_mmio_get_region() to get the
+MemoryRegion pointer ?
 
-You could say '&s->irq' here, since you have the local variable.
-
-> +}
-> +
-> +static void serial_io_class_init(ObjectClass *klass, void* data)
-> +{
-> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> +
-> +    dc->realize =3D serial_io_realize;
-
-For class methods where the class has no data that needs
-to be migrated it's helpful to have a comment
-  /* No dc->vmsd: class has no migratable state */
-(which lets us know that it's intentional and not a forgotten
-thing). Some day I will get round to writing a patch so you
-can say "dc->vmsd =3D no_migratable_state;" ...
-
-> +}
-> +
-> +static void serial_io_instance_init(Object *o)
-> +{
-> +    SerialIO *self =3D SERIAL_IO(o);
-> +
-> +    object_initialize_child(o, "serial", &self->serial, sizeof(self->ser=
-ial),
-> +                            TYPE_SERIAL, &error_abort, NULL);
-> +
-> +    qdev_alias_all_properties(DEVICE(&self->serial), o);
-> +}
-> +
-> +
-> +static const TypeInfo serial_io_info =3D {
-> +    .name =3D TYPE_SERIAL_IO,
-> +    .parent =3D TYPE_SYS_BUS_DEVICE,
-> +    .instance_size =3D sizeof(SerialIO),
-> +    .instance_init =3D serial_io_instance_init,
-> +    .class_init =3D serial_io_class_init,
-> +};
-> +
-> +SerialIO *serial_init(int base, qemu_irq irq, int baudbase,
-> +                         Chardev *chr, MemoryRegion *system_io)
-> +{
-> +    SerialIO *self =3D SERIAL_IO(qdev_create(NULL, TYPE_SERIAL_IO));
->
-> -    return s;
-> +    qdev_prop_set_uint32(DEVICE(self), "baudbase", baudbase);
-> +    qdev_prop_set_chr(DEVICE(self), "chardev", chr);
-> +    qdev_prop_set_int32(DEVICE(self), "instance-id", base);
-> +    qdev_init_nofail(DEVICE(self));
-> +
-> +    sysbus_connect_irq(SYS_BUS_DEVICE(self), 0, irq);
-> +    memory_region_add_subregion(system_io, base, &self->serial.io);
-> +
-> +    return self;
->  }
+(If that does work, we should someday refactor
+sysbus_add_io() so that all the devices it's used with
+register the MemoryRegions that way, and then sysbus_add_io()
+can just take an 'int n' the way sysbus_mmio_map() does.
+But not today.)
 
 thanks
 -- PMM
