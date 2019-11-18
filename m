@@ -2,103 +2,82 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A35C3C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D1AFC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:36:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6791220857
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:31:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED9712089F
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:36:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OYJoe7/s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6791220857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UPHMGIFL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED9712089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWj0M-0005sv-Ix
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 10:31:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37836)
+	id 1iWj4S-0007pW-1s
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 10:36:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38729)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jag.raman@oracle.com>) id 1iWiyI-0004Mz-CV
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:29:49 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iWj3I-0006kd-P1
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:34:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jag.raman@oracle.com>) id 1iWiyH-0002wX-3Z
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:29:46 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:33802)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
- id 1iWiyG-0002w3-Oo
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:29:44 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAIFNhE8063589;
- Mon, 18 Nov 2019 15:29:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=fDY4NLWdohMDrMUachqLYihE5QMPQrKN1b1WHsvSdBI=;
- b=OYJoe7/sILF/En4xUMXdqJcTO2HdF9Z3FebPTyCBi/kfHlsMosbTB853Ml2OP/A/Q8hj
- n424tQ87jp1T7qrwajz0X4dcl2B/oEt3EGWjmysjyuZYqq8bydPi3W4nkjzZ3IKmXwLR
- VWc2cyDKEZ4JBomXYCC08/au2Fo4RtvtU/qxBWDsAZwg7DsDedXeh8/v1ZYwq/fJBDJj
- evz/CRc0bm3WGIHGYPRLbSUupI5KNGxyaGrZH4qLw/V3AGgDrLGQ4Rmkvl361/qJyVNK
- DctAYxGCscUXHvXS5HaJtsPfX29vMVExz9wQD1I/GjYIM5y8jFo7kv60rw80sZATgYPr Gw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2130.oracle.com with ESMTP id 2wa8htgxq1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 18 Nov 2019 15:29:35 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAIFOAkA125461;
- Mon, 18 Nov 2019 15:29:34 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by userp3020.oracle.com with ESMTP id 2wau8ne2dx-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 18 Nov 2019 15:29:34 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAIFTXQH005167;
- Mon, 18 Nov 2019 15:29:33 GMT
-Received: from [10.152.34.2] (/10.152.34.2)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 18 Nov 2019 07:29:32 -0800
-Subject: Re: [RFC v4 PATCH 10/49] multi-process: setup a machine object for
- remote device process
-To: Stefan Hajnoczi <stefanha@redhat.com>
-References: <cover.1571905346.git.jag.raman@oracle.com>
- <6df05bbf3cba4611b462879a7b937f40486cea0a.1571905346.git.jag.raman@oracle.com>
- <20191113162201.GE563983@stefanha-x1.localdomain>
-From: Jag Raman <jag.raman@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <d47faeae-d8fd-58bb-da2a-b19adf2b0ecc@oracle.com>
-Date: Mon, 18 Nov 2019 10:29:31 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+ (envelope-from <peter.maydell@linaro.org>) id 1iWj3H-0005jT-Cn
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:34:56 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:43484)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iWj3H-0005ij-6c
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:34:55 -0500
+Received: by mail-ot1-x342.google.com with SMTP id l14so14840526oti.10
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 07:34:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=lFcD0c4XBd2VxlKYJhUQ7FMwh9UM1pbxiLuaAZ2es24=;
+ b=UPHMGIFLFrii9wDXK0ssxifqPC2W7RSbhjBdstsfKPW3KdiEcgJdk3TrtfQ4EitH0P
+ dTJx9OWYXgnptDTRX3kM4pFfA+pNafwKJeCda/9mZoV1ydjmf1a5NnuuNTM8xtlxcPoj
+ hno+Rwzu4Yt2zt+9nZ/+G6ohmsIFgsiVUZH1VGm2C2Uq3aFCp7lCKoUr9FG3kdocTR6O
+ 4kvcnaJ2t25XUEp4vpjyHIUdGmAvAvUOf39AFL9mNBGxLRIiirk+bPvuET1cYZOrp94N
+ ZY+E+DlBNbJ+V/ooB338QuGLk6zhmHlz5jVLgiCVUHpNj6h7KBRmAHvzYMCwXs41KbC0
+ /v2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=lFcD0c4XBd2VxlKYJhUQ7FMwh9UM1pbxiLuaAZ2es24=;
+ b=n3Z3qYkKl/9oqG/4PHCMs6c8pIt/5ZDA0P9pgZAk1d//zPyAAcx9u4luJD+N1Edvg9
+ e9AseySIxmeTr0KB3YNARCV0QqCdmnlC8oAa8IvBR6d+Zsq4T+KKdGBSuc+owZPlZDI8
+ 16euTL8i0JcAJVSwLWNW2oELImsL0hKBjsOa+PWW5dqowUDWSwPAqmRrBZy4vHS551qZ
+ z4xIymBAruO2F4267NDeGjUH2M4GSWmTlmHavvrzWVImUeH5SLrFhjnlxL7Pq8ojGBO1
+ DEVhb7pYGHP6j+vBFp898kAS169+s/FwMIx4xlzEcsoDwrfkg/PeSwCAm3SE+YRmS4JF
+ JPnw==
+X-Gm-Message-State: APjAAAXLuDFK4O4k/hxC9927WB098fLzUlDve4RbgtHjWRx6SWJ+/fkH
+ HEjsihU4xkOoxl1bdNG6OPh+grkHk1tm2pSRnfAvkA==
+X-Google-Smtp-Source: APXvYqzQVVnzCjtz2o8JtMIagY6qP3hRbZ3gw5XHJ8R6+acLqHiOw3Z5DZEw1mdMVgHZmG0ZElz0K7FFRnnD+RXs8f0=
+X-Received: by 2002:a9d:7ac2:: with SMTP id m2mr23006601otn.135.1574091294327; 
+ Mon, 18 Nov 2019 07:34:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191113162201.GE563983@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
- malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911180141
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445
- signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911180141
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 156.151.31.86
+References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
+ <20191023173154.30051-25-marcandre.lureau@redhat.com>
+In-Reply-To: <20191023173154.30051-25-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 18 Nov 2019 15:34:43 +0000
+Message-ID: <CAFEAcA_R1Ne+H5k-PYEjqX+d7G55kZNh2QTxq2WN5bv1U3K=Ng@mail.gmail.com>
+Subject: Re: [PATCH v3 24/33] leon3: use qemu_irq framework instead of
+ callback as property
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,105 +89,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, thuth@redhat.com,
- john.g.johnson@oracle.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
- quintela@redhat.com, berrange@redhat.com, mst@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, ross.lagerwall@citrix.com,
- kanth.ghatraju@oracle.com, kraxel@redhat.com, kwolf@redhat.com,
- pbonzini@redhat.com, liran.alon@oracle.com, marcandre.lureau@gmail.com,
- mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paul Burton <pburton@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Wed, 23 Oct 2019 at 18:34, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> "set_pin_in" property is used to define a callback mechanism where the
+> device says "call the callback function, passing it an opaque cookie
+> and a 32-bit value". We already have a generic mechanism for doing
+> that, which is the qemu_irq. So we should just use that.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
 
+This is probably a good place to put a comment:
 
-On 11/13/2019 11:22 AM, Stefan Hajnoczi wrote:
-> On Thu, Oct 24, 2019 at 05:08:51AM -0400, Jagannathan Raman wrote:
->> +static NotifierList machine_init_done_notifiers =
->> +    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
->> +
->> +bool machine_init_done;
->> +
->> +void qemu_add_machine_init_done_notifier(Notifier *notify)
->> +{
->> +    notifier_list_add(&machine_init_done_notifiers, notify);
->> +    if (machine_init_done) {
->> +        notify->notify(notify, NULL);
->> +    }
->> +}
->> +
->> +void qemu_remove_machine_init_done_notifier(Notifier *notify)
->> +{
->> +    notifier_remove(notify);
->> +}
->> +
->> +void qemu_run_machine_init_done_notifiers(void)
->> +{
->> +    machine_init_done = true;
->> +    notifier_list_notify(&machine_init_done_notifiers, NULL);
->> +}
-> 
-> qemu_add_machine_init_done_notifier() is already defined in vl.c.
-> Please share the implementation instead of duplicating it into the
-> remote program.
-> 
->> +
->> +static void remote_machine_init(Object *obj)
->> +{
->> +    RemMachineState *s = REMOTE_MACHINE(obj);
->> +    RemPCIHost *rem_host;
->> +    MemoryRegion *system_memory, *system_io, *pci_memory;
->> +
->> +    Error *error_abort = NULL;
->> +
->> +    qemu_mutex_init(&ram_list.mutex);
-> 
-> Please keep global initialization separate from RemMachineState (e.g. do
-> it in main() or a function called by main()).  This function should only
-> initialize RemMachineState.
+/*
+ * This device assumes that the incoming 'level' value on the
+ * qemu_irq is the interrupt number, not just a simple 0/1 level.
+ */
 
-OK, will do!
+> -static void leon3_set_pil_in(void *opaque, uint32_t pil_in)
+> +static void leon3_set_pil_in(void *opaque, int n, int level)
+>  {
+> -    CPUSPARCState *env =3D (CPUSPARCState *)opaque;
+> +    CPUSPARCState *env =3D opaque;
+> +    uint32_t pil_in =3D level;
+>      CPUState *cs;
+>
+>      assert(env !=3D NULL);
 
-> 
->> +
->> +    object_property_add_child(object_get_root(), "machine", obj, &error_abort);
->> +    if (error_abort) {
->> +        error_report_err(error_abort);
->> +    }
->> +
->> +    memory_map_init();
-> 
-> This is global init, please move it elsewhere.
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Got it, thank you!
-
-> 
->> +
->> +    system_memory = get_system_memory();
->> +    system_io = get_system_io();
->> +
->> +    pci_memory = g_new(MemoryRegion, 1);
->> +    memory_region_init(pci_memory, NULL, "pci", UINT64_MAX);
->> +
->> +    rem_host = REMOTE_HOST_DEVICE(qdev_create(NULL, TYPE_REMOTE_HOST_DEVICE));
->> +
->> +    rem_host->mr_pci_mem = pci_memory;
->> +    rem_host->mr_sys_mem = system_memory;
->> +    rem_host->mr_sys_io = system_io;
->> +
->> +    s->host = rem_host;
-> 
-> Both s and rem_host are QOM objects.  There should be a child property
-> relationship between them here.  It will ensure that rem_host is cleaned
-> up when s is cleaned up.  Please use that instead of a regular C
-> pointer.
-
-OK, will add a property linking these two as parent-child.
-
-Thank you!
---
-Jag
-
-> 
+thanks
+-- PMM
 
