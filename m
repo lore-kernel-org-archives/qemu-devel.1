@@ -2,87 +2,55 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1764FC432C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3354C432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:51:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB35A206CC
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:43:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=greensocs.com header.i=@greensocs.com header.b="kimbKtoF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB35A206CC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=greensocs.com
+	by mail.kernel.org (Postfix) with ESMTPS id 889352071B
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 09:51:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 889352071B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWdZd-0006Sg-RQ
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 04:43:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59956)
+	id 1iWdgV-0000t2-LS
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 04:51:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32792)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <damien.hedde@greensocs.com>) id 1iWdWh-0005or-2V
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:40:56 -0500
+ (envelope-from <its@irrelevant.dk>) id 1iWdeb-0008MU-Fk
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:49:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <damien.hedde@greensocs.com>) id 1iWdWf-0005sb-NA
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:40:54 -0500
-Received: from beetle.greensocs.com ([5.135.226.135]:37666)
+ (envelope-from <its@irrelevant.dk>) id 1iWdea-0008KO-8f
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:49:05 -0500
+Received: from charlie.dont.surf ([128.199.63.193]:35564)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <damien.hedde@greensocs.com>)
- id 1iWdWf-0005sJ-7l
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 04:40:53 -0500
-Received: from [172.16.11.102] (crumble.bar.greensocs.com [172.16.11.102])
- by beetle.greensocs.com (Postfix) with ESMTPSA id 7BB2496EF0;
- Mon, 18 Nov 2019 09:40:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com;
- s=mail; t=1574070050;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UkN2zFY2j4vOtaSzwekFWC/w6XyaCJHF5JjVPvIYnnw=;
- b=kimbKtoFC6qxfnCRDYWYSR92/uLZYUOTowQCa8VGZEt4xvUOos9d2GcxM2LmhHx3Hmmgud
- 2PsueRAWevf983/vuTEYjMSuzrkB+xS4eKmP3cvnVag+ovdmO9i2msGBUvd4NEuZ3FryaY
- FLRku/H2uB3+VIq90JbUp7vP+AOB7SM=
-Subject: Re: [RFC PATCH 02/11] gdbstub: stop passing GDBState * around
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191115173000.21891-1-alex.bennee@linaro.org>
- <20191115173000.21891-3-alex.bennee@linaro.org>
-From: Damien Hedde <damien.hedde@greensocs.com>
-Message-ID: <9df9cde2-9689-3658-da7a-74a289d6d4e8@greensocs.com>
-Date: Mon, 18 Nov 2019 10:40:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1iWdeW-0008Hu-9n; Mon, 18 Nov 2019 04:49:00 -0500
+Received: from apples.localdomain (unknown [194.62.217.57])
+ by charlie.dont.surf (Postfix) with ESMTPSA id B612DBF4E8;
+ Mon, 18 Nov 2019 09:48:57 +0000 (UTC)
+Date: Mon, 18 Nov 2019 10:48:56 +0100
+From: Klaus Birkelund <its@irrelevant.dk>
+To: Beata Michalska <beata.michalska@linaro.org>
+Subject: Re: [PATCH v2 12/20] nvme: bump supported specification version to 1.3
+Message-ID: <20191118094856.GB812803@apples.localdomain>
+References: <20191015103900.313928-1-its@irrelevant.dk>
+ <20191015103900.313928-13-its@irrelevant.dk>
+ <CADSWDzt-YfwuxmxL=c7qQzac-Xby1azxAsGhAfviSRXz2FkNhg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191115173000.21891-3-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US-large
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=greensocs.com; 
- s=mail; t=1574070051;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UkN2zFY2j4vOtaSzwekFWC/w6XyaCJHF5JjVPvIYnnw=;
- b=rnACP60cwn76mW9Mvgex6UtK665ICFlfVR8U7iarDOl6CPrFaOKLATEcUDyYOAo4euAQg7
- OHM0Bh5xLYrTd9WocA9n/7rgUlFtHYKh6QNbOWZkwiaRa+sGfvTj5mJTpMomMDGaAcgGGg
- HsuF+WaqwPwsyswTb14WBqnH39Kd1pU=
-ARC-Seal: i=1; s=mail; d=greensocs.com; t=1574070051; a=rsa-sha256; cv=none;
- b=uBOm0Q+gYyIe9g5CGJfNutdq2Uk5IYZbRXnclqv6sC1WWgzMce4sFakzO/slfUQ09IPrfl
- j09GW903Y7dV69tzJceBVoOSIApOJ+1+3mRXL8m48OaoAziygtX0AeeKwlM/zv7zYgp5Do
- uo4I3jWAjgt84piRIOZrq0mAlrbeGY8=
-ARC-Authentication-Results: i=1; ORIGINATING;
- auth=pass smtp.auth=damien smtp.mailfrom=damien.hedde@greensocs.com
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADSWDzt-YfwuxmxL=c7qQzac-Xby1azxAsGhAfviSRXz2FkNhg@mail.gmail.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.135.226.135
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,27 +62,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: luis.machado@linaro.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- richard.henderson@linaro.org, alan.hayward@arm.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Paul Durrant <Paul.Durrant@citrix.com>, Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Tue, Nov 12, 2019 at 03:05:06PM +0000, Beata Michalska wrote:
+> Hi Klaus,
+> 
+> On Tue, 15 Oct 2019 at 11:52, Klaus Jensen <its@irrelevant.dk> wrote:
+> >
+> > +static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeCmd *c)
+> > +{
+> > +    static const int len = 4096;
+> > +
+> > +    struct ns_descr {
+> > +        uint8_t nidt;
+> > +        uint8_t nidl;
+> > +        uint8_t rsvd2[2];
+> > +        uint8_t nid[16];
+> > +    };
+> > +
+> > +    uint32_t nsid = le32_to_cpu(c->nsid);
+> > +    uint64_t prp1 = le64_to_cpu(c->prp1);
+> > +    uint64_t prp2 = le64_to_cpu(c->prp2);
+> > +
+> > +    struct ns_descr *list;
+> > +    uint16_t ret;
+> > +
+> > +    trace_nvme_identify_ns_descr_list(nsid);
+> > +
+> > +    if (unlikely(nsid == 0 || nsid > n->num_namespaces)) {
+> > +        trace_nvme_err_invalid_ns(nsid, n->num_namespaces);
+> > +        return NVME_INVALID_NSID | NVME_DNR;
+> > +    }
+> > +
+> In theory this should abort the command for inactive NSIDs as well.
+> But I guess this will come later on.
+> 
 
+At this point in the series, the device does not support multiple
+namespaces anyway and num_namespaces is always 1. But this has also been
+reported seperately in relation the patch adding multiple namespaces and
+is fixed in v3.
 
-On 11/15/19 6:29 PM, Alex Benn=C3=A9e wrote:
-> We only have one GDBState which should be allocated at the time we
-> process any commands. This will make further clean-up a bit easier.
->=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->  gdbstub.c | 307 +++++++++++++++++++++++++++++++-----------------------
->  1 file changed, 177 insertions(+), 130 deletions(-)
+> > +    list = g_malloc0(len);
+> > +    list->nidt = 0x3;
+> > +    list->nidl = 0x10;
+> > +    *(uint32_t *) &list->nid[12] = cpu_to_be32(nsid);
+> > +
+> Might be worth to add some comment here -> as per the NGUID/EUI64 format.
+> Also those are not specified currently in the namespace identity data structure.
+> 
 
-Do we know why we choose to pass GDBState * everywhere ?
-It sounds like a way to eventually handle multiple gdb connections but I
-don't know if it has some sense.
+I'll add a comment for why the Namespace UUID is set to this value here.
+The NGUID/EUI64 fields are not set in the namespace identity data
+structure as they are not required. See the descriptions of NGUID and
+EUI64. Here for NGUID:
 
-Damien
+    "The controller shall specify a globally unique namespace identifier
+    in this field, the EUI64 field, or a Namespace UUID in the Namespace
+    Identification Descriptor..."
+
+Here, I chose to provide it in the Namespace Identification Descriptor
+(by setting `list->nidt = 0x3`).
+
+> > +    ret = nvme_dma_read_prp(n, (uint8_t *) list, len, prp1, prp2);
+> > +    g_free(list);
+> > +    return ret;
+> > +}
+> > +
+> >  static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+> >  {
+> >      NvmeIdentify *c = (NvmeIdentify *)cmd;
+> > @@ -934,7 +978,9 @@ static uint16_t nvme_identify(NvmeCtrl *n, NvmeCmd *cmd)
+> >      case 0x01:
+> >          return nvme_identify_ctrl(n, c);
+> >      case 0x02:
+> > -        return nvme_identify_nslist(n, c);
+> > +        return nvme_identify_ns_list(n, c);
+> > +    case 0x03:
+> > +        return nvme_identify_ns_descr_list(n, cmd);
+> >      default:
+> >          trace_nvme_err_invalid_identify_cns(le32_to_cpu(c->cns));
+> >          return NVME_INVALID_FIELD | NVME_DNR;
+> > @@ -1101,6 +1147,14 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >          blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+> >          break;
+> >      case NVME_NUMBER_OF_QUEUES:
+> > +        if (n->qs_created > 2) {
+> > +            return NVME_CMD_SEQ_ERROR | NVME_DNR;
+> > +        }
+> > +
+> I am not sure this is entirely correct as the spec says:
+> "if any I/O Submission and/or Completion Queues (...)"
+> so it might be enough to have a single queue created
+> for this command to be valid.
+> Also I think that the condition here is to make sure that the number
+> of queues requested is being set once at init phase. Currently this will
+> allow the setting to happen if there is no active queue -> so at any
+> point of time (provided the condition mentioned). I might be wrong here
+> but it seems that what we need is a single status saying any queue
+> has been created prior to the Set Feature command at all
+> 
+
+Internally, the admin queue pair is counted in qs_created, which is the
+reason for checking if is above 2. The admin queues are created when the
+controller is enabled (mmio write to the EN register in CC).
+
+I'll add a comment about that - I see why it is unclear.
+
+> 
+> Small note: this patch seems to be introducing more changes
+> than specified in the commit message and especially the subject. Might
+> be worth to extend it a bit.
+> 
+
+You are right. I'll split it up.
 
