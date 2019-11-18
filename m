@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E14DC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:57:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CF6DC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:58:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18C4120730
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:57:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAC2D20730
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:58:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hcPOfFNB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18C4120730
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MAvypaDc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAC2D20730
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60516 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWeib-00060H-RI
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:57:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42432)
+	id 1iWejc-0006mG-G3
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:58:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42544)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iWef6-0001bT-II
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:53:41 -0500
+ (envelope-from <lvivier@redhat.com>) id 1iWefF-0001ph-QX
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:53:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iWef5-0004RY-9F
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:53:40 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:21989
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <lvivier@redhat.com>) id 1iWefD-0004VS-A9
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:53:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20320
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iWef5-0004RM-59
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:53:39 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iWefD-0004VH-5b
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:53:47 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574074418;
+ s=mimecast20190719; t=1574074426;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=AnX5Bp7pofx0wLQCrap7/m/Bi3qK71qWPkamm5SYI2Q=;
- b=hcPOfFNBF3LI1qREKLjKG9GwAVi3DobdG0EOLyiNDcpdQEb8kUrvMWdkUe1fT7eJSp8M80
- Z0ENuS4IksarKpQY2ViWX0fq9g3dRZo+uZchLe7yyd+qZ5JY8UWaz8B9sV8Wjxu+o6u3be
- Qk0ZkPrcKJkXRLaWKIT+dSn9Nu9EAE8=
+ bh=3MZMBksKQ4RUbBl1WGfm1llnPtwEZ4SD2P8rjb9Hpew=;
+ b=MAvypaDcaG8RGv9RNnWpjpEMjoEXa/seOWQdO4KeZThlNY7AJpcxlkxF9T2uZ/zu57M3Mt
+ A4WEXjHI6XwKbyaR8jcL5ooFLBqe2PQj9ioismFMMUzg3fK63vaGYZU3NgFMBYgiolEQag
+ BCMW6eDjnSmE1Uk2fY+pxsbN/s0pFPM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-xi8x2q9eNPi_H_AgQm4XkQ-1; Mon, 18 Nov 2019 05:53:35 -0500
+ us-mta-103-gWIJ_IueOuWNhFowkG2JGA-1; Mon, 18 Nov 2019 05:53:42 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52DBA80268B;
- Mon, 18 Nov 2019 10:53:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C59BB477;
+ Mon, 18 Nov 2019 10:53:40 +0000 (UTC)
 Received: from thinkpad.redhat.com (ovpn-117-32.ams2.redhat.com [10.36.117.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D702260856;
- Mon, 18 Nov 2019 10:53:30 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F35AE60856;
+ Mon, 18 Nov 2019 10:53:38 +0000 (UTC)
 From: Laurent Vivier <lvivier@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 4/6] spapr: Add /chosen to FDT only at reset time to
- preserve kernel and initramdisk
-Date: Mon, 18 Nov 2019 11:53:17 +0100
-Message-Id: <20191118105319.7658-5-lvivier@redhat.com>
+Subject: [PULL v2 6/6] mos6522: fix T1 and T2 timers
+Date: Mon, 18 Nov 2019 11:53:19 +0100
+Message-Id: <20191118105319.7658-7-lvivier@redhat.com>
 In-Reply-To: <20191118105319.7658-1-lvivier@redhat.com>
 References: <20191118105319.7658-1-lvivier@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: xi8x2q9eNPi_H_AgQm4XkQ-1
+X-MC-Unique: gWIJ_IueOuWNhFowkG2JGA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,122 +85,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org,
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>, qemu-ppc@nongnu.org,
  =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+From: Laurent Vivier <laurent@vivier.eu>
 
-Since "spapr: Render full FDT on ibm,client-architecture-support" we build
-the entire flatten device tree (FDT) twice - at the reset time and
-when "ibm,client-architecture-support" (CAS) is called. The full FDT from
-CAS is then applied on top of the SLOF internal device tree.
+With the Quadra 800 emulation, mos6522 timers processing can consume
+until 70% of the host CPU time with an idle guest (I guess the problem
+should also happen with PowerMac emulation).
 
-This is mostly ok, however there is a case when the QEMU is started with
--initrd and for some reason the guest decided to move/unpack the init RAM
-disk image - the guest correctly notifies SLOF about the change but
-at CAS it is overridden with the QEMU initial location addresses and
-the guest may fail to boot if the original initrd memory was changed.
+On a recent system, it can be painless (except if you look at top), but
+on an old host like a PowerMac G5 the guest kernel can be terribly slow
+during the boot sequence (for instance, unpacking initramfs can take 15
+seconds rather than only 3 seconds).
 
-This fixes the problem by only adding the /chosen node at the reset time
-to prevent the original QEMU's linux,initrd-start/linux,initrd-end to
-override the updated addresses.
+We can avoid this CPU overload by enabling QEMU internal timers only if
+the mos6522 counter interrupts are enabled. Sometime the guest kernel
+wants to read the counters values, but we don't need the timers to
+update the counters.
 
-This only treats /chosen differently as we know there is a special case
-already and it is unlikely anything else will need to change /chosen at CAS
-we are better off not touching /chosen after we handed it over to SLOF.
+With this patch applied, an idle Q800 consumes only 3% of host CPU time
+(and the guest can boot in a decent time).
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-Id: <20191024041308.5673-1-aik@ozlabs.ru>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20191102154919.17775-1-laurent@vivier.eu>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- hw/ppc/spapr.c | 25 +++++++++++++++----------
- 1 file changed, 15 insertions(+), 10 deletions(-)
+ hw/misc/mos6522.c | 67 ++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 52 insertions(+), 15 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 94f9d27096af..e076f6023c73 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -917,7 +917,7 @@ static bool spapr_hotplugged_dev_before_cas(void)
-     return false;
- }
+diff --git a/hw/misc/mos6522.c b/hw/misc/mos6522.c
+index 57f13db266b4..aa3bfe1afddd 100644
+--- a/hw/misc/mos6522.c
++++ b/hw/misc/mos6522.c
+@@ -38,8 +38,10 @@
 =20
--static void *spapr_build_fdt(SpaprMachineState *spapr);
-+static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset);
+ /* XXX: implement all timer modes */
 =20
- int spapr_h_cas_compose_response(SpaprMachineState *spapr,
-                                  target_ulong addr, target_ulong size,
-@@ -939,7 +939,7 @@ int spapr_h_cas_compose_response(SpaprMachineState *spa=
-pr,
+-static void mos6522_timer_update(MOS6522State *s, MOS6522Timer *ti,
+-                                 int64_t current_time);
++static void mos6522_timer1_update(MOS6522State *s, MOS6522Timer *ti,
++                                  int64_t current_time);
++static void mos6522_timer2_update(MOS6522State *s, MOS6522Timer *ti,
++                                  int64_t current_time);
 =20
-     size -=3D sizeof(hdr);
-=20
--    fdt =3D spapr_build_fdt(spapr);
-+    fdt =3D spapr_build_fdt(spapr, false);
-     _FDT((fdt_pack(fdt)));
-=20
-     if (fdt_totalsize(fdt) + sizeof(hdr) > size) {
-@@ -1197,7 +1197,7 @@ static void spapr_dt_hypervisor(SpaprMachineState *sp=
-apr, void *fdt)
-     }
- }
-=20
--static void *spapr_build_fdt(SpaprMachineState *spapr)
-+static void *spapr_build_fdt(SpaprMachineState *spapr, bool reset)
+ static void mos6522_update_irq(MOS6522State *s)
  {
-     MachineState *machine =3D MACHINE(spapr);
-     MachineClass *mc =3D MACHINE_GET_CLASS(machine);
-@@ -1297,7 +1297,9 @@ static void *spapr_build_fdt(SpaprMachineState *spapr=
-)
-     spapr_dt_rtas(spapr, fdt);
-=20
-     /* /chosen */
--    spapr_dt_chosen(spapr, fdt);
-+    if (reset) {
-+        spapr_dt_chosen(spapr, fdt);
+@@ -98,7 +100,11 @@ static void set_counter(MOS6522State *s, MOS6522Timer *=
+ti, unsigned int val)
+     trace_mos6522_set_counter(1 + ti->index, val);
+     ti->load_time =3D get_load_time(s, ti);
+     ti->counter_value =3D val;
+-    mos6522_timer_update(s, ti, ti->load_time);
++    if (ti->index =3D=3D 0) {
++        mos6522_timer1_update(s, ti, ti->load_time);
++    } else {
++        mos6522_timer2_update(s, ti, ti->load_time);
 +    }
+ }
 =20
-     /* /hypervisor */
-     if (kvm_enabled()) {
-@@ -1305,11 +1307,14 @@ static void *spapr_build_fdt(SpaprMachineState *spa=
-pr)
+ static int64_t get_next_irq_time(MOS6522State *s, MOS6522Timer *ti,
+@@ -130,19 +136,34 @@ static int64_t get_next_irq_time(MOS6522State *s, MOS=
+6522Timer *ti,
+     trace_mos6522_get_next_irq_time(ti->latch, d, next_time - d);
+     next_time =3D muldiv64(next_time, NANOSECONDS_PER_SECOND, ti->frequenc=
+y) +
+                          ti->load_time;
++
+     if (next_time <=3D current_time) {
+         next_time =3D current_time + 1;
      }
+     return next_time;
+ }
 =20
-     /* Build memory reserve map */
--    if (spapr->kernel_size) {
--        _FDT((fdt_add_mem_rsv(fdt, KERNEL_LOAD_ADDR, spapr->kernel_size)))=
-;
--    }
--    if (spapr->initrd_size) {
--        _FDT((fdt_add_mem_rsv(fdt, spapr->initrd_base, spapr->initrd_size)=
-));
-+    if (reset) {
-+        if (spapr->kernel_size) {
-+            _FDT((fdt_add_mem_rsv(fdt, KERNEL_LOAD_ADDR, spapr->kernel_siz=
-e)));
-+        }
-+        if (spapr->initrd_size) {
-+            _FDT((fdt_add_mem_rsv(fdt, spapr->initrd_base,
-+                                  spapr->initrd_size)));
-+        }
+-static void mos6522_timer_update(MOS6522State *s, MOS6522Timer *ti,
++static void mos6522_timer1_update(MOS6522State *s, MOS6522Timer *ti,
++                                 int64_t current_time)
++{
++    if (!ti->timer) {
++        return;
++    }
++    if ((s->ier & T1_INT) =3D=3D 0 || (s->acr & T1MODE) !=3D T1MODE_CONT) =
+{
++        timer_del(ti->timer);
++    } else {
++        ti->next_irq_time =3D get_next_irq_time(s, ti, current_time);
++        timer_mod(ti->timer, ti->next_irq_time);
++    }
++}
++
++static void mos6522_timer2_update(MOS6522State *s, MOS6522Timer *ti,
+                                  int64_t current_time)
+ {
+     if (!ti->timer) {
+         return;
      }
+-    if (ti->index =3D=3D 0 && (s->acr & T1MODE) !=3D T1MODE_CONT) {
++    if ((s->ier & T2_INT) =3D=3D 0) {
+         timer_del(ti->timer);
+     } else {
+         ti->next_irq_time =3D get_next_irq_time(s, ti, current_time);
+@@ -155,7 +176,7 @@ static void mos6522_timer1(void *opaque)
+     MOS6522State *s =3D opaque;
+     MOS6522Timer *ti =3D &s->timers[0];
 =20
-     /* ibm,client-architecture-support updates */
-@@ -1718,7 +1723,7 @@ static void spapr_machine_reset(MachineState *machine=
-)
-      */
-     fdt_addr =3D MIN(spapr->rma_size, RTAS_MAX_ADDR) - FDT_MAX_SIZE;
+-    mos6522_timer_update(s, ti, ti->next_irq_time);
++    mos6522_timer1_update(s, ti, ti->next_irq_time);
+     s->ifr |=3D T1_INT;
+     mos6522_update_irq(s);
+ }
+@@ -165,7 +186,7 @@ static void mos6522_timer2(void *opaque)
+     MOS6522State *s =3D opaque;
+     MOS6522Timer *ti =3D &s->timers[1];
 =20
--    fdt =3D spapr_build_fdt(spapr);
-+    fdt =3D spapr_build_fdt(spapr, true);
+-    mos6522_timer_update(s, ti, ti->next_irq_time);
++    mos6522_timer2_update(s, ti, ti->next_irq_time);
+     s->ifr |=3D T2_INT;
+     mos6522_update_irq(s);
+ }
+@@ -204,7 +225,16 @@ uint64_t mos6522_read(void *opaque, hwaddr addr, unsig=
+ned size)
+ {
+     MOS6522State *s =3D opaque;
+     uint32_t val;
++    int64_t now =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
 =20
-     rc =3D fdt_pack(fdt);
++    if (now >=3D s->timers[0].next_irq_time) {
++        mos6522_timer1_update(s, &s->timers[0], now);
++        s->ifr |=3D T1_INT;
++    }
++    if (now >=3D s->timers[1].next_irq_time) {
++        mos6522_timer2_update(s, &s->timers[1], now);
++        s->ifr |=3D T2_INT;
++    }
+     switch (addr) {
+     case VIA_REG_B:
+         val =3D s->b;
+@@ -299,8 +329,8 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_t =
+val, unsigned size)
+         break;
+     case VIA_REG_T1CL:
+         s->timers[0].latch =3D (s->timers[0].latch & 0xff00) | val;
+-        mos6522_timer_update(s, &s->timers[0],
+-                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
++        mos6522_timer1_update(s, &s->timers[0],
++                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+         break;
+     case VIA_REG_T1CH:
+         s->timers[0].latch =3D (s->timers[0].latch & 0xff) | (val << 8);
+@@ -309,14 +339,14 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_=
+t val, unsigned size)
+         break;
+     case VIA_REG_T1LL:
+         s->timers[0].latch =3D (s->timers[0].latch & 0xff00) | val;
+-        mos6522_timer_update(s, &s->timers[0],
+-                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
++        mos6522_timer1_update(s, &s->timers[0],
++                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+         break;
+     case VIA_REG_T1LH:
+         s->timers[0].latch =3D (s->timers[0].latch & 0xff) | (val << 8);
+         s->ifr &=3D ~T1_INT;
+-        mos6522_timer_update(s, &s->timers[0],
+-                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
++        mos6522_timer1_update(s, &s->timers[0],
++                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+         break;
+     case VIA_REG_T2CL:
+         s->timers[1].latch =3D (s->timers[1].latch & 0xff00) | val;
+@@ -334,8 +364,8 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_t =
+val, unsigned size)
+         break;
+     case VIA_REG_ACR:
+         s->acr =3D val;
+-        mos6522_timer_update(s, &s->timers[0],
+-                             qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
++        mos6522_timer1_update(s, &s->timers[0],
++                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+         break;
+     case VIA_REG_PCR:
+         s->pcr =3D val;
+@@ -354,6 +384,11 @@ void mos6522_write(void *opaque, hwaddr addr, uint64_t=
+ val, unsigned size)
+             s->ier &=3D ~val;
+         }
+         mos6522_update_irq(s);
++        /* if IER is modified starts needed timers */
++        mos6522_timer1_update(s, &s->timers[0],
++                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
++        mos6522_timer2_update(s, &s->timers[1],
++                              qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+         break;
+     default:
+     case VIA_REG_ANH:
+@@ -426,9 +461,11 @@ static void mos6522_reset(DeviceState *dev)
+     s->timers[0].frequency =3D s->frequency;
+     s->timers[0].latch =3D 0xffff;
+     set_counter(s, &s->timers[0], 0xffff);
++    timer_del(s->timers[0].timer);
 =20
+     s->timers[1].frequency =3D s->frequency;
+     s->timers[1].latch =3D 0xffff;
++    timer_del(s->timers[1].timer);
+ }
+=20
+ static void mos6522_init(Object *obj)
 --=20
 2.23.0
 
