@@ -4,80 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78115C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADB2CC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:08:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BD1E20855
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:04:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7677820643
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:08:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KlRy++5I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BD1E20855
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sL6/xvYI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7677820643
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWia5-0006Y3-Eh
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 10:04:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33661)
+	id 1iWidG-0000TL-Iu
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 10:08:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34312)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iWiYh-0005sR-K8
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:03:21 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iWicX-00088D-6I
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:07:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iWiYd-0005y6-9H
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:03:18 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46372)
+ (envelope-from <peter.maydell@linaro.org>) id 1iWicW-0001xI-1k
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:07:17 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:39652)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iWiYa-0005u3-1k
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:03:12 -0500
-Received: by mail-ot1-x341.google.com with SMTP id n23so14728758otr.13
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 07:03:11 -0800 (PST)
+ id 1iWicV-0001wr-Rj
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:07:15 -0500
+Received: by mail-oi1-x243.google.com with SMTP id v138so15592332oif.6
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 07:07:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=Kup+OjCW82IEaimKWKBPzaRe659Et8pbAD30ottMu8o=;
- b=KlRy++5IN8/ITrMOf28Zpi4o0LqKmUY8CMxprP1+L9tjaNA/wwy4EJPU52M/0xIMLE
- hCgr8y4GjXJyebzHiEQSz+CdiqB037e4tKsbHfEzjstyb/OMoz5nIlHKIWfRLFTwh6pt
- TmcYA6X6M7cV7S3uOKdtWPPFg2SwEku1B8+rpYqsZ9DQKGKP/UzFhTTu4bddGMwlwOvh
- N06PBR6SzbIKbGlyOROosRzF1rni/oHIKP4y3y0Y/gOAi9Sg13TEgrdD4zdynCicLm7C
- 07Yv0c5J7wyXTq+WJNCRhls+PtB3MPntTDJWMAP/lRPHEdkYIyS4M6add9ocQEpPOjj7
- 7lwA==
+ bh=Gu1Iv+CCf5Exkt+e6vonr2FfIz9x71rXUkPRrXFHeuY=;
+ b=sL6/xvYIcp2y1CIXEqJM1fxDHi9rw3vgWuCt+c9GN8zMxkVx2wfpOK/tz7ov0pCByS
+ Db98AijiS0VeWFTOIk8hJJ1DteUFH09Tuli9smz5b8b4sP5z9EvqqyBT5ASAGLyMAbzB
+ WYUNo94eUd2nE7Eg2bCL6lhhBTT9KItDJIk/Cs2aLJdfVPFS38UVpDc1VVEWTWLuh04T
+ nDrzHt51hQbDzndOJhA0VI/WEYI6ob5Xph8K826N7b6/EZ+VNy5/M2Lq24pKhR8I1qHx
+ ucrYDyfjjXPrpJlZ3fYF/bbzHooDliJZiRhFGKqihcWaCeHDjvHc1PyY05TVP6Tqul+n
+ +now==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=Kup+OjCW82IEaimKWKBPzaRe659Et8pbAD30ottMu8o=;
- b=q8kPM0po42p3CERa0QoxPungzJP5QqZKVSksiGvGWXNZyQWgD/bspmYpsGUfvtNiBk
- eFO+ttdmhMfjrV8Au1KkbrfR4Pxn86I86IvHVuHzO6FNflxm4T1pYPqhAy6qR/eDTjsi
- P+p9q5oxO1H+Plv3h1OAMXA8PQA10/iWPYOA0CBmBh4oiNTiVUwr6uyXb8cFxNSXudT/
- uLP1uhtUECCM/hQs8UeCBEBt3kSrygWY4VwDh4ocz4bRYJehvZzk57+MGr+kowF6uYzn
- YDphEN63r/AHUgvi3+4OODJfvARzSGkQDjHQ7IwaqNHXvqBfIHQUPRzcs9LM+sLQOyEg
- XgVQ==
-X-Gm-Message-State: APjAAAUiyj88GFeHSVF+LfVDY9uLme1HJUwLkdnZh4wBRWraqHRal1II
- gC1xXl/UVWGC3VnyCS0FtsqqLpQ+FKOr600F84jDfw==
-X-Google-Smtp-Source: APXvYqyEI2D/LRl/bjobiMHF5n80oVS6JCk+YkyJMxw8k/w9DKkyWn+JFvT4mLY+FBCbg4Mw8Qg5jrcfs+NzhEQxFhY=
-X-Received: by 2002:a9d:7ac2:: with SMTP id m2mr22878561otn.135.1574089390518; 
- Mon, 18 Nov 2019 07:03:10 -0800 (PST)
+ bh=Gu1Iv+CCf5Exkt+e6vonr2FfIz9x71rXUkPRrXFHeuY=;
+ b=BBjrlHjpBm3GhjP+vTbEe44fVd4gtB6Lpvt4E2IQBTtxJfN0EALmoHDKVGCfmiUHY3
+ 6fgA4vkoiv/pK8x7uLLKX0QMpxY+WviqQgLuolWavsqf9i+ysJmNMSqzPChY6Qwq6Rqg
+ bpmC7A5jAWchF6J2uEPWmc6VQSIgQXn5tJgncGBDorUdRHbhbi2dbSzvHpXUi33SALXi
+ g9yHQaAyhlV4g4inA6CsmHxh3lHjSbjdeKKp7/7LiOEt8lwzUM9RsBG8hw8mp6fT5z5N
+ SAjmKRYTwbnzcZU23I+Mumk2y37iqBtmHKh/2k/rpJEIfDk0Y4hFTi9tHIHMe7bw6n7v
+ Hc/A==
+X-Gm-Message-State: APjAAAWjEewqunDW2Fa5blfiq13pVx1tTABwQ59PIVQXqZbn9NLzOUP0
+ FerHZVhJCXohOFTmKTXHyi/h1hiLJTArFoMSMngzLg==
+X-Google-Smtp-Source: APXvYqxEjS7siq+yIgF3zh8VFZgeY0aE/sfvW4+xqUBzDHEk1qfC646UnSQviquz6lNUdFbcZice2Bwu+5UVKkj32lc=
+X-Received: by 2002:a05:6808:b04:: with SMTP id
+ s4mr20824695oij.163.1574089634917; 
+ Mon, 18 Nov 2019 07:07:14 -0800 (PST)
 MIME-Version: 1.0
 References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
  <20191023173154.30051-16-marcandre.lureau@redhat.com>
 In-Reply-To: <20191023173154.30051-16-marcandre.lureau@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Nov 2019 15:02:58 +0000
-Message-ID: <CAFEAcA97SUwPxcZq-5BQyPgb7geBsgu46dpc1zTj4gBGZ2WwAQ@mail.gmail.com>
+Date: Mon, 18 Nov 2019 15:07:04 +0000
+Message-ID: <CAFEAcA_e4byjW-zPWPWdwZX0qFwUesKo+FTFK6Y9_tMTejSsBQ@mail.gmail.com>
 Subject: Re: [PATCH v3 15/33] serial-mm: add endianness property
 To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -138,27 +138,14 @@ e,
 >      DEFINE_PROP_UINT8("regshift", SerialMM, regshift, 0),
 > +    DEFINE_PROP_UINT8("endianness", SerialMM, endianness, DEVICE_NATIVE_=
 ENDIAN),
-
-Again, a brief comment documenting the property here would be nice.
-
 >      DEFINE_PROP_END_OF_LIST(),
 >  };
->
-> diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
-> index 759c85976d..2d0802a909 100644
-> --- a/include/hw/char/serial.h
-> +++ b/include/hw/char/serial.h
-> @@ -86,6 +86,7 @@ typedef struct SerialMM {
->      SerialState serial;
->
->      uint8_t regshift;
-> +    uint8_t endianness;
->  } SerialMM;
 
-(The type-checking on the property-setting macros doesn't let
-us define this as 'enum device_endian'.)
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+...on reading patch 16, I just noticed that here in patch 15
+you define the 'endianness' property on the SerialMM object, but
+you're trying to set it on the SerialState object. This bug then
+gets fixed in passing in patch 16, but we should just be
+setting it on the right object to start with.
 
 thanks
 -- PMM
