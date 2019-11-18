@@ -2,84 +2,78 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB39BC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 967B3C432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:36:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8763720656
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:28:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 60A5D2068D
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:36:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gA97bVyh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8763720656
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FzjO+NXm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60A5D2068D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWfDG-000246-Ku
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 06:28:58 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50652)
+	id 1iWfKG-000586-DN
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 06:36:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51398)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iWfCK-00012y-V0
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:28:02 -0500
+ (envelope-from <slp@redhat.com>) id 1iWfJQ-0004EX-6q
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:35:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iWfCI-0003Bc-DH
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:27:59 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36714
+ (envelope-from <slp@redhat.com>) id 1iWfJN-0005jw-6I
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:35:18 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39687
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iWfCI-0003BQ-7U
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:27:58 -0500
+ (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iWfJL-0005ik-1j
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:35:15 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574076477;
+ s=mimecast20190719; t=1574076912;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=8J8ep8Q+HcyU0vUqccqqqRoKcgNeb64AweflzqTfZ5k=;
- b=gA97bVyhFhlipeTn2VtGQSXT0IaO3TulLR28yeYZIZWbUf4TQQKgVYhUDIJNrjaWSKQXaF
- hfm9tnmSgdGYKlqeT2Mv4y9+gAD+m0l//Lf6GtslOVxfd6Fh3rLmSvi4xtLy+K24/s0VrU
- JEOMHSAdwn+8a9Pnju/XbG+ZZyoSHpU=
+ bh=L73iR7S0c4y+PPkbcpRiCNaBX1jUviS/Yu3+QetPhKQ=;
+ b=FzjO+NXmE9iM8owJy8uWWd6Ix8ZJA+BlewnCAsAAxGk68AppksShMTic3aFaZmlaqxmaS6
+ OLKsb/jHiULfAWQyH+VIaVlwU14JQN4f9ZXRHO/S7c7WaCdjXUtaxTQm1czVbVIft2khbb
+ aeI4CZWEbyNH6sDWeP+HsQAMNo/blRA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-Py8A4h8fM6ydkVspaPvNfw-1; Mon, 18 Nov 2019 06:27:53 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-45-Yjq5w6gfP_a0Z7RN3J0D6g-1; Mon, 18 Nov 2019 06:35:09 -0500
+X-MC-Unique: Yjq5w6gfP_a0Z7RN3J0D6g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1BDB18B9FC4
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 11:27:52 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-200.ams2.redhat.com
- [10.36.116.200])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BBE32610B0;
- Mon, 18 Nov 2019 11:27:49 +0000 (UTC)
-Subject: Re: [PATCH 03/16] vl: merge -accel processing into
- configure_accelerators
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
- <1573655945-14912-4-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <4a330f6c-84ed-3f02-60f8-bd34314ad85d@redhat.com>
-Date: Mon, 18 Nov 2019 12:27:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92E20107B7FE;
+ Mon, 18 Nov 2019 11:35:07 +0000 (UTC)
+Received: from dritchie.redhat.com (unknown [10.33.36.162])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E14BC60856;
+ Mon, 18 Nov 2019 11:35:01 +0000 (UTC)
+References: <1574075605-25215-1-git-send-email-liam.merwick@oracle.com>
+User-agent: mu4e 1.2.0; emacs 26.2
+From: Sergio Lopez <slp@redhat.com>
+To: Liam Merwick <liam.merwick@oracle.com>
+Subject: Re: [PATCH v2] hw/i386: Move save_tsc_khz from PCMachineClass to
+ X86MachineClass
+In-reply-to: <1574075605-25215-1-git-send-email-liam.merwick@oracle.com>
+Date: Mon, 18 Nov 2019 12:34:57 +0100
+Message-ID: <87eey5s9i6.fsf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1573655945-14912-4-git-send-email-pbonzini@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: Py8A4h8fM6ydkVspaPvNfw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,222 +85,191 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com
+Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
+ darren.kenny@oracle.com, pbonzini@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/11/2019 15.38, Paolo Bonzini wrote:
-> The next step is to move the parsing of "-machine accel=3D..." into vl.c,
-> unifying it with the configure_accelerators() function that has just
-> been introduced.  This way, we will be able to desugar it into multiple
-> "-accel" options, without polluting accel/accel.c.
->=20
-> The CONFIG_TCG and CONFIG_KVM symbols are not available in vl.c, but
-> we can use accel_find instead to find their value at runtime.  Once we
-> know that the binary has one of TCG or KVM, the default accelerator
-> can be expressed simply as "tcg:kvm", because TCG never fails to initiali=
-ze.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
+
+
+Liam Merwick <liam.merwick@oracle.com> writes:
+
+> Attempting to migrate a VM using the microvm machine class results in the=
+ source
+> QEMU aborting with the following message/backtrace:
+>
+> target/i386/machine.c:955:tsc_khz_needed: Object 0x555556608fa0 is not an
+> instance of type generic-pc-machine
+>
+> abort()
+> object_class_dynamic_cast_assert()
+> vmstate_save_state_v()
+> vmstate_save_state()
+> vmstate_save()
+> qemu_savevm_state_complete_precopy()
+> migration_thread()
+> migration_thread()
+> migration_thread()
+> qemu_thread_start()
+> start_thread()
+> clone()
+>
+> The access to the machine class returned by MACHINE_GET_CLASS() in
+> tsc_khz_needed() is crashing as it is trying to dereference a different
+> type of machine class object (TYPE_PC_MACHINE) to that of this microVM.
+>
+> This can be resolved by extending the changes in the following commit
+> f0bb276bf8d5 ("hw/i386: split PCMachineState deriving X86MachineState fro=
+m it")
+> and moving the save_tsc_khz field in PCMachineClass to X86MachineClass.
+>
+> Fixes: f0bb276bf8d5 ("hw/i386: split PCMachineState deriving X86MachineSt=
+ate from it")
+> Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 > ---
->  accel/accel.c          | 63 ++------------------------------------------=
-------
->  include/sysemu/accel.h |  4 +++-
->  vl.c                   | 62 ++++++++++++++++++++++++++++++++++++++++++++=
-+----
->  3 files changed, 62 insertions(+), 67 deletions(-)
->=20
-> diff --git a/accel/accel.c b/accel/accel.c
-> index 5fa3171..74eda68 100644
-> --- a/accel/accel.c
-> +++ b/accel/accel.c
-> @@ -44,7 +44,7 @@ static const TypeInfo accel_type =3D {
->  };
+>
+> v1 -> v2 - fix SHA1 of patch being referenced.
+>
+>  hw/i386/pc.c          | 1 -
+>  hw/i386/pc_piix.c     | 4 ++--
+>  hw/i386/pc_q35.c      | 4 ++--
+>  hw/i386/x86.c         | 1 +
+>  include/hw/i386/pc.h  | 2 --
+>  include/hw/i386/x86.h | 2 ++
+>  target/i386/machine.c | 4 ++--
+>  7 files changed, 9 insertions(+), 9 deletions(-)
+>
+> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> index 96715f8a3f99..ac08e6360437 100644
+> --- a/hw/i386/pc.c
+> +++ b/hw/i386/pc.c
+> @@ -2195,7 +2195,6 @@ static void pc_machine_class_init(ObjectClass *oc, =
+void *data)
+>      /* BIOS ACPI tables: 128K. Other BIOS datastructures: less than 4K r=
+eported
+>       * to be used at the moment, 32K should be enough for a while.  */
+>      pcmc->acpi_data_size =3D 0x20000 + 0x8000;
+> -    pcmc->save_tsc_khz =3D true;
+>      pcmc->linuxboot_dma_enabled =3D true;
+>      pcmc->pvh_enabled =3D true;
+>      assert(!mc->get_hotplug_handler);
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 2aefa3b8dfe3..0548c259dc74 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -567,10 +567,10 @@ DEFINE_I440FX_MACHINE(v2_6, "pc-i440fx-2.6", NULL,
 > =20
->  /* Lookup AccelClass from opt_name. Returns NULL if not found */
-> -static AccelClass *accel_find(const char *opt_name)
-> +AccelClass *accel_find(const char *opt_name)
+>  static void pc_i440fx_2_5_machine_options(MachineClass *m)
 >  {
->      char *class_name =3D g_strdup_printf(ACCEL_CLASS_NAME("%s"), opt_nam=
-e);
->      AccelClass *ac =3D ACCEL_CLASS(object_class_by_name(class_name));
-> @@ -52,7 +52,7 @@ static AccelClass *accel_find(const char *opt_name)
->      return ac;
+> -    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+> +    X86MachineClass *x86mc =3D X86_MACHINE_CLASS(m);
+> =20
+>      pc_i440fx_2_6_machine_options(m);
+> -    pcmc->save_tsc_khz =3D false;
+> +    x86mc->save_tsc_khz =3D false;
+>      m->legacy_fw_cfg_order =3D 1;
+>      compat_props_add(m->compat_props, hw_compat_2_5, hw_compat_2_5_len);
+>      compat_props_add(m->compat_props, pc_compat_2_5, pc_compat_2_5_len);
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index d51f5247276d..385e5cffb167 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -508,10 +508,10 @@ DEFINE_Q35_MACHINE(v2_6, "pc-q35-2.6", NULL,
+> =20
+>  static void pc_q35_2_5_machine_options(MachineClass *m)
+>  {
+> -    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(m);
+> +    X86MachineClass *x86mc =3D X86_MACHINE_CLASS(m);
+> =20
+>      pc_q35_2_6_machine_options(m);
+> -    pcmc->save_tsc_khz =3D false;
+> +    x86mc->save_tsc_khz =3D false;
+>      m->legacy_fw_cfg_order =3D 1;
+>      compat_props_add(m->compat_props, hw_compat_2_5, hw_compat_2_5_len);
+>      compat_props_add(m->compat_props, pc_compat_2_5, pc_compat_2_5_len);
+> diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+> index fd84b23124e6..394edc2f7209 100644
+> --- a/hw/i386/x86.c
+> +++ b/hw/i386/x86.c
+> @@ -763,6 +763,7 @@ static void x86_machine_class_init(ObjectClass *oc, v=
+oid *data)
+>      mc->get_default_cpu_node_id =3D x86_get_default_cpu_node_id;
+>      mc->possible_cpu_arch_ids =3D x86_possible_cpu_arch_ids;
+>      x86mc->compat_apic_id_mode =3D false;
+> +    x86mc->save_tsc_khz =3D true;
+>      nc->nmi_monitor_handler =3D x86_nmi;
+> =20
+>      object_class_property_add(oc, X86_MACHINE_MAX_RAM_BELOW_4G, "size",
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index e6fa8418ca61..1f86eba3f998 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -116,8 +116,6 @@ typedef struct PCMachineClass {
+>      bool enforce_aligned_dimm;
+>      bool broken_reserved_end;
+> =20
+> -    /* TSC rate migration: */
+> -    bool save_tsc_khz;
+>      /* generate legacy CPU hotplug AML */
+>      bool legacy_cpu_hotplug;
+> =20
+> diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+> index 82d09fd7d099..4b8491788526 100644
+> --- a/include/hw/i386/x86.h
+> +++ b/include/hw/i386/x86.h
+> @@ -30,6 +30,8 @@ typedef struct {
+> =20
+>      /*< public >*/
+> =20
+> +    /* TSC rate migration: */
+> +    bool save_tsc_khz;
+>      /* Enables contiguous-apic-ID mode */
+>      bool compat_apic_id_mode;
+>  } X86MachineClass;
+> diff --git a/target/i386/machine.c b/target/i386/machine.c
+> index 6481f846f6e9..7bdeb7815755 100644
+> --- a/target/i386/machine.c
+> +++ b/target/i386/machine.c
+> @@ -988,8 +988,8 @@ static bool tsc_khz_needed(void *opaque)
+>      X86CPU *cpu =3D opaque;
+>      CPUX86State *env =3D &cpu->env;
+>      MachineClass *mc =3D MACHINE_GET_CLASS(qdev_get_machine());
+> -    PCMachineClass *pcmc =3D PC_MACHINE_CLASS(mc);
+> -    return env->tsc_khz && pcmc->save_tsc_khz;
+> +    X86MachineClass *x86mc =3D X86_MACHINE_CLASS(mc);
+> +    return env->tsc_khz && x86mc->save_tsc_khz;
 >  }
 > =20
-> -static int accel_init_machine(AccelClass *acc, MachineState *ms)
-> +int accel_init_machine(AccelClass *acc, MachineState *ms)
->  {
->      ObjectClass *oc =3D OBJECT_CLASS(acc);
->      const char *cname =3D object_class_get_name(oc);
-> @@ -71,65 +71,6 @@ static int accel_init_machine(AccelClass *acc, Machine=
-State *ms)
->      return ret;
->  }
-> =20
-> -void configure_accelerator(MachineState *ms, const char *progname)
-> -{
-> -    const char *accel;
-> -    char **accel_list, **tmp;
-> -    int ret;
-> -    bool accel_initialised =3D false;
-> -    bool init_failed =3D false;
-> -    AccelClass *acc =3D NULL;
-> -
-> -    accel =3D qemu_opt_get(qemu_get_machine_opts(), "accel");
-> -    if (accel =3D=3D NULL) {
-> -        /* Select the default accelerator */
-> -        int pnlen =3D strlen(progname);
-> -        if (pnlen >=3D 3 && g_str_equal(&progname[pnlen - 3], "kvm")) {
-> -            /* If the program name ends with "kvm", we prefer KVM */
-> -            accel =3D "kvm:tcg";
-> -        } else {
-> -#if defined(CONFIG_TCG)
-> -            accel =3D "tcg";
-> -#elif defined(CONFIG_KVM)
-> -            accel =3D "kvm";
-> -#else
-> -            error_report("No accelerator selected and"
-> -                         " no default accelerator available");
-> -            exit(1);
-> -#endif
-> -        }
-> -    }
-> -
-> -    accel_list =3D g_strsplit(accel, ":", 0);
-> -
-> -    for (tmp =3D accel_list; !accel_initialised && tmp && *tmp; tmp++) {
-> -        acc =3D accel_find(*tmp);
-> -        if (!acc) {
-> -            continue;
-> -        }
-> -        ret =3D accel_init_machine(acc, ms);
-> -        if (ret < 0) {
-> -            init_failed =3D true;
-> -            error_report("failed to initialize %s: %s",
-> -                         acc->name, strerror(-ret));
-> -        } else {
-> -            accel_initialised =3D true;
-> -        }
-> -    }
-> -    g_strfreev(accel_list);
-> -
-> -    if (!accel_initialised) {
-> -        if (!init_failed) {
-> -            error_report("-machine accel=3D%s: No accelerator found", ac=
-cel);
-> -        }
-> -        exit(1);
-> -    }
-> -
-> -    if (init_failed) {
-> -        error_report("Back to %s accelerator", acc->name);
-> -    }
-> -}
-> -
->  void accel_setup_post(MachineState *ms)
->  {
->      AccelState *accel =3D ms->accelerator;
-> diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
-> index 8eb60b8..90b6213 100644
-> --- a/include/sysemu/accel.h
-> +++ b/include/sysemu/accel.h
-> @@ -66,7 +66,9 @@ typedef struct AccelClass {
-> =20
->  extern unsigned long tcg_tb_size;
-> =20
-> -void configure_accelerator(MachineState *ms, const char *progname);
-> +AccelClass *accel_find(const char *opt_name);
-> +int accel_init_machine(AccelClass *acc, MachineState *ms);
-> +
->  /* Called just before os_setup_post (ie just before drop OS privs) */
->  void accel_setup_post(MachineState *ms);
-> =20
-> diff --git a/vl.c b/vl.c
-> index 5367f23..fc9e70f 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2845,8 +2845,62 @@ static int do_configure_accelerator(void *opaque, =
-QemuOpts *opts, Error **errp)
->      return 0;
->  }
-> =20
-> -static void configure_accelerators(void)
-> +static void configure_accelerators(const char *progname)
->  {
-> +    const char *accel;
-> +    char **accel_list, **tmp;
-> +    int ret;
-> +    bool accel_initialised =3D false;
-> +    bool init_failed =3D false;
-> +    AccelClass *acc =3D NULL;
-> +
-> +    accel =3D qemu_opt_get(qemu_get_machine_opts(), "accel");
-> +    if (accel =3D=3D NULL) {
-> +        /* Select the default accelerator */
-> +        if (!accel_find("tcg") && !accel_find("kvm")) {
-> +            error_report("No accelerator selected and"
-> +                         " no default accelerator available");
-> +            exit(1);
-> +        } else {
-> +            int pnlen =3D strlen(progname);
-> +            if (pnlen >=3D 3 && g_str_equal(&progname[pnlen - 3], "kvm")=
-) {
-> +                /* If the program name ends with "kvm", we prefer KVM */
-> +                accel =3D "kvm:tcg";
-> +            } else {
-> +                accel =3D "tcg:kvm";
-> +            }
-> +        }
-> +    }
-> +
-> +    accel_list =3D g_strsplit(accel, ":", 0);
-> +
-> +    for (tmp =3D accel_list; !accel_initialised && tmp && *tmp; tmp++) {
-> +        acc =3D accel_find(*tmp);
-> +        if (!acc) {
-> +            continue;
-> +        }
-> +        ret =3D accel_init_machine(acc, current_machine);
-> +        if (ret < 0) {
-> +            init_failed =3D true;
-> +            error_report("failed to initialize %s: %s",
-> +                         acc->name, strerror(-ret));
-> +        } else {
-> +            accel_initialised =3D true;
-> +        }
-> +    }
-> +    g_strfreev(accel_list);
-> +
-> +    if (!accel_initialised) {
-> +        if (!init_failed) {
-> +            error_report("-machine accel=3D%s: No accelerator found", ac=
-cel);
-> +        }
-> +        exit(1);
-> +    }
-> +
-> +    if (init_failed) {
-> +        error_report("Back to %s accelerator", acc->name);
-> +    }
-> +
->      qemu_opts_foreach(qemu_find_opts("icount"),
->                        do_configure_icount, NULL, &error_fatal);
-> =20
-> @@ -4183,7 +4237,8 @@ int main(int argc, char **argv, char **envp)
->       * Note: uses machine properties such as kernel-irqchip, must run
->       * after machine_set_property().
->       */
-> -    configure_accelerator(current_machine, argv[0]);
-> +    cpu_ticks_init();
-> +    configure_accelerators(argv[0]);
+>  static const VMStateDescription vmstate_tsc_khz =3D {
 
-The comment about kernel-irqchip obviously rather belongs to
-configure_accelerators() instead of cpu_ticks_init(), so maybe you
-should move the cpu_ticks_init() before the comment now? (does it need
-to be moved here at all? ... it looks pretty independent at a first glance)
+LGTM, thanks.
 
- Thomas
+Reviewed-by: Sergio Lopez <slp@redhat.com>
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl3SgeEACgkQ9GknjS8M
+AjX66g//V7e4qWNoAmHF0JsvlL5yraYa/CZSbJ5kwCuqvrhFaThkPYWZPTFwYtZ8
+IL9Hdb8mHXRTGZyzTDr9pfdKDvCPlC/RbLYO0tJYNLszVtActYjMcN0OPCmzOibK
+M1s0EK7hsRHCc7fabjg9ubHsapfZRQFqZzkK3QAhtCztDFDDvtCDtzJ19KUr3F49
+UPdH/lPhq/va4XM0DP1N6oJkcahC3hAUEEVX3/YOVO+3E7SgVXE3wAWIhCVV9aVN
+z8URkE6t6/YEzBA2R+gat1+erkq71Yvdnqr5PnGzGctu5/K4/xIGM1SBZhZ+8Wo3
+BczMGN5R3EC3peyl9E9WzVZCdRc59ZmBsdewdrBQRz5841axHC4aMHeyEQ49X4hY
+ly9LkL8JNG/E22eBS73FcUJ1441F6p0aXrfWo4Evma08y5i04v4kg7/aqdsdCsMY
+ClS4vtyc/3R8RrrDSfJDrQ0zjh+Ce5dSUYT8AzMrv/I1X2HSdkyU02Uzhcf86/k6
+YYXBdv80g3YX6O5MrykAGg/koYRx9rkFwMaIszg9kyI+wuIZ6z+SDXQ2yAeESCbc
+UfN4x2M0XcjUK3KpBQqE+V5yhADFR06/GYEKEW/O5Tmt45tnbsj0KDNnDBScjObT
+/KBoRqX1hH6ycpiMe9U11IGWhqNzRSagqQ6ZUP0Xbtzo880Hnt0=
+=hgEO
+-----END PGP SIGNATURE-----
+--=-=-=--
 
 
