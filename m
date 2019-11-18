@@ -2,60 +2,79 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B636C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:56:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F87C432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 07:15:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62ADD2071E
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:56:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62ADD2071E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 35CD52068D
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 07:15:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="F27B3uxl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35CD52068D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWaxV-0005au-I2
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 01:56:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39896)
+	id 1iWbFy-0000i3-6g
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 02:15:30 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42212)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <guoheyi@huawei.com>) id 1iWawm-00051i-FP
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:55:41 -0500
+ (envelope-from <joel.stan@gmail.com>) id 1iWbDV-0008BV-J5
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 02:12:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <guoheyi@huawei.com>) id 1iWawk-0001SY-TF
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:55:40 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:36528 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <guoheyi@huawei.com>)
- id 1iWawh-0001Or-AU; Mon, 18 Nov 2019 01:55:35 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id C2AAD672B27508F4C875;
- Mon, 18 Nov 2019 14:55:29 +0800 (CST)
-Received: from [127.0.0.1] (10.133.216.73) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Mon, 18 Nov 2019
- 14:55:21 +0800
-Subject: Re: [RFC v2 00/14] Add SDEI support for arm64
-To: <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>, Peter Maydell
- <peter.maydell@linaro.org>
-References: <20191105091056.9541-1-guoheyi@huawei.com>
-From: Guoheyi <guoheyi@huawei.com>
-Message-ID: <9d7a2c5d-df78-ef67-87af-3860fcb7aee8@huawei.com>
-Date: Mon, 18 Nov 2019 14:55:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+ (envelope-from <joel.stan@gmail.com>) id 1iWbDU-00054G-EI
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 02:12:57 -0500
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:34783)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+ id 1iWbDQ-0004z5-Ub; Mon, 18 Nov 2019 02:12:53 -0500
+Received: by mail-qt1-x842.google.com with SMTP id i17so19139693qtq.1;
+ Sun, 17 Nov 2019 23:12:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jms.id.au; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=xMEnZ2lxrIHBBfDaC+zzSoaWk1OGVkB9H/9Lul5BReY=;
+ b=F27B3uxlAtAL3Foez6c5m5oucPEXDS3UruQzvG9Kg+gLsQ7B82rPnZztt67JNzJSsa
+ XSxBa3+U/m0MbU19rDX+gNFEdtRwRGrXyksvhg6aEbFQUJNJQLExmpEzwrE3aC9RgbLe
+ 5Ys5Q8X18JDi8X2aRyAx97o/BWaT9zba64YBk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=xMEnZ2lxrIHBBfDaC+zzSoaWk1OGVkB9H/9Lul5BReY=;
+ b=RMovXrLE4J4Cp48F0io1SqsruUebd+fAcY4q6Z+p//+rU/Njj6fp36eE6QYOgtmSrn
+ T7siyfZqZTpaYoR2PmkzztY4CHk+SoGcEm1R1NsSgHgtPmBoYF9yX6hwQP5UlJMnvJhA
+ YHi4SIIi6C68EvAhexyNg4cXvIyVoyFEAbkHRHb812S/DSFsA7Hd7nz/F4LUqnw2GhU6
+ qc8kt3qffX2sOtWz5rSqEcR3g0wxQqn+1T2qKGviYDlFcSnuOR9gBLM44OJ/PtXoWZH3
+ 1XG67EZMoG7iZIhvWQszSuJLQLqzF3T81RQWVux1S6nvKxoo0nU8LlcXUQTPmMeCM2ez
+ Yb0Q==
+X-Gm-Message-State: APjAAAV3+IFuEo1FUuZDH/3FTE+Vy8+ExeUK2MKd5oJdyUECSHABvh6i
+ 3V7Gsk5Uo1HhjgU9Zm4HAWb8kqf20KZ97JTIBdQ=
+X-Google-Smtp-Source: APXvYqyEy41ZSP4hcBEAv7/cC6Rz7g0Dys3WvAUkEOpnULDaPaVSMA4qmerjL6+3i3Vwntdte9tV4NOa3e0+NyStiQw=
+X-Received: by 2002:ac8:e03:: with SMTP id a3mr25983215qti.169.1574061171991; 
+ Sun, 17 Nov 2019 23:12:51 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191105091056.9541-1-guoheyi@huawei.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.216.73]
-X-CFilter-Loop: Reflected
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 45.249.212.32
+References: <20191114094544.30114-1-clg@kaod.org>
+ <20191114094544.30114-2-clg@kaod.org>
+In-Reply-To: <20191114094544.30114-2-clg@kaod.org>
+From: Joel Stanley <joel@jms.id.au>
+Date: Mon, 18 Nov 2019 07:12:40 +0000
+Message-ID: <CACPK8XeMFVaPrs7Je0AU_2024E8E1i=+tKmg7rGhDV+RyBFRRg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] aspeed/smc: Restore default AHB window mapping at
+ reset
+To: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::842
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -67,154 +86,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Marc Zyngier <marc.zyngier@arm.com>, Cornelia Huck <cohuck@redhat.com>,
- Shannon Zhao <shannon.zhaosl@gmail.com>, Igor Mammedov <imammedo@redhat.com>,
- James Morse <james.morse@arm.com>, Paolo Bonzini <pbonzini@redhat.com>,
- wanghaibin.wang@huawei.com, Dave Martin <Dave.Martin@arm.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Peter,
+On Thu, 14 Nov 2019 at 09:46, C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>
+> The current model only restores the Segment Register values but leaves
+> the previous CS mapping behind. Introduce a helper setting the
+> register value and mapping the region at the requested address. Use
+> this helper when a Segment register is set and at reset.
+>
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 
-Could you spare some time to review the framework and provide comments 
-and advice?
+Reviewed-by: Joel Stanley <joel@jms.id.au>
 
-Thanks,
-
-HG
-
-
-On 2019/11/5 17:10, Heyi Guo wrote:
-> SDEI is for ARM "Software Delegated Exception Interface". AS ARM64 doesn't have
-> native non-maskable interrupt (NMI), we rely on higher privileged (larger
-> exception level) software to change the execution flow of lower privileged
-> (smaller exception level) software when certain events occur, to emulate NMI
-> mechanism, and SDEI is the standard interfaces between the two levels of
-> privileged software. It is based on SMC/HVC calls.
+> ---
+>  hw/ssi/aspeed_smc.c | 32 +++++++++++++++++++++-----------
+>  1 file changed, 21 insertions(+), 11 deletions(-)
 >
-> The higher privileged software implements an SDEI dispatcher to handle SDEI
-> related SMC/HVC calls and trigger SDEI events; the lower privileged software
-> implements an SDEI client to request SDEI services and handle SDEI events.
+> diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+> index f0c7bbbad302..955ec21852ac 100644
+> --- a/hw/ssi/aspeed_smc.c
+> +++ b/hw/ssi/aspeed_smc.c
+> @@ -475,10 +475,26 @@ static bool aspeed_smc_flash_overlap(const AspeedSM=
+CState *s,
+>      return false;
+>  }
 >
-> Core interfaces provided by SDEI include:
+> +static void aspeed_smc_flash_set_segment_region(AspeedSMCState *s, int c=
+s,
+> +                                                uint64_t regval)
+> +{
+> +    AspeedSMCFlash *fl =3D &s->flashes[cs];
+> +    AspeedSegments seg;
+> +
+> +    s->ctrl->reg_to_segment(s, regval, &seg);
+> +
+> +    memory_region_transaction_begin();
+> +    memory_region_set_size(&fl->mmio, seg.size);
+> +    memory_region_set_address(&fl->mmio, seg.addr - s->ctrl->flash_windo=
+w_base);
+> +    memory_region_set_enabled(&fl->mmio, true);
+> +    memory_region_transaction_commit();
+> +
+> +    s->regs[R_SEG_ADDR0 + cs] =3D regval;
+> +}
+> +
+>  static void aspeed_smc_flash_set_segment(AspeedSMCState *s, int cs,
+>                                           uint64_t new)
+>  {
+> -    AspeedSMCFlash *fl =3D &s->flashes[cs];
+>      AspeedSegments seg;
 >
-> 1. interrupt bind: client can request to bind an interrupt to an SDEI event, so
-> the interrupt will be a non-maskable event and the event number will be returned
-> to the caller. Only PPI and SPI can be bound to SDEI events.
+>      s->ctrl->reg_to_segment(s, new, &seg);
+> @@ -529,13 +545,7 @@ static void aspeed_smc_flash_set_segment(AspeedSMCSt=
+ate *s, int cs,
+>      aspeed_smc_flash_overlap(s, &seg, cs);
 >
-> 2. register: client can request to register a handler to an SDEI event, so
-> dispatcher will change PC of lower privileged software to this handler when
-> certain event occurs.
+>      /* All should be fine now to move the region */
+> -    memory_region_transaction_begin();
+> -    memory_region_set_size(&fl->mmio, seg.size);
+> -    memory_region_set_address(&fl->mmio, seg.addr - s->ctrl->flash_windo=
+w_base);
+> -    memory_region_set_enabled(&fl->mmio, true);
+> -    memory_region_transaction_commit();
+> -
+> -    s->regs[R_SEG_ADDR0 + cs] =3D new;
+> +    aspeed_smc_flash_set_segment_region(s, cs, new);
+>  }
 >
-> 3. complete: client notifies dispatcher that it has completed the event
-> handling, so dispatcher will restore the context of guest when it is
-> interrupted.
+>  static uint64_t aspeed_smc_flash_default_read(void *opaque, hwaddr addr,
+> @@ -897,10 +907,10 @@ static void aspeed_smc_reset(DeviceState *d)
+>          qemu_set_irq(s->cs_lines[i], true);
+>      }
 >
-> In virtualization situation, guest OS is the lower privileged software and
-> hypervisor is the higher one.
+> -    /* setup default segment register values for all */
+> +    /* setup the default segment register values and regions for all */
+>      for (i =3D 0; i < s->ctrl->max_slaves; ++i) {
+> -        s->regs[R_SEG_ADDR0 + i] =3D
+> -            s->ctrl->segment_to_reg(s, &s->ctrl->segments[i]);
+> +        aspeed_smc_flash_set_segment_region(s, i,
+> +                    s->ctrl->segment_to_reg(s, &s->ctrl->segments[i]));
+>      }
 >
-> KVM is supposed to pass SMC/HVC calls to qemu, and qemu will emulate an SDEI
-> dispatcher to serve the SDEI requests and trigger the events. If an interrupt is
-> requested to be bound to an event, qemu should not inject the interrupt to guest
-> any more; instead, it should save the context of VCPU and change the PC to event
-> handler which is registered by guest, and then return to guest.
+>      /* HW strapping flash type for the AST2600 controllers  */
+> --
+> 2.21.0
 >
-> To make the conversion of interrupt to SDEI event transparent to other modules
-> in qemu, we used qemu_irq and qemu_irq_intercept_in() to override the default
-> irq handler with SDEI event trigger. I saw qemu_irq_intercept_in() should be
-> only used in qemu MST, but it seemed fit to override interrupt injection with
-> event trigger after guest requests to bind interrupt to SDEI event.
->
-> This patchset is trying to implement the whole SDEI framework in qemu with KVM
-> enabled, including all SDEI v1.0 interfaces, as well as event trigger conduit
-> from other qemu devices after interrupt binding.
->
-> Key points:
-> - We propose to only support kvm enabled arm64 virtual machines, for
->    non-kvm VMs can emulate EL3 and have Trusted Firmware run on it,
->    which has a builtin SDEI dispatcher.
-> - New kvm capability KVM_CAP_FORWARD_HYPERCALL is added to probe if
->    kvm supports forwarding hypercalls, and the capability should be
->    enabled explicitly.
-> - We make the dispatcher as a logical device, to save the states
->    during migration or save/restore operation; only one instance is
->    allowed in one VM.
-> - We use qemu_irq as the bridge for other qemu modules to switch from
->    irq injection to SDEI event trigger after VM binds the interrupt to
->    SDEI event. We use qemu_irq_intercept_in() to override qemu_irq
->    handler with SDEI event trigger, and a new interface
->    qemu_irq_remove_intercept() is added to restore the handler to
->    default one (i.e. ARM GIC).
->
-> More details are in the commit message of each patch.
->
-> Basic tests are done by emulating a watchdog timer and triggering SDEI
-> event in every 10s.
->
-> Please focus on the interfaces and framework first. We can refine the code for
-> several rounds after the big things have been determined.
->
-> Any comment or suggestion is welcome.
->
-> Thanks,
->
-> HG
->
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: Dave Martin <Dave.Martin@arm.com>
-> Cc: Marc Zyngier <marc.zyngier@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: James Morse <james.morse@arm.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
->
-> v2:
-> - Import import linux/arm_sdei.h to standard-headers
-> - Drop SDEI table definition and add comments
-> - Some bugfix and code refinement
->
-> Heyi Guo (14):
->    update-linux-headers.sh: import linux/arm_sdei.h to standard-headers
->    standard-headers: import arm_sdei.h
->    arm/sdei: add virtual device framework
->    arm: add CONFIG_SDEI build flag
->    arm/sdei: add support to handle SDEI requests from guest
->    arm/sdei: add system reset callback
->    arm/sdei: add support to trigger event by GIC interrupt ID
->    core/irq: add qemu_irq_remove_intercept interface
->    arm/sdei: override qemu_irq handler when binding interrupt
->    arm/sdei: add support to register interrupt bind notifier
->    linux-headers/kvm.h: add capability to forward hypercall
->    arm/sdei: add stub to fix build failure when SDEI is not enabled
->    arm/kvm: handle guest exit of hypercall
->    virt/acpi: add SDEI table if SDEI is enabled
->
->   default-configs/arm-softmmu.mak           |    1 +
->   hw/arm/Kconfig                            |    4 +
->   hw/arm/virt-acpi-build.c                  |   26 +
->   hw/core/irq.c                             |   11 +
->   include/hw/irq.h                          |    8 +-
->   include/standard-headers/linux/arm_sdei.h |   73 +
->   linux-headers/linux/kvm.h                 |    1 +
->   scripts/update-linux-headers.sh           |    1 +
->   target/arm/Makefile.objs                  |    4 +
->   target/arm/kvm.c                          |   17 +
->   target/arm/sdei-stub.c                    |   49 +
->   target/arm/sdei.c                         | 1576 +++++++++++++++++++++
->   target/arm/sdei.h                         |   60 +
->   target/arm/sdei_int.h                     |  121 ++
->   14 files changed, 1950 insertions(+), 2 deletions(-)
->   create mode 100644 include/standard-headers/linux/arm_sdei.h
->   create mode 100644 target/arm/sdei-stub.c
->   create mode 100644 target/arm/sdei.c
->   create mode 100644 target/arm/sdei.h
->   create mode 100644 target/arm/sdei_int.h
->
-
-
 
