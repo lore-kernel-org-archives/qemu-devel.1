@@ -2,96 +2,84 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB03C432C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB39BC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:28:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB42E2068D
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:26:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8763720656
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:28:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xxNFfyF6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB42E2068D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gA97bVyh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8763720656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWfAb-0007z4-Ss
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 06:26:13 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50064)
+	id 1iWfDG-000246-Ku
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 06:28:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50652)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iWf9N-00074y-AA
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:24:58 -0500
+ (envelope-from <thuth@redhat.com>) id 1iWfCK-00012y-V0
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:28:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iWf9M-00025r-1g
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:24:56 -0500
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36353)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iWf9L-00025Z-PZ
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:24:55 -0500
-Received: by mail-wm1-x342.google.com with SMTP id c22so18352450wmd.1
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 03:24:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=JzfRpd5L2e1m2BapBhmfnzIXt6f64QiF0td+FoTUkHY=;
- b=xxNFfyF6ChX6awTGAHiwG5IvKpqM/2xbiKKfDeNR7tj3GLB1G3uu/1qyZBLiILn5C5
- 2dO3VrlcpE+aj0YlMDFxTyLEzTuImnCUHkDwHYSc1ACE5rSxgmD90QAVt9jQ/jEuM1JU
- SKlqMi3CKSD8mkyzXnqUGrvglCLFCFSu/nut32MICu4lRkNmuoLEAG9w2sNeez2NjvQP
- xLoHsybg8KON1GdfBK39iW/6vwBkgMnYQMAkTClJuh0KRp9X18gYNY5KQRD5m6WLNbjB
- T7IdmD0VChdkSD5BMrif4f/M6Gbv9xh7YMebRTbhP24g/PKWZAee/qzjlNR9YS7l0Vf7
- YX5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=JzfRpd5L2e1m2BapBhmfnzIXt6f64QiF0td+FoTUkHY=;
- b=rSobRxxNKFhpOzphM71mhX2IDbGRvyWaOUVxVhYbYGF51+j0L0cLDJOqkFiX3mK/wn
- R1mKUCGmJ7fMe+cPVxXLy1Wl24GYE3vTOh/mO+lKwq/2jPGRyWVE1tPWq7VXS8+C2qfJ
- 8342xET8HBEv6OGAhGfa6xmxbeb0vbIpPZiGh8tlJOrrh9bsRv7d1wP7uuV3putZIAXL
- TuAsNGMVYTULvjNovAl5SA65pM6Cx3Y+5nIiHIHi9GOS41C0e/zZigvnxWvNfSn8wEJZ
- ZwzPyZ81SwTNtX80/FN8b1AM2WwpO4HdzKEZDKFuKVaSuX9Jchq8EGZ1jHWW673uJ5g6
- Lpmg==
-X-Gm-Message-State: APjAAAVZNil+LJLvgNMh9blxUsMyFW1G6vFoZj90Juy2dJCjwev/nUn2
- UhQT/syDlej10NzddyPASwjWjA==
-X-Google-Smtp-Source: APXvYqwq02/IHlQl1sb0v1cxtW8NsEzk8g8/ydH0wfNnd3DbgqWRv9Boz0RW7tfVynyewRi8qxpOeA==
-X-Received: by 2002:a05:600c:2105:: with SMTP id
- u5mr27543346wml.47.1574076294455; 
- Mon, 18 Nov 2019 03:24:54 -0800 (PST)
-Received: from [192.168.8.102] (65.red-79-149-41.dynamicip.rima-tde.net.
- [79.149.41.65])
- by smtp.gmail.com with ESMTPSA id k14sm23673990wrw.46.2019.11.18.03.24.51
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 18 Nov 2019 03:24:53 -0800 (PST)
-Subject: Re: [RFC PATCH 01/11] gdbstub: move allocation of GDBState to one
- place
-To: Damien Hedde <damien.hedde@greensocs.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
-References: <20191115173000.21891-1-alex.bennee@linaro.org>
- <20191115173000.21891-2-alex.bennee@linaro.org>
- <9f87f9e8-ecc6-398f-62b3-05a7f9af2366@linaro.org>
- <422bfc5c-4d2d-a581-7bb2-8a2f8e113b35@greensocs.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <4acfb969-b6fb-89d2-c1cf-951c88d08f2a@linaro.org>
-Date: Mon, 18 Nov 2019 12:24:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <thuth@redhat.com>) id 1iWfCI-0003Bc-DH
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:27:59 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36714
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iWfCI-0003BQ-7U
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 06:27:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574076477;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8J8ep8Q+HcyU0vUqccqqqRoKcgNeb64AweflzqTfZ5k=;
+ b=gA97bVyhFhlipeTn2VtGQSXT0IaO3TulLR28yeYZIZWbUf4TQQKgVYhUDIJNrjaWSKQXaF
+ hfm9tnmSgdGYKlqeT2Mv4y9+gAD+m0l//Lf6GtslOVxfd6Fh3rLmSvi4xtLy+K24/s0VrU
+ JEOMHSAdwn+8a9Pnju/XbG+ZZyoSHpU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-12-Py8A4h8fM6ydkVspaPvNfw-1; Mon, 18 Nov 2019 06:27:53 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1BDB18B9FC4
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 11:27:52 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-200.ams2.redhat.com
+ [10.36.116.200])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BBE32610B0;
+ Mon, 18 Nov 2019 11:27:49 +0000 (UTC)
+Subject: Re: [PATCH 03/16] vl: merge -accel processing into
+ configure_accelerators
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
+ <1573655945-14912-4-git-send-email-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <4a330f6c-84ed-3f02-60f8-bd34314ad85d@redhat.com>
+Date: Mon, 18 Nov 2019 12:27:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-In-Reply-To: <422bfc5c-4d2d-a581-7bb2-8a2f8e113b35@greensocs.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1573655945-14912-4-git-send-email-pbonzini@redhat.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::342
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: Py8A4h8fM6ydkVspaPvNfw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,44 +91,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- luis.machado@linaro.org, alan.hayward@arm.com
+Cc: armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/18/19 10:19 AM, Damien Hedde wrote:
-> 
-> 
-> On 11/18/19 8:41 AM, Richard Henderson wrote:
->> On 11/15/19 6:29 PM, Alex Bennée wrote:
->>>  
->>>  static GDBState *gdbserver_state;
->>>  
->>> +static GDBState *gdb_allocate_state(void)
->>> +{
->>> +    g_assert(!gdbserver_state);
->>> +    gdbserver_state = g_new0(GDBState, 1);
->>> +    return gdbserver_state;
->>> +}
->>> +
->>
->> Actually, if we're only going to have one, why are we allocating it
->> dynamically?  We might as well allocate it statically and drop the pointer
->> indirection.
-> 
-> In use_gdb_syscalls(), we check if gdbserver_state is NULL:
-> | /* -semihosting-config target=auto */
-> | /* On the first call check if gdb is connected and remember. */
-> | if (gdb_syscall_mode == GDB_SYS_UNKNOWN) {
-> | gdb_syscall_mode = (gdbserver_state ? GDB_SYS_ENABLED
-> |                                     : GDB_SYS_DISABLED);
-> | }
-> 
-> So we cannot drop the pointer or we have to add some flag to do this test.
+On 13/11/2019 15.38, Paolo Bonzini wrote:
+> The next step is to move the parsing of "-machine accel=3D..." into vl.c,
+> unifying it with the configure_accelerators() function that has just
+> been introduced.  This way, we will be able to desugar it into multiple
+> "-accel" options, without polluting accel/accel.c.
+>=20
+> The CONFIG_TCG and CONFIG_KVM symbols are not available in vl.c, but
+> we can use accel_find instead to find their value at runtime.  Once we
+> know that the binary has one of TCG or KVM, the default accelerator
+> can be expressed simply as "tcg:kvm", because TCG never fails to initiali=
+ze.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  accel/accel.c          | 63 ++------------------------------------------=
+------
+>  include/sysemu/accel.h |  4 +++-
+>  vl.c                   | 62 ++++++++++++++++++++++++++++++++++++++++++++=
++----
+>  3 files changed, 62 insertions(+), 67 deletions(-)
+>=20
+> diff --git a/accel/accel.c b/accel/accel.c
+> index 5fa3171..74eda68 100644
+> --- a/accel/accel.c
+> +++ b/accel/accel.c
+> @@ -44,7 +44,7 @@ static const TypeInfo accel_type =3D {
+>  };
+> =20
+>  /* Lookup AccelClass from opt_name. Returns NULL if not found */
+> -static AccelClass *accel_find(const char *opt_name)
+> +AccelClass *accel_find(const char *opt_name)
+>  {
+>      char *class_name =3D g_strdup_printf(ACCEL_CLASS_NAME("%s"), opt_nam=
+e);
+>      AccelClass *ac =3D ACCEL_CLASS(object_class_by_name(class_name));
+> @@ -52,7 +52,7 @@ static AccelClass *accel_find(const char *opt_name)
+>      return ac;
+>  }
+> =20
+> -static int accel_init_machine(AccelClass *acc, MachineState *ms)
+> +int accel_init_machine(AccelClass *acc, MachineState *ms)
+>  {
+>      ObjectClass *oc =3D OBJECT_CLASS(acc);
+>      const char *cname =3D object_class_get_name(oc);
+> @@ -71,65 +71,6 @@ static int accel_init_machine(AccelClass *acc, Machine=
+State *ms)
+>      return ret;
+>  }
+> =20
+> -void configure_accelerator(MachineState *ms, const char *progname)
+> -{
+> -    const char *accel;
+> -    char **accel_list, **tmp;
+> -    int ret;
+> -    bool accel_initialised =3D false;
+> -    bool init_failed =3D false;
+> -    AccelClass *acc =3D NULL;
+> -
+> -    accel =3D qemu_opt_get(qemu_get_machine_opts(), "accel");
+> -    if (accel =3D=3D NULL) {
+> -        /* Select the default accelerator */
+> -        int pnlen =3D strlen(progname);
+> -        if (pnlen >=3D 3 && g_str_equal(&progname[pnlen - 3], "kvm")) {
+> -            /* If the program name ends with "kvm", we prefer KVM */
+> -            accel =3D "kvm:tcg";
+> -        } else {
+> -#if defined(CONFIG_TCG)
+> -            accel =3D "tcg";
+> -#elif defined(CONFIG_KVM)
+> -            accel =3D "kvm";
+> -#else
+> -            error_report("No accelerator selected and"
+> -                         " no default accelerator available");
+> -            exit(1);
+> -#endif
+> -        }
+> -    }
+> -
+> -    accel_list =3D g_strsplit(accel, ":", 0);
+> -
+> -    for (tmp =3D accel_list; !accel_initialised && tmp && *tmp; tmp++) {
+> -        acc =3D accel_find(*tmp);
+> -        if (!acc) {
+> -            continue;
+> -        }
+> -        ret =3D accel_init_machine(acc, ms);
+> -        if (ret < 0) {
+> -            init_failed =3D true;
+> -            error_report("failed to initialize %s: %s",
+> -                         acc->name, strerror(-ret));
+> -        } else {
+> -            accel_initialised =3D true;
+> -        }
+> -    }
+> -    g_strfreev(accel_list);
+> -
+> -    if (!accel_initialised) {
+> -        if (!init_failed) {
+> -            error_report("-machine accel=3D%s: No accelerator found", ac=
+cel);
+> -        }
+> -        exit(1);
+> -    }
+> -
+> -    if (init_failed) {
+> -        error_report("Back to %s accelerator", acc->name);
+> -    }
+> -}
+> -
+>  void accel_setup_post(MachineState *ms)
+>  {
+>      AccelState *accel =3D ms->accelerator;
+> diff --git a/include/sysemu/accel.h b/include/sysemu/accel.h
+> index 8eb60b8..90b6213 100644
+> --- a/include/sysemu/accel.h
+> +++ b/include/sysemu/accel.h
+> @@ -66,7 +66,9 @@ typedef struct AccelClass {
+> =20
+>  extern unsigned long tcg_tb_size;
+> =20
+> -void configure_accelerator(MachineState *ms, const char *progname);
+> +AccelClass *accel_find(const char *opt_name);
+> +int accel_init_machine(AccelClass *acc, MachineState *ms);
+> +
+>  /* Called just before os_setup_post (ie just before drop OS privs) */
+>  void accel_setup_post(MachineState *ms);
+> =20
+> diff --git a/vl.c b/vl.c
+> index 5367f23..fc9e70f 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -2845,8 +2845,62 @@ static int do_configure_accelerator(void *opaque, =
+QemuOpts *opts, Error **errp)
+>      return 0;
+>  }
+> =20
+> -static void configure_accelerators(void)
+> +static void configure_accelerators(const char *progname)
+>  {
+> +    const char *accel;
+> +    char **accel_list, **tmp;
+> +    int ret;
+> +    bool accel_initialised =3D false;
+> +    bool init_failed =3D false;
+> +    AccelClass *acc =3D NULL;
+> +
+> +    accel =3D qemu_opt_get(qemu_get_machine_opts(), "accel");
+> +    if (accel =3D=3D NULL) {
+> +        /* Select the default accelerator */
+> +        if (!accel_find("tcg") && !accel_find("kvm")) {
+> +            error_report("No accelerator selected and"
+> +                         " no default accelerator available");
+> +            exit(1);
+> +        } else {
+> +            int pnlen =3D strlen(progname);
+> +            if (pnlen >=3D 3 && g_str_equal(&progname[pnlen - 3], "kvm")=
+) {
+> +                /* If the program name ends with "kvm", we prefer KVM */
+> +                accel =3D "kvm:tcg";
+> +            } else {
+> +                accel =3D "tcg:kvm";
+> +            }
+> +        }
+> +    }
+> +
+> +    accel_list =3D g_strsplit(accel, ":", 0);
+> +
+> +    for (tmp =3D accel_list; !accel_initialised && tmp && *tmp; tmp++) {
+> +        acc =3D accel_find(*tmp);
+> +        if (!acc) {
+> +            continue;
+> +        }
+> +        ret =3D accel_init_machine(acc, current_machine);
+> +        if (ret < 0) {
+> +            init_failed =3D true;
+> +            error_report("failed to initialize %s: %s",
+> +                         acc->name, strerror(-ret));
+> +        } else {
+> +            accel_initialised =3D true;
+> +        }
+> +    }
+> +    g_strfreev(accel_list);
+> +
+> +    if (!accel_initialised) {
+> +        if (!init_failed) {
+> +            error_report("-machine accel=3D%s: No accelerator found", ac=
+cel);
+> +        }
+> +        exit(1);
+> +    }
+> +
+> +    if (init_failed) {
+> +        error_report("Back to %s accelerator", acc->name);
+> +    }
+> +
+>      qemu_opts_foreach(qemu_find_opts("icount"),
+>                        do_configure_icount, NULL, &error_fatal);
+> =20
+> @@ -4183,7 +4237,8 @@ int main(int argc, char **argv, char **envp)
+>       * Note: uses machine properties such as kernel-irqchip, must run
+>       * after machine_set_property().
+>       */
+> -    configure_accelerator(current_machine, argv[0]);
+> +    cpu_ticks_init();
+> +    configure_accelerators(argv[0]);
 
-True, but perhaps a bool gdbserver_state.in_use is a clearer way to do this?
+The comment about kernel-irqchip obviously rather belongs to
+configure_accelerators() instead of cpu_ticks_init(), so maybe you
+should move the cpu_ticks_init() before the comment now? (does it need
+to be moved here at all? ... it looks pretty independent at a first glance)
 
+ Thomas
 
-r~
 
