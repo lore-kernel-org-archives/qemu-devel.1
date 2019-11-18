@@ -2,94 +2,120 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E435DC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:23:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF3BC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:28:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF8842071B
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:23:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F385D2071B
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:28:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lv3Va4Gc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF8842071B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="h2xY0/8P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F385D2071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWeBg-0006h6-N4
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:23:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37392)
+	id 1iWeGH-0008BQ-1l
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:28:01 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38160)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iWeAG-0005ED-O1
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:21:51 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iWeFD-0007dF-0N
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:26:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iWeAD-0001aU-TF
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:21:47 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50185
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iWeAD-0001ZB-6Z
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:21:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574072504;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=/h5jTaooc6w6I91PXMnHJHijsAUxPefTL59bB9qD/A4=;
- b=Lv3Va4GcLYwir2g/vwCIDh6E8Qi1lt/nuhpGa2UZUZPyvxEBC2Dy3ihCQYQIl0HX+l2gdn
- lKamR9jd4+7oZeTAVT4iNpmEN/pple5bSRtQgfbPj/C5zPuXMQNblJqC2ohnf5AQgo44rx
- VOym21Hbm6mDaqzGBU9qNJ1Bi+coATg=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-w79rEzj-Px6as4tIFhB7sg-1; Mon, 18 Nov 2019 05:21:43 -0500
-Received: by mail-qt1-f198.google.com with SMTP id v92so11915381qtd.18
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 02:21:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=vhDgsN7E1oYZ8Ov1QNwgdLgBq7ApVcGt3xbzxS6Zwrs=;
- b=iagBnf1fJqswRbgksBqE8Chx0sNTcThXqITEFEckxH7Q07VWmH4sK+k/BvomdXFzdj
- Y9kE+k4rJsEkZNkZBJXCQ0zcszvOS1PKM0ACHAhw76otoe7DiHBUjpuggYDc34a9DMQM
- bQyIz2MfPcNiUAF/z3NBAnWxy7a+6Wmhre4KFvAVCPy7caSNdvB4dyZhz+PAV961Fd+U
- Y3YeGOdlpF4cpnMcrTN1FPsF31AZZqxNO+QaJLD6g50e3XGyATM5SpScaPAuneGD9jQ2
- 8L+iw3FRVPV0e4kdlitzE4vom6EUpCAyS2eUGXsw0bGqCuQIz3FfvRBb9KOuTDuaVxY/
- YsIw==
-X-Gm-Message-State: APjAAAXyRtDFMz+vD8uxb7eXUD/DXNbIP4HoRC2HXTJiYoLc1AbGiLtc
- ZZXusIsFu0TVtMuF+QetMCyL/YoIOkDc0Xr/GtdqyKmwPE2Y2CKr580bjHs3S81E9N6VW1lA7vb
- 40RR5gcvkSpf8g4Y=
-X-Received: by 2002:ac8:3386:: with SMTP id c6mr26917755qtb.115.1574072502064; 
- Mon, 18 Nov 2019 02:21:42 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwyVtf/z+sbv3VTXq2wW4SvB38EuBlZXlZvXc7ikthZi4g2bjSMC3F9c0R/P2ZfE8UkfAH2KA==
-X-Received: by 2002:ac8:3386:: with SMTP id c6mr26917738qtb.115.1574072501839; 
- Mon, 18 Nov 2019 02:21:41 -0800 (PST)
-Received: from redhat.com (bzq-79-176-6-42.red.bezeqint.net. [79.176.6.42])
- by smtp.gmail.com with ESMTPSA id n21sm10516898qtn.33.2019.11.18.02.21.38
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 Nov 2019 02:21:41 -0800 (PST)
-Date: Mon, 18 Nov 2019 05:21:36 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Micky Yun Chan <chanmickyyun@gmail.com>
-Subject: Re: [PATCH v2] Implement backend program convention command for
- vhost-user-blk
-Message-ID: <20191118052002-mutt-send-email-mst@kernel.org>
-References: <20191118064519.16072-1-michan@redhat.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iWeFB-00043n-Of
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:26:54 -0500
+Received: from mail-eopbgr30115.outbound.protection.outlook.com
+ ([40.107.3.115]:10753 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iWeF6-00041R-UW; Mon, 18 Nov 2019 05:26:49 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mvtfkDbrm506SqrqLT5lLodqYFb6nb2atpkOMC+MfgjF92dbU+UOhvM8erh6ZW6kFn3LphWH/5NKs2QRc9r2MrRGHGiw4EE8MAULqPUH00qEnwHgphk/AIHRklN5yDQcjBPrUDPeste2FKIzvnn5n9UPMxWlmpG3zDontuKbW4WVV7OQ84xvk5RcM3hgDKOMMHz8tHmmo3ke6DNby55EUeUKWuRL2/vKVkUHPrhdE9opG2crc7KQyDZwTG/h4jKlFgAVvXF6K5xrSRNAGc2zO7JWVlag7+LQXeh2QS+CNYo6z1dnT1cetlY3gG7yYAI2BFaPgNodeYiAdo4Hzc1EjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+zNVumjqpXypWKF2dDmH4sPCAtqUhZ+4yV7VJ8cZo7k=;
+ b=mjGnGZga+4ZVjGdlkkFd5aAoHxkgwnDsLNThcNELXmiDEPnyFkTOZlpAMckfpE3dr+dBBe86vkcQnAKwxrTaG9soCar9DEDi4Urcufjv9/J8upxT8JmY7IIKCtOr6jTeg1OtQPMkSjcq0tlXD10jNrGgzRumF2HIuiE7uoV0K9sS3EDzT3pzc8Pm2uWgv2SqyaFB8eKiCqcawUyMDamo9qjbQFVaBWq4VV1hgHygz0efmhzFpkE6Jdgw5gobaRKQdvhbXHgcZuG6avDk/xCTkbi/mN0YasidfjcMlHYbSeayCjk5Q6MAEzXECzC3J8tNUjj+0pdSIIL0g04ln9+gGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+zNVumjqpXypWKF2dDmH4sPCAtqUhZ+4yV7VJ8cZo7k=;
+ b=h2xY0/8PbkeX0OleJuPAX28ezLor8Jw4AOoEVB8r96gr5kShe6AvIaG+8rkCF/ElCrKYg+WNrfDlxeU6dxO6wbsgKRbXANmBkdOhqP15F+V4eag4FY54ZSHY86hng/+27trSZVhMN67eGjzHdeFFdwYGi61lu2FlKNj8Piu5tDk=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB4676.eurprd08.prod.outlook.com (10.255.99.208) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.26; Mon, 18 Nov 2019 10:26:45 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.029; Mon, 18 Nov 2019
+ 10:26:45 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH v8 3/3] tests/qemu-iotests: add case to write compressed
+ data of multiple clusters
+Thread-Topic: [PATCH v8 3/3] tests/qemu-iotests: add case to write compressed
+ data of multiple clusters
+Thread-Index: AQHVndPpAcY2KMoGc0yJ555J90BV9aeQubCA
+Date: Mon, 18 Nov 2019 10:26:45 +0000
+Message-ID: <d15be06e-65fe-ff4f-e36d-c6c5f949137a@virtuozzo.com>
+References: <1574056144-625164-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1574056144-625164-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+In-Reply-To: <1574056144-625164-4-git-send-email-andrey.shinkevich@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR02CA0088.eurprd02.prod.outlook.com
+ (2603:10a6:7:29::17) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191118132643036
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 45d3f93d-a8b4-47a4-da59-08d76c11cf9b
+x-ms-traffictypediagnostic: AM6PR08MB4676:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB467652CDF4A2DF321FE9375BC14D0@AM6PR08MB4676.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:514;
+x-forefront-prvs: 0225B0D5BC
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(346002)(396003)(39840400004)(366004)(376002)(189003)(199004)(66556008)(6246003)(64756008)(102836004)(66446008)(256004)(7736002)(305945005)(107886003)(2501003)(86362001)(8676002)(5660300002)(110136005)(71200400001)(6486002)(99286004)(54906003)(8936002)(2906002)(446003)(316002)(2201001)(81166006)(76176011)(52116002)(11346002)(81156014)(66476007)(66946007)(6512007)(386003)(6506007)(31686004)(4326008)(26005)(486006)(6436002)(476003)(14454004)(36756003)(25786009)(71190400001)(478600001)(229853002)(186003)(31696002)(6116002)(2616005)(3846002)(66066001)(21314003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4676;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: M9hEGCCBlqBe158LL3/OFpHwKi6+mo8/p2PFcfDwcDT+gvmZ3RAlg+c5HDbMKQDMTUi6pnzLViH63FlxB6CCiqO1Snq1Eo2GvYvB6EZAby6cRNlTG0Xbo0lzehOVjToUHlPqUima1vI3p8g+zyZIB+vESrEkZMBlDRVC0ynLOpEbQb/XZRpxkSxvllbk/TKgP0TIGGDTTtk8lGS7uSEjghOo4msUv9TQvW7538QUSJaZkO34dVbjZ82617JfJHrBxyp+koNbwav8FmFTCnG90fV3p4UuZlpVkQEJJSIeT4FPZH4N4g4btHvdZ2hC3zT/Z5Jxs5MytEvRbLT0GiuuhZlv35foY/TTfel5MZ0a26LnotKECCGZbENK+5kzirWnnMq8umJXJnClhkJk2BrR0yXjJyuRoLhLcK50AIjC+6yD7Nfpr8Cq5lMmYebbpAf7
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <EFB465211BCE60449968C69E006C1359@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20191118064519.16072-1-michan@redhat.com>
-X-MC-Unique: w79rEzj-Px6as4tIFhB7sg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45d3f93d-a8b4-47a4-da59-08d76c11cf9b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Nov 2019 10:26:45.1584 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WxGpYy5kXj7DYGKaVutXegQt1pM1IsHO+aH/1Y3PgyIDwuRLSi6dLg3vWmAjTeYuVN6BGFS5IhhpWgKkqLmkejD6G2IhugW0hERxy7yEXXo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4676
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.115
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,178 +127,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: michan <michan@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
+Cc: "kwolf@redhat.com" <kwolf@redhat.com>, Denis Lunev <den@virtuozzo.com>,
+ "armbru@redhat.com" <armbru@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Nov 18, 2019 at 02:45:19PM +0800, Micky Yun Chan wrote:
-> Subject: Re: [PATCH v2] Implement backend program convention command for =
-vhost-user-blk
-
-subject is not clear to me.
-
-> From: michan <michan@redhat.com>
->
-
-Add patch description pls.
-=20
-> Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
-> ---
->  contrib/vhost-user-blk/vhost-user-blk.c | 102 ++++++++++++++----------
->  1 file changed, 58 insertions(+), 44 deletions(-)
->=20
-> diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user=
--blk/vhost-user-blk.c
-> index ae61034656..8759b6a5d0 100644
-> --- a/contrib/vhost-user-blk/vhost-user-blk.c
-> +++ b/contrib/vhost-user-blk/vhost-user-blk.c
-> @@ -576,70 +576,84 @@ vub_new(char *blk_file)
->      return vdev_blk;
->  }
-> =20
-> +static int opt_fdnum =3D -1;
-> +static char *opt_socket_path;
-> +static char *opt_blk_file;
-> +static gboolean opt_print_caps;
-> +static gboolean opt_read_only;
-> +
-> +
-> +static GOptionEntry entries[] =3D {
-> +    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
-> +      "Print capabilities", NULL },
-
-It merely seems to print help.=20
-
-> +    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
-> +      "Use inherited fd socket", "FDNUM" },
-> +    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
-> +      "Use UNIX socket path", "PATH" },
-> +    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
-> +     "block device or file path", "PATH"},
-> +    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
-> +      "Enable read-only", NULL }
-> +};
-> +
->  int main(int argc, char **argv)
->  {
-> -    int opt;
-> -    char *unix_socket =3D NULL;
-> -    char *blk_file =3D NULL;
-> -    bool enable_ro =3D false;
->      int lsock =3D -1, csock =3D -1;
->      VubDev *vdev_blk =3D NULL;
-> +    GError *error =3D NULL;
-> +    GOptionContext *context;
-> =20
-> -    while ((opt =3D getopt(argc, argv, "b:rs:h")) !=3D -1) {
-> -        switch (opt) {
-> -        case 'b':
-> -            blk_file =3D g_strdup(optarg);
-> -            break;
-> -        case 's':
-> -            unix_socket =3D g_strdup(optarg);
-> -            break;
-> -        case 'r':
-> -            enable_ro =3D true;
-> -            break;
-> -        case 'h':
-> -        default:
-> -            printf("Usage: %s [ -b block device or file, -s UNIX domain =
-socket"
-> -                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
-> -            return 0;
-> +    context =3D g_option_context_new(NULL);
-> +    g_option_context_add_main_entries(context, entries, NULL);
-> +    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-> +        g_printerr("Option parsing failed: %s\n", error->message);
-> +        exit(EXIT_FAILURE);
-> +    }
-> +    if (opt_print_caps) {
-> +        g_option_context_get_help(context, true, NULL);
-> +        exit(EXIT_SUCCESS);
-> +    }
-> +
-> +    if (!opt_blk_file) {
-> +        g_option_context_get_help(context, true, NULL);
-> +        exit(EXIT_FAILURE);
-> +    }
-> +
-> +    if (opt_socket_path) {
-> +        lsock =3D unix_sock_new(opt_socket_path);
-> +        if (lsock < 0) {
-> +           exit(EXIT_FAILURE);
->          }
-> +    } else if(opt_fdnum < 0){
-> +        g_option_context_get_help(context, true, NULL);
-> +    } else {
-> +        lsock =3D opt_fdnum;
->      }
-> =20
-> -    if (!unix_socket || !blk_file) {
-> -        printf("Usage: %s [ -b block device or file, -s UNIX domain sock=
-et"
-> -               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
-> -        return -1;
-> -    }
-> -
-> -    lsock =3D unix_sock_new(unix_socket);
-> -    if (lsock < 0) {
-> -        goto err;
-> -    }
-> -
-> -    csock =3D accept(lsock, (void *)0, (void *)0);
-> +    csock =3D accept(lsock, NULL, NULL);
->      if (csock < 0) {
-> -        fprintf(stderr, "Accept error %s\n", strerror(errno));
-> -        goto err;
-> +        g_printerr("Accept error %s\n", strerror(errno));
-> +        exit(EXIT_FAILURE);
->      }
-> =20
-> -    vdev_blk =3D vub_new(blk_file);
-> +    vdev_blk =3D vub_new(opt_blk_file);
->      if (!vdev_blk) {
-> -        goto err;
-> +        exit(EXIT_FAILURE);
->      }
-> -    if (enable_ro) {
-> +    if (opt_read_only) {
->          vdev_blk->enable_ro =3D true;
->      }
-> =20
->      if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
->                    vub_panic_cb, &vub_iface)) {
-> -        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
-> -        goto err;
-> +        g_printerr("Failed to initialized libvhost-user-glib\n");
-
-as long as you are fixing it, initialized->initialize
-> +        exit(EXIT_FAILURE);
->      }
-> =20
->      g_main_loop_run(vdev_blk->loop);
-> -
-> +    g_main_loop_unref(vdev_blk->loop);
-> +    g_option_context_free(context);
->      vug_deinit(&vdev_blk->parent);
-> -
-> -err:
->      vub_free(vdev_blk);
->      if (csock >=3D 0) {
->          close(csock);
-> @@ -647,8 +661,8 @@ err:
->      if (lsock >=3D 0) {
->          close(lsock);
->      }
-> -    g_free(unix_socket);
-> -    g_free(blk_file);
-> +    g_free(opt_socket_path);
-> +    g_free(opt_blk_file);
-> =20
->      return 0;
->  }
-> --=20
-> 2.21.0
-
+MTguMTEuMjAxOSA4OjQ5LCBBbmRyZXkgU2hpbmtldmljaCB3cm90ZToNCj4gQWRkIHRoZSBjYXNl
+IHRvIHRoZSBpb3Rlc3QgIzIxNCB0aGF0IGNoZWNrcyBwb3NzaWJpbGl0eSBvZiB3cml0aW5nDQo+
+IGNvbXByZXNzZWQgZGF0YSBvZiBtb3JlIHRoYW4gb25lIGNsdXN0ZXIgc2l6ZS4gVGhlIHRlc3Qg
+Y2FzZSBpbnZvbHZlcw0KPiB0aGUgY29tcHJlc3MgZmlsdGVyIGRyaXZlciBzaG93aW5nIGEgc2Ft
+cGxlIHVzYWdlIG9mIHRoYXQuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBBbmRyZXkgU2hpbmtldmlj
+aCA8YW5kcmV5LnNoaW5rZXZpY2hAdmlydHVvenpvLmNvbT4NCj4gLS0tDQo+ICAgdGVzdHMvcWVt
+dS1pb3Rlc3RzLzIxNCAgICAgfCA0MyArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrDQo+ICAgdGVzdHMvcWVtdS1pb3Rlc3RzLzIxNC5vdXQgfCAxNCArKysrKysrKysr
+KysrKw0KPiAgIDIgZmlsZXMgY2hhbmdlZCwgNTcgaW5zZXJ0aW9ucygrKQ0KPiANCj4gZGlmZiAt
+LWdpdCBhL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMTQgYi90ZXN0cy9xZW11LWlvdGVzdHMvMjE0DQo+
+IGluZGV4IDIxZWM4YTIuLjUwMTIxMTIgMTAwNzU1DQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90ZXN0
+cy8yMTQNCj4gKysrIGIvdGVzdHMvcWVtdS1pb3Rlc3RzLzIxNA0KPiBAQCAtODksNiArODksNDkg
+QEAgX2NoZWNrX3Rlc3RfaW1nIC1yIGFsbA0KPiAgICRRRU1VX0lPIC1jICJyZWFkICAtUCAweDEx
+ICAwIDRNIiAiJFRFU1RfSU1HIiAyPiYxIHwgX2ZpbHRlcl9xZW11X2lvIHwgX2ZpbHRlcl90ZXN0
+ZGlyDQo+ICAgJFFFTVVfSU8gLWMgInJlYWQgIC1QIDB4MjIgNE0gNE0iICIkVEVTVF9JTUciIDI+
+JjEgfCBfZmlsdGVyX3FlbXVfaW8gfCBfZmlsdGVyX3Rlc3RkaXINCj4gICANCj4gK2VjaG8NCj4g
+K2VjaG8gIj09PSBXcml0ZSBjb21wcmVzc2VkIGRhdGEgb2YgbXVsdGlwbGUgY2x1c3RlcnMgPT09
+Ig0KPiArZWNobw0KPiArY2x1c3Rlcl9zaXplPTB4MTAwMDANCj4gK19tYWtlX3Rlc3RfaW1nIDJN
+IC1vIGNsdXN0ZXJfc2l6ZT0kY2x1c3Rlcl9zaXplDQo+ICsNCj4gK2VjaG8gIldyaXRlIHVuY29t
+cHJlc3NlZCBkYXRhOiINCj4gK2xldCBkYXRhX3NpemU9IjggKiAkY2x1c3Rlcl9zaXplIg0KPiAr
+JFFFTVVfSU8gLWMgIndyaXRlIC1QIDB4YWEgMCAkZGF0YV9zaXplIiAiJFRFU1RfSU1HIiBcDQo+
+ICsgICAgICAgICAyPiYxIHwgX2ZpbHRlcl9xZW11X2lvIHwgX2ZpbHRlcl90ZXN0ZGlyDQo+ICtz
+aXplQT0kKCRRRU1VX0lNRyBpbmZvIC0tb3V0cHV0PWpzb24gIiRURVNUX0lNRyIgfA0KPiArICAg
+ICAgICBzZWQgLW4gJy8iYWN0dWFsLXNpemUiOi8gcy9bXjAtOV0vL2dwJykNCj4gKw0KPiArX21h
+a2VfdGVzdF9pbWcgMk0gLW8gY2x1c3Rlcl9zaXplPSRjbHVzdGVyX3NpemUNCj4gK2VjaG8gIldy
+aXRlIGNvbXByZXNzZWQgZGF0YToiDQo+ICtsZXQgZGF0YV9zaXplPSIzICogJGNsdXN0ZXJfc2l6
+ZSArICgkY2x1c3Rlcl9zaXplIC8gMikiDQo+ICsjIFNldCBjb21wcmVzcyBvbi4gVGhhdCB3aWxs
+IGFsaWduIHRoZSB3cml0dGVuIGRhdGENCj4gKyMgYnkgdGhlIGNsdXN0ZXIgc2l6ZSBhbmQgd2ls
+bCB3cml0ZSB0aGVtIGNvbXByZXNzZWQuDQo+ICtRRU1VX0lPX09QVElPTlM9JFFFTVVfSU9fT1BU
+SU9OU19OT19GTVQgXA0KPiArJFFFTVVfSU8gLWMgIndyaXRlIC1QIDB4YmIgMCAkZGF0YV9zaXpl
+IiAtLWltYWdlLW9wdHMgXA0KPiArICAgICAgICAgImRyaXZlcj1jb21wcmVzcyxmaWxlLmRyaXZl
+cj0kSU1HRk1ULGZpbGUuZmlsZS5kcml2ZXI9ZmlsZSxmaWxlLmZpbGUuZmlsZW5hbWU9JFRFU1Rf
+SU1HIiBcDQo+ICsgICAgICAgICAyPiYxIHwgX2ZpbHRlcl9xZW11X2lvIHwgX2ZpbHRlcl90ZXN0
+ZGlyDQo+ICsNCj4gK2xldCBvZmZzZXQ9IjQgKiAkY2x1c3Rlcl9zaXplIg0KDQpDb3VsZCB5b3Ug
+bWFrZSBpdA0KbGV0IG9mZnNldD0iNCAqICRjbHVzdGVyX3NpemUgKyAoJGNsdXN0ZXJfc2l6ZSAv
+IDQpIg0KDQpUbyBjaGVjayBib3RoIHVuYWxpZ25lZCBoZWFkIGFuZCB0YWlsPw0KSXQgc2hvdWxk
+IG5vdCBjaGFuZ2UgdGhlIG91dHB1dC4NCg0KV2l0aCBvciB3aXRob3V0IHRoaXM6DQpSZXZpZXdl
+ZC1ieTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
+Y29tPg0KDQpQUzogb2doLCBiYXNoIGlzIGNyYXp5LCBhcml0aG1ldGljIGluIHN0cmluZyBvX08N
+Cg0KPiArUUVNVV9JT19PUFRJT05TPSRRRU1VX0lPX09QVElPTlNfTk9fRk1UIFwNCj4gKyRRRU1V
+X0lPIC1jICJ3cml0ZSAtUCAweGNjICRvZmZzZXQgJGRhdGFfc2l6ZSIgImpzb246e1wNCj4gKyAg
+ICAnZHJpdmVyJzogJ2NvbXByZXNzJywNCj4gKyAgICAnZmlsZSc6IHsnZHJpdmVyJzogJyRJTUdG
+TVQnLA0KPiArICAgICAgICAgICAgICdmaWxlJzogeydkcml2ZXInOiAnZmlsZScsDQo+ICsgICAg
+ICAgICAgICAgICAgICAgICAgJ2ZpbGVuYW1lJzogJyRURVNUX0lNRyd9fX0iIHwgXA0KPiArICAg
+ICAgICAgICAgICAgICAgICAgICAgICBfZmlsdGVyX3FlbXVfaW8gfCBfZmlsdGVyX3Rlc3RkaXIN
+Cj4gKw0KPiArc2l6ZUI9JCgkUUVNVV9JTUcgaW5mbyAtLW91dHB1dD1qc29uICIkVEVTVF9JTUci
+IHwNCj4gKyAgICAgICAgc2VkIC1uICcvImFjdHVhbC1zaXplIjovIHMvW14wLTldLy9ncCcpDQo+
+ICsNCj4gK2lmIFsgJHNpemVBIC1sZSAkc2l6ZUIgXQ0KPiArdGhlbg0KPiArICAgIGVjaG8gIkNv
+bXByZXNzaW9uIEVSUk9SIg0KPiArZmkNCj4gKw0KPiArJFFFTVVfSU1HIGNoZWNrIC0tb3V0cHV0
+PWpzb24gIiRURVNUX0lNRyIgfA0KPiArICAgICAgICAgIHNlZCAtbiAncy8sJC8vOyAvImNvbXBy
+ZXNzZWQtY2x1c3RlcnMiOi8gcy9eICovL3AnDQo+ICsNCj4gICAjIHN1Y2Nlc3MsIGFsbCBkb25l
+DQo+ICAgZWNobyAnKioqIGRvbmUnDQo+ICAgcm0gLWYgJHNlcS5mdWxsDQo+IGRpZmYgLS1naXQg
+YS90ZXN0cy9xZW11LWlvdGVzdHMvMjE0Lm91dCBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMTQub3V0
+DQo+IGluZGV4IDBmY2Q4ZGMuLjRhMmVjMzMgMTAwNjQ0DQo+IC0tLSBhL3Rlc3RzL3FlbXUtaW90
+ZXN0cy8yMTQub3V0DQo+ICsrKyBiL3Rlc3RzL3FlbXUtaW90ZXN0cy8yMTQub3V0DQo+IEBAIC0z
+Miw0ICszMiwxOCBAQCByZWFkIDQxOTQzMDQvNDE5NDMwNCBieXRlcyBhdCBvZmZzZXQgMA0KPiAg
+IDQgTWlCLCBYIG9wczsgWFg6WFg6WFguWCAoWFhYIFlZWS9zZWMgYW5kIFhYWCBvcHMvc2VjKQ0K
+PiAgIHJlYWQgNDE5NDMwNC80MTk0MzA0IGJ5dGVzIGF0IG9mZnNldCA0MTk0MzA0DQo+ICAgNCBN
+aUIsIFggb3BzOyBYWDpYWDpYWC5YIChYWFggWVlZL3NlYyBhbmQgWFhYIG9wcy9zZWMpDQo+ICsN
+Cj4gKz09PSBXcml0ZSBjb21wcmVzc2VkIGRhdGEgb2YgbXVsdGlwbGUgY2x1c3RlcnMgPT09DQo+
+ICsNCj4gK0Zvcm1hdHRpbmcgJ1RFU1RfRElSL3QuSU1HRk1UJywgZm10PUlNR0ZNVCBzaXplPTIw
+OTcxNTINCj4gK1dyaXRlIHVuY29tcHJlc3NlZCBkYXRhOg0KPiArd3JvdGUgNTI0Mjg4LzUyNDI4
+OCBieXRlcyBhdCBvZmZzZXQgMA0KPiArNTEyIEtpQiwgWCBvcHM7IFhYOlhYOlhYLlggKFhYWCBZ
+WVkvc2VjIGFuZCBYWFggb3BzL3NlYykNCj4gK0Zvcm1hdHRpbmcgJ1RFU1RfRElSL3QuSU1HRk1U
+JywgZm10PUlNR0ZNVCBzaXplPTIwOTcxNTINCj4gK1dyaXRlIGNvbXByZXNzZWQgZGF0YToNCj4g
+K3dyb3RlIDIyOTM3Ni8yMjkzNzYgYnl0ZXMgYXQgb2Zmc2V0IDANCj4gKzIyNCBLaUIsIFggb3Bz
+OyBYWDpYWDpYWC5YIChYWFggWVlZL3NlYyBhbmQgWFhYIG9wcy9zZWMpDQo+ICt3cm90ZSAyMjkz
+NzYvMjI5Mzc2IGJ5dGVzIGF0IG9mZnNldCAyNjIxNDQNCj4gKzIyNCBLaUIsIFggb3BzOyBYWDpY
+WDpYWC5YIChYWFggWVlZL3NlYyBhbmQgWFhYIG9wcy9zZWMpDQo+ICsiY29tcHJlc3NlZC1jbHVz
+dGVycyI6IDgNCj4gICAqKiogZG9uZQ0KPiANCg0KDQotLSANCkJlc3QgcmVnYXJkcywNClZsYWRp
+bWlyDQo=
 
