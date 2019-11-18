@@ -2,82 +2,78 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2756DC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 14:24:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2850C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 14:25:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E656C20692
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 14:24:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E23920692
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 14:25:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kp183EDp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E656C20692
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sd2q6cR4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E23920692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWhwv-0004HZ-3h
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 09:24:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55028)
+	id 1iWhxq-0005On-KW
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 09:25:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55223)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iWhw3-00031d-0Z
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:23:23 -0500
+ (envelope-from <kraxel@redhat.com>) id 1iWhwv-0004RJ-1Y
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:24:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iWhw2-000445-1i
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:23:22 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42574)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iWhw1-00042t-Sv
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:23:21 -0500
-Received: by mail-oi1-x243.google.com with SMTP id o12so5316335oic.9
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 06:23:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Bp+3hP5Zl6wCi1+CAAXr+qiE0ttrcm8MLdaglMgNy8A=;
- b=Kp183EDpZVMIaVBoE44RHOyYFcM4ORSVFoNkzJcbcUsQdRK2EbWGHgi48p8NSWN+xN
- 6fJ35522iyQOjpGbkvKB17PQPya7PpmuaFQ+lnm9dNBjalRzls9FuHrwpWHVeEnJh5ZT
- QAuAG4my+Pe8EPAlRzVKnPcw6M0JgGmWKRwdts7WjUNUF8mLD91UsRiON2bTg3TatGVu
- K6msua0xOh49i06kFXoxUTE87OCPiky9pz7wGjEUQyNr5C3V0nvDMOEWC3VvsijCc/59
- WGvbOUjsgateHoxgG9weAu62TpwAWr8TsmlvL/bSyQteu5AEYPNhBX5af/Z9I5u770T5
- z9Nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Bp+3hP5Zl6wCi1+CAAXr+qiE0ttrcm8MLdaglMgNy8A=;
- b=DpsPOT6JkxfbFt50FtdEr5kakR0RnScH0swMO2Q8bwsSrAN47ucWS9fhMxivJkADbz
- KlbvcFxdLW87/6Z4by3+O9W0fhpBFmT0pXtd1VsVyfRiXPt+ZS6zGP/1koDR49DlQkzw
- x8qnFwMjdcYPu3QwHhn+zmJZtqjGXPwtzg2gXsfro1HfoFNruD/pj/1zLn8DmfhEx/lY
- BmxtchYCbCzAOvyPGLFWB9VA8ImgTxZ6gT7O48h49v7Pd+PUf4sirlX8tMaCQ2kmTN3j
- jv4sUMKiq/x4XiAXQa6hqSWesVATw44Xdc7xmEmQ/U2xKXt929YKUhxHcLnvS1IYDDSv
- /Lsg==
-X-Gm-Message-State: APjAAAXFEPrwNOv0lsHcZ1nofH/3OmQT5ajogk5ryomdP4DGKsDv59q0
- +H7JNkM1irm+rClTW/fzaPYfHOeZHltJpW4mWsAIyw==
-X-Google-Smtp-Source: APXvYqz51XPPMlIt16EJPVK01ebeXdgsKjWc8ZBqujrzLTFcDiK7i5g9LaZznWVC0jMKkYvB2Xf8yhVpkRABOISinXM=
-X-Received: by 2002:a05:6808:b04:: with SMTP id
- s4mr20637552oij.163.1574087001110; 
- Mon, 18 Nov 2019 06:23:21 -0800 (PST)
+ (envelope-from <kraxel@redhat.com>) id 1iWhws-0004wX-42
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:24:15 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29169
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iWhws-0004wB-0I
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 09:24:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574087052;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=0dDVF2+3VQEGidJ4932+PtRwX7l+QgKtfra4XXyX0IA=;
+ b=Sd2q6cR4PrGLkjq9UmM3CZ1m/bm75ABSk/3J6KTPumwOayMq3zlg9/jDOyQO4WmVKWtNZg
+ XehtcfoI5PBn4rRUbVp/OsYv1lWglM032iUlqMDXxV7R5Osz5LELuFRlucXFqxDxcjogw8
+ jhRO1jPeFRRCCM7FDKOJHC3cPZL9T4c=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-26-QkDFrY_mNIu1pLtUacOaBg-1; Mon, 18 Nov 2019 09:24:11 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 021E1801FD2
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 14:24:11 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-116-67.ams2.redhat.com
+ [10.36.116.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1866E60856;
+ Mon, 18 Nov 2019 14:24:08 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 0B7EA16E08; Mon, 18 Nov 2019 15:24:07 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 0/2] Seabios 20191118 patches
+Date: Mon, 18 Nov 2019 15:24:05 +0100
+Message-Id: <20191118142407.6040-1-kraxel@redhat.com>
 MIME-Version: 1.0
-References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-9-marcandre.lureau@redhat.com>
-In-Reply-To: <20191023173154.30051-9-marcandre.lureau@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Nov 2019 14:23:09 +0000
-Message-ID: <CAFEAcA-xhXtFnOOzKjp3C_3YE12XqXSfakck5suyjzP+EiB_Gw@mail.gmail.com>
-Subject: Re: [PATCH v3 08/33] serial: add "chardev" property
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: QkDFrY_mNIu1pLtUacOaBg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,37 +85,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 23 Oct 2019 at 18:33, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> This is more QOM-friendly, callers may set/get the property themself.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/char/serial.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+The following changes since commit 9f2ce35dfa4ea4a31dbb765dd02bed2500891887=
+:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+  Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20191111' into st=
+aging (2019-11-11 16:54:16 +0000)
 
-thanks
--- PMM
+are available in the Git repository at:
+
+  git://git.kraxel.org/qemu tags/seabios-20191118-pull-request
+
+for you to fetch changes up to 0285747737417a7d154ddc3e5adcf1fd665566fd:
+
+  seabios: update to pre-1.13 snapshot again (2019-11-18 15:04:19 +0100)
+
+----------------------------------------------------------------
+seabios: update to pre-1.13 snapshot again (lchs fixed)
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (2):
+  seabios: update to pre-1.13 snapshot
+  seabios: update to pre-1.13 snapshot again
+
+ pc-bios/bios-256k.bin             | Bin 262144 -> 262144 bytes
+ pc-bios/bios.bin                  | Bin 131072 -> 131072 bytes
+ pc-bios/vgabios-ati.bin           | Bin 38912 -> 39424 bytes
+ pc-bios/vgabios-bochs-display.bin | Bin 27648 -> 28672 bytes
+ pc-bios/vgabios-cirrus.bin        | Bin 38400 -> 38912 bytes
+ pc-bios/vgabios-qxl.bin           | Bin 38912 -> 39424 bytes
+ pc-bios/vgabios-ramfb.bin         | Bin 28160 -> 28672 bytes
+ pc-bios/vgabios-stdvga.bin        | Bin 38912 -> 39424 bytes
+ pc-bios/vgabios-virtio.bin        | Bin 38912 -> 39424 bytes
+ pc-bios/vgabios-vmware.bin        | Bin 38912 -> 39424 bytes
+ pc-bios/vgabios.bin               | Bin 38400 -> 38912 bytes
+ roms/Makefile                     |   2 +-
+ roms/seabios                      |   2 +-
+ 13 files changed, 2 insertions(+), 2 deletions(-)
+
+--=20
+2.18.1
+
 
