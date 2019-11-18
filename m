@@ -2,82 +2,103 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B741EC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:29:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A35C3C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:31:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8639E20857
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:29:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6791220857
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 15:31:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VEwhSkl8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8639E20857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OYJoe7/s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6791220857
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWiy0-0003gs-Jw
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 10:29:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37539)
+	id 1iWj0M-0005sv-Ix
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 10:31:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37836)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iWix3-0002hy-0T
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:28:29 -0500
+ (envelope-from <jag.raman@oracle.com>) id 1iWiyI-0004Mz-CV
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:29:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iWix2-0002W1-0G
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:28:28 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38437)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iWix1-0002VW-QK
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:28:27 -0500
-Received: by mail-oi1-x244.google.com with SMTP id a14so15659797oid.5
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 07:28:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=7afJ7tzPngtye9+ZMXHFHBKQgLixlBBO+3uIN0csNZk=;
- b=VEwhSkl8ChEcPJNybye8+pdh9412ki0N9z9zjJh7a9eLt7hILBIFqkXrc/u9FR4aGM
- zQ+GE4RwE7ePGTIv82Gn7c3EUeSJ2V8Ln5zHKGqWXtbQL1zJhn/pEMHLq+OHBgtpl/bo
- 0d0nV/uj3OKjzh8FXhuK14gzCApwGGKU1r65UZg+k4wapFMsEeR0PCHBSvohoKJ0H+yC
- XHAmt3kXdt7cUbNNmcHFADbc7iV1dtgXm1PDj3RLGuGBewEzw6gpnMuvIs4V5QsUDice
- CSbdT1Kr41+w3Npdv4fphpDhATfyJajwcEKzqagFQGLdRHXK5x5zpoC12R+tSvFUV9Js
- PaPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=7afJ7tzPngtye9+ZMXHFHBKQgLixlBBO+3uIN0csNZk=;
- b=Xs0lvAyYNybePKPoBGKpvW4mXI3NBwNs3i9FtJkQH2r5Gxz45JEH4cHOGyOf71UuNq
- Bzm6dxi+2VL2imL6prhvWWDf3ED5EgaYB6ev7qw8w0awRJjT5FS8iasiLlD+hFEilfdO
- clUTUC/uuc/x92xkNpIG2xVYqVkPFCUcIv5939zkHBjLoBc5+4ecgXAiu+y1jFqWtcjM
- w9Sb9ZJ8vsK93W/pFbXXh3KCN0MHvFnNxSVqAE7QV40rgctJYEsJHye3GT/KrMr5PLq9
- q/p3dzgF1eFXRJ0hkfwuwlg/z8BkHvJT5JlkVQAS62xZFFAuLzC1RvqBHDZiRjm6VNsB
- PG4Q==
-X-Gm-Message-State: APjAAAVu8IPHqylVpKmRfVlopwvbIpNtbCzCfDFO+4agygtaaPtJo2Ma
- yVoqpaCgptRxTxS1RBjyKM2y5MMXh7hv2dqTIKFLIQ==
-X-Google-Smtp-Source: APXvYqx9QkfqY7JkD/DeEM93qbSIOd4LUIStqhdxl3ODI1qpPFFX/MCkeYcHrig2eAOMr4PvllvE2jo1yeAaiLxTMI0=
-X-Received: by 2002:aca:a9d4:: with SMTP id
- s203mr20061094oie.146.1574090906952; 
- Mon, 18 Nov 2019 07:28:26 -0800 (PST)
+ (envelope-from <jag.raman@oracle.com>) id 1iWiyH-0002wX-3Z
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:29:46 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:33802)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <jag.raman@oracle.com>)
+ id 1iWiyG-0002w3-Oo
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 10:29:44 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAIFNhE8063589;
+ Mon, 18 Nov 2019 15:29:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=fDY4NLWdohMDrMUachqLYihE5QMPQrKN1b1WHsvSdBI=;
+ b=OYJoe7/sILF/En4xUMXdqJcTO2HdF9Z3FebPTyCBi/kfHlsMosbTB853Ml2OP/A/Q8hj
+ n424tQ87jp1T7qrwajz0X4dcl2B/oEt3EGWjmysjyuZYqq8bydPi3W4nkjzZ3IKmXwLR
+ VWc2cyDKEZ4JBomXYCC08/au2Fo4RtvtU/qxBWDsAZwg7DsDedXeh8/v1ZYwq/fJBDJj
+ evz/CRc0bm3WGIHGYPRLbSUupI5KNGxyaGrZH4qLw/V3AGgDrLGQ4Rmkvl361/qJyVNK
+ DctAYxGCscUXHvXS5HaJtsPfX29vMVExz9wQD1I/GjYIM5y8jFo7kv60rw80sZATgYPr Gw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2130.oracle.com with ESMTP id 2wa8htgxq1-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 18 Nov 2019 15:29:35 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAIFOAkA125461;
+ Mon, 18 Nov 2019 15:29:34 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by userp3020.oracle.com with ESMTP id 2wau8ne2dx-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 18 Nov 2019 15:29:34 +0000
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAIFTXQH005167;
+ Mon, 18 Nov 2019 15:29:33 GMT
+Received: from [10.152.34.2] (/10.152.34.2)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 18 Nov 2019 07:29:32 -0800
+Subject: Re: [RFC v4 PATCH 10/49] multi-process: setup a machine object for
+ remote device process
+To: Stefan Hajnoczi <stefanha@redhat.com>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+ <6df05bbf3cba4611b462879a7b937f40486cea0a.1571905346.git.jag.raman@oracle.com>
+ <20191113162201.GE563983@stefanha-x1.localdomain>
+From: Jag Raman <jag.raman@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <d47faeae-d8fd-58bb-da2a-b19adf2b0ecc@oracle.com>
+Date: Mon, 18 Nov 2019 10:29:31 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-23-marcandre.lureau@redhat.com>
-In-Reply-To: <20191023173154.30051-23-marcandre.lureau@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Nov 2019 15:28:12 +0000
-Message-ID: <CAFEAcA8tQ4Hn6Rm5_DeQmo5JHk5Debp_qGFqGoFvJu4Srh3sQw@mail.gmail.com>
-Subject: Re: [PATCH v3 22/33] etraxfs: remove PROP_PTR usage
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+In-Reply-To: <20191113162201.GE563983@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0
+ malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1911180141
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9445
+ signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
+ priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1911180141
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 156.151.31.86
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,40 +110,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paul Burton <pburton@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, thuth@redhat.com,
+ john.g.johnson@oracle.com, ehabkost@redhat.com, konrad.wilk@oracle.com,
+ quintela@redhat.com, berrange@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, armbru@redhat.com, ross.lagerwall@citrix.com,
+ kanth.ghatraju@oracle.com, kraxel@redhat.com, kwolf@redhat.com,
+ pbonzini@redhat.com, liran.alon@oracle.com, marcandre.lureau@gmail.com,
+ mreitz@redhat.com, dgilbert@redhat.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 23 Oct 2019 at 18:34, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> etraxfs_dma_client are not Object, so can't be exposed to user with
-> QOM path. Let's remove property usage and move the constructor to the
-> .c unit, simplifying some code on the way.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  hw/net/etraxfs_eth.c      | 44 +++++++++++++++++++++++++++++----------
->  include/hw/cris/etraxfs.h | 20 +++---------------
->  2 files changed, 36 insertions(+), 28 deletions(-)
->
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-thanks
--- PMM
+On 11/13/2019 11:22 AM, Stefan Hajnoczi wrote:
+> On Thu, Oct 24, 2019 at 05:08:51AM -0400, Jagannathan Raman wrote:
+>> +static NotifierList machine_init_done_notifiers =
+>> +    NOTIFIER_LIST_INITIALIZER(machine_init_done_notifiers);
+>> +
+>> +bool machine_init_done;
+>> +
+>> +void qemu_add_machine_init_done_notifier(Notifier *notify)
+>> +{
+>> +    notifier_list_add(&machine_init_done_notifiers, notify);
+>> +    if (machine_init_done) {
+>> +        notify->notify(notify, NULL);
+>> +    }
+>> +}
+>> +
+>> +void qemu_remove_machine_init_done_notifier(Notifier *notify)
+>> +{
+>> +    notifier_remove(notify);
+>> +}
+>> +
+>> +void qemu_run_machine_init_done_notifiers(void)
+>> +{
+>> +    machine_init_done = true;
+>> +    notifier_list_notify(&machine_init_done_notifiers, NULL);
+>> +}
+> 
+> qemu_add_machine_init_done_notifier() is already defined in vl.c.
+> Please share the implementation instead of duplicating it into the
+> remote program.
+> 
+>> +
+>> +static void remote_machine_init(Object *obj)
+>> +{
+>> +    RemMachineState *s = REMOTE_MACHINE(obj);
+>> +    RemPCIHost *rem_host;
+>> +    MemoryRegion *system_memory, *system_io, *pci_memory;
+>> +
+>> +    Error *error_abort = NULL;
+>> +
+>> +    qemu_mutex_init(&ram_list.mutex);
+> 
+> Please keep global initialization separate from RemMachineState (e.g. do
+> it in main() or a function called by main()).  This function should only
+> initialize RemMachineState.
+
+OK, will do!
+
+> 
+>> +
+>> +    object_property_add_child(object_get_root(), "machine", obj, &error_abort);
+>> +    if (error_abort) {
+>> +        error_report_err(error_abort);
+>> +    }
+>> +
+>> +    memory_map_init();
+> 
+> This is global init, please move it elsewhere.
+
+Got it, thank you!
+
+> 
+>> +
+>> +    system_memory = get_system_memory();
+>> +    system_io = get_system_io();
+>> +
+>> +    pci_memory = g_new(MemoryRegion, 1);
+>> +    memory_region_init(pci_memory, NULL, "pci", UINT64_MAX);
+>> +
+>> +    rem_host = REMOTE_HOST_DEVICE(qdev_create(NULL, TYPE_REMOTE_HOST_DEVICE));
+>> +
+>> +    rem_host->mr_pci_mem = pci_memory;
+>> +    rem_host->mr_sys_mem = system_memory;
+>> +    rem_host->mr_sys_io = system_io;
+>> +
+>> +    s->host = rem_host;
+> 
+> Both s and rem_host are QOM objects.  There should be a child property
+> relationship between them here.  It will ensure that rem_host is cleaned
+> up when s is cleaned up.  Please use that instead of a regular C
+> pointer.
+
+OK, will add a property linking these two as parent-child.
+
+Thank you!
+--
+Jag
+
+> 
 
