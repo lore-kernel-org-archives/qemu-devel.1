@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81978C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:55:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A3FDC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:55:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B42420730
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:55:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DAFC20730
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:55:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dxIWL68Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B42420730
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8HC60UY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DAFC20730
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60480 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWegc-00038c-42
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:55:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42403)
+	id 1iWegh-0003I6-S7
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:55:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42381)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iWef3-0001X0-Lb
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:53:38 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iWef2-0004Qg-Ks
+ (envelope-from <lvivier@redhat.com>) id 1iWef1-0001Uc-Sx
  for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:53:37 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:39296
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <lvivier@redhat.com>) id 1iWef0-0004Q2-MT
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:53:35 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58077
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iWef2-0004QS-Gk
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:53:36 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iWef0-0004Pk-IH
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:53:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574074416;
+ s=mimecast20190719; t=1574074414;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=152F3VsBW27j1IFKoVLVwCYJGK5KIGmsJlQ2TDMp0a8=;
- b=dxIWL68QRqTdmH+cc9oQHXjwniL4a7MCLomyLAnstO35kRNXtDMJILui9eMKsTRqivdkDa
- 1P+Wf1zxgqKWw+mxLWIdZ2QvqU0P7pWiya7nfB9NfVgL1qoSY+EaKc+6hxLbQ7TW/dHwFl
- EtBwmvKoD4lHRPaomQWh2mUQuu14+eE=
+ bh=pLrU9p2DhgfzE1DkGTpdrKbhTRnMgTbOYODJyOf3fEw=;
+ b=K8HC60UYwuxTI7PEAqDt47hCc9TqeGPF4Cdf7VOBHNaAaLatWm5pIK7QzLJf+8rV0IUo42
+ Hrrqmd4JvJcePZXdC8iic/IL+5TWxRf3Hx3xCFeHWFXNOznqEQaVPpoHEO1mJY9GFscXkd
+ Jl7HUh3c+poAIlcwEmJM4yklX/EULt4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-D9zpYNcJPm-cycoKrSRBNA-1; Mon, 18 Nov 2019 05:53:31 -0500
+ us-mta-355-KMEOusV4Mh2lGGDBIrOphw-1; Mon, 18 Nov 2019 05:53:29 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84CC7802688;
- Mon, 18 Nov 2019 10:53:30 +0000 (UTC)
-Received: from thinkpad.redhat.com (ovpn-117-32.ams2.redhat.com [10.36.117.32])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C6D5660856;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70FF6801FD2;
  Mon, 18 Nov 2019 10:53:28 +0000 (UTC)
+Received: from thinkpad.redhat.com (ovpn-117-32.ams2.redhat.com [10.36.117.32])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1AE5A60856;
+ Mon, 18 Nov 2019 10:53:25 +0000 (UTC)
 From: Laurent Vivier <lvivier@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 3/6] ppc: Skip partially initialized vCPUs in 'info pic'
-Date: Mon, 18 Nov 2019 11:53:16 +0100
-Message-Id: <20191118105319.7658-4-lvivier@redhat.com>
+Subject: [PULL v2 2/6] xive, xics: Fix reference counting on CPU objects
+Date: Mon, 18 Nov 2019 11:53:15 +0100
+Message-Id: <20191118105319.7658-3-lvivier@redhat.com>
 In-Reply-To: <20191118105319.7658-1-lvivier@redhat.com>
 References: <20191118105319.7658-1-lvivier@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: D9zpYNcJPm-cycoKrSRBNA-1
+X-MC-Unique: KMEOusV4Mh2lGGDBIrOphw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,68 +95,91 @@ Sender: "Qemu-devel"
 
 From: Greg Kurz <groug@kaod.org>
 
-CPU_FOREACH() can race with vCPU hotplug/unplug on sPAPR machines, ie.
-we may try to print out info about a vCPU with a NULL presenter pointer.
+When a VCPU gets connected to the XIVE interrupt controller, we add a
+const link targetting the CPU object to the TCTX object. Similar links
+are added to the ICP object when using the XICS interrupt controller.
 
-Check that in order to prevent QEMU from crashing.
+As explained in <qom/object.h>:
+
+ * The caller must ensure that @target stays alive as long as
+ * this property exists.  In the case @target is a child of @obj,
+ * this will be the case.  Otherwise, the caller is responsible for
+ * taking a reference.
+
+We're in the latter case for both XICS and XIVE. Add the missing
+calls to object_ref() and object_unref().
+
+This doesn't fix any known issue because the life cycle of the TCTX or
+ICP happens to be shorter than the one of the CPU or XICS fabric, but
+better safe than sorry.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <157192725327.3146912.12047076483178652551.stgit@bahia.lan>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Message-Id: <157192724770.3146912.15400869269097231255.stgit@bahia.lan>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 ---
- hw/intc/xics.c | 11 ++++++++++-
- hw/intc/xive.c | 11 ++++++++++-
- 2 files changed, 20 insertions(+), 2 deletions(-)
+ hw/intc/xics.c | 8 +++++++-
+ hw/intc/xive.c | 6 +++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 5f746079be46..e7ac9ba618fa 100644
+index 935f325749cb..5f746079be46 100644
 --- a/hw/intc/xics.c
 +++ b/hw/intc/xics.c
-@@ -44,7 +44,16 @@
+@@ -388,8 +388,10 @@ Object *icp_create(Object *cpu, const char *type, XICS=
+Fabric *xi, Error **errp)
+     obj =3D object_new(type);
+     object_property_add_child(cpu, type, obj, &error_abort);
+     object_unref(obj);
++    object_ref(OBJECT(xi));
+     object_property_add_const_link(obj, ICP_PROP_XICS, OBJECT(xi),
+                                    &error_abort);
++    object_ref(cpu);
+     object_property_add_const_link(obj, ICP_PROP_CPU, cpu, &error_abort);
+     object_property_set_bool(obj, true, "realized", &local_err);
+     if (local_err) {
+@@ -403,7 +405,11 @@ Object *icp_create(Object *cpu, const char *type, XICS=
+Fabric *xi, Error **errp)
 =20
- void icp_pic_print_info(ICPState *icp, Monitor *mon)
+ void icp_destroy(ICPState *icp)
  {
--    int cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
-+    int cpu_index;
+-    object_unparent(OBJECT(icp));
++    Object *obj =3D OBJECT(icp);
 +
-+    /* Skip partially initialized vCPUs. This can happen on sPAPR when vCP=
-Us
-+     * are hot plugged or unplugged.
-+     */
-+    if (!icp) {
-+        return;
-+    }
-+
-+    cpu_index =3D icp->cs ? icp->cs->cpu_index : -1;
++    object_unref(object_property_get_link(obj, ICP_PROP_CPU, &error_abort)=
+);
++    object_unref(object_property_get_link(obj, ICP_PROP_XICS, &error_abort=
+));
++    object_unparent(obj);
+ }
 =20
-     if (!icp->output) {
-         return;
+ /*
 diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-index 952a461d5329..75dce82fb205 100644
+index 38257aa02083..952a461d5329 100644
 --- a/hw/intc/xive.c
 +++ b/hw/intc/xive.c
-@@ -523,9 +523,18 @@ static const char * const xive_tctx_ring_names[] =3D {
+@@ -682,6 +682,7 @@ Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr,=
+ Error **errp)
+     obj =3D object_new(TYPE_XIVE_TCTX);
+     object_property_add_child(cpu, TYPE_XIVE_TCTX, obj, &error_abort);
+     object_unref(obj);
++    object_ref(cpu);
+     object_property_add_const_link(obj, "cpu", cpu, &error_abort);
+     object_property_set_bool(obj, true, "realized", &local_err);
+     if (local_err) {
+@@ -698,7 +699,10 @@ error:
 =20
- void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon)
+ void xive_tctx_destroy(XiveTCTX *tctx)
  {
--    int cpu_index =3D tctx->cs ? tctx->cs->cpu_index : -1;
-+    int cpu_index;
-     int i;
-=20
-+    /* Skip partially initialized vCPUs. This can happen on sPAPR when vCP=
-Us
-+     * are hot plugged or unplugged.
-+     */
-+    if (!tctx) {
-+        return;
-+    }
+-    object_unparent(OBJECT(tctx));
++    Object *obj =3D OBJECT(tctx);
 +
-+    cpu_index =3D tctx->cs ? tctx->cs->cpu_index : -1;
-+
-     if (kvm_irqchip_in_kernel()) {
-         Error *local_err =3D NULL;
++    object_unref(object_property_get_link(obj, "cpu", &error_abort));
++    object_unparent(obj);
+ }
 =20
+ /*
 --=20
 2.23.0
 
