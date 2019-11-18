@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3298BC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94820C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:08:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F17F12230D
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:07:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 608C9208CE
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 21:08:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cbU672Ye"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F17F12230D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OkzQ0Ipi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 608C9208CE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWoFI-0003Vr-6M
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 16:07:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33920)
+	id 1iWoGU-0004ZO-JL
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 16:08:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33988)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iWoDC-0000bp-3O
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:05:33 -0500
+ (envelope-from <philmd@redhat.com>) id 1iWoDG-0000kG-SS
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:05:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iWoD8-0000MD-DB
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:05:29 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32265
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iWoDC-0000SA-S4
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:05:34 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:48018
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iWoD8-0000M7-9U
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:05:26 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iWoDC-0000RT-Oe
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 16:05:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574111125;
+ s=mimecast20190719; t=1574111130;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Q8wlrYeo5L6HsNC+5R9w7Qdds9F4FGlVrIAoGgzM+rE=;
- b=cbU672YelgzxS8io6npwZ9ku5aroESDNJsGFn3JmcLygUZOeVIQoXKPlQsehBJ3TZkbj4w
- ptuPtngTSVuscfjK3bljrzS/KUcpqh+7ZXYbG18T4ASc0PobXWg9lACyhRT/NUezhE7OoK
- kkmyfRz9oRnz8XEFXgH2Qi/ENxSUwIg=
+ bh=qM1nb36WuoLn5iPpv5w4jChgKX8iZnVU50qCjKMKGUE=;
+ b=OkzQ0IpitUwU7yjpmdh2Lm2W3BVpxTp2VDsDeNuwkIrRkrc8wtED3CfPIr88qJqUTkBO5I
+ 3cjWgYj85iQ329aF3T+kd5l7m8YJmc4QNx7FfkZloOPkK0D7Cd2fF0dE/moH7lIhZXQepR
+ qwpwTFOl+npNMvPfjC8hrqikM0UMNL4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-356-143R-O2HPFmStHMUhF-fFQ-1; Mon, 18 Nov 2019 16:05:22 -0500
+ us-mta-234-znd8cBw2N-KFvJlsNK483w-1; Mon, 18 Nov 2019 16:05:29 -0500
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 58399801E5B;
- Mon, 18 Nov 2019 21:05:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BDDBA1802CEB;
+ Mon, 18 Nov 2019 21:05:27 +0000 (UTC)
 Received: from x1w.redhat.com (unknown [10.40.206.9])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E7EDF646D5;
- Mon, 18 Nov 2019 21:05:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CAA7960BE2;
+ Mon, 18 Nov 2019 21:05:21 +0000 (UTC)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: Eric Blake <eblake@redhat.com>,
 	qemu-devel@nongnu.org
-Subject: [PATCH-for-4.2 v3 2/3] hw/mips/gt64xxx: Remove dynamic field width
- from trace events
-Date: Mon, 18 Nov 2019 22:04:57 +0100
-Message-Id: <20191118210458.11959-3-philmd@redhat.com>
+Subject: [PATCH-for-4.2 v3 3/3] trace: Forbid dynamic field width in event
+ format
+Date: Mon, 18 Nov 2019 22:04:58 +0100
+Message-Id: <20191118210458.11959-4-philmd@redhat.com>
 In-Reply-To: <20191118210458.11959-1-philmd@redhat.com>
 References: <20191118210458.11959-1-philmd@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: 143R-O2HPFmStHMUhF-fFQ-1
+X-MC-Unique: znd8cBw2N-KFvJlsNK483w-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,93 +98,79 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Since not all trace backends support dynamic field width in
-format (dtrace via stap does not), replace by a static field
-width instead.
+format (dtrace via stap does not), forbid them.
 
-We previously passed to the trace API 'width << 1' as the number
-of hex characters to display (the dynamic field width). We don't
-need this anymore. Instead, display the size of bytes accessed.
+Add a check to refuse field width in new formats:
+
+  $ make
+  [...]
+    GEN     hw/block/trace.h
+  Traceback (most recent call last):
+    File "scripts/tracetool.py", line 152, in <module>
+      main(sys.argv)
+    File "scripts/tracetool.py", line 143, in main
+      events.extend(tracetool.read_events(fh, arg))
+    File "scripts/tracetool/__init__.py", line 371, in read_events
+      event =3D Event.build(line)
+    File "scripts/tracetool/__init__.py", line 285, in build
+      raise ValueError("Event format must not contain field width '%*'")
+  ValueError: Error at hw/block/trace-events:11: Event format must not cont=
+ain field width '%*'
 
 Reported-by: Eric Blake <eblake@redhat.com>
 Buglink: https://bugs.launchpad.net/qemu/+bug/1844817
 Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
-v2: Do not update qemu_log_mask()
-v3: display size (in byte)
+v3:
+- use better regex provided by Eric,
+- instead of re.match(), use re.search() which takes unanchored regex,
+- added a comment in tracing.txt
 ---
- hw/mips/gt64xxx_pci.c | 16 ++++++++--------
- hw/mips/trace-events  |  4 ++--
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ docs/devel/tracing.txt        | 3 ++-
+ scripts/tracetool/__init__.py | 3 +++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
-index 5cab9c1ee1..f1af840d8e 100644
---- a/hw/mips/gt64xxx_pci.c
-+++ b/hw/mips/gt64xxx_pci.c
-@@ -642,19 +642,19 @@ static void gt64120_writel(void *opaque, hwaddr addr,
-         /* not really implemented */
-         s->regs[saddr] =3D ~(~(s->regs[saddr]) | ~(val & 0xfffffffe));
-         s->regs[saddr] |=3D !!(s->regs[saddr] & 0xfffffffe);
--        trace_gt64120_write("INTRCAUSE", size << 1, val);
-+        trace_gt64120_write("INTRCAUSE", size, val);
-         break;
-     case GT_INTRMASK:
-         s->regs[saddr] =3D val & 0x3c3ffffe;
--        trace_gt64120_write("INTRMASK", size << 1, val);
-+        trace_gt64120_write("INTRMASK", size, val);
-         break;
-     case GT_PCI0_ICMASK:
-         s->regs[saddr] =3D val & 0x03fffffe;
--        trace_gt64120_write("ICMASK", size << 1, val);
-+        trace_gt64120_write("ICMASK", size, val);
-         break;
-     case GT_PCI0_SERR0MASK:
-         s->regs[saddr] =3D val & 0x0000003f;
--        trace_gt64120_write("SERR0MASK", size << 1, val);
-+        trace_gt64120_write("SERR0MASK", size, val);
-         break;
+diff --git a/docs/devel/tracing.txt b/docs/devel/tracing.txt
+index 8c0376fefa..6c01ce801e 100644
+--- a/docs/devel/tracing.txt
++++ b/docs/devel/tracing.txt
+@@ -113,7 +113,8 @@ Format strings should reflect the types defined in the =
+trace event.  Take
+ special care to use PRId64 and PRIu64 for int64_t and uint64_t types,
+ respectively.  This ensures portability between 32- and 64-bit platforms.
+ Format strings must not end with a newline character.  It is the responsib=
+ility
+-of backends to adapt line ending for proper logging.
++of backends to adapt line ending for proper logging.  Format strings must =
+not
++use numeric field width dynamic precision (SystemTap does not support them=
+).
 =20
-     /* Reserved when only PCI_0 is configured. */
-@@ -930,19 +930,19 @@ static uint64_t gt64120_readl(void *opaque,
-     /* Interrupts */
-     case GT_INTRCAUSE:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("INTRCAUSE", size << 1, val);
-+        trace_gt64120_read("INTRCAUSE", size, val);
-         break;
-     case GT_INTRMASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("INTRMASK", size << 1, val);
-+        trace_gt64120_read("INTRMASK", size, val);
-         break;
-     case GT_PCI0_ICMASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("ICMASK", size << 1, val);
-+        trace_gt64120_read("ICMASK", size, val);
-         break;
-     case GT_PCI0_SERR0MASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("SERR0MASK", size << 1, val);
-+        trace_gt64120_read("SERR0MASK", size, val);
-         break;
+ Each event declaration will start with the event name, then its arguments,
+ finally a format string for pretty-printing. For example:
+diff --git a/scripts/tracetool/__init__.py b/scripts/tracetool/__init__.py
+index 44c118bc2a..ec7fe9fa4a 100644
+--- a/scripts/tracetool/__init__.py
++++ b/scripts/tracetool/__init__.py
+@@ -206,6 +206,7 @@ class Event(object):
+                       "\s*"
+                       "(?:(?:(?P<fmt_trans>\".+),)?\s*(?P<fmt>\".+))?"
+                       "\s*")
++    _DFWRE =3D re.compile(r"%[\d\.\- +#']*\*") # dynamic width precision
 =20
-     /* Reserved when only PCI_0 is configured. */
-diff --git a/hw/mips/trace-events b/hw/mips/trace-events
-index 75d4c73f2e..321933283f 100644
---- a/hw/mips/trace-events
-+++ b/hw/mips/trace-events
-@@ -1,4 +1,4 @@
- # gt64xxx.c
--gt64120_read(const char *regname, int width, uint64_t value) "gt64120 read=
- %s value:0x%0*" PRIx64
--gt64120_write(const char *regname, int width, uint64_t value) "gt64120 wri=
-te %s value:0x%0*" PRIx64
-+gt64120_read(const char *regname, unsigned size, uint64_t value) "gt64120 =
-read %s size:%u value:0x%08" PRIx64
-+gt64120_write(const char *regname, unsigned size, uint64_t value) "gt64120=
- write %s size:%u value:0x%08" PRIx64
- gt64120_isd_remap(uint64_t from_length, uint64_t from_addr, uint64_t to_le=
-ngth, uint64_t to_addr) "ISD: 0x%08" PRIx64 "@0x%08" PRIx64 " -> 0x%08" PRI=
-x64 "@0x%08" PRIx64
+     _VALID_PROPS =3D set(["disable", "tcg", "tcg-trans", "tcg-exec", "vcpu=
+"])
+=20
+@@ -280,6 +281,8 @@ class Event(object):
+         if fmt.endswith(r'\n"'):
+             raise ValueError("Event format must not end with a newline "
+                              "character")
++        if Event._DFWRE.search(fmt):
++            raise ValueError("Event format must not contain field width '%=
+*'")
+=20
+         if len(fmt_trans) > 0:
+             fmt =3D [fmt_trans, fmt]
 --=20
 2.21.0
 
