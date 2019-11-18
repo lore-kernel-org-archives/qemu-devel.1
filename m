@@ -2,80 +2,84 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BC4C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F90C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:01:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AED7620730
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:00:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACCCE20730
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 11:01:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i6yzi5qA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AED7620730
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qz58sPNa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACCCE20730
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60572 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60575 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWelk-0000nZ-5o
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 06:00:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45760)
+	id 1iWemv-0001f8-1v
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 06:01:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43962)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iWejw-0007Uj-T5
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:58:43 -0500
+ (envelope-from <david@redhat.com>) id 1iWeiE-0005uT-7u
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:56:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iWejv-0000Rn-Dt
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:58:40 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:54043
+ (envelope-from <david@redhat.com>) id 1iWeiD-0006cl-2d
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:56:54 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43377
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iWejv-0000PD-8I
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:58:39 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iWeiC-0006cC-Vh
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:56:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574074716;
+ s=mimecast20190719; t=1574074611;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=FCBKW2xKWLtfQCtme/NQ8EP4WP4Ndf8NS2vzk3+ZRus=;
- b=i6yzi5qAqqq8haWrOIFU+iVoBf6OIjdXYiuH5u3rxfxZJ3RVcQHPvJyKh3dZTCxdHX1TKv
- /QvMQtfdLeCKmDIySy8IsYkO2ehmcDn4/bKJB7KXNw+5aq9TLime+CvkZpvvm4pOb1o8N+
- 0KxQcul2aM0y1/kW9czDcwi6LMjQF6o=
+ bh=nmY3kfgf2l0GRL1Y8XTArTj4/ehty1sXljpIc6RpM04=;
+ b=Qz58sPNaEe9t2AZJHX3zEcxaCYD6ztW+i9pIEH760xP6/6qw833snEIDn1sN3s0/Dg8K8w
+ 5YiiSB32NYn5S7Rgas5TNl0Vci1kF3heO/GM9GTzIro2rtGco//oaU4HCGwqAiEEpusrB8
+ 5x1LeJoGjR1seZHKox1z9W96Zl2NkbQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-IQ6pw-0FOgOuJuinvxyIhQ-1; Mon, 18 Nov 2019 05:58:34 -0500
+ us-mta-426-lDuSTbWxPZ6O-FNhHL0_pg-1; Mon, 18 Nov 2019 05:56:48 -0500
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65BD69376F
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 10:58:33 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-116-200.ams2.redhat.com
- [10.36.116.200])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 92E452AABC;
- Mon, 18 Nov 2019 10:58:32 +0000 (UTC)
-Subject: Re: [PATCH 02/16] vl: extract accelerator option processing to a
- separate function
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
- <1573655945-14912-3-git-send-email-pbonzini@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <5e5a4b1e-4ada-11f6-c551-c15de2404e7f@redhat.com>
-Date: Mon, 18 Nov 2019 11:58:30 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32743107ACC5;
+ Mon, 18 Nov 2019 10:56:47 +0000 (UTC)
+Received: from [10.36.118.85] (unknown [10.36.118.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9FE8828DC8;
+ Mon, 18 Nov 2019 10:56:44 +0000 (UTC)
+Subject: Re: [PATCH v1 0/2] s390x/cpumodel: Introduce "best" model variants
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20191108110714.7475-1-david@redhat.com>
+ <CAFEAcA-mD3-Zg2JunGpMqbcaT1qboCenhqEFytZD0FmFcL2i9Q@mail.gmail.com>
+ <5dd613c0-6d9e-b943-b64d-7ba1791cbefe@redhat.com>
+ <CAFEAcA-4r53vM-K24WYr1OFSOufhZ7hDHeZBhnywyaJ0gpMO1g@mail.gmail.com>
+ <20191108191057.GZ3812@habkost.net>
+ <CAFEAcA_No5oAFtULbAOrPDeQE18HHgc0agXbs4m2AGZ+gK_ReQ@mail.gmail.com>
+ <66c64c6d-b7c0-2cb1-2b29-4fdd9b369714@redhat.com>
+ <CAFEAcA-Q7H9sZjN-PcMMDHQU41yN1RdXhNY5KqMh7E6xh0yjgA@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <3aa1d025-20a3-e813-2fe6-35518efedf2f@redhat.com>
+Date: Mon, 18 Nov 2019 11:56:43 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <1573655945-14912-3-git-send-email-pbonzini@redhat.com>
+In-Reply-To: <CAFEAcA-Q7H9sZjN-PcMMDHQU41yN1RdXhNY5KqMh7E6xh0yjgA@mail.gmail.com>
 Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: IQ6pw-0FOgOuJuinvxyIhQ-1
+X-MC-Unique: lDuSTbWxPZ6O-FNhHL0_pg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
@@ -91,63 +95,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Michael Mueller <mimu@linux.ibm.com>,
+ Jiri Denemark <jdenemar@redhat.com>, Janosch Frank <frankja@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/11/2019 15.38, Paolo Bonzini wrote:
-> As a first step towards supporting multiple "-accel" options, push -icoun=
-t
-> and -accel semantics into a new function, and use qemu_opts_foreach to
-> retrieve the key/value lists instead of stashing them into globals.
+On 18.11.19 11:53, Peter Maydell wrote:
+> On Mon, 18 Nov 2019 at 10:47, David Hildenbrand <david@redhat.com> wrote:
+>> My personal opinion: "max" really means "all features". If we want an
+>> automatic way to specify something you requested ("give me something
+>> that's going to work") we either have to change the definition of the
+>> max model for alla rchitectures or introduce something that really
+>> matches the "no -cpu specified" - e.g., "best".
 >=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  vl.c | 40 ++++++++++++++++++++++++++++------------
->  1 file changed, 28 insertions(+), 12 deletions(-)
+> I don't strongly object to 'max' including deprecated features,
+> but I do definitely object to 'max' including by default any
+> experimental (x- prefix) features. Those should never be
+> enabled (whatever the '-cpu foo' name) unless the user has
+> specifically opted into them: that's the point of the x- prefix.
+> We need to be able to tell from the command line whether it's
+> got any non-standard weirdness enabled.
+
+I'll let Eduardo respond to that, as we don't really have experimental=20
+features on s390x, especially under KVM ("host" corresponds to "max").
+
 >=20
-> diff --git a/vl.c b/vl.c
-> index 841fdae..5367f23 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -2827,6 +2827,33 @@ static void user_register_global_props(void)
->                        global_init_func, NULL, NULL);
->  }
-> =20
-> +static int do_configure_icount(void *opaque, QemuOpts *opts, Error **err=
-p)
-> +{
-> +    if (tcg_enabled()) {
-> +        configure_icount(opts, errp);
-> +    } else {
-> +        error_setg(errp, "-icount is not allowed with hardware virtualiz=
-ation");
-> +    }
-> +    return 0;
-> +}
-> +
-> +static int do_configure_accelerator(void *opaque, QemuOpts *opts, Error =
-**errp)
-> +{
-> +    if (tcg_enabled()) {
-> +        qemu_tcg_configure(opts, &error_fatal);
-> +    }
-> +    return 0;
-> +}
-> +
-> +static void configure_accelerators(void)
-> +{
-> +    qemu_opts_foreach(qemu_find_opts("icount"),
-> +                      do_configure_icount, NULL, &error_fatal);
-> +
-> +    qemu_opts_foreach(qemu_find_opts("accel"),
-> +                      do_configure_accelerator, NULL, &error_fatal);
-> +}
+> thanks
+> -- PMM
+>=20
 
-vl.c is already quite overcrowded ... maybe you could add the new code
-to accel/accel.c instead? Just my 0.02 =80.
 
- Thomas
+--=20
+
+Thanks,
+
+David / dhildenb
 
 
