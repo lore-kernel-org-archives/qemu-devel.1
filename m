@@ -2,116 +2,87 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 196A5C432C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:32:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78FB9C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:49:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7BB820730
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:32:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 453E42067D
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 10:49:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="qlJPxY46"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7BB820730
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ADpWvU4E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 453E42067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWeKO-0002vD-24
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:32:16 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38712)
+	id 1iWead-0006sS-7i
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 05:49:03 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41402)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iWeIY-0001sQ-GD
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:30:23 -0500
+ (envelope-from <david@redhat.com>) id 1iWeZV-0006Ox-GW
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:47:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dplotnikov@virtuozzo.com>) id 1iWeIW-00059f-Ru
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:30:22 -0500
-Received: from mail-am5eur02on0711.outbound.protection.outlook.com
- ([2a01:111:f400:fe07::711]:44814
- helo=EUR02-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dplotnikov@virtuozzo.com>)
- id 1iWeIW-00059D-Lq; Mon, 18 Nov 2019 05:30:20 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dU4hLFhB9H4PQjraOMP574cpjJDFsyx3TlJsQZt25CGWwVwfVX+LhdagFcwuGKRu4nbPamkmmcx1ndmHgcgMHY4YncsHpCPP6S2P8T1twN6f5B0P8vFRpUoX0YZmFUCK+vnuUrXrBqDiLJ46AZ9VpXebJpZ+ARhlDdA6dzmupvcGP6+JMuVvUmV7eMYuxe6pheqZC9owa8UuboPPyCzTeh6v/WP2PQ0ql57xZdburL3YLbgK+etU6XfB3jed01gouwhDPe3hOBunqfC6UsKhlioayAcicvfCxMY9qc814rZT8JRy/nyTY/2pBXtb7ahMTdgg1wypC62UPrZe8W6QOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tATb+/piZfo5M1aRsAHScr5O3b4sN12Je4wEwSAoHNA=;
- b=hcds4FnlOAALChrJ6NLXaXJ/ZRXsrRTXesKByqTz0OwVMl3O4DREiO2qw78KrnQiPotJcQeV2bewUi6puDLD1ezeC3z70T3Nnt7XchQvHiR4IdQ8TLknd/EOM5rx3/fAMxnGuYmXMe0LJFg0b3lGZ31C6hwaom0e8CjDs+BhJdX+Wrwclbdn6RYfSs/s60JOSzG08RLC/K2vM51iQ1wZYvvcpoZ3aEm1zNl+YxXAxQorjB/xBs3uTCMfSp3ZSm4EnSrFc7qwUQfsF0d3urZqxXo5wJmV2BC4solFAIx9a4iKWaN+EeR/7nUVaybtyFkq+7ldhT14EeWQgoukvDlqdA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tATb+/piZfo5M1aRsAHScr5O3b4sN12Je4wEwSAoHNA=;
- b=qlJPxY460Iq39AQRg47Zi9UHBI7is07HSYJoMBsnfy8ihSYMAfDMiFfJA2bJ27VPiN12yP8uRUp2bsggoKxI/oCzWys1VTo0B4zOpYYrnWwXQhogWmRwPFMp38c40KdwoFGt9ogaPXhB/y0ci6I5d7YBnNKuFl6hFfmkXxIcPKA=
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com (20.178.22.27) by
- AM0PR08MB3459.eurprd08.prod.outlook.com (20.177.110.203) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.23; Mon, 18 Nov 2019 10:30:11 +0000
-Received: from AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::e8bf:705f:f64d:4aa]) by AM0PR08MB3745.eurprd08.prod.outlook.com
- ([fe80::e8bf:705f:f64d:4aa%4]) with mapi id 15.20.2451.029; Mon, 18 Nov 2019
- 10:30:11 +0000
-From: Denis Plotnikov <dplotnikov@virtuozzo.com>
-To: "qemu-block@nongnu.org" <qemu-block@nongnu.org>
-Subject: Re: [PATCH v0 0/2] allow to set 'drive' property on a realized block
- device
-Thread-Topic: [PATCH v0 0/2] allow to set 'drive' property on a realized block
- device
-Thread-Index: AQHVl/mlibo7ZG8X4kOJhAn0iDaTjqeQxlkA
-Date: Mon, 18 Nov 2019 10:30:11 +0000
-Message-ID: <be30ccc4-4b3c-8d5a-2060-5f461b7f4554@virtuozzo.com>
-References: <20191110190310.19799-1-dplotnikov@virtuozzo.com>
-In-Reply-To: <20191110190310.19799-1-dplotnikov@virtuozzo.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR09CA0046.eurprd09.prod.outlook.com
- (2603:10a6:7:3c::14) To AM0PR08MB3745.eurprd08.prod.outlook.com
- (2603:10a6:208:ff::27)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=dplotnikov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [178.34.163.116]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c061f887-456c-4434-0585-08d76c124aac
-x-ms-traffictypediagnostic: AM0PR08MB3459:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM0PR08MB3459B4B8DDC5872CFE0A0A01CF4D0@AM0PR08MB3459.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0225B0D5BC
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(39840400004)(366004)(396003)(136003)(376002)(199004)(189003)(36756003)(52116002)(316002)(76176011)(446003)(5660300002)(26005)(25786009)(6246003)(107886003)(6436002)(5640700003)(6306002)(53546011)(6116002)(476003)(2616005)(386003)(6506007)(31696002)(102836004)(486006)(66556008)(66446008)(478600001)(64756008)(66476007)(186003)(66066001)(14454004)(966005)(71190400001)(71200400001)(66946007)(99286004)(14444005)(256004)(6916009)(4326008)(31686004)(11346002)(2501003)(6486002)(3846002)(305945005)(7736002)(8936002)(229853002)(8676002)(81166006)(81156014)(54906003)(6512007)(2906002)(2351001)(86362001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM0PR08MB3459;
- H:AM0PR08MB3745.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: VIjclK7r13wIzB44RoBMAUSN3cgHPjX7C1xUSZRlq6blq2sYhYVCs+ZWKS9NKF+cUnAxdlLzT47Yl3wK8IXWviY0jVGDjoW05jKJ8POclFlDc9IRjhte8aoyEY6Ug+02EOwcQquzcuBMwt27ygjcuasa5+MqBW2Y9IYQDD8C+N3pmrcwdRqw3ZkPLq7nSvDNJh/HRQ5qQ0+uU8bBgNLNUbtnSdDe4oaUPkNN29CpGGGplDt/f+nlr/zkKrOJ3hSn7sop6KtKVfLfoUl9FTN/T2eJfQeeiHNug2U8VAtc15hciGuWXb3QOVTVl0+nzrMwr+134MSLhvNED8uEj6iCebNDH14CVDcEFCPSx9K3WJlrQVODRyeEmk6BhGSHxVs/d5UgJ5aVvjBkuBkH9CCcIGf1Nqkg7KONVGgbFsXJDUWbVjXaZaJ1VQZPmuIdv6ag
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <63B333ACB4D37D42B0ED274CD9412E3E@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ (envelope-from <david@redhat.com>) id 1iWeZQ-0002WC-9s
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:47:50 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29772
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iWeZH-0002Ta-Sr
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 05:47:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574074058;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=aEgN/3FpA4+VRydlreE0OjBL4EpFbGJkSFlqWjd9iaM=;
+ b=ADpWvU4Eo2zsj2svnuVKILx5n+ANflyAV9xIMQcV6OajdVP5m9bnt4JHigxfxkxGN+Bnqb
+ doRKMGYhovfRu2qv2YpqiH5QWuLw9igJ+7FicuwvtRnkt3Hk+AnsWGAs/E9nfhlFt/GsZC
+ Xqiv/bVDeHcrUademLJwPp+n5Rnikxk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-43-XiiODSYNNV-hDly26FgcHg-1; Mon, 18 Nov 2019 05:47:35 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFE45800EBA;
+ Mon, 18 Nov 2019 10:47:33 +0000 (UTC)
+Received: from [10.36.118.85] (unknown [10.36.118.85])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DF47B173B1;
+ Mon, 18 Nov 2019 10:47:30 +0000 (UTC)
+Subject: Re: [PATCH v1 0/2] s390x/cpumodel: Introduce "best" model variants
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
+References: <20191108110714.7475-1-david@redhat.com>
+ <CAFEAcA-mD3-Zg2JunGpMqbcaT1qboCenhqEFytZD0FmFcL2i9Q@mail.gmail.com>
+ <5dd613c0-6d9e-b943-b64d-7ba1791cbefe@redhat.com>
+ <CAFEAcA-4r53vM-K24WYr1OFSOufhZ7hDHeZBhnywyaJ0gpMO1g@mail.gmail.com>
+ <20191108191057.GZ3812@habkost.net>
+ <CAFEAcA_No5oAFtULbAOrPDeQE18HHgc0agXbs4m2AGZ+gK_ReQ@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <66c64c6d-b7c0-2cb1-2b29-4fdd9b369714@redhat.com>
+Date: Mon, 18 Nov 2019 11:47:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c061f887-456c-4434-0585-08d76c124aac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Nov 2019 10:30:11.5802 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: V701c7LGschnvqPxZIOa0abxLs6nrGOrkJWQqY3f17D8nxupmrE8iEugnCTgGviMgrSiLOJlAz/TYEUXUh/er2ttwtJKnHNKo7gGvESD7ss=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3459
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe07::711
+In-Reply-To: <CAFEAcA_No5oAFtULbAOrPDeQE18HHgc0agXbs4m2AGZ+gK_ReQ@mail.gmail.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: XiiODSYNNV-hDly26FgcHg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -123,36 +94,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "berrange@redhat.com" <berrange@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>, Denis Lunev <den@virtuozzo.com>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Michael Mueller <mimu@linux.ibm.com>,
+ Jiri Denemark <jdenemar@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGluZyENCg0KT24gMTAuMTEuMjAxOSAyMjowMywgRGVuaXMgUGxvdG5pa292IHdyb3RlOg0KPiBU
-aGlzIGFsbG93cyB0byByZXBsYWNlIHRoZSBmaWxlIG9uIGEgYmxvY2sgZGV2aWNlIGFuZCBpcyB1
-c2VmdWwNCj4gdG8gd29ya2Fyb3VuZCB0aGUgY2FzZXMgKG1pZ3JhdGlvbikgd2hlbiB0aGUgVk0g
-aW1hZ2UgaXMgcGxhY2VkIG9uDQo+IHNvbWUgc2hhcmVkIHN0b3JhZ2Ugd2l0aCBleGNsdXNpdmUg
-ZmlsZSBvcGVuaW5nIG1vZGVsIGJ1dCB0aGUgaW1hZ2UNCj4gc2hvdWxkIGJlIG9wZW4gZm9ybSBt
-b3JlIHRoYW4gb25lIGFwcC4NCj4NCj4gVGhlIHByZXZpb3VzIHZlcnNpb24gb2YgYXBwcm9hY2hp
-bmcgdGhlIHdvcmthcm91bmQgd2FzIGJhc2VkIG9uIHRoZQ0KPiAiYmxvY2tkZXYtY2hhbmdlLW1l
-ZGl1bSIgY29tbWFuZCBtb2RpZmljYXRpb24gYnV0IGhhZCBzb21lIGZsYXdzOg0KPiAgICAqIHNl
-bWFudGljczogYmxvY2tkZXYtY2hhbmdlLW1lZGl1bSBpcyBhaW1lZCB0byBiZSB1c2VkIHdpdGgg
-cmVtb3ZhYmxlIGRldmljZXMNCj4gICAgICBvbmx5DQo+ICAgICogaW50ZXJmYWNlOiBpdCBjYW4n
-dCBhY2NlcHQgYWxsIHBvc3NpYmxlIGNvbWJpbmF0aW9uIG9mIHBhcmFtZXRlcnMgZm9yDQo+ICAg
-ICAgdGhlICJkcml2ZSIgcmVwbGFjZW1lbnQgKGNyZWF0aW9uKS4NCj4NCj4gTW9yZSBkZXRhaWxz
-IGhlcmU6IGh0dHA6Ly9wYXRjaHdvcmsub3psYWJzLm9yZy9wYXRjaC8xMTc5MzI5Lw0KPg0KPiBU
-aGUgY3VycmVudCBzZXJpZXMgc3VnZ2VzdHMgYW5vdGhlciBhcHByb2FjaDoNCj4gMS4gYmxvY2tk
-ZXYtYWRkDQo+IDIuIHFvbS1zZXQgZGlzay5kcml2ZSA9IHRoZSBibG9ja2RldiBhZGRlZCAodGhp
-cyBpcyB3aGF0IHRoZSBzZXJpZXMgYWRkcykNCj4gICANCj4NCj4gRGVuaXMgUGxvdG5pa292ICgy
-KToNCj4gICAgcWRldi1wcm9wZXJ0aWVzLXN5c3RlbTogZXh0ZW5kIHNldF9waW9udGVyIGZvciB1
-bnJlYWxpemVkIGRldmljZXMNCj4gICAgYmxvY2s6IGFsbG93IHRvIHNldCAnZHJpdmUnIHByb3Bl
-cnR5IG9uIGEgcmVhbGl6ZWQgYmxvY2sgZGV2aWNlDQo+DQo+ICAgaHcvY29yZS9xZGV2LXByb3Bl
-cnRpZXMtc3lzdGVtLmMgfCAxMTcgKysrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLQ0KPiAg
-IDEgZmlsZSBjaGFuZ2VkLCA5NiBpbnNlcnRpb25zKCspLCAyMSBkZWxldGlvbnMoLSkNCj4NCg0K
+On 09.11.19 17:07, Peter Maydell wrote:
+> On Fri, 8 Nov 2019 at 19:11, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>>
+>> On Fri, Nov 08, 2019 at 01:02:28PM +0000, Peter Maydell wrote:
+>>> On Fri, 8 Nov 2019 at 12:46, David Hildenbrand <david@redhat.com> wrote=
+:
+>>>> There is a small but important difference between "max"/"host" and
+>>>> "best". Max really means "all features", including deprecated ones.
+>>>> "best", however, can disable experimental or deprecated features. Or a=
+ny
+>>>> other features we don't want to be enabled when somebody selects a mod=
+el
+>>>> manually.
+>>
+>> On x86, this is implemented by "host".  "max" gives you the full
+>> set of features that can be enabled by the user.  "host" gives
+>> you a reasonable set of features you will want to see enabled by
+>> default when the user says "use the host CPU".
+>=20
+> How does "host" work for TCG on x86?
+
+I think just like on s390x, host is limited to KVM only.
+
+>=20
+>>> Hmm. I see the distinction, but is it one that's sufficiently
+>>> worth making that we want to expose it to our users, possibly
+>>> try to add it to the other architectures, etc ? How bad is it
+>>> if the CPU provides some legacy deprecated feature that the
+>>> guest just doesn't use ?
+>>>
+>>
+>> "max" isn't something we want to expose to end users.  It is
+>> something we need to expose to other software components.
+>=20
+> We seem to have a disagreement here about what 'max' is intended
+> for and what its semantics for. That seems unfortunate...
+>=20
+> For Arm, "max" is absolutely something we want to expose to
+> end users. It's the easiest way for a user to say "give me
+> something that's going to work". "host" doesn't work on TCG,
+> only with KVM.
+
+t460s: ~/git/qemu master $ s390x-softmmu/qemu-system-s390x -cpu help |=20
+grep max
+s390 max             Enables all features supported by the accelerator=20
+in the current host
+
+t460s: ~/git/qemu master $ x86_64-softmmu/qemu-system-x86_64 -cpu help |=20
+grep max
+x86 max                   Enables all features supported by the=20
+accelerator in the current host
+
+x86 and s390x interpret the "all features supported" as "possible in=20
+this configuration", not "supported" like in a support statement.
+
+When not passing a "-cpu", you will automatically get the default model=20
+assigned (e.g., host vs. qemu model on s390x). "max" does no mimic that!
+
+>=20
+>>> 'max' already shouldn't include experimental features, at least
+>>> for Arm -- those should be off by default, because they're
+>>> experimental and you only want users to get them if they
+>>> explicitly opt in via '-cpu something,+x-my-feature'.
+>>
+>> The whole point of "max" is to tell management software which
+>> features are valid to be enabled in a host.  If "+x-my-feature"
+>> works, "x-my-feature" must be included in "max".
+>=20
+> No, definitely not. Experimental features should never be
+> enabled by default -- the user must explicitly opt into them
+> so they are aware that they're using something that might
+> change behaviour or go away in a future QEMU version.
+>=20
+> Also, from my point of view "max" is not for the benefit
+> of management software in particular. It's a convenience
+> for users primarily (and also for management software if
+> it doesn't want to care whether it's running KVM or TCG).
+>=20
+> If management software wants a way to ask "what features
+> might be valid" we should provide them with one which
+> doesn't require those features to be enabled-by-default
+> in the 'max' CPU.
+>=20
+> thanks
+> -- PMM
+>=20
+
+My personal opinion: "max" really means "all features". If we want an=20
+automatic way to specify something you requested ("give me something=20
+that's going to work") we either have to change the definition of the=20
+max model for alla rchitectures or introduce something that really=20
+matches the "no -cpu specified" - e.g., "best".
+
+--=20
+
+Thanks,
+
+David / dhildenb
+
 
