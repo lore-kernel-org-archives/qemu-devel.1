@@ -2,51 +2,82 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A81C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 05:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19CB3C432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:19:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6478520726
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 05:52:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6478520726
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id D8FDD2071E
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 06:19:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PePEmBFJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8FDD2071E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWZxy-00032W-KM
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 00:52:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60810)
+	id 1iWaNy-0007ki-0K
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 01:19:42 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36184)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iWZuS-0007cK-SK
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 00:49:14 -0500
+ (envelope-from <joel.stan@gmail.com>) id 1iWaMX-00071W-GM
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:18:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <andrey.shinkevich@virtuozzo.com>) id 1iWZuR-0005ai-5z
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 00:49:12 -0500
-Received: from relay.sw.ru ([185.231.240.75]:42496)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iWZuQ-0005a9-Uj; Mon, 18 Nov 2019 00:49:11 -0500
-Received: from dhcp-172-16-25-136.sw.ru ([172.16.25.136] helo=localhost.sw.ru)
- by relay.sw.ru with esmtp (Exim 4.92.3)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1iWZuL-00029C-5C; Mon, 18 Nov 2019 08:49:05 +0300
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-To: qemu-devel@nongnu.org,
-	qemu-block@nongnu.org
-Subject: [PATCH v8 1/3] block: introduce compress filter driver
-Date: Mon, 18 Nov 2019 08:49:02 +0300
-Message-Id: <1574056144-625164-2-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1574056144-625164-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1574056144-625164-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [fuzzy]
-X-Received-From: 185.231.240.75
+ (envelope-from <joel.stan@gmail.com>) id 1iWaMW-0005zE-0b
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 01:18:13 -0500
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:35027)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <joel.stan@gmail.com>)
+ id 1iWaMS-0005u0-7k; Mon, 18 Nov 2019 01:18:08 -0500
+Received: by mail-pg1-x542.google.com with SMTP id k32so3408275pgl.2;
+ Sun, 17 Nov 2019 22:18:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=JykI96YRsis8dgCEg/shW1vRhmHTLEtMbhdBgs5yPxU=;
+ b=PePEmBFJ9ddf4opsptO/b+fwxkwxeQx887M9wvI3czpv8q+BQ9ytHFT/k4IqazdzCr
+ pU387EzF0vxctAuhN3c+M/6TN/hc58v7YfNbeKhD1cYG6FzzC8GbDTkwtkPnwKTO1sWj
+ L2j8cgO7G8HPkEgZHA8QzZwZdK4X+QJKkOBrFGUdf4vhN9s791p15gpqJty401ufZsnz
+ 9wa0w5sbMwfADwPPDK1whap688Zs7nh9D8lAwFti0pIOWnU1bH/V4S86/djDxnmfUpHn
+ p1GM3Pf05ci4V+IeQtQemQUa96MZ1Il99I15u4h5Tbn1fM0n9APUqMdgcvuQefeJC/tP
+ oPPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=JykI96YRsis8dgCEg/shW1vRhmHTLEtMbhdBgs5yPxU=;
+ b=RicD7fpBKIDyQ7rdsnULBmQU7FNllJDiD3bZ/TuJ49EUqqsiTZLlL0mtm+7nyK2TeD
+ yNkc8W7jorg7nQYS/PmALeZpLT2WTzdCKVTb0c6RiHKKRQXPjAjmQJUrlIyeZsZ3Kkaz
+ k3l6JMORU0E6u9J5eHF+SAjT20e1d5e4fvLvLh34aKFZnQGtsaI9tdTl5J5ksg4Rpkmd
+ yHFyDU4CLZZEsO4E+nGL1GR6qyKIcAcGZ4IlXb9PBCjNQRQa7VK3h+VABn5mc6G9Kqi/
+ IzyDx1crNqISDE81hNdZxO3CavqNd0C5xczD8FyazkIk5njX0l4IrT30xcxLDeMq+oID
+ MF+g==
+X-Gm-Message-State: APjAAAX6IybGn2xGs5VedOuD/omhCB9vv8sCazdLCvcT6is3aajKWXT6
+ 93HhZ9bdhG5YABtXn2O4liU=
+X-Google-Smtp-Source: APXvYqzKVrqppKp0vLUeWakdH558Eh9BqolQiKsIJmg2NuAUxLexjownvSXj8pJzcr+bO19NtFgUdQ==
+X-Received: by 2002:a63:7218:: with SMTP id n24mr19354968pgc.100.1574057885950; 
+ Sun, 17 Nov 2019 22:18:05 -0800 (PST)
+Received: from voyager.ibm.com ([36.255.48.244])
+ by smtp.gmail.com with ESMTPSA id u7sm16602843pjx.19.2019.11.17.22.18.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 17 Nov 2019 22:18:05 -0800 (PST)
+From: Joel Stanley <joel@jms.id.au>
+To: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Subject: [PATCH] misc/pca9552: Add qom set and get
+Date: Mon, 18 Nov 2019 16:47:57 +1030
+Message-Id: <20191118061757.52550-1-joel@jms.id.au>
+X-Mailer: git-send-email 2.24.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::542
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -58,279 +89,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, armbru@redhat.com,
- mreitz@redhat.com, andrey.shinkevich@virtuozzo.com, den@openvz.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ Rashmica Gupta <rashmica.g@gmail.com>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Allow writing all the data compressed through the filter driver.
-The written data will be aligned by the cluster size.
-Based on the QEMU current implementation, that data can be written to
-unallocated clusters only. May be used for a backup job.
+Following the pattern of the work recently done with the ASPEED GPIO
+model, this adds support for inspecting and modifying the PCA9552 LEDs
+from the monitor.
 
-Suggested-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+ (qemu) qom-set  /machine/unattached/device[17] led0 on
+ (qemu) qom-get  /machine/unattached/device[17] led0
+ "on"
+
+ (qemu) qom-set  /machine/unattached/device[17] led0 off
+ (qemu) qom-get  /machine/unattached/device[17] led0
+ "off"
+
+ (qemu) qom-set  /machine/unattached/device[17] led0 pwm0
+ (qemu) qom-get  /machine/unattached/device[17] led0
+ "pwm0"
+
+ (qemu) qom-set  /machine/unattached/device[17] led0 pwm1
+ (qemu) qom-get  /machine/unattached/device[17] led0
+ "pwm1"
+
+Signed-off-by: Joel Stanley <joel@jms.id.au>
 ---
- block/Makefile.objs     |   1 +
- block/filter-compress.c | 201 ++++++++++++++++++++++++++++++++++++++++++++++++
- qapi/block-core.json    |  10 ++-
- 3 files changed, 208 insertions(+), 4 deletions(-)
- create mode 100644 block/filter-compress.c
+The qom device in mainline qemu is a different path. Using the monitor
+examine `info qom-tree /machine/unattached/` to discover it.
 
-diff --git a/block/Makefile.objs b/block/Makefile.objs
-index e394fe0..330529b 100644
---- a/block/Makefile.objs
-+++ b/block/Makefile.objs
-@@ -43,6 +43,7 @@ block-obj-y += crypto.o
+This can be tested with a Witherspoon image.
+
+$ wget https://openpower.xyz/job/openbmc-build/distro=ubuntu,label=builder,target=witherspoon/lastSuccessfulBuild/artifact/deploy/images/witherspoon/obmc-phosphor-image-witherspoon.ubi.mtd
+
+$ qemu-system-arm -M witherspoon-bmc -serial pty -monitor pty -nographic \
+ -drive file=obmc-phosphor-image-witherspoon.ubi.mtd,format=raw,if=mtd
+char device redirected to /dev/pts/5 (label compat_monitor0)
+char device redirected to /dev/pts/10 (label serial0)
+
+$ screen /dev/pts/5
+QEMU 4.1.91 monitor - type 'help' for more information
+(qemu) qom-get  /machine/unattached/device[17] led0
+"off"
+
+$ screen /dev/pts/19
+root@witherspoon:~# cd /sys/class/gpio/
+root@witherspoon:/sys/class/gpio# echo 248 > export
+root@witherspoon:/sys/class/gpio# cat gpio248/value
+0
+
+(qemu) qom-set  /machine/unattached/device[17] led0 on
+
+root@witherspoon:/sys/class/gpio# echo out > gpio248/direction
+root@witherspoon:/sys/class/gpio# cat gpio248/value
+1
+
+(qemu) qom-get  /machine/unattached/device[17] led0
+"on"
+
+(qemu) qom-set  /machine/unattached/device[17] led0 off
+(qemu) qom-get  /machine/unattached/device[17] led0
+"off"
+
+root@witherspoon:/sys/class/gpio# cat gpio248/value
+0
+
+Signed-off-by: Joel Stanley <joel@jms.id.au>
+---
+ hw/misc/pca9552.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 91 insertions(+)
+
+diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+index 73be28d9369c..0362aac8c862 100644
+--- a/hw/misc/pca9552.c
++++ b/hw/misc/pca9552.c
+@@ -15,12 +15,16 @@
+ #include "hw/misc/pca9552.h"
+ #include "hw/misc/pca9552_regs.h"
+ #include "migration/vmstate.h"
++#include "qapi/error.h"
++#include "qapi/visitor.h"
  
- block-obj-y += aio_task.o
- block-obj-y += backup-top.o
-+block-obj-y += filter-compress.o
+ #define PCA9552_LED_ON   0x0
+ #define PCA9552_LED_OFF  0x1
+ #define PCA9552_LED_PWM0 0x2
+ #define PCA9552_LED_PWM1 0x3
  
- common-obj-y += stream.o
++static const char *led_state[] = {"on", "off", "pwm0", "pwm1"};
++
+ static uint8_t pca9552_pin_get_config(PCA9552State *s, int pin)
+ {
+     uint8_t reg   = PCA9552_LS0 + (pin / 4);
+@@ -169,6 +173,84 @@ static int pca9552_event(I2CSlave *i2c, enum i2c_event event)
+     return 0;
+ }
  
-diff --git a/block/filter-compress.c b/block/filter-compress.c
-new file mode 100644
-index 0000000..522d6c3
---- /dev/null
-+++ b/block/filter-compress.c
-@@ -0,0 +1,201 @@
-+/*
-+ * Compress filter block driver
-+ *
-+ * Copyright (c) 2019 Virtuozzo International GmbH
-+ *
-+ * Author:
-+ *   Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-+ *   (based on block/copy-on-read.c by Max Reitz)
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 or
-+ * (at your option) any later version of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "block/block_int.h"
-+#include "qemu/module.h"
-+
-+
-+static int compress_open(BlockDriverState *bs, QDict *options, int flags,
-+                         Error **errp)
++static void pca9552_get_led(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp)
 +{
-+    bs->file = bdrv_open_child(NULL, options, "file", bs, &child_file, false,
-+                                  errp);
-+    if (!bs->file) {
-+        return -EINVAL;
++    PCA9552State *s = PCA9552(obj);
++    int led, rc, reg;
++    char *str;
++    uint8_t state;
++
++    rc = sscanf(name, "led%2d", &led);
++    if (rc != 1) {
++        error_setg(errp, "%s: error reading %s", __func__, name);
++        return;
 +    }
-+
-+    bs->supported_write_flags = BDRV_REQ_WRITE_UNCHANGED |
-+        BDRV_REQ_WRITE_COMPRESSED |
-+        (BDRV_REQ_FUA & bs->file->bs->supported_write_flags);
-+
-+    bs->supported_zero_flags = BDRV_REQ_WRITE_UNCHANGED |
-+        ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK) &
-+            bs->file->bs->supported_zero_flags);
-+
-+    return 0;
-+}
-+
-+
-+#define PERM_PASSTHROUGH (BLK_PERM_CONSISTENT_READ \
-+                          | BLK_PERM_WRITE \
-+                          | BLK_PERM_RESIZE)
-+#define PERM_UNCHANGED (BLK_PERM_ALL & ~PERM_PASSTHROUGH)
-+
-+static void compress_child_perm(BlockDriverState *bs, BdrvChild *c,
-+                                const BdrvChildRole *role,
-+                                BlockReopenQueue *reopen_queue,
-+                                uint64_t perm, uint64_t shared,
-+                                uint64_t *nperm, uint64_t *nshared)
-+{
-+    *nperm = perm & PERM_PASSTHROUGH;
-+    *nshared = (shared & PERM_PASSTHROUGH) | PERM_UNCHANGED;
-+
++    if (led < 0 || led > s->nr_leds) {
++        error_setg(errp, "%s invalid led %s", __func__, name);
++        return;
++    }
 +    /*
-+     * We must not request write permissions for an inactive node, the child
-+     * cannot provide it.
++     * Get the LSx register as the qom interface should expose the device
++     * state, not the modeled 'input line' behaviour which would come from
++     * reading the INPUTx reg
 +     */
-+    if (!(bs->open_flags & BDRV_O_INACTIVE)) {
-+        *nperm |= BLK_PERM_WRITE_UNCHANGED;
++    reg = PCA9552_LS0 + led / 4;
++    state = (pca9552_read(s, reg) >> (led % 8)) & 0x3;
++    str = g_strdup(led_state[state]);
++    visit_type_str(v, name, &str, errp);
++}
++
++/*
++ * Return an LED selector register value based on an existing one, with
++ * the appropriate 2-bit state value set for the given LED number (0-3).
++ */
++static inline uint8_t pca955x_ledsel(uint8_t oldval, int led_num, int state)
++{
++        return (oldval & (~(0x3 << (led_num << 1)))) |
++                ((state & 0x3) << (led_num << 1));
++}
++
++static void pca9552_set_led(Object *obj, Visitor *v, const char *name,
++                            void *opaque, Error **errp)
++{
++    PCA9552State *s = PCA9552(obj);
++    Error *local_err = NULL;
++    int led, rc, reg, val;
++    uint8_t state;
++    char *state_str;
++
++    visit_type_str(v, name, &state_str, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        return;
 +    }
-+}
-+
-+
-+static int64_t compress_getlength(BlockDriverState *bs)
-+{
-+    return bdrv_getlength(bs->file->bs);
-+}
-+
-+
-+static int coroutine_fn compress_co_truncate(BlockDriverState *bs,
-+                                             int64_t offset, bool exact,
-+                                             PreallocMode prealloc,
-+                                             Error **errp)
-+{
-+    return bdrv_co_truncate(bs->file, offset, exact, prealloc, errp);
-+}
-+
-+
-+static int coroutine_fn compress_co_preadv_part(BlockDriverState *bs,
-+                                                uint64_t offset, uint64_t bytes,
-+                                                QEMUIOVector *qiov,
-+                                                size_t qiov_offset,
-+                                                int flags)
-+{
-+    return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
-+                               flags);
-+}
-+
-+
-+static int coroutine_fn compress_co_pwritev_part(BlockDriverState *bs,
-+                                                 uint64_t offset,
-+                                                 uint64_t bytes,
-+                                                 QEMUIOVector *qiov,
-+                                                 size_t qiov_offset, int flags)
-+{
-+    return bdrv_co_pwritev_part(bs->file, offset, bytes, qiov, qiov_offset,
-+                                flags | BDRV_REQ_WRITE_COMPRESSED);
-+}
-+
-+
-+static int coroutine_fn compress_co_pwrite_zeroes(BlockDriverState *bs,
-+                                                  int64_t offset, int bytes,
-+                                                  BdrvRequestFlags flags)
-+{
-+    return bdrv_co_pwrite_zeroes(bs->file, offset, bytes, flags);
-+}
-+
-+
-+static int coroutine_fn compress_co_pdiscard(BlockDriverState *bs,
-+                                             int64_t offset, int bytes)
-+{
-+    return bdrv_co_pdiscard(bs->file, offset, bytes);
-+}
-+
-+
-+static int compress_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-+{
-+    return bdrv_get_info(bs->file->bs, bdi);
-+}
-+
-+
-+static void compress_refresh_limits(BlockDriverState *bs, Error **errp)
-+{
-+    BlockDriverInfo bdi;
-+    int ret;
-+
-+    if (!bs->file) {
++    rc = sscanf(name, "led%2d", &led);
++    if (rc != 1) {
++        error_setg(errp, "%s: error reading %s", __func__, name);
++        return;
++    }
++    if (led < 0 || led > s->nr_leds) {
++        error_setg(errp, "%s invalid led %s", __func__, name);
 +        return;
 +    }
 +
-+    ret = bdrv_get_info(bs->file->bs, &bdi);
-+    if (ret < 0 || bdi.cluster_size == 0) {
++    for (state = 0; state < ARRAY_SIZE(led_state); state++) {
++        if (!strcmp(state_str, led_state[state])) {
++            break;
++        }
++    }
++    if (state >= ARRAY_SIZE(led_state)) {
++        error_setg(errp, "%s invalid led state %s", __func__, state_str);
 +        return;
 +    }
 +
-+    bs->bl.request_alignment = bdi.cluster_size;
++    reg = PCA9552_LS0 + led / 4;
++    val = pca9552_read(s, reg);
++    val = pca955x_ledsel(val, led % 4, state);
++    pca9552_write(s, reg, val);
 +}
 +
+ static const VMStateDescription pca9552_vmstate = {
+     .name = "PCA9552",
+     .version_id = 0,
+@@ -204,6 +286,7 @@ static void pca9552_reset(DeviceState *dev)
+ static void pca9552_initfn(Object *obj)
+ {
+     PCA9552State *s = PCA9552(obj);
++    int led;
+ 
+     /* If support for the other PCA955X devices are implemented, these
+      * constant values might be part of class structure describing the
+@@ -211,6 +294,14 @@ static void pca9552_initfn(Object *obj)
+      */
+     s->max_reg = PCA9552_LS3;
+     s->nr_leds = 16;
 +
-+static void compress_eject(BlockDriverState *bs, bool eject_flag)
-+{
-+    bdrv_eject(bs->file->bs, eject_flag);
-+}
++    for (led = 0; led < s->nr_leds; led++) {
++        char *name;
 +
-+
-+static void compress_lock_medium(BlockDriverState *bs, bool locked)
-+{
-+    bdrv_lock_medium(bs->file->bs, locked);
-+}
-+
-+
-+static bool compress_recurse_is_first_non_filter(BlockDriverState *bs,
-+                                                 BlockDriverState *candidate)
-+{
-+    return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
-+}
-+
-+
-+static BlockDriver bdrv_compress = {
-+    .format_name                        = "compress",
-+
-+    .bdrv_open                          = compress_open,
-+    .bdrv_child_perm                    = compress_child_perm,
-+
-+    .bdrv_getlength                     = compress_getlength,
-+    .bdrv_co_truncate                   = compress_co_truncate,
-+
-+    .bdrv_co_preadv_part                = compress_co_preadv_part,
-+    .bdrv_co_pwritev_part               = compress_co_pwritev_part,
-+    .bdrv_co_pwrite_zeroes              = compress_co_pwrite_zeroes,
-+    .bdrv_co_pdiscard                   = compress_co_pdiscard,
-+    .bdrv_get_info                      = compress_get_info,
-+    .bdrv_refresh_limits                = compress_refresh_limits,
-+
-+    .bdrv_eject                         = compress_eject,
-+    .bdrv_lock_medium                   = compress_lock_medium,
-+
-+    .bdrv_co_block_status               = bdrv_co_block_status_from_backing,
-+
-+    .bdrv_recurse_is_first_non_filter   = compress_recurse_is_first_non_filter,
-+
-+    .has_variable_length                = true,
-+    .is_filter                          = true,
-+};
-+
-+static void bdrv_compress_init(void)
-+{
-+    bdrv_register(&bdrv_compress);
-+}
-+
-+block_init(bdrv_compress_init);
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index aa97ee2..2f34703 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2884,15 +2884,16 @@
- # @copy-on-read: Since 3.0
- # @blklogwrites: Since 3.0
- # @blkreplay: Since 4.2
-+# @compress: Since 5.0
- #
- # Since: 2.9
- ##
- { 'enum': 'BlockdevDriver',
-   'data': [ 'blkdebug', 'blklogwrites', 'blkreplay', 'blkverify', 'bochs',
--            'cloop', 'copy-on-read', 'dmg', 'file', 'ftp', 'ftps', 'gluster',
--            'host_cdrom', 'host_device', 'http', 'https', 'iscsi', 'luks',
--            'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels', 'qcow',
--            'qcow2', 'qed', 'quorum', 'raw', 'rbd',
-+            'cloop', 'copy-on-read', 'compress', 'dmg', 'file', 'ftp', 'ftps',
-+            'gluster', 'host_cdrom', 'host_device', 'http', 'https', 'iscsi',
-+            'luks', 'nbd', 'nfs', 'null-aio', 'null-co', 'nvme', 'parallels',
-+            'qcow', 'qcow2', 'qed', 'quorum', 'raw', 'rbd',
-             { 'name': 'replication', 'if': 'defined(CONFIG_REPLICATION)' },
-             'sheepdog',
-             'ssh', 'throttle', 'vdi', 'vhdx', 'vmdk', 'vpc', 'vvfat', 'vxhs' ] }
-@@ -4045,6 +4046,7 @@
-       'bochs':      'BlockdevOptionsGenericFormat',
-       'cloop':      'BlockdevOptionsGenericFormat',
-       'copy-on-read':'BlockdevOptionsGenericFormat',
-+      'compress':   'BlockdevOptionsGenericFormat',
-       'dmg':        'BlockdevOptionsGenericFormat',
-       'file':       'BlockdevOptionsFile',
-       'ftp':        'BlockdevOptionsCurlFtp',
++        name = g_strdup_printf("led%d", led);
++        object_property_add(obj, name, "bool", pca9552_get_led, pca9552_set_led,
++                            NULL, NULL, NULL);
++    }
+ }
+ 
+ static void pca9552_class_init(ObjectClass *klass, void *data)
 -- 
-1.8.3.1
+2.24.0
 
 
