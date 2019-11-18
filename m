@@ -2,106 +2,83 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5998C432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 18:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E5BBC432C0
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 18:09:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A564218AF
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 18:04:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3A8082192B
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 18:09:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EqJyX9/J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A564218AF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=koconnor.net header.i=@koconnor.net header.b="Gj/9pPVA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A8082192B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=koconnor.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37912 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWlO0-0007j3-Hz
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 13:04:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34873)
+	id 1iWlT5-0002MV-5c
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 13:09:43 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35614)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iWlN0-00075M-2J
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:03:27 -0500
+ (envelope-from <kevin@koconnor.net>) id 1iWlS7-0001m1-PW
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:08:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iWlMz-0000b8-5l
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:03:25 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:57112
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iWlMz-0000at-0M
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:03:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574100204;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=EFPg57HUAZ0bVfsJRpyN26UY78Y1GFrhaaGmWIIjjsI=;
- b=EqJyX9/Ju1ERP4/3qMtPfXSVNcwvJDW6YTCR1N3K+4pV7BpSBZdNaYXSm0nV5c3ID19D00
- Wp+TNSv91ic0SJdNh2r+WUBW8tHKSEmTrHmNAmyIBLueyxi5v5HGLKi9PAgA6MhGkRIGSI
- mLuzKgzoDSyNmQin1Pfbaj2oBUCFs3M=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-LMa_0SWRMJaY8JDbJEnWYw-1; Mon, 18 Nov 2019 13:03:22 -0500
-X-MC-Unique: LMa_0SWRMJaY8JDbJEnWYw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7BE9801E5A;
- Mon, 18 Nov 2019 18:03:21 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-88.ams2.redhat.com
- [10.36.117.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DFDA04B6;
- Mon, 18 Nov 2019 18:03:20 +0000 (UTC)
-Subject: Re: [PATCH 2/2] iotests: Test multiple blockdev-snapshot calls
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20191108085312.27049-1-kwolf@redhat.com>
- <20191108085312.27049-3-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <91867797-dfac-2193-9730-70fc701270df@redhat.com>
-Date: Mon, 18 Nov 2019 19:03:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <kevin@koconnor.net>) id 1iWlS6-0002HI-P2
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:08:43 -0500
+Received: from mail-qk1-x72f.google.com ([2607:f8b0:4864:20::72f]:45484)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <kevin@koconnor.net>) id 1iWlS6-0002GF-GW
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 13:08:42 -0500
+Received: by mail-qk1-x72f.google.com with SMTP id q70so15241629qke.12
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 10:08:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=koconnor.net; s=google;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=cgWTWah+qaITd5ImyC0zWdxPt54Y47f//WWylOcYfEU=;
+ b=Gj/9pPVAkC2+YiSHe3IENJT5NNYKiUqvJrB2GiilpH9uYazO61DJHE+hpGl8UeHJ+l
+ BNik75ka91ahpfH9bWaHyXD9s5tZUaZ+0XXaD+4WwRlL8B1VFj7kt9o41Hr2pxz5bUqX
+ b8qe4Dz/TgMAaYYvP7E53kSjXilbgsv2VXLrk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=cgWTWah+qaITd5ImyC0zWdxPt54Y47f//WWylOcYfEU=;
+ b=nM/3i+cXgAjU/iR4p0CHc0yNks4lc5L0BZmg/Qxd9LmJ78isHURtlzOINiL1bXNQxA
+ slxjUspoxUeuzSk/+/ylTBpz7TDn6C21dLaOeoDAJ1PktCe3Qovwge2wr4lVIY+u31+E
+ jOa6qpyxhDXjJMI8vgyZasKvXCm9UlZ+hrVFfQCFoFSySilwUP+zZFchsDl11DC4KqlU
+ S/cknq9g+uUQKCiN5IWsUqrXCFQn2a2OLaCBHeJ1F3scMOfitKUi5aHvLIbG0vA4/1hj
+ x5jC+3alf75dvZ5mrbXZbX44lP2MLMGbF1cTtNsVeli2mDzJ/xBp+TWPpbHZ5kLGJz19
+ w1sw==
+X-Gm-Message-State: APjAAAWHYy1DlfXR7vyEivKFcptIUwHXuzpFOFzAt/9WArlEfHqP0jBL
+ TnMAEeTUF4i4hiUsdRpwB/NInA==
+X-Google-Smtp-Source: APXvYqyFmr0Hda5WlT0PbAGeNZHrkQaoO87GjrnmYabVj7oPRh2yvOdltNZsfoR2L1H2mTZjTsB8Hw==
+X-Received: by 2002:a37:b044:: with SMTP id z65mr24812975qke.424.1574100521343; 
+ Mon, 18 Nov 2019 10:08:41 -0800 (PST)
+Received: from localhost ([64.9.249.138])
+ by smtp.gmail.com with ESMTPSA id i186sm8865408qkc.8.2019.11.18.10.08.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 18 Nov 2019 10:08:40 -0800 (PST)
+Date: Mon, 18 Nov 2019 13:08:39 -0500
+From: Kevin O'Connor <kevin@koconnor.net>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [SeaBIOS] Re: 1.13 release?
+Message-ID: <20191118180839.GA17869@morn.lan>
+References: <20191016104412.ut3jxjwjf64qsjbk@sirius.home.kraxel.org>
+ <20191106111255.aladyvsumr2kw47b@sirius.home.kraxel.org>
+ <20191106162918.GC19095@morn.lan>
 MIME-Version: 1.0
-In-Reply-To: <20191108085312.27049-3-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="kaVb80zkpmoHyur7UJJyxN7f9LshqO4W1"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191106162918.GC19095@morn.lan>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::72f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -113,68 +90,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pkrempa@redhat.com, qemu-devel@nongnu.org
+Cc: seabios@seabios.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---kaVb80zkpmoHyur7UJJyxN7f9LshqO4W1
-Content-Type: multipart/mixed; boundary="0HmdEFzAzZRtjlI8amGQ00GVxmxIz2h6i"
+On Wed, Nov 06, 2019 at 11:29:18AM -0500, Kevin O'Connor wrote:
+> On Wed, Nov 06, 2019 at 12:12:55PM +0100, Gerd Hoffmann wrote:
+> > On Wed, Oct 16, 2019 at 12:44:12PM +0200, Gerd Hoffmann wrote:
+> > >   Hi,
+> > > 
+> > > Almost a year since 1.12.0 was tagged (Nov 17th to be exact),
+> > > time to plan the 1.13 release I think ...
+> > > 
+> > > How about freeze in a week or two, release by mid-november?
+> > > 
+> > > Pending stuff I'm aware of is the disk geometry patch series.
+> > > The corresponding qemu series is still waiting to be merged.
+> > 
+> > It's finally merged in qemu now.  Going to push the seabios
+> > series and prepare a seabios update for qemu, so upcoming
+> > seabios release gets some more test coverage.
+> 
+> Okay, thanks.
+> 
+> If we're going to update that in SeaBIOS, then we may wish to push
+> back the SeaBIOS release by a few weeks.
 
---0HmdEFzAzZRtjlI8amGQ00GVxmxIz2h6i
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+At this point, I'm targeting early December for the release.  Let me
+know if there are any concerns with that.
 
-On 08.11.19 09:53, Kevin Wolf wrote:
-> Test that doing a second blockdev-snapshot doesn't make the first
-> overlay's backing file go away.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/273     |  76 +++++++++
->  tests/qemu-iotests/273.out | 337 +++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 414 insertions(+)
->  create mode 100755 tests/qemu-iotests/273
->  create mode 100644 tests/qemu-iotests/273.out
-
-[...]
-
-> +                "format-specific": {
-> +                    "type": "IMGFMT",
-> +                    "data": {
-> +                        "compat": "1.1",
-> +                        "lazy-refcounts": false,
-> +                        "refcount-bits": 16,
-> +                        "corrupt": false
-> +                    }
-
-I get a mismatch here with -o compat=3D0.10 or -o refcount_bits=3D1.
-
-Max
-
-
---0HmdEFzAzZRtjlI8amGQ00GVxmxIz2h6i--
-
---kaVb80zkpmoHyur7UJJyxN7f9LshqO4W1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3S3OcACgkQ9AfbAGHV
-z0C0PggAk5FgL41maDjZ4/C/gR78jxILVb7lVOVTlwcwngwQU/WINvdRkuz7nNZG
-3pN39kjIOqyumToapI2vUpJsTO7XWZS3T3yT3AH1KXWXFTyMsPp6X97HIsXL0j6f
-dSMJXQAYMQB2H6UrQ4+G4NboY1HHJYqSotHMk5oBtq/i/gzqIGBXnCS9Dnl+rHpB
-QM/hGhMjo0LXs/9JoSZaKM9FB6K9BIEvt4SgwEpAup0QUY251DwhhwdaBAKlBsco
-wtK81syH70awjSjL1WZdkKM6beUcpKTVX05mYIJ/h6mrRUdUltg1O4zRLZREV15M
-Caf+bWuNZ1XIxNrEhxG+tnp4eZrlyQ==
-=Sbax
------END PGP SIGNATURE-----
-
---kaVb80zkpmoHyur7UJJyxN7f9LshqO4W1--
-
+Cheers,
+-Kevin
 
