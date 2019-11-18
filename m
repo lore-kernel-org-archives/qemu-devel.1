@@ -2,61 +2,57 @@ Return-Path: <SRS0=QE2o=ZK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5439EC432C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 01:49:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 468FEC432C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 01:56:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26B52206D6
-	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 01:49:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26B52206D6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0FFB220679
+	for <qemu-devel@archiver.kernel.org>; Mon, 18 Nov 2019 01:56:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FFB220679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWWAW-0002tq-7s
-	for qemu-devel@archiver.kernel.org; Sun, 17 Nov 2019 20:49:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34692)
+	id 1iWWHK-0005ci-6R
+	for qemu-devel@archiver.kernel.org; Sun, 17 Nov 2019 20:56:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34860)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iWW9p-0002Si-8u
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 20:48:50 -0500
+ (envelope-from <pannengyuan@huawei.com>) id 1iWWBo-0003ZN-Fe
+ for qemu-devel@nongnu.org; Sun, 17 Nov 2019 20:50:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richardw.yang@linux.intel.com>) id 1iWW9n-0006PB-VR
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 20:48:49 -0500
-Received: from mga14.intel.com ([192.55.52.115]:4778)
+ (envelope-from <pannengyuan@huawei.com>) id 1iWWBn-0006vG-CD
+ for qemu-devel@nongnu.org; Sun, 17 Nov 2019 20:50:52 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:44354 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <richardw.yang@linux.intel.com>)
- id 1iWW9n-0006ON-Nq
- for qemu-devel@nongnu.org; Sun, 17 Nov 2019 20:48:47 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 17 Nov 2019 17:48:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,318,1569308400"; d="scan'208";a="195977620"
-Received: from richard.sh.intel.com (HELO localhost) ([10.239.159.54])
- by orsmga007.jf.intel.com with ESMTP; 17 Nov 2019 17:48:39 -0800
-Date: Mon, 18 Nov 2019 09:48:29 +0800
-From: Wei Yang <richardw.yang@linux.intel.com>
-To: Wei Yang <richardw.yang@linux.intel.com>
-Subject: Re: [PATCH 0/2] not use multifd during postcopy
-Message-ID: <20191118014829.GA4382@richard>
-References: <20191025232000.25857-1-richardw.yang@linux.intel.com>
+ (Exim 4.71) (envelope-from <pannengyuan@huawei.com>)
+ id 1iWWBk-0006uK-KU; Sun, 17 Nov 2019 20:50:48 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 094F0E37F54E9B4B59E8;
+ Mon, 18 Nov 2019 09:50:44 +0800 (CST)
+Received: from HGHY2P002143101.china.huawei.com (10.184.39.213) by
+ DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
+ 14.3.439.0; Mon, 18 Nov 2019 09:50:36 +0800
+From: <pannengyuan@huawei.com>
+To: <david@gibson.dropbear.id.au>
+Subject: [Qemu-devel][PATCH] ppc/spapr_events: fix potential NULL pointer
+ dereference in rtas_event_log_dequeue
+Date: Mon, 18 Nov 2019 09:50:13 +0800
+Message-ID: <1574041813-35408-1-git-send-email-pannengyuan@huawei.com>
+X-Mailer: git-send-email 2.7.2.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191025232000.25857-1-richardw.yang@linux.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.115
+Content-Type: text/plain
+X-Originating-IP: [10.184.39.213]
+X-CFilter-Loop: Reflected
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 45.249.212.35
+X-Mailman-Approved-At: Sun, 17 Nov 2019 20:55:24 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,35 +64,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Wei Yang <richardw.yang@linux.intel.com>
-Cc: qemu-devel@nongnu.org, dgilbert@redhat.com, quintela@redhat.com
+Cc: zhang.zhanghailiang@huawei.com, PanNengyuan <pannengyuan@huawei.com>,
+ kenny.zhangjun@huawei.com, qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ kuhn.chenqun@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping for comments.
+From: PanNengyuan <pannengyuan@huawei.com>
 
-On Sat, Oct 26, 2019 at 07:19:58AM +0800, Wei Yang wrote:
->We don't support multifd during postcopy, but user still could enable
->both multifd and postcopy. This leads to migration failure.
->
->Patch 1 does proper cleanup, otherwise we may have data corruption.
->Patch 2 does the main job.
->
->BTW, current multifd synchronization method needs a cleanup. Will send another
->patch set.
->
->Wei Yang (2):
->  migration/multifd: clean pages after filling packet
->  migration/multifd: not use multifd during postcopy
->
-> migration/ram.c | 15 ++++++++++-----
-> 1 file changed, 10 insertions(+), 5 deletions(-)
->
->-- 
->2.17.1
+source is being dereferenced before it is null checked, hence there is a
+potential null pointer dereference.
 
+This fixes:
+        360
+    CID 68911917: (NULL_RETURNS)
+        361. dereference: Dereferencing "source", which is known to be
+        "NULL".
+        361        if (source->mask & event_mask) {
+        362            break;
+        363        }
+
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: PanNengyuan <pannengyuan@huawei.com>
+---
+ hw/ppc/spapr_events.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index 0e4c195..febd2ef 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -358,7 +358,7 @@ static SpaprEventLogEntry *rtas_event_log_dequeue(SpaprMachineState *spapr,
+             rtas_event_log_to_source(spapr,
+                                      spapr_event_log_entry_type(entry));
+ 
+-        if (source->mask & event_mask) {
++        if (source && (source->mask & event_mask)) {
+             break;
+         }
+     }
 -- 
-Wei Yang
-Help you, Help me
+2.7.2.windows.1
+
+
 
