@@ -2,64 +2,72 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA0C9C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 01:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F20C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 01:33:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F96522310
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 01:03:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Iy22A/3S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F96522310
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id BA2B1219FA
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 01:33:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA2B1219FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWruB-0007Oc-1j
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 20:02:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60894)
+	id 1iWsOC-0005H0-Rr
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 20:33:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35002)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iWrsX-0006pQ-KV
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 20:00:26 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iWsND-0004fi-5L
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 20:32:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iWrsW-0001qY-Dv
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 20:00:25 -0500
-Received: from ozlabs.org ([203.11.71.1]:56115)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iWrsW-0001oz-2A; Mon, 18 Nov 2019 20:00:24 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47H6tq5YhSz9sPV; Tue, 19 Nov 2019 12:00:19 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1574125219;
- bh=PsSDjfi61zbflZICabmIrHcXIAPqJQq/L2+4OMfn2nE=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Iy22A/3Sc4EJUbGUcrcTMHXfDTWA15hJvKZ/ssM3vhx+BZ6KGDfSIrMDQyYjg+XT5
- V3aVJmyMm8w226k1Ewi+O1tQaBpaWgoWTqSXrzZdau1uIMC4GuT0IFBex6lFVN9YpA
- MbLtUGWqwID/p1A3mwS2JxEmp5VDzs6+689lra0Y=
-Date: Tue, 19 Nov 2019 12:00:12 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] spapr: Fix VSMT mode when it is not supported by the
- kernel
-Message-ID: <20191119010012.GI5582@umbus.fritz.box>
-References: <20191108154035.12913-1-lvivier@redhat.com>
- <20191108174759.2d4040f1@bahia.lan>
+ (envelope-from <no-reply@patchew.org>) id 1iWsNB-0004ph-8P
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 20:32:06 -0500
+Resent-Date: Mon, 18 Nov 2019 20:32:06 -0500
+Resent-Message-Id: <E1iWsNB-0004ph-8P@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21471)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iWsNA-0004nk-VX
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 20:32:05 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1574127096; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=ajKFhIZiPgRDq4kd8dF08hM0xDv6VbBEUZu97zrg6wV2eBqlBJKAhzForxK7t8/86YSGsL1XurxhOmDUR2cfXuPCa5+gJiQ+IHkdFTIHSLqqTSfJ8VfY+bbgt9q+GYEuolb3c5tXfZgpEUGn0eoaW/T4Qsiuhl+0xcHQjr6MlVw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1574127096;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=pm+SnG58t87KB7EY5U4CPPjjK4QOLhksszGGyG85i2c=; 
+ b=asQ7kI/ydBJY6Ak1QGHU+uTwAWEvi/sGRCyspE3yLS+sKTMeXy2YcIeVvSdhFreZOO4AVBqIrkeKjkuGb6tNcRlX1mzHyfqaoZRURm0ft4O/eNQB+BdyI+a9u8YxRP5dyzSrtaayrLPeYf8NAngiwNdH8cVEuuenXHXW/8O/tbY=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1574127094280952.2316666589521;
+ Mon, 18 Nov 2019 17:31:34 -0800 (PST)
+In-Reply-To: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
+Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of patches
+ - linux-user changes + linux-user/hexagon + skeleton of target/hexagon -
+ Files in target/hexagon/imported are from another project and therefore do
+ not conform to qemu coding standards
+Message-ID: <157412709300.27250.5531224491109755641@37313f22b938>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="Az4VpBrmI9+OyhK/"
-Content-Disposition: inline
-In-Reply-To: <20191108174759.2d4040f1@bahia.lan>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: tsimpson@quicinc.com
+Date: Mon, 18 Nov 2019 17:31:34 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 203.11.71.1
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,78 +79,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org,
- clg@kaod.org
+Reply-To: qemu-devel@nongnu.org
+Cc: tsimpson@quicinc.com, riku.voipio@iki.fi, laurent@vivier.eu,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc0MTIxNDk3LTI0MzMtMS1n
+aXQtc2VuZC1lbWFpbC10c2ltcHNvbkBxdWljaW5jLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
+ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
+IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIXSBBZGQgbWluaW1hbCBIZXhh
+Z29uIHRhcmdldCAtIEZpcnN0IGluIGEgc2VyaWVzIG9mIHBhdGNoZXMgLSBsaW51eC11c2VyIGNo
+YW5nZXMgKyBsaW51eC11c2VyL2hleGFnb24gKyBza2VsZXRvbiBvZiB0YXJnZXQvaGV4YWdvbiAt
+IEZpbGVzIGluIHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkIGFyZSBmcm9tIGFub3RoZXIgcHJvamVj
+dCBhbmQgdGhlcmVmb3JlIGRvIG5vdCBjb25mb3JtIHRvIHFlbXUgY29kaW5nIHN0YW5kYXJkcwpU
+eXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMTU3NDEyMTQ5Ny0yNDMzLTEtZ2l0LXNlbmQtZW1haWwt
+dHNpbXBzb25AcXVpY2luYy5jb20KCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jh
+c2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0t
+bG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMg
+VHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0
+cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09
+CgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjc3NDQ1MDkgQWRkIG1pbmltYWwgSGV4
+YWdvbiB0YXJnZXQgLSBGaXJzdCBpbiBhIHNlcmllcyBvZiBwYXRjaGVzIC0gbGludXgtdXNlciBj
+aGFuZ2VzICsgbGludXgtdXNlci9oZXhhZ29uICsgc2tlbGV0b24gb2YgdGFyZ2V0L2hleGFnb24g
+LSBGaWxlcyBpbiB0YXJnZXQvaGV4YWdvbi9pbXBvcnRlZCBhcmUgZnJvbSBhbm90aGVyIHByb2pl
+Y3QgYW5kIHRoZXJlZm9yZSBkbyBub3QgY29uZm9ybSB0byBxZW11IGNvZGluZyBzdGFuZGFyZHMK
+Cj09PSBPVVRQVVQgQkVHSU4gPT09CldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
+bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzM4OiAKbmV3IGZpbGUgbW9k
+ZSAxMDA2NDQKCkVSUk9SOiBkbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMTkyMjogRklMRTog
+dGFyZ2V0L2hleGFnb24vaW1wb3J0ZWQvaXNzX3Zlcl9yZWdpc3RlcnMuaDo4MDoKKy8vIE5ldyBp
+bnRlcnJ1cHRzLCBrZWVwIG9sZCBkZWZpbmVzIGZvciB0aGUgdGltZSBiZWluZwoKRVJST1I6IHRy
+YWlsaW5nIHdoaXRlc3BhY2UKIzE5MjQ6IEZJTEU6IHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkL2lz
+c192ZXJfcmVnaXN0ZXJzLmg6ODI6CisjZGVmaW5lIEhFWF9SRUdfR1NSIDgxICQKCkVSUk9SOiBk
+byBub3QgdXNlIEM5OSAvLyBjb21tZW50cwojMjAwMzogRklMRTogdGFyZ2V0L2hleGFnb24vaW1w
+b3J0ZWQvaXNzX3Zlcl9yZWdpc3RlcnMuaDoxNjE6CisvLyBHUkVHX0FWUyByZW5hbWVkIHRvIEdS
+RUdfUkdEUjIgaW4gdjY3CgpFUlJPUjogdHJhaWxpbmcgd2hpdGVzcGFjZQojMjAzODogRklMRTog
+dGFyZ2V0L2hleGFnb24vaW1wb3J0ZWQvbWF4Lmg6NzoKKyAqICQKCkVSUk9SOiBjb2RlIGluZGVu
+dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIwNDY6IEZJTEU6IHRhcmdldC9oZXhhZ29uL2ltcG9y
+dGVkL21heC5oOjE1OgorI2RlZmluZSBJTlNUUlVDVElPTlNfTUFYIDdeSV5JLyogMiBwYWlycyAr
+IGxvb3BlbmQgKi8kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMy
+MDUxOiBGSUxFOiB0YXJnZXQvaGV4YWdvbi9pbXBvcnRlZC9tYXguaDoyMDoKKyNkZWZpbmUgTUFY
+X0NPUkVTIDReSV5JXkleSS8qIENvcmVzIHBlciBzaGFyZWQgTDIgKi8kCgpFUlJPUjogbGluZSBv
+dmVyIDkwIGNoYXJhY3RlcnMKIzIwNTQ6IEZJTEU6IHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkL21h
+eC5oOjIzOgorI2RlZmluZSBUSFJFQURTX1BFUl9DT1JFIChNQVhfQ0xVU1RFUlMgKiBNQVhfVEhS
+RUFEU19QRVJfQ0xVU1RFUikgICAgICAgICAgICAgIC8qIEhXIHRocmVhZHMgaW4gYSBjb3JlICov
+CgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMyMDU0OiBGSUxFOiB0
+YXJnZXQvaGV4YWdvbi9pbXBvcnRlZC9tYXguaDoyMzoKKyNkZWZpbmUgVEhSRUFEU19QRVJfQ09S
+RSAoTUFYX0NMVVNURVJTICogTUFYX1RIUkVBRFNfUEVSX0NMVVNURVIpXkleSS8qIEhXIHRocmVh
+ZHMgaW4gYSBjb3JlICovJAoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMyMDU2
+OiBGSUxFOiB0YXJnZXQvaGV4YWdvbi9pbXBvcnRlZC9tYXguaDoyNToKKyNkZWZpbmUgRE1BX01B
+WCBUSFJFQURTX01BWCAgLy8gRE1BOiBtYWtlIHRoaXMgaW5kZXBlbmRlbnQKCkVSUk9SOiBjb2Rl
+IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIwNjQ6IEZJTEU6IHRhcmdldC9oZXhhZ29u
+L2ltcG9ydGVkL21heC5oOjMzOgorI2RlZmluZSBSRUdfV1JJVEVTX01BWCAzMl5JXkkvKj8/ICov
+JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMjA2NTogRklMRTog
+dGFyZ2V0L2hleGFnb24vaW1wb3J0ZWQvbWF4Lmg6MzQ6CisjZGVmaW5lIFBSRURfV1JJVEVTX01B
+WCA1XkleSS8qIDQgaW5zbnMgKyBlbmRsb29wICovJAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNo
+YXJhY3RlcnMKIzIwNzQ6IEZJTEU6IHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkL21heC5oOjQzOgor
+I2RlZmluZSBNQVhfTl9HUkFOVUxFUyA0ICAgICAgICAgICAgICAgLyogTWF4IG9mIG51bWJlciBv
+ZiBncmFudWxlcyBvZiBhbGwgY2FjaGVzICovCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
+dmVyIHVzZSB0YWJzCiMyMDc0OiBGSUxFOiB0YXJnZXQvaGV4YWdvbi9pbXBvcnRlZC9tYXguaDo0
+MzoKKyNkZWZpbmUgTUFYX05fR1JBTlVMRVMgNF5JXkkvKiBNYXggb2YgbnVtYmVyIG9mIGdyYW51
+bGVzIG9mIGFsbCBjYWNoZXMgKi8kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
+ZSB0YWJzCiMyMDgwOiBGSUxFOiB0YXJnZXQvaGV4YWdvbi9pbXBvcnRlZC9tYXguaDo0OToKKyNk
+ZWZpbmUgSUlDX1RBR1NfTUFYICgxMDI0KjEyOCleSS8qIDFNQiA9IDJeMjAgYnl0ZXMgKi8kCgpF
+UlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAoY3R4OlZ4VikKIzIwODA6IEZJ
+TEU6IHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkL21heC5oOjQ5OgorI2RlZmluZSBJSUNfVEFHU19N
+QVggKDEwMjQqMTI4KSAgICAgICAgLyogMU1CID0gMl4yMCBieXRlcyAqLwogICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcqJyAo
+Y3R4OlZ4VikKIzIwODE6IEZJTEU6IHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkL21heC5oOjUwOgor
+I2RlZmluZSBJSUNfREFUQV9JTl9CWVRFU19NQVggKDEwMjQqMTAyNCo0KQogICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0
+aGF0ICcqJyAoY3R4OlZ4VikKIzIwODE6IEZJTEU6IHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkL21h
+eC5oOjUwOgorI2RlZmluZSBJSUNfREFUQV9JTl9CWVRFU19NQVggKDEwMjQqMTAyNCo0KQogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBjb2RlIGluZGVu
+dCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIwODM6IEZJTEU6IHRhcmdldC9oZXhhZ29uL2ltcG9y
+dGVkL21heC5oOjUyOgorI2RlZmluZSBNQVhfVExCX0dVRVNTX0VOVFJJRVMgKDEwMjQpXkkvLyBw
+b3dlciBvZiAyJAoKRVJST1I6IGRvIG5vdCB1c2UgQzk5IC8vIGNvbW1lbnRzCiMyMDgzOiBGSUxF
+OiB0YXJnZXQvaGV4YWdvbi9pbXBvcnRlZC9tYXguaDo1MjoKKyNkZWZpbmUgTUFYX1RMQl9HVUVT
+U19FTlRSSUVTICgxMDI0KSAgIC8vIHBvd2VyIG9mIDIKCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
+YXJvdW5kIHRoYXQgJyonIChjdHg6VnhWKQojMjA4ODogRklMRTogdGFyZ2V0L2hleGFnb24vaW1w
+b3J0ZWQvbWF4Lmg6NTc6CisjZGVmaW5lIElJQ1RMQl9QQUdFX1NJWkUgKDEwMjQqNCkKICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5k
+IHRoYXQgJyonIChjdHg6VnhWKQojMjA5MTogRklMRTogdGFyZ2V0L2hleGFnb24vaW1wb3J0ZWQv
+bWF4Lmg6NjA6CisjZGVmaW5lIE1BWF9MMVNfU0laRSAoMTAyNCoxMDI0KQogICAgICAgICAgICAg
+ICAgICAgICAgICAgICBeCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjA5NDog
+RklMRTogdGFyZ2V0L2hleGFnb24vaW1wb3J0ZWQvbWF4Lmg6NjM6CisjZGVmaW5lIFNVQl9JTU1F
+RFNfTUFYIDQgICAgICAgICAgICAgICAvKiBudW1iZXIgb2YgaW1tZWRpYXRlIGZyYWdtZW50cyB3
+aXRoaW4gaW5zbiAqLwoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
+MjA5NDogRklMRTogdGFyZ2V0L2hleGFnb24vaW1wb3J0ZWQvbWF4Lmg6NjM6CisjZGVmaW5lIFNV
+Ql9JTU1FRFNfTUFYIDReSV5JLyogbnVtYmVyIG9mIGltbWVkaWF0ZSBmcmFnbWVudHMgd2l0aGlu
+IGluc24gKi8kCgpFUlJPUjogZG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMKIzIxMDE6IEZJTEU6
+IHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkL21heC5oOjcwOgorLy8jZGVmaW5lIFFUUkFDRV9IRUFE
+RVJfU0laRV9NQVggNTAgLyogYXQgbW9zdCA1MCBjaGFycyBpbiBoZWFkZXIgKi8KCkVSUk9SOiBj
+b2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzIxMDk6IEZJTEU6IHRhcmdldC9oZXhh
+Z29uL2ltcG9ydGVkL21heC5oOjc4OgorI2VuZGlmXkleSV5JXkleSV5JXkkvKiBfTUFYX0ggKi8k
+Cgp0b3RhbDogMjMgZXJyb3JzLCAzIHdhcm5pbmdzLCAyMjMyIGxpbmVzIGNoZWNrZWQKCkNvbW1p
+dCA3NzQ0NTA5NzE0ZDcgKEFkZCBtaW5pbWFsIEhleGFnb24gdGFyZ2V0IC0gRmlyc3QgaW4gYSBz
+ZXJpZXMgb2YgcGF0Y2hlcyAtIGxpbnV4LXVzZXIgY2hhbmdlcyArIGxpbnV4LXVzZXIvaGV4YWdv
+biArIHNrZWxldG9uIG9mIHRhcmdldC9oZXhhZ29uIC0gRmlsZXMgaW4gdGFyZ2V0L2hleGFnb24v
+aW1wb3J0ZWQgYXJlIGZyb20gYW5vdGhlciBwcm9qZWN0IGFuZCB0aGVyZWZvcmUgZG8gbm90IGNv
+bmZvcm0gdG8gcWVtdSBjb2Rpbmcgc3RhbmRhcmRzKSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8xNTc0
+MTIxNDk3LTI0MzMtMS1naXQtc2VuZC1lbWFpbC10c2ltcHNvbkBxdWljaW5jLmNvbS90ZXN0aW5n
+LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
+bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
---Az4VpBrmI9+OyhK/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Nov 08, 2019 at 05:47:59PM +0100, Greg Kurz wrote:
-> On Fri,  8 Nov 2019 16:40:35 +0100
-> Laurent Vivier <lvivier@redhat.com> wrote:
->=20
-> > Commit 29cb4187497d sets by default the VSMT to smp_threads,
-> > but older kernels (< 4.13) don't support that.
-> >=20
-> > We can reasonably restore previous behavior with this kernel
-> > to allow to run QEMU as before.
-> >=20
-> > If VSMT is not supported, VSMT will be set to MAX(8, smp_threads)
-> > as it is done for previous machine types (< pseries-4.2)
-> >=20
->=20
-> It is usually _bad_ to base the machine behavior on host capabilities.
-> What happens if we migrate between an older kernel and a recent one ?
-
-Right.  We're really trying to remove instaces of such behaviour.  I'd
-prefer to completely revert Greg's original patch than to re-introduce
-host configuration dependency into the guest configuration..
-
-> I understand this is to fix tests/migration-test on older kernels.
-> Couldn't this be achieved with migration-test doing some introspection
-> and maybe pass vsmt=3D8 on the QEMU command line ?
-
-=2E.adjusting the test case like this might be a better idea, though.
-
-What's the test setup where we're using the old kernel?  I really only
-applied the original patch on the guess that we didn't really care
-about kernels that old.  The fact you've hit this in practice makes me
-doubt that assumption.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---Az4VpBrmI9+OyhK/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3TPpwACgkQbDjKyiDZ
-s5Lh2w//elWGoxSXj8vo1T1pxDrgVMgVp70k40oilWPHE4faKFP/jfTq+OpGIxQP
-yLHyMnKQLITtC6ITjhThfJ6pwlYetumbIeI0SRqHgHnPIHJCMnOeV2V61Ly93IVK
-e/9pPwI/BzT/P9MXOOcOz1vl4aMRKAFoj75mgiFl1Dujy1XRK21YJgIh0ziSfyPW
-IczycAOMzPw0Q2MkAlTlHJWRpxP3mh0LHTOpC4tiZxTWxruwQ+mBGKF3ea+UMVXk
-AcWjGZdGfnPJCyn69q9hiexNSW3BnqF7cO7R7YpEo3hG97aNyjIeI0CM4aGBUpUG
-8x1/bp7V6U8s1ztLHhNVUgNGiuNr8/N4DFnkOwU0ek15mRaeDsvS44j9knwiC7Pm
-rx6xy7GdK1irVePC+MZJHIju5XY+tnSgfBx4qxh7Iy4yqtxEJUvl7BjA9QN88OE2
-yrMTyRIwwYqrd/T8plju+OIpe4GUmbesnT1IMNlp9E4hhwt4DyHoIO+ns7C0Hl8/
-FF3dScf4g4DUpH90HCiT77Xxew2Jzpcxr3TU0e4oaCeecFzkwqyt8HZCC69fFZMA
-UQYX4iOFIA5A1xAFvaAgqldGR036w7D0Od0PWYg9s4W0+lOkrfNcr/w8WywwNYot
-DHLnFhNz910GS9A2aTibkFf96cNNyi31bbPq2MsCPKdA1+gt++Q=
-=p1Tk
------END PGP SIGNATURE-----
-
---Az4VpBrmI9+OyhK/--
 
