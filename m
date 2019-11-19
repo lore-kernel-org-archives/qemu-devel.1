@@ -2,86 +2,70 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89037C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 03:49:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 002BFC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 04:05:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5500022316
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 03:49:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="THoELoKD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5500022316
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C090422316
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 04:05:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C090422316
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWuWN-0008Kf-EH
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 22:49:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46628)
+	id 1iWulV-0002ik-SP
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 23:05:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47982)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <elohimes@gmail.com>) id 1iWuVh-0007tX-ES
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:49:02 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iWukr-0002Hq-Q0
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 23:04:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <elohimes@gmail.com>) id 1iWuVg-0005UA-FU
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:49:01 -0500
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41835)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <elohimes@gmail.com>) id 1iWuVg-0005Tp-7q
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:49:00 -0500
-Received: by mail-pg1-x542.google.com with SMTP id 207so3299996pge.8
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 19:49:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=TF6TFAQKsMFo80oxxX5RYhozr/1T6zFTJQcpB8H7WHU=;
- b=THoELoKDyZfRO48/gBB4Z77waV6rXuz1uHP1IYMuBtSyc+ofNceTjN7h7CDv+x1KSA
- D/USexXalkwS6MntZhbVdOGl7xJE3qJ1dY+xq/K7OshR9sfqgfFZvEMirtggUiepQzfC
- ci4vn8NyuRn2FqRU3Ad+CGdRcCtr9TYRg/mAgq8uOjXDy0rQdOTE4wK1HWMi8oOAx7bW
- fn/wCiKP6kHySbagkS3Yasm3Pm/QANBhR4dKwcTJ2jsYwPaFZa4ItgdeE2M2Oe6PSlJS
- QWzJbxD+T6slyhg5YhPON+WtX+v1G3fThG8l3b19lmmeSRoOWH/rmQ1cUVmcOqmoZ0mD
- VotQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=TF6TFAQKsMFo80oxxX5RYhozr/1T6zFTJQcpB8H7WHU=;
- b=Dv8N0zM4YY0FSIBE3o12DidlabgGSuDfEZv/nHYk8EPNL0JeYDHkAo+zs1CZSw4/Eo
- a0NK5O06Q0qWiJmpjrpwfSsVaQ4URuplnTXUlFEvaLaLP0CM2k9Ky1Se5MA9mFTnQunk
- fr4rgorh/T0L9d5PUX0Xw1avCbsNccGXUUPGXGXyT0rWzX3OiqLDWDD6p61cE4r/b2KM
- Ltl/Bm3FEJXPjsLSWFNbRcZ3YJ+7y5CrRM0TAaQQXPuTf1bRmOyXKviFisRyGjNG47AO
- gcXAfbSPHXVKtlijQ6+3EskvUvX1+kV5n/bdozzuLm/a8JBQAXHlKI+p0vvrbbNqDQIq
- sCdA==
-X-Gm-Message-State: APjAAAW1piQjj02T0J0ajBxkZeBmfA9Q6QRMxTLPhW9PwrhsOY2MA8eh
- RYVI5y5MXeH5yUm94gFpY7g=
-X-Google-Smtp-Source: APXvYqw2sDWXYnY2I5VJqPbqz2z4OAVFn61p/ieWJ53H/AJ9GCvzZLLYOeEmd5v02dp/42OSay0Kqg==
-X-Received: by 2002:a63:4b07:: with SMTP id y7mr3028084pga.373.1574135339159; 
- Mon, 18 Nov 2019 19:48:59 -0800 (PST)
-Received: from localhost ([116.247.112.152])
- by smtp.gmail.com with ESMTPSA id a66sm23471118pfb.166.2019.11.18.19.48.58
- (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
- Mon, 18 Nov 2019 19:48:58 -0800 (PST)
-From: elohimes@gmail.com
-X-Google-Original-From: xieyongji@baidu.com
-To: mst@redhat.com,
-	marcandre.lureau@redhat.com
-Subject: [PATCH] libvhost-user: Zero memory allocated for VuVirtqInflightDesc
-Date: Tue, 19 Nov 2019 11:48:51 +0800
-Message-Id: <20191119034851.2285-1-xieyongji@baidu.com>
-X-Mailer: git-send-email 2.17.1
+ (envelope-from <no-reply@patchew.org>) id 1iWukq-0006Wh-Ar
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 23:04:41 -0500
+Resent-Date: Mon, 18 Nov 2019 23:04:41 -0500
+Resent-Message-Id: <E1iWukq-0006Wh-Ar@eggs.gnu.org>
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21442)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iWukq-0006W3-2k
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 23:04:40 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1574136265; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Q9qyvop7LEp9Q2X4N395iUYO/LV9ugIsZ/4sz5VCnIo4Z23Ch8YgABWeomQSW1LsxZm3/+bU6Ml0/CiPgN5Lo7Dwal6s8vSHj3AvYYINyTu5xRi03c07XqHo9YYavWb7NdH/uW72PNXNKwdwQOAoYKJla9iKlM6Li7PnSBDGpbM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1574136265;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=GI5SWRvB75dnjiOK7rHXcmxBQEINBOkbgLC1MFx+hrM=; 
+ b=KYXW8CnWf9zBEv/YLb+ff3A/X8cZekeN5fgUAhYw0iGXkP9hUF8kwBX/11gDpse5N8V7oj9gJgD9UHT/yTcAvMJMGDi1tFz9bsiGd/PSc3qINwsaKuYDMOlVvoZSdkHI/2xNXglnDP8nNCMlQqKrHE+PB0bf+3odu+YRRKOa3Ik=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1574136263378725.9584793739349;
+ Mon, 18 Nov 2019 20:04:23 -0800 (PST)
+In-Reply-To: <20191119022640.11021-1-michan@redhat.com>
+Subject: Re: [PATCH v4] Implement backend program convention command for
+ vhost-user-blk
+Message-ID: <157413626220.27250.4280058310420645706@37313f22b938>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::542
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: chanmickyyun@gmail.com
+Date: Mon, 18 Nov 2019 20:04:23 -0800 (PST)
+X-ZohoMailClient: External
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 136.143.188.54
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,61 +77,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xie Yongji <xieyongji@baidu.com>, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: michan@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org,
+ chanmickyyun@gmail.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xie Yongji <xieyongji@baidu.com>
-
-Use a zero-initialized VuVirtqInflightDesc struct to avoid
-that scan-build reports that vq->resubmit_list[0].counter may
-be garbage value in vu_check_queue_inflights().
-
-Fixes: 5f9ff1eff ("libvhost-user: Support tracking inflight I/O in
-shared memory")
-Reported-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
----
- contrib/libvhost-user/libvhost-user.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
-
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
-index 68c27136ae..e76d6e9920 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -992,7 +992,7 @@ vu_check_queue_inflights(VuDev *dev, VuVirtq *vq)
-     vq->shadow_avail_idx = vq->last_avail_idx = vq->inuse + vq->used_idx;
- 
-     if (vq->inuse) {
--        vq->resubmit_list = malloc(sizeof(VuVirtqInflightDesc) * vq->inuse);
-+        vq->resubmit_list = g_malloc0(sizeof(VuVirtqInflightDesc) * vq->inuse);
-         if (!vq->resubmit_list) {
-             return -1;
-         }
-@@ -1605,10 +1605,8 @@ vu_deinit(VuDev *dev)
-             vq->err_fd = -1;
-         }
- 
--        if (vq->resubmit_list) {
--            free(vq->resubmit_list);
--            vq->resubmit_list = NULL;
--        }
-+        g_free(vq->resubmit_list);
-+        vq->resubmit_list = NULL;
- 
-         vq->inflight = NULL;
-     }
-@@ -2263,7 +2261,7 @@ vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz)
-         elem = vu_queue_map_desc(dev, vq, vq->resubmit_list[i].index, sz);
- 
-         if (!vq->resubmit_num) {
--            free(vq->resubmit_list);
-+            g_free(vq->resubmit_list);
-             vq->resubmit_list = NULL;
-         }
- 
--- 
-2.17.1
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTExOTAyMjY0MC4xMTAy
+MS0xLW1pY2hhbkByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUg
+c29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5m
+b3JtYXRpb246CgpTdWJqZWN0OiBbUEFUQ0ggdjRdIEltcGxlbWVudCBiYWNrZW5kIHByb2dyYW0g
+Y29udmVudGlvbiBjb21tYW5kIGZvciB2aG9zdC11c2VyLWJsawpUeXBlOiBzZXJpZXMKTWVzc2Fn
+ZS1pZDogMjAxOTExMTkwMjI2NDAuMTEwMjEtMS1taWNoYW5AcmVkaGF0LmNvbQoKPT09IFRFU1Qg
+U0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251
+bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNv
+bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFs
+Z29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNl
+Li4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0
+ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwowMzZl
+YTQ1IEltcGxlbWVudCBiYWNrZW5kIHByb2dyYW0gY29udmVudGlvbiBjb21tYW5kIGZvciB2aG9z
+dC11c2VyLWJsawoKPT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IHN1c3BlY3QgY29kZSBpbmRl
+bnQgZm9yIGNvbmRpdGlvbmFsIHN0YXRlbWVudHMgKDgsIDExKQojOTI6IEZJTEU6IGNvbnRyaWIv
+dmhvc3QtdXNlci1ibGsvdmhvc3QtdXNlci1ibGsuYzo2MzA6CisgICAgICAgIGlmIChsc29jayA8
+IDApIHsKKyAgICAgICAgICAgZXhpdChFWElUX0ZBSUxVUkUpOwoKRVJST1I6IHNwYWNlIHJlcXVp
+cmVkIGJlZm9yZSB0aGUgb3BlbiBicmFjZSAneycKIzk1OiBGSUxFOiBjb250cmliL3Zob3N0LXVz
+ZXItYmxrL3Zob3N0LXVzZXItYmxrLmM6NjMzOgorICAgIH0gZWxzZSBpZihvcHRfZmRudW0gPCAw
+KXsKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBiZWZvcmUgdGhlIG9wZW4gcGFyZW50aGVzaXMgJygn
+CiM5NTogRklMRTogY29udHJpYi92aG9zdC11c2VyLWJsay92aG9zdC11c2VyLWJsay5jOjYzMzoK
+KyAgICB9IGVsc2UgaWYob3B0X2ZkbnVtIDwgMCl7Cgp0b3RhbDogMyBlcnJvcnMsIDAgd2Fybmlu
+Z3MsIDE0MyBsaW5lcyBjaGVja2VkCgpDb21taXQgMDM2ZWE0NTdiNDNhIChJbXBsZW1lbnQgYmFj
+a2VuZCBwcm9ncmFtIGNvbnZlbnRpb24gY29tbWFuZCBmb3Igdmhvc3QtdXNlci1ibGspIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4
+aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9w
+YXRjaGV3Lm9yZy9sb2dzLzIwMTkxMTE5MDIyNjQwLjExMDIxLTEtbWljaGFuQHJlZGhhdC5jb20v
+dGVzdGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0
+b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5k
+IHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
 
