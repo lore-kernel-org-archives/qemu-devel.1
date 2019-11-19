@@ -2,99 +2,83 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D37C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 07:49:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF3CC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 07:53:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21C5C21850
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 07:49:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 79D4D2082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 07:53:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O7F0ZLHf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21C5C21850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UOPbg1eT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 79D4D2082F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWyGf-0003OQ-95
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 02:49:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45692)
+	id 1iWyKa-00069b-Kk
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 02:53:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46156)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iWyG3-0002xK-48
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:49:08 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iWyJn-0005iS-7m
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:53:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iWyG0-0007V0-KV
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:49:05 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26877
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iWyG0-0007Ud-9c
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:49:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574149743;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=021bTqa66lBLzJldrNSWEda1K+Xrp3FNczvmZJCy6LA=;
- b=O7F0ZLHfawZ2cFK27wRIhz+KOpUkIuejkECNEVpnZOewZr3kPpP4/v4RpMuq/q/zgwcqw3
- asDZtTmj7eny/R6yAuNZ0K+DaSyPuawigN6O6ITZnwxNrCus0y4uA4V5YJX+KW9qVPkNVh
- 3BGum2YLWuX6NZLq7JotPXC3A3Cj7bs=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-328-X3RiPEdONgyGT_tDACu59Q-1; Tue, 19 Nov 2019 02:49:01 -0500
-Received: by mail-wm1-f70.google.com with SMTP id m68so1972883wme.7
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 23:49:01 -0800 (PST)
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iWyJl-0000oK-Ug
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:52:59 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37829)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iWyJl-0000nn-Ma
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:52:57 -0500
+Received: by mail-wm1-x343.google.com with SMTP id b17so2298903wmj.2
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 23:52:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=2OrRiYkItlMKNSSA/GXqJJ5mHUg8MTHm/hT6XJF3qxQ=;
+ b=UOPbg1eT4VHm9q9C80873y+0Wqg9DS5U9AXc3qfti5vEiobNZMD0rJYQTQTQzMyYju
+ HgC5pheFWdsFbAEZ39WHsDrv5zFU2r+IiOTINIry/3KgJJhzd4zSWtktArSNqRWIQymj
+ wk19dRaPjd1neHk5SgQ6mG0xs8stSsojPw1JzI4sj83fWKBKwp07IGbL+nrmCn735XQB
+ LDKPa3Ifmj5NzSFCBP2EXbFvSPVDM+XiMHHiAzqKhwphBex/AhOV84rR5WWjy1W4fKP/
+ X5ZMtXcSv191qteygZhLNpHtiwhVO67bqatY1S1asOdfiIbSfeRtvQuwqH3RPy/OOnFb
+ zCZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=M39AAyn0qYcnDmcJMitPC5UN2a8z5Hoazf53n49XPX0=;
- b=EH3Ryhf040wVw8ZTUvx1iIksP8NSqVCMLuKnYPu5O2Dx+DH8PLA7i0WSJZtRRPL9AI
- GqwoZjJfnWYiRovRIl1ixwhC9wu8wCkAdWxgEjqFQHhJ5I5P/alsEk03qkygDM2LcroK
- qZHzGwwkKpqNXTWXp8mbh6ilHJfxW5oF+FIZLoi/y5PkxIbaODAbDgiL1OUpWyusjjhQ
- W2dWRFGo8SFwfL57mXFTlILJxy+CsuHzKjkdR++gD8poE3f1Rh//rYLRqRT22xLZ+wZm
- +qMGFCFfLnwei6NarGGFmxILhJhdUVPEPQeherVFrN8k6kUNqpM3EorrdUL7dwuGrQQv
- J3dA==
-X-Gm-Message-State: APjAAAVaBJCWSa85zWHvB077NGAA8oe6+mtRWJU77gjjr0qeiaTr049g
- zONHcYw65s7Ln1FjvQavffhHksKPHDLm+nIFD0vujvNvq0lyMBNBDOtXGM41NmFJVoSxTO+HIaJ
- uWBMYfnM+NO5puZY=
-X-Received: by 2002:a5d:5742:: with SMTP id q2mr24976386wrw.311.1574149740742; 
- Mon, 18 Nov 2019 23:49:00 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyqX5x2YtXTM4c989S+IFAGa5qe8h1S+xFgGEHNobJHNNMIhAxnI1nzinAnvWerKXSa8D4ZMA==
-X-Received: by 2002:a5d:5742:: with SMTP id q2mr24976371wrw.311.1574149740497; 
- Mon, 18 Nov 2019 23:49:00 -0800 (PST)
-Received: from [192.168.1.35] (131.red-88-21-102.staticip.rima-tde.net.
- [88.21.102.131])
- by smtp.gmail.com with ESMTPSA id f67sm2196238wme.16.2019.11.18.23.48.59
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 18 Nov 2019 23:48:59 -0800 (PST)
-Subject: Re: [PATCH v4] Implement backend program convention command for
- vhost-user-blk
-To: Micky Yun Chan <chanmickyyun@gmail.com>, qemu-devel@nongnu.org
-References: <20191119022640.11021-1-michan@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0a4cfd68-5f15-b25b-fab6-c384153a9ab0@redhat.com>
-Date: Tue, 19 Nov 2019 08:48:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=2OrRiYkItlMKNSSA/GXqJJ5mHUg8MTHm/hT6XJF3qxQ=;
+ b=OOxQkhgRnMH2H92xmGD7KTGZ++7P5EluJoMTuUgnRiFhvOySod1FN42D404h2fUwDA
+ hjhy9Vx5aFzvlbhngZs370RmCt8mzcE8VAunz/WInFzcHq1kRU/oF6mMukYQQVfGJQ51
+ hdBSYHrORp/SU+Jo2zrCAohSsZx8ecWUyV1gWr8gKYDHGAYtKISKOFRnRRSW5SlhwvSN
+ T8GBVLAqmbKRDz08TrC4uIVyVpeJ7Qct/r2Ph8h+VvLVvlW9HmQb4/wtVw9/dZl8NGen
+ 07u+Q3i6Zd2f+i4gsFhi+LQxRrvro3mp8RfRlZmAiX6PcEKuW4Oi09pA8KQ0bPfPSrq7
+ M5sg==
+X-Gm-Message-State: APjAAAWjPGeQIlUwRuRmORRE5CAw2BYn9UnZMUUAtm6qyoNJxcfwW4by
+ 1opEc4LYb64z6L+yps4mvsOITRobWsZh9alYw6NZBnBH
+X-Google-Smtp-Source: APXvYqzJb0WeeV11wReAQsIok8aLyVQKLlxL3tV+yFirUK5skzH55i3rYYnFZhGCfE2c4ziSPLtB7crWpKTXYsYwNvg=
+X-Received: by 2002:a05:600c:20e:: with SMTP id
+ 14mr3641310wmi.107.1574149975986; 
+ Mon, 18 Nov 2019 23:52:55 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191119022640.11021-1-michan@redhat.com>
-Content-Language: en-US
-X-MC-Unique: X3RiPEdONgyGT_tDACu59Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <20191119063911.18888-1-michan@redhat.com>
+In-Reply-To: <20191119063911.18888-1-michan@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 19 Nov 2019 11:52:42 +0400
+Message-ID: <CAJ+F1CJfX7mQTkdrUHHtDgYdNFsBTgX6F1Z=HJHcCJaUVXtBgA@mail.gmail.com>
+Subject: Re: [PATCH v5] Implement backend program convention command for
+ vhost-user-blk
+To: Micky Yun Chan <chanmickyyun@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,31 +90,197 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: michan <michan@redhat.com>, stefanha@redhat.com,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: michan <michan@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Micky,
+Hi
 
-On 11/19/19 3:26 AM, Micky Yun Chan wrote:
+On Tue, Nov 19, 2019 at 10:40 AM Micky Yun Chan <chanmickyyun@gmail.com> wr=
+ote:
+>
 > From: michan <michan@redhat.com>
-
-It seems your git setup lacks your username.
-
-This should solve it (eventually running with --global):
-
-   git config user.name "Micky Yun Chan"
-
+>
 > This patch is to add standard commands defined in docs/interop/vhost-user=
 .rst
+
+You should also follow and update docs/interop/vhost-user.json
+
 > For vhost-user-* program
->=20
+>
 > Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
 > ---
->   contrib/vhost-user-blk/vhost-user-blk.c | 109 ++++++++++++++----------
->   1 file changed, 65 insertions(+), 44 deletions(-)
-[...]
+>  contrib/vhost-user-blk/vhost-user-blk.c | 109 ++++++++++++++----------
+>  1 file changed, 65 insertions(+), 44 deletions(-)
+>
+> diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user=
+-blk/vhost-user-blk.c
+> index ae61034656..96c43bb58d 100644
+> --- a/contrib/vhost-user-blk/vhost-user-blk.c
+> +++ b/contrib/vhost-user-blk/vhost-user-blk.c
+> @@ -576,70 +576,91 @@ vub_new(char *blk_file)
+>      return vdev_blk;
+>  }
+>
+> +static int opt_fdnum =3D -1;
+> +static char *opt_socket_path;
+> +static char *opt_blk_file;
+> +static gboolean opt_print_caps;
+> +static gboolean opt_read_only;
+> +
+> +
+> +static GOptionEntry entries[] =3D {
+> +    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
+> +      "Print capabilities", NULL },
+> +    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
+> +      "Use inherited fd socket", "FDNUM" },
+> +    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
+> +      "Use UNIX socket path", "PATH" },
+> +    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
+> +     "block device or file path", "PATH"},
+> +    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
+> +      "Enable read-only", NULL }
+> +};
+> +
+>  int main(int argc, char **argv)
+>  {
+> -    int opt;
+> -    char *unix_socket =3D NULL;
+> -    char *blk_file =3D NULL;
+> -    bool enable_ro =3D false;
+>      int lsock =3D -1, csock =3D -1;
+>      VubDev *vdev_blk =3D NULL;
+> +    GError *error =3D NULL;
+> +    GOptionContext *context;
+>
+> -    while ((opt =3D getopt(argc, argv, "b:rs:h")) !=3D -1) {
+> -        switch (opt) {
+> -        case 'b':
+> -            blk_file =3D g_strdup(optarg);
+> -            break;
+> -        case 's':
+> -            unix_socket =3D g_strdup(optarg);
+> -            break;
+> -        case 'r':
+> -            enable_ro =3D true;
+> -            break;
+> -        case 'h':
+> -        default:
+> -            printf("Usage: %s [ -b block device or file, -s UNIX domain =
+socket"
+> -                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+> -            return 0;
+> +    context =3D g_option_context_new(NULL);
+> +    g_option_context_add_main_entries(context, entries, NULL);
+> +    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+> +        g_printerr("Option parsing failed: %s\n", error->message);
+> +        exit(EXIT_FAILURE);
+> +    }
+> +    if (opt_print_caps) {
+> +        g_print("{\n");
+> +        g_print("  \"type\": \"blk\",\n");
 
+block
+
+> +        g_print("  \"features\": [\n");
+> +        g_print("    \"read-only\",\n");
+> +        g_print("    \"blk-file\"\n");
+
+We don't yet have a VHostUserBackendCapabilitiesBlock defined in
+docs/interop/vhost-user.json
+
+
+> +        g_print("  ]\n");
+> +        g_print("}\n");
+> +        exit(EXIT_SUCCESS);
+> +    }
+> +
+> +    if (!opt_blk_file) {
+> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+> +    if (opt_socket_path) {
+> +        lsock =3D unix_sock_new(opt_socket_path);
+> +        if (lsock < 0) {
+> +            exit(EXIT_FAILURE);
+>          }
+> +    } else if (opt_fdnum < 0) {
+> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
+> +        exit(EXIT_FAILURE);
+> +    } else {
+> +        lsock =3D opt_fdnum;
+>      }
+>
+> -    if (!unix_socket || !blk_file) {
+> -        printf("Usage: %s [ -b block device or file, -s UNIX domain sock=
+et"
+> -               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+> -        return -1;
+> -    }
+> -
+> -    lsock =3D unix_sock_new(unix_socket);
+> -    if (lsock < 0) {
+> -        goto err;
+> -    }
+> -
+> -    csock =3D accept(lsock, (void *)0, (void *)0);
+> +    csock =3D accept(lsock, NULL, NULL);
+>      if (csock < 0) {
+> -        fprintf(stderr, "Accept error %s\n", strerror(errno));
+> -        goto err;
+> +        g_printerr("Accept error %s\n", strerror(errno));
+> +        exit(EXIT_FAILURE);
+>      }
+>
+> -    vdev_blk =3D vub_new(blk_file);
+> +    vdev_blk =3D vub_new(opt_blk_file);
+>      if (!vdev_blk) {
+> -        goto err;
+> +        exit(EXIT_FAILURE);
+>      }
+> -    if (enable_ro) {
+> +    if (opt_read_only) {
+>          vdev_blk->enable_ro =3D true;
+>      }
+>
+>      if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
+>                    vub_panic_cb, &vub_iface)) {
+> -        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
+> -        goto err;
+> +        g_printerr("Failed to initialize libvhost-user-glib\n");
+> +        exit(EXIT_FAILURE);
+>      }
+>
+>      g_main_loop_run(vdev_blk->loop);
+> -
+> +    g_main_loop_unref(vdev_blk->loop);
+> +    g_option_context_free(context);
+>      vug_deinit(&vdev_blk->parent);
+> -
+> -err:
+>      vub_free(vdev_blk);
+>      if (csock >=3D 0) {
+>          close(csock);
+> @@ -647,8 +668,8 @@ err:
+>      if (lsock >=3D 0) {
+>          close(lsock);
+>      }
+> -    g_free(unix_socket);
+> -    g_free(blk_file);
+> +    g_free(opt_socket_path);
+> +    g_free(opt_blk_file);
+>
+>      return 0;
+>  }
+> --
+> 2.21.0
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
