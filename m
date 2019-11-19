@@ -2,84 +2,92 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9416C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 012AEC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:15:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87FAA22317
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:13:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EC7B22317
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:15:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1zeP/n+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87FAA22317
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="UPiuUTbM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EC7B22317
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51192 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX9sR-0003Ac-PM
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 15:13:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50217)
+	id 1iX9uN-0003na-4e
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 15:15:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50344)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mrolnik@gmail.com>) id 1iX9p3-0001Mu-OK
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:10:03 -0500
+ (envelope-from <deller@gmx.de>) id 1iX9pz-0001rf-Mu
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:11:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mrolnik@gmail.com>) id 1iX9p2-000167-FT
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:10:01 -0500
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:36726)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iX9p2-00015n-BQ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:10:00 -0500
-Received: by mail-qk1-x742.google.com with SMTP id d13so19069810qko.3
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 12:09:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=EkNkM6UCUGDdHcl0lMXWJpwSe5gDp+1NR8XYjIGCkXg=;
- b=F1zeP/n+eebWEyyKODW2CghmG5mBrzIXJSBK3wQ4rolfyYQFtNwwOM/ereyH6bfKh/
- bjradQTFeO1VO+FQ5kPE1Y0ALfu1bXeNKu4x17SoLwXkT+wP0aVBt58NLftue1dXpIQa
- uJqMg9VGGWJP4wB8TqvVVstpfQGllcrd1RRdBbftWRTEhGhVXtH4MzRCXD6HgxwkqdqT
- FvbdhFOKjRXqowKc+86NsjhA2Z47Cgoeyg/DAbu0ahGl2cxxXnwYoryHgcJOnPUkXbop
- EbPNM/esL4IewCDTQNWdejRbvcqcGUK0ejGLH8MlHd4ySqeV073Gfc8muVfi4WqF+7Wq
- l+PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=EkNkM6UCUGDdHcl0lMXWJpwSe5gDp+1NR8XYjIGCkXg=;
- b=JTAkw2ZJFJwsUVkTD+gWORi01k0PDL/nklX2MC4M/foCeXgXi2IQl96uZHQEE+ok3I
- Vd1gTw3fwzcX4Vai7xvtgPYdK3JmbK053M2MQ7Q0hnc0ohG8bnpi3st4h8/O90kHBLOU
- zvAI+mW4SqB/cXHiDk/y8n0Z7ADPorvMNy+TkmgqPo6FcI3BPqPYhN9rQjAG+w48Z2La
- LF71A4110fNwAEdQsFMEVM/EPB0A2eY3+quXrfYdjkS6YnEbCC7NOCcGEalci6GqrDe/
- gDN3SEzQOfauPs44Dv/y6YIj8qYswjZvj2o30boTdaIR/8Sqrl42qtI5NwJHQ6aLZHSz
- aPSw==
-X-Gm-Message-State: APjAAAURGePqjH0Vb3tjDxAVLNaSh+ldsETZKWvQckzmrEvyMj0N6rjH
- HmVo1UIBYNDNrvT6wzXHvvy70tyCMhJhIWaLo54=
-X-Google-Smtp-Source: APXvYqyPD11GpXNLIcRsFJ/FzHJsX8IyvMuUtJqyPg/uHlMSYez1jkcGaQc8zMDh8bAX/SGK2m51hCwjxuR1UEQ2Zu0=
-X-Received: by 2002:a37:388:: with SMTP id 130mr31236462qkd.378.1574194198681; 
- Tue, 19 Nov 2019 12:09:58 -0800 (PST)
+ (envelope-from <deller@gmx.de>) id 1iX9py-0001S2-KG
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:10:59 -0500
+Received: from mout.gmx.net ([212.227.17.22]:57931)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <deller@gmx.de>) id 1iX9py-0001Rg-BA
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:10:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+ s=badeba3b8450; t=1574194252;
+ bh=QPCpCV2P5sSVUJcZNj8fAFPWf03tG1h3qNuMNwsxywQ=;
+ h=X-UI-Sender-Class:Subject:From:To:Cc:References:Date:In-Reply-To;
+ b=UPiuUTbMZHJiCrhQe7svxFJN7FoUZxYz2pljBkPZl2yeUKyPj0IaRORXcclRmFJFD
+ KR9JiXOOzHe4Ji2c+3zhzv1heaxv2YgXaRRU7tDUzXmCbGr7e6PV+UwamZJxBmN4+S
+ gwqGEaF6LiH5xav4QhzI07rDvYkm0jI7eB+a0QZk=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [192.168.20.60] ([92.116.148.64]) by mail.gmx.com (mrgmx105
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MFsUp-1idWZH1mxz-00HPKM; Tue, 19
+ Nov 2019 21:10:52 +0100
+Subject: Re: [PATCH] linux-user/strace: Add missing signal strings
+From: Helge Deller <deller@gmx.de>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20191119185153.GA23003@ls3530.fritz.box>
+ <48097cb5-bc47-e532-fcde-67ca65a2039e@linaro.org>
+ <06aaa584-fc97-8097-ca52-00d97982e5be@gmx.de>
+Message-ID: <ee03462e-74e2-8d87-22a7-1b786bb669e4@gmx.de>
+Date: Tue, 19 Nov 2019 21:10:49 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20191029212430.20617-1-mrolnik@gmail.com>
- <20191029212430.20617-6-mrolnik@gmail.com>
- <CAL1e-=gKGJC4X9aNtj1SL7+s5UryNtEF81YcG4kvhjPNP247Kw@mail.gmail.com>
- <CAL1e-=gXr5KJ7W3_bnuBaupuz6jYr0LnAX7FXJ8+F8rJ=ARKxw@mail.gmail.com>
- <14d51697-9415-14b9-8f92-3ae3de2fca58@linaro.org>
- <CAL1e-=g6ctnzUSgq3eRn98nOMPJ88ucUNX7xc5MxCr6J=k4YMg@mail.gmail.com>
-In-Reply-To: <CAL1e-=g6ctnzUSgq3eRn98nOMPJ88ucUNX7xc5MxCr6J=k4YMg@mail.gmail.com>
-From: Michael Rolnik <mrolnik@gmail.com>
-Date: Tue, 19 Nov 2019 22:09:03 +0200
-Message-ID: <CAK4993j1a6Eo+FjM7rrOZgL7u955-fTXboyOWR2BriCcyFmCuw@mail.gmail.com>
-Subject: Re: [PATCH v35 05/13] target/avr: Add instruction translation -
- Arithmetic and Logic Instructions
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::742
+In-Reply-To: <06aaa584-fc97-8097-ca52-00d97982e5be@gmx.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:dfKdEx/LAbxJ6XYVgZmJKK3WcAhGdv4zkbCO57Dj1PgUg/+v0We
+ dN2OkVg2RMM+Rgie17A5Gb0kXWL1z43o1fgOL2BStv0SOFdJww5NIoTW79MPfdV3b2IjlrB
+ A61QCYK46elLAsgGXZdlIAmCtVsBIww62ZBroxzsa4kb1xezAM+S9S7HsxJfPhUZp8eSgV9
+ 7IU+oWHDtp7Xs5zvacHJQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:4HKBIxSHREM=:zEyNVf+STzA4b9ig+M6wHi
+ DYvX4+bd6GU6bggF6gJljyhvHqDoY4VGoSozi9MsQW/6W4p6P+l/j/7Bik/9zEeWit0WvabLE
+ N3efQo8FpQ6W56kQ+sC5OypPm7fOZufeYnPFrfKnFz/rZw0E1LT+wMOVWiQzJSH8Vh2eLLVkd
+ MdGbHWMNk4GmJZCHDF38+B498hq2SrvZPiujLeWEQN8SqkOlRy/E6mPaqne018TEvWxKkEJBR
+ +XcJNS1T1GonC61tkM5ayONx9EF7SAEuKI5/hllR0jVRc8hXt2ESQD6wg1UWehHfu1gRmSWSb
+ 5KcSjPuGomUKhgWOgzOsPi6kMGnz3NaNkLjh+m6EsoJW2ogWV64KUuhv0Kcjn6+dh7m1gVLgG
+ U8ACNUZGl4IX0xUyGBNTShaDfp2lZolb5EOii5JTzH/CTZoitIiOV88NnEagC0jA1R9SB9Vsd
+ zB6v9w2yVuHv/QSn/WksIzNjfntqMRioWPindW6zMrTXf9z/9/KK1N/ZTISslr99n7EjTLFlc
+ LW/PZAtgzrgGITB8JzaOERhZ/rzYIpmCe62BUGHSMUd1NZfXWkyYPxwKIGP2qCzn54klcGvNI
+ bxdbewk9e45bpee383strdajXujRZ8C4UCgocmR9Br6Iv4IgrztrzoiK8f8w6W7vITgJFHK78
+ k8cWHIk1ayQtFdFMHWOu9ex+qJUdsUK8mFtOtNnKyU5ZWn3/eqUL+LYemqTe2aiRz0YvyH/1p
+ glKT4/gqqXUOqZdlBf1kPK4xZEYIfhQt5tJZAqbLp6SglzU1CaDwg/TnHQzfiFNdLLkTTaChU
+ 5J4+d4ezi3Qq6wc03lbAyVW1DcPjiuJkE6neay/NBRWiUw70Y8UOvXCNGNaxQtDM5GDDsi57S
+ HYSZCR0DmQfptrdDoXTAt/ltbAdoYvgfLgCcN9LCT7z8y6PaMJO+7hsK0gD/rDUgGOshq1kCt
+ 5i+5jD8pb8BwstTnDDVkWGAamx7TVgfJS7gTQjUJB+wft2t5jkq33EDM3aGmhIMmqfTAsFz0E
+ lrjDjSCGFMLDyAmzZLgO01nBhSrl4/aHDkojImt2auzQb8pVhgRXP5RrSHL3Pj047ADtM1a2x
+ 2sMwJTfaU0IVtUWX/Vsdl9AmUe97g/mn7pMiraJJ0i45q7sz6ibGhhnkiS8b9elDkg0CoQVOt
+ 8MQ+RdLG8jxEx6j1XyOwztPh/dxWuB15B4kKANoL4Md5L34OOE3c9/pCwLjAoD8uN7J+2ZRfL
+ F+tN+Q26OxGZcAbfVK7KwDqD8GOH+dDk6CKHP5Q==
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 212.227.17.22
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,121 +99,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "thuth@redhat.com" <thuth@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "dovgaluk@ispras.ru" <dovgaluk@ispras.ru>,
- "imammedo@redhat.com" <imammedo@redhat.com>,
- "philmd@redhat.com" <philmd@redhat.com>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Aleksandar et al.
-
-how is it going? should I rebase or not?
-
-Michael
-
-On Tue, Nov 5, 2019 at 4:38 PM Aleksandar Markovic
-<aleksandar.m.mail@gmail.com> wrote:
+On 19.11.19 21:06, Helge Deller wrote:
+> On 19.11.19 20:56, Richard Henderson wrote:
+>> On 11/19/19 7:51 PM, Helge Deller wrote:
+>>> Add the textual representations of some missing target signals.
+>>>
+>>> Signed-off-by: Helge Deller <deller@gmx.de>
+>>>
+>>> diff --git a/linux-user/strace.c b/linux-user/strace.c
+>>> index 3d4d684450..18b57a9ef9 100644
+>>> --- a/linux-user/strace.c
+>>> +++ b/linux-user/strace.c
+>>> @@ -146,6 +146,22 @@ print_signal(abi_ulong arg, int last)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case TARGET_SIGSTOP: signal_name =3D "S=
+IGSTOP"; break;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case TARGET_SIGTTIN: signal_name =3D "S=
+IGTTIN"; break;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 case TARGET_SIGTTOU: signal_name =3D "S=
+IGTTOU"; break;
+>>> +=C2=A0=C2=A0=C2=A0 case TARGET_SIGIO: signal_name =3D "SIGIO"; break;
+>>> +=C2=A0=C2=A0=C2=A0 case TARGET_SIGTRAP: signal_name =3D "SIGTRAP"; br=
+eak;
+>>> +=C2=A0=C2=A0=C2=A0 /* case TARGET_SIGIOT: signal_name =3D "SIGIOT"; b=
+reak; */
+>>
+>> Unused commented code.
 >
-> On Tue, Nov 5, 2019 at 2:23 PM Richard Henderson
-> <richard.henderson@linaro.org> wrote:
-> >
-> > On 11/5/19 10:46 AM, Aleksandar Markovic wrote:
-> > >
-> > >
-> > > On Tuesday, November 5, 2019, Aleksandar Markovic <aleksandar.m.mail@gmail.com
-> > > <mailto:aleksandar.m.mail@gmail.com>> wrote:
-> > >
-> > >
-> > >         +
-> > >         +/*
-> > >         + *  This instruction performs 8-bit x 8-bit -> 16-bit signed
-> > >         multiplication
-> > >         + *  and shifts the result one bit left.
-> > >         + */
-> > >         +static bool trans_FMULSU(DisasContext *ctx, arg_FMULSU *a)
-> > >         +{
-> > >         +    if (!avr_have_feature(ctx, AVR_FEATURE_MUL)) {
-> > >         +        return true;
-> > >         +    }
-> > >         +
-> > >         +    TCGv R0 = cpu_r[0];
-> > >         +    TCGv R1 = cpu_r[1];
-> > >         +    TCGv Rd = cpu_r[a->rd];
-> > >         +    TCGv Rr = cpu_r[a->rr];
-> > >         +    TCGv R = tcg_temp_new_i32();
-> > >         +    TCGv t0 = tcg_temp_new_i32();
-> > >         +
-> > >         +    tcg_gen_ext8s_tl(t0, Rd); /* make Rd full 32 bit signed */
-> > >         +    tcg_gen_mul_tl(R, t0, Rr); /* R = Rd * Rr */
-> > >         +    tcg_gen_andi_tl(R, R, 0xffff); /* make it 16 bits */
-> > >         +
-> > >         +    tcg_gen_shri_tl(cpu_Cf, R, 15); /* Cf = R(15) */
-> > >         +    tcg_gen_setcondi_tl(TCG_COND_EQ, cpu_Zf, R, 0); /* Zf = R == 0 */
-> > >         +
-> > >         +    tcg_gen_shli_tl(R, R, 1);
-> > >         +
-> > >         +    tcg_gen_andi_tl(R0, R, 0xff);
-> > >         +    tcg_gen_shri_tl(R1, R, 8);
-> > >         +    tcg_gen_andi_tl(R1, R1, 0xff);
-> > >         +
-> > >         +    tcg_temp_free_i32(t0);
-> > >         +    tcg_temp_free_i32(R);
-> > >         +
-> > >         +    return true;
-> > >         +}
-> > >         +
-> > >
-> > >
-> > >     Hi, Michael.
-> > >
-> > >     The way I understand the spec is that a->rd and a->rd must be between 16
-> > >     and 23:
-> > >
-> > >     https://www.microchip.com/webdoc/avrassembler/avrassembler.wb_FMULSU.html
-> > >     <https://www.microchip.com/webdoc/avrassembler/avrassembler.wb_FMULSU.html>
-> > >
-> > >     Is my interpretation right? If yes, where is the corresponding part in the
-> > >     implementation?
-> > >
-> > >
-> > > Or, perhaps,
-> > >
-> > > TCGv Rd = cpu_r[a->rd];
-> > >
-> > > should be
-> > >
-> > > TCGv Rd = cpu_r[a->rd + 16];
-> > >
-> > > (and the same for rs)
-> >
-> > This happens during decode:
-> >
-> > +%rd_b           4:3                         !function=to_B
-> > +%rr_b           0:3                         !function=to_B
-> > +@fmul           .... .... . ... . ...       &rd_rr      rd=%rd_b rr=%rr_b
-> > +FMUL            0000 0011 0 ... 1 ...       @fmul
-> > +FMULS           0000 0011 1 ... 0 ...       @fmul
-> > +FMULSU          0000 0011 1 ... 1 ...       @fmul
-> >
-> > This means that a->rd = to_B(extract32(insn, 4, 3)), and
-> >
-> > > +static int to_B(DisasContext *ctx, int indx) { return 16 + (indx % 8); }
-> >
-> > et voila.
-> >
+> True, but I kept it intentionally the same as it's currently in
+> linux-user/signal.c (line 40) so it's not forgotten if that changes:
+> /*=C2=A0=C2=A0=C2=A0 [SIGIOT] =3D TARGET_SIGIOT,*/
 >
-> OK. Thanks for clarification.
+>>> +#ifdef SIGSTKFLT
+>>> +=C2=A0=C2=A0=C2=A0 case TARGET_SIGSTKFLT: signal_name =3D "SIGSTKFLT"=
+; break;
+>>> +#endif
+>>
+>> Wrong ifdef.
 >
-> >
-> > r~
+> Same here, see in linux-user/signal.c (line 50):
+> #ifdef SIGSTKFLT
+>  =C2=A0=C2=A0=C2=A0 [SIGSTKFLT] =3D TARGET_SIGSTKFLT,
+> #endif
 
+OIC!
+My code should to be:
+#ifdef TARGET_SIGSTKFLT
 
+Will resubmit after getting suggestions for the unused commented code.
 
--- 
-Best Regards,
-Michael Rolnik
+Helge
 
