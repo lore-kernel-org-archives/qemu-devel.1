@@ -2,87 +2,95 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4926C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30BF6C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:45:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FC9F2186D
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:43:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F236A223B0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:45:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mkyf21Yr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FC9F2186D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SvuZ6er7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F236A223B0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50974 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX9PZ-0004qr-Me
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 14:43:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46044)
+	id 1iX9Qs-0005jK-6m
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 14:45:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46232)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <ehabkost@redhat.com>) id 1iX9On-0004OM-9J
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:42:54 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iX9Px-0005Hn-RL
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:44:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <ehabkost@redhat.com>) id 1iX9Ok-0008HX-Di
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:42:51 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40069
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iX9Ok-0008Gw-09
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:42:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574192568;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WhnGpK6gdoGtS9EoOeoUoe1KxZ5DQuaMfH6rzaAT/Lk=;
- b=Mkyf21YrAlKQF0QIo0brS6vPTKeM04tKiXsP7jCflAj6ZrPo/+xVdR4ZZsJwivEq94F5Bu
- 3LLri+QBugr/xJwL1TPOukz+xl5s//gKgs4I4N07wPwXuWyyqZYej/DPpDd7MKLi16R+XR
- hSQ5/b+RDlFt/BozKB265GudC2oUNu4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-W1SOps04N6avHGvZ_tnCuQ-1; Tue, 19 Nov 2019 14:42:45 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F0D918C5381;
- Tue, 19 Nov 2019 19:42:43 +0000 (UTC)
-Received: from localhost (ovpn-116-6.gru2.redhat.com [10.97.116.6])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DC6EB9CD3;
- Tue, 19 Nov 2019 19:42:40 +0000 (UTC)
-Date: Tue, 19 Nov 2019 16:42:38 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH v1 0/2] s390x/cpumodel: Introduce "best" model variants
-Message-ID: <20191119194238.GJ3812@habkost.net>
-References: <66c64c6d-b7c0-2cb1-2b29-4fdd9b369714@redhat.com>
- <CAFEAcA-Q7H9sZjN-PcMMDHQU41yN1RdXhNY5KqMh7E6xh0yjgA@mail.gmail.com>
- <3aa1d025-20a3-e813-2fe6-35518efedf2f@redhat.com>
- <20191118184906.GB3812@habkost.net>
- <CAFEAcA_iTX2TKh20DB9ZMtDLuPm=OvoyP==KRhfVh99BqDnrzA@mail.gmail.com>
- <20191118220417.GF3812@habkost.net>
- <CAFEAcA8XoyeAfHuKe0AEvecCzo748Yk1VD1+VD=C3ACZdfzwsw@mail.gmail.com>
- <ca517ad9-46bb-c0ac-2227-a64ab8fe5e15@redhat.com>
- <CAFEAcA-egL5kbo81eBT+FVBz7vSaWqUVzFUF3MNOttnzY6vZMQ@mail.gmail.com>
- <1fd9876d-5ad9-15e9-a2dc-6e5e747f9ca8@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1iX9Pw-0000Dy-E2
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:44:05 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42372)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iX9Pw-0000Db-4s
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:44:04 -0500
+Received: by mail-wr1-x442.google.com with SMTP id a15so25341607wrf.9
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 11:44:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=3+b0wPei5K3oKfjfgKXyL/WIT9ImopA+t5x0wS49hjk=;
+ b=SvuZ6er729t3207+XuzOli+n/2ykhA9HGCmkqt9Cw8LgvUB0W0iuxIsKU+UtotEoXb
+ vKKFJzcIW+gIm4lRIhTfiAxidTKgcftFKllUWjitwhIwwW3hPDqG6mCIsscmvDJBEdn1
+ /IDVqlzrrBEBXTf0l55FTlNfuVAYevv/5rO/zaPWAAXAVmcePsK8MJ5DpzytqG81c2vP
+ CL2p2GQC5Tftlklckh1aoOMoieoxI43JBZ6Xz5cDY878+Qbc/LhRE3kDHsu8xlj7lRQF
+ 1hABOynkuK+7qahk8+H0ZNXuKp7955RvvySmgBrqwgCCEcsX+GSGYj9U+BZunYGTfp9/
+ lZdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3+b0wPei5K3oKfjfgKXyL/WIT9ImopA+t5x0wS49hjk=;
+ b=cfWUej/kNJyqs5a5SYAFXIMOAMnz47VLhPGr2TiuCCttBxCya3rEon3BKe1vfKwUex
+ 5jm1YqAy+jByaFuQt64y/DpcbJrt3W6QKnA+OPQwuCidGsMRWKazOqcUW2rwN+r/u4SQ
+ Q/W+W1R2h8MDnS0l1KZfdw6v2YZYiWEhaL01jSVwBmVYCR5imI31T+M9PdJ3Ht7qI2+l
+ MqvoXl0UlA+6/3DvGLqVaYxgldVsn3v91EwKNyy665dgKn1bvde/8jZcBXW1XDEQtg/6
+ WUqSstrG2zH0/JRuagWdkFmjA49P0zNpvd0SVhu70Oz5w1SlWoUeNbHUVsdTTMdZ0B4e
+ tkpg==
+X-Gm-Message-State: APjAAAUgnj5oPT9RQpxb9uCpIPL5c8Q9J5Cy0IPjt1W51V1fdwlGz7gM
+ lNfscfkLNcizCPnmzBSRUFOLfRsIDiXodg==
+X-Google-Smtp-Source: APXvYqwE+X7DXa11gnXfCRgk1jIVw1vvPcI44AmQcWcLnh7Jrcz9jxdHLAEOJAfqmM8SgeQsgq9weQ==
+X-Received: by 2002:a5d:62cd:: with SMTP id o13mr30842150wrv.367.1574192642522; 
+ Tue, 19 Nov 2019 11:44:02 -0800 (PST)
+Received: from [192.168.8.102] (64.red-79-149-204.dynamicip.rima-tde.net.
+ [79.149.204.64])
+ by smtp.gmail.com with ESMTPSA id c9sm4090127wmb.42.2019.11.19.11.44.01
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 19 Nov 2019 11:44:01 -0800 (PST)
+Subject: Re: [PATCH] audio: fix audio recording
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>,
+ Gerd Hoffmann <kraxel@redhat.com>, =?UTF-8?B?S8WRdsOhZ8OzLCBab2x0w6Fu?=
+ <DirtY.iCE.hu@gmail.com>
+References: <2fc947cf-7b42-de68-3f11-cbcf1c096be9@t-online.de>
+ <a9ed793b-ebe7-b9da-3181-af246e16a59a@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <780a707e-f80f-e83f-7fe5-31360050fdb0@linaro.org>
+Date: Tue, 19 Nov 2019 20:43:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <1fd9876d-5ad9-15e9-a2dc-6e5e747f9ca8@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: W1SOps04N6avHGvZ_tnCuQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <a9ed793b-ebe7-b9da-3181-af246e16a59a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,98 +102,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
- Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Michael Mueller <mimu@linux.ibm.com>,
- Jiri Denemark <jdenemar@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 19, 2019 at 12:00:14PM +0100, David Hildenbrand wrote:
-> On 19.11.19 11:36, Peter Maydell wrote:
-> > On Tue, 19 Nov 2019 at 09:59, David Hildenbrand <david@redhat.com> wrot=
-e:
-> > >=20
-> > > On 19.11.19 10:22, Peter Maydell wrote:
-> > > > I don't hugely care about query-cpu-model-expansion. I
-> > > > just don't want it to have bad effects on the semantics
-> > > > of user-facing stuff like x- properties.
-> > >=20
-> > > IMHO, max should really include all features (yes, also the bad
-> > > x-features on arm :) ) and we should have a way to give users the
-> > > opportunity to specify "just give me the best model independent of th=
-e
-> > > accelerator" - something like a "best" model, but I don't care about =
-the
-> > > name.
+On 11/19/19 9:01 AM, Philippe Mathieu-Daudé wrote:
+> Cc'ing Zoltán.
+> 
+> On 11/19/19 7:58 AM, Volker Rümelin wrote:
+>> With current code audio recording with all audio backends
+>> except PulseAudio and DirectSound is broken. The generic audio
+>> recording buffer management forgot to update the current read
+>> position after a read.
+>>
+>> Fixes: ff095e5231 "audio: api for mixeng code free backends"
+>>
+>> Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
+>> ---
+>>   audio/audio.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/audio/audio.c b/audio/audio.c
+>> index 7fc3aa9d16..56fae55047 100644
+>> --- a/audio/audio.c
+>> +++ b/audio/audio.c
+>> @@ -1390,6 +1390,7 @@ void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t
+>> *size)
+>>           size_t read = hw->pcm_ops->read(hw, hw->buf_emul + hw->pos_emul,
+>>                                           read_len);
+>>           hw->pending_emul += read;
+>> +        hw->pos_emul = (hw->pos_emul + read) % hw->size_emul;
+> 
+> Anyway since read() can return a negative value, both previous assignments
+> should go after this if/break check...
 
-I'm in agreement with Peter, here: if "max" is user-visible, it's
-better to make it provide more usable defaults.
+This isn't read(2).
+
+    size_t (*read)    (HWVoiceIn *hw, void *buf, size_t size);
+
+Since this isn't ssize_t, no negative return value possible.
 
 
-> >=20
-> > How would "max includes all features" work if we have two
-> > x- features (or even two normal features!) which are incompatible
-> > with each other? How does it work for features which are
->=20
-> I assume the "max" model should at least be consistent, see below.
->=20
-> > valid for some other CPU type but not for 'max'? The design
-> > seems to assume a rather simplified system where every
-> > feature is independent and can always be applied to every
-> > CPU, which I don't think is guaranteed to be the case.
->=20
-> I do agree that the use case of "max" for detecting which features can be
-> enabled for any CPU model is quite simplified and would also not work lik=
-e
-> this on s390x. It really means "give me the maximum/latest/greatest you
-> can". Some examples on s390x:
->=20
-> On s390x, we don't allow to enable new features for older CPU generation.
-> "vx" was introduced with a z13. If "max" is a z13, it can include "vx", i=
-f
-> available. However, if you select a z12 (zEC12), you cannot enable "vx":
->=20
-> "Feature '%s' is not available for CPU model '%s', it was introduced with
-> later models."
->=20
-> Also, we have dependency checks
-> (target/s390x/cpu_models.c:check_consistency()), that at least warn on
-> inconsistencies between features (feature X requires feature Y).
->=20
-> We would need more fine-grained "max" models. E.g., z13-max vs. z13-best =
-vs.
-> z13-base.
->=20
-> - z13-max: Maximum features that can be enabled on the current
->            accel/host for a z13.
-> - z13-best: Best features that can be enabled on the current
->            accel/host for a z13.
-> - z13-base: base feature set, independent of current
->            accel/host for a z13. (we do have this already on s390x)
-
-We don't need to create new CPU types for that, do we?  These
-different modes could be configured by a CPU option (e.g.
-"z13,features=3Dmax"[1], "z13,features=3Dbest").
-
-If we do add new CPU options to tune feature defaults, libvirt
-can start using these options on query-cpu-model-expansion, and
-everybody will be happy.  No need to change defaults in the "max"
-CPU model in a way that makes it less usable just to make
-query-cpu-model-expansion work.
-
-[1] Probably we need to call it something else instead of
-    "features=3Dmax", just to avoid confusion with the "max" CPU
-    model.  Maybe "experimental-features=3Don",
-    "recommended-features=3Don"?
-
---=20
-Eduardo
-
+r~
 
