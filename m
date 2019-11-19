@@ -7,62 +7,61 @@ X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B8F7C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 21:19:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FA37C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 21:21:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65E26222B6
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 21:19:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5A5A206F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 21:21:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eXCRRnAr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65E26222B6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h0tAaDNU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5A5A206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXAu2-0002Hr-Hu
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 16:19:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58246)
+	id 1iXAwA-0003Vx-Va
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 16:21:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXAtG-0001tA-MV
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 16:18:27 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1iXAvT-0002zh-Rc
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 16:20:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXAtF-0002en-Ow
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 16:18:26 -0500
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:37177)
+ (envelope-from <mrolnik@gmail.com>) id 1iXAvS-00042T-Vo
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 16:20:43 -0500
+Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:37197)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iXAtF-0002eX-I7
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 16:18:25 -0500
-Received: by mail-oi1-x243.google.com with SMTP id y194so20439573oie.4
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 13:18:25 -0800 (PST)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iXAvS-00042F-SH
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 16:20:42 -0500
+Received: by mail-qk1-x742.google.com with SMTP id e187so19288469qkf.4
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 13:20:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=QjMNz+4TePyGkHe+ygN/OynQIxVDQA/Cce3RiDNY9Bs=;
- b=eXCRRnArudFhBWR/jFuVsOIAdJxGBgnJu577jW31xzdYt0jgNEjbtHpGBi8d+6r8qy
- a8nzKfuZ2VPxJRu8+br1v0pJDyJ6BBuL0kqCEBonSbc2TT1dJVhKQl+ZI2R60OrMghOI
- aRZWu08xGYASqfQ/sE00kUVGj+AGKEjjsJBj/6gOdGx5tsKX4Bwv8buSxqIylRje3WPZ
- u+kI+FTPJ3ISsk6i+2D5MdgPPEEMjU7OHYz0Im4SHgpQsQmMvBAFDmQyR2cpQ7Fatar/
- QDFqX8vvseyIGO0eyWMhRw2x5bpKhkFip0GosPaCgqyKRT002mrzM8xSIZDd5WtC3xmQ
- idFg==
+ :cc; bh=/vcIsL+7uCitU/6S8jEPh5wvIdzcyxB8WmvnNnI+dL4=;
+ b=h0tAaDNUrKI3W8IMn8i2qDHcshX60B8aLYC2AG+Zr5nAEk39qbIIPR6ZVJZQSDKGe7
+ oUfBMT+YsLDq21OM1JaoVwW6bZrsyNqi81rN/psmFx6xVJpGYZTYrb2KKh4c5YjC4rBp
+ VdKN7OX2lUVGSvMzXXFRd88tkn072YZUeIGBnjl8B1E7kvHdmgo+tGwyqy0bsKD+7xWm
+ loIFObNQeQg1Ko6i+rUNd/SE3uDNDJPTbOUpXBkVMxNiF3sAndWjo7mYZ3yyPfSwru7M
+ 7o1pOTDV7ZdxIzwpZr9MSekE9waTFIjzl0vR4LZpq9tRVcFkzAL3sRhrvMF3At71FmH2
+ VL1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=QjMNz+4TePyGkHe+ygN/OynQIxVDQA/Cce3RiDNY9Bs=;
- b=HQb1wdvS2eIArEBcJryeXvlH7OOi4h1KpRXitVVVrzMQybdssQf76AIPXc1q+uwKAC
- h9cx7KJ+WxExadGGsG/PItwP2pv8ctxjtmlIzTd0L5C1gEcAK6cJsGajT1RTpj0rQags
- Sfq4hQDJeVWHRATsoHTRVE9G6oFH3BjPThy4OK4GCYThzGRuyzyNJOwU8PPfRmXtoz26
- VHfRTyvKYj2kGZj1sI58YltcbXa3lpWqlY2mkbxYVAl+xkv56Qp7w/NuSN989MuoAcMK
- xPgYlMl3pWDIZDfw2rTaSSSTnWxO7rCOPP6ccL1t54mxevG3EC0CsUgUiokubiQVUDNd
- Ca7g==
-X-Gm-Message-State: APjAAAUIpdoJH1OsnOo7SGCHDUMnYb14Dyui3hLM+z9MarvlwAv4Olip
- yUfAPzBlWq7XW5jfP22eUCQhMlgjiqaBxzHFelc=
-X-Google-Smtp-Source: APXvYqxN/Uzy2QHdCjwsH8fwdt9+rbbP/g8B7Q1qlX+GYc3VrSpVAb7fbrYa2WN+UkWQJ+NXcF1CxSta0IdUO+Lc4Ic=
-X-Received: by 2002:aca:670b:: with SMTP id z11mr5767576oix.79.1574198304693; 
- Tue, 19 Nov 2019 13:18:24 -0800 (PST)
+ bh=/vcIsL+7uCitU/6S8jEPh5wvIdzcyxB8WmvnNnI+dL4=;
+ b=OGpUt9bleSdgHZag3iWez6zbmrgp+dQAjhfd+p4QG2AdRMnGUvli3gUzCYuZ7pgVoU
+ XMXz06Am88tB/Xi38KE95sKFnIaZsDmVn0f77IqWJodY1+TftVz4dzYF6po2P1jaey+c
+ ULVys/hCiDImjD20MPeZCI3aq5wGtL7s0ixlqYRA3imQjYCszmMFMyCe0D8uT3LhnQVU
+ 2eeRQgRfvPgXmTsWp/ZdpeKPffE+H5z6HHJv4HmlBjep+KWG6nIadEdN9xcV7IRGXxN0
+ D6vbqAM/s2v9zzJ4jJm8Id6rD+JewVl1uvXVKJd7kpqkrz0Ud3vZo2OcbdAk8QYP6i7r
+ vZyA==
+X-Gm-Message-State: APjAAAXzhPo6D4TP230XbnhEHfPGQxLYNHRh8NJ0e57j10+jvAS46eIr
+ LG6pp+Zuf0n3opOCIjgNV7gk0UsIuNwnO8LlmOU=
+X-Google-Smtp-Source: APXvYqxx4P6gIaZS+BzfgYlgqlL8BSbf85OAIXtc/+E9PbK483WfNvkvZOjLpU7qCu/k/+qSSA2Op2KWPDLGsdvADe8=
+X-Received: by 2002:a37:8a05:: with SMTP id m5mr28759436qkd.181.1574198441961; 
+ Tue, 19 Nov 2019 13:20:41 -0800 (PST)
 MIME-Version: 1.0
 References: <20191029212430.20617-1-mrolnik@gmail.com>
  <20191029212430.20617-6-mrolnik@gmail.com>
@@ -71,17 +70,18 @@ References: <20191029212430.20617-1-mrolnik@gmail.com>
  <14d51697-9415-14b9-8f92-3ae3de2fca58@linaro.org>
  <CAL1e-=g6ctnzUSgq3eRn98nOMPJ88ucUNX7xc5MxCr6J=k4YMg@mail.gmail.com>
  <CAK4993j1a6Eo+FjM7rrOZgL7u955-fTXboyOWR2BriCcyFmCuw@mail.gmail.com>
-In-Reply-To: <CAK4993j1a6Eo+FjM7rrOZgL7u955-fTXboyOWR2BriCcyFmCuw@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 19 Nov 2019 22:18:14 +0100
-Message-ID: <CAL1e-=gQF3CDiYnim6NCQu=n8=S8V4J0Ej8fMaWC7bzLJKFjjA@mail.gmail.com>
+ <CAL1e-=gQF3CDiYnim6NCQu=n8=S8V4J0Ej8fMaWC7bzLJKFjjA@mail.gmail.com>
+In-Reply-To: <CAL1e-=gQF3CDiYnim6NCQu=n8=S8V4J0Ej8fMaWC7bzLJKFjjA@mail.gmail.com>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Tue, 19 Nov 2019 23:19:46 +0200
+Message-ID: <CAK4993gDA85yHKgHN-5J5g-KoEOYQYmkBgx806OLxVe4MqWJ3g@mail.gmail.com>
 Subject: Re: [PATCH v35 05/13] target/avr: Add instruction translation -
  Arithmetic and Logic Instructions
-To: Michael Rolnik <mrolnik@gmail.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::243
+X-Received-From: 2607:f8b0:4864:20::742
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -103,22 +103,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 19, 2019 at 9:09 PM Michael Rolnik <mrolnik@gmail.com> wrote:
->
-> Hi Aleksandar et al.
->
-> how is it going? should I rebase or not?
->
-> Michael
->
+Sounds good, thanks!
 
-I am just in the process of taking a detailed look to the whole series.
+On Tue, Nov 19, 2019 at 11:18 PM Aleksandar Markovic
+<aleksandar.m.mail@gmail.com> wrote:
+>
+> On Tue, Nov 19, 2019 at 9:09 PM Michael Rolnik <mrolnik@gmail.com> wrote:
+> >
+> > Hi Aleksandar et al.
+> >
+> > how is it going? should I rebase or not?
+> >
+> > Michael
+> >
+>
+> I am just in the process of taking a detailed look to the whole series.
+>
+> I don't have any serious objection so far, I may just suggest a couple
+> of things that will improve readability of the code - so nothing of some
+> really serious nature.
+>
+> Stay tuned (and be patient). Will hear from me soon.
+>
+> Yours, Aleksandar
 
-I don't have any serious objection so far, I may just suggest a couple
-of things that will improve readability of the code - so nothing of some
-really serious nature.
 
-Stay tuned (and be patient). Will hear from me soon.
 
-Yours, Aleksandar
+-- 
+Best Regards,
+Michael Rolnik
 
