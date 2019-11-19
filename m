@@ -2,87 +2,65 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.4 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A5D7C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 02:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB469C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 02:48:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F258B22310
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 02:27:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA2FE223AC
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 02:48:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MOKBYVcT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F258B22310
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="UHBVCqFw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA2FE223AC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41076 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41128 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWtF0-0008NF-5R
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 21:27:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39278)
+	id 1iWtYq-0004PM-4s
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 21:48:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41132)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <chanmickyyun@gmail.com>) id 1iWtEG-0007an-M8
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 21:26:57 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iWtWm-0002y4-1B
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 21:46:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <chanmickyyun@gmail.com>) id 1iWtEF-0002od-Bx
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 21:26:56 -0500
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:40902)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <chanmickyyun@gmail.com>)
- id 1iWtEF-0002oX-4D
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 21:26:55 -0500
-Received: by mail-pl1-x641.google.com with SMTP id e3so10882462plt.7
- for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 18:26:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=i2r/mOApj4LAQtxgh1li1SATnPX6DmW2po1B+XTx69E=;
- b=MOKBYVcTOvhT4CJoT3QNDu5O0c3DNgwu52SL3u8ddPSJ3/aEcz7lAP49veU+7SoFEX
- +lIxFJtKm2KYl83GtYFTt5rFGs0I1Zp17AQF28JF8l6Y8CAsjOoPefB+dQiD9BtsQfHf
- gkGZIHw/Ik6ljsW2uOWMw3eClmBxex+LZfxCdZOclSY5QpJe1CG1GNzqnzacGEVoJaQb
- MNcz8fjf2GuBtQmAcPmPzEGJe6Ufwf2RNmXqMcRYuScOfL6KmNjHkI1kiBAwR6Cu/ay6
- Ra/KZDCgij+rgeoPaIMeR9ZdzKKvwbsyzDix6QOI/0cZ7f7BBrLamKRkp0V2kNkouIpY
- mNZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=i2r/mOApj4LAQtxgh1li1SATnPX6DmW2po1B+XTx69E=;
- b=EUsbeLJ4kfD80Xh9jOrmW+7U6E8phkYOYwq6/5SMnqI6aYwLSjQsw2NTitlq+FG08T
- APauDPcLnmtd60MLY195/meH7hz0834oTnXv8V/1iAcP+dMIsChNkaY0YqI3LY/9nbAx
- zlGhF74EVfQ0lqw5Cfuv0HKiilaudJmEZpmbtJ8drMaYdMS1t/aCW7deyYopT77o4vdk
- 4sj0MbJ4Eyuc0PZvv4Yq9Ik46f66tTQ/54iRo6OHO6SWYUne2CB7QKG/27Qpj1zxtwmO
- 0XeRkY24sDXJKUvoF8onfjTHk3gojCGRFs8q6ySg2LIBqrdGZiPUrQBh/qf1+8wkME3w
- z7dQ==
-X-Gm-Message-State: APjAAAWlX65wJMLBOtrz0jZ1VCH7sFeLgmsTCWJ3vyduhrCcALcyPpRC
- mIBFIDmfanHLxgeAlXISTJWtFKBvpy14S8jV
-X-Google-Smtp-Source: APXvYqyx+oCOkkk5OEdo/K/Ru7eppXdZqzmG1rPLaY0wDnx+ISlOUXaRXM1hyvZAwvdUXdzuW4mmmw==
-X-Received: by 2002:a17:90a:348c:: with SMTP id
- p12mr2910677pjb.105.1574130413428; 
- Mon, 18 Nov 2019 18:26:53 -0800 (PST)
-Received: from localhost.localdomain.com ([209.132.188.80])
- by smtp.googlemail.com with ESMTPSA id i2sm21912113pgt.34.2019.11.18.18.26.50
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 18 Nov 2019 18:26:52 -0800 (PST)
-From: Micky Yun Chan <chanmickyyun@gmail.com>
-X-Google-Original-From: Micky Yun Chan <michan@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4] Implement backend program convention command for
- vhost-user-blk
-Date: Tue, 19 Nov 2019 10:26:40 +0800
-Message-Id: <20191119022640.11021-1-michan@redhat.com>
-X-Mailer: git-send-email 2.21.0
+ (envelope-from <dgibson@ozlabs.org>) id 1iWtWj-0004E6-G9
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 21:46:03 -0500
+Received: from ozlabs.org ([203.11.71.1]:36945)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iWtWi-0004D5-LZ; Mon, 18 Nov 2019 21:46:01 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47H9Dg53RZz9sPc; Tue, 19 Nov 2019 13:45:55 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1574131555;
+ bh=R7oyII1nFWsjg/K5ZAOmiC29M4tDYE28eE2xnFjv2UE=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=UHBVCqFw0A4ShhjvyZqHbMLztAmOnmVKYCTuuQlePRXWyWKidwGi1tOgaqNLxrmsN
+ dm+jUcjedXjb+2OBgnmp2KVS6/C2ir33qCeGjtGeT8dTPwyXrdQ60VtTMk7V2PxtZ3
+ hIdIvkPFYNUpgi22vPx3XoipMc0C6XsRoPcIFLVk=
+Date: Tue, 19 Nov 2019 13:45:14 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Ganesh Goudar <ganeshgr@linux.ibm.com>
+Subject: Re: [PATCH v17 6/7] migration: Include migration support for machine
+ check handling
+Message-ID: <20191119024514.GM5582@umbus.fritz.box>
+References: <20191024074307.22821-1-ganeshgr@linux.ibm.com>
+ <20191024074307.22821-7-ganeshgr@linux.ibm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::641
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="WkHPBKJ2pKcVUM5H"
+Content-Disposition: inline
+In-Reply-To: <20191024074307.22821-7-ganeshgr@linux.ibm.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,172 +72,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: michan <michan@redhat.com>, Micky Yun Chan <chanmickyyun@gmail.com>,
- stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: arawinda.p@gmail.com, aik@ozlabs.ru, qemu-devel@nongnu.org, groug@kaod.org,
+ paulus@ozlabs.org, qemu-ppc@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: michan <michan@redhat.com>
 
-This patch is to add standard commands defined in docs/interop/vhost-user.rst
-For vhost-user-* program
+--WkHPBKJ2pKcVUM5H
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
----
- contrib/vhost-user-blk/vhost-user-blk.c | 109 ++++++++++++++----------
- 1 file changed, 65 insertions(+), 44 deletions(-)
+On Thu, Oct 24, 2019 at 01:13:06PM +0530, Ganesh Goudar wrote:
+> From: Aravinda Prasad <arawinda.p@gmail.com>
+>=20
+> This patch includes migration support for machine check
+> handling. Especially this patch blocks VM migration
+> requests until the machine check error handling is
+> complete as these errors are specific to the source
+> hardware and is irrelevant on the target hardware.
+>=20
+> [Do not set FWNMI cap in post_load, now its done in .apply hook]
+> Signed-off-by: Ganesh Goudar <ganeshgr@linux.ibm.com>
+> Signed-off-by: Aravinda Prasad <arawinda.p@gmail.com>
+> ---
+>  hw/ppc/spapr.c         | 41 +++++++++++++++++++++++++++++++++++++++++
+>  hw/ppc/spapr_events.c  | 16 +++++++++++++++-
+>  hw/ppc/spapr_rtas.c    |  2 ++
+>  include/hw/ppc/spapr.h |  2 ++
+>  4 files changed, 60 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 346ec5ba6c..e0d0f95ec0 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -46,6 +46,7 @@
+>  #include "migration/qemu-file-types.h"
+>  #include "migration/global_state.h"
+>  #include "migration/register.h"
+> +#include "migration/blocker.h"
+>  #include "mmu-hash64.h"
+>  #include "mmu-book3s-v3.h"
+>  #include "cpu-models.h"
+> @@ -1751,6 +1752,8 @@ static void spapr_machine_reset(MachineState *machi=
+ne)
+> =20
+>      /* Signal all vCPUs waiting on this condition */
+>      qemu_cond_broadcast(&spapr->mc_delivery_cond);
+> +
+> +    migrate_del_blocker(spapr->fwnmi_migration_blocker);
+>  }
+> =20
+>  static void spapr_create_nvram(SpaprMachineState *spapr)
+> @@ -2041,6 +2044,43 @@ static const VMStateDescription vmstate_spapr_dtb =
+=3D {
+>      },
+>  };
+> =20
+> +static bool spapr_fwnmi_needed(void *opaque)
+> +{
+> +    SpaprMachineState *spapr =3D (SpaprMachineState *)opaque;
+> +
+> +    return spapr->guest_machine_check_addr !=3D -1;
+> +}
+> +
+> +static int spapr_fwnmi_pre_save(void *opaque)
+> +{
+> +    SpaprMachineState *spapr =3D (SpaprMachineState *)opaque;
+> +
+> +    /*
+> +     * With -only-migratable QEMU option, we cannot block migration.
+> +     * Hence check if machine check handling is in progress and print
+> +     * a warning message.
+> +     */
 
-diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-index ae61034656..a226148bdc 100644
---- a/contrib/vhost-user-blk/vhost-user-blk.c
-+++ b/contrib/vhost-user-blk/vhost-user-blk.c
-@@ -576,70 +576,91 @@ vub_new(char *blk_file)
-     return vdev_blk;
- }
- 
-+static int opt_fdnum = -1;
-+static char *opt_socket_path;
-+static char *opt_blk_file;
-+static gboolean opt_print_caps;
-+static gboolean opt_read_only;
-+
-+
-+static GOptionEntry entries[] = {
-+    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
-+      "Print capabilities", NULL },
-+    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
-+      "Use inherited fd socket", "FDNUM" },
-+    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
-+      "Use UNIX socket path", "PATH" },
-+    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
-+     "block device or file path", "PATH"},
-+    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
-+      "Enable read-only", NULL }
-+};
-+
- int main(int argc, char **argv)
- {
--    int opt;
--    char *unix_socket = NULL;
--    char *blk_file = NULL;
--    bool enable_ro = false;
-     int lsock = -1, csock = -1;
-     VubDev *vdev_blk = NULL;
-+    GError *error = NULL;
-+    GOptionContext *context;
- 
--    while ((opt = getopt(argc, argv, "b:rs:h")) != -1) {
--        switch (opt) {
--        case 'b':
--            blk_file = g_strdup(optarg);
--            break;
--        case 's':
--            unix_socket = g_strdup(optarg);
--            break;
--        case 'r':
--            enable_ro = true;
--            break;
--        case 'h':
--        default:
--            printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
--                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
--            return 0;
-+    context = g_option_context_new(NULL);
-+    g_option_context_add_main_entries(context, entries, NULL);
-+    if (!g_option_context_parse(context, &argc, &argv, &error)) {
-+        g_printerr("Option parsing failed: %s\n", error->message);
-+        exit(EXIT_FAILURE);
-+    }
-+    if (opt_print_caps) {
-+        g_print("{\n");
-+        g_print("  \"type\": \"blk\",\n");
-+        g_print("  \"features\": [\n");
-+        g_print("    \"read-only\",\n");
-+        g_print("    \"blk-file\"\n");
-+        g_print("  ]\n");
-+        g_print("}\n");
-+        exit(EXIT_SUCCESS);
-+    }
-+
-+    if (!opt_blk_file) {
-+        g_print("%s\n", g_option_context_get_help(context, true, NULL));
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (opt_socket_path) {
-+        lsock = unix_sock_new(opt_socket_path);
-+        if (lsock < 0) {
-+           exit(EXIT_FAILURE);
-         }
-+    } else if(opt_fdnum < 0){
-+        g_print("%s\n", g_option_context_get_help(context, true, NULL));
-+        exit(EXIT_FAILURE);
-+    } else {
-+        lsock = opt_fdnum;
-     }
- 
--    if (!unix_socket || !blk_file) {
--        printf("Usage: %s [ -b block device or file, -s UNIX domain socket"
--               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
--        return -1;
--    }
--
--    lsock = unix_sock_new(unix_socket);
--    if (lsock < 0) {
--        goto err;
--    }
--
--    csock = accept(lsock, (void *)0, (void *)0);
-+    csock = accept(lsock, NULL, NULL);
-     if (csock < 0) {
--        fprintf(stderr, "Accept error %s\n", strerror(errno));
--        goto err;
-+        g_printerr("Accept error %s\n", strerror(errno));
-+        exit(EXIT_FAILURE);
-     }
- 
--    vdev_blk = vub_new(blk_file);
-+    vdev_blk = vub_new(opt_blk_file);
-     if (!vdev_blk) {
--        goto err;
-+        exit(EXIT_FAILURE);
-     }
--    if (enable_ro) {
-+    if (opt_read_only) {
-         vdev_blk->enable_ro = true;
-     }
- 
-     if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
-                   vub_panic_cb, &vub_iface)) {
--        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
--        goto err;
-+        g_printerr("Failed to initialize libvhost-user-glib\n");
-+        exit(EXIT_FAILURE);
-     }
- 
-     g_main_loop_run(vdev_blk->loop);
--
-+    g_main_loop_unref(vdev_blk->loop);
-+    g_option_context_free(context);
-     vug_deinit(&vdev_blk->parent);
--
--err:
-     vub_free(vdev_blk);
-     if (csock >= 0) {
-         close(csock);
-@@ -647,8 +668,8 @@ err:
-     if (lsock >= 0) {
-         close(lsock);
-     }
--    g_free(unix_socket);
--    g_free(blk_file);
-+    g_free(opt_socket_path);
-+    g_free(opt_blk_file);
- 
-     return 0;
- }
--- 
-2.21.0
+IIUC the logic below this could also occur in the case where the fwnmi
+event occurs after a migration has started, but before it completes,
+not just with -only-migratable.  Is that correct?
 
+> +    if (spapr->mc_status !=3D -1) {
+> +        warn_report("A machine check is being handled during migration. =
+The"
+> +                "handler may run and log hardware error on the destinati=
+on");
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static const VMStateDescription vmstate_spapr_machine_check =3D {
+> +    .name =3D "spapr_machine_check",
+> +    .version_id =3D 1,
+> +    .minimum_version_id =3D 1,
+> +    .needed =3D spapr_fwnmi_needed,
+> +    .pre_save =3D spapr_fwnmi_pre_save,
+> +    .fields =3D (VMStateField[]) {
+> +        VMSTATE_UINT64(guest_machine_check_addr, SpaprMachineState),
+> +        VMSTATE_INT32(mc_status, SpaprMachineState),
+> +        VMSTATE_END_OF_LIST()
+> +    },
+> +};
+> +
+>  static const VMStateDescription vmstate_spapr =3D {
+>      .name =3D "spapr",
+>      .version_id =3D 3,
+> @@ -2075,6 +2115,7 @@ static const VMStateDescription vmstate_spapr =3D {
+>          &vmstate_spapr_cap_large_decr,
+>          &vmstate_spapr_cap_ccf_assist,
+>          &vmstate_spapr_cap_fwnmi,
+> +        &vmstate_spapr_machine_check,
+>          NULL
+>      }
+>  };
+> diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+> index db44e09154..30d9371c88 100644
+> --- a/hw/ppc/spapr_events.c
+> +++ b/hw/ppc/spapr_events.c
+> @@ -43,6 +43,7 @@
+>  #include "qemu/main-loop.h"
+>  #include "hw/ppc/spapr_ovec.h"
+>  #include <libfdt.h>
+> +#include "migration/blocker.h"
+> =20
+>  #define RTAS_LOG_VERSION_MASK                   0xff000000
+>  #define   RTAS_LOG_VERSION_6                    0x06000000
+> @@ -842,6 +843,8 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recove=
+red)
+>  {
+>      SpaprMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>      CPUState *cs =3D CPU(cpu);
+> +    int ret;
+> +    Error *local_err =3D NULL;
+> =20
+>      if (spapr->guest_machine_check_addr =3D=3D -1) {
+>          /*
+> @@ -871,8 +874,19 @@ void spapr_mce_req_event(PowerPCCPU *cpu, bool recov=
+ered)
+>              return;
+>          }
+>      }
+> -    spapr->mc_status =3D cpu->vcpu_id;
+> =20
+> +    ret =3D migrate_add_blocker(spapr->fwnmi_migration_blocker, &local_e=
+rr);
+> +    if (ret =3D=3D -EBUSY) {
+> +        /*
+> +         * We don't want to abort so we let the migration to continue.
+> +         * In a rare case, the machine check handler will run on the tar=
+get.
+> +         * Though this is not preferable, it is better than aborting
+> +         * the migration or killing the VM.
+> +         */
+> +        warn_report_err(local_err);
+
+I suspect the error message in local_err won't be particularly
+meaningful on its own.  Perhaps you need to add a prefix to clarify
+that the problem is you've received a fwnmi after migration has
+commenced?
+
+> +    }
+> +
+> +    spapr->mc_status =3D cpu->vcpu_id;
+>      spapr_mce_dispatch_elog(cpu, recovered);
+>  }
+> =20
+> diff --git a/hw/ppc/spapr_rtas.c b/hw/ppc/spapr_rtas.c
+> index 0328b1f341..c78d96ee7e 100644
+> --- a/hw/ppc/spapr_rtas.c
+> +++ b/hw/ppc/spapr_rtas.c
+> @@ -50,6 +50,7 @@
+>  #include "hw/ppc/fdt.h"
+>  #include "target/ppc/mmu-hash64.h"
+>  #include "target/ppc/mmu-book3s-v3.h"
+> +#include "migration/blocker.h"
+> =20
+>  static void rtas_display_character(PowerPCCPU *cpu, SpaprMachineState *s=
+papr,
+>                                     uint32_t token, uint32_t nargs,
+> @@ -446,6 +447,7 @@ static void rtas_ibm_nmi_interlock(PowerPCCPU *cpu,
+>       */
+>      spapr->mc_status =3D -1;
+>      qemu_cond_signal(&spapr->mc_delivery_cond);
+> +    migrate_del_blocker(spapr->fwnmi_migration_blocker);
+
+Oh... damn.  I suggested using a static fwnmi_migration_blocker
+instance, but I just realized there's a problem with it.
+
+If we do receive multiple fwnmi events on different cpus at roughly
+the same time, this will break: I think we'll try to add the same
+migration blocker instance multiple times, which won't be good.  Even
+if that doesn't do anything *too* bad, then we'll unblock the
+migration on the first interlock, rather than waiting for all pending
+fwnmi events to complete.
+
+>      rtas_st(rets, 0, RTAS_OUT_SUCCESS);
+>  }
+> =20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index 86f0fc8fdd..290abd6328 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -215,6 +215,8 @@ struct SpaprMachineState {
+> =20
+>      unsigned gpu_numa_id;
+>      SpaprTpmProxy *tpm_proxy;
+> +
+> +    Error *fwnmi_migration_blocker;
+>  };
+> =20
+>  #define H_SUCCESS         0
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--WkHPBKJ2pKcVUM5H
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3TVzkACgkQbDjKyiDZ
+s5IQ8xAA0lzUL9uYqr7bv0A8CXGe1R3yXglG6X8zrYsl4vlnlFmyss+Mcfn/2W5x
+JOO8jq9ZVU3TdFmninOfzn/5bCkvfet4ituCIYXqGG7tNvpTyseWV+UmRJsHGNOk
+PzZ3AkmH22rV/r30Gl/T/BsYytJAx9ty3TaeprneT4fqTy/CEo8FeG6ieHOVifQa
+ZvlIgjiHBILyXLjm/3kQrB+4HAJFmfDyf40NoIF4GZj6++k3RigHXLP6bNYdU3Tu
+n7mCmMlSUwKU6v0vj74S4hrC3hsWPl9eDkJrMbxG3uHmjiI+VEljakYOneowPdXv
+LcLWiUgpezZKoZr1qE3feSuhtlZhVFU0vhXx08mJe9G7XQkuWZqabB7BYH52Z20y
+ou++eIxkMM/zmM+dFxugSvf7aYGliIE+acovmMYagkxlKFXsXl1yPOKQnUWIPV7W
+YuOzlvnA25ck4B3H7sIObg8ygoKmh/0c+Gt7VtfTr/uXSU5GsdmVtDLbTFLrKL3Q
+MCd7Vfg29L/wQyLlQE+C1pmc5m3B1ig1oqIxlRwZWYCMQ6yCBmsIHaQH9MAG6Q9c
+ivO72YC7UXkV4HmMK+BO0Tp7Rk2j8hOkiX4GwnZZJuiRNIr52HnoZ8XmAFtSI68I
+8wIyhf/cgIIN28Zag63l4Hx6F5Jki5eDTbZBVQN7jHuYjBmV1x8=
+=61sK
+-----END PGP SIGNATURE-----
+
+--WkHPBKJ2pKcVUM5H--
 
