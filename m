@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D98C432C0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70AFAC43215
 	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:17:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6E85223AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:17:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3EEEC22363
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:17:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r9t7UvUh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6E85223AC
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="icVKQlmv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EEEC22363
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47090 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX6CG-00034P-91
+	id 1iX6CG-00035E-KG
 	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 11:17:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60762)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60771)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iX63u-000207-DQ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:07 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iX63v-00021Y-AD
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iX63t-00068v-4e
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:06 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:34951)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iX63u-00069S-21
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:07 -0500
+Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:54364)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iX63s-00068T-UQ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:05 -0500
-Received: by mail-wm1-x333.google.com with SMTP id 8so4365562wmo.0
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 08:09:04 -0800 (PST)
+ id 1iX63t-000695-RW
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:06 -0500
+Received: by mail-wm1-x32f.google.com with SMTP id z26so3791999wmi.4
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 08:09:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=84AXGKd0a/dx96HO4dm8J3dMCUNzIh5I2fM2rW+So9Q=;
- b=r9t7UvUho1TLYTzhudNOQXO1MyL4i6b472qsm9NP4KyC8Qmel6V9mSn44HLQ3y+ad+
- 9XUizctHpcdGPPM4+S3yAdgzVyGPNGXZyYJvQ0HomOUW7OH8YECbkYTnA0HZYSZU/VMX
- FwXy+OriSXo211ibrgvT5fD4Cy7IEgxMp+jNwo5cj4NIn95UMweX0do2SVHzWBB6bCH2
- sWnIpWvlJTQ/U5w+PQmDk86XObyKmXetHqD0tRw0mIyM9WvZgUE6/kllPsg0lypSQQ8M
- 9lzlpBJIowd0LgqTpY5N25EU0xTN0tMKDpw0WvQlnHrSl6Zi+xL1mrJp7Ppq6keKkSFS
- Q+pg==
+ bh=iIEhLJHGJyb/n0As6qSQK05whIAhohU7R9F3hYodbw0=;
+ b=icVKQlmv2Y9HtY5+AT45kiySywerRLDixl1CG9V3SKDYtf//xFuaKxflsEk4qXmX+U
+ LcLbedTX8RUpExn9RXIca0gX547aITz+oRR0qTNfTvXjsUZYmuPDxxcnAW5brk0bbKpd
+ c1Gxx1jsE6hKJbXxfb4HiMKT4V42A2ierrt/++bB/oof2NEFFHfH6ylE49NU+2tobkJq
+ A+U+TZ710YtAffh4wZ7hxNG5YwiTBs8vfwIMRZBKeXtV/ef5okLf4M+b4j7BHFvekCE+
+ s8JoI0eZ/KhacGBL+1/yfc7W7y9QXhlr/6T5JwhM3bRQNbfxKw9JvB0RVhW3+Jsyx8Mc
+ odOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
  :in-reply-to:references;
- bh=84AXGKd0a/dx96HO4dm8J3dMCUNzIh5I2fM2rW+So9Q=;
- b=eqglkvCOS9rTGO8XTekxJdMkcYtC29uYHjolo02U8LJC7Qkyxhg7Sj7f4ZhnJ82ktH
- SPekfHwikV25ZQNcakriIzH+7WWS+9kEHWR6DWKdqdcdq+BxVh7S2hQGD3cIj7e/RlIY
- WWUvBZP3GiCuB4NfCwCj7kWyaZkPNauCXzZjWcS9nnQcaD4vEV/xh28cRottUgwSG7lG
- MiW0h2896/MyBjOJCPkK1JcWm/pi6GRoYjBj+OZu5HMk1eiUYw0DPlnxbfwg7MEhdCMh
- F1q6IKMyaAU5+FkNyZx0HBOT8ozK3tbhSFFM2grvtS0n1eJKcMtIIRG6z/4EWd7GjKju
- im/Q==
-X-Gm-Message-State: APjAAAUJmGhkLfgr1ivqf3DPotIDQj0lkDPDDoA6PdWZ9aSyxrJJUkk7
- NXZYy27Lx/JPNr7XRIvhiA7WuBYX
-X-Google-Smtp-Source: APXvYqz7sECQOk7FW+4B8rlMM0MNLEtlzN10BBIM68Zd6gQxsMix+IIQmNDrQnn2ORhGp1YDbbE9wQ==
-X-Received: by 2002:a1c:7c18:: with SMTP id x24mr6809842wmc.130.1574179743560; 
- Tue, 19 Nov 2019 08:09:03 -0800 (PST)
+ bh=iIEhLJHGJyb/n0As6qSQK05whIAhohU7R9F3hYodbw0=;
+ b=HhgRVlzeAbhogxSJ5goaO2SjBRLXOa+zI1ETni7C0Sq3d3tZKrEb8guim6I2OQCbxU
+ NAlud0cRNZTosFnciLw+/UcRDXl3kprjuSKHzBvQcPBCxZdMpGIcd3+evDfiUKa/LrDa
+ TnqwWFhdE4siZH6Guq41DTWwPI+L8bGy0tseLJUcbYQo4mDq9UwONAYdsCvF6KCitWZM
+ CywBdQlKFSLcV9OWeleB3WC64hZt3epQoU5+VtHj4NCHjMC+cKjPi8mDU0SZK6SRVYqj
+ foXrOQOzVBBqESdDSXsDIlGmo259sQ/mfQ3L2gkaBPfdukRMQhg/nln9KVQDA2U1hQBE
+ KhtA==
+X-Gm-Message-State: APjAAAUkMbC/R+D8nFb/HsTe2MwR/1JQluT0zHzvmtGhuhLTO8BZFfyC
+ DZUl2pW3ZZA/3o9mKZE3Ip0gWSnt
+X-Google-Smtp-Source: APXvYqyqbarSik4UhQAnuYZwBlFyhLRn2+lXi0y+Mv6M6A4RD3Eaa6/1231M+eGZ/AIFDmSG8j7hnw==
+X-Received: by 2002:a1c:7905:: with SMTP id l5mr7040588wme.76.1574179744541;
+ Tue, 19 Nov 2019 08:09:04 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n13sm3442203wmi.25.2019.11.19.08.09.02
+ by smtp.gmail.com with ESMTPSA id n13sm3442203wmi.25.2019.11.19.08.09.03
  for <qemu-devel@nongnu.org>
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 19 Nov 2019 08:09:02 -0800 (PST)
+ Tue, 19 Nov 2019 08:09:03 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/12] scsi: deprecate scsi-disk
-Date: Tue, 19 Nov 2019 17:08:46 +0100
-Message-Id: <1574179728-35535-11-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 11/12] Revert "mc146818rtc: fix timer interrupt reinjection"
+Date: Tue, 19 Nov 2019 17:08:47 +0100
+Message-Id: <1574179728-35535-12-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1574179728-35535-1-git-send-email-pbonzini@redhat.com>
 References: <1574179728-35535-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-Received-From: 2a00:1450:4864:20::32f
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,96 +94,102 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's an old compatibility shim that just delegates to scsi-cd or scsi-hd.
-Just like ide-drive, we don't need this.
+This reverts commit b429de730174b388ea5760e3debb0d542ea3c261, except
+that the reversal of the outer "if (period)" is left in.
 
-Acked-by: Peter Krempa <pkrempa@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-bus.c            | 12 +++++++++++-
- hw/scsi/scsi-disk.c           |  3 +++
- qemu-deprecated.texi          |  5 +++++
- tests/qemu-iotests/051.pc.out |  6 ++++--
- 4 files changed, 23 insertions(+), 3 deletions(-)
+ hw/rtc/mc146818rtc.c | 67 ++++++++++++++++++++++++++--------------------------
+ 1 file changed, 33 insertions(+), 34 deletions(-)
 
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index 359d50d..ad0e7f6 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -254,8 +254,18 @@ SCSIDevice *scsi_bus_legacy_add_drive(SCSIBus *bus, BlockBackend *blk,
-     char *name;
-     DeviceState *dev;
-     Error *err = NULL;
-+    DriveInfo *dinfo;
+diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
+index ee6bf82..9869dc5 100644
+--- a/hw/rtc/mc146818rtc.c
++++ b/hw/rtc/mc146818rtc.c
+@@ -174,7 +174,6 @@ periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
+     int64_t cur_clock, next_irq_clock, lost_clock = 0;
  
--    driver = blk_is_sg(blk) ? "scsi-generic" : "scsi-disk";
-+    if (blk_is_sg(blk)) {
-+        driver = "scsi-generic";
-+    } else {
-+        dinfo = blk_legacy_dinfo(blk);
-+        if (dinfo && dinfo->media_cd) {
-+            driver = "scsi-cd";
-+        } else {
-+            driver = "scsi-hd";
-+        }
+     period = rtc_periodic_clock_ticks(s);
+-
+     if (!period) {
+         s->irq_coalesced = 0;
+         timer_del(s->periodic_timer);
+@@ -197,42 +196,42 @@ periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
+         last_periodic_clock = next_periodic_clock - old_period;
+         lost_clock = cur_clock - last_periodic_clock;
+         assert(lost_clock >= 0);
 +    }
-     dev = qdev_create(&bus->qbus, driver);
-     name = g_strdup_printf("legacy[%d]", unit);
-     object_property_add_child(OBJECT(bus), name, OBJECT(dev), NULL);
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 07fb5eb..e44c61e 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -2481,6 +2481,9 @@ static void scsi_disk_realize(SCSIDevice *dev, Error **errp)
-     DriveInfo *dinfo;
-     Error *local_err = NULL;
  
-+    warn_report("'scsi-disk' is deprecated, "
-+                "please use 'scsi-hd' or 'scsi-cd' instead");
++    /*
++     * s->irq_coalesced can change for two reasons:
++     *
++     * a) if one or more periodic timer interrupts have been lost,
++     *    lost_clock will be more that a period.
++     *
++     * b) when the period may be reconfigured, we expect the OS to
++     *    treat delayed tick as the new period.  So, when switching
++     *    from a shorter to a longer period, scale down the missing,
++     *    because the OS will treat past delayed ticks as longer
++     *    (leftovers are put back into lost_clock).  When switching
++     *    to a shorter period, scale up the missing ticks since the
++     *    OS handler will treat past delayed ticks as shorter.
++     */
++    if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW) {
++        uint32_t old_irq_coalesced = s->irq_coalesced;
 +
-     if (!dev->conf.blk) {
-         scsi_realize(dev, &local_err);
-         assert(local_err);
-diff --git a/qemu-deprecated.texi b/qemu-deprecated.texi
-index 296bfc9..4b4b742 100644
---- a/qemu-deprecated.texi
-+++ b/qemu-deprecated.texi
-@@ -259,6 +259,11 @@ their usecases.
- The 'ide-drive' device is deprecated. Users should use 'ide-hd' or
- 'ide-cd' as appropriate to get an IDE hard disk or CD-ROM as needed.
++        s->period = period;
++        lost_clock += old_irq_coalesced * old_period;
++        s->irq_coalesced = lost_clock / s->period;
++        lost_clock %= s->period;
++        if (old_irq_coalesced != s->irq_coalesced ||
++            old_period != s->period) {
++            DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, "
++                      "period scaled from %d to %d\n", old_irq_coalesced,
++                      s->irq_coalesced, old_period, s->period);
++            rtc_coalesced_timer_update(s);
++        }
++    } else {
+         /*
+-         * s->irq_coalesced can change for two reasons:
+-         *
+-         * a) if one or more periodic timer interrupts have been lost,
+-         *    lost_clock will be more that a period.
+-         *
+-         * b) when the period may be reconfigured, we expect the OS to
+-         *    treat delayed tick as the new period.  So, when switching
+-         *    from a shorter to a longer period, scale down the missing,
+-         *    because the OS will treat past delayed ticks as longer
+-         *    (leftovers are put back into lost_clock).  When switching
+-         *    to a shorter period, scale up the missing ticks since the
+-         *    OS handler will treat past delayed ticks as shorter.
++         * no way to compensate the interrupt if LOST_TICK_POLICY_SLEW
++         * is not used, we should make the time progress anyway.
+          */
+-        if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW) {
+-            uint32_t old_irq_coalesced = s->irq_coalesced;
+-
+-            s->period = period;
+-            lost_clock += old_irq_coalesced * old_period;
+-            s->irq_coalesced = lost_clock / s->period;
+-            lost_clock %= s->period;
+-            if (old_irq_coalesced != s->irq_coalesced ||
+-                old_period != s->period) {
+-                DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, "
+-                          "period scaled from %d to %d\n", old_irq_coalesced,
+-                          s->irq_coalesced, old_period, s->period);
+-                rtc_coalesced_timer_update(s);
+-            }
+-        } else {
+-            /*
+-             * no way to compensate the interrupt if LOST_TICK_POLICY_SLEW
+-             * is not used, we should make the time progress anyway.
+-             */
+-            lost_clock = MIN(lost_clock, period);
+-        }
++        lost_clock = MIN(lost_clock, period);
+     }
  
-+@subsection scsi-disk (since 4.2)
-+
-+The 'scsi-disk' device is deprecated. Users should use 'scsi-hd' or
-+'scsi-cd' as appropriate to get a SCSI hard disk or CD-ROM as needed.
-+
- @section System emulator machines
- 
- @subsection pc-0.12, pc-0.13, pc-0.14 and pc-0.15 (since 4.0)
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index 34849dd..0ea80d3 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -167,7 +167,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- 
- Testing: -drive if=none,id=disk -device lsi53c895a -device scsi-disk,drive=disk
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) QEMU_PROG: -device scsi-disk,drive=disk: Device needs media, but drive is empty
-+(qemu) QEMU_PROG: -device scsi-disk,drive=disk: warning: 'scsi-disk' is deprecated, please use 'scsi-hd' or 'scsi-cd' instead
-+QEMU_PROG: -device scsi-disk,drive=disk: Device needs media, but drive is empty
- 
- Testing: -drive if=none,id=disk -device lsi53c895a -device scsi-hd,drive=disk
- QEMU X.Y.Z monitor - type 'help' for more information
-@@ -238,7 +239,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
- 
- Testing: -drive file=TEST_DIR/t.qcow2,if=none,id=disk,readonly=on -device lsi53c895a -device scsi-disk,drive=disk
- QEMU X.Y.Z monitor - type 'help' for more information
--(qemu) quit
-+(qemu) QEMU_PROG: -device scsi-disk,drive=disk: warning: 'scsi-disk' is deprecated, please use 'scsi-hd' or 'scsi-cd' instead
-+quit
- 
- Testing: -drive file=TEST_DIR/t.qcow2,if=none,id=disk,readonly=on -device lsi53c895a -device scsi-hd,drive=disk
- QEMU X.Y.Z monitor - type 'help' for more information
+     assert(lost_clock >= 0 && lost_clock <= period);
 -- 
 1.8.3.1
 
