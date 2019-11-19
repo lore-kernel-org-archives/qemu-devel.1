@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E3ECC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 03:10:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 516CCC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 03:11:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58BA42070E
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 03:10:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DCED22316
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 03:11:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hNwEqSRG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58BA42070E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RkjOxS9j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DCED22316
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWtuc-0004UY-9f
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 22:10:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42769)
+	id 1iWtve-0006D1-0r
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 22:11:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42708)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iWtsH-0001t2-PK
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:08:19 -0500
+ (envelope-from <eblake@redhat.com>) id 1iWtsF-0001sL-C7
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:08:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iWtsF-0004jE-MW
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:08:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47791
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iWtsF-0004hY-Gj
+ (envelope-from <eblake@redhat.com>) id 1iWtsD-0004fF-ED
  for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:08:15 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58666
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iWtsD-0004e4-AQ
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:08:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574132894;
+ s=mimecast20190719; t=1574132891;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3vkggM0AK/j9YNOIYCu4VAnSxct234IkL8KRBv3z/kI=;
- b=hNwEqSRG9FQXUQrXoZFfnjMQcSnPuEjHvyeRx0b4zT5arBY1ZAJ+caYcBno4JITKJxWEmv
- FaY25LCRhgS0quYz/jELJ1PDGpQKHT01yAc3CZklXQsyqqQfE1jbYUXcOBCVEG2qTp2gA6
- Bck7csOSG6n1ejnADdvwco0u72VFjM8=
+ bh=k6TjX/L+saoePk/7FJ7wZ4ec27XNv3l1AI8xcJt9k9w=;
+ b=RkjOxS9j3LVWo10j/EVyrHDRL/GAk9zv5WAqwgQE4huwKBXSl17LrCX7fvfj6mXRbCmXMF
+ Iq1JlAr0l8vF7Kp7XHEuY9sMHKZD6w+4W84O0IIYasWLwz8crHGAfo4uJzxmXrcQ1EyGM2
+ 4wLlbQoyBqCdf55+yBq6DbW040Okazk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-8hJNiWWtOg27QGPlcxjMhg-1; Mon, 18 Nov 2019 22:08:13 -0500
+ us-mta-432-_zrnzMuHNriAMQzd4RPHSw-1; Mon, 18 Nov 2019 22:08:08 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDC5D1005500;
- Tue, 19 Nov 2019 03:08:11 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70153802682;
+ Tue, 19 Nov 2019 03:08:07 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-116-221.phx2.redhat.com [10.3.116.221])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4B5F460565;
- Tue, 19 Nov 2019 03:08:11 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E0A9560565;
+ Tue, 19 Nov 2019 03:08:06 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/10] nbd: Don't send oversize strings
-Date: Mon, 18 Nov 2019 21:07:54 -0600
-Message-Id: <20191119030759.24907-6-eblake@redhat.com>
+Subject: [PULL 03/10] nbd/server: Prefer heap over stack for parsing client
+ names
+Date: Mon, 18 Nov 2019 21:07:52 -0600
+Message-Id: <20191119030759.24907-4-eblake@redhat.com>
 In-Reply-To: <20191119030759.24907-1-eblake@redhat.com>
 References: <20191119030759.24907-1-eblake@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: 8hJNiWWtOg27QGPlcxjMhg-1
+X-MC-Unique: _zrnzMuHNriAMQzd4RPHSw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,330 +95,162 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Qemu as server currently won't accept export names larger than 256
-bytes, nor create dirty bitmap names longer than 1023 bytes, so most
-uses of qemu as client or server have no reason to get anywhere near
-the NBD spec maximum of a 4k limit per string.
-
-However, we weren't actually enforcing things, ignoring when the
-remote side violates the protocol on input, and also having several
-code paths where we send oversize strings on output (for example,
-qemu-nbd --description could easily send more than 4k).  Tighten
-things up as follows:
-
-client:
-- Perform bounds check on export name and dirty bitmap request prior
-  to handing it to server
-- Validate that copied server replies are not too long (ignoring
-  NBD_INFO_* replies that are not copied is not too bad)
-server:
-- Perform bounds check on export name and description prior to
-  advertising it to client
-- Reject client name or metadata query that is too long
-- Adjust things to allow full 4k name limit rather than previous
-  256 byte limit
+As long as we limit NBD names to 256 bytes (the bare minimum permitted
+by the standard), stack-allocation works for parsing a name received
+from the client.  But as mentioned in a comment, we eventually want to
+permit up to the 4k maximum of the NBD standard, which is too large
+for stack allocation; so switch everything in the server to use heap
+allocation.  For now, there is no change in actually supported name
+length.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20191114024635.11363-4-eblake@redhat.com>
+Message-Id: <20191114024635.11363-2-eblake@redhat.com>
+[eblake: fix uninit variable compile failure]
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/nbd.h |  8 ++++----
- block/nbd.c         | 10 ++++++++++
- blockdev-nbd.c      |  5 +++++
- nbd/client.c        | 18 +++++++++++++++---
- nbd/server.c        | 20 +++++++++++++++-----
- qemu-nbd.c          |  9 +++++++++
- 6 files changed, 58 insertions(+), 12 deletions(-)
+ include/block/nbd.h | 10 +++++-----
+ nbd/server.c        | 25 +++++++++++++++----------
+ 2 files changed, 20 insertions(+), 15 deletions(-)
 
 diff --git a/include/block/nbd.h b/include/block/nbd.h
-index c306423dc85c..7f46932d80f1 100644
+index 316fd705a9e4..c306423dc85c 100644
 --- a/include/block/nbd.h
 +++ b/include/block/nbd.h
-@@ -227,11 +227,11 @@ enum {
+@@ -226,11 +226,11 @@ enum {
+ /* Maximum size of a single READ/WRITE data buffer */
  #define NBD_MAX_BUFFER_SIZE (32 * 1024 * 1024)
 
- /*
-- * Maximum size of an export name. The NBD spec requires a minimum of
-- * 256 and recommends that servers support up to 4096; all users use
-- * malloc so we can bump this constant without worry.
-+ * Maximum size of a protocol string (export name, meta context name,
-+ * etc.).  Use malloc rather than stack allocation for storage of a
-+ * string.
-  */
--#define NBD_MAX_NAME_SIZE 256
-+#define NBD_MAX_STRING_SIZE 4096
+-/* Maximum size of an export name. The NBD spec requires 256 and
+- * suggests that servers support up to 4096, but we stick to only the
+- * required size so that we can stack-allocate the names, and because
+- * going larger would require an audit of more code to make sure we
+- * aren't overflowing some other buffer. */
++/*
++ * Maximum size of an export name. The NBD spec requires a minimum of
++ * 256 and recommends that servers support up to 4096; all users use
++ * malloc so we can bump this constant without worry.
++ */
+ #define NBD_MAX_NAME_SIZE 256
 
  /* Two types of reply structures */
- #define NBD_SIMPLE_REPLY_MAGIC      0x67446698
-diff --git a/block/nbd.c b/block/nbd.c
-index 123976171cf4..5f18f78a9471 100644
---- a/block/nbd.c
-+++ b/block/nbd.c
-@@ -1832,6 +1832,10 @@ static int nbd_process_options(BlockDriverState *bs,=
- QDict *options,
-     }
-
-     s->export =3D g_strdup(qemu_opt_get(opts, "export"));
-+    if (s->export && strlen(s->export) > NBD_MAX_STRING_SIZE) {
-+        error_setg(errp, "export name too long to send to server");
-+        goto error;
-+    }
-
-     s->tlscredsid =3D g_strdup(qemu_opt_get(opts, "tls-creds"));
-     if (s->tlscredsid) {
-@@ -1849,6 +1853,11 @@ static int nbd_process_options(BlockDriverState *bs,=
- QDict *options,
-     }
-
-     s->x_dirty_bitmap =3D g_strdup(qemu_opt_get(opts, "x-dirty-bitmap"));
-+    if (s->x_dirty_bitmap && strlen(s->x_dirty_bitmap) > NBD_MAX_STRING_SI=
-ZE) {
-+        error_setg(errp, "x-dirty-bitmap query too long to send to server"=
-);
-+        goto error;
-+    }
-+
-     s->reconnect_delay =3D qemu_opt_get_number(opts, "reconnect-delay", 0)=
-;
-
-     ret =3D 0;
-@@ -1859,6 +1868,7 @@ static int nbd_process_options(BlockDriverState *bs, =
-QDict *options,
-         qapi_free_SocketAddress(s->saddr);
-         g_free(s->export);
-         g_free(s->tlscredsid);
-+        g_free(s->x_dirty_bitmap);
-     }
-     qemu_opts_del(opts);
-     return ret;
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index 6a8b206e1d74..8c20baa4a4b9 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -162,6 +162,11 @@ void qmp_nbd_server_add(const char *device, bool has_n=
-ame, const char *name,
-         name =3D device;
-     }
-
-+    if (strlen(name) > NBD_MAX_STRING_SIZE) {
-+        error_setg(errp, "export name '%s' too long", name);
-+        return;
-+    }
-+
-     if (nbd_export_find(name)) {
-         error_setg(errp, "NBD server already has export named '%s'", name)=
-;
-         return;
-diff --git a/nbd/client.c b/nbd/client.c
-index f6733962b49b..ba173108baab 100644
---- a/nbd/client.c
-+++ b/nbd/client.c
-@@ -289,8 +289,8 @@ static int nbd_receive_list(QIOChannel *ioc, char **nam=
-e, char **description,
-         return -1;
-     }
-     len -=3D sizeof(namelen);
--    if (len < namelen) {
--        error_setg(errp, "incorrect option name length");
-+    if (len < namelen || namelen > NBD_MAX_STRING_SIZE) {
-+        error_setg(errp, "incorrect name length in server's list response"=
-);
-         nbd_send_opt_abort(ioc);
-         return -1;
-     }
-@@ -303,6 +303,12 @@ static int nbd_receive_list(QIOChannel *ioc, char **na=
-me, char **description,
-     local_name[namelen] =3D '\0';
-     len -=3D namelen;
-     if (len) {
-+        if (len > NBD_MAX_STRING_SIZE) {
-+            error_setg(errp, "incorrect description length in server's "
-+                       "list response");
-+            nbd_send_opt_abort(ioc);
-+            return -1;
-+        }
-         local_desc =3D g_malloc(len + 1);
-         if (nbd_read(ioc, local_desc, len, "export description", errp) < 0=
-) {
-             nbd_send_opt_abort(ioc);
-@@ -479,6 +485,10 @@ static int nbd_opt_info_or_go(QIOChannel *ioc, uint32_=
-t opt,
-             break;
-
-         default:
-+            /*
-+             * Not worth the bother to check if NBD_INFO_NAME or
-+             * NBD_INFO_DESCRIPTION exceed NBD_MAX_STRING_SIZE.
-+             */
-             trace_nbd_opt_info_unknown(type, nbd_info_lookup(type));
-             if (nbd_drop(ioc, len, errp) < 0) {
-                 error_prepend(errp, "Failed to read info payload: ");
-@@ -645,9 +655,11 @@ static int nbd_send_meta_query(QIOChannel *ioc, uint32=
-_t opt,
-     char *p;
-
-     data_len =3D sizeof(export_len) + export_len + sizeof(queries);
-+    assert(export_len <=3D NBD_MAX_STRING_SIZE);
-     if (query) {
-         query_len =3D strlen(query);
-         data_len +=3D sizeof(query_len) + query_len;
-+        assert(query_len <=3D NBD_MAX_STRING_SIZE);
-     } else {
-         assert(opt =3D=3D NBD_OPT_LIST_META_CONTEXT);
-     }
-@@ -1009,7 +1021,7 @@ int nbd_receive_negotiate(AioContext *aio_context, QI=
-OChannel *ioc,
-     bool zeroes;
-     bool base_allocation =3D info->base_allocation;
-
--    assert(info->name);
-+    assert(info->name && strlen(info->name) <=3D NBD_MAX_STRING_SIZE);
-     trace_nbd_receive_negotiate_name(info->name);
-
-     result =3D nbd_start_negotiate(aio_context, ioc, tlscreds, hostname, o=
-utioc,
 diff --git a/nbd/server.c b/nbd/server.c
-index 6bbeb98f8237..24ebc1a80571 100644
+index d8d1e6245532..6bbeb98f8237 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -321,7 +321,7 @@ static int nbd_opt_skip(NBDClient *client, size_t size,=
- Error **errp)
- /* nbd_opt_read_name
-  *
-  * Read a string with the format:
-- *   uint32_t len     (<=3D NBD_MAX_NAME_SIZE)
-+ *   uint32_t len     (<=3D NBD_MAX_STRING_SIZE)
+@@ -324,18 +324,20 @@ static int nbd_opt_skip(NBDClient *client, size_t siz=
+e, Error **errp)
+  *   uint32_t len     (<=3D NBD_MAX_NAME_SIZE)
   *   len bytes string (not 0-terminated)
   *
-  * On success, @name will be allocated.
-@@ -344,7 +344,7 @@ static int nbd_opt_read_name(NBDClient *client, char **=
-name, uint32_t *length,
-     }
-     len =3D cpu_to_be32(len);
+- * @name should be enough to store NBD_MAX_NAME_SIZE+1.
++ * On success, @name will be allocated.
+  * If @length is non-null, it will be set to the actual string length.
+  *
+  * Return -errno on I/O error, 0 if option was completely handled by
+  * sending a reply about inconsistent lengths, or 1 on success.
+  */
+-static int nbd_opt_read_name(NBDClient *client, char *name, uint32_t *leng=
+th,
++static int nbd_opt_read_name(NBDClient *client, char **name, uint32_t *len=
+gth,
+                              Error **errp)
+ {
+     int ret;
+     uint32_t len;
++    g_autofree char *local_name =3D NULL;
 
--    if (len > NBD_MAX_NAME_SIZE) {
-+    if (len > NBD_MAX_STRING_SIZE) {
-         return nbd_opt_invalid(client, errp,
++    *name =3D NULL;
+     ret =3D nbd_opt_read(client, &len, sizeof(len), errp);
+     if (ret <=3D 0) {
+         return ret;
+@@ -347,15 +349,17 @@ static int nbd_opt_read_name(NBDClient *client, char =
+*name, uint32_t *length,
                                 "Invalid name length: %" PRIu32, len);
      }
-@@ -379,6 +379,7 @@ static int nbd_negotiate_send_rep_list(NBDClient *clien=
-t, NBDExport *exp,
-     trace_nbd_negotiate_send_rep_list(name, desc);
-     name_len =3D strlen(name);
-     desc_len =3D strlen(desc);
-+    assert(name_len <=3D NBD_MAX_STRING_SIZE && desc_len <=3D NBD_MAX_STRI=
-NG_SIZE);
-     len =3D name_len + desc_len + sizeof(len);
-     ret =3D nbd_negotiate_send_rep_len(client, NBD_REP_SERVER, len, errp);
-     if (ret < 0) {
-@@ -445,7 +446,7 @@ static int nbd_negotiate_handle_export_name(NBDClient *=
-client, bool no_zeroes,
+
+-    ret =3D nbd_opt_read(client, name, len, errp);
++    local_name =3D g_malloc(len + 1);
++    ret =3D nbd_opt_read(client, local_name, len, errp);
+     if (ret <=3D 0) {
+         return ret;
+     }
+-    name[len] =3D '\0';
++    local_name[len] =3D '\0';
+
+     if (length) {
+         *length =3D len;
+     }
++    *name =3D g_steal_pointer(&local_name);
+
+     return 1;
+ }
+@@ -427,7 +431,7 @@ static void nbd_check_meta_export(NBDClient *client)
+ static int nbd_negotiate_handle_export_name(NBDClient *client, bool no_zer=
+oes,
+                                             Error **errp)
+ {
+-    char name[NBD_MAX_NAME_SIZE + 1];
++    g_autofree char *name =3D NULL;
+     char buf[NBD_REPLY_EXPORT_NAME_SIZE] =3D "";
+     size_t len;
+     int ret;
+@@ -441,10 +445,11 @@ static int nbd_negotiate_handle_export_name(NBDClient=
+ *client, bool no_zeroes,
          [10 .. 133]   reserved     (0) [unless no_zeroes]
       */
      trace_nbd_negotiate_handle_export_name();
--    if (client->optlen > NBD_MAX_NAME_SIZE) {
-+    if (client->optlen > NBD_MAX_STRING_SIZE) {
+-    if (client->optlen >=3D sizeof(name)) {
++    if (client->optlen > NBD_MAX_NAME_SIZE) {
          error_setg(errp, "Bad length received");
          return -EINVAL;
      }
-@@ -613,6 +614,7 @@ static int nbd_negotiate_handle_info(NBDClient *client,=
++    name =3D g_malloc(client->optlen + 1);
+     if (nbd_read(client->ioc, name, client->optlen, "export name", errp) <=
+ 0) {
+         return -EIO;
+     }
+@@ -533,7 +538,7 @@ static int nbd_reject_length(NBDClient *client, bool fa=
+tal, Error **errp)
+ static int nbd_negotiate_handle_info(NBDClient *client, Error **errp)
+ {
+     int rc;
+-    char name[NBD_MAX_NAME_SIZE + 1];
++    g_autofree char *name =3D NULL;
+     NBDExport *exp;
+     uint16_t requests;
+     uint16_t request;
+@@ -551,7 +556,7 @@ static int nbd_negotiate_handle_info(NBDClient *client,=
  Error **errp)
-     if (exp->description) {
-         size_t len =3D strlen(exp->description);
-
-+        assert(len <=3D NBD_MAX_STRING_SIZE);
-         rc =3D nbd_negotiate_send_info(client, NBD_INFO_DESCRIPTION,
-                                      len, exp->description, errp);
-         if (rc < 0) {
-@@ -757,6 +759,7 @@ static int nbd_negotiate_send_meta_context(NBDClient *c=
-lient,
-         {.iov_base =3D (void *)context, .iov_len =3D strlen(context)}
-     };
-
-+    assert(iov[1].iov_len <=3D NBD_MAX_STRING_SIZE);
-     if (client->opt =3D=3D NBD_OPT_LIST_META_CONTEXT) {
-         context_id =3D 0;
+         2 bytes: N, number of requests (can be 0)
+         N * 2 bytes: N requests
+     */
+-    rc =3D nbd_opt_read_name(client, name, &namelen, errp);
++    rc =3D nbd_opt_read_name(client, &name, &namelen, errp);
+     if (rc <=3D 0) {
+         return rc;
      }
-@@ -905,7 +908,7 @@ static int nbd_meta_qemu_query(NBDClient *client, NBDEx=
-portMetaContexts *meta,
-  * Parse namespace name and call corresponding function to parse body of t=
-he
-  * query.
-  *
-- * The only supported namespace now is 'base'.
-+ * The only supported namespaces are 'base' and 'qemu'.
-  *
-  * The function aims not wasting time and memory to read long unknown name=
-space
-  * names.
-@@ -931,6 +934,10 @@ static int nbd_negotiate_meta_query(NBDClient *client,
+@@ -957,7 +962,7 @@ static int nbd_negotiate_meta_queries(NBDClient *client=
+,
+                                       NBDExportMetaContexts *meta, Error *=
+*errp)
+ {
+     int ret;
+-    char export_name[NBD_MAX_NAME_SIZE + 1];
++    g_autofree char *export_name =3D NULL;
+     NBDExportMetaContexts local_meta;
+     uint32_t nb_queries;
+     int i;
+@@ -976,7 +981,7 @@ static int nbd_negotiate_meta_queries(NBDClient *client=
+,
+
+     memset(meta, 0, sizeof(*meta));
+
+-    ret =3D nbd_opt_read_name(client, export_name, NULL, errp);
++    ret =3D nbd_opt_read_name(client, &export_name, NULL, errp);
+     if (ret <=3D 0) {
+         return ret;
      }
-     len =3D cpu_to_be32(len);
-
-+    if (len > NBD_MAX_STRING_SIZE) {
-+        trace_nbd_negotiate_meta_query_skip("length too long");
-+        return nbd_opt_skip(client, len, errp);
-+    }
-     if (len < ns_len) {
-         trace_nbd_negotiate_meta_query_skip("length too short");
-         return nbd_opt_skip(client, len, errp);
-@@ -1492,7 +1499,7 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint6=
-4_t dev_offset,
-      * access since the export could be available before migration handove=
-r.
-      * ctx was acquired in the caller.
-      */
--    assert(name);
-+    assert(name && strlen(name) <=3D NBD_MAX_STRING_SIZE);
-     ctx =3D bdrv_get_aio_context(bs);
-     bdrv_invalidate_cache(bs, NULL);
-
-@@ -1518,6 +1525,7 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint6=
-4_t dev_offset,
-     assert(dev_offset <=3D INT64_MAX);
-     exp->dev_offset =3D dev_offset;
-     exp->name =3D g_strdup(name);
-+    assert(!desc || strlen(desc) <=3D NBD_MAX_STRING_SIZE);
-     exp->description =3D g_strdup(desc);
-     exp->nbdflags =3D (NBD_FLAG_HAS_FLAGS | NBD_FLAG_SEND_FLUSH |
-                      NBD_FLAG_SEND_FUA | NBD_FLAG_SEND_CACHE);
-@@ -1564,8 +1572,10 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint=
-64_t dev_offset,
-
-         bdrv_dirty_bitmap_set_busy(bm, true);
-         exp->export_bitmap =3D bm;
-+        assert(strlen(bitmap) <=3D BDRV_BITMAP_MAX_NAME_SIZE);
-         exp->export_bitmap_context =3D g_strdup_printf("qemu:dirty-bitmap:=
-%s",
-                                                      bitmap);
-+        assert(strlen(exp->export_bitmap_context) < NBD_MAX_STRING_SIZE);
-     }
-
-     exp->close =3D close;
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index caacf0ed7379..108a51f7eb01 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -833,9 +833,18 @@ int main(int argc, char **argv)
-             break;
-         case 'x':
-             export_name =3D optarg;
-+            if (strlen(export_name) > NBD_MAX_STRING_SIZE) {
-+                error_report("export name '%s' too long", export_name);
-+                exit(EXIT_FAILURE);
-+            }
-             break;
-         case 'D':
-             export_description =3D optarg;
-+            if (strlen(export_description) > NBD_MAX_STRING_SIZE) {
-+                error_report("export description '%s' too long",
-+                             export_description);
-+                exit(EXIT_FAILURE);
-+            }
-             break;
-         case 'v':
-             verbose =3D 1;
 --=20
 2.21.0
 
