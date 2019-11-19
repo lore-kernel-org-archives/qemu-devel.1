@@ -2,100 +2,87 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5998DC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4926C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:43:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25E822186D
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7FC9F2186D
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:43:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Bgj4ZBbk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25E822186D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mkyf21Yr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FC9F2186D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX9K5-0003Fo-0B
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 14:38:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45277)
+	id 1iX9PZ-0004qr-Me
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 14:43:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46044)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iX9Iu-0002jr-W4
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:36:49 -0500
+ (envelope-from <ehabkost@redhat.com>) id 1iX9On-0004OM-9J
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:42:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iX9Iu-0005ZN-2f
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:36:48 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38073)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iX9It-0005Ys-Sb
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:36:48 -0500
-Received: by mail-wr1-x444.google.com with SMTP id i12so25331490wro.5
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 11:36:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=2+H0YNDemKRjXJDUgif6n4MIbtXp2KAsqOQ5L73ind8=;
- b=Bgj4ZBbk2VDulvdNEGgBj+hsB0sY4D/kZZ6pK0FNKznBag62CAha+80Gvk+UF372Ij
- pxwVLvOO4Kj0+DVDW0m0MDG5a6RbqhyWsLMAK4+EefyV4X5t8DjHNrcydMBWzWWIh+zE
- Mcw4Oo3Lyf39GumAcK+hFDxpPKBXvQUppk9V9gT/amllpSKMveOI2FSCttGySXSozMg1
- 7wFMqzRn0/4wDn4t8nDrm3r1QDOCZhpQ8/h2ySXvbkN1HpClX15zEDVFhOYJHo2F0A+t
- /xlvqrnvmWKKYgNf+b+YkSTBNygtyzUqk06Wj82r+SfuaEh2J3sjqqY/m7tjEU2Idy9U
- CZIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=2+H0YNDemKRjXJDUgif6n4MIbtXp2KAsqOQ5L73ind8=;
- b=hdka6qHG+Yo1OxOr4K6XmcQxxkuMPLHiwCsEjRi7UNIF9qyXKC6kifJ22fTPsPEjyI
- b0WYWzYQIKe9m5k9lZiOzBZHKbFJcY1CiiCWZ/JJAXJ/4NseHLO75FjoUSaYWlGNtz+P
- bhcYLT9sVsAN8wwwigFyDbyIHUIIxStxq91D+TP1hvMGOnL6tHUu72fVfsg51lTB1DTq
- QDUfGCvhxEn8sOatAiEK7geBuXeUQFaENhf+M7XBhuPmQqFD023tTVc+whlP5Zi93Eiw
- DazgRIblco/qgFiVHXh81qhKl5tZKj/SBXmlR86PFJb9v6pLEccgwwtOPF4QIfAyGTId
- XkiQ==
-X-Gm-Message-State: APjAAAVlhv0G3W1khqLhPlKla5MTPrB202MBuA+LJCl/9uK075oXKiqv
- 5+GbOynohWPRKO/JonBzfqT0Smd/UftIIA==
-X-Google-Smtp-Source: APXvYqybsWNh4BVFGbuL0q/26/W01kJx45q0BZmktZ2Erwr2MvURv075RXEf8RUqDP6gMMXsleExaw==
-X-Received: by 2002:a5d:4589:: with SMTP id p9mr27077217wrq.61.1574192206317; 
- Tue, 19 Nov 2019 11:36:46 -0800 (PST)
-Received: from [192.168.8.102] (64.red-79-149-204.dynamicip.rima-tde.net.
- [79.149.204.64])
- by smtp.gmail.com with ESMTPSA id 205sm5291652wmb.3.2019.11.19.11.36.43
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 19 Nov 2019 11:36:45 -0800 (PST)
-Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of patches
- - linux-user changes + linux-user/hexagon + skeleton of
- target/hexagon -
- Files in target/hexagon/imported are from another project and therefore do
- not conform to qemu coding standards
-To: Taylor Simpson <tsimpson@quicinc.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- "laurent@vivier.eu" <laurent@vivier.eu>,
- "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
- <a77ce406-5307-cee8-8e0b-7c08056fb0df@redhat.com>
- <BYAPR02MB488666AA94EBB57C2A318004DE4C0@BYAPR02MB4886.namprd02.prod.outlook.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <82dfa44e-0a27-080e-2653-b004c27fc3d1@linaro.org>
-Date: Tue, 19 Nov 2019 20:36:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <ehabkost@redhat.com>) id 1iX9Ok-0008HX-Di
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:42:51 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40069
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1iX9Ok-0008Gw-09
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:42:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574192568;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WhnGpK6gdoGtS9EoOeoUoe1KxZ5DQuaMfH6rzaAT/Lk=;
+ b=Mkyf21YrAlKQF0QIo0brS6vPTKeM04tKiXsP7jCflAj6ZrPo/+xVdR4ZZsJwivEq94F5Bu
+ 3LLri+QBugr/xJwL1TPOukz+xl5s//gKgs4I4N07wPwXuWyyqZYej/DPpDd7MKLi16R+XR
+ hSQ5/b+RDlFt/BozKB265GudC2oUNu4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-W1SOps04N6avHGvZ_tnCuQ-1; Tue, 19 Nov 2019 14:42:45 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F0D918C5381;
+ Tue, 19 Nov 2019 19:42:43 +0000 (UTC)
+Received: from localhost (ovpn-116-6.gru2.redhat.com [10.97.116.6])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DC6EB9CD3;
+ Tue, 19 Nov 2019 19:42:40 +0000 (UTC)
+Date: Tue, 19 Nov 2019 16:42:38 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v1 0/2] s390x/cpumodel: Introduce "best" model variants
+Message-ID: <20191119194238.GJ3812@habkost.net>
+References: <66c64c6d-b7c0-2cb1-2b29-4fdd9b369714@redhat.com>
+ <CAFEAcA-Q7H9sZjN-PcMMDHQU41yN1RdXhNY5KqMh7E6xh0yjgA@mail.gmail.com>
+ <3aa1d025-20a3-e813-2fe6-35518efedf2f@redhat.com>
+ <20191118184906.GB3812@habkost.net>
+ <CAFEAcA_iTX2TKh20DB9ZMtDLuPm=OvoyP==KRhfVh99BqDnrzA@mail.gmail.com>
+ <20191118220417.GF3812@habkost.net>
+ <CAFEAcA8XoyeAfHuKe0AEvecCzo748Yk1VD1+VD=C3ACZdfzwsw@mail.gmail.com>
+ <ca517ad9-46bb-c0ac-2227-a64ab8fe5e15@redhat.com>
+ <CAFEAcA-egL5kbo81eBT+FVBz7vSaWqUVzFUF3MNOttnzY6vZMQ@mail.gmail.com>
+ <1fd9876d-5ad9-15e9-a2dc-6e5e747f9ca8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <BYAPR02MB488666AA94EBB57C2A318004DE4C0@BYAPR02MB4886.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+In-Reply-To: <1fd9876d-5ad9-15e9-a2dc-6e5e747f9ca8@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: W1SOps04N6avHGvZ_tnCuQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,18 +94,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Michael Mueller <mimu@linux.ibm.com>,
+ Jiri Denemark <jdenemar@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/19/19 6:22 PM, Taylor Simpson wrote:
-> - Laurent suggested I split the patch into two parts: linux-user and target/hexagon.  If I do that, which one should contain the changes to common files (e.g., configure)?  Also, note that we won't be able to build until both patches are merged.  Is that OK?
+On Tue, Nov 19, 2019 at 12:00:14PM +0100, David Hildenbrand wrote:
+> On 19.11.19 11:36, Peter Maydell wrote:
+> > On Tue, 19 Nov 2019 at 09:59, David Hildenbrand <david@redhat.com> wrot=
+e:
+> > >=20
+> > > On 19.11.19 10:22, Peter Maydell wrote:
+> > > > I don't hugely care about query-cpu-model-expansion. I
+> > > > just don't want it to have bad effects on the semantics
+> > > > of user-facing stuff like x- properties.
+> > >=20
+> > > IMHO, max should really include all features (yes, also the bad
+> > > x-features on arm :) ) and we should have a way to give users the
+> > > opportunity to specify "just give me the best model independent of th=
+e
+> > > accelerator" - something like a "best" model, but I don't care about =
+the
+> > > name.
 
-The configure parts should be a third, last, patch.
-
-The series is bisectable, because before the configure patch,
-none of the hexagon code is compiled at all.
+I'm in agreement with Peter, here: if "max" is user-visible, it's
+better to make it provide more usable defaults.
 
 
-r~
+> >=20
+> > How would "max includes all features" work if we have two
+> > x- features (or even two normal features!) which are incompatible
+> > with each other? How does it work for features which are
+>=20
+> I assume the "max" model should at least be consistent, see below.
+>=20
+> > valid for some other CPU type but not for 'max'? The design
+> > seems to assume a rather simplified system where every
+> > feature is independent and can always be applied to every
+> > CPU, which I don't think is guaranteed to be the case.
+>=20
+> I do agree that the use case of "max" for detecting which features can be
+> enabled for any CPU model is quite simplified and would also not work lik=
+e
+> this on s390x. It really means "give me the maximum/latest/greatest you
+> can". Some examples on s390x:
+>=20
+> On s390x, we don't allow to enable new features for older CPU generation.
+> "vx" was introduced with a z13. If "max" is a z13, it can include "vx", i=
+f
+> available. However, if you select a z12 (zEC12), you cannot enable "vx":
+>=20
+> "Feature '%s' is not available for CPU model '%s', it was introduced with
+> later models."
+>=20
+> Also, we have dependency checks
+> (target/s390x/cpu_models.c:check_consistency()), that at least warn on
+> inconsistencies between features (feature X requires feature Y).
+>=20
+> We would need more fine-grained "max" models. E.g., z13-max vs. z13-best =
+vs.
+> z13-base.
+>=20
+> - z13-max: Maximum features that can be enabled on the current
+>            accel/host for a z13.
+> - z13-best: Best features that can be enabled on the current
+>            accel/host for a z13.
+> - z13-base: base feature set, independent of current
+>            accel/host for a z13. (we do have this already on s390x)
+
+We don't need to create new CPU types for that, do we?  These
+different modes could be configured by a CPU option (e.g.
+"z13,features=3Dmax"[1], "z13,features=3Dbest").
+
+If we do add new CPU options to tune feature defaults, libvirt
+can start using these options on query-cpu-model-expansion, and
+everybody will be happy.  No need to change defaults in the "max"
+CPU model in a way that makes it less usable just to make
+query-cpu-model-expansion work.
+
+[1] Probably we need to call it something else instead of
+    "features=3Dmax", just to avoid confusion with the "max" CPU
+    model.  Maybe "experimental-features=3Don",
+    "recommended-features=3Don"?
+
+--=20
+Eduardo
+
 
