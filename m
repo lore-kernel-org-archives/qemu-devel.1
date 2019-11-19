@@ -2,80 +2,66 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BAFC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C37DC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:30:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2B65223B0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:26:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hasLz+jW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2B65223B0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0120B222A2
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:30:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0120B222A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX6Kj-0007U6-Uc
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 11:26:29 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35917)
+	id 1iX6Oq-00033I-PG
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 11:30:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39455)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iX69P-0001Oh-CB
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:14:48 -0500
+ (envelope-from <clg@kaod.org>) id 1iX6M9-0000yx-6m
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:28:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iX69N-0001Rv-G6
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:14:46 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21774
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iX6M7-0001rI-5i
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:27:57 -0500
+Received: from 1.mo177.mail-out.ovh.net ([178.33.107.143]:44256)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iX69N-0001Rf-BU
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:14:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574180084;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=gCVlw6uXB0vdxN6J2BW+eK4Z7aJD5bBNaRlCvQbZyfA=;
- b=hasLz+jWPAJIZx3wrMS7JQPazFXL8Ezjld79zb5IL2QZhtk775DFmNYAEypigx+mUGPjnt
- XLRJSkLsKSylbrFQPRSR2JBlSh6BxxfrZrOWzBiF3iNUxLOF7FYVSaPRP6RjkgUgzWury/
- lNfldLEw3scAhzrjLPIQWdTLg4E2wzE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-71-Icz_iihdP9W6Rxay7sAxVQ-1; Tue, 19 Nov 2019 11:14:42 -0500
-X-MC-Unique: Icz_iihdP9W6Rxay7sAxVQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB7ED593A8;
- Tue, 19 Nov 2019 16:14:40 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.4])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3ADC9605A7;
- Tue, 19 Nov 2019 16:14:35 +0000 (UTC)
-Date: Tue, 19 Nov 2019 16:14:34 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: Exclude paths from checkpatch (was: Re: [PATCH] Add minimal
- Hexagon target)
-Message-ID: <20191119161434.GB229732@stefanha-x1.localdomain>
-References: <157412709300.27250.5531224491109755641@37313f22b938>
- <7851e556-a5f2-9059-faf7-3d2a4e32958c@redhat.com>
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iX6M5-0001jk-BT
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:27:54 -0500
+Received: from player692.ha.ovh.net (unknown [10.108.35.59])
+ by mo177.mail-out.ovh.net (Postfix) with ESMTP id 1E07E113FBA
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 17:27:49 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: clg@kaod.org)
+ by player692.ha.ovh.net (Postfix) with ESMTPSA id 9575FC2C8C00;
+ Tue, 19 Nov 2019 16:27:40 +0000 (UTC)
+Subject: Re: [PATCH] misc/pca9552: Add qom set and get
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Joel Stanley <joel@jms.id.au>, Peter Maydell <peter.maydell@linaro.org>
+References: <20191118061757.52550-1-joel@jms.id.au>
+ <42f378d5-e7ea-11ce-11d5-9589fe7194d2@kaod.org>
+ <9f810374-97d4-8162-c92d-a1513c1a23a0@redhat.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <817b83f1-f534-9886-2054-4de6cd04a899@kaod.org>
+Date: Tue, 19 Nov 2019 17:27:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <7851e556-a5f2-9059-faf7-3d2a4e32958c@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="4SFOXa2GPu3tIq4H"
-Content-Disposition: inline
+In-Reply-To: <9f810374-97d4-8162-c92d-a1513c1a23a0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 1730789633458932500
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -83
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudegkedgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnegfrhhlucfvnfffucdludejmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuffhomhgrihhnpehophgvnhhpohifvghrrdighiiipdhoiihlrggsshdrohhrghenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheiledvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 178.33.107.143
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,110 +73,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, riku.voipio@iki.fi,
- qemu-devel@nongnu.org, laurent@vivier.eu, Max Filippov <jcmvbkbc@gmail.com>,
- tsimpson@quicinc.com, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Andrew Jeffery <andrew@aj.id.au>, Rashmica Gupta <rashmica.g@gmail.com>,
+ qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---4SFOXa2GPu3tIq4H
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Nov 19, 2019 at 09:51:00AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 11/19/19 2:31 AM, no-reply@patchew.org wrote:
-> > Patchew URL: https://patchew.org/QEMU/1574121497-2433-1-git-send-email-=
-tsimpson@quicinc.com/
-> >=20
-> >=20
-> >=20
-> > Hi,
-> >=20
-> > This series seems to have some coding style problems. See output below =
-for
-> > more information:
-> >=20
-> > Subject: [PATCH] Add minimal Hexagon target - First in a series of patc=
-hes - linux-user changes + linux-user/hexagon + skeleton of target/hexagon =
-- Files in target/hexagon/imported are from another project and therefore d=
-o not conform to qemu coding standards
-> > Type: series
-> > Message-id: 1574121497-2433-1-git-send-email-tsimpson@quicinc.com
-> >=20
-> > =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> > #!/bin/bash
-> > git rev-parse base > /dev/null || exit 0
-> > git config --local diff.renamelimit 0
-> > git config --local diff.renames True
-> > git config --local diff.algorithm histogram
-> > ./scripts/checkpatch.pl --mailback base..
-> > =3D=3D=3D TEST SCRIPT END =3D=3D=3D
-> >=20
-> > Switched to a new branch 'test'
-> > 7744509 Add minimal Hexagon target - First in a series of patches - lin=
-ux-user changes + linux-user/hexagon + skeleton of target/hexagon - Files i=
-n target/hexagon/imported are from another project and therefore do not con=
-form to qemu coding standards
-> >=20
-> > =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> > WARNING: added, moved or deleted file(s), does MAINTAINERS need updatin=
-g?
-> > #38:
-> > new file mode 100644
-> >=20
-> > ERROR: do not use C99 // comments
-> > #1922: FILE: target/hexagon/imported/iss_ver_registers.h:80:
-> > +// New interrupts, keep old defines for the time being
+On 18/11/2019 18:48, Philippe Mathieu-Daud=C3=A9 wrote:
+> Odd... I only received C=C3=A9dric answer, not Joel patch.
 >=20
-> I tried this quick way to filter some file/directory out of checkpatch.pl=
-,
-> and it works nicely:
+> On 11/18/19 11:00 AM, C=C3=A9dric Le Goater wrote:
+>> On 18/11/2019 07:17, Joel Stanley wrote:
+>>> Following the pattern of the work recently done with the ASPEED GPIO
+>>> model, this adds support for inspecting and modifying the PCA9552 LED=
+s
+>>> from the monitor.
+>>>
+>>> =C2=A0 (qemu) qom-set=C2=A0 /machine/unattached/device[17] led0 on
+>>> =C2=A0 (qemu) qom-get=C2=A0 /machine/unattached/device[17] led0
+>>> =C2=A0 "on"
+>>>
+>>> =C2=A0 (qemu) qom-set=C2=A0 /machine/unattached/device[17] led0 off
+>>> =C2=A0 (qemu) qom-get=C2=A0 /machine/unattached/device[17] led0
+>>> =C2=A0 "off"
+>>>
+>>> =C2=A0 (qemu) qom-set=C2=A0 /machine/unattached/device[17] led0 pwm0
+>>> =C2=A0 (qemu) qom-get=C2=A0 /machine/unattached/device[17] led0
+>>> =C2=A0 "pwm0"
+>>>
+>>> =C2=A0 (qemu) qom-set=C2=A0 /machine/unattached/device[17] led0 pwm1
+>>> =C2=A0 (qemu) qom-get=C2=A0 /machine/unattached/device[17] led0
+>>> =C2=A0 "pwm1"
+>>
+>> It would be nice to revive the QOM get patchset from David.
+>>
+>> =C2=A0=C2=A0=C2=A0=C2=A0http://patchwork.ozlabs.org/patch/666458/
+>>
+>> Did we reach some consensus ?
+>>
+>>> Signed-off-by: Joel Stanley <joel@jms.id.au>
+>>
+>> Some comments below.
+>>
+>>> ---
+>>> The qom device in mainline qemu is a different path. Using the monito=
+r
+>>> examine `info qom-tree /machine/unattached/` to discover it.
+>>>
+>>> This can be tested with a Witherspoon image.
+>>>
+>>> $ wget https://openpower.xyz/job/openbmc-build/distro=3Dubuntu,label=3D=
+builder,target=3Dwitherspoon/lastSuccessfulBuild/artifact/deploy/images/w=
+itherspoon/obmc-phosphor-image-witherspoon.ubi.mtd
+>>>
+>>> $ qemu-system-arm -M witherspoon-bmc -serial pty -monitor pty -nograp=
+hic \
+>>> =C2=A0 -drive file=3Dobmc-phosphor-image-witherspoon.ubi.mtd,format=3D=
+raw,if=3Dmtd
+>>> char device redirected to /dev/pts/5 (label compat_monitor0)
+>>> char device redirected to /dev/pts/10 (label serial0)
+>>>
+>>> $ screen /dev/pts/5
+>>> QEMU 4.1.91 monitor - type 'help' for more information
+>>> (qemu) qom-get=C2=A0 /machine/unattached/device[17] led0
+>>> "off"
+>>>
+>>> $ screen /dev/pts/19
+>>> root@witherspoon:~# cd /sys/class/gpio/
+>>> root@witherspoon:/sys/class/gpio# echo 248 > export
+>>> root@witherspoon:/sys/class/gpio# cat gpio248/value
+>>> 0
+>>>
+>>> (qemu) qom-set=C2=A0 /machine/unattached/device[17] led0 on
+>>>
+>>> root@witherspoon:/sys/class/gpio# echo out > gpio248/direction
+>>> root@witherspoon:/sys/class/gpio# cat gpio248/value
+>>> 1
+>>>
+>>> (qemu) qom-get=C2=A0 /machine/unattached/device[17] led0
+>>> "on"
+>>>
+>>> (qemu) qom-set=C2=A0 /machine/unattached/device[17] led0 off
+>>> (qemu) qom-get=C2=A0 /machine/unattached/device[17] led0
+>>> "off"
+>>>
+>>> root@witherspoon:/sys/class/gpio# cat gpio248/value
+>>> 0
 >=20
-> $ cat .git/hooks/pre-commit
-> #!/bin/bash
-> exec git diff --cached -- ':(top)' $(test -e .checkpatchignore && sed -ne
-> '/^\(#.*\|$\)/ ! s/.*/:(exclude)\0/p' < .checkpatchignore) |
-> scripts/checkpatch.pl --no-signoff -q -
+> I am assuming this is 5.0 material.
 >=20
-> $ cat .checkpatchignore
-> # A line starting with # serves as a comment.
-> # A blank line matches no files, so it can serve as a separator for
-> readability.
-> include/standard-headers
-> target/xtensa/core-*
-> target/hexagon/imported
+> This is a good starting point, and is useful.
 >=20
-> Would this be acceptable to reduce patchew false positives?
+> However this would be useful for other boards/devices too.
 >=20
-> git exclude pathspec trick from:
-> https://stackoverflow.com/questions/39931781/git-diff-stat-exclude-certai=
-n-files/39937070#39937070
+> What about defining a InterfaceInfo[] for external GPIOs?
 
-Seems useful so that patchew/checkpatch output remains high-quality.
+The code below is very specific to pca9552.
 
-An alternative to the git exclude pathspec trick is to build
-.checkpatchignore into the checkpatch.pl script so that regular
-invocations also use .checkpatchignore.
+What kind of interface do you have in mind more precisely ?=20
+which handlers ?
 
-Stefan
+Thanks
 
---4SFOXa2GPu3tIq4H
-Content-Type: application/pgp-signature; name="signature.asc"
+C.
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3UFOoACgkQnKSrs4Gr
-c8gMVwf/aOxnOmSyW5Wg506AplotYZV8Ek4oV7p0SkKahpVsK2GCMDoCn2cv4ZsQ
-R+kNPM4NJq6WfhLJAwD+vHQWlgc4foaP2+O/8NteZT/FcB3zJ/WGErkZms1o3Y3X
-HJxa9JZUiThtLVoX9k+4DM9cI+FCR2d+Q+UW7oQJq/V4Q0QPTYUTixNiIqRPQzJH
-sYkZWTzacyevf8a0THbFzB3WDwky+gcSzHEXeZ8W2WZpUPviDBh6Lp2P7ag1D+3H
-/zIJovl5nVL3AVrrIbxJDuv4aWrEfEUSAG6dnj7f+kg7om8JnNxfrnUN6raemOih
-T6mtIgtIHKF2MhBF4srgHttHoIyPbg==
-=+Y0u
------END PGP SIGNATURE-----
-
---4SFOXa2GPu3tIq4H--
+> Shouldn't we use the qemu_irq type for that then?
+>=20
+>>>
+>>> Signed-off-by: Joel Stanley <joel@jms.id.au>
+>>> ---
+>>> =C2=A0 hw/misc/pca9552.c | 91 +++++++++++++++++++++++++++++++++++++++=
+++++++++
+>>> =C2=A0 1 file changed, 91 insertions(+)
+>>>
+>>> diff --git a/hw/misc/pca9552.c b/hw/misc/pca9552.c
+>>> index 73be28d9369c..0362aac8c862 100644
+>>> --- a/hw/misc/pca9552.c
+>>> +++ b/hw/misc/pca9552.c
+>>> @@ -15,12 +15,16 @@
+>>> =C2=A0 #include "hw/misc/pca9552.h"
+>>> =C2=A0 #include "hw/misc/pca9552_regs.h"
+>>> =C2=A0 #include "migration/vmstate.h"
+>>> +#include "qapi/error.h"
+>>> +#include "qapi/visitor.h"
+>>> =C2=A0 =C2=A0 #define PCA9552_LED_ON=C2=A0=C2=A0 0x0
+>>> =C2=A0 #define PCA9552_LED_OFF=C2=A0 0x1
+>>> =C2=A0 #define PCA9552_LED_PWM0 0x2
+>>> =C2=A0 #define PCA9552_LED_PWM1 0x3
+>>> =C2=A0 +static const char *led_state[] =3D {"on", "off", "pwm0", "pwm=
+1"};
+>=20
+> BTW "pwm0/pwm1" as "state" is confuse, but I understand this is how the=
+ PCA9552 datasheet describes it.
+>=20
+>>> +
+>>> =C2=A0 static uint8_t pca9552_pin_get_config(PCA9552State *s, int pin=
+)
+>>> =C2=A0 {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t reg=C2=A0=C2=A0 =3D PCA9552_LS=
+0 + (pin / 4);
+>>> @@ -169,6 +173,84 @@ static int pca9552_event(I2CSlave *i2c, enum i2c=
+_event event)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>>> =C2=A0 }
+>>> =C2=A0 +static void pca9552_get_led(Object *obj, Visitor *v, const ch=
+ar *name,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 void *opaque, Error **errp)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 PCA9552State *s =3D PCA9552(obj);
+>>> +=C2=A0=C2=A0=C2=A0 int led, rc, reg;
+>>> +=C2=A0=C2=A0=C2=A0 char *str;
+>>> +=C2=A0=C2=A0=C2=A0 uint8_t state;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 rc =3D sscanf(name, "led%2d", &led);
+>>> +=C2=A0=C2=A0=C2=A0 if (rc !=3D 1) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "%s: err=
+or reading %s", __func__, name);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 if (led < 0 || led > s->nr_leds) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "%s inva=
+lid led %s", __func__, name);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 /*
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Get the LSx register as the qom interface=
+ should expose the device
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * state, not the modeled 'input line' behav=
+iour which would come from
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * reading the INPUTx reg
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0 */
+>>> +=C2=A0=C2=A0=C2=A0 reg =3D PCA9552_LS0 + led / 4;
+>>> +=C2=A0=C2=A0=C2=A0 state =3D (pca9552_read(s, reg) >> (led % 8)) & 0=
+x3;
+>>
+>> Could we add accessors to extract the register fields and to clarify
+>> the layout ?
+>>
+>>> +=C2=A0=C2=A0=C2=A0 str =3D g_strdup(led_state[state]);
+>>> +=C2=A0=C2=A0=C2=A0 visit_type_str(v, name, &str, errp);
+>>> +}
+>>> +
+>>> +/*
+>>> + * Return an LED selector register value based on an existing one, w=
+ith
+>>> + * the appropriate 2-bit state value set for the given LED number (0=
+-3).
+>>> + */
+>>> +static inline uint8_t pca955x_ledsel(uint8_t oldval, int led_num, in=
+t state)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return (oldval & (~(0x3 <=
+< (led_num << 1)))) |
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 ((state & 0x3) << (led_num << 1));
+>>> +}
+>>> +
+>>> +static void pca9552_set_led(Object *obj, Visitor *v, const char *nam=
+e,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 void *opaque, Error **errp)
+>>> +{
+>>> +=C2=A0=C2=A0=C2=A0 PCA9552State *s =3D PCA9552(obj);
+>>> +=C2=A0=C2=A0=C2=A0 Error *local_err =3D NULL;
+>>> +=C2=A0=C2=A0=C2=A0 int led, rc, reg, val;
+>>> +=C2=A0=C2=A0=C2=A0 uint8_t state;
+>>> +=C2=A0=C2=A0=C2=A0 char *state_str;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 visit_type_str(v, name, &state_str, &local_err);
+>>> +=C2=A0=C2=A0=C2=A0 if (local_err) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_propagate(errp, loc=
+al_err);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 rc =3D sscanf(name, "led%2d", &led);
+>>> +=C2=A0=C2=A0=C2=A0 if (rc !=3D 1) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "%s: err=
+or reading %s", __func__, name);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 if (led < 0 || led > s->nr_leds) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "%s inva=
+lid led %s", __func__, name);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 for (state =3D 0; state < ARRAY_SIZE(led_state); =
+state++) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!strcmp(state_str, le=
+d_state[state])) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 b=
+reak;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0 if (state >=3D ARRAY_SIZE(led_state)) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp, "%s inva=
+lid led state %s", __func__, state_str);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return;
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 reg =3D PCA9552_LS0 + led / 4;
+>>> +=C2=A0=C2=A0=C2=A0 val =3D pca9552_read(s, reg);
+>>> +=C2=A0=C2=A0=C2=A0 val =3D pca955x_ledsel(val, led % 4, state);
+>>> +=C2=A0=C2=A0=C2=A0 pca9552_write(s, reg, val);
+>>> +}
+>>> +
+>>> =C2=A0 static const VMStateDescription pca9552_vmstate =3D {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .name =3D "PCA9552",
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 .version_id =3D 0,
+>>> @@ -204,6 +286,7 @@ static void pca9552_reset(DeviceState *dev)
+>>> =C2=A0 static void pca9552_initfn(Object *obj)
+>>> =C2=A0 {
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PCA9552State *s =3D PCA9552(obj);
+>>> +=C2=A0=C2=A0=C2=A0 int led;
+>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* If support for the other PCA=
+955X devices are implemented, these
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * constant values might be part =
+of class structure describing the
+>>> @@ -211,6 +294,14 @@ static void pca9552_initfn(Object *obj)
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->max_reg =3D PCA9552_LS3;
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s->nr_leds =3D 16;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0 for (led =3D 0; led < s->nr_leds; led++) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 char *name;
+>>> +
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name =3D g_strdup_printf(=
+"led%d", led);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 object_property_add(obj, =
+name, "bool", pca9552_get_led, pca9552_set_led,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 NULL, NULL, NULL);
+>>
+>> It misses a :
+>>
+>> =C2=A0=C2=A0=C2=A0 g_free(name)
+>>
+>> C.
+>>
+>>> +=C2=A0=C2=A0=C2=A0 }
+>>> =C2=A0 }
+>>> =C2=A0 =C2=A0 static void pca9552_class_init(ObjectClass *klass, void=
+ *data)
+>>>
+>>
+>>
+>=20
 
 
