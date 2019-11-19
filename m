@@ -2,57 +2,92 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F25C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6872BC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:58:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D18D3222DC
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:52:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D18D3222DC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 32FCF22444
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:58:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mtzgxbFn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32FCF22444
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51064 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX9YC-0000pD-V6
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 14:52:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47092)
+	id 1iX9dR-0003x4-Cp
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 14:58:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47749)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <its@irrelevant.dk>) id 1iX9X0-00086r-03
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:51:23 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iX9bh-0002b7-8O
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:56:14 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <its@irrelevant.dk>) id 1iX9Wy-0003WE-U0
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:51:21 -0500
-Received: from charlie.dont.surf ([128.199.63.193]:37958)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <its@irrelevant.dk>)
- id 1iX9Ww-0003Uy-9n; Tue, 19 Nov 2019 14:51:18 -0500
-Received: from apples.localdomain (ip-5-186-123-87.cgn.fibianet.dk
- [5.186.123.87])
- by charlie.dont.surf (Postfix) with ESMTPSA id 501F2BF614;
- Tue, 19 Nov 2019 19:51:14 +0000 (UTC)
-Date: Tue, 19 Nov 2019 20:51:10 +0100
-From: Klaus Birkelund <its@irrelevant.dk>
-To: Beata Michalska <beata.michalska@linaro.org>
-Subject: Re: [PATCH v2 09/20] nvme: add support for the asynchronous event
- request command
-Message-ID: <20191119195110.GA1022320@apples.localdomain>
-References: <20191015103900.313928-1-its@irrelevant.dk>
- <20191015103900.313928-10-its@irrelevant.dk>
- <CADSWDzuzDPZdXUi-3e-TbwDy8GcGZPM78cA0fUU84nOj+y3NCA@mail.gmail.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1iX9bf-0006PR-Vu
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:56:12 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51424)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iX9bf-0006PI-OG
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:56:11 -0500
+Received: by mail-wm1-x341.google.com with SMTP id q70so4579895wme.1
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 11:56:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=+vH32JhdurTQfBi31a9nzuxJjyfD6u+B80YZ/BBo1Y4=;
+ b=mtzgxbFnJwhuBgupOOYig9hpzUkpRk6eko/RPFCdasB2eSwmBaTstelQ9ci7fEDzT4
+ T/gBR/gVGoqA52Y00f0czUZY0VmTEJ3Zqxa0Jm8S+txFTF9KtVMxIy+1B8Gi+nie2Vv8
+ i206Fx1KH10yNsjFkP8znbxtUWy9HctFGiqRZ1p0nS3/EStLUWw/k4AO9dlCbPbeLqA2
+ 3poln7jA1BUriXkjLcoVW6fm6GIIpVMcvhHgYgLQv1rIySO62hUHiXEWeed8ofTv1a81
+ P9aVP6DOHPLcuMb21i4/kIglOAAKGobb8WfO8q6aXatl/wK1Nf9ce2fLv3FLLyesTIhG
+ Tkvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+vH32JhdurTQfBi31a9nzuxJjyfD6u+B80YZ/BBo1Y4=;
+ b=GfXcTrSamrBpe5On+Xf4XoN8zL0BRJav8lTv0/OHBQ6slu8L9NiSsQZicA5ciUESvW
+ FmhV0Xfl+/xHrD7LRdPYwh6wJW5M6Nv/2Uj2YZzHHhlrrQrZGB1HsifiBqXvvkUSLDok
+ YHJ6DOeVgvr4WRcCFtNUanDB4nzFm8R0R/DJn/tWnujsvWJqHTXk4CEk5vLnB8w5ekQN
+ iJF0+8s491McKJzwdX+quooQHWqIcgHJgrYu3LRvlPfMbX3E66tOiap3cspLEM/lZO+O
+ 9AFKHEldqZlqTE8hIfZOXJ3+TaNZ0jkMgVHbx3bWFzzYx/p9rECNbBnsCkMK2nO6es4w
+ JCbA==
+X-Gm-Message-State: APjAAAUCQL9nRDvjT15qTBYveHZ8+Lri1z4tTbfpLsr5aJAaNI8Kjapq
+ hTk5/57wxVClCc3jz3N7V/tP9A==
+X-Google-Smtp-Source: APXvYqwImVlA9a/QbL+8CrNINf31LEM2keGb6EE11yK/ZLc7fVrTku8u144Fc4JOS1ExWpWUyp69jQ==
+X-Received: by 2002:a05:600c:2911:: with SMTP id
+ i17mr7812764wmd.83.1574193370299; 
+ Tue, 19 Nov 2019 11:56:10 -0800 (PST)
+Received: from [192.168.8.102] (64.red-79-149-204.dynamicip.rima-tde.net.
+ [79.149.204.64])
+ by smtp.gmail.com with ESMTPSA id z14sm27798635wrl.60.2019.11.19.11.56.09
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 19 Nov 2019 11:56:09 -0800 (PST)
+Subject: Re: [PATCH] linux-user/strace: Add missing signal strings
+To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
+References: <20191119185153.GA23003@ls3530.fritz.box>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <48097cb5-bc47-e532-fcde-67ca65a2039e@linaro.org>
+Date: Tue, 19 Nov 2019 20:56:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADSWDzuzDPZdXUi-3e-TbwDy8GcGZPM78cA0fUU84nOj+y3NCA@mail.gmail.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 128.199.63.193
+In-Reply-To: <20191119185153.GA23003@ls3530.fritz.box>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -64,70 +99,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Paul Durrant <Paul.Durrant@citrix.com>,
- Keith Busch <kbusch@kernel.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 12, 2019 at 03:04:59PM +0000, Beata Michalska wrote:
-> Hi Klaus,
+On 11/19/19 7:51 PM, Helge Deller wrote:
+> Add the textual representations of some missing target signals.
 > 
-> On Tue, 15 Oct 2019 at 11:49, Klaus Jensen <its@irrelevant.dk> wrote:
-> > @@ -1188,6 +1326,9 @@ static int nvme_start_ctrl(NvmeCtrl *n)
-> >
-> >      nvme_set_timestamp(n, 0ULL);
-> >
-> > +    n->aer_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, nvme_process_aers, n);
-> > +    QTAILQ_INIT(&n->aer_queue);
-> > +
+> Signed-off-by: Helge Deller <deller@gmx.de>
 > 
-> Is the timer really needed here ? The CEQ can be posted either when requested
-> by host through AER, if there are any pending events, or once the
-> event is triggered
-> and there are active AER's.
-> 
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 3d4d684450..18b57a9ef9 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -146,6 +146,22 @@ print_signal(abi_ulong arg, int last)
+>      case TARGET_SIGSTOP: signal_name = "SIGSTOP"; break;
+>      case TARGET_SIGTTIN: signal_name = "SIGTTIN"; break;
+>      case TARGET_SIGTTOU: signal_name = "SIGTTOU"; break;
+> +    case TARGET_SIGIO: signal_name = "SIGIO"; break;
+> +    case TARGET_SIGTRAP: signal_name = "SIGTRAP"; break;
+> +    /* case TARGET_SIGIOT: signal_name = "SIGIOT"; break; */
 
-I guess you are right. I mostly cribbed this from Keith's tree, but I
-see no reason to keep the timer.
+Unused commented code.
 
-Keith, do you have any comments on this?
+> +#ifdef SIGSTKFLT
+> +    case TARGET_SIGSTKFLT: signal_name = "SIGSTKFLT"; break;
+> +#endif
 
-> > @@ -1380,6 +1521,13 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
-> >                             "completion queue doorbell write"
-> >                             " for nonexistent queue,"
-> >                             " sqid=%"PRIu32", ignoring", qid);
-> > +
-> > +            if (n->outstanding_aers) {
-> > +                nvme_enqueue_event(n, NVME_AER_TYPE_ERROR,
-> > +                    NVME_AER_INFO_ERR_INVALID_DB_REGISTER,
-> > +                    NVME_LOG_ERROR_INFO);
-> > +            }
-> > +
-> This one (as well as cases below) might not be entirely right
-> according to the spec. If given event is enabled for asynchronous
-> reporting the controller should retain that even. In this case, the event
-> will be ignored as there is no pending request.
-> 
-
-I understand these notifications to be special cases (i.e. they cannot
-be enabled/disabled through the Asynchronous Event Configuration
-feature). See Section 4.1 of NVM Express 1.2.1. The spec specifically
-says that "... and an Asynchronous Event Request command is outstanding,
-...).
-
-> > @@ -1591,6 +1759,7 @@ static void nvme_init_ctrl(NvmeCtrl *n)
-> >      id->ver = cpu_to_le32(0x00010201);
-> >      id->oacs = cpu_to_le16(0);
-> >      id->acl = 3;
-> > +    id->aerl = n->params.aerl;
-> 
-> What about the configuration for the asynchronous events ?
-> 
-
-It will default to an AEC vector of 0 (everything disabled).
+Wrong ifdef.
 
 
-K
+r~
 
