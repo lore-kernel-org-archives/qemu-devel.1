@@ -2,78 +2,88 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBCE9C432C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 09:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC599C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 09:23:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99BB82082F
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 09:22:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A72D220721
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 09:23:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="igTXx5/c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99BB82082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VsfHeuE3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A72D220721
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWzin-0006Gw-MF
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 04:22:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58626)
+	id 1iWzjc-00079j-SV
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 04:23:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58740)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iWzi3-0005pv-S4
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 04:22:08 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iWziq-0006Ra-DK
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 04:22:57 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iWzi0-0008U7-77
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 04:22:05 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:20301
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iWzhx-0008QH-Ev
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 04:22:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574155319;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Rq0C8YjHA+S/tSICJOwI9sHyh6UoHo3kISx0tvyTtZw=;
- b=igTXx5/c7qea2gBfyUNAFMCG9O4m19IP/Ww4E8au2ZWbtUekntNXy83HTXDZ4WDgrZeXLe
- TUh6ZuSa2h4zQqg5/0XnTrzeYQ3Wr2XiZ3stMpbuURU3Vrqy1QLozCWtpjfeRGeRfC7y8P
- ogy4qwTzvdGdgUU0blQNRmjUOp5pYzA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-215-3dRlCE7ZPOyd--3vmgACiA-1; Tue, 19 Nov 2019 04:21:57 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9FDE9107ACC4;
- Tue, 19 Nov 2019 09:21:55 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-117-181.ams2.redhat.com
- [10.36.117.181])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 93B7875E41;
- Tue, 19 Nov 2019 09:21:51 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH] travis.yml: Remove the redundant
- clang-with-MAIN_SOFTMMU_TARGETS entry
-Date: Tue, 19 Nov 2019 10:21:47 +0100
-Message-Id: <20191119092147.4260-1-thuth@redhat.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iWzip-0000U9-7N
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 04:22:56 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:38814)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iWzip-0000Sh-1P
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 04:22:55 -0500
+Received: by mail-oi1-x243.google.com with SMTP id a14so18253906oid.5
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 01:22:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=INYAegvOpUBaRi4FPo8ZjEkeL6wUMxLwNO+KgbJ3gXI=;
+ b=VsfHeuE31igtz93uXRDmrvmMnS71H+vpMVh8IK0xyWmTnznO6kkulBxLVAoN7g5Nqt
+ DqVdjIrJbtDiVKxcU78RAdsRH5eJXPBk/bCvPuqzKt0oAFl35BvIQF8DtTvgkefBfpR5
+ ytpmOxCGPbqGWY2Vko/zgKGYlOUI/Jgmq57R+/vOVHYgW+/It1jH69aVHzd9RhNdCs9w
+ 2ombuNddE0U0SbGdDHw8x/By69YowzZvOmVA/QVF270+On+PvB4Hs6bStgpKFBRWXftx
+ qJ74YyoBq2dWFByPTsKdvNriJBrvvhkKaElKFjlkARpeIJXkHfk8j829D6EJ95N9yTe3
+ d7MQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=INYAegvOpUBaRi4FPo8ZjEkeL6wUMxLwNO+KgbJ3gXI=;
+ b=DFR6iOYqsS8L9RTKdOfu0qvU7d9WYdoS8r9HRHmtSKVq+cvkts+GD0v3JP0LtSsLnA
+ SBjB/K0dwgIXq8Afw3RA8ysGRinwtm9nzY+u46ls66PJrPjQRv2lFpEBljyp3YwH7yCV
+ Gk/CXFSFqPAJ+Ji0N0YfXPAIuMwCfx/bl1vVfH2hZVtHq1YLLeBlH/NmN7lQhfiNpuaE
+ VnorwbCzFC+3uFoa4nzwVSzP9WJyc9UFSGtdnqjjVAGteJXLIskLo6XqVQK/4v5xLDnf
+ MQWhY1zs56h5ELcs6dOPDWKfwKRubIgomsjxDsrtsEITMCFpqtxPoNno3DylbAXTyJfW
+ 7K3w==
+X-Gm-Message-State: APjAAAW/zz+7f8Y/G+yPCAVQKVv6BAYSAt03q7moJOlrGvJrWSgmM5Mu
+ ONb1SAaMHq/cpEB/TE58NRopYz+vqwFgXr+ZAVMsaQ==
+X-Google-Smtp-Source: APXvYqzHBQQ6NtVrgBUqRoknC4LDQfFlsz2kVDCS8PP/yzobSSG44vqgR5pUZL2rAvyFafIVKnEqqHEFjXbBVWZgbb4=
+X-Received: by 2002:aca:cf12:: with SMTP id f18mr3076287oig.48.1574155373787; 
+ Tue, 19 Nov 2019 01:22:53 -0800 (PST)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: 3dRlCE7ZPOyd--3vmgACiA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <CAFEAcA-mD3-Zg2JunGpMqbcaT1qboCenhqEFytZD0FmFcL2i9Q@mail.gmail.com>
+ <5dd613c0-6d9e-b943-b64d-7ba1791cbefe@redhat.com>
+ <CAFEAcA-4r53vM-K24WYr1OFSOufhZ7hDHeZBhnywyaJ0gpMO1g@mail.gmail.com>
+ <20191108191057.GZ3812@habkost.net>
+ <CAFEAcA_No5oAFtULbAOrPDeQE18HHgc0agXbs4m2AGZ+gK_ReQ@mail.gmail.com>
+ <66c64c6d-b7c0-2cb1-2b29-4fdd9b369714@redhat.com>
+ <CAFEAcA-Q7H9sZjN-PcMMDHQU41yN1RdXhNY5KqMh7E6xh0yjgA@mail.gmail.com>
+ <3aa1d025-20a3-e813-2fe6-35518efedf2f@redhat.com>
+ <20191118184906.GB3812@habkost.net>
+ <CAFEAcA_iTX2TKh20DB9ZMtDLuPm=OvoyP==KRhfVh99BqDnrzA@mail.gmail.com>
+ <20191118220417.GF3812@habkost.net>
+In-Reply-To: <20191118220417.GF3812@habkost.net>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Nov 2019 09:22:42 +0000
+Message-ID: <CAFEAcA8XoyeAfHuKe0AEvecCzo748Yk1VD1+VD=C3ACZdfzwsw@mail.gmail.com>
+Subject: Re: [PATCH v1 0/2] s390x/cpumodel: Introduce "best" model variants
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,42 +95,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Janosch Frank <frankja@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ qemu-s390x <qemu-s390x@nongnu.org>, Michael Mueller <mimu@linux.ibm.com>,
+ Jiri Denemark <jdenemar@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We test clang with the MAIN_SOFTMMU_TARGETS twice, once without
-sanitizers and once with sanitizers enabled. That's somewhat redundant
-since if compilation and tests succeeded with sanitizers enabled, it
-should also work fine without sanitizers. Thus remove the clang entry
-without sanitizers to speed up the CI testing a little bit.
+On Mon, 18 Nov 2019 at 22:04, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> On Mon, Nov 18, 2019 at 09:19:55PM +0000, Peter Maydell wrote:
+> > Why should it matter whether a feature is enabled
+> > or disabled by default in the CPU type? It ought to be probeable
+> > by QMP either way (ie there is a difference between
+> > "this CPU has this feature switch and it is on by default",
+> > "this CPU has this feature switch and it is off by default"
+> > and "this CPU does not have this feature switch at all",
+> > and presumably libvirt needs to distinguish them).
+>
+> Its use case is neither "this CPU has this feature switch" or for
+> "it is on|off by default".  We use it to probe for "this feature
+> can be enabled in this host hardware+kernel+QEMU combination".
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- .travis.yml | 6 ------
- 1 file changed, 6 deletions(-)
+OK. Well, the answer to that depends on the name of the CPU,
+in general. So you can't use a fake CPU name to try to answer
+the question.
 
-diff --git a/.travis.yml b/.travis.yml
-index b9a026c8ee..47875bdafe 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -181,12 +181,6 @@ matrix:
-       compiler: clang
-=20
-=20
--    - env:
--        - CONFIG=3D"--disable-user --target-list=3D${MAIN_SOFTMMU_TARGETS}=
-"
--        - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-clang-default"
--      compiler: clang
--
--
-     - env:
-         - CONFIG=3D"--target-list=3D${MAIN_SOFTMMU_TARGETS} "
-         - CACHE_NAME=3D"${TRAVIS_BRANCH}-linux-clang-sanitize"
---=20
-2.23.0
+> In other words, in x86 and s390x "max" is just a reserved name
+> for the query-cpu-model-expansion command arguments in s390x and
+> x86.  The fact that it is visible to users can be considered a
+> bug, and we can fix that.
 
+I think 'max' is useful to users, and we've provided it to users,
+so removing it again would be a compatibility break. I'm not
+entirely sure where we go from here...
+
+> If you still don't like how query-cpu-model-expansion works, we
+> can also discuss that.  But I'm not sure it would be a good use
+> of our (and libvirt developers') time.
+
+I don't hugely care about query-cpu-model-expansion. I
+just don't want it to have bad effects on the semantics
+of user-facing stuff like x- properties.
+
+thanks
+-- PMM
 
