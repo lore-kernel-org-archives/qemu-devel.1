@@ -2,62 +2,62 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F363C432C0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A40D3C43141
 	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 22:06:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09B6222440
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 22:06:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EE1E22440
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 22:06:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Vq0aU6Lx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09B6222440
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="agQNzygw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EE1E22440
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXBdW-00044R-U8
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 17:06:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35803)
+	id 1iXBdX-00043q-Dw
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 17:06:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35801)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iXBb3-0002IZ-1g
+ (envelope-from <dgibson@ozlabs.org>) id 1iXBb3-0002IX-0D
  for qemu-devel@nongnu.org; Tue, 19 Nov 2019 17:03:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iXBb1-0007pL-4z
+ (envelope-from <dgibson@ozlabs.org>) id 1iXBb1-0007pR-66
  for qemu-devel@nongnu.org; Tue, 19 Nov 2019 17:03:40 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:36835 helo=ozlabs.org)
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:45689 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iXBb0-0007nG-Pi; Tue, 19 Nov 2019 17:03:39 -0500
+ id 1iXBb0-0007nF-QA; Tue, 19 Nov 2019 17:03:39 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47HfwP1FB9z9sPL; Wed, 20 Nov 2019 09:03:33 +1100 (AEDT)
+ id 47HfwP0b5mz9sPV; Wed, 20 Nov 2019 09:03:33 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1574201013;
- bh=bz3VgbM5bcPHwm4BRnE/W8qR+9GDx8v3N8D87H8bK5A=;
+ bh=/mD7CGW7/rYFAPyyHxHGSXYZMYX0p6LQfbfLh4dNVm0=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Vq0aU6Lx2j7gMtSIxn/cOFqw17ApjVfEb4DCT30P+Qs1S1HL9TtPiKW8gxy+wJNX8
- wlptoKNe5noZMtUj9ZOa94SzRfsoZ0tAvushL5ZMMhwDBC7aoQ7rFYPSeDBgoCsXOk
- CBzgJB6bFy1cKnoaf52WbOB7AXrNW6dOf0Kf0F+g=
-Date: Wed, 20 Nov 2019 09:00:32 +1100
+ b=agQNzygw07RfGJZG3uOEql+llKW+0u2q2OpGVplSl8RMj2vNAWcj6iH4EAgTPT39c
+ Gj/so6uE5EaukpNUGiLszZUSijh6RM4aHY0dHmnj2TD25+F/2/dRhb/nVZkD0tTpzZ
+ F/Il7VOUXw878tQdtlErnfZHKaPcIvcQ+dFAtVlI=
+Date: Wed, 20 Nov 2019 08:52:15 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Balamuruhan S <bala24@linux.ibm.com>
-Subject: Re: [PATCH 2/5] hw/ppc/pnv_xscom: PBA bar mask values are incorrect
- with homer/occ sizes
-Message-ID: <20191119220032.GV5582@umbus.fritz.box>
-References: <20191119175056.32518-1-bala24@linux.ibm.com>
- <20191119175056.32518-3-bala24@linux.ibm.com>
- <20191119215618.GU5582@umbus.fritz.box>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH for-5.0] xive/kvm: Trigger interrupts from userspace
+Message-ID: <20191119215215.GT5582@umbus.fritz.box>
+References: <157408992731.494439.3405812941731584740.stgit@bahia.lan>
+ <f81b87b2-c6c9-9c12-2929-adbb341cd391@kaod.org>
+ <20191119004713.GF5582@umbus.fritz.box>
+ <50ff4d1f-6576-0fc3-e1d5-9600cdbef5e4@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="NHfequSh1hmJPP0s"
+ protocol="application/pgp-signature"; boundary="l4+/aJnPlhOv5JVj"
 Content-Disposition: inline
-In-Reply-To: <20191119215618.GU5582@umbus.fritz.box>
+In-Reply-To: <50ff4d1f-6576-0fc3-e1d5-9600cdbef5e4@kaod.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -73,82 +73,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---NHfequSh1hmJPP0s
+--l4+/aJnPlhOv5JVj
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 20, 2019 at 08:56:18AM +1100, David Gibson wrote:
-> On Tue, Nov 19, 2019 at 11:20:53PM +0530, Balamuruhan S wrote:
-> > homer/occ sizes are calculated in skiboot with `(mask | 0xfffff) + 1`,
-> > and from xscom access should return correct mask values instead of actu=
-al
-> > sizes.
+On Tue, Nov 19, 2019 at 09:15:52AM +0100, C=E9dric Le Goater wrote:
+> On 19/11/2019 01:47, David Gibson wrote:
+> > On Mon, Nov 18, 2019 at 04:37:16PM +0100, C=E9dric Le Goater wrote:
+> >> On 18/11/2019 16:12, Greg Kurz wrote:
+> >>> When using the XIVE KVM device, the trigger page is directly accessib=
+le
+> >>> in QEMU. Unlike with XICS, no need to ask KVM to fire the interrupt. A
+> >>> simple store on the trigger page does the job.
+> >>>
+> >>> Just call xive_esb_trigger().
+> >>
+> >> Yes but the KVM XIVE device does a few other checks.=20
+> >>
+> >> It checks that the interrupt was correctly initialized at the KVM devi=
+ce
+> >> level. We should be fine in QEMU which has similar checks.
+> >>
+> >> It caches the LSI assertion level. We should be fine also because it is
+> >> useless in KVM when using the XIVE native exploitation mode.
+> >>
+> >> It checks it is not a passthru interrupt. Any idea on how to check thi=
+s=20
+> >> condition under QEMU ?=20
+> >> =20
+> >>> This may improve performance of emulated devices that go through
+> >>> qemu_set_irq(), eg. virtio devices created with ioeventfd=3Doff or
+> >>> configured by the guest to use LSI interrupts, which aren't really
+> >>> recommended setups.
+> >>
+> >> LGTM.
 > >=20
-> > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> > Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
-> > ---
-> >  hw/ppc/pnv_xscom.c | 10 ++++++----
-> >  1 file changed, 6 insertions(+), 4 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
-> > index f01d788a65..cdd5fa356e 100644
-> > --- a/hw/ppc/pnv_xscom.c
-> > +++ b/hw/ppc/pnv_xscom.c
-> > @@ -46,6 +46,10 @@
-> >  #define P9_PBA_BARMASK0                 0x5012b04
-> >  #define P9_PBA_BARMASK2                 0x5012b06
-> > =20
-> > +/* Mask to calculate Homer/Occ size */
-> > +#define HOMER_SIZE_MASK                 0x0000000000300000ull
-> > +#define OCC_SIZE_MASK                   0x0000000000700000ull
+> > Ok, between the comments above and this, I'm not sure if this is ready
+> > to merge or not.
 >=20
-> Uuuhhhhh... AFAICT these defines have identical values to
-> PNV_HOMER_SIZE and PNV_OCC_COMMON_AREA_SIZE, so I don't see what this
-> patch is actually changing.
-
-Oh, sorry, missed that the values were changed in 1/5.  Would have
-been easier to follow if the two patches were folded together, but
-never mind.  Applied.
-
+> I think it is.=20
 >=20
+> With this change, we are loosing a check on passthrough interrupts but=20
+> I am not sure how critical this is given that QEMU can anyhow bypass=20
+> KVM and trigger the interrupt using a store on the ESB page.=20
 >=20
-> >  static void xscom_complete(CPUState *cs, uint64_t hmer_bits)
-> >  {
-> >      /*
-> > @@ -90,9 +94,8 @@ static uint64_t xscom_read_default(PnvChip *chip, uin=
-t32_t pcba)
-> >          return PNV_HOMER_BASE(chip);
-> > =20
-> >      case P9_PBA_BARMASK0: /* P9 homer region size */
-> > -        return PNV9_HOMER_SIZE;
-> >      case P8_PBA_BARMASK0: /* P8 homer region size */
-> > -        return PNV_HOMER_SIZE;
-> > +        return HOMER_SIZE_MASK;
-> > =20
-> >      case P9_PBA_BAR2: /* P9 occ common area */
-> >          return PNV9_OCC_COMMON_AREA(chip);
-> > @@ -100,9 +103,8 @@ static uint64_t xscom_read_default(PnvChip *chip, u=
-int32_t pcba)
-> >          return PNV_OCC_COMMON_AREA(chip);
-> > =20
-> >      case P9_PBA_BARMASK2: /* P9 occ common area size */
-> > -        return PNV9_OCC_COMMON_AREA_SIZE;
-> >      case P8_PBA_BARMASK2: /* P8 occ common area size */
-> > -        return PNV_OCC_COMMON_AREA_SIZE;
-> > +        return OCC_SIZE_MASK;
-> > =20
-> >      case 0x1010c00:     /* PIBAM FIR */
-> >      case 0x1010c03:     /* PIBAM FIR MASK */
+> >> Any figures to share ?=20
 >=20
+> I am torturing Greg to have numbers :) but he resisted well.
+>=20
+> >> C.
+> >>
+> >>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>=20
+> Let's move on.
+>=20
+> Reviewed-by: C=E9dric Le Goater <clg@kaod.org>
 
-
+Works for me.  Applied.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -156,25 +144,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---NHfequSh1hmJPP0s
+--l4+/aJnPlhOv5JVj
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3UZgAACgkQbDjKyiDZ
-s5JLtA/+Jo93ouDOCJ63bsiPmfyP910FeQtE/QvjjEVcS68LoAaV1V5hM8RJTVf/
-DYsszQWmCqwCSCIKaYdytATnwqQqFzo2RP8K6NxNOzeaBOTEQ+wfJFpHSaejEEU4
-ccnxAj9wBkvUxvyZQWK4gA9700trr4iGiFQGU7lQhQH+0/xEPrQwd4ODj8MRpquH
-3LTLVmHMHZGavxU02cPjxLXo+gnS2v8ApdTOsY111IXOoe6b17eYeC+dL5JNQtU5
-9TF8+vjb9PGh6cQEvdCSF1fnXc6myTcAgM9FJnSXKDdp/1/P0d6B9/9BJfbskPTH
-vgaMM5N3sx4r4SUbfozaDjMmdZNpb/DIWhpxu1zYL+NfbDfjN7CuuRmW7Ydt8lYT
-2nzJ/TzKRMBEYCB+ZY/mfWplouTnmBFie4ULKkzlw6IMw5P5FeBllvQhz7j7x0hT
-NW63gJbvr1/pHDWLw2RayjdPS68CLgAjMk70U7lOIVe+W+O7SqUkZ9ZYEbymP1f2
-TMYXmanas7X1JqG/oBkhGJl//CY1UQsmc1PJXA4/ZCmhKxJSGtpn60DPTLzALOW5
-qA91QCbTL3oxUy/clekhuRYFD/O3e0z8x2ynKnjKtKnWt5y/7Hw3lX6lOLFav5Rq
-ZnrrNOSWwtVvgft3/Rxyb1DEdOGAKad/q3A3lyJ0rUgxXp4wjnE=
-=braH
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3UZA8ACgkQbDjKyiDZ
+s5JY7Q//WFxXpx7cw2B4pCVNEWCcv1UxmbKX96H5J1mXaMwmYHFv9axTmRCWAcs6
+M+G/HZSOx2bB1o9NW0HwIzaKspzVaO6YO3xLqikCH/vYRykKkijhlPpaT//Ak11S
+d6tGzwgxgIq0tTWxN056zanjMoBhUzAuzSNevIyD7HdzPYMkAIQ1SxRj1dlH3K14
+gcJR+upmdS6ik3PjGdte70KshP48G7hYmBjQuEXNTiyBF6WtdHbHUwA201avvl5D
+j07pombTyTrPpTqq28TiDVjVg1dqiLrrC73vjYARBQuGUxgiaHZzbY1e/vi2kXyA
+Mwg6CxLtnEtBGoChD5DGjhVisYZ03NtoGw96g3qknr7W/ecpicwNtfeJ6vFRnEEq
+IyfFJQc+FBP2s8Vzxiz4VU947rEV0wx1VcOQXzwqXQOaAew/ZfIZRAguxcCwTC5Z
+tnwGKCfTadzONm7LTJT9YiG+WHFKjIOLY+pJBbYc0DlHK3MPMqNEUMY+2tIDtvE2
+59XApxE2Ji/FnosT07k0dXhU7h7ulVSySEo1PF/D068s6DvlI2mS68O4OVJsg9PZ
+NNwHqbJt2lSAAq9U4B8nDl67H0MU4Rzjk7Too+WmoexogMPK4juDECGEL59a8P6D
+kqYag0RqZNmvWP09WacBQ6iisgaC7UGdAQF8bTKfM/KXb5rfkIU=
+=xpPh
 -----END PGP SIGNATURE-----
 
---NHfequSh1hmJPP0s--
+--l4+/aJnPlhOv5JVj--
 
