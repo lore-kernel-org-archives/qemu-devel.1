@@ -7,58 +7,59 @@ X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F47C33C9D
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 00:55:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 843C8C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 00:55:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5B0D522303
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 00:55:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 505A322303
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 00:55:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QpV690RW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B0D522303
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="bQEIWCYf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 505A322303
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWrmE-0003Lv-GP
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 19:53:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60223)
+	id 1iWrmH-0003QT-BE
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 19:53:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60222)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iWrlA-0002B2-K5
+ (envelope-from <dgibson@ozlabs.org>) id 1iWrlA-0002B1-NQ
  for qemu-devel@nongnu.org; Mon, 18 Nov 2019 19:52:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iWrl8-0005rG-BU
+ (envelope-from <dgibson@ozlabs.org>) id 1iWrl7-0005qY-HW
  for qemu-devel@nongnu.org; Mon, 18 Nov 2019 19:52:48 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:53685 helo=ozlabs.org)
+Received: from ozlabs.org ([2401:3900:2:1::2]:38547)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iWrl5-0005mE-P1; Mon, 18 Nov 2019 19:52:45 -0500
+ id 1iWrl6-0005mC-DI; Mon, 18 Nov 2019 19:52:45 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47H6jz4M3Nz9sPW; Tue, 19 Nov 2019 11:52:39 +1100 (AEDT)
+ id 47H6jz35fpz9sPV; Tue, 19 Nov 2019 11:52:39 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1574124759;
- bh=kezO9pO44swx7qELErF8jMfL0M3/Dw9zWvpWdVJ0Dzk=;
+ bh=AHmTULuQJQt6oqGi5Z69V8IeFHpLr/v5b27JM8Ak5Yg=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=QpV690RWVLpF/EpPLvyJzlYJ/R3tMt2flLeqfTBTVFBBXabM1UfzjbrdXhWGvdeYs
- iRcr6dOzhogczj/OmYX6ZUYnQIN0kVMZNZ2b0ogCe15x2Xb0CkEIjMXINgUu52PoUa
- rNzuxTFEqusr9L645x1JCWfgOBjF0vJxuknI4AqI=
-Date: Tue, 19 Nov 2019 11:52:32 +1100
+ b=bQEIWCYfcm49gaTXutvlDTAJV6F+D5vD/nYpH1SZ3yFNReYRg/KoC1vkkM9hKMmYs
+ njV+1Fk0lvA+APB986QA65rAW91in/MaRoUKLT24rtyPY+oH0LMiQAHmMQPUQfeaPH
+ Q1LpEVfNhcG/M023M4r7UbPjzM46OxEEsVFrdIuY=
+Date: Tue, 19 Nov 2019 11:47:13 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH] ppc/pnv: Create BMC devices at machine init
-Message-ID: <20191119005232.GH5582@umbus.fritz.box>
-References: <20191118092222.15691-1-clg@kaod.org>
+Subject: Re: [PATCH for-5.0] xive/kvm: Trigger interrupts from userspace
+Message-ID: <20191119004713.GF5582@umbus.fritz.box>
+References: <157408992731.494439.3405812941731584740.stgit@bahia.lan>
+ <f81b87b2-c6c9-9c12-2929-adbb341cd391@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="VbfcI4OLZ4XW0yH2"
+ protocol="application/pgp-signature"; boundary="TU+u6i6jrDPzmlWF"
 Content-Disposition: inline
-In-Reply-To: <20191118092222.15691-1-clg@kaod.org>
+In-Reply-To: <f81b87b2-c6c9-9c12-2929-adbb341cd391@kaod.org>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 203.11.71.1
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,178 +71,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Corey Minyard <cminyard@mvista.com>,
- Oliver O'Halloran <oohall@gmail.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---VbfcI4OLZ4XW0yH2
+--TU+u6i6jrDPzmlWF
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 18, 2019 at 10:22:22AM +0100, C=E9dric Le Goater wrote:
-> The BMC of the OpenPOWER systems monitors the machine state using
-> sensors, controls the power and controls the access to the PNOR flash
-> device containing the firmware image required to boot the host.
+On Mon, Nov 18, 2019 at 04:37:16PM +0100, C=E9dric Le Goater wrote:
+> On 18/11/2019 16:12, Greg Kurz wrote:
+> > When using the XIVE KVM device, the trigger page is directly accessible
+> > in QEMU. Unlike with XICS, no need to ask KVM to fire the interrupt. A
+> > simple store on the trigger page does the job.
+> >=20
+> > Just call xive_esb_trigger().
 >=20
-> QEMU models the power cycle process, access to the sensors and access
-> to the PNOR device. But, for these features to be available, the QEMU
-> PowerNV machine needs two extras devices on the command line, an IPMI
-> BT device for communication and a BMC backend device:
+> Yes but the KVM XIVE device does a few other checks.=20
 >=20
->   -device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10
+> It checks that the interrupt was correctly initialized at the KVM device
+> level. We should be fine in QEMU which has similar checks.
 >=20
-> The BMC properties are then defined accordingly in the device tree and
-> OPAL self adapts. If a BMC device and an IPMI BT device are not
-> available, OPAL does not try to communicate with the BMC in any
-> manner. This is not how real systems behave.
+> It caches the LSI assertion level. We should be fine also because it is
+> useless in KVM when using the XIVE native exploitation mode.
 >=20
-> To be closer to the default behavior, create an IPMI BMC simulator
-> device and an IPMI BT device at machine initialization time. We loose
-> the ability to define an external BMC device but there are benefits:
+> It checks it is not a passthru interrupt. Any idea on how to check this=
+=20
+> condition under QEMU ?=20
+> =20
+> > This may improve performance of emulated devices that go through
+> > qemu_set_irq(), eg. virtio devices created with ioeventfd=3Doff or
+> > configured by the guest to use LSI interrupts, which aren't really
+> > recommended setups.
 >=20
->   - a better match with real systems,
->   - a better test coverage of the OPAL code,
->   - system powerdown and reset commands that work,
->   - a QEMU device tree compliant with the specifications (*).
->=20
-> (*) Still needs a MBOX device.
->=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> LGTM.
 
-This doesn't apply to ppc-for-5.0 for me.  I'm not sure which change
-in there it's conflicting with, but there seems to be something.
+Ok, between the comments above and this, I'm not sure if this is ready
+to merge or not.
 
-> ---
->  include/hw/ppc/pnv.h |  2 +-
->  hw/ppc/pnv.c         | 33 ++++++++++++++++-----------------
->  hw/ppc/pnv_bmc.c     | 20 +++++++++++++++++---
->  3 files changed, 34 insertions(+), 21 deletions(-)
 >=20
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index 07c56c05ad30..90f1343ed07c 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -198,7 +198,7 @@ static inline bool pnv_is_power9(PnvMachineState *pnv)
->   */
->  void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt);
->  void pnv_bmc_powerdown(IPMIBmc *bmc);
-> -int pnv_bmc_hiomap(IPMIBmc *bmc);
-> +IPMIBmc *pnv_bmc_create(void);
-> =20
->  /*
->   * POWER8 MMIO base addresses
-> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-> index c3ac0d6d5b4a..2117d879895c 100644
-> --- a/hw/ppc/pnv.c
-> +++ b/hw/ppc/pnv.c
-> @@ -551,27 +551,10 @@ static void pnv_powerdown_notify(Notifier *n, void =
-*opaque)
-> =20
->  static void pnv_reset(MachineState *machine)
->  {
-> -    PnvMachineState *pnv =3D PNV_MACHINE(machine);
->      void *fdt;
-> -    Object *obj;
-> =20
->      qemu_devices_reset();
-> =20
-> -    /*
-> -     * OpenPOWER systems have a BMC, which can be defined on the
-> -     * command line with:
-> -     *
-> -     *   -device ipmi-bmc-sim,id=3Dbmc0
-> -     *
-> -     * This is the internal simulator but it could also be an external
-> -     * BMC.
-> -     */
-> -    obj =3D object_resolve_path_type("", "ipmi-bmc-sim", NULL);
-> -    if (obj) {
-> -        pnv->bmc =3D IPMI_BMC(obj);
-> -        pnv_bmc_hiomap(pnv->bmc);
-> -    }
-> -
->      fdt =3D pnv_dt_create(machine);
-> =20
->      /* Pack resulting tree */
-> @@ -629,6 +612,16 @@ static bool pnv_match_cpu(const char *default_type, =
-const char *cpu_type)
->      return ppc_default->pvr_match(ppc_default, ppc->pvr);
->  }
-> =20
-> +static void ipmi_bt_init(ISABus *bus, IPMIBmc *bmc, uint32_t irq)
-> +{
-> +    Object *obj;
-> +
-> +    obj =3D OBJECT(isa_create(bus, "isa-ipmi-bt"));
-> +    object_property_set_link(obj, OBJECT(bmc), "bmc", &error_fatal);
-> +    object_property_set_int(obj, irq, "irq", &error_fatal);
-> +    object_property_set_bool(obj, true, "realized", &error_fatal);
-> +}
-> +
->  static void pnv_init(MachineState *machine)
->  {
->      PnvMachineState *pnv =3D PNV_MACHINE(machine);
-> @@ -751,6 +744,9 @@ static void pnv_init(MachineState *machine)
->      }
->      g_free(chip_typename);
-> =20
-> +    /* Create the machine BMC simulator */
-> +    pnv->bmc =3D pnv_bmc_create();
-> +
->      /* Instantiate ISA bus on chip 0 */
->      pnv->isa_bus =3D pnv_isa_create(pnv->chips[0], &error_fatal);
-> =20
-> @@ -760,6 +756,9 @@ static void pnv_init(MachineState *machine)
->      /* Create an RTC ISA device too */
->      mc146818_rtc_init(pnv->isa_bus, 2000, NULL);
-> =20
-> +    /* Create the IPMI BT device for communication with the BMC */
-> +    ipmi_bt_init(pnv->isa_bus, pnv->bmc, 10);
-> +
->      /*
->       * OpenPOWER systems use a IPMI SEL Event message to notify the
->       * host to powerdown
-> diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
-> index aa5c89586c63..07fa1e1c7e45 100644
-> --- a/hw/ppc/pnv_bmc.c
-> +++ b/hw/ppc/pnv_bmc.c
-> @@ -17,6 +17,8 @@
->   */
-> =20
->  #include "qemu/osdep.h"
-> +#include "qemu-common.h"
-> +#include "qapi/error.h"
->  #include "target/ppc/cpu.h"
->  #include "qemu/log.h"
->  #include "hw/ipmi/ipmi.h"
-> @@ -211,8 +213,20 @@ static const IPMINetfn hiomap_netfn =3D {
->      .cmd_handlers =3D hiomap_cmds
->  };
-> =20
-> -int pnv_bmc_hiomap(IPMIBmc *bmc)
-> +/*
-> + * Instantiate the machine BMC. PowerNV uses the QEMU internal
-> + * simulator but it could also be external.
-> + */
-> +IPMIBmc *pnv_bmc_create(void)
->  {
-> -    return ipmi_sim_register_netfn(IPMI_BMC_SIMULATOR(bmc),
-> -                                   IPMI_NETFN_OEM, &hiomap_netfn);
-> +    Object *obj;
-> +
-> +    obj =3D object_new(TYPE_IPMI_BMC_SIMULATOR);
-> +    object_property_set_bool(obj, true, "realized", &error_fatal);
-> +
-> +    /* Install the HIOMAP protocol handlers to access the PNOR */
-> +    ipmi_sim_register_netfn(IPMI_BMC_SIMULATOR(obj), IPMI_NETFN_OEM,
-> +                            &hiomap_netfn);
-> +
-> +    return IPMI_BMC(obj);
->  }
+> Any figures to share ?=20
+>=20
+> C.
+>=20
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  hw/intc/spapr_xive_kvm.c |   16 ++--------------
+> >  1 file changed, 2 insertions(+), 14 deletions(-)
+> >=20
+> > diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+> > index 08012ac7cd76..69e73552f1ef 100644
+> > --- a/hw/intc/spapr_xive_kvm.c
+> > +++ b/hw/intc/spapr_xive_kvm.c
+> > @@ -354,32 +354,20 @@ static void kvmppc_xive_source_get_state(XiveSour=
+ce *xsrc)
+> >  void kvmppc_xive_source_set_irq(void *opaque, int srcno, int val)
+> >  {
+> >      XiveSource *xsrc =3D opaque;
+> > -    SpaprXive *xive =3D SPAPR_XIVE(xsrc->xive);
+> > -    struct kvm_irq_level args;
+> > -    int rc;
+> > -
+> > -    /* The KVM XIVE device should be in use */
+> > -    assert(xive->fd !=3D -1);
+> > =20
+> > -    args.irq =3D srcno;
+> >      if (!xive_source_irq_is_lsi(xsrc, srcno)) {
+> >          if (!val) {
+> >              return;
+> >          }
+> > -        args.level =3D KVM_INTERRUPT_SET;
+> >      } else {
+> >          if (val) {
+> >              xsrc->status[srcno] |=3D XIVE_STATUS_ASSERTED;
+> > -            args.level =3D KVM_INTERRUPT_SET_LEVEL;
+> >          } else {
+> >              xsrc->status[srcno] &=3D ~XIVE_STATUS_ASSERTED;
+> > -            args.level =3D KVM_INTERRUPT_UNSET;
+> >          }
+> >      }
+> > -    rc =3D kvm_vm_ioctl(kvm_state, KVM_IRQ_LINE, &args);
+> > -    if (rc < 0) {
+> > -        error_report("XIVE: kvm_irq_line() failed : %s", strerror(errn=
+o));
+> > -    }
+> > +
+> > +    xive_esb_trigger(xsrc, srcno);
+> >  }
+>=20
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -249,25 +170,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---VbfcI4OLZ4XW0yH2
+--TU+u6i6jrDPzmlWF
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3TPNAACgkQbDjKyiDZ
-s5Ir8A//fEGQUJEn4vIbVV0Bp0UNdclaDvpQ/GMxfRTySHh97xjB5ZO4AamPx4sX
-YvenEenwWUd6ZsomOQmr2GXkmKwPyxZpsLF8+zKr6AoCLTGhTbczBgCxHZzCKYBP
-+J82CgRwAu158P9cvzRssX9bqL634mg+QSGdJ+DOBmt5suaIjOZEYUpQaIY6Zkil
-NdxyEEXUxOAFQM7srpkrF6cCs8R1yNOcFBQpauU1PsQSU5D5n/0KXctIdQIKA2NR
-NRHfXCViMfthIGT7Z7cRLbBYExkk0Nm0Ztm5OjEAoRTvX+MVFQsamEw3Sk3z3RqA
-HEE/Hd0U/+36GOvDQK7/R2lWAOLyibOf7HxmpHAaN5wkcEuxKl1SgxZ4DYAxjLZQ
-AmWrTMFJgrIx44JioA9e6DYsioV8+dkzNKRV/bcRwuT6YMVDPhmHChJLhxEF9h+q
-f2wXu8J4SfSRaRwHhe+N39EpBFpX5PYXGqeqY0S9/PQZ/6WJC9Ioz7Bz4YHtBlHe
-IkOGQ1ka2zYuwXWZxFigtN+vLPyrZ8LVSCWfDbttXWJkqPY5GP6CoMGLJwhpuj32
-vSbuZGqLa/l4uZLVABxp8nO5sk3IAdvKdLt60dycR483IEVSK6R3sfNt/oEatSzv
-uJA+G8OEu8ID0nNtd4vBk1DkM76AUqbMXQ+qCuMdOQ80aWxAGCI=
-=FTuV
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3TO44ACgkQbDjKyiDZ
+s5LI+g/+O4j+2xTac7UNrabUpBp7j0PuFU5Z/Fy+Li8IpMme5y9EHJHSRkgcEkOQ
+oeS1K2795V/JljH8nE1Wr5I55u8hnRVfwwjkeJdohH2Sx+3x+8jgDWgB5ou1q8m5
+JFifrl2PKbQpKQ4nRuHQIn42kw9sCyjeyQhgqMwAn01v8TnBTZJJVd+O/tNPBrri
+5WDnM3auvn+nQqUSoxV+g08rJr5SGL7Hf+1U8mMmx6wd0IX3rLpaE+IV7hudvrhl
+hHWG/Vdqyz0VMtc5d0BwBP3c6vD9cW4cppSUqdV2GH4XLEBUdNj0cBKR7toyqMb5
+icZ2pasrIAniM2VOWDcwdqZboM5Uk1UagTPe4eG8Sm4M461/s7ESm2o8cRzOs3p9
+MJ2NuqpwkbCsANPPm/IxD4h5s7lmjYRquHHfQd4rPFGj0lDSnZ3tl59a9Jf+qcEx
+91JZwsDzDrL3xiqt1smx5VhgA1sAtdTFjktdP+qY/RGfwKGQxwUr0w7HeeaSx+gz
+n36TXzjNsg1APW+e1OdMyZDqPeNMRR/C614LgYNqM3O+xXqIE+RN0+4hFTh+Jbhh
+LTVgvz8NtqLENRpxvW7E6GDjGRxhJj+xK7krMtYfGjuFClpoju5A46b0Zh0yaW8B
++VoiZFnAB1qfadk8K54e+/l21uxRPug9FN2bLxVCklHHEuvTyso=
+=QaR7
 -----END PGP SIGNATURE-----
 
---VbfcI4OLZ4XW0yH2--
+--TU+u6i6jrDPzmlWF--
 
