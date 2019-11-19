@@ -2,79 +2,63 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F48C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:02:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 063F6C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:05:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A85A7222D3
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:02:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RxXvbnkp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A85A7222D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id CF151222D3
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:05:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF151222D3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45844 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX45m-0006XS-72
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 09:02:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40172)
+	id 1iX47v-0008Kx-04
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 09:05:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40677)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iX444-00053S-VR
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:01:15 -0500
+ (envelope-from <groug@kaod.org>) id 1iX479-0007u4-HD
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:04:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iX43z-0001Bz-JW
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:01:08 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31983
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <groug@kaod.org>) id 1iX478-0001zp-6b
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:04:19 -0500
+Received: from 8.mo5.mail-out.ovh.net ([178.32.116.78]:42744)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iX43z-0001Bm-GC
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:01:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574172063;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QKsDjYj/uYYgMo5nDYSa+n4cFYXrKwT7rdQauL5Yk8E=;
- b=RxXvbnkpVqrr5idQJoNuNpZyCy4tSoXkSUhP2eycvqwX72Jla3/4s/rNmRqSuC3BiC9qB7
- rGJcb4jmbz7iVDANd/ZoyIFitv+egHIMneUYyJDQzcALEtkmBhyRDVbi8clA88wRUBVkn5
- o93ePOGSoVfGoHoTC6QuW4jnzeItuf4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-YLOKB1QJMF28B65PdfdyIQ-1; Tue, 19 Nov 2019 09:01:01 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3054C1005500;
- Tue, 19 Nov 2019 14:01:00 +0000 (UTC)
-Received: from x1w.redhat.com (unknown [10.40.206.9])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 75E39610B0;
- Tue, 19 Nov 2019 14:00:57 +0000 (UTC)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/2] hw/mips/gt64xxx: Remove dynamic field width from trace
- events
-Date: Tue, 19 Nov 2019 15:00:43 +0100
-Message-Id: <20191119140043.28539-3-philmd@redhat.com>
-In-Reply-To: <20191119140043.28539-1-philmd@redhat.com>
-References: <20191119140043.28539-1-philmd@redhat.com>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iX478-0001zI-0c
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:04:18 -0500
+Received: from player718.ha.ovh.net (unknown [10.109.159.73])
+ by mo5.mail-out.ovh.net (Postfix) with ESMTP id 78D4525AC27
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 15:04:15 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: groug@kaod.org)
+ by player718.ha.ovh.net (Postfix) with ESMTPSA id 6B219C35FDF5;
+ Tue, 19 Nov 2019 14:04:10 +0000 (UTC)
+Date: Tue, 19 Nov 2019 15:04:03 +0100
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH for-5.0 v5 02/23] ppc/xive: Introduce helpers for the
+ NVT id
+Message-ID: <20191119150403.02a78ace@bahia.lan>
+In-Reply-To: <20191115162436.30548-3-clg@kaod.org>
+References: <20191115162436.30548-1-clg@kaod.org>
+ <20191115162436.30548-3-clg@kaod.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: YLOKB1QJMF28B65PdfdyIQ-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 17752626784658561419
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudegkedgheelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdduleehrddvuddvrddvledrudeiieenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjedukedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 178.32.116.78
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,104 +70,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since not all trace backends support dynamic field width in
-format (dtrace via stap does not), replace by a static field
-width instead.
+On Fri, 15 Nov 2019 17:24:15 +0100
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-We previously passed to the trace API 'width << 1' as the number
-of hex characters to display (the dynamic field width). We don't
-need this anymore. Instead, display the size of bytes accessed.
+> Each vCPU in the system is identified with an NVT identifier which is
+> pushed in the OS CAM line (QW1W2) of the HW thread interrupt context
+> register when the vCPU is dispatched on a HW thread. This identifier
+> is used by the presenter subengine to find a matching target to notify
+> of an event. It is also used to fetch the associate NVT structure
+> which may contain pending interrupts that need a resend.
+>=20
+> Add a couple of helpers for the NVT ids. The NVT space is 19 bits
+> wide, giving a maximum of 512K per chip.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  include/hw/ppc/xive.h      |  5 -----
+>  include/hw/ppc/xive_regs.h | 21 +++++++++++++++++++++
+>  2 files changed, 21 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index 8fd439ec9bba..fa7adf87feb2 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -418,11 +418,6 @@ Object *xive_tctx_create(Object *cpu, XiveRouter *xr=
+tr, Error **errp);
+>  void xive_tctx_reset(XiveTCTX *tctx);
+>  void xive_tctx_destroy(XiveTCTX *tctx);
+> =20
+> -static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
+dx)
+> -{
+> -    return (nvt_blk << 19) | nvt_idx;
+> -}
+> -
+>  /*
+>   * KVM XIVE device helpers
+>   */
+> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+> index 530f232b04f8..1a5622f8ded8 100644
+> --- a/include/hw/ppc/xive_regs.h
+> +++ b/include/hw/ppc/xive_regs.h
+> @@ -272,4 +272,25 @@ typedef struct XiveNVT {
+> =20
+>  #define xive_nvt_is_valid(nvt)    (be32_to_cpu((nvt)->w0) & NVT_W0_VALID)
+> =20
+> +/*
+> + * The VP number space in a block is defined by the END_W6_NVT_INDEX
+> + * field of the XIVE END
+> + */
+> +#define XIVE_NVT_SHIFT                19
+> +
+> +static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nvt_i=
+dx)
+> +{
+> +    return (nvt_blk << XIVE_NVT_SHIFT) | nvt_idx;
 
-Fixes: ab6bff424f ("gt64xxx_pci: Convert debug printf to trace events")
-Reported-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Buglink: https://bugs.launchpad.net/qemu/+bug/1844817
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
----
- hw/mips/gt64xxx_pci.c | 16 ++++++++--------
- hw/mips/trace-events  |  4 ++--
- 2 files changed, 10 insertions(+), 10 deletions(-)
+Shouldn't we ensure nvt_idx fits in the 19 bits ?
 
-diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
-index 5cab9c1ee1..f1af840d8e 100644
---- a/hw/mips/gt64xxx_pci.c
-+++ b/hw/mips/gt64xxx_pci.c
-@@ -642,19 +642,19 @@ static void gt64120_writel(void *opaque, hwaddr addr,
-         /* not really implemented */
-         s->regs[saddr] =3D ~(~(s->regs[saddr]) | ~(val & 0xfffffffe));
-         s->regs[saddr] |=3D !!(s->regs[saddr] & 0xfffffffe);
--        trace_gt64120_write("INTRCAUSE", size << 1, val);
-+        trace_gt64120_write("INTRCAUSE", size, val);
-         break;
-     case GT_INTRMASK:
-         s->regs[saddr] =3D val & 0x3c3ffffe;
--        trace_gt64120_write("INTRMASK", size << 1, val);
-+        trace_gt64120_write("INTRMASK", size, val);
-         break;
-     case GT_PCI0_ICMASK:
-         s->regs[saddr] =3D val & 0x03fffffe;
--        trace_gt64120_write("ICMASK", size << 1, val);
-+        trace_gt64120_write("ICMASK", size, val);
-         break;
-     case GT_PCI0_SERR0MASK:
-         s->regs[saddr] =3D val & 0x0000003f;
--        trace_gt64120_write("SERR0MASK", size << 1, val);
-+        trace_gt64120_write("SERR0MASK", size, val);
-         break;
-=20
-     /* Reserved when only PCI_0 is configured. */
-@@ -930,19 +930,19 @@ static uint64_t gt64120_readl(void *opaque,
-     /* Interrupts */
-     case GT_INTRCAUSE:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("INTRCAUSE", size << 1, val);
-+        trace_gt64120_read("INTRCAUSE", size, val);
-         break;
-     case GT_INTRMASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("INTRMASK", size << 1, val);
-+        trace_gt64120_read("INTRMASK", size, val);
-         break;
-     case GT_PCI0_ICMASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("ICMASK", size << 1, val);
-+        trace_gt64120_read("ICMASK", size, val);
-         break;
-     case GT_PCI0_SERR0MASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("SERR0MASK", size << 1, val);
-+        trace_gt64120_read("SERR0MASK", size, val);
-         break;
-=20
-     /* Reserved when only PCI_0 is configured. */
-diff --git a/hw/mips/trace-events b/hw/mips/trace-events
-index 75d4c73f2e..321933283f 100644
---- a/hw/mips/trace-events
-+++ b/hw/mips/trace-events
-@@ -1,4 +1,4 @@
- # gt64xxx.c
--gt64120_read(const char *regname, int width, uint64_t value) "gt64120 read=
- %s value:0x%0*" PRIx64
--gt64120_write(const char *regname, int width, uint64_t value) "gt64120 wri=
-te %s value:0x%0*" PRIx64
-+gt64120_read(const char *regname, unsigned size, uint64_t value) "gt64120 =
-read %s size:%u value:0x%08" PRIx64
-+gt64120_write(const char *regname, unsigned size, uint64_t value) "gt64120=
- write %s size:%u value:0x%08" PRIx64
- gt64120_isd_remap(uint64_t from_length, uint64_t from_addr, uint64_t to_le=
-ngth, uint64_t to_addr) "ISD: 0x%08" PRIx64 "@0x%08" PRIx64 " -> 0x%08" PRI=
-x64 "@0x%08" PRIx64
---=20
-2.21.0
+> +}
+> +
+> +static inline uint32_t xive_nvt_idx(uint32_t cam_line)
+> +{
+> +    return cam_line & ((1 << XIVE_NVT_SHIFT) - 1);
+> +}
+> +
+> +static inline uint32_t xive_nvt_blk(uint32_t cam_line)
+> +{
+> +    return (cam_line >> XIVE_NVT_SHIFT) & 0xf;
+> +}
+> +
+>  #endif /* PPC_XIVE_REGS_H */
 
 
