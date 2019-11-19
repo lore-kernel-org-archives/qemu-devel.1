@@ -2,77 +2,63 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E15AC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 03:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 629AAC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 03:15:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC41A2231A
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 03:14:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="drRNcQev"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC41A2231A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38AAF219F6
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 03:15:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38AAF219F6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWty9-0000sD-Qi
-	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 22:14:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42852)
+	id 1iWtyl-0001tt-7V
+	for qemu-devel@archiver.kernel.org; Mon, 18 Nov 2019 22:14:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43336)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iWtsK-0001z4-W9
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:08:22 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1iWtvY-0006Qz-PA
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:11:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iWtsI-0004p1-UP
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:08:20 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57561
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <tao3.xu@intel.com>) id 1iWtvX-00089T-3V
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:11:40 -0500
+Received: from mga04.intel.com ([192.55.52.120]:22050)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iWtsI-0004oD-QD
- for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:08:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574132898;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1sMogfW6oNSS6+OquqWXNrhtHWsI3J23eaamEA7qgMs=;
- b=drRNcQev0439OigmRyhCbpBe4qVbOCSBUmNBZOF1bFD81DwnyQ7BoAR460mb1WM7QoJ/xt
- ZfdEEXj7ubPdOta0Ajo7aY7jtcTyBq+GbuOVgF6UPMMnl6NlqOSb4oADh9FqS5ftjeBNLE
- O2hLqouJYF4+reSXEQYPwvKxxNb6xEw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-131-WyohkPpzNqeMXMeAfkm7Ew-1; Mon, 18 Nov 2019 22:08:14 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08FD11005509;
- Tue, 19 Nov 2019 03:08:13 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-116-221.phx2.redhat.com [10.3.116.221])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9CF3860565;
- Tue, 19 Nov 2019 03:08:12 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 07/10] iotests: Fix 173
-Date: Mon, 18 Nov 2019 21:07:56 -0600
-Message-Id: <20191119030759.24907-8-eblake@redhat.com>
-In-Reply-To: <20191119030759.24907-1-eblake@redhat.com>
-References: <20191119030759.24907-1-eblake@redhat.com>
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iWtvW-00085z-Q6
+ for qemu-devel@nongnu.org; Mon, 18 Nov 2019 22:11:39 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 18 Nov 2019 19:11:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,322,1569308400"; d="scan'208";a="237174200"
+Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.197.13])
+ ([10.239.197.13])
+ by fmsmga002.fm.intel.com with ESMTP; 18 Nov 2019 19:11:34 -0800
+Subject: Re: [PATCH] target/i386: Remove monitor from some CPU model
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20191115083345.22638-1-tao3.xu@intel.com>
+ <20191118221030.GG3812@habkost.net>
+From: Tao Xu <tao3.xu@intel.com>
+Message-ID: <9c228e08-c95d-259a-1af3-96093d692b35@intel.com>
+Date: Tue, 19 Nov 2019 11:11:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: WyohkPpzNqeMXMeAfkm7Ew-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <20191118221030.GG3812@habkost.net>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,84 +70,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Max Reitz <mreitz@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test has been broken since 3.0.  It used TEST_IMG to influence
-the name of a file created during _make_test_img, but commit 655ae6bb
-changed things so that the wrong file name is being created, which
-then caused _launch_qemu to fail.  In the meantime, the set of events
-issued for the actions of the test has increased.
+On 11/19/2019 6:10 AM, Eduardo Habkost wrote:
+> On Fri, Nov 15, 2019 at 04:33:45PM +0800, Tao Xu wrote:
+>> Add new version of Snowridge, Denverton, Opteron_G3, EPYC, and Dhyana
+>> CPU model to remove MONITOR/MWAIT feature.
+>>
+>> After QEMU/KVM use "-overcommit cpu-pm=on" to expose MONITOR/MWAIT
+>> (commit id 6f131f13e68d648a8e4f083c667ab1acd88ce4cd), the MONITOR/MWAIT
+>> feature in these CPU model is unused.
+>>
+>> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+>> ---
+>>   target/i386/cpu.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++
+>>   1 file changed, 58 insertions(+)
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index a624163ac2..7c5f1e8fe0 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -2770,6 +2770,19 @@ static X86CPUDefinition builtin_x86_defs[] = {
+>>               MSR_ARCH_CAP_RDCL_NO | MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY,
+>>           .xlevel = 0x80000008,
+>>           .model_id = "Intel Atom Processor (Denverton)",
+>> +        .versions = (X86CPUVersionDefinition[]) {
+>> +            { .version = 1 },
+>> +            {
+>> +                .version = 2,
+>> +                .props = (PropValue[]) {
+>> +                    { "monitor", "off" },
+>> +                    { "model-id",
+>> +                      "Intel Atom Processor (Denverton, no MONITOR)" },
+> 
+> We never changed model-id when adding/removing features in
+> machine-type code, and I don't see why we should start doing that
+> now.  This info might be helpful on "-cpu help", but probably
+> confusing for people looking at /proc/cpuinfo inside the VM.
+> 
+> If you think it is important to add extra info to "-cpu help", I
+> suggest you send a patch adding a separate field instead of
+> changing model ID on CPUID.
+> 
 
-Why haven't we noticed the failure? Because the test rarely gets run:
-'./check -qcow2 173' is insufficient (that defaults to using file protocol)
-'./check -nfs 173' is insufficient (that defaults to using raw format)
-so the test is only run with:
-./check -qcow2 -nfs 173
-
-Note that we already have a number of other problems with -nfs:
-./check -nfs (fails 18/30)
-./check -qcow2 -nfs (fails 45/76 after this patch, if exports does
-not permit 'insecure')
-and it's not on my priority list to fix those.  Rather, I found this
-because of my next patch's work on tests using _send_qemu_cmd.
-
-Fixes: 655ae6b
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20191114213415.23499-2-eblake@redhat.com>
----
- tests/qemu-iotests/173     | 4 ++--
- tests/qemu-iotests/173.out | 6 +++++-
- 2 files changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/tests/qemu-iotests/173 b/tests/qemu-iotests/173
-index 9e2fa2e73cb9..29dcaa1960df 100755
---- a/tests/qemu-iotests/173
-+++ b/tests/qemu-iotests/173
-@@ -47,9 +47,9 @@ size=3D100M
- BASE_IMG=3D"${TEST_DIR}/image.base"
- TOP_IMG=3D"${TEST_DIR}/image.snp1"
-
--TEST_IMG=3D"${BASE_IMG}" _make_test_img $size
-+TEST_IMG_FILE=3D"${BASE_IMG}" _make_test_img $size
-
--TEST_IMG=3D"${TOP_IMG}" _make_test_img $size
-+TEST_IMG_FILE=3D"${TOP_IMG}" _make_test_img $size
-
- echo
- echo =3D=3D=3D Running QEMU, using block-stream to find backing image =3D=
-=3D=3D
-diff --git a/tests/qemu-iotests/173.out b/tests/qemu-iotests/173.out
-index f477a0099a32..e83d17ec2f64 100644
---- a/tests/qemu-iotests/173.out
-+++ b/tests/qemu-iotests/173.out
-@@ -7,6 +7,10 @@ Formatting 'TEST_DIR/image.snp1', fmt=3DIMGFMT size=3D1048=
-57600
- {"return": {}}
- {"return": {}}
- {"return": {}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
-: "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk2"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
-: "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk2"}}
- {"return": {}}
--{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
-: "BLOCK_JOB_COMPLETED", "data": {"device": "disk2", "len": 104857600, "off=
-set": 104857600, "speed": 0, "type": "stream"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
-: "JOB_STATUS_CHANGE", "data": {"status": "waiting", "id": "disk2"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
-: "JOB_STATUS_CHANGE", "data": {"status": "pending", "id": "disk2"}}
-+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event"=
-: "BLOCK_JOB_COMPLETED", "data": {"device": "disk2", "len": 0, "offset": 0,=
- "speed": 0, "type": "stream"}}
- *** done
---=20
-2.21.0
-
+OK I will add a new info to do this.
 
