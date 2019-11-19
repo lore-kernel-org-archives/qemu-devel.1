@@ -2,82 +2,124 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24FA6C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 18:04:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB410C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 18:14:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B95F121D7F
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 18:04:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RrZC/2kD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B95F121D7F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 94FD12231A
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 18:14:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94FD12231A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX7r6-00018y-QI
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 13:04:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55032)
+	id 1iX81h-0004f3-Ng
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 13:14:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57508)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iX7pB-0008QR-Md
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:02:03 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iX80m-0003ta-5G
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:14:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iX7p5-0008A6-TZ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:02:01 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:34871)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iX7p5-00089q-NG
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:01:55 -0500
-Received: by mail-oi1-x241.google.com with SMTP id n16so19818539oig.2
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 10:01:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=7fpTCSW0POtGslsylHIPNUk5yyae8P/6m7xp3b8IL4Y=;
- b=RrZC/2kDlDjKZHanWOTHO/5dTk0AKKjAUf20MzCK5z6NKFNW/iWv4EVEbxQ2Yzn+/5
- ZEUkExgCY4GmiY6zztuwMOYkqpy3a/KOIHH2pUtBw7B5TU5IutmADk592Aqb1CKN6wQU
- TgfAg4QFSjOkdEtk8NdSZ9f0T6GrN6cgNiGi7Dr8f+bAPMMg2KNAQ3jduCvSOf0srzgl
- g86WMJbFGaPgSYa4VMgBbtUdhMVlDFCxv8SlEHHRAiuvZ/lX3YX9Bpvfj5NP526drhXl
- S8eN0TB3BbdCuaLaAaUYQURfcKxIn6VD94akK7QmbbL3srIB5s6zJtWgJ5BdnPL+fAeA
- tDMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=7fpTCSW0POtGslsylHIPNUk5yyae8P/6m7xp3b8IL4Y=;
- b=BY/nuvNitPg098N3i3KQrEyQiA8JjCib0NuYnuDmUubbONIWIyNpSVEADNMdQbGbRT
- xdZwXjMev0VivVDYUeP/xVMCRMoYIuc4HBFc1DtVgTjlCSQVYb498mqQ2jSpOQT/R2Q3
- pzVX7IRjyDBdAETZXnc3b2b4h/WxitpQ2vvc+DUXqjf5uUuRceTQJrZk8JCxcrYjEk4J
- 1Uo7zhOT5PY5P8mBWonv2xTlqSQqwYUDGsuNsxAbFIlOHTkvgbscR/a3mbA6mHYpWy51
- nup+CeZkEiJfe1qo0s35vVM2WVscI290GV5O58GPiaI69YdsGJYex2xMFeWRzmGjexZJ
- HIgQ==
-X-Gm-Message-State: APjAAAUiQsomCInm0LdRG7SFqraEOkhn9wTV/XiJHJBKt5q/Iie44Zw8
- sbuGEcYLwneCbktlFZ+yNy3L4LWSDD6KHG0VTMyhmQ==
-X-Google-Smtp-Source: APXvYqwNwzcLVS8tlygjd5kBItEMw+MJQw4CxtsggO5cmtxAK+dS3lW6YeWBf/FDSLOo+QVH/itP1q4beZoaX/z5Ko8=
-X-Received: by 2002:aca:451:: with SMTP id 78mr5376138oie.170.1574186514698;
- Tue, 19 Nov 2019 10:01:54 -0800 (PST)
+ (envelope-from <laurent@vivier.eu>) id 1iX80k-0003Zz-Nv
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:13:59 -0500
+Received: from mout.kundenserver.de ([217.72.192.75]:49611)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iX80k-0003Z4-Ek
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:13:58 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M2wCg-1iYEzp2Fae-003KTm; Tue, 19 Nov 2019 19:13:33 +0100
+To: Taylor Simpson <tsimpson@quicinc.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
+ <a77ce406-5307-cee8-8e0b-7c08056fb0df@redhat.com>
+ <BYAPR02MB488666AA94EBB57C2A318004DE4C0@BYAPR02MB4886.namprd02.prod.outlook.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCJMYXVyZW50IFZp
+ dmllciA8bGF1cmVudEB2aXZpZXIuZXU+iQI4BBMBAgAiBQJWBTDeAhsDBgsJCAcDAgYVCAIJ
+ CgsEFgIDAQIeAQIXgAAKCRDzDDi9Py++PCEdD/oD8LD5UWxhQrMQCsUgLlXCSM7sxGLkwmmF
+ ozqSSljEGRhffxZvO35wMFcdX9Z0QOabVoFTKrT04YmvbjsErh/dP5zeM/4EhUByeOS7s6Yl
+ HubMXVQTkak9Wa9Eq6irYC6L41QNzz/oTwNEqL1weV1+XC3TNnht9B76lIaELyrJvRfgsp9M
+ rE+PzGPo5h7QHWdL/Cmu8yOtPLa8Y6l/ywEJ040IoiAUfzRoaJs2csMXf0eU6gVBhCJ4bs91
+ jtWTXhkzdl4tdV+NOwj3j0ukPy+RjqeL2Ej+bomnPTOW8nAZ32dapmu7Fj7VApuQO/BSIHyO
+ NkowMMjB46yohEepJaJZkcgseaus0x960c4ua/SUm/Nm6vioRsxyUmWd2nG0m089pp8LPopq
+ WfAk1l4GciiMepp1Cxn7cnn1kmG6fhzedXZ/8FzsKjvx/aVeZwoEmucA42uGJ3Vk9TiVdZes
+ lqMITkHqDIpHjC79xzlWkXOsDbA2UY/P18AtgJEZQPXbcrRBtdSifCuXdDfHvI+3exIdTpvj
+ BfbgZAar8x+lcsQBugvktlQWPfAXZu4Shobi3/mDYMEDOE92dnNRD2ChNXg2IuvAL4OW40wh
+ gXlkHC1ZgToNGoYVvGcZFug1NI+vCeCFchX+L3bXyLMg3rAfWMFPAZLzn42plIDMsBs+x2yP
+ +bkCDQRWBSYZARAAvFJBFuX9A6eayxUPFaEczlMbGXugs0mazbOYGlyaWsiyfyc3PStHLFPj
+ rSTaeJpPCjBJErwpZUN4BbpkBpaJiMuVO6egrC8Xy8/cnJakHPR2JPEvmj7Gm/L9DphTcE15
+ 92rxXLesWzGBbuYxKsj8LEnrrvLyi3kNW6B5LY3Id+ZmU8YTQ2zLuGV5tLiWKKxc6s3eMXNq
+ wrJTCzdVd6ThXrmUfAHbcFXOycUyf9vD+s+WKpcZzCXwKgm7x1LKsJx3UhuzT8ier1L363RW
+ ZaJBZ9CTPiu8R5NCSn9V+BnrP3wlFbtLqXp6imGhazT9nJF86b5BVKpF8Vl3F0/Y+UZ4gUwL
+ d9cmDKBcmQU/JaRUSWvvolNu1IewZZu3rFSVgcpdaj7F/1aC0t5vLdx9KQRyEAKvEOtCmP4m
+ 38kU/6r33t3JuTJnkigda4+Sfu5kYGsogeYG6dNyjX5wpK5GJIJikEhdkwcLM+BUOOTi+I9u
+ tX03BGSZo7FW/J7S9y0l5a8nooDs2gBRGmUgYKqQJHCDQyYut+hmcr+BGpUn9/pp2FTWijrP
+ inb/Pc96YDQLQA1q2AeAFv3Rx3XoBTGl0RCY4KZ02c0kX/dm3eKfMX40XMegzlXCrqtzUk+N
+ 8LeipEsnOoAQcEONAWWo1HcgUIgCjhJhBEF0AcELOQzitbJGG5UAEQEAAYkCHwQYAQIACQUC
+ VgUmGQIbDAAKCRDzDDi9Py++PCD3D/9VCtydWDdOyMTJvEMRQGbx0GacqpydMEWbE3kUW0ha
+ US5jz5gyJZHKR3wuf1En/3z+CEAEfP1M3xNGjZvpaKZXrgWaVWfXtGLoWAVTfE231NMQKGoB
+ w2Dzx5ivIqxikXB6AanBSVpRpoaHWb06tPNxDL6SVV9lZpUn03DSR6gZEZvyPheNWkvz7bE6
+ FcqszV/PNvwm0C5Ju7NlJA8PBAQjkIorGnvN/vonbVh5GsRbhYPOc/JVwNNr63P76rZL8Gk/
+ hb3xtcIEi5CCzab45+URG/lzc6OV2nTj9Lg0SNcRhFZ2ILE3txrmI+aXmAu26+EkxLLfqCVT
+ ohb2SffQha5KgGlOSBXustQSGH0yzzZVZb+HZPEvx6d/HjQ+t9sO1bCpEgPdZjyMuuMp9N1H
+ ctbwGdQM2Qb5zgXO+8ZSzwC+6rHHIdtcB8PH2j+Nd88dVGYlWFKZ36ELeZxD7iJflsE8E8yg
+ OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
+ JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
+ ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
+Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of patches
+ - linux-user changes + linux-user/hexagon + skeleton of
+ target/hexagon -
+ Files in target/hexagon/imported are from another project and therefore do
+ not conform to qemu coding standards
+Message-ID: <8c92b107-b707-b8a7-6284-5b1ed8e95897@vivier.eu>
+Date: Tue, 19 Nov 2019 19:13:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <CAFEAcA88YR0mU2N=-immpWVFCnnU6fJsorZYHSyerfMO72iZaA@mail.gmail.com>
- <CAFEAcA9vHZc=s+2f7-a88DsLPph=PE2noz+ai+q5tM+KGabkSg@mail.gmail.com>
- <CAFEAcA_cAaJ7Q=FNf8dZJuGAjjuCANW2QkMFFjfSLaSAFBN6Vw@mail.gmail.com>
- <f4cfc080-2084-0da5-e3ad-2f65aaed41d5@redhat.com>
- <CAFEAcA-aq-0_QuHyiqpjWMKcxSaadyyfgcvg5bKPUChpSbGmvA@mail.gmail.com>
-In-Reply-To: <CAFEAcA-aq-0_QuHyiqpjWMKcxSaadyyfgcvg5bKPUChpSbGmvA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Nov 2019 18:01:43 +0000
-Message-ID: <CAFEAcA8V-vbfoEcreX=-8W+ZX1mcvOo_VspAh4Ea9+iUOjcDwQ@mail.gmail.com>
-Subject: Re: test-aio-multithread assertion
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+In-Reply-To: <BYAPR02MB488666AA94EBB57C2A318004DE4C0@BYAPR02MB4886.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:rUXsme/4k7X+76RDwSbP95sPOm9EP+vhpSZpTMqzQfRL0uwjINV
+ LC2cQ253VA7a1600F43Y1Ar22g5+jh1BzhxRUjlndSxNN7njih8c7V/Ghs8jag6uyl/4SgH
+ 6vKBY0R2N3L0fQaoKku+3YD+A/v3YETWpXta1+wsWJJY1zKFQ82eIo8QktTnsEZhEGjG0p9
+ 0NN3BDkB6P6ZPuMKc9HKA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Y3S1qJAxpY8=:RdW9PriJoDq3c9DCIiUeA9
+ l6VUwx9qsifTPPesErsvbNDvouQPGE93T5tjgx4pF5VwTa6r6TcI15OLWJB+Vp+Fz05hybQ2R
+ R678++3WPxn0PQWAyo4qP+CmMzgSoQvceirQxgqa3ShXCaPQACR9Ds7BFOQouLpdeTtafb5Id
+ 35RUZMVxfaDXYBrriJUSxkusIyJgMDHkZf9hIV+oeoBNv6sIMZvIqNaIGFUYTGv40N6ucE8vK
+ 5QzYYykIFyaCR+W0hhAeS2Jfu8e201GoCW/+neLukvcLAmItpLm+Tyqd0bgiGXJfBlWwYns6L
+ O167ZvJlG+ywvpYHeSD1px+gwZ1glUGpI6X4/DrF6zh3X/kif4mbjr43vrH44xYg3fESjGbK5
+ gJfjnCteVkDcUG+hYxi+PhP0IGpnOOy6ItAn5WDRdbdDLLs9/zaP9xX8zWh4ycATaQPl/5adx
+ MxZuyf487IjsoL24hltsSG3mOSU9zsmVT1iylUlsE9iS9Xwaxs4NTehv1TJwpW2HA/lc6OgYz
+ CAU5I6Tpbiw/TFFYWGrxF4OwWcMARo/UMX3yU3/gihjt7ARmAMTs0CP4tUcvkumTTqUeJRlHk
+ ma9OH5hYt9XvmD/NBdgLFH4aaqbl/G88gUxCY7IVqSNrym5JpRr/SSfwz2IzAERbcywhk+d2n
+ p50jP+X0pAsT+c4LtJLImBjUF9QBzZIakwywJHA7MpCQdION0hAUicm9x2heZXqIXS4aOj+NO
+ b94/nv3exnAMU85N6XBWNhVexPmbCuaqDWBjBzGbR0Zh47pdfiq7HxMK+ME8Xsw317j98PBNf
+ uevE7b5rz7HqjL5W+CJGTfgVVrn98gGSPY55283uVB3DFHejUHyCCqUulQe/ENmy4qrWw+sXU
+ 6yrZ4zklpRDZTEFGJAVP29hmt3ZelgQfGOHtHIDBk=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 217.72.192.75
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,181 +131,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 19 Nov 2019 at 17:55, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Here's a gdb backtrace from as assertion failure under NetBSD
-> when running ./tests/test-aio-multithread -p /aio/multi/mutex/contended
-> (which is pretty replicable for me); does it look like the same
-> thing as the commit 2362a28ea1 issue? (Apologies for all the
-> "optimized out" stuff in the backtraces; I'll try to rerun with
-> a --enable-debug build.)
+Le 19/11/2019 à 18:22, Taylor Simpson a écrit :
+> Thanks for all the feedback on the patch.  I'll summarize my TODO list here.  Please let me know if there's anything I missed.
+> - Add a README file in the imported directory to make it clear that the code comes from another project.  Personally, I prefer keeping the name as "imported".  It was suggested by Richard at the meeting.  Also as a heads-up, that is a small subset of the files that will be in that directory eventually.  Right now, it is the minimum needed to build the skeleton target.
+> - Work on the .checkpatchignore as Philippe suggested.
+> - Split out the "[__SIGRTMAX - 1] = __SIGRTMIN + 1" into a separate patch.
+> - Clean up the long subject line.
+> - Add license text to the new files.
+> - Remove the DEBUG_HEX blocks.  In general the DEBUG_HEX macro controls a bunch of debugging output as you'll see in later patches.  In the long run, I think it should be replaces with a macro that is defined when configured with --enable-debug and then an additional command-line argument.  I haven't looked into this, so any pointers would be appreciated.
 
-...that was easier than I thought it might be. Here's the
---enable-debug version:
+You can have a look to the trace infrastructure
+(docs/devel/tracing.txt). We have also some qemu_log() macros for low
+level debugging.
 
-Thread 7 (LWP 2):
-#0  0x000078b302099c0a in ___lwp_park60 () from /usr/lib/libc.so.12
-#1  0x000078b302409ee3 in pthread_cond_timedwait () from
-/usr/lib/libpthread.so.1
-#2  0x0000000000519388 in qemu_futex_wait (ev=0x7d26e0
-<rcu_call_ready_event>, val=4294967295)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-thread-posix.c:364
-#3  0x000000000051959d in qemu_event_wait (ev=0x7d26e0 <rcu_call_ready_event>)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-thread-posix.c:459
-#4  0x00000000005305db in call_rcu_thread (opaque=0x0)
-    at /home/qemu/qemu-test.0WfUNX/src/util/rcu.c:260
-#5  0x000000000051969f in qemu_thread_start (args=0x78b305722c00)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-thread-posix.c:519
-#6  0x000078b30240b8b5 in ?? () from /usr/lib/libpthread.so.1
-#7  0x000078b302081e20 in ?? () from /usr/lib/libc.so.12
-#8  0x00010102464c457f in ?? ()
-#9  0x0000000000000000 in ?? ()
+> - Laurent suggested I split the patch into two parts: linux-user and target/hexagon.  If I do that, which one should contain the changes to common files (e.g., configure)?  Also, note that we won't be able to build until both patches are merged.  Is that OK?
 
-Thread 6 (LWP 3):
-#0  0x000078b30203e02a in write () from /usr/lib/libc.so.12
-#1  0x000078b302407561 in write () from /usr/lib/libpthread.so.1
-#2  0x0000000000516e26 in event_notifier_set (e=0x78b304701284)
-    at /home/qemu/qemu-test.0WfUNX/src/util/event_notifier-posix.c:100
-#3  0x0000000000511ccb in aio_notify (ctx=0x78b304701180)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:350
-#4  0x000000000051183d in qemu_bh_schedule (bh=0x78b304717050)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:167
-#5  0x0000000000512100 in aio_co_schedule (ctx=0x78b304701180,
-co=0x78b303701280)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:473
-#6  0x0000000000512180 in aio_co_enter (ctx=0x78b304701180, co=0x78b303701280)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:494
-#7  0x000000000051214f in aio_co_wake (co=0x78b303701280)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:488
-#8  0x0000000000531b3e in qemu_co_mutex_wake (mutex=0x7d1700
-<comutex>, co=0x78b303701280)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-coroutine-lock.c:198
-#9  0x0000000000531eb2 in qemu_co_mutex_unlock (mutex=0x7d1700 <comutex>)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-coroutine-lock.c:301
-#10 0x000000000040b8b5 in test_multi_co_mutex_entry (opaque=0x0)
-    at /home/qemu/qemu-test.0WfUNX/src/tests/test-aio-multithread.c:208
-#11 0x0000000000532bc1 in coroutine_trampoline (i0=57676000, i1=30899)
-    at /home/qemu/qemu-test.0WfUNX/src/util/coroutine-ucontext.c:115
-#12 0x000078b30205dba0 in ?? () from /usr/lib/libc.so.12
-#13 0x00010102464c457f in ?? ()
-#14 0x0000000000000000 in ?? ()
+You should add target/hexagon first, and it should not be build as we
+don't have any target (hexagon-linux-user or hexagon-softmmu),
+then you can add linux-user part that will be built and use the
+target/hexagone CPU. I think the configure part should go to the
+linux-user part as it enables the build.
 
-Thread 5 (LWP 5):
-#0  0x000078b30203e02a in write () from /usr/lib/libc.so.12
-#1  0x000078b302407561 in write () from /usr/lib/libpthread.so.1
-#2  0x0000000000516e26 in event_notifier_set (e=0x78b305316284)
-    at /home/qemu/qemu-test.0WfUNX/src/util/event_notifier-posix.c:100
-#3  0x0000000000511ccb in aio_notify (ctx=0x78b305316180)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:350
-#4  0x000000000051183d in qemu_bh_schedule (bh=0x78b305301080)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:167
-#5  0x0000000000512100 in aio_co_schedule (ctx=0x78b305316180,
-co=0x78b303701350)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:473
-#6  0x0000000000512180 in aio_co_enter (ctx=0x78b305316180, co=0x78b303701350)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:494
-#7  0x000000000051214f in aio_co_wake (co=0x78b303701350)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:488
-#8  0x0000000000531b3e in qemu_co_mutex_wake (mutex=0x7d1700
-<comutex>, co=0x78b303701350)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-coroutine-lock.c:198
-#9  0x0000000000531eb2 in qemu_co_mutex_unlock (mutex=0x7d1700 <comutex>)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-coroutine-lock.c:301
-#10 0x000000000040b8b5 in test_multi_co_mutex_entry (opaque=0x0)
-    at /home/qemu/qemu-test.0WfUNX/src/tests/test-aio-multithread.c:208
-#11 0x0000000000532bc1 in coroutine_trampoline (i0=57676416, i1=30899)
-    at /home/qemu/qemu-test.0WfUNX/src/util/coroutine-ucontext.c:115
+I asked to split the patch for review purpose, but this should not break
+anything (to allow bisect).
 
-#12 0x000078b30205dba0 in ?? () from /usr/lib/libc.so.12
-#13 0x00010102464c457f in ?? ()
-#14 0x0000000000000000 in ?? ()
+Thanks,
+Laurent
 
-Thread 4 (LWP 6):
-#0  0x000078b30203e28a in poll () from /usr/lib/libc.so.12
-#1  0x000078b3024072d0 in poll () from /usr/lib/libpthread.so.1
-#2  0x0000000000513bf9 in qemu_poll_ns (fds=0x78b3053050c0, nfds=1, timeout=-1)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-timer.c:351
-#3  0x000000000051665a in aio_poll (ctx=0x78b305316180, blocking=true)
-    at /home/qemu/qemu-test.0WfUNX/src/util/aio-posix.c:669
-#4  0x00000000004ddf5c in iothread_run (opaque=0x78b30530b270)
-    at /home/qemu/qemu-test.0WfUNX/src/tests/iothread.c:51
-#5  0x000000000051969f in qemu_thread_start (args=0x78b305303080)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-thread-posix.c:519
-#6  0x000078b30240b8b5 in ?? () from /usr/lib/libpthread.so.1
-#7  0x000078b302081e20 in ?? () from /usr/lib/libc.so.12
-#8  0x0000000000000000 in ?? ()
+> 
+> Thanks,
+> Taylor
+> 
+> 
+> -----Original Message-----
+> From: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Sent: Tuesday, November 19, 2019 9:19 AM
+> To: Taylor Simpson <tsimpson@quicinc.com>; laurent@vivier.eu; riku.voipio@iki.fi; qemu-devel@nongnu.org
+> Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of patches - linux-user changes + linux-user/hexagon + skeleton of target/hexagon - Files in target/hexagon/imported are from another project and therefore do not conform to qemu coding standards
+> 
+> -------------------------------------------------------------------------
+> CAUTION: This email originated from outside of the organization.
+> -------------------------------------------------------------------------
+> 
+> On 11/19/19 12:58 AM, Taylor Simpson wrote:
+>> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
+>> ---
+> [...]
+>>   target/hexagon/imported/global_types.h      |  25 +++
+>>   target/hexagon/imported/iss_ver_registers.h | 183 +++++++++++++++
+>>   target/hexagon/imported/max.h               |  78 +++++++
+>>   target/hexagon/imported/regs.h              |  19 ++
+> 
+> Maybe you can rename this directory as:
+> 
+> target/hexagon/dsp-sdk/
+> 
+> and add a README "Files under this directory are imported from the SDK available once registered on developer.qualcomm.com ..."
+> 
+> 
 
-Thread 3 (LWP 7):
-#0  0x000078b30203e28a in poll () from /usr/lib/libc.so.12
-#1  0x000078b3024072d0 in poll () from /usr/lib/libpthread.so.1
-#2  0x0000000000513bf9 in qemu_poll_ns (fds=0x78b303f22080, nfds=1, timeout=-1)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-timer.c:351
-#3  0x000000000051665a in aio_poll (ctx=0x78b303f01180, blocking=true)
-    at /home/qemu/qemu-test.0WfUNX/src/util/aio-posix.c:669
-#4  0x00000000004ddf5c in iothread_run (opaque=0x78b30530b300)
-    at /home/qemu/qemu-test.0WfUNX/src/tests/iothread.c:51
-#5  0x000000000051969f in qemu_thread_start (args=0x78b305303080)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-thread-posix.c:519
-#6  0x000078b30240b8b5 in ?? () from /usr/lib/libpthread.so.1
-#7  0x000078b302081e20 in ?? () from /usr/lib/libc.so.12
-#8  0x0000000000000000 in ?? ()
-
-Thread 2 (LWP 4):
-#0  0x000078b3020fe7ea in _lwp_kill () from /usr/lib/libc.so.12
-#1  0x000078b3020fe092 in abort () from /usr/lib/libc.so.12
-#2  0x000078b30209fd57 in __assert13 () from /usr/lib/libc.so.12
-#3  0x0000000000511ae8 in aio_ctx_finalize (source=0x78b305316180)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:279
-#4  0x000078b304045596 in g_source_unref_internal () from
-/usr/pkg/lib/libglib-2.0.so.0
-#5  0x0000000000512247 in aio_context_unref (ctx=0x78b305316180)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:516
-#6  0x000000000051210c in aio_co_schedule (ctx=0x78b305316180,
-co=0x78b303701350)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:475
-#7  0x0000000000512180 in aio_co_enter (ctx=0x78b305316180, co=0x78b303701350)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:494
-#8  0x000000000051214f in aio_co_wake (co=0x78b303701350)
-    at /home/qemu/qemu-test.0WfUNX/src/util/async.c:488
-#9  0x0000000000531b3e in qemu_co_mutex_wake (mutex=0x7d1700
-<comutex>, co=0x78b303701350)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-coroutine-lock.c:198
-#10 0x0000000000531eb2 in qemu_co_mutex_unlock (mutex=0x7d1700 <comutex>)
-    at /home/qemu/qemu-test.0WfUNX/src/util/qemu-coroutine-lock.c:301
-#11 0x000000000040b8b5 in test_multi_co_mutex_entry (opaque=0x0)
-    at /home/qemu/qemu-test.0WfUNX/src/tests/test-aio-multithread.c:208
-#12 0x0000000000532bc1 in coroutine_trampoline (i0=57676208, i1=30899)
-    at /home/qemu/qemu-test.0WfUNX/src/util/coroutine-ucontext.c:115
-#13 0x000078b30205dba0 in ?? () from /usr/lib/libc.so.12
-#14 0x00010102464c457f in ?? ()
-#15 0x0000000000000000 in ?? ()
-
-Thread 1 (LWP 1):
-#0  0x000078b30203e2ea in _sys___nanosleep50 () from /usr/lib/libc.so.12
-#1  0x000078b302407287 in __nanosleep50 () from /usr/lib/libpthread.so.1
-#2  0x000078b30406e511 in g_usleep () from /usr/pkg/lib/libglib-2.0.so.0
-#3  0x000000000040b9ba in test_multi_co_mutex (threads=5, seconds=1)
-    at /home/qemu/qemu-test.0WfUNX/src/tests/test-aio-multithread.c:237
-#4  0x000000000040ba75 in test_multi_co_mutex_1 ()
-    at /home/qemu/qemu-test.0WfUNX/src/tests/test-aio-multithread.c:255
-#5  0x000078b30406bd15 in g_test_run_suite_internal () from
-/usr/pkg/lib/libglib-2.0.so.0
-#6  0x000078b30406bc3e in g_test_run_suite_internal () from
-/usr/pkg/lib/libglib-2.0.so.0
-#7  0x000078b30406bc3e in g_test_run_suite_internal () from
-/usr/pkg/lib/libglib-2.0.so.0
-#8  0x000078b30406bc3e in g_test_run_suite_internal () from
-/usr/pkg/lib/libglib-2.0.so.0
-#9  0x000078b30406c1a0 in g_test_run_suite () from /usr/pkg/lib/libglib-2.0.so.0
-#10 0x000078b30406c1e8 in g_test_run () from /usr/pkg/lib/libglib-2.0.so.0
-#11 0x000000000040bdc3 in main (argc=1, argv=0x7f7fffc34528)
-    at /home/qemu/qemu-test.0WfUNX/src/tests/test-aio-multithread.c:459
-
-thanks
--- PMM
 
