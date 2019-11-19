@@ -2,83 +2,116 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BCD4C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 12:34:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D4ABC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 12:35:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA9F3222A4
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 12:34:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28766222A4
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 12:35:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z2kCkSwt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA9F3222A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="lzF9McXQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28766222A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX2iE-0000ai-K4
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 07:34:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56405)
+	id 1iX2iz-00023E-Bp
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 07:35:17 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56510)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iX2fK-0007aS-AJ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 07:31:32 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iX2gW-0000Pv-Mw
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 07:32:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iX2fC-0007nc-JV
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 07:31:29 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:45118
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iX2fA-0007lv-AQ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 07:31:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574166678;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=eY4x9znae/yNZEegR9GZ1KuMrUhPuKzsnlHdj3AH+Xg=;
- b=Z2kCkSwtkyLNG59vffzdYhDfJ3tt35K+48eW0aohQT+P8ADJexFVzegdH+zzvQQWJi5Krd
- GBKvhP1zJrIkQ2OxtOCcedoPf+XHMcCNZwuikjO0yIn3WEJHr2S2AzSDkKe6upGdZScKYk
- zHrHo7aa+tHVbhWY/7SyQcsSC1Ebo1c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-LTrpXidYPpC6_vjSB9Uo_w-1; Tue, 19 Nov 2019 07:31:14 -0500
-X-MC-Unique: LTrpXidYPpC6_vjSB9Uo_w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C17E71005502;
- Tue, 19 Nov 2019 12:31:13 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.2])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2FC5D5E276;
- Tue, 19 Nov 2019 12:31:11 +0000 (UTC)
-References: <20191112113012.71136-1-slp@redhat.com>
- <157359898425.22470.3655469789274855006@37313f22b938>
- <87pnhwt9xm.fsf@redhat.com> <87h837ucxa.fsf@redhat.com>
- <34ffd31f-66c4-59f5-ead1-b2df449ecee6@redhat.com> <87d0docf0s.fsf@redhat.com>
- <20191119111840.GA5910@linux.fritz.box> <87blt8cd4r.fsf@redhat.com>
- <20191119121357.GC5910@linux.fritz.box>
-User-agent: mu4e 1.2.0; emacs 26.2
-From: Sergio Lopez <slp@redhat.com>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iX2gV-0008De-74
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 07:32:44 -0500
+Received: from mail-eopbgr00135.outbound.protection.outlook.com
+ ([40.107.0.135]:28801 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iX2gV-0008DF-0X; Tue, 19 Nov 2019 07:32:43 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DxiHw+cDSX6Pw4kw1K3qONdSqY1e3PSbDtwyXoO7ARDyRE5NR7/IdyGPEIVvImNTJVBHbo09uSRtDJjerI2yxL+ckRFiWgjtBeupr7kEYdKofa5x0iVWlBq3BhhrywrHNajJ0SCfjPWAskruYu2F9z3hOEjqwYvGeKwuYdvrqOARNnhEpdAkwXtvErW3OiBpIicUqGrfpzvFG+VxFXovwGSKJpgmkUFrhJFUKTl+I52Lh7MgBjS4hhd6cbk5fCQYDMUwTj/LjX49BzkPWUpFes6VQ3Z1Adhi6siMpixmOGz57ucyKFfvOZs0bK7Ry/lufoXKr82soI3R3hUJO8Dmrg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2b94kC0I370ulogWScwh/7PO7I5UTmCSwDHcs+tYY8A=;
+ b=KFq6GwF2YPhxsfwU5G/q1if0//M4lt9uoAPS8ouqZJDeq4Q9pGlfaF8/NT3drKas23Iu9KeGhxJZ7b5YxjDWytbpEEfIjrBFglieNpMT1LMor3liZWlgXIh3XQnc6Hh6obHY3bxdcV/4hgez6uxXkHeiz3FenxqU4sI0ec+uS/Pn2u3Xs8zFlLdrGXOkHXu6iwG7UnVv9B7/GwU4a+KdRx8crC4HU1gjJzWbyGtik1ZU0TnjCzMSN7hXs21vCfkHHQwGfrC+TzcEDS6ykBFiAnvl8YvctF8KhImxOXSCma7lh67mVkbB71OO7ghAPBF2reThKhkDfWLoJIXh/RTYJA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2b94kC0I370ulogWScwh/7PO7I5UTmCSwDHcs+tYY8A=;
+ b=lzF9McXQi1BkhioDglQkwlj1FUDT593guhYi3eB8keQncJk2xeNaXa2UfIZQRblsX2YNm6mRg4e3U/a2l3nmiLC8FShsKXR+mxzLPegI79N9LSBgUR6XKBQ78bOOnTvbDqZrGlhv+3ZMJodPKRzAYOvUWClfO2MAL6BMfuiHXYw=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB5192.eurprd08.prod.outlook.com (10.255.34.85) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.22; Tue, 19 Nov 2019 12:32:40 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.031; Tue, 19 Nov 2019
+ 12:32:40 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v3 0/8] blockdev: avoid acquiring AioContext lock twice at
- do_drive_backup and do_blockdev_backup
-In-reply-to: <20191119121357.GC5910@linux.fritz.box>
-Date: Tue, 19 Nov 2019 13:31:09 +0100
-Message-ID: <878soccak2.fsf@redhat.com>
+Subject: Re: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
+Thread-Topic: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
+Thread-Index: AQHVnJu0qDM7Hy9Fo0iUR1ci8onW5KeSaikAgAADVICAAAQmAA==
+Date: Tue, 19 Nov 2019 12:32:40 +0000
+Message-ID: <45e3566b-4429-969e-288c-f84ba909313e@virtuozzo.com>
+References: <20191116163410.12129-1-vsementsov@virtuozzo.com>
+ <20191119120552.GB5910@linux.fritz.box>
+ <3b5a71bd-b247-fabe-824a-f0cde32deb13@virtuozzo.com>
+In-Reply-To: <3b5a71bd-b247-fabe-824a-f0cde32deb13@virtuozzo.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0902CA0004.eurprd09.prod.outlook.com
+ (2603:10a6:3:e5::14) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191119153238580
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 64fa16e7-a38d-4900-10e4-08d76cec9170
+x-ms-traffictypediagnostic: AM6PR08MB5192:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB51925E321A1BA28909A7AE7EC14C0@AM6PR08MB5192.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 022649CC2C
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(396003)(346002)(39840400004)(366004)(376002)(53754006)(199004)(189003)(8676002)(5660300002)(256004)(446003)(11346002)(4326008)(6512007)(6116002)(25786009)(486006)(6486002)(26005)(31686004)(86362001)(102836004)(305945005)(66946007)(7736002)(66446008)(31696002)(64756008)(66556008)(66476007)(6436002)(66066001)(81156014)(2616005)(186003)(81166006)(476003)(2906002)(107886003)(6246003)(386003)(6506007)(36756003)(99286004)(6916009)(54906003)(478600001)(316002)(14454004)(52116002)(8936002)(76176011)(3846002)(71200400001)(14444005)(229853002)(71190400001);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB5192;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: CQsek2cBy/7YAA6AXmf0csya3VHHaeGfrZApi3oD1w9+DI3KvWOIb1U3w9Jtjd+Zplp/mMp6EB7UJURzxPFakjBKqDp4kVOQIxK5kSwdnZJeAWuKTQZ/KvCslSB09a0KLrcL5mLO7qeZsJV4NjYCh6vkpYHN/Cf4d/97bjbJ5xkhKaxqAkzW3LF2qJeR6oTu/mzgwjtrTh+ddU+qPfDxGUKE//xkv4L5dznnC/QQ2qyQoL3vS5rEJq7UgRcjxnWCHRkjciSv6iv7de0L6EBOlGwWTMkelfqr7BA5PmIMXwoBmJs3KqD6xCdNZL0RLiC1ORsB+qfUlMMonDcB69Z8kY//6KKqWFBEigJ/3oLERuaxoqkWvAEKNXspGEiKO8DVn96ev7e8w4afoZA6IKkXqcRjlqSMd9L+/fzSCYeVWhtVq0V6EOgkxnn/Wf16R26y
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <3350385CE472154F96E564570530EA66@eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64fa16e7-a38d-4900-10e4-08d76cec9170
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2019 12:32:40.6075 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: K9ewXqAIemRmgd69hV54/Rz3oZrFDHjmZ0ufVpymdEs8/bZVDeWXaYtFJGhUXbGQDS8V9uVqK/cbmpaHJPSSUjWzR+z+dTDZDP910ZnRUB4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5192
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.0.135
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,197 +123,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: "fam@euphon.net" <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+19.11.2019 15:17, Vladimir Sementsov-Ogievskiy wrote:
+> 19.11.2019 15:05, Kevin Wolf wrote:
+>> Am 16.11.2019 um 17:34 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>> Hi all!
+>>>
+>>> I wanted to understand, what is the real difference between
+>>> bdrv_block_status_above and bdrv_is_allocated_above, IMHO
+>>> bdrv_is_allocated_above should work through bdrv_block_status_above..
+>>>
+>>> And I found the problem: bdrv_is_allocated_above considers space after
+>>> EOF as UNALLOCATED for intermediate nodes..
+>>>
+>>> UNALLOCATED is not about allocation at fs level, but about should we
+>>> go to backing or not.. And it seems incorrect for me, as in case of
+>>> short backing file, we'll read zeroes after EOF, instead of going
+>>> further by backing chain.
+>>
+>> We actually have documentation what it means:
+>>
+>> =A0 * BDRV_BLOCK_ALLOCATED: the content of the block is determined by th=
+is
+>> =A0 *=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 =
+layer rather than any backing, set by block layer
+>>
+>> Say we have a short overlay, like this:
+>>
+>> base.qcow2:=A0=A0=A0=A0 AAAAAAAA
+>> overlay.qcow2:=A0 BBBB
+>>
+>> Then of course the content of block 5 (the one after EOF of
+>> overlay.qcow2) is still determined by overlay.qcow2, which can be easily
+>> verified by reading it from overlay.qcow2 (produces zeros) and from
+>> base.qcow2 (produces As).
+>>
+>> So the correct result when querying the block status of block 5 on
+>> overlay.qcow2 is BDRV_BLOCK_ALLOCATED | BDRV_BLOCK_ZERO.
+>>
+>> Interestingly, we already fixed the opposite case (large overlay over
+>> short backing file) in commit e88ae2264d9 from May 2014 according to the
+>> same logic.
+>>
+>>> This leads to the following effect:
+>>>
+>>> ./qemu-img create -f qcow2 base.qcow2 2M
+>>> ./qemu-io -c "write -P 0x1 0 2M" base.qcow2
+>>>
+>>> ./qemu-img create -f qcow2 -b base.qcow2 mid.qcow2 1M
+>>> ./qemu-img create -f qcow2 -b mid.qcow2 top.qcow2 2M
+>>>
+>>> Region 1M..2M is shadowed by short middle image, so guest sees zeroes:
+>>> ./qemu-io -c "read -P 0 1M 1M" top.qcow2
+>>> read 1048576/1048576 bytes at offset 1048576
+>>> 1 MiB, 1 ops; 00.00 sec (22.795 GiB/sec and 23341.5807 ops/sec)
+>>>
+>>> But after commit guest visible state is changed, which seems wrong for =
+me:
+>>> ./qemu-img commit top.qcow2 -b mid.qcow2
+>>>
+>>> ./qemu-io -c "read -P 0 1M 1M" mid.qcow2
+>>> Pattern verification failed at offset 1048576, 1048576 bytes
+>>> read 1048576/1048576 bytes at offset 1048576
+>>> 1 MiB, 1 ops; 00.00 sec (4.981 GiB/sec and 5100.4794 ops/sec)
+>>>
+>>> ./qemu-io -c "read -P 1 1M 1M" mid.qcow2
+>>> read 1048576/1048576 bytes at offset 1048576
+>>> 1 MiB, 1 ops; 00.00 sec (3.365 GiB/sec and 3446.1606 ops/sec)
+>>>
+>>>
+>>> I don't know, is it a real bug, as I don't know, do we support backing
+>>> file larger than its parent. Still, I'm not sure that this behavior of
+>>> bdrv_is_allocated_above don't lead to other problems.
+>>
+>> I agree it's a bug.
+>>
+>> Your fix doesn't look right to me, though. You leave the buggy behaviour
+>> of bdrv_co_block_status() as it is and then add four patches to work
+>> around it in some (but not all) callers of it.
+>>
+>> All that it should take to fix this is making the bs->backing check
+>> independent from want_zero and let it set ALLOCATED. What I expected
+>> would be something like the below patch.
+>>
+>> But it doesn't seem to fully fix the problem (though 'alloc 1M 1M' in
+>> qemu-io shows that the range is now considered allocated), so probably
+>> there is still a separate bug in bdrv_is_allocated_above().
+>>
+>> And I think we'll want an iotests case for both cases (short overlay,
+>> short backing file).
+>>
+>> Kevin
+>>
+>>
+>> diff --git a/block/io.c b/block/io.c
+>> index f75777f5ea..5eafcff01a 100644
+>> --- a/block/io.c
+>> +++ b/block/io.c
+>> @@ -2359,16 +2359,17 @@ static int coroutine_fn bdrv_co_block_status(Blo=
+ckDriverState *bs,
+>> =A0=A0=A0=A0=A0 if (ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO)) {
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 ret |=3D BDRV_BLOCK_ALLOCATED;
+>> -=A0=A0=A0 } else if (want_zero) {
+>> -=A0=A0=A0=A0=A0=A0=A0 if (bdrv_unallocated_blocks_are_zero(bs)) {
+>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret |=3D BDRV_BLOCK_ZERO;
+>> -=A0=A0=A0=A0=A0=A0=A0 } else if (bs->backing) {
+>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 BlockDriverState *bs2 =3D bs->backing=
+->bs;
+>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 int64_t size2 =3D bdrv_getlength(bs2)=
+;
+>> -
+>> -=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (size2 >=3D 0 && offset >=3D size2=
+) {
+>> +=A0=A0=A0 } else if (want_zero && bdrv_unallocated_blocks_are_zero(bs))=
+ {
+>> +=A0=A0=A0=A0=A0=A0=A0 ret |=3D BDRV_BLOCK_ZERO;
+>> +=A0=A0=A0 } else if (bs->backing) {
+>> +=A0=A0=A0=A0=A0=A0=A0 BlockDriverState *bs2 =3D bs->backing->bs;
+>> +=A0=A0=A0=A0=A0=A0=A0 int64_t size2 =3D bdrv_getlength(bs2);
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 if (size2 >=3D 0 && offset >=3D size2) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (want_zero) {
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret |=3D BDRV_BLOCK_=
+ZERO;
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret |=3D BDRV_BLOCK_ALLOCATED;
+>=20
+> No, I think it's wrong, as it's not allocated at bs, but at bs->backing->=
+bs.
+>=20
+>=20
+> So, bdrv_co_block_status works correct, what we can change about it, is n=
+ot
+> to return pnum=3D0 if requested range after eof, but return pnum=3Dbytes,=
+ together
+> with BDRV_BLOCK_ALLOCATED | BDRV_BLOCK_ZERO | BDRV_BLOCK_EOF.
+
+But this will break users which rely on pnum=3D0.
+
+>=20
+> And actual problem is in bdrv_block_status_above and bdrv_is_allocated_ab=
+ove, which
+> I'm fixing.
+>=20
+>=20
+>=20
 
 
-Kevin Wolf <kwolf@redhat.com> writes:
-
-> Am 19.11.2019 um 12:35 hat Sergio Lopez geschrieben:
->>=20
->> Kevin Wolf <kwolf@redhat.com> writes:
->>=20
->> > Am 19.11.2019 um 11:54 hat Sergio Lopez geschrieben:
->> >>=20
->> >> Max Reitz <mreitz@redhat.com> writes:
->> >>=20
->> >> > On 13.11.19 14:24, Sergio Lopez wrote:
->> >> >>=20
->> >> >> Sergio Lopez <slp@redhat.com> writes:
->> >> >>=20
->> >> >>> no-reply@patchew.org writes:
->> >> >>>
->> >> >>>> Patchew URL: https://patchew.org/QEMU/20191112113012.71136-1-slp=
-@redhat.com/
->> >> >>>>
->> >> >>>>
->> >> >>>>
->> >> >>>> Hi,
->> >> >>>>
->> >> >>>> This series failed the docker-quick@centos7 build test. Please f=
-ind the testing commands and
->> >> >>>> their output below. If you have Docker installed, you can probab=
-ly reproduce it
->> >> >>>> locally.
->> >> >>>>
->> >> >>>> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
->> >> >>>> #!/bin/bash
->> >> >>>> make docker-image-centos7 V=3D1 NETWORK=3D1
->> >> >>>> time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=
-=3D1
->> >> >>>> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->> >> >>>>
->> >> >>>>   TEST    iotest-qcow2: 268
->> >> >>>> Failures: 141
->> >> >>>
->> >> >>> Hm... 141 didn't fail in my test machine. I'm going to have a loo=
-k.
->> >> >>=20
->> >> >> So here's the output:
->> >> >>=20
->> >> >> --- /root/qemu/tests/qemu-iotests/141.out=092019-11-12 04:43:27.65=
-1557587 -0500
->> >> >> +++ /root/qemu/build/tests/qemu-iotests/141.out.bad=092019-11-13 0=
-8:12:06.575967337 -0500
->> >> >> @@ -10,6 +10,8 @@
->> >> >>  Formatting 'TEST_DIR/o.IMGFMT', fmt=3DIMGFMT size=3D1048576 backi=
-ng_file=3DTEST_DIR/t.IMGFMT backing_fmt=3DIMGFMT
->> >> >>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}=
-, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "job0"}=
-}
->> >> >>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}=
-, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}=
-}
->> >> >> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}=
-, "event": "JOB_STATUS_CHANGE", "data": {"status": "paused", "id": "job0"}}
->> >> >> +{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}=
-, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "job0"}=
-}
->> >> >>  {"error": {"class": "GenericError", "desc": "Node 'drv0' is busy:=
- node is used as backing hd of 'NODE_NAME'"}}
->> >> >>  {"return": {}}
->> >> >>  {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}=
-, "event": "JOB_STATUS_CHANGE", "data": {"status": "aborting", "id": "job0"=
-}}
->> >> >>=20
->> >> >> Those extra lines, the "paused" and "running", are a result of the=
- job
->> >> >> being done in a transaction, within a drained section.
->> >> >>=20
->> >> >> We can update 141.out, but now I'm wondering, was it safe creating=
- the
->> >> >> job at do_drive_backup() outside of a drained section, as
->> >> >> qmp_drive_backup was doing?
->> >> >
->> >> > I think it is.  Someone needs to drain the source node before attac=
-hing
->> >> > the job filter (which intercepts writes), and bdrv_backup_top_appen=
-d()
->> >> > does precisely this.
->> >> >
->> >> > If the source node is in an I/O thread, you could argue that the dr=
-ain
->> >> > starts later than when the user has invoked the backup command, and=
- so
->> >> > some writes might slip through.  That=E2=80=99s correct.  But at th=
-e same time,
->> >> > it=E2=80=99s impossible to drain it the instant the command is rece=
-ived.  So
->> >> > some writes might always slip through (and the drain will not stop =
-them
->> >> > either, it will just let them happen).
->> >> >
->> >> > Therefore, I think it=E2=80=99s fine the way it is.
->> >> >
->> >> >> Do you think there may be any potential drawbacks as a result of a=
-lways
->> >> >> doing it now inside a drained section?
->> >> >
->> >> > Well, one drawback is clearly visible.  The job goes to paused for =
-no
->> >> > reason.
->> >>=20
->> >> This is something that already happens when requesting the drive-back=
-up
->> >> through a transaction:
->> >>=20
->> >> {"execute":"transaction","arguments":{"actions":[{"type":"drive-backu=
-p","data":{"device":"drv0","target":"o.qcow2","sync":"full","format":"qcow2=
-"}}]}}
->> >>=20
->> >> I don't think it makes sense to have two different behaviors for the
->> >> same action. So we either accept the additional pause+resume iteratio=
-n
->> >> for qmp_drive_backup, or we remove the drained section from the
->> >> transaction based one.
->> >>=20
->> >> What do you think?
->> >
->> > Draining all involved nodes is necessary for transactions, because you
->> > want a consistent backup across all involved disks. That is, you want =
-it
->> > to be a snapshot at the same point in time for all of them - no reques=
-ts
->> > may happen between starting backup on the first and the second disk.
->> >
->> > For a single device operation, this requirement doesn't exist, because
->> > there is nothing else that must happen at the same point in time.
->>=20
->> This poses a problem with the unification strategy you suggested for qmp
->> commands and transactions. I guess that, if we really want to preserve
->> the original behavior, we can extend DriveBackup to add a flag to
->> indicate whether the transaction should create a drained section or not.
->>=20
->> Does this sound reasonable to you?
->
-> I think we can accept an unnecessary drain for the single-device case.
-> It's only minimally worse than not draining early (because, as Max said,
-> we'll drain the node anyway later).
->
-> I'm not sure what the code looks like, but does the job go to paused
-> even when it's already created inside the drained section? (As opposed
-> to first creating the job and then draining.) I assume that this is what
-> you're already doing, just double-checking.
-
-Yes, that's the case. drive_backup_prepare() calls to
-bdrv_drained_begin() first, and then to do_backup_common(), which creates
-the job.
-
-> If this is how things work, I'd just adjust the test output and explain
-> the change in the commit message.
-
-OK, I'll prepare a v4 with a rework of the patchset and an update to the
-job.
-
-Thanks,
-Sergio.
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl3T4I0ACgkQ9GknjS8M
-AjV/QRAAqzPP2BQLesHr/671Nniyh8gFrydEvoH24mXFOSAKFDr/ELQFtjZaLTud
-+GBRLPs2yZq3OY0KsxqfFFYqz9PzxMSTXxRXdxuFmZX6xBtf+I7+0rvMKVpr+SF3
-gsQQVwy2FcdUaD1Moai5M+KVpI5WPKo9pgeaZ6KulKxVPce7TCX38R5qpkmGFshG
-1Olu0EFUA2WdmCOFfZ9uGphh7nun65zfv83Y/bAj88f7mHE5gp4J/Q0iRP5DjQe3
-TYM12rC5QJ0N+rKXyZ+az0we+OuHweR3s+zEiBcbj+fIrVT40rOaWgo0Sja32N1T
-FFC/eLLB1JYLbrTD3w06jokI9e5mpdCkxzOdlGsj6DXM6PTMkiWGnE5nAqoW7ZXO
-l4CJpgfDqcZLgim9XWhOuI3YhWOSdPXA2ABDxBiYxc4UJhdqyS+NyYfGzDjCPKgU
-0feKgqwdJcNUq4YqR4RuEy5YI3S7UZ6KAfdDIrzMesX+AwnV231HvE4+w70HG+R9
-cyvJQnkNSAC97hHT7BunYZE1S53bJAzFcm1PhVmgo3V1bjLAGOgskn0DWfMjAs8i
-CRNxeneM049F53d1DWKfgqEKM6HtUxvRGEQ4FsVIzst+AuoItns7DHj1wDOKo7A8
-ran42DsbIKnIr2HFQnCm4rV03ovLNfOHc9+Yo23BRhjQZ3CNkPY=
-=yF/W
------END PGP SIGNATURE-----
---=-=-=--
-
+--=20
+Best regards,
+Vladimir
 
