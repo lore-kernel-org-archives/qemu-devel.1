@@ -2,61 +2,79 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FFC5C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B3A4C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:55:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38270222B0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:31:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38270222B0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 22221222A0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:55:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FRV3xZan"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22221222A0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX4XP-00019t-9J
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 09:31:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42160)
+	id 1iX4uO-00083E-8R
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 09:55:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47458)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iX4GY-0007KF-A6
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:14:07 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iX4tk-0007e7-Po
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:54:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iX4GW-0005hL-SG
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:14:02 -0500
-Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:36518)
+ (envelope-from <kwolf@redhat.com>) id 1iX4th-0000Fn-W9
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:54:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32352
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iX4GW-0005gc-It
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:14:00 -0500
-Received: from player795.ha.ovh.net (unknown [10.109.159.69])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id E4FDB1B5A72
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 15:13:58 +0100 (CET)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: clg@kaod.org)
- by player795.ha.ovh.net (Postfix) with ESMTPSA id 2BB40C18ADFF;
- Tue, 19 Nov 2019 14:13:52 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 12/17] aspeed/smc: Add AST2600 timings registers
-Date: Tue, 19 Nov 2019 15:12:06 +0100
-Message-Id: <20191119141211.25716-13-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191119141211.25716-1-clg@kaod.org>
-References: <20191119141211.25716-1-clg@kaod.org>
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iX4th-0000FO-Hm
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:54:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574175268;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=naDu/k2UK5DQHEIyqHpUoCsdogICq6ZbdFhAUae1mqI=;
+ b=FRV3xZangWUJ9DS9IJf2I6yfrjOuOGOK/O8gjhKyX7cYTp2/ZUWqNAJBbxfz+Mppb28euO
+ +6CFJ+7Xh3g3FPs1xI8T5DOXUBjIhuEY2Oe1KMeCyDiOfRg5Qx0+egno4lQcoSJG9GLSik
+ ajASOmQA9MPH2tCfpsJYQmWg40UrC+0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-83-5dvuU7aMPs2t4R3YxRUJuA-1; Tue, 19 Nov 2019 09:54:27 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EAD28CD813;
+ Tue, 19 Nov 2019 14:54:26 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-116-75.ams2.redhat.com [10.36.116.75])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 45DD71001B3F;
+ Tue, 19 Nov 2019 14:54:21 +0000 (UTC)
+Date: Tue, 19 Nov 2019 15:54:19 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
+Message-ID: <20191119145419.GF5910@linux.fritz.box>
+References: <20191116163410.12129-1-vsementsov@virtuozzo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 17917008169540487953
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudegkedgiedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejleehrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeek
+In-Reply-To: <20191116163410.12129-1-vsementsov@virtuozzo.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 5dvuU7aMPs2t4R3YxRUJuA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.53.149
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,143 +86,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
+Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Each CS has its own Read Timing Compensation Register on newer SoCs.
+Am 16.11.2019 um 17:34 hat Vladimir Sementsov-Ogievskiy geschrieben:
+> Hi all!
+>=20
+> I wanted to understand, what is the real difference between bdrv_block_st=
+atus_above
+> and bdrv_is_allocated_above, IMHO bdrv_is_allocated_above should work thr=
+ough
+> bdrv_block_status_above..
+>=20
+> And I found the problem: bdrv_is_allocated_above considers space after EO=
+F as
+> UNALLOCATED for intermediate nodes..
+>=20
+> UNALLOCATED is not about allocation at fs level, but about should we go t=
+o backing or
+> not.. And it seems incorrect for me, as in case of short backing file, we=
+'ll read
+> zeroes after EOF, instead of going further by backing chain.
+>=20
+> This leads to the following effect:
+>=20
+> ./qemu-img create -f qcow2 base.qcow2 2M
+> ./qemu-io -c "write -P 0x1 0 2M" base.qcow2
+>=20
+> ./qemu-img create -f qcow2 -b base.qcow2 mid.qcow2 1M
+> ./qemu-img create -f qcow2 -b mid.qcow2 top.qcow2 2M
+>=20
+> Region 1M..2M is shadowed by short middle image, so guest sees zeroes:
+> ./qemu-io -c "read -P 0 1M 1M" top.qcow2
+> read 1048576/1048576 bytes at offset 1048576
+> 1 MiB, 1 ops; 00.00 sec (22.795 GiB/sec and 23341.5807 ops/sec)
+>=20
+> But after commit guest visible state is changed, which seems wrong for me=
+:
+> ./qemu-img commit top.qcow2 -b mid.qcow2
+>=20
+> ./qemu-io -c "read -P 0 1M 1M" mid.qcow2
+> Pattern verification failed at offset 1048576, 1048576 bytes
+> read 1048576/1048576 bytes at offset 1048576
+> 1 MiB, 1 ops; 00.00 sec (4.981 GiB/sec and 5100.4794 ops/sec)
+>=20
+> ./qemu-io -c "read -P 1 1M 1M" mid.qcow2
+> read 1048576/1048576 bytes at offset 1048576
+> 1 MiB, 1 ops; 00.00 sec (3.365 GiB/sec and 3446.1606 ops/sec)
+>=20
+>=20
+> I don't know, is it a real bug, as I don't know, do we support backing
+> file larger than its parent. Still, I'm not sure that this behavior of
+> bdrv_is_allocated_above don't lead to other problems.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-Reviewed-by: Joel Stanley <joel@jms.id.au>
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- include/hw/ssi/aspeed_smc.h |  1 +
- hw/ssi/aspeed_smc.c         | 17 ++++++++++++++---
- 2 files changed, 15 insertions(+), 3 deletions(-)
+Actually, this specific problem is completely unrelated to how the block
+status functions deal with short backing files because they are only
+ever called for backing files of the same length as their overlay.
 
-diff --git a/include/hw/ssi/aspeed_smc.h b/include/hw/ssi/aspeed_smc.h
-index 684d16e33613..6fbbb238f158 100644
---- a/include/hw/ssi/aspeed_smc.h
-+++ b/include/hw/ssi/aspeed_smc.h
-@@ -40,6 +40,7 @@ typedef struct AspeedSMCController {
-     uint8_t r_ce_ctrl;
-     uint8_t r_ctrl0;
-     uint8_t r_timings;
-+    uint8_t nregs_timings;
-     uint8_t conf_enable_w0;
-     uint8_t max_slaves;
-     const AspeedSegments *segments;
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index 86cadbe4cc00..7755eca34976 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -137,7 +137,7 @@
- /* Checksum Calculation Result */
- #define R_DMA_CHECKSUM    (0x90 / 4)
+The problem is that the commit job grows the backing file first without
+making sure that the clusters in the new part read as zeros. After this,
+the damage is done and bdrv_is_allocated_above() returns correctly that
+the blocks are unallocated both in top.qcow2 and in mid.qcow2.
+
+So the simple fix for 4.2 would be the following. Maybe we can find a
+way to optimise it later (though probably it's not worth it because
+short backing files are an uncommon case anyway).
+
+Kevin
+
+
+diff --git a/block/commit.c b/block/commit.c
+index 23c90b3b91..a0c4f51caf 100644
+--- a/block/commit.c
++++ b/block/commit.c
+@@ -159,6 +159,11 @@ static int coroutine_fn commit_run(Job *job, Error **e=
+rrp)
+         if (ret) {
+             goto out;
+         }
++        ret =3D blk_co_pwrite_zeroes(s->base, base_len, len - base_len,
++                                   BDRV_REQ_MAY_UNMAP);
++        if (ret < 0) {
++            goto out;
++        }
+     }
 =20
--/* Misc Control Register #2 */
-+/* Read Timing Compensation Register */
- #define R_TIMINGS         (0x94 / 4)
+     buf =3D blk_blockalign(s->top, COMMIT_BUFFER_SIZE);
+diff --git a/block/mirror.c b/block/mirror.c
+index f0f2d9dff1..2a34f2fad6 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -883,6 +883,12 @@ static int coroutine_fn mirror_run(Job *job, Error **e=
+rrp)
+             if (ret < 0) {
+                 goto immediate_exit;
+             }
++            ret =3D blk_co_pwrite_zeroes(s->target, base_length,
++                                       s->bdev_length - base_length,
++                                       BDRV_REQ_MAY_UNMAP);
++            if (ret < 0) {
++                goto immediate_exit;
++            }
+         }
+     }
 =20
- /* SPI controller registers and bits (AST2400) */
-@@ -256,6 +256,7 @@ static const AspeedSMCController controllers[] =3D {
-         .r_ce_ctrl         =3D R_CE_CTRL,
-         .r_ctrl0           =3D R_CTRL0,
-         .r_timings         =3D R_TIMINGS,
-+        .nregs_timings     =3D 1,
-         .conf_enable_w0    =3D CONF_ENABLE_W0,
-         .max_slaves        =3D 5,
-         .segments          =3D aspeed_segments_legacy,
-@@ -271,6 +272,7 @@ static const AspeedSMCController controllers[] =3D {
-         .r_ce_ctrl         =3D R_CE_CTRL,
-         .r_ctrl0           =3D R_CTRL0,
-         .r_timings         =3D R_TIMINGS,
-+        .nregs_timings     =3D 1,
-         .conf_enable_w0    =3D CONF_ENABLE_W0,
-         .max_slaves        =3D 5,
-         .segments          =3D aspeed_segments_fmc,
-@@ -288,6 +290,7 @@ static const AspeedSMCController controllers[] =3D {
-         .r_ce_ctrl         =3D 0xff,
-         .r_ctrl0           =3D R_SPI_CTRL0,
-         .r_timings         =3D R_SPI_TIMINGS,
-+        .nregs_timings     =3D 1,
-         .conf_enable_w0    =3D SPI_CONF_ENABLE_W0,
-         .max_slaves        =3D 1,
-         .segments          =3D aspeed_segments_spi,
-@@ -303,6 +306,7 @@ static const AspeedSMCController controllers[] =3D {
-         .r_ce_ctrl         =3D R_CE_CTRL,
-         .r_ctrl0           =3D R_CTRL0,
-         .r_timings         =3D R_TIMINGS,
-+        .nregs_timings     =3D 1,
-         .conf_enable_w0    =3D CONF_ENABLE_W0,
-         .max_slaves        =3D 3,
-         .segments          =3D aspeed_segments_ast2500_fmc,
-@@ -320,6 +324,7 @@ static const AspeedSMCController controllers[] =3D {
-         .r_ce_ctrl         =3D R_CE_CTRL,
-         .r_ctrl0           =3D R_CTRL0,
-         .r_timings         =3D R_TIMINGS,
-+        .nregs_timings     =3D 1,
-         .conf_enable_w0    =3D CONF_ENABLE_W0,
-         .max_slaves        =3D 2,
-         .segments          =3D aspeed_segments_ast2500_spi1,
-@@ -335,6 +340,7 @@ static const AspeedSMCController controllers[] =3D {
-         .r_ce_ctrl         =3D R_CE_CTRL,
-         .r_ctrl0           =3D R_CTRL0,
-         .r_timings         =3D R_TIMINGS,
-+        .nregs_timings     =3D 1,
-         .conf_enable_w0    =3D CONF_ENABLE_W0,
-         .max_slaves        =3D 2,
-         .segments          =3D aspeed_segments_ast2500_spi2,
-@@ -350,6 +356,7 @@ static const AspeedSMCController controllers[] =3D {
-         .r_ce_ctrl         =3D R_CE_CTRL,
-         .r_ctrl0           =3D R_CTRL0,
-         .r_timings         =3D R_TIMINGS,
-+        .nregs_timings     =3D 1,
-         .conf_enable_w0    =3D CONF_ENABLE_W0,
-         .max_slaves        =3D 3,
-         .segments          =3D aspeed_segments_ast2600_fmc,
-@@ -365,6 +372,7 @@ static const AspeedSMCController controllers[] =3D {
-         .r_ce_ctrl         =3D R_CE_CTRL,
-         .r_ctrl0           =3D R_CTRL0,
-         .r_timings         =3D R_TIMINGS,
-+        .nregs_timings     =3D 2,
-         .conf_enable_w0    =3D CONF_ENABLE_W0,
-         .max_slaves        =3D 2,
-         .segments          =3D aspeed_segments_ast2600_spi1,
-@@ -380,6 +388,7 @@ static const AspeedSMCController controllers[] =3D {
-         .r_ce_ctrl         =3D R_CE_CTRL,
-         .r_ctrl0           =3D R_CTRL0,
-         .r_timings         =3D R_TIMINGS,
-+        .nregs_timings     =3D 3,
-         .conf_enable_w0    =3D CONF_ENABLE_W0,
-         .max_slaves        =3D 3,
-         .segments          =3D aspeed_segments_ast2600_spi2,
-@@ -951,7 +960,8 @@ static uint64_t aspeed_smc_read(void *opaque, hwaddr =
-addr, unsigned int size)
-     addr >>=3D 2;
-=20
-     if (addr =3D=3D s->r_conf ||
--        addr =3D=3D s->r_timings ||
-+        (addr >=3D s->r_timings &&
-+         addr < s->r_timings + s->ctrl->nregs_timings) ||
-         addr =3D=3D s->r_ce_ctrl ||
-         addr =3D=3D R_INTR_CTRL ||
-         addr =3D=3D R_DUMMY_DATA ||
-@@ -1216,7 +1226,8 @@ static void aspeed_smc_write(void *opaque, hwaddr a=
-ddr, uint64_t data,
-     addr >>=3D 2;
-=20
-     if (addr =3D=3D s->r_conf ||
--        addr =3D=3D s->r_timings ||
-+        (addr >=3D s->r_timings &&
-+         addr < s->r_timings + s->ctrl->nregs_timings) ||
-         addr =3D=3D s->r_ce_ctrl) {
-         s->regs[addr] =3D value;
-     } else if (addr >=3D s->r_ctrl0 && addr < s->r_ctrl0 + s->num_cs) {
---=20
-2.21.0
 
 
