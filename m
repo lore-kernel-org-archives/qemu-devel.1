@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB32C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:21:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E163AC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:23:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ADDA22363
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:21:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB3D922363
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:23:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZW7VpqmJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ADDA22363
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCf3KC0q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB3D922363
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX6Fc-0006Ad-8J
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 11:21:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60791)
+	id 1iX6Hs-00032p-E7
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 11:23:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60751)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iX63w-00023E-Be
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:09 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iX63t-0001y2-88
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iX63v-0006AC-2Q
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:08 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38330)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iX63r-00068B-U8
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:05 -0500
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:56265)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iX63u-00069n-SJ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:07 -0500
-Received: by mail-wm1-x343.google.com with SMTP id z19so4349990wmk.3
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 08:09:06 -0800 (PST)
+ id 1iX63r-00067d-NS
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:03 -0500
+Received: by mail-wm1-x335.google.com with SMTP id b11so3787858wmb.5
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 08:09:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=qHpVdmqCzVmXoW2Mq3yTyYlL6lxGnPFe8HxZarA2NvA=;
- b=ZW7VpqmJUX59VfNJeCJiGIUD9wixFMg4enTEmxRx65a17JZmTVIXZEiKJqQY19c3ez
- TE/TKhkyHdETL283ydPNigupIzoeri33oUlwHsZ4BHYbK1xorhkJjlbtAMsvmljWwJwZ
- azY+BAKufb293JaSj2gWCkopSXNes/uzxoE2quqaMXEjjv6hW/k024i9f0dFO1cb+V2h
- A7rGUZS8W5Ai6+VycvN3icXanidg//QBic0K2M4nx67hjGonXqKzjf/ocO76WxgzfKwq
- hCDJ3TNfGRsz7FFjpHphvYLkcfIoZ5GGlnPc12XKkEJQyLoOB9IEbLZoeG5z3GCyNx4F
- Kl/Q==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=x/7dL5GKaLKKTQGfreBczzCpIjJHYavx06Q35HIG390=;
+ b=TCf3KC0qFWAh0xKFRO1aICnowVi48ggU3kqnGK086BL9n8CxtURNgl33MjgnWfcCfS
+ 11IdGh/KNEzM1Ex2dcIEaJxlbMcgq94DL6fRsI93VYBQp29SsVCqKm/RIYmqi65CwYcF
+ Pkre4xgIisl53+qcgLCjnsKunoVtr4lRYIq3wShUGaGdacc10ZwgNZHS2ZkHhIDGtEup
+ 2VomiIS4/sOdDXppw4TkVFZdKp6ZvHTSb9kEkWSuYafZFJ/yZqEBY44QWSyUY8s1Qxir
+ LT0lPQVB/prsSzp2wC9ov+lx55hLmBP2BNBBp0KDcCcVzMRNcZ1Fjx85Zc6kdTMwqZ4G
+ quGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=qHpVdmqCzVmXoW2Mq3yTyYlL6lxGnPFe8HxZarA2NvA=;
- b=uAQX4HwuhN8nruTrZEnhLxW5lCb9O/pg9aN1Ch3AQIUwUUqQGAqlN85JZDC2qb341R
- PKNmKBuEbVk3cwF29yeJJ9WY+czsMFqnJwXXYCLosYmb0Ukyy4XjklZ1p4EuK0uohSk5
- AZJSGZ3DkFODca0x/7+AJEAZCHj3dDi3vc5fflEuGdjdDGikzErVqkanbXaQuOqGL2oa
- wllGI+wxfH+XT0fs5btPOd1jbC0Kj6CvNNZ5HxSiaEOJaipCb9tBJlBSQrsSsjdbX72/
- 4FshVBXle28BAkGDceM6mt2iG4ce8r1GOrfGWuGptC0MmZoUcEYRP8qXN6VhE1ptVohk
- NuCQ==
-X-Gm-Message-State: APjAAAVOBLksIr5q1xJPKES9D0Pw64Yxeq60qn2KIrHJc+Ftfw82igSl
- LQYVCNFMM/CslvrbjH/HxnIytQWv
-X-Google-Smtp-Source: APXvYqytz0VHqF0XISX51gSasBIAPPaFfiyd1x2B+B6LO5mhngt7itkC8n1VxtTYbyXWkHahmxY/Rw==
-X-Received: by 2002:a1c:720b:: with SMTP id n11mr6184568wmc.60.1574179745590; 
- Tue, 19 Nov 2019 08:09:05 -0800 (PST)
+ bh=x/7dL5GKaLKKTQGfreBczzCpIjJHYavx06Q35HIG390=;
+ b=OuezyzA277/kjf9YGpCu01E5rCblh0KeJra6v4jrPliu33UQBNaAs2o5AeAnytMid6
+ 4kmPhVGolzcF7ipLJI0PJn3qDvTO8rIqhBxeiZrqQnc03FKfsxksXm23zpIgP4B7364n
+ oSO378pcQ8tDE8oISMAxZY4nCurGvtMt9ON/tuzUmimeo6gDi8ZuA/f6B/AEx/8Zshe6
+ s2sXLhbrXQEfv1PVbNpyVcdXrE6duhaJYemuYC7biXyfuJ1H0tReIVNDpn95d53bdMGb
+ S+mt3RqWed2xtUkd6/B7FP4MohUr+Ag2Noun7BN1x/7q3jnmSn2gaxDbp6DAm/1YH7rO
+ o8gQ==
+X-Gm-Message-State: APjAAAUUWFT1cZzA5g5Jsv0vY2xBdFB7TQbgA0z3fiJCzECmjG8Brqus
+ Ocm2dTWTIcpHwUo4lerQwXuzpPxa
+X-Google-Smtp-Source: APXvYqwQehVMicSYylTIpO1o1FBNKYcTaIYZYtkjBXfK9aqFrSoKcoEKuYZrZ6X04o21HnedQw/1Sg==
+X-Received: by 2002:a1c:1b86:: with SMTP id b128mr4551301wmb.127.1574179742270; 
+ Tue, 19 Nov 2019 08:09:02 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n13sm3442203wmi.25.2019.11.19.08.09.04
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id n13sm3442203wmi.25.2019.11.19.08.09.01
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 19 Nov 2019 08:09:04 -0800 (PST)
+ Tue, 19 Nov 2019 08:09:01 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/12] mc146818rtc: fix timer interrupt reinjection again
-Date: Tue, 19 Nov 2019 17:08:48 +0100
-Message-Id: <1574179728-35535-13-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 09/12] hw/i386: Move save_tsc_khz from PCMachineClass to
+ X86MachineClass
+Date: Tue, 19 Nov 2019 17:08:45 +0100
+Message-Id: <1574179728-35535-10-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1574179728-35535-1-git-send-email-pbonzini@redhat.com>
 References: <1574179728-35535-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Received-From: 2a00:1450:4864:20::335
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,107 +94,152 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Commit 369b41359af46bded5799c9ef8be2b641d92e043 broke timer interrupt
-reinjection when there is no period change by the guest.  In that
-case, old_period is 0, which ends up zeroing irq_coalesced (counter of
-reinjected interrupts).
+From: Liam Merwick <liam.merwick@oracle.com>
 
-The consequence is Windows 7 is unable to synchronize time via NTP.
-Easily reproducible by playing a fullscreen video with cirrus and VNC.
+Attempting to migrate a VM using the microvm machine class results in the source
+QEMU aborting with the following message/backtrace:
 
-Fix by passing s->period when periodic_timer_update is called due to
-expiration of the timer.  With this change, old_period == 0 only
-means that the periodic timer was off.
+target/i386/machine.c:955:tsc_khz_needed: Object 0x555556608fa0 is not an
+instance of type generic-pc-machine
 
-Reported-by: Marcelo Tosatti <mtosatti@redhat.com>
-Co-developed-by: Marcelo Tosatti <mtosatti@redhat.com>
+abort()
+object_class_dynamic_cast_assert()
+vmstate_save_state_v()
+vmstate_save_state()
+vmstate_save()
+qemu_savevm_state_complete_precopy()
+migration_thread()
+migration_thread()
+migration_thread()
+qemu_thread_start()
+start_thread()
+clone()
+
+The access to the machine class returned by MACHINE_GET_CLASS() in
+tsc_khz_needed() is crashing as it is trying to dereference a different
+type of machine class object (TYPE_PC_MACHINE) to that of this microVM.
+
+This can be resolved by extending the changes in the following commit
+f0bb276bf8d5 ("hw/i386: split PCMachineState deriving X86MachineState from it")
+and moving the save_tsc_khz field in PCMachineClass to X86MachineClass.
+
+Fixes: f0bb276bf8d5 ("hw/i386: split PCMachineState deriving X86MachineState from it")
+Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+Message-Id: <1574075605-25215-1-git-send-email-liam.merwick@oracle.com>
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/rtc/mc146818rtc.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ hw/i386/pc.c          | 1 -
+ hw/i386/pc_piix.c     | 4 ++--
+ hw/i386/pc_q35.c      | 4 ++--
+ hw/i386/x86.c         | 1 +
+ include/hw/i386/pc.h  | 2 --
+ include/hw/i386/x86.h | 2 ++
+ target/i386/machine.c | 4 ++--
+ 7 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
-index 9869dc5..74ae74b 100644
---- a/hw/rtc/mc146818rtc.c
-+++ b/hw/rtc/mc146818rtc.c
-@@ -168,12 +168,14 @@ static uint32_t rtc_periodic_clock_ticks(RTCState *s)
-  * is just due to period adjustment.
-  */
- static void
--periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
-+periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period, bool period_change)
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 96715f8..ac08e63 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2195,7 +2195,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     /* BIOS ACPI tables: 128K. Other BIOS datastructures: less than 4K reported
+      * to be used at the moment, 32K should be enough for a while.  */
+     pcmc->acpi_data_size = 0x20000 + 0x8000;
+-    pcmc->save_tsc_khz = true;
+     pcmc->linuxboot_dma_enabled = true;
+     pcmc->pvh_enabled = true;
+     assert(!mc->get_hotplug_handler);
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 849ee12..1bd70d1 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -567,10 +567,10 @@ DEFINE_I440FX_MACHINE(v2_6, "pc-i440fx-2.6", NULL,
+ 
+ static void pc_i440fx_2_5_machine_options(MachineClass *m)
  {
-     uint32_t period;
-     int64_t cur_clock, next_irq_clock, lost_clock = 0;
+-    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
++    X86MachineClass *x86mc = X86_MACHINE_CLASS(m);
  
-     period = rtc_periodic_clock_ticks(s);
-+    s->period = period;
-+
-     if (!period) {
-         s->irq_coalesced = 0;
-         timer_del(s->periodic_timer);
-@@ -188,7 +190,7 @@ periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
-      * if the periodic timer's update is due to period re-configuration,
-      * we should count the clock since last interrupt.
-      */
--    if (old_period) {
-+    if (old_period && period_change) {
-         int64_t last_periodic_clock, next_periodic_clock;
+     pc_i440fx_2_6_machine_options(m);
+-    pcmc->save_tsc_khz = false;
++    x86mc->save_tsc_khz = false;
+     m->legacy_fw_cfg_order = 1;
+     compat_props_add(m->compat_props, hw_compat_2_5, hw_compat_2_5_len);
+     compat_props_add(m->compat_props, pc_compat_2_5, pc_compat_2_5_len);
+diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+index d51f524..385e5cf 100644
+--- a/hw/i386/pc_q35.c
++++ b/hw/i386/pc_q35.c
+@@ -508,10 +508,10 @@ DEFINE_Q35_MACHINE(v2_6, "pc-q35-2.6", NULL,
  
-         next_periodic_clock = muldiv64(s->next_periodic_time,
-@@ -215,7 +217,6 @@ periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
-     if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW) {
-         uint32_t old_irq_coalesced = s->irq_coalesced;
- 
--        s->period = period;
-         lost_clock += old_irq_coalesced * old_period;
-         s->irq_coalesced = lost_clock / s->period;
-         lost_clock %= s->period;
-@@ -245,7 +246,7 @@ static void rtc_periodic_timer(void *opaque)
+ static void pc_q35_2_5_machine_options(MachineClass *m)
  {
-     RTCState *s = opaque;
+-    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
++    X86MachineClass *x86mc = X86_MACHINE_CLASS(m);
  
--    periodic_timer_update(s, s->next_periodic_time, 0);
-+    periodic_timer_update(s, s->next_periodic_time, s->period, false);
-     s->cmos_data[RTC_REG_C] |= REG_C_PF;
-     if (s->cmos_data[RTC_REG_B] & REG_B_PIE) {
-         s->cmos_data[RTC_REG_C] |= REG_C_IRQF;
-@@ -511,7 +512,7 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
+     pc_q35_2_6_machine_options(m);
+-    pcmc->save_tsc_khz = false;
++    x86mc->save_tsc_khz = false;
+     m->legacy_fw_cfg_order = 1;
+     compat_props_add(m->compat_props, hw_compat_2_5, hw_compat_2_5_len);
+     compat_props_add(m->compat_props, pc_compat_2_5, pc_compat_2_5_len);
+diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+index fd84b23..394edc2 100644
+--- a/hw/i386/x86.c
++++ b/hw/i386/x86.c
+@@ -763,6 +763,7 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
+     mc->get_default_cpu_node_id = x86_get_default_cpu_node_id;
+     mc->possible_cpu_arch_ids = x86_possible_cpu_arch_ids;
+     x86mc->compat_apic_id_mode = false;
++    x86mc->save_tsc_khz = true;
+     nc->nmi_monitor_handler = x86_nmi;
  
-             if (update_periodic_timer) {
-                 periodic_timer_update(s, qemu_clock_get_ns(rtc_clock),
--                                      old_period);
-+                                      old_period, true);
-             }
+     object_class_property_add(oc, X86_MACHINE_MAX_RAM_BELOW_4G, "size",
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index e6fa841..1f86eba 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -116,8 +116,6 @@ typedef struct PCMachineClass {
+     bool enforce_aligned_dimm;
+     bool broken_reserved_end;
  
-             check_update_timer(s);
-@@ -550,7 +551,7 @@ static void cmos_ioport_write(void *opaque, hwaddr addr,
+-    /* TSC rate migration: */
+-    bool save_tsc_khz;
+     /* generate legacy CPU hotplug AML */
+     bool legacy_cpu_hotplug;
  
-             if (update_periodic_timer) {
-                 periodic_timer_update(s, qemu_clock_get_ns(rtc_clock),
--                                      old_period);
-+                                      old_period, true);
-             }
+diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+index 82d09fd..4b84917 100644
+--- a/include/hw/i386/x86.h
++++ b/include/hw/i386/x86.h
+@@ -30,6 +30,8 @@ typedef struct {
  
-             check_update_timer(s);
-@@ -794,6 +795,7 @@ static int rtc_post_load(void *opaque, int version_id)
-         s->offset = 0;
-         check_update_timer(s);
-     }
-+    s->period = rtc_periodic_clock_ticks(s);
+     /*< public >*/
  
-     /* The periodic timer is deterministic in record/replay mode,
-      * so there is no need to update it after loading the vmstate.
-@@ -803,7 +805,7 @@ static int rtc_post_load(void *opaque, int version_id)
-         uint64_t now = qemu_clock_get_ns(rtc_clock);
-         if (now < s->next_periodic_time ||
-             now > (s->next_periodic_time + get_max_clock_jump())) {
--            periodic_timer_update(s, qemu_clock_get_ns(rtc_clock), 0);
-+            periodic_timer_update(s, qemu_clock_get_ns(rtc_clock), s->period, false);
-         }
-     }
++    /* TSC rate migration: */
++    bool save_tsc_khz;
+     /* Enables contiguous-apic-ID mode */
+     bool compat_apic_id_mode;
+ } X86MachineClass;
+diff --git a/target/i386/machine.c b/target/i386/machine.c
+index 6481f84..7bdeb78 100644
+--- a/target/i386/machine.c
++++ b/target/i386/machine.c
+@@ -988,8 +988,8 @@ static bool tsc_khz_needed(void *opaque)
+     X86CPU *cpu = opaque;
+     CPUX86State *env = &cpu->env;
+     MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
+-    PCMachineClass *pcmc = PC_MACHINE_CLASS(mc);
+-    return env->tsc_khz && pcmc->save_tsc_khz;
++    X86MachineClass *x86mc = X86_MACHINE_CLASS(mc);
++    return env->tsc_khz && x86mc->save_tsc_khz;
+ }
  
+ static const VMStateDescription vmstate_tsc_khz = {
 -- 
 1.8.3.1
+
 
 
