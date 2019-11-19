@@ -6,57 +6,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E05C43215
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:29:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 235EFC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:29:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EFDA208D4
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:29:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EFDA208D4
+	by mail.kernel.org (Postfix) with ESMTPS id ED5DA20692
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:29:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED5DA20692
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX4V8-00079P-DC
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 09:29:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42133)
+	id 1iX4Vb-0007tt-Vz
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 09:29:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42315)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iX4GR-00079L-5I
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:13:56 -0500
+ (envelope-from <clg@kaod.org>) id 1iX4H7-0007wC-Lx
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:14:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iX4GP-0005eK-VJ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:13:55 -0500
-Received: from 1.mo68.mail-out.ovh.net ([46.105.41.146]:40437)
+ (envelope-from <clg@kaod.org>) id 1iX4H5-00060O-1G
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:14:37 -0500
+Received: from 20.mo6.mail-out.ovh.net ([178.32.124.17]:60066)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iX4GP-0005dm-Ph
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:13:53 -0500
-Received: from player795.ha.ovh.net (unknown [10.109.146.143])
- by mo68.mail-out.ovh.net (Postfix) with ESMTP id 1BDD314CEF6
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 15:13:52 +0100 (CET)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iX4H4-0005xP-Nz
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:14:34 -0500
+Received: from player795.ha.ovh.net (unknown [10.108.57.23])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 4E8641EB4E0
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 15:14:32 +0100 (CET)
 Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
  (Authenticated sender: clg@kaod.org)
- by player795.ha.ovh.net (Postfix) with ESMTPSA id 55397C18AD62;
- Tue, 19 Nov 2019 14:13:44 +0000 (UTC)
+ by player795.ha.ovh.net (Postfix) with ESMTPSA id 65B1FC18B173;
+ Tue, 19 Nov 2019 14:14:24 +0000 (UTC)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 11/17] aspeed/smc: Do not map disabled segment on the AST2600
-Date: Tue, 19 Nov 2019 15:12:05 +0100
-Message-Id: <20191119141211.25716-12-clg@kaod.org>
+Subject: [PATCH 16/17] aspeed: Change the "scu" property definition
+Date: Tue, 19 Nov 2019 15:12:10 +0100
+Message-Id: <20191119141211.25716-17-clg@kaod.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191119141211.25716-1-clg@kaod.org>
 References: <20191119141211.25716-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 17915319318968896273
+X-Ovh-Tracer-Id: 17926578319576369937
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudegkedgiedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejleehrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeej
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudegkedgiedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejleehrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpeel
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.41.146
+X-Received-From: 178.32.124.17
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,76 +68,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, qemu-arm@nongnu.org,
- Joel Stanley <joel@jms.id.au>, qemu-devel@nongnu.org
+Cc: Andrew Jeffery <andrew@aj.id.au>, Greg Kurz <groug@kaod.org>,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The segments can be disabled on the AST2600 (zero register value).
-CS0 is open by default but not the other CS. This is closing the
-access to the flash device in user mode and forbids scanning.
+The Aspeed Watchdog and Timer models have a link pointing to the SCU
+controller model of the machine.
 
-In the model, check the segment size and disable the associated region
-when the value is zero.
+Change the "scu" property definition so that it explicitly sets the
+pointer. The property isn't optional : not being able to set the link
+is a bug and QEMU should rather abort than exit in this case.
 
-Fixes: bcaa8ddd081c ("aspeed/smc: Add AST2600 support")
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Joel Stanley <joel@jms.id.au>
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/ssi/aspeed_smc.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ hw/arm/aspeed_ast2600.c  |  8 ++++----
+ hw/arm/aspeed_soc.c      |  8 ++++----
+ hw/timer/aspeed_timer.c  | 17 +++++++++--------
+ hw/watchdog/wdt_aspeed.c | 17 ++++++++---------
+ 4 files changed, 25 insertions(+), 25 deletions(-)
 
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index 955ec21852ac..86cadbe4cc00 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -444,8 +444,13 @@ static void aspeed_2600_smc_reg_to_segment(const Asp=
-eedSMCState *s,
-     uint32_t start_offset =3D (reg << 16) & AST2600_SEG_ADDR_MASK;
-     uint32_t end_offset =3D reg & AST2600_SEG_ADDR_MASK;
+diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+index 0881eb25983e..810fd7de0c06 100644
+--- a/hw/arm/aspeed_ast2600.c
++++ b/hw/arm/aspeed_ast2600.c
+@@ -146,8 +146,6 @@ static void aspeed_soc_ast2600_init(Object *obj)
+     snprintf(typename, sizeof(typename), "aspeed.timer-%s", socname);
+     sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
+                           sizeof(s->timerctrl), typename);
+-    object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
+-                                   OBJECT(&s->scu), &error_abort);
 =20
--    seg->addr =3D s->ctrl->flash_window_base + start_offset;
--    seg->size =3D end_offset + MiB - start_offset;
-+    if (reg) {
-+        seg->addr =3D s->ctrl->flash_window_base + start_offset;
-+        seg->size =3D end_offset + MiB - start_offset;
-+    } else {
-+        seg->addr =3D s->ctrl->flash_window_base;
-+        seg->size =3D 0;
-+    }
- }
-=20
- static bool aspeed_smc_flash_overlap(const AspeedSMCState *s,
-@@ -486,7 +491,7 @@ static void aspeed_smc_flash_set_segment_region(Aspee=
-dSMCState *s, int cs,
-     memory_region_transaction_begin();
-     memory_region_set_size(&fl->mmio, seg.size);
-     memory_region_set_address(&fl->mmio, seg.addr - s->ctrl->flash_windo=
-w_base);
--    memory_region_set_enabled(&fl->mmio, true);
-+    memory_region_set_enabled(&fl->mmio, !!seg.size);
-     memory_region_transaction_commit();
-=20
-     s->regs[R_SEG_ADDR0 + cs] =3D regval;
-@@ -526,8 +531,9 @@ static void aspeed_smc_flash_set_segment(AspeedSMCSta=
-te *s, int cs,
+     snprintf(typename, sizeof(typename), "aspeed.i2c-%s", socname);
+     sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
+@@ -177,8 +175,6 @@ static void aspeed_soc_ast2600_init(Object *obj)
+         snprintf(typename, sizeof(typename), "aspeed.wdt-%s", socname);
+         sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
+                               sizeof(s->wdt[i]), typename);
+-        object_property_add_const_link(OBJECT(&s->wdt[i]), "scu",
+-                                       OBJECT(&s->scu), &error_abort);
      }
 =20
-     /* Keep the segment in the overall flash window */
--    if (seg.addr + seg.size <=3D s->ctrl->flash_window_base ||
--        seg.addr > s->ctrl->flash_window_base + s->ctrl->flash_window_si=
-ze) {
-+    if (seg.size &&
-+        (seg.addr + seg.size <=3D s->ctrl->flash_window_base ||
-+         seg.addr > s->ctrl->flash_window_base + s->ctrl->flash_window_s=
-ize)) {
-         qemu_log_mask(LOG_GUEST_ERROR, "%s: new segment for CS%d is inva=
-lid : "
-                       "[ 0x%"HWADDR_PRIx" - 0x%"HWADDR_PRIx" ]\n",
-                       s->ctrl->name, cs, seg.addr, seg.addr + seg.size);
+     for (i =3D 0; i < sc->macs_num; i++) {
+@@ -323,6 +319,8 @@ static void aspeed_soc_ast2600_realize(DeviceState *d=
+ev, Error **errp)
+                        aspeed_soc_get_irq(s, ASPEED_RTC));
+=20
+     /* Timer */
++    object_property_set_link(OBJECT(&s->timerctrl),
++                             OBJECT(&s->scu), "scu", &error_abort);
+     object_property_set_bool(OBJECT(&s->timerctrl), true, "realized", &e=
+rr);
+     if (err) {
+         error_propagate(errp, err);
+@@ -415,6 +413,8 @@ static void aspeed_soc_ast2600_realize(DeviceState *d=
+ev, Error **errp)
+     for (i =3D 0; i < sc->wdts_num; i++) {
+         AspeedWDTClass *awc =3D ASPEED_WDT_GET_CLASS(&s->wdt[i]);
+=20
++        object_property_set_link(OBJECT(&s->wdt[i]),
++                                 OBJECT(&s->scu), "scu", &error_abort);
+         object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized", &=
+err);
+         if (err) {
+             error_propagate(errp, err);
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index b01c97744196..a6237e594017 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -163,8 +163,6 @@ static void aspeed_soc_init(Object *obj)
+     snprintf(typename, sizeof(typename), "aspeed.timer-%s", socname);
+     sysbus_init_child_obj(obj, "timerctrl", OBJECT(&s->timerctrl),
+                           sizeof(s->timerctrl), typename);
+-    object_property_add_const_link(OBJECT(&s->timerctrl), "scu",
+-                                   OBJECT(&s->scu), &error_abort);
+=20
+     snprintf(typename, sizeof(typename), "aspeed.i2c-%s", socname);
+     sysbus_init_child_obj(obj, "i2c", OBJECT(&s->i2c), sizeof(s->i2c),
+@@ -194,8 +192,6 @@ static void aspeed_soc_init(Object *obj)
+         snprintf(typename, sizeof(typename), "aspeed.wdt-%s", socname);
+         sysbus_init_child_obj(obj, "wdt[*]", OBJECT(&s->wdt[i]),
+                               sizeof(s->wdt[i]), typename);
+-        object_property_add_const_link(OBJECT(&s->wdt[i]), "scu",
+-                                       OBJECT(&s->scu), &error_abort);
+     }
+=20
+     for (i =3D 0; i < sc->macs_num; i++) {
+@@ -291,6 +287,8 @@ static void aspeed_soc_realize(DeviceState *dev, Erro=
+r **errp)
+                        aspeed_soc_get_irq(s, ASPEED_RTC));
+=20
+     /* Timer */
++    object_property_set_link(OBJECT(&s->timerctrl),
++                             OBJECT(&s->scu), "scu", &error_abort);
+     object_property_set_bool(OBJECT(&s->timerctrl), true, "realized", &e=
+rr);
+     if (err) {
+         error_propagate(errp, err);
+@@ -376,6 +374,8 @@ static void aspeed_soc_realize(DeviceState *dev, Erro=
+r **errp)
+     for (i =3D 0; i < sc->wdts_num; i++) {
+         AspeedWDTClass *awc =3D ASPEED_WDT_GET_CLASS(&s->wdt[i]);
+=20
++        object_property_set_link(OBJECT(&s->wdt[i]),
++                                 OBJECT(&s->scu), "scu", &error_abort);
+         object_property_set_bool(OBJECT(&s->wdt[i]), true, "realized", &=
+err);
+         if (err) {
+             error_propagate(errp, err);
+diff --git a/hw/timer/aspeed_timer.c b/hw/timer/aspeed_timer.c
+index bcce2192a92a..a8c38cc1189b 100644
+--- a/hw/timer/aspeed_timer.c
++++ b/hw/timer/aspeed_timer.c
+@@ -19,6 +19,7 @@
+ #include "qemu/timer.h"
+ #include "qemu/log.h"
+ #include "qemu/module.h"
++#include "hw/qdev-properties.h"
+ #include "trace.h"
+=20
+ #define TIMER_NR_REGS 4
+@@ -603,15 +604,8 @@ static void aspeed_timer_realize(DeviceState *dev, E=
+rror **errp)
+     int i;
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+     AspeedTimerCtrlState *s =3D ASPEED_TIMER(dev);
+-    Object *obj;
+-    Error *err =3D NULL;
+=20
+-    obj =3D object_property_get_link(OBJECT(dev), "scu", &err);
+-    if (!obj) {
+-        error_propagate_prepend(errp, err, "required link 'scu' not foun=
+d: ");
+-        return;
+-    }
+-    s->scu =3D ASPEED_SCU(obj);
++    assert(s->scu);
+=20
+     for (i =3D 0; i < ASPEED_TIMER_NR_TIMERS; i++) {
+         aspeed_init_one_timer(s, i);
+@@ -677,6 +671,12 @@ static const VMStateDescription vmstate_aspeed_timer=
+_state =3D {
+     }
+ };
+=20
++static Property aspeed_timer_properties[] =3D {
++    DEFINE_PROP_LINK("scu", AspeedTimerCtrlState, scu, TYPE_ASPEED_SCU,
++                     AspeedSCUState *),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void timer_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -685,6 +685,7 @@ static void timer_class_init(ObjectClass *klass, void=
+ *data)
+     dc->reset =3D aspeed_timer_reset;
+     dc->desc =3D "ASPEED Timer";
+     dc->vmsd =3D &vmstate_aspeed_timer_state;
++    dc->props =3D aspeed_timer_properties;
+ }
+=20
+ static const TypeInfo aspeed_timer_info =3D {
+diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+index 122aa8daaadf..f50dab922e0f 100644
+--- a/hw/watchdog/wdt_aspeed.c
++++ b/hw/watchdog/wdt_aspeed.c
+@@ -241,16 +241,8 @@ static void aspeed_wdt_realize(DeviceState *dev, Err=
+or **errp)
+ {
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(dev);
+     AspeedWDTState *s =3D ASPEED_WDT(dev);
+-    Error *err =3D NULL;
+-    Object *obj;
+=20
+-    obj =3D object_property_get_link(OBJECT(dev), "scu", &err);
+-    if (!obj) {
+-        error_propagate(errp, err);
+-        error_prepend(errp, "required link 'scu' not found: ");
+-        return;
+-    }
+-    s->scu =3D ASPEED_SCU(obj);
++    assert(s->scu);
+=20
+     s->timer =3D timer_new_ns(QEMU_CLOCK_VIRTUAL, aspeed_wdt_timer_expir=
+ed, dev);
+=20
+@@ -264,6 +256,12 @@ static void aspeed_wdt_realize(DeviceState *dev, Err=
+or **errp)
+     sysbus_init_mmio(sbd, &s->iomem);
+ }
+=20
++static Property aspeed_wdt_properties[] =3D {
++    DEFINE_PROP_LINK("scu", AspeedWDTState, scu, TYPE_ASPEED_SCU,
++                     AspeedSCUState *),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void aspeed_wdt_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc =3D DEVICE_CLASS(klass);
+@@ -273,6 +271,7 @@ static void aspeed_wdt_class_init(ObjectClass *klass,=
+ void *data)
+     dc->reset =3D aspeed_wdt_reset;
+     set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+     dc->vmsd =3D &vmstate_aspeed_wdt;
++    dc->props =3D aspeed_wdt_properties;
+ }
+=20
+ static const TypeInfo aspeed_wdt_info =3D {
 --=20
 2.21.0
 
