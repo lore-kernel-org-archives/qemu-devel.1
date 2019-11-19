@@ -2,83 +2,86 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13583C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 13:30:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4E5C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 13:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D347A222C7
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 13:30:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9728F222F2
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 13:34:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EesYJZvJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D347A222C7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YD5cGgEC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9728F222F2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX3a0-0002jZ-Qk
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 08:30:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35866)
+	id 1iX3eG-00056L-9k
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 08:34:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36114)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iX3Z8-0002Cx-5v
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 08:29:11 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iX3bk-0003Lq-TM
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 08:31:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iX3Z5-0002zT-H2
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 08:29:08 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57123
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iX3Z5-0002yj-47
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 08:29:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574170146;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vhoktl710ry/nv8UC2vlGgQiruiGewe8/ZJ5NWl3BoA=;
- b=EesYJZvJwzlk+ejxADrnXqbzyitqhuYQzSApcGgeYA4NwHYraaNN4uy6DUXfq40H1wYhV8
- uQBTGdiXaajCs/HXlpn6398E22MoJOXCAdScVCtWC6eujhRzjj/CY7dcOmR99IJzVkyf7r
- QhCxWlu/OfiIwA5URIGoUOzxeOWsycI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-oBtK3aKaObamttp1AUolGQ-1; Tue, 19 Nov 2019 08:29:02 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 423D01005500;
- Tue, 19 Nov 2019 13:29:01 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-75.ams2.redhat.com [10.36.116.75])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DE1E95E243;
- Tue, 19 Nov 2019 13:28:56 +0000 (UTC)
-Date: Tue, 19 Nov 2019 14:28:55 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
-Message-ID: <20191119132855.GD5910@linux.fritz.box>
-References: <20191116163410.12129-1-vsementsov@virtuozzo.com>
- <09d0bab1-ed7d-4fd7-555d-93075f10d497@redhat.com>
- <6b0811ec-822e-1c4a-1512-d6f3945645d2@openvz.org>
- <5c894f55-71ec-6ef2-856d-d2f0b859144b@redhat.com>
- <6cb1ffd6-3fa2-7828-fdf1-42d31974c85c@virtuozzo.com>
+ (envelope-from <peter.maydell@linaro.org>) id 1iX3bj-0004A8-8j
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 08:31:52 -0500
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:46808)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iX3bj-00049Z-2y
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 08:31:51 -0500
+Received: by mail-wr1-x42d.google.com with SMTP id b3so23833973wrs.13
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 05:31:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=TuuysipQCj49mLVP6qzC24BBiVXuGGfeJLuCpI9AXuw=;
+ b=YD5cGgEC/OkOSVmkZ1yo0OuIvaOwk+Pp8QliQXnLEi8EI+f7DDACuqSehWNZ3ccUDM
+ nFEoyDBH9R0EmWtiHm6LrpFZNGtT8Bp8Cxl8PPl6Xvin047n+DL24DcZGFbhInwPigQ6
+ 2Rwgt1GiqQWX35GPHbcewMLcicihyBpJPQBsPYJEhxJg5UQe4kk09yrjDcULfu3H0vOo
+ PqVj+veBeWLtUZ7Bm4A8VCjCdGdenwUEozEH4a5cuATem/spcD3+X4zowNptAI4w5FZT
+ 2LoTMGgxpmDjDeDClhwOM2puW8kUl9cJG30BDP973RP1uA/Gb8gDzV9wBm5DHigxKFhr
+ Q98Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=TuuysipQCj49mLVP6qzC24BBiVXuGGfeJLuCpI9AXuw=;
+ b=HNNULutLRsoLZTVA+eLJuheDxOhdVvMRBvrSB6UwsNp3/QXzxj+qRiztmHKA3f2qgL
+ KBGHvsy3cwVc+EgmedKXP5jb/kfITNKnZoPyRAFMMFVm0cvkTs/ulzNgMD4z/jSj9wk1
+ f03F9SlBtSS+TmD7fJsfR96ssdT+FpxfweqN0FgIXIJaIxuuhfwlFiRLpa6p6/12wDZw
+ bvzC3GnsPyKKNbBTw2K3dNLwZoqHirEETDrzrMcNFd59Q5UaeINrWe3zoH9xv0GuBZ0k
+ c+jnzDpYrCuRJmCVyhZ27KkAuAr17Y9NBZ5t49FfTjSHJPC/RLWccKy2esm0N8lz2nSL
+ FmBw==
+X-Gm-Message-State: APjAAAUC5ra7j8QycRE9KQV1GOGIdryhUXo/q6s9wF1oNXHP2JbvphCV
+ J/FTq7lfNNzKL8qa2+BqSCQNB+/I9b1kfA==
+X-Google-Smtp-Source: APXvYqyWU9/XGM8wQr/ueYcig80RIt3MNw/lDI+LXnQI5slm2sQol+v5A/Y3dgY04uv38uuYQ9NkOw==
+X-Received: by 2002:adf:fe81:: with SMTP id l1mr27430510wrr.207.1574170309642; 
+ Tue, 19 Nov 2019 05:31:49 -0800 (PST)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id g8sm3094905wmk.23.2019.11.19.05.31.48
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 19 Nov 2019 05:31:48 -0800 (PST)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 1/7] pl031: Expose RTCICR as proper WC register
+Date: Tue, 19 Nov 2019 13:31:39 +0000
+Message-Id: <20191119133145.31466-2-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191119133145.31466-1-peter.maydell@linaro.org>
+References: <20191119133145.31466-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <6cb1ffd6-3fa2-7828-fdf1-42d31974c85c@virtuozzo.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: oBtK3aKaObamttp1AUolGQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::42d
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,106 +93,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 19.11.2019 um 13:30 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> 19.11.2019 15:20, Max Reitz wrote:
-> > On 19.11.19 13:02, Denis V. Lunev wrote:
-> >> On 11/19/19 1:22 PM, Max Reitz wrote:
-> >>> On 16.11.19 17:34, Vladimir Sementsov-Ogievskiy wrote:
-> >>>> Hi all!
-> >>>>
-> >>>> I wanted to understand, what is the real difference between bdrv_blo=
-ck_status_above
-> >>>> and bdrv_is_allocated_above, IMHO bdrv_is_allocated_above should wor=
-k through
-> >>>> bdrv_block_status_above..
-> >>>>
-> >>>> And I found the problem: bdrv_is_allocated_above considers space aft=
-er EOF as
-> >>>> UNALLOCATED for intermediate nodes..
-> >>>>
-> >>>> UNALLOCATED is not about allocation at fs level, but about should we=
- go to backing or
-> >>>> not.. And it seems incorrect for me, as in case of short backing fil=
-e, we'll read
-> >>>> zeroes after EOF, instead of going further by backing chain.
-> >>> Should we, though?  It absolutely makes sense to me to consider post-=
-EOF
-> >>> space as unallocated because, well, it is as unallocated as it gets.
-> >>>
-> >>> So from my POV it would make more sense to fall back to the backing f=
-ile
-> >>> for post-EOF reads.
-> >>>
-> >>> OTOH, I don=E2=80=99t know whether changing that behavior would quali=
-fy as a
-> >>> possible security issue now, because maybe someone has sensitive
-> >>> information in the tail of some disk and then truncated the overlay s=
-o
-> >>> as to hide it?  But honestly, that seems ridiculous and I can=E2=80=
-=99t imagine
-> >>> people to do that.  (It would work only for the tail, and why not jus=
-t
-> >>> write zeroes there, which works everywhere?)  So in practice I don=E2=
-=80=99t
-> >>> believe that to be a problem.
-> >>>
-> >>> Max
-> >>
-> >> That seems to be wrong from my POW. Once we get block device truncated=
-,
-> >> it exposed that tail to the guest with all zeroes.
-> >>
-> >> Let us assume that we have virtual disk of length L. We create new top
-> >> delta of
-> >> length X (less then L) and new top delta after with length Y (more tha=
-n L),
-> >> like the following:
-> >>
-> >> [.........................] Y
-> >> [........] X
-> >> [...................] L
-> >>
-> >> Once the guest creates FS=C2=A0 on state Y it relies on the fact that =
-data from X
-> >> to Y is all zeroes.
-> >>
-> >> Any operations with backing chain must keep guest content to be tha sa=
-me,
-> >> i.e. if we commit from Y to L, virtual disk content should be preserve=
-d,
-> >> i.e.
-> >> read as all zero even if there is some data in L from X to L.
-> >>
-> >> If we commit from X to Y, the range from X to L should remain all zero=
-es.
-> >>
-> >> This is especially valid for backups, which can not be changed and are
-> >> validated by the software from time to time.
-> >>
-> >> Does this makes sense?
-> >=20
-> > All right then.  But then there=E2=80=99s the case of commit not shrink=
-ing the
-> > backing file, so the guest content won=E2=80=99t be the same if you com=
-mit a
-> > short overlay into a longer backing file.
->=20
-> Hmm. Isn't commit target truncated to source before operation?
+From: Alexander Graf <graf@amazon.com>
 
-Only if the target is smaller than the source.
+The current PL031 RTCICR register implementation always clears the
+IRQ pending status on a register write, regardless of the value the
+guest writes.
 
-Maybe we should change that, because I don't think it's expected that a
-guest sees a larger disk, where old data reappears, after resizing
-(shrinking) the active layer and then commiting it to the backing file.
+To justify that behavior, it references the ARM926EJ-S Development
+Chip Reference Manual (DDI0287B) and indicates that said document
+states that any write clears the internal IRQ state.  It is indeed
+true that in section 11.1 this document says:
 
-Kevin
+  "The interrupt is cleared by writing any data value to the
+   interrupt clear register RTCICR".
+
+However, later in section 11.2.2 it contradicts itself by saying:
+
+  "Writing 1 to bit 0 of RTCICR clears the RTCINTR flag."
+
+The latter statement matches the PL031 TRM (DDI0224C), which says:
+
+  "Writing 1 to bit position 0 clears the corresponding interrupt.
+   Writing 0 has no effect."
+
+Let's assume that the self-contradictory DDI0287B is in error, and
+follow the reference manual for the device itself, by making the
+register write-one-to-clear.
+
+Reported-by: Hendrik Borghorst <hborghor@amazon.de>
+Signed-off-by: Alexander Graf <graf@amazon.com>
+Message-id: 20191104115228.30745-1-graf@amazon.com
+[PMM: updated commit message to note that DDI0287B says two
+ conflicting things]
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/rtc/pl031.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/hw/rtc/pl031.c b/hw/rtc/pl031.c
+index 3a982752a2a..c57cf83165d 100644
+--- a/hw/rtc/pl031.c
++++ b/hw/rtc/pl031.c
+@@ -149,11 +149,7 @@ static void pl031_write(void * opaque, hwaddr offset,
+         pl031_update(s);
+         break;
+     case RTC_ICR:
+-        /* The PL031 documentation (DDI0224B) states that the interrupt is
+-           cleared when bit 0 of the written value is set.  However the
+-           arm926e documentation (DDI0287B) states that the interrupt is
+-           cleared when any value is written.  */
+-        s->is = 0;
++        s->is &= ~value;
+         pl031_update(s);
+         break;
+     case RTC_CR:
+-- 
+2.20.1
 
 
