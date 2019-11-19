@@ -2,82 +2,93 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D171FC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 07:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC54BC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 07:34:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C30F222DE
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 07:22:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 862EA2230D
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 07:34:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NZ6m+9qX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C30F222DE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q/RqmEj2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 862EA2230D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iWxpt-0005fr-IF
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 02:22:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42470)
+	id 1iWy1v-0008QB-Mz
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 02:34:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iWxp1-00059v-PL
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:21:13 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iWy0K-0007lm-7H
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:32:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iWxp0-0003Qm-KC
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:21:11 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22059
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iWxp0-0003QF-8Z
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:21:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574148068;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=txeO7NB+kzAEVp/oTlNkB1iSa7fy2pFwpseicNQuOJw=;
- b=NZ6m+9qXkplITTyzavYR9YEUPVw6gDEIwus62xiCLNJ/djGLHJC1vlhTgZTFmAF/jxI7Sm
- tKWLJLwMZKCN8vPRAOrtajj2cD4PjdgC/rjAtJrs0Oa9zEAJ78y91asYDf9G/KPZW55ph8
- E+TH6Q0eevI3ipc42yN20PBjtKIE1rU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-61HLiR2wOgSZVCPHu_TIhA-1; Tue, 19 Nov 2019 02:21:07 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DCCD800A02;
- Tue, 19 Nov 2019 07:21:06 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.36.118.163])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4AD3D29362;
- Tue, 19 Nov 2019 07:21:00 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C97771138606; Tue, 19 Nov 2019 08:20:58 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Wolfgang Bumiller <w.bumiller@proxmox.com>
-Subject: Re: [PATCH v3 for-4.2] monitor/qmp: resume monitor when clearing its
- queue
-References: <20191115085914.21287-1-w.bumiller@proxmox.com>
-Date: Tue, 19 Nov 2019 08:20:58 +0100
-In-Reply-To: <20191115085914.21287-1-w.bumiller@proxmox.com> (Wolfgang
- Bumiller's message of "Fri, 15 Nov 2019 09:59:14 +0100")
-Message-ID: <87v9rg9vs5.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <richard.henderson@linaro.org>) id 1iWy0J-0007Uw-4i
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:32:51 -0500
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:40263)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iWy0I-0007UX-RR
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 02:32:51 -0500
+Received: by mail-wr1-x431.google.com with SMTP id q15so9708897wrw.7
+ for <qemu-devel@nongnu.org>; Mon, 18 Nov 2019 23:32:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=idWxf4dr3x+QCd6oeTBf2ZP1ObTu2n2ly9xqb/SaAEo=;
+ b=Q/RqmEj2BtN5RP8O9nWKk/MwfoxA/fnN3oUxLuB7Kq6OEvjCB29X2BRP+TTMBhWR5C
+ NFpybgClQeTJXztLIVIGB/HoeGzRe3HhNaVkzmBKTh5f23KDPuFQJ6qze4VSKvtZfXPN
+ PKT3vFFFwGXzcf3aXD9A5VYglsZQcAAQOVc2hfhoK2BYMfgBVuED9Aszma0n9kduoeoA
+ 3T6kFw6tlKBuL+DqmxvKHlT2wcNHsLZfKh9yf5EFYOXkfTp49cYD8zpHQmX/C/VMxsqf
+ DJ14IkeXywuQ2hhupY2WeZXtGPBWIe/73fmOEqTic7QW0YPiIWHrN7YgmUr4d1OG3INB
+ OgfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=idWxf4dr3x+QCd6oeTBf2ZP1ObTu2n2ly9xqb/SaAEo=;
+ b=hn0WdfdkNDrbtvReZbfUBIgCE1227pAw/w0szLiebWKhueddgKe/WQjjP2zzggqIH3
+ SJFXp8eDy0v23heMucknPx9Mtpj2PwqBzlxh3AxrsL10JdQ7D2YBOQ046xEoNTaKMslw
+ tAUJnKr7WF9ceiospP9DmeOPQfdPQjSvqWU+8Fx8av0uKQxiyPKzG/fxiQigdOL3QZzm
+ CB+2Tm+qmQ8dNMH3H5j7NUBePr7G6NUrgUPHu7XdTDlJCcHH0cB8kU1CCrCTAJnKFs9c
+ q5b3EGcFZ2x8yOgZUTn8YBD6bDLYYIFbu781OIr+TIIPp4yayCCy3mBF7nIBW3UoWced
+ JDuA==
+X-Gm-Message-State: APjAAAWADS0d9/ELvgslmkrdutWaBSzKrOmrnOZygOwtw1XGmlO09cIn
+ He4tpm1eZyqbNzpuL/PpLzh4yQ==
+X-Google-Smtp-Source: APXvYqztTyMuOmvHlSjxVx8UaW9KmNIKzCc/Zn0sqrAmtQG/VkPN+wP67D0ngs9a/jj6DQkOyEHyeg==
+X-Received: by 2002:a5d:6083:: with SMTP id w3mr17224312wrt.308.1574148769414; 
+ Mon, 18 Nov 2019 23:32:49 -0800 (PST)
+Received: from [192.168.8.102] (64.red-79-149-204.dynamicip.rima-tde.net.
+ [79.149.204.64])
+ by smtp.gmail.com with ESMTPSA id t134sm2129017wmt.24.2019.11.18.23.32.47
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 18 Nov 2019 23:32:48 -0800 (PST)
+Subject: Re: [PATCH-for-4.2 v3 0/3] hw: Remove dynamic field width from trace
+ events
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+References: <20191118210458.11959-1-philmd@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <98767bf6-7248-531c-f06a-17aae81acabe@linaro.org>
+Date: Tue, 19 Nov 2019 08:32:45 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 61HLiR2wOgSZVCPHu_TIhA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+In-Reply-To: <20191118210458.11959-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::431
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,34 +100,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-block@nongnu.org, qemu-trivial@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Wolfgang Bumiller <w.bumiller@proxmox.com> writes:
+On 11/18/19 10:04 PM, Philippe Mathieu-Daudé wrote:
+> Philippe Mathieu-Daudé (3):
+>   hw/block/pflash: Remove dynamic field width from trace events
+>   hw/mips/gt64xxx: Remove dynamic field width from trace events
+>   trace: Forbid dynamic field width in event format
 
-> When a monitor's queue is filled up in handle_qmp_command()
-> it gets suspended. It's the dispatcher bh's job currently to
-> resume the monitor, which it does after processing an event
-> from the queue. However, it is possible for a
-> CHR_EVENT_CLOSED event to be processed before before the bh
-> is scheduled, which will clear the queue without resuming
-> the monitor, thereby preventing the dispatcher from reaching
-> the resume() call.
-> Any new connections to the qmp socket will be accept()ed and
-> show the greeting, but will not respond to any messages sent
-> afterwards (as they will not be read from the
-> still-suspended socket).
-> Fix this by resuming the monitor when clearing a queue which
-> was filled up.
->
-> Signed-off-by: Wolfgang Bumiller <w.bumiller@proxmox.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
 
-I'm going to prepare a pull request for today's -rc2.
-
+r~
 
