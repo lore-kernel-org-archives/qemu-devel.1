@@ -2,105 +2,90 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D30FC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 10:23:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8734DC43215
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 10:24:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 477E520878
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 10:23:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DFDD208CE
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 10:24:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UgNRDtzY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 477E520878
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QxfmzxeI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DFDD208CE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX0fG-0001C8-2V
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 05:23:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38280)
+	id 1iX0g2-0002Oe-Sz
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 05:24:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38392)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mreitz@redhat.com>) id 1iX0eX-0000il-DB
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:22:34 -0500
+ (envelope-from <mlureau@redhat.com>) id 1iX0f9-0001II-Lt
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:23:12 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mreitz@redhat.com>) id 1iX0eW-0001jN-4W
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:22:33 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49674
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <mlureau@redhat.com>) id 1iX0f8-0001xd-G3
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:23:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30073
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mreitz@redhat.com>) id 1iX0eV-0001j4-Vp
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:22:32 -0500
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iX0f8-0001xO-DC
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:23:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574158951;
+ s=mimecast20190719; t=1574158990;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=xiL2Ay90org6FMHBCalgPG00PPoaET7SQJmrz1Tb7zs=;
- b=UgNRDtzYsCT+DGMvxP850IBTN99HG7NzgGyCuqUAxtmVNqg35neVqYMim7VUQixerD+c90
- ai9ffqV17AjhqSYSQ+raNS4wcMhhZApm9atXzoeBRZ9aS0jtZciAABKzfijMEOhv6cGb5/
- QoZVkVp4OXqONPh+izNWYXu1eJ1OOlw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-178-rkGzUgNoNJeN2llEmc3CYw-1; Tue, 19 Nov 2019 05:22:29 -0500
-X-MC-Unique: rkGzUgNoNJeN2llEmc3CYw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4D691005502;
- Tue, 19 Nov 2019 10:22:28 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-117-187.ams2.redhat.com
- [10.36.117.187])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C889F10375CC;
- Tue, 19 Nov 2019 10:22:23 +0000 (UTC)
-Subject: Re: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20191116163410.12129-1-vsementsov@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <09d0bab1-ed7d-4fd7-555d-93075f10d497@redhat.com>
-Date: Tue, 19 Nov 2019 11:22:21 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xXBWRZBtRNpFMOmDiNKH/+l5cfB3RN+RKsFJito5LPc=;
+ b=QxfmzxeIzhbjT/Sl+HIFZ3V6IXMaY7EpCdBvq5x4pyvAFCZ0jLt6iaro+Bmg3AOcwJ9wRv
+ Ip99pIZCpORZoy5IJSL034Qk/tcZyW7ciUfiO+zVKYQLMlP2Fu9vutioJGkF1xN74oBtXm
+ 2LWj9o5RIIuciWxF3PRECwEu4Ei2PYw=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-39-NwgExJauPCuFJJ22u_Ny9g-1; Tue, 19 Nov 2019 05:23:06 -0500
+Received: by mail-ot1-f71.google.com with SMTP id 9so10529344otf.16
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 02:23:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=xXBWRZBtRNpFMOmDiNKH/+l5cfB3RN+RKsFJito5LPc=;
+ b=Wz0+nADm7bg+Iy+fkxWu7WAiYzEvuJbsOfgdSZLYooUtFjXNLVF70isK/FYJPlb4kh
+ cYjxSnjBjUrQ67cQncOWcy/qocMDo9GLWA/rKR/HBmVsA6WmKyQw/GhFdOV57a6mnW2n
+ OyM5Olzf6kt7uP2kqNNMjqmIa/P7TmhwHQKNdG+UE/iZ8J3h40MoWzA52ncnxPTtgYYN
+ o3J53rKsY465Sd+CEtmpTH6x7Go1cR7ZR/bE3vaJaI33xiF1I3tgEaJtUfUiw66EByK6
+ bbFhL5tv8jRzF0xjQSedR2lz7V+uThDyDT4q6p1ri28ZLhCnCDAK0aLwIszjGZPEAJEt
+ SQGQ==
+X-Gm-Message-State: APjAAAVHiBxPiSJIQo0dmtghkj/6iVLt1YRtaZyOlM3cI9ZFPuin9+cc
+ bf2lUJcbm6NJ2mfbxFeLNGPsW6kfbHZVLnc8yd67bUQjJMFaV3l9UcFeSZUsonhRhfoK8AyDzFl
+ cWUbH7kR5Mp/6ZNPmeygvK4R+p6u9fmw=
+X-Received: by 2002:aca:484e:: with SMTP id v75mr3452451oia.6.1574158985247;
+ Tue, 19 Nov 2019 02:23:05 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyAW7u4+zVYTOVejuoZU12DxbH4wBq0IuuJJ3nI2VdhfiA7C9BZIt/eI1n+dqMwNMFkvQ5LtrEY4/JS05lD2+k=
+X-Received: by 2002:aca:484e:: with SMTP id v75mr3452425oia.6.1574158984991;
+ Tue, 19 Nov 2019 02:23:04 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191116163410.12129-1-vsementsov@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
+ <20191023173154.30051-8-marcandre.lureau@redhat.com>
+ <CAFEAcA8GHqiaHSKdTjzTY_mWxYpDLZhXLYc98kjPGLUnzsG3oQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA8GHqiaHSKdTjzTY_mWxYpDLZhXLYc98kjPGLUnzsG3oQ@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Tue, 19 Nov 2019 14:22:53 +0400
+Message-ID: <CAMxuvawcYnH4pp8PitMO6KcTz_GdwF7i=zJxepofsN1o9Yh65w@mail.gmail.com>
+Subject: Re: [PATCH v3 07/33] serial: register vmsd with DeviceClass
+To: Peter Maydell <peter.maydell@linaro.org>
+X-MC-Unique: NwgExJauPCuFJJ22u_Ny9g-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="nI4P11XbriFjgC4gsCNW9rn9kBeBoJkrs"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -112,141 +97,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, qemu-devel@nongnu.org,
- stefanha@redhat.com, den@openvz.org
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nI4P11XbriFjgC4gsCNW9rn9kBeBoJkrs
-Content-Type: multipart/mixed; boundary="WsR7t49ud6O3njAIdM2qDsSEBJN2WyUvm"
+On Mon, Nov 18, 2019 at 6:22 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> On Wed, 23 Oct 2019 at 18:33, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+> >
+> > QOM-ify further.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  hw/char/serial.c | 13 ++++++++++---
+> >  1 file changed, 10 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/hw/char/serial.c b/hw/char/serial.c
+> > index c839035fdd..4af8b0ce4c 100644
+> > --- a/hw/char/serial.c
+> > +++ b/hw/char/serial.c
+> > @@ -990,8 +990,7 @@ SerialState *serial_init(int base, qemu_irq irq, in=
+t baudbase,
+> >      s->baudbase =3D baudbase;
+> >      qemu_chr_fe_init(&s->chr, chr, &error_abort);
+> >      serial_realize_core(s, &error_fatal);
+> > -
+> > -    vmstate_register(NULL, base, &vmstate_serial, s);
+> > +    qdev_set_legacy_instance_id(dev, base, 2);
+> >      qdev_init_nofail(dev);
+>
+> Did you test whether migration still works from a QEMU
+> version without this patch to one with it? (The migration
 
---WsR7t49ud6O3njAIdM2qDsSEBJN2WyUvm
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Yes, I thought I did test correctly, but I realized testing with x86
+isn't correct.
 
-On 16.11.19 17:34, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all!
->=20
-> I wanted to understand, what is the real difference between bdrv_block_st=
-atus_above
-> and bdrv_is_allocated_above, IMHO bdrv_is_allocated_above should work thr=
-ough
-> bdrv_block_status_above..
->=20
-> And I found the problem: bdrv_is_allocated_above considers space after EO=
-F as
-> UNALLOCATED for intermediate nodes..
->=20
-> UNALLOCATED is not about allocation at fs level, but about should we go t=
-o backing or
-> not.. And it seems incorrect for me, as in case of short backing file, we=
-'ll read
-> zeroes after EOF, instead of going further by backing chain.
+So with arm/musicpal for ex, I can migrate from before->after, however
+after->before won't work. Is that ok?
 
-Should we, though?  It absolutely makes sense to me to consider post-EOF
-space as unallocated because, well, it is as unallocated as it gets.
+> vmstate code is too complicated for me to be able to figure
+> out whether passing the 'dev' pointer makes a difference
+> to whot it names the state sections and whether the
+> 'qdev_set_legacy_instance_id' suffices to avoid problems.)
 
-So from my POV it would make more sense to fall back to the backing file
-for post-EOF reads.
-
-OTOH, I don=92t know whether changing that behavior would qualify as a
-possible security issue now, because maybe someone has sensitive
-information in the tail of some disk and then truncated the overlay so
-as to hide it?  But honestly, that seems ridiculous and I can=92t imagine
-people to do that.  (It would work only for the tail, and why not just
-write zeroes there, which works everywhere?)  So in practice I don=92t
-believe that to be a problem.
-
-Max
-
-> This leads to the following effect:
->=20
-> ./qemu-img create -f qcow2 base.qcow2 2M
-> ./qemu-io -c "write -P 0x1 0 2M" base.qcow2
->=20
-> ./qemu-img create -f qcow2 -b base.qcow2 mid.qcow2 1M
-> ./qemu-img create -f qcow2 -b mid.qcow2 top.qcow2 2M
->=20
-> Region 1M..2M is shadowed by short middle image, so guest sees zeroes:
-> ./qemu-io -c "read -P 0 1M 1M" top.qcow2
-> read 1048576/1048576 bytes at offset 1048576
-> 1 MiB, 1 ops; 00.00 sec (22.795 GiB/sec and 23341.5807 ops/sec)
->=20
-> But after commit guest visible state is changed, which seems wrong for me=
-:
-> ./qemu-img commit top.qcow2 -b mid.qcow2
->=20
-> ./qemu-io -c "read -P 0 1M 1M" mid.qcow2
-> Pattern verification failed at offset 1048576, 1048576 bytes
-> read 1048576/1048576 bytes at offset 1048576
-> 1 MiB, 1 ops; 00.00 sec (4.981 GiB/sec and 5100.4794 ops/sec)
->=20
-> ./qemu-io -c "read -P 1 1M 1M" mid.qcow2
-> read 1048576/1048576 bytes at offset 1048576
-> 1 MiB, 1 ops; 00.00 sec (3.365 GiB/sec and 3446.1606 ops/sec)
->=20
->=20
-> I don't know, is it a real bug, as I don't know, do we support backing fi=
-le larger than
-> its parent. Still, I'm not sure that this behavior of bdrv_is_allocated_a=
-bove don't lead
-> to other problems.
->=20
-> =3D=3D=3D=3D=3D
->=20
-> Hmm, bdrv_block_allocated_above behaves strange too:
->=20
-> with want_zero=3Dtrue, it may report unallocated zeroes because of short =
-backing files, which
-> are actually "allocated" in POV of backing chains. But I see this may inf=
-luence only
-> qemu-img compare, and I don't see can it trigger some bug..
->=20
-> with want_zero=3Dfalse, it may do no progress because of short backing fi=
-le. Moreover it may
-> report EOF in the middle!! But want_zero=3Dfalse used only in bdrv_is_all=
-ocated, which considers
-> onlyt top layer, so it seems OK.=20
->=20
-> =3D=3D=3D=3D=3D
->=20
-> So, I propose these series, still I'm not sure is there a real bug.
->=20
-> Vladimir Sementsov-Ogievskiy (4):
->   block/io: fix bdrv_co_block_status_above
->   block/io: bdrv_common_block_status_above: support include_base
->   block/io: bdrv_common_block_status_above: support bs =3D=3D base
->   block/io: fix bdrv_is_allocated_above
->=20
->  block/io.c                 | 104 ++++++++++++++++++-------------------
->  tests/qemu-iotests/154.out |   4 +-
->  2 files changed, 53 insertions(+), 55 deletions(-)
->=20
-
-
-
---WsR7t49ud6O3njAIdM2qDsSEBJN2WyUvm--
-
---nI4P11XbriFjgC4gsCNW9rn9kBeBoJkrs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl3Twl0ACgkQ9AfbAGHV
-z0CspggAkbcLf9OUzCqgt63EdTwiPYfMDBvwZyrEcn3naAFvEtoXy+B8YP7Srn7p
-y5ZfbAhNUCRnqg0mUE6ybNxhNGsfOMmevGpgoQHksGD+dpcthtfJULmkavsQB36I
-ELe6Zzi0r8Z1Jj8UJNyR2wKMpYfu5qZMkidI5YJWTmOs8U2tAB7lXGf12/wIywsW
-FnXAzCCnVACvad7cNdQ/CqO1kp6shODJGYW+H7H2qzvSgjv1b24hTyyEbFT4NUMa
-9YthzB5IAczNtuxoUknJoccq8p1eCl3avT3CdIEMdbPDCrzWxIKog28MMnFTVSa0
-uGWgdAHOcsPqRGg921RTir+6ekJX7g==
-=1lH6
------END PGP SIGNATURE-----
-
---nI4P11XbriFjgC4gsCNW9rn9kBeBoJkrs--
+I don't see a way to fix after->before, because the instance id is
+initially 0 with the new code, and the old code expect a different
+value.
 
 
