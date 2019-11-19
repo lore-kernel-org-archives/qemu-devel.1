@@ -2,84 +2,77 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EBF3C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 12:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06128C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 12:29:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 552CE21850
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 12:23:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NQ5IYR59"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 552CE21850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D08F92186D
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 12:29:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D08F92186D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX2XF-00057t-Ap
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 07:23:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55514)
+	id 1iX2dY-0006v1-V2
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 07:29:40 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56061)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iX2WR-0004hm-KB
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 07:22:20 -0500
+ (envelope-from <chen.zhang@intel.com>) id 1iX2cj-0006Pr-2F
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 07:28:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iX2WQ-0003kT-NU
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 07:22:19 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45521
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <chen.zhang@intel.com>) id 1iX2ch-0006Vs-NJ
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 07:28:48 -0500
+Received: from mga11.intel.com ([192.55.52.93]:24140)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iX2WQ-0003kF-JG
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 07:22:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574166138;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Ue1AMAyBYD93neM5yvDdqmgIu/qWt7o77m7cQk1HTDA=;
- b=NQ5IYR595+n7UKls+P3ladLDjm1JvxYWeswlH1kKjIfFIz8vSWxx0X+f7zXIWHaD+rAeHH
- WwpbW9QIYcC/b34qUE58xvX9QZCCUgcuF0MMrTRSieF9hIAiPHWmHtRQtQhAh8OlD9vlVN
- GQWEc3osRt5AC8BMeMEbBUY553tGbsI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-agNljSb_NJGM_dRfz002iA-1; Tue, 19 Nov 2019 07:22:16 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EF03F107ACC7
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 12:22:15 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-117-181.ams2.redhat.com
- [10.36.117.181])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 401E44D74F;
- Tue, 19 Nov 2019 12:22:15 +0000 (UTC)
-Subject: Re: [PATCH 15/16] kvm: introduce kvm_kernel_irqchip_* functions
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <1573655945-14912-1-git-send-email-pbonzini@redhat.com>
- <1573655945-14912-16-git-send-email-pbonzini@redhat.com>
- <cfa98de2-3bb6-8eef-1edc-6c396e9af121@redhat.com>
- <5414fe36-e8dc-a9bc-9a4c-08fd96a5852f@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d42f5daf-3246-0e4d-966a-c1f1b3546a2f@redhat.com>
-Date: Tue, 19 Nov 2019 13:22:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.0
-MIME-Version: 1.0
-In-Reply-To: <5414fe36-e8dc-a9bc-9a4c-08fd96a5852f@redhat.com>
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1iX2ce-0006Pu-9V; Tue, 19 Nov 2019 07:28:44 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+ by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 19 Nov 2019 04:28:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.68,322,1569308400"; d="scan'208";a="289590192"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+ by orsmga001.jf.intel.com with ESMTP; 19 Nov 2019 04:28:35 -0800
+Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 19 Nov 2019 04:28:35 -0800
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.108]) by
+ SHSMSX153.ccr.corp.intel.com ([169.254.12.215]) with mapi id 14.03.0439.000;
+ Tue, 19 Nov 2019 20:28:33 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
+Subject: RE: [PATCH v7 0/4] colo: Add support for continuous replication
+Thread-Topic: [PATCH v7 0/4] colo: Add support for continuous replication
+Thread-Index: AQHVinb+3QVJTWIS6EWH6Lp9PLoWz6eI5dGAgAmrJEA=
+Date: Tue, 19 Nov 2019 12:28:32 +0000
+Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D7806309C8C@shsmsx102.ccr.corp.intel.com>
+References: <cover.1571925699.git.lukasstraub2@web.de>
+ <20191113173559.0713c27d@luklap>
+In-Reply-To: <20191113173559.0713c27d@luklap>
+Accept-Language: en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: agNljSb_NJGM_dRfz002iA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNzgwOTJmNzAtZjY5Yy00NDA2LWI4YjQtZTkyOWI0MWU3YWQ4IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiVndzS1BUTHZtdnhnRXFxSmRBYkVBYmtzMjZuTXo2OUlYU3czc1JuU0lUSXRDaDVkV0hJZHVCZVZJYnE5MmlZeSJ9
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+MIME-Version: 1.0
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.93
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,30 +84,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: armbru@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Wen Congyang <wencongyang2@huawei.com>, Jason Wang <jasowang@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Xie Changlong <xiechanglong.d@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/11/2019 13.13, Paolo Bonzini wrote:
-> On 19/11/19 12:56, Thomas Huth wrote:
->>> -    if (machine_kernel_irqchip_split(machine)) {
->>> +    if (kvm_enabled() && kvm_kernel_irqchip_split()) {
->>>          error_setg(errp, "kernel_irqchip split mode not supported on p=
-series");
->>>          return;
->>>      }
->> Any reason for the additional kvm_enabled() here? I think it should also
->> be ok without that?
->>
->> Apart from that question, patch looks fine to me.
+
+
+> -----Original Message-----
+> From: Lukas Straub <lukasstraub2@web.de>
+> Sent: Thursday, November 14, 2019 12:36 AM
+> To: qemu-devel <qemu-devel@nongnu.org>
+> Cc: Zhang, Chen <chen.zhang@intel.com>; Jason Wang
+> <jasowang@redhat.com>; Wen Congyang <wencongyang2@huawei.com>;
+> Xie Changlong <xiechanglong.d@gmail.com>; Kevin Wolf
+> <kwolf@redhat.com>; Max Reitz <mreitz@redhat.com>; qemu-block
+> <qemu-block@nongnu.org>
+> Subject: Re: [PATCH v7 0/4] colo: Add support for continuous replication
 >=20
-> It won't compile without that, kvm_kernel_irqchip_split() is defined in
-> accel/kvm/kvm-all.c.
+> On Fri, 25 Oct 2019 19:06:31 +0200
+> Lukas Straub <lukasstraub2@web.de> wrote:
+>=20
+> > Hello Everyone,
+> > These Patches add support for continuous replication to colo. This
+> > means that after the Primary fails and the Secondary did a failover,
+> > the Secondary can then become Primary and resume replication to a new
+> Secondary.
+> >
+> > Regards,
+> > Lukas Straub
+> >
+> > v7:
+> >  - clarify meaning of ip's in documentation and note that active and hi=
+dden
+> >    images just need to be created once
+> >  - reverted removal of bdrv_is_root_node(top_bs) in replication and
+> adjusted
+> >    the top-id=3D parameter in documentation acordingly
+> >
+> > v6:
+> >  - documented the position=3D and insert=3D options
+> >  - renamed replication test
+> >  - clarified documentation by using different ip's for primary and
+> > secondary
+> >  - added Reviewed-by tags
+> >
+> > v5:
+> >  - change syntax for the position=3D parameter
+> >  - fix spelling mistake
+> >
+> > v4:
+> >  - fix checkpatch.pl warnings
+> >
+> > v3:
+> >  - add test for replication changes
+> >  - check if the filter to be inserted before/behind belongs to the
+> > same interface
+> >  - fix the error message for the position=3D parameter
+> >  - rename term "after" -> "behind" and variable "insert_before" ->
+> "insert_before_flag"
+> >  - document the quorum node on the secondary side
+> >  - simplify quorum parameters in documentation
+> >  - remove trailing spaces in documentation
+> >  - clarify the testing procedure in documentation
+> >
+> > v2:
+> >  - fix email formating
+> >  - fix checkpatch.pl warnings
+> >  - fix patchew error
+> >  - clearer commit messages
+> >
+> >
+> > Lukas Straub (4):
+> >   block/replication.c: Ignore requests after failover
+> >   tests/test-replication.c: Add test for for secondary node continuing
+> >     replication
+> >   net/filter.c: Add Options to insert filters anywhere in the filter
+> >     list
+> >   colo: Update Documentation for continuous replication
+> >
+> >  block/replication.c        |  35 +++++-
+> >  docs/COLO-FT.txt           | 224 +++++++++++++++++++++++++++----------
+> >  docs/block-replication.txt |  28 +++--
+> >  include/net/filter.h       |   2 +
+> >  net/filter.c               |  92 ++++++++++++++-
+> >  qemu-options.hx            |  31 ++++-
+> >  tests/test-replication.c   |  52 +++++++++
+> >  7 files changed, 389 insertions(+), 75 deletions(-)
+> >
+>=20
+> Hello Everyone,
+> So I guess this is ready for merging or will that have to wait until the =
+4.2
+> release is done?
 
-Oh, I wonder whether you need a stub for certain compilers? ... but if
-all our supported compilers are fine with this, I'm fine with it, too.
+Due to Qemu 4.2 release schedule, after soft feature freeze(Oct29) the mast=
+er branch does not accept feature changes.
+But I don't know if sub-maintainer(block or net) can queue this series firs=
+t then merge it after 4.2 release?=20
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Thanks
+Zhang Chen
 
+>=20
+> Regards,
+> Lukas Straub
 
