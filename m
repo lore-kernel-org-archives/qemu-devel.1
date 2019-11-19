@@ -2,124 +2,63 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB410C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 18:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E5EC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 18:16:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94FD12231A
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 18:14:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94FD12231A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 834C12231E
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 18:16:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 834C12231E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX81h-0004f3-Ng
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 13:14:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57508)
+	id 1iX83B-0005vx-Lx
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 13:16:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58521)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <laurent@vivier.eu>) id 1iX80m-0003ta-5G
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:14:01 -0500
+ (envelope-from <groug@kaod.org>) id 1iX81g-0004o6-6j
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:14:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <laurent@vivier.eu>) id 1iX80k-0003Zz-Nv
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:13:59 -0500
-Received: from mout.kundenserver.de ([217.72.192.75]:49611)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iX80k-0003Z4-Ek
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:13:58 -0500
-Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M2wCg-1iYEzp2Fae-003KTm; Tue, 19 Nov 2019 19:13:33 +0100
-To: Taylor Simpson <tsimpson@quicinc.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
- <a77ce406-5307-cee8-8e0b-7c08056fb0df@redhat.com>
- <BYAPR02MB488666AA94EBB57C2A318004DE4C0@BYAPR02MB4886.namprd02.prod.outlook.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of patches
- - linux-user changes + linux-user/hexagon + skeleton of
- target/hexagon -
- Files in target/hexagon/imported are from another project and therefore do
- not conform to qemu coding standards
-Message-ID: <8c92b107-b707-b8a7-6284-5b1ed8e95897@vivier.eu>
-Date: Tue, 19 Nov 2019 19:13:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <groug@kaod.org>) id 1iX81d-0004PQ-Sw
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:14:55 -0500
+Received: from 10.mo6.mail-out.ovh.net ([87.98.157.236]:48234)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iX81d-0004O7-J1
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 13:14:53 -0500
+Received: from player792.ha.ovh.net (unknown [10.108.42.102])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id 244B51E63AE
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 19:14:50 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: groug@kaod.org)
+ by player792.ha.ovh.net (Postfix) with ESMTPSA id EE4D5C47AF47;
+ Tue, 19 Nov 2019 18:14:42 +0000 (UTC)
+Date: Tue, 19 Nov 2019 19:14:41 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Subject: Re: [RFC v5 065/126] XIVE: introduce ERRP_AUTO_PROPAGATE
+Message-ID: <20191119191441.2240439d@bahia.lan>
+In-Reply-To: <20191011160552.22907-66-vsementsov@virtuozzo.com>
+References: <20191011160552.22907-1-vsementsov@virtuozzo.com>
+ <20191011160552.22907-66-vsementsov@virtuozzo.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <BYAPR02MB488666AA94EBB57C2A318004DE4C0@BYAPR02MB4886.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:rUXsme/4k7X+76RDwSbP95sPOm9EP+vhpSZpTMqzQfRL0uwjINV
- LC2cQ253VA7a1600F43Y1Ar22g5+jh1BzhxRUjlndSxNN7njih8c7V/Ghs8jag6uyl/4SgH
- 6vKBY0R2N3L0fQaoKku+3YD+A/v3YETWpXta1+wsWJJY1zKFQ82eIo8QktTnsEZhEGjG0p9
- 0NN3BDkB6P6ZPuMKc9HKA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Y3S1qJAxpY8=:RdW9PriJoDq3c9DCIiUeA9
- l6VUwx9qsifTPPesErsvbNDvouQPGE93T5tjgx4pF5VwTa6r6TcI15OLWJB+Vp+Fz05hybQ2R
- R678++3WPxn0PQWAyo4qP+CmMzgSoQvceirQxgqa3ShXCaPQACR9Ds7BFOQouLpdeTtafb5Id
- 35RUZMVxfaDXYBrriJUSxkusIyJgMDHkZf9hIV+oeoBNv6sIMZvIqNaIGFUYTGv40N6ucE8vK
- 5QzYYykIFyaCR+W0hhAeS2Jfu8e201GoCW/+neLukvcLAmItpLm+Tyqd0bgiGXJfBlWwYns6L
- O167ZvJlG+ywvpYHeSD1px+gwZ1glUGpI6X4/DrF6zh3X/kif4mbjr43vrH44xYg3fESjGbK5
- gJfjnCteVkDcUG+hYxi+PhP0IGpnOOy6ItAn5WDRdbdDLLs9/zaP9xX8zWh4ycATaQPl/5adx
- MxZuyf487IjsoL24hltsSG3mOSU9zsmVT1iylUlsE9iS9Xwaxs4NTehv1TJwpW2HA/lc6OgYz
- CAU5I6Tpbiw/TFFYWGrxF4OwWcMARo/UMX3yU3/gihjt7ARmAMTs0CP4tUcvkumTTqUeJRlHk
- ma9OH5hYt9XvmD/NBdgLFH4aaqbl/G88gUxCY7IVqSNrym5JpRr/SSfwz2IzAERbcywhk+d2n
- p50jP+X0pAsT+c4LtJLImBjUF9QBzZIakwywJHA7MpCQdION0hAUicm9x2heZXqIXS4aOj+NO
- b94/nv3exnAMU85N6XBWNhVexPmbCuaqDWBjBzGbR0Zh47pdfiq7HxMK+ME8Xsw317j98PBNf
- uevE7b5rz7HqjL5W+CJGTfgVVrn98gGSPY55283uVB3DFHejUHyCCqUulQe/ENmy4qrWw+sXU
- 6yrZ4zklpRDZTEFGJAVP29hmt3ZelgQfGOHtHIDBk=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 3538140459759671635
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudegkedgudduudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedtrddtrddtrddtpdduleehrddvuddvrddvledrudeiieenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeelvddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 217.72.192.75
+X-Received-From: 87.98.157.236
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -131,67 +70,390 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, armbru@redhat.com,
+ qemu-ppc@nongnu.org, =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 19/11/2019 à 18:22, Taylor Simpson a écrit :
-> Thanks for all the feedback on the patch.  I'll summarize my TODO list here.  Please let me know if there's anything I missed.
-> - Add a README file in the imported directory to make it clear that the code comes from another project.  Personally, I prefer keeping the name as "imported".  It was suggested by Richard at the meeting.  Also as a heads-up, that is a small subset of the files that will be in that directory eventually.  Right now, it is the minimum needed to build the skeleton target.
-> - Work on the .checkpatchignore as Philippe suggested.
-> - Split out the "[__SIGRTMAX - 1] = __SIGRTMIN + 1" into a separate patch.
-> - Clean up the long subject line.
-> - Add license text to the new files.
-> - Remove the DEBUG_HEX blocks.  In general the DEBUG_HEX macro controls a bunch of debugging output as you'll see in later patches.  In the long run, I think it should be replaces with a macro that is defined when configured with --enable-debug and then an additional command-line argument.  I haven't looked into this, so any pointers would be appreciated.
+On Fri, 11 Oct 2019 19:04:51 +0300
+Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com> wrote:
 
-You can have a look to the trace infrastructure
-(docs/devel/tracing.txt). We have also some qemu_log() macros for low
-level debugging.
+> If we want to add some info to errp (by error_prepend() or
+> error_append_hint()), we must use the ERRP_AUTO_PROPAGATE macro.
+> Otherwise, this info will not be added when errp == &fatal_err
+> (the program will exit prior to the error_append_hint() or
+> error_prepend() call).  Fix such cases.
+> 
+> If we want to check error after errp-function call, we need to
+> introduce local_err and than propagate it to errp. Instead, use
+> ERRP_AUTO_PROPAGATE macro, benefits are:
+> 1. No need of explicit error_propagate call
+> 2. No need of explicit local_err variable: use errp directly
+> 3. ERRP_AUTO_PROPAGATE leaves errp as is if it's not NULL or
+>    &error_fatel, this means that we don't break error_abort
+>    (we'll abort on error_set, not on error_propagate)
+> 
+> This commit (together with its neighbors) was generated by
+> 
+> for f in $(git grep -l errp \*.[ch]); do \
+>     spatch --sp-file scripts/coccinelle/auto-propagated-errp.cocci \
+>     --macro-file scripts/cocci-macro-file.h --in-place --no-show-diff $f; \
+> done;
+> 
+> then fix a bit of compilation problems: coccinelle for some reason
+> leaves several
+> f() {
+>     ...
+>     goto out;
+>     ...
+>     out:
+> }
+> patterns, with "out:" at function end.
+> 
+> then
+> ./python/commit-per-subsystem.py MAINTAINERS "$(< auto-msg)"
+> 
+> (auto-msg was a file with this commit message)
+> 
+> Still, for backporting it may be more comfortable to use only the first
+> command and then do one huge commit.
+> 
+> Reported-by: Kevin Wolf <kwolf@redhat.com>
+> Reported-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  hw/intc/spapr_xive.c     | 12 ++++-----
+>  hw/intc/spapr_xive_kvm.c | 55 ++++++++++++++++++----------------------
+>  hw/intc/xive.c           | 27 ++++++++------------
+>  3 files changed, 40 insertions(+), 54 deletions(-)
+> 
 
-> - Laurent suggested I split the patch into two parts: linux-user and target/hexagon.  If I do that, which one should contain the changes to common files (e.g., configure)?  Also, note that we won't be able to build until both patches are merged.  Is that OK?
+We did a huge cleanup recently in this area so this patch doesn't apply
+anymore. Ideally it should be based on David Gibson's ppc-for-5.0 branch
+available at https://github.com/dgibson/qemu .
 
-You should add target/hexagon first, and it should not be build as we
-don't have any target (hexagon-linux-user or hexagon-softmmu),
-then you can add linux-user part that will be built and use the
-target/hexagone CPU. I think the configure part should go to the
-linux-user part as it enables the build.
+Same goes for the PowerPC patch 035/126 actually.
 
-I asked to split the patch for review purpose, but this should not break
-anything (to allow bisect).
-
-Thanks,
-Laurent
-
-> 
-> Thanks,
-> Taylor
-> 
-> 
-> -----Original Message-----
-> From: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Sent: Tuesday, November 19, 2019 9:19 AM
-> To: Taylor Simpson <tsimpson@quicinc.com>; laurent@vivier.eu; riku.voipio@iki.fi; qemu-devel@nongnu.org
-> Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of patches - linux-user changes + linux-user/hexagon + skeleton of target/hexagon - Files in target/hexagon/imported are from another project and therefore do not conform to qemu coding standards
-> 
-> -------------------------------------------------------------------------
-> CAUTION: This email originated from outside of the organization.
-> -------------------------------------------------------------------------
-> 
-> On 11/19/19 12:58 AM, Taylor Simpson wrote:
->> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
->> ---
-> [...]
->>   target/hexagon/imported/global_types.h      |  25 +++
->>   target/hexagon/imported/iss_ver_registers.h | 183 +++++++++++++++
->>   target/hexagon/imported/max.h               |  78 +++++++
->>   target/hexagon/imported/regs.h              |  19 ++
-> 
-> Maybe you can rename this directory as:
-> 
-> target/hexagon/dsp-sdk/
-> 
-> and add a README "Files under this directory are imported from the SDK available once registered on developer.qualcomm.com ..."
-> 
-> 
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 04879abf2e..b25c9ef9ea 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -273,10 +273,10 @@ static void spapr_xive_instance_init(Object *obj)
+>  
+>  static void spapr_xive_realize(DeviceState *dev, Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      SpaprXive *xive = SPAPR_XIVE(dev);
+>      XiveSource *xsrc = &xive->source;
+>      XiveENDSource *end_xsrc = &xive->end_source;
+> -    Error *local_err = NULL;
+>  
+>      if (!xive->nr_irqs) {
+>          error_setg(errp, "Number of interrupt needs to be greater 0");
+> @@ -295,9 +295,8 @@ static void spapr_xive_realize(DeviceState *dev, Error **errp)
+>                              &error_fatal);
+>      object_property_add_const_link(OBJECT(xsrc), "xive", OBJECT(xive),
+>                                     &error_fatal);
+> -    object_property_set_bool(OBJECT(xsrc), true, "realized", &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    object_property_set_bool(OBJECT(xsrc), true, "realized", errp);
+> +    if (*errp) {
+>          return;
+>      }
+>      sysbus_init_mmio(SYS_BUS_DEVICE(xive), &xsrc->esb_mmio);
+> @@ -309,9 +308,8 @@ static void spapr_xive_realize(DeviceState *dev, Error **errp)
+>                              &error_fatal);
+>      object_property_add_const_link(OBJECT(end_xsrc), "xive", OBJECT(xive),
+>                                     &error_fatal);
+> -    object_property_set_bool(OBJECT(end_xsrc), true, "realized", &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +    object_property_set_bool(OBJECT(end_xsrc), true, "realized", errp);
+> +    if (*errp) {
+>          return;
+>      }
+>      sysbus_init_mmio(SYS_BUS_DEVICE(xive), &end_xsrc->esb_mmio);
+> diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+> index 51b334b676..02243537e6 100644
+> --- a/hw/intc/spapr_xive_kvm.c
+> +++ b/hw/intc/spapr_xive_kvm.c
+> @@ -186,6 +186,7 @@ void kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
+>  void kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveEAS *eas,
+>                                     Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      uint32_t end_idx;
+>      uint32_t end_blk;
+>      uint8_t priority;
+> @@ -193,7 +194,6 @@ void kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveEAS *eas,
+>      bool masked;
+>      uint32_t eisn;
+>      uint64_t kvm_src;
+> -    Error *local_err = NULL;
+>  
+>      assert(xive_eas_is_valid(eas));
+>  
+> @@ -214,9 +214,8 @@ void kvmppc_xive_set_source_config(SpaprXive *xive, uint32_t lisn, XiveEAS *eas,
+>          KVM_XIVE_SOURCE_EISN_MASK;
+>  
+>      kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE_CONFIG, lisn,
+> -                      &kvm_src, true, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +                      &kvm_src, true, errp);
+> +    if (*errp) {
+>          return;
+>      }
+>  }
+> @@ -255,19 +254,17 @@ int kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **errp)
+>  
+>  static void kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      SpaprXive *xive = SPAPR_XIVE(xsrc->xive);
+>      int i;
+>  
+>      for (i = 0; i < xsrc->nr_irqs; i++) {
+> -        Error *local_err = NULL;
+> -
+>          if (!xive_eas_is_valid(&xive->eat[i])) {
+>              continue;
+>          }
+>  
+> -        kvmppc_xive_source_reset_one(xsrc, i, &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> +        kvmppc_xive_source_reset_one(xsrc, i, errp);
+> +        if (*errp) {
+>              return;
+>          }
+>      }
+> @@ -389,11 +386,11 @@ void kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
+>                                    uint32_t end_idx, XiveEND *end,
+>                                    Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      struct kvm_ppc_xive_eq kvm_eq = { 0 };
+>      uint64_t kvm_eq_idx;
+>      uint8_t priority;
+>      uint32_t server;
+> -    Error *local_err = NULL;
+>  
+>      assert(xive_end_is_valid(end));
+>  
+> @@ -406,9 +403,8 @@ void kvmppc_xive_get_queue_config(SpaprXive *xive, uint8_t end_blk,
+>          KVM_XIVE_EQ_SERVER_MASK;
+>  
+>      kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_eq_idx,
+> -                      &kvm_eq, false, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +                      &kvm_eq, false, errp);
+> +    if (*errp) {
+>          return;
+>      }
+>  
+> @@ -425,11 +421,11 @@ void kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
+>                                    uint32_t end_idx, XiveEND *end,
+>                                    Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      struct kvm_ppc_xive_eq kvm_eq = { 0 };
+>      uint64_t kvm_eq_idx;
+>      uint8_t priority;
+>      uint32_t server;
+> -    Error *local_err = NULL;
+>  
+>      /*
+>       * Build the KVM state from the local END structure.
+> @@ -468,9 +464,8 @@ void kvmppc_xive_set_queue_config(SpaprXive *xive, uint8_t end_blk,
+>          KVM_XIVE_EQ_SERVER_MASK;
+>  
+>      kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_EQ_CONFIG, kvm_eq_idx,
+> -                      &kvm_eq, true, &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> +                      &kvm_eq, true, errp);
+> +    if (*errp) {
+>          return;
+>      }
+>  }
+> @@ -483,7 +478,7 @@ void kvmppc_xive_reset(SpaprXive *xive, Error **errp)
+>  
+>  static void kvmppc_xive_get_queues(SpaprXive *xive, Error **errp)
+>  {
+> -    Error *local_err = NULL;
+> +    ERRP_AUTO_PROPAGATE();
+>      int i;
+>  
+>      for (i = 0; i < xive->nr_ends; i++) {
+> @@ -492,9 +487,8 @@ static void kvmppc_xive_get_queues(SpaprXive *xive, Error **errp)
+>          }
+>  
+>          kvmppc_xive_get_queue_config(xive, SPAPR_XIVE_BLOCK_ID, i,
+> -                                     &xive->endt[i], &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> +                                     &xive->endt[i], errp);
+> +        if (*errp) {
+>              return;
+>          }
+>      }
+> @@ -742,8 +736,8 @@ static void *kvmppc_xive_mmap(SpaprXive *xive, int pgoff, size_t len,
+>   */
+>  void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      XiveSource *xsrc = &xive->source;
+> -    Error *local_err = NULL;
+>      size_t esb_len = (1ull << xsrc->esb_shift) * xsrc->nr_irqs;
+>      size_t tima_len = 4ull << TM_SHIFT;
+>      CPUState *cs;
+> @@ -772,8 +766,8 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
+>       * 1. Source ESB pages - KVM mapping
+>       */
+>      xsrc->esb_mmap = kvmppc_xive_mmap(xive, KVM_XIVE_ESB_PAGE_OFFSET, esb_len,
+> -                                      &local_err);
+> -    if (local_err) {
+> +                                      errp);
+> +    if (*errp) {
+>          goto fail;
+>      }
+>  
+> @@ -790,8 +784,8 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
+>       * 3. TIMA pages - KVM mapping
+>       */
+>      xive->tm_mmap = kvmppc_xive_mmap(xive, KVM_XIVE_TIMA_PAGE_OFFSET, tima_len,
+> -                                     &local_err);
+> -    if (local_err) {
+> +                                     errp);
+> +    if (*errp) {
+>          goto fail;
+>      }
+>      memory_region_init_ram_device_ptr(&xive->tm_mmio_kvm, OBJECT(xive),
+> @@ -806,15 +800,15 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
+>      CPU_FOREACH(cs) {
+>          PowerPCCPU *cpu = POWERPC_CPU(cs);
+>  
+> -        kvmppc_xive_cpu_connect(spapr_cpu_state(cpu)->tctx, &local_err);
+> -        if (local_err) {
+> +        kvmppc_xive_cpu_connect(spapr_cpu_state(cpu)->tctx, errp);
+> +        if (*errp) {
+>              goto fail;
+>          }
+>      }
+>  
+>      /* Update the KVM sources */
+> -    kvmppc_xive_source_reset(xsrc, &local_err);
+> -    if (local_err) {
+> +    kvmppc_xive_source_reset(xsrc, errp);
+> +    if (*errp) {
+>          goto fail;
+>      }
+>  
+> @@ -824,7 +818,6 @@ void kvmppc_xive_connect(SpaprXive *xive, Error **errp)
+>      return;
+>  
+>  fail:
+> -    error_propagate(errp, local_err);
+>      kvmppc_xive_disconnect(xive, NULL);
+>  }
+>  
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 29df06df11..368f94df71 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -570,15 +570,14 @@ static void xive_tctx_reset(void *dev)
+>  
+>  static void xive_tctx_realize(DeviceState *dev, Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      XiveTCTX *tctx = XIVE_TCTX(dev);
+>      PowerPCCPU *cpu;
+>      CPUPPCState *env;
+>      Object *obj;
+> -    Error *local_err = NULL;
+>  
+> -    obj = object_property_get_link(OBJECT(dev), "cpu", &local_err);
+> +    obj = object_property_get_link(OBJECT(dev), "cpu", errp);
+>      if (!obj) {
+> -        error_propagate(errp, local_err);
+>          error_prepend(errp, "required link 'cpu' not found: ");
+>          return;
+>      }
+> @@ -601,9 +600,8 @@ static void xive_tctx_realize(DeviceState *dev, Error **errp)
+>  
+>      /* Connect the presenter to the VCPU (required for CPU hotplug) */
+>      if (kvm_irqchip_in_kernel()) {
+> -        kvmppc_xive_cpu_connect(tctx, &local_err);
+> -        if (local_err) {
+> -            error_propagate(errp, local_err);
+> +        kvmppc_xive_cpu_connect(tctx, errp);
+> +        if (*errp) {
+>              return;
+>          }
+>      }
+> @@ -681,15 +679,15 @@ static const TypeInfo xive_tctx_info = {
+>  
+>  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)
+>  {
+> -    Error *local_err = NULL;
+> +    ERRP_AUTO_PROPAGATE();
+>      Object *obj;
+>  
+>      obj = object_new(TYPE_XIVE_TCTX);
+>      object_property_add_child(cpu, TYPE_XIVE_TCTX, obj, &error_abort);
+>      object_unref(obj);
+>      object_property_add_const_link(obj, "cpu", cpu, &error_abort);
+> -    object_property_set_bool(obj, true, "realized", &local_err);
+> -    if (local_err) {
+> +    object_property_set_bool(obj, true, "realized", errp);
+> +    if (*errp) {
+>          goto error;
+>      }
+>  
+> @@ -697,7 +695,6 @@ Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp)
+>  
+>  error:
+>      object_unparent(obj);
+> -    error_propagate(errp, local_err);
+>      return NULL;
+>  }
+>  
+> @@ -1050,13 +1047,12 @@ static void xive_source_reset(void *dev)
+>  
+>  static void xive_source_realize(DeviceState *dev, Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      XiveSource *xsrc = XIVE_SOURCE(dev);
+>      Object *obj;
+> -    Error *local_err = NULL;
+>  
+> -    obj = object_property_get_link(OBJECT(dev), "xive", &local_err);
+> +    obj = object_property_get_link(OBJECT(dev), "xive", errp);
+>      if (!obj) {
+> -        error_propagate(errp, local_err);
+>          error_prepend(errp, "required link 'xive' not found: ");
+>          return;
+>      }
+> @@ -1806,13 +1802,12 @@ static const MemoryRegionOps xive_end_source_ops = {
+>  
+>  static void xive_end_source_realize(DeviceState *dev, Error **errp)
+>  {
+> +    ERRP_AUTO_PROPAGATE();
+>      XiveENDSource *xsrc = XIVE_END_SOURCE(dev);
+>      Object *obj;
+> -    Error *local_err = NULL;
+>  
+> -    obj = object_property_get_link(OBJECT(dev), "xive", &local_err);
+> +    obj = object_property_get_link(OBJECT(dev), "xive", errp);
+>      if (!obj) {
+> -        error_propagate(errp, local_err);
+>          error_prepend(errp, "required link 'xive' not found: ");
+>          return;
+>      }
 
 
