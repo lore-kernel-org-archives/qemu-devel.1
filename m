@@ -2,77 +2,89 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EB4EC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9117C43215
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:52:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 180A120718
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:42:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 180A120718
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id ADD032231A
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:52:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SmAhQpJN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADD032231A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48655 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX7WM-0002rl-8I
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 12:42:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52024)
+	id 1iX7fY-00064I-4U
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 12:52:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53234)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iX7VR-0002RK-F9
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:41:38 -0500
+ (envelope-from <berrange@redhat.com>) id 1iX7eZ-0005QP-4E
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:51:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iX7VP-00075z-WD
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:41:37 -0500
-Received: from indium.canonical.com ([91.189.90.7]:39108)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iX7VO-00074u-0P
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:41:35 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iX7VL-0006Fa-AF
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 17:41:31 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 377192E80C8
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 17:41:31 +0000 (UTC)
+ (envelope-from <berrange@redhat.com>) id 1iX7eV-00050d-Sw
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:51:01 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:56116
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iX7eV-0004zx-I2
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:50:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574185857;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iO25zAir3pb37M4tqQZWSaxbeYzYMskWLEXU8sSC4j4=;
+ b=SmAhQpJNpHrDVE+MqKi/q6XfcBVWm/gSLaz3vQPOpdQRQHuBeGlhWXho8UoWfWzjFKl5+f
+ UufGiw6k6iv+w41HdZxF+oMvaIy8g3wFn7olq3JEPFWX0oHwBrTggFQelI9B1l4RUmp8VE
+ N2IVBpgTtBXXrHJokpsdjlcm1dZthJs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-262-KSVYjEpnOtKHAR3Om2rX6Q-1; Tue, 19 Nov 2019 12:50:55 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61F6E801E59;
+ Tue, 19 Nov 2019 17:50:54 +0000 (UTC)
+Received: from redhat.com (ovpn-112-61.ams2.redhat.com [10.36.112.61])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B0C0C18214;
+ Tue, 19 Nov 2019 17:50:47 +0000 (UTC)
+Date: Tue, 19 Nov 2019 17:50:44 +0000
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH 2/6] iotests: Skip test 079 if it is not possible to
+ create large files
+Message-ID: <20191119175044.GH2706053@redhat.com>
+References: <20191119170822.45649-1-thuth@redhat.com>
+ <20191119170822.45649-3-thuth@redhat.com>
+ <7242d268-6563-246f-4acc-2e714ebfd513@redhat.com>
+ <06a31aff-e01b-74ae-3d9a-ff0f8ea2696b@redhat.com>
+ <1d32c8c3-1cc3-574d-e79f-4b5bc2f376d3@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1d32c8c3-1cc3-574d-e79f-4b5bc2f376d3@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: KSVYjEpnOtKHAR3Om2rX6Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Nov 2019 17:32:33 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1844817@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: trace
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <156899449679.4991.3377250373042418918.malonedeb@chaenomeles.canonical.com>
-Message-Id: <157418475460.22889.11571924051490673056.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1844817] Re: trace: dynamic width format syntax not validated
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 7dbd2ce52cc73f3c24f4d3883c49ad2d60390d40
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,61 +93,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1844817 <1844817@bugs.launchpad.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: New =3D> Fix Committed
+On Tue, Nov 19, 2019 at 06:38:20PM +0100, Philippe Mathieu-Daud=C3=A9 wrote=
+:
+> On 11/19/19 6:34 PM, Thomas Huth wrote:
+> > On 19/11/2019 18.29, Philippe Mathieu-Daud=C3=A9 wrote:
+> > > On 11/19/19 6:08 PM, Thomas Huth wrote:
+> > > > Test 079 fails in the arm64, s390x and ppc64le LXD containers, whic=
+h
+> > > > apparently do not allow large files to be created. Test 079 tries t=
+o
+> > > > create a 4G sparse file, so check first whether we can really creat=
+e
+> > > > such files before executing the test.
+> > > >=20
+> > > > Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > > > ---
+> > > >  =C2=A0 tests/qemu-iotests/079 | 6 ++++++
+> > > >  =C2=A0 1 file changed, 6 insertions(+)
+> > > >=20
+> > > > diff --git a/tests/qemu-iotests/079 b/tests/qemu-iotests/079
+> > > > index 81f0c21f53..e9b81419b7 100755
+> > > > --- a/tests/qemu-iotests/079
+> > > > +++ b/tests/qemu-iotests/079
+> > > > @@ -39,6 +39,12 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
+> > > >  =C2=A0 _supported_fmt qcow2
+> > > >  =C2=A0 _supported_proto file nfs
+> > > >  =C2=A0 +# Some containers (e.g. non-x86 on Travis) do not allow la=
+rge files
+> > > > +if ! truncate --size=3D4G "$TEST_IMG"; then
+> > >=20
+> > > Shouldn't we restrict that to Travis-CI by checking some environment =
+var?
+> >=20
+> > I'd rather like to keep it independent from Travis environment
+> > variables, since somebody might want to run "make check" in other
+> > non-Travis containers or on weird filesystems, and then the test should
+> > ideally not fail, but simply skip, too.
+>=20
+> I see. But it would be bad if we stop catching normal bugs with this test
+> because we restricted it to contained environments.
+>=20
+> Maybe we can add a generic is_contained() routine that only checks for
+> TRAVIS env var, and people using other containers can expand it.
 
--- =
+"is_contained" is still expressing the environment.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1844817
+What we need is a way to express features, and be able to switch beteen
+autodetecting features & mandatory enablement.
 
-Title:
-  trace: dynamic width format syntax not validated
+eg
 
-Status in QEMU:
-  Fix Committed
+   if has_feature "large_file"
+   then
+       ...stuff using large files...
+   fi
 
-Bug description:
-  The dtrace via stap backend cannot support the dynamic '*' width
-  format.
+The "has_feature" helper would by default call out to
+"has_feature_large_file" todo automatic probing so that things
+"just work" according to whatever env the tests are run inside.
 
-  Eric noted in https://lists.gnu.org/archive/html/qemu-
-  devel/2019-09/msg04720.html:
+There should, however, be a flag to "./check" which force enables
+the feature eg  "./check --require-feature large_file" will force
+execution and not attempt to probe for it.
 
-    https://sourceware.org/systemtap/langref.pdf
+We could have "--require-feature :all" to force enable all optional
+bits.
 
-    section 9.2 printf, states:
+Any formal CI systems should use --require-feature to explicitly
+force testing of features that are expected to always work.
 
-    "The printf formatting directives are similar to those of C, except that
-    they are fully checked for type by the translator."
+so Travis x86 would use "--require-feature large_large", but
+the arch64 version would not pass this flag and so do probing
+which will auto-skip.
 
-    and does NOT list handling for '*' under precision or width.
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
+ :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com=
+ :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
+ :|
 
-  Some trace events have been merged without checking this:
-
-  $ git ls-files|fgrep trace-event|xargs git grep '*\("\|x\)'
-  hw/block/trace-events:11:pflash_io_read(uint64_t offset, int width, int f=
-mt_width, uint32_t value, uint8_t cmd, uint8_t wcycle) "offset:0x%04"PRIx64=
-" width:%d value:0x%0*x cmd:0x%02x wcycle:%u"
-  hw/block/trace-events:12:pflash_io_write(uint64_t offset, int width, int =
-fmt_width, uint32_t value, uint8_t wcycle) "offset:0x%04"PRIx64" width:%d v=
-alue:0x%0*x wcycle:%u"
-  hw/block/trace-events:13:pflash_data_read(uint64_t offset, int width, uin=
-t32_t value) "data offset:0x%04"PRIx64" value:0x%0*x"
-  hw/block/trace-events:14:pflash_data_write(uint64_t offset, int width, ui=
-nt32_t value, uint64_t counter) "data offset:0x%04"PRIx64" value:0x%0*x cou=
-nter:0x%016"PRIx64
-  hw/mips/trace-events:2:gt64120_read(const char *regname, int width, uint6=
-4_t value) "gt64120 read %s value:0x%0*" PRIx64
-  hw/mips/trace-events:3:gt64120_write(const char *regname, int width, uint=
-64_t value) "gt64120 write %s value:0x%0*" PRIx64
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1844817/+subscriptions
 
