@@ -2,92 +2,56 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6872BC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5438BC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:03:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32FCF22444
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 19:58:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mtzgxbFn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32FCF22444
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2A8B922440
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:03:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A8B922440
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX9dR-0003x4-Cp
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 14:58:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47749)
+	id 1iX9iK-0006Gz-9u
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 15:03:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48826)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iX9bh-0002b7-8O
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:56:14 -0500
+ (envelope-from <its@irrelevant.dk>) id 1iX9hC-0005km-2J
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:02:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iX9bf-0006PR-Vu
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:56:12 -0500
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51424)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iX9bf-0006PI-OG
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 14:56:11 -0500
-Received: by mail-wm1-x341.google.com with SMTP id q70so4579895wme.1
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 11:56:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=+vH32JhdurTQfBi31a9nzuxJjyfD6u+B80YZ/BBo1Y4=;
- b=mtzgxbFnJwhuBgupOOYig9hpzUkpRk6eko/RPFCdasB2eSwmBaTstelQ9ci7fEDzT4
- T/gBR/gVGoqA52Y00f0czUZY0VmTEJ3Zqxa0Jm8S+txFTF9KtVMxIy+1B8Gi+nie2Vv8
- i206Fx1KH10yNsjFkP8znbxtUWy9HctFGiqRZ1p0nS3/EStLUWw/k4AO9dlCbPbeLqA2
- 3poln7jA1BUriXkjLcoVW6fm6GIIpVMcvhHgYgLQv1rIySO62hUHiXEWeed8ofTv1a81
- P9aVP6DOHPLcuMb21i4/kIglOAAKGobb8WfO8q6aXatl/wK1Nf9ce2fLv3FLLyesTIhG
- Tkvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+vH32JhdurTQfBi31a9nzuxJjyfD6u+B80YZ/BBo1Y4=;
- b=GfXcTrSamrBpe5On+Xf4XoN8zL0BRJav8lTv0/OHBQ6slu8L9NiSsQZicA5ciUESvW
- FmhV0Xfl+/xHrD7LRdPYwh6wJW5M6Nv/2Uj2YZzHHhlrrQrZGB1HsifiBqXvvkUSLDok
- YHJ6DOeVgvr4WRcCFtNUanDB4nzFm8R0R/DJn/tWnujsvWJqHTXk4CEk5vLnB8w5ekQN
- iJF0+8s491McKJzwdX+quooQHWqIcgHJgrYu3LRvlPfMbX3E66tOiap3cspLEM/lZO+O
- 9AFKHEldqZlqTE8hIfZOXJ3+TaNZ0jkMgVHbx3bWFzzYx/p9rECNbBnsCkMK2nO6es4w
- JCbA==
-X-Gm-Message-State: APjAAAUCQL9nRDvjT15qTBYveHZ8+Lri1z4tTbfpLsr5aJAaNI8Kjapq
- hTk5/57wxVClCc3jz3N7V/tP9A==
-X-Google-Smtp-Source: APXvYqwImVlA9a/QbL+8CrNINf31LEM2keGb6EE11yK/ZLc7fVrTku8u144Fc4JOS1ExWpWUyp69jQ==
-X-Received: by 2002:a05:600c:2911:: with SMTP id
- i17mr7812764wmd.83.1574193370299; 
- Tue, 19 Nov 2019 11:56:10 -0800 (PST)
-Received: from [192.168.8.102] (64.red-79-149-204.dynamicip.rima-tde.net.
- [79.149.204.64])
- by smtp.gmail.com with ESMTPSA id z14sm27798635wrl.60.2019.11.19.11.56.09
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 19 Nov 2019 11:56:09 -0800 (PST)
-Subject: Re: [PATCH] linux-user/strace: Add missing signal strings
-To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
-References: <20191119185153.GA23003@ls3530.fritz.box>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <48097cb5-bc47-e532-fcde-67ca65a2039e@linaro.org>
-Date: Tue, 19 Nov 2019 20:56:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <its@irrelevant.dk>) id 1iX9hA-0007cx-TJ
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:01:54 -0500
+Received: from charlie.dont.surf ([128.199.63.193]:37980)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1iX9h6-0007br-Je; Tue, 19 Nov 2019 15:01:48 -0500
+Received: from apples.localdomain (ip-5-186-123-87.cgn.fibianet.dk
+ [5.186.123.87])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 83A37BF614;
+ Tue, 19 Nov 2019 20:01:46 +0000 (UTC)
+Date: Tue, 19 Nov 2019 21:01:45 +0100
+From: Klaus Birkelund <its@irrelevant.dk>
+To: Beata Michalska <beata.michalska@linaro.org>
+Subject: Re: [PATCH v2 08/20] nvme: add support for the get log page command
+Message-ID: <20191119200145.GB1022320@apples.localdomain>
+References: <20191015103900.313928-1-its@irrelevant.dk>
+ <20191015103900.313928-9-its@irrelevant.dk>
+ <CADSWDzsrzrnrLfowsdgZobtVgsga1oGXGpo0HyTUsKPVNzhx9w@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191119185153.GA23003@ls3530.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::341
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADSWDzsrzrnrLfowsdgZobtVgsga1oGXGpo0HyTUsKPVNzhx9w@mail.gmail.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,37 +63,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Paul Durrant <Paul.Durrant@citrix.com>,
+ Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/19/19 7:51 PM, Helge Deller wrote:
-> Add the textual representations of some missing target signals.
+On Tue, Nov 12, 2019 at 03:04:52PM +0000, Beata Michalska wrote:
+> Hi Klaus,
 > 
-> Signed-off-by: Helge Deller <deller@gmx.de>
 > 
-> diff --git a/linux-user/strace.c b/linux-user/strace.c
-> index 3d4d684450..18b57a9ef9 100644
-> --- a/linux-user/strace.c
-> +++ b/linux-user/strace.c
-> @@ -146,6 +146,22 @@ print_signal(abi_ulong arg, int last)
->      case TARGET_SIGSTOP: signal_name = "SIGSTOP"; break;
->      case TARGET_SIGTTIN: signal_name = "SIGTTIN"; break;
->      case TARGET_SIGTTOU: signal_name = "SIGTTOU"; break;
-> +    case TARGET_SIGIO: signal_name = "SIGIO"; break;
-> +    case TARGET_SIGTRAP: signal_name = "SIGTRAP"; break;
-> +    /* case TARGET_SIGIOT: signal_name = "SIGIOT"; break; */
+> On Tue, 15 Oct 2019 at 11:45, Klaus Jensen <its@irrelevant.dk> wrote:
+> > +    if (!nsid || (nsid != 0xffffffff && nsid > n->num_namespaces)) {
+> > +        trace_nvme_err_invalid_ns(nsid, n->num_namespaces);
+> > +        return NVME_INVALID_NSID | NVME_DNR;
+> > +    }
+> > +
+> The LAP '0' bit is cleared now - which means there is no support
+> for per-namespace data. So in theory, if that was the aim, this condition
+> should check for the values different than 0x0 and 0xFFFFFFFF and either
+> abort the command or treat that as request for controller specific data.
+> 
 
-Unused commented code.
+This is fixed in v3 (that is, it just checks for values different from
+0x0 and 0xffffffff).
 
-> +#ifdef SIGSTKFLT
-> +    case TARGET_SIGSTKFLT: signal_name = "SIGSTKFLT"; break;
-> +#endif
+> > +    switch (lid) {
+> > +    case NVME_LOG_ERROR_INFO:
+> > +        return nvme_error_info(n, cmd, len, off, req);
+> > +    case NVME_LOG_SMART_INFO:
+> > +        return nvme_smart_info(n, cmd, len, off, req);
+> > +    case NVME_LOG_FW_SLOT_INFO:
+> > +        return nvme_fw_log_info(n, cmd, len, off, req);
+> > +    default:
+> > +        trace_nvme_err_invalid_log_page(req->cid, lid);
+> > +        return NVME_INVALID_LOG_ID | NVME_DNR;
+> 
+> The spec mentions the Invalid Field in Command  case processing
+> command with an unsupported log id.
+> 
 
-Wrong ifdef.
+Thanks. Fixed!
 
+> > +    }
+> > +}
+> > +
+> >  static void nvme_free_cq(NvmeCQueue *cq, NvmeCtrl *n)
+> >  {
+> >      n->cq[cq->cqid] = NULL;
+> > @@ -812,6 +944,9 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >      uint32_t result;
+> >
+> >      switch (dw10) {
+> > +    case NVME_TEMPERATURE_THRESHOLD:
+> > +        result = cpu_to_le32(n->features.temp_thresh);
+> > +        break;
+> >      case NVME_VOLATILE_WRITE_CACHE:
+> >          result = blk_enable_write_cache(n->conf.blk);
+> >          trace_nvme_getfeat_vwcache(result ? "enabled" : "disabled");
+> > @@ -856,6 +991,10 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >      uint32_t dw11 = le32_to_cpu(cmd->cdw11);
+> >
+> >      switch (dw10) {
+> > +    case NVME_TEMPERATURE_THRESHOLD:
+> > +        n->features.temp_thresh = dw11;
+> > +        break;
+> > +
+> >      case NVME_VOLATILE_WRITE_CACHE:
+> >          blk_set_enable_write_cache(n->conf.blk, dw11 & 1);
+> >          break;
+> > @@ -884,6 +1023,8 @@ static uint16_t nvme_admin_cmd(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> >          return nvme_del_sq(n, cmd);
+> >      case NVME_ADM_CMD_CREATE_SQ:
+> >          return nvme_create_sq(n, cmd);
+> > +    case NVME_ADM_CMD_GET_LOG_PAGE:
+> > +        return nvme_get_log(n, cmd, req);
+> >      case NVME_ADM_CMD_DELETE_CQ:
+> >          return nvme_del_cq(n, cmd);
+> >      case NVME_ADM_CMD_CREATE_CQ:
+> > @@ -923,6 +1064,7 @@ static void nvme_process_sq(void *opaque)
+> >          QTAILQ_INSERT_TAIL(&sq->out_req_list, req, entry);
+> >          memset(&req->cqe, 0, sizeof(req->cqe));
+> >          req->cqe.cid = cmd.cid;
+> > +        req->cid = le16_to_cpu(cmd.cid);
+> 
+> If I haven't missed anything this is being used only in one place
+> for tracing - is it really worth to duplicate the cid here ?
+> 
 
-r~
+At this point in the series, yes - it is only used once. But it will be
+used extensively for tracing in the later patches.
+
+> > -    id->lpa = 1 << 0;
+> > +    id->lpa = 1 << 2;
+> 
+> This sets the bit that states support for GLP command but clears the one
+> that states support for per-namespace SMART/Heatld data - is that expected ?
+> 
+
+Yes, clearing the bit for per-namespace SMART/Health log page
+information is intentional. There is no namespace specific information
+defined in the namespace so the global and per-namespace log page
+contains the same information.
 
