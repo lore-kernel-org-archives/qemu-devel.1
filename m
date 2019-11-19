@@ -2,66 +2,102 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C2DDC432C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 15:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFE4C432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 15:37:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DE9C22304
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 15:33:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DE9C22304
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 04EFE22363
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 15:37:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="irNIz5li"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04EFE22363
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX5V3-00065h-FK
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 10:33:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51916)
+	id 1iX5Zl-0000aD-49
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 10:37:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52582)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <liam.r.girdwood@linux.intel.com>) id 1iX5Tj-00057h-PH
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 10:31:45 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iX5Yz-00008h-U9
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 10:37:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <liam.r.girdwood@linux.intel.com>) id 1iX5Ti-0001tO-BJ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 10:31:43 -0500
-Received: from mga14.intel.com ([192.55.52.115]:4774)
+ (envelope-from <pbonzini@redhat.com>) id 1iX5Yx-0003EK-7J
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 10:37:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45553
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <liam.r.girdwood@linux.intel.com>)
- id 1iX5Ti-0001s0-3Q
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 10:31:42 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 19 Nov 2019 07:31:33 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,324,1569308400"; d="scan'208";a="209227174"
-Received: from sstrehla-mobl1.ger.corp.intel.com ([10.252.16.202])
- by orsmga003.jf.intel.com with ESMTP; 19 Nov 2019 07:31:28 -0800
-Message-ID: <bee3aae13f6cf69ee909aa9884926853d6123b25.camel@linux.intel.com>
-Subject: Re: [virtio-dev] Re: guest / host buffer sharing ...
-From: Liam Girdwood <liam.r.girdwood@linux.intel.com>
-To: Gurchetan Singh <gurchetansingh@chromium.org>
-Date: Tue, 19 Nov 2019 15:31:27 +0000
-In-Reply-To: <CAAfnVB=F+HeQrrn23c=rZeOa5BfHo=9ArcG--gLf87gqBXfZ9A@mail.gmail.com>
-References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
- <20191106084344.GB189998@stefanha-x1.localdomain>
- <CAD=HUj41r8wHZ2-By8tLftkoqC5r_Bw=pr=zX2aZ7GTs1ESWhg@mail.gmail.com>
- <c8a6b6f35664ce036c2a48ec41eab97b0f40704d.camel@linux.intel.com>
- <CAAfnVBkMWurTpseQFjcna5kk3__40n6M68=RTHLbQsu__2AFxg@mail.gmail.com>
- <4a5dd822e86757f004d04af62fb7dd35ba75392d.camel@linux.intel.com>
- <CAAfnVB=F+HeQrrn23c=rZeOa5BfHo=9ArcG--gLf87gqBXfZ9A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 192.55.52.115
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iX5Yw-0003EA-St
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 10:37:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574177826;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=1A0zJ6Z4FSOfW7Y8zFWYJmQrHdGw1qqxWATSE6A8kZk=;
+ b=irNIz5li/S+27mRTDtRiG0DETHxAZMQcfJdx9kX/gRq7WRjBvcU7D1PHANtPbovIatLmI1
+ CVB4o4KoMqMu31eOaXvDM5+pkled1UDhclm59GITCmaBZpI54LrBSGmss6IxTHRZaulblC
+ Soh5PewEI5Ush2tiJHnr1xrw5F4YeiQ=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-36-EzGQUR-6MVKqsYpl-CBbCg-1; Tue, 19 Nov 2019 10:37:03 -0500
+Received: by mail-wr1-f72.google.com with SMTP id v6so18327892wrm.18
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 07:37:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=pgDhRhE/j2pAN6KLxpBmLuf6oLQfjn+RA15n3cF1rYw=;
+ b=Mo0/p7kuAMkdLAn6iOY9/UmjUNsYUEt887N4Tjasp4oemEb9YX8ncMQ0ChZ2zkyXOq
+ 7mhbuQpywCSmXIIEQ0uhEbt6r74Y2s5hoK88cZa7toGEZHt4JDoO4pQwMCcmUSzyyzVk
+ n2dL9iDnt/9Yx7tQvJit33UZcubbxDCW0p7q13k8wUz/b7XaxUV3aZHhbNRoZOj/HMgX
+ yeir9CC8nQJoSiwpJnRTV46Slbq0vz1E+O35sVUJ7eDKUa09euM7o22G7zK2s+dJe455
+ pLysuV15ejR+seLlhlwGGDQ1zmeKgol9+kv9mxWnhg394Rl8LFNKurdAk7Jj1e04QuYh
+ CC0w==
+X-Gm-Message-State: APjAAAXquGV9oCkzfivL7nqTEgDZZ7yR2EQvcRswk3ycZHwzUDUyjZlr
+ pE8zJiho9G6CSZ1URAOXVPkbWTSwEx4DoYl/ot61RmSkOKNN8WmYMmwoCzVCKazWfcI9dt1gaeu
+ IP5x+M2LcE0e3IRI=
+X-Received: by 2002:adf:e74e:: with SMTP id c14mr7506874wrn.124.1574177822547; 
+ Tue, 19 Nov 2019 07:37:02 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz9LCwLfjdg9k82wu1V28DtIczubtS0zh5VwoCJkJJqbomPX3qmomfJC8vtHWiW/K6JOg2JQQ==
+X-Received: by 2002:adf:e74e:: with SMTP id c14mr7506834wrn.124.1574177822248; 
+ Tue, 19 Nov 2019 07:37:02 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:dc24:9a59:da87:5724?
+ ([2001:b07:6468:f312:dc24:9a59:da87:5724])
+ by smtp.gmail.com with ESMTPSA id q5sm3379848wmc.27.2019.11.19.07.37.01
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 19 Nov 2019 07:37:01 -0800 (PST)
+Subject: Re: Exclude paths from checkpatch (was: Re: [PATCH] Add minimal
+ Hexagon target)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
+References: <157412709300.27250.5531224491109755641@37313f22b938>
+ <7851e556-a5f2-9059-faf7-3d2a4e32958c@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <def79672-7227-97ae-08b0-02aad6d9f850@redhat.com>
+Date: Tue, 19 Nov 2019 16:37:02 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <7851e556-a5f2-9059-faf7-3d2a4e32958c@redhat.com>
+Content-Language: en-US
+X-MC-Unique: EzGQUR-6MVKqsYpl-CBbCg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,153 +109,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
- Alex Lau <alexlau@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
- Alexandre Courbot <acourbot@chromium.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
- Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
- David Stevens <stevensd@chromium.org>, Hans Verkuil <hverkuil@xs4all.nl>,
- =?ISO-8859-1?Q?St=E9phane?= Marchesin <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>,
- Dmitry Morozov <dmitry.morozov@opensynergy.com>,
- Pawel Osciak <posciak@chromium.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Max Filippov <jcmvbkbc@gmail.com>, tsimpson@quicinc.com, riku.voipio@iki.fi,
+ qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 2019-11-12 at 14:55 -0800, Gurchetan Singh wrote:
-> On Tue, Nov 12, 2019 at 5:56 AM Liam Girdwood
-> <liam.r.girdwood@linux.intel.com> wrote:
-> > 
-> > On Mon, 2019-11-11 at 16:54 -0800, Gurchetan Singh wrote:
-> > > On Tue, Nov 5, 2019 at 2:55 AM Gerd Hoffmann <kraxel@redhat.com>
-> > > wrote:
-> > > > Each buffer also has some properties to carry metadata, some
-> > > > fixed
-> > > > (id, size, application), but
-> > > > also allow free form (name = value, framebuffers would have
-> > > > width/height/stride/format for example).
-> > > 
-> > > Sounds a lot like the recently added DMA_BUF_SET_NAME ioctls:
-> > > 
-> > > https://patchwork.freedesktop.org/patch/310349/
-> > > 
-> > > For virtio-wayland + virtio-vdec, the problem is sharing -- not
-> > > allocation.
-> > > 
-> > 
-> > Audio also needs to share buffers with firmware running on DSPs.
-> > 
-> > > As the buffer reaches a kernel boundary, it's properties devolve
-> > > into
-> > > [fd, size].  Userspace can typically handle sharing
-> > > metadata.  The
-> > > issue is the guest dma-buf fd doesn't mean anything on the host.
-> > > 
-> > > One scenario could be:
-> > > 
-> > > 1) Guest userspace (say, gralloc) allocates using virtio-
-> > > gpu.  When
-> > > allocating, we call uuidgen() and then pass that via
-> > > RESOURCE_CREATE
-> > > hypercall to the host.
-> > > 2) When exporting the dma-buf, we call DMA_BUF_SET_NAME (the
-> > > buffer
-> > > name will be "virtgpu-buffer-${UUID}").
-> > > 3) When importing, virtio-{vdec, video} reads the dma-buf name in
-> > > userspace, and calls fd to handle.  The name is sent to the host
-> > > via
-> > > a
-> > > hypercall, giving host virtio-{vdec, video} enough information to
-> > > identify the buffer.
-> > > 
-> > > This solution is entirely userspace -- we can probably come up
-> > > with
-> > > something in kernel space [generate_random_uuid()] if need
-> > > be.  We
-> > > only need two universal IDs: {device ID, buffer ID}.
-> > > 
-> > 
-> > I need something where I can take a guest buffer and then convert
-> > it to
-> > physical scatter gather page list. I can then either pass the SG
-> > page
-> > list to the DSP firmware (for DMAC IP programming) or have the host
-> > driver program the DMAC directly using the page list (who programs
-> > DMAC
-> > depends on DSP architecture).
-> 
-> So you need the HW address space from a guest allocation? 
+On 19/11/19 09:51, Philippe Mathieu-Daud=C3=A9 wrote:
+>=20
+> $ cat .git/hooks/pre-commit
+> #!/bin/bash
+> exec git diff --cached -- ':(top)' $(test -e .checkpatchignore && sed
+> -ne '/^\(#.*\|$\)/ ! s/.*/:(exclude)\0/p' < .checkpatchignore) |
+> scripts/checkpatch.pl --no-signoff -q -
+>=20
+> $ cat .checkpatchignore
+> # A line starting with # serves as a comment.
+> # A blank line matches no files, so it can serve as a separator for
+> readability.
+> include/standard-headers
+> target/xtensa/core-*
+> target/hexagon/imported
+>=20
+> Would this be acceptable to reduce patchew false positives?
+>=20
+> git exclude pathspec trick from:
+> https://stackoverflow.com/questions/39931781/git-diff-stat-exclude-certai=
+n-files/39937070#39937070
+>=20
 
-Yes.
+Could support for this be added directly to checkpatch, instead?
 
->  Would your
-> allocation hypercalls use something like the virtio_gpu_mem_entry
-> (virtio_gpu.h) and the draft virtio_video_mem_entry (draft)?
-
-IIUC, this looks like generic SG buffer allocation ?
-
-> 
-> struct {
->         __le64 addr;
->         __le32 length;
->         __le32 padding;
-> };
-> 
-> /* VIRTIO_GPU_CMD_RESOURCE_ATTACH_BACKING */
-> struct virtio_gpu_resource_attach_backing {
->         struct virtio_gpu_ctrl_hdr hdr;
->         __le32 resource_id;
->         __le32 nr_entries;
->       *struct struct virtio_gpu_mem_entry */
-> };
-> 
-> struct virtio_video_mem_entry {
->     __le64 addr;
->     __le32 length;
->     __u8 padding[4];
-> };
-> 
-> struct virtio_video_resource_attach_backing {
->     struct virtio_video_ctrl_hdr hdr;
->     __le32 resource_id;
->     __le32 nr_entries;
-> };
-> 
-> > 
-> > DSP FW has no access to userspace so we would need some additional
-> > API
-> > on top of DMA_BUF_SET_NAME etc to get physical hardware pages ?
-> 
-> The dma-buf api currently can share guest memory sg-lists.
-
-Ok, IIUC buffers can either be shared using the GPU proposed APIs
-(above) or using the dma-buf API to share via userspace ? My preference
-would be to use teh more direct GPU APIs sending physical page
-addresses from Guest to device driver. I guess this is your use case
-too ?
-
-Thanks
-
-Liam
-
-> 
-> > 
-> > Liam
-> > 
-> > 
-> > 
-> > -----------------------------------------------------------------
-> > ----
-> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> > For additional commands, e-mail: 
-> > virtio-dev-help@lists.oasis-open.org
-> > 
-> 
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
-> 
+Paolo
 
 
