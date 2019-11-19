@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70AFAC43215
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA41C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:21:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EEEC22363
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:17:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F391C22362
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:21:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="icVKQlmv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EEEC22363
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q34olN5e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F391C22362
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX6CG-00035E-KG
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 11:17:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60771)
+	id 1iX6FQ-0005rS-Q9
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 11:21:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60733)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iX63v-00021Y-AD
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:08 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iX63r-0001vI-Ph
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iX63u-00069S-21
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:07 -0500
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:54364)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iX63q-00067T-Mm
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:03 -0500
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:34951)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iX63t-000695-RW
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:06 -0500
-Received: by mail-wm1-x32f.google.com with SMTP id z26so3791999wmi.4
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 08:09:05 -0800 (PST)
+ id 1iX63q-00066y-Gb
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:02 -0500
+Received: by mail-wm1-x334.google.com with SMTP id 8so4365327wmo.0
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 08:09:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references;
- bh=iIEhLJHGJyb/n0As6qSQK05whIAhohU7R9F3hYodbw0=;
- b=icVKQlmv2Y9HtY5+AT45kiySywerRLDixl1CG9V3SKDYtf//xFuaKxflsEk4qXmX+U
- LcLbedTX8RUpExn9RXIca0gX547aITz+oRR0qTNfTvXjsUZYmuPDxxcnAW5brk0bbKpd
- c1Gxx1jsE6hKJbXxfb4HiMKT4V42A2ierrt/++bB/oof2NEFFHfH6ylE49NU+2tobkJq
- A+U+TZ710YtAffh4wZ7hxNG5YwiTBs8vfwIMRZBKeXtV/ef5okLf4M+b4j7BHFvekCE+
- s8JoI0eZ/KhacGBL+1/yfc7W7y9QXhlr/6T5JwhM3bRQNbfxKw9JvB0RVhW3+Jsyx8Mc
- odOQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=ep9NciRh5AxFxbZ8BVLC6AZ8AyyeFsDsKi2zTRHiEDs=;
+ b=q34olN5e+B7fBP5OyGWSbN52OFQFEIUCQDHMnC5q4RYWebkTba4S6FVHqFqU/XLLl7
+ D5YVKGYdUjMeN8qoIU1BJXnBX2S0geCXRugaeDeTMAs5yCgZHkMNRppT0m30y1THlcVn
+ 6zECr3NT+NhO4opw0DifKQd8CcpP0HGUZpQv2pIKqrdajAjvhHmyJVeVWHiAk7AZXd3L
+ ffZmQPXhopTjXBPAnt6Q9a69BXBFZ+nwppkOUIQ8p0CqYuH1LTT83C/yS2wL2AIKupZv
+ lYagvPEC7AD3FOK5rPTW03+1MMNnL7BOLoVrAJUCcuzRw1mcBS9HG3j9R8LmUH6b8IS/
+ 0odg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=iIEhLJHGJyb/n0As6qSQK05whIAhohU7R9F3hYodbw0=;
- b=HhgRVlzeAbhogxSJ5goaO2SjBRLXOa+zI1ETni7C0Sq3d3tZKrEb8guim6I2OQCbxU
- NAlud0cRNZTosFnciLw+/UcRDXl3kprjuSKHzBvQcPBCxZdMpGIcd3+evDfiUKa/LrDa
- TnqwWFhdE4siZH6Guq41DTWwPI+L8bGy0tseLJUcbYQo4mDq9UwONAYdsCvF6KCitWZM
- CywBdQlKFSLcV9OWeleB3WC64hZt3epQoU5+VtHj4NCHjMC+cKjPi8mDU0SZK6SRVYqj
- foXrOQOzVBBqESdDSXsDIlGmo259sQ/mfQ3L2gkaBPfdukRMQhg/nln9KVQDA2U1hQBE
- KhtA==
-X-Gm-Message-State: APjAAAUkMbC/R+D8nFb/HsTe2MwR/1JQluT0zHzvmtGhuhLTO8BZFfyC
- DZUl2pW3ZZA/3o9mKZE3Ip0gWSnt
-X-Google-Smtp-Source: APXvYqyqbarSik4UhQAnuYZwBlFyhLRn2+lXi0y+Mv6M6A4RD3Eaa6/1231M+eGZ/AIFDmSG8j7hnw==
-X-Received: by 2002:a1c:7905:: with SMTP id l5mr7040588wme.76.1574179744541;
- Tue, 19 Nov 2019 08:09:04 -0800 (PST)
+ bh=ep9NciRh5AxFxbZ8BVLC6AZ8AyyeFsDsKi2zTRHiEDs=;
+ b=tAKfl7o1RGni8Gg4jU4q2U0MVL+xxIEoK4iJX7XepjXf81xx6vxdoWAvUN5CHOD3Z1
+ MEYe0+eR64ATYAjwbGYl5nqni6YgaWn5tgAK/+F6Eki4OM2l9go41BiSHhHOhNB+EgxL
+ ch5k6RY8VIaLAOCsQVU8rCT8D51C74HVq87YXzrjnJ9RN4rtEmKJEGSCMbLZ4xCmSFjq
+ OSSyNT91lpUy3T38eitUXCRLwOvPJrHzxwX8+bWw4B9L5+QcQAESYCcXYj4pPTosiZKz
+ gPKNn1u0cg0Ju8StcI9duqCySAMwBOF9Pxpko+xnDxagjJEJZE/JJmvRcIRouW/mR4r3
+ 4iLQ==
+X-Gm-Message-State: APjAAAWnpM5dtJjciDd/oZS5d/61Xk6oCdLBR+qxHjj6aLvWHQaR/XLE
+ CbeAGmqRJIHAEVVP9gOwe1DU0h2F
+X-Google-Smtp-Source: APXvYqwqvmvvn6lKZWrIrchwmY8QrF876Ief37m6UjixFm1q+1SHHwPrC0APaauYWQ77dIK2pHnOBQ==
+X-Received: by 2002:a1c:e157:: with SMTP id y84mr6275554wmg.59.1574179741090; 
+ Tue, 19 Nov 2019 08:09:01 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n13sm3442203wmi.25.2019.11.19.08.09.03
- for <qemu-devel@nongnu.org>
+ by smtp.gmail.com with ESMTPSA id n13sm3442203wmi.25.2019.11.19.08.09.00
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 19 Nov 2019 08:09:03 -0800 (PST)
+ Tue, 19 Nov 2019 08:09:00 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/12] Revert "mc146818rtc: fix timer interrupt reinjection"
-Date: Tue, 19 Nov 2019 17:08:47 +0100
-Message-Id: <1574179728-35535-12-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 08/12] docs/microvm.rst: add instructions for shutting down the
+ guest
+Date: Tue, 19 Nov 2019 17:08:44 +0100
+Message-Id: <1574179728-35535-9-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1574179728-35535-1-git-send-email-pbonzini@redhat.com>
 References: <1574179728-35535-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::32f
+X-Received-From: 2a00:1450:4864:20::334
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,106 +90,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Sergio Lopez <slp@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts commit b429de730174b388ea5760e3debb0d542ea3c261, except
-that the reversal of the outer "if (period)" is left in.
+From: Sergio Lopez <slp@redhat.com>
 
+Add a new section explaining the particularities of the microvm
+machine type for triggering a guest-initiated shut down.
+
+Signed-off-by: Sergio Lopez <slp@redhat.com>
+Message-Id: <20191115161338.42864-3-slp@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/rtc/mc146818rtc.c | 67 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 33 insertions(+), 34 deletions(-)
+ docs/microvm.rst | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/hw/rtc/mc146818rtc.c b/hw/rtc/mc146818rtc.c
-index ee6bf82..9869dc5 100644
---- a/hw/rtc/mc146818rtc.c
-+++ b/hw/rtc/mc146818rtc.c
-@@ -174,7 +174,6 @@ periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
-     int64_t cur_clock, next_irq_clock, lost_clock = 0;
- 
-     period = rtc_periodic_clock_ticks(s);
--
-     if (!period) {
-         s->irq_coalesced = 0;
-         timer_del(s->periodic_timer);
-@@ -197,42 +196,42 @@ periodic_timer_update(RTCState *s, int64_t current_time, uint32_t old_period)
-         last_periodic_clock = next_periodic_clock - old_period;
-         lost_clock = cur_clock - last_periodic_clock;
-         assert(lost_clock >= 0);
-+    }
- 
-+    /*
-+     * s->irq_coalesced can change for two reasons:
-+     *
-+     * a) if one or more periodic timer interrupts have been lost,
-+     *    lost_clock will be more that a period.
-+     *
-+     * b) when the period may be reconfigured, we expect the OS to
-+     *    treat delayed tick as the new period.  So, when switching
-+     *    from a shorter to a longer period, scale down the missing,
-+     *    because the OS will treat past delayed ticks as longer
-+     *    (leftovers are put back into lost_clock).  When switching
-+     *    to a shorter period, scale up the missing ticks since the
-+     *    OS handler will treat past delayed ticks as shorter.
-+     */
-+    if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW) {
-+        uint32_t old_irq_coalesced = s->irq_coalesced;
+diff --git a/docs/microvm.rst b/docs/microvm.rst
+index 4cf8474..fcf41fc 100644
+--- a/docs/microvm.rst
++++ b/docs/microvm.rst
+@@ -106,3 +106,24 @@ disabled::
+      -device virtio-blk-device,drive=test \
+      -netdev tap,id=tap0,script=no,downscript=no \
+      -device virtio-net-device,netdev=tap0
 +
-+        s->period = period;
-+        lost_clock += old_irq_coalesced * old_period;
-+        s->irq_coalesced = lost_clock / s->period;
-+        lost_clock %= s->period;
-+        if (old_irq_coalesced != s->irq_coalesced ||
-+            old_period != s->period) {
-+            DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, "
-+                      "period scaled from %d to %d\n", old_irq_coalesced,
-+                      s->irq_coalesced, old_period, s->period);
-+            rtc_coalesced_timer_update(s);
-+        }
-+    } else {
-         /*
--         * s->irq_coalesced can change for two reasons:
--         *
--         * a) if one or more periodic timer interrupts have been lost,
--         *    lost_clock will be more that a period.
--         *
--         * b) when the period may be reconfigured, we expect the OS to
--         *    treat delayed tick as the new period.  So, when switching
--         *    from a shorter to a longer period, scale down the missing,
--         *    because the OS will treat past delayed ticks as longer
--         *    (leftovers are put back into lost_clock).  When switching
--         *    to a shorter period, scale up the missing ticks since the
--         *    OS handler will treat past delayed ticks as shorter.
-+         * no way to compensate the interrupt if LOST_TICK_POLICY_SLEW
-+         * is not used, we should make the time progress anyway.
-          */
--        if (s->lost_tick_policy == LOST_TICK_POLICY_SLEW) {
--            uint32_t old_irq_coalesced = s->irq_coalesced;
--
--            s->period = period;
--            lost_clock += old_irq_coalesced * old_period;
--            s->irq_coalesced = lost_clock / s->period;
--            lost_clock %= s->period;
--            if (old_irq_coalesced != s->irq_coalesced ||
--                old_period != s->period) {
--                DPRINTF_C("cmos: coalesced irqs scaled from %d to %d, "
--                          "period scaled from %d to %d\n", old_irq_coalesced,
--                          s->irq_coalesced, old_period, s->period);
--                rtc_coalesced_timer_update(s);
--            }
--        } else {
--            /*
--             * no way to compensate the interrupt if LOST_TICK_POLICY_SLEW
--             * is not used, we should make the time progress anyway.
--             */
--            lost_clock = MIN(lost_clock, period);
--        }
-+        lost_clock = MIN(lost_clock, period);
-     }
- 
-     assert(lost_clock >= 0 && lost_clock <= period);
++
++Triggering a guest-initiated shut down
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++As the microvm machine type includes just a small set of system
++devices, some x86 mechanisms for rebooting or shutting down the
++system, like sending a key sequence to the keyboard or writing to an
++ACPI register, doesn't have any effect in the VM.
++
++The recommended way to trigger a guest-initiated shut down is by
++generating a ``triple-fault``, which will cause the VM to initiate a
++reboot. Additionally, if the ``-no-reboot`` argument is present in the
++command line, QEMU will detect this event and terminate its own
++execution gracefully.
++
++Linux does support this mechanism, but by default will only be used
++after other options have been tried and failed, causing the reboot to
++be delayed by a small number of seconds. It's possible to instruct it
++to try the triple-fault mechanism first, by adding ``reboot=t`` to the
++kernel's command line.
 -- 
 1.8.3.1
 
