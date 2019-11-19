@@ -2,82 +2,67 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35CBBC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 21:36:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D77C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 22:06:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F17D620722
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 21:36:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 202A722440
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 22:06:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpXNqtgm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F17D620722
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Kj3y/kJ9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 202A722440
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXBAm-0008Ki-4G
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 16:36:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60491)
+	id 1iXBdV-00042p-0J
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 17:06:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35802)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXB9w-0007ti-Ua
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 16:35:42 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iXBb2-0002IY-VU
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 17:03:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXB9v-0003wK-NZ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 16:35:40 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38493)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iXB9v-0003w2-Ip; Tue, 19 Nov 2019 16:35:39 -0500
-Received: by mail-oi1-x244.google.com with SMTP id a14so20461619oid.5;
- Tue, 19 Nov 2019 13:35:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=otk+rBTnVVseVaVDCP5qr8KGPdAqhcdvC79IPBEKfLA=;
- b=DpXNqtgmozC3UoS8CoCJP8NGNAsVj7JVs1lgosqPR0t/IB7xKCd1dJBmkhRzK1/f3N
- ZBHDBNlun/as7MzGFUgQxpPPB/phTpmZCQZQwLCtn4nuYgbyyHx+3RyTI7uutgijVajc
- 3emjmZeW1oFlVWiDgIIlViVzn4treY/nNgP/TdQMDuH3MzLaTZ1XCFdxSH0IZ9JQWu1A
- /1Mfc9Z1Kze6d743fAAJlp54KFrSZbQcQ1WBW4ELxICX0wYZIjmvWbL32CSfUx7THfaR
- U7qMaVHP7ooQQVrINqQ35M2yoKISMpo9pFaUZtJEoJCroXagSmndgnCcMfFO0DcikJuH
- rwlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=otk+rBTnVVseVaVDCP5qr8KGPdAqhcdvC79IPBEKfLA=;
- b=Huc9DTFXa+/qdkBg2nCOo7AqBIgST3/nLzvzPPQrC2OhI7EjETlew6X9DBCu+C60Xh
- Sxr72XVdzVk+tkL1EKg4P4FjNBNVNuCO7nUYO7pN9oshFh4OIKziii/K5WJa9f3DJ5yG
- bVTnAFYCyoRCqebyk/WcY2JFLEZLtA53NM/KEQ7dzz78MuNG0A9vMbYimbEDyO8mrMV7
- 5YajtGjMNKEo5znVPlB+4AHrbVLGoM5JBOFDoVU6w+2rGdSXa3cnaDoY8/G56D+VQsf+
- 2tUaHFSVXgzFK1a6yRMIX1vSj55LRig90vWOEN1F3RzgrsXMzC/rNrQb9CBsTNYC0nRm
- VJoQ==
-X-Gm-Message-State: APjAAAUzz7t2OgJGoGC6of0YNiVRlyeJAW6Oh3fVTfGEGPHqof6vvZBM
- 4cRfNqp0EkzpmnCCVsrZaBpZAxZNVuNZP2AEnjg=
-X-Google-Smtp-Source: APXvYqwJ/8cj+bFJJ3AcK794aR9LMVokdOzDwC6kys+Bz9mq3AEIGKsuRP6b+ZfFLdt5r6nTSDn0gwi/gZ+GJ0ierKs=
-X-Received: by 2002:aca:484f:: with SMTP id v76mr6175179oia.62.1574199338641; 
- Tue, 19 Nov 2019 13:35:38 -0800 (PST)
+ (envelope-from <dgibson@ozlabs.org>) id 1iXBb0-0007p6-Pm
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 17:03:40 -0500
+Received: from ozlabs.org ([203.11.71.1]:34459)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iXBaz-0007nH-9O; Tue, 19 Nov 2019 17:03:38 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47HfwP2YJQz9sPW; Wed, 20 Nov 2019 09:03:33 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1574201013;
+ bh=66HDvuFwDEuPKV+KTZ6dV9LErJkqueGuG8ytAi8Xak0=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=Kj3y/kJ95RZaSen7qBNXJ+yMIT2KCKT0l6+Yx0QxBib5a9clHZ8BGpKCqpgQVq7lb
+ 8voXTgEqXWRmkAL4G/l9FMcCWTPQ6fzEDIdVKbFVUYTyRqmcfo2Jb7UwsviiY1ah0l
+ oJocxbs0uVpzcKDEkzEkswYUEGUY0td45V8z0iuo=
+Date: Wed, 20 Nov 2019 09:02:26 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Balamuruhan S <bala24@linux.ibm.com>
+Subject: Re: [PATCH 2/5] hw/ppc/pnv_xscom: PBA bar mask values are incorrect
+ with homer/occ sizes
+Message-ID: <20191119220226.GW5582@umbus.fritz.box>
+References: <20191119175056.32518-1-bala24@linux.ibm.com>
+ <20191119175056.32518-3-bala24@linux.ibm.com>
+ <20191119215618.GU5582@umbus.fritz.box>
+ <20191119220032.GV5582@umbus.fritz.box>
 MIME-Version: 1.0
-References: <20191119204551.240792-1-stefanha@redhat.com>
- <CAL1e-=ibQBWUzUZvsvSWCZ5SwFk5T+b2P94D068W8G_taWVASg@mail.gmail.com>
-In-Reply-To: <CAL1e-=ibQBWUzUZvsvSWCZ5SwFk5T+b2P94D068W8G_taWVASg@mail.gmail.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Tue, 19 Nov 2019 22:35:27 +0100
-Message-ID: <CAL1e-=iEN9GEGDzEvoYM9q477Le4rs-mQZEgxOdzr51ZxLJd0w@mail.gmail.com>
-Subject: Re: [PULL for-4.2-rc2 0/2] Tracing patches
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="aKl9HDSa9q6Cj3fk"
+Content-Disposition: inline
+In-Reply-To: <20191119220032.GV5582@umbus.fritz.box>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,94 +74,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "open list:bochs" <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 19, 2019 at 10:14 PM Aleksandar Markovic
-<aleksandar.m.mail@gmail.com> wrote:
->
-> On Tue, Nov 19, 2019 at 9:46 PM Stefan Hajnoczi <stefanha@redhat.com> wro=
-te:
-> >
-> > The following changes since commit f086f22d6c068ba151b0f6e81e75a64f130d=
-f712:
-> >
-> >   Merge remote-tracking branch 'remotes/awilliam/tags/vfio-fixes-201911=
-18.0' into staging (2019-11-18 21:35:48 +0000)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://github.com/stefanha/qemu.git tags/tracing-pull-request
-> >
-> > for you to fetch changes up to 6b904f1a528a6d8c21f7fbdeab13b9603d1b6df7=
-:
-> >
-> >   hw/mips/gt64xxx: Remove dynamic field width from trace events (2019-1=
-1-19 16:17:05 +0000)
-> >
-> > ----------------------------------------------------------------
-> > Pull request
-> >
-> > Tracing fixes for MIPS.
-> >
-> > ----------------------------------------------------------------
-> >
->
-> Hello, Stefan, Philippe, Peter.
->
-> This appears to be a duplicate of the pull request sent today by Philippe
-> (and already applied by Peter just hours ago):
->
-> https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg02894.html
->
-> The patches from the two pull requests appear to be identical, except
-> some minor details in commit messages: Stefan's versions contain
-> "Message-Id:" identifiers, while Philippe's don't (my suggestion to
-> Philippe is to include "Message-Id:" for all patches that are part of any
-> pull request in future; this can be achieved effortlessly/automatically
-> by applying patches using patchwork).
->
-> In summary, for this very situation, it looks to me we are all set, no ne=
-ed
-> for Peter to process this pull request.
->
 
-And just another really friendly advice for Philippe: When you apply
-some patches or a series to your pull request, just inform others
-about that by replying to the patches or a series: "I applied XXX to
-my queue/pull request" - this helps avoiding duplicate efforts like
-it happened here. This is also reminder to me too, I didn't do it in
-all cases of my applying to my my pull requests, and I should have,
-but I will improve too.
+--aKl9HDSa9q6Cj3fk
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for these fixes!
+On Wed, Nov 20, 2019 at 09:00:32AM +1100, David Gibson wrote:
+> On Wed, Nov 20, 2019 at 08:56:18AM +1100, David Gibson wrote:
+> > On Tue, Nov 19, 2019 at 11:20:53PM +0530, Balamuruhan S wrote:
+> > > homer/occ sizes are calculated in skiboot with `(mask | 0xfffff) + 1`,
+> > > and from xscom access should return correct mask values instead of ac=
+tual
+> > > sizes.
+> > >=20
+> > > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> > > Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
+> > > ---
+> > >  hw/ppc/pnv_xscom.c | 10 ++++++----
+> > >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > >=20
+> > > diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> > > index f01d788a65..cdd5fa356e 100644
+> > > --- a/hw/ppc/pnv_xscom.c
+> > > +++ b/hw/ppc/pnv_xscom.c
+> > > @@ -46,6 +46,10 @@
+> > >  #define P9_PBA_BARMASK0                 0x5012b04
+> > >  #define P9_PBA_BARMASK2                 0x5012b06
+> > > =20
+> > > +/* Mask to calculate Homer/Occ size */
+> > > +#define HOMER_SIZE_MASK                 0x0000000000300000ull
+> > > +#define OCC_SIZE_MASK                   0x0000000000700000ull
+> >=20
+> > Uuuhhhhh... AFAICT these defines have identical values to
+> > PNV_HOMER_SIZE and PNV_OCC_COMMON_AREA_SIZE, so I don't see what this
+> > patch is actually changing.
+>=20
+> Oh, sorry, missed that the values were changed in 1/5.  Would have
+> been easier to follow if the two patches were folded together, but
+> never mind.  Applied.
 
-Aleksandar
+Ugh.. or not.  The first patch doesn't apply for me, looks like it
+needs a rebase (or you have something else in your tree I don't know
+about).
 
-> Regards,
-> Aleksandar
->
-> > Philippe Mathieu-Daud=C3=A9 (2):
-> >   hw/block/pflash: Remove dynamic field width from trace events
-> >   hw/mips/gt64xxx: Remove dynamic field width from trace events
-> >
-> >  hw/block/pflash_cfi01.c |  8 ++++----
-> >  hw/block/pflash_cfi02.c |  8 ++++----
-> >  hw/block/trace-events   |  8 ++++----
-> >  hw/mips/gt64xxx_pci.c   | 16 ++++++++--------
-> >  hw/mips/trace-events    |  4 ++--
-> >  5 files changed, 22 insertions(+), 22 deletions(-)
-> >
-> > --
-> > 2.23.0
-> >
-> >
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--aKl9HDSa9q6Cj3fk
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3UZnIACgkQbDjKyiDZ
+s5ISARAAh0Xp5n11uoDmEy9PY+YkzXm6iyiX9mrfK4kprNgbjD2g3db5F5O3lOtw
++u+ltFoQogpdNmu3wHrhwGAUFy1cp4U55Iemx8qf8idiHZ2BCqln1Uuh5wE6ILI2
+W2AjvR9Wb4s6lSxUODVCyLLPvKdp1APl5TKJ5w959u70WGohq5ZxtlT1PvoRKFJI
+dCuSwUj53XzFzMpw5QvrGvjRxrShiaKRp27JWaIURIUia4tHMrd5ZzB+JypWnlvc
+nOdhj/aATPM2E7RKlHD/VAwbZtuQ6I3MTyblK/e8G5OiUI5S8SPcsvg1RbHldxxM
+V6BOURN/oGSVN8DqeRJBU9W+cdevIcjJiI8pvQRLPNtlbexXH4DvHOVRTPGGCOSd
+O/b1Wl+RHjXFzToPDq+e5eRg42BZY7gKe4YONdmVMHZZWLP/2Dp5Piu2YyxVBFgO
+e6EaBDECvAKk35MNGTtRCa6Jf54avYdB8TUptjq+vfG49brhZURVnEyK+DQU+gti
+gAtcRdT/ly57mgvx3uWt5xluZL2GNMSw7auv6g8CpNf/dVJcE9eMT35ZSJEWBHKp
+wbj1Kp1N4tNpkT4P9enWPhPx3LSHeePG1ySBRN8UEuAQPH+AS8L5lsO+aA2pq79A
+c/iYeA6t6mZvI2Yn9LcFFeYhv2IuqfiVfGOsw7GRVaDVWpQsysI=
+=hkvN
+-----END PGP SIGNATURE-----
+
+--aKl9HDSa9q6Cj3fk--
 
