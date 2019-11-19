@@ -2,92 +2,75 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58953C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:19:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2367DC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:47:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25C7720885
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:19:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E66CE2068F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:47:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a4YyO0Jr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25C7720885
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SJulga5o"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E66CE2068F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX9xp-0005BP-Ar
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 15:19:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50912)
+	id 1iXAPN-0008CI-Tt
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 15:47:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53823)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iX9wm-0004iR-J3
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:18:10 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iXANy-0007CZ-Ac
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:46:07 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iX9wl-00041p-4L
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:18:00 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41509)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iX9wk-00041E-Kt
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:17:58 -0500
-Received: by mail-wr1-x444.google.com with SMTP id b18so24022269wrj.8
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 12:17:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=tRgTt3M7KgEbSYxV2iufJan302+j32iRRzC/BJlLCIo=;
- b=a4YyO0JrmpZRAGFZG3MVTgZr2Ii1+H001l6d9aU7MgJaNyrrfu1aTcS3pasHzQAD5m
- hMx9xky5YaMUAWc3s0nzLZS09sWn0kCYAJpsqKMXSIoRr9JiHAyp2sXm85N2sM71akks
- tvGcrDqlTcWJh0x2YoIe5aYkMji11UJQlVU2S0Kw+gM5tu+fl5qDf58o3Ju/1r/tZEqr
- 7sLgOutwN+AX83DmOA+6q4/AiqE9i0WT6JjxwBU69bpYc1ZisBlPkCtU2voZqpTr0hN8
- TKGhj18L6qyzK71ULY47X9YcfDL4MHHWTmWRwaLcZPpSGkL4Z27G1aZcTEDA5MgoCSl0
- Uo/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=tRgTt3M7KgEbSYxV2iufJan302+j32iRRzC/BJlLCIo=;
- b=l3gwBxVpUza74xI/SVIiPhguC+FDQrXzrXqIlkdYY2avEBp3NAtSc4q9CKpL9JXqYj
- keoI9wxbbTYvQQYCP2YGN5t7bNzBFYAx/APzwqpQaip1zTg5eb0imyRrGjd+pXIdOKcK
- qBmeXIucn8XSQrwlh3qv/JJheNbz99hu+3OUb5+JrcF6NNCv2W7ilqaTC34K8JecqVR3
- reKQQ9NVaSWMudPo7S6ffx0xwghl3pFwqjSlzuz00wScNFgDJ/yvNT/kiyZL+OtcNhwh
- MgRXsb2vxYGAtXNVZpeWiIgUG2cbElZbhPu7o0UMsvMZS2abqeGNkzYxBfiidubz/4ot
- qZ6Q==
-X-Gm-Message-State: APjAAAU/+Lahrz+7nuqTBjdlYibvcRxlXcd0X8i8hX58ugLgbR+W206s
- JwNwJgdPKBKzO3waOadV+ZNlCw==
-X-Google-Smtp-Source: APXvYqwfnCrXvWJIjIN0IzIkWP2aMJXTjHMKj+e/UJVVLpCDEFRfZQvqQbqLja2kdN+izGTQMqOe6Q==
-X-Received: by 2002:adf:f048:: with SMTP id t8mr24719159wro.237.1574194677312; 
- Tue, 19 Nov 2019 12:17:57 -0800 (PST)
-Received: from [192.168.8.102] (64.red-79-149-204.dynamicip.rima-tde.net.
- [79.149.204.64])
- by smtp.gmail.com with ESMTPSA id b8sm27668712wrt.39.2019.11.19.12.17.55
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 19 Nov 2019 12:17:56 -0800 (PST)
-Subject: Re: [PATCH] linux-user/strace: Add missing signal strings
-To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
-References: <20191119185153.GA23003@ls3530.fritz.box>
- <48097cb5-bc47-e532-fcde-67ca65a2039e@linaro.org>
- <06aaa584-fc97-8097-ca52-00d97982e5be@gmx.de>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <21861bfc-f656-0f77-f29d-1dbaabfdaefc@linaro.org>
-Date: Tue, 19 Nov 2019 21:17:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <stefanha@redhat.com>) id 1iXANv-0001fi-Lr
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:46:04 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55946
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iXANv-0001f7-Fi
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:46:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574196362;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=PPECDqwQTHAi8qK9ZSECyrOjMMcGbUMcQDM54JQkhNg=;
+ b=SJulga5oolQd7H7XD4DdCzU66UmcImT70ouaC6r3S57ThZlzGGBVzJCWLxMy176XCnAH0O
+ IeGp6mSo6Lf7x7hobgjiLwXyjU/EowvPef7w/cxgz6TwXIOMHVmj+nKsgtYGA+G08rXoZF
+ 0ZGjpAF7lPLwhCM4VDvhmJqYJItzQP0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-sLuE1U6qPTGbESf2ZYOSrw-1; Tue, 19 Nov 2019 15:46:01 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51EEC1005500;
+ Tue, 19 Nov 2019 20:45:59 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 11CB74A;
+ Tue, 19 Nov 2019 20:45:52 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL for-4.2-rc2 0/2] Tracing patches
+Date: Tue, 19 Nov 2019 20:45:49 +0000
+Message-Id: <20191119204551.240792-1-stefanha@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <06aaa584-fc97-8097-ca52-00d97982e5be@gmx.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: sLuE1U6qPTGbESf2ZYOSrw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -99,27 +82,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/19/19 9:06 PM, Helge Deller wrote:
->>> +#ifdef SIGSTKFLT
->>> +    case TARGET_SIGSTKFLT: signal_name = "SIGSTKFLT"; break;
->>> +#endif
->>
->> Wrong ifdef.
-> 
-> Same here, see in linux-user/signal.c (line 50):
-> #ifdef SIGSTKFLT
->     [SIGSTKFLT] = TARGET_SIGSTKFLT,
-> #endif
+The following changes since commit f086f22d6c068ba151b0f6e81e75a64f130df712=
+:
 
-But that one actually references SIGSTKFLT, but the case above does not.
-You probably don't need the ifdef at all.
+  Merge remote-tracking branch 'remotes/awilliam/tags/vfio-fixes-20191118.0=
+' into staging (2019-11-18 21:35:48 +0000)
 
+are available in the Git repository at:
 
-r~
+  https://github.com/stefanha/qemu.git tags/tracing-pull-request
+
+for you to fetch changes up to 6b904f1a528a6d8c21f7fbdeab13b9603d1b6df7:
+
+  hw/mips/gt64xxx: Remove dynamic field width from trace events (2019-11-19=
+ 16:17:05 +0000)
+
+----------------------------------------------------------------
+Pull request
+
+Tracing fixes for MIPS.
+
+----------------------------------------------------------------
+
+Philippe Mathieu-Daud=C3=A9 (2):
+  hw/block/pflash: Remove dynamic field width from trace events
+  hw/mips/gt64xxx: Remove dynamic field width from trace events
+
+ hw/block/pflash_cfi01.c |  8 ++++----
+ hw/block/pflash_cfi02.c |  8 ++++----
+ hw/block/trace-events   |  8 ++++----
+ hw/mips/gt64xxx_pci.c   | 16 ++++++++--------
+ hw/mips/trace-events    |  4 ++--
+ 5 files changed, 22 insertions(+), 22 deletions(-)
+
+--=20
+2.23.0
+
 
