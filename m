@@ -2,94 +2,75 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16BB2C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:07:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2367CC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:12:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5A7C2068F
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:07:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0E792068F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:12:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CKbMsOCH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5A7C2068F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ov4UoCe7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0E792068F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX6yK-0003cv-0M
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 12:07:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45715)
+	id 1iX739-0000xj-GO
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 12:12:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47165)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peterx@redhat.com>) id 1iX6sR-0006br-Jo
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:01:22 -0500
+ (envelope-from <thuth@redhat.com>) id 1iX6zV-0005Pr-NP
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:08:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peterx@redhat.com>) id 1iX6sJ-000735-93
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:01:16 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:60150
+ (envelope-from <thuth@redhat.com>) id 1iX6zT-0004Fa-Nb
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:08:36 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:40234
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <peterx@redhat.com>) id 1iX6sI-000722-RL
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:01:11 -0500
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iX6zQ-0004DL-RE
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:08:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574182869;
+ s=mimecast20190719; t=1574183312;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ZDPm86k5Fq03D3f20xXIH24X9RtgtIxADSFz9vkU+EI=;
- b=CKbMsOCHp3nqOC6euC2LKjYRXB8nzyg4Z3oADidFdmFqXEKcu6lZa/OrkCvrFqwVLmJiZ2
- ODolc0yGjrYGqlcm1CG7YWX7WYmU35rxzNv2MpVgYFDswnV4XS1mznn9xaHUErmUbbTK6j
- vfD2lHoAR2PFoWrwL0oW0IbQbBamrH0=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-od3RtUFpPMuRhkJ81CFcWw-1; Tue, 19 Nov 2019 12:01:06 -0500
-Received: by mail-qv1-f70.google.com with SMTP id m43so15090653qvc.17
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 09:01:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=/LkNCiYwWKSBGqYEZtdUPk0L85Dp5XIJEuuF85ESeBw=;
- b=rrMq7V0l+sA/KGhxwn7Q+zSmTM2eGieCGpaxDlubHGJPUrnBHRchohKsdlguYGPOf5
- UMgMhD7JKTunaGU92pxHNGYr6utBZPmedijNxxEQqoEq8pz9zV6CgvdP/gcfx2Q/BTGu
- Akc+wXdDJjlLQ3er2ZAyxG8UxfsgeIPZgPW3tkqSlOH95/7LfTY9LkNtaun8FFWZFwAK
- WJYmS9+JirdtzsOCfCdm6LDt0ALDcPyiD5Jmk+WSc46f4Oa+X8wS1rJ468ThdqiYz08C
- FX6CVc26N7XSM4Ma3+1aZs+NQOaJG1ltpUfFS2vQnyIOJrUL0xToBnkwojQejK4Kf6dq
- fXjA==
-X-Gm-Message-State: APjAAAWzIBzNWEKM5EOceNfIgJ2nZ//LKijq9z6uHwEnwTOyss7SCmE6
- aWuNesDUnQPyHBRJTv7KaFztThol6Q6UD4mYLin/pucpWX5e+PgQKZXkChZZQnAzSQBhzDaJCwD
- mLSbSJmc//f28daA=
-X-Received: by 2002:ac8:7550:: with SMTP id b16mr33434751qtr.286.1574182865808; 
- Tue, 19 Nov 2019 09:01:05 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzMXdfFiaIpdhJb3hNt3RdIyiP7KzpBUaRlF84G2qHprHAux2WjVk8Je8OvZxYG87c5if4qQA==
-X-Received: by 2002:ac8:7550:: with SMTP id b16mr33434716qtr.286.1574182865513; 
- Tue, 19 Nov 2019 09:01:05 -0800 (PST)
-Received: from xz-x1 ([104.156.64.74])
- by smtp.gmail.com with ESMTPSA id m22sm10282372qka.28.2019.11.19.09.01.04
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 19 Nov 2019 09:01:04 -0800 (PST)
-Date: Tue, 19 Nov 2019 12:01:03 -0500
-From: Peter Xu <peterx@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH v2 0/2] TM field check failed
-Message-ID: <20191119170103.GM9053@xz-x1>
-References: <cover.1570503331.git.qi1.zhang@intel.com>
- <20191119060259-mutt-send-email-mst@kernel.org>
- <20191119162110.GL9053@xz-x1>
- <20191119113853-mutt-send-email-mst@kernel.org>
+ content-transfer-encoding:content-transfer-encoding;
+ bh=D/EdQ7m9Ml0kThkiyNOqvSzD8lEE+OryYE8c//DizhQ=;
+ b=Ov4UoCe7TeJCWaW8YCMt+Cx1w0u309PGlVGL9xjxyJBtJAXIJYTjISPL76I1f/3GcvKbPS
+ 1AaCi3nz//NE2DhmGWos3x2w/8kR29joybhZ7teynhhOvK+2qXUzMtDmbNGDDRD1Jfghrj
+ 0Isws8CMf21YaXq1QR6+7UHNb5BjA7k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-RA6nIR4GMEWCvpNpeNzb1A-1; Tue, 19 Nov 2019 12:08:29 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4C27801FA1;
+ Tue, 19 Nov 2019 17:08:27 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-117-181.ams2.redhat.com
+ [10.36.117.181])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6E8D45E254;
+ Tue, 19 Nov 2019 17:08:23 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Subject: [PATCH 0/6] Enable Travis builds on arm64, ppc64le and s390x
+Date: Tue, 19 Nov 2019 18:08:15 +0100
+Message-Id: <20191119170822.45649-1-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191119113853-mutt-send-email-mst@kernel.org>
-User-Agent: Mutt/1.11.4 (2019-03-13)
-X-MC-Unique: od3RtUFpPMuRhkJ81CFcWw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: RA6nIR4GMEWCvpNpeNzb1A-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -104,38 +85,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qi1.zhang@intel.com, ehabkost@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, yadong.qi@intel.com, rth@twiddle.net
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 19, 2019 at 11:39:04AM -0500, Michael S. Tsirkin wrote:
-> On Tue, Nov 19, 2019 at 11:21:10AM -0500, Peter Xu wrote:
-> > On Tue, Nov 19, 2019 at 06:05:11AM -0500, Michael S. Tsirkin wrote:
-> > > On Tue, Nov 19, 2019 at 08:28:12PM +0800, qi1.zhang@intel.com wrote:
-> > > > From: "Zhang, Qi" <qi1.zhang@intel.com>
-> > > >=20
-> > > > spilt the reserved fields arrays and remove TM field from reserved=
-=20
-> > > >  bits
-> > >=20
-> > > Looks good to me.
-> > > Also Cc Peter Xu.
-> > > Also I wonder - do we need to version this change
-> > > with the machine type? Peter what's your take?
-> >=20
-> > It should be a bugfix to me.  With the patchset we check even less
-> > reserved bits, then imho it shouldn't break any existing good users.
-> > So we can probably skip versioning this change.
->=20
->=20
-> Can you ack this patch then?
+Travis recently added build hosts for arm64, ppc64le and s390x, so
+this is a welcome addition to our Travis testing matrix.
 
-I've commented.  I'll wait for a reply from Qi or a new version before
-I ack it.  Thanks,
+Unfortunately, the builds are running in quite restricted LXD containers
+there, for example it is not possible to create huge files there (even
+if they are just sparse), and certain system calls are blocked. So we
+have to change some tests first to stop them failing in such environments.
+
+I also included Alex' patch for dropping some targets from the
+MAIN_SOFTMMU_TARGETS config variable, since at least on arm64, the
+build process seems to be rather slow and sometimes hits the 50 minutes
+timeout otherwise.
+
+For the curious, here's a test run (non-x86 at the end of the page):
+
+ https://travis-ci.com/huth/qemu/jobs/258095792
+
+ Thomas
+
+
+Alex Benn=C3=A9e (1):
+  travis.yml: drop 32 bit systems from MAIN_SOFTMMU_TARGETS
+
+Thomas Huth (5):
+  iotests: Skip test 060 if it is not possible to create large files
+  iotests: Skip test 079 if it is not possible to create large files
+  tests/hd-geo-test: Skip test when images can not be created
+  tests/test-util-filemonitor: Skip test on non-x86 Travis containers
+  travis.yml: Enable builds on arm64, ppc64le and s390x
+
+ .travis.yml                   | 85 ++++++++++++++++++++++++++++++++++-
+ tests/hd-geo-test.c           | 12 ++++-
+ tests/qemu-iotests/060        |  6 +++
+ tests/qemu-iotests/079        |  6 +++
+ tests/test-util-filemonitor.c | 11 +++++
+ 5 files changed, 118 insertions(+), 2 deletions(-)
 
 --=20
-Peter Xu
+2.23.0
 
 
