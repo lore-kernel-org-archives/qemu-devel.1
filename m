@@ -2,79 +2,74 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23286C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB5BC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:50:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E21CA206F4
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:49:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dm6TfdA0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E21CA206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 50E0A206F4
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 20:50:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50E0A206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maskray.me
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXARQ-0001Sn-2S
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 15:49:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53890)
+	id 1iXASc-0002O7-Gl
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 15:50:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54379)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iXAOD-0007UU-O9
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:46:23 -0500
+ (envelope-from <emacsray@gmail.com>) id 1iXARN-0001ZU-VV
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:49:39 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iXAOC-0001jz-9K
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:46:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37809
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iXAOC-0001js-5N
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:46:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574196379;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=S6SqXgFoKot0ZX5FUnMp7mvmipVHKaABULgQfgHhejk=;
- b=Dm6TfdA0jXcVvUVVO/UsERdpghILOYY86Kc5NnWphez8EHK7cCufihLS0ZOhRuHMW+ynC+
- 1R1ksYLZDlE5pSYFWE6b5mWQxsroL/l38HDFcp9psBRSzUC5Yr4dSP887Goc/HZjA9FEVt
- 1luaUlfdErIR1pT2cFZsL8bQz+Itre0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-skaemc6XPfyCQA7xQAFcug-1; Tue, 19 Nov 2019 15:46:15 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7D581005511;
- Tue, 19 Nov 2019 20:46:13 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.4])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ACD9560259;
- Tue, 19 Nov 2019 20:46:07 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL for-4.2-rc2 2/2] hw/mips/gt64xxx: Remove dynamic field width
- from trace events
-Date: Tue, 19 Nov 2019 20:45:51 +0000
-Message-Id: <20191119204551.240792-3-stefanha@redhat.com>
-In-Reply-To: <20191119204551.240792-1-stefanha@redhat.com>
-References: <20191119204551.240792-1-stefanha@redhat.com>
+ (envelope-from <emacsray@gmail.com>) id 1iXARM-0002cw-Bl
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:49:37 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:39572)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <emacsray@gmail.com>) id 1iXARM-0002cV-3S
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 15:49:36 -0500
+Received: by mail-pl1-f193.google.com with SMTP id o9so12486698plk.6
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 12:49:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=eeBS6vpPoHKJ2UxyhYjpU92vMjFpdBWvW3MO0WFfNYI=;
+ b=AeWe2uDqT3IJ5Ni8nyGgJ+yd5le1Gn1ag1qnioZMFeMaKpSnv6yGksyH/Z/nPo1tSj
+ 76pluKGWmVcob2sG8V34jOioMIk8hl8mj99WL4mQDV1bOdcTXF4zQzrn76JJtEUZBYFX
+ pP8vnjoISV9zyvOQtcWzM1uMwgGn96PxkALTo6caiO9R0yXrQSaY4fj7xtaqiYI+ffFH
+ uIA2lot/HR1FqrIkI48G5tVy0fKayennz+JA+is59MaR3D80UUXtoKZTXlppEPqmPbaf
+ Hqe5Tk/I25OlkZsA+ecBhaYTsyUsXlnZ7Py7tmds9yOhutK7sH0thYMsefFGkDb6q1nQ
+ /abQ==
+X-Gm-Message-State: APjAAAXOqdpzxcZev0M+Rk4wvIg+gqYBgqPI73JIzZ7/nPOGGBTv80xX
+ LhxByDT+Jgkc9fKXotcDvlY=
+X-Google-Smtp-Source: APXvYqzmshTHqEpvahPpbNSIHgyT3RURf36gnjQBVvtGFhU1Vmtt8RrXnmE0YD2761Evid4u2006lw==
+X-Received: by 2002:a17:90a:8a12:: with SMTP id
+ w18mr9152774pjn.51.1574196574328; 
+ Tue, 19 Nov 2019 12:49:34 -0800 (PST)
+Received: from localhost ([2620:15c:2d1:100:7901:ead3:b8cd:1c59])
+ by smtp.gmail.com with ESMTPSA id l13sm4350821pjq.18.2019.11.19.12.49.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 19 Nov 2019 12:49:33 -0800 (PST)
+Date: Tue, 19 Nov 2019 12:49:32 -0800
+From: Fangrui Song <i@maskray.me>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH] Fix incorrect int->float conversions caught by clang
+ -Wimplicit-int-float-conversion
+Message-ID: <20191119204932.5gdzlsplijveqwju@gmail.com>
+References: <20191116010731.3jdxozzfpsqsrcc4@google.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: skaemc6XPfyCQA7xQAFcug-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/mixed; boundary="en42be5y5iipu2pd"
+Content-Disposition: inline
+In-Reply-To: <20191116010731.3jdxozzfpsqsrcc4@google.com>
+User-Agent: NeoMutt/20180223-112-0c5bf3
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 209.85.214.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,110 +81,185 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Since not all trace backends support dynamic field width in
-format (dtrace via stap does not), replace by a static field
-width instead.
+--en42be5y5iipu2pd
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
 
-We previously passed to the trace API 'width << 1' as the number
-of hex characters to display (the dynamic field width). We don't
-need this anymore. Instead, display the size of bytes accessed.
 
-Fixes: ab6bff424f (gt64xxx_pci: Convert debug printf to trace events)
-Reported-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-id: 20191118222746.31467-3-philmd@redhat.com
-Buglink: https://bugs.launchpad.net/qemu/+bug/1844817
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-Message-Id: <20191118222746.31467-3-philmd@redhat.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Fangrui Song <address@hidden> writes:
+> 
+> > The warning will be enabled by default in clang 10. It is not available for 
+> > clang <= 9.
+> >
+> > qemu/migration/migration.c:2038:24: error: implicit conversion from 'long' to 
+> > 'double' changes value from 9223372036854775807 to 9223372036854775808 
+> > [-Werror,-Wimplicit-int-float-conversion]
+> > ...
+> > qemu/util/cutils.c:245:23: error: implicit conversion from 'unsigned long' to 
+> > 'double' changes value from 18446744073709550592 to 18446744073709551616 
+> > [-Werror,-Wimplicit-int-float-conversion]
+> >
+> > Signed-off-by: Fangrui Song <address@hidden>
+> > ---
+> >   migration/migration.c | 4 ++--
+> >   util/cutils.c         | 4 ++--
+> >   2 files changed, 4 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/migration/migration.c b/migration/migration.c
+> > index 354ad072fa..ac3ea2934a 100644
+> > --- a/migration/migration.c
+> > +++ b/migration/migration.c
+> > @@ -53,6 +53,7 @@
+> >   #include "monitor/monitor.h"
+> >   #include "net/announce.h"
+> >   #include "qemu/queue.h"
+> > +#include <math.h>
+> >   
+> >   #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed 
+> > throttling */
+> >   
+> > @@ -2035,11 +2036,10 @@ void qmp_migrate_set_downtime(double value, Error 
+> > **errp)
+>         if (value < 0 || value > MAX_MIGRATE_DOWNTIME_SECONDS) {
+>             error_setg(errp, "Parameter 'downtime_limit' expects an integer in "
+>                              "the range of 0 to %d seconds",
+>                              MAX_MIGRATE_DOWNTIME_SECONDS);
+>             return;
+> >       }
+> 
+> @value is now in [0,2000].
+> 
+> >   
+> >       value *= 1000; /* Convert to milliseconds */
+> 
+> @value is in [0,2000000]
+> 
+> > -    value = MAX(0, MIN(INT64_MAX, value));
+> 
+> This does nothing.
+> 
+> >   
+> >       MigrateSetParameters p = {
+> >           .has_downtime_limit = true,
+> > -        .downtime_limit = value,
+> > +        .downtime_limit = (int64_t)fmin(value, nextafter(0x1p63, 0)),
+> 
+> This does nothing and is hard to read :)
+> 
+> Can we simply drop the offending line statement instead?
+
+Fixed in the new patch.
+
+> >       };
+> >   
+> >       qmp_migrate_set_parameters(&p, errp);
+> > diff --git a/util/cutils.c b/util/cutils.c
+> > index fd591cadf0..2b4484c015 100644
+> > --- a/util/cutils.c
+> > +++ b/util/cutils.c
+> > @@ -239,10 +239,10 @@ static int do_strtosz(const char *nptr, const char 
+> > **end,
+> >           goto out;
+> >       }
+> >       /*
+> > -     * Values >= 0xfffffffffffffc00 overflow uint64_t after their trip
+> > +     * Values > nextafter(0x1p64, 0) overflow uint64_t after their trip
+> >        * through double (53 bits of precision).
+> >        */
+> > -    if ((val * mul >= 0xfffffffffffffc00) || val < 0) {
+> > +    if ((val * mul > nextafter(0x1p64, 0)) || val < 0) {
+> >           retval = -ERANGE;
+> >           goto out;
+> >       }
+>         *result = val * mul;
+> 
+> I figure this one is correct and hard to read.
+> 
+> 0xfffffffffffffc00 is not representable exactly as double.  It's
+> half-way between the representable values 0xfffffffffffff800 and
+> 0x10000000000000000.  Which one we get is implementation-defined.  Bad.
+> 
+> nextafter(0x1p64, 0) is a clever way to write 0xfffffffffffff800, the
+> largest uint64_t exactly representable as double.
+> 
+> With your patch, val * mul in [0,0xfffffffffffff800] will be accepted.
+> 
+> The first val * mul above this range is 0x1p64.  Rejecting it is
+> correct, because it overflows yint64_t.
+
+I am not subscribed, so apologize that this email may be off the thread.
+
+(The binutils mailing list allows a user to download the raw email so I
+can still reply to a specific email, but this list does not provide such
+feature.)
+
+--en42be5y5iipu2pd
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="qemu.patch"
+
+From 5f1c5a42794ddcbabb63d9af920d9f437ea90a9f Mon Sep 17 00:00:00 2001
+From: Fangrui Song <i@maskray.me>
+Date: Fri, 15 Nov 2019 16:27:47 -0800
+Subject: [PATCH] Fix incorrect integer->float conversions caught by clang
+ -Wimplicit-int-float-conversion
+To: qemu-devel@nongnu.org
+
+The warning will be enabled by default in clang 10. It is not available for clang <= 9.
+
+qemu/migration/migration.c:2038:24: error: implicit conversion from 'long' to 'double' changes value from 9223372036854775807 to 9223372036854775808 [-Werror,-Wimplicit-int-float-conversion]
+...
+qemu/util/cutils.c:245:23: error: implicit conversion from 'unsigned long' to 'double' changes value from 18446744073709550592 to 18446744073709551616 [-Werror,-Wimplicit-int-float-conversion]
+
+Signed-off-by: Fangrui Song <i@maskray.me>
 ---
- hw/mips/gt64xxx_pci.c | 16 ++++++++--------
- hw/mips/trace-events  |  4 ++--
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ migration/migration.c | 3 +--
+ util/cutils.c         | 4 ++--
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/hw/mips/gt64xxx_pci.c b/hw/mips/gt64xxx_pci.c
-index 5cab9c1ee1..f1af840d8e 100644
---- a/hw/mips/gt64xxx_pci.c
-+++ b/hw/mips/gt64xxx_pci.c
-@@ -642,19 +642,19 @@ static void gt64120_writel(void *opaque, hwaddr addr,
-         /* not really implemented */
-         s->regs[saddr] =3D ~(~(s->regs[saddr]) | ~(val & 0xfffffffe));
-         s->regs[saddr] |=3D !!(s->regs[saddr] & 0xfffffffe);
--        trace_gt64120_write("INTRCAUSE", size << 1, val);
-+        trace_gt64120_write("INTRCAUSE", size, val);
-         break;
-     case GT_INTRMASK:
-         s->regs[saddr] =3D val & 0x3c3ffffe;
--        trace_gt64120_write("INTRMASK", size << 1, val);
-+        trace_gt64120_write("INTRMASK", size, val);
-         break;
-     case GT_PCI0_ICMASK:
-         s->regs[saddr] =3D val & 0x03fffffe;
--        trace_gt64120_write("ICMASK", size << 1, val);
-+        trace_gt64120_write("ICMASK", size, val);
-         break;
-     case GT_PCI0_SERR0MASK:
-         s->regs[saddr] =3D val & 0x0000003f;
--        trace_gt64120_write("SERR0MASK", size << 1, val);
-+        trace_gt64120_write("SERR0MASK", size, val);
-         break;
-=20
-     /* Reserved when only PCI_0 is configured. */
-@@ -930,19 +930,19 @@ static uint64_t gt64120_readl(void *opaque,
-     /* Interrupts */
-     case GT_INTRCAUSE:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("INTRCAUSE", size << 1, val);
-+        trace_gt64120_read("INTRCAUSE", size, val);
-         break;
-     case GT_INTRMASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("INTRMASK", size << 1, val);
-+        trace_gt64120_read("INTRMASK", size, val);
-         break;
-     case GT_PCI0_ICMASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("ICMASK", size << 1, val);
-+        trace_gt64120_read("ICMASK", size, val);
-         break;
-     case GT_PCI0_SERR0MASK:
-         val =3D s->regs[saddr];
--        trace_gt64120_read("SERR0MASK", size << 1, val);
-+        trace_gt64120_read("SERR0MASK", size, val);
-         break;
-=20
-     /* Reserved when only PCI_0 is configured. */
-diff --git a/hw/mips/trace-events b/hw/mips/trace-events
-index 75d4c73f2e..321933283f 100644
---- a/hw/mips/trace-events
-+++ b/hw/mips/trace-events
-@@ -1,4 +1,4 @@
- # gt64xxx.c
--gt64120_read(const char *regname, int width, uint64_t value) "gt64120 read=
- %s value:0x%0*" PRIx64
--gt64120_write(const char *regname, int width, uint64_t value) "gt64120 wri=
-te %s value:0x%0*" PRIx64
-+gt64120_read(const char *regname, unsigned size, uint64_t value) "gt64120 =
-read %s size:%u value:0x%08" PRIx64
-+gt64120_write(const char *regname, unsigned size, uint64_t value) "gt64120=
- write %s size:%u value:0x%08" PRIx64
- gt64120_isd_remap(uint64_t from_length, uint64_t from_addr, uint64_t to_le=
-ngth, uint64_t to_addr) "ISD: 0x%08" PRIx64 "@0x%08" PRIx64 " -> 0x%08" PRI=
-x64 "@0x%08" PRIx64
---=20
-2.23.0
+diff --git a/migration/migration.c b/migration/migration.c
+index 354ad072fa..09b150663f 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2035,11 +2035,10 @@ void qmp_migrate_set_downtime(double value, Error **errp)
+     }
+ 
+     value *= 1000; /* Convert to milliseconds */
+-    value = MAX(0, MIN(INT64_MAX, value));
+ 
+     MigrateSetParameters p = {
+         .has_downtime_limit = true,
+-        .downtime_limit = value,
++        .downtime_limit = (int64_t)value,
+     };
+ 
+     qmp_migrate_set_parameters(&p, errp);
+diff --git a/util/cutils.c b/util/cutils.c
+index fd591cadf0..2b4484c015 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -239,10 +239,10 @@ static int do_strtosz(const char *nptr, const char **end,
+         goto out;
+     }
+     /*
+-     * Values >= 0xfffffffffffffc00 overflow uint64_t after their trip
++     * Values > nextafter(0x1p64, 0) overflow uint64_t after their trip
+      * through double (53 bits of precision).
+      */
+-    if ((val * mul >= 0xfffffffffffffc00) || val < 0) {
++    if ((val * mul > nextafter(0x1p64, 0)) || val < 0) {
+         retval = -ERANGE;
+         goto out;
+     }
+-- 
+2.24.0
 
+
+--en42be5y5iipu2pd--
 
