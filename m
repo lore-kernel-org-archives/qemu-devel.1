@@ -2,90 +2,96 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F3DC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 10:37:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CCCEC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 10:41:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42C6D20857
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 10:37:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58C97222ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 10:41:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m8WclEcL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42C6D20857
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NUl6sw1b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58C97222ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX0sl-0000bA-Eh
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 05:37:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40122)
+	id 1iX0wu-0002fa-Gc
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 05:41:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40851)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iX0s8-0000Ad-Nh
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:36:37 -0500
+ (envelope-from <mst@redhat.com>) id 1iX0wF-0002ED-LF
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:40:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iX0s7-0000a3-Oc
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:36:36 -0500
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:37596)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iX0s7-0000Zs-KG
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:36:35 -0500
-Received: by mail-oi1-x241.google.com with SMTP id y194so18459690oie.4
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 02:36:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=aU+mSrMBMJgTEJF7vpM5Zgzgp1lRwBuKJVJ4fT6oY38=;
- b=m8WclEcLpkbooIrWbd5hzpnb+6zJp5c9yUSOy4t3aMI3jBmir4F+Zwl69y3AO3J1y4
- cuH6OI8vrExA1sx6klcBrAN5UScqZvV0TTmD1q6+9hgv+zriJwxHnLYZ1iexjUZP2HFJ
- olXvpLaA3Oz/fVH4AAuqBd7MGzTmVxZ2mVEdtWWYNruT2bl0AX7GPpDxLT66Vhd9ZSCL
- l36ZZqIWNroFETq0siiWyancwFL4iYGBNdOGvtUm/no+e6TYXHX7QstWFNmQ9+3NAasw
- cNXRrob3KXmpzLk0a4ybc11kA+0Ok3gfjIQL6Gxe6lwUr8zHIXtHoiZ/zYn4T8mfveo0
- Qa5w==
+ (envelope-from <mst@redhat.com>) id 1iX0wD-0002jD-R8
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:40:51 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50161
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iX0wD-0002iT-Ca
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 05:40:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574160047;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=HiIYls+a8CGUpHVgzskVar6M+47ZpH5X+x1/Zsss8tw=;
+ b=NUl6sw1b9rgfJVf8uvtDHSz7VOGvaC98zYc4yewcUUL1FGHSzTUStEfu6Rvxo08+1dvL5s
+ 1pVsieEuOgaNLVtDrGb0AOvKvg9aCSt9NZ8V2lLAfRxVr43PCqgmrXmKgl5arJh2yc+9x5
+ JS9sdoqHRlzUXfa/Dfn89U0gRU5L828=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-85-w7PGP4kxNieVfxBPQnfLmQ-1; Tue, 19 Nov 2019 05:40:46 -0500
+Received: by mail-qk1-f200.google.com with SMTP id 22so13292242qka.23
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 02:40:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=aU+mSrMBMJgTEJF7vpM5Zgzgp1lRwBuKJVJ4fT6oY38=;
- b=DYWxFxfHif065HqJXfrVWvt5HRHxFhiX4lLVEuZr/zUO4MWmSUAqwRcZm1XdW/d/fA
- zuszPz5CEt4jDpagAQc5Q5JYWnQmIPeMtOfz0a4zmZElnG+a+GmwEpAWd0lNx+l7aBEw
- Y91a8CX77GNqlfqbYiU5d1pXmy5KUlo2LLSFaPWuyAuHCD3SguM0G77RziororVw6V/G
- mmiAbnaXtzT2cnoNC3Xp/vFAAZ5dNKdEajpH/VDN8/bUzK0S6tyX4T4AgBH2krCns6cg
- cjJy2Pt4D13TWcYOGoR+9RUJNuWs0EzgaE3JkkWsiGeRuFopCOa5NTH+dpQkUI4DzmwZ
- VYEw==
-X-Gm-Message-State: APjAAAUQW+37zb44oBdwZVX4ewuAmS5CoSaKjAqP+yR5sipwV/cAKQ9E
- vYUBV4v5lEm4xBhsXzJjA5OIWKYbpetgpO5jlC8seVKPTRI=
-X-Google-Smtp-Source: APXvYqwep+EebC9qCjjKPmJu74L9qePu4HjozMgJg2z3Xgej5MyUrhGqQXWuZ9NlnjoC2OteDYxJAjCwHMbRagxBn/w=
-X-Received: by 2002:aca:4945:: with SMTP id w66mr3563619oia.98.1574159794921; 
- Tue, 19 Nov 2019 02:36:34 -0800 (PST)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=swit2IlMaaXMY5KxMhMGxVmxg2LrVHvr5WXF9+E/Ccw=;
+ b=lX1tA8RC7FRWDdtvFUgryWRDlmoodX2jXEUFSmPoDFQuXbAEoXw1Y3DodlFZyQSbd9
+ Ah+DuX5FyyvCFyRDnp7I044qt3/TJeVADjpw7BDi802d7sr4doGtC1PkqrtFslczEYpT
+ ccazyvT6o8D+1zp23bgf+/Xd0rX1ROrNQyeVqHUPpcmVA6NDxetVqJ88ep/NvHyVjPY/
+ zVFP4OxOLVV/A0HRkdP6S2t/k8C/x77rTttvZd3Z+Utuo+9VTjVmUuJb2q+vUE99L5Uc
+ UcksvWpzDw8N3dwUL/lDU+qpU3X79pspfOGom2jYCENIgTRZYoFn95gbu6XclZ0dMfrr
+ OW9w==
+X-Gm-Message-State: APjAAAXDf1QpEdVbeeWt/QYN3x0cXPRp5LwOg6mROLFIkSqhX1BB80M3
+ xrc1cMI+OdupA7Dliz4lhfXZBSj+PXWIrr4tuQ6zSAfMsZhm9e3BMPcw8lZnfjJ6BxUwVRN4sBs
+ 8EoEz9htvBYFUoqY=
+X-Received: by 2002:a05:620a:a91:: with SMTP id
+ v17mr28135418qkg.281.1574160045628; 
+ Tue, 19 Nov 2019 02:40:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzufaLnJgO+rgZc8hSqbh7l92YpnlpH5EJeicsMPV4sHlh0Y5Clkxmy2o3VD0uRQQnKla3wCA==
+X-Received: by 2002:a05:620a:a91:: with SMTP id
+ v17mr28135397qkg.281.1574160045252; 
+ Tue, 19 Nov 2019 02:40:45 -0800 (PST)
+Received: from redhat.com (bzq-79-176-6-42.red.bezeqint.net. [79.176.6.42])
+ by smtp.gmail.com with ESMTPSA id 11sm11852488qtx.45.2019.11.19.02.40.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 19 Nov 2019 02:40:44 -0800 (PST)
+Date: Tue, 19 Nov 2019 05:40:39 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Micky Yun Chan <chanmickyyun@gmail.com>
+Subject: Re: [PATCH v5] Implement backend program convention command for
+ vhost-user-blk
+Message-ID: <20191119054004-mutt-send-email-mst@kernel.org>
+References: <20191119063911.18888-1-michan@redhat.com>
 MIME-Version: 1.0
-References: <CAFEAcA-mD3-Zg2JunGpMqbcaT1qboCenhqEFytZD0FmFcL2i9Q@mail.gmail.com>
- <5dd613c0-6d9e-b943-b64d-7ba1791cbefe@redhat.com>
- <CAFEAcA-4r53vM-K24WYr1OFSOufhZ7hDHeZBhnywyaJ0gpMO1g@mail.gmail.com>
- <20191108191057.GZ3812@habkost.net>
- <CAFEAcA_No5oAFtULbAOrPDeQE18HHgc0agXbs4m2AGZ+gK_ReQ@mail.gmail.com>
- <66c64c6d-b7c0-2cb1-2b29-4fdd9b369714@redhat.com>
- <CAFEAcA-Q7H9sZjN-PcMMDHQU41yN1RdXhNY5KqMh7E6xh0yjgA@mail.gmail.com>
- <3aa1d025-20a3-e813-2fe6-35518efedf2f@redhat.com>
- <20191118184906.GB3812@habkost.net>
- <CAFEAcA_iTX2TKh20DB9ZMtDLuPm=OvoyP==KRhfVh99BqDnrzA@mail.gmail.com>
- <20191118220417.GF3812@habkost.net>
- <CAFEAcA8XoyeAfHuKe0AEvecCzo748Yk1VD1+VD=C3ACZdfzwsw@mail.gmail.com>
- <ca517ad9-46bb-c0ac-2227-a64ab8fe5e15@redhat.com>
-In-Reply-To: <ca517ad9-46bb-c0ac-2227-a64ab8fe5e15@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Nov 2019 10:36:23 +0000
-Message-ID: <CAFEAcA-egL5kbo81eBT+FVBz7vSaWqUVzFUF3MNOttnzY6vZMQ@mail.gmail.com>
-Subject: Re: [PATCH v1 0/2] s390x/cpumodel: Introduce "best" model variants
-To: David Hildenbrand <david@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::241
+In-Reply-To: <20191119063911.18888-1-michan@redhat.com>
+X-MC-Unique: w7PGP4kxNieVfxBPQnfLmQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,40 +103,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- qemu-s390x <qemu-s390x@nongnu.org>, Michael Mueller <mimu@linux.ibm.com>,
- Jiri Denemark <jdenemar@redhat.com>, Janosch Frank <frankja@linux.ibm.com>
+Cc: michan <michan@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 19 Nov 2019 at 09:59, David Hildenbrand <david@redhat.com> wrote:
->
-> On 19.11.19 10:22, Peter Maydell wrote:
-> > I don't hugely care about query-cpu-model-expansion. I
-> > just don't want it to have bad effects on the semantics
-> > of user-facing stuff like x- properties.
->
-> IMHO, max should really include all features (yes, also the bad
-> x-features on arm :) ) and we should have a way to give users the
-> opportunity to specify "just give me the best model independent of the
-> accelerator" - something like a "best" model, but I don't care about the
-> name.
+On Tue, Nov 19, 2019 at 02:39:11PM +0800, Micky Yun Chan wrote:
+> From: michan <michan@redhat.com>
+>=20
+> This patch is to add standard commands defined in docs/interop/vhost-user=
+.rst
+> For vhost-user-* program
+>=20
+> Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
 
-How would "max includes all features" work if we have two
-x- features (or even two normal features!) which are incompatible
-with each other? How does it work for features which are
-valid for some other CPU type but not for 'max'? The design
-seems to assume a rather simplified system where every
-feature is independent and can always be applied to every
-CPU, which I don't think is guaranteed to be the case.
 
-thanks
--- PMM
+lots of comments by others already, just adding a minor nit:
+
+> ---
+>  contrib/vhost-user-blk/vhost-user-blk.c | 109 ++++++++++++++----------
+>  1 file changed, 65 insertions(+), 44 deletions(-)
+>=20
+> diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user=
+-blk/vhost-user-blk.c
+> index ae61034656..96c43bb58d 100644
+> --- a/contrib/vhost-user-blk/vhost-user-blk.c
+> +++ b/contrib/vhost-user-blk/vhost-user-blk.c
+> @@ -576,70 +576,91 @@ vub_new(char *blk_file)
+>      return vdev_blk;
+>  }
+> =20
+> +static int opt_fdnum =3D -1;
+> +static char *opt_socket_path;
+> +static char *opt_blk_file;
+> +static gboolean opt_print_caps;
+> +static gboolean opt_read_only;
+> +
+> +
+
+single empty line please.
+
+> +static GOptionEntry entries[] =3D {
+> +    { "print-capabilities", 'c', 0, G_OPTION_ARG_NONE, &opt_print_caps,
+> +      "Print capabilities", NULL },
+> +    { "fd", 'f', 0, G_OPTION_ARG_INT, &opt_fdnum,
+> +      "Use inherited fd socket", "FDNUM" },
+> +    { "socket-path", 's', 0, G_OPTION_ARG_FILENAME, &opt_socket_path,
+> +      "Use UNIX socket path", "PATH" },
+> +    {"blk-file", 'b', 0, G_OPTION_ARG_FILENAME, &opt_blk_file,
+> +     "block device or file path", "PATH"},
+> +    { "read-only", 'r', 0, G_OPTION_ARG_NONE, &opt_read_only,
+> +      "Enable read-only", NULL }
+> +};
+> +
+>  int main(int argc, char **argv)
+>  {
+> -    int opt;
+> -    char *unix_socket =3D NULL;
+> -    char *blk_file =3D NULL;
+> -    bool enable_ro =3D false;
+>      int lsock =3D -1, csock =3D -1;
+>      VubDev *vdev_blk =3D NULL;
+> +    GError *error =3D NULL;
+> +    GOptionContext *context;
+> =20
+> -    while ((opt =3D getopt(argc, argv, "b:rs:h")) !=3D -1) {
+> -        switch (opt) {
+> -        case 'b':
+> -            blk_file =3D g_strdup(optarg);
+> -            break;
+> -        case 's':
+> -            unix_socket =3D g_strdup(optarg);
+> -            break;
+> -        case 'r':
+> -            enable_ro =3D true;
+> -            break;
+> -        case 'h':
+> -        default:
+> -            printf("Usage: %s [ -b block device or file, -s UNIX domain =
+socket"
+> -                   " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+> -            return 0;
+> +    context =3D g_option_context_new(NULL);
+> +    g_option_context_add_main_entries(context, entries, NULL);
+> +    if (!g_option_context_parse(context, &argc, &argv, &error)) {
+> +        g_printerr("Option parsing failed: %s\n", error->message);
+> +        exit(EXIT_FAILURE);
+> +    }
+> +    if (opt_print_caps) {
+> +        g_print("{\n");
+> +        g_print("  \"type\": \"blk\",\n");
+> +        g_print("  \"features\": [\n");
+> +        g_print("    \"read-only\",\n");
+> +        g_print("    \"blk-file\"\n");
+> +        g_print("  ]\n");
+> +        g_print("}\n");
+> +        exit(EXIT_SUCCESS);
+> +    }
+> +
+> +    if (!opt_blk_file) {
+> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
+> +        exit(EXIT_FAILURE);
+> +    }
+> +
+> +    if (opt_socket_path) {
+> +        lsock =3D unix_sock_new(opt_socket_path);
+> +        if (lsock < 0) {
+> +            exit(EXIT_FAILURE);
+>          }
+> +    } else if (opt_fdnum < 0) {
+> +        g_print("%s\n", g_option_context_get_help(context, true, NULL));
+> +        exit(EXIT_FAILURE);
+> +    } else {
+> +        lsock =3D opt_fdnum;
+>      }
+> =20
+> -    if (!unix_socket || !blk_file) {
+> -        printf("Usage: %s [ -b block device or file, -s UNIX domain sock=
+et"
+> -               " | -r Enable read-only ] | [ -h ]\n", argv[0]);
+> -        return -1;
+> -    }
+> -
+> -    lsock =3D unix_sock_new(unix_socket);
+> -    if (lsock < 0) {
+> -        goto err;
+> -    }
+> -
+> -    csock =3D accept(lsock, (void *)0, (void *)0);
+> +    csock =3D accept(lsock, NULL, NULL);
+>      if (csock < 0) {
+> -        fprintf(stderr, "Accept error %s\n", strerror(errno));
+> -        goto err;
+> +        g_printerr("Accept error %s\n", strerror(errno));
+> +        exit(EXIT_FAILURE);
+>      }
+> =20
+> -    vdev_blk =3D vub_new(blk_file);
+> +    vdev_blk =3D vub_new(opt_blk_file);
+>      if (!vdev_blk) {
+> -        goto err;
+> +        exit(EXIT_FAILURE);
+>      }
+> -    if (enable_ro) {
+> +    if (opt_read_only) {
+>          vdev_blk->enable_ro =3D true;
+>      }
+> =20
+>      if (!vug_init(&vdev_blk->parent, VHOST_USER_BLK_MAX_QUEUES, csock,
+>                    vub_panic_cb, &vub_iface)) {
+> -        fprintf(stderr, "Failed to initialized libvhost-user-glib\n");
+> -        goto err;
+> +        g_printerr("Failed to initialize libvhost-user-glib\n");
+> +        exit(EXIT_FAILURE);
+>      }
+> =20
+>      g_main_loop_run(vdev_blk->loop);
+> -
+> +    g_main_loop_unref(vdev_blk->loop);
+> +    g_option_context_free(context);
+>      vug_deinit(&vdev_blk->parent);
+> -
+> -err:
+>      vub_free(vdev_blk);
+>      if (csock >=3D 0) {
+>          close(csock);
+> @@ -647,8 +668,8 @@ err:
+>      if (lsock >=3D 0) {
+>          close(lsock);
+>      }
+> -    g_free(unix_socket);
+> -    g_free(blk_file);
+> +    g_free(opt_socket_path);
+> +    g_free(opt_blk_file);
+> =20
+>      return 0;
+>  }
+> --=20
+> 2.21.0
+
 
