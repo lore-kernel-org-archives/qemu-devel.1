@@ -2,83 +2,65 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E163AC432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A77AFC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB3D922363
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:23:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCf3KC0q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB3D922363
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7C9312082F
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 16:24:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C9312082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX6Hs-00032p-E7
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 11:23:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60751)
+	id 1iX6Il-0004jj-G0
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 11:24:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34233)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iX63t-0001y2-88
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:06 -0500
+ (envelope-from <clg@kaod.org>) id 1iX66y-0007C1-5A
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:12:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iX63r-00068B-U8
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:05 -0500
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:56265)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iX63r-00067d-NS
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:09:03 -0500
-Received: by mail-wm1-x335.google.com with SMTP id b11so3787858wmb.5
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 08:09:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=x/7dL5GKaLKKTQGfreBczzCpIjJHYavx06Q35HIG390=;
- b=TCf3KC0qFWAh0xKFRO1aICnowVi48ggU3kqnGK086BL9n8CxtURNgl33MjgnWfcCfS
- 11IdGh/KNEzM1Ex2dcIEaJxlbMcgq94DL6fRsI93VYBQp29SsVCqKm/RIYmqi65CwYcF
- Pkre4xgIisl53+qcgLCjnsKunoVtr4lRYIq3wShUGaGdacc10ZwgNZHS2ZkHhIDGtEup
- 2VomiIS4/sOdDXppw4TkVFZdKp6ZvHTSb9kEkWSuYafZFJ/yZqEBY44QWSyUY8s1Qxir
- LT0lPQVB/prsSzp2wC9ov+lx55hLmBP2BNBBp0KDcCcVzMRNcZ1Fjx85Zc6kdTMwqZ4G
- quGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=x/7dL5GKaLKKTQGfreBczzCpIjJHYavx06Q35HIG390=;
- b=OuezyzA277/kjf9YGpCu01E5rCblh0KeJra6v4jrPliu33UQBNaAs2o5AeAnytMid6
- 4kmPhVGolzcF7ipLJI0PJn3qDvTO8rIqhBxeiZrqQnc03FKfsxksXm23zpIgP4B7364n
- oSO378pcQ8tDE8oISMAxZY4nCurGvtMt9ON/tuzUmimeo6gDi8ZuA/f6B/AEx/8Zshe6
- s2sXLhbrXQEfv1PVbNpyVcdXrE6duhaJYemuYC7biXyfuJ1H0tReIVNDpn95d53bdMGb
- S+mt3RqWed2xtUkd6/B7FP4MohUr+Ag2Noun7BN1x/7q3jnmSn2gaxDbp6DAm/1YH7rO
- o8gQ==
-X-Gm-Message-State: APjAAAUUWFT1cZzA5g5Jsv0vY2xBdFB7TQbgA0z3fiJCzECmjG8Brqus
- Ocm2dTWTIcpHwUo4lerQwXuzpPxa
-X-Google-Smtp-Source: APXvYqwQehVMicSYylTIpO1o1FBNKYcTaIYZYtkjBXfK9aqFrSoKcoEKuYZrZ6X04o21HnedQw/1Sg==
-X-Received: by 2002:a1c:1b86:: with SMTP id b128mr4551301wmb.127.1574179742270; 
- Tue, 19 Nov 2019 08:09:02 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id n13sm3442203wmi.25.2019.11.19.08.09.01
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 19 Nov 2019 08:09:01 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 09/12] hw/i386: Move save_tsc_khz from PCMachineClass to
- X86MachineClass
-Date: Tue, 19 Nov 2019 17:08:45 +0100
-Message-Id: <1574179728-35535-10-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1574179728-35535-1-git-send-email-pbonzini@redhat.com>
-References: <1574179728-35535-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::335
+ (envelope-from <clg@kaod.org>) id 1iX66w-0008GS-Qn
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:12:15 -0500
+Received: from 9.mo6.mail-out.ovh.net ([87.98.171.146]:46078)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iX66w-0008En-I1
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 11:12:14 -0500
+Received: from player786.ha.ovh.net (unknown [10.109.146.32])
+ by mo6.mail-out.ovh.net (Postfix) with ESMTP id A04A81ED15F
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 17:12:10 +0100 (CET)
+Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
+ (Authenticated sender: clg@kaod.org)
+ by player786.ha.ovh.net (Postfix) with ESMTPSA id 3D157C5F4A84;
+ Tue, 19 Nov 2019 16:12:06 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 v5 02/23] ppc/xive: Introduce helpers for the NVT
+ id
+To: Greg Kurz <groug@kaod.org>
+References: <20191115162436.30548-1-clg@kaod.org>
+ <20191115162436.30548-3-clg@kaod.org> <20191119150403.02a78ace@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <384b6e95-feda-de56-4131-43da3165b3d8@kaod.org>
+Date: Tue, 19 Nov 2019 17:12:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <20191119150403.02a78ace@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Ovh-Tracer-Id: 1466484632900111187
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudegkedgkeeiucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejkeeirdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 87.98.171.146
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,156 +72,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liam Merwick <liam.merwick@oracle.com>
+On 19/11/2019 15:04, Greg Kurz wrote:
+> On Fri, 15 Nov 2019 17:24:15 +0100
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> Each vCPU in the system is identified with an NVT identifier which is
+>> pushed in the OS CAM line (QW1W2) of the HW thread interrupt context
+>> register when the vCPU is dispatched on a HW thread. This identifier
+>> is used by the presenter subengine to find a matching target to notify
+>> of an event. It is also used to fetch the associate NVT structure
+>> which may contain pending interrupts that need a resend.
+>>
+>> Add a couple of helpers for the NVT ids. The NVT space is 19 bits
+>> wide, giving a maximum of 512K per chip.
+>>
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>>  include/hw/ppc/xive.h      |  5 -----
+>>  include/hw/ppc/xive_regs.h | 21 +++++++++++++++++++++
+>>  2 files changed, 21 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+>> index 8fd439ec9bba..fa7adf87feb2 100644
+>> --- a/include/hw/ppc/xive.h
+>> +++ b/include/hw/ppc/xive.h
+>> @@ -418,11 +418,6 @@ Object *xive_tctx_create(Object *cpu, XiveRouter =
+*xrtr, Error **errp);
+>>  void xive_tctx_reset(XiveTCTX *tctx);
+>>  void xive_tctx_destroy(XiveTCTX *tctx);
+>> =20
+>> -static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nv=
+t_idx)
+>> -{
+>> -    return (nvt_blk << 19) | nvt_idx;
+>> -}
+>> -
+>>  /*
+>>   * KVM XIVE device helpers
+>>   */
+>> diff --git a/include/hw/ppc/xive_regs.h b/include/hw/ppc/xive_regs.h
+>> index 530f232b04f8..1a5622f8ded8 100644
+>> --- a/include/hw/ppc/xive_regs.h
+>> +++ b/include/hw/ppc/xive_regs.h
+>> @@ -272,4 +272,25 @@ typedef struct XiveNVT {
+>> =20
+>>  #define xive_nvt_is_valid(nvt)    (be32_to_cpu((nvt)->w0) & NVT_W0_VA=
+LID)
+>> =20
+>> +/*
+>> + * The VP number space in a block is defined by the END_W6_NVT_INDEX
+>> + * field of the XIVE END
+>> + */
+>> +#define XIVE_NVT_SHIFT                19
+>> +
+>> +static inline uint32_t xive_nvt_cam_line(uint8_t nvt_blk, uint32_t nv=
+t_idx)
+>> +{
+>> +    return (nvt_blk << XIVE_NVT_SHIFT) | nvt_idx;
+>=20
+> Shouldn't we ensure nvt_idx fits in the 19 bits ?
 
-Attempting to migrate a VM using the microvm machine class results in the source
-QEMU aborting with the following message/backtrace:
+yes. We should use the END_W6_NVT_INDEX mask. We are fine today because
+the NVT index is extracted from the end w6 using xive_get_field32() or=20
+computed from the PIR using the appropriate mask.
 
-target/i386/machine.c:955:tsc_khz_needed: Object 0x555556608fa0 is not an
-instance of type generic-pc-machine
+Something to improve.=20
 
-abort()
-object_class_dynamic_cast_assert()
-vmstate_save_state_v()
-vmstate_save_state()
-vmstate_save()
-qemu_savevm_state_complete_precopy()
-migration_thread()
-migration_thread()
-migration_thread()
-qemu_thread_start()
-start_thread()
-clone()
-
-The access to the machine class returned by MACHINE_GET_CLASS() in
-tsc_khz_needed() is crashing as it is trying to dereference a different
-type of machine class object (TYPE_PC_MACHINE) to that of this microVM.
-
-This can be resolved by extending the changes in the following commit
-f0bb276bf8d5 ("hw/i386: split PCMachineState deriving X86MachineState from it")
-and moving the save_tsc_khz field in PCMachineClass to X86MachineClass.
-
-Fixes: f0bb276bf8d5 ("hw/i386: split PCMachineState deriving X86MachineState from it")
-Signed-off-by: Liam Merwick <liam.merwick@oracle.com>
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-Message-Id: <1574075605-25215-1-git-send-email-liam.merwick@oracle.com>
-Reviewed-by: Sergio Lopez <slp@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/i386/pc.c          | 1 -
- hw/i386/pc_piix.c     | 4 ++--
- hw/i386/pc_q35.c      | 4 ++--
- hw/i386/x86.c         | 1 +
- include/hw/i386/pc.h  | 2 --
- include/hw/i386/x86.h | 2 ++
- target/i386/machine.c | 4 ++--
- 7 files changed, 9 insertions(+), 9 deletions(-)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 96715f8..ac08e63 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2195,7 +2195,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     /* BIOS ACPI tables: 128K. Other BIOS datastructures: less than 4K reported
-      * to be used at the moment, 32K should be enough for a while.  */
-     pcmc->acpi_data_size = 0x20000 + 0x8000;
--    pcmc->save_tsc_khz = true;
-     pcmc->linuxboot_dma_enabled = true;
-     pcmc->pvh_enabled = true;
-     assert(!mc->get_hotplug_handler);
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 849ee12..1bd70d1 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -567,10 +567,10 @@ DEFINE_I440FX_MACHINE(v2_6, "pc-i440fx-2.6", NULL,
- 
- static void pc_i440fx_2_5_machine_options(MachineClass *m)
- {
--    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+    X86MachineClass *x86mc = X86_MACHINE_CLASS(m);
- 
-     pc_i440fx_2_6_machine_options(m);
--    pcmc->save_tsc_khz = false;
-+    x86mc->save_tsc_khz = false;
-     m->legacy_fw_cfg_order = 1;
-     compat_props_add(m->compat_props, hw_compat_2_5, hw_compat_2_5_len);
-     compat_props_add(m->compat_props, pc_compat_2_5, pc_compat_2_5_len);
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index d51f524..385e5cf 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -508,10 +508,10 @@ DEFINE_Q35_MACHINE(v2_6, "pc-q35-2.6", NULL,
- 
- static void pc_q35_2_5_machine_options(MachineClass *m)
- {
--    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+    X86MachineClass *x86mc = X86_MACHINE_CLASS(m);
- 
-     pc_q35_2_6_machine_options(m);
--    pcmc->save_tsc_khz = false;
-+    x86mc->save_tsc_khz = false;
-     m->legacy_fw_cfg_order = 1;
-     compat_props_add(m->compat_props, hw_compat_2_5, hw_compat_2_5_len);
-     compat_props_add(m->compat_props, pc_compat_2_5, pc_compat_2_5_len);
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index fd84b23..394edc2 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -763,6 +763,7 @@ static void x86_machine_class_init(ObjectClass *oc, void *data)
-     mc->get_default_cpu_node_id = x86_get_default_cpu_node_id;
-     mc->possible_cpu_arch_ids = x86_possible_cpu_arch_ids;
-     x86mc->compat_apic_id_mode = false;
-+    x86mc->save_tsc_khz = true;
-     nc->nmi_monitor_handler = x86_nmi;
- 
-     object_class_property_add(oc, X86_MACHINE_MAX_RAM_BELOW_4G, "size",
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index e6fa841..1f86eba 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -116,8 +116,6 @@ typedef struct PCMachineClass {
-     bool enforce_aligned_dimm;
-     bool broken_reserved_end;
- 
--    /* TSC rate migration: */
--    bool save_tsc_khz;
-     /* generate legacy CPU hotplug AML */
-     bool legacy_cpu_hotplug;
- 
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-index 82d09fd..4b84917 100644
---- a/include/hw/i386/x86.h
-+++ b/include/hw/i386/x86.h
-@@ -30,6 +30,8 @@ typedef struct {
- 
-     /*< public >*/
- 
-+    /* TSC rate migration: */
-+    bool save_tsc_khz;
-     /* Enables contiguous-apic-ID mode */
-     bool compat_apic_id_mode;
- } X86MachineClass;
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 6481f84..7bdeb78 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -988,8 +988,8 @@ static bool tsc_khz_needed(void *opaque)
-     X86CPU *cpu = opaque;
-     CPUX86State *env = &cpu->env;
-     MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
--    PCMachineClass *pcmc = PC_MACHINE_CLASS(mc);
--    return env->tsc_khz && pcmc->save_tsc_khz;
-+    X86MachineClass *x86mc = X86_MACHINE_CLASS(mc);
-+    return env->tsc_khz && x86mc->save_tsc_khz;
- }
- 
- static const VMStateDescription vmstate_tsc_khz = {
--- 
-1.8.3.1
-
+>=20
+>> +}
+>> +
+>> +static inline uint32_t xive_nvt_idx(uint32_t cam_line)
+>> +{
+>> +    return cam_line & ((1 << XIVE_NVT_SHIFT) - 1);
+>> +}
+>> +
+>> +static inline uint32_t xive_nvt_blk(uint32_t cam_line)
+>> +{
+>> +    return (cam_line >> XIVE_NVT_SHIFT) & 0xf;
+>> +}
+>> +
+>>  #endif /* PPC_XIVE_REGS_H */
+>=20
 
 
