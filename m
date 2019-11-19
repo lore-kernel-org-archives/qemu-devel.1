@@ -2,73 +2,74 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC1C1C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 11:08:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76B4CC432C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 11:18:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A88B6208CC
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 11:08:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30B35222F2
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 11:18:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="k0pGrV5t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A88B6208CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NH2GP1y0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30B35222F2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX1N0-0001bU-SR
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 06:08:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45461)
+	id 1iX1Wl-0006in-3J
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 06:18:35 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47026)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1iX1Lw-0008QE-Iq
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 06:07:25 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iX1Uv-0005lw-O9
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 06:16:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <yury-kotov@yandex-team.ru>) id 1iX1Lt-0006Z4-E5
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 06:07:22 -0500
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:42962)
+ (envelope-from <stefanha@redhat.com>) id 1iX1Ut-0003Px-9Q
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 06:16:40 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42053
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <yury-kotov@yandex-team.ru>)
- id 1iX1Lr-0006VF-Mi; Tue, 19 Nov 2019 06:07:21 -0500
-Received: from mxbackcorp2j.mail.yandex.net (mxbackcorp2j.mail.yandex.net
- [IPv6:2a02:6b8:0:1619::119])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 3597A2E14AB;
- Tue, 19 Nov 2019 14:07:14 +0300 (MSK)
-Received: from iva4-c987840161f8.qloud-c.yandex.net
- (iva4-c987840161f8.qloud-c.yandex.net [2a02:6b8:c0c:3da5:0:640:c987:8401])
- by mxbackcorp2j.mail.yandex.net (mxbackcorp/Yandex) with ESMTP id
- VO2TDAzMyt-7DJqCYZQ; Tue, 19 Nov 2019 14:07:14 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1574161634; bh=HrCcSpLJG9L8gXmV5hNBmH/yRn0z5OXCyYhqzp8ItS0=;
- h=Message-Id:Date:Subject:To:From:Cc;
- b=k0pGrV5tS39Xb6YzVgZ4T30m7ZNbBmgx5/vL/J9hGr/3PrXtkDcVIgh6spfrkIjHc
- P4pTcBf76yfAAPGjaROS4h1UUSGyaP+HrXTOT2Fsx9goKQXnjjiZjNSZ7HJHduTWGm
- BDCSO5TV7UElkK+qVtu0hVBo9sad2Nlv/jbeBWiE=
-Authentication-Results: mxbackcorp2j.mail.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net
- [2a02:6b8:0:408:a563:bec5:6346:ec71])
- by iva4-c987840161f8.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- 92QNE4iRjf-7DWqLRrr; Tue, 19 Nov 2019 14:07:13 +0300
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
- (Client certificate not present)
-From: Yury Kotov <yury-kotov@yandex-team.ru>
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iX1Ut-0003PQ-5o
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 06:16:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574162198;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=uaiQi2nfEMRuSMjuZ+gsCf+8nC63MKmPedparNIqYU4=;
+ b=NH2GP1y0C33wrDkQCjCaSsDeeXLL9DFbHWN3/l11/kRwBBSdEulOrNxRnyOBsAQ8Zs6DW7
+ A+CSY2l7huys6t2po6+oJIo6jluHcgt43J8KVMdBgV+cZTm2pwqNLlaWDi32FZDudCt7QX
+ P9ShznK1h+B4p2NnLhJXuvW/DRq7jeI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-HwM2PLtHPnuqYjjniW6Xmg-1; Tue, 19 Nov 2019 06:16:37 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 132F5107ACC5
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 11:16:36 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6CDED6404A;
+ Tue, 19 Nov 2019 11:16:27 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] monitor: Remove unused define
-Date: Tue, 19 Nov 2019 14:07:09 +0300
-Message-Id: <20191119110709.13827-1-yury-kotov@yandex-team.ru>
-X-Mailer: git-send-email 2.24.0
+Subject: [PATCH] vhost-user-input: use free(elem) instead of g_free(elem)
+Date: Tue, 19 Nov 2019 11:16:26 +0000
+Message-Id: <20191119111626.112206-1-stefanha@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: HwM2PLtHPnuqYjjniW6Xmg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 5.45.199.163
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,35 +81,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Remove the definition of QMP_ACCEPT_UNKNOWNS as it is unused since
-refactoring 5c678ee8d940
+The virtqueue element returned by vu_queue_pop() is allocated using
+malloc(3) by virtqueue_alloc_element().  Use the matching free(3)
+function instead of glib's g_free().
 
-Signed-off-by: Yury Kotov <yury-kotov@yandex-team.ru>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- monitor/misc.c | 3 ---
- 1 file changed, 3 deletions(-)
+ contrib/vhost-user-input/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/monitor/misc.c b/monitor/misc.c
-index 3baa15f3bf..6680734ea1 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -106,9 +106,6 @@ struct MonFdset {
-     QLIST_ENTRY(MonFdset) next;
- };
+diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/mai=
+n.c
+index 449fd2171a..ef4b7769f2 100644
+--- a/contrib/vhost-user-input/main.c
++++ b/contrib/vhost-user-input/main.c
+@@ -77,7 +77,7 @@ static void vi_input_send(VuInput *vi, struct virtio_inpu=
+t_event *event)
+         len =3D iov_from_buf(elem->in_sg, elem->in_num,
+                            0, &vi->queue[i].event, sizeof(virtio_input_eve=
+nt));
+         vu_queue_push(dev, vq, elem, len);
+-        g_free(elem);
++        free(elem);
+     }
 =20
--/* QMP checker flags */
--#define QMP_ACCEPT_UNKNOWNS 1
--
- /* Protects mon_fdsets */
- static QemuMutex mon_fdsets_lock;
- static QLIST_HEAD(, MonFdset) mon_fdsets;
+     vu_queue_notify(&vi->dev.parent, vq);
+@@ -153,7 +153,7 @@ static void vi_handle_sts(VuDev *dev, int qidx)
+                          0, &event, sizeof(event));
+         vi_handle_status(vi, &event);
+         vu_queue_push(dev, vq, elem, len);
+-        g_free(elem);
++        free(elem);
+     }
+=20
+     vu_queue_notify(&vi->dev.parent, vq);
 --=20
-2.24.0
+2.23.0
 
 
