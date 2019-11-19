@@ -2,115 +2,103 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 064E5C43215
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:23:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20EBEC432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:30:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5D022075E
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:23:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1FE6208A1
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 17:30:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="IqMzU7kf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5D022075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DKbTVx3+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1FE6208A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48360 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX7E7-00067R-WF
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 12:23:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47997)
+	id 1iX7KY-0008RS-U1
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 12:30:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49602)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iX72C-0000OH-2Z
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:11:26 -0500
+ (envelope-from <philmd@redhat.com>) id 1iX7Iv-0007i5-D2
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:28:42 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iX729-0006Q2-Nv
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:11:23 -0500
-Received: from mail-eopbgr40094.outbound.protection.outlook.com
- ([40.107.4.94]:29223 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iX727-0006MJ-O1; Tue, 19 Nov 2019 12:11:20 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e1JsqMl7S6qy9l5TMrnEquVxtrw0ohQ0m19vfVSB3pgn/aM8xT37nAIw3b8AfIf4FFyR5fsK3Pjzaa3pyi15ixoY/owvo9EjFpiBfAGCxx+TizvPrx0sqExSHmVjtsyu/5TL1AmsYNCmkR5yPX3hAvrkQn3Bfnr4VaUXSE4+tqAt46Lfovva5YCPNX6XDdP6kI/TjRDsXUFCSZipgD04om523hIZ+os5NCDqVJOZWQEumbwu9jBCVePAqsHacO/esRq8kEtZ9t2lp/Iza+0QkQfNfTAXonOT1ADXfYRqeVfcjEBxsEgTzK4+M+nUduwBVwLwvEeT1qrtm4IhEq+Qgg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sn5nY4uV2UrIYqWC93yb/PzVCuvgO1L5w6IgTffFo/g=;
- b=NMUkpAbyVHaNZPoCdGDN5+F9mE8gAJ/fX2l8B6Zn3cDd2aHnPqj15MUi3N79MuTxcaPPfwELK7mPvNE69k8nk5LVlbIgjHbUWqQEtTplcjvxMqLEDrLMzScsE+Oiu5HIcgP+3T2OwXE5f69p1VK1VgqsjjYLKxQOMYgQOxiQnqwBgWHD5lW89yuKZCCbQAd9ZqMjUlukOcDi2LO+FzVL71Q9RKHmoGLb9Q9tPGhuPyGj3NbHjC0yyxgx2VRUbBEtPLFC1sqmXjdBNwXtog/H9ofToIV1uoNjENXbIusM6mL0tnfgxHaTgcsc++OANzl5VMvvbpoNx9lcShDhcmf8CA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sn5nY4uV2UrIYqWC93yb/PzVCuvgO1L5w6IgTffFo/g=;
- b=IqMzU7kfVyZIPB0qJuMWTttLki1MsIDFbPY/H39/lexMG4hNNHZh7Hp1WtanW/xt8OCNRTstJarwMuDCYL5Nrp8fK9bN4WfAX+JEmbb5W5Jv4nC7CvzrQNDD3k8IYr/PTkjJmd9ynXPPR39XDaW8WqmdhFmlQO+ZFTg5+ECMYuk=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB4936.eurprd08.prod.outlook.com (10.255.122.142) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.22; Tue, 19 Nov 2019 17:11:15 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.031; Tue, 19 Nov 2019
- 17:11:15 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
-Thread-Topic: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
-Thread-Index: AQHVnJu0qDM7Hy9Fo0iUR1ci8onW5KeSu8mAgAADrwA=
-Date: Tue, 19 Nov 2019 17:11:14 +0000
-Message-ID: <ab2be956-0b44-f737-4416-322ca4024d9b@virtuozzo.com>
-References: <20191116163410.12129-1-vsementsov@virtuozzo.com>
- <20191119165801.GF229732@stefanha-x1.localdomain>
-In-Reply-To: <20191119165801.GF229732@stefanha-x1.localdomain>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1P195CA0023.EURP195.PROD.OUTLOOK.COM (2603:10a6:3:fd::33)
- To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191119201112587
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e85eb2a9-fa4d-4925-61c0-08d76d137bc8
-x-ms-traffictypediagnostic: AM6PR08MB4936:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <AM6PR08MB4936E2E720E1EA4EE8274D87C14C0@AM6PR08MB4936.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4714;
-x-forefront-prvs: 022649CC2C
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(366004)(396003)(346002)(376002)(39850400004)(53754006)(199004)(189003)(66066001)(25786009)(107886003)(52116002)(486006)(6246003)(7736002)(305945005)(36756003)(478600001)(6916009)(99286004)(54906003)(316002)(8676002)(81156014)(81166006)(8936002)(4326008)(6116002)(6512007)(14454004)(66946007)(3846002)(76176011)(5660300002)(31686004)(31696002)(6506007)(66476007)(26005)(66556008)(229853002)(6486002)(6436002)(186003)(2906002)(256004)(2616005)(11346002)(71200400001)(64756008)(102836004)(66446008)(386003)(476003)(86362001)(446003)(14444005)(71190400001);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB4936;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1h5/xCJmfmq6c3xxtC+XTlHlQ8dHD9VVuA7KfPL8AJ28R0Z6S3hlxp0/wjBmICy0qj9HPiBiEqbH2q6kg55UX/FjiBd7nejFNwH8728IYvi/WvEZqBzsPER+FY7yD4xwtqFLPCXgmTXN1h6hs0vaxesTXkq1SNFE1LQhJipi5IDDjVFpRxzKoGAKtzL8DbYBwnNY9gMtn4jzRDv3ppdrd+0hLNE7O/HSetI6vY3+KmknzEaM7n5ryGzuyUsoz17Ifcdnd8u1m64Q2FEIB27wz4g7zptEOvE040M1nKLHeJxe1QwJ1Y81WBspkzqerTGEoD19kvRB0doYLGQ48ZCDWpWY5fLBzVjUtRHrafspSIPZ3HvmrYuXOUMQ3NbP/AcL+fwTTENOtaPH10S1f/ofKvoeKXKolHpC8katwVuZlrK2jDjY9edDcLHPRGDObvnD
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <54BEE21FC4EC3C4EA8C745D2E1A01F77@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <philmd@redhat.com>) id 1iX7Is-000823-C8
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:28:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54496
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iX7Is-00081N-8R
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 12:28:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574184517;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CPP5TJcKZY0opHcK3J1Fq7WtDbZVvfly1N9BrqSYJXs=;
+ b=DKbTVx3+fGG/IkMO82c1QEellDZOCTbNLM5CyC7ROEz/rcn+L9Ss86kqDo8enD2gsZ7lNj
+ f4XcVJY6uBmYEH1ciDNXWbgExeeqMI7yOof6AHVpjgMrn0kTZqhXrJgGYOwjAkVE3PPtCm
+ JeoQw0vxhv42l44ipCDG4J6WMm5609g=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-HzhAl6g3Msq3VNtd8B1xIw-1; Tue, 19 Nov 2019 12:28:35 -0500
+Received: by mail-wm1-f69.google.com with SMTP id x16so3003972wmk.2
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 09:28:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=q5/VoO7CS29nbGMdS4ApW/cjCAgW0FMUMXnKEJHEAJ8=;
+ b=elKGOyHBjePmlbsZJsgRPib6T8ypgXV4DHDrSLvoUqByEMyCTZfuwe3JXuotbLYXsG
+ YvjkGOWlrIyMypVnA/XDhQB/8fhWuhS7v757AUZATmGesOAj2obe7VKtZBFrfMIWy/Du
+ CscMUtk1EfaoWcFKnkaNEalLJzm4wiuR1LZ2QTwqGDQp2joAjzMLjP/1Jck9J0N+IJWF
+ npGW2R1IjYRDsvLBTmV/05hlCYTJHAv6x/hD3fc45HUKvGECPaBxEYQY48P+u3e8/Tj8
+ 4r7VabGVANtKheiD0lOBIUEkyefyYursU04yNN3oOAL5OuQmtv8QGwdHaS3lvOe0LHBZ
+ 1+QQ==
+X-Gm-Message-State: APjAAAV6qs4PhDFBL0gJppAJDEP1MImzNQaAyJQB3bpCa5hEcfO0pd0t
+ ceC2Cz+90SDH3nspkIfqISitnPA2nXksOuf9R9ytcnqVjKr1iThlBvhtbV9lOljIJYMFrpT1Dvg
+ nZvoMD/RHqRlwY24=
+X-Received: by 2002:adf:979a:: with SMTP id s26mr39556754wrb.92.1574184514680; 
+ Tue, 19 Nov 2019 09:28:34 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwqU+J1Ey3fKUiDKJ55ub90eQSN+qsU3xZv1V0yeiY30wmEmEK1TW27hJH6cnxzLWeV8QvniQ==
+X-Received: by 2002:adf:979a:: with SMTP id s26mr39556719wrb.92.1574184514377; 
+ Tue, 19 Nov 2019 09:28:34 -0800 (PST)
+Received: from [192.168.1.35] (131.red-88-21-102.staticip.rima-tde.net.
+ [88.21.102.131])
+ by smtp.gmail.com with ESMTPSA id c24sm32161763wrb.27.2019.11.19.09.28.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 19 Nov 2019 09:28:33 -0800 (PST)
+Subject: Re: [PATCH 3/6] tests/hd-geo-test: Skip test when images can not be
+ created
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20191119170822.45649-1-thuth@redhat.com>
+ <20191119170822.45649-4-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <9aa4803a-9584-1af6-c49f-a8f08146c63c@redhat.com>
+Date: Tue, 19 Nov 2019 18:28:32 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e85eb2a9-fa4d-4925-61c0-08d76d137bc8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2019 17:11:14.7179 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: y711X+1abQOrgyUZ+RClohGgWzR8TTLSz5O7fIU90DLccY1x+cFee09gpoxmsBE0bsElK7mX7JoruoQKsYDqJnkF3EwyjxTDoSo4z7zZhy4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4936
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.4.94
+In-Reply-To: <20191119170822.45649-4-thuth@redhat.com>
+Content-Language: en-US
+X-MC-Unique: HzhAl6g3Msq3VNtd8B1xIw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -122,101 +110,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "kwolf@redhat.com" <kwolf@redhat.com>, "fam@euphon.net" <fam@euphon.net>,
- Denis Lunev <den@virtuozzo.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-19.11.2019 19:58, Stefan Hajnoczi wrote:
-> On Sat, Nov 16, 2019 at 07:34:06PM +0300, Vladimir Sementsov-Ogievskiy wr=
-ote:
->> Hi all!
->>
->> I wanted to understand, what is the real difference between bdrv_block_s=
-tatus_above
->> and bdrv_is_allocated_above, IMHO bdrv_is_allocated_above should work th=
-rough
->> bdrv_block_status_above..
->>
->> And I found the problem: bdrv_is_allocated_above considers space after E=
-OF as
->> UNALLOCATED for intermediate nodes..
->>
->> UNALLOCATED is not about allocation at fs level, but about should we go =
-to backing or
->> not.. And it seems incorrect for me, as in case of short backing file, w=
-e'll read
->> zeroes after EOF, instead of going further by backing chain.
->>
->> This leads to the following effect:
->>
->> ./qemu-img create -f qcow2 base.qcow2 2M
->> ./qemu-io -c "write -P 0x1 0 2M" base.qcow2
->>
->> ./qemu-img create -f qcow2 -b base.qcow2 mid.qcow2 1M
->> ./qemu-img create -f qcow2 -b mid.qcow2 top.qcow2 2M
->>
->> Region 1M..2M is shadowed by short middle image, so guest sees zeroes:
->> ./qemu-io -c "read -P 0 1M 1M" top.qcow2
->> read 1048576/1048576 bytes at offset 1048576
->> 1 MiB, 1 ops; 00.00 sec (22.795 GiB/sec and 23341.5807 ops/sec)
->>
->> But after commit guest visible state is changed, which seems wrong for m=
-e:
->> ./qemu-img commit top.qcow2 -b mid.qcow2
->>
->> ./qemu-io -c "read -P 0 1M 1M" mid.qcow2
->> Pattern verification failed at offset 1048576, 1048576 bytes
->> read 1048576/1048576 bytes at offset 1048576
->> 1 MiB, 1 ops; 00.00 sec (4.981 GiB/sec and 5100.4794 ops/sec)
->>
->> ./qemu-io -c "read -P 1 1M 1M" mid.qcow2
->> read 1048576/1048576 bytes at offset 1048576
->> 1 MiB, 1 ops; 00.00 sec (3.365 GiB/sec and 3446.1606 ops/sec)
->>
->>
->> I don't know, is it a real bug, as I don't know, do we support backing f=
-ile larger than
->> its parent. Still, I'm not sure that this behavior of bdrv_is_allocated_=
-above don't lead
->> to other problems.
+On 11/19/19 6:08 PM, Thomas Huth wrote:
+> In certain environments like restricted containers, we can not create
+> huge test images. To be able to use "make check" in such container
+> environments, too, let's skip the hd-geo-test instead of failing when
+> the test images could not be created.
 >=20
-> It seems correct that a backing file limits the virtual disk size of its
-> backing chain.
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   tests/hd-geo-test.c | 12 +++++++++++-
+>   1 file changed, 11 insertions(+), 1 deletion(-)
 >=20
-> The "qemu-img commit" behavior seems counter-intuitive at first, but the
-> problem there is that the top-most image file is larger than its backing
-> file - not that the backing chain has differing sizes.  Committing
-> should not lose data, mid.qcow2 will be grown and then you get the
-> result you've observed.
->=20
-> I consider this a little weird but not a bug.  Does anyone else have
-> opinions?
+> diff --git a/tests/hd-geo-test.c b/tests/hd-geo-test.c
+> index 7e86c5416c..a249800544 100644
+> --- a/tests/hd-geo-test.c
+> +++ b/tests/hd-geo-test.c
+> @@ -34,8 +34,13 @@ static char *create_test_img(int secs)
+>       fd =3D mkstemp(template);
+>       g_assert(fd >=3D 0);
+>       ret =3D ftruncate(fd, (off_t)secs * 512);
+> -    g_assert(ret =3D=3D 0);
+>       close(fd);
+> +
+> +    if (ret) {
+> +        free(template);
+> +        template =3D NULL;
+> +    }
+> +
+>       return template;
+>   }
+>  =20
+> @@ -934,6 +939,10 @@ int main(int argc, char **argv)
+>       for (i =3D 0; i < backend_last; i++) {
+>           if (img_secs[i] >=3D 0) {
+>               img_file_name[i] =3D create_test_img(img_secs[i]);
+> +            if (!img_file_name[i]) {
+> +                g_test_message("Could not create test images.");
+> +                goto test_add_done;
+> +            }
+>           } else {
+>               img_file_name[i] =3D NULL;
+>           }
+> @@ -965,6 +974,7 @@ int main(int argc, char **argv)
+>                          "skipping hd-geo/override/* tests");
+>       }
+>  =20
+> +test_add_done:
+>       ret =3D g_test_run();
+>  =20
+>       for (i =3D 0; i < backend_last; i++) {
 >=20
 
-I thing, that the fact that read and block_status treats space after EOF
-in different ways is a bug anyway.
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-Also, block_status behavior don't correspond to our definition of
-BDRV_BLOCK_ALLOCATED (see Kevin's response)
-
-Also, as I explained in parallel branch, such situation is possible for exa=
-mple
-when we interleave incremental backup creation with vm disk resize.
-
-So, then, we have incremental backup chain with different sizes like in
-example. Assume we want to merge some sequential incremental backups into
-one (aka, remove incremental backup), it may be done with help of commit.
-And we get final image, where we see data from base backup instead of
-zeros. This is illegal, vm should not get access to this data.
-
-Possibly, similar thing is possible with snapshots.
-
---=20
-Best regards,
-Vladimir
 
