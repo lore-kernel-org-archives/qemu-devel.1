@@ -2,79 +2,83 @@ Return-Path: <SRS0=aBJE=ZL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B3A4C432C0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:55:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD92C432C0
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 15:05:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22221222A0
-	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 14:55:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57EBF222CD
+	for <qemu-devel@archiver.kernel.org>; Tue, 19 Nov 2019 15:05:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FRV3xZan"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22221222A0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HN+l1G3G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57EBF222CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iX4uO-00083E-8R
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 09:55:12 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47458)
+	id 1iX54X-0005At-IX
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 10:05:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49272)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iX4tk-0007e7-Po
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:54:34 -0500
+ (envelope-from <jasowang@redhat.com>) id 1iX53a-0004YO-RA
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 10:04:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iX4th-0000Fn-W9
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:54:31 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32352
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <jasowang@redhat.com>) id 1iX53W-0003iE-Mm
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 10:04:41 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:48278
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iX4th-0000FO-Hm
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 09:54:29 -0500
+ (Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1iX53W-0003hs-FG
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 10:04:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574175268;
+ s=mimecast20190719; t=1574175877;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=naDu/k2UK5DQHEIyqHpUoCsdogICq6ZbdFhAUae1mqI=;
- b=FRV3xZangWUJ9DS9IJf2I6yfrjOuOGOK/O8gjhKyX7cYTp2/ZUWqNAJBbxfz+Mppb28euO
- +6CFJ+7Xh3g3FPs1xI8T5DOXUBjIhuEY2Oe1KMeCyDiOfRg5Qx0+egno4lQcoSJG9GLSik
- ajASOmQA9MPH2tCfpsJYQmWg40UrC+0=
+ bh=aGjBkIAy5+WhJ7q1IacL/KDYyDC+3EdL9vxspMfaCSc=;
+ b=HN+l1G3GXSW3MlFkCHtf+kBbekemnEqKyh/KpwZ4nJG1V/KAWKId/TokQexDEoNFxAf5DV
+ A68/uJPXHyuJZB2VNloBTMpfWsclVagPi8UM8yNDzUy2/NpgR+UMbH9bxnJCgHbEC4xIOF
+ naL1BI5dHhwC2Hu3/5KZmEhcHaJxHgg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-5dvuU7aMPs2t4R3YxRUJuA-1; Tue, 19 Nov 2019 09:54:27 -0500
+ us-mta-62-LmWCvOueN6CP0LXzEPRxJw-1; Tue, 19 Nov 2019 10:03:19 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0EAD28CD813;
- Tue, 19 Nov 2019 14:54:26 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-116-75.ams2.redhat.com [10.36.116.75])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 45DD71001B3F;
- Tue, 19 Nov 2019 14:54:21 +0000 (UTC)
-Date: Tue, 19 Nov 2019 15:54:19 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: Re: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
-Message-ID: <20191119145419.GF5910@linux.fritz.box>
-References: <20191116163410.12129-1-vsementsov@virtuozzo.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04E04801E5A;
+ Tue, 19 Nov 2019 15:03:18 +0000 (UTC)
+Received: from [10.72.12.74] (ovpn-12-74.pek2.redhat.com [10.72.12.74])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DE0831001B32;
+ Tue, 19 Nov 2019 15:03:12 +0000 (UTC)
+Subject: Re: [PATCH v7 0/4] colo: Add support for continuous replication
+To: "Zhang, Chen" <chen.zhang@intel.com>, Lukas Straub <lukasstraub2@web.de>, 
+ qemu-devel <qemu-devel@nongnu.org>
+References: <cover.1571925699.git.lukasstraub2@web.de>
+ <20191113173559.0713c27d@luklap>
+ <9CFF81C0F6B98A43A459C9EDAD400D7806309C8C@shsmsx102.ccr.corp.intel.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <049fdd65-c654-f619-4de1-5a3fe0a2ad5b@redhat.com>
+Date: Tue, 19 Nov 2019 23:03:10 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191116163410.12129-1-vsementsov@virtuozzo.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <9CFF81C0F6B98A43A459C9EDAD400D7806309C8C@shsmsx102.ccr.corp.intel.com>
+Content-Language: en-US
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 5dvuU7aMPs2t4R3YxRUJuA-1
+X-MC-Unique: LmWCvOueN6CP0LXzEPRxJw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,112 +90,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, qemu-block@nongnu.org, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 16.11.2019 um 17:34 hat Vladimir Sementsov-Ogievskiy geschrieben:
-> Hi all!
->=20
-> I wanted to understand, what is the real difference between bdrv_block_st=
-atus_above
-> and bdrv_is_allocated_above, IMHO bdrv_is_allocated_above should work thr=
-ough
-> bdrv_block_status_above..
->=20
-> And I found the problem: bdrv_is_allocated_above considers space after EO=
-F as
-> UNALLOCATED for intermediate nodes..
->=20
-> UNALLOCATED is not about allocation at fs level, but about should we go t=
-o backing or
-> not.. And it seems incorrect for me, as in case of short backing file, we=
-'ll read
-> zeroes after EOF, instead of going further by backing chain.
->=20
-> This leads to the following effect:
->=20
-> ./qemu-img create -f qcow2 base.qcow2 2M
-> ./qemu-io -c "write -P 0x1 0 2M" base.qcow2
->=20
-> ./qemu-img create -f qcow2 -b base.qcow2 mid.qcow2 1M
-> ./qemu-img create -f qcow2 -b mid.qcow2 top.qcow2 2M
->=20
-> Region 1M..2M is shadowed by short middle image, so guest sees zeroes:
-> ./qemu-io -c "read -P 0 1M 1M" top.qcow2
-> read 1048576/1048576 bytes at offset 1048576
-> 1 MiB, 1 ops; 00.00 sec (22.795 GiB/sec and 23341.5807 ops/sec)
->=20
-> But after commit guest visible state is changed, which seems wrong for me=
-:
-> ./qemu-img commit top.qcow2 -b mid.qcow2
->=20
-> ./qemu-io -c "read -P 0 1M 1M" mid.qcow2
-> Pattern verification failed at offset 1048576, 1048576 bytes
-> read 1048576/1048576 bytes at offset 1048576
-> 1 MiB, 1 ops; 00.00 sec (4.981 GiB/sec and 5100.4794 ops/sec)
->=20
-> ./qemu-io -c "read -P 1 1M 1M" mid.qcow2
-> read 1048576/1048576 bytes at offset 1048576
-> 1 MiB, 1 ops; 00.00 sec (3.365 GiB/sec and 3446.1606 ops/sec)
->=20
->=20
-> I don't know, is it a real bug, as I don't know, do we support backing
-> file larger than its parent. Still, I'm not sure that this behavior of
-> bdrv_is_allocated_above don't lead to other problems.
 
-Actually, this specific problem is completely unrelated to how the block
-status functions deal with short backing files because they are only
-ever called for backing files of the same length as their overlay.
+On 2019/11/19 =E4=B8=8B=E5=8D=888:28, Zhang, Chen wrote:
+>
+>> -----Original Message-----
+>> From: Lukas Straub <lukasstraub2@web.de>
+>> Sent: Thursday, November 14, 2019 12:36 AM
+>> To: qemu-devel <qemu-devel@nongnu.org>
+>> Cc: Zhang, Chen <chen.zhang@intel.com>; Jason Wang
+>> <jasowang@redhat.com>; Wen Congyang <wencongyang2@huawei.com>;
+>> Xie Changlong <xiechanglong.d@gmail.com>; Kevin Wolf
+>> <kwolf@redhat.com>; Max Reitz <mreitz@redhat.com>; qemu-block
+>> <qemu-block@nongnu.org>
+>> Subject: Re: [PATCH v7 0/4] colo: Add support for continuous replication
+>>
+>> On Fri, 25 Oct 2019 19:06:31 +0200
+>> Lukas Straub <lukasstraub2@web.de> wrote:
+>>
+>>> Hello Everyone,
+>>> These Patches add support for continuous replication to colo. This
+>>> means that after the Primary fails and the Secondary did a failover,
+>>> the Secondary can then become Primary and resume replication to a new
+>> Secondary.
+>>> Regards,
+>>> Lukas Straub
+>>>
+>>> v7:
+>>>   - clarify meaning of ip's in documentation and note that active and h=
+idden
+>>>     images just need to be created once
+>>>   - reverted removal of bdrv_is_root_node(top_bs) in replication and
+>> adjusted
+>>>     the top-id=3D parameter in documentation acordingly
+>>>
+>>> v6:
+>>>   - documented the position=3D and insert=3D options
+>>>   - renamed replication test
+>>>   - clarified documentation by using different ip's for primary and
+>>> secondary
+>>>   - added Reviewed-by tags
+>>>
+>>> v5:
+>>>   - change syntax for the position=3D parameter
+>>>   - fix spelling mistake
+>>>
+>>> v4:
+>>>   - fix checkpatch.pl warnings
+>>>
+>>> v3:
+>>>   - add test for replication changes
+>>>   - check if the filter to be inserted before/behind belongs to the
+>>> same interface
+>>>   - fix the error message for the position=3D parameter
+>>>   - rename term "after" -> "behind" and variable "insert_before" ->
+>> "insert_before_flag"
+>>>   - document the quorum node on the secondary side
+>>>   - simplify quorum parameters in documentation
+>>>   - remove trailing spaces in documentation
+>>>   - clarify the testing procedure in documentation
+>>>
+>>> v2:
+>>>   - fix email formating
+>>>   - fix checkpatch.pl warnings
+>>>   - fix patchew error
+>>>   - clearer commit messages
+>>>
+>>>
+>>> Lukas Straub (4):
+>>>    block/replication.c: Ignore requests after failover
+>>>    tests/test-replication.c: Add test for for secondary node continuing
+>>>      replication
+>>>    net/filter.c: Add Options to insert filters anywhere in the filter
+>>>      list
+>>>    colo: Update Documentation for continuous replication
+>>>
+>>>   block/replication.c        |  35 +++++-
+>>>   docs/COLO-FT.txt           | 224 +++++++++++++++++++++++++++---------=
+-
+>>>   docs/block-replication.txt |  28 +++--
+>>>   include/net/filter.h       |   2 +
+>>>   net/filter.c               |  92 ++++++++++++++-
+>>>   qemu-options.hx            |  31 ++++-
+>>>   tests/test-replication.c   |  52 +++++++++
+>>>   7 files changed, 389 insertions(+), 75 deletions(-)
+>>>
+>> Hello Everyone,
+>> So I guess this is ready for merging or will that have to wait until the=
+ 4.2
+>> release is done?
+> Due to Qemu 4.2 release schedule, after soft feature freeze(Oct29) the ma=
+ster branch does not accept feature changes.
+> But I don't know if sub-maintainer(block or net) can queue this series fi=
+rst then merge it after 4.2 release?
+>
+> Thanks
+> Zhang Chen
 
-The problem is that the commit job grows the backing file first without
-making sure that the clusters in the new part read as zeros. After this,
-the damage is done and bdrv_is_allocated_above() returns correctly that
-the blocks are unallocated both in top.qcow2 and in mid.qcow2.
 
-So the simple fix for 4.2 would be the following. Maybe we can find a
-way to optimise it later (though probably it's not worth it because
-short backing files are an uncommon case anyway).
+Will try to queue this series.
 
-Kevin
+Thanks
 
 
-diff --git a/block/commit.c b/block/commit.c
-index 23c90b3b91..a0c4f51caf 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -159,6 +159,11 @@ static int coroutine_fn commit_run(Job *job, Error **e=
-rrp)
-         if (ret) {
-             goto out;
-         }
-+        ret =3D blk_co_pwrite_zeroes(s->base, base_len, len - base_len,
-+                                   BDRV_REQ_MAY_UNMAP);
-+        if (ret < 0) {
-+            goto out;
-+        }
-     }
-=20
-     buf =3D blk_blockalign(s->top, COMMIT_BUFFER_SIZE);
-diff --git a/block/mirror.c b/block/mirror.c
-index f0f2d9dff1..2a34f2fad6 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -883,6 +883,12 @@ static int coroutine_fn mirror_run(Job *job, Error **e=
-rrp)
-             if (ret < 0) {
-                 goto immediate_exit;
-             }
-+            ret =3D blk_co_pwrite_zeroes(s->target, base_length,
-+                                       s->bdev_length - base_length,
-+                                       BDRV_REQ_MAY_UNMAP);
-+            if (ret < 0) {
-+                goto immediate_exit;
-+            }
-         }
-     }
-=20
+>
+>> Regards,
+>> Lukas Straub
 
 
