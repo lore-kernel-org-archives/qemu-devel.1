@@ -4,61 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03882C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 17:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9254C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 17:32:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8ED22067D
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 17:28:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8ED22067D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9C83920730
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 17:32:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C83920730
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maskray.me
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32884 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXTmV-0001JT-0h
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 12:28:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54951)
+	id 1iXTq6-0003ZG-J9
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 12:32:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55347)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iXTln-0000lS-Ri
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 12:28:00 -0500
+ (envelope-from <emacsray@gmail.com>) id 1iXTo7-0002aW-K0
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 12:30:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iXTlm-0007tA-6m
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 12:27:59 -0500
-Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:58988)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iXTlm-0007sg-1T
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 12:27:58 -0500
-Received: from player778.ha.ovh.net (unknown [10.108.57.188])
- by mo2.mail-out.ovh.net (Postfix) with ESMTP id A8C611B566E
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 18:27:55 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player778.ha.ovh.net (Postfix) with ESMTPSA id 28DD9C480C5F;
- Wed, 20 Nov 2019 17:27:51 +0000 (UTC)
-Date: Wed, 20 Nov 2019 18:27:49 +0100
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH for-5.0 v5 12/23] ppc/xive: Introduce a XiveFabric
- interface
-Message-ID: <20191120182749.7e985a5b@bahia.lan>
-In-Reply-To: <20191115162436.30548-13-clg@kaod.org>
-References: <20191115162436.30548-1-clg@kaod.org>
- <20191115162436.30548-13-clg@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (envelope-from <emacsray@gmail.com>) id 1iXTo5-00019D-UF
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 12:30:23 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:42720)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <emacsray@gmail.com>) id 1iXTo5-00018o-KX
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 12:30:21 -0500
+Received: by mail-pf1-f193.google.com with SMTP id s5so50399pfh.9
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 09:30:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=GKWksBOyTGFrcb1yXhvRt7iles2TcQvLBi45Rj/q3kc=;
+ b=pt2GQG+NH/kcBFNbdFSoS2pNLgx03PNhQDP9ZpSsjjtEpef/74yJ2b2s5G1DRz4Zrd
+ YqRupMrNrIOAGVRlCfXHNIyibxDkws6LMYAVUP2mSb6ZiY8+SWYXnYDgVj3G+8YmI/GC
+ pw+P9OpIPyxU+FGZJbZ40AtGC0sVgSv9aRBabnouWK31egsO95DAZ8uuFMdKTJC1ya3B
+ K+LuqN6Flt53ElPyaRrgyRql0oLI7bHXymPZY4JBL/SAWrqSqqYGi+NsQpI+PkMDMGio
+ CUs5Xx3/xYGx29JjgME1wdPIWMY9vmjlXrLvOEykxl0xFYgvo79AmeBhcpx00pc+iODd
+ BW4Q==
+X-Gm-Message-State: APjAAAU8Ui+wpLaBmnCSbyAMQKvSZbsOQzzD8Y0Gmu+mstli9i8M7p1B
+ 4t/DIIm8RjEHZtcEZOT9d8I=
+X-Google-Smtp-Source: APXvYqxu5Npbddi1Q9Cpd0BVLewSWuTHPM8WmZ91KkjRtmlLWqgy0pGziG3RYikzgMdO2hMxy88U3A==
+X-Received: by 2002:a63:4415:: with SMTP id r21mr4655640pga.184.1574271020037; 
+ Wed, 20 Nov 2019 09:30:20 -0800 (PST)
+Received: from localhost ([2620:15c:2d1:100:7901:ead3:b8cd:1c59])
+ by smtp.gmail.com with ESMTPSA id c3sm28045111pgi.19.2019.11.20.09.30.19
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 20 Nov 2019 09:30:19 -0800 (PST)
+Date: Wed, 20 Nov 2019 09:30:18 -0800
+From: Fangrui Song <i@maskray.me>
+To: Juan Quintela <quintela@redhat.com>
+Subject: Re: [PATCH] Fix incorrect int->float conversions caught by clang
+ -Wimplicit-int-float-conversion
+Message-ID: <20191120173018.4jahw3pei3zcupvo@gmail.com>
+References: <20191116010731.3jdxozzfpsqsrcc4@google.com>
+ <87tv6z7vb0.fsf@dusky.pond.sub.org> <87pnhmol25.fsf@trasno.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 8618482316022552971
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehtddguddttdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgsehtqhertdertdejnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpkedvrddvheefrddvtdekrddvgeeknecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <87pnhmol25.fsf@trasno.org>
+User-Agent: NeoMutt/20180223-112-0c5bf3
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.165.38
+X-Received-From: 209.85.210.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,89 +81,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 Nov 2019 17:24:25 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On 2019-11-20, Juan Quintela wrote:
+>Markus Armbruster <armbru@redhat.com> wrote:
+>> Fangrui Song <i@maskray.me> writes:
+>>
+>>> The warning will be enabled by default in clang 10. It is not
+>>> available for clang <= 9.
+>>>
+>>> qemu/migration/migration.c:2038:24: error: implicit conversion from
+>>> 'long' to 'double' changes value from 9223372036854775807 to
+>>> 9223372036854775808 [-Werror,-Wimplicit-int-float-conversion]
+>>> ...
+>>> qemu/util/cutils.c:245:23: error: implicit conversion from 'unsigned
+>>> long' to 'double' changes value from 18446744073709550592 to
+>>> 18446744073709551616 [-Werror,-Wimplicit-int-float-conversion]
+>>>
+>>> Signed-off-by: Fangrui Song <i@maskray.me>
+>>> ---
+>>>   migration/migration.c | 4 ++--
+>>>   util/cutils.c         | 4 ++--
+>>>   2 files changed, 4 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/migration/migration.c b/migration/migration.c
+>>> index 354ad072fa..ac3ea2934a 100644
+>>> --- a/migration/migration.c
+>>> +++ b/migration/migration.c
+>>> @@ -53,6 +53,7 @@
+>>>   #include "monitor/monitor.h"
+>>>   #include "net/announce.h"
+>>>   #include "qemu/queue.h"
+>>> +#include <math.h>
+>>>
+>>>   #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed throttling */
+>>>
+>>> @@ -2035,11 +2036,10 @@ void qmp_migrate_set_downtime(double value, Error **errp)
+>>         if (value < 0 || value > MAX_MIGRATE_DOWNTIME_SECONDS) {
+>>             error_setg(errp, "Parameter 'downtime_limit' expects an integer in "
+>>                              "the range of 0 to %d seconds",
+>>                              MAX_MIGRATE_DOWNTIME_SECONDS);
+>>             return;
+>>>       }
+>>
+>> @value is now in [0,2000].
+>>
+>>>
+>>>       value *= 1000; /* Convert to milliseconds */
+>>
+>> @value is in [0,2000000]
+>>
+>>> -    value = MAX(0, MIN(INT64_MAX, value));
+>>
+>> This does nothing.
+>>
+>>>
+>>>       MigrateSetParameters p = {
+>>>           .has_downtime_limit = true,
+>>> -        .downtime_limit = value,
+>>> +        .downtime_limit = (int64_t)fmin(value, nextafter(0x1p63, 0)),
+>>
+>> This does nothing and is hard to read :)
+>>
+>> Can we simply drop the offending line statement instead?
+>
+>Agreed aboutdropping the whole bussines for migration.
+>
+>
+>>>       };
+>>>
+>>>       qmp_migrate_set_parameters(&p, errp);
+>>> diff --git a/util/cutils.c b/util/cutils.c
+>>> index fd591cadf0..2b4484c015 100644
+>>> --- a/util/cutils.c
+>>> +++ b/util/cutils.c
+>>> @@ -239,10 +239,10 @@ static int do_strtosz(const char *nptr, const char **end,
+>>>           goto out;
+>>>       }
+>>>       /*
+>>> -     * Values >= 0xfffffffffffffc00 overflow uint64_t after their trip
+>>> +     * Values > nextafter(0x1p64, 0) overflow uint64_t after their trip
+>>>        * through double (53 bits of precision).
+>>>        */
+>>> -    if ((val * mul >= 0xfffffffffffffc00) || val < 0) {
+>>> +    if ((val * mul > nextafter(0x1p64, 0)) || val < 0) {
+>>>           retval = -ERANGE;
+>>>           goto out;
+>>>       }
+>
+>This comment was really bad (it says the same that the code).
+>On the other hand, I can *kind of* understand what does 0xffff<more
+>f's here>.
+>
+>But I am at a complete loss about what value is:
+>
+>nextafter(0x1p64, 0).
+>
+>Can we put what value is that instead?
 
-> The XiveFabric QOM interface acts as the PowerBUS interface between
-> the interrupt controller and the system and should be implemented by
-> the QEMU machine. On HW, the XIVE sub-engine is responsible for the
-> communication with the other chip is the Common Queue (CQ) bridge
-> unit.
->=20
-> This interface offers a 'match_nvt' handler to perform the CAM line
-> matching when looking for a XIVE Presenter with a dispatched NVT.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
+It is a C99 hexadecimal floating-point literal.
+0x1p64 represents hex fraction 1.0 scaled by 2**64, that is 2**64.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+We can write this as `val * mul > 0xfffffffffffff800p0`, but I feel that
+counting the number of f's is error-prone and is not fun.
 
->  include/hw/ppc/xive.h | 22 ++++++++++++++++++++++
->  hw/intc/xive.c        | 10 ++++++++++
->  2 files changed, 32 insertions(+)
->=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index f9aa0fa0dac3..b00af988779b 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -399,6 +399,28 @@ int xive_presenter_tctx_match(XivePresenter *xptr, X=
-iveTCTX *tctx,
->                                uint8_t nvt_blk, uint32_t nvt_idx,
->                                bool cam_ignore, uint32_t logic_serv);
-> =20
-> +/*
-> + * XIVE Fabric (Interface between Interrupt Controller and Machine)
-> + */
-> +
-> +typedef struct XiveFabric XiveFabric;
-> +
-> +#define TYPE_XIVE_FABRIC "xive-fabric"
-> +#define XIVE_FABRIC(obj)                                     \
-> +    INTERFACE_CHECK(XiveFabric, (obj), TYPE_XIVE_FABRIC)
-> +#define XIVE_FABRIC_CLASS(klass)                                     \
-> +    OBJECT_CLASS_CHECK(XiveFabricClass, (klass), TYPE_XIVE_FABRIC)
-> +#define XIVE_FABRIC_GET_CLASS(obj)                                   \
-> +    OBJECT_GET_CLASS(XiveFabricClass, (obj), TYPE_XIVE_FABRIC)
-> +
-> +typedef struct XiveFabricClass {
-> +    InterfaceClass parent;
-> +    int (*match_nvt)(XiveFabric *xfb, uint8_t format,
-> +                     uint8_t nvt_blk, uint32_t nvt_idx,
-> +                     bool cam_ignore, uint8_t priority,
-> +                     uint32_t logic_serv, XiveTCTXMatch *match);
-> +} XiveFabricClass;
-> +
->  /*
->   * XIVE END ESBs
->   */
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index da6196ca958f..1c9e58f8deac 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -1893,8 +1893,18 @@ static const TypeInfo xive_presenter_info =3D {
->      .class_size =3D sizeof(XivePresenterClass),
->  };
-> =20
-> +/*
-> + * XIVE Fabric
-> + */
-> +static const TypeInfo xive_fabric_info =3D {
-> +    .name =3D TYPE_XIVE_FABRIC,
-> +    .parent =3D TYPE_INTERFACE,
-> +    .class_size =3D sizeof(XiveFabricClass),
-> +};
-> +
->  static void xive_register_types(void)
->  {
-> +    type_register_static(&xive_fabric_info);
->      type_register_static(&xive_source_info);
->      type_register_static(&xive_notifier_info);
->      type_register_static(&xive_presenter_info);
-
+(We cannot use val * mul >= 0x1p64.
+If FLT_EVAL_METHOD == 2, the intermediate computation val * mul will be
+performed at long double precision, val * mul may not by representable
+by a double and will overflow as (double)0x1p64.)
 
