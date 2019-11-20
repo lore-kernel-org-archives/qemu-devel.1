@@ -2,77 +2,87 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53F87C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 19:17:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B7F5C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 19:19:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2439820855
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 19:17:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2439820855
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E93B420855
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 19:19:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KTyvVv/Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E93B420855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXVTt-0008RC-7C
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 14:17:37 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44787)
+	id 1iXVVh-0004Px-0u
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 14:19:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44846)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iXVS6-0007s1-Mx
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 14:15:47 -0500
+ (envelope-from <eblake@redhat.com>) id 1iXVT2-0008I7-By
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 14:16:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iXVS4-00021O-Ru
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 14:15:46 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51046)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iXVS4-00020x-MU
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 14:15:44 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iXVS3-0002y8-20
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 19:15:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0E1202E8048
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 19:15:43 +0000 (UTC)
+ (envelope-from <eblake@redhat.com>) id 1iXVSz-0002N0-T1
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 14:16:43 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:21904
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iXVSy-0002JC-Kt
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 14:16:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574277390;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JOl+2e36xf7irAuB7BM5W74HubWafG1anw4Wt7ovj3g=;
+ b=KTyvVv/Zcuo93DqsuRX6pRccmU8rf5eDBhEZbOCPb6MlnMjathZkQxh/zHGyfPcAI3wTkb
+ GjDXMmTGj2dF79E5+pFTXbj+DbxNSyNqaNrYNR6Eu9SFzIKC+WG/IHbx4959DUzpadAY7X
+ PqisZnMRN8nHJwRopvo1SZY6+lbCMLo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-155-Yi5vflBvNMWRnqNG3IdghA-1; Wed, 20 Nov 2019 14:16:24 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2271C1883524;
+ Wed, 20 Nov 2019 19:16:23 +0000 (UTC)
+Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A112451C7B;
+ Wed, 20 Nov 2019 19:16:22 +0000 (UTC)
+Subject: Re: [PATCH 2/6] tests/Makefile.include: Fix missing
+ test-qapi-emit-events.[ch]
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20191120182551.23795-1-armbru@redhat.com>
+ <20191120182551.23795-3-armbru@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <32d24b89-a897-f4e3-71a3-b6a67254bb51@redhat.com>
+Date: Wed, 20 Nov 2019 13:16:22 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20191120182551.23795-3-armbru@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: Yi5vflBvNMWRnqNG3IdghA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Nov 2019 19:10:25 -0000
-From: Frank Heimes <1852781@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: product=ubuntu-z-systems; status=Incomplete;
- importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Tags: s390x
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: colin-king paelzer th-huth
-X-Launchpad-Bug-Reporter: Colin Ian King (colin-king)
-X-Launchpad-Bug-Modifier: Frank Heimes (frank-heimes)
-References: <157384084797.7162.9983011521410421204.malonedeb@gac.canonical.com>
-Message-Id: <157427702590.22769.6702527300995675320.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1852781] Re: qemu s390x on focal - applications breaking
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 866fa1f6ab5839cd7e2a6842705170c12506bff7
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -81,71 +91,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1852781 <1852781@bugs.launchpad.net>
+Cc: mdroth@linux.vnet.ibm.com, kwolf@pond.sub.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Also affects: ubuntu-z-systems
-   Importance: Undecided
-       Status: New
+On 11/20/19 12:25 PM, Markus Armbruster wrote:
+> Commit 5d75648b56 "qapi: Generate QAPIEvent stuff into separate files"
+> added tests/test-qapi-emit-events.[ch] to the set of generated files,
+> but neglected to update tests/.gitignore and tests/Makefile.include.
+> Commit a0af8cee3c "tests/.gitignore: ignore test-qapi-emit-events.[ch]
+> for in-tree builds" fixed the former.  Now fix the latter.
+>=20
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   tests/Makefile.include | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
 
-** Changed in: ubuntu-z-systems
-       Status: New =3D> Incomplete
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
--- =
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1852781
-
-Title:
-  qemu s390x on focal - applications breaking
-
-Status in QEMU:
-  Incomplete
-Status in Ubuntu on IBM z Systems:
-  Incomplete
-
-Bug description:
-  Running qemu-system-s390x (1:4.0+dfsg-0ubuntu10) on an x86-64 Focal
-  host with an upgrade of a Eoan s390x VM to a Focal s390x is triggering
-  random breakage, for example:
-
-  sudo apt-get update && sudo apt-get dist-upgrade
-
-  ...
-  ...
-
-  Unpacking debianutils (4.9) over (4.8.6.3) ...
-  Setting up debianutils (4.9) ...
-  Use of uninitialized value $ARGV[0] in string ne at /usr/sbin/update-mime=
- line 43.
-  (Reading database ... 83640 files and directories currently installed.)
-  Preparing to unpack .../bash_5.0-5ubuntu1_s390x.deb ...
-  Unpacking bash (5.0-5ubuntu1) over (5.0-4ubuntu1) ...
-  Setting up bash (5.0-5ubuntu1) ...
-  [12124.788618] User process fault: interruption code 0007 ilc:3 in bash[2=
-aa3d780000+149000]
-  dpkg: error processing package bash (--configure):
-   installed bash package post-installation script subprocess was killed by=
- signal (Floating point exception), core du
-  mped
-  Errors were encountered while processing:
-   bash
-  E: Sub-process /usr/bin/dpkg returned an error code (1)
-
-  And now bash is completely broken:
-
-  cking@eoan-s390x:~$ bash
-  [12676.204389] User process fault: interruption code 0007 ilc:3 in bash[2=
-aa14780000+149000]
-
-  Floating point exception (core dumped)
-
-  The upgrade works OK on a s390x, so I'm assuming it's something to do
-  with the qemu emulation.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1852781/+subscriptions
 
