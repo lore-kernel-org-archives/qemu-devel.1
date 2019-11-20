@@ -2,78 +2,79 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94E52C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F8DC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:51:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C9BD20659
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:49:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2229920659
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:51:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QYfWCmRg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C9BD20659
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hiuw9kCf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2229920659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXSEe-00034s-5J
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 10:49:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34763)
+	id 1iXSG6-0004qf-TT
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 10:51:10 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35082)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iXRvd-0005oG-NE
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:30:03 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iXRx9-00075Y-3y
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:31:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iXRvb-000827-Kd
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:30:01 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:58609
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iXRx1-0000z8-2E
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:31:29 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43644
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iXRva-00081g-Uu
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:29:59 -0500
+ id 1iXRwz-0000wg-3e
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:31:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574263798;
+ s=mimecast20190719; t=1574263883;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lPF4WP6Jk39Vib77UZDSDbM8SSHh/svFXPccUgscxzU=;
- b=QYfWCmRgadRwG5vt0S89DDnbm4pectIBnF1G68fexhs0lGuAEtCUg/0Kx6RzjXUPZpHW2h
- 4bbsjPCTeK0q8kODvw+8pQo+bQPy6VxoxL8C8a1vo+K3Gqi8/3PGG+aPN+TJWcJDR2ZM/l
- uD3xSN1ge4o+4Awsy0RsI2fUKC811sk=
+ bh=PurGUxzBofordEzQ/Xn6ypIugdPqz6DRHCdALTotyNE=;
+ b=hiuw9kCfDy9b5iuVx6f7s3yTRWKaFnFLyiN1ekE9NZXN0glhjTnULoBq7u7h6P+GS3WVSP
+ ss+MxW2yWIjcRn36hCvrVFMfdX5D8lCmnzrS5hTQY6knZhoYX7sU5tme/HAQ95mf/EVPkU
+ Z7kxqvBU/xSJWpC4FiYEOr7cX3iJXpY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-115-uruazQ1-N4WhND0OZAhOfw-1; Wed, 20 Nov 2019 10:29:55 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-152-WoHeQrGNO7KV_-1Udi-cdQ-1; Wed, 20 Nov 2019 10:31:21 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A09918026AA;
- Wed, 20 Nov 2019 15:29:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 292D0188352C;
+ Wed, 20 Nov 2019 15:31:20 +0000 (UTC)
 Received: from localhost (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 04C446BF8C;
- Wed, 20 Nov 2019 15:29:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 908095C1D4;
+ Wed, 20 Nov 2019 15:31:14 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 25/37] dp8393x: replace PROP_PTR with PROP_LINK
-Date: Wed, 20 Nov 2019 19:24:30 +0400
-Message-Id: <20191120152442.26657-26-marcandre.lureau@redhat.com>
+Subject: [PATCH v4 33/37] omap-i2c: remove PROP_PTR
+Date: Wed, 20 Nov 2019 19:24:38 +0400
+Message-Id: <20191120152442.26657-34-marcandre.lureau@redhat.com>
 In-Reply-To: <20191120152442.26657-1-marcandre.lureau@redhat.com>
 References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: uruazQ1-N4WhND0OZAhOfw-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: WoHeQrGNO7KV_-1Udi-cdQ-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,93 +86,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Jason Wang <jasowang@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Link property is the correct way to pass a MemoryRegion to a device
-for DMA purposes.
+Since clocks are not QOM objects, replace PROP_PTR of clocks with
+setters methods.
 
-Sidenote: as a sysbus device, this remains non-usercreatable
-even though we can drop the specific flag here.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Reviewed-by: Corey Minyard <cminyard@mvista.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- hw/m68k/q800.c      | 3 ++-
- hw/mips/mips_jazz.c | 3 ++-
- hw/net/dp8393x.c    | 7 +++----
- 3 files changed, 7 insertions(+), 6 deletions(-)
+ hw/arm/omap1.c        |  2 +-
+ hw/arm/omap2.c        |  8 ++++----
+ hw/i2c/omap_i2c.c     | 19 ++++++++++++-------
+ include/hw/arm/omap.h | 13 +++++++++++++
+ 4 files changed, 30 insertions(+), 12 deletions(-)
 
-diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
-index 4ca8678007..8f3eb6bfe7 100644
---- a/hw/m68k/q800.c
-+++ b/hw/m68k/q800.c
-@@ -239,7 +239,8 @@ static void q800_init(MachineState *machine)
-     qdev_set_nic_properties(dev, &nd_table[0]);
-     qdev_prop_set_uint8(dev, "it_shift", 2);
-     qdev_prop_set_bit(dev, "big_endian", true);
--    qdev_prop_set_ptr(dev, "dma_mr", get_system_memory());
-+    object_property_set_link(OBJECT(dev), OBJECT(get_system_memory()),
-+                             "dma_mr", &error_abort);
-     qdev_init_nofail(dev);
-     sysbus =3D SYS_BUS_DEVICE(dev);
-     sysbus_mmio_map(sysbus, 0, SONIC_BASE);
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index d978bb64a0..1518eb5e55 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -284,7 +284,8 @@ static void mips_jazz_init(MachineState *machine,
-             dev =3D qdev_create(NULL, "dp8393x");
-             qdev_set_nic_properties(dev, nd);
-             qdev_prop_set_uint8(dev, "it_shift", 2);
--            qdev_prop_set_ptr(dev, "dma_mr", rc4030_dma_mr);
-+            object_property_set_link(OBJECT(dev), OBJECT(rc4030_dma_mr),
-+                                     "dma_mr", &error_abort);
-             qdev_init_nofail(dev);
-             sysbus =3D SYS_BUS_DEVICE(dev);
-             sysbus_mmio_map(sysbus, 0, 0x80001000);
-diff --git a/hw/net/dp8393x.c b/hw/net/dp8393x.c
-index 3d991af163..cdc2631c0c 100644
---- a/hw/net/dp8393x.c
-+++ b/hw/net/dp8393x.c
-@@ -175,7 +175,7 @@ typedef struct dp8393xState {
-     int loopback_packet;
+diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+index 1afd1d3d7f..807e5f70d1 100644
+--- a/hw/arm/omap1.c
++++ b/hw/arm/omap1.c
+@@ -4030,7 +4030,7 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegio=
+n *dram,
 =20
-     /* Memory access */
--    void *dma_mr;
-+    MemoryRegion *dma_mr;
-     AddressSpace as;
- } dp8393xState;
+     s->i2c[0] =3D qdev_create(NULL, "omap_i2c");
+     qdev_prop_set_uint8(s->i2c[0], "revision", 0x11);
+-    qdev_prop_set_ptr(s->i2c[0], "fclk", omap_findclk(s, "mpuper_ck"));
++    omap_i2c_set_fclk(OMAP_I2C(s->i2c[0]), omap_findclk(s, "mpuper_ck"));
+     qdev_init_nofail(s->i2c[0]);
+     busdev =3D SYS_BUS_DEVICE(s->i2c[0]);
+     sysbus_connect_irq(busdev, 0, qdev_get_gpio_in(s->ih[1], OMAP_INT_I2C)=
+);
+diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
+index 1d7cc435ef..171e2d0472 100644
+--- a/hw/arm/omap2.c
++++ b/hw/arm/omap2.c
+@@ -2425,8 +2425,8 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRegi=
+on *sdram,
 =20
-@@ -948,7 +948,8 @@ static const VMStateDescription vmstate_dp8393x =3D {
+     s->i2c[0] =3D qdev_create(NULL, "omap_i2c");
+     qdev_prop_set_uint8(s->i2c[0], "revision", 0x34);
+-    qdev_prop_set_ptr(s->i2c[0], "iclk", omap_findclk(s, "i2c1.iclk"));
+-    qdev_prop_set_ptr(s->i2c[0], "fclk", omap_findclk(s, "i2c1.fclk"));
++    omap_i2c_set_iclk(OMAP_I2C(s->i2c[0]), omap_findclk(s, "i2c1.iclk"));
++    omap_i2c_set_fclk(OMAP_I2C(s->i2c[0]), omap_findclk(s, "i2c1.fclk"));
+     qdev_init_nofail(s->i2c[0]);
+     busdev =3D SYS_BUS_DEVICE(s->i2c[0]);
+     sysbus_connect_irq(busdev, 0,
+@@ -2437,8 +2437,8 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRegi=
+on *sdram,
 =20
- static Property dp8393x_properties[] =3D {
-     DEFINE_NIC_PROPERTIES(dp8393xState, conf),
--    DEFINE_PROP_PTR("dma_mr", dp8393xState, dma_mr),
-+    DEFINE_PROP_LINK("dma_mr", dp8393xState, dma_mr,
-+                     TYPE_MEMORY_REGION, MemoryRegion *),
-     DEFINE_PROP_UINT8("it_shift", dp8393xState, it_shift, 0),
-     DEFINE_PROP_BOOL("big_endian", dp8393xState, big_endian, false),
-     DEFINE_PROP_END_OF_LIST(),
-@@ -963,8 +964,6 @@ static void dp8393x_class_init(ObjectClass *klass, void=
- *data)
-     dc->reset =3D dp8393x_reset;
-     dc->vmsd =3D &vmstate_dp8393x;
-     dc->props =3D dp8393x_properties;
--    /* Reason: dma_mr property can't be set */
--    dc->user_creatable =3D false;
+     s->i2c[1] =3D qdev_create(NULL, "omap_i2c");
+     qdev_prop_set_uint8(s->i2c[1], "revision", 0x34);
+-    qdev_prop_set_ptr(s->i2c[1], "iclk", omap_findclk(s, "i2c2.iclk"));
+-    qdev_prop_set_ptr(s->i2c[1], "fclk", omap_findclk(s, "i2c2.fclk"));
++    omap_i2c_set_iclk(OMAP_I2C(s->i2c[1]), omap_findclk(s, "i2c2.iclk"));
++    omap_i2c_set_fclk(OMAP_I2C(s->i2c[1]), omap_findclk(s, "i2c2.fclk"));
+     qdev_init_nofail(s->i2c[1]);
+     busdev =3D SYS_BUS_DEVICE(s->i2c[1]);
+     sysbus_connect_irq(busdev, 0,
+diff --git a/hw/i2c/omap_i2c.c b/hw/i2c/omap_i2c.c
+index 3ba965a58f..3ccbd5cc2c 100644
+--- a/hw/i2c/omap_i2c.c
++++ b/hw/i2c/omap_i2c.c
+@@ -28,10 +28,7 @@
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+=20
+-#define TYPE_OMAP_I2C "omap_i2c"
+-#define OMAP_I2C(obj) OBJECT_CHECK(OMAPI2CState, (obj), TYPE_OMAP_I2C)
+-
+-typedef struct OMAPI2CState {
++struct OMAPI2CState {
+     SysBusDevice parent_obj;
+=20
+     MemoryRegion iomem;
+@@ -56,7 +53,7 @@ typedef struct OMAPI2CState {
+     uint8_t divider;
+     uint8_t times[2];
+     uint16_t test;
+-} OMAPI2CState;
++};
+=20
+ #define OMAP2_INTR_REV=090x34
+ #define OMAP2_GC_REV=090x34
+@@ -504,10 +501,18 @@ static void omap_i2c_realize(DeviceState *dev, Error =
+**errp)
+     }
  }
 =20
- static const TypeInfo dp8393x_info =3D {
++void omap_i2c_set_iclk(OMAPI2CState *i2c, omap_clk clk)
++{
++    i2c->iclk =3D clk;
++}
++
++void omap_i2c_set_fclk(OMAPI2CState *i2c, omap_clk clk)
++{
++    i2c->fclk =3D clk;
++}
++
+ static Property omap_i2c_properties[] =3D {
+     DEFINE_PROP_UINT8("revision", OMAPI2CState, revision, 0),
+-    DEFINE_PROP_PTR("iclk", OMAPI2CState, iclk),
+-    DEFINE_PROP_PTR("fclk", OMAPI2CState, fclk),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+diff --git a/include/hw/arm/omap.h b/include/hw/arm/omap.h
+index bcecf19f89..39a295ba20 100644
+--- a/include/hw/arm/omap.h
++++ b/include/hw/arm/omap.h
+@@ -81,6 +81,19 @@ typedef struct omap_intr_handler_s omap_intr_handler;
+ void omap_intc_set_iclk(omap_intr_handler *intc, omap_clk clk);
+ void omap_intc_set_fclk(omap_intr_handler *intc, omap_clk clk);
+=20
++/* omap_i2c.c */
++#define TYPE_OMAP_I2C "omap_i2c"
++#define OMAP_I2C(obj) OBJECT_CHECK(OMAPI2CState, (obj), TYPE_OMAP_I2C)
++
++typedef struct OMAPI2CState OMAPI2CState;
++
++/*
++ * TODO: Ideally we should have a clock framework that
++ * let us wire these clocks up with QOM properties or links.
++ */
++void omap_i2c_set_iclk(OMAPI2CState *i2c, omap_clk clk);
++void omap_i2c_set_fclk(OMAPI2CState *i2c, omap_clk clk);
++
+ /* OMAP2 l4 Interconnect */
+ struct omap_l4_s;
+ struct omap_l4_region_s {
 --=20
 2.24.0
 
