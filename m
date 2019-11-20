@@ -2,99 +2,117 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D8CAC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA51DC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:12:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 681B5219FA
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:07:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MEZPtfLZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 681B5219FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C0128219FA
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:12:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0128219FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXL1Q-0006bm-Jh
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 03:07:32 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43809)
+	id 1iXL5m-0008DT-SF
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 03:12:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47057)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iXL0a-00069w-WE
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:06:42 -0500
+ (envelope-from <laurent@vivier.eu>) id 1iXL4C-0007dm-36
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:10:25 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iXL0Y-0004K0-UT
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:06:40 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33445)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iXL0Y-0004I8-LW
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:06:38 -0500
-Received: by mail-wr1-x443.google.com with SMTP id w9so26958622wrr.0
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 00:06:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=rPh3Jc/7A2awgQ/1rLSfczKNYcD0wLjmWo1XVsrZNyQ=;
- b=MEZPtfLZncGo8o/ux+RXb5+PN9yRD1oQfBlYrZv0JlO5q93nfmLveKBKZVt11HTAUy
- P5UZjnZiTlg4Q7mqOwBw/nt5zy6w5SDHHIXZf23bBbgOKNfZNm5P236h0iS7Q7gzgVWT
- aOd7uxK8vX52NqK/tmaq7PLhNZ6i0/iRoSR2pNDachWcA5Bg7SlGsKEBipT8jO7zHr1U
- BogdX2SpZE7mW5ohcOi0Nl+XPKO8tvg6I8KxiIXLRe/JwrNFzls+nGR67CqGg9B/OiD7
- 47n1PyLLzNh+Cs/VH211i3RgW7eWfOVWHVz16AuJnhN0jZvoQ9zv/1uhTdAvEhfhr3GL
- 481w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=rPh3Jc/7A2awgQ/1rLSfczKNYcD0wLjmWo1XVsrZNyQ=;
- b=EjjwEnc4Txk9w4wFN9ar9Yfm3Wn663mSgUcdlEGuqTa9TDsbkU84mUzz9Z5XPwqGF9
- NhbHIePRZ1bZsRfSOULznC9s+FLNCr4x84GgZgfSlFRIjCQFf8K7RjioRNSajOxyHpSb
- jYYL3f8TyQqO+fYQ5SOBiChP2EhzCs3dZXzQxdSK+a/JrX9i6Axf+HVOsTbDK9VWDvjT
- fwSM5kCURW8lpGpkt4BV2NRASllE8kDLuWv279Mh+1fiS/jYv0MudGHh4s94w8DELq55
- Glhm9TJBNmHF6xjgROn+AlRGrhcUL+7K09kvPFQACIaRFHRVxRX2nPbvaZXItQlQr5T6
- Ui+w==
-X-Gm-Message-State: APjAAAWOw4ZxUJ+BNSPAFKD/DBGLIYSG+MuG6JHVfG2NZcFoH0uEmvDE
- v3sidM3OcUH9fQQsfJRprkzoePt2lSqHcQ==
-X-Google-Smtp-Source: APXvYqyKPKWSSKr6XVEPeL+buczWe15eG9WzgANsQz3ZQ/BCwG2KE7isF89CnQr0qC+IEuf6FPtuMA==
-X-Received: by 2002:adf:ec44:: with SMTP id w4mr1649553wrn.274.1574237197182; 
- Wed, 20 Nov 2019 00:06:37 -0800 (PST)
-Received: from [192.168.8.102] (253.red-37-10-245.dynamicip.rima-tde.net.
- [37.10.245.253])
- by smtp.gmail.com with ESMTPSA id m3sm29708036wrw.20.2019.11.20.00.06.35
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 20 Nov 2019 00:06:36 -0800 (PST)
-Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of patches
- - linux-user changes + linux-user/hexagon + skeleton of
- target/hexagon -
- Files in target/hexagon/imported are from another project and therefore do
- not conform to qemu coding standards
-To: Taylor Simpson <tsimpson@quicinc.com>,
- "laurent@vivier.eu" <laurent@vivier.eu>,
- "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
- <41e0e646-f595-be14-fc31-12a5ec090dcb@linaro.org>
- <BYAPR02MB4886DFE6DB0E6400B9409154DE4F0@BYAPR02MB4886.namprd02.prod.outlook.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <4b0ce6f3-f9a2-68a6-910c-f9830c34585c@linaro.org>
-Date: Wed, 20 Nov 2019 09:06:33 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <laurent@vivier.eu>) id 1iXL4A-0001OI-TY
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:10:23 -0500
+Received: from mout.kundenserver.de ([217.72.192.73]:54997)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1iXL4A-0001L6-Ij
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:10:22 -0500
+Received: from [192.168.100.1] ([78.238.229.36]) by mrelayeu.kundenserver.de
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N0WPK-1haoWK18BI-00wTZd; Wed, 20 Nov 2019 09:10:00 +0100
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Taylor Simpson <tsimpson@quicinc.com>
+References: <1574190388-12605-1-git-send-email-tsimpson@quicinc.com>
+ <CAFEAcA8AeTgY+3GaN9ZUi-5XtX5jxhqpdOhr3ixYwouWhQOQ5g@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH] Hexagon: Swap SIGRGMAX-1 and SIGRTMIN+1
+Message-ID: <e4a52719-fc16-f94a-fb8d-1a4d9e683ce0@vivier.eu>
+Date: Wed, 20 Nov 2019 09:09:55 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <BYAPR02MB4886DFE6DB0E6400B9409154DE4F0@BYAPR02MB4886.namprd02.prod.outlook.com>
+In-Reply-To: <CAFEAcA8AeTgY+3GaN9ZUi-5XtX5jxhqpdOhr3ixYwouWhQOQ5g@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:RjJezbB6E/PHE9byobqyxXcOtCWFDdKyB9noQLrefNoei25K0u4
+ 17ajt6RL1wuEdi3x5Idp64fy8lb5+4WjPZqKJgD8gthIOdIcJAP/bf4hrE6rDYfUP9g0gZE
+ lpsl3MEszJ8Ss8a3XFRjVWPJERrsmtHHrupNaWuXjtKHGjJMw8ozpc+3HfmQkNIHBgHmfJk
+ PusatN1E3iQGDcajJhK/A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:a8ejNFrn9+U=:kLlMKbaZ6yjlrPmgAe5P1R
+ DXZ0Icrkw17IoaY9EtUCy4EyNYImy40s+XfNJVbwq1WymRNR7MZa6cshNQEUDBNo70TbuG/zs
+ 4eA8J/e3pcCEeD5zJasOJjuAFW+mlrMLgQeFQZVMqyUIpbnnLKCNd1EGttnHHrmYINHPll6w2
+ N7mWJFAPsIB2nigBY6VPLcWjWXp7AkDHTTpL7wGA24stnTytge0djj3GI3O/j+De0RYGjXZbb
+ nqgpqAETx0dPqg2wYdFdXnkti6csYPPcMyyHfKkKqX+mVO9RpX10thPUmBChf/Vji1dKoShpc
+ Odh6uIiq25bXkBHSBmPbhVNir5HH/LqMPEWaJ5m+yetZDIBdta9N2h4K/JrwPH/dVfuT/h20C
+ nDB6JA3/NQOGqMSNodTLPCgzT52GIJMqkw5yTgZyon9SeswRgM1OVjZucr18Qsi8mYqGcpa8c
+ BzjPXdvCiqto1FpnIQ2Mz68IxfteCrT9z2VCnVBA2LEq1rb3QEgyn3cFhC6EqvizQAYxPP++j
+ MB2Y8ibui5RqLznJj6S3+W3pMihn7YeCHe7Z+8Frt5FuKxa133gaTiVjZ86v/BCLI6kKV5oCg
+ 5x5+9Ua3FAyZuIIhloeVr9lLFY98/L0+SHYKEjMUxDS7IMJdEiD0iOs4iXoMj1vz7o0y2F4p3
+ N+xZq4o/tTBvd8oNf21lzYTTGK3GKhU/2lDCWaEzL3G2ftWLTGXQc3txkOSCe9iI0E9Uobo6W
+ 8OI6KZg5znVwNFT3DmItAbyx22Y4Hm2uvvcBFgDw1Zqbpow5tN/fqP4Zraty9p2iD38ugg5vi
+ MZzTSSRhua/qfyVay2trtURx5S2cLuy40mnvxXOVZT8INOKcbCujWA0Skxk3zU6H9wYH7T4IX
+ Oor0tvfr4Bz6RbA3ZZpcgMfOuJlWRnTAdt6OgoBNo=
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 217.72.192.73
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,108 +124,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/20/19 6:15 AM, Taylor Simpson wrote:
->> +const char * const hexagon_prednames[] = {
->> +  "p0 ", "p1 ", "p2 ", "p3 "
->> +};
-> 
-> Inter-string spacing probably belongs to the format not the name.
-> [Taylor] Could you elaborate?  Should I put spacing  after the commas?
-
-"p0" not "p0 ".  Typo on my part for "inter-"; sorry for the confusion.
-
->> +static inline target_ulong hack_stack_ptrs(CPUHexagonState *env,
->> +                                           target_ulong addr) {
->> +    target_ulong stack_start = env->stack_start;
->> +    target_ulong stack_size = 0x10000;
->> +    target_ulong stack_adjust = env->stack_adjust;
->> +
->> +    if (stack_start + 0x1000 >= addr && addr >= (stack_start - stack_size)) {
->> +        return addr - stack_adjust;
->> +    }
->> +    return addr;
->> +}
-> 
-> An explanation would be welcome here.
-> [Taylor]  I will add a comment.  One of the main debugging techniques is to use "-d cpu" and compare against LLDB output when single stepping.  However, the target and qemu put the stacks in different locations.  This is used to compensate so the diff is cleaner.
-
-Ug.  I understand why you want this, but... ug.
-
-
->> +static void hexagon_dump(CPUHexagonState *env, FILE *f) {
->> +    static target_ulong last_pc;
->> +    int i;
->> +
+Le 19/11/2019 à 20:31, Peter Maydell a écrit :
+> On Tue, 19 Nov 2019 at 19:07, Taylor Simpson <tsimpson@quicinc.com> wrote:
+>>
+>> Signed-off-by: Taylor Simpson <tsimpson@quicinc.com>
+>> ---
+>>  linux-user/signal.c | 8 ++++++++
+>>  1 file changed, 8 insertions(+)
+>>
+>> diff --git a/linux-user/signal.c b/linux-user/signal.c
+>> index 5ca6d62..ce3d27f 100644
+>> --- a/linux-user/signal.c
+>> +++ b/linux-user/signal.c
+>> @@ -72,6 +72,14 @@ static uint8_t host_to_target_signal_table[_NSIG] = {
+>>         over a single host signal.  */
+>>      [__SIGRTMIN] = __SIGRTMAX,
+>>      [__SIGRTMAX] = __SIGRTMIN,
+>> +#ifdef TARGET_HEXAGON
 >> +    /*
->> +     * When comparing with LLDB, it doesn't step through single-cycle
->> +     * hardware loops the same way.  So, we just skip them here
+>> +     * Hexagon uses the same signal for pthread cancel as the host pthreads,
+>> +     * so cannot be overridden.
+>> +     * Therefore, we map Hexagon signal to a different host signal.
 >> +     */
->> +    if (env->gpr[HEX_REG_PC] == last_pc) {
->> +        return;
->> +    }
+>> +    [__SIGRTMAX - 1] = __SIGRTMIN + 1,
+>> +#endif
+>>  };
 > 
-> This seems mis-placed.
-> [Taylor] Hexagon has hardware controlled loops, so we can have a single packet that executes multiple times.  We don't want the dump to print every time.
-
-Certainly I do.  If I'm single-stepping, I want every packet present.  Just as
-if this were written as a traditional loop, with a branch back to the single
-packet in the loop body.
-
-Also, you cannot expect a static variable to work in multi-threaded mode, and
-you cannot expect a __thread variable to work in single-threaded round-robin mode.
-
->> +static void decode_packet(CPUHexagonState *env, DisasContext *ctx) {
->> +    size4u_t words[4];
->> +    int i;
->> +    /* Brute force way to make sure current PC is set */
->> +    tcg_gen_movi_tl(hex_gpr[HEX_REG_PC], ctx->base.pc_next);
+> This breaks other stuff, unfortunately, like Go binaries.
+> (Also, you now have two host signals mapped to the same
+> target signal; notice that the existing RTMAX/RTMIN
+> is a swap of the two slots.)
 > 
-> What's this for?
-> [Taylor] Honestly, I'm not sure.  If I remove it, nothing works - not even "hello world".
+> We need a generic solution for this, Hexagon is not the
+> only one with the problem. There's a patchset on list
+> from ages back that had a suggested approach, but
+> it needed review and work.
 
-Weird.  I would have expected that the update you do within hexagon_tr_tb_stop
-would be sufficient.  I guess I'll have to peek at it.
+For the moment we don't have a better solution, Josh Kunz tried to
+rework [1] patches from Miloš Stojanović [2] but it doesn't seem to be
+an easy task.
 
-I presume your minimal test case is a bit of hand-crafted assembly that issues
-a write syscall and exit?
+So I agree we need a generic solution to fix this problem, but in the
+meantime I told to Taylor if he doesn't care about Go on hexagon he can
+do this change specifically to his target (perhaps we can have cleaner
+approach by containing this change into linux-user/hexagon). And what I
+understand is hexagon libc (musl) doesn't work without this.
 
->> +
->> +    for (i = 0; i < 4; i++) {
->> +        words[i] = cpu_ldl_code(env, ctx->base.pc_next + i * sizeof(size4u_t));
->> +    }
-> 
-> And this?
-> [Taylor] It's reading from the instruction memory.  The switch statement below uses it.
+Thanks,
+Laurent
 
-I thought packets are variable length and ended by a bit set.  Therefore why
-the fixed iteration to 4?  Also...
-
-> 
->> +    /*
->> +     * Brute force just enough to get the first program to execute.
->> +     */
->> +    switch (words[0]) {
-
-... you only use 1 word, but you read 4.
-
->> +static void hexagon_tr_init_disas_context(DisasContextBase *dcbase,
->> +                                          CPUState *cs) {
->> +    DisasContext *ctx = container_of(dcbase, DisasContext, base);
->> +
->> +    ctx->mem_idx = ctx->base.tb->flags & TB_FLAGS_MMU_MASK;
-> 
-> Since you're not initializing this in cpu_get_tb_cpu_state, you might as well just use
-> 
->     ctx->mem_idx = MMU_USER_IDX;
-> [Taylor] Should I be initialize this in cpu_get_bt_cpu_state?
-
-Not until there's something more interesting to put there, when you implement
-system state.  The constant initialization should be fine.
-
-
-r~
+[1] https://lists.gnu.org/archive/html/qemu-devel/2019-10/msg00738.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2019-05/msg05259.html
 
