@@ -2,89 +2,98 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1B79C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:40:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFC64C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:41:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81A5A2067D
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:40:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E0D52088F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:41:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WKO5BFjz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81A5A2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fs8jQQbN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E0D52088F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXT1O-0005wT-Mw
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 11:40:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46834)
+	id 1iXT3C-0008AG-OW
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 11:41:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47130)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlureau@redhat.com>) id 1iXT0i-0005PH-Ii
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:39:21 -0500
+ (envelope-from <alex.bennee@linaro.org>) id 1iXT2L-0007Q9-Du
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:41:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1iXT0g-0007pZ-ET
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:39:19 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49465
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iXT0g-0007pO-Ae
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:39:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574267957;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=K1yxd9uTm2kXjS9tn/eewks21onqIR5DZuqQ1HAoP8I=;
- b=WKO5BFjz7Yov/2fpT7qxDSSJwCHLG6KT+pmeRr0kbl80SzB8OkOW+tgbLBVYhA6qhsdNqJ
- xtRgnKKo5/wbhP7OZuKXmRC9uifNegcI3qRMi5ID2PaPu38Tk7qV0/GD20Uvjl1k8tvzpk
- TBzTWzXaeew0546HuJXI2GBuFAcSmMo=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-indogHz8MFuYAfKCXCpaMA-1; Wed, 20 Nov 2019 11:39:14 -0500
-Received: by mail-ot1-f70.google.com with SMTP id z39so20133ota.7
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:39:14 -0800 (PST)
+ (envelope-from <alex.bennee@linaro.org>) id 1iXT2H-00005j-Ij
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:41:00 -0500
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:37417)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+ id 1iXT2H-0008WT-96
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:40:57 -0500
+Received: by mail-wm1-x342.google.com with SMTP id b17so322748wmj.2
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:40:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Fzw6AvuhTdSk7eMKis7RGWNJuPHFoaP+GEfOD5+BxlU=;
+ b=fs8jQQbN7wh6is5PZIl9wRheguT0rDLUJMsLpxj9ZbwQsDyN3ct7YIfWGcaC8X7uU5
+ St3/IKra5tB0ladroDKuGQhJeuhshTJ0enuS+XmwzzAAz4okR4Bur5w6j7AZEb4cMj4d
+ TkEczCNCZL955TUn4rcqicaxd29eIzjUUfWPQ6NukgumTsCumvMGDIUVqT3TAxeDM/SK
+ fv8wqRpOWeGuBRYAbSiPKSg3ABE6Zb4GpIS8okl5dJBNhEEbLFxs7vzTC6DgO21f549k
+ DMDcxMjMkRr2R420+Ouiewb7AaWml81BJxI0S8PC3UTO98vbRDMDBegEgH/UEgKkScWM
+ U3Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=K1yxd9uTm2kXjS9tn/eewks21onqIR5DZuqQ1HAoP8I=;
- b=XeWuRSMtuvtBI7lgajSrAHay+h4gnDQ9JulhLIKuHj+lziNhLdGaIiO2Wv21tg72UO
- VBn6wosIUKIWJneFj1fhgDLQEyF9gHN/lhtcqxsrSwIjcQT8LpbhzhIJAx3K9ET0OUq1
- 4jyJK0zBN6wDt1BUbL/j58RjQYm6GRA0M3j0yuZJmRXJ8V9syr7h0zVVBFhJZhFEHYHT
- u0O23GIXtpz/O7JNXIN9BYnSmEMv5aLNua4//hlUc4Tv/He4MbxDFP+VAy6f5gRrAw5s
- VSFcqxJgxtjJQw/aKpVEc/T4cbgsBncsz9CzuzNKoaFNMIO5qkr2GrBCslTAFazCqVEV
- S8xA==
-X-Gm-Message-State: APjAAAXICXywHzg2LLYdbVdQDmywujuLbDuAx7v0sRRERtSvtsdRTGOh
- A2TpDrQB4FurTmGw2znSlRB0wU28I6fvIQKuFC0srUxRtW4zfpqTHMhL586kOmBrVAn0U7WoC5U
- koQ+hfWw2K1e8nUjaxoIhpkvU3cLICsg=
-X-Received: by 2002:a9d:5388:: with SMTP id w8mr2638787otg.368.1574267953284; 
- Wed, 20 Nov 2019 08:39:13 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzR9CKWhjNvzRkd8kfqpkXcgr1FjH8IH5I1RmFaBrCqKplx4X08QKEzK5KDJk5b1nkv1Pc3VyheAPPJJZ3Da7A=
-X-Received: by 2002:a9d:5388:: with SMTP id w8mr2638768otg.368.1574267952921; 
- Wed, 20 Nov 2019 08:39:12 -0800 (PST)
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Fzw6AvuhTdSk7eMKis7RGWNJuPHFoaP+GEfOD5+BxlU=;
+ b=FaltaLV/bp2R5MztiNG2FkDt5jtpaw7WGBkxMDJSI1MVGRQKKtuvVjI2XLn+59fBya
+ Z7p+wm0cOiSDGLsss1pWimLBBlgqGlQbMuBCZYghcHv4FR39zgXUdsOoQXq3/TJ/98LC
+ AHw+2odWlEc9OHLMfrQkxQilN8vscOXokh3EuS0D68z+1ugArVuHAR5l76OzeQsKMYMb
+ QAS40Bf4nDq/a+jVYMfjzBeFj99f1v1inFhuVIvC57nUw8a9yWWAGCHT3plKz3T+FTuW
+ dI9ixR5wECfFvDigDI6kIwws9/VR1kezIWolp0oShxQMIoHDecnu2oZprx2vVcwr4eFf
+ QjiA==
+X-Gm-Message-State: APjAAAXWg5JOJ1v3iJVbZwtnEldcnEXJTe5sm3FuIBpDm7IK7kqDpZ41
+ DRUmRG4f79FvtGAyH77U/t2cvA==
+X-Google-Smtp-Source: APXvYqzuPA9+3uyYBUPbWfEwLg0VJEf29UYNOPipBqNVxDHjm6FoEk0I/wuyJpU7BmL/FDy3XMdtwQ==
+X-Received: by 2002:a1c:2d4b:: with SMTP id t72mr4534872wmt.112.1574268055434; 
+ Wed, 20 Nov 2019 08:40:55 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id h140sm7614813wme.22.2019.11.20.08.40.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 20 Nov 2019 08:40:53 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id BCC931FF87;
+ Wed, 20 Nov 2019 16:40:52 +0000 (GMT)
+References: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
+ <a77ce406-5307-cee8-8e0b-7c08056fb0df@redhat.com>
+ <BYAPR02MB488666AA94EBB57C2A318004DE4C0@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <8c92b107-b707-b8a7-6284-5b1ed8e95897@vivier.eu>
+ <BYAPR02MB4886E559B9286FE580C28556DE4F0@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <98464579-194a-2b96-5cb9-3b7a7d9e680d@vivier.eu>
+ <42954e4f-11cd-6c95-e74c-9dbec2f90d56@linaro.org>
+ <BYAPR02MB48867C73CDE23CA70FEE5369DE4F0@BYAPR02MB4886.namprd02.prod.outlook.com>
+User-agent: mu4e 1.3.5; emacs 27.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of
+ patches - linux-user changes + linux-user/hexagon + skeleton of
+ target/hexagon - Files in target/hexagon/imported are from another project
+ and therefore do not conform to qemu coding standards
+In-reply-to: <BYAPR02MB48867C73CDE23CA70FEE5369DE4F0@BYAPR02MB4886.namprd02.prod.outlook.com>
+Date: Wed, 20 Nov 2019 16:40:52 +0000
+Message-ID: <87k17ufqln.fsf@linaro.org>
 MIME-Version: 1.0
-References: <20191120125444.31365-1-marcandre.lureau@redhat.com>
- <bb4b636d-99d0-4fbe-c4bb-ec3d5c480a03@redhat.com> <87pnhmfrc9.fsf@linaro.org>
-In-Reply-To: <87pnhmfrc9.fsf@linaro.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 20 Nov 2019 20:39:01 +0400
-Message-ID: <CAMxuvaw9AVC9dG=oz8uAoUg52oyM248cF7M8ZZ+zJRgU3xJVcQ@mail.gmail.com>
-Subject: Re: [PATCH] RFC: CODING_STYLE: describe "self" variable convention
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-X-MC-Unique: indogHz8MFuYAfKCXCpaMA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,154 +105,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
 
-On Wed, Nov 20, 2019 at 8:25 PM Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
->
->
-> Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
->
-> > On 11/20/19 1:54 PM, Marc-Andr=C3=A9 Lureau wrote:
-> >> Following the discussion in thread "[PATCH v3 13/33] serial: start
-> >> making SerialMM a sysbus device", I'd like to recommend the usage of
-> >> "self" variable to reference to the OOP-style method instance, as
-> >> commonly done in various languages and in GObject world.
-> >> Cc: Peter Maydell <peter.maydell@linaro.org>
-> >> Cc: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
-> >> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >> ---
-> >>   CODING_STYLE.rst | 38 ++++++++++++++++++++++++++++++++------
-> >>   1 file changed, 32 insertions(+), 6 deletions(-)
-> >> diff --git a/CODING_STYLE.rst b/CODING_STYLE.rst
-> >> index 427699e0e4..cb6635af71 100644
-> >> --- a/CODING_STYLE.rst
-> >> +++ b/CODING_STYLE.rst
-> >> @@ -102,12 +102,38 @@ Rationale:
-> >>   Naming
-> >>   =3D=3D=3D=3D=3D=3D
-> >>   -Variables are lower_case_with_underscores; easy to type and read.
-> >> Structured
-> >> -type names are in CamelCase; harder to type but standing out.  Enum t=
-ype
-> >> -names and function type names should also be in CamelCase.  Scalar ty=
-pe
-> >> -names are lower_case_with_underscores_ending_with_a_t, like the POSIX
-> >> -uint64_t and family.  Note that this last convention contradicts POSI=
-X
-> >> -and is therefore likely to be changed.
-> >> +Variables are lower_case_with_underscores; easy to type and read.
-> >> +
-> >> +The most common naming for a variable is an abbreviation of the type
-> >> +name.  Some common examples:
-> >> +
-> >> +.. code-block:: c
-> >> +
-> >> +    Object *obj;
-> >> +    QVirtioSCSI *scsi;
-> >> +    SerialMM *smm;
-> >> +
-> >> +When writing QOM/OOP-style function, a "self" variable allows to refe=
-r
-> >> +without ambiguity to the instance of the method that is being
-> >> +implemented (this is not very common in QEMU code base, but it is
-> >> +often a good option to increase the readability and consistency,
-> >> +making further refactoring easier as well).  Example:
-> >> +
-> >> +.. code-block:: c
-> >> +
-> >> +    serial_mm_flush(SerialMM *self);
-> >> +
-> >> +    serial_mm_instance_init(Object *o) {
-> >> +        SerialMM *self =3D SERIAL_MM(o);
-> >> +        ..
-> >> +    }
-> >> +
-> >> +Structured type names are in CamelCase; harder to type but standing
-> >> +out.  Enum type names and function type names should also be in
-> >> +CamelCase.  Scalar type names are
-> >> +lower_case_with_underscores_ending_with_a_t, like the POSIX uint64_t
-> >> +and family.  Note that this last convention contradicts POSIX and is
-> >> +therefore likely to be changed.
-> >>     When wrapping standard library functions, use the prefix
-> >> ``qemu_`` to alert
-> >>   readers that they are seeing a wrapped version; otherwise avoid this=
- prefix.
-> >>
-> >
-> > So in this example:
-> >
-> > static void pci_unin_agp_init(Object *obj)
-> > {
-> >     UNINHostState *s =3D UNI_NORTH_AGP_HOST_BRIDGE(obj);
->
-> Using *s for the contextually appropriate state holding structure is
-> certainly common enough in the code base. Maybe we should should
-> document that too?
+Taylor Simpson <tsimpson@quicinc.com> writes:
 
-Yes, "s" is very common in qemu. Yet, it's ambiguous to me, as it is
-used in other cases, while "self" is explicit for OOP-style, to refer
-to the instance type being implemented.
+> Is there a precedent for this?  I'm OK with DEBUG_HEX, but I assumed revi=
+ewers wouldn't approve
+> #ifdef FIXME
+> #define DEBUG_HEX
+> #endif
+
+We are trying to phase out this style of #define as it's prone to
+bitrot. What you can do if define a debug helper like:
+
+#define D(fmt, ..) \
+  if (DEBUG_HEXAGON) { \
+      qemu_log(fmt, ## __VA_ARGS__); \
+  }
+
+So the debug will still be built (and format strings checked etc) but
+with DEBUG_HEXAGON as 0 things get dead coded away.
 
 >
-> >     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-> >     PCIHostState *h =3D PCI_HOST_BRIDGE(obj);
-> >
-> >     /* Uninorth AGP bus */
-> >     memory_region_init_io(&h->conf_mem, OBJECT(h),
-> >                           &pci_host_conf_le_ops,
-> >                           obj, "unin-agp-conf-idx", 0x1000);
-> >     memory_region_init_io(&h->data_mem, OBJECT(h),
-> >                           &pci_host_data_le_ops,
-> >                           obj, "unin-agp-conf-data", 0x1000);
-> >
-> >     object_property_add_link(obj, "pic", TYPE_OPENPIC,
-> >                              (Object **) &s->pic,
-> >                              qdev_prop_allow_set_link_before_realize,
-> >                              0, NULL);
-> >
-> >     sysbus_init_mmio(sbd, &h->conf_mem);
-> >     sysbus_init_mmio(sbd, &h->data_mem);
-> > }
-> >
-> > You would change 'Object *obj' -> 'Object *self'?
->
-> I would have read it as:
->
->   SysBusDevice *self =3D SYS_BUS_DEVICE(obj);
->
-> as the only device object in the example. But perhaps this is a complex
-> example?
->
-> >
-> > But here we want to keep 'klass', right?
-> >
-> > static void gpex_host_class_init(ObjectClass *klass, void *data)
-> > {
-> >     DeviceClass *dc =3D DEVICE_CLASS(klass);
-> >     PCIHostBridgeClass *hc =3D PCI_HOST_BRIDGE_CLASS(klass);
-> >
-> >     hc->root_bus_path =3D gpex_host_root_bus_path;
-> >     dc->realize =3D gpex_host_realize;
-> >     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
-> >     dc->fw_name =3D "pci";
-> > }
-> >
-> > Maybe we should restrict 'self' as name of Object type only?
-> > But your example is with SerialMM, so no?
+> Taylor
 >
 >
-> --
-> Alex Benn=C3=A9e
+> -----Original Message-----
+> From: Richard Henderson <richard.henderson@linaro.org>
+> Sent: Wednesday, November 20, 2019 3:02 AM
+> To: Laurent Vivier <laurent@vivier.eu>; Taylor Simpson <tsimpson@quicinc.=
+com>; Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>; riku.voipio@iki.fi; =
+qemu-devel@nongnu.org
+> Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of pa=
+tches - linux-user changes + linux-user/hexagon + skeleton of target/hexago=
+n - Files in target/hexagon/imported are from another project and therefore=
+ do not conform to qemu coding standards
 >
+>
+> On 11/20/19 9:33 AM, Laurent Vivier wrote:
+>> Le 20/11/2019 =C3=A0 05:48, Taylor Simpson a =C3=A9crit :
+>>> For the general DEBUG_HEX messages, I think the trace infrastructure is=
+n't quite what I'm looking for.
+>>>
+>>> Here's a sample of what it prints
+>>> Start packet: pc =3D 0x4002f0
+>>> Packet committed: pc =3D 0x4002f0
+>>> Regs written
+>>>         r18 =3D -69420 (0xfffef0d4)
+>>>         r19 =3D -69412 (0xfffef0dc)
+>>> Stores
+>>>         memd[0xfffef0b0] =3D 0 (0x0000000000000000) Next PC =3D 0x4002f8
+>>> Exec counters: pkt =3D 17, insn =3D 24, hvx =3D 0
+>
+> For something like this, I'd keep DEBUG_HEX.
+>
+>>>     if (qemu_loglevel_maks(CPU_LOG_EXEC)) {
+>
+> CPU_LOG_EXEC already has a specific structure, listing the TranslationBlo=
+cks that are executed.  It shouldn't be hijacked for something else.
+>
+> If you really want a runtime flag for this, we should add a new CPU_LOG_*=
+ flag.
+>
+>
+> r~
 
-thanks
 
+--
+Alex Benn=C3=A9e
 
