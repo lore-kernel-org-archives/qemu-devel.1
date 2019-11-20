@@ -2,118 +2,95 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA10C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D344C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:59:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A776D20714
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:57:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4778620715
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:59:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="EmtVKYLk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A776D20714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYPCqW7O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4778620715
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXSMX-0008LS-Hm
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 10:57:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37642)
+	id 1iXSOI-0002KZ-5o
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 10:59:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38851)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iXSEO-00038G-Dm
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:49:25 -0500
+ (envelope-from <mst@redhat.com>) id 1iXSKu-0004i0-67
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:56:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iXSEN-0002AS-42
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:49:24 -0500
-Received: from mail-am5eur02on0716.outbound.protection.outlook.com
- ([2a01:111:f400:fe07::716]:53159
- helo=EUR02-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iXSEM-0002AI-DJ; Wed, 20 Nov 2019 10:49:23 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iOeEBp02T7QQqwZcpQpnO+8R8TnGN83tZeI28zjBjWC8YcoGMhX1xRPxbSsBsKbN5HJKE7HSxv9zOJ7qvhz3EBciaj6kbq03KCN1iGWiUblv9TqPJNiCPGkJJ0UqGqN+qLb4XBUKpouNcmVlpBQQyGKzMXemYpEZYLQLoFTz1jHvakVizKs3cM5ci38UPRq5I4Wog6d9nm1cAeRNDmUS2SN2da+MCbISQ7UevLSrxN5vQuqqnH/S/0BlK8hqWFRatcbKEMI5noQ2G7LxAvZ9eYJbym/UC/z9znXBaRgqhvfbJKxT6uNz8cgh/8SoySG9WDXHYTRYvbbzBPm7yCrhMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FewzLXCq5H9cLmKnv2ARiXhRTBG+17HetSyAynqR5uE=;
- b=hIIXbsG38HVha6gbiFM10pPKJs5zfrejWP2Fzd5KNZbczti5Gw1BxrqiLnK3t6usr+dD9so6JbVA8ByzLaCYGAMgEh8KRYELry9gWaBRgW0m5DdU+ygYKNWzd4JTpfrrKJ6GUttdoKPZIygXMdWiE33PQrvIPD+iSuxQQ+xyGO1FbWQEL8TZwuGYZV2mWgvqAOe1yitC4DuK9xAmenaKA8pRYsmnyp1RQB7PnZuggE06J/JO12cCeOJsaxXpJ3Pjp6fStHMgDTHvEZZYMynt7fDCBmHIs+/RRQLH8o9xLLCjjR7K2qCa0Lvn7jCficUkuGOpHLkvtwPrN1It17lfpA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FewzLXCq5H9cLmKnv2ARiXhRTBG+17HetSyAynqR5uE=;
- b=EmtVKYLk5/yaqNMkrd6MXzyHmGl9tzumA54TQz/PQ+YAqhrGv6ScEjTQQGZlyiC6+HGOEwqyn63BIR3oV0kWcfzqf7aCVqqpowGgYYMWdN3F/XWxHawnq464b8ohthNaJ24h7XIoxjhNh7qdy7IT+aaE2lMQGytGFqTxnVJsguk=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3398.eurprd08.prod.outlook.com (20.177.115.151) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.30; Wed, 20 Nov 2019 15:49:19 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.031; Wed, 20 Nov 2019
- 15:49:19 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH for-4.2? 0/6] block: Fix resize (extending) of short
- overlays
-Thread-Topic: [PATCH for-4.2? 0/6] block: Fix resize (extending) of short
- overlays
-Thread-Index: AQHVn6tV94AsXTPMCkWMUmvbsutwsKeUNMqA
-Date: Wed, 20 Nov 2019 15:49:19 +0000
-Message-ID: <404fa5f5-0b5a-8a62-78bb-8ba414ab3973@virtuozzo.com>
-References: <20191120140319.1505-1-kwolf@redhat.com>
-In-Reply-To: <20191120140319.1505-1-kwolf@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR09CA0046.eurprd09.prod.outlook.com
- (2603:10a6:7:3c::14) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191120184917574
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: eb5d0471-73ca-4566-5ecc-08d76dd134ac
-x-ms-traffictypediagnostic: AM6PR08MB3398:
-x-microsoft-antispam-prvs: <AM6PR08MB3398AE89016BA180275B6D9FC14F0@AM6PR08MB3398.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2887;
-x-forefront-prvs: 02272225C5
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(396003)(39850400004)(346002)(366004)(136003)(376002)(199004)(189003)(256004)(6512007)(7736002)(478600001)(316002)(86362001)(8936002)(52116002)(2906002)(229853002)(6486002)(3846002)(6116002)(102836004)(386003)(6506007)(186003)(476003)(26005)(486006)(71190400001)(71200400001)(76176011)(2616005)(446003)(11346002)(36756003)(66066001)(4326008)(31686004)(110136005)(54906003)(31696002)(81166006)(66946007)(6436002)(14454004)(6246003)(5660300002)(25786009)(305945005)(64756008)(66446008)(66556008)(99286004)(2501003)(66476007)(81156014)(8676002);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3398;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: gPzyuOBvW0so1NOicFXcyxs5+FB9y/d40mZ8zyuhnS0slBukFP9SZFY2gKiPeTJi4kZtTpFu5mX5Gn4+LtiqgfqNjMC319/PA46soHGtN/PInxprxVbTMjcWY34KoJT1lX0OTZUOgKxsnm9gk0anXrV46BFw6RCo9KRn7ND070mmWP4QlXE2Rba0lRM8WPx4W10BRP4iqUYnUdCamegSMKYW5aGylmf4aTft9xf8XcN23YlRxwVwpPSROdrKzCIpo29tH44hW9WMsP1vVmx5wFtrtgFgI+dODZ/9BKBbmOUiwevz2I9G1VOM4mDUS1I9gz3ZWNbMl+Uv3YJBleyG9sAa17ljqKVOOjTO+MR9PkN70iwvxXZWBlzFZPburj+cADedDN6Eu3NwnQnyzhseaCleH7LsiyEQKq+oOhpeYfM3b2uuDlTKvxrRo0LGtUze
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <95ED1A28CFE8374288155F7EF15D9E3F@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <mst@redhat.com>) id 1iXSKr-0003yY-A1
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:56:07 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43776
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iXSKr-0003yI-5P
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:56:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574265363;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dG1jDAkZjtJQ+wQQHHS+QYvheV5NTaym2NMbhvczy0o=;
+ b=XYPCqW7OWUG7OJxHGRPltbFA7iXPqrbPQxs1KYEiV2F3rZdcFeT9mwd/Hx8OV3xM4J30O2
+ 1eAg7ruaSDchLPegVHyss2Q30dDt53XHGhGDlz9/bQ/tgjWNC3yrVRw4EawffnMA7pa/Lc
+ FgGkc2zL0xwuYOUEQNPSaX6TrPlMcG8=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-368-GqSeS7U2OzmPc78P63fQcA-1; Wed, 20 Nov 2019 10:56:02 -0500
+Received: by mail-qk1-f197.google.com with SMTP id a129so16058698qkg.22
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 07:56:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=aJldszurJTfTC5FLA1JbIBG/Mrx28zninuyRKVveJMs=;
+ b=oLB9aPieWqAhH/I74E/c36kaxGJ+WorDh/d1iaFSMhridOsDQ5RBoL3hqzwm3RBLxw
+ eUNM8k1gzmc+0nvU3hSls+jHLSDnR3XzE7GY7k5YC6dCMBBsaz8ObA5B0uGK04Qgqz9I
+ x9Xlacn7tdZHUqyaQcuM2FukKTBzFDqe5Q83unB9BpCZJwxfXkt6lmdC/YyCKyNEcdmh
+ YeQuDUQnwes4iQoGGKbxu+QKD9s5ZMS2I0RyZzcnY8+lW+fseKw4W49pCQL695jdPWft
+ AQH0aQTHtdH+BKpuyGaa4APqypBDAfH4giKjCilr5hJWCRPweglyEVW+o445AK5tUo1g
+ K07Q==
+X-Gm-Message-State: APjAAAUisSAf/MNfBQ9G3/c0eQFpXjnUErH0tqG3D48HlKu/BBj7QY+f
+ d9O7cf2fnPwLoZhfEgeQfDdCigbdapm05Wjbh7s6mfj6+dXx5Re41UEv0QYR4PCH5vckI+LBLiV
+ VDXLu4M5z34rVmPA=
+X-Received: by 2002:a37:aa8b:: with SMTP id t133mr3149690qke.449.1574265361677; 
+ Wed, 20 Nov 2019 07:56:01 -0800 (PST)
+X-Google-Smtp-Source: APXvYqy4ssBFLPw2KGmXXdEwRMey0KcKrIVtLBNDIDQTh9UDcOfVZU1XnDOB3Kim3dwpFf5K3Td7Qw==
+X-Received: by 2002:a37:aa8b:: with SMTP id t133mr3149661qke.449.1574265361422; 
+ Wed, 20 Nov 2019 07:56:01 -0800 (PST)
+Received: from redhat.com (bzq-79-176-6-42.red.bezeqint.net. [79.176.6.42])
+ by smtp.gmail.com with ESMTPSA id p3sm11931221qkf.107.2019.11.20.07.55.58
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 20 Nov 2019 07:56:00 -0800 (PST)
+Date: Wed, 20 Nov 2019 10:55:55 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jens Freimann <jfreimann@redhat.com>
+Subject: Re: [PATCH v3 2/4] net/virtio: return early when failover primary
+ alread added
+Message-ID: <20191120105529-mutt-send-email-mst@kernel.org>
+References: <20191120154951.27877-1-jfreimann@redhat.com>
+ <20191120154951.27877-3-jfreimann@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb5d0471-73ca-4566-5ecc-08d76dd134ac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Nov 2019 15:49:19.7977 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TEmBzSdjFQuvejVcsPYX1HCbLWokyO/+BtBwjZcDqKuOrPb9TRwiA3DzkpG7eSgDFlNgSgmZLkD1bewo82t4GvLGk3RyQ9RXIb4nd8t4dGs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3398
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 2a01:111:f400:fe07::716
+In-Reply-To: <20191120154951.27877-3-jfreimann@redhat.com>
+X-MC-Unique: GqSeS7U2OzmPc78P63fQcA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,66 +102,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: peter.maydell@linaro.org, jasowang@redhat.com, qemu-devel@nongnu.org,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-20.11.2019 17:03, Kevin Wolf wrote:
-> Consider the following scenario where the overlay is shorter than its
-> backing file:
->=20
->      base.qcow2:     AAAAAAAA
->      overlay.qcow2:  BBBB
->=20
-> When resizing (extending) overlay.qcow2, the new blocks should not stay
-> unallocated and make the additional As from base.qcow2 visible like
-> before this series, but zeros should be read.
->=20
-> A similar case happens with the various variants of a commit job when an
-> intermediate file is short (- for unallocated):
->=20
->      base.qcow2:     A-A-AAAA
->      mid.qcow2:      BB-B
->      top.qcow2:      C--C--C-
->=20
-> After commit top.qcow2 to mid.qcow2, the following happens:
->=20
->      mid.qcow2:      CB-C00C0 (correct result)
->      mid.qcow2:      CB-C--C- (before this fix)
->=20
-> Without the fix, blocks that previously read as zeros on top.qcow2
-> suddenly turn into A.
+in case you repost:
 
-Note, that committing to base should still be broken after these series,
-and is fixed in my "[PATCH 0/4] fix & merge block_status_above and is_alloc=
-ated_above".
+>Subject: Re: [PATCH v3 2/4] net/virtio: return early when failover primary=
+ alread added
 
-I think, I'll post a 5/4 patch, to add this case to your new test.
-
->=20
-> Kevin Wolf (6):
->    block: bdrv_co_do_pwrite_zeroes: 64 bit 'bytes' parameter
->    block: truncate: Don't make backing file data visible
->    iotests: Add qemu_io_log()
->    iotests: Fix timeout in run_job()
->    iotests: Support job-complete in run_job()
->    iotests: Test committing to short backing file
->=20
->   block/io.c                    |  31 ++++++-
->   tests/qemu-iotests/274        | 131 +++++++++++++++++++++++++++++
->   tests/qemu-iotests/274.out    | 150 ++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/group      |   1 +
->   tests/qemu-iotests/iotests.py |  11 ++-
->   5 files changed, 319 insertions(+), 5 deletions(-)
->   create mode 100755 tests/qemu-iotests/274
->   create mode 100644 tests/qemu-iotests/274.out
->=20
+s/alread/already/
 
 
---=20
-Best regards,
-Vladimir
+On Wed, Nov 20, 2019 at 04:49:49PM +0100, Jens Freimann wrote:
+> Bail out when primary device was already added before.
+> This avoids printing a wrong warning message during reboot.
+>=20
+> Fixes: 9711cd0dfc3f ("net/virtio: add failover support")
+> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>  hw/net/virtio-net.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 946039c0dc..ac4d19109e 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -759,6 +759,10 @@ static void failover_add_primary(VirtIONet *n, Error=
+ **errp)
+>  {
+>      Error *err =3D NULL;
+> =20
+> +    if (n->primary_dev) {
+> +        return;
+> +    }
+> +
+>      n->primary_device_opts =3D qemu_opts_find(qemu_find_opts("device"),
+>              n->primary_device_id);
+>      if (n->primary_device_opts) {
+> --=20
+> 2.21.0
+
 
