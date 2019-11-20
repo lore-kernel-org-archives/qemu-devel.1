@@ -2,104 +2,101 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7F21C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 21:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92294C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 22:16:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9011E20708
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 21:50:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9011E20708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 591CF20714
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 22:16:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ns1Tf0tp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 591CF20714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXXsC-0002Hz-Kv
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 16:50:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41257)
+	id 1iXYGt-000246-FE
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 17:16:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44375)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cheloha@linux.vnet.ibm.com>) id 1iXXq8-0000kX-Mg
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 16:48:46 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iXYFP-0001Sw-GH
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 17:14:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cheloha@linux.vnet.ibm.com>) id 1iXXq7-0006mT-GQ
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 16:48:44 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44994)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cheloha@linux.vnet.ibm.com>)
- id 1iXXq6-0006kX-LV
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 16:48:43 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xAKLh0sB070381; Wed, 20 Nov 2019 16:48:30 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wcf57yb3y-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 20 Nov 2019 16:48:30 -0500
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xAKLiSpq077029;
- Wed, 20 Nov 2019 16:48:30 -0500
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wcf57yb3f-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 20 Nov 2019 16:48:30 -0500
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xAKLjJPD027629;
- Wed, 20 Nov 2019 21:48:29 GMT
-Received: from b03cxnp07029.gho.boulder.ibm.com
- (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
- by ppma02dal.us.ibm.com with ESMTP id 2wa8r6tkgv-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 20 Nov 2019 21:48:29 +0000
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xAKLmSeV11469284
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 20 Nov 2019 21:48:28 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4B09DBE053;
- Wed, 20 Nov 2019 21:48:28 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2C698BE051;
- Wed, 20 Nov 2019 21:48:28 +0000 (GMT)
-Received: from localhost (unknown [9.41.179.32])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
- Wed, 20 Nov 2019 21:48:28 +0000 (GMT)
-Date: Wed, 20 Nov 2019 15:48:27 -0600
-From: Scott Cheloha <cheloha@linux.vnet.ibm.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH v2 2/2] migration: savevm_state_handler_insert:
- constant-time element insertion
-Message-ID: <20191120214827.iui5rtwyls3r62ns@rascal.austin.ibm.com>
-References: <20191017205953.13122-1-cheloha@linux.vnet.ibm.com>
- <20191017205953.13122-3-cheloha@linux.vnet.ibm.com>
- <20191018081625.GA2990@work-vm>
- <351dca8e-e77c-c450-845b-d78ba621156a@redhat.com>
- <20191018094352.GC2990@work-vm>
- <20191019101223.GD1960@umbus.fritz.box>
- <20191021081444.GA2934@work-vm>
+ (envelope-from <pbonzini@redhat.com>) id 1iXYFM-0002oX-DK
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 17:14:49 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36069
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iXYFL-0002ny-Vo
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 17:14:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574288087;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=4Xr3JYKdEgsqAdeJ+R+VygllyGzovoK5EGWWAic0S0A=;
+ b=Ns1Tf0tp8Sjej2NQZJPlGUtHh+fxSikAPOdWAcuF0XZWGS6udB/4Ugor9S/O/6sHJ0ag63
+ nKfkpMXvncZEu7QwkdTEdIKpmXwl18PfC0Ij6ije0NDxvvkpnjKMY3dctC5FrIiFnZHerL
+ N2GIpxUjABsyylVd8TK/keGw+1VjGKQ=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-og60afPXPGq8WQOWz2Fi1Q-1; Wed, 20 Nov 2019 17:14:45 -0500
+Received: by mail-wm1-f69.google.com with SMTP id l184so818656wmf.6
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 14:14:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5FiS4PULp5hrh6QtpoMQDJ91GDuCpCyy7pFiothuI2Q=;
+ b=NMcfVz/vxg4BVp4TU2oADSz4h5E2puO/kbNeVyDk2XfkrpPIby9JMz9GOx+tJ/hSnR
+ 6HfVW2XJ6FhBA7IiDMEYOYNdX1jmAYPzkAqI8mEXRySgmp24Q/pvX+mAsOeLHXZNxHzu
+ R/dWYncoq2FgZy4vVwrRes7J3S9SXFpPmnGDSJ+MJ+vf0fsPr6/gds5Y2Hpei1IK3K+c
+ 5JMs1l7bGlVpgQww+kmanWFTS+qFLUu4/xpmtTaFBVSENYExNbiKH8qx5jMOuMtEMVt+
+ XmpkeEwG1qWYGkQkaP/AWU0znyQ5n6btvckGikAIZuDLnf7p1EKZ24Zo347HTSU3SgNC
+ dlMQ==
+X-Gm-Message-State: APjAAAWUSGLJBYbHe/HpFyldx+YN/nsYKHRE0ZOmLY3UvJgb+B5s3kVg
+ 6yJkFOcUmZVNBA8k2rlyCfyOoaReYoedvn0Sr09Nk/kyrS41myEw7E8+Oa0r1/Yve27Tqrv651p
+ INxY4TpAG4N2671E=
+X-Received: by 2002:adf:9786:: with SMTP id s6mr6761454wrb.188.1574288084075; 
+ Wed, 20 Nov 2019 14:14:44 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyGNnSsO8IXxPxWnNrtuxitTB5ENexeI8Ck/L6CEqX9c0cPoBsU5HxjQCuyHfS1dTDnYwL4sQ==
+X-Received: by 2002:adf:9786:: with SMTP id s6mr6761420wrb.188.1574288083799; 
+ Wed, 20 Nov 2019 14:14:43 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:dc24:9a59:da87:5724?
+ ([2001:b07:6468:f312:dc24:9a59:da87:5724])
+ by smtp.gmail.com with ESMTPSA id c4sm829753wrp.86.2019.11.20.14.14.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 20 Nov 2019 14:14:43 -0800 (PST)
+Subject: Re: [PATCH] target/i386: add VMX features to named CPU models
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20191120173753.8894-1-pbonzini@redhat.com>
+ <20191120184533.GT3812@habkost.net>
+ <a86d16e7-c738-9b4b-e29a-518d94f174e0@redhat.com>
+ <20191120211526.GW3812@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <32679eab-e789-1c43-565c-e783baf6591e@redhat.com>
+Date: Wed, 20 Nov 2019 23:14:42 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191021081444.GA2934@work-vm>
-User-Agent: NeoMutt/20180716
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-20_07:2019-11-20,2019-11-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 mlxscore=0
- phishscore=0 adultscore=0 lowpriorityscore=0 mlxlogscore=999
- priorityscore=1501 suspectscore=0 spamscore=0 impostorscore=0
- clxscore=1011 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911200183
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+In-Reply-To: <20191120211526.GW3812@habkost.net>
+Content-Language: en-US
+X-MC-Unique: og60afPXPGq8WQOWz2Fi1Q-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -111,65 +108,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org,
- Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Jiri Denemark <jdenemar@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 21, 2019 at 09:14:44AM +0100, Dr. David Alan Gilbert wrote:
-> * David Gibson (david@gibson.dropbear.id.au) wrote:
-> > On Fri, Oct 18, 2019 at 10:43:52AM +0100, Dr. David Alan Gilbert wrote:
-> > > * Laurent Vivier (lvivier@redhat.com) wrote:
-> > > > On 18/10/2019 10:16, Dr. David Alan Gilbert wrote:
-> > > > > * Scott Cheloha (cheloha@linux.vnet.ibm.com) wrote:
-> > > > >> savevm_state's SaveStateEntry TAILQ is a priority queue.  Priority
-> > > > >> sorting is maintained by searching from head to tail for a suitable
-> > > > >> insertion spot.  Insertion is thus an O(n) operation.
-> > > > >>
-> > > > >> If we instead keep track of the head of each priority's subqueue
-> > > > >> within that larger queue we can reduce this operation to O(1) time.
-> > > > >>
-> > > > >> savevm_state_handler_remove() becomes slightly more complex to
-> > > > >> accomodate these gains: we need to replace the head of a priority's
-> > > > >> subqueue when removing it.
-> > > > >>
-> > > > >> With O(1) insertion, booting VMs with many SaveStateEntry objects is
-> > > > >> more plausible.  For example, a ppc64 VM with maxmem=8T has 40000 such
-> > > > >> objects to insert.
-> > > > > 
-> > > > > Separate from reviewing this patch, I'd like to understand why you've
-> > > > > got 40000 objects.  This feels very very wrong and is likely to cause
-> > > > > problems to random other bits of qemu as well.
-> > > > 
-> > > > I think the 40000 objects are the "dr-connectors" that are used to plug
-> > > > peripherals (memory, pci card, cpus, ...).
-> > > 
-> > > Yes, Scott confirmed that in the reply to the previous version.
-> > > IMHO nothing in qemu is designed to deal with that many devices/objects
-> > > - I'm sure that something other than the migration code is going to
-> > > get upset.
-> > 
-> > It kind of did.  Particularly when there was n^2 and n^3 cubed
-> > behaviour in the property stuff we had some ludicrously long startup
-> > times (hours) with large maxmem values.
-> > 
-> > Fwiw, the DRCs for PCI slots, DRCs and PHBs aren't really a problem.
-> > The problem is the memory DRCs, there's one for each LMB - each 256MiB
-> > chunk of memory (or possible memory).
-> > 
-> > > Is perhaps the structure wrong somewhere - should there be a single DRC
-> > > device that knows about all DRCs?
-> > 
-> > Maybe.  The tricky bit is how to get there from here without breaking
-> > migration or something else along the way.
-> 
-> Switch on the next machine type version - it doesn't matter if migration
-> is incompatible then.
+On 20/11/19 22:15, Eduardo Habkost wrote:
+>=20
+> For how long was this broken?  Jiri, was libvirt including +vmx
+> in mode=3Dhost-model for a long time, or is this something recent?
 
-1mo bump.
+Could that be related to making nested=3D1 the default in the kernel?  KVM =
+has
 
-Is there anything I need to do with this patch in particular to make it suitable
-for merging?
+static void vmx_set_supported_cpuid(u32 func, struct kvm_cpuid_entry2
+*entry)
+{
+        if (func =3D=3D 1 && nested)
+                entry->ecx |=3D bit(X86_FEATURE_VMX);
+}
+
+which would date the change to Linux 4.20 (December 2018).
+
+Paolo
+
 
