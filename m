@@ -6,88 +6,71 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D344C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B07EC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:00:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4778620715
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:59:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4297D20714
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:00:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XYPCqW7O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4778620715
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbumeeiI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4297D20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXSOI-0002KZ-5o
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 10:59:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38851)
+	id 1iXSP2-0003B4-LE
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 11:00:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35199)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iXSKu-0004i0-67
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:56:09 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iXRxa-0007XL-LJ
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:32:03 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iXSKr-0003yY-A1
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:56:07 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43776
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iXRxZ-0001j6-DF
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:32:02 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44805
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iXSKr-0003yI-5P
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:56:05 -0500
+ (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1iXRxZ-0001ix-9G
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:32:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574265363;
+ s=mimecast20190719; t=1574263920;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dG1jDAkZjtJQ+wQQHHS+QYvheV5NTaym2NMbhvczy0o=;
- b=XYPCqW7OWUG7OJxHGRPltbFA7iXPqrbPQxs1KYEiV2F3rZdcFeT9mwd/Hx8OV3xM4J30O2
- 1eAg7ruaSDchLPegVHyss2Q30dDt53XHGhGDlz9/bQ/tgjWNC3yrVRw4EawffnMA7pa/Lc
- FgGkc2zL0xwuYOUEQNPSaX6TrPlMcG8=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-368-GqSeS7U2OzmPc78P63fQcA-1; Wed, 20 Nov 2019 10:56:02 -0500
-Received: by mail-qk1-f197.google.com with SMTP id a129so16058698qkg.22
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 07:56:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=aJldszurJTfTC5FLA1JbIBG/Mrx28zninuyRKVveJMs=;
- b=oLB9aPieWqAhH/I74E/c36kaxGJ+WorDh/d1iaFSMhridOsDQ5RBoL3hqzwm3RBLxw
- eUNM8k1gzmc+0nvU3hSls+jHLSDnR3XzE7GY7k5YC6dCMBBsaz8ObA5B0uGK04Qgqz9I
- x9Xlacn7tdZHUqyaQcuM2FukKTBzFDqe5Q83unB9BpCZJwxfXkt6lmdC/YyCKyNEcdmh
- YeQuDUQnwes4iQoGGKbxu+QKD9s5ZMS2I0RyZzcnY8+lW+fseKw4W49pCQL695jdPWft
- AQH0aQTHtdH+BKpuyGaa4APqypBDAfH4giKjCilr5hJWCRPweglyEVW+o445AK5tUo1g
- K07Q==
-X-Gm-Message-State: APjAAAUisSAf/MNfBQ9G3/c0eQFpXjnUErH0tqG3D48HlKu/BBj7QY+f
- d9O7cf2fnPwLoZhfEgeQfDdCigbdapm05Wjbh7s6mfj6+dXx5Re41UEv0QYR4PCH5vckI+LBLiV
- VDXLu4M5z34rVmPA=
-X-Received: by 2002:a37:aa8b:: with SMTP id t133mr3149690qke.449.1574265361677; 
- Wed, 20 Nov 2019 07:56:01 -0800 (PST)
-X-Google-Smtp-Source: APXvYqy4ssBFLPw2KGmXXdEwRMey0KcKrIVtLBNDIDQTh9UDcOfVZU1XnDOB3Kim3dwpFf5K3Td7Qw==
-X-Received: by 2002:a37:aa8b:: with SMTP id t133mr3149661qke.449.1574265361422; 
- Wed, 20 Nov 2019 07:56:01 -0800 (PST)
-Received: from redhat.com (bzq-79-176-6-42.red.bezeqint.net. [79.176.6.42])
- by smtp.gmail.com with ESMTPSA id p3sm11931221qkf.107.2019.11.20.07.55.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 Nov 2019 07:56:00 -0800 (PST)
-Date: Wed, 20 Nov 2019 10:55:55 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jens Freimann <jfreimann@redhat.com>
-Subject: Re: [PATCH v3 2/4] net/virtio: return early when failover primary
- alread added
-Message-ID: <20191120105529-mutt-send-email-mst@kernel.org>
-References: <20191120154951.27877-1-jfreimann@redhat.com>
- <20191120154951.27877-3-jfreimann@redhat.com>
+ bh=SlnrVNfRLNjcjw1Xl9TECTlnAVbkO5jdhxvztSBIVuY=;
+ b=JbumeeiIusZqg4BlhCJvl1+4H6jZskn7VkKd30DXVHNObzZNkRGFRT4N7A8NpFBbrNhRfI
+ yed9H76GtTxL+0EHnHsZ4GRfFQ5shHY7MOGXRWQXPNdTVMxC7jIZAqqLUDT/SrYn5OnTek
+ Nr75S4atczH087VPY3+Rp5HGTD+z1Ew=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-122-VHpoeeayMU6Zs9w9koS5Lw-1; Wed, 20 Nov 2019 10:31:58 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F249C8024CC;
+ Wed, 20 Nov 2019 15:31:57 +0000 (UTC)
+Received: from localhost (ovpn-112-56.ams2.redhat.com [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DE7C568882;
+ Wed, 20 Nov 2019 15:31:51 +0000 (UTC)
+From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 36/37] qdev: remove QDEV_PROP_PTR
+Date: Wed, 20 Nov 2019 19:24:41 +0400
+Message-Id: <20191120152442.26657-37-marcandre.lureau@redhat.com>
+In-Reply-To: <20191120152442.26657-1-marcandre.lureau@redhat.com>
+References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191120154951.27877-3-jfreimann@redhat.com>
-X-MC-Unique: GqSeS7U2OzmPc78P63fQcA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: VHpoeeayMU6Zs9w9koS5Lw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -102,48 +85,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, jasowang@redhat.com, qemu-devel@nongnu.org,
- dgilbert@redhat.com
+Cc: peter.maydell@linaro.org, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-in case you repost:
+No longer used in the tree. The comment about user_creatable is still
+quite relevant, but there is already a similar comment in qdev-core.h.
 
->Subject: Re: [PATCH v3 2/4] net/virtio: return early when failover primary=
- alread added
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ hw/core/qdev-properties.c    | 18 ------------------
+ include/hw/qdev-properties.h | 22 ----------------------
+ 2 files changed, 40 deletions(-)
 
-s/alread/already/
-
-
-On Wed, Nov 20, 2019 at 04:49:49PM +0100, Jens Freimann wrote:
-> Bail out when primary device was already added before.
-> This avoids printing a wrong warning message during reboot.
->=20
-> Fixes: 9711cd0dfc3f ("net/virtio: add failover support")
-> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
-> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  hw/net/virtio-net.c | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index 946039c0dc..ac4d19109e 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -759,6 +759,10 @@ static void failover_add_primary(VirtIONet *n, Error=
- **errp)
->  {
->      Error *err =3D NULL;
-> =20
-> +    if (n->primary_dev) {
-> +        return;
-> +    }
-> +
->      n->primary_device_opts =3D qemu_opts_find(qemu_find_opts("device"),
->              n->primary_device_id);
->      if (n->primary_device_opts) {
-> --=20
-> 2.21.0
+diff --git a/hw/core/qdev-properties.c b/hw/core/qdev-properties.c
+index be4cb01f0b..6271169d7d 100644
+--- a/hw/core/qdev-properties.c
++++ b/hw/core/qdev-properties.c
+@@ -469,13 +469,6 @@ const PropertyInfo qdev_prop_string =3D {
+     .set   =3D set_string,
+ };
+=20
+-/* --- pointer --- */
+-
+-/* Not a proper property, just for dirty hacks.  TODO Remove it!  */
+-const PropertyInfo qdev_prop_ptr =3D {
+-    .name  =3D "ptr",
+-};
+-
+ /* --- mac address --- */
+=20
+ /*
+@@ -1133,17 +1126,6 @@ void qdev_prop_set_enum(DeviceState *dev, const char=
+ *name, int value)
+                             name, &error_abort);
+ }
+=20
+-void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value)
+-{
+-    Property *prop;
+-    void **ptr;
+-
+-    prop =3D qdev_prop_find(dev, name);
+-    assert(prop && prop->info =3D=3D &qdev_prop_ptr);
+-    ptr =3D qdev_get_prop_ptr(dev, prop);
+-    *ptr =3D value;
+-}
+-
+ static GPtrArray *global_props(void)
+ {
+     static GPtrArray *gp;
+diff --git a/include/hw/qdev-properties.h b/include/hw/qdev-properties.h
+index 5bba033b7b..a708c3870b 100644
+--- a/include/hw/qdev-properties.h
++++ b/include/hw/qdev-properties.h
+@@ -17,7 +17,6 @@ extern const PropertyInfo qdev_prop_size;
+ extern const PropertyInfo qdev_prop_string;
+ extern const PropertyInfo qdev_prop_chr;
+ extern const PropertyInfo qdev_prop_tpm;
+-extern const PropertyInfo qdev_prop_ptr;
+ extern const PropertyInfo qdev_prop_macaddr;
+ extern const PropertyInfo qdev_prop_on_off_auto;
+ extern const PropertyInfo qdev_prop_losttickpolicy;
+@@ -168,25 +167,6 @@ extern const PropertyInfo qdev_prop_pcie_link_width;
+ #define DEFINE_PROP_PCI_DEVFN(_n, _s, _f, _d)                   \
+     DEFINE_PROP_SIGNED(_n, _s, _f, _d, qdev_prop_pci_devfn, int32_t)
+=20
+-/*
+- * Please avoid pointer properties.  If you must use them, you must
+- * cover them in their device's class init function as follows:
+- *
+- * - If the property must be set, the device cannot be used with
+- *   device_add, so add code like this:
+- *   |* Reason: pointer property "NAME-OF-YOUR-PROP" *|
+- *   DeviceClass *dc =3D DEVICE_CLASS(class);
+- *   dc->user_creatable =3D false;
+- *
+- * - If the property may safely remain null, document it like this:
+- *   |*
+- *    * Note: pointer property "interrupt_vector" may remain null, thus
+- *    * no need for dc->user_creatable =3D false;
+- *    *|
+- */
+-#define DEFINE_PROP_PTR(_n, _s, _f)             \
+-    DEFINE_PROP(_n, _s, _f, qdev_prop_ptr, void*)
+-
+ #define DEFINE_PROP_CHR(_n, _s, _f)             \
+     DEFINE_PROP(_n, _s, _f, qdev_prop_chr, CharBackend)
+ #define DEFINE_PROP_STRING(_n, _s, _f)             \
+@@ -259,8 +239,6 @@ void qdev_prop_set_drive(DeviceState *dev, const char *=
+name,
+ void qdev_prop_set_macaddr(DeviceState *dev, const char *name,
+                            const uint8_t *value);
+ void qdev_prop_set_enum(DeviceState *dev, const char *name, int value);
+-/* FIXME: Remove opaque pointer properties.  */
+-void qdev_prop_set_ptr(DeviceState *dev, const char *name, void *value);
+=20
+ void qdev_prop_register_global(GlobalProperty *prop);
+ int qdev_prop_check_globals(void);
+--=20
+2.24.0
 
 
