@@ -2,141 +2,117 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CE1C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 13:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1DCDC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 13:38:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3FB1224D2
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 13:36:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D11D2251E
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 13:38:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TU/FjKi+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3FB1224D2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="kKooz22C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D11D2251E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXQA2-0005ZD-3K
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 08:36:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41519)
+	id 1iXQBQ-0006Rn-HT
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 08:38:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41821)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iXQ9I-0004p3-9e
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 08:36:01 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iXQAl-00062h-IF
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 08:37:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iXQ9F-0002NB-Aw
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 08:35:58 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29858
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iXQ9F-0002Mt-7C
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 08:35:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574256956;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=WVZeCJfxqtQwM+nOXYocsl0+wSzGuNBvNZzX2aG8yo8=;
- b=TU/FjKi+8ph6ANn4wsdd9QN0JLSNXaak47qjqkYhZxfiewX7jvwz3rGxdnx/82DhcRcYg7
- dmUGsJ3OT0yXmWD/yTMuwpHv/mYHexW8U2dIg6zYOunFuKUok8YhjhgZ6Dicohf8MA410L
- ZzKjddbsrm04kdLOhEU3kWCGATjfhFw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-xgJTv3EPORqQTDZVHDZb_Q-1; Wed, 20 Nov 2019 08:35:52 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38DE5593A0;
- Wed, 20 Nov 2019 13:35:51 +0000 (UTC)
-Received: from [10.36.116.216] (ovpn-116-216.ams2.redhat.com [10.36.116.216])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CF93466D46;
- Wed, 20 Nov 2019 13:35:48 +0000 (UTC)
-Subject: Re: [PATCH] spapr: Fix VSMT mode when it is not supported by the
- kernel
-To: Greg Kurz <groug@kaod.org>
-References: <20191108154035.12913-1-lvivier@redhat.com>
- <20191108174759.2d4040f1@bahia.lan> <20191119010012.GI5582@umbus.fritz.box>
- <caa35299-c928-a968-83b5-842d000f0242@redhat.com>
- <20191119164526.0e980a37@bahia.lan> <20191120043653.GG5582@umbus.fritz.box>
- <cb8f7dc7-d6db-6bd9-e825-1ade7d89cdd9@redhat.com>
- <0c1f57ac-0823-4268-429b-d1aee8f7f8d5@redhat.com>
- <20191120134720.3221a6f4@bahia.lan>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
- WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
- SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
- UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
- Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
- JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
- q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
- RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
- 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
- LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCNMYXVyZW50IFZp
- dmllciA8bHZpdmllckByZWRoYXQuY29tPokCOAQTAQIAIgUCVgVQgAIbAwYLCQgHAwIGFQgC
- CQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjwpgg//fSGy0Rs/t8cPFuzoY1cex4limJQfReLr
- SJXCANg9NOWy/bFK5wunj+h/RCFxIFhZcyXveurkBwYikDPUrBoBRoOJY/BHK0iZo7/WQkur
- 6H5losVZtrotmKOGnP/lJYZ3H6OWvXzdz8LL5hb3TvGOP68K8Bn8UsIaZJoeiKhaNR0sOJyI
- YYbgFQPWMHfVwHD/U+/gqRhD7apVysxv5by/pKDln1I5v0cRRH6hd8M8oXgKhF2+rAOL7gvh
- jEHSSWKUlMjC7YwwjSZmUkL+TQyE18e2XBk85X8Da3FznrLiHZFHQ/NzETYxRjnOzD7/kOVy
- gKD/o7asyWQVU65mh/ECrtjfhtCBSYmIIVkopoLaVJ/kEbVJQegT2P6NgERC/31kmTF69vn8
- uQyW11Hk8tyubicByL3/XVBrq4jZdJW3cePNJbTNaT0d/bjMg5zCWHbMErUib2Nellnbg6bc
- 2HLDe0NLVPuRZhHUHM9hO/JNnHfvgiRQDh6loNOUnm9Iw2YiVgZNnT4soUehMZ7au8PwSl4I
- KYE4ulJ8RRiydN7fES3IZWmOPlyskp1QMQBD/w16o+lEtY6HSFEzsK3o0vuBRBVp2WKnssVH
- qeeV01ZHw0bvWKjxVNOksP98eJfWLfV9l9e7s6TaAeySKRRubtJ+21PRuYAxKsaueBfUE7ZT
- 7ze0LUxhdXJlbnQgVml2aWVyIChSZWQgSGF0KSA8bHZpdmllckByZWRoYXQuY29tPokCOAQT
- AQIAIgUCVgUmGQIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjxtNBAA
- o2xGmbXl9vJQALkj7MVlsMlgewQ1rdoZl+bZ6ythTSBsqwwtl1BUTQGA1GF2LAchRVYca5bJ
- lw4ai5OdZ/rc5dco2XgrRFtj1np703BzNEhGU1EFxtms/Y9YOobq/GZpck5rK8jV4osEb8oc
- 3xEgCm/xFwI/2DOe0/s2cHKzRkvdmKWEDhT1M+7UhtSCnloX776zCsrofYiHP2kasFyMa/5R
- 9J1Rt9Ax/jEAX5vFJ8+NPf68497nBfrAtLM3Xp03YJSr/LDxer44Mevhz8dFw7IMRLhnuSfr
- 8jP93lr6Wa8zOe3pGmFXZWpNdkV/L0HaeKwTyDKKdUDH4U7SBnE1gcDfe9x08G+oDfVhqED8
- qStKCxPYxRUKIdUjGPF3f5oj7N56Q5zZaZkfxeLNTQ13LDt3wGbVHyZxzFc81B+qT8mkm74y
- RbeVSuviPTYjbBQ66GsUgiZZpDUyJ6s54fWqQdJf4VFwd7M/mS8WEejbSjglGHMxMGiBeRik
- Y0+ur5KAF7z0D1KfW1kHO9ImQ0FbEbMbTMf9u2+QOCrSWOz/rj23EwPrCQ2TSRI2fWakMJZ+
- zQZvy+ei3D7lZ09I9BT/GfFkTIONgtNfDxwyMc4v4XyP0IvvZs/YZqt7j3atyTZM0S2HSaZ9
- rXmQYkBt1/u691cZfvy+Tr2xZaDpFcjPkci5Ag0EVgUmGQEQALxSQRbl/QOnmssVDxWhHM5T
- Gxl7oLNJms2zmBpcmlrIsn8nNz0rRyxT460k2niaTwowSRK8KWVDeAW6ZAaWiYjLlTunoKwv
- F8vP3JyWpBz0diTxL5o+xpvy/Q6YU3BNefdq8Vy3rFsxgW7mMSrI/CxJ667y8ot5DVugeS2N
- yHfmZlPGE0Nsy7hlebS4liisXOrN3jFzasKyUws3VXek4V65lHwB23BVzsnFMn/bw/rPliqX
- Gcwl8CoJu8dSyrCcd1Ibs0/Inq9S9+t0VmWiQWfQkz4rvEeTQkp/VfgZ6z98JRW7S6l6eoph
- oWs0/ZyRfOm+QVSqRfFZdxdP2PlGeIFMC3fXJgygXJkFPyWkVElr76JTbtSHsGWbt6xUlYHK
- XWo+xf9WgtLeby3cfSkEchACrxDrQpj+Jt/JFP+q997dybkyZ5IoHWuPkn7uZGBrKIHmBunT
- co1+cKSuRiSCYpBIXZMHCzPgVDjk4viPbrV9NwRkmaOxVvye0vctJeWvJ6KA7NoAURplIGCq
- kCRwg0MmLrfoZnK/gRqVJ/f6adhU1oo6z4p2/z3PemA0C0ANatgHgBb90cd16AUxpdEQmOCm
- dNnNJF/3Zt3inzF+NFzHoM5Vwq6rc1JPjfC3oqRLJzqAEHBDjQFlqNR3IFCIAo4SYQRBdAHB
- CzkM4rWyRhuVABEBAAGJAh8EGAECAAkFAlYFJhkCGwwACgkQ8ww4vT8vvjwg9w//VQrcnVg3
- TsjEybxDEUBm8dBmnKqcnTBFmxN5FFtIWlEuY8+YMiWRykd8Ln9RJ/98/ghABHz9TN8TRo2b
- 6WimV64FmlVn17Ri6FgFU3xNt9TTEChqAcNg88eYryKsYpFwegGpwUlaUaaGh1m9OrTzcQy+
- klVfZWaVJ9Nw0keoGRGb8j4XjVpL8+2xOhXKrM1fzzb8JtAuSbuzZSQPDwQEI5CKKxp7zf76
- J21YeRrEW4WDznPyVcDTa+tz++q2S/BpP4W98bXCBIuQgs2m+OflERv5c3Ojldp04/S4NEjX
- EYRWdiCxN7ca5iPml5gLtuvhJMSy36glU6IW9kn30IWuSoBpTkgV7rLUEhh9Ms82VWW/h2Tx
- L8enfx40PrfbDtWwqRID3WY8jLrjKfTdR3LW8BnUDNkG+c4FzvvGUs8AvuqxxyHbXAfDx9o/
- jXfPHVRmJVhSmd+hC3mcQ+4iX5bBPBPMoDqSoLt5w9GoQQ6gDVP2ZjTWqwSRMLzNr37rJjZ1
- pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
- XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <17a17c2f-327a-23e9-8da0-0deedeb47779@redhat.com>
-Date: Wed, 20 Nov 2019 14:35:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
-MIME-Version: 1.0
-In-Reply-To: <20191120134720.3221a6f4@bahia.lan>
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iXQAj-0002xZ-Da
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 08:37:30 -0500
+Received: from mail-eopbgr130139.outbound.protection.outlook.com
+ ([40.107.13.139]:26290 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iXQAi-0002wp-Pb; Wed, 20 Nov 2019 08:37:29 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YmebY7DOMarMQqTZCwpN5wuQp3PGw1IGvUatCT38soDNO7m1GCXolY8+q8UZpHQyxKafhHGucnHICJj3ZSNgT1Y70zgR7em4VunNJFcnc67TCEjJ+1FtG6Qk4MCLWTNDbjDtiav9/y5X8XbbwGwkTo4SY86NiEqI2Uip2wXusGLh2zHYlDz/MfgTzeovR28kMKgqiOKAIzyVWi08Z6vPptpshc+9jDMatEhVmsJktqtq+/Xn6xz9RFvGvSlVNHWKqyw/zTnU7eGWEuJ/lUNyAps8w7jJ/YXASGn6GRBJJ1e2A0Aov0+/Tf0YI32pPE4CSDgPXrBwouCk6HQaClU7tw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=U7xdia79sc7JlrxCt8B7fCzuSm4ZA3Y64AOXKvh5wFw=;
+ b=GElu/tQSLTtXI8i5XDkVLm6OCnDy3fbwgWZsgDj3tX5cU39ngOndEFj5VW8YxAdoOnJYtj0yo6XAJ7zfbNBucRJsLSRWJYFwUJjiFbhXkurvwMYZs0oU+6oQonV9ur5x3/YoyUzguzuIcZWpFIJVxdMl/N6lrek6N/NoMTo8oDClEFQ4eAMGNCtWzuBWZgR9Xx42oU7gZv8L/BEQFW3ehjxTIVdFZQE4vnFiSLtBf3NRZ4dmntBcaZHA/rE+KBFHwP2DXiIGl8LOPiNwURDovmzqdsx7Z3q2a3ZhOWXmFnVhbHfb+iXmNGTX6gj8U83Q+nK/z+KsTRi0YRL5tznRvg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=U7xdia79sc7JlrxCt8B7fCzuSm4ZA3Y64AOXKvh5wFw=;
+ b=kKooz22Cj6g6mT3WjJZwg3rCi/0YIcFAnsDv5EtappQ3Le6FTGLWefqD32zmuYohAARpvmRibCYuKoUekYJtY0aJT3j3VwO6k9qf4g2eoZjAW2R4Aj3jtz108Lx2KydEDreuTzcfA+cyYp9nLCN4ob3tNLg0ZZ+ieaLrKzeW6AU=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3990.eurprd08.prod.outlook.com (20.179.0.159) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2474.16; Wed, 20 Nov 2019 13:37:24 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.031; Wed, 20 Nov 2019
+ 13:37:24 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
+Thread-Topic: [PATCH 0/4] fix & merge block_status_above and is_allocated_above
+Thread-Index: AQHVnJu0qDM7Hy9Fo0iUR1ci8onW5KeT3vMAgAAXeACAAAWSAIAAGhEA
+Date: Wed, 20 Nov 2019 13:37:23 +0000
+Message-ID: <89b56858-c500-7b18-954d-c8d081751dc1@virtuozzo.com>
+References: <20191116163410.12129-1-vsementsov@virtuozzo.com>
+ <7f8574a2-8fd2-9724-a197-d67d3c69d538@virtuozzo.com>
+ <20191120114408.GA5779@linux.fritz.box>
+ <abb27eb4-1b1d-39b4-3867-b6ade59884d0@virtuozzo.com>
+In-Reply-To: <abb27eb4-1b1d-39b4-3867-b6ade59884d0@virtuozzo.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: xgJTv3EPORqQTDZVHDZb_Q-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1P18901CA0024.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:3:8b::34) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191120163722003
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 33365284-a7a6-40a8-1b73-08d76dbec667
+x-ms-traffictypediagnostic: AM6PR08MB3990:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM6PR08MB3990F36C2E82A6D09D8FBDCAC14F0@AM6PR08MB3990.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 02272225C5
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(346002)(376002)(136003)(39850400004)(396003)(53754006)(199004)(189003)(229853002)(14454004)(486006)(31696002)(2906002)(186003)(26005)(71190400001)(71200400001)(476003)(5660300002)(66476007)(66556008)(66446008)(64756008)(31686004)(107886003)(6246003)(6512007)(6486002)(6436002)(4326008)(76176011)(66066001)(54906003)(66946007)(11346002)(52116002)(316002)(99286004)(478600001)(2616005)(36756003)(102836004)(386003)(6506007)(25786009)(8936002)(8676002)(6116002)(305945005)(7736002)(81166006)(6916009)(81156014)(86362001)(3846002)(446003)(256004)(14444005);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3990;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: z9b8VeReoUxaxZKVoxos8Ca/RGgLb5DPP22cdvk3I4s9y0ps1+yJ37VwAUID5rIrI2h9qzkpM/MX7a9jancV1Kmuc9aY7/ILDiSsXm4tYpSiOkVppDMTvJLuz9mQUlDtFjgBP7VIWjmH/xF7UeJ/3UL7erkxLzf1DOaLJgnsYHZ1IUtUNOK1so/4mMKR42DNsjnHJqRfQzajDpM8DaKFhXqLg8w3l9NhUj1Y2bZIEYo/Wi/2TFrLL6lGMDoEcLE20u4Oj05mWiJZ4W+N0gqQ5MnklhPIgXcvTpEVhGDbBLoF/R7VNQWY7q7t4U9F3cN0KFnwxNnXHkIo2njRlY3CDQSM2ZODUyD++OskFGCCddOUE5OhHEy5kfDFE9KYLW//FweXCMmZxGSXhmjmbUd+hOn9BZ4MDAJHeNcje3NGLRbdPl7Uh2DUJRlBjU3vfRZA
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <9BF1D4DFE31B0344965C1658616F9323@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33365284-a7a6-40a8-1b73-08d76dbec667
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Nov 2019 13:37:23.8452 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lnq0TOChA3TN70GFe2gmqAgzNFKzNAEHNLsZLeJNOxDbHT0fO2xDQ5nn95EjAuvFcZgIIGc6Ysj1459y9He0jzrUckF/lj1swUMliZ6ilZ4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3990
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.13.139
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,115 +124,245 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org,
- clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: "fam@euphon.net" <fam@euphon.net>, Denis Lunev <den@virtuozzo.com>,
+ "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "mreitz@redhat.com" <mreitz@redhat.com>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/11/2019 13:47, Greg Kurz wrote:
-> On Wed, 20 Nov 2019 12:28:19 +0100
-> Laurent Vivier <lvivier@redhat.com> wrote:
->=20
->> On 20/11/2019 10:00, Laurent Vivier wrote:
->>> On 20/11/2019 05:36, David Gibson wrote:
->>>> On Tue, Nov 19, 2019 at 04:45:26PM +0100, Greg Kurz wrote:
->>>>> On Tue, 19 Nov 2019 15:06:51 +0100
->>>>> Laurent Vivier <lvivier@redhat.com> wrote:
->>>>>
->>>>>> On 19/11/2019 02:00, David Gibson wrote:
->>>>>>> On Fri, Nov 08, 2019 at 05:47:59PM +0100, Greg Kurz wrote:
->>>>>>>> On Fri,  8 Nov 2019 16:40:35 +0100
->>>>>>>> Laurent Vivier <lvivier@redhat.com> wrote:
->>>>>>>>
->>>>>>>>> Commit 29cb4187497d sets by default the VSMT to smp_threads,
->>>>>>>>> but older kernels (< 4.13) don't support that.
->>>>>>>>>
->>>>>>>>> We can reasonably restore previous behavior with this kernel
->>>>>>>>> to allow to run QEMU as before.
->>>>>>>>>
->>>>>>>>> If VSMT is not supported, VSMT will be set to MAX(8, smp_threads)
->>>>>>>>> as it is done for previous machine types (< pseries-4.2)
->>>>>>>>>
->>>>>>>>
->>>>>>>> It is usually _bad_ to base the machine behavior on host capabilit=
-ies.
->>>>>>>> What happens if we migrate between an older kernel and a recent on=
-e ?
->>>>>>>
->>>>>>> Right.  We're really trying to remove instaces of such behaviour.  =
-I'd
->>>>>>> prefer to completely revert Greg's original patch than to re-introd=
-uce
->>>>>>> host configuration dependency into the guest configuration..
->>>>>>>
->>>>>>>> I understand this is to fix tests/migration-test on older kernels.
->>>>>>>> Couldn't this be achieved with migration-test doing some introspec=
-tion
->>>>>>>> and maybe pass vsmt=3D8 on the QEMU command line ?
->>>>>>>
->>>>>>> ..adjusting the test case like this might be a better idea, though.
->>>>>>>
->>>>>>> What's the test setup where we're using the old kernel?  I really o=
-nly
->>>>>>> applied the original patch on the guess that we didn't really care
->>>>>>> about kernels that old.  The fact you've hit this in practice makes=
- me
->>>>>>> doubt that assumption.
->>>>>>>
->>>>>>
->>>>>> The way to fix the tests is to add "-smp threads=3D8" on the command=
- line
->>>>>> (for all tests, so basically in qtest_init_without_qmp_handshake(), =
-and
->>>>>> it will impact all the machine types), and we have to check if it is
->>>>>
->>>>> Ohhh... it isn't possible to initialize Qtest with machine specific
->>>>> properties ? That's a bit unfortunate :-\
+20.11.2019 15:04, Vladimir Sementsov-Ogievskiy wrote:
+> 20.11.2019 14:44, Kevin Wolf wrote:
+>> Am 20.11.2019 um 11:20 hat Vladimir Sementsov-Ogievskiy geschrieben:
+>>> 16.11.2019 19:34, Vladimir Sementsov-Ogievskiy wrote:
+>>>> Hi all!
 >>>>
->>>> Uhh... I don't see why we can't.  Couldn't we just put either -machine
->>>> vsmt=3D8 or -smp 8 into the cmd_src / cmd_dst printfs() in the
->>>> strcmp(arch, "ppc64") case?
+>>>> I wanted to understand, what is the real difference between bdrv_block=
+_status_above
+>>>> and bdrv_is_allocated_above, IMHO bdrv_is_allocated_above should work =
+through
+>>>> bdrv_block_status_above..
+>>>>
+>>>> And I found the problem: bdrv_is_allocated_above considers space after=
+ EOF as
+>>>> UNALLOCATED for intermediate nodes..
+>>>>
+>>>> UNALLOCATED is not about allocation at fs level, but about should we g=
+o to backing or
+>>>> not.. And it seems incorrect for me, as in case of short backing file,=
+ we'll read
+>>>> zeroes after EOF, instead of going further by backing chain.
+>>>>
+>>>> This leads to the following effect:
+>>>>
+>>>> ./qemu-img create -f qcow2 base.qcow2 2M
+>>>> ./qemu-io -c "write -P 0x1 0 2M" base.qcow2
+>>>>
+>>>> ./qemu-img create -f qcow2 -b base.qcow2 mid.qcow2 1M
+>>>> ./qemu-img create -f qcow2 -b mid.qcow2 top.qcow2 2M
+>>>>
+>>>> Region 1M..2M is shadowed by short middle image, so guest sees zeroes:
+>>>> ./qemu-io -c "read -P 0 1M 1M" top.qcow2
+>>>> read 1048576/1048576 bytes at offset 1048576
+>>>> 1 MiB, 1 ops; 00.00 sec (22.795 GiB/sec and 23341.5807 ops/sec)
+>>>>
+>>>> But after commit guest visible state is changed, which seems wrong for=
+ me:
+>>>> ./qemu-img commit top.qcow2 -b mid.qcow2
+>>>>
+>>>> ./qemu-io -c "read -P 0 1M 1M" mid.qcow2
+>>>> Pattern verification failed at offset 1048576, 1048576 bytes
+>>>> read 1048576/1048576 bytes at offset 1048576
+>>>> 1 MiB, 1 ops; 00.00 sec (4.981 GiB/sec and 5100.4794 ops/sec)
+>>>>
+>>>> ./qemu-io -c "read -P 1 1M 1M" mid.qcow2
+>>>> read 1048576/1048576 bytes at offset 1048576
+>>>> 1 MiB, 1 ops; 00.00 sec (3.365 GiB/sec and 3446.1606 ops/sec)
+>>>>
+>>>>
+>>>> I don't know, is it a real bug, as I don't know, do we support backing=
+ file larger than
+>>>> its parent. Still, I'm not sure that this behavior of bdrv_is_allocate=
+d_above don't lead
+>>>> to other problems.
+>>>>
+>>>> =3D=3D=3D=3D=3D
+>>>>
+>>>> Hmm, bdrv_block_allocated_above behaves strange too:
+>>>>
+>>>> with want_zero=3Dtrue, it may report unallocated zeroes because of sho=
+rt backing files, which
+>>>> are actually "allocated" in POV of backing chains. But I see this may =
+influence only
+>>>> qemu-img compare, and I don't see can it trigger some bug..
+>>>>
+>>>> with want_zero=3Dfalse, it may do no progress because of short backing=
+ file. Moreover it may
+>>>> report EOF in the middle!! But want_zero=3Dfalse used only in bdrv_is_=
+allocated, which considers
+>>>> onlyt top layer, so it seems OK.
+>>>>
+>>>> =3D=3D=3D=3D=3D
+>>>>
+>>>> So, I propose these series, still I'm not sure is there a real bug.
+>>>>
+>>>> Vladimir Sementsov-Ogievskiy (4):
+>>>> =A0=A0=A0 block/io: fix bdrv_co_block_status_above
+>>>> =A0=A0=A0 block/io: bdrv_common_block_status_above: support include_ba=
+se
+>>>> =A0=A0=A0 block/io: bdrv_common_block_status_above: support bs =3D=3D =
+base
+>>>> =A0=A0=A0 block/io: fix bdrv_is_allocated_above
+>>>>
+>>>> =A0=A0 block/io.c=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 | 10=
+4 ++++++++++++++++++-------------------
+>>>> =A0=A0 tests/qemu-iotests/154.out |=A0=A0 4 +-
+>>>> =A0=A0 2 files changed, 53 insertions(+), 55 deletions(-)
+>>>>
 >>>
->>> Yes, but we need to do that to all other tests that fail. test-migratio=
-n
->>> is not the only one impacted by the problem (we have also pxe-test), so
->>> it's why I thought to fix the problem in a generic place.
 >>>
->>> But it seems there are only this couple of tests that are impacted so I
->>> can modify both instead. I think only tests that really start CPU have
->>> the problem.
->>>
->>> I'm going to send a patch to fix that.
+>>> Interesting that the problem illustrated here is not fixed by the serie=
+s, it's actually
+>>> relates to the fact that mirror does truncation with PREALLOC_MODE_OFF,=
+ which leads
+>>> to unallocated qcow2 clusters, which I think should be fixed too.
 >>
->> And again, it's a little bit more complicated than expected: setting
->> vsmt to 8 works only with kvm_hv, but breaks in case of TCG or kvm_pr.
->> So the test must check what is in use...
+>> Yes, this is what I posted yesterday. (With a suggested quick fix, but
+>> it turns out it was not quite correct, see below.)
+>>
+>>> To illustrate the problem fixed by the series, we should commit to base=
+:
+>>>
+>>> # ./qemu-img commit top.qcow2 -b base.qcow2
+>>> Image committed.
+>>> # ./qemu-io -c "read -P 0 1M 1M" base.qcow2
+>>> Pattern verification failed at offset 1048576, 1048576 bytes
+>>> read 1048576/1048576 bytes at offset 1048576
+>>> 1 MiB, 1 ops; 00.00 sec (5.366 GiB/sec and 5494.4149 ops/sec)
+>>
+>> Ok, I'll try that later.
+>>
+>>> Hmm, but how to fix the problem about truncate? I think truncate must
+>>> not make underlying backing available for read.. Discard operation
+>>> doesn't do it.
+>>>
+>>> So, actually on PREALLOC_MODE_OFF we must allocated L2 tables and mark
+>>> new clusters as ZERO?
+>>
+>> Yes, we need to write zeroes to the new area if the backing file covers
+>> it. We need to do this not only in mirror/commit/bdrv_commit(), but in
+>> fact for all truncate operations: Berto mentioned on IRC yesterday that
+>> you can get into the same situation with 'block_resize' monitor
+>> commands.
+>>
+>> So I tried to fix this yesterday, and I thought that I had a fix, when I
+>> noticed that bdrv_co_do_zero_pwritev() takes a 32 bit bytes parameter.
+>> So I'll still need to fix this. Other than that, I suppose the following
+>> fix should work (but is probably a bit too invasive for -rc3).
+>>
+>> Kevin
+>>
+>> diff --git a/block/io.c b/block/io.c
+>> index f75777f5ea..4118bf0118 100644
+>> --- a/block/io.c
+>> +++ b/block/io.c
+>> @@ -3382,6 +3382,32 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *chil=
+d, int64_t offset, bool exact,
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 goto out;
+>> =A0=A0=A0=A0=A0 }
+>>
+>> +=A0=A0=A0 /*
+>> +=A0=A0=A0=A0 * If the image has a backing file that is large enough tha=
+t it would
+>> +=A0=A0=A0=A0 * provide data for the new area, we cannot leave it unallo=
+cated because
+>> +=A0=A0=A0=A0 * then the backing file content would become visible. Inst=
+ead, zero-fill
+>> +=A0=A0=A0=A0 * the area where backing file and new area overlap.
+>> +=A0=A0=A0=A0 */
+>> +=A0=A0=A0 if (new_bytes && bs->backing && prealloc =3D=3D PREALLOC_MODE=
+_OFF) {
+>> +=A0=A0=A0=A0=A0=A0=A0 int64_t backing_len;
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 backing_len =3D bdrv_getlength(backing_bs(bs));
+>> +=A0=A0=A0=A0=A0=A0=A0 if (backing_len < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D backing_len;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto out;
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +
+>> +=A0=A0=A0=A0=A0=A0=A0 if (backing_len > old_size) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 /* FIXME bytes parameter is 32 bits *=
+/
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 ret =3D bdrv_co_do_zero_pwritev(child=
+, old_size,
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 MIN(new_bytes, backi=
+ng_len - old_size),
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 BDRV_REQ_ZERO_WRITE =
+| BDRV_REQ_MAY_UNMAP, &req);
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 if (ret < 0) {
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 goto out;
+>> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 }
+>> +=A0=A0=A0=A0=A0=A0=A0 }
+>> +=A0=A0=A0 }
+>> +
+>> =A0=A0=A0=A0=A0 ret =3D refresh_total_sectors(bs, offset >> BDRV_SECTOR_=
+BITS);
+>> =A0=A0=A0=A0=A0 if (ret < 0) {
+>> =A0=A0=A0=A0=A0=A0=A0=A0=A0 error_setg_errno(errp, -ret, "Could not refr=
+esh total sector count");
 >>
 >=20
-> AFAICT, migration-test explicitly skip tests if kvm_hv isn't present.
+> I'm not sure that it is safe enough: we may not have opened backing at th=
+e moment, but
+> still it may exist and managed by user.
 >=20
->     /*
->      * On ppc64, the test only works with kvm-hv, but not with kvm-pr and=
- TCG
->      * is touchy due to race conditions on dirty bits (especially on PPC =
-for
->      * some reason)
->      */
->     if (g_str_equal(qtest_get_arch(), "ppc64") &&
->         access("/sys/module/kvm_hv", F_OK)) {
->         g_test_message("Skipping test: kvm_hv not available");
->         return g_test_run();
->     }
+> PREALLOC_MODE_OFF is documented as
+> # @off: no preallocation
 >=20
-> and I don't see any error in pxe-test if I force tcg and vsmt=3D8.
+> - not very descriptive, but I think it's nothing about making backing fil=
+e available
+> through new clusters.
 >=20
-> What error do you see with your testing ?
+> I think PREALLOC_MODE_OFF should always make new clusters "BDRV_BLOCK_ALL=
+OCATED". If
+> for some scenarios (are they exist at all?) we need to preallocate cluste=
+r in manner
+> that backing file would be visible through them, we'd better add another =
+preallocation
+> mode which will directly document this behaviour, like PREALLOC_MODE_BACK=
+ING.
+>=20
+> So, I'd consider PREALLOC_MODE_OFF as something that must not create UNAL=
+LOCATED (in POV
+> of backing chains) clusters, and should be fixed in all formats.. Or as a=
+ quick fix may
+> we may write zeros from bdrv_co_truncate, but independently of backing fi=
+le existence
+> and length.
+>=20
+> =3D=3D=3D
 
-In fact, you're right, it works with vsmt=3D8 and it's better.
+Or visa-versa, if we can't change current qemu-img-create default, which me=
+ans preallocation=3D"off"
+  =3D=3D=3D UNALLOCATED transaprent image, we may improve preallocation:"of=
+f" specification, mentioning
+backing files, and add preallocation:"zero" mode, to be used in truncate.
 
-Laurent
+>=20
+> Also I think it's a wrong thing at all that qcow2 new file is transparent=
+ by default..
+> It should be transparent only when we create snapshots and incremental ba=
+ckups. But when
+> we create new disk for new vm it should be zeroed (and extending L1 table=
+ entry spec by
+> "zero bit" may help)
+>=20
 
+--=20
+Best regards,
+Vladimir
 
