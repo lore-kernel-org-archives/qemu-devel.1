@@ -2,81 +2,83 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D45CDC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:46:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A47C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:47:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EE3E2088F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:46:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 441AC2088F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:47:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+YJYm+s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EE3E2088F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UQqbTBhs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 441AC2088F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60562 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXT7J-0003wV-OM
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 11:46:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47221)
+	id 1iXT8R-0005aK-FT
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 11:47:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47960)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgilbert@redhat.com>) id 1iXT2U-0007bA-EN
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:41:11 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iXT6s-0003bW-AF
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:45:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgilbert@redhat.com>) id 1iXT2S-0000ED-Lu
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:41:10 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30172
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iXT2S-0000Dk-Hp
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:41:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574268067;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+04ApiQitCXocLjL7A2pQ36+TcsC+4h7V84Cey+GE8w=;
- b=h+YJYm+scEZ/ibCDJ7/pOJPG7KpAe9Tws4fbmwypg+BIG8unrn0efA0egYGMwgA0AIn5p/
- qa/CpnFIsCXPXbZvOkt+WjI70Ni0AhOU6uvGHU+nLya/+mITOs0MIfideIufuh0WR9ulC8
- Z7C+nabOz05HaSZRTzBs/W1em5wCCq4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-uGynr_RkOkGv3BXDRzQ4yg-1; Wed, 20 Nov 2019 11:41:03 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44343107ACC7;
- Wed, 20 Nov 2019 16:41:02 +0000 (UTC)
-Received: from work-vm (unknown [10.36.118.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D651F1001902;
- Wed, 20 Nov 2019 16:40:55 +0000 (UTC)
-Date: Wed, 20 Nov 2019 16:40:53 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2] virtio-pci: disable vring processing when
- bus-mastering is disabled
-Message-ID: <20191120164053.GC2858@work-vm>
-References: <157423033042.2797.15950947649776190513@37313f22b938>
- <157426700550.3335.16748606368540493053@sif>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iXT6q-0002RL-Fe
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:45:42 -0500
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33474)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iXT6k-0002Or-TV
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:45:36 -0500
+Received: by mail-wr1-x442.google.com with SMTP id w9so671825wrr.0
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:45:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=WlWKwatgBhd8wI3amqobjwzO9M2adDGCwC3SO4Qaskc=;
+ b=UQqbTBhsVpmoz3PGWi9myOl9K+e/JMpG7AQTGxalavxlGDqmAa50y07EPdLJPgv5Om
+ PK3KQTH0u4GgiqbPvBuREXhhfa8qBGI46r4yh04oYaLNsGW8nGsPMgBXCTmNhDqiZykt
+ b36P1KMDvq8I0TWD653WRqJwg/UYTqOWGUbqzsDJVVc5zsaKHRzs72yihypqHJsdL1fP
+ FDAdU2SFepTPuwbwn04m7PQ0do9JwOajRAB/8F/1Y6r3HGPF/ARnc83J1p9bw81oq6r2
+ q3ZY53Qptn30WHGpElPCNi26hll7ZlsZuURIwWs1CBPkHBAXtroSjnIS2afV2eqmEtSx
+ Sd2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=WlWKwatgBhd8wI3amqobjwzO9M2adDGCwC3SO4Qaskc=;
+ b=GYz2PUwaPhnmi/IonIsBn28+5+vifHV4T1VSeR67uetmdIsswFJvxKnF4d7kll79re
+ Fm3EGwr3+JTVfJh2Gw/L7OEAkYdWk9GUnpJQ9T68Kxk2HZVzagk+wHKngLVwMNdu19Ld
+ 3zsDA8XobpHZKFOQ7DPcu5/iVpALFlo830eFzFOdBMZS/1fuf/nWgkJcxVyX+fMbIhr+
+ oNifqmNTe7ntG+xxjgR9c6sCEIlBZJfTtIhvljp9of39t64ir5rTH1wO7iNdXx+mmyPc
+ 4DSCni5EkVtnIc8sGR6kAFhKof4j6pYMREeZpu0Lml/0W6Ct+F0AAh8VYp0621Jsta1V
+ Q6Cg==
+X-Gm-Message-State: APjAAAVZjlamSY9oAcoNVRTqiiRzI6eweA1qHxFmoAwP8gArCYODVKKh
+ bfAjS87llkpy0Ch4aKr7XhOYkSP8Laih4pybZCc=
+X-Google-Smtp-Source: APXvYqzZch22SKvtyQF9KbcMNOefZZ5Pil3l4jLXikGH7wyCuU0lmLwFSp8nFXvuRT0k3oHVEHldCvgm9vHirPnPnlg=
+X-Received: by 2002:a5d:4ad2:: with SMTP id y18mr4522432wrs.396.1574268330627; 
+ Wed, 20 Nov 2019 08:45:30 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <157426700550.3335.16748606368540493053@sif>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: uGynr_RkOkGv3BXDRzQ4yg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
+ <20191120152442.26657-7-marcandre.lureau@redhat.com>
+ <c43719b2-9ed9-d77e-3cd5-95ee8bd29568@redhat.com>
+In-Reply-To: <c43719b2-9ed9-d77e-3cd5-95ee8bd29568@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 20 Nov 2019 20:45:16 +0400
+Message-ID: <CAJ+F1C+6W=g26VUdtAR6taPbOXBB8O0GxDfp8xiwWFqjWC_-BQ@mail.gmail.com>
+Subject: Re: [PATCH v4 06/37] serial: initial qom-ification
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::442
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,87 +90,265 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: no-reply@patchew.org, aik@ozlabs.ru, david@gibson.dropbear.id.au,
- qemu-devel@nongnu.org, mst@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Michael Roth (mdroth@linux.vnet.ibm.com) wrote:
-> Quoting no-reply@patchew.org (2019-11-20 00:12:11)
-> > Patchew URL: https://patchew.org/QEMU/20191120005003.27035-1-mdroth@lin=
-ux.vnet.ibm.com/
-> >=20
-> >=20
-> >=20
-> > Hi,
-> >=20
-> > This series failed the docker-quick@centos7 build test. Please find the=
- testing commands and
-> > their output below. If you have Docker installed, you can probably repr=
-oduce it
-> > locally.
-> >=20
-> > =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> > #!/bin/bash
-> > make docker-image-centos7 V=3D1 NETWORK=3D1
-> > time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=3D1
-> > =3D=3D=3D TEST SCRIPT END =3D=3D=3D
-> >=20
-> >   TEST    check-unit: tests/test-thread-pool
-> > wait_for_migration_fail: unexpected status status=3Dwait-unplug allow_a=
-ctive=3D1
-> > **
-> > ERROR:/tmp/qemu-test/src/tests/migration-test.c:908:wait_for_migration_=
-fail: assertion failed: (result)
-> > ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/migration-test.c:908:w=
-ait_for_migration_fail: assertion failed: (result)
->=20
-> Seems to be an unrelated issue noted in this thread:
->=20
->   https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg01326.html
+Hi
 
-Yeh, Jens has a patch series that's fixing that.
-
-Dave
-
-> I'm running the centos docker test in a loop but haven't been able to rep=
-roduce
-> so far after 7 attempts
->=20
-> > make: *** [check-qtest-aarch64] Error 1
-> > make: *** Waiting for unfinished jobs....
-> >   TEST    check-unit: tests/test-hbitmap
-> >   TEST    check-unit: tests/test-bdrv-drain
+On Wed, Nov 20, 2019 at 8:42 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
+>
+> On 11/20/19 4:24 PM, Marc-Andr=C3=A9 Lureau wrote:
+> > Make SerialState a device (the following patches will introduce IO/MM
+> > sysbus serial devices)
+> >
+> > None of the serial_{,mm}_init() callers actually free the returned
+> > value (even if they did, it would be quite harmless), so we can change
+> > the object allocation at will.
+> >
+> > However, the devices that embed SerialState must now have their field
+> > QOM-initialized manually (isa, pci, pci-multi).
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 > > ---
-> >     raise CalledProcessError(retcode, cmd)
-> > subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run',=
- '--label', 'com.qemu.instance.uuid=3Dc863e15882a747a88c290575505cc1de', '-=
-u', '1001', '--security-opt', 'seccomp=3Dunconfined', '--rm', '-e', 'TARGET=
-_LIST=3D', '-e', 'EXTRA_CONFIGURE_OPTS=3D', '-e', 'V=3D', '-e', 'J=3D14', '=
--e', 'DEBUG=3D', '-e', 'SHOW_ENV=3D1', '-e', 'CCACHE_DIR=3D/var/tmp/ccache'=
-, '-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', =
-'/var/tmp/patchew-tester-tmp-wg70rgpu/src/docker-src.2019-11-20-01.02.57.12=
-412:/var/tmp/qemu:z,ro', 'qemu:centos7', '/var/tmp/qemu/run', 'test-quick']=
-' returned non-zero exit status 2.
-> > filter=3D--filter=3Dlabel=3Dcom.qemu.instance.uuid=3Dc863e15882a747a88c=
-290575505cc1de
-> > make[1]: *** [docker-run] Error 1
-> > make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-wg70rgpu/src'
-> > make: *** [docker-run-test-quick@centos7] Error 2
-> >=20
-> > real    9m13.236s
-> > user    0m8.131s
-> >=20
-> >=20
-> > The full log is available at
-> > http://patchew.org/logs/20191120005003.27035-1-mdroth@linux.vnet.ibm.co=
-m/testing.docker-quick@centos7/?type=3Dmessage.
-> > ---
-> > Email generated automatically by Patchew [https://patchew.org/].
-> > Please send your feedback to patchew-devel@redhat.com
->=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> >   hw/char/serial-isa.c       |  9 +++++++++
+> >   hw/char/serial-pci-multi.c | 15 +++++++++++++++
+> >   hw/char/serial-pci.c       | 13 ++++++++++++-
+> >   hw/char/serial.c           | 33 +++++++++++++++++++++++++++------
+> >   include/hw/char/serial.h   |  7 ++++++-
+> >   5 files changed, 69 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/hw/char/serial-isa.c b/hw/char/serial-isa.c
+> > index 9e31c51bb6..9a5928b3ee 100644
+> > --- a/hw/char/serial-isa.c
+> > +++ b/hw/char/serial-isa.c
+> > @@ -111,10 +111,19 @@ static void serial_isa_class_initfn(ObjectClass *=
+klass, void *data)
+> >       set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+> >   }
+> >
+> > +static void serial_isa_initfn(Object *o)
+> > +{
+> > +    ISASerialState *self =3D ISA_SERIAL(o);
+> > +
+> > +    object_initialize_child(o, "serial", &self->state, sizeof(self->st=
+ate),
+> > +                            TYPE_SERIAL, &error_abort, NULL);
+> > +}
+> > +
+> >   static const TypeInfo serial_isa_info =3D {
+> >       .name          =3D TYPE_ISA_SERIAL,
+> >       .parent        =3D TYPE_ISA_DEVICE,
+> >       .instance_size =3D sizeof(ISASerialState),
+> > +    .instance_init =3D serial_isa_initfn,
+> >       .class_init    =3D serial_isa_class_initfn,
+> >   };
+> >
+> > diff --git a/hw/char/serial-pci-multi.c b/hw/char/serial-pci-multi.c
+> > index 5c553c30d0..edfbfdca9e 100644
+> > --- a/hw/char/serial-pci-multi.c
+> > +++ b/hw/char/serial-pci-multi.c
+> > @@ -181,10 +181,24 @@ static void multi_4x_serial_pci_class_initfn(Obje=
+ctClass *klass, void *data)
+> >       set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+> >   }
+> >
+> > +static void multi_serial_init(Object *o)
+> > +{
+> > +    PCIDevice *dev =3D PCI_DEVICE(o);
+> > +    PCIMultiSerialState *pms =3D DO_UPCAST(PCIMultiSerialState, dev, d=
+ev);
+> > +    size_t i, nports =3D multi_serial_get_port_count(PCI_DEVICE_GET_CL=
+ASS(dev));
+> > +
+> > +    for (i =3D 0; i < nports; i++) {
+> > +        object_initialize_child(o, "serial[*]", &pms->state[i],
+> > +                                sizeof(pms->state[i]),
+> > +                                TYPE_SERIAL, &error_abort, NULL);
+> > +    }
+> > +}
+> > +
+> >   static const TypeInfo multi_2x_serial_pci_info =3D {
+> >       .name          =3D "pci-serial-2x",
+> >       .parent        =3D TYPE_PCI_DEVICE,
+> >       .instance_size =3D sizeof(PCIMultiSerialState),
+> > +    .instance_init =3D multi_serial_init,
+> >       .class_init    =3D multi_2x_serial_pci_class_initfn,
+> >       .interfaces =3D (InterfaceInfo[]) {
+> >           { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> > @@ -196,6 +210,7 @@ static const TypeInfo multi_4x_serial_pci_info =3D =
+{
+> >       .name          =3D "pci-serial-4x",
+> >       .parent        =3D TYPE_PCI_DEVICE,
+> >       .instance_size =3D sizeof(PCIMultiSerialState),
+> > +    .instance_init =3D multi_serial_init,
+> >       .class_init    =3D multi_4x_serial_pci_class_initfn,
+> >       .interfaces =3D (InterfaceInfo[]) {
+> >           { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> > diff --git a/hw/char/serial-pci.c b/hw/char/serial-pci.c
+> > index cb9b76e22b..f99b6c19e0 100644
+> > --- a/hw/char/serial-pci.c
+> > +++ b/hw/char/serial-pci.c
+> > @@ -40,6 +40,8 @@ typedef struct PCISerialState {
+> >       uint8_t prog_if;
+> >   } PCISerialState;
+> >
+> > +#define TYPE_PCI_SERIAL "pci-serial"
+> > +#define PCI_SERIAL(s) OBJECT_CHECK(PCISerialState, (s), TYPE_PCI_SERIA=
+L)
+> >
+> >   static void serial_pci_realize(PCIDevice *dev, Error **errp)
+> >   {
+> > @@ -103,10 +105,19 @@ static void serial_pci_class_initfn(ObjectClass *=
+klass, void *data)
+> >       set_bit(DEVICE_CATEGORY_INPUT, dc->categories);
+> >   }
+> >
+> > +static void serial_pci_init(Object *o)
+> > +{
+> > +    PCISerialState *ps =3D PCI_SERIAL(o);
+> > +
+> > +    object_initialize_child(o, "serial", &ps->state, sizeof(ps->state)=
+,
+> > +                            TYPE_SERIAL, &error_abort, NULL);
+> > +}
+> > +
+> >   static const TypeInfo serial_pci_info =3D {
+> > -    .name          =3D "pci-serial",
+> > +    .name          =3D TYPE_PCI_SERIAL,
+> >       .parent        =3D TYPE_PCI_DEVICE,
+> >       .instance_size =3D sizeof(PCISerialState),
+> > +    .instance_init =3D serial_pci_init,
+> >       .class_init    =3D serial_pci_class_initfn,
+> >       .interfaces =3D (InterfaceInfo[]) {
+> >           { INTERFACE_CONVENTIONAL_PCI_DEVICE },
+> > diff --git a/hw/char/serial.c b/hw/char/serial.c
+> > index b4aa250950..e0a5bec290 100644
+> > --- a/hw/char/serial.c
+> > +++ b/hw/char/serial.c
+> > @@ -983,9 +983,8 @@ const MemoryRegionOps serial_io_ops =3D {
+> >   SerialState *serial_init(int base, qemu_irq irq, int baudbase,
+> >                            Chardev *chr, MemoryRegion *system_io)
+> >   {
+> > -    SerialState *s;
+> > -
+> > -    s =3D g_malloc0(sizeof(SerialState));
+> > +    DeviceState *dev =3D DEVICE(object_new(TYPE_SERIAL));
+> > +    SerialState *s =3D SERIAL(dev);
+> >
+> >       s->irq =3D irq;
+> >       s->baudbase =3D baudbase;
+> > @@ -993,6 +992,7 @@ SerialState *serial_init(int base, qemu_irq irq, in=
+t baudbase,
+> >       serial_realize_core(s, &error_fatal);
+> >
+> >       vmstate_register(NULL, base, &vmstate_serial, s);
+> > +    qdev_init_nofail(dev);
+> >
+> >       memory_region_init_io(&s->io, NULL, &serial_io_ops, s, "serial", =
+8);
+> >       memory_region_add_subregion(system_io, base, &s->io);
+> > @@ -1000,6 +1000,20 @@ SerialState *serial_init(int base, qemu_irq irq,=
+ int baudbase,
+> >       return s;
+> >   }
+> >
+> > +static void serial_class_init(ObjectClass *klass, void *data)
+> > +{
+> > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> > +
+> > +    dc->user_creatable =3D false;
+>
+> Why? Due to the "chardev" property?
 
+No, because it's not user usable as such (it's an internal device for
+serialio/serialmm and others). And making abstract wouldn't work
+either.
+
+>
+> > +}
+> > +
+> > +static const TypeInfo serial_info =3D {
+> > +    .name =3D TYPE_SERIAL,
+> > +    .parent =3D TYPE_DEVICE,
+> > +    .instance_size =3D sizeof(SerialState),
+> > +    .class_init =3D serial_class_init,
+> > +};
+> > +
+> >   /* Memory mapped interface */
+> >   static uint64_t serial_mm_read(void *opaque, hwaddr addr,
+> >                                  unsigned size)
+> > @@ -1045,9 +1059,8 @@ SerialState *serial_mm_init(MemoryRegion *address=
+_space,
+> >                               qemu_irq irq, int baudbase,
+> >                               Chardev *chr, enum device_endian end)
+> >   {
+> > -    SerialState *s;
+> > -
+> > -    s =3D g_malloc0(sizeof(SerialState));
+> > +    DeviceState *dev =3D DEVICE(object_new(TYPE_SERIAL));
+> > +    SerialState *s =3D SERIAL(dev);
+> >
+> >       s->it_shift =3D it_shift;
+> >       s->irq =3D irq;
+> > @@ -1056,9 +1069,17 @@ SerialState *serial_mm_init(MemoryRegion *addres=
+s_space,
+> >
+> >       serial_realize_core(s, &error_fatal);
+> >       vmstate_register(NULL, base, &vmstate_serial, s);
+> > +    qdev_init_nofail(dev);
+> >
+> >       memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], s,
+> >                             "serial", 8 << it_shift);
+> >       memory_region_add_subregion(address_space, base, &s->io);
+> >       return s;
+> >   }
+> > +
+> > +static void serial_register_types(void)
+> > +{
+> > +    type_register_static(&serial_info);
+> > +}
+> > +
+> > +type_init(serial_register_types)
+> > diff --git a/include/hw/char/serial.h b/include/hw/char/serial.h
+> > index 8be3d8a4f9..180cc7c24e 100644
+> > --- a/include/hw/char/serial.h
+> > +++ b/include/hw/char/serial.h
+> > @@ -30,10 +30,13 @@
+> >   #include "exec/memory.h"
+> >   #include "qemu/fifo8.h"
+> >   #include "chardev/char.h"
+> > +#include "hw/sysbus.h"
+> >
+> >   #define UART_FIFO_LENGTH    16      /* 16550A Fifo Length */
+> >
+> >   typedef struct SerialState {
+> > +    DeviceState parent;
+> > +
+> >       uint16_t divider;
+> >       uint8_t rbr; /* receive register */
+> >       uint8_t thr; /* transmit holding register */
+> > @@ -84,7 +87,9 @@ void serial_realize_core(SerialState *s, Error **errp=
+);
+> >   void serial_exit_core(SerialState *s);
+> >   void serial_set_frequency(SerialState *s, uint32_t frequency);
+> >
+> > -/* legacy pre qom */
+> > +#define TYPE_SERIAL "serial"
+> > +#define SERIAL(s) OBJECT_CHECK(SerialState, (s), TYPE_SERIAL)
+> > +
+> >   SerialState *serial_init(int base, qemu_irq irq, int baudbase,
+> >                            Chardev *chr, MemoryRegion *system_io);
+> >   SerialState *serial_mm_init(MemoryRegion *address_space,
+> >
+>
+>
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
 
