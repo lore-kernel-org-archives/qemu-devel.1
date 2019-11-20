@@ -2,118 +2,141 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB2CC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:33:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04BE7C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:35:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0ADB020692
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:33:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C08F520855
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:35:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="veU9vp6l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ADB020692
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TX7qvLig"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C08F520855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXR30-0000jL-4S
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 09:33:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51378)
+	id 1iXR4j-00029J-Jv
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 09:35:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51483)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iXQxV-0004ve-S6
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:27:55 -0500
+ (envelope-from <lvivier@redhat.com>) id 1iXQy6-00057V-9z
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:28:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iXQxU-0002zp-Kz
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:27:53 -0500
-Received: from mail-eopbgr50133.outbound.protection.outlook.com
- ([40.107.5.133]:32262 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iXQxT-0002yY-UY; Wed, 20 Nov 2019 09:27:52 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K5s1fLK6f+sXk2ax2vN0aY0+l9cw4GRidEypdB7dbxJLR5nMX/cv6E3gb29J4q+3i1K7032fd3Y37BbDOS/IgS4dQnWYszYyMNg+KIvvyaHYKfc7LzlseFZXrLibEVKtZoBJyiMP3owB19wqsfK8zZmzdCbgrtnNVTHR3/p41Kmw+vIGGxnWnRqE4IbTmGP5t1oEAMh6CcHy6RMbuzMSdZoTCknH0wLFk5Ib26lmuMNXlRjeTuM2SMDFCHnbFqOte4iCzGPv0bvCCF0ivBcKVsDoJEz0v7ph6Jr4CYDsxUH5n2CQRlrh/FLc4tPGMIpp+ycqaAtLKdsk1k8tynbdSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vw3H9ZZP3tVjElQu8qz3sfKIFB31cFjcGbfwqGsUJWo=;
- b=FocpCl9wiZmUDDuv2mXMdXKa/vsgcLMPc114ATjeH8piEAbfJAY77a1AiF7yYA6adnKXRpxDkZ4XSVd7Lc6KprX6jxgFKr8Q7jErkhjsR6EQocI18wQH/n0NQ+PqXH5ezWUQachyClKlFMuoGU4EaggutSrNakIgmWQfN/ObNi4BT78DcK5sh52PmkH9GE4xgfrdbO3waTEThzTkqLsRAIbbsyNC7DO1GtNx2a49upwP7jWAibQPWy8KQMPFxLJLHvPD8qHucJFHzykHX3VhFdVY9WjoziRssH3IrZgijuuRO4Vsa6I3udClzRWIcwnamduy+h/jOk423FqAybl6dg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vw3H9ZZP3tVjElQu8qz3sfKIFB31cFjcGbfwqGsUJWo=;
- b=veU9vp6l8fJpupzkhBU1l5o6yF5Ob3akQ40HGLe05IP8tItKeWnERTceoCdvAlsQqsop9BYDyShLlKhrtFoqb5obgHtVDw8Ua+8VK9mwZd8nop6MeCSR8Ji+5xeW/cGbdoEYXjjbyJP4CWokjqka8KJeqYkXxsutNDkPbjVNAqA=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB5207.eurprd08.prod.outlook.com (10.255.122.77) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.23; Wed, 20 Nov 2019 14:27:49 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.031; Wed, 20 Nov 2019
- 14:27:48 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org"
- <qemu-block@nongnu.org>
-Subject: Re: [PATCH 1/6] block: bdrv_co_do_pwrite_zeroes: 64 bit 'bytes'
- parameter
-Thread-Topic: [PATCH 1/6] block: bdrv_co_do_pwrite_zeroes: 64 bit 'bytes'
- parameter
-Thread-Index: AQHVn6tWCoN06Rr8pECE+XALnO9chqeUHgQA
-Date: Wed, 20 Nov 2019 14:27:48 +0000
-Message-ID: <2d60d49c-12c8-dee5-aa0c-7b67810effd0@virtuozzo.com>
-References: <20191120140319.1505-1-kwolf@redhat.com>
- <20191120140319.1505-2-kwolf@redhat.com>
-In-Reply-To: <20191120140319.1505-2-kwolf@redhat.com>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0301CA0009.eurprd03.prod.outlook.com
- (2603:10a6:3:76::19) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191120172746844
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 02e0405d-9f03-478f-f116-08d76dc5d177
-x-ms-traffictypediagnostic: AM6PR08MB5207:
-x-microsoft-antispam-prvs: <AM6PR08MB520747B961E038CFCADFAE5BC14F0@AM6PR08MB5207.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4502;
-x-forefront-prvs: 02272225C5
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(346002)(39840400004)(366004)(376002)(396003)(136003)(199004)(189003)(86362001)(4326008)(99286004)(31686004)(102836004)(81156014)(71190400001)(6246003)(81166006)(6436002)(2501003)(5660300002)(4744005)(229853002)(476003)(11346002)(26005)(2616005)(66946007)(71200400001)(6512007)(186003)(36756003)(76176011)(66066001)(8936002)(446003)(2906002)(486006)(478600001)(316002)(110136005)(54906003)(8676002)(386003)(31696002)(14444005)(256004)(6506007)(3846002)(66446008)(64756008)(66556008)(66476007)(6486002)(14454004)(52116002)(7736002)(6116002)(305945005)(25786009);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB5207;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: HL3nuH8CkBrPrgEiK5m3TcUF19v5Ep+lA5lcuKbO+UTi5Z1gfL/wfj1ocAMWAYs0qBXkv9tycMAyt4T5fIaqWNkg6qTgkez9p96096/LO5vtBZ4cCFtKP0IFCWNLRjUwIVAVGZtQWPjEydW0ZXawEUSJhupzuhxq3OKuzTVwrNWGpgP+XV6XBRCEGSuXZQV2LmKk2zXK+K/E5nWm5KJKts3VMwuzWkZOcCBJz+4Cj+Nt715BGbKKE0EoLhKXSSxmCH6aowIBH99HOIx2jBj3OzMr8bmi9p32LamT8miN9W106E/kbf/SNagcxdbsrkKkzErJXLCaAsldzsFgVk7xIjBHiBZiqC4GVrCvAMPbEopXAd8nSJJvdG3OsdECNMm/wLEC7lDt8Zo/Ob0jXzFMqymzcBPiKrdUXUCBwP8qs7guwcUcDSJkTdbLoTEmdq50
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <336FB0E67DEDA342AEA1D890E80BAB6B@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (envelope-from <lvivier@redhat.com>) id 1iXQy5-0003Is-0t
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:28:30 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22554
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iXQy4-0003Im-Ta
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:28:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574260108;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=9U9k1zQ5UEkq2mYUtu3AxNhuCZwOd+7ytAXfoPd2EkQ=;
+ b=TX7qvLigxUbQ6J7j9NWI9HHv6/THr2c6Hb22QcyKzHUPHYtfOKN7wMeCiGqyS56iYsmTNP
+ E0iLIavfxqZ/inTcivLjali6ipDNxqexQMgWp72YFiRJwEm3iXuXUKwdwYB4s4RXylcMLM
+ vICmxO0qyrCjTl3qECNw0AX+T0bScxU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-33-X2zZdEv8MfO7DG5rfPxe8A-1; Wed, 20 Nov 2019 09:28:25 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1CF48026BF;
+ Wed, 20 Nov 2019 14:28:22 +0000 (UTC)
+Received: from [10.36.116.216] (ovpn-116-216.ams2.redhat.com [10.36.116.216])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B4C3E5ED2D;
+ Wed, 20 Nov 2019 14:28:20 +0000 (UTC)
+Subject: Re: [PATCH] spapr: Fix VSMT mode when it is not supported by the
+ kernel
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20191108154035.12913-1-lvivier@redhat.com>
+ <20191108174759.2d4040f1@bahia.lan> <20191119010012.GI5582@umbus.fritz.box>
+ <caa35299-c928-a968-83b5-842d000f0242@redhat.com>
+ <20191119164526.0e980a37@bahia.lan> <20191120043653.GG5582@umbus.fritz.box>
+ <cb8f7dc7-d6db-6bd9-e825-1ade7d89cdd9@redhat.com>
+ <0c1f57ac-0823-4268-429b-d1aee8f7f8d5@redhat.com>
+ <20191120114128.GN5582@umbus.fritz.box>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <8bc97c7d-9773-b5e2-cd29-deab14e919ad@redhat.com>
+Date: Wed, 20 Nov 2019 15:28:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02e0405d-9f03-478f-f116-08d76dc5d177
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Nov 2019 14:27:48.8127 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Vv/hTW2hMweKP91Sllqe/LPbdyhrY6LU+/nkn7lw/EiK3SQBeYctQzwoYBDEpAlqBZ4b7fmXiLxEIbAQ25k9qxGNNajQaOoNZE0K95Rl//8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5207
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.133
+In-Reply-To: <20191120114128.GN5582@umbus.fritz.box>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: X2zZdEv8MfO7DG5rfPxe8A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,25 +148,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-ppc@nongnu.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-20.11.2019 17:03, Kevin Wolf wrote:
-> bdrv_co_do_pwrite_zeroes() can already cope with maximum request sizes
-> by calling the driver in a loop until everything is done. Make the small
-> remaining change that is necessary to let it accept a 64 bit byte count.
+On 20/11/2019 12:41, David Gibson wrote:
+> On Wed, Nov 20, 2019 at 12:28:19PM +0100, Laurent Vivier wrote:
+>> On 20/11/2019 10:00, Laurent Vivier wrote:
+>>> On 20/11/2019 05:36, David Gibson wrote:
+>>>> On Tue, Nov 19, 2019 at 04:45:26PM +0100, Greg Kurz wrote:
+>>>>> On Tue, 19 Nov 2019 15:06:51 +0100
+>>>>> Laurent Vivier <lvivier@redhat.com> wrote:
+>>>>>
+>>>>>> On 19/11/2019 02:00, David Gibson wrote:
+>>>>>>> On Fri, Nov 08, 2019 at 05:47:59PM +0100, Greg Kurz wrote:
+>>>>>>>> On Fri,  8 Nov 2019 16:40:35 +0100
+>>>>>>>> Laurent Vivier <lvivier@redhat.com> wrote:
+>>>>>>>>
+>>>>>>>>> Commit 29cb4187497d sets by default the VSMT to smp_threads,
+>>>>>>>>> but older kernels (< 4.13) don't support that.
+>>>>>>>>>
+>>>>>>>>> We can reasonably restore previous behavior with this kernel
+>>>>>>>>> to allow to run QEMU as before.
+>>>>>>>>>
+>>>>>>>>> If VSMT is not supported, VSMT will be set to MAX(8, smp_threads)
+>>>>>>>>> as it is done for previous machine types (< pseries-4.2)
+>>>>>>>>>
+>>>>>>>>
+>>>>>>>> It is usually _bad_ to base the machine behavior on host capabilit=
+ies.
+>>>>>>>> What happens if we migrate between an older kernel and a recent on=
+e ?
+>>>>>>>
+>>>>>>> Right.  We're really trying to remove instaces of such behaviour.  =
+I'd
+>>>>>>> prefer to completely revert Greg's original patch than to re-introd=
+uce
+>>>>>>> host configuration dependency into the guest configuration..
+>>>>>>>
+>>>>>>>> I understand this is to fix tests/migration-test on older kernels.
+>>>>>>>> Couldn't this be achieved with migration-test doing some introspec=
+tion
+>>>>>>>> and maybe pass vsmt=3D8 on the QEMU command line ?
+>>>>>>>
+>>>>>>> ..adjusting the test case like this might be a better idea, though.
+>>>>>>>
+>>>>>>> What's the test setup where we're using the old kernel?  I really o=
+nly
+>>>>>>> applied the original patch on the guess that we didn't really care
+>>>>>>> about kernels that old.  The fact you've hit this in practice makes=
+ me
+>>>>>>> doubt that assumption.
+>>>>>>>
+>>>>>>
+>>>>>> The way to fix the tests is to add "-smp threads=3D8" on the command=
+ line
+>>>>>> (for all tests, so basically in qtest_init_without_qmp_handshake(), =
+and
+>>>>>> it will impact all the machine types), and we have to check if it is
+>>>>>
+>>>>> Ohhh... it isn't possible to initialize Qtest with machine specific
+>>>>> properties ? That's a bit unfortunate :-\
+>>>>
+>>>> Uhh... I don't see why we can't.  Couldn't we just put either -machine
+>>>> vsmt=3D8 or -smp 8 into the cmd_src / cmd_dst printfs() in the
+>>>> strcmp(arch, "ppc64") case?
+>>>
+>>> Yes, but we need to do that to all other tests that fail. test-migratio=
+n
+>>> is not the only one impacted by the problem (we have also pxe-test), so
+>>> it's why I thought to fix the problem in a generic place.
+>>>
+>>> But it seems there are only this couple of tests that are impacted so I
+>>> can modify both instead. I think only tests that really start CPU have
+>>> the problem.
+>>>
+>>> I'm going to send a patch to fix that.
+>>
+>> And again, it's a little bit more complicated than expected: setting
+>> vsmt to 8 works only with kvm_hv, but breaks in case of TCG or kvm_pr.
+>> So the test must check what is in use...
 >=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Ugh, yeah, that's getting too ugly.  I think the feasible options are
+> either to revert the patch, or just say that upstream qemu no longer
+> supports a RHEL7 host.
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+In I was mistakenly using "-smp threads=3D8", with "-M vsmt=3D8" it works
+with TCG and KVM PR (with a warning).
 
+I've sent the patch.
 
+Thanks,
+Laurent
 
---=20
-Best regards,
-Vladimir
 
