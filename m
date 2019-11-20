@@ -2,80 +2,98 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87666C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E4A0C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:39:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55090223D1
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:38:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB142223D1
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:39:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IIOc1F59"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55090223D1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GOBzpmW2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB142223D1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXMRQ-0007fH-0T
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 04:38:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44954)
+	id 1iXMSZ-0000xV-0Q
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 04:39:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45201)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jtomko@redhat.com>) id 1iXMPK-0005h8-Al
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:36:19 -0500
+ (envelope-from <philmd@redhat.com>) id 1iXMQg-0006wP-SV
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:37:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jtomko@redhat.com>) id 1iXMPJ-00047L-9b
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:36:18 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:52095
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <philmd@redhat.com>) id 1iXMQe-0004cC-Jy
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:37:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44996
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1iXMPJ-000470-66
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:36:17 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iXMQe-0004bk-G0
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:37:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574242576;
+ s=mimecast20190719; t=1574242660;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UrHd7RqNrB+1bDkaKW8M5t+cGM1h//lO5MzDrsHEsOA=;
- b=IIOc1F594H6TRf7V1/C6x8Uw3KfpnekbVXNzV3SI1czQ7X7vvFCmwf6zbveLMAhpf+wzKW
- X89TUHDNLoz6c+Y2qX8dZoI8aTELcgPtInhdRxt/vNLD0uL9gG0s7/ObzM690VHrnGF9uM
- XkR8BOkHlDhqx8oagWCeaCeqndpjuZc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-XqDW1PHrPquzjStFyHcJ6w-1; Wed, 20 Nov 2019 04:35:06 -0500
-X-MC-Unique: XqDW1PHrPquzjStFyHcJ6w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45FA9801E6A;
- Wed, 20 Nov 2019 09:35:05 +0000 (UTC)
-Received: from lpt (unknown [10.43.2.17])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 929C267E5C;
- Wed, 20 Nov 2019 09:34:54 +0000 (UTC)
-Date: Wed, 20 Nov 2019 10:35:49 +0100
-From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [libvirt] [PATCH for-5.0 2/4] hw/usb: Remove the USB bluetooth
- dongle device
-Message-ID: <20191120093549.GO3832@lpt>
-References: <20191120091014.16883-1-thuth@redhat.com>
- <20191120091014.16883-3-thuth@redhat.com>
+ bh=DPvn60zkncPKPfL8x6mQNtMSRNzCVa057PHz9BY83+A=;
+ b=GOBzpmW2K2vZLwF3/U9copi3j9fTVjq7yNww5JD4n1y/IuxPRcr6p70pA7IoNZqGoVvfji
+ cuQc7nuI1JjGbEzt/Y6Iybw8kQEBYpuVTh1+C+rS4iZ1T/FBTcKBBu38CG+l+NY+LoLTpf
+ F20bN5BoCqyiFcrx+Tf8knM7h8V3b/8=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-396-n24Ji2ncP3yeJO4HxjZbCg-1; Wed, 20 Nov 2019 04:37:38 -0500
+Received: by mail-wr1-f69.google.com with SMTP id e10so20655345wrt.16
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 01:37:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=3F493hOXcT30RR0VKdYZmqAmCUlv6EOzoIpFF6ohQos=;
+ b=DzMg+byammknZumlrAKVMgRYeieyzjXSF2p9Vl/hKyY32so3rixN8gJDhNrI8AxYru
+ PgBqle1c9haF9UNa1EpNpNsWI79zrUzvBc7JCLn93eaQ4wQ8CG4jbWzzOmTujB2A8nQu
+ CsP6Dmq4RdEc03i3grKVyCNco/YvU6d3nmXyMjYTSIC3VXe5+xuGOpPBNVtThNbzzHDx
+ LK69rWw48LNBjqeKWrhiRsxoj7R4oujXOjzb2Cnp14RB6dDQDRz+8YvnUIeS0MTZ2fs2
+ F3BEvkFmDTjYrYV2A81sKeVWI+qQ3ONBDiPZetMDhxGPXKpecaN61WEHMe5PLoZqlruY
+ np3w==
+X-Gm-Message-State: APjAAAU5MGpdgz+T7c/3Js1yD0D5v3JoWZe6nTEd2sbMEKoChq1xUvgW
+ LOCcyfA4O98bgFJ3BouzUSZhHjjJ8pcMkxaCB7q646lov8e6GFvkkT93tlEu4isT/3FW81KV5OY
+ 0FtjiVbCusGxZnVQ=
+X-Received: by 2002:a5d:460b:: with SMTP id t11mr2044331wrq.185.1574242657708; 
+ Wed, 20 Nov 2019 01:37:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzqSgSYmrdkXOSyFzk1Jz3rns84FeP5/LufY2tRsMTgWhxAJAFJD2ufK92WcUtjpmPVDxvaDw==
+X-Received: by 2002:a5d:460b:: with SMTP id t11mr2044311wrq.185.1574242657536; 
+ Wed, 20 Nov 2019 01:37:37 -0800 (PST)
+Received: from [192.168.43.238] (92.red-95-127-154.staticip.rima-tde.net.
+ [95.127.154.92])
+ by smtp.gmail.com with ESMTPSA id w4sm30696388wrs.1.2019.11.20.01.37.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 20 Nov 2019 01:37:37 -0800 (PST)
+Subject: Re: [PATCH] vhost-user-input: use free(elem) instead of g_free(elem)
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20191119111626.112206-1-stefanha@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <6b45458f-386f-3be0-c3d8-20c88ca37a2b@redhat.com>
+Date: Wed, 20 Nov 2019 10:37:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191120091014.16883-3-thuth@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20191119111626.112206-1-stefanha@redhat.com>
+Content-Language: en-US
+X-MC-Unique: n24Ji2ncP3yeJO4HxjZbCg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="BuBclajtnfx5hylj"
-Content-Disposition: inline
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,54 +105,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, libvir-list@redhat.com,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---BuBclajtnfx5hylj
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 11/19/19 12:16 PM, Stefan Hajnoczi wrote:
+> The virtqueue element returned by vu_queue_pop() is allocated using
+> malloc(3) by virtqueue_alloc_element().  Use the matching free(3)
+> function instead of glib's g_free().
+>=20
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-On Wed, Nov 20, 2019 at 10:10:12AM +0100, Thomas Huth wrote:
->We are going to remove the bluetooth backend, so the USB bluetooth
->dongle can not work anymore. It's a completely optional device, no
->board depends on it, so let's simply remove it now.
->
->Signed-off-by: Thomas Huth <thuth@redhat.com>
->---
-> hw/usb/Kconfig         |   5 -
-> hw/usb/Makefile.objs   |   1 -
-> hw/usb/dev-bluetooth.c | 581 -----------------------------------------
-> qemu-doc.texi          |  15 --
-> 4 files changed, 602 deletions(-)
-> delete mode 100644 hw/usb/dev-bluetooth.c
->
+Fixes: 06914c97d3a ?
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-Reviewed-by: J=E1n Tomko <jtomko@redhat.com>
-
-Jano
-
---BuBclajtnfx5hylj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl3VCO8ACgkQ+YPwO/Ma
-t50gSwgAivAhVu/IeLutYVnPgIFVBRn+l0WLl8gsdTV6W+gJtW0J8T0lFzP29ekE
-HfOXC7DI+RVi4YV/wX8RJSuBj/yfk50ce/cSrsSGuf0H3mRNDI0uI5eri9ByZ8Iz
-MA/bapDxhQ0E1pDq1doDtdZU7xagW5W7S7vJqHYEl9YUx32m7QPJYEBiGU+lL2L3
-d2UA/TovE3EbVJW8GTM1Jf0a1Cv+uqpodz2/OhUCe/wRJuJfePfDxtkZ9+p2z08u
-m0WMIM8YeTXDru0wnogT5VtPVSiXtwnjnK2Wf3sJUSw0WfvtN/899jlz3FNsFKHe
-bO9caxvQ54yycYGbLDLlv1hzbW6srw==
-=OU4P
------END PGP SIGNATURE-----
-
---BuBclajtnfx5hylj--
+> ---
+>   contrib/vhost-user-input/main.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/m=
+ain.c
+> index 449fd2171a..ef4b7769f2 100644
+> --- a/contrib/vhost-user-input/main.c
+> +++ b/contrib/vhost-user-input/main.c
+> @@ -77,7 +77,7 @@ static void vi_input_send(VuInput *vi, struct virtio_in=
+put_event *event)
+>           len =3D iov_from_buf(elem->in_sg, elem->in_num,
+>                              0, &vi->queue[i].event, sizeof(virtio_input_=
+event));
+>           vu_queue_push(dev, vq, elem, len);
+> -        g_free(elem);
+> +        free(elem);
+>       }
+>  =20
+>       vu_queue_notify(&vi->dev.parent, vq);
+> @@ -153,7 +153,7 @@ static void vi_handle_sts(VuDev *dev, int qidx)
+>                            0, &event, sizeof(event));
+>           vi_handle_status(vi, &event);
+>           vu_queue_push(dev, vq, elem, len);
+> -        g_free(elem);
+> +        free(elem);
+>       }
+>  =20
+>       vu_queue_notify(&vi->dev.parent, vq);
+>=20
 
 
