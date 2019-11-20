@@ -2,83 +2,82 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3954BC432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:45:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE20C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:49:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0624922429
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:45:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A874E22429
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:49:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="piXVvh64"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0624922429
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jLIB68W8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A874E22429
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXNTt-0003AZ-65
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 05:45:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59205)
+	id 1iXNXm-00074R-L6
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 05:49:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59908)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iXNSk-0001tG-TX
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:43:55 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iXNUu-0004kf-9W
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:46:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iXNSj-0003Zu-Oa
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:43:54 -0500
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:45090)
+ (envelope-from <peter.maydell@linaro.org>) id 1iXNUt-00071K-13
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:46:08 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40632)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iXNSj-0003Y7-IA
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:43:53 -0500
-Received: by mail-oi1-x242.google.com with SMTP id 14so22028580oir.12
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 02:43:53 -0800 (PST)
+ id 1iXNUs-0006zO-QZ
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:46:06 -0500
+Received: by mail-oi1-x243.google.com with SMTP id d22so15122810oic.7
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 02:46:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=MpVCv9Ixf6/DfcBFJ+SNRHUVUUgICqu7sWMbrPHm8Ag=;
- b=piXVvh64DuFi5ZFJf2NwQAE/AqhwJbRnyoZsgW+bditlhziDCl2dnXxZSnUzMVE367
- NAzn32Ak58HTs+udYOOShW0uuIIu1qJO3WVVgFL7IwbmrvHC7rL1I1ruqLP4USxHN3KR
- so7IiP7MRaSH9e0WKYmAccSf/bApxr9uAwgcjv9JMaa+tsWlNG/jzm2IwuadQoMqM+8y
- ndjrS/kpOIiaRmlyk1agDBb0n3TvLhBHzC9+UGgg9gkeL4WFRPbJVp1f2t6mfaA0ez9i
- gXx8r8p51Cql9+RBlqoiqllgBywQHVfDhIDGZybkJncuoxxE9kVc3FYRuvgSjNbFj4cw
- frxw==
+ bh=ie8L3rDj1Y6wSodTzYXmrciTMZUQS77Rrk8qR7eS8CA=;
+ b=jLIB68W8hN/FzpVBM4qTMLwhqXbfZnk/lYJBAFQjdTv0//YaLnoj2iX8x6cyDeFDPj
+ vI0X0DeCwNfdurqrUDfklfXQUs8laS6Xfb5vVdYhxheqJIQ6Nd5ClPzSj5hAjwwSSCX0
+ MvNvVdu2Cc+pqV8+utW9V5PG+35J+0MxMWKOtQ4RmDaNYgbbyDYfbRMqt8JhFHnGfYH0
+ 9vpGUqy3vm3nunkIcVIS3GiLT8t2CTwz6i+vvwuQ6T8Kd+p5FYUVuwuS14kt4y58iQm5
+ loDVjevvAh/tkmF/oGtt0j/tcwiC0yG65nN6YXs+F0Ec2h/j41mrKghnnFKot7Ajes3L
+ xKtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=MpVCv9Ixf6/DfcBFJ+SNRHUVUUgICqu7sWMbrPHm8Ag=;
- b=E/FP4TN8+mAPAr5wMngCfqj8X8tgxIbvT08fSELQ/7Z47H2Dz59stK2W0Myv2Ocrkj
- uxyOnSVjguYiAc8jVU74n/fq7RzBjg8YnhWm3T3JuYoXLuetndNmn6OYoNeMO/+RVUbW
- hLARNzHYXDQ7cE8RfmjcJ757ZLoEOCq7D2N6LQHV8wp3uWj8DXDIvZ0Pt5L9XN4veLVv
- 8/DGXRX0Gv+cbT/4t8hPcaiypRhcv/c6Eq+UeFrXN69jYNui8pUqTRFpGzL8xMWtmd1Y
- 1MDYtMwHFx3sdG+4LXD7A/K6oEC/ftscqRICrvBpTweQTOJFqoCu+EWAJOgjnTAfBc0s
- Ydiw==
-X-Gm-Message-State: APjAAAWNi5vIvLHO69m9Ux8QoKJJAA8QPGzD1ESUWs3aEG07uKYcK8Yb
- GCFNqwO4yh7Xcj6NKXxe5DC9BH0ztJdsQkpZXOQBlQ==
-X-Google-Smtp-Source: APXvYqzuSDc0HHtWY3DF3dcIbP2LdOYOhWkQqYgURc+NGwFliWi9ucvWfJv8qyuyU7MJze+j0jPtZn305uGerkFhPZ0=
-X-Received: by 2002:aca:a9d4:: with SMTP id s203mr2126160oie.146.1574246632670; 
- Wed, 20 Nov 2019 02:43:52 -0800 (PST)
+ bh=ie8L3rDj1Y6wSodTzYXmrciTMZUQS77Rrk8qR7eS8CA=;
+ b=TgwFwGze4WtbdbT3JkJghy2niX3JR8f6s5QV84aljM3NG4ytSByz/QFl4CTItKzQhw
+ Xgd6Qv7TEDUuUvbGq/6ldf1GXNC0TpTUSwv3CJPA6VA8Aa289s03vqVAadPp2QR8pBre
+ i7e1W0hKD/zWN0NT4mP/B9KBpowW5/AEIKDuBrOYyEdWR4BP0D1VVtHjNV5kZmbC6SQm
+ 06L1H5/LqpCIpKh7uHEjtvEy2Zpns2PUCMU1QWwRahyQp5y1xoHQ6/xUeGhNlEPU/RmI
+ 68FN2bT2uBq8Li+JBEfnxs+q/KTN2LqI4K4DNTioXnbqtNCw3S/k9Iazyb8BIlKxLVYA
+ N+8w==
+X-Gm-Message-State: APjAAAUP0zCqxWTmjTaW5ZYXNCDsKxsG0zXLWXePrRbXXFa1X6aPQtf+
+ 4o5PO8DwIbrQQYy0We2y2AzztDUN844HYW3WCUUdDw==
+X-Google-Smtp-Source: APXvYqz7AgRUo9ENk1yRRbDXkkedk9kb6IpQfwsqFFs6IWetODSBmjfEVr5xN/VyPRvyVvG9wGy3t4uahe8nIhQwtaE=
+X-Received: by 2002:aca:a9d4:: with SMTP id s203mr2133017oie.146.1574246766130; 
+ Wed, 20 Nov 2019 02:46:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-15-marcandre.lureau@redhat.com>
- <CAFEAcA_2ct-fOfBGgNExjCrjg7WKb-Xp44GghHWXiW2+3HjWbg@mail.gmail.com>
- <CAMxuvayTGh6d5H_JXnKRoG7E1MeY-dsw5XqSeR59fdM7njPVeQ@mail.gmail.com>
-In-Reply-To: <CAMxuvayTGh6d5H_JXnKRoG7E1MeY-dsw5XqSeR59fdM7njPVeQ@mail.gmail.com>
+References: <1574190388-12605-1-git-send-email-tsimpson@quicinc.com>
+ <CAFEAcA8AeTgY+3GaN9ZUi-5XtX5jxhqpdOhr3ixYwouWhQOQ5g@mail.gmail.com>
+ <e4a52719-fc16-f94a-fb8d-1a4d9e683ce0@vivier.eu>
+In-Reply-To: <e4a52719-fc16-f94a-fb8d-1a4d9e683ce0@vivier.eu>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Nov 2019 10:43:41 +0000
-Message-ID: <CAFEAcA90uuQnWXjq=1RjiU5949vxaSuuy7EPFGjMJjpqmY7wMg@mail.gmail.com>
-Subject: Re: [PATCH v3 14/33] serial-mm: add "regshift" property
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 20 Nov 2019 10:45:53 +0000
+Message-ID: <CAFEAcA-tVh9AMucDL4hgQ3ngFZwu4AThcGyhwjVa-LbG8o8-Lg@mail.gmail.com>
+Subject: Re: [PATCH] Hexagon: Swap SIGRGMAX-1 and SIGRTMIN+1
+To: Laurent Vivier <laurent@vivier.eu>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::242
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,61 +89,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paul Burton <pburton@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Taylor Simpson <tsimpson@quicinc.com>, Riku Voipio <riku.voipio@iki.fi>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 20 Nov 2019 at 07:54, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
+On Wed, 20 Nov 2019 at 08:10, Laurent Vivier <laurent@vivier.eu> wrote:
+> For the moment we don't have a better solution, Josh Kunz tried to
+> rework [1] patches from Milo=C5=A1 Stojanovi=C4=87 [2] but it doesn't see=
+m to be
+> an easy task.
 >
-> Hi
->
-> On Mon, Nov 18, 2019 at 6:54 PM Peter Maydell <peter.maydell@linaro.org> =
-wrote:
-> >
-> > On Wed, 23 Oct 2019 at 18:34, Marc-Andr=C3=A9 Lureau
-> > <marcandre.lureau@redhat.com> wrote:
-> > > +static Property serial_mm_properties[] =3D {
-> > > +    DEFINE_PROP_UINT8("regshift", SerialMM, regshift, 0),
-> >
-> > This could use a comment describing what the property does.
->
-> "Set the register shift value"? Half-kidding, do you have better
-> comment to make? Otherwise, it's probably not worth.
->
-> From what I understand, it's just applying a shift on the IO addr,
-> probably for alignment/access arch-specific reasons. You probably know
-> better than me ;)
+> So I agree we need a generic solution to fix this problem, but in the
+> meantime I told to Taylor if he doesn't care about Go on hexagon he can
+> do this change specifically to his target (perhaps we can have cleaner
+> approach by containing this change into linux-user/hexagon). And what I
+> understand is hexagon libc (musl) doesn't work without this.
 
-What this is doing is defining the spacing between adjacent
-registers. Some MMIO-based 16550 implementations have the registers
-at byte offsets from each other (that's regshift 0). Some have
-them at halfword offsets (regshift 1); and some use 4-byte
-offsets (regshift 2). Something like this will do:
-
- /*
-  * Set the spacing between adjacent memory-mapped UART registers.
-  * Each register will be at (1 << regshift) bytes after the previous one.
-  */
-
-(basically the comment bridges the gap between what I know as
-somebody trying to use the 16550 model, ie the behaviour of
-the hardware I'm trying to model, and what I need to do to configure
-the QEMU code to give that behaviour.)
+I really don't like target-specific ifdeffery that changes behaviour
+that shouldn't be target specific. They reduce the chances we ever
+try to go back and actually fix the underlying problem correctly,
+and they can be awkward to undo without breaking things.
+As far as I can tell there is nothing special about Hexagon here.
 
 thanks
 -- PMM
