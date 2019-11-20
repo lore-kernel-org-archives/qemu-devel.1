@@ -2,79 +2,55 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB3AC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D1DC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:41:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ABC8F223D1
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:40:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aRDSB6Na"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABC8F223D1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1AE6D223D1
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:41:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AE6D223D1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55266 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXMSy-0001dz-JB
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 04:40:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45023)
+	id 1iXMUi-0003o0-Bc
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 04:41:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45633)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <jtomko@redhat.com>) id 1iXMPg-00062w-2G
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:36:41 -0500
+ (envelope-from <its@irrelevant.dk>) id 1iXMSS-00018b-G3
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:39:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <jtomko@redhat.com>) id 1iXMPc-0004F4-Rq
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:36:39 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54431
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <its@irrelevant.dk>) id 1iXMSN-0005DU-6L
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:39:32 -0500
+Received: from charlie.dont.surf ([128.199.63.193]:38966)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <jtomko@redhat.com>) id 1iXMPa-0004Eg-NK
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:36:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574242594;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=cqOxygx0X6XnKw8PDZFbH4XlG3ohAm074QouO/3N3J8=;
- b=aRDSB6Nas12jImu1Rjud1umAg9CmyJuAJPns1nbmd2OsyNK36/tOHTmTtSURbVPeh7wc0F
- PXdT63yJSw+bElqwlJgsszN8cvKIiSiIzbtrwNj7seNpJIDZeHtT1K4a7BpjGC3u1Jgguj
- Noya2f48np61jNYlI/XNI8mj9xWg/Sk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-82-2iOl4u2XOOG6mxcmGoy7NA-1; Wed, 20 Nov 2019 04:35:27 -0500
-X-MC-Unique: 2iOl4u2XOOG6mxcmGoy7NA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A48E2100550E;
- Wed, 20 Nov 2019 09:35:26 +0000 (UTC)
-Received: from lpt (unknown [10.43.2.17])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A9E0C66D4E;
- Wed, 20 Nov 2019 09:35:16 +0000 (UTC)
-Date: Wed, 20 Nov 2019 10:36:11 +0100
-From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [libvirt] [PATCH for-5.0 3/4] Remove the core bluetooth code
-Message-ID: <20191120093611.GP3832@lpt>
-References: <20191120091014.16883-1-thuth@redhat.com>
- <20191120091014.16883-4-thuth@redhat.com>
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1iXMSG-0005An-R1; Wed, 20 Nov 2019 04:39:21 -0500
+Received: from apples.localdomain (unknown [194.62.217.4])
+ by charlie.dont.surf (Postfix) with ESMTPSA id AB182BF65A;
+ Wed, 20 Nov 2019 09:39:18 +0000 (UTC)
+Date: Wed, 20 Nov 2019 10:39:14 +0100
+From: Klaus Birkelund <its@irrelevant.dk>
+To: Beata Michalska <beata.michalska@linaro.org>
+Subject: Re: [PATCH v2 13/20] nvme: refactor prp mapping
+Message-ID: <20191120093914.GA1052314@apples.localdomain>
+References: <20191015103900.313928-1-its@irrelevant.dk>
+ <20191015103900.313928-14-its@irrelevant.dk>
+ <CADSWDzs6mECPKv2qAojEF75Vxi1i5_2fkvDtjWkQU22F9a4a7g@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20191120091014.16883-4-thuth@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="A6Z7MKnLVMfR85kG"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <CADSWDzs6mECPKv2qAojEF75Vxi1i5_2fkvDtjWkQU22F9a4a7g@mail.gmail.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,85 +62,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, libvir-list@redhat.com,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Paul Durrant <Paul.Durrant@citrix.com>,
+ Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---A6Z7MKnLVMfR85kG
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, Nov 12, 2019 at 03:23:43PM +0000, Beata Michalska wrote:
+> Hi Klaus,
+> 
+> On Tue, 15 Oct 2019 at 11:57, Klaus Jensen <its@irrelevant.dk> wrote:
+> >
+> > Instead of handling both QSGs and IOVs in multiple places, simply use
+> > QSGs everywhere by assuming that the request does not involve the
+> > controller memory buffer (CMB). If the request is found to involve the
+> > CMB, convert the QSG to an IOV and issue the I/O. The QSG is converted
+> > to an IOV by the dma helpers anyway, so the CMB path is not unfairly
+> > affected by this simplifying change.
+> >
+> 
+> Out of curiosity, in how many cases the SG list will have to
+> be converted to IOV ? Does that justify creating the SG list in vain ?
+> 
 
-On Wed, Nov 20, 2019 at 10:10:13AM +0100, Thomas Huth wrote:
->It's been deprecated since QEMU v3.1. We've explicitly asked in the
->deprecation message that people should speak up on qemu-devel in case
->they are still actively using the bluetooth part of QEMU, but nobody
->ever replied that they are really still using it.
->
->I've tried it on my own to use this bluetooth subsystem for one of my
->guests, but I was also not able to get it running anymore: When I was
->trying to pass-through a real bluetooth device, either the guest did
->not see the device at all, or the guest crashed.
->
->Even worse for the emulated device: When running
->
-> qemu-system-x86_64 -bt device:keyboard
->
->QEMU crashes once you hit a key.
->
->So it seems like the bluetooth stack is not only neglected, it is
->completely bitrotten, as far as I can tell. The only attention that
->this code got during the past years were some CVEs that have been
->spotted there. So this code is a burden for the developers, without
->any real benefit anymore. Time to remove it.
->
->Signed-off-by: Thomas Huth <thuth@redhat.com>
->---
-> Makefile.objs        |    2 -
-> bt-host.c            |  198 ----
-> bt-vhci.c            |  167 ----
-> configure            |   31 -
-> hw/Kconfig           |    1 -
-> hw/Makefile.objs     |    1 -
-> hw/bt/Kconfig        |    2 -
-> hw/bt/Makefile.objs  |    3 -
-> hw/bt/core.c         |  143 ---
-> hw/bt/hci-csr.c      |  512 ----------
-> hw/bt/hci.c          | 2263 ------------------------------------------
-> hw/bt/hid.c          |  553 -----------
-> hw/bt/l2cap.c        | 1367 -------------------------
-> hw/bt/sdp.c          |  989 ------------------
-> include/hw/bt.h      | 2177 ----------------------------------------
-> include/sysemu/bt.h  |   20 -
-> qemu-deprecated.texi |    7 -
-> qemu-options.hx      |   79 --
-> vl.c                 |  136 ---
-> 19 files changed, 8651 deletions(-)
+You got me wondering. Only using QSGs does not really remove much
+complexity, so I readded the direct use of IOVs for the CMB path. There
+is no harm in that.
 
-Reviewed-by: J=E1n Tomko <jtomko@redhat.com>
+> > +static uint16_t nvme_map_prp(NvmeCtrl *n, QEMUSGList *qsg, uint64_t prp1,
+> > +    uint64_t prp2, uint32_t len, NvmeRequest *req)
+> >  {
+> >      hwaddr trans_len = n->page_size - (prp1 % n->page_size);
+> >      trans_len = MIN(len, trans_len);
+> >      int num_prps = (len >> n->page_bits) + 1;
+> > +    uint16_t status = NVME_SUCCESS;
+> > +    bool prp_list_in_cmb = false;
+> > +
+> > +    trace_nvme_map_prp(req->cid, req->cmd.opcode, trans_len, len, prp1, prp2,
+> > +        num_prps);
+> >
+> >      if (unlikely(!prp1)) {
+> >          trace_nvme_err_invalid_prp();
+> >          return NVME_INVALID_FIELD | NVME_DNR;
+> > -    } else if (n->cmbsz && prp1 >= n->ctrl_mem.addr &&
+> > -               prp1 < n->ctrl_mem.addr + int128_get64(n->ctrl_mem.size)) {
+> > -        qsg->nsg = 0;
+> > -        qemu_iovec_init(iov, num_prps);
+> > -        qemu_iovec_add(iov, (void *)&n->cmbuf[prp1 - n->ctrl_mem.addr], trans_len);
+> > -    } else {
+> > -        pci_dma_sglist_init(qsg, &n->parent_obj, num_prps);
+> > -        qemu_sglist_add(qsg, prp1, trans_len);
+> >      }
+> > +
+> > +    if (nvme_addr_is_cmb(n, prp1)) {
+> > +        req->is_cmb = true;
+> > +    }
+> > +
+> This seems to be used here and within read/write functions which are calling
+> this one. Maybe there is a nicer way to track that instead of passing
+> the request
+> from multiple places ?
+> 
 
-Jano
+Hmm. Whether or not the command reads/writes from the CMB is really only
+something you can determine by looking at the PRPs (which is done in
+nvme_map_prp), so I think this is the right way to track it. Or do you
+have something else in mind?
 
---A6Z7MKnLVMfR85kG
-Content-Type: application/pgp-signature; name="signature.asc"
+> > +    pci_dma_sglist_init(qsg, &n->parent_obj, num_prps);
+> > +    qemu_sglist_add(qsg, prp1, trans_len);
+> > +
+> >      len -= trans_len;
+> >      if (len) {
+> >          if (unlikely(!prp2)) {
+> >              trace_nvme_err_invalid_prp2_missing();
+> > +            status = NVME_INVALID_FIELD | NVME_DNR;
+> >              goto unmap;
+> >          }
+> > +
+> >          if (len > n->page_size) {
+> >              uint64_t prp_list[n->max_prp_ents];
+> >              uint32_t nents, prp_trans;
+> >              int i = 0;
+> >
+> > +            if (nvme_addr_is_cmb(n, prp2)) {
+> > +                prp_list_in_cmb = true;
+> > +            }
+> > +
+> >              nents = (len + n->page_size - 1) >> n->page_bits;
+> >              prp_trans = MIN(n->max_prp_ents, nents) * sizeof(uint64_t);
+> > -            nvme_addr_read(n, prp2, (void *)prp_list, prp_trans);
+> > +            nvme_addr_read(n, prp2, (void *) prp_list, prp_trans);
+> >              while (len != 0) {
+> > +                bool addr_is_cmb;
+> >                  uint64_t prp_ent = le64_to_cpu(prp_list[i]);
+> >
+> >                  if (i == n->max_prp_ents - 1 && len > n->page_size) {
+> >                      if (unlikely(!prp_ent || prp_ent & (n->page_size - 1))) {
+> >                          trace_nvme_err_invalid_prplist_ent(prp_ent);
+> > +                        status = NVME_INVALID_FIELD | NVME_DNR;
+> > +                        goto unmap;
+> > +                    }
+> > +
+> > +                    addr_is_cmb = nvme_addr_is_cmb(n, prp_ent);
+> > +                    if ((prp_list_in_cmb && !addr_is_cmb) ||
+> > +                        (!prp_list_in_cmb && addr_is_cmb)) {
+> 
+> Minor: Same condition (based on different vars) is being used in
+> multiple places. Might be worth to move it outside and just pass in
+> the needed values.
+> 
 
------BEGIN PGP SIGNATURE-----
+I'm really not sure what I was smoking when writing those conditions.
+It's just `var != nvme_addr_is_cmb(n, prp_ent)`. I fixed that. No need
+to pull it out I think.
 
-iQEzBAEBCAAdFiEEQeJGMrnL0ADuclbP+YPwO/Mat50FAl3VCQsACgkQ+YPwO/Ma
-t509xwgAh4bM/I773MxOazWuQDIkUFm300owdx+O1ymFtgV/JQempqj6ODrRg+uc
-rdwsQK9wmxkVe8V3pN0O55zW4686TcHq/b8ASSlBNA64kWZ3gQawzyeDwFdp9k7k
-b7nPu3iqtv9DcVQteNwfcs1PEQ17qJ9KOp6j2eXik7aPFGHp5cDot7p68yR9imLm
-1eeX9SaqdH0ZJlwwW+G0bzDStiVB0iMqyxpllkOWGQb+R6X4PXwsMDFl2nXH8qcq
-gUbfn+sXtluMIXNAer/rXPvgAx0bz5DFjk6UIH117qb11Ii7LY9MQUVvPbT/tfpM
-rUjMIVxyTFIo5G+p1ny9kcXbU0KjEg==
-=8RCf
------END PGP SIGNATURE-----
+> >  static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
+> > -                                   uint64_t prp1, uint64_t prp2)
+> > +    uint64_t prp1, uint64_t prp2, NvmeRequest *req)
+> >  {
+> >      QEMUSGList qsg;
+> > -    QEMUIOVector iov;
+> >      uint16_t status = NVME_SUCCESS;
+> >
+> > -    if (nvme_map_prp(&qsg, &iov, prp1, prp2, len, n)) {
+> > -        return NVME_INVALID_FIELD | NVME_DNR;
+> > +    status = nvme_map_prp(n, &qsg, prp1, prp2, len, req);
+> > +    if (status) {
+> > +        return status;
+> >      }
+> > -    if (qsg.nsg > 0) {
+> > -        if (dma_buf_write(ptr, len, &qsg)) {
+> > -            status = NVME_INVALID_FIELD | NVME_DNR;
+> > -        }
+> > -        qemu_sglist_destroy(&qsg);
+> > -    } else {
+> > -        if (qemu_iovec_to_buf(&iov, 0, ptr, len) != len) {
+> > +
+> > +    if (req->is_cmb) {
+> > +        QEMUIOVector iov;
+> > +
+> > +        qemu_iovec_init(&iov, qsg.nsg);
+> > +        dma_to_cmb(n, &qsg, &iov);
+> > +
+> > +        if (unlikely(qemu_iovec_to_buf(&iov, 0, ptr, len) != len)) {
+> > +            trace_nvme_err_invalid_dma();
+> >              status = NVME_INVALID_FIELD | NVME_DNR;
+> >          }
+> > +
+> >          qemu_iovec_destroy(&iov);
+> > +
+> Aren't we missing the sglist cleanup here ?
+> (goto as in nvme_dma_read_prp)
+> 
+> Aside: both nvme_write_prp and nvme_read_prp seem to differ only
+> with the final call to either dma or qemu_ioves calls.
+> Might be worth to unify it and move it to a single function with additional
+> parameter that will determine the type of the transaction.
+> 
 
---A6Z7MKnLVMfR85kG--
+True. I have combined them into a single nvme_dma_prp function.
 
+> > +static void nvme_init_req(NvmeCtrl *n, NvmeCmd *cmd, NvmeRequest *req)
+> > +{
+> > +    memset(&req->cqe, 0, sizeof(req->cqe));
+> > +    req->cqe.cid = cmd->cid;
+> > +    req->cid = le16_to_cpu(cmd->cid);
+> > +
+> > +    memcpy(&req->cmd, cmd, sizeof(NvmeCmd));
+> > +    req->status = NVME_SUCCESS;
+> > +    req->is_cmb = false;
+> > +    req->is_write = false;
+> 
+> What is the use case for this one ?
+> It does not seem to be referenced in this patch.
+> 
+
+That crept in there by mistake. I have removed it.
 
