@@ -2,99 +2,93 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D124C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 00:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8189BC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 00:43:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0360922459
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 00:41:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E29D2245F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 00:43:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDXrbQRl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0360922459
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aatNqWaL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E29D2245F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXE3i-0005Q3-4u
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 19:41:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41062)
+	id 1iXE66-0006Qw-Ei
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 19:43:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42055)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iXE2h-0004yj-5c
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:40:24 -0500
+ (envelope-from <gurchetansingh@chromium.org>) id 1iXE5L-0005xp-IG
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:43:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dirty.ice.hu@gmail.com>) id 1iXE2g-0007xs-82
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:40:23 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33721)
+ (envelope-from <gurchetansingh@chromium.org>) id 1iXE5K-0001Sx-0U
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:43:07 -0500
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:41417)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <dirty.ice.hu@gmail.com>)
- id 1iXE2g-0007x6-1x
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:40:22 -0500
-Received: by mail-wr1-x444.google.com with SMTP id w9so26096954wrr.0
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 16:40:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:subject:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=LjLoxN2IJL4Dbu9LWCN595/7N/dZUTENfBxnOW6hIpE=;
- b=iDXrbQRl02PnnNl6GBajS63cA6fk2nFgE0uIY5qG/E3dh8kcKSzj781NPVWlgozOwK
- 3LqJJpENCsgkjXWVdQI61DS57eB5DavZEc47FoGReKskteps+v2S3hGWkz28PlUcSTr3
- qyIqUFLoMe9HQ8Qf5OAyAsk8E/HsbupTQdBCjDlgcDs760q0+KI6xJWwywBpSHAbU5E2
- 8UNQDu6t5+CV7Viq/VFf5Qd4YHsxJx+uY4kdwJ1NBuQONU1ACrXHtFxNL7jxlEUBwQ8a
- Jrl4cBw1vPdE8QQW4N9g/u1vCQ7vsmDveZ5GYqU6rJUVqjkObnZkdj8o4jF6DOjGRrEK
- 8AHQ==
+ (Exim 4.71) (envelope-from <gurchetansingh@chromium.org>)
+ id 1iXE5J-0001RK-M0
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:43:05 -0500
+Received: by mail-lf1-x142.google.com with SMTP id j14so18665322lfb.8
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 16:43:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=SuCiKSsIRDKTbEIrlKuHNFUxZMf3N0BWgvOBBoTFOxg=;
+ b=aatNqWaL0QyzhfFvsyJVZNwE0B3j5uWP4gtCcj8hIO+DL3zX4s+xOfl1Pb2PHnepNb
+ YAAhjnh9lsk5gVv4jY4LAKfHk5UEtn+Aqq76ly7inUWooSmlMUp4o+Ozp+DPyrFCXoad
+ R2JSfxtSpuaY4HTG9QFIXSei5hjZJA573tT6E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:subject:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=LjLoxN2IJL4Dbu9LWCN595/7N/dZUTENfBxnOW6hIpE=;
- b=RLLrap36YYw1E7fELcr7eIHQKhKt1L23TQK72VDKgVSR2qUDmbGsaCV54A2MOxpFeN
- 8i4WnZZoRGH0c06W9zyeSE+TehPzG38n0WVLls+h1bggck0c2wpTenhDtFI86Ohij7Aq
- Z6CENzu5sLxPlH9qLOjEhPjXeRFEZJgsFZDd782I7qUyvk60+gbnUZFxwYNqOx/i6HS4
- GS6k5topb2XtHPVWHUDPyzLEPQhG+mI8BRNk7RJkmDK4PbKvrqNukEdmJJ4DZk4t3mG5
- nip6CDavqYNoqBPnrfcjiBf78NyG9dCuy2EzGTg75pYSha7LDNe70f8bP8NrEwvxipO8
- 0rtg==
-X-Gm-Message-State: APjAAAWzupcBtgKCNk5zCqgHXoXyq+x/qGz/+LpOxvF0LmaqNBn8VqLC
- kciJyuhXflZtU+mXWEv3uYtR6Xa3
-X-Google-Smtp-Source: APXvYqyBxNTYrhhuXKV4aZ8wm7I9rBG/k7sljYAXA48ADd+NehsaPhEommGicSWeKCg6bxRQRWfZjg==
-X-Received: by 2002:adf:e5c5:: with SMTP id a5mr211229wrn.103.1574210420741;
- Tue, 19 Nov 2019 16:40:20 -0800 (PST)
-Received: from ?IPv6:fd00:835b:d940:d4fc:1::1b?
- (2a01-036c-0113-0d0a-0001-0000-0000-001b.pool6.digikabel.hu.
- [2a01:36c:113:d0a:1::1b])
- by smtp.gmail.com with ESMTPSA id 17sm4735936wmg.19.2019.11.19.16.40.19
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 19 Nov 2019 16:40:20 -0800 (PST)
-From: "=?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=" <dirty.ice.hu@gmail.com>
-X-Google-Original-From: =?UTF-8?B?Wm9sdMOhbiBLxZF2w6Fnw7M=?=
- <DirtY.iCE.hu@gmail.com>
-Subject: Re: [PATCH] audio: fix audio recording
-To: Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>,
- Gerd Hoffmann <kraxel@redhat.com>
-References: <2fc947cf-7b42-de68-3f11-cbcf1c096be9@t-online.de>
- <a9ed793b-ebe7-b9da-3181-af246e16a59a@redhat.com>
- <780a707e-f80f-e83f-7fe5-31360050fdb0@linaro.org>
-Message-ID: <a5cd66a2-45a3-1d42-7eb6-1aa2317866bb@gmail.com>
-Date: Wed, 20 Nov 2019 01:40:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=SuCiKSsIRDKTbEIrlKuHNFUxZMf3N0BWgvOBBoTFOxg=;
+ b=GqIngBdf0mdDBiiQFwNmGpaPApdetsiq/JDHD6TApvDwJBFP0/zkdA3+KrdtqBpD8z
+ okQ/60iSbOt15ImYmsGWhUHdqbRdf2BBXFRSd32uBKX2wnJzguGPxTlGm3QNOLLzsqau
+ XnIjyK0cMVODKT2C+eRQyVr+kjkdj9nOsgBX2xxvki8Op+iGyUJh1ER6svJHI6QI+ENj
+ /Lu9bMknldgGOI46/mDLTudz0MITyU9tzQSLdcVgHRvk/8mqNWZEBajbJI2vNTn6/qqU
+ VmQjeqR7/IAiEaGYMHunwvS6UWn9ESq+/gQxYJM5Y7GcfpxVTqjiVIXcx93wHCZhd9N6
+ qmqg==
+X-Gm-Message-State: APjAAAU1yuNl5RH7TlDgVKmpxFFvK36Ysm2qRRwz4vLc7tm6NZWjqt9c
+ uTCJZhgvW254gFaSoHLYq5tKFYdStPQ=
+X-Google-Smtp-Source: APXvYqx2OnJbLsfHKMAW3bBDU+lmBfVEVdifisO/kL5dhxCDeePrabP+iMp4JJuTMCFzjlO6cJOb4w==
+X-Received: by 2002:a19:84d:: with SMTP id 74mr326424lfi.122.1574210583600;
+ Tue, 19 Nov 2019 16:43:03 -0800 (PST)
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com.
+ [209.85.208.181])
+ by smtp.gmail.com with ESMTPSA id q24sm10470424ljm.76.2019.11.19.16.43.02
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 19 Nov 2019 16:43:02 -0800 (PST)
+Received: by mail-lj1-f181.google.com with SMTP id v8so25499078ljh.5
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 16:43:02 -0800 (PST)
+X-Received: by 2002:a2e:2e03:: with SMTP id u3mr209839lju.115.1574210581666;
+ Tue, 19 Nov 2019 16:43:01 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <780a707e-f80f-e83f-7fe5-31360050fdb0@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
+ <20191106084344.GB189998@stefanha-x1.localdomain>
+ <CAD=HUj41r8wHZ2-By8tLftkoqC5r_Bw=pr=zX2aZ7GTs1ESWhg@mail.gmail.com>
+ <c8a6b6f35664ce036c2a48ec41eab97b0f40704d.camel@linux.intel.com>
+ <CAAfnVBkMWurTpseQFjcna5kk3__40n6M68=RTHLbQsu__2AFxg@mail.gmail.com>
+ <4a5dd822e86757f004d04af62fb7dd35ba75392d.camel@linux.intel.com>
+ <CAAfnVB=F+HeQrrn23c=rZeOa5BfHo=9ArcG--gLf87gqBXfZ9A@mail.gmail.com>
+ <bee3aae13f6cf69ee909aa9884926853d6123b25.camel@linux.intel.com>
+In-Reply-To: <bee3aae13f6cf69ee909aa9884926853d6123b25.camel@linux.intel.com>
+From: Gurchetan Singh <gurchetansingh@chromium.org>
+Date: Tue, 19 Nov 2019 16:42:49 -0800
+X-Gmail-Original-Message-ID: <CAAfnVBmcBWWpvTAijg8AY-6RoKGJ84AS_qo2WqF6sgLHVsHJsw@mail.gmail.com>
+Message-ID: <CAAfnVBmcBWWpvTAijg8AY-6RoKGJ84AS_qo2WqF6sgLHVsHJsw@mail.gmail.com>
+Subject: Re: [virtio-dev] Re: guest / host buffer sharing ...
+To: Liam Girdwood <liam.r.girdwood@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Received-From: 2a00:1450:4864:20::142
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,50 +100,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
+ Alex Lau <alexlau@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
+ Alexandre Courbot <acourbot@chromium.org>,
+ Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
+ Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
+ David Stevens <stevensd@chromium.org>, Hans Verkuil <hverkuil@xs4all.nl>,
+ =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
+ Dylan Reid <dgreid@chromium.org>,
+ Linux Media Mailing List <linux-media@vger.kernel.org>,
+ Dmitry Morozov <dmitry.morozov@opensynergy.com>,
+ Pawel Osciak <posciak@chromium.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2019-11-19 20:43, Richard Henderson wrote:
-> On 11/19/19 9:01 AM, Philippe Mathieu-Daudé wrote:
->> Cc'ing Zoltán.
->>
->> On 11/19/19 7:58 AM, Volker Rümelin wrote:
->>> With current code audio recording with all audio backends
->>> except PulseAudio and DirectSound is broken. The generic audio
->>> recording buffer management forgot to update the current read
->>> position after a read.
->>>
->>> Fixes: ff095e5231 "audio: api for mixeng code free backends"
->>>
->>> Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
->>> ---
->>>    audio/audio.c | 1 +
->>>    1 file changed, 1 insertion(+)
->>>
->>> diff --git a/audio/audio.c b/audio/audio.c
->>> index 7fc3aa9d16..56fae55047 100644
->>> --- a/audio/audio.c
->>> +++ b/audio/audio.c
->>> @@ -1390,6 +1390,7 @@ void *audio_generic_get_buffer_in(HWVoiceIn *hw, size_t
->>> *size)
->>>            size_t read = hw->pcm_ops->read(hw, hw->buf_emul + hw->pos_emul,
->>>                                            read_len);
->>>            hw->pending_emul += read;
->>> +        hw->pos_emul = (hw->pos_emul + read) % hw->size_emul;
->>
->> Anyway since read() can return a negative value, both previous assignments
->> should go after this if/break check...
-> 
-> This isn't read(2).
-> 
->      size_t (*read)    (HWVoiceIn *hw, void *buf, size_t size);
-> 
-> Since this isn't ssize_t, no negative return value possible.
+On Tue, Nov 19, 2019 at 7:31 AM Liam Girdwood
+<liam.r.girdwood@linux.intel.com> wrote:
+>
+> On Tue, 2019-11-12 at 14:55 -0800, Gurchetan Singh wrote:
+> > On Tue, Nov 12, 2019 at 5:56 AM Liam Girdwood
+> > <liam.r.girdwood@linux.intel.com> wrote:
+> > >
+> > > On Mon, 2019-11-11 at 16:54 -0800, Gurchetan Singh wrote:
+> > > > On Tue, Nov 5, 2019 at 2:55 AM Gerd Hoffmann <kraxel@redhat.com>
+> > > > wrote:
+> > > > > Each buffer also has some properties to carry metadata, some
+> > > > > fixed
+> > > > > (id, size, application), but
+> > > > > also allow free form (name = value, framebuffers would have
+> > > > > width/height/stride/format for example).
+> > > >
+> > > > Sounds a lot like the recently added DMA_BUF_SET_NAME ioctls:
+> > > >
+> > > > https://patchwork.freedesktop.org/patch/310349/
+> > > >
+> > > > For virtio-wayland + virtio-vdec, the problem is sharing -- not
+> > > > allocation.
+> > > >
+> > >
+> > > Audio also needs to share buffers with firmware running on DSPs.
+> > >
+> > > > As the buffer reaches a kernel boundary, it's properties devolve
+> > > > into
+> > > > [fd, size].  Userspace can typically handle sharing
+> > > > metadata.  The
+> > > > issue is the guest dma-buf fd doesn't mean anything on the host.
+> > > >
+> > > > One scenario could be:
+> > > >
+> > > > 1) Guest userspace (say, gralloc) allocates using virtio-
+> > > > gpu.  When
+> > > > allocating, we call uuidgen() and then pass that via
+> > > > RESOURCE_CREATE
+> > > > hypercall to the host.
+> > > > 2) When exporting the dma-buf, we call DMA_BUF_SET_NAME (the
+> > > > buffer
+> > > > name will be "virtgpu-buffer-${UUID}").
+> > > > 3) When importing, virtio-{vdec, video} reads the dma-buf name in
+> > > > userspace, and calls fd to handle.  The name is sent to the host
+> > > > via
+> > > > a
+> > > > hypercall, giving host virtio-{vdec, video} enough information to
+> > > > identify the buffer.
+> > > >
+> > > > This solution is entirely userspace -- we can probably come up
+> > > > with
+> > > > something in kernel space [generate_random_uuid()] if need
+> > > > be.  We
+> > > > only need two universal IDs: {device ID, buffer ID}.
+> > > >
+> > >
+> > > I need something where I can take a guest buffer and then convert
+> > > it to
+> > > physical scatter gather page list. I can then either pass the SG
+> > > page
+> > > list to the DSP firmware (for DMAC IP programming) or have the host
+> > > driver program the DMAC directly using the page list (who programs
+> > > DMAC
+> > > depends on DSP architecture).
+> >
+> > So you need the HW address space from a guest allocation?
+>
+> Yes.
+>
+> >  Would your
+> > allocation hypercalls use something like the virtio_gpu_mem_entry
+> > (virtio_gpu.h) and the draft virtio_video_mem_entry (draft)?
+>
+> IIUC, this looks like generic SG buffer allocation ?
+>
+> >
+> > struct {
+> >         __le64 addr;
+> >         __le32 length;
+> >         __le32 padding;
+> > };
+> >
+> > /* VIRTIO_GPU_CMD_RESOURCE_ATTACH_BACKING */
+> > struct virtio_gpu_resource_attach_backing {
+> >         struct virtio_gpu_ctrl_hdr hdr;
+> >         __le32 resource_id;
+> >         __le32 nr_entries;
+> >       *struct struct virtio_gpu_mem_entry */
+> > };
+> >
+> > struct virtio_video_mem_entry {
+> >     __le64 addr;
+> >     __le32 length;
+> >     __u8 padding[4];
+> > };
+> >
+> > struct virtio_video_resource_attach_backing {
+> >     struct virtio_video_ctrl_hdr hdr;
+> >     __le32 resource_id;
+> >     __le32 nr_entries;
+> > };
+> >
+> > >
+> > > DSP FW has no access to userspace so we would need some additional
+> > > API
+> > > on top of DMA_BUF_SET_NAME etc to get physical hardware pages ?
+> >
+> > The dma-buf api currently can share guest memory sg-lists.
+>
+> Ok, IIUC buffers can either be shared using the GPU proposed APIs
+> (above) or using the dma-buf API to share via userspace ?
 
-Yes, read failures are handled inside the backends.  If the backend 
-really can't read anything, it'll return zero, which is harmless here.
+If we restrict ourselves to guest-sg lists only, then the current
+dma-buf API is sufficient to share buffers.  From example, virtio-gpu
+can allocate with the following hypercall (as it does now):
 
-Zoltan
+struct virtio_gpu_resource_attach_backing {
+         struct virtio_gpu_ctrl_hdr hdr;
+         __le32 resource_id;
+         __le32 nr_entries;
+       *struct struct virtio_gpu_mem_entry */
+};
+
+Then in the guest kernel, virtio-{video, snd} can get the sg-list via
+dma_buf_map_attachment, and then have a hypercall of it's own:
+
+struct virtio_video_resource_import {
+         struct virtio_video_ctrl_hdr hdr;
+         __le32 video_resource_id;
+         __le32 nr_entries;
+       *struct struct virtio_gpu_mem_entry */
+};
+
+Then it can create dmabuf on the host or get the HW address from the SG list.
+
+The complications come in from sharing host allocated buffers ... for
+that we may need a method to translate from guest fds to universal
+"virtualized" resource IDs.  I've heard talk about the need to
+translate from guest fence fds to host fence fds as well.
+
+> My preference
+> would be to use teh more direct GPU APIs sending physical page
+> addresses from Guest to device driver. I guess this is your use case
+> too ?
+
+For my use case, guest memory is sufficient, especially given the
+direction towards modifiers + system memory.  For closed source
+drivers, we may need to directly map host buffers.  However, that use
+case is restricted to virtio-gpu and won't work with other virtio
+devices.
+
+
+>
+> Thanks
+>
+> Liam
+>
+> >
+> > >
+> > > Liam
+> > >
+> > >
+> > >
+> > > -----------------------------------------------------------------
+> > > ----
+> > > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> > > For additional commands, e-mail:
+> > > virtio-dev-help@lists.oasis-open.org
+> > >
+> >
+> > ---------------------------------------------------------------------
+> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+> >
+>
+>
+> ---------------------------------------------------------------------
+> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
+> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
+>
 
