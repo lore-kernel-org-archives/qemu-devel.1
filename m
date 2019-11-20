@@ -2,65 +2,83 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E22FC43215
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:49:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 427A1C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:49:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 282BD22429
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:49:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 282BD22429
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0EE9C22429
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:49:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LQ8EGEqz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EE9C22429
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXNYI-0007sr-I8
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 05:49:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59740)
+	id 1iXNYP-00081h-HT
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 05:49:45 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60131)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iXNUZ-0004Ra-5X
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:45:50 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iXNVu-0005uO-Nn
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:47:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iXNUX-0006Oa-0K
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:45:46 -0500
-Received: from 9.mo69.mail-out.ovh.net ([46.105.56.78]:58811)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iXNUV-0006FF-Eb
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:45:44 -0500
-Received: from player732.ha.ovh.net (unknown [10.108.54.74])
- by mo69.mail-out.ovh.net (Postfix) with ESMTP id 4BBE872A7B
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 11:45:36 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player732.ha.ovh.net (Postfix) with ESMTPSA id CF530C38123E;
- Wed, 20 Nov 2019 10:45:31 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v5 09/23] ppc/xive: Implement the XivePresenter
- interface
-To: Greg Kurz <groug@kaod.org>
-References: <20191115162436.30548-1-clg@kaod.org>
- <20191115162436.30548-10-clg@kaod.org> <20191120111852.6bd519c2@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <625d0e83-671a-8d28-0b90-2f004bab30f7@kaod.org>
-Date: Wed, 20 Nov 2019 11:45:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <peter.maydell@linaro.org>) id 1iXNVt-0000Dz-NH
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:47:10 -0500
+Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:34331)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iXNVt-0000DD-HI
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:47:09 -0500
+Received: by mail-oi1-x22a.google.com with SMTP id l202so22099304oig.1
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 02:47:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=xSdl2SeYHvgvJ5ZbpK7zx/2E11p/fPQL+s40eFSsUDk=;
+ b=LQ8EGEqzFA8YglAYBIiVexBqTLiAfefgLc5Xf5Kgz5xPhzle0yB/affBBtTOehJ0Lw
+ xsYilaK8o9N9n/42ptgV0400/3NkHls7ZjW07VF4OHbM69CVpgL33kNtVdJ9UKlUIDAX
+ /IwcvMrYSNi/cbZ4n8V5lTyxgWhP3fWj9xExuEl2qzjpDjuvO7PPjLNcW97u6ukmpQ1e
+ t40KuNLzejcKc1BMxmNNkJ54KjEHJXtjbfJhl2ok8R3uTGfFzjsynMO1QB7+9Uc+NGKw
+ 1+TAbVbwiC6tFBpELQVEjnBaaFLk0VZ34033uccepOkBp87vPaoAoHDm4ybNZ3C99mZR
+ MDmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=xSdl2SeYHvgvJ5ZbpK7zx/2E11p/fPQL+s40eFSsUDk=;
+ b=af7sAglNCJwgBvof/Vi4cjV15wVZ/mvd57yEJ5tUL55cQKvSLKdqjl70nJDjT7cI9O
+ XxPVMy7Kx+z/X15vTTskLAV/1cDJhtOpPZkwtpel7OiZqqb/OneT5z7nlHUkBI53aS7Y
+ CbLRx3AxWxQ48PcPW5WP9RLVZqeSGVw3c7BuumDnqRUojHNUzKnMhxW69tndijhtnhmq
+ kCtuh6k77MxaiRvNcS1QQzKt4vGFgO8mu2bXsjTbM06dDooY8n5+Vv6gjEVfRh+hRdUZ
+ WAZiLMPOW/SntHBFOd2tkEHNznQgdH/JXA7o2MSw7Gean4v0Iko3rAej5jRuKxQ1iGrg
+ USWQ==
+X-Gm-Message-State: APjAAAWDSRz802X04tJumdM80bmjxT1NYnWQ9RpV999SzPjEskEQMxNK
+ dt0P+GdZXLFH22ge9e2LiyeCG/eCLPTVeRRc/L6m8A==
+X-Google-Smtp-Source: APXvYqwgNP5MIpVw/5rAm1snLCPv4NXJXwbIovvuff5mFC9I2kFGW4CsRRuY+bRb6fCAc6srtSg/1NVOZJVZpOtg4gs=
+X-Received: by 2002:aca:a9d4:: with SMTP id s203mr2136400oie.146.1574246828696; 
+ Wed, 20 Nov 2019 02:47:08 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191120111852.6bd519c2@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 1823676377487018835
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehtddgudelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejfedvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
+ <20191023173154.30051-17-marcandre.lureau@redhat.com>
+ <CAFEAcA-dShnHHGEYrsmc+27aUrH7WUMn3=Pvn92B8XH=qtYFBQ@mail.gmail.com>
+ <CAMxuvayKZXnkm_v5V1L=dE2-dJgMjcSBy0aufVjmGhLkuZW0hw@mail.gmail.com>
+In-Reply-To: <CAMxuvayKZXnkm_v5V1L=dE2-dJgMjcSBy0aufVjmGhLkuZW0hw@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 20 Nov 2019 10:46:57 +0000
+Message-ID: <CAFEAcA8RZFDv4njYWyhor3b75Y+N9NfJdkpGGj86gu=mCLoU+g@mail.gmail.com>
+Subject: Re: [PATCH v3 16/33] serial-mm: use sysbus facilities
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 46.105.56.78
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::22a
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,276 +90,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paul Burton <pburton@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/11/2019 11:18, Greg Kurz wrote:
-> On Fri, 15 Nov 2019 17:24:22 +0100
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> Each XIVE Router model, sPAPR and PowerNV, now implements the 'match_n=
-vt'
->> handler of the XivePresenter QOM interface. This is simply moving code
->> and taking into account the new API.
->>
->> To be noted that the xive_router_get_tctx() helper is not used anymore
->> when doing CAM matching and will be removed later on after other chang=
-es.
->>
->> The XIVE presenter model is still too simple for the PowerNV machine
->> and the CAM matching algo is not correct on multichip system. Subseque=
-nt
->> patches will introduce more changes to scan all chips of the system.
->>
->> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/intc/pnv_xive.c   | 41 +++++++++++++++++++++++++++++++++++
->>  hw/intc/spapr_xive.c | 49 ++++++++++++++++++++++++++++++++++++++++++
->>  hw/intc/xive.c       | 51 ++++++-------------------------------------=
--
->>  3 files changed, 97 insertions(+), 44 deletions(-)
->>
->> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
->> index a394331ddd6a..087cbfbaad48 100644
->> --- a/hw/intc/pnv_xive.c
->> +++ b/hw/intc/pnv_xive.c
->> @@ -372,6 +372,45 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, uin=
-t8_t blk, uint32_t idx,
->>      return pnv_xive_vst_read(xive, VST_TSEL_IVT, blk, idx, eas);
->>  }
->> =20
->> +static int pnv_xive_match_nvt(XivePresenter *xptr, uint8_t format,
->> +                              uint8_t nvt_blk, uint32_t nvt_idx,
->> +                              bool cam_ignore, uint8_t priority,
->> +                              uint32_t logic_serv, XiveTCTXMatch *mat=
-ch)
->> +{
->> +    CPUState *cs;
->> +    int count =3D 0;
->> +
->> +    CPU_FOREACH(cs) {
->> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->> +        XiveTCTX *tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
->> +        int ring;
->> +
->=20
-> I guess it's ok not to check tctx here because the powernv machine type
-> doesn't support cpu hotplug.
+On Wed, 20 Nov 2019 at 08:30, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
+>
+> Hi
+>
+> On Mon, Nov 18, 2019 at 7:09 PM Peter Maydell <peter.maydell@linaro.org> =
+wrote:
+> > Otherwise
+> > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>
+> Does your r-b stands if I keep "self"? Or do you feel strongly about it?
 
-patch 10 and patch 11 add some more changes in that area.
+Yes, I do strongly think you need to change that (see argument in other thr=
+ead).
 
-C.
-
->=20
-> LGTM despite the non-strict CamelCase type :)
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
->> +        /*
->> +         * Check the thread context CAM lines and record matches.
->> +         */
->> +        ring =3D xive_presenter_tctx_match(xptr, tctx, format, nvt_bl=
-k, nvt_idx,
->> +                                         cam_ignore, logic_serv);
->> +        /*
->> +         * Save the context and follow on to catch duplicates, that w=
-e
->> +         * don't support yet.
->> +         */
->> +        if (ring !=3D -1) {
->> +            if (match->tctx) {
->> +                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a=
- "
->> +                              "thread context NVT %x/%x\n",
->> +                              nvt_blk, nvt_idx);
->> +                return -1;
->> +            }
->> +
->> +            match->ring =3D ring;
->> +            match->tctx =3D tctx;
->> +            count++;
->> +        }
->> +    }
->> +
->> +    return count;
->> +}
->> +
->>  static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
->>  {
->>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->> @@ -1810,6 +1849,7 @@ static void pnv_xive_class_init(ObjectClass *kla=
-ss, void *data)
->>      PnvXScomInterfaceClass *xdc =3D PNV_XSCOM_INTERFACE_CLASS(klass);
->>      XiveRouterClass *xrc =3D XIVE_ROUTER_CLASS(klass);
->>      XiveNotifierClass *xnc =3D XIVE_NOTIFIER_CLASS(klass);
->> +    XivePresenterClass *xpc =3D XIVE_PRESENTER_CLASS(klass);
->> =20
->>      xdc->dt_xscom =3D pnv_xive_dt_xscom;
->> =20
->> @@ -1825,6 +1865,7 @@ static void pnv_xive_class_init(ObjectClass *kla=
-ss, void *data)
->>      xrc->get_tctx =3D pnv_xive_get_tctx;
->> =20
->>      xnc->notify =3D pnv_xive_notify;
->> +    xpc->match_nvt  =3D pnv_xive_match_nvt;
->>  };
->> =20
->>  static const TypeInfo pnv_xive_info =3D {
->> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->> index 729246e906c9..bb3b2dfdb77f 100644
->> --- a/hw/intc/spapr_xive.c
->> +++ b/hw/intc/spapr_xive.c
->> @@ -405,6 +405,52 @@ static XiveTCTX *spapr_xive_get_tctx(XiveRouter *=
-xrtr, CPUState *cs)
->>      return spapr_cpu_state(cpu)->tctx;
->>  }
->> =20
->> +static int spapr_xive_match_nvt(XivePresenter *xptr, uint8_t format,
->> +                                uint8_t nvt_blk, uint32_t nvt_idx,
->> +                                bool cam_ignore, uint8_t priority,
->> +                                uint32_t logic_serv, XiveTCTXMatch *m=
-atch)
->> +{
->> +    CPUState *cs;
->> +    int count =3D 0;
->> +
->> +    CPU_FOREACH(cs) {
->> +        PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->> +        XiveTCTX *tctx =3D spapr_cpu_state(cpu)->tctx;
->> +        int ring;
->> +
->> +        /*
->> +         * Skip partially initialized vCPUs. This can happen when
->> +         * vCPUs are hotplugged.
->> +         */
->> +        if (!tctx) {
->> +            continue;
->> +        }
->> +
->> +        /*
->> +         * Check the thread context CAM lines and record matches.
->> +         */
->> +        ring =3D xive_presenter_tctx_match(xptr, tctx, format, nvt_bl=
-k, nvt_idx,
->> +                                         cam_ignore, logic_serv);
->> +        /*
->> +         * Save the matching thread interrupt context and follow on t=
-o
->> +         * check for duplicates which are invalid.
->> +         */
->> +        if (ring !=3D -1) {
->> +            if (match->tctx) {
->> +                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a=
- thread "
->> +                              "context NVT %x/%x\n", nvt_blk, nvt_idx=
-);
->> +                return -1;
->> +            }
->> +
->> +            match->ring =3D ring;
->> +            match->tctx =3D tctx;
->> +            count++;
->> +        }
->> +    }
->> +
->> +    return count;
->> +}
->> +
->>  static const VMStateDescription vmstate_spapr_xive_end =3D {
->>      .name =3D TYPE_SPAPR_XIVE "/end",
->>      .version_id =3D 1,
->> @@ -684,6 +730,7 @@ static void spapr_xive_class_init(ObjectClass *kla=
-ss, void *data)
->>      DeviceClass *dc =3D DEVICE_CLASS(klass);
->>      XiveRouterClass *xrc =3D XIVE_ROUTER_CLASS(klass);
->>      SpaprInterruptControllerClass *sicc =3D SPAPR_INTC_CLASS(klass);
->> +    XivePresenterClass *xpc =3D XIVE_PRESENTER_CLASS(klass);
->> =20
->>      dc->desc    =3D "sPAPR XIVE Interrupt Controller";
->>      dc->props   =3D spapr_xive_properties;
->> @@ -708,6 +755,8 @@ static void spapr_xive_class_init(ObjectClass *kla=
-ss, void *data)
->>      sicc->print_info =3D spapr_xive_print_info;
->>      sicc->dt =3D spapr_xive_dt;
->>      sicc->post_load =3D spapr_xive_post_load;
->> +
->> +    xpc->match_nvt  =3D spapr_xive_match_nvt;
->>  }
->> =20
->>  static const TypeInfo spapr_xive_info =3D {
->> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->> index 344bb3f3bc4b..da6196ca958f 100644
->> --- a/hw/intc/xive.c
->> +++ b/hw/intc/xive.c
->> @@ -1428,51 +1428,14 @@ static bool xive_presenter_match(XiveRouter *x=
-rtr, uint8_t format,
->>                                   bool cam_ignore, uint8_t priority,
->>                                   uint32_t logic_serv, XiveTCTXMatch *=
-match)
->>  {
->> -    CPUState *cs;
->> +    XivePresenter *xptr =3D XIVE_PRESENTER(xrtr);
->> +    XivePresenterClass *xpc =3D XIVE_PRESENTER_GET_CLASS(xptr);
->> +    int count;
->> =20
->> -    /*
->> -     * TODO (PowerNV): handle chip_id overwrite of block field for
->> -     * hardwired CAM compares
->> -     */
->> -
->> -    CPU_FOREACH(cs) {
->> -        XiveTCTX *tctx =3D xive_router_get_tctx(xrtr, cs);
->> -        int ring;
->> -
->> -        /*
->> -         * Skip partially initialized vCPUs. This can happen when
->> -         * vCPUs are hotplugged.
->> -         */
->> -        if (!tctx) {
->> -            continue;
->> -        }
->> -
->> -        /*
->> -         * HW checks that the CPU is enabled in the Physical Thread
->> -         * Enable Register (PTER).
->> -         */
->> -
->> -        /*
->> -         * Check the thread context CAM lines and record matches. We
->> -         * will handle CPU exception delivery later
->> -         */
->> -        ring =3D xive_presenter_tctx_match(XIVE_PRESENTER(xrtr), tctx=
-, format,
->> -                                         nvt_blk, nvt_idx,
->> -                                         cam_ignore, logic_serv);
->> -        /*
->> -         * Save the context and follow on to catch duplicates, that w=
-e
->> -         * don't support yet.
->> -         */
->> -        if (ring !=3D -1) {
->> -            if (match->tctx) {
->> -                qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a=
- thread "
->> -                              "context NVT %x/%x\n", nvt_blk, nvt_idx=
-);
->> -                return false;
->> -            }
->> -
->> -            match->ring =3D ring;
->> -            match->tctx =3D tctx;
->> -        }
->> +    count =3D xpc->match_nvt(xptr, format, nvt_blk, nvt_idx, cam_igno=
-re,
->> +                           priority, logic_serv, match);
->> +    if (count < 0) {
->> +        return false;
->>      }
->> =20
->>      if (!match->tctx) {
->=20
-
+thanks
+-- PMM
 
