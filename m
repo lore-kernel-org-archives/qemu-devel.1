@@ -7,44 +7,44 @@ X-Spam-Status: No, score=0.7 required=3.0 tests=FORGED_HOTMAIL_RCVD2,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFF7C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 06:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A5C5C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 06:12:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FE042240A
+	by mail.kernel.org (Postfix) with ESMTPS id D71072244A
 	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 06:12:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FE042240A
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D71072244A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXJDm-0001Nh-Oi
+	id 1iXJDm-0001O6-Uh
 	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 01:12:10 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39960)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39966)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iXJCc-0000Mt-MX
+ (envelope-from <bounces@canonical.com>) id 1iXJCc-0000Mu-QT
  for qemu-devel@nongnu.org; Wed, 20 Nov 2019 01:10:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iXJCb-0005Q0-IA
+ (envelope-from <bounces@canonical.com>) id 1iXJCb-0005Q8-Iu
  for qemu-devel@nongnu.org; Wed, 20 Nov 2019 01:10:58 -0500
-Received: from indium.canonical.com ([91.189.90.7]:51834)
+Received: from indium.canonical.com ([91.189.90.7]:51846)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iXJCb-0005LK-9N
+ id 1iXJCb-0005Mk-AE
  for qemu-devel@nongnu.org; Wed, 20 Nov 2019 01:10:57 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iXJCZ-0003P3-CP
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:10:55 +0000
+ id 1iXJCa-0003PN-4J
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:10:56 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 54B1D2E80C0
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:10:55 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 1A7502E80C8
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:10:56 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Nov 2019 05:53:04 -0000
+Date: Wed, 20 Nov 2019 05:56:54 -0000
 From: wzis <wzis@hotmail.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -57,7 +57,7 @@ X-Launchpad-Bug-Commenters: philmd th-huth wzis
 X-Launchpad-Bug-Reporter: wzis (wzis)
 X-Launchpad-Bug-Modifier: wzis (wzis)
 References: <157413352600.6824.7282626865462030571.malonedeb@gac.canonical.com>
-Message-Id: <157422918489.21620.2451682356700139078.malone@soybean.canonical.com>
+Message-Id: <157422941406.6190.15011599684183189225.malone@gac.canonical.com>
 Subject: [Bug 1853083] Re: qemu ppc64 4.0 boot AIX5.1 hung
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="c597c3229eb023b1e626162d5947141bf7befb13";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 65fb106f1183b5e33b96f3b212b532b3835b7b58
+X-Launchpad-Hash: e46f1322e9890c3035289ead83c723ada586ac62
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -84,11 +84,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'm running this to start the AIX5.1 installation on qemu:
-#!/bin/bash
-qemu-system-ppc64 -cpu POWER8 -machine pseries -m 2048 -serial mon:stdio  -=
-hda aix-hdd.qcow2 -cdrom /Download/AIX5.1/VOLUME1.iso -prom-env boot-comman=
-d=3D'boot cdrom: -s verbose'
+and it got:
+[root@192 emu]# ./aix51
+VNC server running on ::1:5900
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-cfpc=
+=3Dworkaround
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-sbbc=
+=3Dworkaround
+qemu-system-ppc64: warning: TCG doesn't support requested feature, cap-ibs=
+=3Dworkaround
+
+
+SLOF **********************************************************************
+QEMU Starting
+ Build Date =3D Jul  3 2019 12:26:14
+ FW Version =3D git-ba1ab360eebe6338
+ Press "s" to enter Open Firmware.
+
+Populating /vdevice methods
+Populating /vdevice/vty@71000000
+Populating /vdevice/nvram@71000001
+Populating /vdevice/l-lan@71000002
+Populating /vdevice/v-scsi@71000003
+       SCSI: Looking for devices
+          8000000000000000 DISK     : "QEMU     QEMU HARDDISK    2.5+"
+          8200000000000000 CD-ROM   : "QEMU     QEMU CD-ROM      2.5+"
+Populating /pci@800000020000000
+                     00 0000 (D) : 1234 1111    qemu vga
+                     00 0800 (D) : 1033 0194    serial bus [ usb-xhci ]
+Installing QEMU fb
+
+
+Scanning USB
+  XHCI: Initializing
+    USB Keyboard
+    USB mouse
+No console specified using screen & keyboard
+
+  Welcome to Open Firmware
+
+  Copyright (c) 2004, 2017 IBM Corporation All rights reserved.
+  This program and the accompanying materials are made available
+  under the terms of the BSD License available at
+  http://www.opensource.org/licenses/bsd-license.php
+
+
+Trying to load: -s verbose from: /vdevice/v-scsi@71000003/disk@820000000000=
+0000: ...
+
+and just hung there, took lots of CPU time, never proceed further.
 
 -- =
 
