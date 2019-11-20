@@ -2,90 +2,63 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29AD9C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:37:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19AFDC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:47:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8E102230F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:37:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UAwdL1Qp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8E102230F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E399D208A1
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:47:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E399D208A1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXKXc-0007mK-DC
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 02:36:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42524)
+	id 1iXKiM-0002Lb-3o
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 02:47:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50586)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlureau@redhat.com>) id 1iXKVt-0006u6-FU
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:35:01 -0500
+ (envelope-from <clg@kaod.org>) id 1iXKhK-0001rI-0s
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:46:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1iXKVl-0005PB-Kb
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:34:52 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46820
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iXKhH-0000vb-Py
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:46:44 -0500
+Received: from 3.mo68.mail-out.ovh.net ([46.105.58.60]:48938)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iXKVl-0005Ko-7a
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:34:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574235284;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=316cTHKnaJdtIgeHH1iN6wxI4x0BhIlr2FEz4LwEfs4=;
- b=UAwdL1QpivMRwlYIHFGOTls3TSotVamnS8SaWy1XajE+4J5T6hXPSLIBmmu3VwV+SkoZKI
- RXBdCXGmGTjUvPHHK4yqdZJbBMd6Gdvp4UR3fWZFasywMLqbNICZCPVtk5780XPHu3D216
- +4lw6okS8FjjRxEgZDmCurxxv8zm4kQ=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-ywieQrqLPzuci4BuImVYjg-1; Wed, 20 Nov 2019 02:34:43 -0500
-Received: by mail-oi1-f197.google.com with SMTP id 10so12061682ois.18
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 23:34:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=316cTHKnaJdtIgeHH1iN6wxI4x0BhIlr2FEz4LwEfs4=;
- b=ck05X3UgOp+fkXtoL/9nX6OnbDivr2GGHeXck3hItaUDFMi80UxWDPxBTa7gcljHbJ
- k0i+IYCdi1LUBzWQvlcVeza7IJp3HbAZOU6+sg43lqFgzZr31gBeNtJxYAwxiEbHDOjh
- EYaKSwxdgq93ytS8M4VJQOyTiReSqBtPHUBdddiJbpZlUNp0gjOHX/EzXik3sDNgv/ia
- WW1d90ia2YXzMfwYNhLCl9KEMAuOEls9tEGLxjJeBcYfhEcIeQFXcWEhCSGGT0r6cUXd
- /WhHdwXy0B/cB+qll1yZi3qQGXtua92L6gG/mwxPkubPf2ua30qEekcfBMGVcNYDlNDi
- Ercw==
-X-Gm-Message-State: APjAAAX/OIKZmmEL0qAdnnO6sV3xyfhUbal8FhlRemKwTvhdtMjfcY6U
- 4oN6g1ZArg00YVO+waAnhLAg/yaFtFUxE+XtV13+mlCDEpQm5sJeYqU7FAU1N0yWQMBUCdL/iYj
- Ypih5qBq7VGIItzxnfsynmaTC0ayIx64=
-X-Received: by 2002:aca:1702:: with SMTP id j2mr1485421oii.13.1574235282940;
- Tue, 19 Nov 2019 23:34:42 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyzpFFPW+LW4s3xGwmEtVeSszD/7fF6plMhBpK/IDBvwVZKkvwxq0KH2Kb+mfsnBl0nDUkag7HN5qfoKFhXveA=
-X-Received: by 2002:aca:1702:: with SMTP id j2mr1485398oii.13.1574235282688;
- Tue, 19 Nov 2019 23:34:42 -0800 (PST)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iXKhH-0000tA-1G
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:46:43 -0500
+Received: from player756.ha.ovh.net (unknown [10.109.159.224])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id 50F6F14D074
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:46:40 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player756.ha.ovh.net (Postfix) with ESMTPSA id 71B62B7E30E2;
+ Wed, 20 Nov 2019 07:46:34 +0000 (UTC)
+Subject: Re: [PATCH 0/5] ppc/pnv: fix Homer/Occ mappings on multichip systems
+To: Balamuruhan S <bala24@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191119175056.32518-1-bala24@linux.ibm.com>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <779f2a3b-62d2-62e9-674c-b2b53bf26da0@kaod.org>
+Date: Wed, 20 Nov 2019 08:46:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-14-marcandre.lureau@redhat.com>
- <CAFEAcA9Cq_MkAzqAjt5uPNu3HDUfxO0hyVWtqEiAashPEEq3=g@mail.gmail.com>
-In-Reply-To: <CAFEAcA9Cq_MkAzqAjt5uPNu3HDUfxO0hyVWtqEiAashPEEq3=g@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 20 Nov 2019 11:34:31 +0400
-Message-ID: <CAMxuvawroZ0jrQTJCbakft21Lgk2cHrE9VyihiUvYBVp+AXgXw@mail.gmail.com>
-Subject: Re: [PATCH v3 13/33] serial: start making SerialMM a sysbus device
-To: Peter Maydell <peter.maydell@linaro.org>
-X-MC-Unique: ywieQrqLPzuci4BuImVYjg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20191119175056.32518-1-bala24@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 17248505098024029158
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudegledgudduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeehiedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 46.105.58.60
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,121 +70,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paul Burton <pburton@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-ppc@nongnu.org, groug@kaod.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+Hello,
 
-On Mon, Nov 18, 2019 at 6:43 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
->
-> On Wed, 23 Oct 2019 at 18:33, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
-> >
-> > Memory mapped serial device is in fact a sysbus device. The following
-> > patches will make use of sysbus facilities for resource and
-> > registration.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  hw/char/omap_uart.c      |  2 +-
-> >  hw/char/serial.c         | 47 ++++++++++++++++++++++++++++------------
-> >  hw/mips/boston.c         |  2 +-
-> >  hw/mips/mips_malta.c     |  2 +-
-> >  include/hw/char/serial.h | 20 ++++++++++++-----
-> >  5 files changed, 51 insertions(+), 22 deletions(-)
->
->
-> > -SerialState *serial_mm_init(MemoryRegion *address_space,
-> > +SerialMM *serial_mm_init(MemoryRegion *address_space,
-> >                              hwaddr base, int it_shift,
-> >                              qemu_irq irq, int baudbase,
-> >                              Chardev *chr, enum device_endian end)
-> >  {
-> > -    DeviceState *dev =3D DEVICE(object_new(TYPE_SERIAL));
-> > -    SerialState *s =3D SERIAL(dev);
-> > +    SerialMM *self =3D SERIAL_MM(qdev_create(NULL, TYPE_SERIAL_MM));
-> > +    SerialState *s =3D &self->serial;
-> >
-> > -    s->it_shift =3D it_shift;
-> > +    self->it_shift =3D it_shift;
-> >      s->irq =3D irq;
-> > -    qdev_prop_set_uint32(dev, "baudbase", baudbase);
-> > -    qdev_prop_set_chr(dev, "chardev", chr);
-> > -    qdev_prop_set_int32(dev, "instance-id", base);
-> > -    qdev_init_nofail(dev);
-> > +    qdev_prop_set_uint32(DEVICE(s), "baudbase", baudbase);
-> > +    qdev_prop_set_chr(DEVICE(s), "chardev", chr);
-> > +    qdev_prop_set_int32(DEVICE(s), "instance-id", base);
-> > +
-> > +    qdev_init_nofail(DEVICE(s));
-> > +    qdev_init_nofail(DEVICE(self));
->
-> Something odd is going on here. This is a convenience
-> wrapper around creating the SERIAL_MM device, so it's
-> correct that it has to init DEVICE(self). But it should
-> not be doing anything with the internals of 'self'.
-> It's the instance_init/realize of the SERIAL_MM object that should
-> instance_init/realize the 'self->serial' object. You have the
-> code below to do the 'instance_init' in the serial_mm_instance_init
-> function, but are missing the equivalent realize code.
+On 19/11/2019 18:50, Balamuruhan S wrote:
+> Hi All,
+> 
+> PowerNV fails to boot in multichip systems due to some misinterpretation
+> and mapping in Homer/Occ device models, this patchset fixes the
+> following,
+> 
+>  - Homer size is 4MB per chip and Occ common area size is 8MB
+>  - Bar masks are used to calculate sizes of Homer/Occ in skiboot so
+>    return appropriate value
+>  - Occ common area is in BAR 3 on Power8 but wrongly mapped to BAR 2
+>    currently
+>  - OCC common area is shared across chips and should be mapped only once
+>    for multichip systems
 
-This should be addressed later with "serial-mm: use sysbus
-facilities". I'll add a comment.
+The first thing to address is the HOMER XSCOM region. 
 
->
-> > -    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], s,
-> > +    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], self,
-> >                            "serial", 8 << it_shift);
-> >      memory_region_add_subregion(address_space, base, &s->io);
-> > -    return s;
-> > +
-> > +    return self;
-> > +}
-> > +
-> > +static void serial_mm_instance_init(Object *o)
-> > +{
-> > +    SerialMM *self =3D SERIAL_MM(o);
->
-> 'self' is not idiomatic for the name of the variable containing
-> the pointer to the object in QOM code ("git grep '\Wself\W' hw"
-> shows no uses of it at all, which is quite unusual for us --
-> usually the codebase has at least a few uses of any non-standard
-> way of writing something ;-))
->
-> Usually we use something approximating to the abbreviation
-> of the type name, so here 'smm' would do.
+Introduce an empty skeleton for P8 and P9 with different mem ops handers
+because the registers have a different layout. From there, add the support
+for the different PBA* regs and move them out from the default XSCOM
+handlers. That should fix most of the current problems and it will provide 
+a nice framework for future extensions.
 
-I would prefer something more straightforward than having to come up
-with various name mangling.
+Why not add the associated HOMER MMIO region while we are it ? the PBA
+registers have all the definitions we need and it will gives us access
+to the pstate table.
 
-Imho, we loose some readability, consistency & semantic by not naming
-the object argument of the method "self"
 
+Second is the OCC region. Do we need a XSCOM *or* a MMIO region ? This is 
+not clear. Please check skiboot. I think a MMIO region should be enough
+because this is how sensor data from the OCC is accessed. 
+
+On that topic, we could define properties on the PnvOCC model for each 
+sensor and tune the value from the QEMU monitor. It really shouldn't be
+too complex.
+
+Also the same address is used, we should only map it once but we need 
+to invent something to know from which chip it is accessed. 
+
+
+C.
+
+
+> 
+> Request for your review and suggestions to make it better. I would like to
+> thank Cedric for his time and help to figure out the issues.
 >
-> > +
-> > +    object_initialize_child(o, "serial", &self->serial, sizeof(self->s=
-erial),
-> > +                            TYPE_SERIAL, &error_abort, NULL);
-> >  }
->
-> thanks
-> -- PMM
->
+> Balamuruhan S (5):
+>   hw/ppc/pnv: incorrect homer and occ common area size
+>   hw/ppc/pnv_xscom: PBA bar mask values are incorrect with homer/occ
+>     sizes
+>   hw/ppc/pnv_xscom: Power8 occ common area is in PBA BAR 3
+>   hw/ppc/pnv_xscom: occ common area to be mapped only once
+>   hw/ppc/pnv_xscom: add PBA BARs for Power8 slw image
+> 
+>  hw/ppc/pnv_occ.c     |  2 +-
+>  hw/ppc/pnv_xscom.c   | 37 +++++++++++++++++++++++++++----------
+>  include/hw/ppc/pnv.h | 12 ++++++++----
+>  3 files changed, 36 insertions(+), 15 deletions(-)
+> 
 
 
