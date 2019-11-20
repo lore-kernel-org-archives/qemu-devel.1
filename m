@@ -6,71 +6,71 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19A9BC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A6BC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:26:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8A4720714
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:25:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6EBF20714
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 15:26:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GJXlCbTn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8A4720714
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="czGstr9T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6EBF20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXRqm-00067s-2d
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 10:25:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33789)
+	id 1iXRsD-0007pt-Le
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 10:26:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33842)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iXRq9-0005dr-AF
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:24:22 -0500
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iXRqk-0006Ez-4k
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:24:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@redhat.com>) id 1iXRq7-0003xS-T4
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:24:21 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47720
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <marcandre.lureau@redhat.com>) id 1iXRqi-000592-Oj
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:24:58 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56520
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
- id 1iXRq7-0003wK-PL
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:24:19 -0500
+ id 1iXRqi-00058w-Lm
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 10:24:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574263459;
+ s=mimecast20190719; t=1574263496;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding;
  bh=ev/gTvgFyXtJSHrl5YfYWtFbubKtiOYjVJl5Vz1aJ5Y=;
- b=GJXlCbTnFZPLSoQhs6FpQLE0frLANx9RMgWgkDdFISNjNNJFKG9prJoaccDHzg1nEQhWB4
- zzMRjOIgiR8WIho6RIisVirS8KI4gGnBpjFhUDbk+19V5P72YJg45VkIpkOT/dzF9uhZhq
- 1ssmqAfE3OjGRPJCkQ46wmG3W6GWE+g=
+ b=czGstr9TSxWlTMicg7N+5RRgfHH9cAl2QAL6LCLJH2Uiolj/7iaSRzAucFlUHRIHDc4RFC
+ ssuvWr5aO1HnjeVdxuGhUk4haQfgdo+rBjwcF3/YkwCDDBNBzQXoh90H4gkoHOW/gz6GAC
+ KY/BOIqvK2JUHvUX33zBZHY5WvC0v3c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-3ReFl-cjOA2FZZQoBplOQA-1; Wed, 20 Nov 2019 10:24:15 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-311-SLd56l_9OSWy6dj0TWuwpg-1; Wed, 20 Nov 2019 10:24:54 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8D6C800A02;
- Wed, 20 Nov 2019 15:24:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B0FB107ACC6;
+ Wed, 20 Nov 2019 15:24:53 +0000 (UTC)
 Received: from localhost (ovpn-112-56.ams2.redhat.com [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 96AC06715F;
- Wed, 20 Nov 2019 15:24:04 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 996E067E40;
+ Wed, 20 Nov 2019 15:24:47 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 00/37] Clean-ups: qom-ify serial and remove QDEV_PROP_PTR
-Date: Wed, 20 Nov 2019 19:23:23 +0400
-Message-Id: <20191120152400.26012-1-marcandre.lureau@redhat.com>
+Subject: [PATCH v4 00/37] Clean-ups: qom-ify serial and remove QDEV_PROP_PTR
+Date: Wed, 20 Nov 2019 19:24:05 +0400
+Message-Id: <20191120152442.26657-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: 3ReFl-cjOA2FZZQoBplOQA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: SLd56l_9OSWy6dj0TWuwpg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
