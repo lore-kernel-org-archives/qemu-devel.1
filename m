@@ -2,69 +2,79 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBDB7C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 12:48:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D02E7C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 12:51:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90B702251F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 12:48:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90B702251F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9BC39224F3
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 12:51:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VAPVwvhz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BC39224F3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXPPN-0003Ri-OX
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 07:48:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59578)
+	id 1iXPRz-0004vl-Ou
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 07:51:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60419)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iXPOR-0002nd-7X
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 07:47:36 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iXPRD-0004OK-Tr
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 07:50:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iXPOP-0004P8-UU
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 07:47:35 -0500
-Received: from 14.mo7.mail-out.ovh.net ([178.33.251.19]:55930)
+ (envelope-from <cohuck@redhat.com>) id 1iXPRB-0005Yd-4f
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 07:50:26 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22182
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iXPOP-0004OK-N9
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 07:47:33 -0500
-Received: from player730.ha.ovh.net (unknown [10.108.57.139])
- by mo7.mail-out.ovh.net (Postfix) with ESMTP id D491213F89F
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 13:47:30 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player730.ha.ovh.net (Postfix) with ESMTPSA id 9A354C32ACCD;
- Wed, 20 Nov 2019 12:47:21 +0000 (UTC)
-Date: Wed, 20 Nov 2019 13:47:20 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PATCH] spapr: Fix VSMT mode when it is not supported by the
- kernel
-Message-ID: <20191120134720.3221a6f4@bahia.lan>
-In-Reply-To: <0c1f57ac-0823-4268-429b-d1aee8f7f8d5@redhat.com>
-References: <20191108154035.12913-1-lvivier@redhat.com>
- <20191108174759.2d4040f1@bahia.lan>
- <20191119010012.GI5582@umbus.fritz.box>
- <caa35299-c928-a968-83b5-842d000f0242@redhat.com>
- <20191119164526.0e980a37@bahia.lan>
- <20191120043653.GG5582@umbus.fritz.box>
- <cb8f7dc7-d6db-6bd9-e825-1ade7d89cdd9@redhat.com>
- <0c1f57ac-0823-4268-429b-d1aee8f7f8d5@redhat.com>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iXPRA-0005YG-RD
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 07:50:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574254223;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6WmXlO/NHd9/ajdNalxFkaUu8NFe52C917r2+tblOmY=;
+ b=VAPVwvhzyVuQ/deHFCbfLPu8JUKX/dBmaoW7MgqAOh2sPkZ/tdhmvqiCPAmY88gcS4HKfa
+ vF8vTt81d8IqIT0jAzEB9Ee1mOOtxkYobNEmGykmfEowhcfi5e53HpDqc5X4LmCC+ZjedW
+ dLfMi/JctZvFDadhPqocazNuDAaicgY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-134-qh7X0KeDNamkjeJ7pto0OQ-1; Wed, 20 Nov 2019 07:50:20 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61C71107ACC4;
+ Wed, 20 Nov 2019 12:50:19 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4E25C10016EB;
+ Wed, 20 Nov 2019 12:50:18 +0000 (UTC)
+Date: Wed, 20 Nov 2019 13:50:15 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Eric Farman <farman@linux.ibm.com>
+Subject: Re: [RFC PATCH v1 8/8] vfio-ccw: Add support for the CRW irq
+Message-ID: <20191120135015.359cf054.cohuck@redhat.com>
+In-Reply-To: <20191115033437.37926-9-farman@linux.ibm.com>
+References: <20191115033437.37926-1-farman@linux.ibm.com>
+ <20191115033437.37926-9-farman@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 3882665832943491366
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehtddggeefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeeftddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: qh7X0KeDNamkjeJ7pto0OQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.251.19
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,102 +86,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org,
- clg@kaod.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
+ qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+ Jared Rossi <jrossi@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 20 Nov 2019 12:28:19 +0100
-Laurent Vivier <lvivier@redhat.com> wrote:
+On Fri, 15 Nov 2019 04:34:37 +0100
+Eric Farman <farman@linux.ibm.com> wrote:
 
-> On 20/11/2019 10:00, Laurent Vivier wrote:
-> > On 20/11/2019 05:36, David Gibson wrote:
-> >> On Tue, Nov 19, 2019 at 04:45:26PM +0100, Greg Kurz wrote:
-> >>> On Tue, 19 Nov 2019 15:06:51 +0100
-> >>> Laurent Vivier <lvivier@redhat.com> wrote:
-> >>>
-> >>>> On 19/11/2019 02:00, David Gibson wrote:
-> >>>>> On Fri, Nov 08, 2019 at 05:47:59PM +0100, Greg Kurz wrote:
-> >>>>>> On Fri,  8 Nov 2019 16:40:35 +0100
-> >>>>>> Laurent Vivier <lvivier@redhat.com> wrote:
-> >>>>>>
-> >>>>>>> Commit 29cb4187497d sets by default the VSMT to smp_threads,
-> >>>>>>> but older kernels (< 4.13) don't support that.
-> >>>>>>>
-> >>>>>>> We can reasonably restore previous behavior with this kernel
-> >>>>>>> to allow to run QEMU as before.
-> >>>>>>>
-> >>>>>>> If VSMT is not supported, VSMT will be set to MAX(8, smp_threads)
-> >>>>>>> as it is done for previous machine types (< pseries-4.2)
-> >>>>>>>
-> >>>>>>
-> >>>>>> It is usually _bad_ to base the machine behavior on host capabilities.
-> >>>>>> What happens if we migrate between an older kernel and a recent one ?
-> >>>>>
-> >>>>> Right.  We're really trying to remove instaces of such behaviour.  I'd
-> >>>>> prefer to completely revert Greg's original patch than to re-introduce
-> >>>>> host configuration dependency into the guest configuration..
-> >>>>>
-> >>>>>> I understand this is to fix tests/migration-test on older kernels.
-> >>>>>> Couldn't this be achieved with migration-test doing some introspection
-> >>>>>> and maybe pass vsmt=8 on the QEMU command line ?
-> >>>>>
-> >>>>> ..adjusting the test case like this might be a better idea, though.
-> >>>>>
-> >>>>> What's the test setup where we're using the old kernel?  I really only
-> >>>>> applied the original patch on the guess that we didn't really care
-> >>>>> about kernels that old.  The fact you've hit this in practice makes me
-> >>>>> doubt that assumption.
-> >>>>>
-> >>>>
-> >>>> The way to fix the tests is to add "-smp threads=8" on the command line
-> >>>> (for all tests, so basically in qtest_init_without_qmp_handshake(), and
-> >>>> it will impact all the machine types), and we have to check if it is
-> >>>
-> >>> Ohhh... it isn't possible to initialize Qtest with machine specific
-> >>> properties ? That's a bit unfortunate :-\
-> >>
-> >> Uhh... I don't see why we can't.  Couldn't we just put either -machine
-> >> vsmt=8 or -smp 8 into the cmd_src / cmd_dst printfs() in the
-> >> strcmp(arch, "ppc64") case?
-> > 
-> > Yes, but we need to do that to all other tests that fail. test-migration
-> > is not the only one impacted by the problem (we have also pxe-test), so
-> > it's why I thought to fix the problem in a generic place.
-> > 
-> > But it seems there are only this couple of tests that are impacted so I
-> > can modify both instead. I think only tests that really start CPU have
-> > the problem.
-> > 
-> > I'm going to send a patch to fix that.
-> 
-> And again, it's a little bit more complicated than expected: setting
-> vsmt to 8 works only with kvm_hv, but breaks in case of TCG or kvm_pr.
-> So the test must check what is in use...
-> 
+> From: Farhan Ali <alifm@linux.ibm.com>
+>=20
+> The CRW irq will be used by vfio-ccw to notify the userspace
+> about any CRWs the userspace needs to handle. Let's add support
+> for it.
+>=20
+> Signed-off-by: Farhan Ali <alifm@linux.ibm.com>
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>=20
+> Notes:
+>     v0->v1: [EF]
+>      - Check vcdev->crw_region before registering the irq,
+>        in case host kernel does not have matching support
+>      - Split the refactoring changes to an earlier (new) patch
+>        (and don't remove the "num_irqs" check in the register
+>        routine, but adjust it to the check the input variable)
+>      - Don't revert the cool vfio_set_irq_signaling() stuff
 
-AFAICT, migration-test explicitly skip tests if kvm_hv isn't present.
+Only the uncool stuff? ;)
 
-    /*
-     * On ppc64, the test only works with kvm-hv, but not with kvm-pr and TCG
-     * is touchy due to race conditions on dirty bits (especially on PPC for
-     * some reason)
-     */
-    if (g_str_equal(qtest_get_arch(), "ppc64") &&
-        access("/sys/module/kvm_hv", F_OK)) {
-        g_test_message("Skipping test: kvm_hv not available");
-        return g_test_run();
-    }
+>      - Unregister CRW IRQ before IO IRQ in unrealize
+>      - s/crw1/crw0/
+>=20
+>  hw/vfio/ccw.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 45 insertions(+)
+>=20
+> diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+> index b16526d5de..b3f4120118 100644
+> --- a/hw/vfio/ccw.c
+> +++ b/hw/vfio/ccw.c
+> @@ -48,6 +48,7 @@ struct VFIOCCWDevice {
+>      uint64_t crw_region_offset;
+>      struct ccw_crw_region *crw_region;
+>      EventNotifier io_notifier;
+> +    EventNotifier crw_notifier;
+>      bool force_orb_pfch;
+>      bool warned_orb_pfch;
+>  };
+> @@ -259,6 +260,34 @@ static void vfio_ccw_reset(DeviceState *dev)
+>      ioctl(vcdev->vdev.fd, VFIO_DEVICE_RESET);
+>  }
+> =20
+> +static void vfio_ccw_crw_notifier_handler(void *opaque)
+> +{
+> +    VFIOCCWDevice *vcdev =3D opaque;
+> +    struct ccw_crw_region *region =3D vcdev->crw_region;
+> +    CRW crw;
+> +    int size;
+> +    uint8_t erc;
+> +    uint16_t rsid;
+> +
+> +    if (!event_notifier_test_and_clear(&vcdev->crw_notifier)) {
+> +        return;
+> +    }
 
-and I don't see any error in pxe-test if I force tcg and vsmt=8.
+Referring back to the comments I made for the kernel part
+(https://lore.kernel.org/kvm/20191119195236.35189d5b.cohuck@redhat.com/),
+I think we may have a problem when we have multiple crws pending.
 
-What error do you see with your testing ?
+IIUC, the kernel does not provide any guarantees that we get exactly
+one interrupt per crw. I'm wondering whether it would make sense to
+mimic the behaviour of stcrw, i.e.
 
-> Thanks,
-> Laurent
-> 
+(a) get a notification
+(b) read the region to obtain a crw
+(c) do whatever needs to be done
+(d) repeat (b) and (c) until (b) does not return a valid crw
+
+That way, we can also accommodate arbitrary lengths of crw chains, as
+we do not have to reserve space for a pre-defined number of crws in the
+region.
+
+> +
+> +    memset(region, 0, sizeof(*region));
+> +    size =3D pread(vcdev->vdev.fd, region, vcdev->crw_region_size,
+> +                 vcdev->crw_region_offset);
+> +
+> +    if (size =3D=3D -1) {
+> +        error_report("vfio-ccw: Read crw region failed with errno=3D%d",=
+ errno);
+> +        return;
+> +    }
+> +
+> +    memcpy(&crw, &region->crw0, sizeof(CRW));
+> +    erc =3D crw.flags & 0x003f;
+> +    rsid =3D crw.rsid;
+> +    css_queue_crw(CRW_RSC_CHP, erc, 0, 0, rsid);
+> +}
+> +
+>  static void vfio_ccw_io_notifier_handler(void *opaque)
+>  {
+>      VFIOCCWDevice *vcdev =3D opaque;
 
 
