@@ -2,70 +2,92 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 876C9C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:43:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A249C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:46:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52D9B21906
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:43:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GUhPW766"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52D9B21906
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 1035A22304
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:46:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1035A22304
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56776 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXOO4-0001wh-Fb
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 06:43:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42891)
+	id 1iXORA-0004sp-Pi
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 06:46:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43284)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iXOMs-0000xf-FM
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:41:56 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iXOOu-00036F-13
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:44:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iXOMp-0007GX-Pl
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:41:54 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:42757 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iXOMo-00078x-WD; Wed, 20 Nov 2019 06:41:51 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47J14T2cTkz9sPc; Wed, 20 Nov 2019 22:41:45 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1574250105;
- bh=xm/OD7gHeqIK4V+e5RzwnfYaJi2fQC8X9pkmZJcIJqo=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=GUhPW766y0JWPtM9MDBSIxTN8ffRomhwEMpynGNRDG41ePqNu1n+/+M0Riw5yzCiP
- /gsyBYVP/oY+EfTu5SfwaY7HqtOrXnCz2KaN8RaTNwz+rr5LANMNXyEfexhiqYz5He
- /DLQK1hlbcc9RMEjhvk7xU1/cmYj+XNau2aiLSJQ=
-Date: Wed, 20 Nov 2019 22:41:28 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PATCH] spapr: Fix VSMT mode when it is not supported by the
- kernel
-Message-ID: <20191120114128.GN5582@umbus.fritz.box>
-References: <20191108154035.12913-1-lvivier@redhat.com>
- <20191108174759.2d4040f1@bahia.lan>
- <20191119010012.GI5582@umbus.fritz.box>
- <caa35299-c928-a968-83b5-842d000f0242@redhat.com>
- <20191119164526.0e980a37@bahia.lan>
- <20191120043653.GG5582@umbus.fritz.box>
- <cb8f7dc7-d6db-6bd9-e825-1ade7d89cdd9@redhat.com>
- <0c1f57ac-0823-4268-429b-d1aee8f7f8d5@redhat.com>
+ (envelope-from <frankja@linux.ibm.com>) id 1iXOOs-00035o-0k
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:43:59 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59490)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iXOOq-0002yI-1z
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:43:57 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAKBgEbV094689
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:43:53 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wcf57cwqs-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:43:52 -0500
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Wed, 20 Nov 2019 11:43:50 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 20 Nov 2019 11:43:48 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAKBhkeg16318646
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 20 Nov 2019 11:43:46 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 8D19C4C04E;
+ Wed, 20 Nov 2019 11:43:46 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5C4664C050;
+ Wed, 20 Nov 2019 11:43:45 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.152.224.205])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 20 Nov 2019 11:43:45 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 00/15] s390x: Protected Virtualization support
+Date: Wed, 20 Nov 2019 06:43:19 -0500
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="L0wVL3lRYNLgmYWy"
-Content-Disposition: inline
-In-Reply-To: <0c1f57ac-0823-4268-429b-d1aee8f7f8d5@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19112011-4275-0000-0000-00000383E080
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112011-4276-0000-0000-000038975980
+Message-Id: <20191120114334.2287-1-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-20_03:2019-11-15,2019-11-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 mlxscore=0
+ phishscore=0 adultscore=0 lowpriorityscore=0 mlxlogscore=751
+ priorityscore=1501 suspectscore=1 spamscore=0 impostorscore=0
+ clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911200107
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,124 +99,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- Greg Kurz <groug@kaod.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- qemu-ppc@nongnu.org, clg@kaod.org
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Most of the QEMU changes for PV are related to the new IPL type with
+subcodes 8 - 10 and the execution of the necessary Ultravisor calls to
+IPL secure guests. Note that we can only boot into secure mode from
+normal mode, i.e. stfle 161 is not active in secure mode.
 
---L0wVL3lRYNLgmYWy
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The other changes related to data gathering for emulation and
+disabling addressing checks in secure mode, as well as CPU resets.
 
-On Wed, Nov 20, 2019 at 12:28:19PM +0100, Laurent Vivier wrote:
-> On 20/11/2019 10:00, Laurent Vivier wrote:
-> > On 20/11/2019 05:36, David Gibson wrote:
-> >> On Tue, Nov 19, 2019 at 04:45:26PM +0100, Greg Kurz wrote:
-> >>> On Tue, 19 Nov 2019 15:06:51 +0100
-> >>> Laurent Vivier <lvivier@redhat.com> wrote:
-> >>>
-> >>>> On 19/11/2019 02:00, David Gibson wrote:
-> >>>>> On Fri, Nov 08, 2019 at 05:47:59PM +0100, Greg Kurz wrote:
-> >>>>>> On Fri,  8 Nov 2019 16:40:35 +0100
-> >>>>>> Laurent Vivier <lvivier@redhat.com> wrote:
-> >>>>>>
-> >>>>>>> Commit 29cb4187497d sets by default the VSMT to smp_threads,
-> >>>>>>> but older kernels (< 4.13) don't support that.
-> >>>>>>>
-> >>>>>>> We can reasonably restore previous behavior with this kernel
-> >>>>>>> to allow to run QEMU as before.
-> >>>>>>>
-> >>>>>>> If VSMT is not supported, VSMT will be set to MAX(8, smp_threads)
-> >>>>>>> as it is done for previous machine types (< pseries-4.2)
-> >>>>>>>
-> >>>>>>
-> >>>>>> It is usually _bad_ to base the machine behavior on host capabilit=
-ies.
-> >>>>>> What happens if we migrate between an older kernel and a recent on=
-e ?
-> >>>>>
-> >>>>> Right.  We're really trying to remove instaces of such behaviour.  =
-I'd
-> >>>>> prefer to completely revert Greg's original patch than to re-introd=
-uce
-> >>>>> host configuration dependency into the guest configuration..
-> >>>>>
-> >>>>>> I understand this is to fix tests/migration-test on older kernels.
-> >>>>>> Couldn't this be achieved with migration-test doing some introspec=
-tion
-> >>>>>> and maybe pass vsmt=3D8 on the QEMU command line ?
-> >>>>>
-> >>>>> ..adjusting the test case like this might be a better idea, though.
-> >>>>>
-> >>>>> What's the test setup where we're using the old kernel?  I really o=
-nly
-> >>>>> applied the original patch on the guess that we didn't really care
-> >>>>> about kernels that old.  The fact you've hit this in practice makes=
- me
-> >>>>> doubt that assumption.
-> >>>>>
-> >>>>
-> >>>> The way to fix the tests is to add "-smp threads=3D8" on the command=
- line
-> >>>> (for all tests, so basically in qtest_init_without_qmp_handshake(), =
-and
-> >>>> it will impact all the machine types), and we have to check if it is
-> >>>
-> >>> Ohhh... it isn't possible to initialize Qtest with machine specific
-> >>> properties ? That's a bit unfortunate :-\
-> >>
-> >> Uhh... I don't see why we can't.  Couldn't we just put either -machine
-> >> vsmt=3D8 or -smp 8 into the cmd_src / cmd_dst printfs() in the
-> >> strcmp(arch, "ppc64") case?
-> >=20
-> > Yes, but we need to do that to all other tests that fail. test-migration
-> > is not the only one impacted by the problem (we have also pxe-test), so
-> > it's why I thought to fix the problem in a generic place.
-> >=20
-> > But it seems there are only this couple of tests that are impacted so I
-> > can modify both instead. I think only tests that really start CPU have
-> > the problem.
-> >=20
-> > I'm going to send a patch to fix that.
->=20
-> And again, it's a little bit more complicated than expected: setting
-> vsmt to 8 works only with kvm_hv, but breaks in case of TCG or kvm_pr.
-> So the test must check what is in use...
+While working on this I sprinkled in some cleanups, as we sometimes
+significantly increase line count of some functions and they got
+unreadable.
 
-Ugh, yeah, that's getting too ugly.  I think the feasible options are
-either to revert the patch, or just say that upstream qemu no longer
-supports a RHEL7 host.
+Janosch Frank (15):
+  s390x: Cleanup cpu resets
+  s390x: Beautify diag308 handling
+  s390x: protvirt: Add diag308 subcodes 8 - 10
+  Header sync protvirt
+  s390x: protvirt: Sync PV state
+  s390x: protvirt: Support unpack facility
+  s390x: protvirt: Handle diag 308 subcodes 0,1,3,4
+  s390x: protvirt: KVM intercept changes
+  s390x: protvirt: SCLP interpretation
+  s390x: protvirt: Add new VCPU reset functions
+  RFC: s390x: Exit on vcpu reset error
+  s390x: protvirt: Set guest IPL PSW
+  s390x: protvirt: Move diag 308 data over SIDAD
+  s390x: protvirt: Disable address checks for PV guest IO emulation
+  s390x: protvirt: Handle SIGP store status correctly
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+ hw/s390x/Makefile.objs              |   1 +
+ hw/s390x/ipl.c                      |  81 +++++++++++++++++-
+ hw/s390x/ipl.h                      |  35 ++++++++
+ hw/s390x/pv.c                       | 123 +++++++++++++++++++++++++++
+ hw/s390x/pv.h                       |  27 ++++++
+ hw/s390x/s390-virtio-ccw.c          |  79 ++++++++++++++---
+ hw/s390x/sclp.c                     |  16 ++++
+ include/hw/s390x/sclp.h             |   2 +
+ linux-headers/asm-s390/kvm.h        |   4 +-
+ linux-headers/linux/kvm.h           |  43 ++++++++++
+ target/s390x/cpu.c                  | 127 ++++++++++++++--------------
+ target/s390x/cpu.h                  |   1 +
+ target/s390x/cpu_features_def.inc.h |   1 +
+ target/s390x/diag.c                 | 108 +++++++++++++++++------
+ target/s390x/ioinst.c               |  46 ++++++----
+ target/s390x/kvm-stub.c             |  10 ++-
+ target/s390x/kvm.c                  |  58 +++++++++++--
+ target/s390x/kvm_s390x.h            |   4 +-
+ target/s390x/sigp.c                 |   7 +-
+ 19 files changed, 640 insertions(+), 133 deletions(-)
+ create mode 100644 hw/s390x/pv.c
+ create mode 100644 hw/s390x/pv.h
 
---L0wVL3lRYNLgmYWy
-Content-Type: application/pgp-signature; name="signature.asc"
+-- 
+2.20.1
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3VJmYACgkQbDjKyiDZ
-s5LVww/9Gsbxgu86Sx6FHj5lzp8rEFC5hNHIsaNLB8jort06k0nhzwGR/81SqaZu
-mWwwSzrXYGVsCtlUy+cs30n7niktbJ62Rs7GC2hpK/Xhm/W2NTVSw8xc0Aq6R2LI
-duAzsKB2rJG4n3jeM3yDwpkXYa5j0r2dYgRoXqobfaM1cNKJseuNVlXfGVnWZjZi
-6dgxWNSNsQDs9gCIx2DRqbkCNvHqldYa3nNFw4N4dAJu9U5Rrty+r8BPepetmduf
-NuS1rCoVX+i41JaHT4ULEtAvGG0GI8oc/qqm8x5ZORQaJYQ3kU2EAISE1IExeToO
-XtXrfhFkpF8sM/r3bVaXNcTlWPvAjIZPJCzb5W7ILmh/vnDaSh9SZXejtZz+W6D6
-2HFID4rZYrcmnOVe6BZOvMSZCo1m/NDl73ZDZOik8LNyTNPVYHowcz4SJYmS3Kj1
-eBQBVA8JJ44/JUDjkvE8zT4r6W1dbXRih43NCNmuDGG0MuaioOrU2LjX/4BUYnc4
-V9yIrRFQdeKh+YJAVWyt4FEWGddjTxGM4RfjIokQViSXLJgTyjkHJTHRYLMC8Y+P
-NwNW+/ttLJc0p9hApAu7cgNUEqUQmtU4muq2Hezb8K3o3gYf1WmfwwxhrIx+oiCC
-4HETOfO8rzyaPsxBiGh8y/6osGs00MhzxaFkog6++Wm82Uxvpk0=
-=vx8b
------END PGP SIGNATURE-----
-
---L0wVL3lRYNLgmYWy--
 
