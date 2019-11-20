@@ -2,80 +2,80 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B480C432C3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6448BC432C0
 	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 18:27:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFCB6206DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 18:27:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 32B442088F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 18:27:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aOaqbsLQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFCB6206DA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LPLWEng0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32B442088F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXUhW-0004oi-T2
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 13:27:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37035)
+	id 1iXUhX-0004me-5z
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 13:27:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37031)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iXUfw-0003E3-VU
+ (envelope-from <armbru@redhat.com>) id 1iXUfx-0003E1-15
  for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:26:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iXUfv-00083i-2z
+ (envelope-from <armbru@redhat.com>) id 1iXUfu-00083M-UW
  for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:26:00 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:59601
- helo=us-smtp-delivery-1.mimecast.com)
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54282
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iXUfu-000836-VS
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:25:59 -0500
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iXUfu-000835-QO
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:25:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1574274358;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xtIiyMIliWfvUzvE7LfKSEmNI5efewvQ5sBmNuelqqo=;
- b=aOaqbsLQ7uJ0zGct0Wg07mygIzICKpLIR5Dv81WzIpczWd/0BYEKpa0F4XMJPvoN0OVXI/
- g9ooNFMGXtKEUm16kqipGLyhbNga1faScTw3eYbcTpicB3ozQ/N26xif3KXz+FKaWvjsY8
- NwAT3yG3sUWngDM0KSrrrejlOtfBilw=
+ bh=wbHKGl4VKJS7oylcaMTkmc7AQJ+X3Y4TJPOCz/mFYH4=;
+ b=LPLWEng0tuZ33unfSi920ShQtFvNpZt0H2svXYd4UYawiwfsdn+5pN7lepLtlKiA4Z1OTd
+ c23kpzCMASckYHL4BvJBhiVlzNkoZ6VpDzjstdx8sCfrWqhLK83TXt7Fna6N8n4wYMQo3i
+ chbyb43aBEknpydB20wMdjJOpnu3nGo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-228-BbbevEkSNqWPZpzPg86aQQ-1; Wed, 20 Nov 2019 13:25:56 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-414-u9MBhDCINey3natO_uvxFA-1; Wed, 20 Nov 2019 13:25:54 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E57AFDBA9;
- Wed, 20 Nov 2019 18:25:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AA9D800A02;
+ Wed, 20 Nov 2019 18:25:53 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.36.118.163])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8EABF5ED36;
- Wed, 20 Nov 2019 18:25:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D7B063483A;
+ Wed, 20 Nov 2019 18:25:52 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6746F11366DB; Wed, 20 Nov 2019 19:25:51 +0100 (CET)
+ id 60FD511366D1; Wed, 20 Nov 2019 19:25:51 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 6/6] qapi: Simplify QAPISchemaModularCVisitor
-Date: Wed, 20 Nov 2019 19:25:51 +0100
-Message-Id: <20191120182551.23795-7-armbru@redhat.com>
+Subject: [PATCH 4/6] qapi: Proper intermediate representation for modules
+Date: Wed, 20 Nov 2019 19:25:49 +0100
+Message-Id: <20191120182551.23795-5-armbru@redhat.com>
 In-Reply-To: <20191120182551.23795-1-armbru@redhat.com>
 References: <20191120182551.23795-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: BbbevEkSNqWPZpzPg86aQQ-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: u9MBhDCINey3natO_uvxFA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,156 +92,166 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since the previous commit, QAPISchemaVisitor.visit_module() is called
-just once.  Simplify QAPISchemaModularCVisitor accordingly.
+Modules are represented only by their names so far.  Introduce class
+QAPISchemaModule.  So far, it merely wraps the name.  The next patch
+will put it to more interesting use.
+
+Once again, arrays spice up the patch a bit.  For any other type,
+@info points to the definition, which lets us map from @info to
+module.  For arrays, there is no definition, and @info points to the
+first use instead.  We have to use the element type's module instead,
+which is only available after .check().
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- scripts/qapi/commands.py |  2 +-
- scripts/qapi/events.py   |  2 +-
- scripts/qapi/gen.py      | 28 ++++++++++++++--------------
- scripts/qapi/types.py    |  5 +++--
- scripts/qapi/visit.py    |  8 ++++----
- 5 files changed, 23 insertions(+), 22 deletions(-)
+ scripts/qapi/schema.py | 63 ++++++++++++++++++++++++++++--------------
+ 1 file changed, 43 insertions(+), 20 deletions(-)
 
-diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
-index 47f4a18cfe..afa55b055c 100644
---- a/scripts/qapi/commands.py
-+++ b/scripts/qapi/commands.py
-@@ -239,7 +239,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaModularCVis=
-itor):
-     def __init__(self, prefix):
-         QAPISchemaModularCVisitor.__init__(
-             self, prefix, 'qapi-commands',
--            ' * Schema-defined QAPI/QMP commands', __doc__)
-+            ' * Schema-defined QAPI/QMP commands', None, __doc__)
-         self._regy =3D QAPIGenCCode(None)
-         self._visited_ret_types =3D {}
+diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
+index cfb574c85d..0f2e0dcfce 100644
+--- a/scripts/qapi/schema.py
++++ b/scripts/qapi/schema.py
+@@ -50,9 +50,6 @@ class QAPISchemaEntity(object):
 =20
-diff --git a/scripts/qapi/events.py b/scripts/qapi/events.py
-index 10fc509fa9..2bde3e6128 100644
---- a/scripts/qapi/events.py
-+++ b/scripts/qapi/events.py
-@@ -140,7 +140,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaModularCVisit=
-or):
-     def __init__(self, prefix):
-         QAPISchemaModularCVisitor.__init__(
-             self, prefix, 'qapi-events',
--            ' * Schema-defined QAPI/QMP events', __doc__)
-+            ' * Schema-defined QAPI/QMP events', None, __doc__)
-         self._event_enum_name =3D c_name(prefix + 'QAPIEvent', protect=3DF=
-alse)
-         self._event_enum_members =3D []
-         self._event_emit_name =3D c_name(prefix + 'qapi_event_emit')
-diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
-index 112b6d94c5..95afae0615 100644
---- a/scripts/qapi/gen.py
-+++ b/scripts/qapi/gen.py
-@@ -201,10 +201,11 @@ class QAPISchemaMonolithicCVisitor(QAPISchemaVisitor)=
-:
+     def check(self, schema):
+         assert not self._checked
+-        if self.info:
+-            self._module =3D os.path.relpath(self.info.fname,
+-                                           os.path.dirname(schema.fname))
+         seen =3D {}
+         for f in self.features:
+             f.check_clash(self.info, seen)
+@@ -68,6 +65,13 @@ class QAPISchemaEntity(object):
+         if self.doc:
+             self.doc.check()
 =20
- class QAPISchemaModularCVisitor(QAPISchemaVisitor):
++    def _set_module(self, schema, info):
++        assert self._checked
++        self._module =3D schema.module_by_fname(info and info.fname)
++
++    def set_module(self, schema):
++        self._set_module(schema, self.info)
++
+     @property
+     def ifcond(self):
+         assert self._checked
+@@ -75,7 +79,7 @@ class QAPISchemaEntity(object):
 =20
--    def __init__(self, prefix, what, blurb, pydoc):
-+    def __init__(self, prefix, what, user_blurb, builtin_blurb, pydoc):
-         self._prefix =3D prefix
-         self._what =3D what
--        self._blurb =3D blurb
-+        self._user_blurb =3D user_blurb
-+        self._builtin_blurb =3D builtin_blurb
-         self._pydoc =3D pydoc
-         self._genc =3D None
-         self._genh =3D None
-@@ -245,7 +246,7 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
-         genc =3D QAPIGenC(basename + '.c', blurb, self._pydoc)
-         genh =3D QAPIGenH(basename + '.h', blurb, self._pydoc)
-         self._module[name] =3D (genc, genh)
--        self._set_module(name)
-+        self._genc, self._genh =3D self._module[name]
+     @property
+     def module(self):
+-        assert self._checked
++        assert self._module or not self.info
+         return self._module
 =20
-     def _add_user_module(self, name, blurb):
-         assert self._is_user_module(name)
-@@ -256,9 +257,6 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
-     def _add_system_module(self, name, blurb):
-         self._add_module(name and './' + name, blurb)
-=20
--    def _set_module(self, name):
--        self._genc, self._genh =3D self._module[name]
--
-     def write(self, output_dir, opt_builtins=3DFalse):
-         for name in self._module:
-             if self._is_builtin_module(name) and not opt_builtins:
-@@ -271,15 +269,17 @@ class QAPISchemaModularCVisitor(QAPISchemaVisitor):
+     def is_implicit(self):
+@@ -135,15 +139,19 @@ class QAPISchemaVisitor(object):
          pass
 =20
-     def visit_module(self, name):
--        if name in self._module:
--            self._set_module(name)
--        elif self._is_builtin_module(name):
--            # The built-in module has not been created.  No code may
--            # be generated.
--            self._genc =3D None
--            self._genh =3D None
-+        if name is None:
-+            if self._builtin_blurb:
-+                self._add_system_module(None, self._builtin_blurb)
-+                self._begin_system_module(name)
-+            else:
-+                # The built-in module has not been created.  No code may
-+                # be generated.
-+                self._genc =3D None
-+                self._genh =3D None
-         else:
--            self._add_user_module(name, self._blurb)
-+            self._add_user_module(name, self._user_blurb)
-             self._begin_user_module(name)
 =20
-     def visit_include(self, name, info):
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index d8751daa04..99dcaf7074 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -243,8 +243,9 @@ class QAPISchemaGenTypeVisitor(QAPISchemaModularCVisito=
-r):
-     def __init__(self, prefix):
-         QAPISchemaModularCVisitor.__init__(
-             self, prefix, 'qapi-types', ' * Schema-defined QAPI types',
--            __doc__)
--        self._add_system_module(None, ' * Built-in QAPI types')
-+            ' * Built-in QAPI types', __doc__)
++class QAPISchemaModule(object):
++    def __init__(self, name):
++        self.name =3D name
 +
-+    def _begin_system_module(self, name):
-         self._genc.preamble_add(mcgen('''
- #include "qemu/osdep.h"
- #include "qapi/dealloc-visitor.h"
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index c72f2bc5c0..4efce62b0c 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -285,8 +285,9 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVisit=
-or):
-     def __init__(self, prefix):
-         QAPISchemaModularCVisitor.__init__(
-             self, prefix, 'qapi-visit', ' * Schema-defined QAPI visitors',
--            __doc__)
--        self._add_system_module(None, ' * Built-in QAPI visitors')
-+            ' * Built-in QAPI visitors', __doc__)
 +
-+    def _begin_system_module(self, name):
-         self._genc.preamble_add(mcgen('''
- #include "qemu/osdep.h"
- #include "qapi/error.h"
-@@ -296,8 +297,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaModularCVisit=
-or):
- #include "qapi/visitor.h"
- #include "qapi/qapi-builtin-types.h"
+ class QAPISchemaInclude(QAPISchemaEntity):
+-
+-    def __init__(self, fname, info):
++    def __init__(self, sub_module, info):
+         QAPISchemaEntity.__init__(self, None, info, None)
+-        self.fname =3D fname
++        self._sub_module =3D sub_module
 =20
--''',
--                                      prefix=3Dprefix))
-+'''))
+     def visit(self, visitor):
+         QAPISchemaEntity.visit(self, visitor)
+-        visitor.visit_include(self.fname, self.info)
++        visitor.visit_include(self._sub_module.name, self.info)
 =20
-     def _begin_user_module(self, name):
-         types =3D self._module_basename('qapi-types', name)
+=20
+ class QAPISchemaType(QAPISchemaEntity):
+@@ -276,16 +284,14 @@ class QAPISchemaArrayType(QAPISchemaType):
+             self.info and self.info.defn_meta)
+         assert not isinstance(self.element_type, QAPISchemaArrayType)
+=20
++    def set_module(self, schema):
++        self._set_module(schema, self.element_type.info)
++
+     @property
+     def ifcond(self):
+         assert self._checked
+         return self.element_type.ifcond
+=20
+-    @property
+-    def module(self):
+-        assert self._checked
+-        return self.element_type.module
+-
+     def is_implicit(self):
+         return True
+=20
+@@ -783,6 +789,10 @@ class QAPISchema(object):
+         self.docs =3D parser.docs
+         self._entity_list =3D []
+         self._entity_dict =3D {}
++        self._module_dict =3D {}
++        self._schema_dir =3D os.path.dirname(fname)
++        self._make_module(None) # built-ins
++        self._make_module(fname)
+         self._predefining =3D True
+         self._def_predefineds()
+         self._predefining =3D False
+@@ -826,14 +836,26 @@ class QAPISchema(object):
+                 info, "%s uses unknown type '%s'" % (what, name))
+         return typ
+=20
++    def _module_name(self, fname):
++        if fname is None:
++            return None
++        return os.path.relpath(fname, self._schema_dir)
++
++    def _make_module(self, fname):
++        name =3D self._module_name(fname)
++        if not name in self._module_dict:
++            self._module_dict[name] =3D QAPISchemaModule(name)
++        return self._module_dict[name]
++
++    def module_by_fname(self, fname):
++        name =3D self._module_name(fname)
++        assert name in self._module_dict
++        return self._module_dict[name]
++
+     def _def_include(self, expr, info, doc):
+         include =3D expr['include']
+         assert doc is None
+-        main_info =3D info
+-        while main_info.parent:
+-            main_info =3D main_info.parent
+-        fname =3D os.path.relpath(include, os.path.dirname(main_info.fname=
+))
+-        self._def_entity(QAPISchemaInclude(fname, info))
++        self._def_entity(QAPISchemaInclude(self._make_module(include), inf=
+o))
+=20
+     def _def_builtin_type(self, name, json_type, c_type):
+         self._def_entity(QAPISchemaBuiltinType(name, json_type, c_type))
+@@ -1065,15 +1087,16 @@ class QAPISchema(object):
+             ent.check(self)
+             ent.connect_doc()
+             ent.check_doc()
++        for ent in self._entity_list:
++            ent.set_module(self)
+=20
+     def visit(self, visitor):
+         visitor.visit_begin(self)
+         module =3D None
+-        visitor.visit_module(module)
+         for entity in self._entity_list:
+             if visitor.visit_needed(entity):
+                 if entity.module !=3D module:
+                     module =3D entity.module
+-                    visitor.visit_module(module)
++                    visitor.visit_module(module.name)
+                 entity.visit(visitor)
+         visitor.visit_end()
 --=20
 2.21.0
 
