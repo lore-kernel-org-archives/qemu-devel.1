@@ -2,82 +2,103 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A0DC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 02:36:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92BE7C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 03:02:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 505702240D
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 02:36:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nvdEOkBp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 505702240D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6937222449
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 03:02:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6937222449
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXFqo-0000wU-BR
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 21:36:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35076)
+	id 1iXGGL-0006C3-Sx
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 22:02:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50108)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXFpl-0000Ky-JN
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:35:11 -0500
+ (envelope-from <bala24@linux.ibm.com>) id 1iXGF8-0005Ng-Hd
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 22:01:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXFpk-0003se-Je
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:35:09 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33590)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iXFpk-0003sF-C6
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:35:08 -0500
-Received: by mail-ot1-x342.google.com with SMTP id u13so19897751ote.0
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 18:35:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=o+sycsXsPY8vMFAga525YzP3r3wCue6MmGUsEHay0FU=;
- b=nvdEOkBpxZC6rl0tL7f2swERsgm+puFy4PFl35ovxRZOwwdOdbOaldYny8jCSnuewz
- Zln+4wP+KhO5/cRdwqPIkturEAxF5g7Q+nLh2fysK+0TSXplyN0iPyiBgFDG1qJdrqVO
- 3hlXOPsQosX490mLPvs1aLoSkC7kObqFOmuHqXLU6N7XnM6ccgeUXUW62hiNAvAffpvP
- EofV75YLun4AvrzTkxL9bXdpDhnjGmUF2ZRWYO1zCD9Vhmnc4RwA+w8gHPawdAiPzWvp
- rq/8MHJCxzKMKcObxzprWosGVDSWAepmD0IHYcIBHFu1N7Cr3sbA+f/F5da/60IOl7sx
- 3mwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=o+sycsXsPY8vMFAga525YzP3r3wCue6MmGUsEHay0FU=;
- b=jA+TWa4G5MFJbYnn0Az1TOjUoLf2YlET79HPZcqMU1wFwK7Kv57ciWVwqDnJ/ScKHb
- YuiS9aqZ/psbsm3fmH7EJuyWwf1Uyb3KDUq2mvGkADOjD9NxZbwEUw7G0YWKL9zUIVhe
- UEalYBAWlJhTLVvoFyGm9Yk+X7FxO4dDNAekrZYvs/xVWw3hs5Vpj3hee7QyZEASmq/Q
- vvf8HKLmeNAAhT8u6Y9qyBmA3ayiPY2XeeXL29FD/pBETRvRvcqbS9L59AwCBh4mkE19
- f3Umei7ourEX6s1srNx7K9P0DNHMYzy0P8bWe/NTkmRhagvHJRNed8DveD7atxBrwNeh
- 82aQ==
-X-Gm-Message-State: APjAAAXBXa0dVsFQpzgwNtLfJO6oLUBOuSuSPlkOR8zyKeJEwtg+Ytgi
- ZHo5ZicIg9DWlxDHtVqxBy9IQkrCnABQuNt9dZ4=
-X-Google-Smtp-Source: APXvYqwIng9oSLx3RJk/luDEXkgjHFLqWbbWc7rq8+xWAXql13vb0l1B9ndwoC8+330DD6xvkyteRu6j1wiS271hwME=
-X-Received: by 2002:a05:6830:44c:: with SMTP id
- d12mr116543otc.121.1574217307401; 
- Tue, 19 Nov 2019 18:35:07 -0800 (PST)
+ (envelope-from <bala24@linux.ibm.com>) id 1iXGF6-0008T2-32
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 22:01:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62784)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <bala24@linux.ibm.com>)
+ id 1iXGF4-0008Qe-1M
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 22:01:18 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAK2v4DU111204
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 22:01:17 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wact7qhbm-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 22:01:15 -0500
+Received: from localhost
+ by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <bala24@linux.ibm.com>;
+ Wed, 20 Nov 2019 03:01:10 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 20 Nov 2019 03:01:08 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com
+ (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xAK317AK44106042
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 20 Nov 2019 03:01:07 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 11D3CA4065;
+ Wed, 20 Nov 2019 03:01:07 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id CF25CA4067;
+ Wed, 20 Nov 2019 03:01:05 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.199.42.238])
+ by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+ Wed, 20 Nov 2019 03:01:05 +0000 (GMT)
+Date: Wed, 20 Nov 2019 08:31:03 +0530
+From: Balamuruhan S <bala24@linux.ibm.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 2/5] hw/ppc/pnv_xscom: PBA bar mask values are incorrect
+ with homer/occ sizes
+References: <20191119175056.32518-1-bala24@linux.ibm.com>
+ <20191119175056.32518-3-bala24@linux.ibm.com>
+ <20191119215618.GU5582@umbus.fritz.box>
+ <20191119220032.GV5582@umbus.fritz.box>
+ <20191119220226.GW5582@umbus.fritz.box>
 MIME-Version: 1.0
-Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Tue, 19 Nov 2019 18:35:07
- -0800 (PST)
-In-Reply-To: <20191119190405.GA23854@ls3530.fritz.box>
-References: <20191119190405.GA23854@ls3530.fritz.box>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 20 Nov 2019 03:35:07 +0100
-Message-ID: <CAL1e-=iFW3JhEu_OwVM3LFekgVav=P2CED=BGFM=tqDJW0RQEw@mail.gmail.com>
-Subject: Re: [PATCH] linux-user/strace: Improve output of various syscalls
-To: Helge Deller <deller@gmx.de>
-Content-Type: multipart/alternative; boundary="00000000000068341f0597be0786"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::342
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20191119220226.GW5582@umbus.fritz.box>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-TM-AS-GCONF: 00
+x-cbid: 19112003-0012-0000-0000-000003693653
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112003-0013-0000-0000-000021A4C2CB
+Message-Id: <20191120030103.GA689@localhost.localdomain>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-19_08:2019-11-15,2019-11-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ priorityscore=1501 phishscore=0 mlxlogscore=999 suspectscore=0
+ adultscore=0 mlxscore=0 bulkscore=0 clxscore=1015 spamscore=0
+ malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-1911200026
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by
+ mx0a-001b2d01.pphosted.com id xAK2v4DU111204
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,42 +110,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: groug@kaod.org, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000068341f0597be0786
-Content-Type: text/plain; charset="UTF-8"
+On Wed, Nov 20, 2019 at 09:02:26AM +1100, David Gibson wrote:
+> On Wed, Nov 20, 2019 at 09:00:32AM +1100, David Gibson wrote:
+> > On Wed, Nov 20, 2019 at 08:56:18AM +1100, David Gibson wrote:
+> > > On Tue, Nov 19, 2019 at 11:20:53PM +0530, Balamuruhan S wrote:
+> > > > homer/occ sizes are calculated in skiboot with `(mask | 0xfffff) =
++ 1`,
+> > > > and from xscom access should return correct mask values instead o=
+f actual
+> > > > sizes.
+> > > >=20
+> > > > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> > > > Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
+> > > > ---
+> > > >  hw/ppc/pnv_xscom.c | 10 ++++++----
+> > > >  1 file changed, 6 insertions(+), 4 deletions(-)
+> > > >=20
+> > > > diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
+> > > > index f01d788a65..cdd5fa356e 100644
+> > > > --- a/hw/ppc/pnv_xscom.c
+> > > > +++ b/hw/ppc/pnv_xscom.c
+> > > > @@ -46,6 +46,10 @@
+> > > >  #define P9_PBA_BARMASK0                 0x5012b04
+> > > >  #define P9_PBA_BARMASK2                 0x5012b06
+> > > > =20
+> > > > +/* Mask to calculate Homer/Occ size */
+> > > > +#define HOMER_SIZE_MASK                 0x0000000000300000ull
+> > > > +#define OCC_SIZE_MASK                   0x0000000000700000ull
+> > >=20
+> > > Uuuhhhhh... AFAICT these defines have identical values to
+> > > PNV_HOMER_SIZE and PNV_OCC_COMMON_AREA_SIZE, so I don't see what th=
+is
+> > > patch is actually changing.
+> >=20
+> > Oh, sorry, missed that the values were changed in 1/5.  Would have
+> > been easier to follow if the two patches were folded together, but
+> > never mind.  Applied.
+>=20
+> Ugh.. or not.  The first patch doesn't apply for me, looks like it
+> needs a rebase (or you have something else in your tree I don't know
+> about).
 
->
->  #ifdef TARGET_NR_ioctl
-> -{ TARGET_NR_ioctl, "ioctl" , NULL, NULL, NULL },
-> +{ TARGET_NR_ioctl, "ioctl" , "%s(%d,%#x,%#x,%#x,%#x,%#x)", NULL, NULL },
->  #endif
+I checked out from upstream master (commit: 8937f17249) and worked on
+it.
+
+-- Bala
+>=20
+> --=20
+> David Gibson			| I'll have my music baroque, and my code
+> david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _oth=
+er_
+> 				| _way_ _around_!
+> http://www.ozlabs.org/~dgibson
 
 
-ioctl() has only three arguments.
-
-Regards,
-
-Aleksandar
-
---00000000000068341f0597be0786
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-=C2=A0#ifdef TARGET_NR_ioctl<br>
--{ TARGET_NR_ioctl, &quot;ioctl&quot; , NULL, NULL, NULL },<br>
-+{ TARGET_NR_ioctl, &quot;ioctl&quot; , &quot;%s(%d,%#x,%#x,%#x,%#x,%#x)&qu=
-ot;, NULL, NULL },<br>
-=C2=A0#endif</blockquote><div><br></div><div>ioctl() has only three argumen=
-ts.</div><div><br></div><div>Regards,</div><div><br></div><div>Aleksandar</=
-div><div><br></div><div><br></div>
-
---00000000000068341f0597be0786--
 
