@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 324EDC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 20:32:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A66C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 20:36:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1DE920895
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 20:32:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8CB382075E
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 20:36:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H9B6PZ7y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1DE920895
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VCxksShR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CB382075E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXWek-0006bl-4G
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 15:32:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59744)
+	id 1iXWi3-0001zU-O0
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 15:36:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60233)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iXWe1-0006AZ-G9
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:32:10 -0500
+ (envelope-from <eblake@redhat.com>) id 1iXWhG-0001Nl-E6
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:35:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iXWdx-0007Jc-Hq
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:32:07 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37016
+ (envelope-from <eblake@redhat.com>) id 1iXWhF-00027Z-1F
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:35:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27207
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iXWdx-0007JA-EZ
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:32:05 -0500
+ (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iXWhE-00024u-UA
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:35:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574281923;
+ s=mimecast20190719; t=1574282127;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VaSl4JBldp0Zm3LMlPI61ff65Dv3CRb+utK7gV/zTWM=;
- b=H9B6PZ7yLBdl3aHaztiokEVXblyJIjGnMa8tu4LOqNzHYIW8VLCyi2vMrr/gM6G370aCxa
- uEAO9IfaOGpwgaPzrFM4tU9LiQvAuJLNYIMwLcrraifMR2XWTO1/HlbSgftaG15G7MYPwh
- txHPT7W+ceuJGYR+EhLTbplDeSMOsiI=
+ bh=zoRL0s/PwlgdpLfSG7fpqjXb9S8UjCR0IsyiGG2OCjM=;
+ b=VCxksShRTUN7v8EqxUvDxaO8+YI3nkOojSzrpXe0kPOLH0MnhKVh6Eu7QQ/qYHuCgKZcTI
+ EV6UKIcz/I8nMPKtj/tRZ+Ipx7u1KdH8/MrZZbD6vvrzJRRxq5JfFYdv50WUaspfk/TWnc
+ UWwJMKqyaIIzFJJIQybDzd7jYyupakg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-_2rEzBtLMAGyY_43fX4q8Q-1; Wed, 20 Nov 2019 15:32:01 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-107-0FK6NQYYO-O1XmCaEJP5cw-1; Wed, 20 Nov 2019 15:35:24 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B948801E7E;
- Wed, 20 Nov 2019 20:32:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AA87DB20;
+ Wed, 20 Nov 2019 20:35:23 +0000 (UTC)
 Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 79D5468433;
- Wed, 20 Nov 2019 20:31:59 +0000 (UTC)
-Subject: Re: [PATCH 4/6] qapi: Proper intermediate representation for modules
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F317A19C70;
+ Wed, 20 Nov 2019 20:35:22 +0000 (UTC)
+Subject: Re: [PATCH 5/6] qapi: Fix code generation for empty modules
 To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
 References: <20191120182551.23795-1-armbru@redhat.com>
- <20191120182551.23795-5-armbru@redhat.com>
+ <20191120182551.23795-6-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <2a6e49b6-eb8a-43a8-7308-1980c1f1432e@redhat.com>
-Date: Wed, 20 Nov 2019 14:31:58 -0600
+Message-ID: <f9a57f04-4c8e-3fda-bd7f-9f74cb24a7fb@redhat.com>
+Date: Wed, 20 Nov 2019 14:35:22 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191120182551.23795-5-armbru@redhat.com>
+In-Reply-To: <20191120182551.23795-6-armbru@redhat.com>
 Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: _2rEzBtLMAGyY_43fX4q8Q-1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: 0FK6NQYYO-O1XmCaEJP5cw-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
@@ -96,21 +96,21 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 11/20/19 12:25 PM, Markus Armbruster wrote:
-> Modules are represented only by their names so far.  Introduce class
-> QAPISchemaModule.  So far, it merely wraps the name.  The next patch
-> will put it to more interesting use.
+> When a sub-module doesn't contain any definitions, we don't generate
+> code for it, but we do generate the #include.
 >=20
-> Once again, arrays spice up the patch a bit.  For any other type,
-> @info points to the definition, which lets us map from @info to
-> module.  For arrays, there is no definition, and @info points to the
-> first use instead.  We have to use the element type's module instead,
-> which is only available after .check().
+> We generate code only for modules that get visited.
+> QAPISchema.visit() visits only modules that have definitions.  It can
+> visit modules multiple times.
+>=20
+> Clean this up as follows.  Collect entities in their QAPISchemaModule.
+> Have QAPISchema.visit() call QAPISchemaModule.visit() for each module.
+> Have QAPISchemaModule.visit() call .visit_module() for itself, and
+> QAPISchemaEntity.visit() for each of its entities.  This way, we visit
+> each module exactly once.
 >=20
 > Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   scripts/qapi/schema.py | 63 ++++++++++++++++++++++++++++--------------
->   1 file changed, 43 insertions(+), 20 deletions(-)
->=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
