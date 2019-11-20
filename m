@@ -2,79 +2,70 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 804E2C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 876C9C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:43:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4AF1D21906
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:43:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 52D9B21906
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:43:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HUyFBTbE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AF1D21906
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GUhPW766"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52D9B21906
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXONx-0001ms-Jv
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 06:43:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42872)
+	id 1iXOO4-0001wh-Fb
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 06:43:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42891)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iXOMl-0000tj-C5
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:41:48 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iXOMs-0000xf-FM
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:41:56 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iXOMj-00076c-MJ
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:41:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27077
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1iXOMp-0007GX-Pl
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:41:54 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:42757 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iXOMj-00075Q-BX
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:41:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574250104;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=zalnQXLaPowJs7MLSHDtEvpAbA/8e+NyuWkugn7g8YE=;
- b=HUyFBTbEW0ktLkp8vok6d1lBRDQOwHkRmeIqgpxCuoqFaOY5gqwqM4PvWiUqdU0v6nYzH9
- DxtALlF8BCDeNPCGIhFG0mVV+swY3nAhF0RVcT0hMMttRfTgMrwG0bOWcGnKCmZ/avKVax
- ogi9GjzQshGhWY8ug+uPdCDCj5wLjkQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-82-rP8yJImzMwy4YXQuOyF7qQ-1; Wed, 20 Nov 2019 06:41:43 -0500
-X-MC-Unique: rP8yJImzMwy4YXQuOyF7qQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99419802689
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 11:41:42 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.151])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F22DE600C9;
- Wed, 20 Nov 2019 11:41:32 +0000 (UTC)
-Date: Wed, 20 Nov 2019 11:41:32 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH] vhost-user-input: use free(elem) instead of g_free(elem)
-Message-ID: <20191120114132.GD242924@stefanha-x1.localdomain>
-References: <20191119111626.112206-1-stefanha@redhat.com>
- <6b45458f-386f-3be0-c3d8-20c88ca37a2b@redhat.com>
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iXOMo-00078x-WD; Wed, 20 Nov 2019 06:41:51 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47J14T2cTkz9sPc; Wed, 20 Nov 2019 22:41:45 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1574250105;
+ bh=xm/OD7gHeqIK4V+e5RzwnfYaJi2fQC8X9pkmZJcIJqo=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=GUhPW766y0JWPtM9MDBSIxTN8ffRomhwEMpynGNRDG41ePqNu1n+/+M0Riw5yzCiP
+ /gsyBYVP/oY+EfTu5SfwaY7HqtOrXnCz2KaN8RaTNwz+rr5LANMNXyEfexhiqYz5He
+ /DLQK1hlbcc9RMEjhvk7xU1/cmYj+XNau2aiLSJQ=
+Date: Wed, 20 Nov 2019 22:41:28 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [PATCH] spapr: Fix VSMT mode when it is not supported by the
+ kernel
+Message-ID: <20191120114128.GN5582@umbus.fritz.box>
+References: <20191108154035.12913-1-lvivier@redhat.com>
+ <20191108174759.2d4040f1@bahia.lan>
+ <20191119010012.GI5582@umbus.fritz.box>
+ <caa35299-c928-a968-83b5-842d000f0242@redhat.com>
+ <20191119164526.0e980a37@bahia.lan>
+ <20191120043653.GG5582@umbus.fritz.box>
+ <cb8f7dc7-d6db-6bd9-e825-1ade7d89cdd9@redhat.com>
+ <0c1f57ac-0823-4268-429b-d1aee8f7f8d5@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <6b45458f-386f-3be0-c3d8-20c88ca37a2b@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ylS2wUBXLOxYXZFQ"
+ protocol="application/pgp-signature"; boundary="L0wVL3lRYNLgmYWy"
 Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+In-Reply-To: <0c1f57ac-0823-4268-429b-d1aee8f7f8d5@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,46 +77,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ Greg Kurz <groug@kaod.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ qemu-ppc@nongnu.org, clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---ylS2wUBXLOxYXZFQ
-Content-Type: text/plain; charset=iso-8859-1
+
+--L0wVL3lRYNLgmYWy
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 20, 2019 at 10:37:35AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 11/19/19 12:16 PM, Stefan Hajnoczi wrote:
-> > The virtqueue element returned by vu_queue_pop() is allocated using
-> > malloc(3) by virtqueue_alloc_element().  Use the matching free(3)
-> > function instead of glib's g_free().
+On Wed, Nov 20, 2019 at 12:28:19PM +0100, Laurent Vivier wrote:
+> On 20/11/2019 10:00, Laurent Vivier wrote:
+> > On 20/11/2019 05:36, David Gibson wrote:
+> >> On Tue, Nov 19, 2019 at 04:45:26PM +0100, Greg Kurz wrote:
+> >>> On Tue, 19 Nov 2019 15:06:51 +0100
+> >>> Laurent Vivier <lvivier@redhat.com> wrote:
+> >>>
+> >>>> On 19/11/2019 02:00, David Gibson wrote:
+> >>>>> On Fri, Nov 08, 2019 at 05:47:59PM +0100, Greg Kurz wrote:
+> >>>>>> On Fri,  8 Nov 2019 16:40:35 +0100
+> >>>>>> Laurent Vivier <lvivier@redhat.com> wrote:
+> >>>>>>
+> >>>>>>> Commit 29cb4187497d sets by default the VSMT to smp_threads,
+> >>>>>>> but older kernels (< 4.13) don't support that.
+> >>>>>>>
+> >>>>>>> We can reasonably restore previous behavior with this kernel
+> >>>>>>> to allow to run QEMU as before.
+> >>>>>>>
+> >>>>>>> If VSMT is not supported, VSMT will be set to MAX(8, smp_threads)
+> >>>>>>> as it is done for previous machine types (< pseries-4.2)
+> >>>>>>>
+> >>>>>>
+> >>>>>> It is usually _bad_ to base the machine behavior on host capabilit=
+ies.
+> >>>>>> What happens if we migrate between an older kernel and a recent on=
+e ?
+> >>>>>
+> >>>>> Right.  We're really trying to remove instaces of such behaviour.  =
+I'd
+> >>>>> prefer to completely revert Greg's original patch than to re-introd=
+uce
+> >>>>> host configuration dependency into the guest configuration..
+> >>>>>
+> >>>>>> I understand this is to fix tests/migration-test on older kernels.
+> >>>>>> Couldn't this be achieved with migration-test doing some introspec=
+tion
+> >>>>>> and maybe pass vsmt=3D8 on the QEMU command line ?
+> >>>>>
+> >>>>> ..adjusting the test case like this might be a better idea, though.
+> >>>>>
+> >>>>> What's the test setup where we're using the old kernel?  I really o=
+nly
+> >>>>> applied the original patch on the guess that we didn't really care
+> >>>>> about kernels that old.  The fact you've hit this in practice makes=
+ me
+> >>>>> doubt that assumption.
+> >>>>>
+> >>>>
+> >>>> The way to fix the tests is to add "-smp threads=3D8" on the command=
+ line
+> >>>> (for all tests, so basically in qtest_init_without_qmp_handshake(), =
+and
+> >>>> it will impact all the machine types), and we have to check if it is
+> >>>
+> >>> Ohhh... it isn't possible to initialize Qtest with machine specific
+> >>> properties ? That's a bit unfortunate :-\
+> >>
+> >> Uhh... I don't see why we can't.  Couldn't we just put either -machine
+> >> vsmt=3D8 or -smp 8 into the cmd_src / cmd_dst printfs() in the
+> >> strcmp(arch, "ppc64") case?
 > >=20
-> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > Yes, but we need to do that to all other tests that fail. test-migration
+> > is not the only one impacted by the problem (we have also pxe-test), so
+> > it's why I thought to fix the problem in a generic place.
+> >=20
+> > But it seems there are only this couple of tests that are impacted so I
+> > can modify both instead. I think only tests that really start CPU have
+> > the problem.
+> >=20
+> > I'm going to send a patch to fix that.
 >=20
-> Fixes: 06914c97d3a ?
+> And again, it's a little bit more complicated than expected: setting
+> vsmt to 8 works only with kvm_hv, but breaks in case of TCG or kvm_pr.
+> So the test must check what is in use...
 
-Good idea, I should have included that.
+Ugh, yeah, that's getting too ugly.  I think the feasible options are
+either to revert the patch, or just say that upstream qemu no longer
+supports a RHEL7 host.
 
-Stefan
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
---ylS2wUBXLOxYXZFQ
+--L0wVL3lRYNLgmYWy
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3VJmsACgkQnKSrs4Gr
-c8iU8AgAjCH4yzbFhW6jh7iMfcADOu25yyP+aYBf6KRiBC7iUq+8wp7+qwzkeFu5
-j1QD824m8L1I9J0WF6illuJnCrAKB+rZhDMJZplzoPxJB0dR8KiUKp8+kLftTLOS
-pD8a2y1k8poznSaDy/qK8iIfXc8gTClqRkwhEwxUonWAWCkXEF6loUOOkQwTQXHt
-HNTTur6NIoPmmlDlFzw4fD30G0VT5CBIBhKbyEDTlg51ud92cRjY//6FKFkjbFTs
-fXQ66RBDtzt5ZDVKn52cDXtYG0QEC0BTepfZCj0tWcqN8XunDIvQtzdgNsHZ3rDc
-bmmvvcvHGNYDjZp8TCBvqudiR8UGVg==
-=yV3o
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3VJmYACgkQbDjKyiDZ
+s5LVww/9Gsbxgu86Sx6FHj5lzp8rEFC5hNHIsaNLB8jort06k0nhzwGR/81SqaZu
+mWwwSzrXYGVsCtlUy+cs30n7niktbJ62Rs7GC2hpK/Xhm/W2NTVSw8xc0Aq6R2LI
+duAzsKB2rJG4n3jeM3yDwpkXYa5j0r2dYgRoXqobfaM1cNKJseuNVlXfGVnWZjZi
+6dgxWNSNsQDs9gCIx2DRqbkCNvHqldYa3nNFw4N4dAJu9U5Rrty+r8BPepetmduf
+NuS1rCoVX+i41JaHT4ULEtAvGG0GI8oc/qqm8x5ZORQaJYQ3kU2EAISE1IExeToO
+XtXrfhFkpF8sM/r3bVaXNcTlWPvAjIZPJCzb5W7ILmh/vnDaSh9SZXejtZz+W6D6
+2HFID4rZYrcmnOVe6BZOvMSZCo1m/NDl73ZDZOik8LNyTNPVYHowcz4SJYmS3Kj1
+eBQBVA8JJ44/JUDjkvE8zT4r6W1dbXRih43NCNmuDGG0MuaioOrU2LjX/4BUYnc4
+V9yIrRFQdeKh+YJAVWyt4FEWGddjTxGM4RfjIokQViSXLJgTyjkHJTHRYLMC8Y+P
+NwNW+/ttLJc0p9hApAu7cgNUEqUQmtU4muq2Hezb8K3o3gYf1WmfwwxhrIx+oiCC
+4HETOfO8rzyaPsxBiGh8y/6osGs00MhzxaFkog6++Wm82Uxvpk0=
+=vx8b
 -----END PGP SIGNATURE-----
 
---ylS2wUBXLOxYXZFQ--
-
+--L0wVL3lRYNLgmYWy--
 
