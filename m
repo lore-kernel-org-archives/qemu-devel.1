@@ -2,60 +2,61 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.4 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLACK,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDFB8C43215
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC8B8C432C0
 	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 03:42:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE3702245D
+	by mail.kernel.org (Postfix) with ESMTPS id 750922244A
 	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 03:42:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="iFJRMgVU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE3702245D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="RXT8G0N9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 750922244A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53402 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXGtM-0007C0-Nn
+	id 1iXGtM-0007Ci-KG
 	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 22:42:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48370)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48378)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iXGsG-00063A-0d
+ (envelope-from <dgibson@ozlabs.org>) id 1iXGsG-00063C-1X
  for qemu-devel@nongnu.org; Tue, 19 Nov 2019 22:41:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iXGsE-00020f-Iv
+ (envelope-from <dgibson@ozlabs.org>) id 1iXGsE-00020k-J7
  for qemu-devel@nongnu.org; Tue, 19 Nov 2019 22:41:47 -0500
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:53165 helo=ozlabs.org)
+Received: from ozlabs.org ([2401:3900:2:1::2]:38515)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iXGsD-0001vL-Su; Tue, 19 Nov 2019 22:41:46 -0500
+ id 1iXGsD-0001vv-RH; Tue, 19 Nov 2019 22:41:46 -0500
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 47HpQV25SNz9sPV; Wed, 20 Nov 2019 14:41:38 +1100 (AEDT)
+ id 47HpQV2ngLz9sPf; Wed, 20 Nov 2019 14:41:38 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1574221298;
- bh=WmIMY2kyFRbwIJoaOQRQ/x7hA6B+1zmuq5C7zFZiTGk=;
+ bh=+4M7v6QcHPgr8jDHobnTfot9DkUYJ8C0PIZQx9eEHOQ=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=iFJRMgVUzZt6Q6GYyEpg5f8fEQaPh2WJeQMTvzFGfuFmhZTIHXUAXsa0fDck7ylRH
- CETM3GkAbPCZu/r8yCeEdAaXOtBxCwYCi/kKrT/+PYkr/JckldHwmI03aBrbLcJALU
- D5SZkaXA6EzOG4YhJZ643O24vjvev6BEgdQcmkTI=
-Date: Wed, 20 Nov 2019 14:25:25 +1100
+ b=RXT8G0N9eAFp4rW8umgwY252V+6lXVzWAJoQE3FOjd1dOiNBKf4F7EV+b6EhSD3bs
+ 6hWyTE9UzFYeKUHHUApEmP4pLwhJbiTUocP6TvneWaY2Kgrug4KxRvoMOn7htPHQBm
+ sv4T4HqQmGcGUuzQf8EYgR3e6erWL7nHFourMK5s=
+Date: Wed, 20 Nov 2019 14:34:12 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH for-5.0 v5 07/23] ppc/xive: Check V bit in TM_PULL_POOL_CTX
-Message-ID: <20191120032525.GB5582@umbus.fritz.box>
-References: <20191115162436.30548-1-clg@kaod.org>
- <20191115162436.30548-8-clg@kaod.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [RFC 3/5] vfio/pci: Respond to KVM irqchip change notifier
+Message-ID: <20191120033412.GC5582@umbus.fritz.box>
+References: <20191017054218.8876-1-david@gibson.dropbear.id.au>
+ <20191017054218.8876-4-david@gibson.dropbear.id.au>
+ <20191017142845.5d4d9121@x1.home>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="TuBLotoxjxNtqonL"
+ protocol="application/pgp-signature"; boundary="YLwdFo+Xu6B7B0Yp"
 Content-Disposition: inline
-In-Reply-To: <20191115162436.30548-8-clg@kaod.org>
+In-Reply-To: <20191017142845.5d4d9121@x1.home>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
@@ -71,47 +72,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: aik@ozlabs.ru, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, clg@kaod.org,
+ groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---TuBLotoxjxNtqonL
-Content-Type: text/plain; charset=iso-8859-1
+--YLwdFo+Xu6B7B0Yp
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 15, 2019 at 05:24:20PM +0100, C=E9dric Le Goater wrote:
-> A context should be 'valid' when pulled from the thread interrupt
-> context registers.
+On Thu, Oct 17, 2019 at 02:28:45PM -0600, Alex Williamson wrote:
+> On Thu, 17 Oct 2019 16:42:16 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-Applied, thanks.
-
-> ---
->  hw/intc/xive.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> > VFIO PCI devices already respond to the pci intx routing notifier, in o=
+rder
+> > to update kernel irqchip mappings when routing is updated.  However this
+> > won't handle the case where the irqchip itself is replaced by a differe=
+nt
+> > model while retaining the same routing.  This case can happen on
+> > the pseries machine type due to PAPR feature negotiation.
+> >=20
+> > To handle that case, add a handler for the irqchip change notifier, whi=
+ch
+> > does much the same thing as the routing notifier, but is unconditional,
+> > rather than being a no-op when the routing hasn't changed.
+> >=20
+> > Cc: Alex Williamson <alex.williamson@redhat.com>
+> > Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
+> >=20
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+> > ---
+> >  hw/vfio/pci.c | 12 ++++++++++++
+> >  hw/vfio/pci.h |  2 ++
+> >  2 files changed, 14 insertions(+)
+> >=20
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index 529ad13908..6aa806baff 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -255,6 +255,14 @@ static void vfio_intx_routing_notifier(PCIDevice *=
+pdev)
+> >      }
+> >  }
+> > =20
+> > +static void vfio_irqchip_change(Notifier *notify, void *data)
+> > +{
+> > +    VFIOPCIDevice *vdev =3D container_of(notify, VFIOPCIDevice,
+> > +                                       irqchip_change_notifier);
+> > +
+> > +    vfio_intx_update(vdev, &vdev->intx.route);
+> > +}
+> > +
+> >  static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
+> >  {
+> >      uint8_t pin =3D vfio_pci_read_config(&vdev->pdev, PCI_INTERRUPT_PI=
+N, 1);
+> > @@ -2960,6 +2968,8 @@ static void vfio_realize(PCIDevice *pdev, Error *=
+*errp)
+> >                                                    vfio_intx_mmap_enabl=
+e, vdev);
+> >          pci_device_set_intx_routing_notifier(&vdev->pdev,
+> >                                               vfio_intx_routing_notifie=
+r);
+> > +        vdev->irqchip_change_notifier.notify =3D vfio_irqchip_change;
+> > +        kvm_irqchip_add_change_notifier(&vdev->irqchip_change_notifier=
+);
+> >          ret =3D vfio_intx_enable(vdev, errp);
+> >          if (ret) {
+> >              goto out_teardown;
+> > @@ -3009,6 +3019,7 @@ static void vfio_realize(PCIDevice *pdev, Error *=
+*errp)
+> > =20
+> >  out_teardown:
+> >      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+> > +    kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
 >=20
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index 42e9a11ef731..511e1a936347 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -377,6 +377,11 @@ static uint64_t xive_tm_pull_os_ctx(XiveTCTX *tctx, =
-hwaddr offset,
-> =20
->      qw1w2 =3D xive_tctx_get_os_cam(tctx, &nvt_blk, &nvt_idx, &vo);
-> =20
-> +    if (!vo) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: pulling invalid NVT %x/%x =
-!?\n",
-> +                      nvt_blk, nvt_idx);
-> +    }
-> +
->      /* Invalidate CAM line */
->      qw1w2_new =3D xive_set_field32(TM_QW1W2_VO, qw1w2, 0);
->      xive_tctx_set_os_cam(tctx, qw1w2_new);
+> We can get here without having added the irqchip notifier and I don't
+> think QLIST_REMOVE is very friendly with gratuitous calls.
+
+Good point, adjusted.
+
+
+> >      vfio_teardown_msi(vdev);
+> >      vfio_bars_exit(vdev);
+> >  error:
+> > @@ -3042,6 +3053,7 @@ static void vfio_exitfn(PCIDevice *pdev)
+> >      vfio_unregister_req_notifier(vdev);
+> >      vfio_unregister_err_notifier(vdev);
+> >      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
+> > +    kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
+>=20
+> Same here.  Otherwise the approach looks sane to me.  Thanks,
+>=20
+> Alex
+>=20
+> >      vfio_disable_interrupts(vdev);
+> >      if (vdev->intx.mmap_timer) {
+> >          timer_free(vdev->intx.mmap_timer);
+> > diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+> > index 834a90d646..11324f28ce 100644
+> > --- a/hw/vfio/pci.h
+> > +++ b/hw/vfio/pci.h
+> > @@ -168,6 +168,8 @@ typedef struct VFIOPCIDevice {
+> >      bool no_vfio_ioeventfd;
+> >      bool enable_ramfb;
+> >      VFIODisplay *dpy;
+> > +
+> > +    Notifier irqchip_change_notifier;
+> >  } VFIOPCIDevice;
+> > =20
+> >  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
+>=20
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -119,25 +194,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---TuBLotoxjxNtqonL
+--YLwdFo+Xu6B7B0Yp
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3UsiUACgkQbDjKyiDZ
-s5Lk4g/+JYwacO1kCMZxvUvCXS6ZcXo6QWpNHZ7AkN0734gjIK2bD3ffNsFLor9f
-vgKHVBuW0gbNd2A+nDKtnc8IrMSpJnr/IlAiB+/QU2P0mY3x3QmN/G5mNUIMsVUM
-woR3fFmE84Rp9GnpaBBg4MpYlaBrBqeXfZYo+uLBNxnuRbIgXr7FbT1qzLG80vKU
-EH60zb0rJ/Kd3zyddKKXstkCJPOo4ygn1WtAu8PJtWFYPJA+92Mh8jW4GMi3/JxE
-ZCt4NYK/KeipBQzan9htbU33bGbPqXhbNd7m7WEQv4jTWDZxup3HvVAECS5YwTuZ
-UuiqsedcweOhbqAWsqsIB5yAq/L0oMtPQHYiZV/wFFQi17y6IUb5E+7lO6Mp2j9Z
-JPRuaJfE+/4nSPKpKtZclj4rCtv0CMTZnUB+lMsy1126dLs9rIpiRuh5lv69XZTf
-gLcGYQF/MItuig/gxsdjtQHbpBjSwvEAJOai3fNN6qE7I6xTeH7up3a8Bx/gK9oL
-Hb6D9A8hlYTMM9W+otC1HNXIQZF9Ig1qUbGx2+r2TEsQlxbjztpR4VMZ8ieAWj0D
-NaxouVhV8vOJIFFDzY002QQgtNHEdwjXoXeGqp8qB+SX59X1gosfkGqEdZZ6zGaW
-96LtC0FfBEAs3mc5FGLDQxnPaBMVljgrdUejuqb2jFsqo2dobJg=
-=4N6+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3UtDQACgkQbDjKyiDZ
+s5JSoQ//Y54FHdHeMarLaFRjpgqL5QHDvpHlBpGDPpL2V/JbgJg7afRIOyaFmDc+
+pbROcZ01Ey2cIqY1kgW/gADLUvJUMKd2vGXaLxaVcs1m/kWRrzSkp1Ote48OLNVz
+ug9VIZz9EoJ5u6J9lJUDUebblLs4VlAu81X00qUUubdBOZeFgZ0/6WofADRj6IPY
+iQt5F6i9RrYrPKZfMSou3rahjjtbEcHPW6Nn8OpjZjusP4bAf7WPY7Hr77vvU/ns
+Wti3ZeV271I9g2Yjnjj9fnbe489JgrPvUFvrFfpRkx8kuoy1BVbWrsvFkWE/Jew/
+iRMMgkuWULZ0UPMFryPON4sDCasbGoU2JS/uU56aC9RanmuNSWPi/Q1u3dSYZSwK
+QyPFwQ4M4DlkOLHH+YiJ5dscUm2zJjBvhA3wN0CTq0WYZWCzgi2z3YU1WOZyWxgt
+hMcfu1AOdHDddfCoz6l2odG7TQ3UTmFWKknCH5FiurmHPutAL8AherYfb5hu/Cid
+9heosyZ6AUSMQMu50inJ+gQFsm/RC8bd63YHNU5j8j4P4a00aD697yCDt+/6Zwb4
+bCun3qUWQbTBzRPtITalbLSI7K/7vcREiHHVhO7fxPriPUAuZ9yCqgEG/kuvZCcJ
+9fJvMI7fjihRMxH0v+NEm2fxlzRCKSX7/4S8ZmgfLtPlg4kM4VI=
+=Wzxg
 -----END PGP SIGNATURE-----
 
---TuBLotoxjxNtqonL--
+--YLwdFo+Xu6B7B0Yp--
 
