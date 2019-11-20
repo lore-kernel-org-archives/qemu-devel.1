@@ -7,93 +7,92 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4888BC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:02:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDC6C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:03:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1622D22429
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:02:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8280223D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:03:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BY1AejRa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1622D22429
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MLxH4U2H"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8280223D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXMoF-0006Cj-6P
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 05:02:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49512)
+	id 1iXMpu-0007tR-RT
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 05:03:46 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50491)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mst@redhat.com>) id 1iXMlx-0003jV-OB
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:59:42 -0500
+ (envelope-from <mst@redhat.com>) id 1iXMpE-0007Bi-A8
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:03:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mst@redhat.com>) id 1iXMlw-0004id-KS
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:59:41 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27742
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <mst@redhat.com>) id 1iXMpD-00072k-B6
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:03:04 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29515
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iXMlw-0004i1-GO
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:59:40 -0500
+ (Exim 4.71) (envelope-from <mst@redhat.com>) id 1iXMpD-00072S-7A
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:03:03 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574243979;
+ s=mimecast20190719; t=1574244182;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oarDnP90Afnb43mO4u2yKQgzH/TrOzm1gjqPWa9S4BA=;
- b=BY1AejRafo0ae4SUow8+XRgkPBlJcLSzYx/YyQrHHL7qlWCF3kcM5YwouV7miAx+CxFYjW
- Ne7Ml8CofXkj4v11dsGleTj7+LK7HTZuk05H2yCW+rG/4KuVwrrdcSdJCvXz4i5rV6kN1L
- DKOW2Okda0/kpIDTvYRxnuD9PplykNA=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-65zqoU0HPuKmRQV__Ywj3w-1; Wed, 20 Nov 2019 04:59:38 -0500
-Received: by mail-qt1-f198.google.com with SMTP id x50so16740478qth.4
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 01:59:38 -0800 (PST)
+ bh=1N0YO9aq8dPMLduzr+NixeVuzUQBBWmON9U10Qp9kz8=;
+ b=MLxH4U2HQT5gzd4cVsnbjrePREWpjVMO6KGm+O6xF11j4N5hP2t5bNSraaAcH4ZDGdP4jV
+ 1/TMhjqhwRGxCAApBJTK1NXb4gJpKsAFnX4LfA+fn8DOc/Jrk8bHcNssAe/GRW+PCMO2Mq
+ LKtwXQCId8LDOhv/2p1KCSbhQgon2eM=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-175-UGAP9IPKOYSbI54x7D4wow-1; Wed, 20 Nov 2019 04:59:43 -0500
+Received: by mail-qt1-f199.google.com with SMTP id h15so16692216qtn.6
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 01:59:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:content-transfer-encoding
  :in-reply-to;
- bh=3AVbLd6xjAB+NFS8fzE/fQA+6B5PATtOwgAshllb0wE=;
- b=OwIdoa3hltuEomEHvQjoXSftQSfqB+dp00McKovTBPqQpZnIVOXWWNANwAmwz1q+gz
- HXzMsJIcX5fjf0EUjNMqDfLT2rXBvrjPHRtxuzNuCuhkGNnbq/mpD7Ea6akeudUr0+/o
- Nngh/g5i5MLfVP49WRGV/iMQh0t9AQrofomN7EqolMTFH5SpWukTsRtMf8o0AiSOpVMp
- bjxloxxcim0X45JVBugB//CF5OQPkHXk1MsRXi5d18ChQhudg5aELry4qbp/JE+VhZW6
- 5dXuM3+c5dExYclEcfMgaZLn6K8RPeXyiqhxH4th5jdnvf0W9uVOB8HpBUIL3YGIvH1k
- r3Uw==
-X-Gm-Message-State: APjAAAWPN+SG5tOFfK2bPdhXihfQVCmXwRbZ7oU+TIyrePfKwz8ic87x
- oeINyLb3OIB5RUC4dQlewcSE5WsBEicWyjTd4nEEXxa4kvzVaingzdk8oKVUo7Sah4zMEXBKRzJ
- W03g/wJBUrhwdxCs=
-X-Received: by 2002:ac8:6bd9:: with SMTP id b25mr1739559qtt.295.1574243977495; 
- Wed, 20 Nov 2019 01:59:37 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwaiVgul7wa2lB1BaRr2O9QMlmBf+3jyAeSOOLLuchvCrd62ve+1hvxDkOBmMDqr29s2f+dLA==
-X-Received: by 2002:ac8:6bd9:: with SMTP id b25mr1739553qtt.295.1574243977353; 
- Wed, 20 Nov 2019 01:59:37 -0800 (PST)
+ bh=OQFdwkIthF4kIPw5/zTWhuJUEuuTMGScbyEP0azu+ZE=;
+ b=BEbshRgd41idHM4uKO1wbW5b742gJID9k4zI1ClBgVFjzHoOXW6DkKNcMgikZZcwF/
+ 9KO/4ku7G+gVMTGg/NzllYN9sZd4jbHD2j9RL0XbeHBPoaQ6HYasown1Y/x60hFbEVMX
+ uIsalWrs3b4v2EVRieQvwXu/esvgBW2zkUOQcAiJREjIPtaPPL+9TXuX2hKsWNfNCrCg
+ akL7N6aDO+6QiY0VNNOUYm7wNW21sTK88l5JD7GS2XyyHgIV4Ik3y68/VNefVRaZXvaL
+ USgOUAr4MiApKVfgY9bZE2w54kA6FhQRkkbjfOOteEroYOai4jpwBs5grR0YUIG+KsQN
+ evPw==
+X-Gm-Message-State: APjAAAUSdrTeH1DFR/6oN4KZRo0igNZi3B3vPXLKZ9OiXKZBfzpQThwq
+ 7zdVAu816/K4NYGpMZWSBNJ7xT+CBSFhGMRY63PYMUERv0vFxyg/grn674v6PNrOXNMXwrKmr2d
+ QE+Bsf7CNJmHEfOQ=
+X-Received: by 2002:ac8:53c1:: with SMTP id c1mr1702393qtq.328.1574243982692; 
+ Wed, 20 Nov 2019 01:59:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwi6pSI+nCkSX+Xo7OQWjcSYlb7mj5Ad8yKiZozFAemOMhtyZA/hEpop2vEmDwBfySsI6FmzA==
+X-Received: by 2002:ac8:53c1:: with SMTP id c1mr1702382qtq.328.1574243982542; 
+ Wed, 20 Nov 2019 01:59:42 -0800 (PST)
 Received: from redhat.com (bzq-79-176-6-42.red.bezeqint.net. [79.176.6.42])
- by smtp.gmail.com with ESMTPSA id p59sm13945623qtd.2.2019.11.20.01.59.34
+ by smtp.gmail.com with ESMTPSA id m186sm634642qkc.39.2019.11.20.01.59.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 20 Nov 2019 01:59:36 -0800 (PST)
-Date: Wed, 20 Nov 2019 04:59:32 -0500
+ Wed, 20 Nov 2019 01:59:41 -0800 (PST)
+Date: Wed, 20 Nov 2019 04:59:37 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/3] libvhost-user: Zero memory allocated for
- VuVirtqInflightDesc
-Message-ID: <20191120095904.11384-2-mst@redhat.com>
+Subject: [PULL 2/3] vhost-user-input: use free(elem) instead of g_free(elem)
+Message-ID: <20191120095904.11384-3-mst@redhat.com>
 References: <20191120095904.11384-1-mst@redhat.com>
 MIME-Version: 1.0
 In-Reply-To: <20191120095904.11384-1-mst@redhat.com>
 X-Mailer: git-send-email 2.22.0.678.g13338e74b8
 X-Mutt-Fcc: =sent
-X-MC-Unique: 65zqoU0HPuKmRQV__Ywj3w-1
+X-MC-Unique: UGAP9IPKOYSbI54x7D4wow-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,48 +104,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Xie Yongji <xieyongji@baidu.com>,
- Zhang Yu <zhangyu31@baidu.com>, Gerd Hoffmann <kraxel@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Xie Yongji <xieyongji@baidu.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-Use a zero-initialized VuVirtqInflightDesc struct to avoid
-that scan-build reports that vq->resubmit_list[0].counter may
-be garbage value in vu_check_queue_inflights().
+The virtqueue element returned by vu_queue_pop() is allocated using
+malloc(3) by virtqueue_alloc_element().  Use the matching free(3)
+function instead of glib's g_free().
 
-Fixes: 5f9ff1eff ("libvhost-user: Support tracking inflight I/O in
-shared memory")
-Reported-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Xie Yongji <xieyongji@baidu.com>
-Message-Id: <20191119075759.4334-1-xieyongji@baidu.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20191119111626.112206-1-stefanha@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 ---
- contrib/libvhost-user/libvhost-user.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ contrib/vhost-user-input/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/=
-libvhost-user.c
-index 68c27136ae..ec27b78ff1 100644
---- a/contrib/libvhost-user/libvhost-user.c
-+++ b/contrib/libvhost-user/libvhost-user.c
-@@ -992,7 +992,7 @@ vu_check_queue_inflights(VuDev *dev, VuVirtq *vq)
-     vq->shadow_avail_idx =3D vq->last_avail_idx =3D vq->inuse + vq->used_i=
-dx;
+diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/mai=
+n.c
+index 449fd2171a..ef4b7769f2 100644
+--- a/contrib/vhost-user-input/main.c
++++ b/contrib/vhost-user-input/main.c
+@@ -77,7 +77,7 @@ static void vi_input_send(VuInput *vi, struct virtio_inpu=
+t_event *event)
+         len =3D iov_from_buf(elem->in_sg, elem->in_num,
+                            0, &vi->queue[i].event, sizeof(virtio_input_eve=
+nt));
+         vu_queue_push(dev, vq, elem, len);
+-        g_free(elem);
++        free(elem);
+     }
 =20
-     if (vq->inuse) {
--        vq->resubmit_list =3D malloc(sizeof(VuVirtqInflightDesc) * vq->inu=
-se);
-+        vq->resubmit_list =3D calloc(vq->inuse, sizeof(VuVirtqInflightDesc=
-));
-         if (!vq->resubmit_list) {
-             return -1;
-         }
+     vu_queue_notify(&vi->dev.parent, vq);
+@@ -153,7 +153,7 @@ static void vi_handle_sts(VuDev *dev, int qidx)
+                          0, &event, sizeof(event));
+         vi_handle_status(vi, &event);
+         vu_queue_push(dev, vq, elem, len);
+-        g_free(elem);
++        free(elem);
+     }
+=20
+     vu_queue_notify(&vi->dev.parent, vq);
 --=20
 MST
 
