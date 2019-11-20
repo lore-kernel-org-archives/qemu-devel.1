@@ -2,98 +2,67 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E34C43215
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:50:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB0E2C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:51:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE60920872
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:50:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZIB2TzQg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE60920872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C5FA320872
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:51:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5FA320872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXKkw-0003WF-GG
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 02:50:30 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53264)
+	id 1iXKm5-0004hY-0c
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 02:51:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53932)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iXKk0-00031d-Ra
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:49:33 -0500
+ (envelope-from <groug@kaod.org>) id 1iXKka-0003bS-Jy
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:50:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iXKjz-0004c5-Dz
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:49:32 -0500
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43801)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iXKjz-0004aF-3m
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:49:31 -0500
-Received: by mail-wr1-x443.google.com with SMTP id n1so26856367wra.10
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 23:49:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=RXwmt1lc+cUNt9Enj0eTlfx4a+2hw/FbBNInPVcEjJI=;
- b=ZIB2TzQgef7F4QYmEg8FmlrTcCbBB3Q3xWlUdIe0C+SpGIxe5oMM8nqGx1zVTrixc2
- Gb1dIWMVq0/B5P/bSo665D9St1kXdi+pzX2/XBf9lhd1BRRvHF/dWseySYv64NO03YYa
- YtBX2ix8Ge7LaRg/gZf8Fsd0x0GTQJ21xi+vWw297AY11bR/wbVLCL9LrWPyPv7HgnVW
- ybbzKIlympv1r7J2LDtNM+JQEO2A67zw0K8e48mfSOt0z2vFEN++gAGEbqAKRFG941dd
- 5bU/7/34HCOLXzD5s/UTewRmM/hcXh9wQZcjJ8JE4L88TSBLzwkGK9k9V7EONUteKZlq
- Nz/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=RXwmt1lc+cUNt9Enj0eTlfx4a+2hw/FbBNInPVcEjJI=;
- b=NetjLGICE5XNWRdGGcJmBrYy1N7AkA0paTCp1N12uuS0wR8r3f3tT0rHeBDscaaYPM
- EsVVw/hdFu4T/YMsvUxxpWaLLRgFoQ+Ely4U0DQqlfysqYVGl8//5Y/RFANxS/7TLl+s
- Wh1Q16N+AgmiODwaVCSmhdfLXPwmJvPrR1AVtODqr+PFnsVD8lKdQR2+IZ5TSGtwHrjV
- BlLDKQk3tB0NrVRXx+m+6ky5HPHP48jKpamzHQ2admGzrIvnjoR2iGO2hDmXiKyOK22f
- GgIEgI4dj+cYBaDkInNeixD68TNOJ2NedQH9YrKl7xl8I2kT27DuKuEPCKPTSmfEvtMZ
- gAzQ==
-X-Gm-Message-State: APjAAAUQ4+gJ/97yO+wYv/J41JWDkMFfoPhdKFBN31tjIVc1IdVZ5axk
- b9IzNNyvI8ZDa8qchEDArlYohBRHOikTJQ==
-X-Google-Smtp-Source: APXvYqxemLzgj+c3TMOZi88x3B4zMGLhOGUVXf4eDcrkgqS7tqei7X5IUUlX7YwpUX6U1vRmzUTmig==
-X-Received: by 2002:adf:ed48:: with SMTP id u8mr1459252wro.28.1574236169390;
- Tue, 19 Nov 2019 23:49:29 -0800 (PST)
-Received: from [192.168.8.102] (253.red-37-10-245.dynamicip.rima-tde.net.
- [37.10.245.253])
- by smtp.gmail.com with ESMTPSA id y6sm30133250wrw.6.2019.11.19.23.49.27
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 19 Nov 2019 23:49:28 -0800 (PST)
-Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of patches
- - linux-user changes + linux-user/hexagon + skeleton of
- target/hexagon -
- Files in target/hexagon/imported are from another project and therefore do
- not conform to qemu coding standards
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-References: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
- <a77ce406-5307-cee8-8e0b-7c08056fb0df@redhat.com>
- <BYAPR02MB488666AA94EBB57C2A318004DE4C0@BYAPR02MB4886.namprd02.prod.outlook.com>
- <82dfa44e-0a27-080e-2653-b004c27fc3d1@linaro.org>
- <CAL1e-=gmLywnyUoySxuDPS1FQRx=WiH1kYrqEJDGAAcO5vDg4A@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <59c88efa-999b-9edf-7e34-f283ac8c802e@linaro.org>
-Date: Wed, 20 Nov 2019 08:49:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ (envelope-from <groug@kaod.org>) id 1iXKkZ-0005J4-8t
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:50:08 -0500
+Received: from 17.mo3.mail-out.ovh.net ([87.98.178.58]:43184)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iXKkZ-0005GV-0w
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:50:07 -0500
+Received: from player692.ha.ovh.net (unknown [10.108.57.150])
+ by mo3.mail-out.ovh.net (Postfix) with ESMTP id 0478C232317
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:50:04 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player692.ha.ovh.net (Postfix) with ESMTPSA id 908E5C308551;
+ Wed, 20 Nov 2019 07:49:56 +0000 (UTC)
+Date: Wed, 20 Nov 2019 08:49:55 +0100
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH] spapr: Fix VSMT mode when it is not supported by the
+ kernel
+Message-ID: <20191120084955.160aa793@bahia.lan>
+In-Reply-To: <20191120043653.GG5582@umbus.fritz.box>
+References: <20191108154035.12913-1-lvivier@redhat.com>
+ <20191108174759.2d4040f1@bahia.lan>
+ <20191119010012.GI5582@umbus.fritz.box>
+ <caa35299-c928-a968-83b5-842d000f0242@redhat.com>
+ <20191119164526.0e980a37@bahia.lan>
+ <20191120043653.GG5582@umbus.fritz.box>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=gmLywnyUoySxuDPS1FQRx=WiH1kYrqEJDGAAcO5vDg4A@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::443
+Content-Type: multipart/signed; boundary="Sig_/sy4ApcBtHuvRpnLeZOkDCbA";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Ovh-Tracer-Id: 17306207472055982566
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudegledgudduvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgesghdtreerredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieelvddrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 87.98.178.58
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -105,53 +74,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Taylor Simpson <tsimpson@quicinc.com>,
- "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- "laurent@vivier.eu" <laurent@vivier.eu>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ =?UTF-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org,
+ clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/20/19 3:26 AM, Aleksandar Markovic wrote:
-> 
-> 
-> On Tuesday, November 19, 2019, Richard Henderson <richard.henderson@linaro.org
-> <mailto:richard.henderson@linaro.org>> wrote:
-> 
->     On 11/19/19 6:22 PM, Taylor Simpson wrote:
->     > - Laurent suggested I split the patch into two parts: linux-user and
->     target/hexagon.  If I do that, which one should contain the changes to
->     common files (e.g., configure)?  Also, note that we won't be able to build
->     until both patches are merged.  Is that OK?
-> 
->     The configure parts should be a third, last, patch.
-> 
->     The series is bisectable, because before the configure patch,
->     none of the hexagon code is compiled at all.
-> 
-> 
-> I don't think this is a good advice. Yes, at first glance, that would make the
-> submitter's job easier - since he could divide the whole code into parts
-> practicaly arbitrarily - but the resulting series will be of suboptimal
-> quality.
+--Sig_/sy4ApcBtHuvRpnLeZOkDCbA
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-How's that?  He has been asked to split the linux-user stuff from the target
-skeleton stuff.  Neither of these will compile independently.  You could merge
-the configure bits artificially into the second of the two patches, or you
-could leave it separate.
+On Wed, 20 Nov 2019 15:36:53 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
-> If the submitter was forced from the outset to add segments of his
-> solution so that each step actually (not only ostensibly) compiles, he would
-> also be forced to organize patches in much more coherent way, organize his code
-> in much more modular way, possibly improve initial organization, additionally
-> making reviews much easier.
+> On Tue, Nov 19, 2019 at 04:45:26PM +0100, Greg Kurz wrote:
+> > On Tue, 19 Nov 2019 15:06:51 +0100
+> > Laurent Vivier <lvivier@redhat.com> wrote:
+> >=20
+> > > On 19/11/2019 02:00, David Gibson wrote:
+> > > > On Fri, Nov 08, 2019 at 05:47:59PM +0100, Greg Kurz wrote:
+> > > >> On Fri,  8 Nov 2019 16:40:35 +0100
+> > > >> Laurent Vivier <lvivier@redhat.com> wrote:
+> > > >>
+> > > >>> Commit 29cb4187497d sets by default the VSMT to smp_threads,
+> > > >>> but older kernels (< 4.13) don't support that.
+> > > >>>
+> > > >>> We can reasonably restore previous behavior with this kernel
+> > > >>> to allow to run QEMU as before.
+> > > >>>
+> > > >>> If VSMT is not supported, VSMT will be set to MAX(8, smp_threads)
+> > > >>> as it is done for previous machine types (< pseries-4.2)
+> > > >>>
+> > > >>
+> > > >> It is usually _bad_ to base the machine behavior on host capabilit=
+ies.
+> > > >> What happens if we migrate between an older kernel and a recent on=
+e ?
+> > > >=20
+> > > > Right.  We're really trying to remove instaces of such behaviour.  =
+I'd
+> > > > prefer to completely revert Greg's original patch than to re-introd=
+uce
+> > > > host configuration dependency into the guest configuration..
+> > > >=20
+> > > >> I understand this is to fix tests/migration-test on older kernels.
+> > > >> Couldn't this be achieved with migration-test doing some introspec=
+tion
+> > > >> and maybe pass vsmt=3D8 on the QEMU command line ?
+> > > >=20
+> > > > ..adjusting the test case like this might be a better idea, though.
+> > > >=20
+> > > > What's the test setup where we're using the old kernel?  I really o=
+nly
+> > > > applied the original patch on the guess that we didn't really care
+> > > > about kernels that old.  The fact you've hit this in practice makes=
+ me
+> > > > doubt that assumption.
+> > > >=20
+> > >=20
+> > > The way to fix the tests is to add "-smp threads=3D8" on the command =
+line
+> > > (for all tests, so basically in qtest_init_without_qmp_handshake(), a=
+nd
+> > > it will impact all the machine types), and we have to check if it is
+> >=20
+> > Ohhh... it isn't possible to initialize Qtest with machine specific
+> > properties ? That's a bit unfortunate :-\
+>=20
+> Uhh... I don't see why we can't.  Couldn't we just put either -machine
+> vsmt=3D8 or -smp 8 into the cmd_src / cmd_dst printfs() in the
+> strcmp(arch, "ppc64") case?
+>=20
 
-This argument would make more sense if there were more present here than a
-skeleton.  The vast majority of the work is yet to be submitted, and *will*
-have to compile, be coherent, etc, just as you suggest.
+Yes you seem to be right for migration-test... so I'm not sure what Laurent=
+ is
+implying with qtest_init_without_qmp_handshake().
+
+> > > ppc64/pseries to do that, and there it becomes a little bit complicat=
+ed
+> > > for a so small piece of code.
+> > >=20
+> > > So I think the best to do is to revert Greg's patch.
+> > >=20
+> >=20
+> > I'm okay with that since this patch doesn't bring much for the moment.
+> >=20
+> > But soon, ie. linux-5.5 hopefully, KVM will allow to configure the numb=
+er
+> > of presenters in the XIVE and XICS-on-XIVE devices on POWER9. Combined
+> > with this patch, it will allow to drastically reduce the consumption of
+> > resources in the XIVE HW, which currently limits the number of VMs that
+> > can run concurrently with an in-kernel irqchip. So I hope the 'make che=
+ck'
+> > you're willing to fix is worth it :-), and BTW you didn't answer David's
+> > question about the test setup.
+> >=20
+>=20
 
 
-r~
+--Sig_/sy4ApcBtHuvRpnLeZOkDCbA
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl3U8CMACgkQcdTV5YIv
+c9blYQ//WwiK9sacNfoBe2raQC8IOmaeqTxvIz2lBjClUzUSo+QSflYqsFFEVswU
+PNxypm62AYgkkRpKzpt4et+tEEWavtRSZlYiWyjqXbgnSg//Z030NojaJmOJ6q1Y
+pfq7b1/r0A+ZfH7frjAcMSIaFESpBh/UqUbDVsyk+7ExKkmTRzWysbq1IAAIomPY
+C2lISJGUQWtRYxBoH13FJHRZVYFiN/LsjKh1o5lkWhBZA3Rci2Zrc0qXobf7CtCj
++CIUSXw969li7PT8WSwYPn4U1roQqA7ao1VJPd0ZdzsHndymmbZZPNi8myB/CKM/
+T8xBD45FOaRmo8MxZ9frR31qUsbEMcH1kuY10fV+UjjuM77pJ7Xt+OzrstbDUQsy
+K5fq2/7FmiuvbmuoUGK+56NKJmpYAvoKepru30P1VKwezzJsDjmFkeUx8KcDLQvI
+7vWyHSLO/3e9PvemhXDLY1/IjfZNI4zs1+U5IKqjX54mCPGyuPbvaU+WIEnDuY2F
+VpyHjIuatGKJHNk99n4Rm3IJgL+atILz0eMZFvPqE43TTujPBQVcRVkYeQSicf5K
+d4bUEIOhPKZZ6Io7wEyv0X/u7aVIlRs24XGvjnZdhcKzc4t6eBAsPjFNWosnBRab
+/a0wL4tPoqzGt6+Jkptvia3snJ82f4PMNno6Sutr9BazKaofhF0=
+=LrNb
+-----END PGP SIGNATURE-----
+
+--Sig_/sy4ApcBtHuvRpnLeZOkDCbA--
 
