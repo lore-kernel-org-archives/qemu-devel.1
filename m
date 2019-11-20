@@ -2,90 +2,64 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C34C4C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 03:37:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDFB8C43215
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 03:42:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 894802244A
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 03:37:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AE3702245D
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 03:42:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J/GRzHwI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 894802244A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="iFJRMgVU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE3702245D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXGoA-0004zA-LA
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 22:37:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44875)
+	id 1iXGtM-0007C0-Nn
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 22:42:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48370)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlureau@redhat.com>) id 1iXGnD-0004Mp-J9
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 22:36:36 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iXGsG-00063A-0d
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 22:41:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1iXGnB-00052C-Iw
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 22:36:34 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42508
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgibson@ozlabs.org>) id 1iXGsE-00020f-Iv
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 22:41:47 -0500
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:53165 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iXGnA-00050E-Rn
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 22:36:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574220992;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wSKl4ZjlxedUP+FlAu7TIdnnUEwTf0V/UY+HsjFaX0Y=;
- b=J/GRzHwI0Fgh5t4H3XtX+CrrZzlABSyde2YZTZ72XSv97h66f9eyLM++rpBxzVdVGRpMfI
- ODg9vkql7hcfiSVzKhJGENAZYekUEZIYcPYS81lD8fV7U/ZrLO3dAG8kkg2Hf9B5fhnLCw
- OdW1C4x5qEwWKiVsaOih8AohJ6/e1MA=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-XwLi3qtsNmWvZkkgNBlnOw-1; Tue, 19 Nov 2019 22:36:31 -0500
-Received: by mail-ot1-f71.google.com with SMTP id w14so13243395otk.21
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 19:36:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=wSKl4ZjlxedUP+FlAu7TIdnnUEwTf0V/UY+HsjFaX0Y=;
- b=sWMuwkGyNbYXecNiUqLUt0WPHVJJd8e9/KlLyrAq3dSKe+ltH4PL9VokvGxPnBp6pk
- 7D7KAnmnZpdMKgsnWmWORbJ45per/vpQoO95EoVyqatcQi5JB68UOsHzGykhDJPGNSd2
- +TOU174e7F2kFxRC+Wy/r6czEtePvU6F46QkzbHOyqiFiDWvod9bAFjlrLi55TT6Y37U
- ZHnN/BNE1sT844tPXjw+9Z4Q1mgqxU+LrTynE0v4ZQiLBJ3HhwEI76z+7U8Ukx0GHJwM
- GFxlG8TnNzeGzF7sIbwUe6tbmCSNF/AejvWzcFH1L21p5DiDUqyodOWj03LziU0D4goK
- HWAw==
-X-Gm-Message-State: APjAAAXigS88RpSJ9Z+zJVbAs/oZ04X5QjIl/Yhxr+S8wWW5/xRipTkk
- 5v9ZUPlberJE5N0jy3+y5KnKu5WR93uN4rqamrSj92j0KeCX1NOTIqswsXRuKRanyyHbbrHvSpj
- peHWapXs23gn4+sWVGb1m4WoZ4SZF9vk=
-X-Received: by 2002:a9d:5cc7:: with SMTP id r7mr242481oti.331.1574220990115;
- Tue, 19 Nov 2019 19:36:30 -0800 (PST)
-X-Google-Smtp-Source: APXvYqw82NQM/pmr2xgUxYC2sgYieQzIzLuS3ak0Mf9DL9kH75KKaKGHOUN34nR6V/4tQiQcOrRA1+o05VCt77a1pm4=
-X-Received: by 2002:a9d:5cc7:: with SMTP id r7mr242448oti.331.1574220989481;
- Tue, 19 Nov 2019 19:36:29 -0800 (PST)
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
+ id 1iXGsD-0001vL-Su; Tue, 19 Nov 2019 22:41:46 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47HpQV25SNz9sPV; Wed, 20 Nov 2019 14:41:38 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1574221298;
+ bh=WmIMY2kyFRbwIJoaOQRQ/x7hA6B+1zmuq5C7zFZiTGk=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=iFJRMgVUzZt6Q6GYyEpg5f8fEQaPh2WJeQMTvzFGfuFmhZTIHXUAXsa0fDck7ylRH
+ CETM3GkAbPCZu/r8yCeEdAaXOtBxCwYCi/kKrT/+PYkr/JckldHwmI03aBrbLcJALU
+ D5SZkaXA6EzOG4YhJZ643O24vjvev6BEgdQcmkTI=
+Date: Wed, 20 Nov 2019 14:25:25 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH for-5.0 v5 07/23] ppc/xive: Check V bit in TM_PULL_POOL_CTX
+Message-ID: <20191120032525.GB5582@umbus.fritz.box>
+References: <20191115162436.30548-1-clg@kaod.org>
+ <20191115162436.30548-8-clg@kaod.org>
 MIME-Version: 1.0
-References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-2-marcandre.lureau@redhat.com>
- <CAFEAcA_k9TqzRJZ4=Q1jQP46SajiaMLEciSHZ83_CicMv__oiA@mail.gmail.com>
-In-Reply-To: <CAFEAcA_k9TqzRJZ4=Q1jQP46SajiaMLEciSHZ83_CicMv__oiA@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 20 Nov 2019 07:36:18 +0400
-Message-ID: <CAMxuvawFVf=6-GLO59T=v+W0vrhYVYuj0w30Oi6c7Zsen7Ri4g@mail.gmail.com>
-Subject: Re: [PATCH v3 01/33] qdev: remove unused qdev_prop_int64
-To: Peter Maydell <peter.maydell@linaro.org>
-X-MC-Unique: XwLi3qtsNmWvZkkgNBlnOw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="TuBLotoxjxNtqonL"
+Content-Disposition: inline
+In-Reply-To: <20191115162436.30548-8-clg@kaod.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2401:3900:2:1::2
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,51 +71,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paul Burton <pburton@wavecomp.com>, Aleksandar Rikalo <arikalo@wavecomp.com>,
- Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
 
-On Mon, Nov 18, 2019 at 6:01 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
->
-> On Wed, 23 Oct 2019 at 18:32, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  hw/core/qdev-properties.c    | 32 --------------------------------
-> >  include/hw/qdev-properties.h |  3 ---
-> >  2 files changed, 35 deletions(-)
->
-> I think I'd rather keep this. It's weird to not have a symmetric
-> set of properties for the common integer types, and annoying
-> for whoever next runs into a need for an int64 property to
-> have to reinstate the deleted code. (Yes, I know we don't
-> currently have int8 or int16.)
->
+--TuBLotoxjxNtqonL
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I don't think we should aim at being complete. Whenever we identify
-dead code, unused for a long while, we should clean it up.
+On Fri, Nov 15, 2019 at 05:24:20PM +0100, C=E9dric Le Goater wrote:
+> A context should be 'valid' when pulled from the thread interrupt
+> context registers.
+>=20
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 
-In this case, it is even worse, this has never been used since its
-introduction in commit 07d1d063d3235c02f60dc92ec174d419e6f8a750, in
-2017.
+Applied, thanks.
 
+> ---
+>  hw/intc/xive.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index 42e9a11ef731..511e1a936347 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -377,6 +377,11 @@ static uint64_t xive_tm_pull_os_ctx(XiveTCTX *tctx, =
+hwaddr offset,
+> =20
+>      qw1w2 =3D xive_tctx_get_os_cam(tctx, &nvt_blk, &nvt_idx, &vo);
+> =20
+> +    if (!vo) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: pulling invalid NVT %x/%x =
+!?\n",
+> +                      nvt_blk, nvt_idx);
+> +    }
+> +
+>      /* Invalidate CAM line */
+>      qw1w2_new =3D xive_set_field32(TM_QW1W2_VO, qw1w2, 0);
+>      xive_tctx_set_os_cam(tctx, qw1w2_new);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--TuBLotoxjxNtqonL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3UsiUACgkQbDjKyiDZ
+s5Lk4g/+JYwacO1kCMZxvUvCXS6ZcXo6QWpNHZ7AkN0734gjIK2bD3ffNsFLor9f
+vgKHVBuW0gbNd2A+nDKtnc8IrMSpJnr/IlAiB+/QU2P0mY3x3QmN/G5mNUIMsVUM
+woR3fFmE84Rp9GnpaBBg4MpYlaBrBqeXfZYo+uLBNxnuRbIgXr7FbT1qzLG80vKU
+EH60zb0rJ/Kd3zyddKKXstkCJPOo4ygn1WtAu8PJtWFYPJA+92Mh8jW4GMi3/JxE
+ZCt4NYK/KeipBQzan9htbU33bGbPqXhbNd7m7WEQv4jTWDZxup3HvVAECS5YwTuZ
+UuiqsedcweOhbqAWsqsIB5yAq/L0oMtPQHYiZV/wFFQi17y6IUb5E+7lO6Mp2j9Z
+JPRuaJfE+/4nSPKpKtZclj4rCtv0CMTZnUB+lMsy1126dLs9rIpiRuh5lv69XZTf
+gLcGYQF/MItuig/gxsdjtQHbpBjSwvEAJOai3fNN6qE7I6xTeH7up3a8Bx/gK9oL
+Hb6D9A8hlYTMM9W+otC1HNXIQZF9Ig1qUbGx2+r2TEsQlxbjztpR4VMZ8ieAWj0D
+NaxouVhV8vOJIFFDzY002QQgtNHEdwjXoXeGqp8qB+SX59X1gosfkGqEdZZ6zGaW
+96LtC0FfBEAs3mc5FGLDQxnPaBMVljgrdUejuqb2jFsqo2dobJg=
+=4N6+
+-----END PGP SIGNATURE-----
+
+--TuBLotoxjxNtqonL--
 
