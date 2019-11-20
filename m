@@ -2,75 +2,93 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.7 required=3.0 tests=FORGED_HOTMAIL_RCVD2,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB1CCC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BE6AC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:31:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1BB5218A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:28:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1BB5218A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0272D22312
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:31:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YgLm8H0Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0272D22312
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXLLM-0006e7-Q9
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 03:28:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56253)
+	id 1iXLOd-0008LT-W5
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 03:31:32 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57394)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iXLJ7-0004e9-9E
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:25:50 -0500
+ (envelope-from <mlureau@redhat.com>) id 1iXLNg-0007g4-Ic
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:30:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iXLJ6-0007qp-5C
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:25:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41686)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iXLJ5-0007qP-Vc
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:25:48 -0500
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iXLJ5-0007YA-3j
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:25:47 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 1A5642E8037
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:25:47 +0000 (UTC)
+ (envelope-from <mlureau@redhat.com>) id 1iXLNe-0002GZ-HG
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:30:31 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27679
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iXLNe-0002FP-1j
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:30:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574238629;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=OUE3rUtxH2aruBzNmueOYuaThREWH+pjVERvEFbZT60=;
+ b=YgLm8H0Q5HiGVSCOxyJY3+JQijPrDM+HsACxGA1SuoELtPaZMFiO3MVnIOWnpt1LOu9Ome
+ RDvuGPJQZxDDmBa4GnrpSLsz0l+SWj53q8Ddhto0lHc39khuc06d1EpGMuaHuGpEf7Y8kH
+ tV4kgRL9+6oC/Fu4SUa9U85qECKKZ8c=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-381-NkJNgH86Msqz2SsjWmqw3g-1; Wed, 20 Nov 2019 03:30:28 -0500
+Received: by mail-oi1-f200.google.com with SMTP id g189so12134372oif.10
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 00:30:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=OUE3rUtxH2aruBzNmueOYuaThREWH+pjVERvEFbZT60=;
+ b=LihF4Oem+Sa0vbKBlTyadW9iZqCWJBB+wQFUM9JpHkYeKEtBX5gl7fi7MVOqH1IgfR
+ iy6rJhCeH+8VRBVOeEvBdW6NRL/X5ziXSv6NK/+PocfDhKmQoHYqRlmobLsRclPEqONM
+ eYj3nRPnQnGB3exh2/7r0Qn3A9bwRb6eH8ZLOnWMKTZj0j1F1KF3mqPqrGLIVGL+6EdU
+ qNlS5bvU2BaFObgbhoWnv+FKClyN7eBt/zA7t4NBX9g31jmuTC4+uSMHOFjq5NI9p8Uj
+ AdwH+gIIxS3ikdKvevkVRX/+5Pu4nP0VdO3fo00v/faYOJWYQVRAPbrQKdwCtpzs8xqW
+ 2PoA==
+X-Gm-Message-State: APjAAAVeSrEOFzQ1Qu00KRlxgsoZeGGfBWgZ15XCAoRt0pYfpWh36Kmt
+ KJajBynjJFkgDEfGUDtHrS8H9Rwhg6O7RuUpjj4BcoXn3RoFxwa+/LSMXwxukw2ceb7HiJDZZNE
+ ed300BPplhvptV7Xz0hs7H23K7y5cblk=
+X-Received: by 2002:aca:4c14:: with SMTP id z20mr1751550oia.76.1574238627262; 
+ Wed, 20 Nov 2019 00:30:27 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwiJsmxSQZ3dIPyyAHCNr5dsR7GnYFDNG5vLABkLZNMCeIuIlfbr485aFA6V2OssFLppRqOjFa3cW6gyc282d0=
+X-Received: by 2002:aca:4c14:: with SMTP id z20mr1751505oia.76.1574238626855; 
+ Wed, 20 Nov 2019 00:30:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
+ <20191023173154.30051-17-marcandre.lureau@redhat.com>
+ <CAFEAcA-dShnHHGEYrsmc+27aUrH7WUMn3=Pvn92B8XH=qtYFBQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA-dShnHHGEYrsmc+27aUrH7WUMn3=Pvn92B8XH=qtYFBQ@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 20 Nov 2019 12:30:15 +0400
+Message-ID: <CAMxuvayKZXnkm_v5V1L=dE2-dJgMjcSBy0aufVjmGhLkuZW0hw@mail.gmail.com>
+Subject: Re: [PATCH v3 16/33] serial-mm: use sysbus facilities
+To: Peter Maydell <peter.maydell@linaro.org>
+X-MC-Unique: NkJNgH86Msqz2SsjWmqw3g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Nov 2019 08:18:51 -0000
-From: wzis <wzis@hotmail.com>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd th-huth wzis
-X-Launchpad-Bug-Reporter: wzis (wzis)
-X-Launchpad-Bug-Modifier: wzis (wzis)
-References: <157413352600.6824.7282626865462030571.malonedeb@gac.canonical.com>
-Message-Id: <157423793208.30952.7033556956571665387.malone@wampee.canonical.com>
-Subject: [Bug 1853083] Re: qemu ppc64 4.0 boot AIX5.1 hung
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="c597c3229eb023b1e626162d5947141bf7befb13";
- Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 4f7d4d00c713afe12511baa7fc034ce3eb17a5be
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 91.189.90.7
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -79,32 +97,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1853083 <1853083@bugs.launchpad.net>
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paul Burton <pburton@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[root@192 emu]# qemu-system-ppc64 --version
-QEMU emulator version 4.1.0
-Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
-[root@192 emu]#
+Hi
 
--- =
+On Mon, Nov 18, 2019 at 7:09 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> On Wed, 23 Oct 2019 at 18:34, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+> >
+> > Make SerialMM a regular sysbus device, by registering the irq, and the
+> > mmio region. Reexport the internal serial properties.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  hw/char/serial.c | 35 ++++++++++++++++++++++++-----------
+> >  1 file changed, 24 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/hw/char/serial.c b/hw/char/serial.c
+> > index 2f7667c30c..a40bc3ab81 100644
+> > --- a/hw/char/serial.c
+> > +++ b/hw/char/serial.c
+> > @@ -1074,21 +1074,18 @@ SerialMM *serial_mm_init(MemoryRegion *address_=
+space,
+> >                              Chardev *chr, enum device_endian end)
+> >  {
+> >      SerialMM *self =3D SERIAL_MM(qdev_create(NULL, TYPE_SERIAL_MM));
+> > -    SerialState *s =3D &self->serial;
+> > +    MemoryRegion *mr;
+> >
+> >      qdev_prop_set_uint8(DEVICE(self), "regshift", regshift);
+> > -    s->irq =3D irq;
+> > -    qdev_prop_set_uint32(DEVICE(s), "baudbase", baudbase);
+> > -    qdev_prop_set_chr(DEVICE(s), "chardev", chr);
+> > -    qdev_prop_set_int32(DEVICE(s), "instance-id", base);
+> > -    qdev_prop_set_uint8(DEVICE(s), "endianness", end);
+> > -
+> > -    qdev_init_nofail(DEVICE(s));
+> > +    qdev_prop_set_uint32(DEVICE(self), "baudbase", baudbase);
+> > +    qdev_prop_set_chr(DEVICE(self), "chardev", chr);
+> > +    qdev_prop_set_int32(DEVICE(self), "instance-id", base);
+> > +    qdev_prop_set_uint8(DEVICE(self), "endianness", end);
+>
+> (this last line should be in patch 15)
+>
+> >      qdev_init_nofail(DEVICE(self));
+> >
+> > -    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], self,
+> > -                          "serial", 8 << regshift);
+> > -    memory_region_add_subregion(address_space, base, &s->io);
+> > +    sysbus_connect_irq(SYS_BUS_DEVICE(self), 0, irq);
+> > +    mr =3D sysbus_mmio_get_region(SYS_BUS_DEVICE(self), 0);
+> > +    memory_region_add_subregion(address_space, base, mr);
+> >
+> >      return self;
+> >  }
+> > @@ -1099,6 +1096,8 @@ static void serial_mm_instance_init(Object *o)
+> >
+> >      object_initialize_child(o, "serial", &self->serial, sizeof(self->s=
+erial),
+> >                              TYPE_SERIAL, &error_abort, NULL);
+> > +
+> > +    qdev_alias_all_properties(DEVICE(&self->serial), o);
+> >  }
+> >
+> >  static Property serial_mm_properties[] =3D {
+> > @@ -1107,11 +1106,25 @@ static Property serial_mm_properties[] =3D {
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> >
+> > +static void serial_mm_realize(DeviceState *dev, Error **errp)
+> > +{
+> > +    SerialMM *self =3D SERIAL_MM(dev);
+> > +    SerialState *s =3D &self->serial;
+>
+> Again, 'self' isn't idiomatic in QOM methods.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1853083
+I made my argument earlier about why I prefer "self" even though it's
+not represented today in hw/
 
-Title:
-  qemu ppc64 4.0 boot AIX5.1 hung
+> > +
+> > +    qdev_init_nofail(DEVICE(s));
+> > +
+> > +    memory_region_init_io(&s->io, NULL, &serial_mm_ops[self->endiannes=
+s], self,
+> > +                          "serial", 8 << self->regshift);
+> > +    sysbus_init_mmio(SYS_BUS_DEVICE(self), &s->io);
+> > +    sysbus_init_irq(SYS_BUS_DEVICE(self), &self->serial.irq);
+> > +}
+> > +
+> >  static void serial_mm_class_init(ObjectClass *klass, void* data)
+> >  {
+> >      DeviceClass *dc =3D DEVICE_CLASS(klass);
+> >
+> >      dc->props =3D serial_mm_properties;
+> > +    dc->realize =3D serial_mm_realize;
+> >  }
+> >
+> >  static const TypeInfo serial_mm_info =3D {
+> > --
+> > 2.23.0.606.g08da6496b6
+>
+> Otherwise
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Status in QEMU:
-  Incomplete
+Does your r-b stands if I keep "self"? Or do you feel strongly about it?
 
-Bug description:
-  When boot AIX5.1 from cdrom device, qemu hung there, no further info
-  is displayed and cpu consumption is high.
+thanks
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1853083/+subscriptions
 
