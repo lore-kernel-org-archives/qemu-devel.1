@@ -7,44 +7,44 @@ X-Spam-Status: No, score=0.7 required=3.0 tests=FORGED_HOTMAIL_RCVD2,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D54EEC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB1CCC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:28:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A47BE218A3
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:27:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A47BE218A3
+	by mail.kernel.org (Postfix) with ESMTPS id A1BB5218A3
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 08:28:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1BB5218A3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=hotmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXLKP-0005Wi-Nn
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 03:27:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56252)
+	id 1iXLLM-0006e7-Q9
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 03:28:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56253)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <bounces@canonical.com>) id 1iXLJ7-0004e8-9E
+ (envelope-from <bounces@canonical.com>) id 1iXLJ7-0004e9-9E
  for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:25:50 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <bounces@canonical.com>) id 1iXLJ6-0007qu-5R
+ (envelope-from <bounces@canonical.com>) id 1iXLJ6-0007qp-5C
  for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:25:49 -0500
-Received: from indium.canonical.com ([91.189.90.7]:41678)
+Received: from indium.canonical.com ([91.189.90.7]:41686)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <bounces@canonical.com>)
- id 1iXLJ5-0007qK-Ve
+ id 1iXLJ5-0007qP-Vc
  for qemu-devel@nongnu.org; Wed, 20 Nov 2019 03:25:48 -0500
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1iXLJ4-0007Y4-Ji
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:25:46 +0000
+ id 1iXLJ5-0007YA-3j
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:25:47 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 924392E80C0
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:25:46 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 1A5642E8037
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:25:47 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 20 Nov 2019 08:17:37 -0000
+Date: Wed, 20 Nov 2019 08:18:51 -0000
 From: wzis <wzis@hotmail.com>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -57,7 +57,7 @@ X-Launchpad-Bug-Commenters: philmd th-huth wzis
 X-Launchpad-Bug-Reporter: wzis (wzis)
 X-Launchpad-Bug-Modifier: wzis (wzis)
 References: <157413352600.6824.7282626865462030571.malonedeb@gac.canonical.com>
-Message-Id: <157423785712.21540.15608916935229626608.malone@soybean.canonical.com>
+Message-Id: <157423793208.30952.7033556956571665387.malone@wampee.canonical.com>
 Subject: [Bug 1853083] Re: qemu ppc64 4.0 boot AIX5.1 hung
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
@@ -65,7 +65,7 @@ Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="c597c3229eb023b1e626162d5947141bf7befb13";
  Instance="production-secrets-lazr.conf"
-X-Launchpad-Hash: 6a3fcaa88bcdac4e23271d696a7a4902bd76eed6
+X-Launchpad-Hash: 4f7d4d00c713afe12511baa7fc034ce3eb17a5be
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 91.189.90.7
@@ -84,9 +84,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Tried POWER5, but got
-[root@192 emu]# ./aix51
-qemu-system-ppc64: unable to find CPU model 'POWER5'
+[root@192 emu]# qemu-system-ppc64 --version
+QEMU emulator version 4.1.0
+Copyright (c) 2003-2019 Fabrice Bellard and the QEMU Project developers
+[root@192 emu]#
 
 -- =
 
