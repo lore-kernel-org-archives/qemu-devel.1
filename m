@@ -2,70 +2,68 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLACK,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A10C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 06:13:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2847FC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 06:51:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1A180222A0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 06:13:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A180222A0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id EFFD1218BA
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 06:51:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFFD1218BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXJFS-00032c-2B
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 01:13:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41136)
+	id 1iXJpx-0001G8-UU
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 01:51:37 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39597)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iXJEL-0001yY-HY
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 01:12:47 -0500
+ (envelope-from <clg@kaod.org>) id 1iXJot-0000ka-1B
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 01:50:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iXJEJ-0008PW-Ut
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 01:12:45 -0500
-Resent-Date: Wed, 20 Nov 2019 01:12:45 -0500
-Resent-Message-Id: <E1iXJEJ-0008PW-Ut@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21470)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iXJEJ-0008JJ-NR
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 01:12:43 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1574230332; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=THPaZlxu1zktlC4ZtGV6ss/ShoqN0NzemUZXQozCuaMyLRU0qI816dSh7gdSEyjV8GFMY2SASweCrnSj2QnG9322/9pa5Jfoy6kaFU5A/Zr3cqBzhN4NNNgFPQURKy3vA0pixRJ1IbEt4JyL+WzwUWMU4PBHXUps/8B5Gly3J6Q=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1574230332;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=A23mRzs35sk+Fvf9PHia0MhvUZRV57jxXhTMLrc0t64=; 
- b=aEG0XFpbmJZJYIE9TR7rPtbxhRPWgQgBYmkfg2CktadnKUHwz4iWyHKJgCpqYGAC/0nEtFidJPAJC/zIdHOetingzJLyarbFJVnJiaES4IWkBKcSOr8V/DIsVF6tapUXs/7Mqrx/QCv1CUC9WfUA6IVLL8go7KUlGtE3bbHzjog=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1574230331496174.27800411362568;
- Tue, 19 Nov 2019 22:12:11 -0800 (PST)
-In-Reply-To: <20191120005003.27035-1-mdroth@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2] virtio-pci: disable vring processing when
- bus-mastering is disabled
-Message-ID: <157423033042.2797.15950947649776190513@37313f22b938>
+ (envelope-from <clg@kaod.org>) id 1iXJor-0001wD-Cy
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 01:50:30 -0500
+Received: from 2.mo68.mail-out.ovh.net ([46.105.52.162]:38826)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iXJor-0001tJ-67
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 01:50:29 -0500
+Received: from player694.ha.ovh.net (unknown [10.108.35.158])
+ by mo68.mail-out.ovh.net (Postfix) with ESMTP id A68C6148C1A
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 07:50:26 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player694.ha.ovh.net (Postfix) with ESMTPSA id 183E3C3CE109;
+ Wed, 20 Nov 2019 06:50:18 +0000 (UTC)
+Subject: Re: [RFC 5/5] spapr: Work around spurious warnings from vfio INTx
+ initialization
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20191017054218.8876-1-david@gibson.dropbear.id.au>
+ <20191017054218.8876-6-david@gibson.dropbear.id.au>
+ <3cded480-ce51-eef7-dc75-686022a18726@kaod.org>
+ <2319e683-983c-2c40-3234-c4c43555c657@kaod.org>
+ <20191120041739.GE5582@umbus.fritz.box>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <652c50bf-a6ce-4dff-77a1-413c615ed519@kaod.org>
+Date: Wed, 20 Nov 2019 07:50:18 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: mdroth@linux.vnet.ibm.com
-Date: Tue, 19 Nov 2019 22:12:11 -0800 (PST)
-X-ZohoMailClient: External
+In-Reply-To: <20191120041739.GE5582@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+X-Ovh-Tracer-Id: 16299090005006781248
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudegledguddtudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeehnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuffhomhgrihhnpehoiihlrggsshdrohhrghenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheileegrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 136.143.188.54
+X-Received-From: 46.105.52.162
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -77,50 +75,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: aik@ozlabs.ru, david@gibson.dropbear.id.au, qemu-devel@nongnu.org,
- mst@redhat.com
+Cc: aik@ozlabs.ru, alex.williamson@redhat.com, qemu-ppc@nongnu.org,
+ groug@kaod.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyMDAwNTAwMy4yNzAz
-NS0xLW1kcm90aEBsaW51eC52bmV0LmlibS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
-IHRoZSBkb2NrZXItcXVpY2tAY2VudG9zNyBidWlsZCB0ZXN0LiBQbGVhc2UgZmluZCB0aGUgdGVz
-dGluZyBjb21tYW5kcyBhbmQKdGhlaXIgb3V0cHV0IGJlbG93LiBJZiB5b3UgaGF2ZSBEb2NrZXIg
-aW5zdGFsbGVkLCB5b3UgY2FuIHByb2JhYmx5IHJlcHJvZHVjZSBpdApsb2NhbGx5LgoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAptYWtlIGRvY2tlci1pbWFnZS1jZW50b3M3
-IFY9MSBORVRXT1JLPTEKdGltZSBtYWtlIGRvY2tlci10ZXN0LXF1aWNrQGNlbnRvczcgU0hPV19F
-TlY9MSBKPTE0IE5FVFdPUks9MQo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKICBURVNUICAgIGNo
-ZWNrLXVuaXQ6IHRlc3RzL3Rlc3QtdGhyZWFkLXBvb2wKd2FpdF9mb3JfbWlncmF0aW9uX2ZhaWw6
-IHVuZXhwZWN0ZWQgc3RhdHVzIHN0YXR1cz13YWl0LXVucGx1ZyBhbGxvd19hY3RpdmU9MQoqKgpF
-UlJPUjovdG1wL3FlbXUtdGVzdC9zcmMvdGVzdHMvbWlncmF0aW9uLXRlc3QuYzo5MDg6d2FpdF9m
-b3JfbWlncmF0aW9uX2ZhaWw6IGFzc2VydGlvbiBmYWlsZWQ6IChyZXN1bHQpCkVSUk9SIC0gQmFp
-bCBvdXQhIEVSUk9SOi90bXAvcWVtdS10ZXN0L3NyYy90ZXN0cy9taWdyYXRpb24tdGVzdC5jOjkw
-ODp3YWl0X2Zvcl9taWdyYXRpb25fZmFpbDogYXNzZXJ0aW9uIGZhaWxlZDogKHJlc3VsdCkKbWFr
-ZTogKioqIFtjaGVjay1xdGVzdC1hYXJjaDY0XSBFcnJvciAxCm1ha2U6ICoqKiBXYWl0aW5nIGZv
-ciB1bmZpbmlzaGVkIGpvYnMuLi4uCiAgVEVTVCAgICBjaGVjay11bml0OiB0ZXN0cy90ZXN0LWhi
-aXRtYXAKICBURVNUICAgIGNoZWNrLXVuaXQ6IHRlc3RzL3Rlc3QtYmRydi1kcmFpbgotLS0KICAg
-IHJhaXNlIENhbGxlZFByb2Nlc3NFcnJvcihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVk
-UHJvY2Vzc0Vycm9yOiBDb21tYW5kICdbJ3N1ZG8nLCAnLW4nLCAnZG9ja2VyJywgJ3J1bicsICct
-LWxhYmVsJywgJ2NvbS5xZW11Lmluc3RhbmNlLnV1aWQ9Yzg2M2UxNTg4MmE3NDdhODhjMjkwNTc1
-NTA1Y2MxZGUnLCAnLXUnLCAnMTAwMScsICctLXNlY3VyaXR5LW9wdCcsICdzZWNjb21wPXVuY29u
-ZmluZWQnLCAnLS1ybScsICctZScsICdUQVJHRVRfTElTVD0nLCAnLWUnLCAnRVhUUkFfQ09ORklH
-VVJFX09QVFM9JywgJy1lJywgJ1Y9JywgJy1lJywgJ0o9MTQnLCAnLWUnLCAnREVCVUc9JywgJy1l
-JywgJ1NIT1dfRU5WPTEnLCAnLWUnLCAnQ0NBQ0hFX0RJUj0vdmFyL3RtcC9jY2FjaGUnLCAnLXYn
-LCAnL2hvbWUvcGF0Y2hldy8uY2FjaGUvcWVtdS1kb2NrZXItY2NhY2hlOi92YXIvdG1wL2NjYWNo
-ZTp6JywgJy12JywgJy92YXIvdG1wL3BhdGNoZXctdGVzdGVyLXRtcC13ZzcwcmdwdS9zcmMvZG9j
-a2VyLXNyYy4yMDE5LTExLTIwLTAxLjAyLjU3LjEyNDEyOi92YXIvdG1wL3FlbXU6eixybycsICdx
-ZW11OmNlbnRvczcnLCAnL3Zhci90bXAvcWVtdS9ydW4nLCAndGVzdC1xdWljayddJyByZXR1cm5l
-ZCBub24temVybyBleGl0IHN0YXR1cyAyLgpmaWx0ZXI9LS1maWx0ZXI9bGFiZWw9Y29tLnFlbXUu
-aW5zdGFuY2UudXVpZD1jODYzZTE1ODgyYTc0N2E4OGMyOTA1NzU1MDVjYzFkZQptYWtlWzFdOiAq
-KiogW2RvY2tlci1ydW5dIEVycm9yIDEKbWFrZVsxXTogTGVhdmluZyBkaXJlY3RvcnkgYC92YXIv
-dG1wL3BhdGNoZXctdGVzdGVyLXRtcC13ZzcwcmdwdS9zcmMnCm1ha2U6ICoqKiBbZG9ja2VyLXJ1
-bi10ZXN0LXF1aWNrQGNlbnRvczddIEVycm9yIDIKCnJlYWwgICAgOW0xMy4yMzZzCnVzZXIgICAg
-MG04LjEzMXMKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
-Zy9sb2dzLzIwMTkxMTIwMDA1MDAzLjI3MDM1LTEtbWRyb3RoQGxpbnV4LnZuZXQuaWJtLmNvbS90
-ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5l
-cmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBs
-ZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+On 20/11/2019 05:17, David Gibson wrote:
+> On Thu, Oct 17, 2019 at 03:42:06PM +0200, C=E9dric Le Goater wrote:
+>> On 17/10/2019 10:43, C=E9dric Le Goater wrote:
+>>> On 17/10/2019 07:42, David Gibson wrote:
+>>>> Traditional PCI INTx for vfio devices can only perform well if using
+>>>> an in-kernel irqchip.  Therefore, vfio_intx_update() issues a warnin=
+g
+>>>> if an in kernel irqchip is not available.
+>>>>
+>>>> We usually do have an in-kernel irqchip available for pseries machin=
+es
+>>>> on POWER hosts.  However, because the platform allows feature
+>>>> negotiation of what interrupt controller model to use, we don't
+>>>> currently initialize it until machine reset.  vfio_intx_update() is
+>>>> called (first) from vfio_realize() before that, so it can issue a
+>>>> spurious warning, even if we will have an in kernel irqchip by the
+>>>> time we need it.
+>>>>
+>>>> To workaround this, make a call to spapr_irq_update_active_intc() fr=
+om
+>>>> spapr_irq_init() which is called at machine realize time, before the
+>>>> vfio realize.  This call will be pretty much obsoleted by the later
+>>>> call at reset time, but it serves to suppress the spurious warning
+>>>> from VFIO.
+>>>>
+>>>> Cc: Alex Williamson <alex.williamson@redhat.com>
+>>>> Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>>>
+>>>> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>>>> ---
+>>>>  hw/ppc/spapr_irq.c | 11 ++++++++++-
+>>>>  1 file changed, 10 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/hw/ppc/spapr_irq.c b/hw/ppc/spapr_irq.c
+>>>> index 45544b8976..bb91c61fa0 100644
+>>>> --- a/hw/ppc/spapr_irq.c
+>>>> +++ b/hw/ppc/spapr_irq.c
+>>>> @@ -345,6 +345,14 @@ void spapr_irq_init(SpaprMachineState *spapr, E=
+rror **errp)
+>>>> =20
+>>>>      spapr->qirqs =3D qemu_allocate_irqs(spapr_set_irq, spapr,
+>>>>                                        smc->nr_xirqs + SPAPR_XIRQ_BA=
+SE);
+>>>> +
+>>>> +    /*
+>>>> +     * Mostly we don't actually need this until reset, except that =
+not
+>>>> +     * having this set up can cause VFIO devices to issue a
+>>>> +     * false-positive warning during realize(), because they don't =
+yet
+>>>> +     * have an in-kernel irq chip.
+>>>> +     */
+>>>> +    spapr_irq_update_active_intc(spapr);
+>>>
+>>> This will call the de/activate hooks of the irq chip very early=20
+>>> before reset and CAS, and won't call them at reset if the intc
+>>> pointers are the same (xive only for instance). It breaks very=20
+>>> obviously the emulated XIVE device which won't reset the OS CAM=20
+>>> line with the CPU id values and CPU notification will be broken.
+>>>
+>>> We have to find something else.
+>>
+>> Here is a possible fix for the (re)setting of the OS CAM line.=20
+>>
+>> Removing spapr_xive_set_tctx_os_cam() is a good thing but this solutio=
+n
+>> shows some issues in our modeling of hot-plugged CPUS with a reset()=20
+>> being called at realize().
+>=20
+> Ok, I've applied the patch below now.=20
 
+Yes. this was replaced by :
+
+  http://patchwork.ozlabs.org/cover/1181522/
+
+> Does that mean that my 5/5 patch should be good now?
+
+We should.
+
+C.
 
