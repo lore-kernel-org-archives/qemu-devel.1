@@ -6,91 +6,90 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA4EC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D532DC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:59:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42DAB22419
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:58:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42DAB22419
+	by mail.kernel.org (Postfix) with ESMTPS id 97C2D22444
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:59:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97C2D22444
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXOcp-0003hq-9t
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 06:58:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43351)
+	id 1iXOdk-0004RN-PT
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 06:59:20 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43493)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iXOOv-00039S-Vo
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:44:03 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iXOP1-0003Jg-Vn
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:44:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iXOOu-0003DV-6o
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:44:01 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:1472
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <frankja@linux.ibm.com>) id 1iXOP0-0003Vj-2P
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:44:07 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54534)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iXOOt-0003AB-VC
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:44:00 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ id 1iXOOz-0003SA-R5
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:44:06 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xAKBg315017539
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:43:59 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wcf47duv9-1
+ xAKBfwcm079157
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:44:04 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wcendfxug-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:43:59 -0500
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:44:03 -0500
 Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Wed, 20 Nov 2019 11:43:56 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Wed, 20 Nov 2019 11:44:00 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Wed, 20 Nov 2019 11:43:52 -0000
+ Wed, 20 Nov 2019 11:43:56 -0000
 Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
  [9.149.105.58])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xAKBhoEf27263226
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xAKBht9q31850772
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 20 Nov 2019 11:43:50 GMT
+ Wed, 20 Nov 2019 11:43:55 GMT
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C77ED4C044;
- Wed, 20 Nov 2019 11:43:50 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id E8DD84C040;
+ Wed, 20 Nov 2019 11:43:54 +0000 (GMT)
 Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 97D704C04A;
- Wed, 20 Nov 2019 11:43:49 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id BAA794C046;
+ Wed, 20 Nov 2019 11:43:53 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.152.224.205])
  by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Wed, 20 Nov 2019 11:43:49 +0000 (GMT)
+ Wed, 20 Nov 2019 11:43:53 +0000 (GMT)
 From: Janosch Frank <frankja@linux.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/15] s390x: protvirt: Add diag308 subcodes 8 - 10
-Date: Wed, 20 Nov 2019 06:43:22 -0500
+Subject: [PATCH 06/15] s390x: protvirt: Support unpack facility
+Date: Wed, 20 Nov 2019 06:43:25 -0500
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191120114334.2287-1-frankja@linux.ibm.com>
 References: <20191120114334.2287-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19112011-0008-0000-0000-00000335273D
+x-cbid: 19112011-0020-0000-0000-0000038C55AF
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112011-0009-0000-0000-00004A544B6F
-Message-Id: <20191120114334.2287-4-frankja@linux.ibm.com>
+x-cbparentid: 19112011-0021-0000-0000-000021E288E0
+Message-Id: <20191120114334.2287-7-frankja@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-11-20_03:2019-11-15,2019-11-20 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 adultscore=0
- lowpriorityscore=0 mlxscore=0 mlxlogscore=999 suspectscore=3 spamscore=0
- phishscore=0 priorityscore=1501 malwarescore=0 clxscore=1015
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ suspectscore=3 malwarescore=0
+ phishscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0 adultscore=0
+ impostorscore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1910280000 definitions=main-1911200107
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -108,273 +107,362 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For diag308 subcodes 8 - 10 we have a new ipib of type 5. The ipib
-holds the address and length of the secure execution header, as well
-as a list of guest components.
+When a guest has saved a ipib of type 5 and call diagnose308 with
+subcode 10, we have to setup the protected processing environment via
+Ultravisor calls. The calls are done by KVM and are exposed via an API.
 
-Each component is a block of memory, for example kernel or initrd,
-which needs to be decrypted by the Ultravisor in order to run a
-protected VM. The secure execution header instructs the Ultravisor on
-how to handle the protected VM and its components.
+The following steps are necessary:
+1. Create a VM (register it with the Ultravisor)
+2. Create secure CPUs for all of our current cpus
+3. Forward the secure header to the Ultravisor (has all information on
+how to decrypt the image and VM information)
+4. Protect image pages from the host and decrypt them
+5. Verify the image integrity
 
-Subcodes 8 and 9 are similiar to 5 and 6 and subcode 10 will finally
-start the protected guest.
-
-Subcodes 8-10 are not valid in protected mode, we have to do a subcode
-3 and then the 8 and 10 combination for a protected reboot.
+Only after step 5 a protected VM is allowed to run.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- hw/s390x/ipl.c      | 48 ++++++++++++++++++++++++++++++++++++++++++---
- hw/s390x/ipl.h      | 33 +++++++++++++++++++++++++++++++
- target/s390x/diag.c | 26 ++++++++++++++++++++++--
- 3 files changed, 102 insertions(+), 5 deletions(-)
+ hw/s390x/Makefile.objs              |   1 +
+ hw/s390x/ipl.c                      |  33 ++++++++
+ hw/s390x/ipl.h                      |   2 +
+ hw/s390x/pv.c                       | 118 ++++++++++++++++++++++++++++
+ hw/s390x/pv.h                       |  26 ++++++
+ hw/s390x/s390-virtio-ccw.c          |  45 ++++++++---
+ target/s390x/cpu_features_def.inc.h |   1 +
+ 7 files changed, 216 insertions(+), 10 deletions(-)
+ create mode 100644 hw/s390x/pv.c
+ create mode 100644 hw/s390x/pv.h
 
+diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+index 94e57113d8..568bab9711 100644
+--- a/hw/s390x/Makefile.objs
++++ b/hw/s390x/Makefile.objs
+@@ -31,6 +31,7 @@ obj-y += tod-qemu.o
+ obj-$(CONFIG_KVM) += tod-kvm.o
+ obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+ obj-$(CONFIG_KVM) += s390-stattrib-kvm.o s390-mchk.o
++obj-$(CONFIG_KVM) += pv.o
+ obj-y += s390-ccw.o
+ obj-y += ap-device.o
+ obj-y += ap-bridge.o
 diff --git a/hw/s390x/ipl.c b/hw/s390x/ipl.c
-index ca544d64c5..a077926f36 100644
+index a077926f36..50501fcd27 100644
 --- a/hw/s390x/ipl.c
 +++ b/hw/s390x/ipl.c
-@@ -529,15 +529,56 @@ static bool is_virtio_scsi_device(IplParameterBlock *iplb)
-     return is_virtio_ccw_device_of_type(iplb, VIRTIO_ID_SCSI);
+@@ -33,6 +33,7 @@
+ #include "qemu/cutils.h"
+ #include "qemu/option.h"
+ #include "exec/exec-all.h"
++#include "pv.h"
+ 
+ #define KERN_IMAGE_START                0x010000UL
+ #define LINUX_MAGIC_ADDR                0x010008UL
+@@ -668,6 +669,38 @@ static void s390_ipl_prepare_qipl(S390CPU *cpu)
+     cpu_physical_memory_unmap(addr, len, 1, len);
  }
  
-+int s390_ipl_pv_check_comp(IplParameterBlock *iplb)
++int s390_ipl_prepare_pv_header(void)
 +{
-+    int i;
++    int rc;
++    IplParameterBlock *iplb = s390_ipl_get_iplb_secure();
++    IPLBlockPV *ipib_pv = &iplb->pv;
++    void *hdr = g_malloc(ipib_pv->pv_header_len);
++
++    cpu_physical_memory_read(ipib_pv->pv_header_addr, hdr,
++                             ipib_pv->pv_header_len);
++    rc = s390_pv_set_sec_parms((uint64_t)hdr,
++                               ipib_pv->pv_header_len);
++    g_free(hdr);
++    return rc;
++}
++
++int s390_ipl_pv_unpack(void)
++{
++    int i, rc;
++    IplParameterBlock *iplb = s390_ipl_get_iplb_secure();
 +    IPLBlockPV *ipib_pv = &iplb->pv;
 +
-+    if (ipib_pv->num_comp == 0) {
-+        return -EINVAL;
-+    }
-+
 +    for (i = 0; i < ipib_pv->num_comp; i++) {
-+
-+        /* Addr must be 4k aligned */
-+        if (ipib_pv->components[i].addr & ~TARGET_PAGE_MASK) {
-+            return -EINVAL;
-+        }
-+
-+        /* Tweak prefix is monotonously increasing with each component */
-+        if (i < ipib_pv->num_comp - 1 &&
-+            ipib_pv->components[i].tweak_pref >
-+            ipib_pv->components[i + 1].tweak_pref) {
-+            return -EINVAL;
++        rc = s390_pv_unpack(ipib_pv->components[i].addr,
++                            TARGET_PAGE_ALIGN(ipib_pv->components[i].size),
++                            ipib_pv->components[i].tweak_pref);
++        if (rc) {
++            return rc;
 +        }
 +    }
-+    return 1;
++    return rc;
 +}
 +
- void s390_ipl_update_diag308(IplParameterBlock *iplb)
+ void s390_ipl_prepare_cpu(S390CPU *cpu)
  {
      S390IPLState *ipl = get_ipl_device();
- 
--    ipl->iplb = *iplb;
--    ipl->iplb_valid = true;
-+    if (iplb->pbt == 5) {
-+        ipl->iplb_pbt5 = *iplb;
-+        ipl->iplb_valid_pbt5 = true;
-+    } else {
-+        ipl->iplb = *iplb;
-+        ipl->iplb_valid = true;
-+    }
-     ipl->netboot = is_virtio_net_device(iplb);
- }
- 
-+IplParameterBlock *s390_ipl_get_iplb_secure(void)
-+{
-+    S390IPLState *ipl = get_ipl_device();
-+
-+    if (!ipl->iplb_valid_pbt5) {
-+        return NULL;
-+    }
-+    return &ipl->iplb_pbt5;
-+}
-+
- IplParameterBlock *s390_ipl_get_iplb(void)
- {
-     S390IPLState *ipl = get_ipl_device();
-@@ -552,7 +593,8 @@ void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type)
- {
-     S390IPLState *ipl = get_ipl_device();
- 
--    if (reset_type == S390_RESET_EXTERNAL || reset_type == S390_RESET_REIPL) {
-+    if (reset_type == S390_RESET_EXTERNAL || reset_type == S390_RESET_REIPL ||
-+        reset_type == S390_RESET_PV) {
-         /* use CPU 0 for full resets */
-         ipl->reset_cpu_index = 0;
-     } else {
 diff --git a/hw/s390x/ipl.h b/hw/s390x/ipl.h
-index d4813105db..7b8a493509 100644
+index 7b8a493509..e848602c16 100644
 --- a/hw/s390x/ipl.h
 +++ b/hw/s390x/ipl.h
-@@ -15,6 +15,24 @@
- #include "cpu.h"
- #include "hw/qdev-core.h"
- 
-+struct IPLBlockPVComp {
-+    uint64_t tweak_pref;
-+    uint64_t addr;
-+    uint64_t size;
-+} QEMU_PACKED;
-+typedef struct IPLBlockPVComp IPLBlockPVComp;
-+
-+struct IPLBlockPV {
-+    uint8_t  reserved[84];
-+    uint8_t  reserved67[3];
-+    uint8_t  version;
-+    uint32_t num_comp;
-+    uint64_t pv_header_addr;
-+    uint64_t pv_header_len;
-+    struct IPLBlockPVComp components[];
-+} QEMU_PACKED;
-+typedef struct IPLBlockPV IPLBlockPV;
-+
- struct IplBlockCcw {
-     uint8_t  reserved0[85];
-     uint8_t  ssid;
-@@ -71,6 +89,7 @@ union IplParameterBlock {
-         union {
-             IplBlockCcw ccw;
-             IplBlockFcp fcp;
-+            IPLBlockPV pv;
-             IplBlockQemuScsi scsi;
-         };
-     } QEMU_PACKED;
-@@ -84,9 +103,11 @@ union IplParameterBlock {
- typedef union IplParameterBlock IplParameterBlock;
- 
+@@ -105,6 +105,8 @@ typedef union IplParameterBlock IplParameterBlock;
  int s390_ipl_set_loadparm(uint8_t *loadparm);
-+int s390_ipl_pv_check_comp(IplParameterBlock *iplb);
+ int s390_ipl_pv_check_comp(IplParameterBlock *iplb);
  void s390_ipl_update_diag308(IplParameterBlock *iplb);
++int s390_ipl_prepare_pv_header(void);
++int s390_ipl_pv_unpack(void);
  void s390_ipl_prepare_cpu(S390CPU *cpu);
  IplParameterBlock *s390_ipl_get_iplb(void);
-+IplParameterBlock *s390_ipl_get_iplb_secure(void);
- 
- enum s390_reset {
-     /* default is a reset not triggered by a CPU e.g. issued by QMP */
-@@ -94,6 +115,7 @@ enum s390_reset {
-     S390_RESET_REIPL,
-     S390_RESET_MODIFIED_CLEAR,
-     S390_RESET_LOAD_NORMAL,
-+    S390_RESET_PV,
- };
- void s390_ipl_reset_request(CPUState *cs, enum s390_reset reset_type);
- void s390_ipl_get_reset_request(CPUState **cs, enum s390_reset *reset_type);
-@@ -133,6 +155,7 @@ struct S390IPLState {
-     /*< private >*/
-     DeviceState parent_obj;
-     IplParameterBlock iplb;
-+    IplParameterBlock iplb_pbt5;
-     QemuIplParameters qipl;
-     uint64_t start_addr;
-     uint64_t compat_start_addr;
-@@ -140,6 +163,7 @@ struct S390IPLState {
-     uint64_t compat_bios_start_addr;
-     bool enforce_bios;
-     bool iplb_valid;
-+    bool iplb_valid_pbt5;
-     bool netboot;
-     /* reset related properties don't have to be migrated or reset */
-     enum s390_reset reset_type;
-@@ -161,9 +185,11 @@ QEMU_BUILD_BUG_MSG(offsetof(S390IPLState, iplb) & 3, "alignment of iplb wrong");
- 
- #define S390_IPL_TYPE_FCP 0x00
- #define S390_IPL_TYPE_CCW 0x02
-+#define S390_IPL_TYPE_PV 0x05
- #define S390_IPL_TYPE_QEMU_SCSI 0xff
- 
- #define S390_IPLB_HEADER_LEN 8
-+#define S390_IPLB_MIN_PV_LEN 148
- #define S390_IPLB_MIN_CCW_LEN 200
- #define S390_IPLB_MIN_FCP_LEN 384
- #define S390_IPLB_MIN_QEMU_SCSI_LEN 200
-@@ -185,4 +211,11 @@ static inline bool iplb_valid_fcp(IplParameterBlock *iplb)
-            iplb->pbt == S390_IPL_TYPE_FCP;
- }
- 
-+static inline bool iplb_valid_se(IplParameterBlock *iplb)
+ IplParameterBlock *s390_ipl_get_iplb_secure(void);
+diff --git a/hw/s390x/pv.c b/hw/s390x/pv.c
+new file mode 100644
+index 0000000000..0218070322
+--- /dev/null
++++ b/hw/s390x/pv.c
+@@ -0,0 +1,118 @@
++/*
++ * Secure execution functions
++ *
++ * Copyright IBM Corp. 2019
++ * Author(s):
++ *  Janosch Frank <frankja@linux.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++#include "qemu/osdep.h"
++#include <sys/ioctl.h>
++
++#include <linux/kvm.h>
++
++#include "qemu/error-report.h"
++#include "sysemu/kvm.h"
++#include "pv.h"
++
++static int s390_pv_cmd(uint32_t cmd, void *data)
 +{
-+    return be32_to_cpu(iplb->len) >= S390_IPLB_MIN_PV_LEN &&
-+           iplb->pbt == S390_IPL_TYPE_PV;
++    int rc;
++    struct kvm_pv_cmd pv_cmd = {
++        .cmd = cmd,
++        .data = (uint64_t)data,
++    };
++
++    rc = kvm_vm_ioctl(kvm_state, KVM_S390_PV_COMMAND, &pv_cmd);
++    if (rc) {
++        error_report("KVM PV command failed cmd: %d rc: %d", cmd, rc);
++        exit(1);
++    }
++    return rc;
 +}
 +
++static int s390_pv_cmd_vcpu(CPUState *cs, uint32_t cmd, void *data)
++{
++    int rc;
++    struct kvm_pv_cmd pv_cmd = {
++        .cmd = cmd,
++        .data = (uint64_t)data,
++    };
 +
- #endif
-diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-index 067c667ba7..32049bb4ee 100644
---- a/target/s390x/diag.c
-+++ b/target/s390x/diag.c
-@@ -52,6 +52,8 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
- #define DIAG_308_RC_OK              0x0001
- #define DIAG_308_RC_NO_CONF         0x0102
- #define DIAG_308_RC_INVALID         0x0402
-+#define DIAG_308_RC_NO_PV_CONF      0x0a02
-+#define DIAG_308_RC_INV_FOR_PV      0x0b02
++    rc = kvm_vcpu_ioctl(cs, KVM_S390_PV_COMMAND_VCPU, &pv_cmd);
++    if (rc) {
++        error_report("KVM PV VCPU command failed cmd: %d rc: %d", cmd, rc);
++        exit(1);
++    }
++    return rc;
++}
++
++int s390_pv_vm_create(void)
++{
++    return s390_pv_cmd(KVM_PV_VM_CREATE, NULL);
++}
++
++int s390_pv_vm_destroy(void)
++{
++    return s390_pv_cmd(KVM_PV_VM_DESTROY, NULL);
++}
++
++int s390_pv_vcpu_create(CPUState *cs)
++{
++    return s390_pv_cmd_vcpu(cs, KVM_PV_VCPU_CREATE, NULL);
++}
++
++int s390_pv_vcpu_destroy(CPUState *cs)
++{
++    S390CPU *cpu = S390_CPU(cs);
++    CPUS390XState *env = &cpu->env;
++    int rc;
++
++    rc = s390_pv_cmd_vcpu(cs, KVM_PV_VCPU_DESTROY, NULL);
++    if (!rc) {
++        env->pv = false;
++    }
++    return rc;
++}
++
++int s390_pv_set_sec_parms(uint64_t origin, uint64_t length)
++{
++    struct kvm_s390_pv_sec_parm args = {
++        .origin = origin,
++        .length = length,
++    };
++
++    return s390_pv_cmd(KVM_PV_VM_SET_SEC_PARMS, &args);
++}
++
++/*
++ * Called for each component in the SE type IPL parameter block 0.
++ */
++int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak)
++{
++    struct kvm_s390_pv_unp args = {
++        .addr = addr,
++        .size = size,
++        .tweak = tweak,
++    };
++
++    return s390_pv_cmd(KVM_PV_VM_UNPACK, &args);
++}
++
++int s390_pv_perf_clear_reset(void)
++{
++    return s390_pv_cmd(KVM_PV_VM_PERF_CLEAR_RESET, NULL);
++}
++
++int s390_pv_verify(void)
++{
++    return s390_pv_cmd(KVM_PV_VM_VERIFY, NULL);
++}
++
++int s390_pv_unshare(void)
++{
++    return s390_pv_cmd(KVM_PV_VM_UNSHARE, NULL);
++}
+diff --git a/hw/s390x/pv.h b/hw/s390x/pv.h
+new file mode 100644
+index 0000000000..eb074e4bc9
+--- /dev/null
++++ b/hw/s390x/pv.h
+@@ -0,0 +1,26 @@
++/*
++ * Protected Virtualization header
++ *
++ * Copyright IBM Corp. 2019
++ * Author(s):
++ *  Janosch Frank <frankja@linux.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++
++#ifndef HW_S390_PV_H
++#define HW_S390_PV_H
++
++int s390_pv_vm_create(void);
++int s390_pv_vm_destroy(void);
++int s390_pv_vcpu_destroy(CPUState *cs);
++int s390_pv_vcpu_create(CPUState *cs);
++int s390_pv_set_sec_parms(uint64_t origin, uint64_t length);
++int s390_pv_unpack(uint64_t addr, uint64_t size, uint64_t tweak);
++int s390_pv_perf_clear_reset(void);
++int s390_pv_verify(void);
++int s390_pv_unshare(void);
++
++#endif /* HW_S390_PV_H */
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index c1d1440272..7262453616 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -41,6 +41,7 @@
+ #include "hw/qdev-properties.h"
+ #include "hw/s390x/tod.h"
+ #include "sysemu/sysemu.h"
++#include "hw/s390x/pv.h"
  
- #define DIAG308_RES_MOD_CLR		0
- #define DIAG308_RES_LOAD_NORM		1
-@@ -59,6 +61,9 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, uint64_t r3)
- #define DIAG308_LOAD_NORMAL_DUMP	4
- #define DIAG308_SET			5
- #define DIAG308_STORE			6
-+#define DIAG308_PV_SET			8
-+#define DIAG308_PV_STORE		9
-+#define DIAG308_PV_START		10
+ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+ {
+@@ -322,6 +323,7 @@ static void s390_machine_reset(MachineState *machine)
+ {
+     enum s390_reset reset_type;
+     CPUState *cs, *t;
++    S390CPU *cpu;
  
- static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t addr,
-                               uintptr_t ra, bool write)
-@@ -105,6 +110,7 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
-         s390_ipl_reset_request(cs, S390_RESET_REIPL);
+     /* get the reset parameters, reset them once done */
+     s390_ipl_get_reset_request(&cs, &reset_type);
+@@ -329,16 +331,10 @@ static void s390_machine_reset(MachineState *machine)
+     /* all CPUs are paused and synchronized at this point */
+     s390_cmma_reset();
+ 
+-    switch (reset_type) {
+-    case S390_RESET_EXTERNAL:
+-    case S390_RESET_REIPL:
+-        qemu_devices_reset();
+-        s390_crypto_reset();
++    cpu = S390_CPU(cs);
+ 
+-        /* configure and start the ipl CPU only */
+-        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
+-        break;
+-    case S390_RESET_MODIFIED_CLEAR:
++    switch (reset_type) {
++    case S390_RESET_MODIFIED_CLEAR:  /* Subcode 0 */
+         CPU_FOREACH(t) {
+             run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
+         }
+@@ -346,7 +342,7 @@ static void s390_machine_reset(MachineState *machine)
+         s390_crypto_reset();
+         run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
          break;
-     case DIAG308_SET:
-+    case DIAG308_PV_SET: /* Set SE parms */
-         if (diag308_parm_check(env, r1, addr, ra, false)) {
-             return;
-         }
-@@ -117,7 +123,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uintptr_t ra)
- 
-         cpu_physical_memory_read(addr, iplb, be32_to_cpu(iplb->len));
- 
--        if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb)) {
-+        if (!iplb_valid_ccw(iplb) && !iplb_valid_fcp(iplb) &&
-+            !(iplb_valid_se(iplb) && s390_ipl_pv_check_comp(iplb) >= 0)) {
-             env->regs[r1 + 1] = DIAG_308_RC_INVALID;
-             goto out;
-         }
-@@ -128,10 +135,15 @@ out:
-         g_free(iplb);
-         return;
-     case DIAG308_STORE:
-+    case DIAG308_PV_STORE: /* Get SE parms */
-         if (diag308_parm_check(env, r1, addr, ra, true)) {
-             return;
-         }
--        iplb = s390_ipl_get_iplb();
-+        if (subcode == DIAG308_PV_STORE) {
-+            iplb = s390_ipl_get_iplb_secure();
-+        } else {
-+            iplb = s390_ipl_get_iplb();
-+        }
-         if (iplb) {
-             cpu_physical_memory_write(addr, iplb, be32_to_cpu(iplb->len));
-             env->regs[r1 + 1] = DIAG_308_RC_OK;
-@@ -139,6 +151,16 @@ out:
-             env->regs[r1 + 1] = DIAG_308_RC_NO_CONF;
-         }
-         return;
+-    case S390_RESET_LOAD_NORMAL:
++    case S390_RESET_LOAD_NORMAL: /* Subcode 1*/
+         CPU_FOREACH(t) {
+             if (t == cs) {
+                 continue;
+@@ -357,6 +353,35 @@ static void s390_machine_reset(MachineState *machine)
+         run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
+         run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+         break;
++    case S390_RESET_EXTERNAL:
++    case S390_RESET_REIPL: /* Subcode 4 */
++        qemu_devices_reset();
++        s390_crypto_reset();
++        /* configure and start the ipl CPU only */
++        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
 +        break;
-+    case DIAG308_PV_START: /* SE start */
-+        iplb = s390_ipl_get_iplb_secure();
-+        if (!iplb_valid_se(iplb)) {
-+            env->regs[r1 + 1] = DIAG_308_RC_NO_PV_CONF;
-+            return;
++    case S390_RESET_PV: /* Subcode 10 */
++        subsystem_reset();
++        s390_crypto_reset();
++
++        CPU_FOREACH(t) {
++            run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
 +        }
 +
-+        s390_ipl_reset_request(cs, S390_RESET_PV);
++        /* Create SE VM */
++        s390_pv_vm_create();
++        CPU_FOREACH(t) {
++            s390_pv_vcpu_create(t);
++        }
++
++        /* Set SE header and unpack */
++        s390_ipl_prepare_pv_header();
++        /* Decrypt image */
++        s390_ipl_pv_unpack();
++        /* Verify integrity */
++        s390_pv_verify();
++        s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
 +        break;
      default:
-         s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-         break;
+         g_assert_not_reached();
+     }
+diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_features_def.inc.h
+index 31dff0d84e..60db28351d 100644
+--- a/target/s390x/cpu_features_def.inc.h
++++ b/target/s390x/cpu_features_def.inc.h
+@@ -107,6 +107,7 @@ DEF_FEAT(DEFLATE_BASE, "deflate-base", STFL, 151, "Deflate-conversion facility (
+ DEF_FEAT(VECTOR_PACKED_DECIMAL_ENH, "vxpdeh", STFL, 152, "Vector-Packed-Decimal-Enhancement Facility")
+ DEF_FEAT(MSA_EXT_9, "msa9-base", STFL, 155, "Message-security-assist-extension-9 facility (excluding subfunctions)")
+ DEF_FEAT(ETOKEN, "etoken", STFL, 156, "Etoken facility")
++DEF_FEAT(UNPACK, "unpack", STFL, 161, "Unpack facility")
+ 
+ /* Features exposed via SCLP SCCB Byte 80 - 98  (bit numbers relative to byte-80) */
+ DEF_FEAT(SIE_GSLS, "gsls", SCLP_CONF_CHAR, 40, "SIE: Guest-storage-limit-suppression facility")
 -- 
 2.20.1
 
