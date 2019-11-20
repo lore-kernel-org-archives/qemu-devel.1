@@ -2,135 +2,75 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0A0CC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:44:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B75DC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:46:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ADA2217F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:44:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81660217D6
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:45:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ALlbE21G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ADA2217F9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YQZuhSek"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81660217D6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXRDd-0003WP-Kp
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 09:44:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53167)
+	id 1iXRF0-0004ps-BG
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 09:45:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <lvivier@redhat.com>) id 1iXR8I-0006L1-LS
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:39:03 -0500
+ (envelope-from <jfreimann@redhat.com>) id 1iXR8O-0006MP-Gi
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:39:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <lvivier@redhat.com>) id 1iXR8H-0007I4-6Q
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:39:02 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:27490
+ (envelope-from <jfreimann@redhat.com>) id 1iXR8N-0007KO-HO
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:39:08 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45610
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iXR8H-0007Hl-2X
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:39:01 -0500
+ (Exim 4.71) (envelope-from <jfreimann@redhat.com>)
+ id 1iXR8N-0007K8-Dk
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:39:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574260740;
+ s=mimecast20190719; t=1574260746;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=r2Lpo+F+bhFL/XHdmh3jpx3Umt/8Z5+mvEX6Kh9UaNw=;
- b=ALlbE21GEzW8VmtZhQjv3pnyLhs/y9jRZHj0130nRgUTt/qGkMnFYHhffVpCZr4UIzXYE/
- XUHLVbY8goysreH6ygoq2aqn88u4J1wOlGzrGQPUDrKGJhtGOfvR1dsayK9n4VzMHWBHFu
- UqyeVN/Qwn1mC54bOHpVkpro1tORaSQ=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=HNBT50wUIX1sytE6fF5yfmbAxZB8D7eDcI7FmelMh8A=;
+ b=YQZuhSek3L5JybDAL1hdZw8lTUbJUR+aglqFYyjlWQZlnMoTqvwtEuMXCk3ouBMibco/xd
+ Hda+fmpbIl8ER/rNMoEJ7XeaCsy7lNCmXv3UHTF1NT0eG2RokuLGyl03zOBVBz9BDilsYj
+ 7SOnQcRBVywDRgtC0Pj3B5Qv0xB4UDA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-kAfhKmnRPwKoeqpDEknBTQ-1; Wed, 20 Nov 2019 09:38:56 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-267-P8s8LgqQOLCLZsDKBFfWyg-1; Wed, 20 Nov 2019 09:39:05 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B566E800A02;
- Wed, 20 Nov 2019 14:38:55 +0000 (UTC)
-Received: from [10.36.116.216] (ovpn-116-216.ams2.redhat.com [10.36.116.216])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3B1876013A;
- Wed, 20 Nov 2019 14:38:52 +0000 (UTC)
-Subject: Re: [PATCH] pseries: fix migration-test and pxe-test
-To: quintela@redhat.com
-References: <20191120142539.236279-1-lvivier@redhat.com>
- <87imneobvf.fsf@trasno.org>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <7ddc4653-aed5-2cf9-4a7a-5c64fdd0d4b9@redhat.com>
-Date: Wed, 20 Nov 2019 15:38:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.2.2
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D2112EDD;
+ Wed, 20 Nov 2019 14:39:04 +0000 (UTC)
+Received: from localhost (dhcp-192-217.str.redhat.com [10.33.192.217])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D1BE51F1B;
+ Wed, 20 Nov 2019 14:39:01 +0000 (UTC)
+From: Jens Freimann <jfreimann@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/4] net/virtio: fixes for failover
+Date: Wed, 20 Nov 2019 15:38:55 +0100
+Message-Id: <20191120143859.24584-1-jfreimann@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87imneobvf.fsf@trasno.org>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: kAfhKmnRPwKoeqpDEknBTQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: P8s8LgqQOLCLZsDKBFfWyg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -142,36 +82,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Greg Kurz <groug@kaod.org>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org, jasowang@redhat.com, dgilbert@redhat.com,
+ mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/11/2019 15:34, Juan Quintela wrote:
-> Laurent Vivier <lvivier@redhat.com> wrote:
->> Commit 29cb4187497d ("spapr: Set VSMT to smp_threads by default")
->> has introduced a new default value for VSMT that is not supported
->> by old kernels (before 4.13 kernel) and this breaks "make check"
->> on these kernels.
->>
->> To fix that, explicitly set in the involved tests the value that was
->> used as the default value before the change.
->>
->> Cc: Greg Kurz <groug@kaod.org>
->> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
->=20
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
->=20
-> A comment telling that never their use could help for future readers
-> O:-)
+This series fixes bugs found by coverity and one reported by David
+Gilbert.
 
-I assumed that "git blame" would be enough for a reader that wants more
-details :)
+Jens Freimann (4):
+  net/virtio: fix dev_unplug_pending
+  net/virtio: return early when failover primary alread added
+  net/virtio: avoid passing NULL to qdev_set_parent_bus
+  net/virtio: return error when device_opts arg is NULL
 
-Thanks,
-Laurent
+ hw/net/virtio-net.c | 58 +++++++++++++++++++++++++++++----------------
+ migration/savevm.c  |  3 ++-
+ 2 files changed, 40 insertions(+), 21 deletions(-)
+
+--=20
+2.21.0
 
 
