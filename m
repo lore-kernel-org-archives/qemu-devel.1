@@ -2,83 +2,79 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A66C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 20:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9BB9C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 20:44:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CB382075E
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 20:36:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8078520726
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 20:44:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VCxksShR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CB382075E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JYafPBcl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8078520726
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34342 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXWi3-0001zU-O0
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 15:36:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60233)
+	id 1iXWqQ-0003UR-NT
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 15:44:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32844)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iXWhG-0001Nl-E6
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:35:31 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXWpk-00034R-N1
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:44:17 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iXWhF-00027Z-1F
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:35:30 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27207
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iXWhE-00024u-UA
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:35:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574282127;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=zoRL0s/PwlgdpLfSG7fpqjXb9S8UjCR0IsyiGG2OCjM=;
- b=VCxksShRTUN7v8EqxUvDxaO8+YI3nkOojSzrpXe0kPOLH0MnhKVh6Eu7QQ/qYHuCgKZcTI
- EV6UKIcz/I8nMPKtj/tRZ+Ipx7u1KdH8/MrZZbD6vvrzJRRxq5JfFYdv50WUaspfk/TWnc
- UWwJMKqyaIIzFJJIQybDzd7jYyupakg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-107-0FK6NQYYO-O1XmCaEJP5cw-1; Wed, 20 Nov 2019 15:35:24 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AA87DB20;
- Wed, 20 Nov 2019 20:35:23 +0000 (UTC)
-Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F317A19C70;
- Wed, 20 Nov 2019 20:35:22 +0000 (UTC)
-Subject: Re: [PATCH 5/6] qapi: Fix code generation for empty modules
-To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
-References: <20191120182551.23795-1-armbru@redhat.com>
- <20191120182551.23795-6-armbru@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <f9a57f04-4c8e-3fda-bd7f-9f74cb24a7fb@redhat.com>
-Date: Wed, 20 Nov 2019 14:35:22 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXWpj-0004cd-K1
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:44:16 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:45197)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iXWpj-0004bG-As
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 15:44:15 -0500
+Received: by mail-oi1-x243.google.com with SMTP id 14so1021710oir.12
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 12:44:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=IrGzEhAVokXnY9mIl3c/73d3PZaToiauaqRJgmslU10=;
+ b=JYafPBclM/iF+0ngyf4kctWg+n4qXMDU57nG+BLhUC42ap5eCznM3B8cX7SxVsOgj3
+ Df7gaaciXQOwEnqOePx0Ls90gQUH0EamCZkAYR6jULqBGbivOXvXeL/s3KPkZ1cDiYVK
+ Ppyi/ru7Tkq1EYRrS9zKruSaqOTzBMbHqnPpg4hQqOiTVTwuCXH741GXuNUjapgJ+Kd2
+ QeT93Xj2N40QFVCGkTz0Vkf6OgYdQ5a/br/3+Ikt+Rct2gEBZRKWuHJGnthhojqV6mQn
+ UGe6BWKgdFaI1QUYpj6jw9n4eTO1tokGHuwTZ0YfperJD3KmsTuMh1T4T8pSGfxgjMf5
+ A0wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=IrGzEhAVokXnY9mIl3c/73d3PZaToiauaqRJgmslU10=;
+ b=cvkLDGc/++yP1BbF9o2FZKjklH/r396arJk+bjUq3Ul6nSc+NiGYSy0vnsJdKARPUk
+ PJDd+vb4OHaGZNKsAk4EQkDY+YZ/yJZ0SiS2VDxATbaT4WSswtm8ji85xfbdUqNxErPH
+ yHNJwmraFvjX3iu8MHXKYRPV5qQLeBYzrlFbuogwDDbSBeF3RosVTKfPnMLeYUbEpjK9
+ WKfhzAo21owiF8MJgc/m0r5jQ4YwaF4u/NSJo1KgGEG4LNvdvVCLpPJaKLynGf5gzGFj
+ WqVhhlQjAyjhbMaqn7NeooM5sb0R01d0P3/3hqThnbIUBNQFBQsvJG2UuDjl+9lOGAvL
+ gTXw==
+X-Gm-Message-State: APjAAAU0n1BZ3ENVL+LDRp6JiftIgWdNIrRI7qWn44QM/gRPhjBV1qCn
+ J9qCK5E/0Ab4w2BsWbseRYuY/W3nLus/RPf1h6o=
+X-Google-Smtp-Source: APXvYqxbL4TLuBpjJUT8hN7z3BpYAxbsTucD81xtsOSEvHx13VdMt4BVmH/buiGR4hbjduBNJC+l/yGGQuZwJ657ZXI=
+X-Received: by 2002:aca:670b:: with SMTP id z11mr4303911oix.79.1574282654378; 
+ Wed, 20 Nov 2019 12:44:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191120182551.23795-6-armbru@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: 0FK6NQYYO-O1XmCaEJP5cw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.120
+References: <20191119190405.GA23854@ls3530.fritz.box>
+In-Reply-To: <20191119190405.GA23854@ls3530.fritz.box>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 20 Nov 2019 21:44:03 +0100
+Message-ID: <CAL1e-=i79EfRrvB+z9LQBXZUKak3Y5akEpWqgu2o_Vk6Js6zTQ@mail.gmail.com>
+Subject: Re: [PATCH] linux-user/strace: Improve output of various syscalls
+To: Helge Deller <deller@gmx.de>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,33 +86,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mdroth@linux.vnet.ibm.com, kwolf@pond.sub.org
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/20/19 12:25 PM, Markus Armbruster wrote:
-> When a sub-module doesn't contain any definitions, we don't generate
-> code for it, but we do generate the #include.
->=20
-> We generate code only for modules that get visited.
-> QAPISchema.visit() visits only modules that have definitions.  It can
-> visit modules multiple times.
->=20
-> Clean this up as follows.  Collect entities in their QAPISchemaModule.
-> Have QAPISchema.visit() call QAPISchemaModule.visit() for each module.
-> Have QAPISchemaModule.visit() call .visit_module() for itself, and
-> QAPISchemaEntity.visit() for each of its entities.  This way, we visit
-> each module exactly once.
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
-> ---
+> @@ -26,7 +26,7 @@
+>  { TARGET_NR_afs_syscall, "afs_syscall" , NULL, NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_alarm
+> -{ TARGET_NR_alarm, "alarm" , NULL, NULL, NULL },
+> +{ TARGET_NR_alarm, "alarm" , "%s(%d)", NULL, NULL },
+>  #endif
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Man page says:
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+unsigned int alarm(unsigned int seconds)
 
+The sole argument is unsigned int - therefore "%d" should be "%u",
+shouldn't it?
+
+--------------------------------------------------
+
+This is not a part of your changes, but appeared in your patch diff:
+
+>  #ifdef TARGET_NR_epoll_create
+>  { TARGET_NR_epoll_create, "epoll_create" , NULL, NULL, NULL },
+
+From man pages:
+
+int epoll_create(int size);
+
+So, this also belongs to the category "has only int-type parameter,'
+and "%s(%d)" should be used, no?
+
+---------------------------------------------------
+
+>  #ifdef TARGET_NR_setresgid
+> -{ TARGET_NR_setresgid, "setresgid" , NULL, NULL, NULL },
+> +{ TARGET_NR_setresgid, "setresgid" , "%s(%u,%u,%u)", NULL, NULL },
+>  #endif
+>  #ifdef TARGET_NR_setresgid32
+>  { TARGET_NR_setresgid32, "setresgid32" , NULL, NULL, NULL },
+>  #endif
+
+Why are you here correcting setresgid(), but leaving setresgid32()
+intact, even though they have the same argument type pattern?
+
+--------------------------------------------------
+
+I have these objections, however, in general, I salute the patch, and
+your efforts to improve QEMU linux-user strace, it is a quite useful
+debug tool, and thanks for doing this! :)
+
+Yours,
+Aleksandar
 
