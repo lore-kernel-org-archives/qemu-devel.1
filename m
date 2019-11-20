@@ -2,81 +2,117 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UPPERCASE_75_100,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE16C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 18:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40852C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 18:03:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77DC220679
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 18:00:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B848B20643
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 18:03:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DIL5Xe+Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77DC220679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LTPdRHVN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B848B20643
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33166 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXUGv-0002sv-L1
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 13:00:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59247)
+	id 1iXUKD-00062k-L2
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 13:03:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33461)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iXU7O-0003nH-SW
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 12:50:23 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iXUIa-00052f-1z
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:01:53 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iXU7I-0001fl-NQ
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 12:50:17 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33980
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iXU7I-0001eC-75
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 12:50:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574272211;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=padFQJWMU0/PtWurwsOOAYRD346o/+U1FWZ8aKZJh9Q=;
- b=DIL5Xe+Z+9v95D7xvKzR6kYjPcZpiaQbdqpSM5hvbazR4UwuwgZ2BRUJ2dMr28L6vXXmI9
- RJDz8fV6vRuD66Kdy4bPTT5W9bumgIWWLN7ryU7DNaTga9XpL8W0WECe2JqOJd/3vX7nuX
- unJ5YobT1ohm19lGOUeBUUrvorei8rA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-2zVPpPsKMsyceOW5aUqmlw-1; Wed, 20 Nov 2019 12:50:08 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 008B8800054
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 17:50:08 +0000 (UTC)
-Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 98517104B527;
- Wed, 20 Nov 2019 17:50:05 +0000 (UTC)
-Date: Wed, 20 Nov 2019 17:50:02 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] target/i386: add VMX features to named CPU models
-Message-ID: <20191120175002.GP2785116@redhat.com>
-References: <20191120173753.8894-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-In-Reply-To: <20191120173753.8894-1-pbonzini@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: 2zVPpPsKMsyceOW5aUqmlw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iXUIY-0006jm-K3
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:01:51 -0500
+Received: from mail-eopbgr70097.outbound.protection.outlook.com
+ ([40.107.7.97]:38941 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iXUIY-0006iH-BW; Wed, 20 Nov 2019 13:01:50 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fLfhcH7eLdVB6cyMIxrlLTm7FmcutZohA5nWR09H8QGIdpBA847jbOYDpbRBFHXQrn3Nv4G73cro6J0xqmOnoq0EaNqeH4l0eJsDplZwYq9HGMO5Wg4CW88dSIhD0SVesuCMmMD6aviPQAaXZqbm0/AvHbAzE/9Oy6N5AcDWpcDRGzctd+igFW0HyiB+ZQhVTAcVuRCj1k9qt+XkZqbba8dEAlso9UqmWLhrYM0r8AM7EIlcRCKODV+4AvroCt3op+O/amSmroUFsSNdoGQ2SPhwQPqJVwJ7vmE2pNGiCxWZIUxFRjtC1oq9PxkZwtPicQdhV0RUptx0Lz93/3Ozog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CKikWfdUUhRLsk/hpa3Z6e+2shCIN+N5kNScAySiLs0=;
+ b=BW0Nwntwph0RLKw8kYsARzQ6H+TcCtiDU3n+EdX8ds8WnM+kn5d9Agu2W9rLrr3ErtJvXtd/2ywLfJDyVpcOJdS/JrJWAmwv6u9W6OXZY2ZZzunPHqu51iD3QanE8omLbkLfTiif8SRQiA+FCWTJ9q4Cac5XfuiyAwJRUGZc5QrF5NJThx0M22VO+8ffUwFzROExaXkJreziy9x7SrDE9Uzy7B865xfBVCmt+FIBnlMQW9TdljQcQRkSRE7cAqUsGtqng5nHEVedCdGt0XcEW3lb6dyeAu61IXlKQW0juwUa5LwHDOsiB2NgBpvpPhKecz/ZbilJbcB0veMbxr5uNQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CKikWfdUUhRLsk/hpa3Z6e+2shCIN+N5kNScAySiLs0=;
+ b=LTPdRHVNZbSHVZHDTbSc+VkFyBn2N1zxWj/1CYhIegMTsGY6zXxD/eLvF48ge7dj4POyZfC3QO/zwBDux3QkYeWkaAoOcFRfUGGBzJJ1RzKCakW14/oMbtv7lQa+uopMkh/OFU0LSXXoY8u1mpbyDNNUtCX+XdgPqJ+p7svxgf8=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3333.eurprd08.prod.outlook.com (52.135.163.160) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.23; Wed, 20 Nov 2019 18:01:47 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.031; Wed, 20 Nov 2019
+ 18:01:46 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH 2/6] block: truncate: Don't make backing file data visible
+Thread-Topic: [PATCH 2/6] block: truncate: Don't make backing file data visible
+Thread-Index: AQHVn6tWfO4qk+G27kuJNGXuHPps36eUWcwA
+Date: Wed, 20 Nov 2019 18:01:46 +0000
+Message-ID: <57c28fd7-4949-3da3-37c5-e2db0914ccae@virtuozzo.com>
+References: <20191120140319.1505-1-kwolf@redhat.com>
+ <20191120140319.1505-3-kwolf@redhat.com>
+In-Reply-To: <20191120140319.1505-3-kwolf@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR05CA0231.eurprd05.prod.outlook.com
+ (2603:10a6:3:fa::31) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191120210144451
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3077932d-9a26-4059-7455-08d76de3b532
+x-ms-traffictypediagnostic: AM6PR08MB3333:
+x-microsoft-antispam-prvs: <AM6PR08MB3333538F2AF0D42293344DBEC14F0@AM6PR08MB3333.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 02272225C5
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(396003)(346002)(136003)(39850400004)(366004)(376002)(199004)(189003)(6486002)(81166006)(81156014)(8676002)(76176011)(14454004)(52116002)(66556008)(6506007)(2906002)(102836004)(4326008)(229853002)(5660300002)(386003)(11346002)(26005)(2501003)(2616005)(476003)(486006)(54906003)(31696002)(86362001)(6436002)(6246003)(6512007)(6116002)(316002)(3846002)(31686004)(7736002)(66066001)(8936002)(305945005)(186003)(446003)(110136005)(71190400001)(71200400001)(99286004)(256004)(66946007)(478600001)(66446008)(64756008)(66476007)(36756003)(25786009);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3333;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; A:1; MX:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: g+AwwEZ7ga/3ojSrAI5h1wzja0hVJWEpKDeHzlTM2jdA624TcsIBwLTu/KSvlXYTUFwjaQvh2RWKma4ye3al2O5kzLFauo8BXKwoYjP3doED9PIClIWdi/Q7NG8VkYKq8fGwZ6DOCBiRCYWV0A1TBoWveiRFxhCQN6We8wOINU9rX8CPshzthzvYlJxPNH8Nax8Nqc0rIH1KAfC3PZhvXH501Ye3/0fgp1FVB9GapaoZO0AOVVufYv3OKn6Xary3G25aTdTk4K7HEghkYz7R5/0Lwfw+90mydXNnGmk52t0f98krtu0oNLHkvLASyDwu2vqgLNjMQyE2lE+z2OjYDm1zyHCRt6S6NXTNsxpO7Qn3cs7SeVGIyE8hPQ1dxVpTnTY7lHXHMXL7HExkGUabhPAd74tH1tp5V9Owc64UJnWMusHEjjL9bPKRRfSg9FnB
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <BAE9E57177F4D84592CB0DAC40B19C1D@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3077932d-9a26-4059-7455-08d76de3b532
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Nov 2019 18:01:46.6018 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: D7anzrSlbF64xTGEGz/ypA9u7AwkKX9qp98q5NmijvD67XmkZ9nunR+VBucwB6hztG1lAe7XS8prF3w8NPRntWom7HMXkTzVce3PooxG8Is=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3333
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.7.97
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,1368 +124,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Nov 20, 2019 at 06:37:53PM +0100, Paolo Bonzini wrote:
-> This allows using "-cpu Haswell,+vmx", which we did not really want to
-> support in QEMU but was produced by Libvirt when using the "host-model"
-> CPU model.
-
-Can you say what is currently broken ?  If I launch my current QEMU (I have
-4.1.1 on Fedora 31):
-
- qemu-system-x86_64 -cpu Haswell,+vmx
-
-... I don't get any reported errors.
-
+20.11.2019 17:03, Kevin Wolf wrote:
+> When extending the size of an image that has a backing file larger than
+> its old size, make sure that the backing file data doesn't become
+> visible in the guest, but the added area is properly zeroed out.
 >=20
-> This was produced from the output of scripts/kvm/vmxcap using the followi=
-ng
-> very ugly Python script:
+> The old behaviour made a difference in 'block_resize' (where showing the
+> backing file data from an old snapshot rather than zeros is
+> questionable) as well as in commit block jobs (both from active and
+> intermediate nodes) and HMP 'commit', where committing to a short
+> backing file would incorrectly omit writing zeroes for unallocated
+> blocks on the top layer after the EOF of the short backing file.
 >=20
->     bits =3D {
->             'INS/OUTS instruction information': ['FEAT_VMX_BASIC', 'MSR_V=
-MX_BASIC_INS_OUTS'],
->             'IA32_VMX_TRUE_*_CTLS support': ['FEAT_VMX_BASIC', 'MSR_VMX_B=
-ASIC_TRUE_CTLS'],
->             'External interrupt exiting': ['FEAT_VMX_PINBASED_CTLS', 'VMX=
-_PIN_BASED_EXT_INTR_MASK'],
->             'NMI exiting': ['FEAT_VMX_PINBASED_CTLS', 'VMX_PIN_BASED_NMI_=
-EXITING'],
->             'Virtual NMIs': ['FEAT_VMX_PINBASED_CTLS', 'VMX_PIN_BASED_VIR=
-TUAL_NMIS'],
->             'Activate VMX-preemption timer': ['FEAT_VMX_PINBASED_CTLS', '=
-VMX_PIN_BASED_VMX_PREEMPTION_TIMER'],
->             'Process posted interrupts': ['FEAT_VMX_PINBASED_CTLS', 'VMX_=
-PIN_BASED_POSTED_INTR'],
->             'Interrupt window exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_=
-CPU_BASED_VIRTUAL_INTR_PENDING'],
->             'Use TSC offsetting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BA=
-SED_USE_TSC_OFFSETING'],
->             'HLT exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASED_HLT=
-_EXITING'],
->             'INVLPG exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASED_=
-INVLPG_EXITING'],
->             'MWAIT exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASED_M=
-WAIT_EXITING'],
->             'RDPMC exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASED_R=
-DPMC_EXITING'],
->             'RDTSC exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASED_R=
-DTSC_EXITING'],
->             'CR3-load exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASE=
-D_CR3_LOAD_EXITING'],
->             'CR3-store exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BAS=
-ED_CR3_STORE_EXITING'],
->             'CR8-load exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASE=
-D_CR8_LOAD_EXITING'],
->             'CR8-store exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BAS=
-ED_CR8_STORE_EXITING'],
->             'Use TPR shadow': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASED_=
-TPR_SHADOW'],
->             'NMI-window exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BA=
-SED_VIRTUAL_NMI_PENDING'],
->             'MOV-DR exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASED_=
-MOV_DR_EXITING'],
->             'Unconditional I/O exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX=
-_CPU_BASED_UNCOND_IO_EXITING'],
->             'Use I/O bitmaps': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASED=
-_USE_IO_BITMAPS'],
->             'Monitor trap flag': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BAS=
-ED_MONITOR_TRAP_FLAG'],
->             'Use MSR bitmaps': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASED=
-_USE_MSR_BITMAPS'],
->             'MONITOR exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASED=
-_MONITOR_EXITING'],
->             'PAUSE exiting': ['FEAT_VMX_PROCBASED_CTLS', 'VMX_CPU_BASED_P=
-AUSE_EXITING'],
->             'Activate secondary control': ['FEAT_VMX_PROCBASED_CTLS', 'VM=
-X_CPU_BASED_ACTIVATE_SECONDARY_CONTROLS'],
->             'Virtualize APIC accesses': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_=
-SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES'],
->             'Enable EPT': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECONDARY_EXEC=
-_ENABLE_EPT'],
->             'Descriptor-table exiting': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_=
-SECONDARY_EXEC_DESC'],
->             'Enable RDTSCP': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECONDARY_E=
-XEC_RDTSCP'],
->             'Virtualize x2APIC mode': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SE=
-CONDARY_EXEC_VIRTUALIZE_X2APIC_MODE'],
->             'Enable VPID': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECONDARY_EXE=
-C_ENABLE_VPID'],
->             'WBINVD exiting': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECONDARY_=
-EXEC_WBINVD_EXITING'],
->             'Unrestricted guest': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECOND=
-ARY_EXEC_UNRESTRICTED_GUEST'],
->             'APIC register emulation': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_S=
-ECONDARY_EXEC_APIC_REGISTER_VIRT'],
->             'Virtual interrupt delivery': ['FEAT_VMX_SECONDARY_CTLS', 'VM=
-X_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY'],
->             'PAUSE-loop exiting': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECOND=
-ARY_EXEC_PAUSE_LOOP_EXITING'],
->             'RDRAND exiting': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECONDARY_=
-EXEC_RDRAND_EXITING'],
->             'Enable INVPCID': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECONDARY_=
-EXEC_ENABLE_INVPCID'],
->             'Enable VM functions': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECON=
-DARY_EXEC_ENABLE_VMFUNC'],
->             'VMCS shadowing': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECONDARY_=
-EXEC_SHADOW_VMCS'],
->             'RDSEED exiting': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECONDARY_=
-EXEC_RDSEED_EXITING'],
->             'Enable PML': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SECONDARY_EXEC=
-_ENABLE_PML'],
->             'Enable XSAVES/XRSTORS': ['FEAT_VMX_SECONDARY_CTLS', 'VMX_SEC=
-ONDARY_EXEC_XSAVES'],
->             'Save debug controls': ['FEAT_VMX_EXIT_CTLS', 'VMX_VM_EXIT_SA=
-VE_DEBUG_CONTROLS'],
->             'Host address-space size': ['FEAT_VMX_EXIT_CTLS', 'VMX_VM_EXI=
-T_HOST_ADDR_SPACE_SIZE'],
->             'Load IA32_PERF_GLOBAL_CTRL': ['FEAT_VMX_EXIT_CTLS', 'VMX_VM_=
-EXIT_LOAD_IA32_PERF_GLOBAL_CTRL'],
->             'Acknowledge interrupt on exit': ['FEAT_VMX_EXIT_CTLS', 'VMX_=
-VM_EXIT_ACK_INTR_ON_EXIT'],
->             'Save IA32_PAT': ['FEAT_VMX_EXIT_CTLS', 'VMX_VM_EXIT_SAVE_IA3=
-2_PAT'],
->             'Load IA32_PAT': ['FEAT_VMX_EXIT_CTLS', 'VMX_VM_EXIT_LOAD_IA3=
-2_PAT'],
->             'Save IA32_EFER': ['FEAT_VMX_EXIT_CTLS', 'VMX_VM_EXIT_SAVE_IA=
-32_EFER'],
->             'Load IA32_EFER': ['FEAT_VMX_EXIT_CTLS', 'VMX_VM_EXIT_LOAD_IA=
-32_EFER'],
->             'Save VMX-preemption timer value': ['FEAT_VMX_EXIT_CTLS', 'VM=
-X_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER'],
->             'Clear IA32_BNDCFGS': ['FEAT_VMX_EXIT_CTLS', 'VMX_VM_EXIT_CLE=
-AR_BNDCFGS'],
->             'Load debug controls': ['FEAT_VMX_ENTRY_CTLS', 'VMX_VM_ENTRY_=
-LOAD_DEBUG_CONTROLS'],
->             'IA-32e mode guest': ['FEAT_VMX_ENTRY_CTLS', 'VMX_VM_ENTRY_IA=
-32E_MODE'],
->             'Load IA32_PERF_GLOBAL_CTRL': ['FEAT_VMX_ENTRY_CTLS', 'VMX_VM=
-_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL'],
->             'Load IA32_PAT': ['FEAT_VMX_ENTRY_CTLS', 'VMX_VM_ENTRY_LOAD_I=
-A32_PAT'],
->             'Load IA32_EFER': ['FEAT_VMX_ENTRY_CTLS', 'VMX_VM_ENTRY_LOAD_=
-IA32_EFER'],
->             'Load IA32_BNDCFGS': ['FEAT_VMX_ENTRY_CTLS', 'VMX_VM_ENTRY_LO=
-AD_BNDCFGS'],
->             'Store EFER.LMA into IA-32e mode guest control': ['FEAT_VMX_M=
-ISC', 'MSR_VMX_MISC_STORE_LMA'],
->             'HLT activity state': ['FEAT_VMX_MISC', 'MSR_VMX_MISC_ACTIVIT=
-Y_HLT'],
->             'VMWRITE to VM-exit information fields': ['FEAT_VMX_MISC', 'M=
-SR_VMX_MISC_VMWRITE_VMEXIT'],
->             'Inject event with insn length=3D0': ['FEAT_VMX_MISC', 'MSR_V=
-MX_MISC_ZERO_LEN_INJECT'],
->             'Execute-only EPT translations': ['FEAT_VMX_EPT_VPID_CAPS', '=
-MSR_VMX_EPT_EXECONLY'],
->             'Page-walk length 4': ['FEAT_VMX_EPT_VPID_CAPS', 'MSR_VMX_EPT=
-_PAGE_WALK_LENGTH_4'],
->             'Paging-structure memory type WB': ['FEAT_VMX_EPT_VPID_CAPS',=
- 'MSR_VMX_EPT_WB'],
->             '2MB EPT pages': ['FEAT_VMX_EPT_VPID_CAPS', 'MSR_VMX_EPT_2MB =
-| MSR_VMX_EPT_1GB'],
->             'INVEPT supported': ['FEAT_VMX_EPT_VPID_CAPS', 'MSR_VMX_EPT_I=
-NVEPT'],
->             'EPT accessed and dirty flags': ['FEAT_VMX_EPT_VPID_CAPS', 'M=
-SR_VMX_EPT_AD_BITS'],
->             'Single-context INVEPT': ['FEAT_VMX_EPT_VPID_CAPS', 'MSR_VMX_=
-EPT_INVEPT_SINGLE_CONTEXT'],
->             'All-context INVEPT': ['FEAT_VMX_EPT_VPID_CAPS', 'MSR_VMX_EPT=
-_INVEPT_ALL_CONTEXT'],
->             'INVVPID supported': ['FEAT_VMX_EPT_VPID_CAPS', 'MSR_VMX_EPT_=
-INVVPID'],
->             'Individual-address INVVPID': ['FEAT_VMX_EPT_VPID_CAPS', 'MSR=
-_VMX_EPT_INVVPID_SINGLE_ADDR'],
->             'Single-context INVVPID': ['FEAT_VMX_EPT_VPID_CAPS', 'MSR_VMX=
-_EPT_INVVPID_SINGLE_CONTEXT'],
->             'All-context INVVPID': ['FEAT_VMX_EPT_VPID_CAPS', 'MSR_VMX_EP=
-T_INVVPID_ALL_CONTEXT'],
->             'Single-context-retaining-globals INVVPID': ['FEAT_VMX_EPT_VP=
-ID_CAPS', 'MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS'],
->             'EPTP Switching': ['FEAT_VMX_VMFUNC', 'MSR_VMX_VMFUNC_EPT_SWI=
-TCHING']
->     }
->=20
->     import sys
->     import textwrap
->=20
->     out =3D {}
->     for l in sys.stdin.readlines():
->         l =3D l.rstrip()
->         if l.endswith('!!'):
->             l =3D l[:-2].rstrip()
->         if l.startswith('    ') and (l.endswith('default') or l.endswith(=
-'yes')):
->             l =3D l[4:]
->             for key, value in bits.items():
->                 if l.startswith(key):
->                     ctl, bit =3D value
->                     if ctl in out:
->                         out[ctl] =3D out[ctl] + ' | '
->                     else:
->                         out[ctl] =3D '    [%s] =3D ' % ctl
->                     out[ctl] =3D out[ctl] + bit
->=20
->     for x in sorted(out.keys()):
->         print("\n         ".join(textwrap.wrap(out[x] + ",")))
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  target/i386/cpu.c | 674 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 674 insertions(+)
+>   block/io.c | 25 +++++++++++++++++++++++++
+>   1 file changed, 25 insertions(+)
 >=20
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 8447f4b82c..0f38c82903 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1873,6 +1873,24 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
->          .features[FEAT_8000_0001_ECX] =3D
->              CPUID_EXT3_LAHF_LM,
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel(R) Core(TM)2 Duo CPU     T7700  @ 2.40GHz",
->      },
-> @@ -1900,6 +1918,21 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->                      CPUID_EXT3_OSVW, CPUID_EXT3_IBS, CPUID_EXT3_SVM */
->          .features[FEAT_8000_0001_ECX] =3D
->              0,
-> +        /* VMX features from Cedar Mill/Prescott */
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
-,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Common KVM processor"
->      },
-> @@ -1931,6 +1964,20 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_EXT_SSE3,
->          .features[FEAT_8000_0001_ECX] =3D
->              0,
-> +        /* VMX features from Yonah */
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXIT=
-ING |
-> +             VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITIN=
-G |
-> +             VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_USE_MSR_BITMAPS=
-,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Common 32-bit KVM processor"
->      },
-> @@ -1952,6 +1999,19 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_EXT_SSE3 | CPUID_EXT_MONITOR,
->          .features[FEAT_8000_0001_EDX] =3D
->              CPUID_EXT2_NX,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_MOV_DR_EXITING | VMX_CPU_BASED_UNCOND_IO_EXIT=
-ING |
-> +             VMX_CPU_BASED_USE_IO_BITMAPS | VMX_CPU_BASED_MONITOR_EXITIN=
-G |
-> +             VMX_CPU_BASED_PAUSE_EXITING | VMX_CPU_BASED_USE_MSR_BITMAPS=
-,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Genuine Intel(R) CPU           T2600  @ 2.16GHz",
->      },
-> @@ -2062,6 +2122,24 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
->          .features[FEAT_8000_0001_ECX] =3D
->              CPUID_EXT3_LAHF_LM,
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Celeron_4x0 (Conroe/Merom Class Core 2)",
->      },
-> @@ -2085,6 +2163,27 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_EXT2_LM | CPUID_EXT2_NX | CPUID_EXT2_SYSCALL,
->          .features[FEAT_8000_0001_ECX] =3D
->              CPUID_EXT3_LAHF_LM,
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Core 2 Duo P9xxx (Penryn Class Core 2)",
->      },
-> @@ -2108,6 +2207,45 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_EXT2_LM | CPUID_EXT2_SYSCALL | CPUID_EXT2_NX,
->          .features[FEAT_8000_0001_ECX] =3D
->              CPUID_EXT3_LAHF_LM,
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Core i7 9xx (Nehalem Class Core i7)",
->          .versions =3D (X86CPUVersionDefinition[]) {
-> @@ -2148,6 +2286,47 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_EXT3_LAHF_LM,
->          .features[FEAT_6_EAX] =3D
->              CPUID_6_EAX_ARAT,
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Westmere E56xx/L56xx/X56xx (Nehalem-C)",
->          .versions =3D (X86CPUVersionDefinition[]) {
-> @@ -2193,6 +2372,47 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_XSAVE_XSAVEOPT,
->          .features[FEAT_6_EAX] =3D
->              CPUID_6_EAX_ARAT,
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Xeon E312xx (Sandy Bridge)",
->          .versions =3D (X86CPUVersionDefinition[]) {
-> @@ -2241,6 +2461,50 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_XSAVE_XSAVEOPT,
->          .features[FEAT_6_EAX] =3D
->              CPUID_6_EAX_ARAT,
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_I=
-NTR,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING |
-> +             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> +             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-> +             VMX_SECONDARY_EXEC_RDRAND_EXITING,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Xeon E3-12xx v2 (Ivy Bridge)",
->          .versions =3D (X86CPUVersionDefinition[]) {
-> @@ -2292,6 +2556,52 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_XSAVE_XSAVEOPT,
->          .features[FEAT_6_EAX] =3D
->              CPUID_6_EAX_ARAT,
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_=
-AD_BITS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_I=
-NTR,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING |
-> +             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> +             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-> +             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_INVPCID |
-> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADO=
-W_VMCS,
-> +        .features[FEAT_VMX_VMFUNC] =3D MSR_VMX_VMFUNC_EPT_SWITCHING,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Core Processor (Haswell)",
->          .versions =3D (X86CPUVersionDefinition[]) {
-> @@ -2376,6 +2686,52 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_XSAVE_XSAVEOPT,
->          .features[FEAT_6_EAX] =3D
->              CPUID_6_EAX_ARAT,
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_=
-AD_BITS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_I=
-NTR,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING |
-> +             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> +             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-> +             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_INVPCID |
-> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADO=
-W_VMCS,
-> +        .features[FEAT_VMX_VMFUNC] =3D MSR_VMX_VMFUNC_EPT_SWITCHING,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Core Processor (Broadwell)",
->          .versions =3D (X86CPUVersionDefinition[]) {
-> @@ -2460,6 +2816,50 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_XSAVE_XGETBV1,
->          .features[FEAT_6_EAX] =3D
->              CPUID_6_EAX_ARAT,
-> +        /* Missing: Mode-based execute control (XS/XU), processor tracin=
-g, TSC scaling */
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_=
-AD_BITS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING |
-> +             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_INVPCID |
-> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADO=
-W_VMCS,
-> +        .features[FEAT_VMX_VMFUNC] =3D MSR_VMX_VMFUNC_EPT_SWITCHING,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Core Processor (Skylake)",
->          .versions =3D (X86CPUVersionDefinition[]) {
-> @@ -2524,6 +2924,52 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_XSAVE_XGETBV1,
->          .features[FEAT_6_EAX] =3D
->              CPUID_6_EAX_ARAT,
-> +        /* Missing: Mode-based execute control (XS/XU), processor tracin=
-g, TSC scaling */
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_=
-AD_BITS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_I=
-NTR,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING |
-> +             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> +             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-> +             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_INVPCID |
-> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADO=
-W_VMCS,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Xeon Processor (Skylake)",
->          .versions =3D (X86CPUVersionDefinition[]) {
-> @@ -2594,6 +3040,52 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_XSAVE_XGETBV1,
->          .features[FEAT_6_EAX] =3D
->              CPUID_6_EAX_ARAT,
-> +        /* Missing: Mode-based execute control (XS/XU), processor tracin=
-g, TSC scaling */
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_=
-AD_BITS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_I=
-NTR,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING |
-> +             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> +             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-> +             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_INVPCID |
-> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADO=
-W_VMCS,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Xeon Processor (Cascadelake)",
->          .versions =3D (X86CPUVersionDefinition[]) {
-> @@ -2663,6 +3155,50 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_XSAVE_XGETBV1,
->          .features[FEAT_6_EAX] =3D
->              CPUID_6_EAX_ARAT,
-> +        /* Missing: Mode-based execute control (XS/XU), processor tracin=
-g, TSC scaling */
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_=
-AD_BITS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING |
-> +             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_INVPCID |
-> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADO=
-W_VMCS,
-> +        .features[FEAT_VMX_VMFUNC] =3D MSR_VMX_VMFUNC_EPT_SWITCHING,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Core Processor (Icelake)",
->      },
-> @@ -2721,6 +3257,52 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_XSAVE_XGETBV1,
->          .features[FEAT_6_EAX] =3D
->              CPUID_6_EAX_ARAT,
-> +        /* Missing: Mode-based execute control (XS/XU), processor tracin=
-g, TSC scaling */
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_=
-AD_BITS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_I=
-NTR,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING |
-> +             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> +             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-> +             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_INVPCID |
-> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADO=
-W_VMCS,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Xeon Processor (Icelake)",
->      },
-> @@ -2768,6 +3350,52 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_6_EAX_ARAT,
->          .features[FEAT_ARCH_CAPABILITIES] =3D
->              MSR_ARCH_CAP_RDCL_NO | MSR_ARCH_CAP_SKIP_L1DFL_VMENTRY,
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_=
-AD_BITS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_I=
-NTR,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING |
-> +             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> +             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-> +             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_INVPCID |
-> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADO=
-W_VMCS,
-> +        .features[FEAT_VMX_VMFUNC] =3D MSR_VMX_VMFUNC_EPT_SWITCHING,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Atom Processor (Denverton)",
->      },
-> @@ -2838,6 +3466,52 @@ static X86CPUDefinition builtin_x86_defs[] =3D {
->              CPUID_XSAVE_XGETBV1,
->          .features[FEAT_6_EAX] =3D
->              CPUID_6_EAX_ARAT,
-> +        .features[FEAT_VMX_BASIC] =3D MSR_VMX_BASIC_INS_OUTS |
-> +             MSR_VMX_BASIC_TRUE_CTLS,
-> +        .features[FEAT_VMX_ENTRY_CTLS] =3D VMX_VM_ENTRY_IA32E_MODE |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL |
-> +             VMX_VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL | VMX_VM_ENTRY_LOAD=
-_IA32_PAT |
-> +             VMX_VM_ENTRY_LOAD_IA32_EFER | VMX_VM_ENTRY_LOAD_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_ENTRY_LOAD_IA32_PAT | VMX_VM_ENTRY_LOAD_IA32_EFER,
-> +        .features[FEAT_VMX_EPT_VPID_CAPS] =3D MSR_VMX_EPT_EXECONLY |
-> +             MSR_VMX_EPT_PAGE_WALK_LENGTH_4 | MSR_VMX_EPT_WB | MSR_VMX_E=
-PT_2MB |
-> +             MSR_VMX_EPT_1GB | MSR_VMX_EPT_INVEPT |
-> +             MSR_VMX_EPT_INVEPT_SINGLE_CONTEXT | MSR_VMX_EPT_INVEPT_ALL_=
-CONTEXT |
-> +             MSR_VMX_EPT_INVVPID | MSR_VMX_EPT_INVVPID_SINGLE_ADDR |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT | MSR_VMX_EPT_INVVPID_AL=
-L_CONTEXT |
-> +             MSR_VMX_EPT_INVVPID_SINGLE_CONTEXT_NOGLOBALS | MSR_VMX_EPT_=
-AD_BITS,
-> +        .features[FEAT_VMX_EXIT_CTLS] =3D VMX_VM_EXIT_HOST_ADDR_SPACE_SI=
-ZE |
-> +             VMX_VM_EXIT_ACK_INTR_ON_EXIT | VMX_VM_EXIT_SAVE_DEBUG_CONTR=
-OLS |
-> +             VMX_VM_EXIT_SAVE_IA32_PAT | VMX_VM_EXIT_SAVE_IA32_EFER |
-> +             VMX_VM_EXIT_SAVE_VMX_PREEMPTION_TIMER,
-> +        .features[FEAT_VMX_MISC] =3D MSR_VMX_MISC_ACTIVITY_HLT |
-> +             MSR_VMX_MISC_STORE_LMA | MSR_VMX_MISC_VMWRITE_VMEXIT,
-> +        .features[FEAT_VMX_PINBASED_CTLS] =3D VMX_PIN_BASED_EXT_INTR_MAS=
-K |
-> +             VMX_PIN_BASED_NMI_EXITING | VMX_PIN_BASED_VIRTUAL_NMIS |
-> +             VMX_PIN_BASED_VMX_PREEMPTION_TIMER | VMX_PIN_BASED_POSTED_I=
-NTR,
-> +        .features[FEAT_VMX_PROCBASED_CTLS] =3D VMX_CPU_BASED_VIRTUAL_INT=
-R_PENDING |
-> +             VMX_CPU_BASED_USE_TSC_OFFSETING | VMX_CPU_BASED_HLT_EXITING=
- |
-> +             VMX_CPU_BASED_INVLPG_EXITING | VMX_CPU_BASED_MWAIT_EXITING =
-|
-> +             VMX_CPU_BASED_RDPMC_EXITING | VMX_CPU_BASED_RDTSC_EXITING |
-> +             VMX_CPU_BASED_CR8_LOAD_EXITING | VMX_CPU_BASED_CR8_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_TPR_SHADOW | VMX_CPU_BASED_MOV_DR_EXITING |
-> +             VMX_CPU_BASED_UNCOND_IO_EXITING | VMX_CPU_BASED_USE_IO_BITM=
-APS |
-> +             VMX_CPU_BASED_MONITOR_EXITING | VMX_CPU_BASED_PAUSE_EXITING=
- |
-> +             VMX_CPU_BASED_VIRTUAL_NMI_PENDING | VMX_CPU_BASED_USE_MSR_B=
-ITMAPS |
-> +             VMX_CPU_BASED_CR3_LOAD_EXITING | VMX_CPU_BASED_CR3_STORE_EX=
-ITING |
-> +             VMX_CPU_BASED_MONITOR_TRAP_FLAG,
-> +        .features[FEAT_VMX_SECONDARY_CTLS] =3D
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES |
-> +             VMX_SECONDARY_EXEC_WBINVD_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_EPT |
-> +             VMX_SECONDARY_EXEC_DESC | VMX_SECONDARY_EXEC_RDTSCP |
-> +             VMX_SECONDARY_EXEC_VIRTUALIZE_X2APIC_MODE |
-> +             VMX_SECONDARY_EXEC_ENABLE_VPID | VMX_SECONDARY_EXEC_UNRESTR=
-ICTED_GUEST |
-> +             VMX_SECONDARY_EXEC_PAUSE_LOOP_EXITING |
-> +             VMX_SECONDARY_EXEC_APIC_REGISTER_VIRT |
-> +             VMX_SECONDARY_EXEC_VIRTUAL_INTR_DELIVERY |
-> +             VMX_SECONDARY_EXEC_RDRAND_EXITING | VMX_SECONDARY_EXEC_ENAB=
-LE_INVPCID |
-> +             VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADO=
-W_VMCS,
-> +        .features[FEAT_VMX_VMFUNC] =3D MSR_VMX_VMFUNC_EPT_SWITCHING,
->          .xlevel =3D 0x80000008,
->          .model_id =3D "Intel Atom Processor (SnowRidge)",
->          .versions =3D (X86CPUVersionDefinition[]) {
-> --=20
-> 2.21.0
->=20
+> diff --git a/block/io.c b/block/io.c
+> index 003f4ea38c..8683f7a4bd 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -3382,6 +3382,31 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child=
+, int64_t offset, bool exact,
+>           goto out;
+>       }
+>  =20
+> +    /*
+> +     * If the image has a backing file that is large enough that it woul=
+d
+> +     * provide data for the new area, we cannot leave it unallocated bec=
+ause
+> +     * then the backing file content would become visible. Instead, zero=
+-fill
+> +     * the area where backing file and new area overlap.
+> +     */
+> +    if (new_bytes && bs->backing && prealloc =3D=3D PREALLOC_MODE_OFF) {
+> +        int64_t backing_len;
+> +
+> +        backing_len =3D bdrv_getlength(backing_bs(bs));
+> +        if (backing_len < 0) {
+> +            ret =3D backing_len;
+> +            goto out;
+> +        }
+> +
+> +        if (backing_len > old_size) {
+> +            ret =3D bdrv_co_do_pwrite_zeroes(bs, old_size,
+> +                                           MIN(new_bytes, backing_len - =
+old_size),
+> +                                           BDRV_REQ_ZERO_WRITE | BDRV_RE=
+Q_MAY_UNMAP);
+> +            if (ret < 0) {
+> +                goto out;
+> +            }
+> +        }
+> +    }
+> +
+>       ret =3D refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
+>       if (ret < 0) {
+>           error_setg_errno(errp, -ret, "Could not refresh total sector co=
+unt");
 >=20
 
-Regards,
-Daniel
+
+Hmmmm. I'm think that for commit, we also should zero truncated area if !bd=
+rv_has_zero_init_truncate(bs).
+But we should not do it here, as it should not be done if we just resizing =
+disk..
+
+What formats are that bad?
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
-
+Best regards,
+Vladimir
 
