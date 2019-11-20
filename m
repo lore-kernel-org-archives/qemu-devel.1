@@ -2,64 +2,90 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29063C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29AD9C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:37:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC7B0223D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:34:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC7B0223D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id E8E102230F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 07:37:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UAwdL1Qp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8E102230F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXKVK-0006Rk-5z
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 02:34:22 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40314)
+	id 1iXKXc-0007mK-DC
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 02:36:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42524)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iXKT4-0005bQ-AA
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:32:04 -0500
+ (envelope-from <mlureau@redhat.com>) id 1iXKVt-0006u6-FU
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:35:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iXKT1-0001tu-Dz
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:32:02 -0500
-Received: from 6.mo4.mail-out.ovh.net ([188.165.36.253]:47976)
+ (envelope-from <mlureau@redhat.com>) id 1iXKVl-0005PB-Kb
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:34:52 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46820
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iXKT1-0001r1-5U
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:31:59 -0500
-Received: from player716.ha.ovh.net (unknown [10.109.143.223])
- by mo4.mail-out.ovh.net (Postfix) with ESMTP id D98C12125C6
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:31:56 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player716.ha.ovh.net (Postfix) with ESMTPSA id D54F6C4056C5;
- Wed, 20 Nov 2019 07:31:51 +0000 (UTC)
-Subject: Re: [PATCH 5/5] hw/ppc/pnv_xscom: add PBA BARs for Power8 slw image
-To: Balamuruhan S <bala24@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20191119175056.32518-1-bala24@linux.ibm.com>
- <20191119175056.32518-6-bala24@linux.ibm.com>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <9ad3aae4-1164-74aa-9e35-3a0a4d701d51@kaod.org>
-Date: Wed, 20 Nov 2019 08:31:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iXKVl-0005Ko-7a
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 02:34:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574235284;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=316cTHKnaJdtIgeHH1iN6wxI4x0BhIlr2FEz4LwEfs4=;
+ b=UAwdL1QpivMRwlYIHFGOTls3TSotVamnS8SaWy1XajE+4J5T6hXPSLIBmmu3VwV+SkoZKI
+ RXBdCXGmGTjUvPHHK4yqdZJbBMd6Gdvp4UR3fWZFasywMLqbNICZCPVtk5780XPHu3D216
+ +4lw6okS8FjjRxEgZDmCurxxv8zm4kQ=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-423-ywieQrqLPzuci4BuImVYjg-1; Wed, 20 Nov 2019 02:34:43 -0500
+Received: by mail-oi1-f197.google.com with SMTP id 10so12061682ois.18
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 23:34:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=316cTHKnaJdtIgeHH1iN6wxI4x0BhIlr2FEz4LwEfs4=;
+ b=ck05X3UgOp+fkXtoL/9nX6OnbDivr2GGHeXck3hItaUDFMi80UxWDPxBTa7gcljHbJ
+ k0i+IYCdi1LUBzWQvlcVeza7IJp3HbAZOU6+sg43lqFgzZr31gBeNtJxYAwxiEbHDOjh
+ EYaKSwxdgq93ytS8M4VJQOyTiReSqBtPHUBdddiJbpZlUNp0gjOHX/EzXik3sDNgv/ia
+ WW1d90ia2YXzMfwYNhLCl9KEMAuOEls9tEGLxjJeBcYfhEcIeQFXcWEhCSGGT0r6cUXd
+ /WhHdwXy0B/cB+qll1yZi3qQGXtua92L6gG/mwxPkubPf2ua30qEekcfBMGVcNYDlNDi
+ Ercw==
+X-Gm-Message-State: APjAAAX/OIKZmmEL0qAdnnO6sV3xyfhUbal8FhlRemKwTvhdtMjfcY6U
+ 4oN6g1ZArg00YVO+waAnhLAg/yaFtFUxE+XtV13+mlCDEpQm5sJeYqU7FAU1N0yWQMBUCdL/iYj
+ Ypih5qBq7VGIItzxnfsynmaTC0ayIx64=
+X-Received: by 2002:aca:1702:: with SMTP id j2mr1485421oii.13.1574235282940;
+ Tue, 19 Nov 2019 23:34:42 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyzpFFPW+LW4s3xGwmEtVeSszD/7fF6plMhBpK/IDBvwVZKkvwxq0KH2Kb+mfsnBl0nDUkag7HN5qfoKFhXveA=
+X-Received: by 2002:aca:1702:: with SMTP id j2mr1485398oii.13.1574235282688;
+ Tue, 19 Nov 2019 23:34:42 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191119175056.32518-6-bala24@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Ovh-Tracer-Id: 16999962694897339366
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudegledguddtlecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdeltddrjeeirdehtddrvddvfeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeduiedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
+ <20191023173154.30051-14-marcandre.lureau@redhat.com>
+ <CAFEAcA9Cq_MkAzqAjt5uPNu3HDUfxO0hyVWtqEiAashPEEq3=g@mail.gmail.com>
+In-Reply-To: <CAFEAcA9Cq_MkAzqAjt5uPNu3HDUfxO0hyVWtqEiAashPEEq3=g@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Date: Wed, 20 Nov 2019 11:34:31 +0400
+Message-ID: <CAMxuvawroZ0jrQTJCbakft21Lgk2cHrE9VyihiUvYBVp+AXgXw@mail.gmail.com>
+Subject: Re: [PATCH v3 13/33] serial: start making SerialMM a sysbus device
+To: Peter Maydell <peter.maydell@linaro.org>
+X-MC-Unique: ywieQrqLPzuci4BuImVYjg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 188.165.36.253
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,87 +97,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, groug@kaod.org, david@gibson.dropbear.id.au
+Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paul Burton <pburton@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/11/2019 18:50, Balamuruhan S wrote:
-> slw base and size mask are accessed during boot in homer_init_chip(),
-> so include BAR2 and BARMASK2 for Power8.
-> 
-> Signed-off-by: Balamuruhan S <bala24@linux.ibm.com>
-> ---
->  hw/ppc/pnv_xscom.c   | 10 ++++++++--
->  include/hw/ppc/pnv.h |  4 ++++
->  2 files changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/ppc/pnv_xscom.c b/hw/ppc/pnv_xscom.c
-> index f797a5ec7d..828a2e2a5a 100644
-> --- a/hw/ppc/pnv_xscom.c
-> +++ b/hw/ppc/pnv_xscom.c
-> @@ -38,8 +38,10 @@
->  
->  /* PBA BARs */
->  #define P8_PBA_BAR0                     0x2013f00
-> +#define P8_PBA_BAR2                     0x2013f02
->  #define P8_PBA_BAR3                     0x2013f03
->  #define P8_PBA_BARMASK0                 0x2013f04
-> +#define P8_PBA_BARMASK2                 0x2013f06
+Hi
 
-and you add the definitions back ! :)
+On Mon, Nov 18, 2019 at 6:43 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> On Wed, 23 Oct 2019 at 18:33, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+> >
+> > Memory mapped serial device is in fact a sysbus device. The following
+> > patches will make use of sysbus facilities for resource and
+> > registration.
+> >
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  hw/char/omap_uart.c      |  2 +-
+> >  hw/char/serial.c         | 47 ++++++++++++++++++++++++++++------------
+> >  hw/mips/boston.c         |  2 +-
+> >  hw/mips/mips_malta.c     |  2 +-
+> >  include/hw/char/serial.h | 20 ++++++++++++-----
+> >  5 files changed, 51 insertions(+), 22 deletions(-)
+>
+>
+> > -SerialState *serial_mm_init(MemoryRegion *address_space,
+> > +SerialMM *serial_mm_init(MemoryRegion *address_space,
+> >                              hwaddr base, int it_shift,
+> >                              qemu_irq irq, int baudbase,
+> >                              Chardev *chr, enum device_endian end)
+> >  {
+> > -    DeviceState *dev =3D DEVICE(object_new(TYPE_SERIAL));
+> > -    SerialState *s =3D SERIAL(dev);
+> > +    SerialMM *self =3D SERIAL_MM(qdev_create(NULL, TYPE_SERIAL_MM));
+> > +    SerialState *s =3D &self->serial;
+> >
+> > -    s->it_shift =3D it_shift;
+> > +    self->it_shift =3D it_shift;
+> >      s->irq =3D irq;
+> > -    qdev_prop_set_uint32(dev, "baudbase", baudbase);
+> > -    qdev_prop_set_chr(dev, "chardev", chr);
+> > -    qdev_prop_set_int32(dev, "instance-id", base);
+> > -    qdev_init_nofail(dev);
+> > +    qdev_prop_set_uint32(DEVICE(s), "baudbase", baudbase);
+> > +    qdev_prop_set_chr(DEVICE(s), "chardev", chr);
+> > +    qdev_prop_set_int32(DEVICE(s), "instance-id", base);
+> > +
+> > +    qdev_init_nofail(DEVICE(s));
+> > +    qdev_init_nofail(DEVICE(self));
+>
+> Something odd is going on here. This is a convenience
+> wrapper around creating the SERIAL_MM device, so it's
+> correct that it has to init DEVICE(self). But it should
+> not be doing anything with the internals of 'self'.
+> It's the instance_init/realize of the SERIAL_MM object that should
+> instance_init/realize the 'self->serial' object. You have the
+> code below to do the 'instance_init' in the serial_mm_instance_init
+> function, but are missing the equivalent realize code.
 
->  #define P8_PBA_BARMASK3                 0x2013f07
->  #define P9_PBA_BAR0                     0x5012b00
->  #define P9_PBA_BAR2                     0x5012b02
-> @@ -49,6 +51,7 @@
->  /* Mask to calculate Homer/Occ size */
->  #define HOMER_SIZE_MASK                 0x0000000000300000ull
->  #define OCC_SIZE_MASK                   0x0000000000700000ull
-> +#define SLW_SIZE_MASK                   0x0
->  
->  static void xscom_complete(CPUState *cs, uint64_t hmer_bits)
->  {
-> @@ -115,6 +118,11 @@ static uint64_t xscom_read_default(PnvChip *chip, uint32_t pcba)
->          }
->          return 0;
->  
-> +    case P8_PBA_BAR2: /* P8 slw image */
-> +        return PNV_SLW_IMAGE_BASE(chip);
-> +    case P8_PBA_BARMASK2: /* P8 slw image size is 1MB and mask is zero*/
-> +        return SLW_SIZE_MASK;
+This should be addressed later with "serial-mm: use sysbus
+facilities". I'll add a comment.
 
-We need a HOMER XSCOM region.
+>
+> > -    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], s,
+> > +    memory_region_init_io(&s->io, NULL, &serial_mm_ops[end], self,
+> >                            "serial", 8 << it_shift);
+> >      memory_region_add_subregion(address_space, base, &s->io);
+> > -    return s;
+> > +
+> > +    return self;
+> > +}
+> > +
+> > +static void serial_mm_instance_init(Object *o)
+> > +{
+> > +    SerialMM *self =3D SERIAL_MM(o);
+>
+> 'self' is not idiomatic for the name of the variable containing
+> the pointer to the object in QOM code ("git grep '\Wself\W' hw"
+> shows no uses of it at all, which is quite unusual for us --
+> usually the codebase has at least a few uses of any non-standard
+> way of writing something ;-))
+>
+> Usually we use something approximating to the abbreviation
+> of the type name, so here 'smm' would do.
 
-> +
->      case 0x1010c00:     /* PIBAM FIR */
->      case 0x1010c03:     /* PIBAM FIR MASK */
->  
-> @@ -135,9 +143,7 @@ static uint64_t xscom_read_default(PnvChip *chip, uint32_t pcba)
->      case 0x202000f:     /* ADU stuff, receive status register*/
->          return 0;
->      case 0x2013f01:     /* PBA stuff */
-> -    case 0x2013f02:     /* PBA stuff */
->      case 0x2013f05:     /* PBA stuff */
-> -    case 0x2013f06:     /* PBA stuff */
->          return 0;
->      case 0x2013028:     /* CAPP stuff */
->      case 0x201302a:     /* CAPP stuff */
-> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-> index e9ed8b928a..bd22dbf8a9 100644
-> --- a/include/hw/ppc/pnv.h
-> +++ b/include/hw/ppc/pnv.h
-> @@ -212,6 +212,10 @@ void pnv_bmc_powerdown(IPMIBmc *bmc);
->  #define PNV_HOMER_BASE(chip)                                            \
->      (0x7ffd800000ull + ((uint64_t)PNV_CHIP_INDEX(chip)) * PNV_HOMER_SIZE)
->  
-> +#define PNV_SLW_SIZE                0x0000000000100000ull
-> +#define PNV_SLW_IMAGE_BASE(chip)                                        \
-> +    (0x2ffda00000ull + ((uint64_t)PNV_CHIP_INDEX(chip)) * PNV_SLW_SIZE)
-> +
->  
->  /*
->   * XSCOM 0x20109CA defines the ICP BAR:
-> 
+I would prefer something more straightforward than having to come up
+with various name mangling.
+
+Imho, we loose some readability, consistency & semantic by not naming
+the object argument of the method "self"
+
+>
+> > +
+> > +    object_initialize_child(o, "serial", &self->serial, sizeof(self->s=
+erial),
+> > +                            TYPE_SERIAL, &error_abort, NULL);
+> >  }
+>
+> thanks
+> -- PMM
+>
 
 
