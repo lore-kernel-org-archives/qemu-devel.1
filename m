@@ -7,80 +7,74 @@ X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 392E3C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 02:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86A0DC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 02:36:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0211F222CD
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 02:27:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 505702240D
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 02:36:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhLrLZ4q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0211F222CD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nvdEOkBp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 505702240D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXFiB-0006T2-43
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 21:27:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58473)
+	id 1iXFqo-0000wU-BR
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 21:36:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35076)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXFhT-00064a-3M
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:26:36 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXFpl-0000Ky-JN
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:35:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXFhQ-0004nz-Nv
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:26:34 -0500
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33498)
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXFpk-0003se-Je
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:35:09 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33590)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iXFhQ-0004mz-IJ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:26:32 -0500
-Received: by mail-ot1-x342.google.com with SMTP id u13so19883762ote.0
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 18:26:32 -0800 (PST)
+ id 1iXFpk-0003sF-C6
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:35:08 -0500
+Received: by mail-ot1-x342.google.com with SMTP id u13so19897751ote.0
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 18:35:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=WeTITXWdsgOsRRusmwAgaBUglFu9RBPE8O1qzSZTPBs=;
- b=dhLrLZ4q2wciMnxiy1PEmPLNbQUBuz93TVCFcCtrkM5zc6Pzw+rrp/YHHbXX6Nbbhj
- AENfLKwKXGIFw16bEAelUMaz8d+TP0RYeXaj+ZBwYCZ0GpHyIoVJTd07VFRBxQWk67Wz
- m3CPrL9gLKEftptlttz2KGhyALlDDU1cqjAz+wjLhYivfbpfxxmlSzuGFqy/xpPqVrZq
- Fq/eB0I2givWtfWrTK1aU9rANn5B2XFI0WSRXKkMFJwJiDn7uoHBTWOg5bpGH5Ycq+9E
- 9K5WHw9nIi+93dgTrDx75uj2o0ic/BS+whN3xZl4YdG43SIGUiFgj0iLIFl2lnX8l24g
- pQSw==
+ :cc; bh=o+sycsXsPY8vMFAga525YzP3r3wCue6MmGUsEHay0FU=;
+ b=nvdEOkBpxZC6rl0tL7f2swERsgm+puFy4PFl35ovxRZOwwdOdbOaldYny8jCSnuewz
+ Zln+4wP+KhO5/cRdwqPIkturEAxF5g7Q+nLh2fysK+0TSXplyN0iPyiBgFDG1qJdrqVO
+ 3hlXOPsQosX490mLPvs1aLoSkC7kObqFOmuHqXLU6N7XnM6ccgeUXUW62hiNAvAffpvP
+ EofV75YLun4AvrzTkxL9bXdpDhnjGmUF2ZRWYO1zCD9Vhmnc4RwA+w8gHPawdAiPzWvp
+ rq/8MHJCxzKMKcObxzprWosGVDSWAepmD0IHYcIBHFu1N7Cr3sbA+f/F5da/60IOl7sx
+ 3mwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:in-reply-to:references:from:date
  :message-id:subject:to:cc;
- bh=WeTITXWdsgOsRRusmwAgaBUglFu9RBPE8O1qzSZTPBs=;
- b=ng7ANeqdqlnV1A2S3wMf+hNAqlsFZnSgqH+iIN709L4gIB7pnWF7CTGkSJ7mysgeXJ
- OKDtoNmglCXGVFOX5qN3/ZprwOnxz+47ksKO23fN4k/yYUL8lNgC6u75rkcyUIjxGqwS
- u1N5ktricdUYfr4McwmYYjpbWQXW/m1+J5qz6WXLZ2b1kwxI6vlZeFc5lPg+YPg29N0K
- Li3Vo2VoTY+im94ryQ2AcQ6zTftEeRKq/tnR7FpFgeUt+pjyd4FUi38WfEcCpEt2MdUA
- 5O4kWOLsVCuAV6XDOqrdBiHA8xW9i7r+1ArLvYgn1Y368oQ3OQGzZOgOO7x05dgCqn1N
- NW1Q==
-X-Gm-Message-State: APjAAAW7SuFYn86xUUXNjkHRI9XP74lxfgL+w55lmQCdka7styZHh9Nq
- 9nH6TEX37Yq4PZXMRmSltDQd689d/Q+MdIXQt6Q=
-X-Google-Smtp-Source: APXvYqz21hMOocs0hqxPUAmC24fm5kdSazzoKH+ZYQsJ+6kcLK3pRAlXuwQoCaUIJKyIruVbukeuaIbFjrm6Xcqi+IM=
-X-Received: by 2002:a05:6830:81:: with SMTP id a1mr123208oto.64.1574216791722; 
- Tue, 19 Nov 2019 18:26:31 -0800 (PST)
+ bh=o+sycsXsPY8vMFAga525YzP3r3wCue6MmGUsEHay0FU=;
+ b=jA+TWa4G5MFJbYnn0Az1TOjUoLf2YlET79HPZcqMU1wFwK7Kv57ciWVwqDnJ/ScKHb
+ YuiS9aqZ/psbsm3fmH7EJuyWwf1Uyb3KDUq2mvGkADOjD9NxZbwEUw7G0YWKL9zUIVhe
+ UEalYBAWlJhTLVvoFyGm9Yk+X7FxO4dDNAekrZYvs/xVWw3hs5Vpj3hee7QyZEASmq/Q
+ vvf8HKLmeNAAhT8u6Y9qyBmA3ayiPY2XeeXL29FD/pBETRvRvcqbS9L59AwCBh4mkE19
+ f3Umei7ourEX6s1srNx7K9P0DNHMYzy0P8bWe/NTkmRhagvHJRNed8DveD7atxBrwNeh
+ 82aQ==
+X-Gm-Message-State: APjAAAXBXa0dVsFQpzgwNtLfJO6oLUBOuSuSPlkOR8zyKeJEwtg+Ytgi
+ ZHo5ZicIg9DWlxDHtVqxBy9IQkrCnABQuNt9dZ4=
+X-Google-Smtp-Source: APXvYqwIng9oSLx3RJk/luDEXkgjHFLqWbbWc7rq8+xWAXql13vb0l1B9ndwoC8+330DD6xvkyteRu6j1wiS271hwME=
+X-Received: by 2002:a05:6830:44c:: with SMTP id
+ d12mr116543otc.121.1574217307401; 
+ Tue, 19 Nov 2019 18:35:07 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Tue, 19 Nov 2019 18:26:31
+Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Tue, 19 Nov 2019 18:35:07
  -0800 (PST)
-In-Reply-To: <82dfa44e-0a27-080e-2653-b004c27fc3d1@linaro.org>
-References: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
- <a77ce406-5307-cee8-8e0b-7c08056fb0df@redhat.com>
- <BYAPR02MB488666AA94EBB57C2A318004DE4C0@BYAPR02MB4886.namprd02.prod.outlook.com>
- <82dfa44e-0a27-080e-2653-b004c27fc3d1@linaro.org>
+In-Reply-To: <20191119190405.GA23854@ls3530.fritz.box>
+References: <20191119190405.GA23854@ls3530.fritz.box>
 From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Wed, 20 Nov 2019 03:26:31 +0100
-Message-ID: <CAL1e-=gmLywnyUoySxuDPS1FQRx=WiH1kYrqEJDGAAcO5vDg4A@mail.gmail.com>
-Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of patches
- - linux-user changes + linux-user/hexagon + skeleton of
- target/hexagon -
- Files in target/hexagon/imported are from another project and therefore do
- not conform to qemu coding standards
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000ab8f400597bde8bf"
+Date: Wed, 20 Nov 2019 03:35:07 +0100
+Message-ID: <CAL1e-=iFW3JhEu_OwVM3LFekgVav=P2CED=BGFM=tqDJW0RQEw@mail.gmail.com>
+Subject: Re: [PATCH] linux-user/strace: Improve output of various syscalls
+To: Helge Deller <deller@gmx.de>
+Content-Type: multipart/alternative; boundary="00000000000068341f0597be0786"
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
 X-Received-From: 2607:f8b0:4864:20::342
@@ -95,83 +89,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Taylor Simpson <tsimpson@quicinc.com>,
- "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- "laurent@vivier.eu" <laurent@vivier.eu>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ab8f400597bde8bf
+--00000000000068341f0597be0786
 Content-Type: text/plain; charset="UTF-8"
 
-On Tuesday, November 19, 2019, Richard Henderson <
-richard.henderson@linaro.org> wrote:
+>
+>  #ifdef TARGET_NR_ioctl
+> -{ TARGET_NR_ioctl, "ioctl" , NULL, NULL, NULL },
+> +{ TARGET_NR_ioctl, "ioctl" , "%s(%d,%#x,%#x,%#x,%#x,%#x)", NULL, NULL },
+>  #endif
 
-> On 11/19/19 6:22 PM, Taylor Simpson wrote:
-> > - Laurent suggested I split the patch into two parts: linux-user and
-> target/hexagon.  If I do that, which one should contain the changes to
-> common files (e.g., configure)?  Also, note that we won't be able to build
-> until both patches are merged.  Is that OK?
->
-> The configure parts should be a third, last, patch.
->
-> The series is bisectable, because before the configure patch,
-> none of the hexagon code is compiled at all.
->
->
-I don't think this is a good advice. Yes, at first glance, that would make
-the submitter's job easier - since he could divide the whole code into
-parts practicaly arbitrarily - but the resulting series will be of
-suboptimal quality. If the submitter was forced from the outset to add
-segments of his solution so that each step actually (not only ostensibly)
-compiles, he would also be forced to organize patches in much more coherent
-way, organize his code in much more modular way, possibly improve initial
-organization, additionally making reviews much easier.
+
+ioctl() has only three arguments.
+
+Regards,
 
 Aleksandar
 
-
->
-> r~
->
->
-
---000000000000ab8f400597bde8bf
+--00000000000068341f0597be0786
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<br><br>On Tuesday, November 19, 2019, Richard Henderson &lt;<a href=3D"mai=
-lto:richard.henderson@linaro.org">richard.henderson@linaro.org</a>&gt; wrot=
-e:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-l=
-eft:1px #ccc solid;padding-left:1ex">On 11/19/19 6:22 PM, Taylor Simpson wr=
-ote:<br>
-&gt; - Laurent suggested I split the patch into two parts: linux-user and t=
-arget/hexagon.=C2=A0 If I do that, which one should contain the changes to =
-common files (e.g., configure)?=C2=A0 Also, note that we won&#39;t be able =
-to build until both patches are merged.=C2=A0 Is that OK?<br>
-<br>
-The configure parts should be a third, last, patch.<br>
-<br>
-The series is bisectable, because before the configure patch,<br>
-none of the hexagon code is compiled at all.<br>
-<br></blockquote><div><br></div><div>I don&#39;t think this is a good advic=
-e. Yes, at first glance, that would make the submitter&#39;s job easier - s=
-ince he could divide the whole code into parts practicaly arbitrarily - but=
- the resulting series will be of suboptimal quality. If the submitter was f=
-orced from the outset to add segments of his solution so that each step act=
-ually (not only ostensibly) compiles, he would also be forced to organize p=
-atches in much more coherent way, organize his code in much more modular wa=
-y, possibly improve initial organization, additionally making reviews much =
-easier.</div><div><br></div><div>Aleksandar</div><div>=C2=A0</div><blockquo=
-te class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc so=
-lid;padding-left:1ex">
-<br>
-r~<br>
-<br>
-</blockquote>
+<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
+x #ccc solid;padding-left:1ex">
+=C2=A0#ifdef TARGET_NR_ioctl<br>
+-{ TARGET_NR_ioctl, &quot;ioctl&quot; , NULL, NULL, NULL },<br>
++{ TARGET_NR_ioctl, &quot;ioctl&quot; , &quot;%s(%d,%#x,%#x,%#x,%#x,%#x)&qu=
+ot;, NULL, NULL },<br>
+=C2=A0#endif</blockquote><div><br></div><div>ioctl() has only three argumen=
+ts.</div><div><br></div><div>Regards,</div><div><br></div><div>Aleksandar</=
+div><div><br></div><div><br></div>
 
---000000000000ab8f400597bde8bf--
+--00000000000068341f0597be0786--
 
