@@ -2,102 +2,75 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7CBEC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:03:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E0F0C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:03:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B38522243F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:03:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E5B32243F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:03:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="f5OF3hc2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B38522243F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BJFKJjdj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E5B32243F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXLtY-0005EH-U4
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 04:03:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38878)
+	id 1iXLtw-00065J-El
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 04:03:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38927)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iXLsO-0004VQ-4U
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:02:17 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iXLsq-0004oI-FX
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:02:46 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iXLsM-0007xY-M7
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:02:15 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51603)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iXLsM-0007vn-E8
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:02:14 -0500
-Received: by mail-wm1-x343.google.com with SMTP id q70so6103338wme.1
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 01:02:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=eZYWen690pA3/Ibz8XELozgezg4kk+oalLXKfOMLFBA=;
- b=f5OF3hc2wZXLGkh7LbcnXPqT7OHEKjClcn69hwNcLOtyDsCQp1dWiIsTtPThlovn4f
- aWBuYFLqMlstdWJrw2IbgYb7F08+oy2TUslstU7h5zK3t+6McyI3FkjKTqYxaYY1u3un
- LgDFbHLaoZ6VfFNomkHcKgMI0k812OKmwpYCqTgeKg8yoTiQWHv3PoHtBY0DCZf7UYc/
- lkVS4Rnw5HVZlY6SqU+EhFtRD20EHXAubq+p8O5ygtyxGu4ExajA3Xsi14smrR8JO7l5
- Ygj8Eata1+Af9hWkXDIdpTdgMA5iRv5ngJ5Z05YpdMX8T9da8fmYOSPWZFroP0ibORvF
- iI8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=eZYWen690pA3/Ibz8XELozgezg4kk+oalLXKfOMLFBA=;
- b=DEo92xae1VsSQN06Ithd/mA28VHuOM5daieUruGM2EAL09v0eEtnirq0Wr1PkrhSTC
- 7Yg8h1fvxvXHeyZQhHnln0PV/2zbOwrbiAfqRdD9KmAlg7GseAIuqlHtx1MStrqUWyEu
- BeFoP6oxKmmak6C8iYdU2ZJ+UiDiY0RZSVT2hru2M9RXeZ8YOh31oCxvLMgj86nfUmqS
- e3VgvU0BkT5Dd+XaDUNrC8dQD6AehHKkoPQTko5lgmwdVCfvEpH3GbHUoXtIr0kWHOGy
- 0z4i7vg9d7grEDrUC697koaqwjeH1aZFwg+RsukNhy7jSZFkew3/Vy5PRPOedJMNXhrh
- X3Cw==
-X-Gm-Message-State: APjAAAVzh8EXKXKMwNdSs2biTr2HACPPOjiWUSuoMSHEw9geMd6ao5T+
- Y/7JJA44Y3MaxgrIQSw/HMTyGni8vK08Lw==
-X-Google-Smtp-Source: APXvYqxWtVBqcUDmvKJAQemVjkKMbmQIbXgSW8EoM2Z4Q2uqgXGUoX64rSdNCdO8HMO/xnnLG4gryQ==
-X-Received: by 2002:a1c:64d4:: with SMTP id y203mr1883377wmb.27.1574240532419; 
- Wed, 20 Nov 2019 01:02:12 -0800 (PST)
-Received: from [192.168.8.102] (253.red-37-10-245.dynamicip.rima-tde.net.
- [37.10.245.253])
- by smtp.gmail.com with ESMTPSA id d202sm5523831wmd.47.2019.11.20.01.02.09
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 20 Nov 2019 01:02:11 -0800 (PST)
-Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of patches
- - linux-user changes + linux-user/hexagon + skeleton of
- target/hexagon -
- Files in target/hexagon/imported are from another project and therefore do
- not conform to qemu coding standards
-To: Laurent Vivier <laurent@vivier.eu>, Taylor Simpson
- <tsimpson@quicinc.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <philmd@redhat.com>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
- <a77ce406-5307-cee8-8e0b-7c08056fb0df@redhat.com>
- <BYAPR02MB488666AA94EBB57C2A318004DE4C0@BYAPR02MB4886.namprd02.prod.outlook.com>
- <8c92b107-b707-b8a7-6284-5b1ed8e95897@vivier.eu>
- <BYAPR02MB4886E559B9286FE580C28556DE4F0@BYAPR02MB4886.namprd02.prod.outlook.com>
- <98464579-194a-2b96-5cb9-3b7a7d9e680d@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <42954e4f-11cd-6c95-e74c-9dbec2f90d56@linaro.org>
-Date: Wed, 20 Nov 2019 10:02:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <98464579-194a-2b96-5cb9-3b7a7d9e680d@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+ (envelope-from <imammedo@redhat.com>) id 1iXLsp-00088W-Dp
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:02:44 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28858
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iXLsp-00088G-A6
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:02:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574240562;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=szCs7CHpwFXfeXzzTMSx7nFEjamilkWRjqiGRBdrq9w=;
+ b=BJFKJjdjk8f07rKh9dlZwxM5EEf/IY/5EvW0+xh1CacvFrX2Rbcpg+CUqHDp0iP+tTO2h5
+ efz57Dj/s1oVSw9asq19USTmTXZFUvQAJKqTQJPChSYqsANHzRviveHFd++EveLHBrKyRe
+ p3SB6nEKsh4C/+fnIGxMXdg4X1Phjyw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-JW2a_bJyO7a9gNrDg-eiPA-1; Wed, 20 Nov 2019 04:02:41 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3685118B9FC1
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 09:02:40 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E11F21FA;
+ Wed, 20 Nov 2019 09:02:36 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] tests: acpi: always retain dumped ACPI tables in case of error
+Date: Wed, 20 Nov 2019 10:02:40 +0100
+Message-Id: <1574240560-12538-1-git-send-email-imammedo@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: JW2a_bJyO7a9gNrDg-eiPA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,36 +82,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/20/19 9:33 AM, Laurent Vivier wrote:
-> Le 20/11/2019 à 05:48, Taylor Simpson a écrit :
->> For the general DEBUG_HEX messages, I think the trace infrastructure isn't quite what I'm looking for.
->>
->> Here's a sample of what it prints
->> Start packet: pc = 0x4002f0
->> Packet committed: pc = 0x4002f0
->> Regs written
->>         r18 = -69420 (0xfffef0d4)
->>         r19 = -69412 (0xfffef0dc)
->> Stores
->>         memd[0xfffef0b0] = 0 (0x0000000000000000)
->> Next PC = 0x4002f8
->> Exec counters: pkt = 17, insn = 24, hvx = 0
+If IASL wasn't able to parse expected file, test will just
+print warning
+  "Warning! iasl couldn't parse the expected aml\n"
+and remove temporary table dumped from guest.
 
-For something like this, I'd keep DEBUG_HEX.
+Typically expected tables are always valid, with an exception
+when patchset introduces new tables.
+Make sure dumped tables are retained even if expected files
+are not valid, so one could have a chance to manualy check new
+tables.
 
->>     if (qemu_loglevel_maks(CPU_LOG_EXEC)) {
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+---
+ tests/bios-tables-test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-CPU_LOG_EXEC already has a specific structure, listing
-the TranslationBlocks that are executed.  It shouldn't
-be hijacked for something else.
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 96803c1..3ef927e 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -437,11 +437,11 @@ static void test_acpi_asl(test_data *data)
+         g_assert(!err || exp_err);
+=20
+         if (g_strcmp0(asl->str, exp_asl->str)) {
++            sdt->tmp_files_retain =3D true;
+             if (exp_err) {
+                 fprintf(stderr,
+                         "Warning! iasl couldn't parse the expected aml\n")=
+;
+             } else {
+-                sdt->tmp_files_retain =3D true;
+                 exp_sdt->tmp_files_retain =3D true;
+                 fprintf(stderr,
+                         "acpi-test: Warning! %.4s mismatch. "
+--=20
+2.7.4
 
-If you really want a runtime flag for this, we should
-add a new CPU_LOG_* flag.
-
-
-r~
 
