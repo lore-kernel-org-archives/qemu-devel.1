@@ -6,74 +6,73 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C91C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 18:48:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE604C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 18:48:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D59232071C
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 18:48:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7BED42071C
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 18:48:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DOm82FhG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D59232071C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dqm/N6pN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BED42071C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXV1N-00063E-DM
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 13:48:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40005)
+	id 1iXV1b-0006Nb-2W
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 13:48:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40084)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iXUyg-000433-30
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:45:23 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iXUyo-0004C1-TB
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:45:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iXUye-0005uz-Ll
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:45:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:31503
+ (envelope-from <kwolf@redhat.com>) id 1iXUym-0005xZ-Qx
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:45:30 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:31920
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iXUye-0005ut-I6
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:45:20 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iXUym-0005wt-Na
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 13:45:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574275520;
+ s=mimecast20190719; t=1574275527;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=j0X+odcGYorCdLxjadK+r+mItUPcO6tYTx2Cq5q8UdQ=;
- b=DOm82FhGOalgjxsFuNI4YrolnJtzokNfpKEs3eoAPtOLY3LdDpfrnLKllYPET/CmPWQLmv
- +moXSTeTVl5ffmDkFu1hhS1NPo7ee4sVIPsqdD1nKdWb7fOwv9kVNEorv9kNhulT0UhmUw
- LqOaUK1YXLGNVctL+n+zQeRNfeOHp/c=
+ bh=JtvzgvKfWDivogXUEpjvjlkmc45IluGJ861VEwYJ/Aw=;
+ b=dqm/N6pNo8QlP5v6oR8hTtPNvrQf7WQWYcYimIkROeOp+3efh+xva3IG7S5NREOe7rI2Nw
+ megqAoqs/J8J7dXi8pCjPQmLv1+YnU1yhGxKiSe8D43EEZ3CRlcdxVutmvjGf1on+BBYl7
+ qPlmW00l32fa3BIMAOVrJPWcgJTS6Sw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-434-njVCwgDROnKllt4Y8pTOFg-1; Wed, 20 Nov 2019 13:45:17 -0500
+ us-mta-141-p8uHVpzNOcmjrBieWgapew-1; Wed, 20 Nov 2019 13:45:26 -0500
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A54CE800054;
- Wed, 20 Nov 2019 18:45:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A264800054;
+ Wed, 20 Nov 2019 18:45:24 +0000 (UTC)
 Received: from linux.fritz.box.com (unknown [10.36.118.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 18D091042B7D;
- Wed, 20 Nov 2019 18:45:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 93E431042B7D;
+ Wed, 20 Nov 2019 18:45:22 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v2 1/6] block: bdrv_co_do_pwrite_zeroes: 64 bit 'bytes'
- parameter
-Date: Wed, 20 Nov 2019 19:44:56 +0100
-Message-Id: <20191120184501.28159-2-kwolf@redhat.com>
+Subject: [PATCH v2 5/6] iotests: Support job-complete in run_job()
+Date: Wed, 20 Nov 2019 19:45:00 +0100
+Message-Id: <20191120184501.28159-6-kwolf@redhat.com>
 In-Reply-To: <20191120184501.28159-1-kwolf@redhat.com>
 References: <20191120184501.28159-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: njVCwgDROnKllt4Y8pTOFg-1
+X-MC-Unique: p8uHVpzNOcmjrBieWgapew-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,53 +90,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-bdrv_co_do_pwrite_zeroes() can already cope with maximum request sizes
-by calling the driver in a loop until everything is done. Make the small
-remaining change that is necessary to let it accept a 64 bit byte count.
+Automatically complete jobs that have a 'ready' state and need an
+explicit job-complete. Without this, run_job() would hang for such
+jobs.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/io.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/iotests.py | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block/io.c b/block/io.c
-index f75777f5ea..003f4ea38c 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -42,7 +42,7 @@
-=20
- static void bdrv_parent_cb_resize(BlockDriverState *bs);
- static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
--    int64_t offset, int bytes, BdrvRequestFlags flags);
-+    int64_t offset, int64_t bytes, BdrvRequestFlags flags);
-=20
- static void bdrv_parent_drained_begin(BlockDriverState *bs, BdrvChild *ign=
-ore,
-                                       bool ignore_bds_parents)
-@@ -1730,7 +1730,7 @@ int coroutine_fn bdrv_co_preadv_part(BdrvChild *child=
-,
- }
-=20
- static int coroutine_fn bdrv_co_do_pwrite_zeroes(BlockDriverState *bs,
--    int64_t offset, int bytes, BdrvRequestFlags flags)
-+    int64_t offset, int64_t bytes, BdrvRequestFlags flags)
- {
-     BlockDriver *drv =3D bs->drv;
-     QEMUIOVector qiov;
-@@ -1760,7 +1760,7 @@ static int coroutine_fn bdrv_co_do_pwrite_zeroes(Bloc=
-kDriverState *bs,
-     assert(max_write_zeroes >=3D bs->bl.request_alignment);
-=20
-     while (bytes > 0 && !ret) {
--        int num =3D bytes;
-+        int num =3D MIN(bytes, BDRV_REQUEST_MAX_BYTES);
-=20
-         /* Align request.  Block drivers can expect the "bulk" of the requ=
-est
-          * to be aligned, and that unaligned requests do not cross cluster
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index b409198e47..c4063ef6bb 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -617,6 +617,8 @@ class VM(qtest.QEMUQtestMachine):
+                         error =3D j['error']
+                         if use_log:
+                             log('Job failed: %s' % (j['error']))
++            elif status =3D=3D 'ready':
++                self.qmp_log('job-complete', id=3Djob)
+             elif status =3D=3D 'pending' and not auto_finalize:
+                 if pre_finalize:
+                     pre_finalize()
 --=20
 2.20.1
 
