@@ -2,82 +2,116 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEDF1C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F203BC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:52:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34FB0206DA
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:51:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA189206DA
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 14:52:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hCDgZptD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34FB0206DA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ViwYYmGO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA189206DA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXRJy-0001YO-5V
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 09:51:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55012)
+	id 1iXRKp-0002Wa-U1
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 09:51:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55299)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iXRJE-0000oh-Iy
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:50:21 -0500
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iXRK2-0001kh-LM
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:51:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iXRJD-0002Aj-Fe
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:50:20 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35822)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iXRJD-0002AM-9I
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:50:19 -0500
-Received: by mail-wr1-x444.google.com with SMTP id s5so144786wrw.2
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:50:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=fq/kj87Wg1JR7Uc7h1f1+mYl8QVYHl09zCw6Rv7RU84=;
- b=hCDgZptDarq/0WVafAB2lAMT1SCzpIt8ti3sFG7E+vcRDDGMq7UGugwh/KWlI4SxqA
- hc9q4iuEeQdx24v+wWmVRAcyOqPKtr0p93N5AlPmvV/NzTZOm6UG4uoaBSLSYUD0Puyr
- ZdgoS5y4umLeu2AYdIt/WDn5YWFaxAWYbTybu5vkZ4m4gqWfFvGamULIowJdnfj7fi3h
- 5au/zV7AYk/+Rfr4SOd+OlXDd1Uphj2S9T6DnCEbicqJ1qabVqDzco2NxGONa++92HmU
- OMXU86N22l4H4TeqRLm1oHh+H6MnzvHD3rgs5ELAknKGi9ezqewqWE0k0c+Th4b1Ss1B
- +S3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=fq/kj87Wg1JR7Uc7h1f1+mYl8QVYHl09zCw6Rv7RU84=;
- b=j5CTo9b4hQ2kTVBmQNm6tqzNkqFJwMAuNbIYjHX8Gz2gov8/BzH0k+Axk2tGM3FGWr
- pR4NRm0f+wpxeRUb/u2EY7jMrMYnLtKZDKInK4m0VfQTKwI0KOYfTzuFogfAzz/cPpNC
- U9LoTEnNGmEaz1KMtphABNY3AKRPThFCAXi3m2GvoUgSaHkTFoVJSD0JbfzkJlsIl0IP
- tqC1du/fK529f6JuvGQRSpqItro72WpjGRV7m9bZZuVDNOMdMmg/Ecf6Tqq+r5KAj70k
- nwL0ntGEtU7Vz1ZTZRq5/IvRom3K5bfUkRYWzDmvDb8hgAO8OQP6KO0cotoNNdB1ubgz
- USsg==
-X-Gm-Message-State: APjAAAXmgCnOPcWvgdOCM+CELEY7atHGMk/Vqiywlb8dzKnkNUneHzWX
- DpZ6tehxPYxHb6O2TLw6T8Atk3F3Pcz/H/CYD/E=
-X-Google-Smtp-Source: APXvYqwkD2SyzTo2EJXKjtDTyK0F4mhM10SkirITiMShVmPg0bx73pxnouaXXMtMP84jgSMG4+s6Flq/EZjxfwphdUY=
-X-Received: by 2002:adf:f20f:: with SMTP id p15mr3600957wro.370.1574261417569; 
- Wed, 20 Nov 2019 06:50:17 -0800 (PST)
-MIME-Version: 1.0
-References: <20191107192731.17330-1-marcandre.lureau@redhat.com>
- <20191108045257-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20191108045257-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 20 Nov 2019 18:50:05 +0400
-Message-ID: <CAJ+F1CJ3NHq1fcvpkMy+SsGxV2fr+dPeAK4bjn4yduaTA8QJ+A@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Some memory leak fixes
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+ (envelope-from <vsementsov@virtuozzo.com>) id 1iXRK1-0002Sz-OQ
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 09:51:10 -0500
+Received: from mail-eopbgr30136.outbound.protection.outlook.com
+ ([40.107.3.136]:35750 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1iXRK1-0002SM-IC; Wed, 20 Nov 2019 09:51:09 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b+zrGCQWNBkS44UQweoSwhVo4khhN1DhEAxmh2qKlfX7NMgjMcdGx0jGR5frt1/nTwogERHKlqjFNDncKX+kwZDec74yW6BpPcZGWPPbVxElXVrJ+O/5v/lO/x7fZuaFpAdHYiZ5lS5yQ844fSLm1V7LpOp5Z92EwHiHojmDxsoZXn48W0qwTze2Tt3w9q5et1RIluO88qH8Q5JpJNFCiZ5vo2rMhnTxTpOUY2g+oVv9TQeYBI3dKICW838Zn53LUYjB7Yz7Sf73lHLkOCpEfXu6/px1cC894PTbPcc+C116dqqDIpwBolDgJ3Sp0hlPwuCf3LiIqIldTJmV9Qb9mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=THOeHyrqfJhPdoansE7cetBpOz8Bba4xWQOMBlCjjVk=;
+ b=X/X2LgI+lto59a1j5w1eyUkbgkd7nv19phKuEO71jN8TwtQs6tQvuJOOjdYSy8kpLpn9VitBG+tYRwakt7rfb5pXA6XaAxR19Z1udpRsEp+C4YGcmomszyn65HLaQ0ISkltu13z0QvnkaY/HVscmBNOOtE7mri/m+lQ/h/OGnq992naaPfucfvwoZHbSkQo9dhZYBPx1dVEiZIxMSmEtUwAdcY+qBRR/burCFe9D7W31mOAWtqKmuSR+k4zndO1eWJ8RwS80Fr8OwXsRfIl/xyYbnZhouwJlQZ3PdYU42Lb7ztCs5RxuTg6DdPG6q0WWal/hW4VGAJprEVFEuSYelQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=THOeHyrqfJhPdoansE7cetBpOz8Bba4xWQOMBlCjjVk=;
+ b=ViwYYmGO4lvAPIeqJqhW8aVCGeDVS5t5hR7IHoLGqMX69qs+mO3a7jO3G19n5ZB08Z9LYsB21HZGWqXVDWfQweKfHfjft/EZFbsNebEjIvJup7CHTvWpHcoR1eOWDj/FCytF8nT5tc53xWbg7HGTl5ftlowX6wiXh1iZuiUveKE=
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
+ AM6PR08MB3127.eurprd08.prod.outlook.com (52.135.162.152) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2474.17; Wed, 20 Nov 2019 14:51:07 +0000
+Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
+ ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2451.031; Wed, 20 Nov 2019
+ 14:51:07 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>, "qemu-block@nongnu.org"
+ <qemu-block@nongnu.org>
+Subject: Re: [PATCH 4/6] iotests: Fix timeout in run_job()
+Thread-Topic: [PATCH 4/6] iotests: Fix timeout in run_job()
+Thread-Index: AQHVn6taAcZI9MWJg0eOlSLbLcHrhKeUJIeA
+Date: Wed, 20 Nov 2019 14:51:07 +0000
+Message-ID: <07d82471-6499-ba37-3925-4a28cf91ab9b@virtuozzo.com>
+References: <20191120140319.1505-1-kwolf@redhat.com>
+ <20191120140319.1505-5-kwolf@redhat.com>
+In-Reply-To: <20191120140319.1505-5-kwolf@redhat.com>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: HE1PR0701CA0087.eurprd07.prod.outlook.com
+ (2603:10a6:3:64::31) To AM6PR08MB4423.eurprd08.prod.outlook.com
+ (2603:10a6:20b:bf::12)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vsementsov@virtuozzo.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tagtoolbar-keys: D20191120175105613
+x-originating-ip: [185.231.240.5]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3b1321a4-4ef2-4220-7fc7-08d76dc91332
+x-ms-traffictypediagnostic: AM6PR08MB3127:
+x-microsoft-antispam-prvs: <AM6PR08MB31279CCC80786A315BA77EFFC14F0@AM6PR08MB3127.eurprd08.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4303;
+x-forefront-prvs: 02272225C5
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(366004)(376002)(346002)(39840400004)(136003)(396003)(189003)(199004)(71190400001)(71200400001)(2906002)(229853002)(66066001)(6436002)(4326008)(31696002)(86362001)(6246003)(66446008)(64756008)(66946007)(99286004)(66556008)(8676002)(66476007)(81156014)(6116002)(3846002)(36756003)(5660300002)(478600001)(2501003)(476003)(2616005)(305945005)(7736002)(446003)(11346002)(486006)(26005)(6486002)(8936002)(31686004)(558084003)(102836004)(6506007)(386003)(256004)(81166006)(6512007)(52116002)(14454004)(54906003)(110136005)(76176011)(25786009)(186003)(316002);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3127;
+ H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+received-spf: None (protection.outlook.com: virtuozzo.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: oXOzD8TqJWxQukSkI6EDI371RdN77mfiEf5+4N7aG1D5iaoyVZ248M5SVzz2/AQbta3x0+d/UZYla8JSYtQpTyfHT9Mn+40vNk8ofNbT4P/Rgnog3ibH623ZM4AJfr7+MRbxDefl+1k6TnF6zH6rufPceVxoSoMetAAs6H6+SXXMXWeHVfmNUhPc8rH/yw+6PCMpJJnIe0TlDgYrOEisO/A5d0co2Y++a9RzimHTrYkZm4FebsaU7DYDwEwqlN9ZlT+4Qo0ArYJ7256vrt1yJrN+IWaQ+J13J+oNNjFYK7sbYnhEdZB9iryXwMTkDrQOrlGYnqmNjtD8BiCljvXyzBpoqibNaucZ4rEsW842uUIA21YVqB3M2wpnhKce084nu6sCEh7chM+TCl444UM1pGc2K4QsXQjpJDinGYW/DSO2OH9W5VW3TlDGpKRZKz93
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <B1F9CDF14A758340BC2F42E4A999B317@eurprd08.prod.outlook.com>
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+MIME-Version: 1.0
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b1321a4-4ef2-4220-7fc7-08d76dc91332
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Nov 2019 14:51:07.5564 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: l8koL9uLmdXzl5gDOUC0fY+TPHLV/Jc57mnJVS2lGhZwsDUeyxsgzEvazA7J8pL7p/GMeAKVQzOSgVpLF+EuiKuSOOezBXnJyYgmsgQSR1k=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3127
+X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
+X-Received-From: 40.107.3.136
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,42 +123,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Thomas Huth <thuth@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>,
+ "mreitz@redhat.com" <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+20.11.2019 17:03, Kevin Wolf wrote:
+> run_job() accepts a wait parameter for a timeout, but it doesn't
+> actually use it. The only thing that is missing is passing it to
+> events_wait(), so do that now.
+>=20
+> Signed-off-by: Kevin Wolf<kwolf@redhat.com>
 
-On Fri, Nov 8, 2019 at 1:54 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Thu, Nov 07, 2019 at 11:27:28PM +0400, Marc-Andr=C3=A9 Lureau wrote:
-> > Hi,
-> >
-> > Another bunch of fixes spotted by ASAN when running check-qtest-x86_64.
->
-> So who's merging this?
->
-> > Marc-Andr=C3=A9 Lureau (3):
-> >   virtio-input: fix memory leak on unrealize
-
-This one is still pending. Michael, could you take it?
-
-> >   qtest: fix qtest_qmp_device_add leak
-> >   cpu-plug-test: fix leaks
-> >
-> >  hw/input/virtio-input.c | 3 +++
-> >  tests/cpu-plug-test.c   | 2 ++
-> >  tests/libqtest.c        | 1 +
-> >  3 files changed, 6 insertions(+)
-> >
-> > --
-> > 2.24.0.rc0.20.gd81542e6f3
->
-
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 --=20
-Marc-Andr=C3=A9 Lureau
+Best regards,
+Vladimir
 
