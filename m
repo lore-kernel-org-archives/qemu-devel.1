@@ -6,87 +6,84 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E931C432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 01:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F93FC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 01:34:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12C0C2245C
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 01:05:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12C0C2245C
+	by mail.kernel.org (Postfix) with ESMTPS id 06100222AB
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 01:34:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06100222AB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXER6-0003Sw-5f
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 20:05:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50716)
+	id 1iXEsf-0000vg-8K
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 20:34:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56462)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kevin.tian@intel.com>) id 1iXEQF-00032D-U7
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 20:04:45 -0500
+ (envelope-from <chen.zhang@intel.com>) id 1iXEqQ-0008WU-O7
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 20:31:48 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kevin.tian@intel.com>) id 1iXEQD-00006Y-Ao
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 20:04:43 -0500
-Received: from mga14.intel.com ([192.55.52.115]:47736)
+ (envelope-from <chen.zhang@intel.com>) id 1iXEqP-0002Rn-Ao
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 20:31:46 -0500
+Received: from mga04.intel.com ([192.55.52.120]:48325)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kevin.tian@intel.com>)
- id 1iXEQD-0008Td-0T
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 20:04:41 -0500
+ (Exim 4.71) (envelope-from <chen.zhang@intel.com>)
+ id 1iXEqL-0002FI-9K; Tue, 19 Nov 2019 20:31:41 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 19 Nov 2019 17:04:36 -0800
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 19 Nov 2019 17:31:37 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,220,1571727600"; d="scan'208";a="407950786"
+X-IronPort-AV: E=Sophos;i="5.69,220,1571727600"; d="scan'208";a="231761824"
 Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
- by fmsmga006.fm.intel.com with ESMTP; 19 Nov 2019 17:04:36 -0800
-Received: from fmsmsx151.amr.corp.intel.com (10.18.125.4) by
+ by fmsmga004.fm.intel.com with ESMTP; 19 Nov 2019 17:31:36 -0800
+Received: from fmsmsx605.amr.corp.intel.com (10.18.126.85) by
  fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 19 Nov 2019 17:04:35 -0800
-Received: from shsmsx108.ccr.corp.intel.com (10.239.4.97) by
- FMSMSX151.amr.corp.intel.com (10.18.125.4) with Microsoft SMTP Server (TLS)
- id 14.3.439.0; Tue, 19 Nov 2019 17:04:35 -0800
-Received: from shsmsx104.ccr.corp.intel.com ([169.254.5.127]) by
- SHSMSX108.ccr.corp.intel.com ([169.254.8.41]) with mapi id 14.03.0439.000;
- Wed, 20 Nov 2019 09:04:34 +0800
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: RE: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
- dirty pages bitmap.
-Thread-Topic: [PATCH v9 Kernel 2/5] vfio iommu: Add ioctl defination to get
- dirty pages bitmap.
-Thread-Index: AQHVmX9T7ifKT6t+r02nKr4nCxrVM6eHmG0AgAFiAICAAAhOgIABfoGAgAAkaICAAF1egIAAC3KAgACYZPCABv7vgIAAn4Ew
-Date: Wed, 20 Nov 2019 01:04:33 +0000
-Message-ID: <AADFC41AFE54684AB9EE6CBC0274A5D19D6059A5@SHSMSX104.ccr.corp.intel.com>
-References: <1573578220-7530-1-git-send-email-kwankhede@nvidia.com>
- <1573578220-7530-3-git-send-email-kwankhede@nvidia.com>
- <20191112153020.71406c44@x1.home>
- <324ce4f8-d655-ee37-036c-fc9ef9045bef@nvidia.com>
- <20191113130705.32c6b663@x1.home>
- <7f74a2a1-ba1c-9d4c-dc5e-343ecdd7d6d6@nvidia.com>
- <20191114140625.213e8a99@x1.home>	<20191115024035.GA24163@joy-OptiPlex-7040>
- <20191114202133.4b046cb9@x1.home>
- <AADFC41AFE54684AB9EE6CBC0274A5D19D5F6A83@SHSMSX104.ccr.corp.intel.com>
- <20191119161659.50b7fa50@x1.home>
-In-Reply-To: <20191119161659.50b7fa50@x1.home>
+ id 14.3.439.0; Tue, 19 Nov 2019 17:31:36 -0800
+Received: from fmsmsx605.amr.corp.intel.com (10.18.126.85) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Tue, 19 Nov 2019 17:31:35 -0800
+Received: from shsmsx104.ccr.corp.intel.com (10.239.4.70) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.1713.5
+ via Frontend Transport; Tue, 19 Nov 2019 17:31:35 -0800
+Received: from shsmsx102.ccr.corp.intel.com ([169.254.2.108]) by
+ SHSMSX104.ccr.corp.intel.com ([169.254.5.127]) with mapi id 14.03.0439.000;
+ Wed, 20 Nov 2019 09:31:34 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Jason Wang <jasowang@redhat.com>, Lukas Straub <lukasstraub2@web.de>,
+ qemu-devel <qemu-devel@nongnu.org>
+Subject: RE: [PATCH v7 0/4] colo: Add support for continuous replication
+Thread-Topic: [PATCH v7 0/4] colo: Add support for continuous replication
+Thread-Index: AQHVinb+3QVJTWIS6EWH6Lp9PLoWz6eI5dGAgAmrJED//6jqAIABNYgw
+Date: Wed, 20 Nov 2019 01:31:34 +0000
+Message-ID: <9CFF81C0F6B98A43A459C9EDAD400D780630AB3E@shsmsx102.ccr.corp.intel.com>
+References: <cover.1571925699.git.lukasstraub2@web.de>
+ <20191113173559.0713c27d@luklap>
+ <9CFF81C0F6B98A43A459C9EDAD400D7806309C8C@shsmsx102.ccr.corp.intel.com>
+ <049fdd65-c654-f619-4de1-5a3fe0a2ad5b@redhat.com>
+In-Reply-To: <049fdd65-c654-f619-4de1-5a3fe0a2ad5b@redhat.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYmRhYzJjMzktMzE3MC00ODIyLTkyMTAtNjIzZTVhNWViNDdiIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiZEVVWDI0R3p3NWVCZjBOSXo1ZXM0bUhYbWdsczRZSmhNQkFyTlUrb0EzVGhRYTNqejZvZ0lhQUVvaXJnZHhORiJ9
 dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
+dlp-version: 11.2.0.6
 dlp-reaction: no-action
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNjVkOTcwMmQtNzE3Yy00MjgyLWIxZGUtOTQ0YjMyNDEyZmRmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiWXo5UVFuY1BZaWZwTFhGdUplM2JlYzNhVDBzWit3b2VNRTdMdlwvXC9QV0t3YWFVQWthYnBVdFNnRUZZZ3NQbzhuIn0=
 x-originating-ip: [10.239.127.40]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 192.55.52.115
+X-Received-From: 192.55.52.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -98,287 +95,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Zhengxiao.zx@Alibaba-inc.com" <Zhengxiao.zx@Alibaba-inc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu, Yi
- L" <yi.l.liu@intel.com>, "cjia@nvidia.com" <cjia@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "eskultet@redhat.com" <eskultet@redhat.com>, "Yang,
- Ziye" <ziye.yang@intel.com>, "cohuck@redhat.com" <cohuck@redhat.com>,
- "shuangtai.tst@alibaba-inc.com" <shuangtai.tst@alibaba-inc.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>, "Wang, 
- Zhi A" <zhi.a.wang@intel.com>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
- "pasic@linux.ibm.com" <pasic@linux.ibm.com>, "aik@ozlabs.ru" <aik@ozlabs.ru>,
- Kirti Wankhede <kwankhede@nvidia.com>, "eauger@redhat.com" <eauger@redhat.com>,
- "felipe@nutanix.com" <felipe@nutanix.com>,
- "jonathan.davies@nutanix.com" <jonathan.davies@nutanix.com>, "Zhao,
- Yan Y" <yan.y.zhao@intel.com>, "Liu, Changpeng" <changpeng.liu@intel.com>,
- "Ken.Xue@amd.com" <Ken.Xue@amd.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>, Xie
+ Changlong <xiechanglong.d@gmail.com>, qemu-block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> From: Alex Williamson [mailto:alex.williamson@redhat.com]
-> Sent: Wednesday, November 20, 2019 7:17 AM
->=20
-> On Fri, 15 Nov 2019 05:10:53 +0000
-> "Tian, Kevin" <kevin.tian@intel.com> wrote:
->=20
-> > > From: Alex Williamson
-> > > Sent: Friday, November 15, 2019 11:22 AM
-> > >
-> > > On Thu, 14 Nov 2019 21:40:35 -0500
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > >
-> > > > On Fri, Nov 15, 2019 at 05:06:25AM +0800, Alex Williamson wrote:
-> > > > > On Fri, 15 Nov 2019 00:26:07 +0530
-> > > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > >
-> > > > > > On 11/14/2019 1:37 AM, Alex Williamson wrote:
-> > > > > > > On Thu, 14 Nov 2019 01:07:21 +0530
-> > > > > > > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > > > >
-> > > > > > >> On 11/13/2019 4:00 AM, Alex Williamson wrote:
-> > > > > > >>> On Tue, 12 Nov 2019 22:33:37 +0530
-> > > > > > >>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> > > > > > >>>
-> > > > > > >>>> All pages pinned by vendor driver through vfio_pin_pages
-> API
-> > > should be
-> > > > > > >>>> considered as dirty during migration. IOMMU container
-> > > maintains a list of
-> > > > > > >>>> all such pinned pages. Added an ioctl defination to get
-> bitmap of
-> > > such
-> > > > > > >>>
-> > > > > > >>> definition
-> > > > > > >>>
-> > > > > > >>>> pinned pages for requested IO virtual address range.
-> > > > > > >>>
-> > > > > > >>> Additionally, all mapped pages are considered dirty when
-> > > physically
-> > > > > > >>> mapped through to an IOMMU, modulo we discussed devices
-> > > opting in to
-> > > > > > >>> per page pinning to indicate finer granularity with a TBD
-> > > mechanism to
-> > > > > > >>> figure out if any non-opt-in devices remain.
-> > > > > > >>>
-> > > > > > >>
-> > > > > > >> You mean, in case of device direct assignment (device pass
-> > > through)?
-> > > > > > >
-> > > > > > > Yes, or IOMMU backed mdevs.  If vfio_dmas in the container ar=
-e
-> > > fully
-> > > > > > > pinned and mapped, then the correct dirty page set is all
-> mapped
-> > > pages.
-> > > > > > > We discussed using the vpfn list as a mechanism for vendor
-> drivers
-> > > to
-> > > > > > > reduce their migration footprint, but we also discussed that =
-we
-> > > would
-> > > > > > > need a way to determine that all participants in the containe=
-r
-> have
-> > > > > > > explicitly pinned their working pages or else we must conside=
-r
-> the
-> > > > > > > entire potential working set as dirty.
-> > > > > > >
-> > > > > >
-> > > > > > How can vendor driver tell this capability to iommu module? Any
-> > > suggestions?
-> > > > >
-> > > > > I think it does so by pinning pages.  Is it acceptable that if th=
-e
-> > > > > vendor driver pins any pages, then from that point forward we
-> consider
-> > > > > the IOMMU group dirty page scope to be limited to pinned pages?
-> > > There
-> > > > > are complications around non-singleton IOMMU groups, but I think
-> > > we're
-> > > > > already leaning towards that being a non-worthwhile problem to
-> solve.
-> > > > > So if we require that only singleton IOMMU groups can pin pages
-> and
-> > > we
-> > > > > pass the IOMMU group as a parameter to
-> > > > > vfio_iommu_driver_ops.pin_pages(), then the type1 backend can
-> set a
-> > > > > flag on its local vfio_group struct to indicate dirty page scope =
-is
-> > > > > limited to pinned pages.  We might want to keep a flag on the
-> > > > > vfio_iommu struct to indicate if all of the vfio_groups for each
-> > > > > vfio_domain in the vfio_iommu.domain_list dirty page scope limite=
-d
-> to
-> > > > > pinned pages as an optimization to avoid walking lists too often.
-> Then
-> > > > > we could test if vfio_iommu.domain_list is not empty and this new
-> flag
-> > > > > does not limit the dirty page scope, then everything within each
-> > > > > vfio_dma is considered dirty.
-> > > > >
-> > > >
-> > > > hi Alex
-> > > > could you help clarify whether my understandings below are right?
-> > > > In future,
-> > > > 1. for mdev and for passthrough device withoug hardware ability to
-> track
-> > > > dirty pages, the vendor driver has to explicitly call
-> > > > vfio_pin_pages()/vfio_unpin_pages() + a flag to tell vfio its dirty=
- page
-> set.
-> > >
-> > > For non-IOMMU backed mdevs without hardware dirty page tracking,
-> > > there's no change to the vendor driver currently.  Pages pinned by th=
-e
-> > > vendor driver are marked as dirty.
-> >
-> > What about the vendor driver can figure out, in software means, which
-> > pinned pages are actually dirty? In that case, would a separate mark_di=
-rty
-> > interface make more sense? Or introduce read/write flag to the
-> pin_pages
-> > interface similar to DMA API? Existing drivers always set both r/w flag=
-s
-> but
-> > just in case then a specific driver may set read-only or write-only...
->=20
-> You're jumping ahead to 2. below, where my reply is that we need to
-
-They are different. 2) is about hardware support which may collect
-dirty page info in a log buffer and then report to driver when the latter
-requests. Here I'm talking about software approach, i.e. when the
-vendor driver intercepts certain guest operations, it may figure out
-whether the captured DMA pages are used for write or read. The
-hardware approach is log-based, which needs a driver callback so=20
-container can notify vendor driver to report. The latter is trap-based,=20
-which needs a VFIO API to update dirty status synchronously.=20
-
-> extend the interface to allow the vendor driver to manipulate
-> clean/dirty state.  I don't know exactly what those interfaces should
-> look like, but yes, something should exist to allow that control.  If
-> the default is to mark pinned pages dirty, then we might need a
-> separate pin_pages_clean callback.
->=20
-> > > For any IOMMU backed device, mdev or direct assignment, all mapped
-> > > memory would be considered dirty unless there are explicit calls to p=
-in
-> > > pages on top of the IOMMU page pinning and mapping.  These would
-> likely
-> > > be enabled only when the device is in the _SAVING device_state.
-> > >
-> > > > 2. for those devices with hardware ability to track dirty pages, wi=
-ll still
-> > > > provide a callback to vendor driver to get dirty pages. (as for tho=
-se
-> > > devices,
-> > > > it is hard to explicitly call vfio_pin_pages()/vfio_unpin_pages())
-> > > >
-> > > > 3. for devices relying on dirty bit info in physical IOMMU, there
-> > > > will be a callback to physical IOMMU driver to get dirty page set f=
-rom
-> > > > vfio.
-> > >
-> > > The proposal here does not cover exactly how these would be
-> > > implemented, it only establishes the container as the point of user
-> > > interaction with the dirty bitmap and hopefully allows us to maintain
-> > > that interface regardless of whether we have dirty tracking at the
-> > > device or the system IOMMU.  Ideally devices with dirty tracking woul=
-d
-> > > make use of page pinning and we'd extend the interface to allow
-> vendor
-> > > drivers the ability to indicate the clean/dirty state of those pinned
-> >
-> > I don't think "dirty tracking" =3D=3D "page pinning". It's possible tha=
-t a device
-> > support tracking/logging dirty page info into a driver-registered buffe=
-r,
-> > then the host vendor driver doesn't need to mediate fast-path operation=
-s.
-> > In such case, the entire guest memory is always pinned and we just need
-> > a log-sync like interface for vendor driver to fill dirty bitmap.
->=20
-> An mdev device only has access to the pages that have been pinned on
-> behalf of the device, so just as we assume that any page pinned and
-> mapped through the IOMMU might be dirtied by a device, we can by
-> default assume that an page pinned for an mdev device is dirty.  This
-> maps fairly well to our existing mdev devices that don't seem to have
-> finer granularity dirty page tracking.  As I state above though, I
-> certainly don't expect this to be the final extent of dirty page
-> tracking.  I'm reluctant to commit to a log-sync interface though as
-> that seems to put the responsibility on the container to poll every
-> attached device whereas I was rather hoping that making the container
-> the central interface for dirty tracking would have devices marking
-> dirty pages in the container asynchronous to the user polling.
-
-Having device to mark dirty pages asynchronous only applies to the
-software approach which tracks dirty pages by mediating fast-path
-guest operations. In case the device logging dirty info into a buffer,
-we need a log-sync interface so vendor driver can be notified to
-collect hardware-logged information. Whether to have vendor driver
-directly update container's dirty bitmap, or have vendor driver to
-call mark_dirty for every recorded dirty page, it's just an implementation
-choice and you make the decision. :-) This is actually similar to IOMMU=20
-dirty-bit collection, where we also need an interface to notify IOMMU=20
-driver to collect its dirty bits.
-
->=20
-> > > pages.  For system IOMMU dirty page tracking, that potentially might
-> > > mean that we support IOMMU page faults and the container manages
-> > > those
-> > > faults such that the container is the central record of dirty pages.
-> >
-> > IOMMU dirty-bit is not equivalent to IOMMU page fault. The latter
-> > is much more complex which requires support both in IOMMU and in
-> > device. Here similar to above device-dirty-tracking case, we just need =
-a
-> > log-sync interface calling into iommu driver to get dirty info filled f=
-or
-> > requested address range.
-> >
-> > > Until these interfaces are designed, we can only speculate, but the
-> > > goal is to design a user interface compatible with how those features
-> > > might evolve.  If you identify something that can't work, please rais=
-e
-> > > the issue.  Thanks,
-> > >
-> > > Alex
-> >
-> > Here is the desired scheme in my mind. Feel free to correct me. :-)
-> >
-> > 1. iommu log-buf callback is preferred if underlying IOMMU reports
-> > such capability. The iommu driver walks IOMMU page table to find
-> > dirty pages for requested address range;
-> > 2. otherwise vendor driver log-buf callback is preferred if the vendor
-> > driver reports such capability when registering mdev types. The
-> > vendor driver calls device-specific interface to fill dirty info;
-> > 3. otherwise pages pined by vfio_pin_pages (with WRITE flag) are
-> > considered dirty. This covers normal mediated devices or using
-> > fast-path mediation for migrating passthrough device;
-> > 4. otherwise all mapped pages are considered dirty;
-> >
-> > Currently we're working on 1) based on VT-d rev3.0. I know some
-> > vendors implement 2) in their own code base. 3) has real usages
-> > already. 4) is the fall-back.
-> >
-> > Alex, are you willing to have all the interfaces ready in one batch,
-> > or support them based on available usages? I'm fine with either
-> > way, but even just doing 3/4 in this series, I'd prefer to having
-> > above scheme included in the code comment, to give the whole
-> > picture of all possible situations. :-)
->=20
-> My intention was to cover 3 & 4 given the current state of device and
-> IOMMU dirty tracking.  I expect the user interface to remain unchanged
-> for 1 & 2 but the API between vfio, the vendor drivers, and the IOMMU
-> is internal to the kernel and more flexible.  Thanks,
->=20
-
-Sure. I also don't expect any change to user space API when extending
-to 1 and 2. here our discussion is purely about kernel internal APIs.=20
-
-Thanks
-Kevin
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyA8amFz
+b3dhbmdAcmVkaGF0LmNvbT4NCj4gU2VudDogVHVlc2RheSwgTm92ZW1iZXIgMTksIDIwMTkgMTE6
+MDMgUE0NCj4gVG86IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT47IEx1a2FzIFN0
+cmF1Yg0KPiA8bHVrYXNzdHJhdWIyQHdlYi5kZT47IHFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9u
+Z251Lm9yZz4NCj4gQ2M6IEtldmluIFdvbGYgPGt3b2xmQHJlZGhhdC5jb20+OyBxZW11LWJsb2Nr
+IDxxZW11LQ0KPiBibG9ja0Bub25nbnUub3JnPjsgV2VuIENvbmd5YW5nIDx3ZW5jb25neWFuZzJA
+aHVhd2VpLmNvbT47IE1heA0KPiBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+OyBYaWUgQ2hhbmds
+b25nIDx4aWVjaGFuZ2xvbmcuZEBnbWFpbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjcg
+MC80XSBjb2xvOiBBZGQgc3VwcG9ydCBmb3IgY29udGludW91cyByZXBsaWNhdGlvbg0KPiANCj4g
+DQo+IE9uIDIwMTkvMTEvMTkg5LiL5Y2IODoyOCwgWmhhbmcsIENoZW4gd3JvdGU6DQo+ID4NCj4g
+Pj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPj4gRnJvbTogTHVrYXMgU3RyYXViIDxs
+dWthc3N0cmF1YjJAd2ViLmRlPg0KPiA+PiBTZW50OiBUaHVyc2RheSwgTm92ZW1iZXIgMTQsIDIw
+MTkgMTI6MzYgQU0NCj4gPj4gVG86IHFlbXUtZGV2ZWwgPHFlbXUtZGV2ZWxAbm9uZ251Lm9yZz4N
+Cj4gPj4gQ2M6IFpoYW5nLCBDaGVuIDxjaGVuLnpoYW5nQGludGVsLmNvbT47IEphc29uIFdhbmcN
+Cj4gPj4gPGphc293YW5nQHJlZGhhdC5jb20+OyBXZW4gQ29uZ3lhbmcNCj4gPHdlbmNvbmd5YW5n
+MkBodWF3ZWkuY29tPjsgWGllDQo+ID4+IENoYW5nbG9uZyA8eGllY2hhbmdsb25nLmRAZ21haWwu
+Y29tPjsgS2V2aW4gV29sZg0KPiA8a3dvbGZAcmVkaGF0LmNvbT47DQo+ID4+IE1heCBSZWl0eiA8
+bXJlaXR6QHJlZGhhdC5jb20+OyBxZW11LWJsb2NrIDxxZW11LWJsb2NrQG5vbmdudS5vcmc+DQo+
+ID4+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjcgMC80XSBjb2xvOiBBZGQgc3VwcG9ydCBmb3IgY29u
+dGludW91cw0KPiA+PiByZXBsaWNhdGlvbg0KPiA+Pg0KPiA+PiBPbiBGcmksIDI1IE9jdCAyMDE5
+IDE5OjA2OjMxICswMjAwDQo+ID4+IEx1a2FzIFN0cmF1YiA8bHVrYXNzdHJhdWIyQHdlYi5kZT4g
+d3JvdGU6DQo+ID4+DQo+ID4+PiBIZWxsbyBFdmVyeW9uZSwNCj4gPj4+IFRoZXNlIFBhdGNoZXMg
+YWRkIHN1cHBvcnQgZm9yIGNvbnRpbnVvdXMgcmVwbGljYXRpb24gdG8gY29sby4gVGhpcw0KPiA+
+Pj4gbWVhbnMgdGhhdCBhZnRlciB0aGUgUHJpbWFyeSBmYWlscyBhbmQgdGhlIFNlY29uZGFyeSBk
+aWQgYSBmYWlsb3ZlciwNCj4gPj4+IHRoZSBTZWNvbmRhcnkgY2FuIHRoZW4gYmVjb21lIFByaW1h
+cnkgYW5kIHJlc3VtZSByZXBsaWNhdGlvbiB0byBhDQo+ID4+PiBuZXcNCj4gPj4gU2Vjb25kYXJ5
+Lg0KPiA+Pj4gUmVnYXJkcywNCj4gPj4+IEx1a2FzIFN0cmF1Yg0KPiA+Pj4NCj4gPj4+IHY3Og0K
+PiA+Pj4gICAtIGNsYXJpZnkgbWVhbmluZyBvZiBpcCdzIGluIGRvY3VtZW50YXRpb24gYW5kIG5v
+dGUgdGhhdCBhY3RpdmUgYW5kDQo+IGhpZGRlbg0KPiA+Pj4gICAgIGltYWdlcyBqdXN0IG5lZWQg
+dG8gYmUgY3JlYXRlZCBvbmNlDQo+ID4+PiAgIC0gcmV2ZXJ0ZWQgcmVtb3ZhbCBvZiBiZHJ2X2lz
+X3Jvb3Rfbm9kZSh0b3BfYnMpIGluIHJlcGxpY2F0aW9uIGFuZA0KPiA+PiBhZGp1c3RlZA0KPiA+
+Pj4gICAgIHRoZSB0b3AtaWQ9IHBhcmFtZXRlciBpbiBkb2N1bWVudGF0aW9uIGFjb3JkaW5nbHkN
+Cj4gPj4+DQo+ID4+PiB2NjoNCj4gPj4+ICAgLSBkb2N1bWVudGVkIHRoZSBwb3NpdGlvbj0gYW5k
+IGluc2VydD0gb3B0aW9ucw0KPiA+Pj4gICAtIHJlbmFtZWQgcmVwbGljYXRpb24gdGVzdA0KPiA+
+Pj4gICAtIGNsYXJpZmllZCBkb2N1bWVudGF0aW9uIGJ5IHVzaW5nIGRpZmZlcmVudCBpcCdzIGZv
+ciBwcmltYXJ5IGFuZA0KPiA+Pj4gc2Vjb25kYXJ5DQo+ID4+PiAgIC0gYWRkZWQgUmV2aWV3ZWQt
+YnkgdGFncw0KPiA+Pj4NCj4gPj4+IHY1Og0KPiA+Pj4gICAtIGNoYW5nZSBzeW50YXggZm9yIHRo
+ZSBwb3NpdGlvbj0gcGFyYW1ldGVyDQo+ID4+PiAgIC0gZml4IHNwZWxsaW5nIG1pc3Rha2UNCj4g
+Pj4+DQo+ID4+PiB2NDoNCj4gPj4+ICAgLSBmaXggY2hlY2twYXRjaC5wbCB3YXJuaW5ncw0KPiA+
+Pj4NCj4gPj4+IHYzOg0KPiA+Pj4gICAtIGFkZCB0ZXN0IGZvciByZXBsaWNhdGlvbiBjaGFuZ2Vz
+DQo+ID4+PiAgIC0gY2hlY2sgaWYgdGhlIGZpbHRlciB0byBiZSBpbnNlcnRlZCBiZWZvcmUvYmVo
+aW5kIGJlbG9uZ3MgdG8gdGhlDQo+ID4+PiBzYW1lIGludGVyZmFjZQ0KPiA+Pj4gICAtIGZpeCB0
+aGUgZXJyb3IgbWVzc2FnZSBmb3IgdGhlIHBvc2l0aW9uPSBwYXJhbWV0ZXINCj4gPj4+ICAgLSBy
+ZW5hbWUgdGVybSAiYWZ0ZXIiIC0+ICJiZWhpbmQiIGFuZCB2YXJpYWJsZSAiaW5zZXJ0X2JlZm9y
+ZSIgLT4NCj4gPj4gImluc2VydF9iZWZvcmVfZmxhZyINCj4gPj4+ICAgLSBkb2N1bWVudCB0aGUg
+cXVvcnVtIG5vZGUgb24gdGhlIHNlY29uZGFyeSBzaWRlDQo+ID4+PiAgIC0gc2ltcGxpZnkgcXVv
+cnVtIHBhcmFtZXRlcnMgaW4gZG9jdW1lbnRhdGlvbg0KPiA+Pj4gICAtIHJlbW92ZSB0cmFpbGlu
+ZyBzcGFjZXMgaW4gZG9jdW1lbnRhdGlvbg0KPiA+Pj4gICAtIGNsYXJpZnkgdGhlIHRlc3Rpbmcg
+cHJvY2VkdXJlIGluIGRvY3VtZW50YXRpb24NCj4gPj4+DQo+ID4+PiB2MjoNCj4gPj4+ICAgLSBm
+aXggZW1haWwgZm9ybWF0aW5nDQo+ID4+PiAgIC0gZml4IGNoZWNrcGF0Y2gucGwgd2FybmluZ3MN
+Cj4gPj4+ICAgLSBmaXggcGF0Y2hldyBlcnJvcg0KPiA+Pj4gICAtIGNsZWFyZXIgY29tbWl0IG1l
+c3NhZ2VzDQo+ID4+Pg0KPiA+Pj4NCj4gPj4+IEx1a2FzIFN0cmF1YiAoNCk6DQo+ID4+PiAgICBi
+bG9jay9yZXBsaWNhdGlvbi5jOiBJZ25vcmUgcmVxdWVzdHMgYWZ0ZXIgZmFpbG92ZXINCj4gPj4+
+ICAgIHRlc3RzL3Rlc3QtcmVwbGljYXRpb24uYzogQWRkIHRlc3QgZm9yIGZvciBzZWNvbmRhcnkg
+bm9kZSBjb250aW51aW5nDQo+ID4+PiAgICAgIHJlcGxpY2F0aW9uDQo+ID4+PiAgICBuZXQvZmls
+dGVyLmM6IEFkZCBPcHRpb25zIHRvIGluc2VydCBmaWx0ZXJzIGFueXdoZXJlIGluIHRoZSBmaWx0
+ZXINCj4gPj4+ICAgICAgbGlzdA0KPiA+Pj4gICAgY29sbzogVXBkYXRlIERvY3VtZW50YXRpb24g
+Zm9yIGNvbnRpbnVvdXMgcmVwbGljYXRpb24NCj4gPj4+DQo+ID4+PiAgIGJsb2NrL3JlcGxpY2F0
+aW9uLmMgICAgICAgIHwgIDM1ICsrKysrLQ0KPiA+Pj4gICBkb2NzL0NPTE8tRlQudHh0ICAgICAg
+ICAgICB8IDIyNCArKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0NCj4gLQ0KPiA+
+Pj4gICBkb2NzL2Jsb2NrLXJlcGxpY2F0aW9uLnR4dCB8ICAyOCArKystLQ0KPiA+Pj4gICBpbmNs
+dWRlL25ldC9maWx0ZXIuaCAgICAgICB8ICAgMiArDQo+ID4+PiAgIG5ldC9maWx0ZXIuYyAgICAg
+ICAgICAgICAgIHwgIDkyICsrKysrKysrKysrKysrLQ0KPiA+Pj4gICBxZW11LW9wdGlvbnMuaHgg
+ICAgICAgICAgICB8ICAzMSArKysrLQ0KPiA+Pj4gICB0ZXN0cy90ZXN0LXJlcGxpY2F0aW9uLmMg
+ICB8ICA1MiArKysrKysrKysNCj4gPj4+ICAgNyBmaWxlcyBjaGFuZ2VkLCAzODkgaW5zZXJ0aW9u
+cygrKSwgNzUgZGVsZXRpb25zKC0pDQo+ID4+Pg0KPiA+PiBIZWxsbyBFdmVyeW9uZSwNCj4gPj4g
+U28gSSBndWVzcyB0aGlzIGlzIHJlYWR5IGZvciBtZXJnaW5nIG9yIHdpbGwgdGhhdCBoYXZlIHRv
+IHdhaXQgdW50aWwNCj4gPj4gdGhlIDQuMiByZWxlYXNlIGlzIGRvbmU/DQo+ID4gRHVlIHRvIFFl
+bXUgNC4yIHJlbGVhc2Ugc2NoZWR1bGUsIGFmdGVyIHNvZnQgZmVhdHVyZSBmcmVlemUoT2N0Mjkp
+IHRoZQ0KPiBtYXN0ZXIgYnJhbmNoIGRvZXMgbm90IGFjY2VwdCBmZWF0dXJlIGNoYW5nZXMuDQo+
+ID4gQnV0IEkgZG9uJ3Qga25vdyBpZiBzdWItbWFpbnRhaW5lcihibG9jayBvciBuZXQpIGNhbiBx
+dWV1ZSB0aGlzIHNlcmllcyBmaXJzdA0KPiB0aGVuIG1lcmdlIGl0IGFmdGVyIDQuMiByZWxlYXNl
+Pw0KPiA+DQo+ID4gVGhhbmtzDQo+ID4gWmhhbmcgQ2hlbg0KPiANCj4gDQo+IFdpbGwgdHJ5IHRv
+IHF1ZXVlIHRoaXMgc2VyaWVzLg0KDQpUaGFuayB5b3UgSmFzb25+DQoNClRoYW5rcw0KWmhhbmcg
+Q2hlbg0KDQo+IA0KPiBUaGFua3MNCj4gDQo+IA0KPiA+DQo+ID4+IFJlZ2FyZHMsDQo+ID4+IEx1
+a2FzIFN0cmF1Yg0KDQo=
 
