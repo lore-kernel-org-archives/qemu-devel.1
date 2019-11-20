@@ -2,99 +2,81 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DECC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D45CDC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:46:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49D6520637
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:43:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EE3E2088F
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 16:46:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NKZx9Puw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49D6520637
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+YJYm+s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EE3E2088F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60520 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXT4y-0001N6-B1
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 11:43:44 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47548)
+	id 1iXT7J-0003wV-OM
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 11:46:09 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47221)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iXT3i-0000OF-3P
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:42:26 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iXT2U-0007bA-EN
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:41:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iXT3h-000147-0H
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:42:26 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52659
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <dgilbert@redhat.com>) id 1iXT2S-0000ED-Lu
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:41:10 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30172
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iXT3g-00013d-TN
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:42:24 -0500
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iXT2S-0000Dk-Hp
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 11:41:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574268144;
+ s=mimecast20190719; t=1574268067;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9KI43LfNLY1yvwVstRW6qlRhYW7vbci8u7TYLANb7bc=;
- b=NKZx9PuwTtPnhtroctN7qFJwkBsoq74On2qV6q9o/pF+wQbe/vpAVgUNH+Zca+vQfrmEgQ
- RJEZerc6gepjDnF6vZU7mvJRqAXhGmcolteGgNjIRlVi0FHJCdclcHSpi8qf5KeLW00Dr6
- qW06i+aBjJ4HAg+/mnRvef6yOnWM3aU=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-ka0zkqmMMPK_v4ucNN-s5Q-1; Wed, 20 Nov 2019 11:42:23 -0500
-Received: by mail-wr1-f71.google.com with SMTP id z10so4582618wrr.5
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 08:42:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=R50SDX6rAN6EiTQYpY/YuNv7/p9X/91RVUYaeedhswA=;
- b=RLEc+X15np92MWh/BznK5qXPeqBJKgQUuZ9d1ZvvApeNnw0ZD9ZBBmJ6ATDMA6QDmB
- nemB6LfpldZelTQ9uT3rKhXfK8UBQWaddhC/vMabSjPmN6//wji4OSQgjk9iHsv7qbWP
- a3ZIWkZvRChfWWhZiDpSpPpsAoRmJOfs033QHeFiSLrs4ZtqF1n7PSEfQ6rfeZhfM13A
- ZRUepNrqar7mcSyn00+wfnK+WGjzhCZOV1EAriiZV3imUaarH4QN3KRWngFmxgpHKAGg
- JzlZmgp4i5gNqPlhBjUjQrOC53XWkCO+ZMfONdzUKlB1PdEQb9/26uhIsf8pNyCk2HR3
- EVjQ==
-X-Gm-Message-State: APjAAAWPFctF83h/GsGxM1cjNUI2jZDoI6KAKpAaQaIg1smadY3tgHqD
- 7AWhsUdR2MAGLWyYPH8rzC695j0ykxS5QwnKCKeDo9WdhNls3q7/A/5ZN2SkU49zfLDjrqbhLIe
- IKMwVvWYDZqjRZ7I=
-X-Received: by 2002:a5d:6a08:: with SMTP id m8mr4416625wru.52.1574268141979;
- Wed, 20 Nov 2019 08:42:21 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzjqv4fPtXxo5LyUfMtNmVDqMJJa8OLq6Zeougm5OVMDPE+IjbEw/k3E/pN5g7n0khE7reobg==
-X-Received: by 2002:a5d:6a08:: with SMTP id m8mr4416591wru.52.1574268141807;
- Wed, 20 Nov 2019 08:42:21 -0800 (PST)
-Received: from [192.168.1.35] (131.red-88-21-102.staticip.rima-tde.net.
- [88.21.102.131])
- by smtp.gmail.com with ESMTPSA id n1sm32559877wrr.24.2019.11.20.08.42.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 20 Nov 2019 08:42:21 -0800 (PST)
-Subject: Re: [PATCH for 4.2?] tests/vm/centos: fix centos build target
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-References: <20191120161436.13937-1-alex.bennee@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <6500bd91-3d39-3979-83c7-5717e5dc1676@redhat.com>
-Date: Wed, 20 Nov 2019 17:42:19 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ bh=+04ApiQitCXocLjL7A2pQ36+TcsC+4h7V84Cey+GE8w=;
+ b=h+YJYm+scEZ/ibCDJ7/pOJPG7KpAe9Tws4fbmwypg+BIG8unrn0efA0egYGMwgA0AIn5p/
+ qa/CpnFIsCXPXbZvOkt+WjI70Ni0AhOU6uvGHU+nLya/+mITOs0MIfideIufuh0WR9ulC8
+ Z7C+nabOz05HaSZRTzBs/W1em5wCCq4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-uGynr_RkOkGv3BXDRzQ4yg-1; Wed, 20 Nov 2019 11:41:03 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44343107ACC7;
+ Wed, 20 Nov 2019 16:41:02 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D651F1001902;
+ Wed, 20 Nov 2019 16:40:55 +0000 (UTC)
+Date: Wed, 20 Nov 2019 16:40:53 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Subject: Re: [PATCH v2] virtio-pci: disable vring processing when
+ bus-mastering is disabled
+Message-ID: <20191120164053.GC2858@work-vm>
+References: <157423033042.2797.15950947649776190513@37313f22b938>
+ <157426700550.3335.16748606368540493053@sif>
 MIME-Version: 1.0
-In-Reply-To: <20191120161436.13937-1-alex.bennee@linaro.org>
-Content-Language: en-US
-X-MC-Unique: ka0zkqmMMPK_v4ucNN-s5Q-1
+In-Reply-To: <157426700550.3335.16748606368540493053@sif>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: uGynr_RkOkGv3BXDRzQ4yg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -106,36 +88,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, peter.maydell@linaro.org
+Cc: no-reply@patchew.org, aik@ozlabs.ru, david@gibson.dropbear.id.au,
+ qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/20/19 5:14 PM, Alex Benn=C3=A9e wrote:
-> To be able to run the docker tests centos has here we have to install
-> python3 as well as the basic tools.
+* Michael Roth (mdroth@linux.vnet.ibm.com) wrote:
+> Quoting no-reply@patchew.org (2019-11-20 00:12:11)
+> > Patchew URL: https://patchew.org/QEMU/20191120005003.27035-1-mdroth@lin=
+ux.vnet.ibm.com/
+> >=20
+> >=20
+> >=20
+> > Hi,
+> >=20
+> > This series failed the docker-quick@centos7 build test. Please find the=
+ testing commands and
+> > their output below. If you have Docker installed, you can probably repr=
+oduce it
+> > locally.
+> >=20
+> > =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
+> > #!/bin/bash
+> > make docker-image-centos7 V=3D1 NETWORK=3D1
+> > time make docker-test-quick@centos7 SHOW_ENV=3D1 J=3D14 NETWORK=3D1
+> > =3D=3D=3D TEST SCRIPT END =3D=3D=3D
+> >=20
+> >   TEST    check-unit: tests/test-thread-pool
+> > wait_for_migration_fail: unexpected status status=3Dwait-unplug allow_a=
+ctive=3D1
+> > **
+> > ERROR:/tmp/qemu-test/src/tests/migration-test.c:908:wait_for_migration_=
+fail: assertion failed: (result)
+> > ERROR - Bail out! ERROR:/tmp/qemu-test/src/tests/migration-test.c:908:w=
+ait_for_migration_fail: assertion failed: (result)
 >=20
-> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> ---
->   tests/vm/centos | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Seems to be an unrelated issue noted in this thread:
 >=20
-> diff --git a/tests/vm/centos b/tests/vm/centos
-> index 53976f1c4c9..b9e851f2d33 100755
-> --- a/tests/vm/centos
-> +++ b/tests/vm/centos
-> @@ -73,7 +73,7 @@ class CentosVM(basevm.BaseVM):
->           self.wait_ssh()
->           self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
->           self.ssh_root_check("yum update -y")
-> -        self.ssh_root_check("yum install -y docker make git")
-> +        self.ssh_root_check("yum install -y docker make git python3")
->           self.ssh_root_check("systemctl enable docker")
->           self.ssh_root("poweroff")
->           self.wait()
->=20
+>   https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg01326.html
 
-It would be nice to have this fixed in 4.2.
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Yeh, Jens has a patch series that's fixing that.
+
+Dave
+
+> I'm running the centos docker test in a loop but haven't been able to rep=
+roduce
+> so far after 7 attempts
+>=20
+> > make: *** [check-qtest-aarch64] Error 1
+> > make: *** Waiting for unfinished jobs....
+> >   TEST    check-unit: tests/test-hbitmap
+> >   TEST    check-unit: tests/test-bdrv-drain
+> > ---
+> >     raise CalledProcessError(retcode, cmd)
+> > subprocess.CalledProcessError: Command '['sudo', '-n', 'docker', 'run',=
+ '--label', 'com.qemu.instance.uuid=3Dc863e15882a747a88c290575505cc1de', '-=
+u', '1001', '--security-opt', 'seccomp=3Dunconfined', '--rm', '-e', 'TARGET=
+_LIST=3D', '-e', 'EXTRA_CONFIGURE_OPTS=3D', '-e', 'V=3D', '-e', 'J=3D14', '=
+-e', 'DEBUG=3D', '-e', 'SHOW_ENV=3D1', '-e', 'CCACHE_DIR=3D/var/tmp/ccache'=
+, '-v', '/home/patchew/.cache/qemu-docker-ccache:/var/tmp/ccache:z', '-v', =
+'/var/tmp/patchew-tester-tmp-wg70rgpu/src/docker-src.2019-11-20-01.02.57.12=
+412:/var/tmp/qemu:z,ro', 'qemu:centos7', '/var/tmp/qemu/run', 'test-quick']=
+' returned non-zero exit status 2.
+> > filter=3D--filter=3Dlabel=3Dcom.qemu.instance.uuid=3Dc863e15882a747a88c=
+290575505cc1de
+> > make[1]: *** [docker-run] Error 1
+> > make[1]: Leaving directory `/var/tmp/patchew-tester-tmp-wg70rgpu/src'
+> > make: *** [docker-run-test-quick@centos7] Error 2
+> >=20
+> > real    9m13.236s
+> > user    0m8.131s
+> >=20
+> >=20
+> > The full log is available at
+> > http://patchew.org/logs/20191120005003.27035-1-mdroth@linux.vnet.ibm.co=
+m/testing.docker-quick@centos7/?type=3Dmessage.
+> > ---
+> > Email generated automatically by Patchew [https://patchew.org/].
+> > Please send your feedback to patchew-devel@redhat.com
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
