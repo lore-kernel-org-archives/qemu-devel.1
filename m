@@ -2,82 +2,84 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF7DBC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F124C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:43:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 779DC22429
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:43:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28A3D206EC
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 10:43:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FI9+yDZv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 779DC22429
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mfrIgbyK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28A3D206EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXNRy-0000jq-Ie
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 05:43:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58748)
+	id 1iXNSj-0001ij-C6
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 05:43:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58566)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iXNQH-0007XT-LN
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:41:22 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iXNPq-0006uz-7w
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:40:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iXNQG-0008RO-7q
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:41:21 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:47070
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iXNQG-0008QC-2x
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:41:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574246479;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=FnkbYX6g2LRanVgSQjVwjlcwp9f2PUUS0iWHhK22b4c=;
- b=FI9+yDZvkUUhnEkNkDojfrkunnxCyWrJQ/Ndk0fRY+sWdYQvq0fBn1lCrwrvsU1wYuBWLI
- ZMZsoOj8saMC+ogDuWrwtBuxXRPrSkNnRq+0PBhUYvmwk/SD7FolMnylRmY6/0GXTfKyJ9
- xE0/DFLP+1iGh4l7zDwQwqN+bt7I5SM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-222-YDCPFCg1OkChKo6VnUH2eQ-1; Wed, 20 Nov 2019 05:41:17 -0500
-X-MC-Unique: YDCPFCg1OkChKo6VnUH2eQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2F14801E74;
- Wed, 20 Nov 2019 10:41:15 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.151])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1C0F55F79D;
- Wed, 20 Nov 2019 10:41:12 +0000 (UTC)
-Date: Wed, 20 Nov 2019 10:41:11 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PULL for-4.2-rc2 0/2] Tracing patches
-Message-ID: <20191120104111.GA242924@stefanha-x1.localdomain>
-References: <20191119204551.240792-1-stefanha@redhat.com>
- <CAL1e-=ibQBWUzUZvsvSWCZ5SwFk5T+b2P94D068W8G_taWVASg@mail.gmail.com>
- <CAL1e-=iEN9GEGDzEvoYM9q477Le4rs-mQZEgxOdzr51ZxLJd0w@mail.gmail.com>
- <02d25aa5-d913-947d-3ccd-5057bc516fd2@redhat.com>
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iXNPo-0007pA-VR
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 05:40:54 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:39866)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iXNPo-0007nc-Pb; Wed, 20 Nov 2019 05:40:52 -0500
+Received: by mail-wr1-x441.google.com with SMTP id l7so27518953wrp.6;
+ Wed, 20 Nov 2019 02:40:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=jdVziSE2yJjgCmCoewk2esye2yNz3gG8mZIZe2t2++c=;
+ b=mfrIgbyK4rbIUtPKay5Tin7JAuHtVCEqdCxVenQN0h7k+Cml1PEFh2QITOun1aLBsj
+ e3P81MqtqZN5Od9lxw6FaNDx2p1yvhBU7baVGs3aJvluAtMEjJmCFqcmgt8+/MZvFbgC
+ z8JeMSnrYgK5gM8Zco9m6koU7v/UmfD4xJidWJ4z29qNitB6NFi0hwqNObPN/iFPFoPI
+ JvyICNy/9tNBs8ZQH7CMYPvA3ldchA+vX5sl5OcSIg/y1pGXvnWxrxowKZ+tSiLgQumT
+ H9ZLxHqnoJA9FDvw2NkPX1DPxJfTUI/cE9o6s+7kmRXSzxw90p8ufrwUDo5U/hNFxVVo
+ vUJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=jdVziSE2yJjgCmCoewk2esye2yNz3gG8mZIZe2t2++c=;
+ b=KKtDBKSJirVPbZJQsv0jgddNk7EuGFzYwD1RpCB9z+QUS5/fNaM8GcrhCyyJieNh2U
+ 4/c2X6tKUa8TROfQvVkBN3lxPaPqo60amU8BMCVPgU9w8vhTDe3Tp16vC1s0lh56gq9Q
+ jG2nOFdWdjsxFEVRpmnkqcO6DzC3L/kuEh6qAax/hOd5InSNiHkMDBD+6oHkrSLYs83R
+ cQ5rAFoqwP2TNoSR+BxDdIkDW7T6M0kHZjJ9UF2vxcyz8h7hoEjVy+EmiJ3S1tzmS51v
+ hMnk7aBWQTW07VAEbLKi5aHlDXo80kU2iwpJCr0jXkc1lJYsUcWBx4oyMMatWlci1oeD
+ 8Yjw==
+X-Gm-Message-State: APjAAAVWhI/7NKSA66457zYNKR7NxRcZtZrlV9/K6sOeZ/l3vPsbH8S0
+ LOwp9Sb75Zq/z73bOkDqU9nY0E5RUqroIBPb8Zg=
+X-Google-Smtp-Source: APXvYqzgxeysE6GY0J92IRNkC4vvC7PpCDVc0/dGJc/tC1l/4f8KwRmblhSiqHYZrH6HGtbSDGhYoM/gm9JbK0g9GX0=
+X-Received: by 2002:a5d:6cc3:: with SMTP id c3mr2367608wrc.202.1574246450708; 
+ Wed, 20 Nov 2019 02:40:50 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <02d25aa5-d913-947d-3ccd-5057bc516fd2@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="liOOAslEiF7prFVr"
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
+ <20191023173154.30051-14-marcandre.lureau@redhat.com>
+ <CAFEAcA9Cq_MkAzqAjt5uPNu3HDUfxO0hyVWtqEiAashPEEq3=g@mail.gmail.com>
+ <CAMxuvawroZ0jrQTJCbakft21Lgk2cHrE9VyihiUvYBVp+AXgXw@mail.gmail.com>
+ <CAFEAcA97LxS0LhCN-uqmO++D2U3dXBn3KctW7n-4tA-b50xKcw@mail.gmail.com>
+In-Reply-To: <CAFEAcA97LxS0LhCN-uqmO++D2U3dXBn3KctW7n-4tA-b50xKcw@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 20 Nov 2019 14:40:37 +0400
+Message-ID: <CAJ+F1CJGHeb2aT+8t7vEdB0bKZ8r6OAnnqpDdnkGbfDRcV=JjA@mail.gmail.com>
+Subject: Re: [PATCH v3 13/33] serial: start making SerialMM a sysbus device
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,110 +91,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "open list:bochs" <qemu-block@nongnu.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+Cc: Corey Minyard <cminyard@mvista.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, Magnus Damm <magnus.damm@gmail.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Fabien Chouteau <chouteau@adacore.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
  Aurelien Jarno <aurelien@aurel32.net>,
  Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Paul Burton <pburton@wavecomp.com>, Artyom Tarasenko <atar4qemu@gmail.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---liOOAslEiF7prFVr
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi
 
-On Wed, Nov 20, 2019 at 10:33:35AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> On 11/19/19 10:35 PM, Aleksandar Markovic wrote:
-> > On Tue, Nov 19, 2019 at 10:14 PM Aleksandar Markovic
-> > <aleksandar.m.mail@gmail.com> wrote:
-> > >=20
-> > > On Tue, Nov 19, 2019 at 9:46 PM Stefan Hajnoczi <stefanha@redhat.com>=
- wrote:
-> > > >=20
-> > > > The following changes since commit f086f22d6c068ba151b0f6e81e75a64f=
-130df712:
-> > > >=20
-> > > >    Merge remote-tracking branch 'remotes/awilliam/tags/vfio-fixes-2=
-0191118.0' into staging (2019-11-18 21:35:48 +0000)
-> > > >=20
-> > > > are available in the Git repository at:
-> > > >=20
-> > > >    https://github.com/stefanha/qemu.git tags/tracing-pull-request
-> > > >=20
-> > > > for you to fetch changes up to 6b904f1a528a6d8c21f7fbdeab13b9603d1b=
-6df7:
-> > > >=20
-> > > >    hw/mips/gt64xxx: Remove dynamic field width from trace events (2=
-019-11-19 16:17:05 +0000)
-> > > >=20
-> > > > ----------------------------------------------------------------
-> > > > Pull request
-> > > >=20
-> > > > Tracing fixes for MIPS.
-> > > >=20
-> > > > ----------------------------------------------------------------
-> > > >=20
-> > >=20
-> > > Hello, Stefan, Philippe, Peter.
-> > >=20
-> > > This appears to be a duplicate of the pull request sent today by Phil=
-ippe
-> > > (and already applied by Peter just hours ago):
-> > >=20
-> > > https://lists.gnu.org/archive/html/qemu-devel/2019-11/msg02894.html
-> > >=20
-> > > The patches from the two pull requests appear to be identical, except
-> > > some minor details in commit messages: Stefan's versions contain
-> > > "Message-Id:" identifiers, while Philippe's don't (my suggestion to
-> > > Philippe is to include "Message-Id:" for all patches that are part of=
- any
-> > > pull request in future; this can be achieved effortlessly/automatical=
-ly
-> > > by applying patches using patchwork).
-> > >=20
-> > > In summary, for this very situation, it looks to me we are all set, n=
-o need
-> > > for Peter to process this pull request.
-> > >=20
-> >=20
-> > And just another really friendly advice for Philippe: When you apply
-> > some patches or a series to your pull request, just inform others
-> > about that by replying to the patches or a series: "I applied XXX to
-> > my queue/pull request" - this helps avoiding duplicate efforts like
-> > it happened here. This is also reminder to me too, I didn't do it in
-> > all cases of my applying to my my pull requests, and I should have,
-> > but I will improve too.
->=20
-> You are totally correct, in a rush to get these patches merged before the
-> release candidate get tagged, I neglected to reply to my series and let
-> Stefan waste his time.
->=20
-> Stefan, I sincerely apologize and will make efforts so this won't happen
-> again.
+On Wed, Nov 20, 2019 at 2:36 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> On Wed, 20 Nov 2019 at 07:34, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@redhat.com> wrote:
+>
+> > > > +static void serial_mm_instance_init(Object *o)
+> > > > +{
+> > > > +    SerialMM *self =3D SERIAL_MM(o);
+> > >
+> > > 'self' is not idiomatic for the name of the variable containing
+> > > the pointer to the object in QOM code ("git grep '\Wself\W' hw"
+> > > shows no uses of it at all, which is quite unusual for us --
+> > > usually the codebase has at least a few uses of any non-standard
+> > > way of writing something ;-))
+> > >
+> > > Usually we use something approximating to the abbreviation
+> > > of the type name, so here 'smm' would do.
+> >
+> > I would prefer something more straightforward than having to come up
+> > with various name mangling.
+> >
+> > Imho, we loose some readability, consistency & semantic by not naming
+> > the object argument of the method "self"
+>
+> There are two problems here:
+>  (1) "self" gives no hint at all about whether it's the Object*,
+> the DeviceState*, or the SerialMM*. All of those are the
+> object the method is operating on, but the type differences matter.
 
-No problem, I just wanted to make sure we don't miss these patches.
+"self" should have the type of the object that is being implemented.
 
-Stefan
+serial_mm_instance_init ->  SerialMM *self
 
---liOOAslEiF7prFVr
-Content-Type: application/pgp-signature; name="signature.asc"
+>
+> (2) *Absolutely nobody anywhere else in any other device model
+> is using the 'self' argument name*. It's not a convention if
+> only this one file is using it, and adopting it here gives us
+> absolutely no consistency -- exactly the opposite.
 
------BEGIN PGP SIGNATURE-----
+Since there is no clear convention, then adding "self" isn't breaking
+any convention.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3VGEcACgkQnKSrs4Gr
-c8i+3Qf+KCw2rx3z9jXf18TS/Md2IfXyWT4SZpZGabtaeBF/AF8FYhFLskcaGBqg
-a5+sdzPBNMLAwASr+hP26z6N37mQCIXMHpsR7DqoDWb0METnCmVbE+YGqkPxdPd+
-Unl2EHghdro7WQbWBqmiOKWduvsZziRBY5fvoDIyzSO1yiFpWi7TyKfzifw7SDjz
-e0+ylncFjpLgdS38Kfr53farbVWGL0+Dbzc0bvxAOr9kACywgEa1Ltl10QvRoNgV
-9sy6oX4Ro5l0sR4so2ZOOvpxkOffVcdW8g/+Uaq6IDz2dEttd1N/P5oRYxiQBIsh
-SvOKDK187u1bIK0RGwuuu9igHyUNIQ==
-=dhne
------END PGP SIGNATURE-----
+>
+> Item (1) is part of why we do things the way we do; item (2)
+> is why we should not make the 16550 UART some weird
+> exception from the way we do things.
 
---liOOAslEiF7prFVr--
+It's about trying to make things better, and not about staying in the
+current undefined/free zone.
 
+--=20
+Marc-Andr=C3=A9 Lureau
 
