@@ -2,93 +2,94 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLACK,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8189BC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 00:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C81AC432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 00:53:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E29D2245F
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 00:43:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aatNqWaL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E29D2245F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTPS id 08F14222DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 00:53:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08F14222DF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXE66-0006Qw-Ei
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 19:43:54 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42055)
+	id 1iXEFK-0000c9-50
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 19:53:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45865)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <gurchetansingh@chromium.org>) id 1iXE5L-0005xp-IG
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:43:09 -0500
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iXEES-0000Cu-60
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:52:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <gurchetansingh@chromium.org>) id 1iXE5K-0001Sx-0U
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:43:07 -0500
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:41417)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <gurchetansingh@chromium.org>)
- id 1iXE5J-0001RK-M0
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:43:05 -0500
-Received: by mail-lf1-x142.google.com with SMTP id j14so18665322lfb.8
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 16:43:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=chromium.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=SuCiKSsIRDKTbEIrlKuHNFUxZMf3N0BWgvOBBoTFOxg=;
- b=aatNqWaL0QyzhfFvsyJVZNwE0B3j5uWP4gtCcj8hIO+DL3zX4s+xOfl1Pb2PHnepNb
- YAAhjnh9lsk5gVv4jY4LAKfHk5UEtn+Aqq76ly7inUWooSmlMUp4o+Ozp+DPyrFCXoad
- R2JSfxtSpuaY4HTG9QFIXSei5hjZJA573tT6E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=SuCiKSsIRDKTbEIrlKuHNFUxZMf3N0BWgvOBBoTFOxg=;
- b=GqIngBdf0mdDBiiQFwNmGpaPApdetsiq/JDHD6TApvDwJBFP0/zkdA3+KrdtqBpD8z
- okQ/60iSbOt15ImYmsGWhUHdqbRdf2BBXFRSd32uBKX2wnJzguGPxTlGm3QNOLLzsqau
- XnIjyK0cMVODKT2C+eRQyVr+kjkdj9nOsgBX2xxvki8Op+iGyUJh1ER6svJHI6QI+ENj
- /Lu9bMknldgGOI46/mDLTudz0MITyU9tzQSLdcVgHRvk/8mqNWZEBajbJI2vNTn6/qqU
- VmQjeqR7/IAiEaGYMHunwvS6UWn9ESq+/gQxYJM5Y7GcfpxVTqjiVIXcx93wHCZhd9N6
- qmqg==
-X-Gm-Message-State: APjAAAU1yuNl5RH7TlDgVKmpxFFvK36Ysm2qRRwz4vLc7tm6NZWjqt9c
- uTCJZhgvW254gFaSoHLYq5tKFYdStPQ=
-X-Google-Smtp-Source: APXvYqx2OnJbLsfHKMAW3bBDU+lmBfVEVdifisO/kL5dhxCDeePrabP+iMp4JJuTMCFzjlO6cJOb4w==
-X-Received: by 2002:a19:84d:: with SMTP id 74mr326424lfi.122.1574210583600;
- Tue, 19 Nov 2019 16:43:03 -0800 (PST)
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com.
- [209.85.208.181])
- by smtp.gmail.com with ESMTPSA id q24sm10470424ljm.76.2019.11.19.16.43.02
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 19 Nov 2019 16:43:02 -0800 (PST)
-Received: by mail-lj1-f181.google.com with SMTP id v8so25499078ljh.5
- for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 16:43:02 -0800 (PST)
-X-Received: by 2002:a2e:2e03:: with SMTP id u3mr209839lju.115.1574210581666;
- Tue, 19 Nov 2019 16:43:01 -0800 (PST)
-MIME-Version: 1.0
-References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
- <20191106084344.GB189998@stefanha-x1.localdomain>
- <CAD=HUj41r8wHZ2-By8tLftkoqC5r_Bw=pr=zX2aZ7GTs1ESWhg@mail.gmail.com>
- <c8a6b6f35664ce036c2a48ec41eab97b0f40704d.camel@linux.intel.com>
- <CAAfnVBkMWurTpseQFjcna5kk3__40n6M68=RTHLbQsu__2AFxg@mail.gmail.com>
- <4a5dd822e86757f004d04af62fb7dd35ba75392d.camel@linux.intel.com>
- <CAAfnVB=F+HeQrrn23c=rZeOa5BfHo=9ArcG--gLf87gqBXfZ9A@mail.gmail.com>
- <bee3aae13f6cf69ee909aa9884926853d6123b25.camel@linux.intel.com>
-In-Reply-To: <bee3aae13f6cf69ee909aa9884926853d6123b25.camel@linux.intel.com>
-From: Gurchetan Singh <gurchetansingh@chromium.org>
-Date: Tue, 19 Nov 2019 16:42:49 -0800
-X-Gmail-Original-Message-ID: <CAAfnVBmcBWWpvTAijg8AY-6RoKGJ84AS_qo2WqF6sgLHVsHJsw@mail.gmail.com>
-Message-ID: <CAAfnVBmcBWWpvTAijg8AY-6RoKGJ84AS_qo2WqF6sgLHVsHJsw@mail.gmail.com>
-Subject: Re: [virtio-dev] Re: guest / host buffer sharing ...
-To: Liam Girdwood <liam.r.girdwood@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::142
+ (envelope-from <mdroth@linux.vnet.ibm.com>) id 1iXEEP-0000u0-U1
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:52:31 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:9224
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+ id 1iXEEP-0000t2-Od
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 19:52:29 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAK0qJYl024080; Tue, 19 Nov 2019 19:52:22 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2way22af24-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 19 Nov 2019 19:52:21 -0500
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xAK0qLWr025309;
+ Tue, 19 Nov 2019 19:52:21 -0500
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 2way22aeyv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 19 Nov 2019 19:52:21 -0500
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xAK0oViR020157;
+ Wed, 20 Nov 2019 00:52:15 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com
+ (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+ by ppma02dal.us.ibm.com with ESMTP id 2wa8r6garb-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 20 Nov 2019 00:52:15 +0000
+Received: from b03ledav001.gho.boulder.ibm.com
+ (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+ by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAK0qEpo53543286
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 20 Nov 2019 00:52:14 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 240466E052;
+ Wed, 20 Nov 2019 00:52:14 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 026E86E04E;
+ Wed, 20 Nov 2019 00:52:13 +0000 (GMT)
+Received: from localhost (unknown [9.53.179.218])
+ by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Wed, 20 Nov 2019 00:52:13 +0000 (GMT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] virtio-pci: disable vring processing when bus-mastering is
+ disabled
+Date: Tue, 19 Nov 2019 18:50:03 -0600
+Message-Id: <20191120005003.27035-1-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-19_08:2019-11-15,2019-11-19 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=999
+ malwarescore=0 bulkscore=0 suspectscore=13 spamscore=0 adultscore=0
+ clxscore=1015 mlxscore=0 priorityscore=1501 impostorscore=0 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911200007
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -100,199 +101,341 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
- Alex Lau <alexlau@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
- Alexandre Courbot <acourbot@chromium.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
- Tomasz Figa <tfiga@chromium.org>, Keiichi Watanabe <keiichiw@chromium.org>,
- David Stevens <stevensd@chromium.org>, Hans Verkuil <hverkuil@xs4all.nl>,
- =?UTF-8?Q?St=C3=A9phane_Marchesin?= <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>,
- Dmitry Morozov <dmitry.morozov@opensynergy.com>,
- Pawel Osciak <posciak@chromium.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, "Michael S. Tsirkin" <mst@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 19, 2019 at 7:31 AM Liam Girdwood
-<liam.r.girdwood@linux.intel.com> wrote:
->
-> On Tue, 2019-11-12 at 14:55 -0800, Gurchetan Singh wrote:
-> > On Tue, Nov 12, 2019 at 5:56 AM Liam Girdwood
-> > <liam.r.girdwood@linux.intel.com> wrote:
-> > >
-> > > On Mon, 2019-11-11 at 16:54 -0800, Gurchetan Singh wrote:
-> > > > On Tue, Nov 5, 2019 at 2:55 AM Gerd Hoffmann <kraxel@redhat.com>
-> > > > wrote:
-> > > > > Each buffer also has some properties to carry metadata, some
-> > > > > fixed
-> > > > > (id, size, application), but
-> > > > > also allow free form (name = value, framebuffers would have
-> > > > > width/height/stride/format for example).
-> > > >
-> > > > Sounds a lot like the recently added DMA_BUF_SET_NAME ioctls:
-> > > >
-> > > > https://patchwork.freedesktop.org/patch/310349/
-> > > >
-> > > > For virtio-wayland + virtio-vdec, the problem is sharing -- not
-> > > > allocation.
-> > > >
-> > >
-> > > Audio also needs to share buffers with firmware running on DSPs.
-> > >
-> > > > As the buffer reaches a kernel boundary, it's properties devolve
-> > > > into
-> > > > [fd, size].  Userspace can typically handle sharing
-> > > > metadata.  The
-> > > > issue is the guest dma-buf fd doesn't mean anything on the host.
-> > > >
-> > > > One scenario could be:
-> > > >
-> > > > 1) Guest userspace (say, gralloc) allocates using virtio-
-> > > > gpu.  When
-> > > > allocating, we call uuidgen() and then pass that via
-> > > > RESOURCE_CREATE
-> > > > hypercall to the host.
-> > > > 2) When exporting the dma-buf, we call DMA_BUF_SET_NAME (the
-> > > > buffer
-> > > > name will be "virtgpu-buffer-${UUID}").
-> > > > 3) When importing, virtio-{vdec, video} reads the dma-buf name in
-> > > > userspace, and calls fd to handle.  The name is sent to the host
-> > > > via
-> > > > a
-> > > > hypercall, giving host virtio-{vdec, video} enough information to
-> > > > identify the buffer.
-> > > >
-> > > > This solution is entirely userspace -- we can probably come up
-> > > > with
-> > > > something in kernel space [generate_random_uuid()] if need
-> > > > be.  We
-> > > > only need two universal IDs: {device ID, buffer ID}.
-> > > >
-> > >
-> > > I need something where I can take a guest buffer and then convert
-> > > it to
-> > > physical scatter gather page list. I can then either pass the SG
-> > > page
-> > > list to the DSP firmware (for DMAC IP programming) or have the host
-> > > driver program the DMAC directly using the page list (who programs
-> > > DMAC
-> > > depends on DSP architecture).
-> >
-> > So you need the HW address space from a guest allocation?
->
-> Yes.
->
-> >  Would your
-> > allocation hypercalls use something like the virtio_gpu_mem_entry
-> > (virtio_gpu.h) and the draft virtio_video_mem_entry (draft)?
->
-> IIUC, this looks like generic SG buffer allocation ?
->
-> >
-> > struct {
-> >         __le64 addr;
-> >         __le32 length;
-> >         __le32 padding;
-> > };
-> >
-> > /* VIRTIO_GPU_CMD_RESOURCE_ATTACH_BACKING */
-> > struct virtio_gpu_resource_attach_backing {
-> >         struct virtio_gpu_ctrl_hdr hdr;
-> >         __le32 resource_id;
-> >         __le32 nr_entries;
-> >       *struct struct virtio_gpu_mem_entry */
-> > };
-> >
-> > struct virtio_video_mem_entry {
-> >     __le64 addr;
-> >     __le32 length;
-> >     __u8 padding[4];
-> > };
-> >
-> > struct virtio_video_resource_attach_backing {
-> >     struct virtio_video_ctrl_hdr hdr;
-> >     __le32 resource_id;
-> >     __le32 nr_entries;
-> > };
-> >
-> > >
-> > > DSP FW has no access to userspace so we would need some additional
-> > > API
-> > > on top of DMA_BUF_SET_NAME etc to get physical hardware pages ?
-> >
-> > The dma-buf api currently can share guest memory sg-lists.
->
-> Ok, IIUC buffers can either be shared using the GPU proposed APIs
-> (above) or using the dma-buf API to share via userspace ?
+Currently the SLOF firmware for pseries guests will disable/re-enable
+a PCI device multiple times via IO/MEM/MASTER bits of PCI_COMMAND
+register after the initial probe/feature negotiation, as it tends to
+work with a single device at a time at various stages like probing
+and running block/network bootloaders without doing a full reset
+in-between.
 
-If we restrict ourselves to guest-sg lists only, then the current
-dma-buf API is sufficient to share buffers.  From example, virtio-gpu
-can allocate with the following hypercall (as it does now):
+In QEMU, when PCI_COMMAND_MASTER is disabled we disable the
+corresponding IOMMU memory region, so DMA accesses (including to vring
+fields like idx/flags) will no longer undergo the necessary
+translation. Normally we wouldn't expect this to happen since it would
+be misbehavior on the driver side to continue driving DMA requests.
 
-struct virtio_gpu_resource_attach_backing {
-         struct virtio_gpu_ctrl_hdr hdr;
-         __le32 resource_id;
-         __le32 nr_entries;
-       *struct struct virtio_gpu_mem_entry */
-};
+However, in the case of pseries, with iommu_platform=on, we trigger the
+following sequence when tearing down the virtio-blk dataplane ioeventfd
+in response to the guest unsetting PCI_COMMAND_MASTER:
 
-Then in the guest kernel, virtio-{video, snd} can get the sg-list via
-dma_buf_map_attachment, and then have a hypercall of it's own:
+  #2  0x0000555555922651 in virtqueue_map_desc (vdev=vdev@entry=0x555556dbcfb0, p_num_sg=p_num_sg@entry=0x7fffe657e1a8, addr=addr@entry=0x7fffe657e240, iov=iov@entry=0x7fffe6580240, max_num_sg=max_num_sg@entry=1024, is_write=is_write@entry=false, pa=0, sz=0)
+      at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:757
+  #3  0x0000555555922a89 in virtqueue_pop (vq=vq@entry=0x555556dc8660, sz=sz@entry=184)
+      at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:950
+  #4  0x00005555558d3eca in virtio_blk_get_request (vq=0x555556dc8660, s=0x555556dbcfb0)
+      at /home/mdroth/w/qemu.git/hw/block/virtio-blk.c:255
+  #5  0x00005555558d3eca in virtio_blk_handle_vq (s=0x555556dbcfb0, vq=0x555556dc8660)
+      at /home/mdroth/w/qemu.git/hw/block/virtio-blk.c:776
+  #6  0x000055555591dd66 in virtio_queue_notify_aio_vq (vq=vq@entry=0x555556dc8660)
+      at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:1550
+  #7  0x000055555591ecef in virtio_queue_notify_aio_vq (vq=0x555556dc8660)
+      at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:1546
+  #8  0x000055555591ecef in virtio_queue_host_notifier_aio_poll (opaque=0x555556dc86c8)
+      at /home/mdroth/w/qemu.git/hw/virtio/virtio.c:2527
+  #9  0x0000555555d02164 in run_poll_handlers_once (ctx=ctx@entry=0x55555688bfc0, timeout=timeout@entry=0x7fffe65844a8)
+      at /home/mdroth/w/qemu.git/util/aio-posix.c:520
+  #10 0x0000555555d02d1b in try_poll_mode (timeout=0x7fffe65844a8, ctx=0x55555688bfc0)
+      at /home/mdroth/w/qemu.git/util/aio-posix.c:607
+  #11 0x0000555555d02d1b in aio_poll (ctx=ctx@entry=0x55555688bfc0, blocking=blocking@entry=true)
+      at /home/mdroth/w/qemu.git/util/aio-posix.c:639
+  #12 0x0000555555d0004d in aio_wait_bh_oneshot (ctx=0x55555688bfc0, cb=cb@entry=0x5555558d5130 <virtio_blk_data_plane_stop_bh>, opaque=opaque@entry=0x555556de86f0)
+      at /home/mdroth/w/qemu.git/util/aio-wait.c:71
+  #13 0x00005555558d59bf in virtio_blk_data_plane_stop (vdev=<optimized out>)
+      at /home/mdroth/w/qemu.git/hw/block/dataplane/virtio-blk.c:288
+  #14 0x0000555555b906a1 in virtio_bus_stop_ioeventfd (bus=bus@entry=0x555556dbcf38)
+      at /home/mdroth/w/qemu.git/hw/virtio/virtio-bus.c:245
+  #15 0x0000555555b90dbb in virtio_bus_stop_ioeventfd (bus=bus@entry=0x555556dbcf38)
+      at /home/mdroth/w/qemu.git/hw/virtio/virtio-bus.c:237
+  #16 0x0000555555b92a8e in virtio_pci_stop_ioeventfd (proxy=0x555556db4e40)
+      at /home/mdroth/w/qemu.git/hw/virtio/virtio-pci.c:292
+  #17 0x0000555555b92a8e in virtio_write_config (pci_dev=0x555556db4e40, address=<optimized out>, val=1048832, len=<optimized out>)
+      at /home/mdroth/w/qemu.git/hw/virtio/virtio-pci.c:613
 
-struct virtio_video_resource_import {
-         struct virtio_video_ctrl_hdr hdr;
-         __le32 video_resource_id;
-         __le32 nr_entries;
-       *struct struct virtio_gpu_mem_entry */
-};
+I.e. the calling code is only scheduling a one-shot BH for
+virtio_blk_data_plane_stop_bh, but somehow we end up trying to process
+an additional virtqueue entry before we get there. This is likely due
+to the following check in virtio_queue_host_notifier_aio_poll:
 
-Then it can create dmabuf on the host or get the HW address from the SG list.
+  static bool virtio_queue_host_notifier_aio_poll(void *opaque)
+  {
+      EventNotifier *n = opaque;
+      VirtQueue *vq = container_of(n, VirtQueue, host_notifier);
+      bool progress;
 
-The complications come in from sharing host allocated buffers ... for
-that we may need a method to translate from guest fds to universal
-"virtualized" resource IDs.  I've heard talk about the need to
-translate from guest fence fds to host fence fds as well.
+      if (!vq->vring.desc || virtio_queue_empty(vq)) {
+          return false;
+      }
 
-> My preference
-> would be to use teh more direct GPU APIs sending physical page
-> addresses from Guest to device driver. I guess this is your use case
-> too ?
+      progress = virtio_queue_notify_aio_vq(vq);
 
-For my use case, guest memory is sufficient, especially given the
-direction towards modifiers + system memory.  For closed source
-drivers, we may need to directly map host buffers.  However, that use
-case is restricted to virtio-gpu and won't work with other virtio
-devices.
+namely the call to virtio_queue_empty(). In this case, since no new
+requests have actually been issued, shadow_avail_idx == last_avail_idx,
+so we actually try to access the vring via vring_avail_idx() to get
+the latest non-shadowed idx:
 
+  int virtio_queue_empty(VirtQueue *vq)
+  {
+      bool empty;
+      ...
 
->
-> Thanks
->
-> Liam
->
-> >
-> > >
-> > > Liam
-> > >
-> > >
-> > >
-> > > -----------------------------------------------------------------
-> > > ----
-> > > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> > > For additional commands, e-mail:
-> > > virtio-dev-help@lists.oasis-open.org
-> > >
-> >
-> > ---------------------------------------------------------------------
-> > To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> > For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
-> >
->
->
-> ---------------------------------------------------------------------
-> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
-> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
->
+      if (vq->shadow_avail_idx != vq->last_avail_idx) {
+          return 0;
+      }
+
+      rcu_read_lock();
+      empty = vring_avail_idx(vq) == vq->last_avail_idx;
+      rcu_read_unlock();
+      return empty;
+
+but since the IOMMU region has been disabled we get a bogus value (0
+usually), which causes virtio_queue_empty() to falsely report that
+there are entries to be processed, which causes errors such as:
+
+  "virtio: zero sized buffers are not allowed"
+
+or
+
+  "virtio-blk missing headers"
+
+and puts the device in an error state.
+
+This patch works around the issue by introducing virtio_set_disabled(),
+which sets a 'disabled' flag to bypass checks like virtio_queue_empty()
+when bus-mastering is disabled. Since we'd check this flag at all the
+same sites as vdev->broken, we replace those checks with an inline
+function which checks for either vdev->broken or vdev->disabled.
+
+The 'disabled' flag is only migrated when set, which should be fairly
+rare, but to maintain migration compatibility we disable it's use for
+older machine types. Users requiring the use of the flag in conjunction
+with older machine types can set it explicitly as a virtio-device
+option.
+
+NOTES:
+
+ - This leaves some other oddities in play, like the fact that
+   DRIVER_OK also gets unset in response to bus-mastering being
+   disabled, but not restored (however the device seems to continue
+   working)
+ - Similarly, we disable the host notifier via
+   virtio_bus_stop_ioeventfd(), which seems to move the handling out
+   of virtio-blk dataplane and back into the main IO thread, and it
+   ends up staying there till a reset (but otherwise continues working
+   normally)
+
+Cc: David Gibson <david@gibson.dropbear.id.au>,
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+v2:
+ - add migration support and only default to using 'disabled' flag
+   for newer machines via virtio-device compat option (MST)
+ - use inline functions to decouple checks from specific fields (MST)
+ - rebased on master
+---
+ hw/core/machine.c          |  1 +
+ hw/virtio/virtio-pci.c     | 12 ++++++++----
+ hw/virtio/virtio.c         | 35 ++++++++++++++++++++++++++++-------
+ include/hw/virtio/virtio.h | 15 +++++++++++++++
+ 4 files changed, 52 insertions(+), 11 deletions(-)
+
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 1689ad3bf8..9f3073b23b 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -29,6 +29,7 @@
+ 
+ GlobalProperty hw_compat_4_1[] = {
+     { "virtio-pci", "x-pcie-flr-init", "off" },
++    { "virtio-device", "use-disabled-flag", "false" },
+ };
+ const size_t hw_compat_4_1_len = G_N_ELEMENTS(hw_compat_4_1);
+ 
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index c6b47a9c73..394d409fb9 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -608,10 +608,14 @@ static void virtio_write_config(PCIDevice *pci_dev, uint32_t address,
+         pcie_cap_flr_write_config(pci_dev, address, val, len);
+     }
+ 
+-    if (range_covers_byte(address, len, PCI_COMMAND) &&
+-        !(pci_dev->config[PCI_COMMAND] & PCI_COMMAND_MASTER)) {
+-        virtio_pci_stop_ioeventfd(proxy);
+-        virtio_set_status(vdev, vdev->status & ~VIRTIO_CONFIG_S_DRIVER_OK);
++    if (range_covers_byte(address, len, PCI_COMMAND)) {
++        if (!(pci_dev->config[PCI_COMMAND] & PCI_COMMAND_MASTER)) {
++            virtio_set_disabled(vdev, true);
++            virtio_pci_stop_ioeventfd(proxy);
++            virtio_set_status(vdev, vdev->status & ~VIRTIO_CONFIG_S_DRIVER_OK);
++        } else {
++            virtio_set_disabled(vdev, false);
++        }
+     }
+ 
+     if (proxy->config_cap &&
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index 04716b5f6c..3cb603a466 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -546,7 +546,7 @@ static inline bool is_desc_avail(uint16_t flags, bool wrap_counter)
+  * Called within rcu_read_lock().  */
+ static int virtio_queue_empty_rcu(VirtQueue *vq)
+ {
+-    if (unlikely(vq->vdev->broken)) {
++    if (virtio_device_disabled(vq->vdev)) {
+         return 1;
+     }
+ 
+@@ -565,7 +565,7 @@ static int virtio_queue_split_empty(VirtQueue *vq)
+ {
+     bool empty;
+ 
+-    if (unlikely(vq->vdev->broken)) {
++    if (virtio_device_disabled(vq->vdev)) {
+         return 1;
+     }
+ 
+@@ -783,7 +783,7 @@ void virtqueue_fill(VirtQueue *vq, const VirtQueueElement *elem,
+ 
+     virtqueue_unmap_sg(vq, elem, len);
+ 
+-    if (unlikely(vq->vdev->broken)) {
++    if (virtio_device_disabled(vq->vdev)) {
+         return;
+     }
+ 
+@@ -839,7 +839,7 @@ static void virtqueue_packed_flush(VirtQueue *vq, unsigned int count)
+ 
+ void virtqueue_flush(VirtQueue *vq, unsigned int count)
+ {
+-    if (unlikely(vq->vdev->broken)) {
++    if (virtio_device_disabled(vq->vdev)) {
+         vq->inuse -= count;
+         return;
+     }
+@@ -1602,7 +1602,7 @@ err_undo_map:
+ 
+ void *virtqueue_pop(VirtQueue *vq, size_t sz)
+ {
+-    if (unlikely(vq->vdev->broken)) {
++    if (virtio_device_disabled(vq->vdev)) {
+         return NULL;
+     }
+ 
+@@ -1698,7 +1698,7 @@ unsigned int virtqueue_drop_all(VirtQueue *vq)
+ {
+     struct VirtIODevice *vdev = vq->vdev;
+ 
+-    if (unlikely(vdev->broken)) {
++    if (virtio_device_disabled(vq->vdev)) {
+         return 0;
+     }
+ 
+@@ -1816,7 +1816,7 @@ static void virtio_notify_vector(VirtIODevice *vdev, uint16_t vector)
+     BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
+     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+ 
+-    if (unlikely(vdev->broken)) {
++    if (virtio_device_disabled(vdev)) {
+         return;
+     }
+ 
+@@ -1920,6 +1920,7 @@ void virtio_reset(void *opaque)
+     vdev->guest_features = 0;
+     vdev->queue_sel = 0;
+     vdev->status = 0;
++    vdev->disabled = false;
+     atomic_set(&vdev->isr, 0);
+     vdev->config_vector = VIRTIO_NO_VECTOR;
+     virtio_notify_vector(vdev, vdev->config_vector);
+@@ -2553,6 +2554,13 @@ static bool virtio_started_needed(void *opaque)
+     return vdev->started;
+ }
+ 
++static bool virtio_disabled_needed(void *opaque)
++{
++    VirtIODevice *vdev = opaque;
++
++    return vdev->disabled;
++}
++
+ static const VMStateDescription vmstate_virtqueue = {
+     .name = "virtqueue_state",
+     .version_id = 1,
+@@ -2718,6 +2726,17 @@ static const VMStateDescription vmstate_virtio_started = {
+     }
+ };
+ 
++static const VMStateDescription vmstate_virtio_disabled = {
++    .name = "virtio/disabled",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = &virtio_disabled_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_BOOL(disabled, VirtIODevice),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static const VMStateDescription vmstate_virtio = {
+     .name = "virtio",
+     .version_id = 1,
+@@ -2735,6 +2754,7 @@ static const VMStateDescription vmstate_virtio = {
+         &vmstate_virtio_extra_state,
+         &vmstate_virtio_started,
+         &vmstate_virtio_packed_virtqueues,
++        &vmstate_virtio_disabled,
+         NULL
+     }
+ };
+@@ -3569,6 +3589,7 @@ static void virtio_device_instance_finalize(Object *obj)
+ static Property virtio_properties[] = {
+     DEFINE_VIRTIO_COMMON_FEATURES(VirtIODevice, host_features),
+     DEFINE_PROP_BOOL("use-started", VirtIODevice, use_started, true),
++    DEFINE_PROP_BOOL("use-disabled-flag", VirtIODevice, use_disabled_flag, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index c32a815303..f23d2efbc0 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -100,6 +100,8 @@ struct VirtIODevice
+     uint16_t device_id;
+     bool vm_running;
+     bool broken; /* device in invalid state, needs reset */
++    bool use_disabled_flag; /* allow use of 'disable' flag when needed */
++    bool disabled; /* device in temporarily disabled state */
+     bool use_started;
+     bool started;
+     bool start_on_kick; /* when virtio 1.0 feature has not been negotiated */
+@@ -378,4 +380,17 @@ static inline void virtio_set_started(VirtIODevice *vdev, bool started)
+         vdev->started = started;
+     }
+ }
++
++static inline void virtio_set_disabled(VirtIODevice *vdev, bool disable)
++{
++    if (vdev->use_disabled_flag) {
++        vdev->disabled = disable;
++    }
++}
++
++static inline bool virtio_device_disabled(VirtIODevice *vdev)
++{
++    return unlikely(vdev->disabled || vdev->broken);
++}
++
+ #endif
+-- 
+2.17.1
+
 
