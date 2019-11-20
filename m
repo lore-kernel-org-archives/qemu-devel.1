@@ -2,90 +2,139 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05478C432C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:18:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3EC8C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:29:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C4B1922419
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:18:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7ED6021823
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:29:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XoVPB1Py"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4B1922419
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OmkSeVAI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ED6021823
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXO0f-0007zM-U6
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 06:18:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37972)
+	id 1iXOB6-0003b7-Fr
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 06:29:44 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40915)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <mlureau@redhat.com>) id 1iXNxA-00059j-2B
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:15:21 -0500
+ (envelope-from <lvivier@redhat.com>) id 1iXO9s-0002ZL-TF
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:28:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <mlureau@redhat.com>) id 1iXNx8-0004Op-06
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:15:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:50684
+ (envelope-from <lvivier@redhat.com>) id 1iXO9q-0000cs-IA
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:28:27 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:23829
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1iXNx7-0004MU-SE
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:15:17 -0500
+ (Exim 4.71) (envelope-from <lvivier@redhat.com>) id 1iXO9q-0000ao-75
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:28:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574248515;
+ s=mimecast20190719; t=1574249305;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=F8JScVDCxeFL0hAEAFur6V/NaAmZm80CZ0SXrq1ZfYI=;
- b=XoVPB1PyaeDjp8G88wkCZNWO38KWisuFYfw/G01moJH/wPE7kErXaL5KJdxvPqPAQtB7Bk
- eLdZNXdRJ+t5SdHJEMeERaTKqbKrhhomY2v6U+jGm6zG0qp1rMsP/ZkdUuAHao9XNQuaRO
- kQozs6fIj+aktJQa3qVBs+0Z7cVIUmQ=
-Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
- [209.85.167.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-lmQG4rqpMIa1gdVD-Owkzw-1; Wed, 20 Nov 2019 06:15:10 -0500
-Received: by mail-oi1-f197.google.com with SMTP id a193so12324947oib.11
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 03:15:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=F8JScVDCxeFL0hAEAFur6V/NaAmZm80CZ0SXrq1ZfYI=;
- b=lhPnhcpzAs5/Bd65IqsGHimXe18zvPQT0AkTYtRDGry9hgScspsszwM1advzf7nYAU
- xdFF/y6jIycOpP/Roc0n3KoogH0B5b/BIpCVpYi3oIkI1s8WWW08eQ4sEkR5l8Q6mgfj
- dBfrf0o9lxBMQQHS/+s8oa47C3EdPyyC648k3Ed3KyUfr9RVocmi1tZ0ECKjDltp0+PF
- ATnsjBiMJ2WhEhz4cFZrpyxTQUzxZzf5wD6tQ1/KaX4M5b9RI0NlYWL/LpXf0bn2srtb
- 2Hc0bt+77mTsrDYY9OD4CqK9faWPDtwOXnOtNpoDQvsvV4YHk/ShrrZkR2GVTceRJSah
- XJlA==
-X-Gm-Message-State: APjAAAU+8ReCBemvF2yAc+fnPnrh//GMfaYipxImzybPReRqDirUxREZ
- QFChghBjov6igr/usAu/lRkcJVRNzXGhGYukiQVS1sFw8kbljQokPJtndaAcAruUNPVt0WHUAER
- XfuIxV1UL/V3s/R9WUIEFP+JqW+8ehxU=
-X-Received: by 2002:aca:484e:: with SMTP id v75mr2347937oia.6.1574248509362;
- Wed, 20 Nov 2019 03:15:09 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyq+eNs4/9FDLOsDGkaJ/74CaHB69/rY8dxDHxJLwIPlOXOitqfn0uFP7HtgyOEkOstsOGuwrXCNDnSxMRa+ms=
-X-Received: by 2002:aca:484e:: with SMTP id v75mr2347895oia.6.1574248508897;
- Wed, 20 Nov 2019 03:15:08 -0800 (PST)
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=IKEkz3Hp5LQtebBAEHdxQ2uO23dpUj2SRFcYOXahYR4=;
+ b=OmkSeVAIvhdr+r9e183Zl4ka9dz5Z2y3YXQCBA1/uDuSEqnZ0bHpHPJ40P0oT5RkN6G0ol
+ DyoLLxBtA8U4lBT8bB8xAmZTB+7WHSLxKTgTy1AUGw81AXlZ2ebahRGDv4NfIEqHUj+XZY
+ bxgzbJ5iZHQNS5kjKDN6HpBk2Veesgw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-19-Fkw1T6VIPBOX6-q52qhM-w-1; Wed, 20 Nov 2019 06:28:23 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 539EC107ACC7;
+ Wed, 20 Nov 2019 11:28:22 +0000 (UTC)
+Received: from [10.36.116.216] (ovpn-116-216.ams2.redhat.com [10.36.116.216])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DEED7600C9;
+ Wed, 20 Nov 2019 11:28:19 +0000 (UTC)
+Subject: Re: [PATCH] spapr: Fix VSMT mode when it is not supported by the
+ kernel
+From: Laurent Vivier <lvivier@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>, Greg Kurz <groug@kaod.org>
+References: <20191108154035.12913-1-lvivier@redhat.com>
+ <20191108174759.2d4040f1@bahia.lan> <20191119010012.GI5582@umbus.fritz.box>
+ <caa35299-c928-a968-83b5-842d000f0242@redhat.com>
+ <20191119164526.0e980a37@bahia.lan> <20191120043653.GG5582@umbus.fritz.box>
+ <cb8f7dc7-d6db-6bd9-e825-1ade7d89cdd9@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
+ WoeuLWDmXE7A3oJoIsRecD6BXHTb0OYS20lS608anr3B0xn5g0BX7es9Mw+hV/pL+63EOCVm
+ SUVTEQwbGQN62guOKnJJJfphbbv82glIC/Ei4Ky8BwZkUuXd7d5NFJKC9/GDrbWdj75cDNQx
+ UZ9XXbXEKY9MHX83Uy7JFoiFDMOVHn55HnncflUncO0zDzY7CxFeQFwYRbsCXOUL9yBtqLer
+ Ky8/yjBskIlNrp0uQSt9LMoMsdSjYLYhvk1StsNPg74+s4u0Q6z45+l8RAsgLw5OLtTa+ePM
+ JyS7OIGNYxAX6eZk1+91a6tnqfyPcMbduxyBaYXn94HUG162BeuyBkbNoIDkB7pCByed1A7q
+ q9/FbuTDwgVGVLYthYSfTtN0Y60OgNkWCMtFwKxRaXt1WFA5ceqinN/XkgA+vf2Ch72zBkJL
+ RBIhfOPFv5f2Hkkj0MvsUXpOWaOjatiu0fpPo6Hw14UEpywke1zN4NKubApQOlNKZZC4hu6/
+ 8pv2t4HRi7s0K88jQYBRPObjrN5+owtI51xMaYzvPitHQ2053LmgsOdN9EKOqZeHAYG2SmRW
+ LOxYWKX14YkZI5j/TXfKlTpwSMvXho+efN4kgFvFmP6WT+tPnwARAQABtCNMYXVyZW50IFZp
+ dmllciA8bHZpdmllckByZWRoYXQuY29tPokCOAQTAQIAIgUCVgVQgAIbAwYLCQgHAwIGFQgC
+ CQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjwpgg//fSGy0Rs/t8cPFuzoY1cex4limJQfReLr
+ SJXCANg9NOWy/bFK5wunj+h/RCFxIFhZcyXveurkBwYikDPUrBoBRoOJY/BHK0iZo7/WQkur
+ 6H5losVZtrotmKOGnP/lJYZ3H6OWvXzdz8LL5hb3TvGOP68K8Bn8UsIaZJoeiKhaNR0sOJyI
+ YYbgFQPWMHfVwHD/U+/gqRhD7apVysxv5by/pKDln1I5v0cRRH6hd8M8oXgKhF2+rAOL7gvh
+ jEHSSWKUlMjC7YwwjSZmUkL+TQyE18e2XBk85X8Da3FznrLiHZFHQ/NzETYxRjnOzD7/kOVy
+ gKD/o7asyWQVU65mh/ECrtjfhtCBSYmIIVkopoLaVJ/kEbVJQegT2P6NgERC/31kmTF69vn8
+ uQyW11Hk8tyubicByL3/XVBrq4jZdJW3cePNJbTNaT0d/bjMg5zCWHbMErUib2Nellnbg6bc
+ 2HLDe0NLVPuRZhHUHM9hO/JNnHfvgiRQDh6loNOUnm9Iw2YiVgZNnT4soUehMZ7au8PwSl4I
+ KYE4ulJ8RRiydN7fES3IZWmOPlyskp1QMQBD/w16o+lEtY6HSFEzsK3o0vuBRBVp2WKnssVH
+ qeeV01ZHw0bvWKjxVNOksP98eJfWLfV9l9e7s6TaAeySKRRubtJ+21PRuYAxKsaueBfUE7ZT
+ 7ze0LUxhdXJlbnQgVml2aWVyIChSZWQgSGF0KSA8bHZpdmllckByZWRoYXQuY29tPokCOAQT
+ AQIAIgUCVgUmGQIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQ8ww4vT8vvjxtNBAA
+ o2xGmbXl9vJQALkj7MVlsMlgewQ1rdoZl+bZ6ythTSBsqwwtl1BUTQGA1GF2LAchRVYca5bJ
+ lw4ai5OdZ/rc5dco2XgrRFtj1np703BzNEhGU1EFxtms/Y9YOobq/GZpck5rK8jV4osEb8oc
+ 3xEgCm/xFwI/2DOe0/s2cHKzRkvdmKWEDhT1M+7UhtSCnloX776zCsrofYiHP2kasFyMa/5R
+ 9J1Rt9Ax/jEAX5vFJ8+NPf68497nBfrAtLM3Xp03YJSr/LDxer44Mevhz8dFw7IMRLhnuSfr
+ 8jP93lr6Wa8zOe3pGmFXZWpNdkV/L0HaeKwTyDKKdUDH4U7SBnE1gcDfe9x08G+oDfVhqED8
+ qStKCxPYxRUKIdUjGPF3f5oj7N56Q5zZaZkfxeLNTQ13LDt3wGbVHyZxzFc81B+qT8mkm74y
+ RbeVSuviPTYjbBQ66GsUgiZZpDUyJ6s54fWqQdJf4VFwd7M/mS8WEejbSjglGHMxMGiBeRik
+ Y0+ur5KAF7z0D1KfW1kHO9ImQ0FbEbMbTMf9u2+QOCrSWOz/rj23EwPrCQ2TSRI2fWakMJZ+
+ zQZvy+ei3D7lZ09I9BT/GfFkTIONgtNfDxwyMc4v4XyP0IvvZs/YZqt7j3atyTZM0S2HSaZ9
+ rXmQYkBt1/u691cZfvy+Tr2xZaDpFcjPkci5Ag0EVgUmGQEQALxSQRbl/QOnmssVDxWhHM5T
+ Gxl7oLNJms2zmBpcmlrIsn8nNz0rRyxT460k2niaTwowSRK8KWVDeAW6ZAaWiYjLlTunoKwv
+ F8vP3JyWpBz0diTxL5o+xpvy/Q6YU3BNefdq8Vy3rFsxgW7mMSrI/CxJ667y8ot5DVugeS2N
+ yHfmZlPGE0Nsy7hlebS4liisXOrN3jFzasKyUws3VXek4V65lHwB23BVzsnFMn/bw/rPliqX
+ Gcwl8CoJu8dSyrCcd1Ibs0/Inq9S9+t0VmWiQWfQkz4rvEeTQkp/VfgZ6z98JRW7S6l6eoph
+ oWs0/ZyRfOm+QVSqRfFZdxdP2PlGeIFMC3fXJgygXJkFPyWkVElr76JTbtSHsGWbt6xUlYHK
+ XWo+xf9WgtLeby3cfSkEchACrxDrQpj+Jt/JFP+q997dybkyZ5IoHWuPkn7uZGBrKIHmBunT
+ co1+cKSuRiSCYpBIXZMHCzPgVDjk4viPbrV9NwRkmaOxVvye0vctJeWvJ6KA7NoAURplIGCq
+ kCRwg0MmLrfoZnK/gRqVJ/f6adhU1oo6z4p2/z3PemA0C0ANatgHgBb90cd16AUxpdEQmOCm
+ dNnNJF/3Zt3inzF+NFzHoM5Vwq6rc1JPjfC3oqRLJzqAEHBDjQFlqNR3IFCIAo4SYQRBdAHB
+ CzkM4rWyRhuVABEBAAGJAh8EGAECAAkFAlYFJhkCGwwACgkQ8ww4vT8vvjwg9w//VQrcnVg3
+ TsjEybxDEUBm8dBmnKqcnTBFmxN5FFtIWlEuY8+YMiWRykd8Ln9RJ/98/ghABHz9TN8TRo2b
+ 6WimV64FmlVn17Ri6FgFU3xNt9TTEChqAcNg88eYryKsYpFwegGpwUlaUaaGh1m9OrTzcQy+
+ klVfZWaVJ9Nw0keoGRGb8j4XjVpL8+2xOhXKrM1fzzb8JtAuSbuzZSQPDwQEI5CKKxp7zf76
+ J21YeRrEW4WDznPyVcDTa+tz++q2S/BpP4W98bXCBIuQgs2m+OflERv5c3Ojldp04/S4NEjX
+ EYRWdiCxN7ca5iPml5gLtuvhJMSy36glU6IW9kn30IWuSoBpTkgV7rLUEhh9Ms82VWW/h2Tx
+ L8enfx40PrfbDtWwqRID3WY8jLrjKfTdR3LW8BnUDNkG+c4FzvvGUs8AvuqxxyHbXAfDx9o/
+ jXfPHVRmJVhSmd+hC3mcQ+4iX5bBPBPMoDqSoLt5w9GoQQ6gDVP2ZjTWqwSRMLzNr37rJjZ1
+ pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
+ XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <0c1f57ac-0823-4268-429b-d1aee8f7f8d5@redhat.com>
+Date: Wed, 20 Nov 2019 12:28:19 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-19-marcandre.lureau@redhat.com>
- <CAFEAcA8WacEjmNT93MYyheqh8U=+7zrDbrQ1jzVO+dWdrNkVyw@mail.gmail.com>
-In-Reply-To: <CAFEAcA8WacEjmNT93MYyheqh8U=+7zrDbrQ1jzVO+dWdrNkVyw@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 20 Nov 2019 15:14:57 +0400
-Message-ID: <CAMxuvayF+_cJdzLtSmq6iGCuXErT-fGVxk926sRrNnjv-tXQ0w@mail.gmail.com>
-Subject: Re: [PATCH v3 18/33] mips: inline serial_init
-To: Peter Maydell <peter.maydell@linaro.org>
-X-MC-Unique: lmQG4rqpMIa1gdVD-Owkzw-1
+In-Reply-To: <cb8f7dc7-d6db-6bd9-e825-1ade7d89cdd9@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Fkw1T6VIPBOX6-q52qhM-w-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,125 +146,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paul Burton <pburton@wavecomp.com>, Magnus Damm <magnus.damm@gmail.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Fabien Chouteau <chouteau@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org,
+ clg@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
+On 20/11/2019 10:00, Laurent Vivier wrote:
+> On 20/11/2019 05:36, David Gibson wrote:
+>> On Tue, Nov 19, 2019 at 04:45:26PM +0100, Greg Kurz wrote:
+>>> On Tue, 19 Nov 2019 15:06:51 +0100
+>>> Laurent Vivier <lvivier@redhat.com> wrote:
+>>>
+>>>> On 19/11/2019 02:00, David Gibson wrote:
+>>>>> On Fri, Nov 08, 2019 at 05:47:59PM +0100, Greg Kurz wrote:
+>>>>>> On Fri,  8 Nov 2019 16:40:35 +0100
+>>>>>> Laurent Vivier <lvivier@redhat.com> wrote:
+>>>>>>
+>>>>>>> Commit 29cb4187497d sets by default the VSMT to smp_threads,
+>>>>>>> but older kernels (< 4.13) don't support that.
+>>>>>>>
+>>>>>>> We can reasonably restore previous behavior with this kernel
+>>>>>>> to allow to run QEMU as before.
+>>>>>>>
+>>>>>>> If VSMT is not supported, VSMT will be set to MAX(8, smp_threads)
+>>>>>>> as it is done for previous machine types (< pseries-4.2)
+>>>>>>>
+>>>>>>
+>>>>>> It is usually _bad_ to base the machine behavior on host capabilitie=
+s.
+>>>>>> What happens if we migrate between an older kernel and a recent one =
+?
+>>>>>
+>>>>> Right.  We're really trying to remove instaces of such behaviour.  I'=
+d
+>>>>> prefer to completely revert Greg's original patch than to re-introduc=
+e
+>>>>> host configuration dependency into the guest configuration..
+>>>>>
+>>>>>> I understand this is to fix tests/migration-test on older kernels.
+>>>>>> Couldn't this be achieved with migration-test doing some introspecti=
+on
+>>>>>> and maybe pass vsmt=3D8 on the QEMU command line ?
+>>>>>
+>>>>> ..adjusting the test case like this might be a better idea, though.
+>>>>>
+>>>>> What's the test setup where we're using the old kernel?  I really onl=
+y
+>>>>> applied the original patch on the guess that we didn't really care
+>>>>> about kernels that old.  The fact you've hit this in practice makes m=
+e
+>>>>> doubt that assumption.
+>>>>>
+>>>>
+>>>> The way to fix the tests is to add "-smp threads=3D8" on the command l=
+ine
+>>>> (for all tests, so basically in qtest_init_without_qmp_handshake(), an=
+d
+>>>> it will impact all the machine types), and we have to check if it is
+>>>
+>>> Ohhh... it isn't possible to initialize Qtest with machine specific
+>>> properties ? That's a bit unfortunate :-\
+>>
+>> Uhh... I don't see why we can't.  Couldn't we just put either -machine
+>> vsmt=3D8 or -smp 8 into the cmd_src / cmd_dst printfs() in the
+>> strcmp(arch, "ppc64") case?
+>=20
+> Yes, but we need to do that to all other tests that fail. test-migration
+> is not the only one impacted by the problem (we have also pxe-test), so
+> it's why I thought to fix the problem in a generic place.
+>=20
+> But it seems there are only this couple of tests that are impacted so I
+> can modify both instead. I think only tests that really start CPU have
+> the problem.
+>=20
+> I'm going to send a patch to fix that.
 
-On Mon, Nov 18, 2019 at 7:25 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
->
-> On Wed, 23 Oct 2019 at 18:34, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@redhat.com> wrote:
-> >
-> > The function is specific to mipssim, let's inline it.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  hw/char/serial.c         | 16 ----------------
-> >  hw/mips/mips_mipssim.c   | 13 ++++++++++---
-> >  include/hw/char/serial.h |  2 --
-> >  3 files changed, 10 insertions(+), 21 deletions(-)
-> >
-> > diff --git a/hw/char/serial.c b/hw/char/serial.c
-> > index 84de2740a7..ca95e09ec9 100644
-> > --- a/hw/char/serial.c
-> > +++ b/hw/char/serial.c
-> > @@ -1023,22 +1023,6 @@ static const TypeInfo serial_io_info =3D {
-> >      .class_init =3D serial_io_class_init,
-> >  };
-> >
-> > -SerialIO *serial_init(int base, qemu_irq irq, int baudbase,
-> > -                         Chardev *chr, MemoryRegion *system_io)
-> > -{
-> > -    SerialIO *self =3D SERIAL_IO(qdev_create(NULL, TYPE_SERIAL_IO));
-> > -
-> > -    qdev_prop_set_uint32(DEVICE(self), "baudbase", baudbase);
-> > -    qdev_prop_set_chr(DEVICE(self), "chardev", chr);
-> > -    qdev_prop_set_int32(DEVICE(self), "instance-id", base);
-> > -    qdev_init_nofail(DEVICE(self));
-> > -
-> > -    sysbus_connect_irq(SYS_BUS_DEVICE(self), 0, irq);
-> > -    memory_region_add_subregion(system_io, base, &self->serial.io);
-> > -
-> > -    return self;
-> > -}
-> > -
-> >  static Property serial_properties[] =3D {
-> >      DEFINE_PROP_CHR("chardev", SerialState, chr),
-> >      DEFINE_PROP_UINT32("baudbase", SerialState, baudbase, 115200),
-> > diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-> > index 282bbecb24..26fb8fa4de 100644
-> > --- a/hw/mips/mips_mipssim.c
-> > +++ b/hw/mips/mips_mipssim.c
-> > @@ -40,6 +40,7 @@
-> >  #include "hw/loader.h"
-> >  #include "elf.h"
-> >  #include "hw/sysbus.h"
-> > +#include "hw/qdev-properties.h"
-> >  #include "exec/address-spaces.h"
-> >  #include "qemu/error-report.h"
-> >  #include "sysemu/qtest.h"
-> > @@ -219,9 +220,15 @@ mips_mipssim_init(MachineState *machine)
-> >       * A single 16450 sits at offset 0x3f8. It is attached to
-> >       * MIPS CPU INT2, which is interrupt 4.
-> >       */
-> > -    if (serial_hd(0))
-> > -        serial_init(0x3f8, env->irq[4], 115200, serial_hd(0),
-> > -                    get_system_io());
-> > +    if (serial_hd(0)) {
-> > +        DeviceState *dev =3D qdev_create(NULL, TYPE_SERIAL_IO);
-> > +
-> > +        qdev_prop_set_chr(dev, "chardev", serial_hd(0));
-> > +        qdev_prop_set_int32(dev, "instance-id", 0x3f8);
-> > +        qdev_init_nofail(dev);
-> > +        sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
-> > +        sysbus_add_io(SYS_BUS_DEVICE(dev), 0x3f8, &SERIAL_IO(dev)->ser=
-ial.io);
-> > +    }
->
-> The code being inlined here doesn't seem to be identical to the
-> code in the function above (it uses sysbus_add_io() rather than
-> memory_region_add_subregion()).
+And again, it's a little bit more complicated than expected: setting
+vsmt to 8 works only with kvm_hv, but breaks in case of TCG or kvm_pr.
+So the test must check what is in use...
 
-sysbus_add_io() is memory_region_add_subregion(get_system_io(), ...).
-
-I went a step too fast, let's make it a seperate patch to clarify it then.
-
->
-> It's also a bit ugly that the code has to reach into the
-> internals of the device to get the MemoryRegion pointer.
-> Would it work to have the device use sysbus_init_mmio()
-> in its init or realize method to register the IO port MemoryRegion,
-> and then we could use sysbus_mmio_get_region() to get the
-> MemoryRegion pointer ?
-
-Sure, seems fine to me. The caller must have extra knowledge of the
-memory region number though. This seems a bit fragile to me, compared
-to static compilation checking.
-
->
-> (If that does work, we should someday refactor
-> sysbus_add_io() so that all the devices it's used with
-> register the MemoryRegions that way, and then sysbus_add_io()
-> can just take an 'int n' the way sysbus_mmio_map() does.
-> But not today.)
-
-I see, left for another day
+Thanks,
+Laurent
 
 
