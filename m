@@ -2,86 +2,83 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89084C33C9A
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6640C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:17:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 580A522463
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:15:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71489223D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 11:17:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nwcAtTHP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 580A522463
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dOzxNtOb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71489223D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56564 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXNwr-0004lL-Gw
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 06:15:01 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35791)
+	id 1iXNzC-0006UH-Hs
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 06:17:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38204)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iXNmJ-0004Uf-KX
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:04:08 -0500
+ (envelope-from <quintela@redhat.com>) id 1iXNxo-0005cN-GJ
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:16:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <marcandre.lureau@gmail.com>) id 1iXNmI-0006RU-9H
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:04:07 -0500
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:32785)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
- id 1iXNmH-0006PZ-U3; Wed, 20 Nov 2019 06:04:06 -0500
-Received: by mail-wr1-x442.google.com with SMTP id w9so27624999wrr.0;
- Wed, 20 Nov 2019 03:04:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=xGQ7+jRsYcLEubH7JDX88uX5w//TbVg1n/VU/GJV+6A=;
- b=nwcAtTHPOas25yEfzXaBNA5ZUsfe0lhg/0tpJ1CQxXh9X2a/PoJiUNSXbJ3F1uXXz2
- XF8atO68hdB5d8PsO6SsR6PkebXA+xh9wOVC52G8rUBkWiE4tMRkVaLox0zL9jUuF+U9
- qNdwmL/amlZH60EZNnzei7vRgbrdxX+81xsx/jobZIE/5L0wYgJ2Wo/Mn3PqQ8JRR4zV
- /820ee2Dn1ng7v5ArSaDww7BpRpIQ6Oorc39+8YNwc6eC1XLfWVMqGmBvZt4T3cNPdmF
- FShxuFBJndFcF43DTXS0vdkoiUAPkHRDWX+yAFRU8uiOHtM9UF7R/ugXQEUZbI5Wf2vR
- 7enw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=xGQ7+jRsYcLEubH7JDX88uX5w//TbVg1n/VU/GJV+6A=;
- b=sH22vr93/SLxZqpZvW+3pp5TzElaU3zXl0XnRZaQndtvG1vaSp6tBCPYiwTs5is/TF
- VuS5tjMXJYls+5No28+Coxc/wnsUcgAgmbIdKBxrEMsOkDkYXyuZRVJprSnnogF5cnop
- M7z2hk6Q2+jF4jShp2xm0qhRerfS6FKsaccAF8sJV62fbuPyn03KBe7YnZGoRGX2ChDS
- KTZ459iqncUDP/B9jWqSUzK+SxwPcQFaF53FrJyIo3MI9bB9Cls+pIZUwi4FYrx4ykfj
- UMoq1j0Y92gDTKhq4KdXy1YZej/+Rww2PEU4d284YDfoUFoDgmZlZ0Xv/dTMO7FUPNZV
- 57pw==
-X-Gm-Message-State: APjAAAV+qbn7MgCayEV9cTmrIbBDAMO7Ook2wij8+AGviMf9oUjyanVJ
- pWL1ufHIC1Rqsl/aoMmm4cmAhS9JZVSi5YBowQA=
-X-Google-Smtp-Source: APXvYqzpWeGq0pz1SK5KT66O/Wd4vxDpZHY5Kj6anWnvWohoLcM9Ht59wQWv9u34cYQyej2KKqU25BeFlYdIgPs66IE=
-X-Received: by 2002:a5d:4ad2:: with SMTP id y18mr2440828wrs.396.1574247843169; 
- Wed, 20 Nov 2019 03:04:03 -0800 (PST)
+ (envelope-from <quintela@redhat.com>) id 1iXNxk-0005EW-OD
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:15:58 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34396
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <quintela@redhat.com>) id 1iXNxk-0005DK-JG
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:15:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574248555;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=PR8m2SO4fnVa017ElZk4lMTFCozB5FQwf/2c1yxPaZY=;
+ b=dOzxNtObJXGb1k1LUSFt46D99oE5TSr4vPzsFHomAO6O9mD21PKok4Cei+Bm1/O4sTZAha
+ 5ZFXCMI6zOVLvfZ2HJwpb0FaI1NUO6bv3O6mF0GPYl9cLiEe6dAFiRhfAR4X+9FQf4NnyJ
+ M/J8k+5uTc2EhkQ0yzBHHn5LG0Wtf7k=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-170-nZ-85HWmPzGviMKYsjNeCQ-1; Wed, 20 Nov 2019 06:15:52 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 974991802CFC;
+ Wed, 20 Nov 2019 11:15:51 +0000 (UTC)
+Received: from redhat.com (unknown [10.36.118.120])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 13B8460493;
+ Wed, 20 Nov 2019 11:15:50 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH] Fix incorrect int->float conversions caught by clang
+ -Wimplicit-int-float-conversion
+In-Reply-To: <87tv6z7vb0.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Tue, 19 Nov 2019 16:14:11 +0100")
+References: <20191116010731.3jdxozzfpsqsrcc4@google.com>
+ <87tv6z7vb0.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+Date: Wed, 20 Nov 2019 12:15:46 +0100
+Message-ID: <87pnhmol25.fsf@trasno.org>
 MIME-Version: 1.0
-References: <20191023173154.30051-1-marcandre.lureau@redhat.com>
- <20191023173154.30051-14-marcandre.lureau@redhat.com>
- <CAFEAcA9Cq_MkAzqAjt5uPNu3HDUfxO0hyVWtqEiAashPEEq3=g@mail.gmail.com>
- <CAMxuvawroZ0jrQTJCbakft21Lgk2cHrE9VyihiUvYBVp+AXgXw@mail.gmail.com>
- <CAFEAcA97LxS0LhCN-uqmO++D2U3dXBn3KctW7n-4tA-b50xKcw@mail.gmail.com>
- <CAJ+F1CJGHeb2aT+8t7vEdB0bKZ8r6OAnnqpDdnkGbfDRcV=JjA@mail.gmail.com>
- <CAFEAcA-_fexNrzgdqwoaJVEyHMG-GAPZkEawiE59EX9+u_Kr5Q@mail.gmail.com>
-In-Reply-To: <CAFEAcA-_fexNrzgdqwoaJVEyHMG-GAPZkEawiE59EX9+u_Kr5Q@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 20 Nov 2019 15:03:50 +0400
-Message-ID: <CAJ+F1CL00TcaKz5LmC41urBULcO7meJuzuxW8nHmLQ6hG66tHg@mail.gmail.com>
-Subject: Re: [PATCH v3 13/33] serial: start making SerialMM a sysbus device
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: nZ-85HWmPzGviMKYsjNeCQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::442
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,95 +90,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Corey Minyard <cminyard@mvista.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, Magnus Damm <magnus.damm@gmail.com>,
- Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Fabien Chouteau <chouteau@adacore.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>, qemu-arm <qemu-arm@nongnu.org>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Paul Burton <pburton@wavecomp.com>, Artyom Tarasenko <atar4qemu@gmail.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: quintela@redhat.com
+Cc: Fangrui Song <i@maskray.me>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
-
-On Wed, Nov 20, 2019 at 2:58 PM Peter Maydell <peter.maydell@linaro.org> wr=
-ote:
+Markus Armbruster <armbru@redhat.com> wrote:
+> Fangrui Song <i@maskray.me> writes:
 >
-> On Wed, 20 Nov 2019 at 10:40, Marc-Andr=C3=A9 Lureau
-> <marcandre.lureau@gmail.com> wrote:
-> > On Wed, Nov 20, 2019 at 2:36 PM Peter Maydell <peter.maydell@linaro.org=
-> wrote:
-> > > There are two problems here:
-> > >  (1) "self" gives no hint at all about whether it's the Object*,
-> > > the DeviceState*, or the SerialMM*. All of those are the
-> > > object the method is operating on, but the type differences matter.
-> >
-> > "self" should have the type of the object that is being implemented.
-> >
-> > serial_mm_instance_init ->  SerialMM *self
+>> The warning will be enabled by default in clang 10. It is not
+>> available for clang <=3D 9.
+>>
+>> qemu/migration/migration.c:2038:24: error: implicit conversion from
+>> 'long' to 'double' changes value from 9223372036854775807 to
+>> 9223372036854775808 [-Werror,-Wimplicit-int-float-conversion]
+>> ...
+>> qemu/util/cutils.c:245:23: error: implicit conversion from 'unsigned
+>> long' to 'double' changes value from 18446744073709550592 to
+>> 18446744073709551616 [-Werror,-Wimplicit-int-float-conversion]
+>>
+>> Signed-off-by: Fangrui Song <i@maskray.me>
+>> ---
+>>   migration/migration.c | 4 ++--
+>>   util/cutils.c         | 4 ++--
+>>   2 files changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 354ad072fa..ac3ea2934a 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -53,6 +53,7 @@
+>>   #include "monitor/monitor.h"
+>>   #include "net/announce.h"
+>>   #include "qemu/queue.h"
+>> +#include <math.h>
+>>  =20
+>>   #define MAX_THROTTLE  (32 << 20)      /* Migration transfer speed thro=
+ttling */
+>>  =20
+>> @@ -2035,11 +2036,10 @@ void qmp_migrate_set_downtime(double value, Erro=
+r **errp)
+>         if (value < 0 || value > MAX_MIGRATE_DOWNTIME_SECONDS) {
+>             error_setg(errp, "Parameter 'downtime_limit' expects an integ=
+er in "
+>                              "the range of 0 to %d seconds",
+>                              MAX_MIGRATE_DOWNTIME_SECONDS);
+>             return;
+>>       }
 >
-> In a typical device implementation, some functions take the
-> object as a "SerialMM" or other specific pointer. Some take
-> an Object*. Some take a DeviceState*. Some take void*.
-> Which of those is "the type of the object that is being implemented" ?
-
-In OOP, you implement methods for a specific type. "self" is of the
-type that is being implemented.
-
-serial_mm_foo(SerialMM *self);
-
-serial_mm_instance_init(Object *o) {
-  SerialMM *self =3D SERIAL_MM(o);
-  ..
-}
-
-
-If you have a generic function, not tied to a specific class, this
-rule doesn't apply.
-
-do_this(some arg, SerialMM *smm)
-
+> @value is now in [0,2000].
 >
-> > > (2) *Absolutely nobody anywhere else in any other device model
-> > > is using the 'self' argument name*. It's not a convention if
-> > > only this one file is using it, and adopting it here gives us
-> > > absolutely no consistency -- exactly the opposite.
-> >
-> > Since there is no clear convention, then adding "self" isn't breaking
-> > any convention.
+>>  =20
+>>       value *=3D 1000; /* Convert to milliseconds */
 >
-> There is a clear convention, which I explained to you already
-> (variable is named with some abbreviation/initialism of
-> the type name, or sometimes just 's' for "state"). You are trying
-> to write code which ignores that convention and does something
-> else *which no other code is doing*. Please stop doing that -- in
-> particular, don't do it in one device in the middle of a refactoring
-> series.
+> @value is in [0,2000000]
 >
-> If you want to argue that we should change our convention for
-> how we write QOM code, feel free -- but that should be a separate
-> discussion and probably ought to come with a plan for how
-> to do a general update of the codebase to avoid a weird
-> mix of styles.
+>> -    value =3D MAX(0, MIN(INT64_MAX, value));
 >
+> This does nothing.
+>
+>>  =20
+>>       MigrateSetParameters p =3D {
+>>           .has_downtime_limit =3D true,
+>> -        .downtime_limit =3D value,
+>> +        .downtime_limit =3D (int64_t)fmin(value, nextafter(0x1p63, 0)),
+>
+> This does nothing and is hard to read :)
+>
+> Can we simply drop the offending line statement instead?
 
-Fair enough
-
-We can only change things incrementally, and while doing refactoring
-is the right moment to write better and more readable code.
+Agreed aboutdropping the whole bussines for migration.
 
 
---=20
-Marc-Andr=C3=A9 Lureau
+>>       };
+>>  =20
+>>       qmp_migrate_set_parameters(&p, errp);
+>> diff --git a/util/cutils.c b/util/cutils.c
+>> index fd591cadf0..2b4484c015 100644
+>> --- a/util/cutils.c
+>> +++ b/util/cutils.c
+>> @@ -239,10 +239,10 @@ static int do_strtosz(const char *nptr, const char=
+ **end,
+>>           goto out;
+>>       }
+>>       /*
+>> -     * Values >=3D 0xfffffffffffffc00 overflow uint64_t after their tri=
+p
+>> +     * Values > nextafter(0x1p64, 0) overflow uint64_t after their trip
+>>        * through double (53 bits of precision).
+>>        */
+>> -    if ((val * mul >=3D 0xfffffffffffffc00) || val < 0) {
+>> +    if ((val * mul > nextafter(0x1p64, 0)) || val < 0) {
+>>           retval =3D -ERANGE;
+>>           goto out;
+>>       }
+
+This comment was really bad (it says the same that the code).
+On the other hand, I can *kind of* understand what does 0xffff<more
+f's here>.
+
+But I am at a complete loss about what value is:
+
+nextafter(0x1p64, 0).
+
+Can we put what value is that instead?
+
+Thanks, Juan.
+
 
