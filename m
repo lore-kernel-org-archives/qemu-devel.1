@@ -6,85 +6,95 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E24ACC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:57:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CCF4C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:59:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B27D921D7A
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:57:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 39E7422429
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 09:59:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G0bXUotg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B27D921D7A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CIn0bMP8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39E7422429
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXMk6-00024f-Pz
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 04:57:46 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48217)
+	id 1iXMle-0003FJ-8g
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 04:59:22 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49288)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kraxel@redhat.com>) id 1iXMgW-0000fL-Gl
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:54:05 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iXMkz-0002kN-1r
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:58:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kraxel@redhat.com>) id 1iXMgT-0002Hn-TH
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:54:02 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:59598
+ (envelope-from <pbonzini@redhat.com>) id 1iXMky-0004Gj-7J
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:58:40 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43169
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1iXMgT-0002HB-Ck
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:54:01 -0500
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iXMky-0004GQ-4B
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 04:58:40 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574243640;
+ s=mimecast20190719; t=1574243919;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PSNLpSLgx5w3Dbhz4nM58lFypQMHwE8ihrCJxNop32Q=;
- b=G0bXUotgAOO3cqshudTUgYPvJT6jwmXzh9MT5beRdROnuqIcZbGvxtNAAeG+81zkclIRod
- iYgj0Ry0z4rU6qjho9nFSUn4vK+FIuJSafr4KHqDMclKGmJkCsV3AlNLivR0IIHecZdy/y
- ybcjmvN2WWVW1L6RnHS/DgQBNSl7eJY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-353-qWi47eunMXOdSOcEtNu-ag-1; Wed, 20 Nov 2019 04:53:57 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 731B3107ACC4;
- Wed, 20 Nov 2019 09:53:54 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-116-67.ams2.redhat.com
- [10.36.116.67])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BBA5328DCB;
- Wed, 20 Nov 2019 09:53:53 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 8157316E05; Wed, 20 Nov 2019 10:53:49 +0100 (CET)
-Date: Wed, 20 Nov 2019 10:53:49 +0100
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Liam Girdwood <liam.r.girdwood@linux.intel.com>
-Subject: Re: [virtio-dev] Re: guest / host buffer sharing ...
-Message-ID: <20191120095349.oobeosin3lujgcja@sirius.home.kraxel.org>
-References: <20191105105456.7xbhtistnbp272lj@sirius.home.kraxel.org>
- <20191106084344.GB189998@stefanha-x1.localdomain>
- <CAD=HUj41r8wHZ2-By8tLftkoqC5r_Bw=pr=zX2aZ7GTs1ESWhg@mail.gmail.com>
- <c8a6b6f35664ce036c2a48ec41eab97b0f40704d.camel@linux.intel.com>
- <CAAfnVBkMWurTpseQFjcna5kk3__40n6M68=RTHLbQsu__2AFxg@mail.gmail.com>
- <4a5dd822e86757f004d04af62fb7dd35ba75392d.camel@linux.intel.com>
- <CAAfnVB=F+HeQrrn23c=rZeOa5BfHo=9ArcG--gLf87gqBXfZ9A@mail.gmail.com>
- <bee3aae13f6cf69ee909aa9884926853d6123b25.camel@linux.intel.com>
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=O9xQYpyBt76UEq8p+FvnObMCUEWajQTRzfrWqVNDag4=;
+ b=CIn0bMP8ZSn0LoG3TNXeAFFR6zi+WhwEJMDyBIsA1euTF2siqI+54IDLbTqNsNzjI0tl3a
+ KyFu4Y2aoJuZr/EFSf2zpD4zsu+xaNQD2y17voAy0u3882NMS1CjxpNNfRJcypwGmNEw+1
+ QgvzZdqJcmfUuHn2QAfEbsplGZyQM+k=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-196-fUyD2DkKO36Bhcf2tHWOJA-1; Wed, 20 Nov 2019 04:58:36 -0500
+Received: by mail-wr1-f70.google.com with SMTP id h7so20877700wrb.2
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 01:58:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=O9xQYpyBt76UEq8p+FvnObMCUEWajQTRzfrWqVNDag4=;
+ b=OJB8jk5NhKSuNNquafPS4UJUK+wXgdZ1A+15PGpZhxKqX3lD0+9c2AKuwNKJDgGgrh
+ g6Zdj0pQxx8VYjHQtgJpXJZiaohVf0fVJafLxscaYAwKfdY7yElsRV05j83PRxyl0+bm
+ Pv9JVqnTllaDoeO+PM2tFn1en75bRj3P9THuQLQSWpsU/nuGKJSFIrPYtsp7Ikr3Y0Yj
+ gGIPAM0M/LbxQBV6ugUU2fjStSOppoLAUzeuJrTIQi25X5e9cO2QIVf3gudFGlM90lt9
+ Hj0FGd/oIwLnN+8qQpoiBPKnLJ1VHUuqefNBKPIQ7i7ffCWKuXvyseegHnHcu66sYIq8
+ X9nA==
+X-Gm-Message-State: APjAAAUQkOT8mA7gxPnIfNWAQSPZ/IBeiGkpzINe7rWBxsuTEs/AaAyq
+ nU23BdOF7XSQ5usMQos5k+NgCv9vDEPEpF0KaTJKldegNpY7SqsESAUdR94h2FVwf++YM2DXZk8
+ oy2mST+cLfudQX6c=
+X-Received: by 2002:adf:82cc:: with SMTP id 70mr142379wrc.231.1574243915167;
+ Wed, 20 Nov 2019 01:58:35 -0800 (PST)
+X-Google-Smtp-Source: APXvYqx5iEVwmXGMwC3lqq6ogRh5jhXw5zeItNp4KAE8jW5hHoVaXbmnZYGUjXMxrS1DWublusdVdg==
+X-Received: by 2002:adf:82cc:: with SMTP id 70mr142354wrc.231.1574243914909;
+ Wed, 20 Nov 2019 01:58:34 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:dc24:9a59:da87:5724?
+ ([2001:b07:6468:f312:dc24:9a59:da87:5724])
+ by smtp.gmail.com with ESMTPSA id v81sm6367455wmg.4.2019.11.20.01.58.33
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 20 Nov 2019 01:58:34 -0800 (PST)
+Subject: Re: [PATCH for-5.0 0/4] Remove the deprecated bluetooth subsystem
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>, Gerd Hoffmann <kraxel@redhat.com>
+References: <20191120091014.16883-1-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <689a3583-9535-f744-1938-061ad0df114b@redhat.com>
+Date: Wed, 20 Nov 2019 10:58:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <bee3aae13f6cf69ee909aa9884926853d6123b25.camel@linux.intel.com>
-User-Agent: NeoMutt/20180716
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: qWi47eunMXOdSOcEtNu-ag-1
+In-Reply-To: <20191120091014.16883-1-thuth@redhat.com>
+Content-Language: en-US
+X-MC-Unique: fUyD2DkKO36Bhcf2tHWOJA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -96,53 +106,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: geoff@hostfission.com, virtio-dev@lists.oasis-open.org,
- Alex Lau <alexlau@chromium.org>, Daniel Vetter <daniel@ffwll.ch>,
- Alexandre Courbot <acourbot@chromium.org>,
- Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org,
- Gurchetan Singh <gurchetansingh@chromium.org>,
- Keiichi Watanabe <keiichiw@chromium.org>,
- David Stevens <stevensd@chromium.org>, Hans Verkuil <hverkuil@xs4all.nl>,
- =?utf-8?B?U3TDqXBoYW5l?= Marchesin <marcheu@chromium.org>,
- Dylan Reid <dgreid@chromium.org>, Tomasz Figa <tfiga@chromium.org>,
- Dmitry Morozov <dmitry.morozov@opensynergy.com>,
- Pawel Osciak <posciak@chromium.org>,
- Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: libvir-list@redhat.com,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+On 20/11/19 10:10, Thomas Huth wrote:
+> This patch series removes the bitrotten bluetooth subsystem. See
+> the patch description of the third patch for the rationale.
 
-> > > DSP FW has no access to userspace so we would need some additional
-> > > API
-> > > on top of DMA_BUF_SET_NAME etc to get physical hardware pages ?
-> >=20
-> > The dma-buf api currently can share guest memory sg-lists.
->=20
-> Ok, IIUC buffers can either be shared using the GPU proposed APIs
-> (above) or using the dma-buf API to share via userspace ? My preference
-> would be to use teh more direct GPU APIs sending physical page
-> addresses from Guest to device driver. I guess this is your use case
-> too ?
-
-I'm not convinced this is useful for audio ...
-
-I basically see two modes of operation which are useful:
-
-  (1) send audio data via virtqueue.
-  (2) map host audio buffers into the guest address space.
-
-The audio driver api (i.e. alsa) typically allows to mmap() the audio
-data buffers, so it is the host audio driver which handles the
-allocation.  Let the audio hardware dma from/to userspace-allocated
-buffers is not possible[1], but we would need that to allow qemu (or
-other vmms) use guest-allocated buffers.
-
-cheers,
-  Gerd
-
-[1] Disclaimer: It's been a while I looked at alsa more closely, so
-    there is a chance this might have changed without /me noticing.
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
 
