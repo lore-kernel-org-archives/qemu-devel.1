@@ -2,81 +2,94 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 086EFC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 12:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43485C432C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 12:04:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C931722419
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 12:02:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aX4p3vup"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C931722419
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 18849223D1
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 12:04:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18849223D1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXOgm-0007iJ-Nf
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 07:02:28 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44480)
+	id 1iXOiU-0000ir-6p
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 07:04:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43591)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berrange@redhat.com>) id 1iXOU7-0000Tg-Dx
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:49:25 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iXOPD-0003dv-PP
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:44:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berrange@redhat.com>) id 1iXOU5-000559-0R
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:49:22 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:57823
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <berrange@redhat.com>) id 1iXOU4-0004xE-F0
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:49:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574250556;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=c7zL4BWYa1kSA5bSg/wi1aR7CmPuK6fmUFk3vyoIfJ0=;
- b=aX4p3vup3ugSNg4UX9Ow1ZKtWq+Xz87fKAcPGWY0wvVhkOr81HVkAalmJct7ocfSEf7h2B
- 9Vu6Tlut0trYPONjN6KbMD9BKwRNm0/qK4DEku9ZeGuL3Ow80aiF00bLxenE5hml7u8xLF
- d/qdS0349i7XlSeM1zZEhtYJaEosRwo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-K8ZsKewIM7apsVCHFjqSDA-1; Wed, 20 Nov 2019 06:49:14 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5EBEC18C35B6
- for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 11:49:13 +0000 (UTC)
-Received: from redhat.com (ovpn-112-57.ams2.redhat.com [10.36.112.57])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5ED6760BB2;
- Wed, 20 Nov 2019 11:48:58 +0000 (UTC)
-Date: Wed, 20 Nov 2019 11:48:56 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH] vhost-user-input: use free(elem) instead of g_free(elem)
-Message-ID: <20191120114856.GG2785116@redhat.com>
-References: <20191119111626.112206-1-stefanha@redhat.com>
+ (envelope-from <frankja@linux.ibm.com>) id 1iXOPC-0003uo-Ag
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:44:19 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11250)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iXOPC-0003Yr-2n
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 06:44:18 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAKBg7H4093132
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:44:07 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2waygnf5xs-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 20 Nov 2019 06:44:06 -0500
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Wed, 20 Nov 2019 11:44:04 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Wed, 20 Nov 2019 11:44:01 -0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAKBi0Ka57147468
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 20 Nov 2019 11:44:00 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5A0864C040;
+ Wed, 20 Nov 2019 11:44:00 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3B1FE4C04E;
+ Wed, 20 Nov 2019 11:43:59 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.152.224.205])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 20 Nov 2019 11:43:59 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 10/15] s390x: protvirt: Add new VCPU reset functions
+Date: Wed, 20 Nov 2019 06:43:29 -0500
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191120114334.2287-1-frankja@linux.ibm.com>
+References: <20191120114334.2287-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20191119111626.112206-1-stefanha@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: K8ZsKewIM7apsVCHFjqSDA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19112011-0028-0000-0000-000003BD0734
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112011-0029-0000-0000-000024802A42
+Message-Id: <20191120114334.2287-11-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-20_03:2019-11-15,2019-11-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 spamscore=0
+ lowpriorityscore=0 malwarescore=0 impostorscore=0 suspectscore=1
+ bulkscore=0 phishscore=0 mlxlogscore=999 priorityscore=1501 clxscore=1015
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911200107
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,82 +101,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Nov 19, 2019 at 11:16:26AM +0000, Stefan Hajnoczi wrote:
-> The virtqueue element returned by vu_queue_pop() is allocated using
-> malloc(3) by virtqueue_alloc_element().  Use the matching free(3)
-> function instead of glib's g_free().
+CPU resets for protected guests need to be done via Ultravisor
+calls. Hence we need a way to issue these calls for each reset.
 
-Just as an FYI, since glib 2.46  g_malloc is hardcoded to use the
-system allocator, so it is now guaranteed that g_malloc/malloc
-and g_free/free are safely interchangable. I recently got this
-clarified in the glib docs:
+As we formerly had only one reset function and it was called for
+initial, as well as for the clear reset, we now need a new interface.
 
-  https://gitlab.gnome.org/GNOME/glib/merge_requests/1099//diffs
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ target/s390x/cpu.c       | 15 ++++++++++++---
+ target/s390x/kvm-stub.c  | 10 +++++++++-
+ target/s390x/kvm.c       | 38 ++++++++++++++++++++++++++++++++------
+ target/s390x/kvm_s390x.h |  4 +++-
+ 4 files changed, 56 insertions(+), 11 deletions(-)
 
-QEMU mandates 2.48 so we are now safe in that regard
-
-For readability/sanity sake I'd still suggest matching functions
-but it is not a functional danger any more. Even when it was a
-risk, that risk only arose if you called GLib's API for installing
-a custom allocator callback which QEMU never did, so it was always
-a non-issue.
-
-Where this is most helpful is in exchanging allocated data with
-3rd party libraries that don't use glib. We no longer have to
-worry about dup'ing memory going in/out libraries not using
-glib's allocators.
-
->=20
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  contrib/vhost-user-input/main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/contrib/vhost-user-input/main.c b/contrib/vhost-user-input/m=
-ain.c
-> index 449fd2171a..ef4b7769f2 100644
-> --- a/contrib/vhost-user-input/main.c
-> +++ b/contrib/vhost-user-input/main.c
-> @@ -77,7 +77,7 @@ static void vi_input_send(VuInput *vi, struct virtio_in=
-put_event *event)
->          len =3D iov_from_buf(elem->in_sg, elem->in_num,
->                             0, &vi->queue[i].event, sizeof(virtio_input_e=
-vent));
->          vu_queue_push(dev, vq, elem, len);
-> -        g_free(elem);
-> +        free(elem);
->      }
-> =20
->      vu_queue_notify(&vi->dev.parent, vq);
-> @@ -153,7 +153,7 @@ static void vi_handle_sts(VuDev *dev, int qidx)
->                           0, &event, sizeof(event));
->          vi_handle_status(vi, &event);
->          vu_queue_push(dev, vq, elem, len);
-> -        g_free(elem);
-> +        free(elem);
->      }
-> =20
->      vu_queue_notify(&vi->dev.parent, vq);
-> --=20
-> 2.23.0
->=20
->=20
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange=
- :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com=
- :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange=
- :|
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 10d5b915d8..ac04fdbba9 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -125,9 +125,18 @@ static void s390_cpu_reset(CPUState *s, uint8_t type)
+     }
+ 
+     /* Reset state inside the kernel that we cannot access yet from QEMU. */
+-    if (kvm_enabled() && (type == S390_CPU_RESET_CLEAR ||
+-                          type == S390_CPU_RESET_INITIAL)) {
+-            kvm_s390_reset_vcpu(cpu);
++    if (kvm_enabled()) {
++        switch (type) {
++        case S390_CPU_RESET_CLEAR:
++            kvm_s390_reset_vcpu_clear(cpu);
++            break;
++        case S390_CPU_RESET_INITIAL:
++            kvm_s390_reset_vcpu_initial(cpu);
++            break;
++        case S390_CPU_RESET_NORMAL:
++            kvm_s390_reset_vcpu_normal(cpu);
++            break;
++        }
+     }
+ 
+ #if defined(CONFIG_USER_ONLY)
+diff --git a/target/s390x/kvm-stub.c b/target/s390x/kvm-stub.c
+index 5152e2bdf1..c4cd497f85 100644
+--- a/target/s390x/kvm-stub.c
++++ b/target/s390x/kvm-stub.c
+@@ -83,7 +83,15 @@ void kvm_s390_cmma_reset(void)
+ {
+ }
+ 
+-void kvm_s390_reset_vcpu(S390CPU *cpu)
++void kvm_s390_reset_vcpu_initial(S390CPU *cpu)
++{
++}
++
++void kvm_s390_reset_vcpu_clear(S390CPU *cpu)
++{
++}
++
++void kvm_s390_reset_vcpu_normal(S390CPU *cpu)
+ {
+ }
+ 
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 0f2458b553..190400df55 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -154,6 +154,7 @@ static int cap_ri;
+ static int cap_gs;
+ static int cap_hpage_1m;
+ static int cap_protvirt;
++static int cap_vcpu_resets;
+ 
+ static int active_cmma;
+ 
+@@ -340,6 +341,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_mem_op = kvm_check_extension(s, KVM_CAP_S390_MEM_OP);
+     cap_s390_irq = kvm_check_extension(s, KVM_CAP_S390_INJECT_IRQ);
+     cap_protvirt = kvm_check_extension(s, KVM_CAP_S390_PROTECTED);
++    cap_vcpu_resets = kvm_check_extension(s, KVM_CAP_S390_VCPU_RESETS);
+ 
+     if (!kvm_check_extension(s, KVM_CAP_S390_GMAP)
+         || !kvm_check_extension(s, KVM_CAP_S390_COW)) {
+@@ -401,20 +403,44 @@ int kvm_arch_destroy_vcpu(CPUState *cs)
+     return 0;
+ }
+ 
+-void kvm_s390_reset_vcpu(S390CPU *cpu)
++static void kvm_s390_reset_vcpu(S390CPU *cpu, unsigned long type)
+ {
+     CPUState *cs = CPU(cpu);
+ 
+-    /* The initial reset call is needed here to reset in-kernel
+-     * vcpu data that we can't access directly from QEMU
+-     * (i.e. with older kernels which don't support sync_regs/ONE_REG).
+-     * Before this ioctl cpu_synchronize_state() is called in common kvm
+-     * code (kvm-all) */
++    /*
++     * The reset call is needed here to reset in-kernel vcpu data that
++     * we can't access directly from QEMU (i.e. with older kernels
++     * which don't support sync_regs/ONE_REG).  Before this ioctl
++     * cpu_synchronize_state() is called in common kvm code
++     * (kvm-all).
++     */
++    if (cap_vcpu_resets) {
++        if (kvm_vcpu_ioctl(cs, KVM_S390_VCPU_RESET, type)) {
++            error_report("CPU reset type %ld failed on CPU %i",
++                         type, cs->cpu_index);
++        }
++        return;
++    }
+     if (kvm_vcpu_ioctl(cs, KVM_S390_INITIAL_RESET, NULL)) {
+         error_report("Initial CPU reset failed on CPU %i", cs->cpu_index);
+     }
+ }
+ 
++void kvm_s390_reset_vcpu_initial(S390CPU *cpu)
++{
++    kvm_s390_reset_vcpu(cpu, KVM_S390_VCPU_RESET_INITIAL);
++}
++
++void kvm_s390_reset_vcpu_clear(S390CPU *cpu)
++{
++    kvm_s390_reset_vcpu(cpu, KVM_S390_VCPU_RESET_CLEAR);
++}
++
++void kvm_s390_reset_vcpu_normal(S390CPU *cpu)
++{
++    kvm_s390_reset_vcpu(cpu, KVM_S390_VCPU_RESET_NORMAL);
++}
++
+ static int can_sync_regs(CPUState *cs, int regs)
+ {
+     return cap_sync_regs && (cs->kvm_run->kvm_valid_regs & regs) == regs;
+diff --git a/target/s390x/kvm_s390x.h b/target/s390x/kvm_s390x.h
+index caf985955b..0b21789796 100644
+--- a/target/s390x/kvm_s390x.h
++++ b/target/s390x/kvm_s390x.h
+@@ -34,7 +34,9 @@ int kvm_s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch,
+                                     int vq, bool assign);
+ int kvm_s390_cmma_active(void);
+ void kvm_s390_cmma_reset(void);
+-void kvm_s390_reset_vcpu(S390CPU *cpu);
++void kvm_s390_reset_vcpu_clear(S390CPU *cpu);
++void kvm_s390_reset_vcpu_normal(S390CPU *cpu);
++void kvm_s390_reset_vcpu_initial(S390CPU *cpu);
+ int kvm_s390_set_mem_limit(uint64_t new_limit, uint64_t *hw_limit);
+ void kvm_s390_set_max_pagesize(uint64_t pagesize, Error **errp);
+ void kvm_s390_crypto_reset(void);
+-- 
+2.20.1
 
 
