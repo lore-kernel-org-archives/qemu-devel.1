@@ -2,69 +2,88 @@ Return-Path: <SRS0=6hMH=ZM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E988BC432C0
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 02:01:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 392E3C432C0
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 02:27:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C135E223D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 02:01:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C135E223D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0211F222CD
+	for <qemu-devel@archiver.kernel.org>; Wed, 20 Nov 2019 02:27:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhLrLZ4q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0211F222CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXFJK-0000OW-QX
-	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 21:01:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43033)
+	id 1iXFiB-0006T2-43
+	for qemu-devel@archiver.kernel.org; Tue, 19 Nov 2019 21:27:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58473)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <no-reply@patchew.org>) id 1iXFID-00080g-7s
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:00:30 -0500
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXFhT-00064a-3M
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:26:36 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <no-reply@patchew.org>) id 1iXFIB-0004bw-HJ
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:00:28 -0500
-Resent-Date: Tue, 19 Nov 2019 21:00:28 -0500
-Resent-Message-Id: <E1iXFIB-0004bw-HJ@eggs.gnu.org>
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21487)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <no-reply@patchew.org>)
- id 1iXFIB-0004Ws-BI
- for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:00:27 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1574215214; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=bip/5C2GDQR85ZDnZYxQSjrRqg79YLSpG6NtS9AJGmOStw4MC+Q5wtk/kcBSot5UvXt6H9HYLelRoLO+r/58u9BGnEz6vDQQOvIroZhSbjXRFHq8qczpmcjCWXZjeOThsda5R3A4ixCg0Suce7BT3r9fMUXwNPnbKF+X9D06uQE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1574215214;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=Cjm3Y5ILOY8aRcyNcIqTgIE7zcdnJ3P1/vqIh1JICt0=; 
- b=IQ4bozj7CzzGfPObDL4hz1K5jBRtd/ImRP673AkNtJH5spB7X5nbOwPEjpJo7FK1QVdiw4AP381RNLnPygH8j5y3mheqN6MoHtV7uZJVBv976Puh2ZxLYK/NoJHfiJA+a2wvP2mM6fh9t2YFlGJgVRuFDm9z0cl+VNLoVibaAyw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=patchew.org;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1574215212861323.98159380686604;
- Tue, 19 Nov 2019 18:00:12 -0800 (PST)
-In-Reply-To: <1574179728-35535-1-git-send-email-pbonzini@redhat.com>
-Subject: Re: [PULL 00/12] Misc patches for QEMU 4.2-rc
-Message-ID: <157421521182.2797.15337357350909803331@37313f22b938>
+ (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXFhQ-0004nz-Nv
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:26:34 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:33498)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
+ id 1iXFhQ-0004mz-IJ
+ for qemu-devel@nongnu.org; Tue, 19 Nov 2019 21:26:32 -0500
+Received: by mail-ot1-x342.google.com with SMTP id u13so19883762ote.0
+ for <qemu-devel@nongnu.org>; Tue, 19 Nov 2019 18:26:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:in-reply-to:references:from:date:message-id:subject:to
+ :cc; bh=WeTITXWdsgOsRRusmwAgaBUglFu9RBPE8O1qzSZTPBs=;
+ b=dhLrLZ4q2wciMnxiy1PEmPLNbQUBuz93TVCFcCtrkM5zc6Pzw+rrp/YHHbXX6Nbbhj
+ AENfLKwKXGIFw16bEAelUMaz8d+TP0RYeXaj+ZBwYCZ0GpHyIoVJTd07VFRBxQWk67Wz
+ m3CPrL9gLKEftptlttz2KGhyALlDDU1cqjAz+wjLhYivfbpfxxmlSzuGFqy/xpPqVrZq
+ Fq/eB0I2givWtfWrTK1aU9rANn5B2XFI0WSRXKkMFJwJiDn7uoHBTWOg5bpGH5Ycq+9E
+ 9K5WHw9nIi+93dgTrDx75uj2o0ic/BS+whN3xZl4YdG43SIGUiFgj0iLIFl2lnX8l24g
+ pQSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+ :message-id:subject:to:cc;
+ bh=WeTITXWdsgOsRRusmwAgaBUglFu9RBPE8O1qzSZTPBs=;
+ b=ng7ANeqdqlnV1A2S3wMf+hNAqlsFZnSgqH+iIN709L4gIB7pnWF7CTGkSJ7mysgeXJ
+ OKDtoNmglCXGVFOX5qN3/ZprwOnxz+47ksKO23fN4k/yYUL8lNgC6u75rkcyUIjxGqwS
+ u1N5ktricdUYfr4McwmYYjpbWQXW/m1+J5qz6WXLZ2b1kwxI6vlZeFc5lPg+YPg29N0K
+ Li3Vo2VoTY+im94ryQ2AcQ6zTftEeRKq/tnR7FpFgeUt+pjyd4FUi38WfEcCpEt2MdUA
+ 5O4kWOLsVCuAV6XDOqrdBiHA8xW9i7r+1ArLvYgn1Y368oQ3OQGzZOgOO7x05dgCqn1N
+ NW1Q==
+X-Gm-Message-State: APjAAAW7SuFYn86xUUXNjkHRI9XP74lxfgL+w55lmQCdka7styZHh9Nq
+ 9nH6TEX37Yq4PZXMRmSltDQd689d/Q+MdIXQt6Q=
+X-Google-Smtp-Source: APXvYqz21hMOocs0hqxPUAmC24fm5kdSazzoKH+ZYQsJ+6kcLK3pRAlXuwQoCaUIJKyIruVbukeuaIbFjrm6Xcqi+IM=
+X-Received: by 2002:a05:6830:81:: with SMTP id a1mr123208oto.64.1574216791722; 
+ Tue, 19 Nov 2019 18:26:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: pbonzini@redhat.com
-Date: Tue, 19 Nov 2019 18:00:12 -0800 (PST)
-X-ZohoMailClient: External
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 136.143.188.54
+Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Tue, 19 Nov 2019 18:26:31
+ -0800 (PST)
+In-Reply-To: <82dfa44e-0a27-080e-2653-b004c27fc3d1@linaro.org>
+References: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
+ <a77ce406-5307-cee8-8e0b-7c08056fb0df@redhat.com>
+ <BYAPR02MB488666AA94EBB57C2A318004DE4C0@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <82dfa44e-0a27-080e-2653-b004c27fc3d1@linaro.org>
+From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Date: Wed, 20 Nov 2019 03:26:31 +0100
+Message-ID: <CAL1e-=gmLywnyUoySxuDPS1FQRx=WiH1kYrqEJDGAAcO5vDg4A@mail.gmail.com>
+Subject: Re: [PATCH] Add minimal Hexagon target - First in a series of patches
+ - linux-user changes + linux-user/hexagon + skeleton of
+ target/hexagon -
+ Files in target/hexagon/imported are from another project and therefore do
+ not conform to qemu coding standards
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000ab8f400597bde8bf"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -76,67 +95,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org
+Cc: Taylor Simpson <tsimpson@quicinc.com>,
+ "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ "laurent@vivier.eu" <laurent@vivier.eu>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNTc0MTc5NzI4LTM1NTM1LTEt
-Z2l0LXNlbmQtZW1haWwtcGJvbnppbmlAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
-ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
-IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BVTEwgMDAvMTJdIE1pc2MgcGF0Y2hl
-cyBmb3IgUUVNVSA0LjItcmMKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDE1NzQxNzk3MjgtMzU1
-MzUtMS1naXQtc2VuZC1lbWFpbC1wYm9uemluaUByZWRoYXQuY29tCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBl
-eGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0t
-bG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGht
-IGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0g
-VEVTVCBTQ1JJUFQgRU5EID09PQoKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpiMTMx
-MzZmIG1jMTQ2ODE4cnRjOiBmaXggdGltZXIgaW50ZXJydXB0IHJlaW5qZWN0aW9uIGFnYWluCmM4
-YWJhMjMgUmV2ZXJ0ICJtYzE0NjgxOHJ0YzogZml4IHRpbWVyIGludGVycnVwdCByZWluamVjdGlv
-biIKZThhZGNhYiBzY3NpOiBkZXByZWNhdGUgc2NzaS1kaXNrCjQyMDkyYzUgaHcvaTM4NjogTW92
-ZSBzYXZlX3RzY19raHogZnJvbSBQQ01hY2hpbmVDbGFzcyB0byBYODZNYWNoaW5lQ2xhc3MKMDZj
-NzQ3MSBkb2NzL21pY3Jvdm0ucnN0OiBhZGQgaW5zdHJ1Y3Rpb25zIGZvciBzaHV0dGluZyBkb3du
-IHRoZSBndWVzdAoxM2MwYzlkIGRvY3MvbWljcm92bS5yc3Q6IGZpeCBhbGlnbm1lbnQgaW4gIkxp
-bWl0YXRpb25zIgowMmY3ODI2IGh3L2kzODY6IEZpeCBjb21waWxlciB3YXJuaW5nIHdoZW4gQ09O
-RklHX0lERV9JU0EgaXMgZGlzYWJsZWQKOTA2MjE5NCB0YXJnZXQvaTM4NjogRXhwb3J0IFRBQV9O
-TyBiaXQgdG8gZ3Vlc3RzCjE5NTAwNzUgdGFyZ2V0L2kzODY6IGFkZCBQU0NIQU5HRV9OTyBiaXQg
-Zm9yIHRoZSBBUkNIX0NBUEFCSUxJVElFUyBNU1IKODg1ODI1ZSBtaWNyb3ZtOiBmaXggbWVtb3J5
-IGxlYWsgaW4gbWljcm92bV9maXhfa2VybmVsX2NtZGxpbmUKN2VmZGZiMSBzY3JpcHRzOiBEZXRl
-Y3QgZ2l0IHdvcmt0cmVlcyBmb3IgZ2V0X21haW50YWluZXIucGwgLS1naXQKCj09PSBPVVRQVVQg
-QkVHSU4gPT09CjEvMTEgQ2hlY2tpbmcgY29tbWl0IDdlZmRmYjE4MTc5ZiAoc2NyaXB0czogRGV0
-ZWN0IGdpdCB3b3JrdHJlZXMgZm9yIGdldF9tYWludGFpbmVyLnBsIC0tZ2l0KQoyLzExIENoZWNr
-aW5nIGNvbW1pdCA4ODU4MjVlNWYzNDMgKG1pY3Jvdm06IGZpeCBtZW1vcnkgbGVhayBpbiBtaWNy
-b3ZtX2ZpeF9rZXJuZWxfY21kbGluZSkKMy8xMSBDaGVja2luZyBjb21taXQgMTk1MDA3NTBkMTdj
-ICh0YXJnZXQvaTM4NjogYWRkIFBTQ0hBTkdFX05PIGJpdCBmb3IgdGhlIEFSQ0hfQ0FQQUJJTElU
-SUVTIE1TUikKNC8xMSBDaGVja2luZyBjb21taXQgOTA2MjE5NDhmOGY0ICh0YXJnZXQvaTM4Njog
-RXhwb3J0IFRBQV9OTyBiaXQgdG8gZ3Vlc3RzKQo1LzExIENoZWNraW5nIGNvbW1pdCAwMmY3ODI2
-MDQ1YTYgKGh3L2kzODY6IEZpeCBjb21waWxlciB3YXJuaW5nIHdoZW4gQ09ORklHX0lERV9JU0Eg
-aXMgZGlzYWJsZWQpCjYvMTEgQ2hlY2tpbmcgY29tbWl0IDEzYzBjOWQ5MzBhMyAoZG9jcy9taWNy
-b3ZtLnJzdDogZml4IGFsaWdubWVudCBpbiAiTGltaXRhdGlvbnMiKQo3LzExIENoZWNraW5nIGNv
-bW1pdCAwNmM3NDcxNDE0NzEgKGRvY3MvbWljcm92bS5yc3Q6IGFkZCBpbnN0cnVjdGlvbnMgZm9y
-IHNodXR0aW5nIGRvd24gdGhlIGd1ZXN0KQo4LzExIENoZWNraW5nIGNvbW1pdCA0MjA5MmM1ZTgy
-OGMgKGh3L2kzODY6IE1vdmUgc2F2ZV90c2Nfa2h6IGZyb20gUENNYWNoaW5lQ2xhc3MgdG8gWDg2
-TWFjaGluZUNsYXNzKQo5LzExIENoZWNraW5nIGNvbW1pdCBlOGFkY2FiODVjYzQgKHNjc2k6IGRl
-cHJlY2F0ZSBzY3NpLWRpc2spCjEwLzExIENoZWNraW5nIGNvbW1pdCBjOGFiYTIzMzE0NjggKFJl
-dmVydCAibWMxNDY4MThydGM6IGZpeCB0aW1lciBpbnRlcnJ1cHQgcmVpbmplY3Rpb24iKQoxMS8x
-MSBDaGVja2luZyBjb21taXQgYjEzMTM2ZmZlZTUwIChtYzE0NjgxOHJ0YzogZml4IHRpbWVyIGlu
-dGVycnVwdCByZWluamVjdGlvbiBhZ2FpbikKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJz
-CiMzMzogRklMRTogaHcvcnRjL21jMTQ2ODE4cnRjLmM6MTcxOgorcGVyaW9kaWNfdGltZXJfdXBk
-YXRlKFJUQ1N0YXRlICpzLCBpbnQ2NF90IGN1cnJlbnRfdGltZSwgdWludDMyX3Qgb2xkX3Blcmlv
-ZCwgYm9vbCBwZXJpb2RfY2hhbmdlKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzEwMTogRklMRTogaHcvcnRjL21jMTQ2ODE4cnRjLmM6ODA4OgorICAgICAgICAgICAgcGVyaW9k
-aWNfdGltZXJfdXBkYXRlKHMsIHFlbXVfY2xvY2tfZ2V0X25zKHJ0Y19jbG9jayksIHMtPnBlcmlv
-ZCwgZmFsc2UpOwoKdG90YWw6IDEgZXJyb3JzLCAxIHdhcm5pbmdzLCA2OSBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCAxMS8xMSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQg
-PT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBh
-dmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTU3NDE3OTcyOC0zNTUzNS0xLWdp
-dC1zZW5kLWVtYWlsLXBib256aW5pQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90eXBl
-PW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFto
-dHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hl
-dy1kZXZlbEByZWRoYXQuY29t
+--000000000000ab8f400597bde8bf
+Content-Type: text/plain; charset="UTF-8"
 
+On Tuesday, November 19, 2019, Richard Henderson <
+richard.henderson@linaro.org> wrote:
+
+> On 11/19/19 6:22 PM, Taylor Simpson wrote:
+> > - Laurent suggested I split the patch into two parts: linux-user and
+> target/hexagon.  If I do that, which one should contain the changes to
+> common files (e.g., configure)?  Also, note that we won't be able to build
+> until both patches are merged.  Is that OK?
+>
+> The configure parts should be a third, last, patch.
+>
+> The series is bisectable, because before the configure patch,
+> none of the hexagon code is compiled at all.
+>
+>
+I don't think this is a good advice. Yes, at first glance, that would make
+the submitter's job easier - since he could divide the whole code into
+parts practicaly arbitrarily - but the resulting series will be of
+suboptimal quality. If the submitter was forced from the outset to add
+segments of his solution so that each step actually (not only ostensibly)
+compiles, he would also be forced to organize patches in much more coherent
+way, organize his code in much more modular way, possibly improve initial
+organization, additionally making reviews much easier.
+
+Aleksandar
+
+
+>
+> r~
+>
+>
+
+--000000000000ab8f400597bde8bf
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<br><br>On Tuesday, November 19, 2019, Richard Henderson &lt;<a href=3D"mai=
+lto:richard.henderson@linaro.org">richard.henderson@linaro.org</a>&gt; wrot=
+e:<br><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-l=
+eft:1px #ccc solid;padding-left:1ex">On 11/19/19 6:22 PM, Taylor Simpson wr=
+ote:<br>
+&gt; - Laurent suggested I split the patch into two parts: linux-user and t=
+arget/hexagon.=C2=A0 If I do that, which one should contain the changes to =
+common files (e.g., configure)?=C2=A0 Also, note that we won&#39;t be able =
+to build until both patches are merged.=C2=A0 Is that OK?<br>
+<br>
+The configure parts should be a third, last, patch.<br>
+<br>
+The series is bisectable, because before the configure patch,<br>
+none of the hexagon code is compiled at all.<br>
+<br></blockquote><div><br></div><div>I don&#39;t think this is a good advic=
+e. Yes, at first glance, that would make the submitter&#39;s job easier - s=
+ince he could divide the whole code into parts practicaly arbitrarily - but=
+ the resulting series will be of suboptimal quality. If the submitter was f=
+orced from the outset to add segments of his solution so that each step act=
+ually (not only ostensibly) compiles, he would also be forced to organize p=
+atches in much more coherent way, organize his code in much more modular wa=
+y, possibly improve initial organization, additionally making reviews much =
+easier.</div><div><br></div><div>Aleksandar</div><div>=C2=A0</div><blockquo=
+te class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc so=
+lid;padding-left:1ex">
+<br>
+r~<br>
+<br>
+</blockquote>
+
+--000000000000ab8f400597bde8bf--
 
