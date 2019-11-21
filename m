@@ -8,75 +8,78 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B18C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCAE0C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:46:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EB622063A
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:41:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C6212063A
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:46:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xnzeca2/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EB622063A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AnQDX8Bp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C6212063A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXsKl-0004yu-8t
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 14:41:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36870)
+	id 1iXsPK-0006ZW-P3
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 14:46:26 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37557)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXsJu-0003Mb-IK
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:40:52 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1iXsOM-00050B-Qa
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:45:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXsJq-0008PV-Rt
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:40:50 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:39671)
+ (envelope-from <mrolnik@gmail.com>) id 1iXsOK-0002HT-M2
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:45:26 -0500
+Received: from mail-qt1-x841.google.com ([2607:f8b0:4864:20::841]:45776)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iXsJq-0008PA-KZ
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:40:46 -0500
-Received: by mail-ot1-x341.google.com with SMTP id w24so4045361otk.6
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 11:40:46 -0800 (PST)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iXsOK-0002HI-H8
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:45:24 -0500
+Received: by mail-qt1-x841.google.com with SMTP id 30so5008154qtz.12
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 11:45:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=NUI/2xqU7+GnmfnvM/mCI+VQfu2ZmuOKpR+gEG6IAss=;
- b=Xnzeca2/uFUpirWJyCVWhlSiIFicNiNBvbTZZyoY+MOqB4TFo/OYa7y+BLRVCRzlG/
- 9Ud5ofp1qCkKcKrlFp7Xhohi9XkIFIV727bdLz4zGUreu4TBnMkPbJBtOZvZIYa0pSsE
- F0cl1OtpuOMboxNNxOLhzIEhwkOBYYdoGS2iV8tZ+q2m2wyYvnM3wRRU2uMivGFIB+kE
- b4tquoso+jtWXIeZoTOux8c2uDkAHEf6/rbLWM1vpLDQepTcwlASayGwlQssOtLL95sU
- RvnVgW/0NDHTaNwh8AyoLbS2p+nXeL47no2SGa8PpI7MIehxK0548QuCZDNiO1LH4i87
- o2VA==
+ :cc:content-transfer-encoding;
+ bh=zm9F0wihKc+hSkb6AafIPKvDT1p6ESRpQfOPWzDz1YQ=;
+ b=AnQDX8BpKfKpl9nahHrUnS8DgqX/SVTqOoSh+x53wI1nMKbYj9jBKOeIK+l68SpV0w
+ QjqSuihn9nHAj9l9tPdUWihkem6Gs0/ZpLdNyQ7z9+HRQqGJE2NnqLbO1vbjMGmUe+FY
+ zAHOO2XFucG6NATlRT0I4D5r47HGPh+xjErmrRtX6EU/hjP9DKzv50OBmrRQKoOSjX+4
+ hWNdN2S8qLCSlKyRwa7wNm3su3Xym1mpbfcmFRhNxeX5Vh4Uh6Viptvz4CpU/ynl1voV
+ vQ1JbNQEqdqUOHnGmw5CGylcpJ06TagpysdCDPEtpEeNLeHbKtiJ6NYbke7/yTL2o7wg
+ fnAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NUI/2xqU7+GnmfnvM/mCI+VQfu2ZmuOKpR+gEG6IAss=;
- b=BFRGJlw0bcWQfneUMSehjgJXe8W1R3udkIC7ewSVhO/So+8Y1Wnt8bMtGrnXspUmr5
- aG6UWATHjz+CLGKM/RxoOkJr1DHdI9P/qx3na5pL9zikGkDvxLeHIMbT+SHflyYBMcAI
- 9nJDTczCHOGI3vWNQ4knBngWQ99+UXe9uCloonBp6Ci1GHpQ86frYRd5cat8GSjPFd7K
- KDCoKXpy/xC+e9hTBZB2pQ60izIWMfykgRp/uhMYX1cFsJ/qCGQcBuisBxDryMWoFGgs
- BA3gqWX+TCg6noMa5VAkvwVB+1FNuV128EDIrsAKGCnM8xhdHpCKT1ThwShLlq3uWbC5
- i1Tw==
-X-Gm-Message-State: APjAAAXnLdF5OjYC1XGCWCpxraa6N9VSLbBy7O9EPzbs/4vGPr2BQxlD
- swlNHMv39bFvvfSdDCT5cmwfeFpxxjz1h378p8Y=
-X-Google-Smtp-Source: APXvYqxFI2Sr62h2WRSIYIRXMCJneNcqx2tyBKqvSHp5LlmMyG8NnuiOPQd/+yiw+dRzO51rmdOqHw3extyS0bj35Gg=
-X-Received: by 2002:a05:6830:44c:: with SMTP id
- d12mr7487085otc.121.1574365245575; 
- Thu, 21 Nov 2019 11:40:45 -0800 (PST)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=zm9F0wihKc+hSkb6AafIPKvDT1p6ESRpQfOPWzDz1YQ=;
+ b=tryzVfDaOwr+DZuVQL17Zf2RjNbfKm9cQmv8KsrgdXZ6uoU6vFIzPIDWdR6qNYmJ+c
+ o3vZMyAo56k5N6j/yc4YtzuiNILe4+Fsrvh1cF/KR0xJn1zYzXYkkbrCwLPrK9Pzbsnw
+ NEi+zdZxRSXxiD5Ze9IaKxeWitrvyP4d2zU4nKvxAr5+J6WpIGUBsGaToHYzpfKolUHS
+ tJ4pKxCYvO0QLJWwLMWAPdZf+gRooBv+Z2qcZgD6omSRtey3XqRyBUPNngzcnEgy8/ua
+ Dg/UhBiu3Cx7H9iXyaNk2KzgNKVagiAwaubaewuIAB5JyGKtKzd+7hxKPtT8H1nV5vVv
+ QlEg==
+X-Gm-Message-State: APjAAAUSy1Gx3YaSsUW1brXxKi6+por3ykY7NMAu/3YEBIHLIpXBIQYi
+ 0ZK865uT+iw2bd5Xck21egqp8RR4nePA35g9g/w=
+X-Google-Smtp-Source: APXvYqyf+rW8IOYuTUwpxrvC7m2NMyRhnkxvC75yEU/+x8yn5bCtl15cw/8GRVLHoiA+ZPBqC5mvjF007T3zXgwB5MA=
+X-Received: by 2002:ac8:4a02:: with SMTP id x2mr10324375qtq.371.1574365522759; 
+ Thu, 21 Nov 2019 11:45:22 -0800 (PST)
 MIME-Version: 1.0
-References: <20191121193351.GA31821@ls3530.fritz.box>
-In-Reply-To: <20191121193351.GA31821@ls3530.fritz.box>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 21 Nov 2019 20:40:35 +0100
-Message-ID: <CAL1e-=iJ1evMipDeqLXNp-Mvvb74-hDgknoMaSaz651QRU0Z6w@mail.gmail.com>
-Subject: Re: [PATCH v3] linux-user/strace: Improve output of various syscalls
-To: Helge Deller <deller@gmx.de>
+References: <20191029212430.20617-1-mrolnik@gmail.com>
+ <20191029212430.20617-2-mrolnik@gmail.com>
+ <750745b9-e51c-3757-3eb6-ffce51042d9c@redhat.com>
+In-Reply-To: <750745b9-e51c-3757-3eb6-ffce51042d9c@redhat.com>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Thu, 21 Nov 2019 21:44:26 +0200
+Message-ID: <CAK4993gtPkqESswLBoo1cMuvJFzwSVgUP=Oh-hpG2JSTKezjmw@mail.gmail.com>
+Subject: Re: [PATCH v35 01/13] target/avr: Add outward facing interfaces and
+ core CPU logic
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::841
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,206 +91,328 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>,
+Cc: Thomas Huth <thuth@redhat.com>, Sarah Harris <S.E.Harris@kent.ac.uk>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
  Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+ QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Nov 21, 2019 at 8:33 PM Helge Deller <deller@gmx.de> wrote:
+On Thu, Nov 21, 2019 at 8:55 PM Philippe Mathieu-Daud=C3=A9
+<philmd@redhat.com> wrote:
 >
-> Improve strace output of various syscalls which either have none
-> or only int-type parameters.
+> Hi Michael,
 >
-> Signed-off-by: Helge Deller <deller@gmx.de>
+> On 10/29/19 10:24 PM, Michael Rolnik wrote:
+> > This includes:
+> > - CPU data structures
+> > - object model classes and functions
+> > - migration functions
+> > - GDB hooks
+> >
+> > Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
+> > Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> > Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> > Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> > Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> > Acked-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+> >   gdb-xml/avr-cpu.xml    |  49 ++++
+> >   target/avr/cpu-param.h |  37 +++
+> >   target/avr/cpu-qom.h   |  54 ++++
+> >   target/avr/cpu.c       | 576 ++++++++++++++++++++++++++++++++++++++++=
++
+> >   target/avr/cpu.h       | 253 ++++++++++++++++++
+> >   target/avr/gdbstub.c   |  85 ++++++
+> >   target/avr/machine.c   | 121 +++++++++
+> >   7 files changed, 1175 insertions(+)
+> >   create mode 100644 gdb-xml/avr-cpu.xml
+> >   create mode 100644 target/avr/cpu-param.h
+> >   create mode 100644 target/avr/cpu-qom.h
+> >   create mode 100644 target/avr/cpu.c
+> >   create mode 100644 target/avr/cpu.h
+> >   create mode 100644 target/avr/gdbstub.c
+> >   create mode 100644 target/avr/machine.c
+> >
+> > diff --git a/gdb-xml/avr-cpu.xml b/gdb-xml/avr-cpu.xml
+> > new file mode 100644
+> > index 0000000000..c4747f5b40
+> > --- /dev/null
+> > +++ b/gdb-xml/avr-cpu.xml
+> > @@ -0,0 +1,49 @@
+> > +<?xml version=3D"1.0"?>
+> > +<!-- Copyright (C) 2018-2019 Free Software Foundation, Inc.
+> > +
+> > +     Copying and distribution of this file, with or without modificati=
+on,
+> > +     are permitted in any medium without royalty provided the copyrigh=
+t
+> > +     notice and this notice are preserved.  -->
+> > +
+> > +<!-- Register numbers are hard-coded in order to maintain backward
+> > +     compatibility with older versions of tools that didn't use xml
+> > +     register descriptions.  -->
+> > +
+> > +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
+> > +<feature name=3D"org.gnu.gdb.riscv.cpu">
+> > +  <reg name=3D"r0" bitsize=3D"8" type=3D"int" regnum=3D"0"/>
+> > +  <reg name=3D"r1" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r2" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r3" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r4" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r5" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r6" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r7" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r8" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r9" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r10" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r11" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r12" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r13" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r14" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r15" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r16" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r17" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r18" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r19" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r20" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r21" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r22" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r23" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r24" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r25" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r26" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r27" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r28" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r29" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r30" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"r31" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"sreg" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"sp" bitsize=3D"8" type=3D"int"/>
+> > +  <reg name=3D"pc" bitsize=3D"8" type=3D"int"/>
+> > +</feature>
+> > diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h
+> > new file mode 100644
+> > index 0000000000..ccd1ea3429
+> > --- /dev/null
+> > +++ b/target/avr/cpu-param.h
+> > @@ -0,0 +1,37 @@
+> > +/*
+> > + * QEMU AVR CPU
+> > + *
+> > + * Copyright (c) 2019 Michael Rolnik
+> > + *
+> > + * This library is free software; you can redistribute it and/or
+> > + * modify it under the terms of the GNU Lesser General Public
+> > + * License as published by the Free Software Foundation; either
+> > + * version 2.1 of the License, or (at your option) any later version.
+> > + *
+> > + * This library is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> > + * Lesser General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU Lesser General Public
+> > + * License along with this library; if not, see
+> > + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> > + */
+> > +
+> > +#ifndef AVR_CPU_PARAM_H
+> > +#define AVR_CPU_PARAM_H 1
+> > +
+> > +#define TARGET_LONG_BITS 32
+> > +/*
+> > + * TARGET_PAGE_BITS cannot be more than 8 bits because
+> > + * 1.  all IO registers occupy [0x0000 .. 0x00ff] address range, and t=
+hey
+> > + *     should be implemented as a device and not memory
+> > + * 2.  SRAM starts at the address 0x0100
+> > + */
+> > +#define TARGET_PAGE_BITS 8
+> > +#define TARGET_PHYS_ADDR_SPACE_BITS 24
+> > +#define TARGET_VIRT_ADDR_SPACE_BITS 24
+> > +#define NB_MMU_MODES 2
+> > +
+> > +
+> > +#endif
+> > diff --git a/target/avr/cpu-qom.h b/target/avr/cpu-qom.h
+> > new file mode 100644
+> > index 0000000000..e28b58c897
+> > --- /dev/null
+> > +++ b/target/avr/cpu-qom.h
+> > @@ -0,0 +1,54 @@
+> > +/*
+> > + * QEMU AVR CPU
+> > + *
+> > + * Copyright (c) 2019 Michael Rolnik
+> > + *
+> > + * This library is free software; you can redistribute it and/or
+> > + * modify it under the terms of the GNU Lesser General Public
+> > + * License as published by the Free Software Foundation; either
+> > + * version 2.1 of the License, or (at your option) any later version.
+> > + *
+> > + * This library is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> > + * Lesser General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU Lesser General Public
+> > + * License along with this library; if not, see
+> > + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> > + */
+> > +
+> > +#ifndef QEMU_AVR_QOM_H
+> > +#define QEMU_AVR_QOM_H
+> > +
+> > +#include "hw/core/cpu.h"
+> > +
+> > +#define TYPE_AVR_CPU "avr-cpu"
+> > +
+> > +#define AVR_CPU_CLASS(klass) \
+> > +    OBJECT_CLASS_CHECK(AVRCPUClass, (klass), TYPE_AVR_CPU)
+> > +#define AVR_CPU(obj) \
+> > +    OBJECT_CHECK(AVRCPU, (obj), TYPE_AVR_CPU)
+> > +#define AVR_CPU_GET_CLASS(obj) \
+> > +    OBJECT_GET_CLASS(AVRCPUClass, (obj), TYPE_AVR_CPU)
+> > +
+> > +/**
+> > + *  AVRCPUClass:
+> > + *  @parent_realize: The parent class' realize handler.
+> > + *  @parent_reset: The parent class' reset handler.
+> > + *  @vr: Version Register value.
+> > + *
+> > + *  A AVR CPU model.
+> > + */
+> > +typedef struct AVRCPUClass {
+> > +    /*< private >*/
+> > +    CPUClass parent_class;
+> > +    /*< public >*/
+> > +    DeviceRealize parent_realize;
+> > +    void (*parent_reset)(CPUState *cpu);
+> > +} AVRCPUClass;
+> > +
+> > +typedef struct AVRCPU AVRCPU;
+> > +
+> > +
+> > +#endif /* !defined (QEMU_AVR_CPU_QOM_H) */
+> > diff --git a/target/avr/cpu.c b/target/avr/cpu.c
+> > new file mode 100644
+> > index 0000000000..dae56d7845
+> > --- /dev/null
+> > +++ b/target/avr/cpu.c
+> > @@ -0,0 +1,576 @@
+> > +/*
+> > + * QEMU AVR CPU
+> > + *
+> > + * Copyright (c) 2019 Michael Rolnik
+> > + *
+> > + * This library is free software; you can redistribute it and/or
+> > + * modify it under the terms of the GNU Lesser General Public
+> > + * License as published by the Free Software Foundation; either
+> > + * version 2.1 of the License, or (at your option) any later version.
+> > + *
+> > + * This library is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> > + * Lesser General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU Lesser General Public
+> > + * License along with this library; if not, see
+> > + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qapi/error.h"
+> > +#include "qemu/qemu-print.h"
+> > +#include "exec/exec-all.h"
+> > +#include "cpu.h"
+> > +
+> > +static void avr_cpu_set_pc(CPUState *cs, vaddr value)
+> > +{
+> > +    AVRCPU *cpu =3D AVR_CPU(cs);
+> > +
+> > +    cpu->env.pc_w =3D value / 2; /* internally PC points to words */
+> > +}
+> > +
+> > +static bool avr_cpu_has_work(CPUState *cs)
+> > +{
+> > +    AVRCPU *cpu =3D AVR_CPU(cs);
+> > +    CPUAVRState *env =3D &cpu->env;
+> > +
+> > +    return (cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERRUP=
+T_RESET))
+> > +            && cpu_interrupts_enabled(env);
+> > +}
+> > +
+> > +static void avr_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock=
+ *tb)
+> > +{
+> > +    AVRCPU *cpu =3D AVR_CPU(cs);
+> > +    CPUAVRState *env =3D &cpu->env;
+> > +
+> > +    env->pc_w =3D tb->pc / 2; /* internally PC points to words */
+> > +}
+> > +
+> > +static void avr_cpu_reset(CPUState *cs)
+> > +{
+> > +    AVRCPU *cpu =3D AVR_CPU(cs);
+> > +    AVRCPUClass *mcc =3D AVR_CPU_GET_CLASS(cpu);
+> > +    CPUAVRState *env =3D &cpu->env;
+> > +
+> > +    mcc->parent_reset(cs);
+> > +
+> > +    env->pc_w =3D 0;
+> > +    env->sregI =3D 1;
+> > +    env->sregC =3D 0;
+> > +    env->sregZ =3D 0;
+> > +    env->sregN =3D 0;
+> > +    env->sregV =3D 0;
+> > +    env->sregS =3D 0;
+> > +    env->sregH =3D 0;
+> > +    env->sregT =3D 0;
+> > +
+> > +    env->rampD =3D 0;
+> > +    env->rampX =3D 0;
+> > +    env->rampY =3D 0;
+> > +    env->rampZ =3D 0;
+> > +    env->eind =3D 0;
+> > +    env->sp =3D 0;
+> > +
+> > +    env->skip =3D 0;
+> > +
+> > +    memset(env->r, 0, sizeof(env->r));
+> > +
+> > +    tlb_flush(cs);
+> > +}
+> > +
+> > +static void avr_cpu_disas_set_info(CPUState *cpu, disassemble_info *in=
+fo)
+> > +{
+> > +    info->mach =3D bfd_arch_avr;
+> > +    info->print_insn =3D NULL;
 >
-> ---
+> Why not implement the dump_ASM code? This is very useful...
+>
+> Richard what is your position on this? I'd rather enforce this as a
+> requirement for each ports.
 
-Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
+Hi Philippe.
+
+I will, however it could be a functionality of the instruction parser.
+
+Regards,
+Michael
+>
+> > +}
+> > +
+> [...]
+>
 
 
-> Changes in v3:
->     fixed alarm()
->     added epoll_create(), epoll_create1(), eventfd(), eventfd2()
->
-> Changes in v2:
->     fixed ioctl()
->
->
-> diff --git a/linux-user/strace.list b/linux-user/strace.list
-> index 1de4319dcf..d49a1e92a8 100644
-> --- a/linux-user/strace.list
-> +++ b/linux-user/strace.list
-> @@ -26,7 +26,7 @@
->  { TARGET_NR_afs_syscall, "afs_syscall" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_alarm
-> -{ TARGET_NR_alarm, "alarm" , NULL, NULL, NULL },
-> +{ TARGET_NR_alarm, "alarm" , "%s(%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_aplib
->  { TARGET_NR_aplib, "aplib" , NULL, NULL, NULL },
-> @@ -116,19 +116,19 @@
->  { TARGET_NR_dipc, "dipc" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_dup
-> -{ TARGET_NR_dup, "dup" , NULL, NULL, NULL },
-> +{ TARGET_NR_dup, "dup" , "%s(%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_dup2
-> -{ TARGET_NR_dup2, "dup2" , NULL, NULL, NULL },
-> +{ TARGET_NR_dup2, "dup2" , "%s(%d,%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_dup3
-> -{ TARGET_NR_dup3, "dup3" , NULL, NULL, NULL },
-> +{ TARGET_NR_dup3, "dup3" , "%s(%d,%d,%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_epoll_create
-> -{ TARGET_NR_epoll_create, "epoll_create" , NULL, NULL, NULL },
-> +{ TARGET_NR_epoll_create, "%s(%d)", NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_epoll_create1
-> -{ TARGET_NR_epoll_create1, "epoll_create1" , NULL, NULL, NULL },
-> +{ TARGET_NR_epoll_create1, "%s(%d)", NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_epoll_ctl
->  { TARGET_NR_epoll_ctl, "epoll_ctl" , NULL, NULL, NULL },
-> @@ -146,10 +146,10 @@
->  { TARGET_NR_epoll_wait_old, "epoll_wait_old" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_eventfd
-> -{ TARGET_NR_eventfd, "eventfd" , NULL, NULL, NULL },
-> +{ TARGET_NR_eventfd, "eventfd", "%s(%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_eventfd2
-> -{ TARGET_NR_eventfd2, "eventfd2" , NULL, NULL, NULL },
-> +{ TARGET_NR_eventfd2, "eventfd2" , "%s(%d,%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_execv
->  { TARGET_NR_execv, "execv" , NULL, print_execv, NULL },
-> @@ -191,7 +191,7 @@
->  { TARGET_NR_fanotify_mark, "fanotify_mark" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_fchdir
-> -{ TARGET_NR_fchdir, "fchdir" , NULL, NULL, NULL },
-> +{ TARGET_NR_fchdir, "fchdir" , "%s(%d)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_fchmod
->  { TARGET_NR_fchmod, "fchmod" , "%s(%d,%#o)", NULL, NULL },
-> @@ -287,7 +287,7 @@
->  { TARGET_NR_getdtablesize, "getdtablesize" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getegid
-> -{ TARGET_NR_getegid, "getegid" , NULL, NULL, NULL },
-> +{ TARGET_NR_getegid, "getegid" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getegid32
->  { TARGET_NR_getegid32, "getegid32" , NULL, NULL, NULL },
-> @@ -299,7 +299,7 @@
->  { TARGET_NR_geteuid32, "geteuid32" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getgid
-> -{ TARGET_NR_getgid, "getgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_getgid, "getgid" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getgid32
->  { TARGET_NR_getgid32, "getgid32" , NULL, NULL, NULL },
-> @@ -329,10 +329,10 @@
->  { TARGET_NR_getpeername, "getpeername" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getpgid
-> -{ TARGET_NR_getpgid, "getpgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_getpgid, "getpgid" , "%s(%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getpgrp
-> -{ TARGET_NR_getpgrp, "getpgrp" , NULL, NULL, NULL },
-> +{ TARGET_NR_getpgrp, "getpgrp" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_getpid
->  { TARGET_NR_getpid, "getpid" , "%s()", NULL, NULL },
-> @@ -432,7 +432,7 @@
->  { TARGET_NR_io_cancel, "io_cancel" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_ioctl
-> -{ TARGET_NR_ioctl, "ioctl" , NULL, NULL, NULL },
-> +{ TARGET_NR_ioctl, "ioctl" , "%s(%d,%#x,%#x)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_io_destroy
->  { TARGET_NR_io_destroy, "io_destroy" , NULL, NULL, NULL },
-> @@ -1257,22 +1257,22 @@
->  { TARGET_NR_setdomainname, "setdomainname" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setfsgid
-> -{ TARGET_NR_setfsgid, "setfsgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setfsgid, "setfsgid" , "%s(%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setfsgid32
-> -{ TARGET_NR_setfsgid32, "setfsgid32" , NULL, NULL, NULL },
-> +{ TARGET_NR_setfsgid32, "setfsgid32" , "%s(%u)" , NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setfsuid
-> -{ TARGET_NR_setfsuid, "setfsuid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setfsuid, "setfsuid" , "%s(%u)" , NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setfsuid32
->  { TARGET_NR_setfsuid32, "setfsuid32" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setgid
-> -{ TARGET_NR_setgid, "setgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setgid, "setgid" , "%s(%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setgid32
-> -{ TARGET_NR_setgid32, "setgid32" , NULL, NULL, NULL },
-> +{ TARGET_NR_setgid32, "setgid32" , "%s(%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setgroups
->  { TARGET_NR_setgroups, "setgroups" , NULL, NULL, NULL },
-> @@ -1296,7 +1296,7 @@
->  { TARGET_NR_setns, "setns" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setpgid
-> -{ TARGET_NR_setpgid, "setpgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setpgid, "setpgid" , "%s(%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setpgrp
->  { TARGET_NR_setpgrp, "setpgrp" , NULL, NULL, NULL },
-> @@ -1311,22 +1311,22 @@
->  { TARGET_NR_setregid32, "setregid32" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setresgid
-> -{ TARGET_NR_setresgid, "setresgid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setresgid, "setresgid" , "%s(%u,%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setresgid32
->  { TARGET_NR_setresgid32, "setresgid32" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setresuid
-> -{ TARGET_NR_setresuid, "setresuid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setresuid, "setresuid" , "%s(%u,%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setresuid32
-> -{ TARGET_NR_setresuid32, "setresuid32" , NULL, NULL, NULL },
-> +{ TARGET_NR_setresuid32, "setresuid32" , "%s(%u,%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setreuid
-> -{ TARGET_NR_setreuid, "setreuid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setreuid, "setreuid" , "%s(%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setreuid32
-> -{ TARGET_NR_setreuid32, "setreuid32" , NULL, NULL, NULL },
-> +{ TARGET_NR_setreuid32, "setreuid32" , "%s(%u,%u)", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setrlimit
->  { TARGET_NR_setrlimit, "setrlimit" , NULL, NULL, NULL },
-> @@ -1335,7 +1335,7 @@
->  { TARGET_NR_set_robust_list, "set_robust_list" , NULL, NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setsid
-> -{ TARGET_NR_setsid, "setsid" , NULL, NULL, NULL },
-> +{ TARGET_NR_setsid, "setsid" , "%s()", NULL, NULL },
->  #endif
->  #ifdef TARGET_NR_setsockopt
->  { TARGET_NR_setsockopt, "setsockopt" , NULL, NULL, NULL },
+--=20
+Best Regards,
+Michael Rolnik
 
