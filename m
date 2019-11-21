@@ -2,79 +2,87 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3961BC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8836C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:52:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04B6920679
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:52:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7397920679
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:52:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B1J6jiBU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04B6920679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IykNunYb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7397920679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXmsR-0002jO-TV
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:52:07 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33912)
+	id 1iXmsp-0003DP-4H
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:52:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34023)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iXmqk-0001OF-7P
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:50:23 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iXmrb-0001t0-F7
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:51:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iXmqh-0002QM-39
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:50:20 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33411
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iXmqg-0002PQ-Tg
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:50:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574344217;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=843rk/hvHKTUdND560tL1cPITIt9NEEhwK3/nwRPi5s=;
- b=B1J6jiBU6j35VlAwtkewLkAAO5ZFpgZYaZO5V+2NmHBz2/5RP80UwRslIWQyHMoXeV+/gP
- m7Nqm/bX/Gjnh3XW4nRXedXxwIjJEodl7T5Bb5dOmFC8Ptlfieb4S14f8tkyGVasfBO/Dj
- nPyix4BLCB1y9RuyjxLKwAExWAmHPno=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-eZoAQ1QSM5ac1mqOijSe_A-1; Thu, 21 Nov 2019 08:50:14 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07F32107ACC4;
- Thu, 21 Nov 2019 13:50:13 +0000 (UTC)
-Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 95C6B692AB;
- Thu, 21 Nov 2019 13:50:03 +0000 (UTC)
-Date: Thu, 21 Nov 2019 14:50:01 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH 07/15] s390x: protvirt: Handle diag 308 subcodes 0,1,3,4
-Message-ID: <20191121145001.5e7a182d.cohuck@redhat.com>
-In-Reply-To: <20191120114334.2287-8-frankja@linux.ibm.com>
-References: <20191120114334.2287-1-frankja@linux.ibm.com>
- <20191120114334.2287-8-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+ (envelope-from <stefanha@gmail.com>) id 1iXmra-0003DR-0t
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:51:15 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:56000)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iXmrZ-0003Bn-QD
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:51:13 -0500
+Received: by mail-wm1-x343.google.com with SMTP id b11so3780173wmb.5
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 05:51:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=KaerfimaGLiAfJXhZnCR1Lc2dMjYR45xPb2iWPC4faE=;
+ b=IykNunYbUUg/02YQDZiviDqdmEO5B3RicRcWm7XRnRXWY9dxNnFtDx1MFzNwRI5v7t
+ gCjhMlzsffFJtI89z/D2kM9Xj5ho0tQMysK91432zYt2B4GO6sm/JV/45CA/ur6LBd+c
+ LLo7hYB25uOFAUJ1oNldFMIL5c8wiUOqb8LkNRJ4WDn0Zcmwb6sy8LHR27HSu9guVCJ7
+ gMXtCrDVeuj5tY5L4Drf2JH56rMg5a057NsdbfO5PmrWyh+mgT+MjLq+l8rBF50vFOUa
+ w8olUluDcRU9aUEHu3KU1YhP00cXU9ogK9fUZVh7S33Mh4/8eitnCaYbSbNOgP2EBSbg
+ TdEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=KaerfimaGLiAfJXhZnCR1Lc2dMjYR45xPb2iWPC4faE=;
+ b=SP1AixIgI3aAx4ZaS9j6Ix/ZaToW0PEuC0s7jb61YvOJqI1rTOWTWs1GHwGi0pt4k4
+ UAOfTfvAkoaZcZeOinXud4gorgk25gsnYS79WVmjXwOdQU0y4LCmTya9JLGNL8K9WrkU
+ ERk+vjHksrJe0jcvN0gJvl8e5RU7NEc37txFaXbRF/Cy9nMvh4MKzY4Qr2tmIAthf5hF
+ tnCpKX0B+FWOqbKjzBo47prAwFNYfxbRe17E2WiqLR+gLUkDgwgNdWgC79m1W8zu+8N+
+ c9l48Pbfnf/DKEZ4s6mx2Lp2eDILIuyTL+zADrCJ8tNNFCXDF6MoHFiecPIu+rSCeldh
+ RScg==
+X-Gm-Message-State: APjAAAXadm+87qWteSb38jrMDiyvKoHmWtBw5jNMonFNgmgCJM67kQPB
+ Ux873G6c+GVM5wMsN5MGIls=
+X-Google-Smtp-Source: APXvYqynesBaN8v5Y403+D1Hu+lBrEbr9NINY2qZXJ2cxYotNJ82pYKz3eA3wQkVcufMu/Z3bRMEBA==
+X-Received: by 2002:a7b:c38c:: with SMTP id s12mr10296891wmj.84.1574344272142; 
+ Thu, 21 Nov 2019 05:51:12 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id c15sm3633656wrx.78.2019.11.21.05.51.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 21 Nov 2019 05:51:10 -0800 (PST)
+Date: Thu, 21 Nov 2019 13:51:09 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH] vhost-user-input: use free(elem) instead of g_free(elem)
+Message-ID: <20191121135109.GW439743@stefanha-x1.localdomain>
+References: <20191119111626.112206-1-stefanha@redhat.com>
+ <20191120114856.GG2785116@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: eZoAQ1QSM5ac1mqOijSe_A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="HACzHn9G0kmbdSJa"
+Content-Disposition: inline
+In-Reply-To: <20191120114856.GG2785116@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,143 +94,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
- qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mihajlov@linux.ibm.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 20 Nov 2019 06:43:26 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> Now that we know the protection state off the cpus, we can start
-> handling all diag 308 subcodes in the protected state.
+--HACzHn9G0kmbdSJa
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-"As we now have access to the protection state of the cpus, we can
-implement special handling of diag 308 subcodes for cpus in the
-protected state."
-
-?
-
+On Wed, Nov 20, 2019 at 11:48:56AM +0000, Daniel P. Berrang=E9 wrote:
+> On Tue, Nov 19, 2019 at 11:16:26AM +0000, Stefan Hajnoczi wrote:
+> > The virtqueue element returned by vu_queue_pop() is allocated using
+> > malloc(3) by virtqueue_alloc_element().  Use the matching free(3)
+> > function instead of glib's g_free().
 >=20
-> For subcodes 0 and 1 we need to unshare all pages before continuing,
-> so the guest doesn't accidently expose data when dumping.
+> Just as an FYI, since glib 2.46  g_malloc is hardcoded to use the
+> system allocator, so it is now guaranteed that g_malloc/malloc
+> and g_free/free are safely interchangable. I recently got this
+> clarified in the glib docs:
 >=20
-> For subcode 3/4 we tear down the protected VM and reboot into
-> unprotected mode. We do not provide a secure reboot.
+>   https://gitlab.gnome.org/GNOME/glib/merge_requests/1099//diffs
 >=20
-> Before we can do the unshare calls, we need to mark all cpus as
-> stopped.
+> QEMU mandates 2.48 so we are now safe in that regard
 >=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c | 30 +++++++++++++++++++++++++++---
->  target/s390x/diag.c        |  4 ++++
->  2 files changed, 31 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 7262453616..6fd50b4c42 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -319,11 +319,26 @@ static inline void s390_do_cpu_ipl(CPUState *cs, ru=
-n_on_cpu_data arg)
->      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
->  }
-> =20
-> +static void s390_pv_prepare_reset(CPUS390XState *env)
-> +{
-> +    CPUState *cs;
-> +
-> +    if (!env->pv) {
-> +        return;
-> +    }
-> +    CPU_FOREACH(cs) {
-> +        s390_cpu_set_state(S390_CPU_STATE_STOPPED, S390_CPU(cs));
-> +    }
-> +    s390_pv_unshare();
-> +    s390_pv_perf_clear_reset();
-> +}
-> +
->  static void s390_machine_reset(MachineState *machine)
->  {
->      enum s390_reset reset_type;
->      CPUState *cs, *t;
->      S390CPU *cpu;
-> +    CPUS390XState *env;
-> =20
->      /* get the reset parameters, reset them once done */
->      s390_ipl_get_reset_request(&cs, &reset_type);
-> @@ -332,29 +347,38 @@ static void s390_machine_reset(MachineState *machin=
-e)
->      s390_cmma_reset();
-> =20
->      cpu =3D S390_CPU(cs);
-> +    env =3D &cpu->env;
-> =20
->      switch (reset_type) {
->      case S390_RESET_MODIFIED_CLEAR:  /* Subcode 0 */
-> +        subsystem_reset();
-> +        s390_crypto_reset();
-> +        s390_pv_prepare_reset(env);
->          CPU_FOREACH(t) {
->              run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
->          }
-> -        subsystem_reset();
-> -        s390_crypto_reset();
+> For readability/sanity sake I'd still suggest matching functions
+> but it is not a functional danger any more. Even when it was a
+> risk, that risk only arose if you called GLib's API for installing
+> a custom allocator callback which QEMU never did, so it was always
+> a non-issue.
 
-This also switches the order in which different parts are reset for
-normal guests. I presume that order doesn't matter here?
+You are right, although QEMU did use g_mem_set_vtable().  The custom
+functions still used malloc() underneath though so it would be safe
+anyway:
 
->          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
->          break;
->      case S390_RESET_LOAD_NORMAL: /* Subcode 1*/
+  commit 98cf48f60aa4999f5b2808569a193a401a390e6a
+  Author: Paolo Bonzini <pbonzini@redhat.com>
+  Date:   Wed Sep 16 17:38:44 2015 +0200
 
-missing blank before */ (introduced in a previous patch)
+      trace: remove malloc tracing
 
+--HACzHn9G0kmbdSJa
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> +        subsystem_reset();
-> +        s390_pv_prepare_reset(env);
->          CPU_FOREACH(t) {
->              if (t =3D=3D cs) {
->                  continue;
->              }
->              run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
->          }
-> -        subsystem_reset();
->          run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
->          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
->          break;
->      case S390_RESET_EXTERNAL:
+-----BEGIN PGP SIGNATURE-----
 
-Annotate this with the subcode as well? (in the patch introducing it)
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3Wlk0ACgkQnKSrs4Gr
+c8jruAf+IuZwBb3rykhFL8wlFVdMbgMyksJXqQ+nGdRPjePaFMb2P/j2iSzEO5DR
+1Mc68R8g/Xqj/36SDE57hQyaaXAmEnrfsSeze+97SdrNBiUhnpKIS5X597XWEX0h
+ZYe2XIbPipKdAZ+DCRJlGiRV2vDQJBq6aUMPuiedVfURr0V70fuYHthS9+8gUmry
+ng/vHpPyyaGTdRRmfj4tHaXNQX9uv7kIGPqxRLxdCpq2gTAmwcwNnrE2ya6tj12r
+UJhSRjb4UC/gNPqEmkHyWOJKWsUimqpEjOAyhBs1D6Kyg3UIy8oq1mrCF0zcHypb
+OFHS3RbnkZRbrP7g5QKupLqY5f9gFA==
+=DOro
+-----END PGP SIGNATURE-----
 
->      case S390_RESET_REIPL: /* Subcode 4 */
-> +        if (env->pv) {
-> +            CPU_FOREACH(t) {
-> +                s390_pv_vcpu_destroy(t);
-> +            }
-> +            s390_pv_vm_destroy();
-> +        }
->          qemu_devices_reset();
->          s390_crypto_reset();
->          /* configure and start the ipl CPU only */
-> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-> index 32049bb4ee..db6d79cef3 100644
-> --- a/target/s390x/diag.c
-> +++ b/target/s390x/diag.c
-> @@ -68,6 +68,10 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, u=
-int64_t r3)
->  static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t =
-addr,
->                                uintptr_t ra, bool write)
->  {
-> +    /* Handled by the Ultravisor */
-> +    if (env->pv) {
-> +        return 0;
-> +    }
->      if ((r1 & 1) || (addr & ~TARGET_PAGE_MASK)) {
->          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->          return -EINVAL;
-
+--HACzHn9G0kmbdSJa--
 
