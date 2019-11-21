@@ -2,79 +2,100 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5951FC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 18:27:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7B3C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 18:28:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22C1F2067D
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 18:27:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 387EE2067D
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 18:28:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kjYs1fl+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22C1F2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZYAbdibt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 387EE2067D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44770 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXrAW-0002LH-3Z
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 13:27:04 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53791)
+	id 1iXrBi-0003Kz-9H
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 13:28:18 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53959)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iXr90-0001KA-H9
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 13:25:31 -0500
+ (envelope-from <philmd@redhat.com>) id 1iXr9f-0001w6-ST
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 13:26:15 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iXr8z-0006eP-Ed
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 13:25:30 -0500
-Received: from mail-oi1-x229.google.com ([2607:f8b0:4864:20::229]:39597)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iXr8z-0006dy-9Y
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 13:25:29 -0500
-Received: by mail-oi1-x229.google.com with SMTP id v138so4094927oif.6
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 10:25:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=LOZGz2UDMIwMUg0tcm9urZX6fqfPGuOFbxhsjTMlJRk=;
- b=kjYs1fl+UtCHwCFH4bPrPnnopj7Ix3pkW5vsaOfMdCkl/YJtJxb5I1W3DpXezsm0F9
- wLh1VNj+9UhyfNZGiv0irhhPOSa9Go2oI0QJajwvZvqh1waU5QD/AQYKtplN2xHbAqXZ
- SW2wyaqi5Z0Vw2qOaB+oXkUaZdvxszZbO2iCteBvniO096lSU8DCqU3bsDLxLEKap1Sa
- /F2hwWYHI4UHVkIGPxJOy9bXDMKPYDkydpxWxfJDWz0SCbKqR/ZCXBzNRAbzSil6kl6d
- riRObHrfzcszR87v9eeVdQ+BTnJKuM2wTMBnz/ax16WyBNr/MM9wy1Jp0jN803x0MKfR
- Qgxw==
+ (envelope-from <philmd@redhat.com>) id 1iXr9e-00071q-TW
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 13:26:11 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:35209
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iXr9e-00071g-QC
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 13:26:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574360770;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=vCnEAv9jvRW7O31uZx//FPCRuayf3VJGyk0xR1sZv2c=;
+ b=ZYAbdibtEityFs0XQPKjlmgcrsCpNqQjd9+1M1eopLl1thNqKzXji5y+leERMyGDy5DpwN
+ pUm4OgeHbpH0cs/x01L26fX5yoqXjiy/9Jpsmrl6Hbd4iNxsVaW2S/ezZeWyTvMiYV7kMG
+ SpVGbf8uK6SkGFpF0BdAWBXqF5tywmQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-167-z2P-vqDCMdm49SL3wq-8Qw-1; Thu, 21 Nov 2019 13:26:08 -0500
+Received: by mail-wr1-f70.google.com with SMTP id 92so2510904wro.14
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 10:26:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=LOZGz2UDMIwMUg0tcm9urZX6fqfPGuOFbxhsjTMlJRk=;
- b=aP4ah5EIbmsbxLUtGXOuJC+N8WlpyqwIJSfXEfkDSKpI35V+V2KA/p7Q+W2F+u8ZPh
- /HN8SXWh+dC3hUvYxAYl7/KNCZYXwZjbQ/l3U5bkit2QeH0a/IhDQf1EcoMrTIr8UqyX
- 0N9kBIr20SWHLEQLnU4gLFtr5u3c8HL20elttHbqZLDtOBg/oAH3PDGUaHskcGc2vsWU
- as4J9/wxKnJzBGNgckwCw00PfmNnGhygA9NPdF2lK0pJGqZ413s+B/v4FiXcK68tnkp8
- Mk3ioMYTiEw3p1XV3EvUJXayCAejI23dD9pktIzOjHEtQfTAfV+ZeQwrV0lBq/ebsfsZ
- TftA==
-X-Gm-Message-State: APjAAAU0+jorK778kH2OT4ax0dy0JOX1EcNszQdcZREC5Qg9OXA182k/
- 1t+olJTrbjtBz2PgtQHv+0HBuO10fxb6yOeKwtzCrw==
-X-Google-Smtp-Source: APXvYqz5+tsTykVfoHAF9eTCgZGyvcchPITBjKJIN32d3291I/nNzDBoB4lC4K842HwEOLgkw+33CWiK6nKmbrIeT90=
-X-Received: by 2002:aca:a9d4:: with SMTP id s203mr8592621oie.146.1574360728474; 
- Thu, 21 Nov 2019 10:25:28 -0800 (PST)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=34oNAQXz/6pxw1PPgOm4m2Kc+OfCObwR1wvooQDwhYQ=;
+ b=iMpj1DdweWMACM9eRUzT9WWPiD1YFaY+S4ioRBCms475iBF38bLUYoE5s24esk1ifZ
+ LL7geQiTCBTcM4Rlhf/fGl9f7r1xv+WhgJzbcjmoJk789FLHHDeJmQn7l0TamsS8h+ws
+ fBfBj4NzR6rvwb5jGtfyhftWBpWRuSiafuSZIV9ghy6FIZUnEmokwdqsT4jzeaGetaJI
+ pY8vforgJGGTaUtGGZ1ESBeD3bAdvTZQhlOnEKWDAleijdXpL168FaZib2WtSs2qzCMf
+ BCwGujnCN39stiIFbwY52JBulasvT4K+CZLTqKr0G2fKgkoG2VZBk9QavBgN/aPR97Qm
+ oizw==
+X-Gm-Message-State: APjAAAXJ4si7B42CJ6GVfh2STW7RwXoLG1PzNcPRphGTejRpXG8T0gnN
+ AE2F1FCkIA33fqwmTwx+bBjRUxbryy8wJfPAraJuWL9iG/rLW2U1NzU6IAw7bMvapgDyyXCtcYt
+ FJqQcFCbHC4faauk=
+X-Received: by 2002:a1c:3843:: with SMTP id f64mr11356662wma.129.1574360767735; 
+ Thu, 21 Nov 2019 10:26:07 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxqhakbNpvgK2YBQRuwUk3smkblsQtYPTGGFLosjpwkFSYNKeD7tFdAJv1AirRZ7puwuIOe/g==
+X-Received: by 2002:a1c:3843:: with SMTP id f64mr11356641wma.129.1574360767534; 
+ Thu, 21 Nov 2019 10:26:07 -0800 (PST)
+Received: from [192.168.43.238] (92.red-95-127-154.staticip.rima-tde.net.
+ [95.127.154.92])
+ by smtp.gmail.com with ESMTPSA id p15sm495952wmb.10.2019.11.21.10.26.06
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 21 Nov 2019 10:26:07 -0800 (PST)
+Subject: Re: [PATCH v6] Implement backend program convention command for
+ vhost-user-blk
+To: Micky Yun Chan <chanmickyyun@gmail.com>, qemu-devel@nongnu.org,
+ Micky Yun Chan <michan@redhat.com>
+References: <20191121015826.4867-1-michan@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <57baef24-3fc2-6e41-8654-e9596dd99c6f@redhat.com>
+Date: Thu, 21 Nov 2019 19:26:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-References: <1574350609-29518-1-git-send-email-pbonzini@redhat.com>
-In-Reply-To: <1574350609-29518-1-git-send-email-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Nov 2019 18:25:17 +0000
-Message-ID: <CAFEAcA_TwtiE3dPvsz3XPkfrPHSSBU3V37-QQ3tnSW+tEnPvbQ@mail.gmail.com>
-Subject: Re: [PULL 0/4] x86 updates for QEMU 4.2-rc
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::229
+In-Reply-To: <20191121015826.4867-1-michan@redhat.com>
+Content-Language: en-US
+X-MC-Unique: z2P-vqDCMdm49SL3wq-8Qw-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,38 +107,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 21 Nov 2019 at 15:39, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit 39e2821077e6dcf788b7c2a9ef50970ec7995437:
->
->   Update version for v4.2.0-rc2 release (2019-11-19 19:34:10 +0000)
->
-> are available in the git repository at:
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 02fa60d10137ed2ef17534718d7467e0d2170142:
->
->   i386: Add -noTSX aliases for hle=off, rtm=off CPU models (2019-11-21 16:35:05 +0100)
->
-> ----------------------------------------------------------------
-> * x86 updates for Intel errata (myself, Eduardo)
-> * the big ugly list of x86 VMX features, which was targeted for 5.0 but
-> caused a Libvirt regression (myself)
->
-> ----------------------------------------------------------------
+On 11/21/19 2:58 AM, Micky Yun Chan wrote:
+> From: michan <michan@redhat.com>
 
+FYI your email setup is still incorrect.
 
-Applied, thanks.
+> This patch is to add standard commands defined in docs/interop/vhost-user=
+.rst
+> For vhost-user-* program
+>=20
+> Signed-off-by: Micky Yun Chan (michiboo) <chanmickyyun@gmail.com>
+> ---
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/4.2
-for any user-visible changes.
-
--- PMM
 
