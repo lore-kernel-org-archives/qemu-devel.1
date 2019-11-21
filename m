@@ -6,71 +6,72 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F85C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90192C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:14:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2F1720731
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:12:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2F1720731
+	by mail.kernel.org (Postfix) with ESMTPS id 654AF20731
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:14:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 654AF20731
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXmFc-0001zX-Nr
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:12:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54977)
+	id 1iXmHt-0003YL-Gf
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:14:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55162)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iXmEt-0001QG-Ay
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:11:16 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iXmGE-0002gx-W9
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:12:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iXmEs-0001qd-19
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:11:15 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26574)
+ (envelope-from <frankja@linux.ibm.com>) id 1iXmGD-0002qQ-28
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:12:38 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31242
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iXmEr-0001pf-P1
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:11:13 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ id 1iXmGB-0002p9-6Y
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:12:36 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xALD6lL9103104
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 08:11:10 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wdu6283md-1
+ xALDCPfq011730
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 08:12:28 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wdkdeg46t-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 08:11:10 -0500
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 08:12:27 -0500
 Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 21 Nov 2019 13:11:07 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Thu, 21 Nov 2019 13:12:26 -0000
+Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 21 Nov 2019 13:11:04 -0000
+ Thu, 21 Nov 2019 13:12:24 -0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
  [9.149.105.62])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xALDB2a259965582
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xALDBiLe33292796
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 21 Nov 2019 13:11:02 GMT
+ Thu, 21 Nov 2019 13:11:44 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C3D7CAE053;
- Thu, 21 Nov 2019 13:11:02 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id A4228AE04D;
+ Thu, 21 Nov 2019 13:12:22 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 4FAA3AE04D;
- Thu, 21 Nov 2019 13:11:02 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 3634AAE045;
+ Thu, 21 Nov 2019 13:12:22 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.70.129])
  by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 21 Nov 2019 13:11:02 +0000 (GMT)
-Subject: Re: [PATCH 01/15] s390x: Cleanup cpu resets
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+ Thu, 21 Nov 2019 13:12:22 +0000 (GMT)
+Subject: Re: [PATCH 04/15] Header sync protvirt
+To: Cornelia Huck <cohuck@redhat.com>
 References: <20191120114334.2287-1-frankja@linux.ibm.com>
- <20191120114334.2287-2-frankja@linux.ibm.com>
- <32e994b4-6ae2-8de2-4ae0-fc61a21f5f7a@redhat.com>
+ <20191120114334.2287-5-frankja@linux.ibm.com>
+ <20191121135959.3fc8f10b.cohuck@redhat.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -114,29 +115,29 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Thu, 21 Nov 2019 14:11:01 +0100
+Date: Thu, 21 Nov 2019 14:12:21 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <32e994b4-6ae2-8de2-4ae0-fc61a21f5f7a@redhat.com>
+In-Reply-To: <20191121135959.3fc8f10b.cohuck@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="Aqbzy2EGhA7ACq70xVe28A45wOccvLDrE"
+ boundary="mGOYgIDv7J78u6mvbc8kub31C6umGVs3D"
 X-TM-AS-GCONF: 00
-x-cbid: 19112113-0020-0000-0000-0000038CE0C0
+x-cbid: 19112113-0028-0000-0000-000003BD92BF
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112113-0021-0000-0000-000021E31AC1
-Message-Id: <b5a83796-792a-3b5b-bbf1-fd806edb8e92@linux.ibm.com>
+x-cbparentid: 19112113-0029-0000-0000-00002480BAF0
+Message-Id: <b1efef4f-48ab-e03e-7246-d7c0bce8ef02@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-11-21_02:2019-11-21,2019-11-21 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 spamscore=0
- adultscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999 phishscore=0
- suspectscore=0 clxscore=1015 bulkscore=0 impostorscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911210120
+ phishscore=0 mlxlogscore=999
+ adultscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0 impostorscore=0
+ suspectscore=0 malwarescore=0 priorityscore=1501 bulkscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-1911210122
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -148,202 +149,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
+ qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Aqbzy2EGhA7ACq70xVe28A45wOccvLDrE
-Content-Type: multipart/mixed; boundary="qJNPJHsSinXVcYPPWo4E2exHPIJWOTzPk"
+--mGOYgIDv7J78u6mvbc8kub31C6umGVs3D
+Content-Type: multipart/mixed; boundary="6wJ56aCmYfoKyFAVN1gAFCRSaOLupXq6o"
 
---qJNPJHsSinXVcYPPWo4E2exHPIJWOTzPk
+--6wJ56aCmYfoKyFAVN1gAFCRSaOLupXq6o
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 11/21/19 1:53 PM, Thomas Huth wrote:
-> On 20/11/2019 12.43, Janosch Frank wrote:
->> Let's move the resets into one function and switch by type, so we can
->> use fallthroughs for shared reset actions.
+On 11/21/19 1:59 PM, Cornelia Huck wrote:
+> On Wed, 20 Nov 2019 06:43:23 -0500
+> Janosch Frank <frankja@linux.ibm.com> wrote:
+>=20
+>> Let's sync all the protvirt header changes
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> ---
->>  hw/s390x/s390-virtio-ccw.c |   3 +
->>  target/s390x/cpu.c         | 111 ++++++++++++++++--------------------=
--
->>  2 files changed, 52 insertions(+), 62 deletions(-)
-> [...]
->> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
->> index 3abe7e80fd..10d5b915d8 100644
->> --- a/target/s390x/cpu.c
->> +++ b/target/s390x/cpu.c
->> @@ -82,67 +82,53 @@ static void s390_cpu_load_normal(CPUState *s)
->>  }
->>  #endif
+>>  linux-headers/asm-s390/kvm.h |  3 ++-
+>>  linux-headers/linux/kvm.h    | 42 +++++++++++++++++++++++++++++++++++=
++
+>>  2 files changed, 44 insertions(+), 1 deletion(-)
+>>
+>=20
+>> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+>> index 18892d6541..d031051601 100644
+>> --- a/linux-headers/linux/kvm.h
+>> +++ b/linux-headers/linux/kvm.h
+>> @@ -995,6 +995,8 @@ struct kvm_ppc_resize_hpt {
+>>  #define KVM_CAP_ARM_SVE 170
+>>  #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+>>  #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
+>> +#define KVM_CAP_S390_PROTECTED 180
+>> +#define KVM_CAP_S390_VCPU_RESETS 181
+>=20
+> Hm, where does this cap come from? I did not see it in the kernel
+> patches.
+
+It'll be part of the V1 once I send it out.
+Pierre found the problem while reviewing QEMU, so I fixed it in both repo=
+s.
+
+>=20
 >> =20
->> -/* S390CPUClass::cpu_reset() */
->> -static void s390_cpu_reset(CPUState *s)
->> +enum {
->> +    S390_CPU_RESET_NORMAL,
->> +    S390_CPU_RESET_INITIAL,
->> +    S390_CPU_RESET_CLEAR,
->> +};
->> +
->> +static void s390_cpu_reset(CPUState *s, uint8_t type)
->=20
-> Please give the enum a name and use that instead of uint8_t for "type".=
-
-> Or at least make it an "int". uint8_t is not really appropriate here.
-
-Sure
-
->=20
->>  {
->>      S390CPU *cpu =3D S390_CPU(s);
->>      S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
->>      CPUS390XState *env =3D &cpu->env;
+>>  #ifdef KVM_CAP_IRQ_ROUTING
 >> =20
->> -    env->pfault_token =3D -1UL;
->> -    env->bpbc =3D false;
->>      scc->parent_reset(s);
->>      cpu->env.sigp_order =3D 0;
->>      s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
->> -}
->> =20
->> -/* S390CPUClass::initial_reset() */
->> -static void s390_cpu_initial_reset(CPUState *s)
->> -{
->> -    S390CPU *cpu =3D S390_CPU(s);
->> -    CPUS390XState *env =3D &cpu->env;
->> +    /* Set initial values after clearing */
->> +    switch (type) {
->> +    case S390_CPU_RESET_CLEAR:
->> +        /* Fallthrough will clear the rest */
->=20
-> I think you could drop the above comment, since /* Fallthrough */ two
-> lines later should be enough.
->=20
->> +        memset(env, 0, offsetof(CPUS390XState, start_initial_reset_fi=
-elds));
->> +        /* Fallthrough */
->> +    case S390_CPU_RESET_INITIAL:
->> +        memset(&env->start_initial_reset_fields, 0,
->> +               offsetof(CPUS390XState, end_reset_fields) -
->> +               offsetof(CPUS390XState, start_initial_reset_fields));
->> +        /* architectured initial values for CR 0 and 14 */
->> +        env->cregs[0] =3D CR0_RESET;
->> +        env->cregs[14] =3D CR14_RESET;
->> =20
->> -    s390_cpu_reset(s);
->> -    /* initial reset does not clear everything! */
->> -    memset(&env->start_initial_reset_fields, 0,
->> -        offsetof(CPUS390XState, end_reset_fields) -
->> -        offsetof(CPUS390XState, start_initial_reset_fields));
->> -
->> -    /* architectured initial values for CR 0 and 14 */
->> -    env->cregs[0] =3D CR0_RESET;
->> -    env->cregs[14] =3D CR14_RESET;
->> -
->> -    /* architectured initial value for Breaking-Event-Address registe=
-r */
->> -    env->gbea =3D 1;
->> -
->> -    env->pfault_token =3D -1UL;
->> -
->> -    /* tininess for underflow is detected before rounding */
->> -    set_float_detect_tininess(float_tininess_before_rounding,
->> -                              &env->fpu_status);
->> +        /* architectured initial value for Breaking-Event-Address reg=
-ister */
->> +        env->gbea =3D 1;
->> +        /* tininess for underflow is detected before rounding */
->> +        set_float_detect_tininess(float_tininess_before_rounding,
->> +                                  &env->fpu_status);
->> +        /* Fallthrough */
->> +    case S390_CPU_RESET_NORMAL:
->> +        env->pfault_token =3D -1UL;
->> +        env->bpbc =3D false;
->> +        break;
->> +    }
->> =20
->>      /* Reset state inside the kernel that we cannot access yet from Q=
-EMU. */
->> -    if (kvm_enabled()) {
->> -        kvm_s390_reset_vcpu(cpu);
->> +    if (kvm_enabled() && (type =3D=3D S390_CPU_RESET_CLEAR ||
->> +                          type =3D=3D S390_CPU_RESET_INITIAL)) {
->> +            kvm_s390_reset_vcpu(cpu);
->>      }
->=20
-> Why don't you simply move that into the switch-case statement, too?
-
-There was a reason for that, time to load it from cold storage...
-
->=20
-> [...]
->=20
-> Anyway, re-using code is of course a good idea, but I wonder whether it=
-
-> would be nicer to keep most things in place, and then simply chain the
-> functions like this:
-
-I tried that and I prefer the version in the patch.
-
->=20
-> static void s390_cpu_reset_normal(CPUState *s)
-> {
->    ...
-> }
->=20
-> static void s390_cpu_reset_initial(CPUState *s)
-> {
->     ...
->     s390_cpu_reset_normal(s);
->     ...
-> }
->=20
-> static void s390_cpu_reset_clear(CPUState *s)
-> {
->     ...
->     s390_cpu_reset_initial()
->     ...
-> }
->=20
-> Just my 0.02 =80, but at least for me, that's easier to understand than=
- a
-> switch-case statement with fallthroughs inbetween.
->=20
->  Thomas
 >=20
 
 
 
---qJNPJHsSinXVcYPPWo4E2exHPIJWOTzPk--
+--6wJ56aCmYfoKyFAVN1gAFCRSaOLupXq6o--
 
---Aqbzy2EGhA7ACq70xVe28A45wOccvLDrE
+--mGOYgIDv7J78u6mvbc8kub31C6umGVs3D
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3WjOUACgkQ41TmuOI4
-ufjZSg//W1fdXOQ1tlVRpFrhxWbqT/CeDHLEq8RNPIaI5tKLzll4i3siS25ftzR6
-tdJPt6HmCSdXF9+9QDKsLHi7V8vLIrN0/attXO3fBDGNcEzHnEkd0a7q92qoAE1d
-tYURfTXaDQU9k8/OI1KzKtMAqlE7XEGC4E4SG8gttVTL46cPHHpaY3I1EXvFWcdc
-TLzk5zGsOGONoDKofu0LBXkFeEMpebwLTNrOP79cYOiSPezfYooQSkVihIa57aR4
-VPluYAeHEixkI9PB0p8kNjP/VsWgo5zYmyGR/G1XOFcmMDkq6+Mgd1glfkwMaDwj
-VALnkOZbrgRVgVJxtJDWjThB8H7FVOxZwTIdh4xMgBrHmG+JMzKQzgG81rTjLtMf
-ergKLRxwGBY83/Y3V6nh8B/LvZHyfQlbViKV0/B379EAUcErVLY+/jLQzODtSgQV
-gxaJfDqU4nQntyv8AgZs5tQTu+BJnPfqBAC7FdLcwUTO9pbjqgdRqg5hWyLkrRXS
-lNRC/GgrZywutW0YeRuo12VNI9mNEIO1muyvbxBWCkwHTOmgqn0X/XUvlpIQ34MT
-DJxzzLDi3c6nDla0nTXxeYisfVI/NWUhAAKQDaBdJCSglAAEmZQGDuI86Kk71dOq
-cUOo7BvY6jHu5Hnf7E4HoWdhlepuDjPujU9ewvR4y5XzjAQdtBk=
-=ANSV
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3WjTUACgkQ41TmuOI4
+ufhVQw/9EUBfbiTzQlj2FiOzq1VIMGEhfsaFhpTL4cNwjCp4T0LAycDmeY5Kk5uT
+jdLRoUPZor1oUFzCWw+STXXM0cXVoM4LT6L1NG0qUT0jSjTx2o3DQIB5R9tZI3YI
+VgYSXGS2cV8AfFfD3sE/ZCQQHpn4qWxMhQYxe7K2gnry1rqBoz0KH3ereLPyIlFd
+GGyMAY7yI+KIBNY6KsTALROyIcQOWLckQsaFTKTh+fRusMqxgUy/bGQQk8V/HoxW
+uHAAQnFXZ8jPDXHoFhUgynEpFlcaA9LqfQA+KEKzS1h4xPbvuirVnjHuGimG68rj
+a/+xqyKxIiU6RQo/aX4/Q7VQlqtKS3v1bb1agGWFPyFiPif684s10IM9jGf4tneU
+M08aoMapuFWK0cZTkQg99Iq1I3av4ET0RA+XCoybb/83piBMWsI1NJC2YQkEs0D4
+QMHofcAPVKh0aeqZHZmO8z1P9WOk0+xJ95Oaev4Mmw9aqJDd+xS10lLqxrNK1s7r
+Xcb9hD2LPaumhC+774df/xk3grhCgUFG6nNNRdyiU2jHFVqNPrFKpYLT/+OlshxX
+yeKCVcsowyqZ30wI81u6kHXRDQCsq+JxbdqRZmr7tDZJfYjtTbyUJgEBW0Iljmou
+7KQbkDjRAniUl5AJWXvmJSJ3XdFl8OibDejnrDj31jI3dUUG8wY=
+=HB3U
 -----END PGP SIGNATURE-----
 
---Aqbzy2EGhA7ACq70xVe28A45wOccvLDrE--
+--mGOYgIDv7J78u6mvbc8kub31C6umGVs3D--
 
 
