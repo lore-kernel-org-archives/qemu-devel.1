@@ -2,79 +2,76 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93763C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:13:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA1C2C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:19:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DAD720709
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:13:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70C9E2068F
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:19:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VUhf5xjy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DAD720709
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EYPJ56Qg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70C9E2068F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXkPL-0004v6-Ii
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 06:13:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51453)
+	id 1iXkUS-0007Nd-8U
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 06:19:12 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52279)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iXkOU-0004JC-HZ
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:13:04 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iXkSl-0006KZ-C4
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:17:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iXkOT-0003tn-42
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:13:02 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:22729
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <cohuck@redhat.com>) id 1iXkSh-0005Nu-FA
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:17:26 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55008
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iXkOT-0003tf-01
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:13:01 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iXkSh-0005Mm-BQ
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:17:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574334780;
+ s=mimecast20190719; t=1574335041;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pthsFfgXSvZifHZBodIOsz+nkD+ojPRV5LUeuXjTkFY=;
- b=VUhf5xjyLiQTxPOS0fiZJGVyNCdD7xetudDX3/8pKIKjJXM3MxmlKmJLQa+lybUtz+7ys/
- 1JtzNRUmA1Itb99NKMUf9r9jywno1SrI0tG4h9gfQ6t2WXfjy1qQhDjNeqAgyilNjDGSFS
- Laq0XXll46A6uqStP2XSSvQlogwPjBU=
+ bh=FmLUgldfz+MTVOEpvts8mb1nmFasdskmy8Fr9ELdqO8=;
+ b=EYPJ56QgIRu3+BKFTVnjDljQhdHUqr0wcXQlHAHrun1dY+qN06OgGnDi7gFaqXHTADPeq7
+ rAtgVvGzQaDTUcD5E3Db0ZqjZWLooCEHr1Z33rEyoGlRQbaoB2U1GYSsheNI58dDG7uWc2
+ /o3NPaGmuKff0ID91PoUfpvYMmYwUm4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-16-Tqhhaan-NqOs-Vr87ROnRw-1; Thu, 21 Nov 2019 06:12:58 -0500
-X-MC-Unique: Tqhhaan-NqOs-Vr87ROnRw-1
+ us-mta-170-os2H2ll3PZOqXtMeFDeO8A-1; Thu, 21 Nov 2019 06:17:20 -0500
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 093E2477;
- Thu, 21 Nov 2019 11:12:58 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-225.ams2.redhat.com [10.36.117.225])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 21A8152FC1;
- Thu, 21 Nov 2019 11:12:56 +0000 (UTC)
-Date: Thu, 21 Nov 2019 12:12:55 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: [RFC 0/4] POC: Generating realistic block errors
-Message-ID: <20191121111255.GC6007@linux.fritz.box>
-References: <20190919194847.18518-1-tasleson@redhat.com>
- <20190920092226.GH14365@stefanha-x1.localdomain>
- <32a302d7-b85a-991b-4366-2a82e38a9382@redhat.com>
- <0752f1c5-ed79-bda4-ad53-6b2566cc35a2@redhat.com>
- <20191121103012.GE439743@stefanha-x1.localdomain>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2934E107B103;
+ Thu, 21 Nov 2019 11:17:19 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 002455379E;
+ Thu, 21 Nov 2019 11:17:02 +0000 (UTC)
+Date: Thu, 21 Nov 2019 12:17:00 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 02/15] s390x: Beautify diag308 handling
+Message-ID: <20191121121700.1f8aa81d.cohuck@redhat.com>
+In-Reply-To: <20191120114334.2287-3-frankja@linux.ibm.com>
+References: <20191120114334.2287-1-frankja@linux.ibm.com>
+ <20191120114334.2287-3-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-In-Reply-To: <20191121103012.GE439743@stefanha-x1.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: os2H2ll3PZOqXtMeFDeO8A-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="3siQDZowHQqNOShm"
-Content-Disposition: inline
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -89,79 +86,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Asleson <tasleson@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
+ qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---3siQDZowHQqNOShm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, 20 Nov 2019 06:43:21 -0500
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Am 21.11.2019 um 11:30 hat Stefan Hajnoczi geschrieben:
-> On Thu, Nov 14, 2019 at 09:47:48AM -0600, Tony Asleson wrote:
-> > On 9/20/19 12:28 PM, Tony Asleson wrote:
-> > > On 9/20/19 4:22 AM, Stefan Hajnoczi wrote:
-> > >> blkdebug is purely at the QEMU block layer level.  It is not aware o=
-f
-> > >> storage controller-specific error information or features.  If you w=
-ant
-> > >> to inject NVMe- or SCSI-specific errors that make no sense in QEMU's
-> > >> block layer, then trying to do it in blkdebug becomes a layering
-> > >> violation.  This justifies adding a new error injection feature dire=
-ctly
-> > >> into AHCI, virtio-scsi, NVMe, etc devices.
-> > >=20
-> > > Good discussion point...
-> > >=20
-> > > In my opening use case for this POC I'm generically trying to create =
-an
-> > > unrecoverable media error for a specific sector.  For each of the
-> > > different device types it's different on how that error is conveyed a=
-nd
-> > > the associated data in transfer.
-> > >=20
-> >=20
-> > I would like to get some additional clarification on this point.  Shoul=
-d
-> > I be investing more time integrating my proposed functionality into
-> > blkdebug or other?
-> >=20
-> > Sorry for the long response time, got sidetracked with other stuff.
+> Let's improve readability by:
+> * Using constants for the subcodes
+> * Moving parameter checking into a function
+> * Removing subcode > 6 check as the default case catches that
 >=20
-> blkdebug can inject EIO when a specific LBA is accessed.  Is that
-> enough for what you want to do?  Then you can reuse and maybe extend
-> blkdebug.
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  target/s390x/diag.c | 54 +++++++++++++++++++++++++++------------------
+>  1 file changed, 32 insertions(+), 22 deletions(-)
+>=20
+> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+> index 53c2f81f2a..067c667ba7 100644
+> --- a/target/s390x/diag.c
+> +++ b/target/s390x/diag.c
+> @@ -53,6 +53,29 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, u=
+int64_t r3)
+>  #define DIAG_308_RC_NO_CONF         0x0102
+>  #define DIAG_308_RC_INVALID         0x0402
+> =20
+> +#define DIAG308_RES_MOD_CLR=09=090
+> +#define DIAG308_RES_LOAD_NORM=09=091
 
-And if we need something more device specific, maybe a common core can
-be extracted that can be used by both blkdebug and the devices. All of
-the logic of managing error injection rules and checking whether
-something needs to be done at the current event should be common between
-both.
+Maybe s/RES/RESET/ ? Not that much longer, but clearer IMHO.
 
-Kevin
+> +#define DIAG308_LOAD_CLEAR=09=093
+> +#define DIAG308_LOAD_NORMAL_DUMP=094
+> +#define DIAG308_SET=09=09=095
+> +#define DIAG308_STORE=09=09=096
 
---3siQDZowHQqNOShm
-Content-Type: application/pgp-signature; name="signature.asc"
+(...)
 
------BEGIN PGP SIGNATURE-----
+Really more readable afterwards.
 
-iQIcBAEBAgAGBQJd1nE3AAoJEH8JsnLIjy/Wrm8QALIaMztTWOESt2jjfUsZqO6i
-qgH14Xz1oSjXC9TkYMy2LOH2pvDF4aw1l0GKP7BGnHto4PgbgimBJ1l0BP/eBzlk
-OYyady8mSyp8OB/GyLo0ouBacuydIVp8wS4QNdO3e8JJCMFuZvYSz1wa7gSWlp2k
-8YfC/BG29O91B38FFBCcx5weOE0bJdjT0J4bqgA/KTFHV8dvAjlG3f4jFnTJfmo0
-iXYWnii7SQe022sdsCD7boNihz32WSOryarh4LNv5MvBJRkPkWNa1E1aw4boP2IR
-m92+lJ7cIZ/ntHwe/WMcnwMZrYE1cqyKTjBs4vX/IT2AezVxlI9Ni/LXKJq6xnPq
-CjzsavWIgV0sLvbk2MM4u/303AMF9/pjZX2i2fIOghov9525SHEavlrNV6n0YlkM
-Dz7es/r3dVeY3Em2Piw+q02IRzJNeGjWnmzCL9x77pdSWUQbb4Wm3a8nxFDknB2c
-6W9f94bgp7M+imJQ8GsXYQBIcBRYwd9et4UWdTe3RVNALVhKXYZAlLkVgdmJlZV7
-VB6+JbsH8qDf4Txpt/HYMJQpwRxxyi954f7YaSLxPiayqvB08itW/hf3aA4bJY1m
-QwlsOOQDz9M99DZMzHYze0fQ5D5X3tmAS6cqKG9r7naTzPn5i52/eRn+7kNBnKa0
-qRT1AvuXzfd45ppKvxM5
-=rjmJ
------END PGP SIGNATURE-----
-
---3siQDZowHQqNOShm--
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
 
