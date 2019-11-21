@@ -2,77 +2,55 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E11C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F7C8C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:00:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1525A20872
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:53:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fWQoZBbn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1525A20872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 33F8720872
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:00:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33F8720872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXl1D-0007oU-6X
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 06:53:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34021)
+	id 1iXl8F-0003xz-5k
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 07:00:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35088)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <thuth@redhat.com>) id 1iXl0V-0007IO-Ng
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:52:20 -0500
+ (envelope-from <its@irrelevant.dk>) id 1iXl64-0001nV-D5
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:58:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <thuth@redhat.com>) id 1iXl0T-0001NG-6S
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:52:18 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26191
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <its@irrelevant.dk>) id 1iXl62-0004Fu-E5
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:58:04 -0500
+Received: from charlie.dont.surf ([128.199.63.193]:40968)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iXl0S-0001Ll-MZ
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:52:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574337135;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=Uoq++likwzydtuLsEg6yx4EK+IYlwTVEOmhEenbr/wE=;
- b=fWQoZBbnn5ApkXD+gis2HWZdLVaa5XguEZAlkmpnhquXpQ777tliszuWpiulNPipVf9o3O
- BzIrsS6cfWuMoZTjQ7b6RHeojAGtA+FIXyDE3Kdj1BmHbZU6cl53gTG8nIYHGevq2ppBuh
- w3z+FHfleuspjsHkS4yrkyN+UnRVE+o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-326-sjOlWy7FMlqc23EswXekAQ-1; Thu, 21 Nov 2019 06:52:12 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 863991005502
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 11:52:11 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-116-86.ams2.redhat.com
- [10.36.116.86])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CCBB960C2D;
- Thu, 21 Nov 2019 11:52:10 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [qemu-web PATCH] Add a blog post about the QEMU-related presentation
- of KVM Forum 2019
-Date: Thu, 21 Nov 2019 12:52:07 +0100
-Message-Id: <20191121115207.5832-1-thuth@redhat.com>
+ (Exim 4.71) (envelope-from <its@irrelevant.dk>)
+ id 1iXl5v-0004DJ-1P; Thu, 21 Nov 2019 06:57:55 -0500
+Received: from apples.localdomain (unknown [194.62.217.57])
+ by charlie.dont.surf (Postfix) with ESMTPSA id 84DE2BF5E2;
+ Thu, 21 Nov 2019 11:57:52 +0000 (UTC)
+Date: Thu, 21 Nov 2019 12:57:51 +0100
+From: Klaus Birkelund <its@irrelevant.dk>
+To: Beata Michalska <beata.michalska@linaro.org>
+Subject: Re: [PATCH v2 14/20] nvme: allow multiple aios per command
+Message-ID: <20191121115751.GB1211716@apples.localdomain>
+References: <20191015103900.313928-1-its@irrelevant.dk>
+ <20191015103900.313928-15-its@irrelevant.dk>
+ <CADSWDzvEdK1MXXNeF6bFiyC0UDY-wTp7_ZdeV-i_Ys5YdGoyqg@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: sjOlWy7FMlqc23EswXekAQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADSWDzvEdK1MXXNeF6bFiyC0UDY-wTp7_ZdeV-i_Ys5YdGoyqg@mail.gmail.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 128.199.63.193
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -84,88 +62,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Paul Durrant <Paul.Durrant@citrix.com>,
+ Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There have been quite a lot of QEMU-related talks at KVM Forum this
-year - let's provide a summary for the people who could not attend.
+On Tue, Nov 12, 2019 at 03:25:06PM +0000, Beata Michalska wrote:
+> Hi Klaus,
+> 
+> On Tue, 15 Oct 2019 at 11:55, Klaus Jensen <its@irrelevant.dk> wrote:
+> > @@ -341,19 +344,18 @@ static uint16_t nvme_dma_write_prp(NvmeCtrl *n, uint8_t *ptr, uint32_t len,
+> Any reason why the nvme_dma_write_prp is missing the changes applied
+> to nvme_dma_read_prp ?
+> 
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- Note: For some talks it's hard to decide whether they really fit the
- QEMU blog or not. I've assembled the list below by quickly skimming
- through the schedule and the videos, and that's what I came up with ...
- If you think any of the other talks should be mentioned here, too,
- please let me know.
+This was adressed by proxy through changes to the previous patch
+(by combining the read/write functions).
 
- _posts/2019-11-21-kvm-forum.md | 45 ++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
- create mode 100644 _posts/2019-11-21-kvm-forum.md
+> > +    case NVME_AIO_OPC_WRITE_ZEROES:
+> > +        block_acct_start(stats, acct, aio->iov.size, BLOCK_ACCT_WRITE);
+> > +        aio->aiocb = blk_aio_pwrite_zeroes(aio->blk, aio->offset,
+> > +            aio->iov.size, BDRV_REQ_MAY_UNMAP, nvme_aio_cb, aio);
+> Minor: aio->blk  => blk
+> 
 
-diff --git a/_posts/2019-11-21-kvm-forum.md b/_posts/2019-11-21-kvm-forum.m=
-d
-new file mode 100644
-index 0000000..e5adf5d
---- /dev/null
-+++ b/_posts/2019-11-21-kvm-forum.md
-@@ -0,0 +1,45 @@
-+---
-+layout: post
-+title:  "Presentations from KVM Forum 2019"
-+date:   2019-11-21 12:30:00 +0100
-+author: Thomas Huth
-+categories: [presentations, conferences]
-+---
-+Last month, the
-+[KVM Forum 2019](https://events.linuxfoundation.org/events/kvm-forum-2019/=
-)
-+took place in Lyon, France. The conference also featured quite a lot talks
-+about QEMU, and now the videos of the presentation are available online.
-+So for those who could not attend, here is the list of the QEMU-related
-+presentations:
-+
-+* [QEMU Status Report](https://www.youtube.com/watch?v=3D6_1QQaXPjd4)
-+  by Paolo Bonzini
-+
-+* [The Hype Around the RISC-V
-+  Hypervisor](https://www.youtube.com/watch?v=3D2MUka4lKGFU) by Alistair F=
-rancis
-+  and Anup Patel
-+
-+* [Reworking the Inter-VM Shared Memory
-+  Device](https://www.youtube.com/watch?v=3DTiZrngLUFMA) by Jan Kiszka
-+
-+* [What's Going On? Taking Advantage of TCG's Total System
-+  Awareness](https://www.youtube.com/watch?v=3DwxIF0dvGDuM) by Alex Benn=
-=C3=A9e
-+
-+* [Towards the Higher Level Debugging with
-+  QEMU](https://www.youtube.com/watch?v=3DE2yJL82gJYM) by Pavel Dovgalyuk
-+
-+* [QEMU-Hexagon: Automatic Translation of the ISA Manual Pseudcode to Tiny=
- Code
-+  Instructions of a VLIW Architecture](https://www.youtube.com/watch?v=3D3=
-EpnTYBOXCI)
-+  by Niccol=C3=B2 Izzo and Taylor Simpson
-+
-+* [Reports of my Bloat Have Been Greatly
-+  Exaggerated](https://www.youtube.com/watch?v=3D5TY7m1AneRY) by Paolo Bon=
-zini
-+
-+* [Multi-process QEMU - Status Update](https://www.youtube.com/watch?v=3Dl=
-slVYCuk4CQ)
-+  by John Johnson and Elena Ufimtseva
-+
-+* [Bring QEMU to Micro Service World](https://www.youtube.com/watch?v=3D5h=
-IDwkpXUiw)
-+  by Xiao Guangrong and Zhang Yulei
-+
-+More interesting virtualization-related talks can be found in the
-+[KVM Forum Youtube Channel](https://www.youtube.com/channel/UCRCSQmAOh7yzg=
-heq-emy1xA).
---=20
-2.23.0
+Thanks. Fixed this in a couple of other places as well.
+
+> > @@ -621,8 +880,11 @@ static uint16_t nvme_del_sq(NvmeCtrl *n, NvmeCmd *cmd)
+> >      sq = n->sq[qid];
+> >      while (!QTAILQ_EMPTY(&sq->out_req_list)) {
+> >          req = QTAILQ_FIRST(&sq->out_req_list);
+> > -        assert(req->aiocb);
+> > -        blk_aio_cancel(req->aiocb);
+> > +        while (!QTAILQ_EMPTY(&req->aio_tailq)) {
+> > +            aio = QTAILQ_FIRST(&req->aio_tailq);
+> > +            assert(aio->aiocb);
+> > +            blk_aio_cancel(aio->aiocb);
+> What about releasing memory associated with given aio ?
+
+I believe the callback is still called when cancelled? That should take
+care of it. Or have I misunderstood that? At least for the DMAAIOCBs it
+is.
+
+> > +struct NvmeAIO {
+> > +    NvmeRequest *req;
+> > +
+> > +    NvmeAIOOp       opc;
+> > +    int64_t         offset;
+> > +    BlockBackend    *blk;
+> > +    BlockAIOCB      *aiocb;
+> > +    BlockAcctCookie acct;
+> > +
+> > +    NvmeAIOCompletionFunc *cb;
+> > +    void                  *cb_arg;
+> > +
+> > +    QEMUSGList   *qsg;
+> > +    QEMUIOVector iov;
+> 
+> There is a bit of inconsistency on the ownership of IOVs and SGLs.
+> SGLs now seem to be owned by request whereas IOVs by the aio.
+> WOuld be good to have that unified or documented at least.
+> 
+
+Fixed this. The NvmeAIO only holds pointers now.
+
+> > +#define NVME_REQ_TRANSFER_DMA  0x1
+> This one does not seem to be used ....
+> 
+
+I have dropped the flags and reverted to a simple req->is_cmb as that is
+all that is really needed.
 
 
