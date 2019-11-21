@@ -2,100 +2,79 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C44BC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 18:59:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F27C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:02:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB96520672
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 18:59:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D6AE820672
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:02:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ir0y29R5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB96520672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pS+ueSF4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6AE820672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXrgG-0005RJ-TK
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 13:59:52 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59728)
+	id 1iXriy-0006Zw-Vr
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 14:02:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60086)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iXrfT-0004tN-Ch
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 13:59:04 -0500
+ (envelope-from <alistair23@gmail.com>) id 1iXrhv-00064b-T6
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:01:38 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iXrfS-0001Qc-8O
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 13:59:03 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25512
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iXrfS-0001Q8-5B
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 13:59:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574362741;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=uVnBXCN/3xd3yFBQ/JitQNjTmDQhaa8qWXg/izJGYGI=;
- b=ir0y29R5/cy5LLvaYjASblvMNE7wg9y3wMIkA/Q7o7XdC5k1wQtAxpPNamJ+f/kKGDZ8P6
- hMzwIjCCUPtpsdoI+bjgi8DkXSoPcv4ktAY9OXuqMgvkglG9ToLhg/+vCAR74KPVtD1Ndy
- bX7MZeAPoJe+CbE6kVY7rNVAC86Oj7Q=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-62-LyJboux7PcGKB8zMHzaR2A-1; Thu, 21 Nov 2019 13:58:58 -0500
-Received: by mail-wm1-f72.google.com with SMTP id 199so2294745wmb.0
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 10:58:58 -0800 (PST)
+ (envelope-from <alistair23@gmail.com>) id 1iXrhu-0003fG-0U
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:01:35 -0500
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:46846)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <alistair23@gmail.com>)
+ id 1iXrhm-0003Ze-75; Thu, 21 Nov 2019 14:01:27 -0500
+Received: by mail-lj1-x244.google.com with SMTP id e9so4414252ljp.13;
+ Thu, 21 Nov 2019 11:01:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=P5ggWWnP4ZFY7xC6ClkCPevYr9B7Pa4A+rwznV/RBZY=;
+ b=pS+ueSF4xua2j57IfcfmNuZ6F0bIfwFhbfOJN0ufsYw7egobIhVYk0AnNov15xWLaL
+ OiUCw6fx2moni0rkCxEgbPEV8DMRzegsoQ+CbFcn2DKgYkQN3yHZdZUW7yzmwXOsIj34
+ S46eZ6hUF14GNZY8vZXTSEADedtRC/QeRyeHibSkJyrDtKkF7TpU+DjWmT14oLRn/ztm
+ 1QWT4ohMnbpLFpVULuTrMOWbqAQiuNMpgBXkJSvIbOec9VAayVQGsGwycZx2TSnMZR/3
+ PWtx7N1xQaCzZHg04QTKCHuUIx+bvACYkw8wLHw55WMi2aoWfII7mJXAp2vGAMe0wf6c
+ UTVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:cc:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=DoxUbj1GEYUNvhJw/EScqAg0fyp35HPnwlP7AoZUp5I=;
- b=cNQV1GAzJ7O89zgWxj/Jha/8cRtOREME3Ws3MDbGMddzcHHplGQH/tP5kEZVZyI2nK
- qP+zC9LdsLBzUkGWoTx6OAhbuX2tm6n4+iSlEDHv4XuDv0UrCt2k3JGTWqwoYZrUg/DA
- A/NJ4EAfThqIQhAkPDnc2GXFUVmRlZSIwn8WpqPFb6VT320LxGtBBFZza5NJUOD/PiDV
- 7S9t1Lh4dyAz7Crn9nFYv7HUi1vZU9nFasXzFVD53AKLZuqu80xJcGj5jvg8jIsLTPeD
- eVf/BeQI/28hKQri8pLoIQ3NxrrF3ncNUf3ZBrXgxqdjxbHvn6BZf1m/a7ZYmTxTjGvr
- SiwA==
-X-Gm-Message-State: APjAAAWV0898N8eStHQw9AehtYew7IQ/bSCJoH1IEsarGedWiLehQMPD
- +PRaWu8BMboF/8AObAQ84WPQwyB3swyXPV/1YDYtcsvX2tqCd0pwt+ldbzJtln7Ebx42h9Ku47L
- y91St7CeVLUqkupg=
-X-Received: by 2002:a5d:4142:: with SMTP id c2mr13014870wrq.60.1574362737037; 
- Thu, 21 Nov 2019 10:58:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqx6eODKBaMCm9/BBCJfW3h2aedJveFmNXOnG0nRpLGgPoK1cPMJI3vsq0aycFTyOhyBZiDe0Q==
-X-Received: by 2002:a5d:4142:: with SMTP id c2mr13014844wrq.60.1574362736824; 
- Thu, 21 Nov 2019 10:58:56 -0800 (PST)
-Received: from [192.168.43.238] (92.red-95-127-154.staticip.rima-tde.net.
- [95.127.154.92])
- by smtp.gmail.com with ESMTPSA id b17sm4559038wru.36.2019.11.21.10.58.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 21 Nov 2019 10:58:56 -0800 (PST)
-Subject: Re: [PATCH-for-4.2?] vmstate-static-checker: Fix for current python
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
- qemu-devel@nongnu.org, quintela@redhat.com, ehabkost@redhat.com,
- crosa@redhat.com
-References: <20191121185303.51685-1-dgilbert@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <19b311c5-d4e2-62e2-8597-07e5419c3688@redhat.com>
-Date: Thu, 21 Nov 2019 19:58:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=P5ggWWnP4ZFY7xC6ClkCPevYr9B7Pa4A+rwznV/RBZY=;
+ b=lCvUtG9iJ/3sJiaBdVsZ6gwa5wdeNvOXvAxNnBNyfVAuLBJ/3sGgtqtfwamCS58E74
+ EZ/5uxVDagDs3QXHL3R5oAlscNiwK4F4oDe1a+bz9xKvi7gleYOkmUQT5jWJqAJ8Fdhu
+ Ykbnll5xNb5Dn8b1yWGUrWhbbwoSYqCj/NZjQB8jftwzLwzLV346M4zE5DVV/KJh9ier
+ gFuDZEXH1213KoqjIZ0SeaFuQpOBBJXv6H+w5XLkHXLo6K2s/9DhSjYcj1pGhVyrzP9Z
+ Cf7wKko9pAWKmzIzdOf0QydaRazsDcPk4k9CRGWPIXoOCZVQxkc+a/uBXq32HdAvlR5K
+ wsKg==
+X-Gm-Message-State: APjAAAURlV/4mNwu19JtMltJqsCQESNGV0mjQjuse/AjJTKXyaTYQQiz
+ uLrewSBGG9+WHAh08U1s7SGGnxFue9r+oanDxDs=
+X-Google-Smtp-Source: APXvYqzeedgafYjyvdhyL0J44fXpqfMN1F7UvTSYxKxHpWAnh7KYNw88yFOKdghjvsfkAZquXWCiduq8EgilTSV0ngY=
+X-Received: by 2002:a2e:8188:: with SMTP id e8mr8989346ljg.152.1574362882594; 
+ Thu, 21 Nov 2019 11:01:22 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191121185303.51685-1-dgilbert@redhat.com>
-Content-Language: en-US
-X-MC-Unique: LyJboux7PcGKB8zMHzaR2A-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+References: <20191110211033.GU2461@umbus.Home>
+ <mhng-7d7315b7-0ef7-4f14-b152-9d478f15c739@palmerdabbelt.mtv.corp.google.com>
+In-Reply-To: <mhng-7d7315b7-0ef7-4f14-b152-9d478f15c739@palmerdabbelt.mtv.corp.google.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Thu, 21 Nov 2019 10:55:32 -0800
+Message-ID: <CAKmqyKNTUNMvxxBdE4kZA44a=d9bPWCkrG9ScUp89MkHFteciQ@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V: virt: This is a "sifive,test1" test finisher
+To: Palmer Dabbelt <palmerdabbelt@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,50 +86,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, Palmer Dabbelt <palmer@sifive.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Christoph Hellwig <hch@infradead.org>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/21/19 7:53 PM, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Python 3.7.5 on f31 doesn't seem to like the old type=3Dfile syntax
-> on argparse.
+On Wed, Nov 20, 2019 at 6:40 PM Palmer Dabbelt <palmerdabbelt@google.com> wrote:
+>
+> On Sun, 10 Nov 2019 13:10:33 PST (-0800), david@gibson.dropbear.id.au wrote:
+> > On Fri, Nov 08, 2019 at 10:13:16AM -0800, Palmer Dabbelt wrote:
+> >> On Fri, 08 Nov 2019 10:04:47 PST (-0800), Peter Maydell wrote:
+> >> > On Fri, 8 Nov 2019 at 17:15, Alistair Francis <alistair23@gmail.com> wrote:
+> >> > >
+> >> > > On Fri, Nov 8, 2019 at 9:05 AM Palmer Dabbelt <palmer@sifive.com> wrote:
+> >> > > >
+> >> > > > The test finisher implements the reset command, which means it's a
+> >> > > > "sifive,test1" device.  This is a backwards compatible change, so it's
+> >> > > > also a "sifive,test0" device.  I copied the odd idiom for adding a
+> >> > > > two-string compatible field from the ARM virt board.
+> >> > > >
+> >> > > > Fixes: 9a2551ed6f ("riscv: sifive_test: Add reset functionality")
+> >> > > > Signed-off-by: Palmer Dabbelt <palmer@sifive.com>
+> >> > > > Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
+> >> > > > ---
+> >> > > >  hw/riscv/virt.c | 5 ++++-
+> >> > > >  1 file changed, 4 insertions(+), 1 deletion(-)
+> >> > > >
+> >> > > > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> >> > > > index 23f340df19..74f2dce81c 100644
+> >> > > > --- a/hw/riscv/virt.c
+> >> > > > +++ b/hw/riscv/virt.c
+> >> > > > @@ -359,7 +359,10 @@ static void create_fdt(RISCVVirtState *s, const struct MemmapEntry *memmap,
+> >> > > >      nodename = g_strdup_printf("/test@%lx",
+> >> > > >          (long)memmap[VIRT_TEST].base);
+> >> > > >      qemu_fdt_add_subnode(fdt, nodename);
+> >> > > > -    qemu_fdt_setprop_string(fdt, nodename, "compatible", "sifive,test0");
+> >> > > > +    {
+> >> > > > +        const char compat[] = "sifive,test1\0sifive,test0";
+> >> > >
+> >> > > Does this really work? Why not use qemu_fdt_setprop_cells()?
+> >> > >
+> >> > > Alistair
+> >> > >
+> >> > > > +        qemu_fdt_setprop(fdt, nodename, "compatible", compat, sizeof(compat));
+> >> > > > +    }
+> >> >
+> >> > qemu_fdt_setprop_cells() is for "set this property to
+> >> > contain this list of 32-bit integers" (and it does a byteswap
+> >> > of each 32-bit value from host to BE). That's not what
+> >> > you want for a string (or a string list, which is what
+> >> > we have here).
+> >> >
+> >> > Cc'ing David Gibson who's our device tree expert to see if there's
+> >> > a nicer way to write this. Oddly, given that it's used in the
+> >> > ubiquitous 'compatible' prop, the dtc Documentation/manual.txt
+> >> > doesn't say anything about properties being able to be
+> >> > 'string lists', only 'strings', '32 bit numbers', 'lists of
+> >> > 32-bit numbers' and 'byte sequences'. You have to dig through
+> >> > the header file comments to deduce that a string list is
+> >> > represented by a string with embedded NULs separating
+> >> > each list item.
+> >>
+> >> I copied this from hw/arm/virt.c, but messed up.  There they use
+> >>
+> >>        const char compat[] = "arm,armv8-timer\0arm,armv7-timer";
+> >>        qemu_fdt_setprop(vms->fdt, "/timer", "compatible",
+> >>                         compat, sizeof(compat));
+> >
+> > I'm not sure what you're saying is messed up.  AFAICT, this matches
+> > the code you have above, and both should be correct.
+>
+> Sorry, I must have been hallucinating.  For some reason I though I wrote
+> qemu_fdt_setprop_string(... compat).
+>
+> I'd like to take this for 4.2 if possible, but I don't think I have a
+> reviewed-by (I just got my email set up on my Google computer, so it might be
+> messy for a bit).  I'm happy to submit the cleaner valist version after 4.2, as
+> per Peter's suggestion.
+>
+> Alistair: are you OK with this?
 
-Looks 4.2 worth to me.
+Yeah, that works for me.
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+For 5.0 we can then merge Anup's patch and your series improving the
+multi compat support.
 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->   scripts/vmstate-static-checker.py | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/scripts/vmstate-static-checker.py b/scripts/vmstate-static-c=
-hecker.py
-> index 21dbdccf3e..9f912dd870 100755
-> --- a/scripts/vmstate-static-checker.py
-> +++ b/scripts/vmstate-static-checker.py
-> @@ -379,9 +379,11 @@ def main():
->       help_text =3D "Parse JSON-formatted vmstate dumps from QEMU in file=
-s SRC and DEST.  Checks whether migration from SRC to DEST QEMU versions wo=
-uld break based on the VMSTATE information contained within the JSON output=
-s.  The JSON output is created from a QEMU invocation with the -dump-vmstat=
-e parameter and a filename argument to it.  Other parameters to QEMU do not=
- matter, except the -M (machine type) parameter."
->  =20
->       parser =3D argparse.ArgumentParser(description=3Dhelp_text)
-> -    parser.add_argument('-s', '--src', type=3Dfile, required=3DTrue,
-> +    parser.add_argument('-s', '--src', type=3Dargparse.FileType('r'),
-> +                        required=3DTrue,
->                           help=3D'json dump from src qemu')
-> -    parser.add_argument('-d', '--dest', type=3Dfile, required=3DTrue,
-> +    parser.add_argument('-d', '--dest', type=3Dargparse.FileType('r'),
-> +                        required=3DTrue,
->                           help=3D'json dump from dest qemu')
->       parser.add_argument('--reverse', required=3DFalse, default=3DFalse,
->                           action=3D'store_true',
->=20
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
+Alistair
+
+>
+> >> I'll send a v2, but I'd be happy to add some sort of setprop_stringlist
+> >> function.  Maybe we just indicate the length with two '\0's?  IIRC that's
+> >> how other similar-looking data structures are encoded.
+> >>
+> >
+> > --
+> > David Gibson                  | I'll have my music baroque, and my code
+> > david AT gibson.dropbear.id.au        | minimalist, thank you.  NOT _the_ _other_
+> >                               | _way_ _around_!
+> > http://www.ozlabs.org/~dgibson
 
