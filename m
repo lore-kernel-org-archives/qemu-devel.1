@@ -6,68 +6,69 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA8AC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:06:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C73AC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:08:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E804A2068F
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:06:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0583C206D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:08:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GHdHeAhB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E804A2068F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DvYBoJKT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0583C206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXn6h-0001eQ-Uv
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 09:06:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35309)
+	id 1iXn8f-0003Yq-5F
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 09:08:53 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36894)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <slp@redhat.com>) id 1iXmyP-0001zK-EZ
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:58:18 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iXn78-0002Hb-Nl
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:07:19 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <slp@redhat.com>) id 1iXmyN-0001KY-OP
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:58:17 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:42017
+ (envelope-from <cohuck@redhat.com>) id 1iXn76-0002UF-NE
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:07:17 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32716
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <slp@redhat.com>) id 1iXmyN-0001Je-JU
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:58:15 -0500
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iXn76-0002To-Iu
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:07:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574344695;
+ s=mimecast20190719; t=1574345235;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uP29D3i3Jo/HrZeAJm59V6dRbMwu73JzUIZJLFx40Vw=;
- b=GHdHeAhBsUI059gP4XRSN5tFqFxzg2kBD0mwcBPBZyJ0Gfbhlv9LO7NT1WonkpvxQ4Vk8y
- eLoqSX1eOGLoR1Kq4riLd9EM4gaJFbadLY8IZpvujE2pBPH9TlDz5XrU8B9vUccZ9umbIY
- lqIFM0t7g3nllBun8BC9afD4FwMSgCo=
+ bh=dkvZ1w22jHCmGzCKE7i29gRYzALFF0sEi7DXEkYPW8c=;
+ b=DvYBoJKT2YzqY0mtxuGDK3aWwTXcraV4uKg2d6dnDO4rkRNUEMzwjlmvJu5nGjjwbRBF2k
+ 60NZ22YERMpdjp+bkHPncYI4bSki6blS75q+X60wzPHNtGTYQJ3dd06yEm+VCISQko64cP
+ VTIE75kzs6Ky/d602SPxs2hibmw8ft8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-327-dwfdLpFJOl2SDg7AflTFHQ-1; Thu, 21 Nov 2019 08:58:14 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-349-uiSBstdbM4iiFmxoI4OBNg-1; Thu, 21 Nov 2019 09:07:12 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03DCC801E58;
- Thu, 21 Nov 2019 13:58:13 +0000 (UTC)
-Received: from dritchie.redhat.com (unknown [10.33.36.14])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 673856CE76;
- Thu, 21 Nov 2019 13:58:11 +0000 (UTC)
-From: Sergio Lopez <slp@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 4/5] blockdev: honor bdrv_try_set_aio_context() context
- requirements
-Date: Thu, 21 Nov 2019 14:57:58 +0100
-Message-Id: <20191121135759.101655-5-slp@redhat.com>
-In-Reply-To: <20191121135759.101655-1-slp@redhat.com>
-References: <20191121135759.101655-1-slp@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 23C281800D45;
+ Thu, 21 Nov 2019 14:07:11 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3399A692AE;
+ Thu, 21 Nov 2019 14:07:07 +0000 (UTC)
+Date: Thu, 21 Nov 2019 15:07:04 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 08/15] s390x: protvirt: KVM intercept changes
+Message-ID: <20191121150704.4d5a09ef.cohuck@redhat.com>
+In-Reply-To: <20191120114334.2287-9-frankja@linux.ibm.com>
+References: <20191120114334.2287-1-frankja@linux.ibm.com>
+ <20191120114334.2287-9-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: dwfdLpFJOl2SDg7AflTFHQ-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: uiSBstdbM4iiFmxoI4OBNg-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
@@ -85,223 +86,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Sergio Lopez <slp@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
+ qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-bdrv_try_set_aio_context() requires that the old context is held, and
-the new context is not held. Fix all the occurrences where it's not
-done this way.
+On Wed, 20 Nov 2019 06:43:27 -0500
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Suggested-by: Max Reitz <mreitz@redhat.com>
-Signed-off-by: Sergio Lopez <slp@redhat.com>
----
- blockdev.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 58 insertions(+), 9 deletions(-)
+> Secure guests no longer intercept with code 4 for an instruction
+> interception. Instead they have codes 104 and 108 for secure
+> instruction interception and secure instruction notification
+> respectively.
+>=20
+> The 104 mirrors the 4, but the 108 is a notification, that something
+> happened and the hypervisor might need to adjust its tracking data to
+> that fact. An example for that is the set prefix notification
+> interception, where KVM only reads the new prefix, but does not update
+> the prefix in the state description.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  target/s390x/kvm.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 418154ccfe..58251c0229 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -115,6 +115,8 @@
+>  #define ICPT_CPU_STOP                   0x28
+>  #define ICPT_OPEREXC                    0x2c
+>  #define ICPT_IO                         0x40
+> +#define ICPT_PV_INSTR                   0x68
+> +#define ICPT_PV_INSTR_NOT               0x6c
 
-diff --git a/blockdev.c b/blockdev.c
-index 152a0f7454..b0647d8d33 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1535,6 +1535,7 @@ static void external_snapshot_prepare(BlkActionState =
-*common,
-                              DO_UPCAST(ExternalSnapshotState, common, comm=
-on);
-     TransactionAction *action =3D common->action;
-     AioContext *aio_context;
-+    AioContext *old_context;
-     int ret;
-=20
-     /* 'blockdev-snapshot' and 'blockdev-snapshot-sync' have similar
-@@ -1675,11 +1676,20 @@ static void external_snapshot_prepare(BlkActionStat=
-e *common,
-         goto out;
-     }
-=20
-+    /* Honor bdrv_try_set_aio_context() context acquisition requirements. =
-*/
-+    old_context =3D bdrv_get_aio_context(state->new_bs);
-+    aio_context_release(aio_context);
-+    aio_context_acquire(old_context);
-+
-     ret =3D bdrv_try_set_aio_context(state->new_bs, aio_context, errp);
-     if (ret < 0) {
--        goto out;
-+        aio_context_release(old_context);
-+        return;
-     }
-=20
-+    aio_context_release(old_context);
-+    aio_context_acquire(aio_context);
-+
-     /* This removes our old bs and adds the new bs. This is an operation t=
-hat
-      * can fail, so we need to do it in .prepare; undoing it for abort is
-      * always possible. */
-@@ -1775,11 +1785,13 @@ static void drive_backup_prepare(BlkActionState *co=
-mmon, Error **errp)
-     BlockDriverState *target_bs;
-     BlockDriverState *source =3D NULL;
-     AioContext *aio_context;
-+    AioContext *old_context;
-     QDict *options;
-     Error *local_err =3D NULL;
-     int flags;
-     int64_t size;
-     bool set_backing_hd =3D false;
-+    int ret;
-=20
-     assert(common->action->type =3D=3D TRANSACTION_ACTION_KIND_DRIVE_BACKU=
-P);
-     backup =3D common->action->u.drive_backup.data;
-@@ -1868,6 +1880,20 @@ static void drive_backup_prepare(BlkActionState *com=
-mon, Error **errp)
-         goto out;
-     }
-=20
-+    /* Honor bdrv_try_set_aio_context() context acquisition requirements. =
-*/
-+    old_context =3D bdrv_get_aio_context(target_bs);
-+    aio_context_release(aio_context);
-+    aio_context_acquire(old_context);
-+
-+    ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
-+    if (ret < 0) {
-+        aio_context_release(old_context);
-+        return;
-+     }
-+
-+    aio_context_release(old_context);
-+    aio_context_acquire(aio_context);
-+
-     if (set_backing_hd) {
-         bdrv_set_backing_hd(target_bs, source, &local_err);
-         if (local_err) {
-@@ -1947,6 +1973,8 @@ static void blockdev_backup_prepare(BlkActionState *c=
-ommon, Error **errp)
-     BlockDriverState *bs;
-     BlockDriverState *target_bs;
-     AioContext *aio_context;
-+    AioContext *old_context;
-+    int ret;
-=20
-     assert(common->action->type =3D=3D TRANSACTION_ACTION_KIND_BLOCKDEV_BA=
-CKUP);
-     backup =3D common->action->u.blockdev_backup.data;
-@@ -1961,7 +1989,18 @@ static void blockdev_backup_prepare(BlkActionState *=
-common, Error **errp)
-         return;
-     }
-=20
-+    /* Honor bdrv_try_set_aio_context() context acquisition requirements. =
-*/
-     aio_context =3D bdrv_get_aio_context(bs);
-+    old_context =3D bdrv_get_aio_context(target_bs);
-+    aio_context_acquire(old_context);
-+
-+    ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
-+    if (ret < 0) {
-+        aio_context_release(old_context);
-+        return;
-+    }
-+
-+    aio_context_release(old_context);
-     aio_context_acquire(aio_context);
-     state->bs =3D bs;
-=20
-@@ -3562,7 +3601,6 @@ static BlockJob *do_backup_common(BackupCommon *backu=
-p,
-     BlockJob *job =3D NULL;
-     BdrvDirtyBitmap *bmap =3D NULL;
-     int job_flags =3D JOB_DEFAULT;
--    int ret;
-=20
-     if (!backup->has_speed) {
-         backup->speed =3D 0;
-@@ -3586,11 +3624,6 @@ static BlockJob *do_backup_common(BackupCommon *back=
-up,
-         backup->compress =3D false;
-     }
-=20
--    ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
--    if (ret < 0) {
--        return NULL;
--    }
--
-     if ((backup->sync =3D=3D MIRROR_SYNC_MODE_BITMAP) ||
-         (backup->sync =3D=3D MIRROR_SYNC_MODE_INCREMENTAL)) {
-         /* done before desugaring 'incremental' to print the right message=
- */
-@@ -3825,6 +3858,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-     BlockDriverState *bs;
-     BlockDriverState *source, *target_bs;
-     AioContext *aio_context;
-+    AioContext *old_context;
-     BlockMirrorBackingMode backing_mode;
-     Error *local_err =3D NULL;
-     QDict *options =3D NULL;
-@@ -3937,12 +3971,22 @@ void qmp_drive_mirror(DriveMirror *arg, Error **err=
-p)
-                    (arg->mode =3D=3D NEW_IMAGE_MODE_EXISTING ||
-                     !bdrv_has_zero_init(target_bs)));
-=20
-+
-+    /* Honor bdrv_try_set_aio_context() context acquisition requirements. =
-*/
-+    old_context =3D bdrv_get_aio_context(target_bs);
-+    aio_context_release(aio_context);
-+    aio_context_acquire(old_context);
-+
-     ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
-     if (ret < 0) {
-         bdrv_unref(target_bs);
--        goto out;
-+        aio_context_release(old_context);
-+        return;
-     }
-=20
-+    aio_context_release(old_context);
-+    aio_context_acquire(aio_context);
-+
-     blockdev_mirror_common(arg->has_job_id ? arg->job_id : NULL, bs, targe=
-t_bs,
-                            arg->has_replaces, arg->replaces, arg->sync,
-                            backing_mode, zero_target,
-@@ -3984,6 +4028,7 @@ void qmp_blockdev_mirror(bool has_job_id, const char =
-*job_id,
-     BlockDriverState *bs;
-     BlockDriverState *target_bs;
-     AioContext *aio_context;
-+    AioContext *old_context;
-     BlockMirrorBackingMode backing_mode =3D MIRROR_LEAVE_BACKING_CHAIN;
-     Error *local_err =3D NULL;
-     bool zero_target;
-@@ -4001,14 +4046,18 @@ void qmp_blockdev_mirror(bool has_job_id, const cha=
-r *job_id,
-=20
-     zero_target =3D (sync =3D=3D MIRROR_SYNC_MODE_FULL);
-=20
-+    /* Honor bdrv_try_set_aio_context() context acquisition requirements. =
-*/
-+    old_context =3D bdrv_get_aio_context(target_bs);
-     aio_context =3D bdrv_get_aio_context(bs);
--    aio_context_acquire(aio_context);
-+    aio_context_acquire(old_context);
-=20
-     ret =3D bdrv_try_set_aio_context(target_bs, aio_context, errp);
-     if (ret < 0) {
-         goto out;
-     }
-=20
-+    aio_context_acquire(aio_context);
-+
-     blockdev_mirror_common(has_job_id ? job_id : NULL, bs, target_bs,
-                            has_replaces, replaces, sync, backing_mode,
-                            zero_target, has_speed, speed,
---=20
-2.23.0
+_NOTIF ?
+
+> =20
+>  #define NR_LOCAL_IRQS 32
+>  /*
+> @@ -151,6 +153,7 @@ static int cap_s390_irq;
+>  static int cap_ri;
+>  static int cap_gs;
+>  static int cap_hpage_1m;
+> +static int cap_protvirt;
+> =20
+>  static int active_cmma;
+> =20
+> @@ -336,6 +339,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>      cap_async_pf =3D kvm_check_extension(s, KVM_CAP_ASYNC_PF);
+>      cap_mem_op =3D kvm_check_extension(s, KVM_CAP_S390_MEM_OP);
+>      cap_s390_irq =3D kvm_check_extension(s, KVM_CAP_S390_INJECT_IRQ);
+> +    cap_protvirt =3D kvm_check_extension(s, KVM_CAP_S390_PROTECTED);
+
+You don't seem to do anything with this yet?
+
+> =20
+>      if (!kvm_check_extension(s, KVM_CAP_S390_GMAP)
+>          || !kvm_check_extension(s, KVM_CAP_S390_COW)) {
+> @@ -1664,6 +1668,8 @@ static int handle_intercept(S390CPU *cpu)
+>              (long)cs->kvm_run->psw_addr);
+>      switch (icpt_code) {
+>          case ICPT_INSTRUCTION:
+> +        case ICPT_PV_INSTR:
+> +        case ICPT_PV_INSTR_NOT:
+>              r =3D handle_instruction(cpu, run);
+
+Doesn't handle_instruction() want to know whether it got a request for
+emulation vs a notification?
+
+>              break;
+>          case ICPT_PROGRAM:
 
 
