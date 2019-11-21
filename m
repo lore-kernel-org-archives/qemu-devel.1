@@ -2,140 +2,85 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A7DC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:53:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F6AC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:56:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E9F42068E
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:53:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E6E720659
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:56:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QB3iIDxD";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="fbkPtoAl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E9F42068E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LaCXbKde"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E6E720659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXsWE-00034A-N5
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 14:53:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38371)
+	id 1iXsZC-0005ED-7r
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 14:56:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38606)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tsimpson@quicinc.com>) id 1iXsVH-0001KI-Dz
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:52:37 -0500
+ (envelope-from <mrolnik@gmail.com>) id 1iXsXY-0004gZ-LJ
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:54:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tsimpson@quicinc.com>) id 1iXsVG-0006BA-3x
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:52:35 -0500
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:57226)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
- id 1iXsVF-00068C-Jw
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:52:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
- t=1574365953; x=1605901953;
- h=from:to:cc:subject:date:message-id:references:
- in-reply-to:content-transfer-encoding:mime-version;
- bh=MZmerJiRToQZB/YCNeDq5TSqB8hw1zdQmb8Q8CnNBKg=;
- b=QB3iIDxDXQ5qyWeuh/2rZAOholB2wyHbnpSIuioGDh7Mp3z1246M71+a
- VES/AP5tH1nsitS7LsbL1FJzwDvds9ZB5tVMSIepGYXrUQSVrzmH7zY08
- ft4x6uB+Svyj6VQUrvX+GXnZEcmkkmladdaP0HqokObuaUKVhpzVoE2el c=;
-Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
- by alexa-out-sd-02.qualcomm.com with ESMTP; 21 Nov 2019 11:52:31 -0800
-IronPort-SDR: OyTf0881qCiT9aSPCRmh0YWCbHMtdlPidqrbWYGXYrECUJZFHH4VIanDP6XkZbkOk2o1Tydi6u
- W20FBIZQ0sQ4SejkWlQhqMIaR1x2SvbJ6B35/yHMZjX7eEs0qdLh1MqWsH8Mz8McNeBIH89oIc
- WWqcmAITmB7zP5Lz9nDV5k5EFSpXzdQybE46KIn8K6mjqJchjQgxp7IwuLkkzrU07qa3iJZwdP
- oeW2hhHQodMXVnnZyiHueKRoCj5mW1a9w30oH1KLZV4vq0O/MFLLgcbIkTqXs4Bjn6/roZ38SJ
- 3264Ddgmuj1mG3w2MUuuF1qi
-Received: from nasanexm03d.na.qualcomm.com ([10.85.0.91])
- by ironmsg01-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
- 21 Nov 2019 11:52:31 -0800
-Received: from NASANEXM01C.na.qualcomm.com (10.85.0.83) by
- nasanexm03d.na.qualcomm.com (10.85.0.91) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3; Thu, 21 Nov 2019 11:52:30 -0800
-Received: from NAM01-BN3-obe.outbound.protection.outlook.com (199.106.107.6)
- by NASANEXM01C.na.qualcomm.com (10.85.0.83) with Microsoft SMTP Server (TLS)
- id 15.0.1473.3 via Frontend Transport; Thu, 21 Nov 2019 11:52:30 -0800
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com (52.135.234.160) by
- BYAPR02MB4087.namprd02.prod.outlook.com (20.176.251.152) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2474.17; Thu, 21 Nov 2019 19:52:29 +0000
-Received: from BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::b0e0:a44a:3fc6:e2b9]) by BYAPR02MB4886.namprd02.prod.outlook.com
- ([fe80::b0e0:a44a:3fc6:e2b9%3]) with mapi id 15.20.2474.018; Thu, 21 Nov 2019
- 19:52:29 +0000
-From: Taylor Simpson <tsimpson@quicinc.com>
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Subject: RE: [PATCH] Add minimal Hexagon target - First in a series of patches
- - linux-user changes + linux-user/hexagon + skeleton of
- target/hexagon -
- Files in target/hexagon/imported are from another project and therefore do
- not conform to qemu coding standards
-Thread-Topic: [PATCH] Add minimal Hexagon target - First in a series of
- patches - linux-user changes + linux-user/hexagon + skeleton of
- target/hexagon - Files in target/hexagon/imported are from another project
- and therefore do not conform to qemu coding standards
-Thread-Index: AQHVnmwob37h/DrHSkKsyb+krTkIzKeWBJUAgAAH6tA=
-Date: Thu, 21 Nov 2019 19:52:28 +0000
-Message-ID: <BYAPR02MB48868819DDB0818111D4E972DE4E0@BYAPR02MB4886.namprd02.prod.outlook.com>
-References: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
- <CAL1e-=gFBMPj938nrPYjvkOPuMQZTEP9OFiitwLLjekgCxRaKA@mail.gmail.com>
-In-Reply-To: <CAL1e-=gFBMPj938nrPYjvkOPuMQZTEP9OFiitwLLjekgCxRaKA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=tsimpson@quicinc.com; 
-x-originating-ip: [199.106.103.59]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3588b37d-a2aa-413b-fee7-08d76ebc5730
-x-ms-traffictypediagnostic: BYAPR02MB4087:
-x-microsoft-antispam-prvs: <BYAPR02MB40870FEA0C0765173F66D3A4DE4E0@BYAPR02MB4087.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0228DDDDD7
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(136003)(396003)(366004)(39860400002)(376002)(346002)(189003)(199004)(13464003)(6916009)(55016002)(52536014)(2906002)(14454004)(305945005)(6436002)(9686003)(7736002)(229853002)(76176011)(7696005)(102836004)(508600001)(5660300002)(8936002)(76116006)(64756008)(54906003)(3846002)(66446008)(66946007)(6506007)(6246003)(8676002)(66066001)(6116002)(86362001)(53546011)(99286004)(4326008)(25786009)(256004)(186003)(66476007)(33656002)(74316002)(81166006)(26005)(316002)(81156014)(14444005)(446003)(71190400001)(71200400001)(11346002)(66556008)(219693003);
- DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB4087;
- H:BYAPR02MB4886.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; MX:1; A:1; 
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 9qG/5o6NKCoGcaspcAkHNCzXbb1trAfhtysTX45KJbzjc9wn7o07WJXtrUggGTy6MTEqpgigM2NGriOBreL3JnH3tC+9GIafzNX6MLEsn3ecle9JyirOjg8G+fvgXpcaDilDhmqlzdHo8DpzFwrai1NuVWhV9iDlV9l19rVXyWpVaSUqQ91kSbeKMOpZ3HM7oU2M6KmQ0zWbbwNH51+MAL3AT19+FdgLUHQCxO5/TvbJorvEh4ATs6TYe+K8WUADFReZp+96s94qTplPTKZ6Z4OsSH84oxrY5MMi2HVlJCRyiPQyR1vDNFpAG/2U3z3DXEbdo4Vva+glFV5IbZzwiTfKDKjW51137frSaQ8hU4fVSzfu6al6FRkTOIrCNo+ucW/1YEdE9nNDxZQ7YtGaS9w6Mz+Z6+R9cgGEkio07TM10uLu4V33EuSLYP+VFu3c
-x-ms-exchange-transport-forked: True
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UF7d2AOHHS+CX9yF/DUx/TVT7IhkEI9mAwac2iiWaAegZrAfbCvi5knR84IIUc8eoswvI6qBShxsnVqxGXP1RSTO1oMwkbxa18H/WbCBsU0ACuv06jbtesW0ePIlTU4wamGLK8UlG5jwKfsbOTYYkHlc3N+7bFmnQt81VViCsXMA+WgMofZmppraCTV9GRZeCX2eQcwqtCqWmsA/7vMqnVd8ytY1YQqZiD8zU9onyKEFNuCJzIxGAHZjVB9anpz0Ehs9j3DjxycFqaMxTkZ02GCigbBaWo2upZxxseRhpAGqLBCTx8/H4Wn/YvGqCHSuhYcTtyeKXyPnfhicEDkgMA==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fp+K16oQ3DMakXeltq8YwgYJcQ2HrDSqkE7wuGEHu18=;
- b=e8mWgZkXKyGzFGTdn3bn19g5ewDJ4JUWnlrHNd4F8VP3xOFcBJU9f3qaxsAlcwmKIRhLQyvwWVQhFDDW1ERqfcpItQ2R8DvNr+k7luFwhayX8deeCjqq+9rEDddmWPcegHOu23he0HsHa0ljUqsWaP8z/F5nok8C9EpHfSqpfqthpOObzbvq0zfD3HFltUonO7RCVLGNHQsnK9ND1Wg1Qd2GdqrpIxVaL7RFAdpHNjJQRuOEJcVzfB6qLeshB4obBH24AbZwQcEOjVzMyrceggMxH8i1FSuynCytF889RNIIgj17RlUnHsThtF5y48kcl0gtrVlNd81sYUsdsGDXlA==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
- dkim=pass header.d=quicinc.com; arc=none
-dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fp+K16oQ3DMakXeltq8YwgYJcQ2HrDSqkE7wuGEHu18=;
- b=fbkPtoAl6YR7WcIlja0T09e3DT4wkP3qYRuoD1Yq5KFMM0xAvJZ6KXMLc1/fkZr6N1NGEe3D7kQCUHwUGgg/eAofL8Ns8tlmvMXnv3X6nswy1TdMUZK2tnDN/TgxWhSFKIMj+yywmeOl6mpyc8uDF0uTjmF0hu+tgI7/uydElss=
-x-ms-exchange-crosstenant-network-message-id: 3588b37d-a2aa-413b-fee7-08d76ebc5730
-x-ms-exchange-crosstenant-originalarrivaltime: 21 Nov 2019 19:52:28.9221 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: wAH9nSni+znjENeMf9554SYJdaajRrmi1WwJck4XrB9lTjSSCEz+5jBcmxiG8FGKpRUSKGltHFLjBU3QOa13SA==
-x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB4087
-x-originatororg: quicinc.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (envelope-from <mrolnik@gmail.com>) id 1iXsXW-0000RU-Jb
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:54:56 -0500
+Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:35688)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <mrolnik@gmail.com>) id 1iXsXW-0000Nd-A6
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:54:54 -0500
+Received: by mail-qk1-x744.google.com with SMTP id i19so4219665qki.2
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 11:54:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=FntM5YLbWq7cHhRArVlX2oSg9To4ITzANCLTBIIyYNM=;
+ b=LaCXbKdexzjtj15z3s7e9SUgmUxJWAYpMgNQmlyPph9PuOljDDc2l6hpc/n40Ls12X
+ QBv9l55y/BSykRV4H/Gx9Wq0rGXAxrUydeYHsPxXvNZtF800UY2RS8gkZrBCmTgrkUi4
+ ilHgCCw407D2sBSNkahZ5u+EidK1BEbNRTdlruQ3ttJ6t3RfSnU6n0Qp0B/AJSb81Nsf
+ +ZGZFYVzEyPPjIu1EGwFKQQ1TvyJ1c5NK0Viudw1YTKqHPM4c+iEpYafGrGswmC/TtD8
+ FiPV9pQhoyDg6pagrDmKNioE9nhKlR0sPN8ELcyA2AAoiw+WKRj/fBdwLw4q6gj8oVDz
+ WSHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=FntM5YLbWq7cHhRArVlX2oSg9To4ITzANCLTBIIyYNM=;
+ b=uYRXNqEkL5WyvdhmUhht4u07ZD3nqRtoZU3L9ojWRNon1mB7w420thIZhh0A4lkV9J
+ wio2AtDZxcsJ6yM44BEV7+KrUvElYGHMdeMUW9LiLKO25h/Bnt+0EePchmKWtinvwzRz
+ TE+gzm/yAKIYOGzxhk02K+cn7aZzONahRSP8qXvkYpkpjNlwoaqHOVMDpcpzgoKiiRz3
+ hqgOTGKG5HKPHhWaCkTKKRpAdW/1C6kOEIiK0jpMlMdC55u9tjXG2FmXEQ9MhUlA/UgI
+ dErWslB2zcbS8+56v+PWxJolRAaoYRjGy/dEHpHXWv+jXzEO2Xzf7aHF4VEckjHjX4jD
+ K+7A==
+X-Gm-Message-State: APjAAAV6HZ06+jzryGQ86Iel/IWBw7yy2wYvxOgkFkIT5unMlgPXFOEM
+ cGxJyIWYfpBA67GmAK8xHWcLKCr+JNlMsKFgH/g=
+X-Google-Smtp-Source: APXvYqxS/knyMK0Q2qTNc4qGHCSlme/wT9HglItm+jHKkch87wg3FgTv2f+kKLM9BLabPFV9lxqhB00VZXdjFZvMwvg=
+X-Received: by 2002:a37:7443:: with SMTP id p64mr9711001qkc.460.1574366093297; 
+ Thu, 21 Nov 2019 11:54:53 -0800 (PST)
 MIME-Version: 1.0
-X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
-X-Received-From: 199.106.114.39
+References: <20191029212430.20617-1-mrolnik@gmail.com>
+ <20191029212430.20617-2-mrolnik@gmail.com>
+ <750745b9-e51c-3757-3eb6-ffce51042d9c@redhat.com>
+ <CAK4993gtPkqESswLBoo1cMuvJFzwSVgUP=Oh-hpG2JSTKezjmw@mail.gmail.com>
+In-Reply-To: <CAK4993gtPkqESswLBoo1cMuvJFzwSVgUP=Oh-hpG2JSTKezjmw@mail.gmail.com>
+From: Michael Rolnik <mrolnik@gmail.com>
+Date: Thu, 21 Nov 2019 21:53:57 +0200
+Message-ID: <CAK4993iFuC3LTzkwjAx7uKA18jh-zOo5aYx2+1ugc9fw8UPtYg@mail.gmail.com>
+Subject: Re: [PATCH v35 01/13] target/avr: Add outward facing interfaces and
+ core CPU logic
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::744
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,38 +92,345 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, Sarah Harris <S.E.Harris@kent.ac.uk>,
+ Joaquin de Andres <me@xcancerberox.com.ar>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Igor Mammedov <imammedo@redhat.com>,
+ Aleksandar Markovic <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-VGhleSBhcmUgaW1wb3J0ZWQgZnJvbSB0aGUgZXhpc3RpbmcgSGV4YWdvbiBzaW11bGF0b3IuICBQ
-bGVhc2UgdW5kZXJzdGFuZCB0aGF0IHRoaXMgcGF0Y2ggaXMgdGhlIGZpcnN0IGluIGEgc2VyaWVz
-LiAgTGF0ZXIgcGF0Y2hlcyB3aWxsIGNvbnRhaW4gbW9yZSBlbGFib3JhdGUgY29udGVudHMgaW4g
-dGhhdCBkaXJlY3RvcnkuICBUaGUgcmVhc29uIEkgZG9uJ3Qgd2FudCB0byByZWZvcm1hdCB0aGVt
-IGlzIHRvIHN0YXkgaW4gc3luYyB3aXRoIHRoZSBvdGhlciBzaW11bGF0b3IgaW4gdGhlIGZ1dHVy
-ZS4gIFdoZW4gdGhlIG90aGVyIHRlYW0gbWFrZXMgY2hhbmdlcyB0byB0aGUgY29kZSAoZWl0aGVy
-IHRvIGZpeCBidWdzIG9yIGFkZCBmZWF0dXJlcyksIGl0IHdpbGwgYmUgZWFzaWVyIHRvIGlkZW50
-aWZ5IHRoZSBjaGFuZ2VzIGFuZCBicmluZyB0aGVtIGludG8gcWVtdS4NCg0KVGF5bG9yDQoNCi0t
-LS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBBbGVrc2FuZGFyIE1hcmtvdmljIDxhbGVr
-c2FuZGFyLm0ubWFpbEBnbWFpbC5jb20+DQpTZW50OiBUaHVyc2RheSwgTm92ZW1iZXIgMjEsIDIw
-MTkgMToyMCBQTQ0KVG86IFRheWxvciBTaW1wc29uIDx0c2ltcHNvbkBxdWljaW5jLmNvbT4NCkNj
-OiBMYXVyZW50IFZpdmllciA8bGF1cmVudEB2aXZpZXIuZXU+OyBSaWt1IFZvaXBpbyA8cmlrdS52
-b2lwaW9AaWtpLmZpPjsgUUVNVSBEZXZlbG9wZXJzIDxxZW11LWRldmVsQG5vbmdudS5vcmc+DQpT
-dWJqZWN0OiBSZTogW1BBVENIXSBBZGQgbWluaW1hbCBIZXhhZ29uIHRhcmdldCAtIEZpcnN0IGlu
-IGEgc2VyaWVzIG9mIHBhdGNoZXMgLSBsaW51eC11c2VyIGNoYW5nZXMgKyBsaW51eC11c2VyL2hl
-eGFnb24gKyBza2VsZXRvbiBvZiB0YXJnZXQvaGV4YWdvbiAtIEZpbGVzIGluIHRhcmdldC9oZXhh
-Z29uL2ltcG9ydGVkIGFyZSBmcm9tIGFub3RoZXIgcHJvamVjdCBhbmQgdGhlcmVmb3JlIGRvIG5v
-dCBjb25mb3JtIHRvIHFlbXUgY29kaW5nIHN0YW5kYXJkcw0KDQoNCj4gIGNyZWF0ZSBtb2RlIDEw
-MDY0NCB0YXJnZXQvaGV4YWdvbi9pbXBvcnRlZC9nbG9iYWxfdHlwZXMuaA0KPiAgY3JlYXRlIG1v
-ZGUgMTAwNjQ0IHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkL2lzc192ZXJfcmVnaXN0ZXJzLmgNCj4g
-IGNyZWF0ZSBtb2RlIDEwMDY0NCB0YXJnZXQvaGV4YWdvbi9pbXBvcnRlZC9tYXguaCAgY3JlYXRl
-IG1vZGUgMTAwNjQ0DQo+IHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkL3JlZ3MuaA0KDQpUYXlsb3Is
-IGlmIEkgdW5kZXJzdG9vZCB5b3Ugd2VsbCwgdGhlc2UgZmlsZXMgZG9uJ3QgY29uZmlybSB0byBR
-RU1VIGNvZGluZyBzdGFuZGFyZCwgYmVjYXVzZSB0aGV5IGFyZSBpbXBvcnRlZC4gQnV0LCBmcm9t
-IHdoZXJlPyBBbmQgd2hhdCBpcyB0aGUgcmVhc29uIHRoZXkgbmVlZCB0byBiZSBpbXBvcnRlZCAo
-YW5kIG5vdCBjcmVhdGVkIGluZGVwZW5kZW50bHkgYnkgeW91IG9yIHNvbWVib2R5IGVsc2UsIGJ1
-dCB3aXRoaW4gUUVNVSBjb2RlIHN0eWxlIGd1aWRlbGluZXMpID8NClRoZWlyIGNvbnRlbnQgbG9v
-a3MgZmFpcmx5IHNpbXBsZSB0byBtZS4NCg0KVGhhbmtzLA0KQWxla3NhbmRhcg0K
+It seems to be a huge investment. this function should parse the
+binary data as `decode_insn` does, so I suggest to modify decodetree
+tool to make decoding information available to the instruction print
+function.
+what do you think?
+
+On Thu, Nov 21, 2019 at 9:44 PM Michael Rolnik <mrolnik@gmail.com> wrote:
+>
+> On Thu, Nov 21, 2019 at 8:55 PM Philippe Mathieu-Daud=C3=A9
+> <philmd@redhat.com> wrote:
+> >
+> > Hi Michael,
+> >
+> > On 10/29/19 10:24 PM, Michael Rolnik wrote:
+> > > This includes:
+> > > - CPU data structures
+> > > - object model classes and functions
+> > > - migration functions
+> > > - GDB hooks
+> > >
+> > > Co-developed-by: Michael Rolnik <mrolnik@gmail.com>
+> > > Co-developed-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> > > Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> > > Signed-off-by: Sarah Harris <S.E.Harris@kent.ac.uk>
+> > > Signed-off-by: Michael Rolnik <mrolnik@gmail.com>
+> > > Acked-by: Igor Mammedov <imammedo@redhat.com>
+> > > ---
+> > >   gdb-xml/avr-cpu.xml    |  49 ++++
+> > >   target/avr/cpu-param.h |  37 +++
+> > >   target/avr/cpu-qom.h   |  54 ++++
+> > >   target/avr/cpu.c       | 576 ++++++++++++++++++++++++++++++++++++++=
++++
+> > >   target/avr/cpu.h       | 253 ++++++++++++++++++
+> > >   target/avr/gdbstub.c   |  85 ++++++
+> > >   target/avr/machine.c   | 121 +++++++++
+> > >   7 files changed, 1175 insertions(+)
+> > >   create mode 100644 gdb-xml/avr-cpu.xml
+> > >   create mode 100644 target/avr/cpu-param.h
+> > >   create mode 100644 target/avr/cpu-qom.h
+> > >   create mode 100644 target/avr/cpu.c
+> > >   create mode 100644 target/avr/cpu.h
+> > >   create mode 100644 target/avr/gdbstub.c
+> > >   create mode 100644 target/avr/machine.c
+> > >
+> > > diff --git a/gdb-xml/avr-cpu.xml b/gdb-xml/avr-cpu.xml
+> > > new file mode 100644
+> > > index 0000000000..c4747f5b40
+> > > --- /dev/null
+> > > +++ b/gdb-xml/avr-cpu.xml
+> > > @@ -0,0 +1,49 @@
+> > > +<?xml version=3D"1.0"?>
+> > > +<!-- Copyright (C) 2018-2019 Free Software Foundation, Inc.
+> > > +
+> > > +     Copying and distribution of this file, with or without modifica=
+tion,
+> > > +     are permitted in any medium without royalty provided the copyri=
+ght
+> > > +     notice and this notice are preserved.  -->
+> > > +
+> > > +<!-- Register numbers are hard-coded in order to maintain backward
+> > > +     compatibility with older versions of tools that didn't use xml
+> > > +     register descriptions.  -->
+> > > +
+> > > +<!DOCTYPE feature SYSTEM "gdb-target.dtd">
+> > > +<feature name=3D"org.gnu.gdb.riscv.cpu">
+> > > +  <reg name=3D"r0" bitsize=3D"8" type=3D"int" regnum=3D"0"/>
+> > > +  <reg name=3D"r1" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r2" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r3" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r4" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r5" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r6" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r7" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r8" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r9" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r10" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r11" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r12" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r13" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r14" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r15" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r16" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r17" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r18" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r19" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r20" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r21" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r22" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r23" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r24" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r25" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r26" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r27" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r28" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r29" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r30" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"r31" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"sreg" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"sp" bitsize=3D"8" type=3D"int"/>
+> > > +  <reg name=3D"pc" bitsize=3D"8" type=3D"int"/>
+> > > +</feature>
+> > > diff --git a/target/avr/cpu-param.h b/target/avr/cpu-param.h
+> > > new file mode 100644
+> > > index 0000000000..ccd1ea3429
+> > > --- /dev/null
+> > > +++ b/target/avr/cpu-param.h
+> > > @@ -0,0 +1,37 @@
+> > > +/*
+> > > + * QEMU AVR CPU
+> > > + *
+> > > + * Copyright (c) 2019 Michael Rolnik
+> > > + *
+> > > + * This library is free software; you can redistribute it and/or
+> > > + * modify it under the terms of the GNU Lesser General Public
+> > > + * License as published by the Free Software Foundation; either
+> > > + * version 2.1 of the License, or (at your option) any later version=
+.
+> > > + *
+> > > + * This library is distributed in the hope that it will be useful,
+> > > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> > > + * Lesser General Public License for more details.
+> > > + *
+> > > + * You should have received a copy of the GNU Lesser General Public
+> > > + * License along with this library; if not, see
+> > > + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> > > + */
+> > > +
+> > > +#ifndef AVR_CPU_PARAM_H
+> > > +#define AVR_CPU_PARAM_H 1
+> > > +
+> > > +#define TARGET_LONG_BITS 32
+> > > +/*
+> > > + * TARGET_PAGE_BITS cannot be more than 8 bits because
+> > > + * 1.  all IO registers occupy [0x0000 .. 0x00ff] address range, and=
+ they
+> > > + *     should be implemented as a device and not memory
+> > > + * 2.  SRAM starts at the address 0x0100
+> > > + */
+> > > +#define TARGET_PAGE_BITS 8
+> > > +#define TARGET_PHYS_ADDR_SPACE_BITS 24
+> > > +#define TARGET_VIRT_ADDR_SPACE_BITS 24
+> > > +#define NB_MMU_MODES 2
+> > > +
+> > > +
+> > > +#endif
+> > > diff --git a/target/avr/cpu-qom.h b/target/avr/cpu-qom.h
+> > > new file mode 100644
+> > > index 0000000000..e28b58c897
+> > > --- /dev/null
+> > > +++ b/target/avr/cpu-qom.h
+> > > @@ -0,0 +1,54 @@
+> > > +/*
+> > > + * QEMU AVR CPU
+> > > + *
+> > > + * Copyright (c) 2019 Michael Rolnik
+> > > + *
+> > > + * This library is free software; you can redistribute it and/or
+> > > + * modify it under the terms of the GNU Lesser General Public
+> > > + * License as published by the Free Software Foundation; either
+> > > + * version 2.1 of the License, or (at your option) any later version=
+.
+> > > + *
+> > > + * This library is distributed in the hope that it will be useful,
+> > > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> > > + * Lesser General Public License for more details.
+> > > + *
+> > > + * You should have received a copy of the GNU Lesser General Public
+> > > + * License along with this library; if not, see
+> > > + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> > > + */
+> > > +
+> > > +#ifndef QEMU_AVR_QOM_H
+> > > +#define QEMU_AVR_QOM_H
+> > > +
+> > > +#include "hw/core/cpu.h"
+> > > +
+> > > +#define TYPE_AVR_CPU "avr-cpu"
+> > > +
+> > > +#define AVR_CPU_CLASS(klass) \
+> > > +    OBJECT_CLASS_CHECK(AVRCPUClass, (klass), TYPE_AVR_CPU)
+> > > +#define AVR_CPU(obj) \
+> > > +    OBJECT_CHECK(AVRCPU, (obj), TYPE_AVR_CPU)
+> > > +#define AVR_CPU_GET_CLASS(obj) \
+> > > +    OBJECT_GET_CLASS(AVRCPUClass, (obj), TYPE_AVR_CPU)
+> > > +
+> > > +/**
+> > > + *  AVRCPUClass:
+> > > + *  @parent_realize: The parent class' realize handler.
+> > > + *  @parent_reset: The parent class' reset handler.
+> > > + *  @vr: Version Register value.
+> > > + *
+> > > + *  A AVR CPU model.
+> > > + */
+> > > +typedef struct AVRCPUClass {
+> > > +    /*< private >*/
+> > > +    CPUClass parent_class;
+> > > +    /*< public >*/
+> > > +    DeviceRealize parent_realize;
+> > > +    void (*parent_reset)(CPUState *cpu);
+> > > +} AVRCPUClass;
+> > > +
+> > > +typedef struct AVRCPU AVRCPU;
+> > > +
+> > > +
+> > > +#endif /* !defined (QEMU_AVR_CPU_QOM_H) */
+> > > diff --git a/target/avr/cpu.c b/target/avr/cpu.c
+> > > new file mode 100644
+> > > index 0000000000..dae56d7845
+> > > --- /dev/null
+> > > +++ b/target/avr/cpu.c
+> > > @@ -0,0 +1,576 @@
+> > > +/*
+> > > + * QEMU AVR CPU
+> > > + *
+> > > + * Copyright (c) 2019 Michael Rolnik
+> > > + *
+> > > + * This library is free software; you can redistribute it and/or
+> > > + * modify it under the terms of the GNU Lesser General Public
+> > > + * License as published by the Free Software Foundation; either
+> > > + * version 2.1 of the License, or (at your option) any later version=
+.
+> > > + *
+> > > + * This library is distributed in the hope that it will be useful,
+> > > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> > > + * Lesser General Public License for more details.
+> > > + *
+> > > + * You should have received a copy of the GNU Lesser General Public
+> > > + * License along with this library; if not, see
+> > > + * <http://www.gnu.org/licenses/lgpl-2.1.html>
+> > > + */
+> > > +
+> > > +#include "qemu/osdep.h"
+> > > +#include "qapi/error.h"
+> > > +#include "qemu/qemu-print.h"
+> > > +#include "exec/exec-all.h"
+> > > +#include "cpu.h"
+> > > +
+> > > +static void avr_cpu_set_pc(CPUState *cs, vaddr value)
+> > > +{
+> > > +    AVRCPU *cpu =3D AVR_CPU(cs);
+> > > +
+> > > +    cpu->env.pc_w =3D value / 2; /* internally PC points to words */
+> > > +}
+> > > +
+> > > +static bool avr_cpu_has_work(CPUState *cs)
+> > > +{
+> > > +    AVRCPU *cpu =3D AVR_CPU(cs);
+> > > +    CPUAVRState *env =3D &cpu->env;
+> > > +
+> > > +    return (cs->interrupt_request & (CPU_INTERRUPT_HARD | CPU_INTERR=
+UPT_RESET))
+> > > +            && cpu_interrupts_enabled(env);
+> > > +}
+> > > +
+> > > +static void avr_cpu_synchronize_from_tb(CPUState *cs, TranslationBlo=
+ck *tb)
+> > > +{
+> > > +    AVRCPU *cpu =3D AVR_CPU(cs);
+> > > +    CPUAVRState *env =3D &cpu->env;
+> > > +
+> > > +    env->pc_w =3D tb->pc / 2; /* internally PC points to words */
+> > > +}
+> > > +
+> > > +static void avr_cpu_reset(CPUState *cs)
+> > > +{
+> > > +    AVRCPU *cpu =3D AVR_CPU(cs);
+> > > +    AVRCPUClass *mcc =3D AVR_CPU_GET_CLASS(cpu);
+> > > +    CPUAVRState *env =3D &cpu->env;
+> > > +
+> > > +    mcc->parent_reset(cs);
+> > > +
+> > > +    env->pc_w =3D 0;
+> > > +    env->sregI =3D 1;
+> > > +    env->sregC =3D 0;
+> > > +    env->sregZ =3D 0;
+> > > +    env->sregN =3D 0;
+> > > +    env->sregV =3D 0;
+> > > +    env->sregS =3D 0;
+> > > +    env->sregH =3D 0;
+> > > +    env->sregT =3D 0;
+> > > +
+> > > +    env->rampD =3D 0;
+> > > +    env->rampX =3D 0;
+> > > +    env->rampY =3D 0;
+> > > +    env->rampZ =3D 0;
+> > > +    env->eind =3D 0;
+> > > +    env->sp =3D 0;
+> > > +
+> > > +    env->skip =3D 0;
+> > > +
+> > > +    memset(env->r, 0, sizeof(env->r));
+> > > +
+> > > +    tlb_flush(cs);
+> > > +}
+> > > +
+> > > +static void avr_cpu_disas_set_info(CPUState *cpu, disassemble_info *=
+info)
+> > > +{
+> > > +    info->mach =3D bfd_arch_avr;
+> > > +    info->print_insn =3D NULL;
+> >
+> > Why not implement the dump_ASM code? This is very useful...
+> >
+> > Richard what is your position on this? I'd rather enforce this as a
+> > requirement for each ports.
+>
+> Hi Philippe.
+>
+> I will, however it could be a functionality of the instruction parser.
+>
+> Regards,
+> Michael
+> >
+> > > +}
+> > > +
+> > [...]
+> >
+>
+>
+> --
+> Best Regards,
+> Michael Rolnik
+
+
+
+--=20
+Best Regards,
+Michael Rolnik
 
