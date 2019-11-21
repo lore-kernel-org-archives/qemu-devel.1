@@ -2,90 +2,141 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69461C43215
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE732C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:21:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07C182089D
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:20:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t+g90HH7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07C182089D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id C25AD20731
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:21:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C25AD20731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXlRu-0001k5-NH
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 07:20:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44718)
+	id 1iXlSe-00038x-10
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 07:21:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44754)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iXlQd-0000Ec-4e
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:19:20 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iXlQn-0000Ss-FQ
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:19:30 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iXlQb-0008As-U4
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:19:18 -0500
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37565)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iXlQb-0008A1-N3
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:19:17 -0500
-Received: by mail-wr1-x441.google.com with SMTP id t1so4161607wrv.4
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 04:19:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=3YrPhJBd+6NEb7cnbcUSADo+3FmjBzw09oDJhuQoavQ=;
- b=t+g90HH7caFDaLe1QzVaEek7zNyez2tgcFlNuNafGiLyQk84KxcW+ZhzCxfUjYl+4f
- ckvgNi/c4thk7L/xPCsbUANViQTZ6xF6TGRr5zbzvhDQEFd//e/qFe+DSTbPHWpjDjt2
- Jg588B97iz2WFIN3pTXc6JDMORDr2cf9F6ITgbm+YiEvhdTJcom1tMX/nWYT9oDHTUP2
- uueInwe4dsQiZw+SLLfQN9tSq0eJ+6jgTRBqUMPGrr8pD2O2Ex9MMcgl7JLXwMP8Grlm
- U5zEVCfz+XydbIRkgMltUdowh3pQwcW8wf7TZymFfIFx7g3bozkMQLJKyIvvlN3HI1/E
- sSOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=3YrPhJBd+6NEb7cnbcUSADo+3FmjBzw09oDJhuQoavQ=;
- b=njeaezGhxh+N/H2jMbNuBzEqehSsYlXDm9IIm6uvcO8/NMgIcjm9+ASo732Ekkcl8g
- D7yYvkCpUluI9X9MLmAqxl9gjxFlcASuQH0FAaUVBUocS5ZUn/RcrTc/T9LZbeKnVFF4
- WFhBwDOAUSOI0pUej50G2Xn4BtsDofX7cLRGZKJQhK/u6yUSKIHlD4C6bHJ/fysg5OEn
- Df4I97w6yrlX5jL/+UHBEobq3PNGpQjSYd+SZZDjNanetcLouGCvOMFrmYuvEX3u8UxA
- vRl1mLeyfdjXmldVVyBQDEnjuoZG1LEbA8herEsoaQt763/5Ha2l5MIqCaFQUXnBH5tG
- vmGQ==
-X-Gm-Message-State: APjAAAWY/A8b3J9aKjVoRqpVeOi6zObydsYhm574w+freIy45NfuG7Ah
- 001wKTkEOO437If2fZHRd14=
-X-Google-Smtp-Source: APXvYqwZv0qhyUWJoXnJPlc0c5UBM+/rawUg+B3xoRQ2Yz75H0oK2txXZmP3BTAnJDA8L9RgYhGSQg==
-X-Received: by 2002:adf:ffd0:: with SMTP id x16mr9890894wrs.86.1574338756485; 
- Thu, 21 Nov 2019 04:19:16 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id d202sm2526642wmd.47.2019.11.21.04.19.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 Nov 2019 04:19:15 -0800 (PST)
-Date: Thu, 21 Nov 2019 12:19:14 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Jag Raman <jag.raman@oracle.com>
-Subject: Re: [RFC v4 PATCH 30/49] multi-process: send heartbeat messages to
- remote
-Message-ID: <20191121121914.GP439743@stefanha-x1.localdomain>
-References: <cover.1571905346.git.jag.raman@oracle.com>
- <14c33104778e77fcf2e7f0df2a1dd96fbcaf49d7.1571905346.git.jag.raman@oracle.com>
- <20191111162750.GJ402228@stefanha-x1.localdomain>
- <6f063381-c842-9c03-280f-1e9652a15881@oracle.com>
+ (envelope-from <frankja@linux.ibm.com>) id 1iXlQm-0008Ht-Bg
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:19:29 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23806)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iXlQm-0008HI-2f
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:19:28 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xALCH9QJ102162
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 07:19:24 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wadn0g8t7-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 07:19:24 -0500
+Received: from localhost
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Thu, 21 Nov 2019 12:19:21 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 21 Nov 2019 12:19:18 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id xALCJGYW45744530
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 21 Nov 2019 12:19:16 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DBE26AE04D;
+ Thu, 21 Nov 2019 12:19:16 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5D75EAE051;
+ Thu, 21 Nov 2019 12:19:16 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.70.129])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 21 Nov 2019 12:19:16 +0000 (GMT)
+Subject: Re: [PATCH 11/15] RFC: s390x: Exit on vcpu reset error
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+References: <20191120114334.2287-1-frankja@linux.ibm.com>
+ <20191120114334.2287-12-frankja@linux.ibm.com>
+ <09359386-a91b-d98c-08f5-5b375f0bd942@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
+ qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
+ 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
+ zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
+ lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
+ Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
+ 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
+ cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
+ Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
+ HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABtCVKYW5vc2NoIEZy
+ YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+iQI3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
+ CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
+ AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
+ bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
+ eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
+ CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
+ EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
+ rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
+ UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
+ RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
+ dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
+ jJbauQINBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
+ cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
+ JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
+ iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
+ tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
+ 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
+ v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
+ HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
+ 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
+ gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABiQIfBBgBCAAJ
+ BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
+ 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
+ jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
+ IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
+ katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
+ dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
+ FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
+ DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
+ Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
+ phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
+Date: Thu, 21 Nov 2019 13:19:15 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
+In-Reply-To: <09359386-a91b-d98c-08f5-5b375f0bd942@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="BnCwdHgQ2ZomtW9r"
-Content-Disposition: inline
-In-Reply-To: <6f063381-c842-9c03-280f-1e9652a15881@oracle.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::441
+ protocol="application/pgp-signature";
+ boundary="YqQhbvIyAD3TcPtIxFuM8SMeBTKck03bq"
+X-TM-AS-GCONF: 00
+x-cbid: 19112112-0028-0000-0000-000003BD8F5E
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112112-0029-0000-0000-00002480B758
+Message-Id: <f67cdf5e-837b-5596-89ee-136eee04943b@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-21_02:2019-11-21,2019-11-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 bulkscore=0
+ mlxlogscore=999 impostorscore=0 mlxscore=0 clxscore=1015
+ priorityscore=1501 spamscore=0 suspectscore=0 lowpriorityscore=0
+ adultscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-1910280000 definitions=main-1911210112
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,91 +148,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com, mst@redhat.com,
- armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, Stefan Hajnoczi <stefanha@redhat.com>, rth@twiddle.net,
- kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--YqQhbvIyAD3TcPtIxFuM8SMeBTKck03bq
+Content-Type: multipart/mixed; boundary="W35WP9pIBSMvuiRT2egFRwFAe5rWlJ255"
 
---BnCwdHgQ2ZomtW9r
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--W35WP9pIBSMvuiRT2egFRwFAe5rWlJ255
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 13, 2019 at 11:01:07AM -0500, Jag Raman wrote:
->=20
->=20
-> On 11/11/2019 11:27 AM, Stefan Hajnoczi wrote:
-> > On Thu, Oct 24, 2019 at 05:09:11AM -0400, Jagannathan Raman wrote:
-> > > +static void broadcast_msg(MPQemuMsg *msg, bool need_reply)
-> > > +{
-> > > +    PCIProxyDev *entry;
-> > > +    unsigned int pid;
-> > > +    int wait;
-> > > +
-> > > +    QLIST_FOREACH(entry, &proxy_dev_list.devices, next) {
-> > > +        if (need_reply) {
-> > > +            wait =3D eventfd(0, EFD_NONBLOCK);
-> > > +            msg->num_fds =3D 1;
-> > > +            msg->fds[0] =3D wait;
-> > > +        }
-> > > +
-> > > +        mpqemu_msg_send(entry->mpqemu_link, msg, entry->mpqemu_link-=
->com);
-> > > +        if (need_reply) {
-> > > +            pid =3D (uint32_t)wait_for_remote(wait);
-> >=20
-> > Sometimes QEMU really needs to wait for the remote process before it can
-> > make progress.  I think this is not one of those cases though.
-> >=20
-> > Since QEMU is event-driven it's problematic to invoke blocking system
-> > calls.  The remote process might not respond for a significant amount of
-> > time.  Other QEMU threads will be held up waiting for the QEMU global
-> > mutex in the meantime (because we hold it!).
->=20
-> There are places where we wait synchronously for the remote process.
-> However, these synchronous waits carry a timeout to prevent the hang
-> situation you described above.
->=20
-> We will add an error recovery in the future. That is, we will respawn
-> the remote process if the QEMU times out waiting for it.
+On 11/21/19 1:14 PM, David Hildenbrand wrote:
+> On 20.11.19 12:43, Janosch Frank wrote:
+>> If a vcpu is not properly reset it might be better to just end the VM.=
 
-Even with a timeout, in the meantime the event loop is blocked.  That
-means timers will be delayed by a large amount, the monitor will be
-unresponsive, etc.
-
-> >=20
-> > Please implement heartbeat/ping asynchronously.  The wait eventfd should
-> > be read by an event loop fd handler instead.  That way QEMU can continue
-> > with running the VM while waiting for the remote process.
+>>
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>   target/s390x/kvm.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+>>
+>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+>> index 190400df55..0210b54157 100644
+>> --- a/target/s390x/kvm.c
+>> +++ b/target/s390x/kvm.c
+>> @@ -418,11 +418,13 @@ static void kvm_s390_reset_vcpu(S390CPU *cpu, un=
+signed long type)
+>>           if (kvm_vcpu_ioctl(cs, KVM_S390_VCPU_RESET, type)) {
+>>               error_report("CPU reset type %ld failed on CPU %i",
+>>                            type, cs->cpu_index);
+>> +            exit(1);
+>>           }
+>>           return;
+>>       }
+>>       if (kvm_vcpu_ioctl(cs, KVM_S390_INITIAL_RESET, NULL)) {
+>>           error_report("Initial CPU reset failed on CPU %i", cs->cpu_i=
+ndex);
+>> +        exit(1);
+>>       }
+>>   }
+>>  =20
+>>
 >=20
-> In the current implementation, the heartbeat/ping is asynchronous.
-> start_heartbeat_timer() sets up a timer to perform the ping.
+> According to the comment in include/qapi/error.h
+>=20
+> "Please don't error_setg(&error_fatal, ...), use error_report() and=20
+> exit(), because that's more obvious."
+>=20
+> This is the right thing to do.
+>=20
+> ... and it's a fairly pathological thing to happen either way.
+>=20
+> Reviewed-by: David Hildenbrand <david@redhat.com>
+>=20
 
-The heartbeat/ping is synchronous because broadcast_msg() blocks.
+Do we want to have that separate or should I squash it into the reset
+changes?
 
-Stefan
 
---BnCwdHgQ2ZomtW9r
+
+--W35WP9pIBSMvuiRT2egFRwFAe5rWlJ255--
+
+--YqQhbvIyAD3TcPtIxFuM8SMeBTKck03bq
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3WgMIACgkQnKSrs4Gr
-c8hTrwgAxH0CgmLgNHPUPzFNFBCUJV0EnwEPzxQkVShAQFe/eSh2eAj7br5Kduj/
-QIIL5OJNg7wEScXpdoiOlt0jj0QZN2FWSDTSA3GZZOObcPyoc1C89W+auY7YDwLm
-qnSNt4utnfWvSSb2JO0/OQjxPyLHJKwQmclBme0KWXvdMBMKnbOb7ETmxwjxqKHO
-g3Xe7PWmBrouIxr6OHTbLIErhkW1wC9VcNTpAe4iBhSaGheMMSHFZtLFcYs/DmYd
-bGhw7kZDKDQ3NB8awfS9Lhd980J29Woq/vCS8VvuJilkEEluVhxZitpHKLJ8l01b
-+qmWJRDkND31P32g43LGQOSv4JM3Fg==
-=1WrO
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3WgMMACgkQ41TmuOI4
+ufiJrQ/+Iw9/Lq96PFZPix3drHOQm5qibeuivkXOITI9G2Q69SPEtgo6WrkR1Iye
+gByI5eWwQtFh7IQHivgSJWYaMjIhRWV+YKzUMloV8RXdxOc30wMjTtngT4OovT3J
+rcWGanKPfRXDT1hoTlSzrMwlCjYovY9N71os+Nwqs+rL0qamscxGRAIv5okxZD1j
+CO95uXBVQabpI59cYpJ/YMXrasUeZxicTI46OxZT7kaJoi6v049Y1Q9y1XLseHve
+wHXKDllN8Ak+Ao5K31baMqb0vleX1r/KJ6a+Glcr6yH6ISy4NyO5j6jLH/sepP/N
+ZXVTReJdwz1cCuRCLl8ulpUIvJP8w8hKveG2801tQZguHH5rgnz7qYkB1K6alD4k
+8FiPWCE9AIeHA51+Ydg7Gm0de+glgSCo+ScM2BfJnH+VoVkKvbG7va/ZbOj7l6BI
+elx5tJSLYVS7OK1bUSzhWFsg/I9I0S5qsAEe4nQ4udvDdVMsEYjSaaNwG+BQLAiJ
+ipozy2FZ7vfhAOkDJJo1BVzv/DomaQuUD9NTR9p6ez5Jx37RrvuKPWILhR89NUZ9
+Rpp9rHrIcYwV5O9CF0C8g4aCcjl6DTctwvAw8TMD5sEnElUVpeTt1clIbjoQXx0g
+hzIQb0MJ7RbQXCqaHCCOPC3pclzJo8UI44kW3nZKEDwFH0wSOsw=
+=ZI0z
 -----END PGP SIGNATURE-----
 
---BnCwdHgQ2ZomtW9r--
+--YqQhbvIyAD3TcPtIxFuM8SMeBTKck03bq--
+
 
