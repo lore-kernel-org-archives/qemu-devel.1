@@ -2,88 +2,80 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 749B1C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:18:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A479C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:19:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C6282068E
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:18:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7B5F2068E
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:19:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sHELJ+af"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C6282068E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OnEiBb1T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7B5F2068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXnIO-00044f-Bx
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 09:18:56 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38465)
+	id 1iXnIv-0004CR-0b
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 09:19:29 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38518)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iXnHL-0003Gx-69
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:17:52 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iXnHc-0003L0-Lx
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:18:09 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iXnHJ-0001a5-Tm
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:17:50 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34926)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iXnHJ-0001Zx-LN
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:17:49 -0500
-Received: by mail-wm1-x343.google.com with SMTP id 8so3923204wmo.0
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 06:17:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=Uo1gy0bKtpX0ZralV68Q+zpjOjMh91wdG3ZqPhrLw28=;
- b=sHELJ+afYoiSgK/B/MSg6RshOqHP/236JZF1ukTZ2GWZFcvCAxfdkwDzIg3Egt1Jwl
- FArgPsbV/+RpTzdNtlJJDn4s1wrLHq/Z4Df9e3RBSvSxrUP5m7NIh+DLYCYljWc/audB
- JVHyXBm96R6Iv2FBB4DpKgoDlIkKF2O6iyiFxF5pXfDFpXBxARFzB5tSBtPT8+cCHSXs
- QwN1vE+2RfYG6B3T6MQh00ZcBjDRJr3boTtDCgI/0XYy5ouWBoN+Q9eH85qLdTvMoAUC
- oR3aTSLUl7O2Gdx/kOi+CUQa6eFIU6eCiMhanOfiQ8rIAQKJFQoOSuj9sUn88m+u4vj7
- S8/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=Uo1gy0bKtpX0ZralV68Q+zpjOjMh91wdG3ZqPhrLw28=;
- b=LOqoQC4ugKqfKjyp+MC+zn/zvRTtPCj1JdaH4nRHVdwwWTm/M1otaoqoPhi+0s9GkY
- cGbyyP19wI2zFhHChivtZ5vpsrdxl8TurRlIBBmv4Zwc4hK9X/jLznOWqpl4wfd0CvsE
- MlPCXtO9GG2hTRFYYkJ3Xqi+qUkBFFq63wvosr5IKaTGEuPWJdw2/z7DJN3HhZ748jYT
- WvPpTJ+wWhh912rHj+HLVTxeA/gGOAWebkAbMSUNRmNo9rXlUK8KDpe5xZEx975oAoSR
- v0sX6ZW9/9pREF6DVUzihbU15N78gUyJww4bNIEiUR+/GnOfs9BiHKVbhL5vo9tqaXF5
- tuiQ==
-X-Gm-Message-State: APjAAAUeNz9Ug/Hx0aCGhdgCfQVP56pvwpTw+zOzpQGJhr0U3I8bwXJz
- 8dqw7dmnj4yo83BaL2jxIhs=
-X-Google-Smtp-Source: APXvYqy1FC8aTq/B7AqjyunYyKwA2FambYBixb/B2ONZHtl9MxgQanUxcyA59bL9BtVhN9itTx3jKg==
-X-Received: by 2002:a05:600c:214a:: with SMTP id
- v10mr10196203wml.102.1574345868434; 
- Thu, 21 Nov 2019 06:17:48 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id u13sm2813886wmm.45.2019.11.21.06.17.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 Nov 2019 06:17:47 -0800 (PST)
-Date: Thu, 21 Nov 2019 14:17:46 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Micky Yun Chan <chanmickyyun@gmail.com>
-Subject: Re: [PATCH v6] Implement backend program convention command for
- vhost-user-blk
-Message-ID: <20191121141746.GZ439743@stefanha-x1.localdomain>
-References: <20191121015826.4867-1-michan@redhat.com>
+ (envelope-from <cohuck@redhat.com>) id 1iXnHb-0001dn-Eo
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:18:08 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25959
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iXnHZ-0001dF-J0
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:18:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574345883;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=+sXBEDyWBDN1EcP1GJIlFktYZiZly7Rwb3dGQuB9LP0=;
+ b=OnEiBb1T/gvTLfixjMt3xVZf2lH+t2eyf4A8a3JLzaRaPcUmoHx1r5xIGnvnjr/nWCp7XZ
+ R2pGKx7lIkg/sBzYzssnW6xQYwsDq2yeeq061E2oJHJw5SK5fwqR4rwJ/m5h6aY4+G316X
+ zpwJhcHNWUSj3wdCjGfFbQrcrWVu4sU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-288-vVqrW763MXK7Vn_DRVM-hw-1; Thu, 21 Nov 2019 09:18:01 -0500
+X-MC-Unique: vVqrW763MXK7Vn_DRVM-hw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FA73801E74;
+ Thu, 21 Nov 2019 14:18:00 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 715A06CE76;
+ Thu, 21 Nov 2019 14:17:52 +0000 (UTC)
+Date: Thu, 21 Nov 2019 15:17:37 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 07/15] s390x: protvirt: Handle diag 308 subcodes 0,1,3,4
+Message-ID: <20191121151737.58f9b513.cohuck@redhat.com>
+In-Reply-To: <2919845b-531d-8c79-fb16-36f67fa29789@linux.ibm.com>
+References: <20191120114334.2287-1-frankja@linux.ibm.com>
+ <20191120114334.2287-8-frankja@linux.ibm.com>
+ <20191121145001.5e7a182d.cohuck@redhat.com>
+ <2919845b-531d-8c79-fb16-36f67fa29789@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="QZ+LYBYf4/WKxcjd"
-Content-Disposition: inline
-In-Reply-To: <20191121015826.4867-1-michan@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; boundary="Sig_/V3dz+E9FIC_0fwBTgAIPK1i";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,78 +87,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: michan <michan@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
+ qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---QZ+LYBYf4/WKxcjd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--Sig_/V3dz+E9FIC_0fwBTgAIPK1i
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 21, 2019 at 09:58:26AM +0800, Micky Yun Chan wrote:
-> diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
-> index da6aaf51c8..d25c3a957f 100644
-> --- a/docs/interop/vhost-user.json
-> +++ b/docs/interop/vhost-user.json
-> @@ -54,6 +54,37 @@
->    ]
->  }
-> =20
-> +##
-> +# @VHostUserBackendBlockFeature:
-> +#
-> +# List of vhost user "block" features.
-> +#
-> +# @read-only: The --read-only command line option is supported.
-> +# @blk-file: The --blk-file command line option is supported.
+On Thu, 21 Nov 2019 15:04:31 +0100
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Please also update docs/interop/vhost-user.rst.  That document
-duplicates the option documentation and it would be good to keep it
-up-to-date.
+> On 11/21/19 2:50 PM, Cornelia Huck wrote:
+> > On Wed, 20 Nov 2019 06:43:26 -0500
+> > Janosch Frank <frankja@linux.ibm.com> wrote: =20
+>=20
+> >  =20
+> >>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+> >>          break;
+> >>      case S390_RESET_LOAD_NORMAL: /* Subcode 1*/ =20
+> >=20
+> > missing blank before */ (introduced in a previous patch)
+> >=20
+> >  =20
+> >> +        subsystem_reset();
+> >> +        s390_pv_prepare_reset(env);
+> >>          CPU_FOREACH(t) {
+> >>              if (t =3D=3D cs) {
+> >>                  continue;
+> >>              }
+> >>              run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
+> >>          }
+> >> -        subsystem_reset();
+> >>          run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
+> >>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+> >>          break;
+> >>      case S390_RESET_EXTERNAL: =20
+> >=20
+> > Annotate this with the subcode as well? (in the patch introducing it) =
+=20
+>=20
+> I think this has no diag 308 subcode and is triggered by qemu
 
-> +#
-> +# Since: 4.0
+-ENOCOFFE
 
-QEMU 4.2 is close to being released and the codebase is frozen.  The
-next release will be 5.0.  Please change this to:
+But even more reason to annotate this with the fact that this is
+triggered by QEMU :)
 
-  Since: 5.0
-
-> +##
-> +{
-> +  'enum': 'VHostUserBackendBlockFeature',
-> +  'data': [ 'read-only', 'blk-file' ]
-> +}
-> +
-> +##
-> +# @VHostUserBackendCapabilitiesBlock:
-> +#
-> +# Capabilities reported by vhost user "block" backends
-> +#
-> +# @features: list of supported features.
-> +#
-> +# Since: 4.0
-
-Same here.
-
---QZ+LYBYf4/WKxcjd
-Content-Type: application/pgp-signature; name="signature.asc"
+--Sig_/V3dz+E9FIC_0fwBTgAIPK1i
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3WnIoACgkQnKSrs4Gr
-c8htzQgAhtgj2KBMnMwgQU53ckyVPCXvnRShx7W30OqT6mnB9Fv0uLsjNXgxTgF1
-RLyL4IQEatGRqAo7NgoY+HIZjLFxQtdNLUbO5Bdn9QFx6HQk7S7xb1IY9n7MJE2e
-bk6E49REuz7hc1uezCMZ/wKP28pgNNuZ8+t75aUwH4Uai2vXSu37GHOvrDSdnmoj
-cI+IBHENYpTL0jjhofV1F9oMmzll5fcKkrqEqQKPX3ZdmLxsvaXvfV2uBLwMdNy0
-wQaJTTtbQ1UjaGUaE2qC2i/HW6s5ZuHeihnBrty/CDoTBVw0R4xmQ4xCcdYWuYFg
-y3KR06PcGF7OQrkFUvc2dxOD/UzHoA==
-=dsHJ
+iQIzBAEBCAAdFiEEw9DWbcNiT/aowBjO3s9rk8bwL68FAl3WnIEACgkQ3s9rk8bw
+L6+mnw/+OcTRhEMmU+KTrV8Q7yJzfhw6RfXa0z04AxEQK7JuABCqgbHra0nzXmBN
+RnELkXs4RX1R9DPwJzo9D0Ad5PRlKSDtbwyiXMo2if7HUrFsvmEaoyiQdqD6+tYB
++WkCo1kDbYKKZzBZYxLZpir6J0zsCZZnKbLBnbOKGGoMyt/QX9+80oMIKJkNiZOf
+Rs9+LnUZORT4mpR7h3CRfc7/6tCCFnjt6dYy4//jWApNHNan5Qlm7285Ug5BxErh
+piDyNrXliCLsEtiJ1rbPlF6prFfL/r0YbY2WuoS0k5lRXfVPVbNCZkmMpf1hm83y
+E9LQkFWa2aGxYtfaKaEcAddRDJ51suF7L5aE4Rk7rd2k1jMseNHExzFC+7BGM4gu
+vHc9WulJlq8zCa2pjjIsJ+Vy12Lyac+EAOBjmgrGtcZkmn0OD6uuxUOWZOQTrSro
+1nB8CZNmmSiLMwv9V6BI5XZG27Zf0owl12mYfiDTnNcOEC+CYdApQBW9z5Gr+ZQ8
+1XF2Q/Fg84ADqlS8fA/3vvEHlBzaOM8mpwM9veYOKNg6XM7EOsWPbS/BsvMPrwQK
+N+WtJFd/uxji8JeytvYLBJR/0ISu1D/oTphf8777IsNcPNjWUxkhRoCLxGT5B/uS
+qCxekBfh1TS+9NyQgMukhgc/FZ3wmIg+tKHuPqQYJn4BUYUDqcE=
+=PZot
 -----END PGP SIGNATURE-----
 
---QZ+LYBYf4/WKxcjd--
+--Sig_/V3dz+E9FIC_0fwBTgAIPK1i--
+
 
