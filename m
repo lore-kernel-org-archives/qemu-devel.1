@@ -2,118 +2,141 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C976EC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F85C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:12:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 925B92089D
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:04:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="TwLuCX6P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 925B92089D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id A2F1720731
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:12:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2F1720731
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXm8f-0006uT-Nn
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:04:49 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53563)
+	id 1iXmFc-0001zX-Nr
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:12:00 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54977)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iXm71-0005f0-Tz
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:03:09 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iXmEt-0001QG-Ay
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:11:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vsementsov@virtuozzo.com>) id 1iXm6w-0004TW-LH
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:03:07 -0500
-Received: from mail-eopbgr50125.outbound.protection.outlook.com
- ([40.107.5.125]:25070 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
+ (envelope-from <frankja@linux.ibm.com>) id 1iXmEs-0001qd-19
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:11:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26574)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
- id 1iXm6v-0004SB-Uo; Thu, 21 Nov 2019 08:03:02 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SupmMRA61bta/58m9BtNJG2Am5T/HZgwk0XoYT+Zjpu+KEzWFmAWI3fXq+GB73Zg/teBDUoWqTHqGHVQoQfN35nCH7ZePFqq7912hnbZxv8wLUHElj53Oq8gWQDorL4QcIdQk9ZLXZjP04AtWOD0/38j7MOZ+sRABL30F947N+Yn/sxGOHPM/gQdCOD4GqjUEvDutPdIO0EH+cpvy/YIFv4r46nDwVKDq86Qnpv2VIygXpZb3Zu/HZy4AWGdobd+6x5OGvT7PmQWJfZSnCPSWKS5CxejTnN7C51g9VHQa/BMq3z9NMpvVUGfpM7vG0d/IDJ8ARd9qA7UyQI47P5OKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GOILUkwJGcQySz5xlgX7hTQpadF8sqcbxyiwviVorHc=;
- b=DJgydeqXHlb52dq9K/smlmA6r8hs5DFRgLUx8kaiNjlllmqHmJb9zhIuqn1o/WMCkLLGuYpxij8W5jFQ6W0CzW/wggiV3F6YvLGnmYVoCSEMl2StFSVlz4hRFEVMVvHmIpuV3PTv2iZyeZrwEMjzC2NfBZ5HjErGmWBhJXq3qK5hndk2iiFDUTqEgmapAFFQI/3M03vQ03fL/7b7ymKFC91B0Ita7OeSq9t+ywZKiJOx63aH5ExsvLh74VfC1ueTjJLFoUIB+OnyBI9cElzEvuCnP7GTh/gHzUWSHkEWjXwYqg4WofN/YFWw3OmXSO2+LgGmuwntdz3wmyykqFqWVA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GOILUkwJGcQySz5xlgX7hTQpadF8sqcbxyiwviVorHc=;
- b=TwLuCX6PAXsjInQZZqJA5e2RkAFqWKWnbgIAqm64HdCy6Q5KFSIxGnVeI67PWOLlS7yST3vVdrzSNTYDmSfy11JEVUfWt5A5HU2acZMQJFzl8DFFATeezsda6OTcm598c5tacoP4ZcKrNxhbEwd3+EkWYV6/SVZpCQZfzTma/PM=
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com (20.179.7.140) by
- AM6PR08MB3365.eurprd08.prod.outlook.com (20.177.112.152) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.30; Thu, 21 Nov 2019 13:02:58 +0000
-Received: from AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f]) by AM6PR08MB4423.eurprd08.prod.outlook.com
- ([fe80::31bd:5bb3:377e:706f%3]) with mapi id 15.20.2474.019; Thu, 21 Nov 2019
- 13:02:58 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v2 6/6] iotests: Test committing to short backing file
-Thread-Topic: [PATCH v2 6/6] iotests: Test committing to short backing file
-Thread-Index: AQHVn9KxRltA7uNPbUqM02ssz4EKHKeVn5cAgAAAVgD//+EpgIAAF0AA
-Date: Thu, 21 Nov 2019 13:02:58 +0000
-Message-ID: <c2b90dda-d5e7-d2e5-73fd-ba9110ccb50a@virtuozzo.com>
-References: <20191120184501.28159-1-kwolf@redhat.com>
- <20191120184501.28159-7-kwolf@redhat.com>
- <832ab7bc-07a2-bbe0-a567-71d416f8c1d3@virtuozzo.com>
- <f502ca13-0840-cb06-150a-cbf605a6c1ff@virtuozzo.com>
- <20191121113943.GF6007@linux.fritz.box>
-In-Reply-To: <20191121113943.GF6007@linux.fritz.box>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: HE1PR0301CA0011.eurprd03.prod.outlook.com
- (2603:10a6:3:76::21) To AM6PR08MB4423.eurprd08.prod.outlook.com
- (2603:10a6:20b:bf::12)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vsementsov@virtuozzo.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tagtoolbar-keys: D20191121160256542
-x-originating-ip: [185.231.240.5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7d10180a-3f99-4693-9087-08d76e832202
-x-ms-traffictypediagnostic: AM6PR08MB3365:
-x-microsoft-antispam-prvs: <AM6PR08MB33652A541AED070C0A9DAB81C14E0@AM6PR08MB3365.eurprd08.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0228DDDDD7
-x-forefront-antispam-report: SFV:NSPM;
- SFS:(10019020)(366004)(396003)(346002)(136003)(39840400004)(376002)(199004)(189003)(6916009)(186003)(8676002)(2616005)(11346002)(81166006)(81156014)(6512007)(229853002)(36756003)(26005)(31686004)(52116002)(3846002)(102836004)(8936002)(25786009)(386003)(6506007)(76176011)(446003)(31696002)(66066001)(6246003)(6116002)(6486002)(64756008)(2906002)(478600001)(7736002)(66946007)(66476007)(66556008)(86362001)(5660300002)(316002)(6436002)(256004)(14454004)(14444005)(54906003)(71190400001)(71200400001)(66446008)(305945005)(4326008)(99286004);
- DIR:OUT; SFP:1102; SCL:1; SRVR:AM6PR08MB3365;
- H:AM6PR08MB4423.eurprd08.prod.outlook.com; FPR:; SPF:None; LANG:en;
- PTR:InfoNoRecords; A:1; MX:1; 
-received-spf: None (protection.outlook.com: virtuozzo.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: EaHU+WyHsZCTz4yNAo97RhjnM+RnZP0RLO+CkqouaSBllQYdMcKu1Xx8h0uRAROyolZmy7Z8WVEzcTwTq8xLrt3Kg2OVTRvuN43o3MHUfCe4yFnP6/aNon6arV7+8vZjZm5CXaFgqApLCY5+0umtYjxyO9S3TzDx+HLBb/9QPk8HubFZMC3NPMr/2tUwE0+uMJZmmWHezDPTixg+D92nDBE41bmg6P1Rn7r/8K4V0Dpo9H/4S36UL1XAPZ3Q1DwnNhgt8ePwsLC3JR/lGJkDWrExTJAuM9elcK94dQbhdVx7Q5u/jL5Pvlg9Wd9jePkg62DZiHagB/OlV9+QJYKVi2/POqZ4Wu3ssx79/rI8WDHPUf5UuIPfESrTrBu9ffJz5H2LoQwTBqvYoyv5wVHqYwbVS/RSlcaS8bAT+/UQ8fdzGtkyDeyrzxclvTT4gAQ2
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <3C46CF052BC2E941A8652DCFC54DE4D8@eurprd08.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iXmEr-0001pf-P1
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:11:13 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xALD6lL9103104
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 08:11:10 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wdu6283md-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 08:11:10 -0500
+Received: from localhost
+ by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Thu, 21 Nov 2019 13:11:07 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Thu, 21 Nov 2019 13:11:04 -0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
+ [9.149.105.62])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xALDB2a259965582
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 21 Nov 2019 13:11:02 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C3D7CAE053;
+ Thu, 21 Nov 2019 13:11:02 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 4FAA3AE04D;
+ Thu, 21 Nov 2019 13:11:02 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.70.129])
+ by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 21 Nov 2019 13:11:02 +0000 (GMT)
+Subject: Re: [PATCH 01/15] s390x: Cleanup cpu resets
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20191120114334.2287-1-frankja@linux.ibm.com>
+ <20191120114334.2287-2-frankja@linux.ibm.com>
+ <32e994b4-6ae2-8de2-4ae0-fc61a21f5f7a@redhat.com>
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
+ 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
+Date: Thu, 21 Nov 2019 14:11:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d10180a-3f99-4693-9087-08d76e832202
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Nov 2019 13:02:58.7758 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: J19oIZ2a7SN9KSu3yy0ZGhUfi4847Ofd0ZcVyesmropYUdZGGBNdXYqX98j1Qudc03XF+4dhw46YF0fD2d5KFPVwxJaPrllwgpNMm3BHV7g=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3365
-X-detected-operating-system: by eggs.gnu.org: Windows 7 or 8 [fuzzy]
-X-Received-From: 40.107.5.125
+In-Reply-To: <32e994b4-6ae2-8de2-4ae0-fc61a21f5f7a@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Aqbzy2EGhA7ACq70xVe28A45wOccvLDrE"
+X-TM-AS-GCONF: 00
+x-cbid: 19112113-0020-0000-0000-0000038CE0C0
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112113-0021-0000-0000-000021E31AC1
+Message-Id: <b5a83796-792a-3b5b-bbf1-fd806edb8e92@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-21_02:2019-11-21,2019-11-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 spamscore=0
+ adultscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=999 phishscore=0
+ suspectscore=0 clxscore=1015 bulkscore=0 impostorscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911210120
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -125,46 +148,202 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "stefanha@redhat.com" <stefanha@redhat.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "mreitz@redhat.com" <mreitz@redhat.com>
+Cc: pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-21.11.2019 14:39, Kevin Wolf wrote:
-> Am 21.11.2019 um 11:30 hat Vladimir Sementsov-Ogievskiy geschrieben:
->> 21.11.2019 13:28, Vladimir Sementsov-Ogievskiy wrote:
->>> 20.11.2019 21:45, Kevin Wolf wrote:
->>>> Signed-off-by: Kevin Wolf<kwolf@redhat.com>
->>>
->>> Hmm, allocating 7G will break tests on small disks, for example,
->>> on my 2G tmpfs.
->>>
->>> So, we probably should
->>> detect "+qemu-img: Failed to resize underlying file: Could not write ze=
-ros for preallocation: No space left on device"
->>> errors and skip test. (better skip testcases, but it's not possible for=
- text-comparing tests :(
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Aqbzy2EGhA7ACq70xVe28A45wOccvLDrE
+Content-Type: multipart/mixed; boundary="qJNPJHsSinXVcYPPWo4E2exHPIJWOTzPk"
+
+--qJNPJHsSinXVcYPPWo4E2exHPIJWOTzPk
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 11/21/19 1:53 PM, Thomas Huth wrote:
+> On 20/11/2019 12.43, Janosch Frank wrote:
+>> Let's move the resets into one function and switch by type, so we can
+>> use fallthroughs for shared reset actions.
 >>
->> Or could you just use smaller disks for resize? What is the purpose of s=
-uch a big size?
+>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>> ---
+>>  hw/s390x/s390-virtio-ccw.c |   3 +
+>>  target/s390x/cpu.c         | 111 ++++++++++++++++--------------------=
+-
+>>  2 files changed, 52 insertions(+), 62 deletions(-)
+> [...]
+>> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+>> index 3abe7e80fd..10d5b915d8 100644
+>> --- a/target/s390x/cpu.c
+>> +++ b/target/s390x/cpu.c
+>> @@ -82,67 +82,53 @@ static void s390_cpu_load_normal(CPUState *s)
+>>  }
+>>  #endif
+>> =20
+>> -/* S390CPUClass::cpu_reset() */
+>> -static void s390_cpu_reset(CPUState *s)
+>> +enum {
+>> +    S390_CPU_RESET_NORMAL,
+>> +    S390_CPU_RESET_INITIAL,
+>> +    S390_CPU_RESET_CLEAR,
+>> +};
+>> +
+>> +static void s390_cpu_reset(CPUState *s, uint8_t type)
 >=20
-> I want to exceed a 32 bit byte count for the write_zeroes operation so
-> that it would break if patch 1 were missing. I guess I could reduce it
-> to a little over 4 GB, but not less.
+> Please give the enum a name and use that instead of uint8_t for "type".=
+
+> Or at least make it an "int". uint8_t is not really appropriate here.
+
+Sure
+
 >=20
-> Hm, though that is only for preallocation=3Doff, which shouldn't actually
-> allocate the space anyway. I could use smaller sizes for falloc and
-> full, even though I'm not sure if we're still testing these modes with
-> sizes larger than INT_MAX anywhere.
+>>  {
+>>      S390CPU *cpu =3D S390_CPU(s);
+>>      S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
+>>      CPUS390XState *env =3D &cpu->env;
+>> =20
+>> -    env->pfault_token =3D -1UL;
+>> -    env->bpbc =3D false;
+>>      scc->parent_reset(s);
+>>      cpu->env.sigp_order =3D 0;
+>>      s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+>> -}
+>> =20
+>> -/* S390CPUClass::initial_reset() */
+>> -static void s390_cpu_initial_reset(CPUState *s)
+>> -{
+>> -    S390CPU *cpu =3D S390_CPU(s);
+>> -    CPUS390XState *env =3D &cpu->env;
+>> +    /* Set initial values after clearing */
+>> +    switch (type) {
+>> +    case S390_CPU_RESET_CLEAR:
+>> +        /* Fallthrough will clear the rest */
+>=20
+> I think you could drop the above comment, since /* Fallthrough */ two
+> lines later should be enough.
+>=20
+>> +        memset(env, 0, offsetof(CPUS390XState, start_initial_reset_fi=
+elds));
+>> +        /* Fallthrough */
+>> +    case S390_CPU_RESET_INITIAL:
+>> +        memset(&env->start_initial_reset_fields, 0,
+>> +               offsetof(CPUS390XState, end_reset_fields) -
+>> +               offsetof(CPUS390XState, start_initial_reset_fields));
+>> +        /* architectured initial values for CR 0 and 14 */
+>> +        env->cregs[0] =3D CR0_RESET;
+>> +        env->cregs[14] =3D CR14_RESET;
+>> =20
+>> -    s390_cpu_reset(s);
+>> -    /* initial reset does not clear everything! */
+>> -    memset(&env->start_initial_reset_fields, 0,
+>> -        offsetof(CPUS390XState, end_reset_fields) -
+>> -        offsetof(CPUS390XState, start_initial_reset_fields));
+>> -
+>> -    /* architectured initial values for CR 0 and 14 */
+>> -    env->cregs[0] =3D CR0_RESET;
+>> -    env->cregs[14] =3D CR14_RESET;
+>> -
+>> -    /* architectured initial value for Breaking-Event-Address registe=
+r */
+>> -    env->gbea =3D 1;
+>> -
+>> -    env->pfault_token =3D -1UL;
+>> -
+>> -    /* tininess for underflow is detected before rounding */
+>> -    set_float_detect_tininess(float_tininess_before_rounding,
+>> -                              &env->fpu_status);
+>> +        /* architectured initial value for Breaking-Event-Address reg=
+ister */
+>> +        env->gbea =3D 1;
+>> +        /* tininess for underflow is detected before rounding */
+>> +        set_float_detect_tininess(float_tininess_before_rounding,
+>> +                                  &env->fpu_status);
+>> +        /* Fallthrough */
+>> +    case S390_CPU_RESET_NORMAL:
+>> +        env->pfault_token =3D -1UL;
+>> +        env->bpbc =3D false;
+>> +        break;
+>> +    }
+>> =20
+>>      /* Reset state inside the kernel that we cannot access yet from Q=
+EMU. */
+>> -    if (kvm_enabled()) {
+>> -        kvm_s390_reset_vcpu(cpu);
+>> +    if (kvm_enabled() && (type =3D=3D S390_CPU_RESET_CLEAR ||
+>> +                          type =3D=3D S390_CPU_RESET_INITIAL)) {
+>> +            kvm_s390_reset_vcpu(cpu);
+>>      }
+>=20
+> Why don't you simply move that into the switch-case statement, too?
+
+There was a reason for that, time to load it from cold storage...
+
+>=20
+> [...]
+>=20
+> Anyway, re-using code is of course a good idea, but I wonder whether it=
+
+> would be nicer to keep most things in place, and then simply chain the
+> functions like this:
+
+I tried that and I prefer the version in the patch.
+
+>=20
+> static void s390_cpu_reset_normal(CPUState *s)
+> {
+>    ...
+> }
+>=20
+> static void s390_cpu_reset_initial(CPUState *s)
+> {
+>     ...
+>     s390_cpu_reset_normal(s);
+>     ...
+> }
+>=20
+> static void s390_cpu_reset_clear(CPUState *s)
+> {
+>     ...
+>     s390_cpu_reset_initial()
+>     ...
+> }
+>=20
+> Just my 0.02 =80, but at least for me, that's easier to understand than=
+ a
+> switch-case statement with fallthroughs inbetween.
+>=20
+>  Thomas
 >=20
 
-Yes, preallocation=3Doff works for me with big disk, so this should work.
 
 
---=20
-Best regards,
-Vladimir
+--qJNPJHsSinXVcYPPWo4E2exHPIJWOTzPk--
+
+--Aqbzy2EGhA7ACq70xVe28A45wOccvLDrE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3WjOUACgkQ41TmuOI4
+ufjZSg//W1fdXOQ1tlVRpFrhxWbqT/CeDHLEq8RNPIaI5tKLzll4i3siS25ftzR6
+tdJPt6HmCSdXF9+9QDKsLHi7V8vLIrN0/attXO3fBDGNcEzHnEkd0a7q92qoAE1d
+tYURfTXaDQU9k8/OI1KzKtMAqlE7XEGC4E4SG8gttVTL46cPHHpaY3I1EXvFWcdc
+TLzk5zGsOGONoDKofu0LBXkFeEMpebwLTNrOP79cYOiSPezfYooQSkVihIa57aR4
+VPluYAeHEixkI9PB0p8kNjP/VsWgo5zYmyGR/G1XOFcmMDkq6+Mgd1glfkwMaDwj
+VALnkOZbrgRVgVJxtJDWjThB8H7FVOxZwTIdh4xMgBrHmG+JMzKQzgG81rTjLtMf
+ergKLRxwGBY83/Y3V6nh8B/LvZHyfQlbViKV0/B379EAUcErVLY+/jLQzODtSgQV
+gxaJfDqU4nQntyv8AgZs5tQTu+BJnPfqBAC7FdLcwUTO9pbjqgdRqg5hWyLkrRXS
+lNRC/GgrZywutW0YeRuo12VNI9mNEIO1muyvbxBWCkwHTOmgqn0X/XUvlpIQ34MT
+DJxzzLDi3c6nDla0nTXxeYisfVI/NWUhAAKQDaBdJCSglAAEmZQGDuI86Kk71dOq
+cUOo7BvY6jHu5Hnf7E4HoWdhlepuDjPujU9ewvR4y5XzjAQdtBk=
+=ANSV
+-----END PGP SIGNATURE-----
+
+--Aqbzy2EGhA7ACq70xVe28A45wOccvLDrE--
+
 
