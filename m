@@ -2,67 +2,102 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E647EC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 078F7C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:18:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7690D2071C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:17:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7690D2071C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C411A2071C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:18:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZRYpUt3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C411A2071C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXiaj-00051p-Ba
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 04:17:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33415)
+	id 1iXibX-0005La-Tf
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 04:18:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33445)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iXiZk-0004FW-1U
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:33 -0500
+ (envelope-from <pbonzini@redhat.com>) id 1iXiZw-0004Qi-3B
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:45 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iXiZi-0003Nb-QA
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:31 -0500
-Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:47826)
+ (envelope-from <pbonzini@redhat.com>) id 1iXiZt-0003Pt-Cy
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:42 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44431
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iXiZi-0003Ll-IR
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:30 -0500
-Received: from player688.ha.ovh.net (unknown [10.109.146.163])
- by mo178.mail-out.ovh.net (Postfix) with ESMTP id A804D82C2F
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 10:16:20 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player688.ha.ovh.net (Postfix) with ESMTPSA id EFD33C49027D;
- Thu, 21 Nov 2019 09:16:15 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v5 11/23] ppc/pnv: Introduce a
- pnv_xive_is_cpu_enabled() helper
-To: Greg Kurz <groug@kaod.org>
-References: <20191115162436.30548-1-clg@kaod.org>
- <20191115162436.30548-12-clg@kaod.org> <20191120182612.3069e279@bahia.lan>
- <4549a66b-5db6-5a71-87a2-3c126fa4db6b@kaod.org>
- <20191121085856.0344fac5@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <639848d3-8621-13e4-6e4b-1716b9c54372@kaod.org>
-Date: Thu, 21 Nov 2019 10:16:14 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iXiZt-0003PX-1P
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574327800;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:openpgp:openpgp;
+ bh=ZaaaXO30YPU5Tglk5XRk2qkrncuy0xtt35P8QhBuIIs=;
+ b=BZRYpUt3xiZo2IrHHpkXP7KOLXS9e8PqHLEBR/zQ4MuKUPs9nomkWsVJpkMUpH55lESom3
+ IXVQsGm8MNSCPfoByKbWyeejsxwhLCjhcIx8VtrX0cNRM6OJreK4XCGGY+AWTkx7bZTFg9
+ /XnwSmRts+89x5aJMrhSrUTI5UgOHh0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-179--He0ZUtlPgWy6tjrRjETfg-1; Thu, 21 Nov 2019 04:16:39 -0500
+Received: by mail-wr1-f72.google.com with SMTP id q6so1734801wrv.11
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 01:16:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=4Y2VUG1uFgQimWXBBaeYjvmWC5l14iP10LtnwHQU6MY=;
+ b=J22zbzz2Ged8xUhCk59DxZyctM6u9l+5I2bJ5Fjqn8lgsHVl0xzOFRw/6SO06LNhmy
+ ModfBWDIu8BKYTf1XhET/8rb3sbdW65Go03j2yIddhJPsSPrVU5C7JVajPD0gmGusZaU
+ nEmk8K08y27CU+YvHt9KQ1WKci4k5fxFXKgAH6ti8ZwR1ptMY2F93+hWolNarIn9Ag6i
+ oixZ3Xw3TvZwjpKbqrDCt6ve6J3frQ75PPbE3WdDicpRgRZw90ktCXBPPj1STsq5h+j8
+ K/s4L5eqiUM6aiGNMngiXQC36wFw9foJQxHvZS6b3iYLHkx1SQvQo2usnOljLGJzQa+L
+ KeLQ==
+X-Gm-Message-State: APjAAAVpqogDPZqn+4R2JSKiRyjAkX5KjrrU6F/EabFZSbxWKWrpyhB9
+ TmGHwELOiAlr3ChypuWS7+iKCAl1ofJx23QX6jQHedqoIAl8t55Ap7xqpyykzESLpzAH4Iofd07
+ rFwKbpwau/Uqmkfg=
+X-Received: by 2002:adf:e2cd:: with SMTP id d13mr9285791wrj.221.1574327797846; 
+ Thu, 21 Nov 2019 01:16:37 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwQP9C6XUnqkHbLzf/xdgOrtwYAjm2CunKt+YzO77emFnBNoy/B9UzG2+hytVgmyfIN+uVl8A==
+X-Received: by 2002:adf:e2cd:: with SMTP id d13mr9285772wrj.221.1574327797583; 
+ Thu, 21 Nov 2019 01:16:37 -0800 (PST)
+Received: from ?IPv6:2001:b07:6468:f312:71a5:6e:f854:d744?
+ ([2001:b07:6468:f312:71a5:6e:f854:d744])
+ by smtp.gmail.com with ESMTPSA id m15sm2662407wrj.52.2019.11.21.01.16.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 21 Nov 2019 01:16:36 -0800 (PST)
+Subject: Re: [PATCH for-4.2 1/2] i386: Add new versions of
+ Skylake/Cascadelake/Icelake without TSX
+To: Eduardo Habkost <ehabkost@redhat.com>
+References: <20191120164912.32384-1-ehabkost@redhat.com>
+ <20191120164912.32384-2-ehabkost@redhat.com>
+ <b1d8c3ef-646a-85c7-176b-c4429f36d384@redhat.com>
+ <20191120184258.GS3812@habkost.net>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Openpgp: preference=signencrypt
+Message-ID: <afd960e8-103e-b166-34c3-f6db1df45277@redhat.com>
+Date: Thu, 21 Nov 2019 10:16:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20191121085856.0344fac5@bahia.lan>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20191120184258.GS3812@habkost.net>
 Content-Language: en-US
-X-Ovh-Tracer-Id: 6189071789202246483
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehvddgtdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheikeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+X-MC-Unique: -He0ZUtlPgWy6tjrRjETfg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.33.251.53
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -74,142 +109,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Jiri Denemark <jdenemar@redhat.com>,
+ Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/11/2019 08:58, Greg Kurz wrote:
-> On Wed, 20 Nov 2019 22:40:31 +0100
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> On 20/11/2019 18:26, Greg Kurz wrote:
->>> On Fri, 15 Nov 2019 17:24:24 +0100
->>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->>>
->>>> and use this helper to exclude CPUs which are not enabled in the XIV=
-E
->>>> controller.
->>>>
->>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>>> ---
->>>>  hw/intc/pnv_xive.c | 18 ++++++++++++++++++
->>>>  1 file changed, 18 insertions(+)
->>>>
->>>> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
->>>> index 71ca4961b6b1..4c8c6e51c20f 100644
->>>> --- a/hw/intc/pnv_xive.c
->>>> +++ b/hw/intc/pnv_xive.c
->>>> @@ -372,6 +372,20 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, u=
-int8_t blk, uint32_t idx,
->>>>      return pnv_xive_vst_read(xive, VST_TSEL_IVT, blk, idx, eas);
->>>>  }
->>>> =20
->>>> +static int cpu_pir(PowerPCCPU *cpu)
->>>> +{
->>>> +    CPUPPCState *env =3D &cpu->env;
->>>> +    return env->spr_cb[SPR_PIR].default_value;
->>>> +}
->>>> +
->>>> +static bool pnv_xive_is_cpu_enabled(PnvXive *xive, PowerPCCPU *cpu)
->>>> +{
->>>> +    int pir =3D cpu_pir(cpu);
->>>> +    int thrd_id =3D pir & 0x7f;
->>>> +
->>>> +    return xive->regs[PC_THREAD_EN_REG0 >> 3] & PPC_BIT(thrd_id);
->>>
->>> A similar check is open-coded in pnv_xive_get_indirect_tctx() :
->>>
->>>     /* Check that HW thread is XIVE enabled */
->>>     if (!(xive->regs[PC_THREAD_EN_REG0 >> 3] & PPC_BIT(pir & 0x3f))) =
-{
->>>         xive_error(xive, "IC: CPU %x is not enabled", pir);
->>>     }
->>>
->>> The thread id is only the 6 lower bits of the PIR there, and so seems=
- to
->>> indicate the skiboot sources:
->>>
->>>         /* Get bit in register */
->>>         bit =3D c->pir & 0x3f;
->>
->> skiboot uses 0x3f when enabling the TCTXT of a CPU because register
->> INT_TCTXT_EN0 covers cores 0-15 (normal) and 0-7 (fused) and=20
->> register INT_TCTXT_EN1 covers cores 16-23 (normal) and 8-11 (fused).=20
->> The encoding in the registers is a bit different.
->>
->>> Why make it pir & 0x7f here ?=20
->>
->> See pnv_chip_core_pir_p9 comments for some details on the CPU ID=20
->> layout.
->>
->=20
-> *   57:61  Core number
-> *   62:63  Thread ID
->=20
-> Ok, so the CPU ID within the socket is 7 bits, ie. pir & 0x7f
->=20
->>> If it should actually be 0x3f,=20
->> but yes, we should fix the mask in the register setting.=20
->>
->>> maybe also use the helper in pnv_xive_get_indirect_tctx().
->>
->> This is getting changed later on. So I rather not.
->>
->=20
-> I don't see any later change there, neither in this series,=20
+On 20/11/19 19:42, Eduardo Habkost wrote:
+> The plan is to set default_cpu_version=3DCPU_VERSION_LATEST on
+> pc-*-5.0 (or, more likely, 5.1).  But this will happen only after
+> libvirt starts resolving CPU model versions.  See the
+> "Runnability guarantee of CPU models" section at
+> qemu-deprecated.texi.
 
-Patch "ppc/pnv: Clarify how the TIMA is accessed on a multichip system"
+Thanks!
 
-changes a few things in that area.
+Then the patches do not interact negatively with my VMX series.  I have
+queued both of them so that we can get the pull request out with all the
+TAA bits.
 
-> nor in your powernv-4.2 on github, but nevermind, this patch is
-> good enough for the purpose of CAM line matching.
-
-Yes. It could be better though and it's a localized change.=20
-
-the INT_TCTXT_EN0 (PC_THREAD_EN_REG0) needs a small fix on the mask.=20
-We don't use the EN1 register also for cores > 15.=20
-
-It works today because we don't start the machine with all the=20
-possible cores. Although it should be possible to start a QEMU=20
-PowerNV machine with 24 cores on each socket.=20
-
-
-I would like to have stricter checks on CAM line accesses because
-it is an OS interface. The INT_TCTXT_EN0 (PC_THREAD_EN_REG0) is=20
-the first level (HW) but we need to check also the 'V' bit of=20
-each ring. That's more complex. For later.
-
-
-C.=20
-
-
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
->> C.
->>
->>>
->>>> +}
->>>> +
->>>>  static int pnv_xive_match_nvt(XivePresenter *xptr, uint8_t format,
->>>>                                uint8_t nvt_blk, uint32_t nvt_idx,
->>>>                                bool cam_ignore, uint8_t priority,
->>>> @@ -393,6 +407,10 @@ static int pnv_xive_match_nvt(XivePresenter *xp=
-tr, uint8_t format,
->>>>              XiveTCTX *tctx;
->>>>              int ring;
->>>> =20
->>>> +            if (!pnv_xive_is_cpu_enabled(xive, cpu)) {
->>>> +                continue;
->>>> +            }
->>>> +
->>>>              tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
->>>> =20
->>>>              /*
->>>
->>
->=20
+Paolo
 
 
