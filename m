@@ -2,86 +2,84 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE436C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 15:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F80C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 15:42:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7296206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 15:40:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oa41B4+a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7296206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3B399206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 15:42:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B399206B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42038 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXoZe-0003eP-Pg
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 10:40:50 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51898)
+	id 1iXobE-0005Bx-Su
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 10:42:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52461)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iXoVt-0006os-4a
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:36:58 -0500
+ (envelope-from <bounces@canonical.com>) id 1iXoZl-0003yL-UY
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:40:59 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iXoVr-0001QZ-I4
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:36:57 -0500
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36346)
+ (envelope-from <bounces@canonical.com>) id 1iXoZj-00059v-Vv
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:40:57 -0500
+Received: from indium.canonical.com ([91.189.90.7]:59190)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iXoVr-0001Pn-Bc
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:36:55 -0500
-Received: by mail-wr1-x444.google.com with SMTP id z3so4978973wru.3
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 07:36:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=9dUEfigVchHfX6ZaLvQxxNBaTzzF6DYxdQ+mCErjP7w=;
- b=Oa41B4+arAzFalN9Shq59ofAqTNT/h3LCHUZ3hXN2SLugpag2ZZe39tPBt2V6mMBnC
- 3T4YfUWc6nYlrzdFV/B3EZU8hJ3V2IgTPDmFMTc1T77NwHbPuOtlpZaZmT54u1AHWaWP
- XxADw/MSyeGSQMechYnLmItQ3JYZM3HLReiM9GkXI5D67cSp/kCgQMa/JslU6JtYZrlO
- ZEU73enTMK7874DI9c2jwVkcAc5h3C1eg+4UX5IySHX1NoklTTHdKb7oo8uWxrri9gwu
- zLem+BdAG90mK72hj6nVUs871GFp23cOcszZBojJ1Aj9Ah6dFDNVtrhPlBlC/OeW5FtX
- M7NQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=9dUEfigVchHfX6ZaLvQxxNBaTzzF6DYxdQ+mCErjP7w=;
- b=G5Q/sWa45Oe0uwWOnxN2fOYAckL/oZifjgKaAwWz0qZlcWMBl+xWJcYt4K7+rR4Jo8
- 6+eo+ys1iruqZEW3x72tnUJL68kLQ9mMPUtreJkOglkv6QgAwIC+7VXb1S0dZd7cCr7f
- NyR8DguIjlmBzwyjCjdv3gF7DY6Y3ruoOV5bdWf5uHIW0qlz0zsvNbTj1jOfTtu4rQmh
- MB/kurjwLy95xCKZXcMmZ55tLbb7+LtdZ1oMAZUaBC777WyEtFdMommqyALdylNbFBrA
- M5fDOB6qGddxysHMg9Jg7ei4H1sCLpabJLZeL5T+R2NofLdHlzWoMO2gq+V8j81jdY1C
- IHSQ==
-X-Gm-Message-State: APjAAAVgBGZ1PsknGogZa1AIeN739k5lFlMG3JepfwMjrZTJBjdGTG0V
- 9X6MYtBxX7M/b27VtN/Ep5CswdIU
-X-Google-Smtp-Source: APXvYqzaAMMwlvIzRy862wlNimEvFgmKZs621yTZafY+eEVekn28uauAgSyoGOTnqN7P89GHWDuzUA==
-X-Received: by 2002:a5d:5687:: with SMTP id f7mr7669444wrv.384.1574350613987; 
- Thu, 21 Nov 2019 07:36:53 -0800 (PST)
-Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id m15sm3970933wrj.52.2019.11.21.07.36.53
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 21 Nov 2019 07:36:53 -0800 (PST)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iXoZi-000577-8F
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:40:55 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iXoZg-0001w9-Lu
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 15:40:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A348F2E80C7
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 15:40:52 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Nov 2019 15:31:39 -0000
+From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1848556@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
-Subject: [PULL 3/4] i386: Add new versions of Skylake/Cascadelake/Icelake
- without TSX
-Date: Thu, 21 Nov 2019 16:36:48 +0100
-Message-Id: <1574350609-29518-4-git-send-email-pbonzini@redhat.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1574350609-29518-1-git-send-email-pbonzini@redhat.com>
-References: <1574350609-29518-1-git-send-email-pbonzini@redhat.com>
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::444
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Fix Released; importance=Medium;
+ assignee=christian.ehrhardt@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
+ component=main; status=Triaged; importance=Medium;
+ assignee=christian.ehrhardt@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
+ component=main; status=Fix Released; importance=Medium;
+ assignee=christian.ehrhardt@canonical.com; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: janitor paelzer rodsmith xanclic
+X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
+ =?utf-8?q?=29?=
+References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
+Message-Id: <157435029911.6582.8114191056114115921.malone@gac.canonical.com>
+Subject: [Bug 1848556] Re: qemu-img check failing on remote image in Eoan
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: ddb2cbc531dc8b271c4da2ab433b15ac4ac9bd94
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,123 +88,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com
+Reply-To: Bug 1848556 <1848556@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eduardo Habkost <ehabkost@redhat.com>
+This was tonight first accepted and then immediately rejected as it was
+surpassed by a security fix.
 
-One of the mitigation methods for TAA[1] is to disable TSX
-support on the host system.  Linux added a mechanism to disable
-TSX globally through the kernel command line, and many Linux
-distributions now default to tsx=off.  This makes existing CPU
-models that have HLE and RTM enabled not usable anymore.
+=3D> Rebased and uploaded 1:4.0+dfsg-0ubuntu9.2 to eoan-unapproved again.
 
-Add new versions of all CPU models that have the HLE and RTM
-features enabled, that can be used when TSX is disabled in the
-host system.
+-- =
 
-References:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1848556
 
-[1] TAA, TSX asynchronous Abort:
-    https://software.intel.com/security-software-guidance/insights/deep-dive-intel-transactional-synchronization-extensions-intel-tsx-asynchronous-abort
-    https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/tsx_async_abort.html
+Title:
+  qemu-img check failing on remote image in Eoan
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- target/i386/cpu.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Eoan:
+  Triaged
+Status in qemu source package in Focal:
+  Fix Released
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 9cd9adf..37c023f 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2902,6 +2902,14 @@ static X86CPUDefinition builtin_x86_defs[] = {
-                     { /* end of list */ }
-                 }
-             },
-+            {
-+                .version = 3,
-+                .props = (PropValue[]) {
-+                    { "hle", "off" },
-+                    { "rtm", "off" },
-+                    { /* end of list */ }
-+                }
-+            },
-             { /* end of list */ }
-         }
-     },
-@@ -3015,6 +3023,14 @@ static X86CPUDefinition builtin_x86_defs[] = {
-                     { /* end of list */ }
-                 }
-             },
-+            {
-+                .version = 3,
-+                .props = (PropValue[]) {
-+                    { "hle", "off" },
-+                    { "rtm", "off" },
-+                    { /* end of list */ }
-+                }
-+            },
-             { /* end of list */ }
-         }
-     },
-@@ -3128,6 +3144,13 @@ static X86CPUDefinition builtin_x86_defs[] = {
-                   { /* end of list */ }
-               },
-             },
-+            { .version = 3,
-+              .props = (PropValue[]) {
-+                  { "hle", "off" },
-+                  { "rtm", "off" },
-+                  { /* end of list */ }
-+              },
-+            },
-             { /* end of list */ }
-         }
-     },
-@@ -3230,6 +3253,18 @@ static X86CPUDefinition builtin_x86_defs[] = {
-         .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
-         .xlevel = 0x80000008,
-         .model_id = "Intel Core Processor (Icelake)",
-+        .versions = (X86CPUVersionDefinition[]) {
-+            { .version = 1 },
-+            {
-+                .version = 2,
-+                .props = (PropValue[]) {
-+                    { "hle", "off" },
-+                    { "rtm", "off" },
-+                    { /* end of list */ }
-+                },
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name = "Icelake-Server",
-@@ -3334,6 +3369,18 @@ static X86CPUDefinition builtin_x86_defs[] = {
-              VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS,
-         .xlevel = 0x80000008,
-         .model_id = "Intel Xeon Processor (Icelake)",
-+        .versions = (X86CPUVersionDefinition[]) {
-+            { .version = 1 },
-+            {
-+                .version = 2,
-+                .props = (PropValue[]) {
-+                    { "hle", "off" },
-+                    { "rtm", "off" },
-+                    { /* end of list */ }
-+                },
-+            },
-+            { /* end of list */ }
-+        }
-     },
-     {
-         .name = "Denverton",
--- 
-1.8.3.1
+Bug description:
+  Ubuntu SRU Template:
 
+  [Impact]
 
+   * There is fallout due to changes in libcurl that affect qemu and might =
+
+     lead to a hang.
+
+   * Fix by backporting the upstream fix
+
+  [Test Case]
+
+   * If you have network just run
+     $ qemu-img check http://10.193.37.117/cloud/eoan-server-cloudimg-amd64=
+.img
+
+   * Without network, install apache2, and get a complex qemu file (like a =
+
+     cloud image) onto the system. Then access the file via apache http but =
+
+     not localhost (that would work)
+
+  [Regression Potential]
+
+   * The change is local to the libcurl usage of qemu, so that could be =
+
+     affected. But then this is what has been found to not work here, so I'=
+d =
+
+     expect not too much trouble. But if so then in the curl usage (which =
+
+     means disks on http)
+
+  [Other Info]
+   =
+
+   * n/a
+
+  ---
+
+  The "qemu-img check" function is failing on remote (HTTP-hosted)
+  images, beginning with Ubuntu 19.10 (qemu-utils version 1:4.0+dfsg-
+  0ubuntu9). With previous versions, through Ubuntu 19.04/qemu-utils
+  version 1:3.1+dfsg-2ubuntu3.5, the following worked:
+
+  $ /usr/bin/qemu-img check  http://10.193.37.117/cloud/eoan-server-cloudim=
+g-amd64.img
+  No errors were found on the image.
+  19778/36032 =3D 54.89% allocated, 90.34% fragmented, 89.90% compressed cl=
+usters
+  Image end offset: 514064384
+
+  The 10.193.37.117 server holds an Apache server that hosts the cloud
+  images on a LAN. Beginning with Ubuntu 19.10/qemu-utils 1:4.0+dfsg-
+  0ubuntu9, the same command never returns. (I've left it for up to an
+  hour with no change.) I'm able to wget the image from the same server
+  and installation on which qemu-img check fails. I've tried several
+  .img files on the server, ranging from Bionic to Eoan, with the same
+  results with all of them.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1848556/+subscriptions
 
