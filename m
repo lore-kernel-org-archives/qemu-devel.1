@@ -2,72 +2,74 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB39C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53F09C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:36:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 832F520855
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:23:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 832F520855
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 264A32068F
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:36:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 264A32068F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXigY-0007Tx-Ii
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 04:23:34 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34286)
+	id 1iXisv-0002eV-7l
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 04:36:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35880)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iXifq-0006x3-3T
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:22:51 -0500
+ (envelope-from <bounces@canonical.com>) id 1iXisA-0001fb-FO
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:35:35 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iXifo-0007X8-RZ
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:22:50 -0500
-Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:40775)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iXifo-0007WI-Ik
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:22:48 -0500
-Received: from player778.ha.ovh.net (unknown [10.108.35.211])
- by mo173.mail-out.ovh.net (Postfix) with ESMTP id 21956123211
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 10:22:45 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player778.ha.ovh.net (Postfix) with ESMTPSA id 75D79C4CD941;
- Thu, 21 Nov 2019 09:22:40 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v5 15/23] ppc/xive: Use the XiveFabric and
- XivePresenter interfaces
-To: Greg Kurz <groug@kaod.org>
-References: <20191115162436.30548-1-clg@kaod.org>
- <20191115162436.30548-16-clg@kaod.org> <20191120193001.5b9229a2@bahia.lan>
- <d03e9084-21e9-90ff-00d2-3c7f11b506c8@kaod.org>
- <20191121083042.190a038a@bahia.lan>
- <e2ff291d-4ec6-5f69-5ea6-5e0cccca1bc2@kaod.org>
- <20191121090801.766e129d@bahia.lan>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a0e67a03-46d8-872a-7283-b7407f16d41f@kaod.org>
-Date: Thu, 21 Nov 2019 10:22:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <bounces@canonical.com>) id 1iXis9-0007CQ-4z
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:35:34 -0500
+Received: from indium.canonical.com ([91.189.90.7]:42652)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iXis8-0007CC-Vi
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:35:33 -0500
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iXis8-0006xy-4k
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:35:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 1320D2E80C8
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:35:32 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20191121090801.766e129d@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-Ovh-Tracer-Id: 6297439655342672723
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehvddgtdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Nov 2019 09:29:09 -0000
+From: Spencer Yu <1853429@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: yushb
+X-Launchpad-Bug-Reporter: Spencer Yu (yushb)
+X-Launchpad-Bug-Modifier: Spencer Yu (yushb)
+References: <157432850401.22889.9178893768216767833.malonedeb@chaenomeles.canonical.com>
+Message-Id: <157432854988.22256.8685858007961605149.malone@chaenomeles.canonical.com>
+Subject: [Bug 1853429] Re: qemu-kvm on aarch64 attach volume failed when vm is
+ booting
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 5046c63b4376f25f54a1f63873f499c1d443afc8
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.40.148
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -76,203 +78,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1853429 <1853429@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/11/2019 09:08, Greg Kurz wrote:
-> On Thu, 21 Nov 2019 08:40:32 +0100
-> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->=20
->> On 21/11/2019 08:30, Greg Kurz wrote:
->>> On Thu, 21 Nov 2019 08:01:44 +0100
->>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->>>
->>>> On 20/11/2019 19:30, Greg Kurz wrote:
->>>>> On Fri, 15 Nov 2019 17:24:28 +0100
->>>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
->>>>>
->>>>>> Now that the machines have handlers implementing the XiveFabric an=
-d
->>>>>> XivePresenter interfaces, remove xive_presenter_match() and make u=
-se
->>>>>> of the 'match_nvt' handler of the machine.
->>>>>>
->>>>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
->>>>>> ---
->>>>>>  hw/intc/xive.c | 48 +++++++++++++++++----------------------------=
----
->>>>>>  1 file changed, 17 insertions(+), 31 deletions(-)
->>>>>>
->>>>>
->>>>> Nice diffstat :)
->>>>>
->>>>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
->>>>>> index 1c9e58f8deac..ab62bda85788 100644
->>>>>> --- a/hw/intc/xive.c
->>>>>> +++ b/hw/intc/xive.c
->>>>>> @@ -1423,30 +1423,6 @@ int xive_presenter_tctx_match(XivePresenter=
- *xptr, XiveTCTX *tctx,
->>>>>>      return -1;
->>>>>>  }
->>>>>> =20
->>>>>> -static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format=
-,
->>>>>> -                                 uint8_t nvt_blk, uint32_t nvt_id=
-x,
->>>>>> -                                 bool cam_ignore, uint8_t priorit=
-y,
->>>>>> -                                 uint32_t logic_serv, XiveTCTXMat=
-ch *match)
->>>>>> -{
->>>>>> -    XivePresenter *xptr =3D XIVE_PRESENTER(xrtr);
->>>>>> -    XivePresenterClass *xpc =3D XIVE_PRESENTER_GET_CLASS(xptr);
->>>>>> -    int count;
->>>>>> -
->>>>>> -    count =3D xpc->match_nvt(xptr, format, nvt_blk, nvt_idx, cam_=
-ignore,
->>>>>> -                           priority, logic_serv, match);
->>>>>> -    if (count < 0) {
->>>>>> -        return false;
->>>>>> -    }
->>>>>> -
->>>>>> -    if (!match->tctx) {
->>>>>> -        qemu_log_mask(LOG_UNIMP, "XIVE: NVT %x/%x is not dispatch=
-ed\n",
->>>>>> -                      nvt_blk, nvt_idx);
->>>>>
->>>>> Maybe keep this trace...
->>>>
->>>> It's in spapr_xive_match_nvt() now.
->>>>
->>>
->>> Not really... spapr_xive_match_nvt() has a trace for the opposite cas=
-e of duplicate
->>> matches:
->>
->> not that one. The one in spapr.c ... Yes I need to change the name.
->>
->=20
-> ... and it seems I cannot memorize a change that was made by the
-> previous patch :-\ Sorry for the noise.
+** Attachment added: "aarch64=E8=99=9A=E6=9C=BA=E7=B3=BB=E7=BB=9F=E6=9C=AA=
+=E5=90=AF=E5=8A=A8=E6=8C=82=E8=BD=BD=E7=9B=98console log.txt"
+   https://bugs.launchpad.net/qemu/+bug/1853429/+attachment/5306839/+files/=
+aarch64%E8%99%9A%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%9C%AA%E5%90%AF%E5%8A%A8%E6%8=
+C%82%E8%BD%BD%E7%9B%98console%20log.txt
 
-np but this is problem for gdb ! Any suggestion on the name :=20
+-- =
 
-   spapr_match_nvt()=20
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1853429
 
-?
- =20
-> With or without the !!count change:
+Title:
+  qemu-kvm on aarch64 attach volume failed when vm is booting
 
-I will add the !!=20
+Status in QEMU:
+  New
 
-C.=20
+Bug description:
+  I use libvirt and qemu-kvm on aarch64 platform to attach volume to a
+  booting vm=EF=BC=8Cwhen the system of vm has not boot up, attach volume w=
+ill
+  be failed, after vm system booting up, attach volume can be
+  successful.
 
->=20
-> Reviewed-by: Greg Kurz <groug@kaod.org>
->=20
->> C.
->>
->>>
->>>             if (match->tctx) {
->>>                 qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a=
- thread "
->>>                               "context NVT %x/%x\n", nvt_blk, nvt_idx=
-);
->>>                 return -1;
->>>             }
->>>
->>>>>
->>>>>> -        return false;
->>>>>> -    }
->>>>>> -
->>>>>> -    return true;
->>>>>> -}
->>>>>> -
->>>>>>  /*
->>>>>>   * This is our simple Xive Presenter Engine model. It is merged i=
-n the
->>>>>>   * Router as it does not require an extra object.
->>>>>> @@ -1462,22 +1438,32 @@ static bool xive_presenter_match(XiveRoute=
-r *xrtr, uint8_t format,
->>>>>>   *
->>>>>>   * The parameters represent what is sent on the PowerBus
->>>>>>   */
->>>>>> -static bool xive_presenter_notify(XiveRouter *xrtr, uint8_t forma=
-t,
->>>>>> +static bool xive_presenter_notify(uint8_t format,
->>>>>>                                    uint8_t nvt_blk, uint32_t nvt_i=
-dx,
->>>>>>                                    bool cam_ignore, uint8_t priori=
-ty,
->>>>>>                                    uint32_t logic_serv)
->>>>>>  {
->>>>>> +    XiveFabric *xfb =3D XIVE_FABRIC(qdev_get_machine());
->>>>>> +    XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xfb);
->>>>>>      XiveTCTXMatch match =3D { .tctx =3D NULL, .ring =3D 0 };
->>>>>> -    bool found;
->>>>>> +    int count;
->>>>>> =20
->>>>>> -    found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx=
-, cam_ignore,
->>>>>> -                                 priority, logic_serv, &match);
->>>>>> -    if (found) {
->>>>>> +    /*
->>>>>> +     * Ask the machine to scan the interrupt controllers for a ma=
-tch
->>>>>> +     */
->>>>>> +    count =3D xfc->match_nvt(xfb, format, nvt_blk, nvt_idx, cam_i=
-gnore,
->>>>>> +                           priority, logic_serv, &match);
->>>>>> +    if (count < 0) {
->>>>>> +        return false;
->>>>>> +    }
->>>>>> +
->>>>>> +    /* handle CPU exception delivery */
->>>>>> +    if (count) {
->>>>>>          ipb_update(&match.tctx->regs[match.ring], priority);
->>>>>>          xive_tctx_notify(match.tctx, match.ring);
->>>>>>      }
->>>>>
->>>>> ... in an else block here ^^ ?
->>>>>
->>>>>> =20
->>>>>> -    return found;
->>>>>> +    return count;
->>>>>
->>>>> Implicit cast is ok I guess, but !!count would ensure no paranoid
->>>>> compiler ever complains.
->>>>
->>>> yes.=20
->>>>
->>>> Thanks,
->>>>
->>>> C.
->>>>
->>>>
->>>>>
->>>>>>  }
->>>>>> =20
->>>>>>  /*
->>>>>> @@ -1590,7 +1576,7 @@ static void xive_router_end_notify(XiveRoute=
-r *xrtr, uint8_t end_blk,
->>>>>>          return;
->>>>>>      }
->>>>>> =20
->>>>>> -    found =3D xive_presenter_notify(xrtr, format, nvt_blk, nvt_id=
-x,
->>>>>> +    found =3D xive_presenter_notify(format, nvt_blk, nvt_idx,
->>>>>>                            xive_get_field32(END_W7_F0_IGNORE, end.=
-w7),
->>>>>>                            priority,
->>>>>>                            xive_get_field32(END_W7_F1_LOG_SERVER_I=
-D, end.w7));
->>>>>
->>>>
->>>
->>
->=20
+  libvirt: 4.5.0
+  qemu : 2.12.0
 
+  console log and qemu command of vm is in attachment.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1853429/+subscriptions
 
