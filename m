@@ -2,84 +2,84 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F08C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:39:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0628C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:53:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B32F52068F
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:39:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96E6B20658
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:53:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QZ0l7+gB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B32F52068F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="mxGEejMv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96E6B20658
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXqQ5-0003vx-Qe
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 12:39:05 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41677)
+	id 1iXqeT-0001x5-Jy
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 12:53:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42905)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iXqPQ-0003X9-Ki
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:38:26 -0500
+ (envelope-from <lukasstraub2@web.de>) id 1iXqad-0000Em-DP
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:50:00 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iXqPN-0008JE-83
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:38:22 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46864
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iXqPM-0008IR-KU
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:38:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574357899;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MzfjVyrl/0EVD+fkuifWwW69o0EKbyFzcZGSSbSJO6Y=;
- b=QZ0l7+gB41cZ3/mwj/htSlbWzfiO70zFEK/btIxZX5jqUVZC1CmVl8tgq/xgRP8b+2vFiP
- qxCjc1jFtEcLtERcfEsF7CwU/HocUf4TX7BMj6BdXAkeN/RW1WedJtzSREdrpI7YQIliLN
- yCtH1PwCWzjtkzio7wHBnEwq91T2Wps=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-360-UGzDavQsNtOzygJAQPPxLg-1; Thu, 21 Nov 2019 12:38:16 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 70473801E6A;
- Thu, 21 Nov 2019 17:38:15 +0000 (UTC)
-Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 036D75DDAB;
- Thu, 21 Nov 2019 17:38:14 +0000 (UTC)
-Subject: Re: [PATCH] Fix incorrect int->float conversions caught by clang
- -Wimplicit-int-float-conversion
-To: Fangrui Song <i@maskray.me>, Markus Armbruster <armbru@redhat.com>
-References: <20191116010731.3jdxozzfpsqsrcc4@google.com>
- <20191119204932.5gdzlsplijveqwju@gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <e456fd62-95d7-4a52-9e14-cf0dbe01f995@redhat.com>
-Date: Thu, 21 Nov 2019 11:38:14 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <lukasstraub2@web.de>) id 1iXqac-00070n-Fh
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:49:59 -0500
+Received: from mout.web.de ([212.227.17.11]:60345)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <lukasstraub2@web.de>) id 1iXqac-0006yQ-2h
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:49:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1574358562;
+ bh=jwfVK4sRWXBkN5gEvWZUe/U4B/BoeFvmRlrE/E3bWP8=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+ b=mxGEejMvP/shWS2lD5GA88ZBZQxqW4OKkEgbtBquzn4d9d3KEOst3ljOs0CbXCpvH
+ LUOPk7JPaibFhcODK7j9BHAnEeylUyiu9dHq/DlgMAbePdk9n0NLLWJ20B4B8khEkW
+ YBvY7QkbOGsq5nEsUoYoc1AJDSHiplX1MCvu2sk0=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([89.247.255.160]) by smtp.web.de (mrweb103
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0LyljP-1hjuqs3Oyd-01693x; Thu, 21
+ Nov 2019 18:49:21 +0100
+Date: Thu, 21 Nov 2019 18:49:18 +0100
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [PATCH 0/4] colo: Introduce resource agent and high-level test
+Message-ID: <cover.1574356137.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-In-Reply-To: <20191119204932.5gdzlsplijveqwju@gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: UGzDavQsNtOzygJAQPPxLg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:VkPE7bInktOE4iZqub1ZzGZEZ5Pki6g2ozM0L0mS235M2Z+gJuQ
+ UXDIcRGkN0A/nnDSJjda2pz6Urf+yWwuflbKfG/QVHVXKgiHAtw7EsOBFB8E9GEm2GWbD6C
+ EvNT9xzhQtRohEWN3v1xbl5JCoNzswDdKiUSGfxG4hFQromaQdmoI6ytIGWixOgneU+Suuz
+ NKbNBMOXHbb8Jwa/aLPWA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:SF+GvnFJNos=:zhLOkieu2GAwlQNDmR5ptx
+ W4Nte082kUUX7BJr+CCreCR2jKH414r+4PmQCBgWDvn/6/AYZhQtGiCiYBfRL/A8Cpzvp1/LR
+ 4Q6B19b8NObhQZT7PNsLrS+IrLBREbYdoMeSVY4X+JF2SfDvFimsFQOrGCM5R1rIHnH8WGe1v
+ ZmLSrTuu7+hSpWnSj+vzpvrnS1Pv5cKdnafPrwipz3oQQDABdKmDsHra54SnHf6nlvbMOwVh8
+ mn087UWTMI/kdS6K4AVcdOrTEK64d36l7ib96diExyaagGwEhIUPNIPkizrHwQy2F90ZOkQf2
+ htryXUhuO/saAVPalX/G5l6iKUfJ8t1T9nJkWmUvcdkTKioL/GzgTYl5pYPkcH6IiXEtcSxpQ
+ kAJ3WpUPDMbqNjl1rvjX71SzYp097TzK55HnfCGoQQpkn0zmDBJAUGfXhO79pQTcHyVLdjMIZ
+ FmX4RhqcMquolctyHMlwAyCbmLlf4Yyam2hOpnC76tpW7cj8ch38wEkCyEKaZ2Ruyq6FrCl7Z
+ mMVbEId/uYQXuLPv1C+CGRdKM8ewRSEdULmTyjxRY/xaMtXvJvbYxMpEI4/oPlXXtmixRMubl
+ 2d404tMtxaT/MCR20dahxcZWLMOz6XhTFCU+fTt0vUxXf9yDX6Hqos7gU9zCbVhkkqOklqj5U
+ 8mbfY0ZXLoYaQ4wbjKTEGmlb1PTs6YFE4SagS5zD3YeXlfDOu9cPQE+cG1BPu9SAwAnnZhs84
+ m1c3WBqGksSzo9Qr7aEmO1SggIyA6IyVHEku6cllt8zZdakg7m1J2WUfiB4fyuyOhyR4MO3Nu
+ Ql3UW11eh3YxrKHOaYqIFZ+FEtFpVheX0E/2SgOxwbKujGr3hO85snEGdQ0oN0x8FwF3MYyiX
+ WWPa686gn7EaBqnms5bxnca0AwaPn3551EL169l44oVg2EFp7R1r5WDsoOlfxZdqaf1y27Z31
+ Q0bBne3SOIGtV1lGtNf9/NPZ2z0gUzuhPfmDjROtVyXZTh6BhTIcevMljBxim5hflykBFdzho
+ DXttFqbXDiuAvoAQwOSWsFGVaXXGIWToCtr5L4yprjCXe4OcxRIqSDrzzWJo/Rgelr0cgONen
+ SfRq3YSvbcwQwrbMnSBlQgzG61FTXifD/433e/VJjI0TdqSQfzxZDQiT2RayWTXpRHRfgvowk
+ /tWMXX4S25EmGkuX90cQAI3d7doRu0ABMDFTiMZrKvJxSIX7spll4+djXsnk+cVHYH0GNazmq
+ sDX7Gou12DTfgegtxArHJhT2YtTCqNZUMTsoGDkIiyZSlDzUjKMiqzOn9ZkI=
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 212.227.17.11
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,98 +91,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
+Cc: "Zhang, Chen" <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
+ Alberto Garcia <berto@igalia.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/19/19 2:49 PM, Fangrui Song wrote:
+Hello Everyone,
+These patches introduce a resource agent for use with the Pacemaker CRM an=
+d a
+high-level test utilizing it for testing qemu COLO.
 
->>
->> Can we simply drop the offending line statement instead?
->=20
-> Fixed in the new patch.
->=20
+The resource agent manages qemu COLO including continuous replication.
 
->> The first val * mul above this range is 0x1p64.=A0 Rejecting it is
->> correct, because it overflows yint64_t.
->=20
-> I am not subscribed, so apologize that this email may be off the thread.
->=20
-> (The binutils mailing list allows a user to download the raw email so I
-> can still reply to a specific email, but this list does not provide such
-> feature.)
+Currently the second test case (where the peer qemu is frozen) fails on pr=
+imary
+failover, because qemu hangs while removing the replication related block =
+nodes.
+Note that this also happens in real world test when cutting power to the p=
+eer
+host, so this needs to be fixed.
 
-Actually, it's better to post a v2 patch as a new top-level thread,=20
-rather than buried as an attachment to a reply to v1, because our CI=20
-tooling doesn't see through the attachment (nor was it easy for me to=20
-reply to the v2 patch - I had to open the attachment to paste its text=20
-inline below...).
+Based-on: <cover.1571925699.git.lukasstraub2@web.de>
+([PATCH v7 0/4] colo: Add support for continuous replication)
 
-More patch submission hints at https://wiki.qemu.org/Contribute/SubmitAPatc=
-h
+Lukas Straub (4):
+  block/quorum.c: stable children names
+  colo: Introduce resource agent
+  colo: Introduce high-level test
+  MAINTAINERS: Add myself as maintainer for COLO resource agent
 
->>From 5f1c5a42794ddcbabb63d9af920d9f437ea90a9f Mon Sep 17 00:00:00 2001
-> From: Fangrui Song <i@maskray.me>
-> Date: Fri, 15 Nov 2019 16:27:47 -0800
-> Subject: [PATCH] Fix incorrect integer->float conversions caught by clang
->  -Wimplicit-int-float-conversion
-> To: qemu-devel@nongnu.org
->=20
-> The warning will be enabled by default in clang 10. It is not available f=
-or clang <=3D 9.
->=20
+ MAINTAINERS                            |    6 +
+ block/quorum.c                         |    6 +
+ scripts/colo-resource-agent/colo       | 1026 ++++++++++++++++++++++++
+ scripts/colo-resource-agent/crm_master |   44 +
+ tests/acceptance/colo.py               |  444 ++++++++++
+ 5 files changed, 1526 insertions(+)
+ create mode 100755 scripts/colo-resource-agent/colo
+ create mode 100755 scripts/colo-resource-agent/crm_master
+ create mode 100644 tests/acceptance/colo.py
 
-> +++ b/migration/migration.c
-> @@ -2035,11 +2035,10 @@ void qmp_migrate_set_downtime(double value, Error=
- **errp)
->      }
-> =20
->      value *=3D 1000; /* Convert to milliseconds */
-> -    value =3D MAX(0, MIN(INT64_MAX, value));
-> =20
->      MigrateSetParameters p =3D {
->          .has_downtime_limit =3D true,
-> -        .downtime_limit =3D value,
-> +        .downtime_limit =3D (int64_t)value,
->      };
-
-The explicit cast looks odd without a comment (generally, we try to=20
-avoid casts, so a comment such as /* explicit cast to silence compiler=20
-*/ can be useful)
-
-> =20
->      qmp_migrate_set_parameters(&p, errp);
-> diff --git a/util/cutils.c b/util/cutils.c
-> index fd591cadf0..2b4484c015 100644
-> --- a/util/cutils.c
-> +++ b/util/cutils.c
-> @@ -239,10 +239,10 @@ static int do_strtosz(const char *nptr, const char =
-**end,
->          goto out;
->      }
->      /*
-> -     * Values >=3D 0xfffffffffffffc00 overflow uint64_t after their trip
-> +     * Values > nextafter(0x1p64, 0) overflow uint64_t after their trip
->       * through double (53 bits of precision).
-
-I thought we agreed on more text than just this (in particular, that the=20
-nextafter() call represents 2^64 rounded towards zero).
-
->       */
-> -    if ((val * mul >=3D 0xfffffffffffffc00) || val < 0) {
-> +    if ((val * mul > nextafter(0x1p64, 0)) || val < 0) {
->          retval =3D -ERANGE;
->          goto out;
->      }
-> --=20
-> 2.24.0
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
-
+=2D-
+2.20.1
 
