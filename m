@@ -2,71 +2,70 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DEE6C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A61C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:11:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D1F4206D7
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:09:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D1F4206D7
+	by mail.kernel.org (Postfix) with ESMTPS id 54E81206D7
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:11:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E81206D7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXn9P-00041u-97
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 09:09:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35752)
+	id 1iXnAm-0005ko-F6
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 09:11:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36456)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iXn18-0005CI-Nc
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:01:10 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iXn4d-0008Bu-TD
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:04:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iXn16-0005JK-9M
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:01:06 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15888
- helo=mx0a-001b2d01.pphosted.com)
+ (envelope-from <frankja@linux.ibm.com>) id 1iXn4c-00005q-Q5
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:04:43 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5670)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iXn16-0005IL-3P
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:01:04 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ id 1iXn4c-000055-HY
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:04:42 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xALDvtPk115480
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:01:01 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wdfxu708y-1
+ xALE2nru142094
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:04:40 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wdhxacbsb-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:01:00 -0500
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:04:40 -0500
 Received: from localhost
- by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 21 Nov 2019 14:00:58 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway:
+ Thu, 21 Nov 2019 14:04:38 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+ by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 21 Nov 2019 14:00:54 -0000
+ Thu, 21 Nov 2019 14:04:34 -0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
  [9.149.105.62])
- by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id xALE0rlf42336588
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xALE4XdP57344112
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 21 Nov 2019 14:00:53 GMT
+ Thu, 21 Nov 2019 14:04:33 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 6735DAE051;
- Thu, 21 Nov 2019 14:00:53 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 3C727AE056;
+ Thu, 21 Nov 2019 14:04:33 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E968DAE05A;
- Thu, 21 Nov 2019 14:00:52 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 4D51DAE045;
+ Thu, 21 Nov 2019 14:04:32 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.70.129])
  by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 21 Nov 2019 14:00:52 +0000 (GMT)
+ Thu, 21 Nov 2019 14:04:32 +0000 (GMT)
 Subject: Re: [PATCH 07/15] s390x: protvirt: Handle diag 308 subcodes 0,1,3,4
 To: Cornelia Huck <cohuck@redhat.com>
 References: <20191120114334.2287-1-frankja@linux.ibm.com>
@@ -115,29 +114,29 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Thu, 21 Nov 2019 15:00:52 +0100
+Date: Thu, 21 Nov 2019 15:04:31 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
 In-Reply-To: <20191121145001.5e7a182d.cohuck@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="p46EtOKbPysJxPt9isRDLQ8OSAMdRepQ4"
+ boundary="Q95J9xD3Pz7JoZ6EdyN8PjHppwVILCfXY"
 X-TM-AS-GCONF: 00
-x-cbid: 19112114-0012-0000-0000-0000036A56D4
+x-cbid: 19112114-0016-0000-0000-000002CA5B90
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112114-0013-0000-0000-000021A5EB3D
-Message-Id: <3101996a-93f6-b7e3-a44b-4e663f6beff6@linux.ibm.com>
+x-cbparentid: 19112114-0017-0000-0000-0000332C219A
+Message-Id: <2919845b-531d-8c79-fb16-36f67fa29789@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-11-21_03:2019-11-21,2019-11-21 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- phishscore=0 impostorscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999
- clxscore=1015 spamscore=0 mlxscore=0 suspectscore=0 priorityscore=1501
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911210127
+ suspectscore=0 spamscore=0
+ clxscore=1015 adultscore=0 malwarescore=0 phishscore=0 impostorscore=0
+ bulkscore=0 mlxscore=0 priorityscore=1501 mlxlogscore=889
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911210128
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -157,10 +156,10 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---p46EtOKbPysJxPt9isRDLQ8OSAMdRepQ4
-Content-Type: multipart/mixed; boundary="LxhFn1LTJfRpYZ9ElrU7I0Y6rMRpUsaxB"
+--Q95J9xD3Pz7JoZ6EdyN8PjHppwVILCfXY
+Content-Type: multipart/mixed; boundary="hHwGqsxsKzlfDEGhPlpmGnLGspcUoOvlZ"
 
---LxhFn1LTJfRpYZ9ElrU7I0Y6rMRpUsaxB
+--hHwGqsxsKzlfDEGhPlpmGnLGspcUoOvlZ
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -168,90 +167,6 @@ Content-Transfer-Encoding: quoted-printable
 On 11/21/19 2:50 PM, Cornelia Huck wrote:
 > On Wed, 20 Nov 2019 06:43:26 -0500
 > Janosch Frank <frankja@linux.ibm.com> wrote:
->=20
->> Now that we know the protection state off the cpus, we can start
->> handling all diag 308 subcodes in the protected state.
->=20
-> "As we now have access to the protection state of the cpus, we can
-> implement special handling of diag 308 subcodes for cpus in the
-> protected state."
->=20
-> ?
-
-Sure
-
->=20
->>
->> For subcodes 0 and 1 we need to unshare all pages before continuing,
->> so the guest doesn't accidently expose data when dumping.
->>
->> For subcode 3/4 we tear down the protected VM and reboot into
->> unprotected mode. We do not provide a secure reboot.
->>
->> Before we can do the unshare calls, we need to mark all cpus as
->> stopped.
->>
->> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->> ---
->>  hw/s390x/s390-virtio-ccw.c | 30 +++++++++++++++++++++++++++---
->>  target/s390x/diag.c        |  4 ++++
->>  2 files changed, 31 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index 7262453616..6fd50b4c42 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -319,11 +319,26 @@ static inline void s390_do_cpu_ipl(CPUState *cs,=
- run_on_cpu_data arg)
->>      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
->>  }
->> =20
->> +static void s390_pv_prepare_reset(CPUS390XState *env)
->> +{
->> +    CPUState *cs;
->> +
->> +    if (!env->pv) {
->> +        return;
->> +    }
->> +    CPU_FOREACH(cs) {
->> +        s390_cpu_set_state(S390_CPU_STATE_STOPPED, S390_CPU(cs));
->> +    }
->> +    s390_pv_unshare();
->> +    s390_pv_perf_clear_reset();
->> +}
->> +
->>  static void s390_machine_reset(MachineState *machine)
->>  {
->>      enum s390_reset reset_type;
->>      CPUState *cs, *t;
->>      S390CPU *cpu;
->> +    CPUS390XState *env;
->> =20
->>      /* get the reset parameters, reset them once done */
->>      s390_ipl_get_reset_request(&cs, &reset_type);
->> @@ -332,29 +347,38 @@ static void s390_machine_reset(MachineState *mac=
-hine)
->>      s390_cmma_reset();
->> =20
->>      cpu =3D S390_CPU(cs);
->> +    env =3D &cpu->env;
->> =20
->>      switch (reset_type) {
->>      case S390_RESET_MODIFIED_CLEAR:  /* Subcode 0 */
->> +        subsystem_reset();
->> +        s390_crypto_reset();
->> +        s390_pv_prepare_reset(env);
->>          CPU_FOREACH(t) {
->>              run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
->>          }
->> -        subsystem_reset();
->> -        s390_crypto_reset();
->=20
-> This also switches the order in which different parts are reset for
-> normal guests. I presume that order doesn't matter here?
-
-I don't think that the order is specified in the POP, it is however
-specified for protected VMs...
 
 >=20
 >>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
@@ -259,9 +174,6 @@ specified for protected VMs...
 >>      case S390_RESET_LOAD_NORMAL: /* Subcode 1*/
 >=20
 > missing blank before */ (introduced in a previous patch)
-
-Will fix
-
 >=20
 >=20
 >> +        subsystem_reset();
@@ -280,64 +192,36 @@ Will fix
 >=20
 > Annotate this with the subcode as well? (in the patch introducing it)
 
-Sure
-
->=20
->>      case S390_RESET_REIPL: /* Subcode 4 */
->> +        if (env->pv) {
->> +            CPU_FOREACH(t) {
->> +                s390_pv_vcpu_destroy(t);
->> +            }
->> +            s390_pv_vm_destroy();
->> +        }
->>          qemu_devices_reset();
->>          s390_crypto_reset();
->>          /* configure and start the ipl CPU only */
->> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
->> index 32049bb4ee..db6d79cef3 100644
->> --- a/target/s390x/diag.c
->> +++ b/target/s390x/diag.c
->> @@ -68,6 +68,10 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1=
-, uint64_t r3)
->>  static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64=
-_t addr,
->>                                uintptr_t ra, bool write)
->>  {
->> +    /* Handled by the Ultravisor */
->> +    if (env->pv) {
->> +        return 0;
->> +    }
->>      if ((r1 & 1) || (addr & ~TARGET_PAGE_MASK)) {
->>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->>          return -EINVAL;
->=20
+I think this has no diag 308 subcode and is triggered by qemu
 
 
 
---LxhFn1LTJfRpYZ9ElrU7I0Y6rMRpUsaxB--
 
---p46EtOKbPysJxPt9isRDLQ8OSAMdRepQ4
+
+--hHwGqsxsKzlfDEGhPlpmGnLGspcUoOvlZ--
+
+--Q95J9xD3Pz7JoZ6EdyN8PjHppwVILCfXY
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3WmJQACgkQ41TmuOI4
-ufhplw//dxyeksQpjouVpQLyqaS9RRLRTcur/9HGZjvMjNZ+ON4mlrznNbitqXBr
-KvHscSg333oFAVl9p/32WnpAD4YuhAMVbme7kPvcXmkMa1SteMi1n6LwmdJ8uHn8
-e7fj5P3nARixZTNugjrw5borqiz2mA8F4wZRv2aozNf9eIBNFnsOPB8j3bBkCH4W
-Fu52jU3UQ8BN+O7SOUDQfI1at9HfYovdWfGfdpSIz/P8R1zNrxR5C0iOj2ADQJDo
-+a9bpkfQZM7+f5CI0+AzWZ9rEf4vo/Tk8djCgH5OlutTwhByLalzG3vLYjNGMeaH
-z32lyEjHqh45ATb5n346RSVVqVmHxsmmN4EsoqgUmbeTMEdoXtZ0g2ArsznzZl3P
-mmwqzVG+tg1FwmPuF1qORnSWyQ+Ub1w3oBxfThDtX6fzFCNHSSZ61Ismsj/o9lKW
-V+ftp4jhlex2jIPSgQeZZAX7aQEKr6z4C+o2jUa1yYZnScG11z4vP5ik4hyM1cO+
-AfU8/yP/mbYPCz97QSm1YzPj8CuietupzEtXW+cyRLoiFRQ53iDw8IYZHl6qXPX7
-MzYuUpqgbd0ohXHqNBT8Lg5Cc7ipKAmY9S9JI5mGXRqstKgXjtDwIbP2geWfGoAh
-xKJ/fuBfk5GsQ2sx6fC2n/+oz1+blhzCYfdVouDgXB/GVwSdibk=
-=7bn2
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3WmW8ACgkQ41TmuOI4
+ufgN3hAAsZP+rPitEWhxOPGhU+fehVqDfcAxrnC5uPEwXEi0P2Y7fByYUk58cTlN
+uZdHntqFNy1r8wM2Uacr9pmpwpAM4pv0LQhcGM1tPAdfaEcfUPgv/U9VGNZFD5lb
+rnqjw8SsOC+NHCNtqMJbnluATBHI/8iRogDnkw1t4YXtSYqZc34U2bzXbvQyJOh5
+OOqRebu9wAdRRDkkPxMO9XDxOtF4KYuYKt/JI143fJIPohYhl02xf+M/NI4sPIm6
+JXcyq4YUEhlMSeRbn/pm+w/zrEMnkstRvUpBGJgD+T038emjoopsHkyTkaomE17M
+TLTWh312/8cbVhc49VLaJkDbOX+5SjSV10bwZwcR0iFMX6gx9NpD8d+5eYZSKcuO
+EReWfhWVBw19jxrcO03GcRBdzwqU8K9WnVSfTvAniEmQFfvQcasXZM/AHyShbEDo
+YKA+4WuD2HwtI7+t0kK5TfKadqE5SxvPIt32FnHINOJd9vJ2dJHd9WJvQkwcFLyy
+pP/cmdU4O54z7k130ZzpVbcbuf5GBM3HB4DtKIUPNSipgJa5VsvVCMfJPr5aQ0Pt
+SFFL6OWmaqZvJzbCHQkjpmFYXen/IVQUZLn/DrLSkUG/CU7ma7RuqKOpzIbG6fyE
+ekEN5Y8/9SJOqjc/taY+9Gzpv/pOSXjlPEY6msKy00Gmvu9ybOc=
+=uB0l
 -----END PGP SIGNATURE-----
 
---p46EtOKbPysJxPt9isRDLQ8OSAMdRepQ4--
+--Q95J9xD3Pz7JoZ6EdyN8PjHppwVILCfXY--
 
 
