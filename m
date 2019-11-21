@@ -4,62 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84677C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:38:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87770C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:40:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D24F2070E
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:38:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 512072070A
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:40:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="eaxPLhr3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D24F2070E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KrABA4tS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 512072070A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXmem-0000tl-EW
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:38:00 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59487)
+	id 1iXmhI-0002Mu-Gg
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:40:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60106)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <berto@igalia.com>) id 1iXmcF-0005yw-T0
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:35:24 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iXmgO-0001Xs-Gy
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:39:41 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <berto@igalia.com>) id 1iXmcE-0007HV-Tl
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:35:23 -0500
-Received: from fanzine.igalia.com ([178.60.130.6]:40605)
+ (envelope-from <peter.maydell@linaro.org>) id 1iXmgN-0002qu-9w
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:39:40 -0500
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:35177)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <berto@igalia.com>)
- id 1iXmcC-0007Ex-NY; Thu, 21 Nov 2019 08:35:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
- bh=TAKuBdfQoWM1eG95nxpjrkTNCasvZIAamFu1R4drsmE=; 
- b=eaxPLhr3B2PNUiVByXmLdjE4eKwDdYEaumEoxIUADvpIM7mMl7aPl1nA7vUbhhyJfwIFrkC1HQAIThV5OKIIL/lpXiGoAJGq6mOD7uTN84JxPfXLrzOikIHfVnDyRPd9wQOHcB1qbkQXxoEBDwICSdbVTO8nWoXPGhreA04bGUXhCdDukxpn9rvDjobmoV+ALyNGu+GK5IH0GnDhC9loUd6QczSQEOvYlxtbZCLzBDwX9jfmAMvbr54ceKr1V3fnEmUuq/MxNI2tcYF1NIc1sfA4zbKSeeDFklZvS2qTtbD/e2cmUxWF2Lj+LIgrCwk31+tMf5lbATTc8j7EF3/Fbw==;
-Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
- by fanzine.igalia.com with esmtps 
- (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
- id 1iXmcB-0001Jw-Ew; Thu, 21 Nov 2019 14:35:19 +0100
-Received: from berto by mail.igalia.com with local (Exim)
- id 1iXmcB-0003Iz-Bw; Thu, 21 Nov 2019 14:35:19 +0100
-From: Alberto Garcia <berto@igalia.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Subject: Re: [PATCH v2 5/6] iotests: Support job-complete in run_job()
-In-Reply-To: <20191120184501.28159-6-kwolf@redhat.com>
-References: <20191120184501.28159-1-kwolf@redhat.com>
- <20191120184501.28159-6-kwolf@redhat.com>
-User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
- (i586-pc-linux-gnu)
-Date: Thu, 21 Nov 2019 14:35:19 +0100
-Message-ID: <w51v9rd4ajs.fsf@maestria.local.igalia.com>
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iXmgN-0002px-1u
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:39:39 -0500
+Received: by mail-oi1-x243.google.com with SMTP id n16so3209681oig.2
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 05:39:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=D21bS1dncI5y9O3sahLEVn88cwUcrsMq4eVRRPk241g=;
+ b=KrABA4tSnDV+4Uz4hWZYDeXZxWQ+1eG81Dy3k5LsCXAf/h0hzQbV6uW+b3weHSYX8d
+ bayvqSHadeZ63MD05GcNennehNDc8E55moMnVv9ToPhxkgP8V1+alwCQSHQPfHPTWF0i
+ NYLHQ4C1mOH4boWarY9egCRVD6dotrObVaIfFCi/bp4wYuXnIq+pJuNG62HLWPhM4sfa
+ CjehMELFreVRy3gAbe/NAEpm08KaRqfjC/gVnte/1ynhV5P4v0HMY6LjyXTpPXhWEDHM
+ qx+6bSvYRzxVIUhoKNFB+EzIyXmGNzbEAIdayI9IIHMRwWfWw7/8U2GUohWpVPDQfr5M
+ osig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=D21bS1dncI5y9O3sahLEVn88cwUcrsMq4eVRRPk241g=;
+ b=lF2H/UGQwCmCP1RsxOLZJMohOzgmyq9BUg5WT44DPbEmdTaRRpcKlzCAM2yvwFtHo8
+ sOIA4NsOmbmJqpOV4Sec7UhhuR7GWHR5hMpBY1h40DmEwsm6oDKTS+qbIZhBNW2oHj5L
+ dnapyToIRFlGqQzzXa2LA8QJWmmiKDxkzXXzX2vUoNe0+pF8hYt85cwNenh+w1WjXZ68
+ Z1Xebp/0jFOWOSYOoV2zFfeSrGatbairkd4Whdr9xXNbh27lW2i+32HUTyDPFFUaSL1e
+ mNL6Vc+vOykE3IwhduC/wRn2g6la2NIMg0RcB4LtKH/fHqhF+5J7xOKmCeEm+CghU1EO
+ CzDg==
+X-Gm-Message-State: APjAAAW3ccg0XmkcKRiWr0VqoWs99T249qqeXgScBTADPcpuPupQ/FQ5
+ w4svNv7gE3jRkzSt03rKpVah7klOI9pAf0LHclynvdH59jQ=
+X-Google-Smtp-Source: APXvYqx5P7iydS86BuvNVTavjbn5bwdUkMooNB1FpVLzz/yhgbSWQGhU+SZFh1OfO84t/8ovOgpMPPVzT0yjT5QiPhY=
+X-Received: by 2002:aca:4945:: with SMTP id w66mr7911237oia.98.1574343578142; 
+ Thu, 21 Nov 2019 05:39:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x (no
- timestamps) [generic] [fuzzy]
-X-Received-From: 178.60.130.6
+References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
+ <20191120152442.26657-7-marcandre.lureau@redhat.com>
+In-Reply-To: <20191120152442.26657-7-marcandre.lureau@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 Nov 2019 13:39:27 +0000
+Message-ID: <CAFEAcA_YdCpE5Nn=b08nThROFdPsAbT1MNK0pYQSmB_9K3zy1w@mail.gmail.com>
+Subject: Re: [PATCH v4 06/37] serial: initial qom-ification
+To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::243
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -71,22 +88,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- stefanha@redhat.com, mreitz@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed 20 Nov 2019 07:45:00 PM CET, Kevin Wolf wrote:
-> Automatically complete jobs that have a 'ready' state and need an
-> explicit job-complete. Without this, run_job() would hang for such
-> jobs.
+On Wed, 20 Nov 2019 at 15:25, Marc-Andr=C3=A9 Lureau
+<marcandre.lureau@redhat.com> wrote:
 >
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Make SerialState a device (the following patches will introduce IO/MM
+> sysbus serial devices)
+>
+> None of the serial_{,mm}_init() callers actually free the returned
+> value (even if they did, it would be quite harmless), so we can change
+> the object allocation at will.
+>
+> However, the devices that embed SerialState must now have their field
+> QOM-initialized manually (isa, pci, pci-multi).
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
+> +static void serial_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
+> +
+> +    dc->user_creatable =3D false;
 
-Berto
+The comment describing user_creatable in qdev-core.h says:
+     * It should never be cleared without a comment explaining why it
+     * is cleared.
+
+So we should have a comment here.
+
+Otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+
+thanks
+-- PMM
 
