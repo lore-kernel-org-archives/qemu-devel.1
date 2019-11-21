@@ -2,83 +2,83 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88952C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 15:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE436C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 15:40:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 545C5206B6
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 15:40:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7296206B6
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 15:40:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ms7ihd4q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 545C5206B6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oa41B4+a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7296206B6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXoZH-00030z-FF
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 10:40:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51884)
+	id 1iXoZe-0003eP-Pg
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 10:40:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51898)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iXoVs-0006nH-1F
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:36:57 -0500
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iXoVt-0006os-4a
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:36:58 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <paolo.bonzini@gmail.com>) id 1iXoVq-0001Pe-JE
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:36:55 -0500
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:50500)
+ (envelope-from <paolo.bonzini@gmail.com>) id 1iXoVr-0001QZ-I4
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:36:57 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36346)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
  (Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
- id 1iXoVq-0001Ob-CJ
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:36:54 -0500
-Received: by mail-wm1-x333.google.com with SMTP id l17so4237528wmh.0
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 07:36:54 -0800 (PST)
+ id 1iXoVr-0001Pn-Bc
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 10:36:55 -0500
+Received: by mail-wr1-x444.google.com with SMTP id z3so4978973wru.3
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 07:36:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=W++B25PcncKXRBog45JaunAzgYs3JNNz2RLMkQBokMM=;
- b=Ms7ihd4qik5QgINSGNX8dxSUb0yzA/In20f3rdS/R1W6TTF1ohmPq23jaD5AFhIW+a
- 3B9g+UukpprGunjNcwc43r/Gn4hXggJB45FY+cp1qwYee/w3wHCW/lGDfggViNFlpbv2
- v0pK9S6MRJz//S8IXFQCnLUwD5sESAgXjJd58S3Ortf3TaF3JWnaGqJe1LuWn0lJtx55
- dbuBPNo05l7ccfy5mvRgAndjb+pjtu0XUOACeKeF8wRvxs9GwcozONPweECbFKqG0NRI
- FUt8MxG23TddgophRkYpEL4mWcFGAawP+SgS4488ID1DQlJCPsmOXmBHLPlo6avXPKQU
- 5cMQ==
+ bh=9dUEfigVchHfX6ZaLvQxxNBaTzzF6DYxdQ+mCErjP7w=;
+ b=Oa41B4+arAzFalN9Shq59ofAqTNT/h3LCHUZ3hXN2SLugpag2ZZe39tPBt2V6mMBnC
+ 3T4YfUWc6nYlrzdFV/B3EZU8hJ3V2IgTPDmFMTc1T77NwHbPuOtlpZaZmT54u1AHWaWP
+ XxADw/MSyeGSQMechYnLmItQ3JYZM3HLReiM9GkXI5D67cSp/kCgQMa/JslU6JtYZrlO
+ ZEU73enTMK7874DI9c2jwVkcAc5h3C1eg+4UX5IySHX1NoklTTHdKb7oo8uWxrri9gwu
+ zLem+BdAG90mK72hj6nVUs871GFp23cOcszZBojJ1Aj9Ah6dFDNVtrhPlBlC/OeW5FtX
+ M7NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=W++B25PcncKXRBog45JaunAzgYs3JNNz2RLMkQBokMM=;
- b=QndYsEcWT4Lgksr3+N+hBQcrRkTIM653u/t/NfrfSOc+O054JVTm8acxF1p0i/UqYK
- ISnBySF74OPVionU51heQN0Xgtb/EB78MyGWc+i/jtohUUYrpT80t5mcVMz8o4hNGvTF
- YHVkZW8H5GZ1r3x7hTuqFL+wycHI5t1izJpJiK36rPdWGYQZy+NBT2nMblL5Ws3iFazE
- N5b7qWHDNu0q8OcbX7SUTNS8VL9vib12vObw0Tu6oL3a7uYJQy6Wf4z1zl2vwvEG78Iw
- Q1oVgjzdgWEdjNMDeVLeoGLOi+7hDzJCTlmhRemzknbXZZTJf9QQmFsiZor9KRJZWKz5
- blRQ==
-X-Gm-Message-State: APjAAAWf/UsCOLGrrIkvga1wPOWL41RB1zjiOxQYzER7sSr/L5rTfIf9
- O5WHlywtOeZu6udW6qH4WmpLjL+Y
-X-Google-Smtp-Source: APXvYqynSfI2fSxXN2THmwVBljnKSdDZAFff4h33yAFTjn/XI8HRtAd2TjWpVk1yzRLKEwFCDGMQwA==
-X-Received: by 2002:a1c:2395:: with SMTP id
- j143mr10478656wmj.128.1574350613059; 
+ bh=9dUEfigVchHfX6ZaLvQxxNBaTzzF6DYxdQ+mCErjP7w=;
+ b=G5Q/sWa45Oe0uwWOnxN2fOYAckL/oZifjgKaAwWz0qZlcWMBl+xWJcYt4K7+rR4Jo8
+ 6+eo+ys1iruqZEW3x72tnUJL68kLQ9mMPUtreJkOglkv6QgAwIC+7VXb1S0dZd7cCr7f
+ NyR8DguIjlmBzwyjCjdv3gF7DY6Y3ruoOV5bdWf5uHIW0qlz0zsvNbTj1jOfTtu4rQmh
+ MB/kurjwLy95xCKZXcMmZ55tLbb7+LtdZ1oMAZUaBC777WyEtFdMommqyALdylNbFBrA
+ M5fDOB6qGddxysHMg9Jg7ei4H1sCLpabJLZeL5T+R2NofLdHlzWoMO2gq+V8j81jdY1C
+ IHSQ==
+X-Gm-Message-State: APjAAAVgBGZ1PsknGogZa1AIeN739k5lFlMG3JepfwMjrZTJBjdGTG0V
+ 9X6MYtBxX7M/b27VtN/Ep5CswdIU
+X-Google-Smtp-Source: APXvYqzaAMMwlvIzRy862wlNimEvFgmKZs621yTZafY+eEVekn28uauAgSyoGOTnqN7P89GHWDuzUA==
+X-Received: by 2002:a5d:5687:: with SMTP id f7mr7669444wrv.384.1574350613987; 
  Thu, 21 Nov 2019 07:36:53 -0800 (PST)
 Received: from 640k.lan ([93.56.166.5])
- by smtp.gmail.com with ESMTPSA id m15sm3970933wrj.52.2019.11.21.07.36.52
+ by smtp.gmail.com with ESMTPSA id m15sm3970933wrj.52.2019.11.21.07.36.53
  (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 21 Nov 2019 07:36:52 -0800 (PST)
+ Thu, 21 Nov 2019 07:36:53 -0800 (PST)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/4] target/i386: add support for MSR_IA32_TSX_CTRL
-Date: Thu, 21 Nov 2019 16:36:47 +0100
-Message-Id: <1574350609-29518-3-git-send-email-pbonzini@redhat.com>
+Subject: [PULL 3/4] i386: Add new versions of Skylake/Cascadelake/Icelake
+ without TSX
+Date: Thu, 21 Nov 2019 16:36:48 +0100
+Message-Id: <1574350609-29518-4-git-send-email-pbonzini@redhat.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1574350609-29518-1-git-send-email-pbonzini@redhat.com>
 References: <1574350609-29518-1-git-send-email-pbonzini@redhat.com>
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2a00:1450:4864:20::333
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -95,147 +95,116 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The MSR_IA32_TSX_CTRL MSR can be used to hide TSX (also known as the
-Trusty Side-channel Extension).  By virtualizing the MSR, KVM guests
-can disable TSX and avoid paying the price of mitigating TSX-based
-attacks on microarchitectural side channels.
+From: Eduardo Habkost <ehabkost@redhat.com>
 
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+One of the mitigation methods for TAA[1] is to disable TSX
+support on the host system.  Linux added a mechanism to disable
+TSX globally through the kernel command line, and many Linux
+distributions now default to tsx=off.  This makes existing CPU
+models that have HLE and RTM enabled not usable anymore.
+
+Add new versions of all CPU models that have the HLE and RTM
+features enabled, that can be used when TSX is disabled in the
+host system.
+
+References:
+
+[1] TAA, TSX asynchronous Abort:
+    https://software.intel.com/security-software-guidance/insights/deep-dive-intel-transactional-synchronization-extensions-intel-tsx-asynchronous-abort
+    https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/tsx_async_abort.html
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c     |  2 +-
- target/i386/cpu.h     |  5 +++++
- target/i386/kvm.c     | 13 +++++++++++++
- target/i386/machine.c | 20 ++++++++++++++++++++
- 4 files changed, 39 insertions(+), 1 deletion(-)
+ target/i386/cpu.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 056874f..9cd9adf 100644
+index 9cd9adf..37c023f 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -1204,7 +1204,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-         .type = MSR_FEATURE_WORD,
-         .feat_names = {
-             "rdctl-no", "ibrs-all", "rsba", "skip-l1dfl-vmentry",
--            "ssb-no", "mds-no", "pschange-mc-no", NULL,
-+            "ssb-no", "mds-no", "pschange-mc-no", "tsx-ctrl",
-             "taa-no", NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 5352c9f..cde2a16 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -349,7 +349,11 @@ typedef enum X86Seg {
- #define MSR_VIRT_SSBD                   0xc001011f
- #define MSR_IA32_PRED_CMD               0x49
- #define MSR_IA32_CORE_CAPABILITY        0xcf
-+
- #define MSR_IA32_ARCH_CAPABILITIES      0x10a
-+#define ARCH_CAP_TSX_CTRL_MSR		(1<<7)
-+
-+#define MSR_IA32_TSX_CTRL		0x122
- #define MSR_IA32_TSCDEADLINE            0x6e0
- 
- #define FEATURE_CONTROL_LOCKED                    (1<<0)
-@@ -1449,6 +1453,7 @@ typedef struct CPUX86State {
-     uint64_t msr_smi_count;
- 
-     uint32_t pkru;
-+    uint32_t tsx_ctrl;
- 
-     uint64_t spec_ctrl;
-     uint64_t virt_ssbd;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index bfd09bd..bf16556 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -97,6 +97,7 @@ static bool has_msr_hv_reenlightenment;
- static bool has_msr_xss;
- static bool has_msr_umwait;
- static bool has_msr_spec_ctrl;
-+static bool has_msr_tsx_ctrl;
- static bool has_msr_virt_ssbd;
- static bool has_msr_smi_count;
- static bool has_msr_arch_capabs;
-@@ -2036,6 +2037,9 @@ static int kvm_get_supported_msrs(KVMState *s)
-             case MSR_IA32_SPEC_CTRL:
-                 has_msr_spec_ctrl = true;
-                 break;
-+            case MSR_IA32_TSX_CTRL:
-+                has_msr_tsx_ctrl = true;
-+                break;
-             case MSR_VIRT_SSBD:
-                 has_msr_virt_ssbd = true;
-                 break;
-@@ -2694,6 +2698,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-     if (has_msr_spec_ctrl) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, env->spec_ctrl);
-     }
-+    if (has_msr_tsx_ctrl) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_TSX_CTRL, env->tsx_ctrl);
-+    }
-     if (has_msr_virt_ssbd) {
-         kvm_msr_entry_add(cpu, MSR_VIRT_SSBD, env->virt_ssbd);
-     }
-@@ -3110,6 +3117,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (has_msr_spec_ctrl) {
-         kvm_msr_entry_add(cpu, MSR_IA32_SPEC_CTRL, 0);
-     }
-+    if (has_msr_tsx_ctrl) {
-+        kvm_msr_entry_add(cpu, MSR_IA32_TSX_CTRL, 0);
-+    }
-     if (has_msr_virt_ssbd) {
-         kvm_msr_entry_add(cpu, MSR_VIRT_SSBD, 0);
-     }
-@@ -3502,6 +3512,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_IA32_SPEC_CTRL:
-             env->spec_ctrl = msrs[i].data;
-             break;
-+        case MSR_IA32_TSX_CTRL:
-+            env->tsx_ctrl = msrs[i].data;
-+            break;
-         case MSR_VIRT_SSBD:
-             env->virt_ssbd = msrs[i].data;
-             break;
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index 7bdeb78..2699eed 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -1293,6 +1293,25 @@ static const VMStateDescription vmstate_efer32 = {
- };
- #endif
- 
-+static bool msr_tsx_ctrl_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+    CPUX86State *env = &cpu->env;
-+
-+    return env->features[FEAT_ARCH_CAPABILITIES] & ARCH_CAP_TSX_CTRL_MSR;
-+}
-+
-+static const VMStateDescription vmstate_msr_tsx_ctrl = {
-+    .name = "cpu/msr_tsx_ctrl",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = msr_tsx_ctrl_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.tsx_ctrl, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- VMStateDescription vmstate_x86_cpu = {
-     .name = "cpu",
-     .version_id = 12,
-@@ -1427,6 +1446,7 @@ VMStateDescription vmstate_x86_cpu = {
- #ifdef CONFIG_KVM
-         &vmstate_nested_state,
- #endif
-+        &vmstate_msr_tsx_ctrl,
-         NULL
-     }
- };
+@@ -2902,6 +2902,14 @@ static X86CPUDefinition builtin_x86_defs[] = {
+                     { /* end of list */ }
+                 }
+             },
++            {
++                .version = 3,
++                .props = (PropValue[]) {
++                    { "hle", "off" },
++                    { "rtm", "off" },
++                    { /* end of list */ }
++                }
++            },
+             { /* end of list */ }
+         }
+     },
+@@ -3015,6 +3023,14 @@ static X86CPUDefinition builtin_x86_defs[] = {
+                     { /* end of list */ }
+                 }
+             },
++            {
++                .version = 3,
++                .props = (PropValue[]) {
++                    { "hle", "off" },
++                    { "rtm", "off" },
++                    { /* end of list */ }
++                }
++            },
+             { /* end of list */ }
+         }
+     },
+@@ -3128,6 +3144,13 @@ static X86CPUDefinition builtin_x86_defs[] = {
+                   { /* end of list */ }
+               },
+             },
++            { .version = 3,
++              .props = (PropValue[]) {
++                  { "hle", "off" },
++                  { "rtm", "off" },
++                  { /* end of list */ }
++              },
++            },
+             { /* end of list */ }
+         }
+     },
+@@ -3230,6 +3253,18 @@ static X86CPUDefinition builtin_x86_defs[] = {
+         .features[FEAT_VMX_VMFUNC] = MSR_VMX_VMFUNC_EPT_SWITCHING,
+         .xlevel = 0x80000008,
+         .model_id = "Intel Core Processor (Icelake)",
++        .versions = (X86CPUVersionDefinition[]) {
++            { .version = 1 },
++            {
++                .version = 2,
++                .props = (PropValue[]) {
++                    { "hle", "off" },
++                    { "rtm", "off" },
++                    { /* end of list */ }
++                },
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name = "Icelake-Server",
+@@ -3334,6 +3369,18 @@ static X86CPUDefinition builtin_x86_defs[] = {
+              VMX_SECONDARY_EXEC_ENABLE_VMFUNC | VMX_SECONDARY_EXEC_SHADOW_VMCS,
+         .xlevel = 0x80000008,
+         .model_id = "Intel Xeon Processor (Icelake)",
++        .versions = (X86CPUVersionDefinition[]) {
++            { .version = 1 },
++            {
++                .version = 2,
++                .props = (PropValue[]) {
++                    { "hle", "off" },
++                    { "rtm", "off" },
++                    { /* end of list */ }
++                },
++            },
++            { /* end of list */ }
++        }
+     },
+     {
+         .name = "Denverton",
 -- 
 1.8.3.1
 
