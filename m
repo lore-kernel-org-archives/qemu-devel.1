@@ -2,65 +2,63 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF0CC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 01:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ACC8C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 01:40:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D9C720878
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 01:29:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D9C720878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 0611220730
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 01:40:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="WYMUpcvf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0611220730
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXbHz-0007Hr-LN
-	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 20:29:43 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37448)
+	id 1iXbS9-0000uM-3f
+	for qemu-devel@archiver.kernel.org; Wed, 20 Nov 2019 20:40:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38306)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iXbGX-0006IN-LO
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 20:28:14 -0500
+ (envelope-from <dgibson@ozlabs.org>) id 1iXbR7-0008OB-5W
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 20:39:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iXbGV-0006ty-J2
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 20:28:12 -0500
-Received: from mga18.intel.com ([134.134.136.126]:26299)
+ (envelope-from <dgibson@ozlabs.org>) id 1iXbR5-0006Qh-G4
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 20:39:08 -0500
+Received: from ozlabs.org ([203.11.71.1]:38223)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iXbGV-0006sd-Ar
- for qemu-devel@nongnu.org; Wed, 20 Nov 2019 20:28:11 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 20 Nov 2019 17:28:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,224,1571727600"; d="scan'208";a="357635556"
-Received: from txu2-mobl.ccr.corp.intel.com (HELO [10.239.197.13])
- ([10.239.197.13])
- by orsmga004.jf.intel.com with ESMTP; 20 Nov 2019 17:28:04 -0800
-Subject: Re: [PATCH v16 11/14] hmat acpi: Build System Locality Latency and
- Bandwidth Information Structure(s)
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20191115075352.17734-1-tao3.xu@intel.com>
- <20191115075352.17734-12-tao3.xu@intel.com>
- <20191120110939.7c60b184@redhat.com>
-From: Tao Xu <tao3.xu@intel.com>
-Message-ID: <b684f71c-bdab-8941-31bf-e0dc7e701a3f@intel.com>
-Date: Thu, 21 Nov 2019 09:28:03 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.1
+ (Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1iXbR4-0006OO-OW
+ for qemu-devel@nongnu.org; Wed, 20 Nov 2019 20:39:07 -0500
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 47JMfZ2jmxz9sPV; Thu, 21 Nov 2019 12:39:02 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1574300342;
+ bh=3RWkHYwhMluUL1KdAL2uSn7QZlQszsw+t+2wFzycclU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=WYMUpcvfKizE+Nj4iuqvLi4e4LUTsbbrysyBINEiuB3DCXYtITMRpTqggaDLegb53
+ c0EyhX/jLKXg6097DvHM2uPWqbgbwWrS7vRnU37/09+HL4Uyg5JcaghX0I6IjNbpNz
+ zEaMIie2CzVa3R9XgeiDeoyclhH+PmRXkrqZJ0x0=
+Date: Thu, 21 Nov 2019 12:26:28 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Laurent Vivier <lvivier@redhat.com>
+Subject: Re: [PATCH] pseries: fix migration-test and pxe-test
+Message-ID: <20191121012628.GO5582@umbus.fritz.box>
+References: <20191120142539.236279-1-lvivier@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191120110939.7c60b184@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.126
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="+qeiGE2Ip5triyhT"
+Content-Disposition: inline
+In-Reply-To: <20191120142539.236279-1-lvivier@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 203.11.71.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,191 +70,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "lvivier@redhat.com" <lvivier@redhat.com>,
- "thuth@redhat.com" <thuth@redhat.com>,
- "ehabkost@redhat.com" <ehabkost@redhat.com>, "mst@redhat.com" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "Liu,
- Jingqi" <jingqi.liu@intel.com>, "Du, Fan" <fan.du@intel.com>,
- "mdroth@linux.vnet.ibm.com" <mdroth@linux.vnet.ibm.com>,
- "armbru@redhat.com" <armbru@redhat.com>,
- "jonathan.cameron@huawei.com" <jonathan.cameron@huawei.com>
+Cc: Thomas Huth <thuth@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/20/2019 6:09 PM, Igor Mammedov wrote:
-> On Fri, 15 Nov 2019 15:53:49 +0800
-> Tao Xu <tao3.xu@intel.com> wrote:
-> 
->> From: Liu Jingqi <jingqi.liu@intel.com>
->>
->> This structure describes the memory access latency and bandwidth
->> information from various memory access initiator proximity domains.
->> The latency and bandwidth numbers represented in this structure
->> correspond to rated latency and bandwidth for the platform.
->> The software could use this information as hint for optimization.
->>
->> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
->> Signed-off-by: Tao Xu <tao3.xu@intel.com>
->> ---
->>
->> Changes in v16:
->>      - Add more description for lb_length (Igor)
->>      - Drop entry_list and calculate entries in this patch (Igor)
->>
->> Changes in v13:
->>      - Calculate the entries in a new patch.
->> ---
->>   hw/acpi/hmat.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 104 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
->> index 9ff79308a4..ed19ebed2f 100644
->> --- a/hw/acpi/hmat.c
->> +++ b/hw/acpi/hmat.c
->> @@ -25,8 +25,10 @@
->>    */
->>   
->>   #include "qemu/osdep.h"
->> +#include "qemu/units.h"
->>   #include "sysemu/numa.h"
->>   #include "hw/acpi/hmat.h"
->> +#include "qemu/error-report.h"
-> 
-> do you really need this header in this patch?
-> 
 
-I will drop this header in next version
-> 
-> modulo above nit, patch looks good so
-> with above fixed (if necessary)
-> 
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> 
->>   
->>   /*
->>    * ACPI 6.3:
->> @@ -67,11 +69,89 @@ static void build_hmat_mpda(GArray *table_data, uint16_t flags,
->>       build_append_int_noprefix(table_data, 0, 8);
->>   }
->>   
->> +/*
->> + * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
->> + * Structure: Table 5-146
->> + */
->> +static void build_hmat_lb(GArray *table_data, HMAT_LB_Info *hmat_lb,
->> +                          uint32_t num_initiator, uint32_t num_target,
->> +                          uint32_t *initiator_list)
->> +{
->> +    int i, index;
->> +    HMAT_LB_Data *lb_data;
->> +    uint16_t *entry_list;
->> +    uint32_t base;
->> +    /* Length in bytes for entire structure */
->> +    uint32_t lb_length
->> +        = 32 /* Table length upto and including Entry Base Unit */
->> +        + 4 * num_initiator /* Initiator Proximity Domain List */
->> +        + 4 * num_target /* Target Proximity Domain List */
->> +        + 2 * num_initiator * num_target; /* Latency or Bandwidth Entries */
->> +
->> +    /* Type */
->> +    build_append_int_noprefix(table_data, 1, 2);
->> +    /* Reserved */
->> +    build_append_int_noprefix(table_data, 0, 2);
->> +    /* Length */
->> +    build_append_int_noprefix(table_data, lb_length, 4);
->> +    /* Flags: Bits [3:0] Memory Hierarchy, Bits[7:4] Reserved */
->> +    assert(!(hmat_lb->hierarchy >> 4));
->> +    build_append_int_noprefix(table_data, hmat_lb->hierarchy, 1);
->> +    /* Data Type */
->> +    build_append_int_noprefix(table_data, hmat_lb->data_type, 1);
->> +    /* Reserved */
->> +    build_append_int_noprefix(table_data, 0, 2);
->> +    /* Number of Initiator Proximity Domains (s) */
->> +    build_append_int_noprefix(table_data, num_initiator, 4);
->> +    /* Number of Target Proximity Domains (t) */
->> +    build_append_int_noprefix(table_data, num_target, 4);
->> +    /* Reserved */
->> +    build_append_int_noprefix(table_data, 0, 4);
->> +
->> +    /* Entry Base Unit */
->> +    if (hmat_lb->data_type <= HMAT_LB_DATA_WRITE_LATENCY) {
->> +        /* Convert latency base from nanoseconds to picosecond */
->> +        base = hmat_lb->base * 1000;
->> +    } else {
->> +        /* Convert bandwidth base from Byte to Megabyte */
->> +        base = hmat_lb->base / MiB;
->> +    }
->> +    build_append_int_noprefix(table_data, base, 8);
->> +
->> +    /* Initiator Proximity Domain List */
->> +    for (i = 0; i < num_initiator; i++) {
->> +        build_append_int_noprefix(table_data, initiator_list[i], 4);
->> +    }
->> +
->> +    /* Target Proximity Domain List */
->> +    for (i = 0; i < num_target; i++) {
->> +        build_append_int_noprefix(table_data, i, 4);
->> +    }
->> +
->> +    /* Latency or Bandwidth Entries */
->> +    entry_list = g_malloc0(hmat_lb->list->len * sizeof(uint16_t));
->> +    for (i = 0; i < hmat_lb->list->len; i++) {
->> +        lb_data = &g_array_index(hmat_lb->list, HMAT_LB_Data, i);
->> +        index = lb_data->initiator * num_target + lb_data->target;
->> +
->> +        entry_list[index] = (uint16_t)(lb_data->data / hmat_lb->base);
->> +    }
->> +
->> +    for (i = 0; i < num_initiator * num_target; i++) {
->> +        build_append_int_noprefix(table_data, entry_list[i], 2);
->> +    }
->> +
->> +    g_free(entry_list);
->> +}
->> +
->>   /* Build HMAT sub table structures */
->>   static void hmat_build_table_structs(GArray *table_data, NumaState *numa_state)
->>   {
->>       uint16_t flags;
->> -    int i;
->> +    uint32_t num_initiator = 0;
->> +    uint32_t initiator_list[MAX_NODES];
->> +    int i, hierarchy, type;
->> +    HMAT_LB_Info *hmat_lb;
->>   
->>       for (i = 0; i < numa_state->num_nodes; i++) {
->>           flags = 0;
->> @@ -82,6 +162,29 @@ static void hmat_build_table_structs(GArray *table_data, NumaState *numa_state)
->>   
->>           build_hmat_mpda(table_data, flags, numa_state->nodes[i].initiator, i);
->>       }
->> +
->> +    for (i = 0; i < numa_state->num_nodes; i++) {
->> +        if (numa_state->nodes[i].has_cpu) {
->> +            initiator_list[num_initiator++] = i;
->> +        }
->> +    }
->> +
->> +    /*
->> +     * ACPI 6.3: 5.2.27.4 System Locality Latency and Bandwidth Information
->> +     * Structure: Table 5-146
->> +     */
->> +    for (hierarchy = HMAT_LB_MEM_MEMORY;
->> +         hierarchy <= HMAT_LB_MEM_CACHE_3RD_LEVEL; hierarchy++) {
->> +        for (type = HMAT_LB_DATA_ACCESS_LATENCY;
->> +             type <= HMAT_LB_DATA_WRITE_BANDWIDTH; type++) {
->> +            hmat_lb = numa_state->hmat_lb[hierarchy][type];
->> +
->> +            if (hmat_lb) {
->> +                build_hmat_lb(table_data, hmat_lb, num_initiator,
->> +                              numa_state->num_nodes, initiator_list);
->> +            }
->> +        }
->> +    }
->>   }
->>   
->>   void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_state)
-> 
+--+qeiGE2Ip5triyhT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Nov 20, 2019 at 03:25:39PM +0100, Laurent Vivier wrote:
+> Commit 29cb4187497d ("spapr: Set VSMT to smp_threads by default")
+> has introduced a new default value for VSMT that is not supported
+> by old kernels (before 4.13 kernel) and this breaks "make check"
+> on these kernels.
+>=20
+> To fix that, explicitly set in the involved tests the value that was
+> used as the default value before the change.
+>=20
+> Cc: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+
+Applied to ppc-for-4.2, thanks.
+
+> ---
+>  tests/migration-test.c | 4 ++--
+>  tests/pxe-test.c       | 6 +++---
+>  2 files changed, 5 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/tests/migration-test.c b/tests/migration-test.c
+> index ac780dffdaad..ebd77a581aff 100644
+> --- a/tests/migration-test.c
+> +++ b/tests/migration-test.c
+> @@ -614,7 +614,7 @@ static int test_migrate_start(QTestState **from, QTes=
+tState **to,
+>          end_address =3D S390_TEST_MEM_END;
+>      } else if (strcmp(arch, "ppc64") =3D=3D 0) {
+>          extra_opts =3D use_shmem ? get_shmem_opts("256M", shmem_path) : =
+NULL;
+> -        cmd_src =3D g_strdup_printf("-machine accel=3D%s -m 256M -nodefa=
+ults"
+> +        cmd_src =3D g_strdup_printf("-machine accel=3D%s,vsmt=3D8 -m 256=
+M -nodefaults"
+>                                    " -name source,debug-threads=3Don"
+>                                    " -serial file:%s/src_serial"
+>                                    " -prom-env 'use-nvramrc?=3Dtrue' -pro=
+m-env "
+> @@ -623,7 +623,7 @@ static int test_migrate_start(QTestState **from, QTes=
+tState **to,
+>                                    "until' %s %s",  accel, tmpfs, end_add=
+ress,
+>                                    start_address, extra_opts ? extra_opts=
+ : "",
+>                                    opts_src);
+> -        cmd_dst =3D g_strdup_printf("-machine accel=3D%s -m 256M"
+> +        cmd_dst =3D g_strdup_printf("-machine accel=3D%s,vsmt=3D8 -m 256=
+M"
+>                                    " -name target,debug-threads=3Don"
+>                                    " -serial file:%s/dest_serial"
+>                                    " -incoming %s %s %s",
+> diff --git a/tests/pxe-test.c b/tests/pxe-test.c
+> index 948b0fbdc727..aaae54f7550d 100644
+> --- a/tests/pxe-test.c
+> +++ b/tests/pxe-test.c
+> @@ -46,15 +46,15 @@ static testdef_t x86_tests_slow[] =3D {
+> =20
+>  static testdef_t ppc64_tests[] =3D {
+>      { "pseries", "spapr-vlan",
+> -      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken" },
+> +      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken,vsm=
+t=3D8" },
+>      { "pseries", "virtio-net-pci",
+> -      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken" },
+> +      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken,vsm=
+t=3D8" },
+>      { NULL },
+>  };
+> =20
+>  static testdef_t ppc64_tests_slow[] =3D {
+>      { "pseries", "e1000",
+> -      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken" },
+> +      "-machine cap-cfpc=3Dbroken,cap-sbbc=3Dbroken,cap-ibs=3Dbroken,vsm=
+t=3D8" },
+>      { NULL },
+>  };
+> =20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--+qeiGE2Ip5triyhT
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3V58EACgkQbDjKyiDZ
+s5JKPBAA1T3RWyHkWADFnbUaE5IkDPSKryODrU7Gz6b/XKECw31xDcPYWmCpk0Le
+I+TfYhCyfLjPKwOSCJ22JOG7CMxKcEI1mVHgIjovotCG5lYxgslbCuyFRir/9Gqj
+7PKtwsv9rGIbgjQfoTS/OSCLzA78tl16JeIo9ce9+H6ECNypKGMR+Om0LRIFPXQ3
+l4W8jvFFsqNEIdedmAnlp+gEZjkCEl+14UVv2bl9/K3Di9XJ9Ijf7dj0kpjogKCf
+Sj18/1hnreYB0UOsqSpbqriKaix3LrFb/SitGO6E4zfuK2IGGWtYPJJKc7SmRGAR
+xJuGsbeRdS6wXcGi0NEU6TLzuYN80UKjcSPbN5dHbORjyK2PTQKhmgjo6ClaT6ZK
+YLk533/pQ586I54Qlf3s0jacv582cbbNGaN0E+hWyyN+8rnksmcJKYtaqfAbRNl9
+O/vcbKmhtEYoT+vRXm3N7OlbdcPWmDYt1FFKyymBXQYJnVtMuGC4kRU7mO+RzehE
+NqvKP2Hh0+gTD2MpWwNcVoyTmx80EB6PstmPR95FSmImnXO4+a9O2DKBqJuXj7jo
+ijEAMlm2l7k34OztOPaInlNIx9WrxiRBrVYPJC5bxnCxLZPfhk5UWU5YpHPy26Hx
+uFpMyEdwP5AslluqNj1MRAVGbCibz/se733OvKHB1Xdwq4JqSx4=
+=1LA6
+-----END PGP SIGNATURE-----
+
+--+qeiGE2Ip5triyhT--
 
