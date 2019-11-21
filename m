@@ -2,90 +2,87 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58814C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DB3C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:08:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 225A620855
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:06:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B54B2073F
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:08:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="od6R9XHn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 225A620855
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jby3pZbZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B54B2073F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXlEF-0001OS-7q
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 07:06:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37412)
+	id 1iXlG1-0003Q2-Gw
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 07:08:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37557)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <richard.henderson@linaro.org>) id 1iXlCn-0008Vw-6d
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:05:02 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iXlCv-0000FL-NQ
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:05:10 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <richard.henderson@linaro.org>) id 1iXlCm-0007qI-2j
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:05:00 -0500
-Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:38105)
+ (envelope-from <stefanha@gmail.com>) id 1iXlCu-00081D-IF
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:05:09 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51653)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
- id 1iXlCl-0007pu-S1
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:05:00 -0500
-Received: by mail-il1-x141.google.com with SMTP id u17so3012537ilq.5
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 04:04:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=i7HCJorl23pNbxxgf8KYDfR2k9rJ+ABzj44MlG/OcTo=;
- b=od6R9XHnnuRjbCnJKizs5X1PnAS47mJq0W7GM55qNm7vPJHG4vw8OqsgAcBVslNGuy
- di98k8Z80xSG4EBkk22dGAULy8ik+pIbCviXaPeRt37G6jeNAkU2ky6wgNFZBP4eC1rv
- TjUDSwiFX0woT75u1cALLvxWcN64m0RWwrWlueJtNmlp+lV7grZP9Q7vBwpctQRKNewp
- PkGk//TpyzgeEMKIvJZcCQ4mgfLcOjAphyWbmlLdLS+xiqYsVhNcVYUg1gL+LzMw6RUX
- FnqZwJ9ziqZunBruhvWROtWuvTqMogzFDjN4RtjufgLZUoAotSxd7QH7Uo8qiKZHK1Ad
- QQlA==
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iXlCu-0007xy-Ah
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:05:08 -0500
+Received: by mail-wm1-x343.google.com with SMTP id g206so3161622wme.1
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 04:05:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=vkbc4EaaPPNklPpPrxrPo7vNcXH2XKi9AJPnSujmXvw=;
+ b=jby3pZbZBApLcCJGjMWvjENA8DkWIoDpFnLlb6u9Nsyqrik5DPbB9IQDwAtVwfPZ9E
+ eMTqZ6tBqUk1rFeO7oyvEmrXT2s/qtEZKYnQpDCDHJUcDE7JeNJUdLb+FN1yRfggbPc3
+ aEG2HjjXckSaCgRIYWo9DmrHcvDafoZxM8DgKcsp7+DNkbZf9XOvuG0TpKRvnOkDtBhj
+ gvgAn1uvJQaQU9Imv8AcjQpVenhpGBogPTcYMUybIzt9r2PF8wq6FDgZWs77uNZpfVFj
+ cLUH3aLi3RMg/YhkgbG/xZnB5OwX4uFXSFoORf2fwLdJzkQm7GsA7qkoLl68NliXCqmu
+ 5Wzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=i7HCJorl23pNbxxgf8KYDfR2k9rJ+ABzj44MlG/OcTo=;
- b=hd4uFSutDZBE6caCkvlBgQDGjwOCJcfJ0L9SgUWYtbtJMYy9fZeOMh0KaRvpcAi/zk
- GJpTwywpXuitSfrBXFZh0SLhGrjmU25LCHwT5HIO6Nk/0fu5OTbf+OfbUoHA4UteVqMr
- I6XE01Clo5PF7xMmBrVVPEqiMfb5MAB3EJlzpek4Bp4lYCMiZKRbD2O2p1UEnQK/Zkh4
- OZJPprRUhnU2C60E8/cO/++uEiTEKnQuePMRo4hRfGMX6ZYkI3FzY7gOCxzBzGRhcync
- UqNG7fOkCRRw+nokxNKrxwH+vCZtZ8tzvi0uLGNYQALiwktK8RoefYdER7BbXcs3kTpU
- o4xQ==
-X-Gm-Message-State: APjAAAUv9jQg0xsNuAjFTJossTm3c9nzT3/WzqiWwnaok6+J0c/9qfRd
- Tg7pXdyInzgdwbX+zIRp9IQb8ezeyXdMOA==
-X-Google-Smtp-Source: APXvYqxKXQ+uhnSnk7jIL9l5HluIsjLK8v3o4abPPOlQptMmJfMtMwl8c9PCWOwcyRKnttYmI8/ikw==
-X-Received: by 2002:a92:9a17:: with SMTP id t23mr9757392ili.40.1574337899105; 
- Thu, 21 Nov 2019 04:04:59 -0800 (PST)
-Received: from [192.168.44.35] ([172.58.139.152])
- by smtp.gmail.com with ESMTPSA id l63sm810544ioa.19.2019.11.21.04.04.56
- (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 21 Nov 2019 04:04:58 -0800 (PST)
-Subject: Re: [PATCH v2] linux-user/strace: Add missing signal strings
-To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
-References: <20191120145555.GA15154@ls3530.fritz.box>
-From: Richard Henderson <richard.henderson@linaro.org>
-Openpgp: preference=signencrypt
-Message-ID: <17b6f4ce-5d71-9ab8-ffc6-f2ab0109e8a7@linaro.org>
-Date: Thu, 21 Nov 2019 13:04:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=vkbc4EaaPPNklPpPrxrPo7vNcXH2XKi9AJPnSujmXvw=;
+ b=dtIagYaHn3EAUTWji+2trg7riwn/QebHfmfYjeHiDETuSzZAAWMhpCVDbskqPrL4La
+ F64Zi6ZbKPZKkI1cLukNcIuy9AeFoyjKcGtMMI0u26uDknNjznG0lFcruv8cWYn88Neq
+ b+FcCCnznpuslSYY8xg2ZJovrGmyqJsQLxcW2yfnWwoRh4HhI+qXeYFD+SAmZtS4dKV9
+ cHKCbnMugewF8Br8ntcMvdeQs9xIePv2O7iN84aL8edPQUfvEBhYs+UcwiiKbFYaaTE6
+ Tk9slfRlvmRVkOi5wofo97gYLOhZWSWNiZtoJ/6f5gdhnQOI/XEUf+eN39gKIcmxZakx
+ LaCw==
+X-Gm-Message-State: APjAAAUp6uHVyCsk97oReHTMxuB+0EbVYpNHS9Jgveu1GoJ7+LnsRemo
+ 7/jMW0ASa2+ikHpW4PtNZgc=
+X-Google-Smtp-Source: APXvYqwFhE3thlvvXrrwhAIUNN2dtcJf3+cEpCJMdQrw74CI6Am4A9EP16NdUX131fgDDSy963WNAg==
+X-Received: by 2002:a7b:cf27:: with SMTP id m7mr9671496wmg.45.1574337906753;
+ Thu, 21 Nov 2019 04:05:06 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id s11sm3004901wrr.43.2019.11.21.04.05.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 21 Nov 2019 04:05:05 -0800 (PST)
+Date: Thu, 21 Nov 2019 12:05:04 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Subject: Re: [RFC v4 PATCH 19/49] multi-process: configure remote side devices
+Message-ID: <20191121120504.GN439743@stefanha-x1.localdomain>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+ <f36f81254336de4efb71b4869bd3c9e02d328392.1571905346.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20191120145555.GA15154@ls3530.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="6o78gXsyQHm68LY/"
+Content-Disposition: inline
+In-Reply-To: <f36f81254336de4efb71b4869bd3c9e02d328392.1571905346.git.jag.raman@oracle.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::141
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -97,19 +94,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com, mst@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, stefanha@redhat.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/20/19 3:55 PM, Helge Deller wrote:
-> Add the textual representations of some missing target signals.
-> 
-> Signed-off-by: Helge Deller <deller@gmx.de>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+--6o78gXsyQHm68LY/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+On Thu, Oct 24, 2019 at 05:09:00AM -0400, Jagannathan Raman wrote:
+> +static void set_remote_opts(PCIDevice *dev, QDict *qdict, unsigned int cmd)
+> +{
+> +    QString *qstr;
+> +    MPQemuMsg msg;
+> +    const char *str;
+> +    PCIProxyDev *pdev;
+> +
+> +    pdev = PCI_PROXY_DEV(dev);
+> +
+> +    qstr = qobject_to_json(QOBJECT(qdict));
 
-r~
+qstr is leaked.
+
+> +    str = qstring_get_str(qstr);
+> +
+> +    memset(&msg, 0, sizeof(MPQemuMsg));
+> +
+> +    msg.data2 = (uint8_t *)str;
+> +    msg.cmd = cmd;
+> +    msg.bytestream = 1;
+> +    msg.size = qstring_get_length(qstr) + 1;
+> +    msg.num_fds = 0;
+> +
+> +    mpqemu_msg_send(pdev->mpqemu_link, &msg, pdev->mpqemu_link->com);
+> +
+> +    return;
+> +}
+
+--6o78gXsyQHm68LY/
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3WfW8ACgkQnKSrs4Gr
+c8gYBwgAkPvk+VuQ64HojuuUOnIGeAVvSUuNEkUu0kcFvm6TkNbDliiHmEiJAMPC
+GD5+f60FKqsm/xf4eU25MHwZh0GofjJHjUQnA0tVmg/wSNWaDtF2zjgcVRY2FLAT
+HwO5uIOA3RYNqbYRl1+tFcmz4eoUSvaoHe86j97qCX6fnoHJkKcUq5uWiqr6sA+a
+FwHyfoZ61eU0KAqVISCciqVJzK0FM87h1JILY0YUzyBjHxkK3ykvdU14KRoDqPry
+Ud1FOAJtcititVPxZhRelHx7Ltzng4hpPJ9QE6YO8NOVnqdZm2jPMf5ydEMFhO7f
+Xl/ZTG/YojmGMbM2vq24ek71l5FRsA==
+=COoX
+-----END PGP SIGNATURE-----
+
+--6o78gXsyQHm68LY/--
 
