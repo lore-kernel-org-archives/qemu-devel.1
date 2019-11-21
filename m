@@ -2,140 +2,67 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6AE2C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:14:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E647EC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:17:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0FE020748
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:14:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0FE020748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7690D2071C
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:17:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7690D2071C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXiXv-00035E-OT
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 04:14:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32969)
+	id 1iXiaj-00051p-Ba
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 04:17:33 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33415)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iXiWy-0002PI-A2
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:13:41 -0500
+ (envelope-from <clg@kaod.org>) id 1iXiZk-0004FW-1U
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iXiWx-00016C-1y
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:13:40 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43900)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iXiWw-000160-Qi
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:13:39 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xAL9DEqD027309
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 04:13:37 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wdhw91wf0-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 04:13:37 -0500
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 21 Nov 2019 09:13:35 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 21 Nov 2019 09:13:32 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xAL9DUV448955490
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 21 Nov 2019 09:13:30 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8AB2411C04A;
- Thu, 21 Nov 2019 09:13:30 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1DD1B11C04C;
- Thu, 21 Nov 2019 09:13:30 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.161.200])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 21 Nov 2019 09:13:30 +0000 (GMT)
-Subject: Re: [PATCH 00/15] s390x: Protected Virtualization support
-To: Cornelia Huck <cohuck@redhat.com>
-References: <20191120114334.2287-1-frankja@linux.ibm.com>
- <20191120142627.39d041fe.cohuck@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Thu, 21 Nov 2019 10:13:29 +0100
+ (envelope-from <clg@kaod.org>) id 1iXiZi-0003Nb-QA
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:31 -0500
+Received: from 1.mo178.mail-out.ovh.net ([178.33.251.53]:47826)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iXiZi-0003Ll-IR
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:30 -0500
+Received: from player688.ha.ovh.net (unknown [10.109.146.163])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id A804D82C2F
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 10:16:20 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player688.ha.ovh.net (Postfix) with ESMTPSA id EFD33C49027D;
+ Thu, 21 Nov 2019 09:16:15 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 v5 11/23] ppc/pnv: Introduce a
+ pnv_xive_is_cpu_enabled() helper
+To: Greg Kurz <groug@kaod.org>
+References: <20191115162436.30548-1-clg@kaod.org>
+ <20191115162436.30548-12-clg@kaod.org> <20191120182612.3069e279@bahia.lan>
+ <4549a66b-5db6-5a71-87a2-3c126fa4db6b@kaod.org>
+ <20191121085856.0344fac5@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <639848d3-8621-13e4-6e4b-1716b9c54372@kaod.org>
+Date: Thu, 21 Nov 2019 10:16:14 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191120142627.39d041fe.cohuck@redhat.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20191121085856.0344fac5@bahia.lan>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19112109-0008-0000-0000-000003359AB4
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112109-0009-0000-0000-00004A54C2E9
-Message-Id: <754ae692-a6d8-8a94-e687-3a01218e0381@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-21_01:2019-11-20,2019-11-21 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501
- adultscore=0 malwarescore=0 impostorscore=0 lowpriorityscore=0
- phishscore=0 clxscore=1015 bulkscore=0 spamscore=0 mlxscore=0
- mlxlogscore=814 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-1911210082
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+X-Ovh-Tracer-Id: 6189071789202246483
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehvddgtdefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrheikeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 178.33.251.53
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -147,20 +74,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
- qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mihajlov@linux.ibm.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/20/19 2:26 PM, Cornelia Huck wrote:
-> On Wed, 20 Nov 2019 06:43:19 -0500
-> Janosch Frank <frankja@linux.ibm.com> wrote:
-> 
-> Do you have a branch with this somewhere?
+On 21/11/2019 08:58, Greg Kurz wrote:
+> On Wed, 20 Nov 2019 22:40:31 +0100
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> On 20/11/2019 18:26, Greg Kurz wrote:
+>>> On Fri, 15 Nov 2019 17:24:24 +0100
+>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>>>
+>>>> and use this helper to exclude CPUs which are not enabled in the XIV=
+E
+>>>> controller.
+>>>>
+>>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>>> ---
+>>>>  hw/intc/pnv_xive.c | 18 ++++++++++++++++++
+>>>>  1 file changed, 18 insertions(+)
+>>>>
+>>>> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+>>>> index 71ca4961b6b1..4c8c6e51c20f 100644
+>>>> --- a/hw/intc/pnv_xive.c
+>>>> +++ b/hw/intc/pnv_xive.c
+>>>> @@ -372,6 +372,20 @@ static int pnv_xive_get_eas(XiveRouter *xrtr, u=
+int8_t blk, uint32_t idx,
+>>>>      return pnv_xive_vst_read(xive, VST_TSEL_IVT, blk, idx, eas);
+>>>>  }
+>>>> =20
+>>>> +static int cpu_pir(PowerPCCPU *cpu)
+>>>> +{
+>>>> +    CPUPPCState *env =3D &cpu->env;
+>>>> +    return env->spr_cb[SPR_PIR].default_value;
+>>>> +}
+>>>> +
+>>>> +static bool pnv_xive_is_cpu_enabled(PnvXive *xive, PowerPCCPU *cpu)
+>>>> +{
+>>>> +    int pir =3D cpu_pir(cpu);
+>>>> +    int thrd_id =3D pir & 0x7f;
+>>>> +
+>>>> +    return xive->regs[PC_THREAD_EN_REG0 >> 3] & PPC_BIT(thrd_id);
+>>>
+>>> A similar check is open-coded in pnv_xive_get_indirect_tctx() :
+>>>
+>>>     /* Check that HW thread is XIVE enabled */
+>>>     if (!(xive->regs[PC_THREAD_EN_REG0 >> 3] & PPC_BIT(pir & 0x3f))) =
+{
+>>>         xive_error(xive, "IC: CPU %x is not enabled", pir);
+>>>     }
+>>>
+>>> The thread id is only the 6 lower bits of the PIR there, and so seems=
+ to
+>>> indicate the skiboot sources:
+>>>
+>>>         /* Get bit in register */
+>>>         bit =3D c->pir & 0x3f;
+>>
+>> skiboot uses 0x3f when enabling the TCTXT of a CPU because register
+>> INT_TCTXT_EN0 covers cores 0-15 (normal) and 0-7 (fused) and=20
+>> register INT_TCTXT_EN1 covers cores 16-23 (normal) and 8-11 (fused).=20
+>> The encoding in the registers is a bit different.
+>>
+>>> Why make it pir & 0x7f here ?=20
+>>
+>> See pnv_chip_core_pir_p9 comments for some details on the CPU ID=20
+>> layout.
+>>
+>=20
+> *   57:61  Core number
+> *   62:63  Thread ID
+>=20
+> Ok, so the CPU ID within the socket is 7 bits, ie. pir & 0x7f
+>=20
+>>> If it should actually be 0x3f,=20
+>> but yes, we should fix the mask in the register setting.=20
+>>
+>>> maybe also use the helper in pnv_xive_get_indirect_tctx().
+>>
+>> This is getting changed later on. So I rather not.
+>>
+>=20
+> I don't see any later change there, neither in this series,=20
 
-Just for you:
-https://github.com/frankjaa/qemu/tree/protvirt
+Patch "ppc/pnv: Clarify how the TIMA is accessed on a multichip system"
+
+changes a few things in that area.
+
+> nor in your powernv-4.2 on github, but nevermind, this patch is
+> good enough for the purpose of CAM line matching.
+
+Yes. It could be better though and it's a localized change.=20
+
+the INT_TCTXT_EN0 (PC_THREAD_EN_REG0) needs a small fix on the mask.=20
+We don't use the EN1 register also for cores > 15.=20
+
+It works today because we don't start the machine with all the=20
+possible cores. Although it should be possible to start a QEMU=20
+PowerNV machine with 24 cores on each socket.=20
+
+
+I would like to have stricter checks on CAM line accesses because
+it is an OS interface. The INT_TCTXT_EN0 (PC_THREAD_EN_REG0) is=20
+the first level (HW) but we need to check also the 'V' bit of=20
+each ring. That's more complex. For later.
+
+
+C.=20
+
+
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
+>> C.
+>>
+>>>
+>>>> +}
+>>>> +
+>>>>  static int pnv_xive_match_nvt(XivePresenter *xptr, uint8_t format,
+>>>>                                uint8_t nvt_blk, uint32_t nvt_idx,
+>>>>                                bool cam_ignore, uint8_t priority,
+>>>> @@ -393,6 +407,10 @@ static int pnv_xive_match_nvt(XivePresenter *xp=
+tr, uint8_t format,
+>>>>              XiveTCTX *tctx;
+>>>>              int ring;
+>>>> =20
+>>>> +            if (!pnv_xive_is_cpu_enabled(xive, cpu)) {
+>>>> +                continue;
+>>>> +            }
+>>>> +
+>>>>              tctx =3D XIVE_TCTX(pnv_cpu_state(cpu)->intc);
+>>>> =20
+>>>>              /*
+>>>
+>>
+>=20
 
 
