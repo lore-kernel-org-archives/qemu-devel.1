@@ -2,59 +2,98 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 377C7C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 16:24:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D5C2C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 16:35:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DCC520692
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 16:24:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DCC520692
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3369520692
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 16:35:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ox06IR1i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3369520692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXpG2-0008CW-9c
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 11:24:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59175)
+	id 1iXpQs-0003Ph-6n
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 11:35:50 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60676)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iXpFN-0007d8-5x
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 11:23:58 -0500
+ (envelope-from <philmd@redhat.com>) id 1iXpPY-0002rl-Hq
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 11:34:29 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iXpFL-0006lB-JO
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 11:23:56 -0500
-Received: from 16.mo6.mail-out.ovh.net ([87.98.139.208]:59857)
+ (envelope-from <philmd@redhat.com>) id 1iXpPW-0003MM-LF
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 11:34:27 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41836
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iXpFL-0006kN-9a
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 11:23:55 -0500
-Received: from player762.ha.ovh.net (unknown [10.109.143.18])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id B32151EDEB5
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 17:23:52 +0100 (CET)
-Received: from kaod.org (deibp9eh1--blueice1n4.emea.ibm.com [195.212.29.166])
- (Authenticated sender: clg@kaod.org)
- by player762.ha.ovh.net (Postfix) with ESMTPSA id 569F1C65F010;
- Thu, 21 Nov 2019 16:23:46 +0000 (UTC)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: [PATCH v2] ppc/pnv: Create BMC devices at machine init
-Date: Thu, 21 Nov 2019 17:23:40 +0100
-Message-Id: <20191121162340.11049-1-clg@kaod.org>
-X-Mailer: git-send-email 2.21.0
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iXpPW-0003M6-Hs
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 11:34:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574354065;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=N+ziACe92S7Dz27GKtoh+aKNMOQv49VtWVAUKXA0tlU=;
+ b=Ox06IR1ipdZAUKoSUbyp1oGZYkc2qWPBECm8E711qsiurrsq2a9IHn3tu+SBOzBQlwck5s
+ h26KUshWQtzUchotnbUxfxL4l0M1QfDU5BQaHGJPdzKxW2XVW14bLY6My/tGOzVZU8qDmJ
+ 4fE1ObfU+ON07LBk3QE5IEoo94GoxDA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-2t9yfV_DNqmiplIpJ11T1g-1; Thu, 21 Nov 2019 11:34:24 -0500
+Received: by mail-wm1-f69.google.com with SMTP id g13so4410540wme.0
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 08:34:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=7UBG/fF0d2aaQQK5Nor+C1oyiW6gVKvtprtAflswiK8=;
+ b=jURRzbL9RMKBFvGxKqhFpLGZKc0S7jNyE6XzN2s+7ipYkQ/SIvWgPLD17PutaNH8SJ
+ aC63WSbkYIl0k65C85qfQMSB3iNSDAwHv2NAqrybm36yOZ+OyOKXY2DmBPCtvohJ9yzf
+ Wrfmg6TNGYVO5EDNahdUU4/rBkUuitRiqsF6mtKEXRQzit+tK+p73OqGcwxffYqK3wXj
+ U3Ft433tS6xHkwj9vyyiJomWAckvJwfijpO1JIzF2NTvBmP1VwkC+a0C31ojV9Q7G/g+
+ RSXO+n8+3cM9tr+Vxp9RzLge91w2Bi5QgInGgOnMRUhaUfjmFpFNgyn4P5dAp4av1SEE
+ GhCQ==
+X-Gm-Message-State: APjAAAW6knw/ikkFr//dA5q6xyLTJgizJOwTQktUr4OllBM/XC7PI6uT
+ fcrtGheckm9E7WhoJx5AKQwoCnicA0z1iJ8Qbc3pFUesNphXxa7T+K96r6W+LqVaZpi/BaRAenV
+ tnzSG16+V0TbPGJ4=
+X-Received: by 2002:a5d:4b08:: with SMTP id v8mr11207265wrq.338.1574354063098; 
+ Thu, 21 Nov 2019 08:34:23 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyBjOFbN6bSsbmJ8SlKqCHz+P5ejw9KX1EU8TWYuohUPpRvyfRdamMTpkxbCbBZYeuztu7VlA==
+X-Received: by 2002:a5d:4b08:: with SMTP id v8mr11207245wrq.338.1574354062932; 
+ Thu, 21 Nov 2019 08:34:22 -0800 (PST)
+Received: from [192.168.1.35] (131.red-88-21-102.staticip.rima-tde.net.
+ [88.21.102.131])
+ by smtp.gmail.com with ESMTPSA id s9sm158855wmj.22.2019.11.21.08.34.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 21 Nov 2019 08:34:22 -0800 (PST)
+Subject: Re: [PATCH v2] linux-user/strace: Add missing signal strings
+To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
+References: <20191120145555.GA15154@ls3530.fritz.box>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <373cddd6-d448-a130-bc01-20fb1272b5f6@redhat.com>
+Date: Thu, 21 Nov 2019 17:34:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Ovh-Tracer-Id: 13409467893351418854
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehvddgledtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffogggtgfesthekredtredtjeenucfhrhhomhepveorughrihgtucfnvgcuifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpudelhedrvdduvddrvdelrdduieeinecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejiedvrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
+In-Reply-To: <20191120145555.GA15154@ls3530.fritz.box>
+Content-Language: en-US
+X-MC-Unique: 2t9yfV_DNqmiplIpJ11T1g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 87.98.139.208
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -66,175 +105,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Corey Minyard <cminyard@mvista.com>,
- Oliver O'Halloran <oohall@gmail.com>, qemu-devel@nongnu.org,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The BMC of the OpenPOWER systems monitors the machine state using
-sensors, controls the power and controls the access to the PNOR flash
-device containing the firmware image required to boot the host.
+On 11/20/19 3:55 PM, Helge Deller wrote:
+> Add the textual representations of some missing target signals.
+>=20
+> Signed-off-by: Helge Deller <deller@gmx.de>
+>=20
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 3d4d684450..de43238fa4 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -146,6 +146,19 @@ print_signal(abi_ulong arg, int last)
+>       case TARGET_SIGSTOP: signal_name =3D "SIGSTOP"; break;
+>       case TARGET_SIGTTIN: signal_name =3D "SIGTTIN"; break;
+>       case TARGET_SIGTTOU: signal_name =3D "SIGTTOU"; break;
+> +    case TARGET_SIGIO: signal_name =3D "SIGIO"; break;
+> +    case TARGET_SIGBUS: signal_name =3D "SIGBUS"; break;
+> +    case TARGET_SIGPWR: signal_name =3D "SIGPWR"; break;
+> +    case TARGET_SIGURG: signal_name =3D "SIGURG"; break;
+> +    case TARGET_SIGSYS: signal_name =3D "SIGSYS"; break;
+> +    case TARGET_SIGTRAP: signal_name =3D "SIGTRAP"; break;
+> +    case TARGET_SIGXCPU: signal_name =3D "SIGXCPU"; break;
+> +    case TARGET_SIGPROF: signal_name =3D "SIGPROF"; break;
+> +    case TARGET_SIGTSTP: signal_name =3D "SIGTSTP"; break;
+> +    case TARGET_SIGXFSZ: signal_name =3D "SIGXFSZ"; break;
+> +    case TARGET_SIGWINCH: signal_name =3D "SIGWINCH"; break;
+> +    case TARGET_SIGVTALRM: signal_name =3D "SIGVTALRM"; break;
+> +    case TARGET_SIGSTKFLT: signal_name =3D "SIGSTKFLT"; break;
+>       }
+>       if (signal_name =3D=3D NULL) {
+>           print_raw_param("%ld", arg, last);
+>=20
 
-QEMU models the power cycle process, access to the sensors and access
-to the PNOR device. But, for these features to be available, the QEMU
-PowerNV machine needs two extras devices on the command line, an IPMI
-BT device for communication and a BMC backend device:
-
-  -device ipmi-bmc-sim,id=3Dbmc0 -device isa-ipmi-bt,bmc=3Dbmc0,irq=3D10
-
-The BMC properties are then defined accordingly in the device tree and
-OPAL self adapts. If a BMC device and an IPMI BT device are not
-available, OPAL does not try to communicate with the BMC in any
-manner. This is not how real systems behave.
-
-To be closer to the default behavior, create an IPMI BMC simulator
-device and an IPMI BT device at machine initialization time. We loose
-the ability to define an external BMC device but there are benefits:
-
-  - a better match with real systems,
-  - a better test coverage of the OPAL code,
-  - system powerdown and reset commands that work,
-  - a QEMU device tree compliant with the specifications (*).
-
-(*) Still needs a MBOX device.
-
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
-
- Changes since v1:
-
- - renamed ipmi_bt_init() to pnv_ipmi_bt_init()
-
- include/hw/ppc/pnv.h |  2 +-
- hw/ppc/pnv.c         | 33 ++++++++++++++++-----------------
- hw/ppc/pnv_bmc.c     | 20 +++++++++++++++++---
- 3 files changed, 34 insertions(+), 21 deletions(-)
-
-diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
-index 07c56c05ad30..90f1343ed07c 100644
---- a/include/hw/ppc/pnv.h
-+++ b/include/hw/ppc/pnv.h
-@@ -198,7 +198,7 @@ static inline bool pnv_is_power9(PnvMachineState *pnv=
-)
-  */
- void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt);
- void pnv_bmc_powerdown(IPMIBmc *bmc);
--int pnv_bmc_hiomap(IPMIBmc *bmc);
-+IPMIBmc *pnv_bmc_create(void);
-=20
- /*
-  * POWER8 MMIO base addresses
-diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
-index c3ac0d6d5b4a..f0adb06c8d65 100644
---- a/hw/ppc/pnv.c
-+++ b/hw/ppc/pnv.c
-@@ -551,27 +551,10 @@ static void pnv_powerdown_notify(Notifier *n, void =
-*opaque)
-=20
- static void pnv_reset(MachineState *machine)
- {
--    PnvMachineState *pnv =3D PNV_MACHINE(machine);
-     void *fdt;
--    Object *obj;
-=20
-     qemu_devices_reset();
-=20
--    /*
--     * OpenPOWER systems have a BMC, which can be defined on the
--     * command line with:
--     *
--     *   -device ipmi-bmc-sim,id=3Dbmc0
--     *
--     * This is the internal simulator but it could also be an external
--     * BMC.
--     */
--    obj =3D object_resolve_path_type("", "ipmi-bmc-sim", NULL);
--    if (obj) {
--        pnv->bmc =3D IPMI_BMC(obj);
--        pnv_bmc_hiomap(pnv->bmc);
--    }
--
-     fdt =3D pnv_dt_create(machine);
-=20
-     /* Pack resulting tree */
-@@ -629,6 +612,16 @@ static bool pnv_match_cpu(const char *default_type, =
-const char *cpu_type)
-     return ppc_default->pvr_match(ppc_default, ppc->pvr);
- }
-=20
-+static void pnv_ipmi_bt_init(ISABus *bus, IPMIBmc *bmc, uint32_t irq)
-+{
-+    Object *obj;
-+
-+    obj =3D OBJECT(isa_create(bus, "isa-ipmi-bt"));
-+    object_property_set_link(obj, OBJECT(bmc), "bmc", &error_fatal);
-+    object_property_set_int(obj, irq, "irq", &error_fatal);
-+    object_property_set_bool(obj, true, "realized", &error_fatal);
-+}
-+
- static void pnv_init(MachineState *machine)
- {
-     PnvMachineState *pnv =3D PNV_MACHINE(machine);
-@@ -751,6 +744,9 @@ static void pnv_init(MachineState *machine)
-     }
-     g_free(chip_typename);
-=20
-+    /* Create the machine BMC simulator */
-+    pnv->bmc =3D pnv_bmc_create();
-+
-     /* Instantiate ISA bus on chip 0 */
-     pnv->isa_bus =3D pnv_isa_create(pnv->chips[0], &error_fatal);
-=20
-@@ -760,6 +756,9 @@ static void pnv_init(MachineState *machine)
-     /* Create an RTC ISA device too */
-     mc146818_rtc_init(pnv->isa_bus, 2000, NULL);
-=20
-+    /* Create the IPMI BT device for communication with the BMC */
-+    pnv_ipmi_bt_init(pnv->isa_bus, pnv->bmc, 10);
-+
-     /*
-      * OpenPOWER systems use a IPMI SEL Event message to notify the
-      * host to powerdown
-diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
-index aa5c89586c63..07fa1e1c7e45 100644
---- a/hw/ppc/pnv_bmc.c
-+++ b/hw/ppc/pnv_bmc.c
-@@ -17,6 +17,8 @@
-  */
-=20
- #include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qapi/error.h"
- #include "target/ppc/cpu.h"
- #include "qemu/log.h"
- #include "hw/ipmi/ipmi.h"
-@@ -211,8 +213,20 @@ static const IPMINetfn hiomap_netfn =3D {
-     .cmd_handlers =3D hiomap_cmds
- };
-=20
--int pnv_bmc_hiomap(IPMIBmc *bmc)
-+/*
-+ * Instantiate the machine BMC. PowerNV uses the QEMU internal
-+ * simulator but it could also be external.
-+ */
-+IPMIBmc *pnv_bmc_create(void)
- {
--    return ipmi_sim_register_netfn(IPMI_BMC_SIMULATOR(bmc),
--                                   IPMI_NETFN_OEM, &hiomap_netfn);
-+    Object *obj;
-+
-+    obj =3D object_new(TYPE_IPMI_BMC_SIMULATOR);
-+    object_property_set_bool(obj, true, "realized", &error_fatal);
-+
-+    /* Install the HIOMAP protocol handlers to access the PNOR */
-+    ipmi_sim_register_netfn(IPMI_BMC_SIMULATOR(obj), IPMI_NETFN_OEM,
-+                            &hiomap_netfn);
-+
-+    return IPMI_BMC(obj);
- }
---=20
-2.21.0
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
 
