@@ -2,82 +2,79 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CAA6C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3961BC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:52:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0491A2067D
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:50:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04B6920679
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:52:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hoWPUjSr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0491A2067D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B1J6jiBU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04B6920679
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXmqX-0000k0-TF
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:50:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33617)
+	id 1iXmsR-0002jO-TV
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:52:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33912)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iXmp6-0008CO-Eu
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:48:41 -0500
+ (envelope-from <cohuck@redhat.com>) id 1iXmqk-0001OF-7P
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:50:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iXmp5-0008Q7-GS
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:48:40 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:42749)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iXmp5-0008Ov-Ar
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:48:39 -0500
-Received: by mail-oi1-x244.google.com with SMTP id o12so3179460oic.9
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 05:48:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=dSfT+bYzEH10v/vu0I5+enZjfZ3bAlhfsUSRV3gp0hk=;
- b=hoWPUjSrOrFIlaUjH+6XO55JpB49s0SOO4F20G/6afN9GXXeTjUXhaw4ZbAYt8FsoV
- 8gRq6POpXOSfz9gl2CmialZYx9cQAvZzTtWOaaYR0/7PGhe8yKEE8FEQrZsSm4Y0QES+
- OG25q1a3klYdcZA8f4NVnBjSqF6d1/uvDjm8Chkv645UcqSXjSP675B9Qk8ir2PUQ6Ip
- LhCfjjk1gNFy1WONgzgIvJANgGJczm+hjmNVfwh0/Br5oX8KNzjeHpwC7drbVa3fGwvz
- VCgGNiMDLPSsmy3pzdCWeofYJCa6h3IQ/60glPTW++1B3Us6xP778WVHoz/A81WsFvx3
- lifQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=dSfT+bYzEH10v/vu0I5+enZjfZ3bAlhfsUSRV3gp0hk=;
- b=dlH9xQigYQ86etSyb0dwvyQ2jNgfQ41Zd4Tv+m22CR1fJiXo5WkDhXNmHGhj79faXi
- BgypZA7bCFQRI1BtW//znt2O7I06hUz59gf9P//RoosvyCCxMQkc9QP9Va/3Ni6hS+Ex
- UU+SLJdfnW1aXz/Qgs8WUOTxOfMo5vKmDVASeYZ64nbYaaKaDasU+dxQnNn2/QYIvgBY
- 5dr5t5FZk539ZaoiRvW6X/iPLu3YdeE9jZocxpKiGkAYz1/cZiwVMKPYHZiVVIJ56AVR
- x8yXW4vjSf9heAQOFHg/cT6epyLWoh2MFD2Xfp0icCI9q6CR7Tv0YKyoxMkkB1iPmKpQ
- wmCw==
-X-Gm-Message-State: APjAAAX07Qn+922gh7LXiLdeb8ZpdQ4O0gv8ZG4xHANDGfBe9JsnAa+r
- TpHVUngpBZKn5JE+rq9ouqDSEWHZvE1kMsFJfKQe8g==
-X-Google-Smtp-Source: APXvYqykW3A2v8N0y9YAb+1gnTCzFstP+xI697NS/24PU3SjyWMcvF22aidu2r80jrs23/0RIl2vlQdqNb4bhMMAnTE=
-X-Received: by 2002:aca:451:: with SMTP id 78mr7900954oie.170.1574344117346;
- Thu, 21 Nov 2019 05:48:37 -0800 (PST)
+ (envelope-from <cohuck@redhat.com>) id 1iXmqh-0002QM-39
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:50:20 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33411
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iXmqg-0002PQ-Tg
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:50:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574344217;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=843rk/hvHKTUdND560tL1cPITIt9NEEhwK3/nwRPi5s=;
+ b=B1J6jiBU6j35VlAwtkewLkAAO5ZFpgZYaZO5V+2NmHBz2/5RP80UwRslIWQyHMoXeV+/gP
+ m7Nqm/bX/Gjnh3XW4nRXedXxwIjJEodl7T5Bb5dOmFC8Ptlfieb4S14f8tkyGVasfBO/Dj
+ nPyix4BLCB1y9RuyjxLKwAExWAmHPno=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-33-eZoAQ1QSM5ac1mqOijSe_A-1; Thu, 21 Nov 2019 08:50:14 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07F32107ACC4;
+ Thu, 21 Nov 2019 13:50:13 +0000 (UTC)
+Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 95C6B692AB;
+ Thu, 21 Nov 2019 13:50:03 +0000 (UTC)
+Date: Thu, 21 Nov 2019 14:50:01 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH 07/15] s390x: protvirt: Handle diag 308 subcodes 0,1,3,4
+Message-ID: <20191121145001.5e7a182d.cohuck@redhat.com>
+In-Reply-To: <20191120114334.2287-8-frankja@linux.ibm.com>
+References: <20191120114334.2287-1-frankja@linux.ibm.com>
+ <20191120114334.2287-8-frankja@linux.ibm.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
- <20191120152442.26657-21-marcandre.lureau@redhat.com>
-In-Reply-To: <20191120152442.26657-21-marcandre.lureau@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Nov 2019 13:48:26 +0000
-Message-ID: <CAFEAcA9r5AQr2mZNgeHUQnNcy-qOC54n-_NsN8hBZQ1jEGhGCw@mail.gmail.com>
-Subject: Re: [PATCH v4 20/37] mips: use sysbus_mmio_get_region() instead of
- internal fields
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: eZoAQ1QSM5ac1mqOijSe_A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,30 +86,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
+ qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 20 Nov 2019 at 15:28, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@redhat.com> wrote:
->
-> Register the memory region with sysbus_init_mmio() and look it up with
-> sysbus_mmio_get_region() to avoid accessing internal device fields.
->
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+On Wed, 20 Nov 2019 06:43:26 -0500
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> Now that we know the protection state off the cpus, we can start
+> handling all diag 308 subcodes in the protected state.
+
+"As we now have access to the protection state of the cpus, we can
+implement special handling of diag 308 subcodes for cpus in the
+protected state."
+
+?
+
+>=20
+> For subcodes 0 and 1 we need to unshare all pages before continuing,
+> so the guest doesn't accidently expose data when dumping.
+>=20
+> For subcode 3/4 we tear down the protected VM and reboot into
+> unprotected mode. We do not provide a secure reboot.
+>=20
+> Before we can do the unshare calls, we need to mark all cpus as
+> stopped.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  hw/char/serial.c       | 1 +
->  hw/mips/mips_mipssim.c | 3 ++-
+>  hw/s390x/s390-virtio-ccw.c | 30 +++++++++++++++++++++++++++---
+>  target/s390x/diag.c        |  4 ++++
+>  2 files changed, 31 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 7262453616..6fd50b4c42 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -319,11 +319,26 @@ static inline void s390_do_cpu_ipl(CPUState *cs, ru=
+n_on_cpu_data arg)
+>      s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+>  }
+> =20
+> +static void s390_pv_prepare_reset(CPUS390XState *env)
+> +{
+> +    CPUState *cs;
+> +
+> +    if (!env->pv) {
+> +        return;
+> +    }
+> +    CPU_FOREACH(cs) {
+> +        s390_cpu_set_state(S390_CPU_STATE_STOPPED, S390_CPU(cs));
+> +    }
+> +    s390_pv_unshare();
+> +    s390_pv_perf_clear_reset();
+> +}
+> +
+>  static void s390_machine_reset(MachineState *machine)
+>  {
+>      enum s390_reset reset_type;
+>      CPUState *cs, *t;
+>      S390CPU *cpu;
+> +    CPUS390XState *env;
+> =20
+>      /* get the reset parameters, reset them once done */
+>      s390_ipl_get_reset_request(&cs, &reset_type);
+> @@ -332,29 +347,38 @@ static void s390_machine_reset(MachineState *machin=
+e)
+>      s390_cmma_reset();
+> =20
+>      cpu =3D S390_CPU(cs);
+> +    env =3D &cpu->env;
+> =20
+>      switch (reset_type) {
+>      case S390_RESET_MODIFIED_CLEAR:  /* Subcode 0 */
+> +        subsystem_reset();
+> +        s390_crypto_reset();
+> +        s390_pv_prepare_reset(env);
+>          CPU_FOREACH(t) {
+>              run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
+>          }
+> -        subsystem_reset();
+> -        s390_crypto_reset();
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+This also switches the order in which different parts are reset for
+normal guests. I presume that order doesn't matter here?
 
-thanks
--- PMM
+>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+>          break;
+>      case S390_RESET_LOAD_NORMAL: /* Subcode 1*/
+
+missing blank before */ (introduced in a previous patch)
+
+
+> +        subsystem_reset();
+> +        s390_pv_prepare_reset(env);
+>          CPU_FOREACH(t) {
+>              if (t =3D=3D cs) {
+>                  continue;
+>              }
+>              run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
+>          }
+> -        subsystem_reset();
+>          run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
+>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+>          break;
+>      case S390_RESET_EXTERNAL:
+
+Annotate this with the subcode as well? (in the patch introducing it)
+
+>      case S390_RESET_REIPL: /* Subcode 4 */
+> +        if (env->pv) {
+> +            CPU_FOREACH(t) {
+> +                s390_pv_vcpu_destroy(t);
+> +            }
+> +            s390_pv_vm_destroy();
+> +        }
+>          qemu_devices_reset();
+>          s390_crypto_reset();
+>          /* configure and start the ipl CPU only */
+> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
+> index 32049bb4ee..db6d79cef3 100644
+> --- a/target/s390x/diag.c
+> +++ b/target/s390x/diag.c
+> @@ -68,6 +68,10 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, u=
+int64_t r3)
+>  static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t =
+addr,
+>                                uintptr_t ra, bool write)
+>  {
+> +    /* Handled by the Ultravisor */
+> +    if (env->pv) {
+> +        return 0;
+> +    }
+>      if ((r1 & 1) || (addr & ~TARGET_PAGE_MASK)) {
+>          s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>          return -EINVAL;
+
 
