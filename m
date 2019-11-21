@@ -6,82 +6,136 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 872E8C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A7DC432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:53:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4EB5420643
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:49:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E9F42068E
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:53:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D0mf9uez"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EB5420643
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QB3iIDxD";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qualcomm.onmicrosoft.com header.i=@qualcomm.onmicrosoft.com header.b="fbkPtoAl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E9F42068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=quicinc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXsS6-00026v-Ue
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 14:49:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37754)
+	id 1iXsWE-00034A-N5
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 14:53:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38371)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iXsQ8-00006a-Dj
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:47:17 -0500
+ (envelope-from <tsimpson@quicinc.com>) id 1iXsVH-0001KI-Dz
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:52:37 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iXsQ5-00036X-14
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:47:14 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:44485
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iXsQ4-00034B-TT
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:47:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574365626;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MWRsNhnLBH1LBQAqWghzm8BE9YMY6D+e/4e45FCIssc=;
- b=D0mf9uez8yccx+ARcfHa4HIkFrKFZWxbGD4FE1HHV2rmwCl0e1grZHmspwXWJtZuueDRYk
- x09zIz+cr7dk4s6EhFsZFUfjlBmMfNOC5L+0bbLpM3eM5r7zRWJLcFXyLhK6pqF4LTuDYz
- JtEyJyqRTp6Itfns4tKCCemlYDjXqMs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-144-eGrpUa8pPtq8b37LQRIoAA-1; Thu, 21 Nov 2019 14:47:03 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B933218B5FA0;
- Thu, 21 Nov 2019 19:47:01 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 576235E263;
- Thu, 21 Nov 2019 19:47:01 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id C7ADB1138606; Thu, 21 Nov 2019 20:46:59 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 03/14] qapi: Introduce default values for
- struct members
-References: <20190624173935.25747-1-mreitz@redhat.com>
- <20190624173935.25747-4-mreitz@redhat.com>
- <87eey1b73y.fsf@dusky.pond.sub.org>
- <0214e73e-062e-a9c8-16c9-e99354c07277@redhat.com>
-Date: Thu, 21 Nov 2019 20:46:59 +0100
-In-Reply-To: <0214e73e-062e-a9c8-16c9-e99354c07277@redhat.com> (Eric Blake's
- message of "Thu, 21 Nov 2019 09:24:44 -0600")
-Message-ID: <871ru1811o.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <tsimpson@quicinc.com>) id 1iXsVG-0006BA-3x
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:52:35 -0500
+Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:57226)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tsimpson@quicinc.com>)
+ id 1iXsVF-00068C-Jw
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:52:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+ t=1574365953; x=1605901953;
+ h=from:to:cc:subject:date:message-id:references:
+ in-reply-to:content-transfer-encoding:mime-version;
+ bh=MZmerJiRToQZB/YCNeDq5TSqB8hw1zdQmb8Q8CnNBKg=;
+ b=QB3iIDxDXQ5qyWeuh/2rZAOholB2wyHbnpSIuioGDh7Mp3z1246M71+a
+ VES/AP5tH1nsitS7LsbL1FJzwDvds9ZB5tVMSIepGYXrUQSVrzmH7zY08
+ ft4x6uB+Svyj6VQUrvX+GXnZEcmkkmladdaP0HqokObuaUKVhpzVoE2el c=;
+Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
+ by alexa-out-sd-02.qualcomm.com with ESMTP; 21 Nov 2019 11:52:31 -0800
+IronPort-SDR: OyTf0881qCiT9aSPCRmh0YWCbHMtdlPidqrbWYGXYrECUJZFHH4VIanDP6XkZbkOk2o1Tydi6u
+ W20FBIZQ0sQ4SejkWlQhqMIaR1x2SvbJ6B35/yHMZjX7eEs0qdLh1MqWsH8Mz8McNeBIH89oIc
+ WWqcmAITmB7zP5Lz9nDV5k5EFSpXzdQybE46KIn8K6mjqJchjQgxp7IwuLkkzrU07qa3iJZwdP
+ oeW2hhHQodMXVnnZyiHueKRoCj5mW1a9w30oH1KLZV4vq0O/MFLLgcbIkTqXs4Bjn6/roZ38SJ
+ 3264Ddgmuj1mG3w2MUuuF1qi
+Received: from nasanexm03d.na.qualcomm.com ([10.85.0.91])
+ by ironmsg01-sd.qualcomm.com with ESMTP/TLS/AES256-SHA;
+ 21 Nov 2019 11:52:31 -0800
+Received: from NASANEXM01C.na.qualcomm.com (10.85.0.83) by
+ nasanexm03d.na.qualcomm.com (10.85.0.91) with Microsoft SMTP Server (TLS) id
+ 15.0.1473.3; Thu, 21 Nov 2019 11:52:30 -0800
+Received: from NAM01-BN3-obe.outbound.protection.outlook.com (199.106.107.6)
+ by NASANEXM01C.na.qualcomm.com (10.85.0.83) with Microsoft SMTP Server (TLS)
+ id 15.0.1473.3 via Frontend Transport; Thu, 21 Nov 2019 11:52:30 -0800
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com (52.135.234.160) by
+ BYAPR02MB4087.namprd02.prod.outlook.com (20.176.251.152) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2474.17; Thu, 21 Nov 2019 19:52:29 +0000
+Received: from BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::b0e0:a44a:3fc6:e2b9]) by BYAPR02MB4886.namprd02.prod.outlook.com
+ ([fe80::b0e0:a44a:3fc6:e2b9%3]) with mapi id 15.20.2474.018; Thu, 21 Nov 2019
+ 19:52:29 +0000
+From: Taylor Simpson <tsimpson@quicinc.com>
+To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Subject: RE: [PATCH] Add minimal Hexagon target - First in a series of patches
+ - linux-user changes + linux-user/hexagon + skeleton of
+ target/hexagon -
+ Files in target/hexagon/imported are from another project and therefore do
+ not conform to qemu coding standards
+Thread-Topic: [PATCH] Add minimal Hexagon target - First in a series of
+ patches - linux-user changes + linux-user/hexagon + skeleton of
+ target/hexagon - Files in target/hexagon/imported are from another project
+ and therefore do not conform to qemu coding standards
+Thread-Index: AQHVnmwob37h/DrHSkKsyb+krTkIzKeWBJUAgAAH6tA=
+Date: Thu, 21 Nov 2019 19:52:28 +0000
+Message-ID: <BYAPR02MB48868819DDB0818111D4E972DE4E0@BYAPR02MB4886.namprd02.prod.outlook.com>
+References: <1574121497-2433-1-git-send-email-tsimpson@quicinc.com>
+ <CAL1e-=gFBMPj938nrPYjvkOPuMQZTEP9OFiitwLLjekgCxRaKA@mail.gmail.com>
+In-Reply-To: <CAL1e-=gFBMPj938nrPYjvkOPuMQZTEP9OFiitwLLjekgCxRaKA@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=tsimpson@quicinc.com; 
+x-originating-ip: [199.106.103.59]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3588b37d-a2aa-413b-fee7-08d76ebc5730
+x-ms-traffictypediagnostic: BYAPR02MB4087:
+x-microsoft-antispam-prvs: <BYAPR02MB40870FEA0C0765173F66D3A4DE4E0@BYAPR02MB4087.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0228DDDDD7
+x-forefront-antispam-report: SFV:NSPM;
+ SFS:(10019020)(136003)(396003)(366004)(39860400002)(376002)(346002)(189003)(199004)(13464003)(6916009)(55016002)(52536014)(2906002)(14454004)(305945005)(6436002)(9686003)(7736002)(229853002)(76176011)(7696005)(102836004)(508600001)(5660300002)(8936002)(76116006)(64756008)(54906003)(3846002)(66446008)(66946007)(6506007)(6246003)(8676002)(66066001)(6116002)(86362001)(53546011)(99286004)(4326008)(25786009)(256004)(186003)(66476007)(33656002)(74316002)(81166006)(26005)(316002)(81156014)(14444005)(446003)(71190400001)(71200400001)(11346002)(66556008)(219693003);
+ DIR:OUT; SFP:1102; SCL:1; SRVR:BYAPR02MB4087;
+ H:BYAPR02MB4886.namprd02.prod.outlook.com; FPR:; SPF:None; LANG:en;
+ PTR:InfoNoRecords; MX:1; A:1; 
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 9qG/5o6NKCoGcaspcAkHNCzXbb1trAfhtysTX45KJbzjc9wn7o07WJXtrUggGTy6MTEqpgigM2NGriOBreL3JnH3tC+9GIafzNX6MLEsn3ecle9JyirOjg8G+fvgXpcaDilDhmqlzdHo8DpzFwrai1NuVWhV9iDlV9l19rVXyWpVaSUqQ91kSbeKMOpZ3HM7oU2M6KmQ0zWbbwNH51+MAL3AT19+FdgLUHQCxO5/TvbJorvEh4ATs6TYe+K8WUADFReZp+96s94qTplPTKZ6Z4OsSH84oxrY5MMi2HVlJCRyiPQyR1vDNFpAG/2U3z3DXEbdo4Vva+glFV5IbZzwiTfKDKjW51137frSaQ8hU4fVSzfu6al6FRkTOIrCNo+ucW/1YEdE9nNDxZQ7YtGaS9w6Mz+Z6+R9cgGEkio07TM10uLu4V33EuSLYP+VFu3c
+x-ms-exchange-transport-forked: True
+arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UF7d2AOHHS+CX9yF/DUx/TVT7IhkEI9mAwac2iiWaAegZrAfbCvi5knR84IIUc8eoswvI6qBShxsnVqxGXP1RSTO1oMwkbxa18H/WbCBsU0ACuv06jbtesW0ePIlTU4wamGLK8UlG5jwKfsbOTYYkHlc3N+7bFmnQt81VViCsXMA+WgMofZmppraCTV9GRZeCX2eQcwqtCqWmsA/7vMqnVd8ytY1YQqZiD8zU9onyKEFNuCJzIxGAHZjVB9anpz0Ehs9j3DjxycFqaMxTkZ02GCigbBaWo2upZxxseRhpAGqLBCTx8/H4Wn/YvGqCHSuhYcTtyeKXyPnfhicEDkgMA==
+arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fp+K16oQ3DMakXeltq8YwgYJcQ2HrDSqkE7wuGEHu18=;
+ b=e8mWgZkXKyGzFGTdn3bn19g5ewDJ4JUWnlrHNd4F8VP3xOFcBJU9f3qaxsAlcwmKIRhLQyvwWVQhFDDW1ERqfcpItQ2R8DvNr+k7luFwhayX8deeCjqq+9rEDddmWPcegHOu23he0HsHa0ljUqsWaP8z/F5nok8C9EpHfSqpfqthpOObzbvq0zfD3HFltUonO7RCVLGNHQsnK9ND1Wg1Qd2GdqrpIxVaL7RFAdpHNjJQRuOEJcVzfB6qLeshB4obBH24AbZwQcEOjVzMyrceggMxH8i1FSuynCytF889RNIIgj17RlUnHsThtF5y48kcl0gtrVlNd81sYUsdsGDXlA==
+arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=quicinc.com; dmarc=pass action=none header.from=quicinc.com;
+ dkim=pass header.d=quicinc.com; arc=none
+dkim-signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=qualcomm.onmicrosoft.com; s=selector1-qualcomm-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fp+K16oQ3DMakXeltq8YwgYJcQ2HrDSqkE7wuGEHu18=;
+ b=fbkPtoAl6YR7WcIlja0T09e3DT4wkP3qYRuoD1Yq5KFMM0xAvJZ6KXMLc1/fkZr6N1NGEe3D7kQCUHwUGgg/eAofL8Ns8tlmvMXnv3X6nswy1TdMUZK2tnDN/TgxWhSFKIMj+yywmeOl6mpyc8uDF0uTjmF0hu+tgI7/uydElss=
+x-ms-exchange-crosstenant-network-message-id: 3588b37d-a2aa-413b-fee7-08d76ebc5730
+x-ms-exchange-crosstenant-originalarrivaltime: 21 Nov 2019 19:52:28.9221 (UTC)
+x-ms-exchange-crosstenant-fromentityheader: Hosted
+x-ms-exchange-crosstenant-id: 98e9ba89-e1a1-4e38-9007-8bdabc25de1d
+x-ms-exchange-crosstenant-mailboxtype: HOSTED
+x-ms-exchange-crosstenant-userprincipalname: wAH9nSni+znjENeMf9554SYJdaajRrmi1WwJck4XrB9lTjSSCEz+5jBcmxiG8FGKpRUSKGltHFLjBU3QOa13SA==
+x-ms-exchange-transport-crosstenantheadersstamped: BYAPR02MB4087
+x-originatororg: quicinc.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: eGrpUa8pPtq8b37LQRIoAA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+X-detected-operating-system: by eggs.gnu.org: FreeBSD 9.x [fuzzy]
+X-Received-From: 199.106.114.39
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,121 +147,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Eric Blake <eblake@redhat.com> writes:
-
-> On 11/21/19 9:07 AM, Markus Armbruster wrote:
->> Max Reitz <mreitz@redhat.com> writes:
->>
->>> With this change, it is possible to give default values for struct
->>> members, as follows:
->>>
->>>    What you had to do so far:
->>>
->>>      # @member: Some description, defaults to 42.
->>>      { 'struct': 'Foo',
->>>        'data': { '*member': 'int' } }
->>>
->>>    What you can do now:
->>>
->>>      { 'struct': 'Foo',
->>>        'data': { '*member': { 'type': 'int', 'default': 42 } }
->>
->> The '*' is redundant in this form.
->>
->> Can anyone think of reasons for keeping it anyway?  Against?
->
-> Is there ever a reason to allow an optional member but without a
-> 'default' value?  Or can we just blindly state that if 'default' is
-> not present, that is the same as 'default':0/'default':null?
->
-> Or, applying your statement further,
->
-> 'data': { '*a':'int', '*b':'str' }
->
-> is shorthand for:
->
-> 'data': { 'a': { 'type':'int', 'default':0 },
->           'b': { 'type':'str', 'default':null } }
-
-You propose to default 'default' to a type-specific value.
-
-I don't think that's a good idea.
-
-Quoting myself on v3:
-
-    In many programming languages, absent optional arguments / members
-    default to a default value specified in the declaration.  Simple.
-
-    In others, 'absent' is effectively an additional value.  The code
-    consuming the argument / member can interpret 'absent' however it wants=
-.
-    It may eliminate the additional value by mapping it to a default value,
-    but it can also interpret 'absent' unlike any value.  If there's more
-    than one consumer, their interpretations need not be consistent.  The
-    declaration provides no clue on semantics of 'absent'.
-
-    QAPI is in the latter camp.  I trust you can already sense how much I
-    like that.
-    [...]
-    If I could go back in time, I'd flip QAPI to "'absent' defaults to a
-    default value".  Lacking a time machine, we're stuck with cases of
-    "'absent' means something you can't express with a value" and "'absent'
-    means different things in different contexts" that have been enshrined
-    in external interfaces.  Is there anything we could do to improve
-    matters for saner cases?
-
-    I think there is: we could provide for an *optional* default value.  If
-    the schema specifies it, that's what 'absent' means.  If it doesn't, al=
-l
-    bets are off, just like they are now.
-
-This patch implements this idea.
-
-When an absent member behaves just like it was present with a certain
-value DFLT, we want to be able to say in the schema 'default': DFLT.
-
-But the schema language also needs to let us say "absent member behaves
-unlike any value".
-
-If we define 'default' to default to a value, then that value must have
-this special meaning.
-
-Where that value is also a valid value, the schema language cannot
-express "absent member behaves like it was present with that value".
-
-I think this makes 0 a poor default value for 'default': "behaves like
-member was present with value 0" is fairly common, I think.
-
-Defaulting 'default' to null regardless of member type could work.
-
-null is a valid value of the 'null' type and of alternate types with a
-member of type 'null'.  For optional members of such types, the schema
-language then can't express ""absent member behaves like it was present
-with value null".  I think the need to say that is much less common than
-the needs to say "like value 0".
-
-Checking...  *sigh*: there are a few optional members that can take null
-values, e.g. MigrateSetParameters member @tls-creds.  I read its doc
-comment twice, and I have to admit I can't make heads or tails of it.
-Can't say for sure whether absent behaves like null, or some other
-value, or unlike any value.
-
-QAPI/QMP introspection already specifies null to have exactly this
-special meaning.
-
-> So I could live with permitting '*' only in the shorthand form, and
-> declaring that it is incompatible with longhand form because the
-> existence of a 'default' key in longhand form is evidence that the
-> member is therefore optional.
-
-Noted.
-
-More opinions?
-
+VGhleSBhcmUgaW1wb3J0ZWQgZnJvbSB0aGUgZXhpc3RpbmcgSGV4YWdvbiBzaW11bGF0b3IuICBQ
+bGVhc2UgdW5kZXJzdGFuZCB0aGF0IHRoaXMgcGF0Y2ggaXMgdGhlIGZpcnN0IGluIGEgc2VyaWVz
+LiAgTGF0ZXIgcGF0Y2hlcyB3aWxsIGNvbnRhaW4gbW9yZSBlbGFib3JhdGUgY29udGVudHMgaW4g
+dGhhdCBkaXJlY3RvcnkuICBUaGUgcmVhc29uIEkgZG9uJ3Qgd2FudCB0byByZWZvcm1hdCB0aGVt
+IGlzIHRvIHN0YXkgaW4gc3luYyB3aXRoIHRoZSBvdGhlciBzaW11bGF0b3IgaW4gdGhlIGZ1dHVy
+ZS4gIFdoZW4gdGhlIG90aGVyIHRlYW0gbWFrZXMgY2hhbmdlcyB0byB0aGUgY29kZSAoZWl0aGVy
+IHRvIGZpeCBidWdzIG9yIGFkZCBmZWF0dXJlcyksIGl0IHdpbGwgYmUgZWFzaWVyIHRvIGlkZW50
+aWZ5IHRoZSBjaGFuZ2VzIGFuZCBicmluZyB0aGVtIGludG8gcWVtdS4NCg0KVGF5bG9yDQoNCi0t
+LS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBBbGVrc2FuZGFyIE1hcmtvdmljIDxhbGVr
+c2FuZGFyLm0ubWFpbEBnbWFpbC5jb20+DQpTZW50OiBUaHVyc2RheSwgTm92ZW1iZXIgMjEsIDIw
+MTkgMToyMCBQTQ0KVG86IFRheWxvciBTaW1wc29uIDx0c2ltcHNvbkBxdWljaW5jLmNvbT4NCkNj
+OiBMYXVyZW50IFZpdmllciA8bGF1cmVudEB2aXZpZXIuZXU+OyBSaWt1IFZvaXBpbyA8cmlrdS52
+b2lwaW9AaWtpLmZpPjsgUUVNVSBEZXZlbG9wZXJzIDxxZW11LWRldmVsQG5vbmdudS5vcmc+DQpT
+dWJqZWN0OiBSZTogW1BBVENIXSBBZGQgbWluaW1hbCBIZXhhZ29uIHRhcmdldCAtIEZpcnN0IGlu
+IGEgc2VyaWVzIG9mIHBhdGNoZXMgLSBsaW51eC11c2VyIGNoYW5nZXMgKyBsaW51eC11c2VyL2hl
+eGFnb24gKyBza2VsZXRvbiBvZiB0YXJnZXQvaGV4YWdvbiAtIEZpbGVzIGluIHRhcmdldC9oZXhh
+Z29uL2ltcG9ydGVkIGFyZSBmcm9tIGFub3RoZXIgcHJvamVjdCBhbmQgdGhlcmVmb3JlIGRvIG5v
+dCBjb25mb3JtIHRvIHFlbXUgY29kaW5nIHN0YW5kYXJkcw0KDQoNCj4gIGNyZWF0ZSBtb2RlIDEw
+MDY0NCB0YXJnZXQvaGV4YWdvbi9pbXBvcnRlZC9nbG9iYWxfdHlwZXMuaA0KPiAgY3JlYXRlIG1v
+ZGUgMTAwNjQ0IHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkL2lzc192ZXJfcmVnaXN0ZXJzLmgNCj4g
+IGNyZWF0ZSBtb2RlIDEwMDY0NCB0YXJnZXQvaGV4YWdvbi9pbXBvcnRlZC9tYXguaCAgY3JlYXRl
+IG1vZGUgMTAwNjQ0DQo+IHRhcmdldC9oZXhhZ29uL2ltcG9ydGVkL3JlZ3MuaA0KDQpUYXlsb3Is
+IGlmIEkgdW5kZXJzdG9vZCB5b3Ugd2VsbCwgdGhlc2UgZmlsZXMgZG9uJ3QgY29uZmlybSB0byBR
+RU1VIGNvZGluZyBzdGFuZGFyZCwgYmVjYXVzZSB0aGV5IGFyZSBpbXBvcnRlZC4gQnV0LCBmcm9t
+IHdoZXJlPyBBbmQgd2hhdCBpcyB0aGUgcmVhc29uIHRoZXkgbmVlZCB0byBiZSBpbXBvcnRlZCAo
+YW5kIG5vdCBjcmVhdGVkIGluZGVwZW5kZW50bHkgYnkgeW91IG9yIHNvbWVib2R5IGVsc2UsIGJ1
+dCB3aXRoaW4gUUVNVSBjb2RlIHN0eWxlIGd1aWRlbGluZXMpID8NClRoZWlyIGNvbnRlbnQgbG9v
+a3MgZmFpcmx5IHNpbXBsZSB0byBtZS4NCg0KVGhhbmtzLA0KQWxla3NhbmRhcg0K
 
