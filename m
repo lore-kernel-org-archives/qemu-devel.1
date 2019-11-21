@@ -2,82 +2,88 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E47FC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F13C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:24:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B88720714
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:23:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3DD52089F
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:24:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BQIkKIGh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B88720714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UADLA0e0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3DD52089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXkYi-0002RL-5u
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 06:23:36 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53463)
+	id 1iXkZL-0003VO-Rw
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 06:24:15 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53663)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iXkXu-0001S6-4j
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:22:47 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iXkYZ-0002UM-B0
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:23:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iXkXs-00083E-S5
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:22:46 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36830
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iXkXs-00082f-NZ
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:22:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574335364;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Dqu78u6yRo4Gua36j1fiPc0+csz+5H2Qn1kPtuTeits=;
- b=BQIkKIGhA7XZ3rjGCruTCEE8VgkRlHpv3E1Xmfu+KmmJPjejHg8SBppn6RMl5Qwh/s4/g5
- LE+GUkX6d20SkOVRkHZoK72xURfB2uN2L8z5G5nE25YO5mDSfvVCdWiZmM18hi5KhcnOtV
- v7YPC/HGCDrFgLvzPQL6fHNEJvx7Nlo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-B_N_eDliO2y5xuI86tM7TQ-1; Thu, 21 Nov 2019 06:22:42 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A966CB3DBD;
- Thu, 21 Nov 2019 11:22:41 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-225.ams2.redhat.com [10.36.117.225])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F6D83DA0;
- Thu, 21 Nov 2019 11:22:37 +0000 (UTC)
-Date: Thu, 21 Nov 2019 12:22:35 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Eric Blake <eblake@redhat.com>
-Subject: Re: [PATCH v2 2/6] block: truncate: Don't make backing file data
- visible
-Message-ID: <20191121112235.GD6007@linux.fritz.box>
-References: <20191120184501.28159-1-kwolf@redhat.com>
- <20191120184501.28159-3-kwolf@redhat.com>
- <96c2c681-851d-4b83-2acd-3952fa850e5f@redhat.com>
+ (envelope-from <stefanha@gmail.com>) id 1iXkYX-0008W5-R0
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:23:27 -0500
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34056)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iXkYX-0008VZ-FC
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:23:25 -0500
+Received: by mail-wr1-x444.google.com with SMTP id t2so3961134wrr.1
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 03:23:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=3PFr5QSS2uj5c56qcvXCX/7Hi9Xdr/bG2+dQofwf+3I=;
+ b=UADLA0e0jX8JPxrPU72TDV/+HCTd6ewre8S2v/HMsbZnvGEAQ/UzXlsNKlHt2bQp9u
+ D20c78Ki8jbnB043brjmsrSSIV5SGsJfa09La8ygRKMNvxv3CdbtnAmd/GFT+zQkPi1J
+ iEeGCWq8dVhv8W6OLoEgGySUyed+8n6ys+E+D76zaUlezYT727xT/k1c+5X/V48NRwNl
+ iIFh97aFGC37lTUcT39gjJPkifNIz77vEf7MOsg5uySCcI4SK73JJMS7N2GzNi6ak8LU
+ N4djYDJ6g7kgFXtO6y8e8rpz3dhGRU0/CohP6kv9owTFZg5N1vBk0qHXhruL9QAJ8Esx
+ Hwwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=3PFr5QSS2uj5c56qcvXCX/7Hi9Xdr/bG2+dQofwf+3I=;
+ b=dtHx8mc+wOF0wJWOX/W0hlzTjQUxEZD+pIJM5rgZ+gBi/ivFupF5OQYu50q1SZnSd2
+ 7ii2GQTnszZjwMZrWxx3bZd+zCxQ1N/e96iJGVRf88rw1cI1uRFThrV/so8OPQLhmzoX
+ Nm+gpz8T6Cjl7uyawFODFx+u81zQUfXWS3vWPA+9I70WaFcjwN+GTMZZgElk+DY0Dhl1
+ ahSYZTnXGzH83TkMZjVs/7ZwrqppU7EBByJmoW5RZoyBgbJN7ZGpITxemis2ecsbSWkB
+ 0jTcXzHaoDJ5QglCx2qDIxIYuVB5RI1XJjR2FNDm66RCVZMFsefM+4Rdnx2psqhj4y1H
+ YsEg==
+X-Gm-Message-State: APjAAAV+sxhonj2Mf3+vDO0wrWM74k4tB29EmQq7oOOuA2HTXRXAx+gf
+ 3+msj3rJ9MOsGgbuw13j7VI=
+X-Google-Smtp-Source: APXvYqxMzCgtmV0Hr5JVHRLbck7DiXWlvBPnp5ka/K8qEf6tERdkF3Kt+s0istLIVYc2OoJg3IUPsA==
+X-Received: by 2002:adf:a1c5:: with SMTP id v5mr10510591wrv.62.1574335404146; 
+ Thu, 21 Nov 2019 03:23:24 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id a6sm3115649wrh.69.2019.11.21.03.23.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 21 Nov 2019 03:23:23 -0800 (PST)
+Date: Thu, 21 Nov 2019 11:23:22 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Jagannathan Raman <jag.raman@oracle.com>
+Subject: Re: [RFC v4 PATCH 14/49] mutli-process: build remote command line args
+Message-ID: <20191121112322.GI439743@stefanha-x1.localdomain>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+ <8d1ffc03424e664000eb65186bef0362cd1a5fd6.1571905346.git.jag.raman@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <96c2c681-851d-4b83-2acd-3952fa850e5f@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-MC-Unique: B_N_eDliO2y5xuI86tM7TQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="9s922KAXlWjPfK/Q"
 Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+In-Reply-To: <8d1ffc03424e664000eb65186bef0362cd1a5fd6.1571905346.git.jag.raman@oracle.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::444
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,102 +95,223 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, stefanha@redhat.com,
- qemu-block@nongnu.org, mreitz@redhat.com
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com, mst@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, stefanha@redhat.com, rth@twiddle.net, kwolf@redhat.com,
+ berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
+ marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 20.11.2019 um 22:15 hat Eric Blake geschrieben:
-> On 11/20/19 12:44 PM, Kevin Wolf wrote:
-> > When extending the size of an image that has a backing file larger than
-> > its old size, make sure that the backing file data doesn't become
-> > visible in the guest, but the added area is properly zeroed out.
-> >=20
-> > Consider the following scenario where the overlay is shorter than its
-> > backing file:
-> >=20
-> >      base.qcow2:     AAAAAAAA
-> >      overlay.qcow2:  BBBB
-> >=20
-> > When resizing (extending) overlay.qcow2, the new blocks should not stay
-> > unallocated and make the additional As from base.qcow2 visible like
-> > before this patch, but zeros should be read.
-> >=20
-> > A similar case happens with the various variants of a commit job when a=
-n
-> > intermediate file is short (- for unallocated):
-> >=20
-> >      base.qcow2:     A-A-AAAA
-> >      mid.qcow2:      BB-B
-> >      top.qcow2:      C--C--C-
-> >=20
-> > After commit top.qcow2 to mid.qcow2, the following happens:
-> >=20
-> >      mid.qcow2:      CB-C00C0 (correct result)
-> >      mid.qcow2:      CB-C--C- (before this fix)
-> >=20
-> > Without the fix, blocks that previously read as zeros on top.qcow2
-> > suddenly turn into A.
-> >=20
-> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> > ---
-> >   block/io.c | 32 ++++++++++++++++++++++++++++++++
-> >   1 file changed, 32 insertions(+)
-> >=20
+
+--9s922KAXlWjPfK/Q
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Oct 24, 2019 at 05:08:55AM -0400, Jagannathan Raman wrote:
+> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 >=20
-> > +    if (new_bytes && bs->backing && prealloc =3D=3D PREALLOC_MODE_OFF)=
- {
-> > +        int64_t backing_len;
-> > +
-> > +        backing_len =3D bdrv_getlength(backing_bs(bs));
-> > +        if (backing_len < 0) {
-> > +            ret =3D backing_len;
-> > +            goto out;
-> > +        }
-> > +
-> > +        if (backing_len > old_size) {
-> > +            ret =3D bdrv_co_do_pwrite_zeroes(
-> > +                    bs, old_size, MIN(new_bytes, backing_len - old_siz=
-e),
-> > +                    BDRV_REQ_ZERO_WRITE | BDRV_REQ_MAY_UNMAP);
-> > +            if (ret < 0) {
-> > +                goto out;
-> > +            }
-> > +        }
-> > +    }
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+> ---
+>  New patch in v3
 >=20
-> Note that if writing zeroes is not fast, and it turns out that we copy a =
-lot
-> of data rather than unallocated sections from the image being committed,
-> that this can actually slow things down (doing a bulk pre-zero doubles up
-> data I/O unless it is fast, which is why we added BDRV_REQ_NO_FALLBACK to
-> avoid slow pre-zeroing).  However, the complication of zeroing only the
-> unallocated clusters rather than a bulk pre-zeroing
+>  hw/proxy/qemu-proxy.c         | 80 +++++++++++++++++++++++++++++++++----=
+------
+>  include/hw/proxy/qemu-proxy.h |  2 +-
+>  2 files changed, 62 insertions(+), 20 deletions(-)
+>=20
+> diff --git a/hw/proxy/qemu-proxy.c b/hw/proxy/qemu-proxy.c
+> index baba4da..ca7dd1a 100644
+> --- a/hw/proxy/qemu-proxy.c
+> +++ b/hw/proxy/qemu-proxy.c
+> @@ -45,47 +45,89 @@
+> =20
+>  static void pci_proxy_dev_realize(PCIDevice *dev, Error **errp);
+> =20
+> +static int add_argv(char *command_str, char **argv, int argc)
+> +{
+> +    int max_args =3D 64;
+> +
+> +    if (argc < max_args - 1) {
+> +        argv[argc++] =3D command_str;
+> +        argv[argc] =3D 0;
+> +    } else {
+> +        return 0;
+> +    }
+> +
+> +    return argc;
+> +}
+> +
+> +static int make_argv(char *command_str, char **argv, int argc)
+> +{
+> +    int max_args =3D 64;
+> +
+> +    char *p2 =3D strtok(command_str, " ");
+> +    while (p2 && argc < max_args - 1) {
+> +        argv[argc++] =3D p2;
+> +        p2 =3D strtok(0, " ");
+> +    }
+> +    argv[argc] =3D 0;
+> +
+> +    return argc;
+> +}
 
-I'm not sure how there could already be any allocated clusters in the
-area that we just added? (Apart from preallocation, of course, which is
-why this is restricted to PREALLOC_MODE_OFF.)
+So "command" isn't really the command-line, it's a string of options to
+append to the hardcoded qemu-scsi-dev command?
 
-You're right that if this truncate was called in the context of a commit
-block job rather than a resize, the zeros might be overwritten later.
-I'm not sure if leaving clusters unallocated while the job is running
-(and might be cancelled) is right, though. On the other hand, while the
-job is running, the target image on its own is invalid anyway.
+This needs to command-line string construction needs to be cleaned up
+and the hardcoded qemu-scsi-dev needs to be replaced with an argument.
 
-> for something that is an unlikely corner case (how often do you create
-> an overlay shorter than the backing file?) is not worth the extra code
-> maintenance (unlike in the 'qemu-img convert' case where it was worth
-> the optimization). So I'm fine with how you fixed it here.
+> +
+>  int remote_spawn(PCIProxyDev *pdev, const char *command, Error **errp)
 
-Also note that raw doesn't support backing files and qcow2 generally
-supports zero writes. If you use an external data file and backing file
-at the same time and your file system doesn't support zero writes, you
-could run into the problem. Or if you use a more unusual image format
-(including qcow2 v2).
+Error handling code is currently inconsistent because there is an int
+-errno return value and an errp argument.  For example, errp isn't set
+when pdev->managed =3D=3D true.
 
-So it's really two corner cases combined.
+The int -errno return value isn't needed.  It can be just be bool and
+errp should be set in every single error code path.
 
-Kevin
+>  {
+> -    char *args[3];
+>      pid_t rpid;
+>      int fd[2] =3D {-1, -1};
+>      Error *local_error =3D NULL;
+> +    char *argv[64];
+> +    int argc =3D 0, _argc;
+> +    char *sfd;
+> +    char *exec_dir;
+> +    int rc =3D -EINVAL;
+> =20
+>      if (pdev->managed) {
+>          /* Child is forked by external program (such as libvirt). */
+> -        return -1;
+> +        return rc;
+>      }
+> =20
+>      if (socketpair(AF_UNIX, SOCK_STREAM, 0, fd)) {
+>          error_setg(errp, "Unable to create unix socket.");
+> -        return -1;
+> +        return rc;
+>      }
+> +    exec_dir =3D g_strdup_printf("%s/%s", qemu_get_exec_dir(), "qemu-scs=
+i-dev");
+> +    argc =3D add_argv(exec_dir, argv, argc);
+> +    sfd =3D g_strdup_printf("%d", fd[1]);
+> +    argc =3D add_argv(sfd, argv, argc);
+> +    _argc =3D argc;
+> +    argc =3D make_argv((char *)command, argv, argc);
+> +
+>      /* TODO: Restrict the forked process' permissions and capabilities. =
+*/
+>      rpid =3D qemu_fork(&local_error);
+> =20
+>      if (rpid =3D=3D -1) {
+>          error_setg(errp, "Unable to spawn emulation program.");
+>          close(fd[0]);
+> -        close(fd[1]);
+> -        return -1;
+> +        goto fail;
+>      }
+> =20
+>      if (rpid =3D=3D 0) {
+>          close(fd[0]);
+> -
+> -        args[0] =3D g_strdup(command);
+> -        args[1] =3D g_strdup_printf("%d", fd[1]);
+> -        args[2] =3D NULL;
+> -        execvp(args[0], (char *const *)args);
+> +        execvp(argv[0], (char *const *)argv);
+>          exit(1);
+>      }
+>      pdev->remote_pid =3D rpid;
+> -    pdev->rsocket =3D fd[0];
+> +    pdev->rsocket =3D fd[1];
+> +    pdev->socket =3D fd[0];
 
+Please choose meaningful names for these fields.  I'm not sure why both
+need to be kept around though...
+
+> =20
+> +    rc =3D 0;
+> +
+> +fail:
+>      close(fd[1]);
+> =20
+> -    return 0;
+> +    for (int i =3D 0; i < _argc; i++) {
+> +        g_free(argv[i]);
+> +    }
+> +
+> +    return rc;
+>  }
+> =20
+>  static int get_proxy_sock(PCIDevice *dev)
+> @@ -94,7 +136,7 @@ static int get_proxy_sock(PCIDevice *dev)
+> =20
+>      pdev =3D PCI_PROXY_DEV(dev);
+> =20
+> -    return pdev->rsocket;
+> +    return pdev->socket;
+>  }
+> =20
+>  static void set_proxy_sock(PCIDevice *dev, int socket)
+> @@ -103,7 +145,7 @@ static void set_proxy_sock(PCIDevice *dev, int socket)
+> =20
+>      pdev =3D PCI_PROXY_DEV(dev);
+> =20
+> -    pdev->rsocket =3D socket;
+> +    pdev->socket =3D socket;
+>      pdev->managed =3D true;
+> =20
+>  }
+> @@ -198,16 +240,16 @@ static void pci_proxy_dev_register_types(void)
+> =20
+>  type_init(pci_proxy_dev_register_types)
+> =20
+> -static void init_proxy(PCIDevice *dev, char *command, Error **errp)
+> +static void init_proxy(PCIDevice *dev, char *command, bool need_spawn, E=
+rror **errp)
+>  {
+>      PCIProxyDev *pdev =3D PCI_PROXY_DEV(dev);
+>      Error *local_error =3D NULL;
+> =20
+>      if (!pdev->managed) {
+> -        if (command) {
+> -            remote_spawn(pdev, command, &local_error);
+> -        } else {
+> -            return;
+> +        if (need_spawn) {
+
+pdev->managed, command =3D=3D NULL, need_spawn are all ways of checking
+whether the remote process needs to be spawned.  Why are all of them
+necessary and can they be simplified?
+
+> +            if (!remote_spawn(pdev, command, &local_error)) {
+> +                return;
+
+local_error needs to be propagated.
+
+--9s922KAXlWjPfK/Q
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3Wc6oACgkQnKSrs4Gr
+c8hSTAf7BeG9RZqwvBTew1L8VkwJ8gCWyz6iltCRGsZg7sfsUPX2VfW8x1/Rr1pI
+a0SWwmLuk1M4nvPJskRs7/EppESsEYvDBuiN2tYc1hM3s4q6jME+zMffsPcd0Rrg
+RHz46qqCNzF63/AQOdf2XLXjBOA7xmQHR9oLWxoMQ2cFluh4GnpNi8wY2kvedcOT
+HgYUadKbu/iJJqSpuBOwmO5dfcrgXXdB+4WOyrhBce/C98t9DbdefO4GV6/DMStQ
+vKU6AImsfqzujZF6Mgy5d/g5HQ8bHeXolbX+bO5hnCMUfL5ruYo3ml4y0dxPK/lV
+xWIPQV9qFAJqxkNMxqcLWDz4dyqDVw==
+=IeSM
+-----END PGP SIGNATURE-----
+
+--9s922KAXlWjPfK/Q--
 
