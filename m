@@ -2,102 +2,69 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 078F7C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB39C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:23:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C411A2071C
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:18:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZRYpUt3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C411A2071C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 832F520855
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 09:23:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 832F520855
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXibX-0005La-Tf
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 04:18:23 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33445)
+	id 1iXigY-0007Tx-Ii
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 04:23:34 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34286)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pbonzini@redhat.com>) id 1iXiZw-0004Qi-3B
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:45 -0500
+ (envelope-from <clg@kaod.org>) id 1iXifq-0006x3-3T
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:22:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <pbonzini@redhat.com>) id 1iXiZt-0003Pt-Cy
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:42 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:44431
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <clg@kaod.org>) id 1iXifo-0007X8-RZ
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:22:50 -0500
+Received: from 5.mo173.mail-out.ovh.net ([46.105.40.148]:40775)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1iXiZt-0003PX-1P
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:16:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574327800;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:openpgp:openpgp;
- bh=ZaaaXO30YPU5Tglk5XRk2qkrncuy0xtt35P8QhBuIIs=;
- b=BZRYpUt3xiZo2IrHHpkXP7KOLXS9e8PqHLEBR/zQ4MuKUPs9nomkWsVJpkMUpH55lESom3
- IXVQsGm8MNSCPfoByKbWyeejsxwhLCjhcIx8VtrX0cNRM6OJreK4XCGGY+AWTkx7bZTFg9
- /XnwSmRts+89x5aJMrhSrUTI5UgOHh0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179--He0ZUtlPgWy6tjrRjETfg-1; Thu, 21 Nov 2019 04:16:39 -0500
-Received: by mail-wr1-f72.google.com with SMTP id q6so1734801wrv.11
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 01:16:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=4Y2VUG1uFgQimWXBBaeYjvmWC5l14iP10LtnwHQU6MY=;
- b=J22zbzz2Ged8xUhCk59DxZyctM6u9l+5I2bJ5Fjqn8lgsHVl0xzOFRw/6SO06LNhmy
- ModfBWDIu8BKYTf1XhET/8rb3sbdW65Go03j2yIddhJPsSPrVU5C7JVajPD0gmGusZaU
- nEmk8K08y27CU+YvHt9KQ1WKci4k5fxFXKgAH6ti8ZwR1ptMY2F93+hWolNarIn9Ag6i
- oixZ3Xw3TvZwjpKbqrDCt6ve6J3frQ75PPbE3WdDicpRgRZw90ktCXBPPj1STsq5h+j8
- K/s4L5eqiUM6aiGNMngiXQC36wFw9foJQxHvZS6b3iYLHkx1SQvQo2usnOljLGJzQa+L
- KeLQ==
-X-Gm-Message-State: APjAAAVpqogDPZqn+4R2JSKiRyjAkX5KjrrU6F/EabFZSbxWKWrpyhB9
- TmGHwELOiAlr3ChypuWS7+iKCAl1ofJx23QX6jQHedqoIAl8t55Ap7xqpyykzESLpzAH4Iofd07
- rFwKbpwau/Uqmkfg=
-X-Received: by 2002:adf:e2cd:: with SMTP id d13mr9285791wrj.221.1574327797846; 
- Thu, 21 Nov 2019 01:16:37 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwQP9C6XUnqkHbLzf/xdgOrtwYAjm2CunKt+YzO77emFnBNoy/B9UzG2+hytVgmyfIN+uVl8A==
-X-Received: by 2002:adf:e2cd:: with SMTP id d13mr9285772wrj.221.1574327797583; 
- Thu, 21 Nov 2019 01:16:37 -0800 (PST)
-Received: from ?IPv6:2001:b07:6468:f312:71a5:6e:f854:d744?
- ([2001:b07:6468:f312:71a5:6e:f854:d744])
- by smtp.gmail.com with ESMTPSA id m15sm2662407wrj.52.2019.11.21.01.16.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 21 Nov 2019 01:16:36 -0800 (PST)
-Subject: Re: [PATCH for-4.2 1/2] i386: Add new versions of
- Skylake/Cascadelake/Icelake without TSX
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20191120164912.32384-1-ehabkost@redhat.com>
- <20191120164912.32384-2-ehabkost@redhat.com>
- <b1d8c3ef-646a-85c7-176b-c4429f36d384@redhat.com>
- <20191120184258.GS3812@habkost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Message-ID: <afd960e8-103e-b166-34c3-f6db1df45277@redhat.com>
-Date: Thu, 21 Nov 2019 10:16:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iXifo-0007WI-Ik
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 04:22:48 -0500
+Received: from player778.ha.ovh.net (unknown [10.108.35.211])
+ by mo173.mail-out.ovh.net (Postfix) with ESMTP id 21956123211
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 10:22:45 +0100 (CET)
+Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
+ (Authenticated sender: clg@kaod.org)
+ by player778.ha.ovh.net (Postfix) with ESMTPSA id 75D79C4CD941;
+ Thu, 21 Nov 2019 09:22:40 +0000 (UTC)
+Subject: Re: [PATCH for-5.0 v5 15/23] ppc/xive: Use the XiveFabric and
+ XivePresenter interfaces
+To: Greg Kurz <groug@kaod.org>
+References: <20191115162436.30548-1-clg@kaod.org>
+ <20191115162436.30548-16-clg@kaod.org> <20191120193001.5b9229a2@bahia.lan>
+ <d03e9084-21e9-90ff-00d2-3c7f11b506c8@kaod.org>
+ <20191121083042.190a038a@bahia.lan>
+ <e2ff291d-4ec6-5f69-5ea6-5e0cccca1bc2@kaod.org>
+ <20191121090801.766e129d@bahia.lan>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <a0e67a03-46d8-872a-7283-b7407f16d41f@kaod.org>
+Date: Thu, 21 Nov 2019 10:22:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191120184258.GS3812@habkost.net>
+In-Reply-To: <20191121090801.766e129d@bahia.lan>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-MC-Unique: -He0ZUtlPgWy6tjrRjETfg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
+X-Ovh-Tracer-Id: 6297439655342672723
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehvddgtdegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejjeekrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 46.105.40.148
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -109,26 +76,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jiri Denemark <jdenemar@redhat.com>,
- Kashyap Chamarthy <kchamart@redhat.com>, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/11/19 19:42, Eduardo Habkost wrote:
-> The plan is to set default_cpu_version=3DCPU_VERSION_LATEST on
-> pc-*-5.0 (or, more likely, 5.1).  But this will happen only after
-> libvirt starts resolving CPU model versions.  See the
-> "Runnability guarantee of CPU models" section at
-> qemu-deprecated.texi.
+On 21/11/2019 09:08, Greg Kurz wrote:
+> On Thu, 21 Nov 2019 08:40:32 +0100
+> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>=20
+>> On 21/11/2019 08:30, Greg Kurz wrote:
+>>> On Thu, 21 Nov 2019 08:01:44 +0100
+>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>>>
+>>>> On 20/11/2019 19:30, Greg Kurz wrote:
+>>>>> On Fri, 15 Nov 2019 17:24:28 +0100
+>>>>> C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+>>>>>
+>>>>>> Now that the machines have handlers implementing the XiveFabric an=
+d
+>>>>>> XivePresenter interfaces, remove xive_presenter_match() and make u=
+se
+>>>>>> of the 'match_nvt' handler of the machine.
+>>>>>>
+>>>>>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>>>>>> ---
+>>>>>>  hw/intc/xive.c | 48 +++++++++++++++++----------------------------=
+---
+>>>>>>  1 file changed, 17 insertions(+), 31 deletions(-)
+>>>>>>
+>>>>>
+>>>>> Nice diffstat :)
+>>>>>
+>>>>>> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+>>>>>> index 1c9e58f8deac..ab62bda85788 100644
+>>>>>> --- a/hw/intc/xive.c
+>>>>>> +++ b/hw/intc/xive.c
+>>>>>> @@ -1423,30 +1423,6 @@ int xive_presenter_tctx_match(XivePresenter=
+ *xptr, XiveTCTX *tctx,
+>>>>>>      return -1;
+>>>>>>  }
+>>>>>> =20
+>>>>>> -static bool xive_presenter_match(XiveRouter *xrtr, uint8_t format=
+,
+>>>>>> -                                 uint8_t nvt_blk, uint32_t nvt_id=
+x,
+>>>>>> -                                 bool cam_ignore, uint8_t priorit=
+y,
+>>>>>> -                                 uint32_t logic_serv, XiveTCTXMat=
+ch *match)
+>>>>>> -{
+>>>>>> -    XivePresenter *xptr =3D XIVE_PRESENTER(xrtr);
+>>>>>> -    XivePresenterClass *xpc =3D XIVE_PRESENTER_GET_CLASS(xptr);
+>>>>>> -    int count;
+>>>>>> -
+>>>>>> -    count =3D xpc->match_nvt(xptr, format, nvt_blk, nvt_idx, cam_=
+ignore,
+>>>>>> -                           priority, logic_serv, match);
+>>>>>> -    if (count < 0) {
+>>>>>> -        return false;
+>>>>>> -    }
+>>>>>> -
+>>>>>> -    if (!match->tctx) {
+>>>>>> -        qemu_log_mask(LOG_UNIMP, "XIVE: NVT %x/%x is not dispatch=
+ed\n",
+>>>>>> -                      nvt_blk, nvt_idx);
+>>>>>
+>>>>> Maybe keep this trace...
+>>>>
+>>>> It's in spapr_xive_match_nvt() now.
+>>>>
+>>>
+>>> Not really... spapr_xive_match_nvt() has a trace for the opposite cas=
+e of duplicate
+>>> matches:
+>>
+>> not that one. The one in spapr.c ... Yes I need to change the name.
+>>
+>=20
+> ... and it seems I cannot memorize a change that was made by the
+> previous patch :-\ Sorry for the noise.
 
-Thanks!
+np but this is problem for gdb ! Any suggestion on the name :=20
 
-Then the patches do not interact negatively with my VMX series.  I have
-queued both of them so that we can get the pull request out with all the
-TAA bits.
+   spapr_match_nvt()=20
 
-Paolo
+?
+ =20
+> With or without the !!count change:
+
+I will add the !!=20
+
+C.=20
+
+>=20
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+>=20
+>> C.
+>>
+>>>
+>>>             if (match->tctx) {
+>>>                 qemu_log_mask(LOG_GUEST_ERROR, "XIVE: already found a=
+ thread "
+>>>                               "context NVT %x/%x\n", nvt_blk, nvt_idx=
+);
+>>>                 return -1;
+>>>             }
+>>>
+>>>>>
+>>>>>> -        return false;
+>>>>>> -    }
+>>>>>> -
+>>>>>> -    return true;
+>>>>>> -}
+>>>>>> -
+>>>>>>  /*
+>>>>>>   * This is our simple Xive Presenter Engine model. It is merged i=
+n the
+>>>>>>   * Router as it does not require an extra object.
+>>>>>> @@ -1462,22 +1438,32 @@ static bool xive_presenter_match(XiveRoute=
+r *xrtr, uint8_t format,
+>>>>>>   *
+>>>>>>   * The parameters represent what is sent on the PowerBus
+>>>>>>   */
+>>>>>> -static bool xive_presenter_notify(XiveRouter *xrtr, uint8_t forma=
+t,
+>>>>>> +static bool xive_presenter_notify(uint8_t format,
+>>>>>>                                    uint8_t nvt_blk, uint32_t nvt_i=
+dx,
+>>>>>>                                    bool cam_ignore, uint8_t priori=
+ty,
+>>>>>>                                    uint32_t logic_serv)
+>>>>>>  {
+>>>>>> +    XiveFabric *xfb =3D XIVE_FABRIC(qdev_get_machine());
+>>>>>> +    XiveFabricClass *xfc =3D XIVE_FABRIC_GET_CLASS(xfb);
+>>>>>>      XiveTCTXMatch match =3D { .tctx =3D NULL, .ring =3D 0 };
+>>>>>> -    bool found;
+>>>>>> +    int count;
+>>>>>> =20
+>>>>>> -    found =3D xive_presenter_match(xrtr, format, nvt_blk, nvt_idx=
+, cam_ignore,
+>>>>>> -                                 priority, logic_serv, &match);
+>>>>>> -    if (found) {
+>>>>>> +    /*
+>>>>>> +     * Ask the machine to scan the interrupt controllers for a ma=
+tch
+>>>>>> +     */
+>>>>>> +    count =3D xfc->match_nvt(xfb, format, nvt_blk, nvt_idx, cam_i=
+gnore,
+>>>>>> +                           priority, logic_serv, &match);
+>>>>>> +    if (count < 0) {
+>>>>>> +        return false;
+>>>>>> +    }
+>>>>>> +
+>>>>>> +    /* handle CPU exception delivery */
+>>>>>> +    if (count) {
+>>>>>>          ipb_update(&match.tctx->regs[match.ring], priority);
+>>>>>>          xive_tctx_notify(match.tctx, match.ring);
+>>>>>>      }
+>>>>>
+>>>>> ... in an else block here ^^ ?
+>>>>>
+>>>>>> =20
+>>>>>> -    return found;
+>>>>>> +    return count;
+>>>>>
+>>>>> Implicit cast is ok I guess, but !!count would ensure no paranoid
+>>>>> compiler ever complains.
+>>>>
+>>>> yes.=20
+>>>>
+>>>> Thanks,
+>>>>
+>>>> C.
+>>>>
+>>>>
+>>>>>
+>>>>>>  }
+>>>>>> =20
+>>>>>>  /*
+>>>>>> @@ -1590,7 +1576,7 @@ static void xive_router_end_notify(XiveRoute=
+r *xrtr, uint8_t end_blk,
+>>>>>>          return;
+>>>>>>      }
+>>>>>> =20
+>>>>>> -    found =3D xive_presenter_notify(xrtr, format, nvt_blk, nvt_id=
+x,
+>>>>>> +    found =3D xive_presenter_notify(format, nvt_blk, nvt_idx,
+>>>>>>                            xive_get_field32(END_W7_F0_IGNORE, end.=
+w7),
+>>>>>>                            priority,
+>>>>>>                            xive_get_field32(END_W7_F1_LOG_SERVER_I=
+D, end.w7));
+>>>>>
+>>>>
+>>>
+>>
+>=20
 
 
