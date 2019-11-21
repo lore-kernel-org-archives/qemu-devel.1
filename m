@@ -2,86 +2,86 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C40AEC432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C568C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:38:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F7F520672
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:37:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DAEC720672
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 19:38:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VQqHGBtX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F7F520672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="gMxggRh3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAEC720672
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXsGl-00034Z-LX
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 14:37:35 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36339)
+	id 1iXsHo-000497-T9
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 14:38:41 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36107)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <crosa@redhat.com>) id 1iXsFk-0001Aa-MH
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:36:34 -0500
+ (envelope-from <deller@gmx.de>) id 1iXsDM-0004To-G0
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:34:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <crosa@redhat.com>) id 1iXsFh-00063U-Qb
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:36:31 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43180
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <crosa@redhat.com>) id 1iXsFh-00062X-Jj
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:36:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574364986;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iL1TG/zj76IYWi3pJKS6bRFvKC7N44kQqANqjWFQEgU=;
- b=VQqHGBtXKy5dAcd0IHL4wVPVmKKKHv2ijDqPxOwr3xI0b9/SdYSk++At7ogpe/Zj5NUgaU
- z9ZMkdTDMCk3t9rIfzfgMxmTrtLkjpR557XYy9nNSp8GyqNFAaguE0kzihgiO63g1lHvil
- YHFmvdnsAdfxyBLQnAh3BSzioXIU9iw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-j9M5EbGgMv-w71pr3ciZpg-1; Thu, 21 Nov 2019 14:36:24 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE0168D4E80
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 19:36:23 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com
- (colo-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.20])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E5E1860BCC
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 19:36:23 +0000 (UTC)
-Received: from zmail17.collab.prod.int.phx2.redhat.com
- (zmail17.collab.prod.int.phx2.redhat.com [10.5.83.19])
- by colo-mx.corp.redhat.com (Postfix) with ESMTP id 96FFF1809563;
- Thu, 21 Nov 2019 19:36:23 +0000 (UTC)
-Date: Thu, 21 Nov 2019 14:36:23 -0500 (EST)
-From: Cleber Rosa <crosa@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Message-ID: <76600245.13392416.1574364983414.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20191121185303.51685-1-dgilbert@redhat.com>
-References: <20191121185303.51685-1-dgilbert@redhat.com>
-Subject: Re: [PATCH] vmstate-static-checker: Fix for current python
+ (envelope-from <deller@gmx.de>) id 1iXsDK-0004vy-Uk
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:34:04 -0500
+Received: from mout.gmx.net ([212.227.17.20]:50387)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <deller@gmx.de>) id 1iXsDK-0004vB-Gp
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 14:34:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+ s=badeba3b8450; t=1574364835;
+ bh=JzP4tzFp+NnxOPqwU1k56WNBiud9q7zQLHgxgyFc/Eo=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+ b=gMxggRh3BTWVv7oje+z+8sFicpNwEUNSF+ixrsDEQ82JD9ZmqH22febLds+r7INfv
+ 4NK0YzE0LUAxsu9RPl86h69KWK3DHH2pVSYQSKoJXJWxg0e8PqDNJM9rYdqxFNzUdI
+ mkHVVbgFuU4Fon+QPl9MphCjZT4TXN+XokmYIwqY=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from ls3530.fritz.box ([92.116.156.18]) by mail.gmx.com (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MtfNf-1hhhMq2ujP-00vAGC; Thu, 21
+ Nov 2019 20:33:55 +0100
+Date: Thu, 21 Nov 2019 20:33:51 +0100
+From: Helge Deller <deller@gmx.de>
+To: qemu-devel@nongnu.org,
+	Aleksandar Markovic <aleksandar.m.mail@gmail.com>
+Subject: [PATCH v3] linux-user/strace: Improve output of various syscalls
+Message-ID: <20191121193351.GA31821@ls3530.fritz.box>
 MIME-Version: 1.0
-X-Originating-IP: [10.10.125.0, 10.4.195.23]
-Thread-Topic: vmstate-static-checker: Fix for current python
-Thread-Index: l3dpKIFcxv6sIw86hZvLd/Uqg50VzQ==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: j9M5EbGgMv-w71pr3ciZpg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Provags-ID: V03:K1:+BYJB7rON8105Rb22Xx0uUl/TGqVnWQYE8oXHHq8TGYdRtaWVcY
+ aLdeRYalx8rQghgOkDwd4Bv8ZS+KwBG6ccuPuJ6Uj15mQBlODBnoTwC9mDqdypsmTqQYH7i
+ sBEUodrYc5Gb1qZOcwX/OrM1A5p6WjKZN3FdouAuyMsDqIqhT32+LEXLqje1OdzZ8Y962Uk
+ Vyl5FlWKHR93ZHP8PajGw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:w6Jgr7WaTFM=:tY4e+PcWRM0HFxfxwvW6FV
+ 838TM1u8w9XemyZ4N/mgXMXQPIGFI2aSOAiUVRSwTU84ZWGDyVKklvXKAfcJCiZWP5Gevvq58
+ EfEonzmGFVHhSD1VufothVUw3Oi7ARp30bkMcokDXaHQJ/LQZnsdBBGeAUc02jZ51a8NWgg+l
+ Sh2P2RgITxImvWQ8enpkkmMHfOOCYFfnaulitmwZaXeaA9lbozXXNvOLxCw6s7wCA6zdL+CNS
+ uzRiS889Qi7bOKOXDOmc3IyDhjYQlz8krTmj1lKwE7mUJA05rKEHYg+Q/ZiVHHSuqxRFL0s9i
+ yOaEV1DBOl/eD3YCcv1NiKUqvxLKlTOnHNoIvSC0riqyfV5OdP+nzlYoPDK+RC5lfekOJQqSD
+ A8OPpaULngiaGK1ZnDJ182hL1EKtGa9rcZxKj2vNOfMuS6BxqdesVq2eLlhZOxDOOPeqNyO+A
+ fLKsWg+LF5n03MUniV5XGKmPQ1veXJoiknREBJb+BXNMyFMOu/G6ArVfA44cPOAI9sFAYkayO
+ 5z0VOXZCrogrtR/UlNowqIcmLomTv5Jfw6+qNy0Hh+5UzmQFaCGBr1BsPiatnVwNyq6nOhK/r
+ T5twxFgvuSItLu8gfVuZYXe9DxUO1HFqq1SPcqLPGaC/M7kfb9ZOWcqPhctVZltQrkAret7lg
+ TUvIdjafe5Ivf296wmkZbzKUEa1LrHKdGj06XtNFQ7zRHTggpNFuFrunCvluDxU9OYscW2g7L
+ nGOCLbkEOY0h1jjQjk9Ywk06xA/qHwU9VLbJG++R6oPerGIJ4h1wyAVmOqMiV6emBLt3pEEGC
+ HvzjD/UaQA0zYHEO0RR9+PzA9/GflzMsYwilTVAirhDfR/LaOmG2yk04eeBRSHl80NnIpZ6KP
+ awz9yToKKq7vWAxM7rzgbupN2GuXam2y+qe4LnYc6Q2EmRMbUqh2rmSOo4DBkHlRQrSH6mB6Q
+ oTkoCT4D/52tJM+ZfJ+DekNDt4cBXctMzEJUjRdslD4DLJnBtfU8ASTYDqBxgMkE8I49E2GmX
+ NK0XYfTUiBtbR2mB7TVXXbzol7k/jSkOTY0C7Yw7pbrTHuMNt2U82RmUuW7truEGQkglpHfcs
+ rAl9s2kD9yxLxCbzj7XIiolq4hcRMe7l0U+sJj3/xlTHlu8PVq41gnwvGI7doOaDq+TjdZSaB
+ TNks2vQNAbo9bBEPwFYYh/75czy7xQcR65msAAKU2BhL+JdwL++CvazSAl9zWeH5cA29A7tMo
+ oS5F3O7mo3dVfVrVHGEYvrwsnwFZE9LLANi+LdQ==
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 212.227.17.20
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,69 +93,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, quintela@redhat.com
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Philippe =?iso-8859-15?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Improve strace output of various syscalls which either have none
+or only int-type parameters.
+
+Signed-off-by: Helge Deller <deller@gmx.de>
+
+---
+Changes in v3:
+    fixed alarm()
+    added epoll_create(), epoll_create1(), eventfd(), eventfd2()
+
+Changes in v2:
+    fixed ioctl()
 
 
------ Original Message -----
-> From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-> To: qemu-devel@nongnu.org, quintela@redhat.com, ehabkost@redhat.com, cros=
-a@redhat.com
-> Sent: Thursday, November 21, 2019 1:53:03 PM
-> Subject: [PATCH] vmstate-static-checker: Fix for current python
->=20
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->=20
-> Python 3.7.5 on f31 doesn't seem to like the old type=3Dfile syntax
-> on argparse.
->=20
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> ---
->  scripts/vmstate-static-checker.py | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->=20
-> diff --git a/scripts/vmstate-static-checker.py
-> b/scripts/vmstate-static-checker.py
-> index 21dbdccf3e..9f912dd870 100755
-> --- a/scripts/vmstate-static-checker.py
-> +++ b/scripts/vmstate-static-checker.py
-> @@ -379,9 +379,11 @@ def main():
->      help_text =3D "Parse JSON-formatted vmstate dumps from QEMU in files=
- SRC
->      and DEST.  Checks whether migration from SRC to DEST QEMU versions
->      would break based on the VMSTATE information contained within the JS=
-ON
->      outputs.  The JSON output is created from a QEMU invocation with the
->      -dump-vmstate parameter and a filename argument to it.  Other
->      parameters to QEMU do not matter, except the -M (machine type)
->      parameter."
-> =20
->      parser =3D argparse.ArgumentParser(description=3Dhelp_text)
-> -    parser.add_argument('-s', '--src', type=3Dfile, required=3DTrue,
-> +    parser.add_argument('-s', '--src', type=3Dargparse.FileType('r'),
-> +                        required=3DTrue,
-
-Actually, as far back as Python 3.4 (maybe even earlier) `file` is not a
-valid built-in function anymore.
-
->                          help=3D'json dump from src qemu')
-> -    parser.add_argument('-d', '--dest', type=3Dfile, required=3DTrue,
-> +    parser.add_argument('-d', '--dest', type=3Dargparse.FileType('r'),
-> +                        required=3DTrue,
->                          help=3D'json dump from dest qemu')
->      parser.add_argument('--reverse', required=3DFalse, default=3DFalse,
->                          action=3D'store_true',
-> --
-> 2.23.0
->=20
->=20
->=20
-
-And I agree that this is 4.2 material.
-
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index 1de4319dcf..d49a1e92a8 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -26,7 +26,7 @@
+ { TARGET_NR_afs_syscall, "afs_syscall" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_alarm
+-{ TARGET_NR_alarm, "alarm" , NULL, NULL, NULL },
++{ TARGET_NR_alarm, "alarm" , "%s(%u)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_aplib
+ { TARGET_NR_aplib, "aplib" , NULL, NULL, NULL },
+@@ -116,19 +116,19 @@
+ { TARGET_NR_dipc, "dipc" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_dup
+-{ TARGET_NR_dup, "dup" , NULL, NULL, NULL },
++{ TARGET_NR_dup, "dup" , "%s(%d)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_dup2
+-{ TARGET_NR_dup2, "dup2" , NULL, NULL, NULL },
++{ TARGET_NR_dup2, "dup2" , "%s(%d,%d)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_dup3
+-{ TARGET_NR_dup3, "dup3" , NULL, NULL, NULL },
++{ TARGET_NR_dup3, "dup3" , "%s(%d,%d,%d)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_epoll_create
+-{ TARGET_NR_epoll_create, "epoll_create" , NULL, NULL, NULL },
++{ TARGET_NR_epoll_create, "%s(%d)", NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_epoll_create1
+-{ TARGET_NR_epoll_create1, "epoll_create1" , NULL, NULL, NULL },
++{ TARGET_NR_epoll_create1, "%s(%d)", NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_epoll_ctl
+ { TARGET_NR_epoll_ctl, "epoll_ctl" , NULL, NULL, NULL },
+@@ -146,10 +146,10 @@
+ { TARGET_NR_epoll_wait_old, "epoll_wait_old" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_eventfd
+-{ TARGET_NR_eventfd, "eventfd" , NULL, NULL, NULL },
++{ TARGET_NR_eventfd, "eventfd", "%s(%d)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_eventfd2
+-{ TARGET_NR_eventfd2, "eventfd2" , NULL, NULL, NULL },
++{ TARGET_NR_eventfd2, "eventfd2" , "%s(%d,%d)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_execv
+ { TARGET_NR_execv, "execv" , NULL, print_execv, NULL },
+@@ -191,7 +191,7 @@
+ { TARGET_NR_fanotify_mark, "fanotify_mark" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_fchdir
+-{ TARGET_NR_fchdir, "fchdir" , NULL, NULL, NULL },
++{ TARGET_NR_fchdir, "fchdir" , "%s(%d)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_fchmod
+ { TARGET_NR_fchmod, "fchmod" , "%s(%d,%#o)", NULL, NULL },
+@@ -287,7 +287,7 @@
+ { TARGET_NR_getdtablesize, "getdtablesize" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getegid
+-{ TARGET_NR_getegid, "getegid" , NULL, NULL, NULL },
++{ TARGET_NR_getegid, "getegid" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getegid32
+ { TARGET_NR_getegid32, "getegid32" , NULL, NULL, NULL },
+@@ -299,7 +299,7 @@
+ { TARGET_NR_geteuid32, "geteuid32" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getgid
+-{ TARGET_NR_getgid, "getgid" , NULL, NULL, NULL },
++{ TARGET_NR_getgid, "getgid" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getgid32
+ { TARGET_NR_getgid32, "getgid32" , NULL, NULL, NULL },
+@@ -329,10 +329,10 @@
+ { TARGET_NR_getpeername, "getpeername" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getpgid
+-{ TARGET_NR_getpgid, "getpgid" , NULL, NULL, NULL },
++{ TARGET_NR_getpgid, "getpgid" , "%s(%u)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getpgrp
+-{ TARGET_NR_getpgrp, "getpgrp" , NULL, NULL, NULL },
++{ TARGET_NR_getpgrp, "getpgrp" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getpid
+ { TARGET_NR_getpid, "getpid" , "%s()", NULL, NULL },
+@@ -432,7 +432,7 @@
+ { TARGET_NR_io_cancel, "io_cancel" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_ioctl
+-{ TARGET_NR_ioctl, "ioctl" , NULL, NULL, NULL },
++{ TARGET_NR_ioctl, "ioctl" , "%s(%d,%#x,%#x)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_io_destroy
+ { TARGET_NR_io_destroy, "io_destroy" , NULL, NULL, NULL },
+@@ -1257,22 +1257,22 @@
+ { TARGET_NR_setdomainname, "setdomainname" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setfsgid
+-{ TARGET_NR_setfsgid, "setfsgid" , NULL, NULL, NULL },
++{ TARGET_NR_setfsgid, "setfsgid" , "%s(%u)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setfsgid32
+-{ TARGET_NR_setfsgid32, "setfsgid32" , NULL, NULL, NULL },
++{ TARGET_NR_setfsgid32, "setfsgid32" , "%s(%u)" , NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setfsuid
+-{ TARGET_NR_setfsuid, "setfsuid" , NULL, NULL, NULL },
++{ TARGET_NR_setfsuid, "setfsuid" , "%s(%u)" , NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setfsuid32
+ { TARGET_NR_setfsuid32, "setfsuid32" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setgid
+-{ TARGET_NR_setgid, "setgid" , NULL, NULL, NULL },
++{ TARGET_NR_setgid, "setgid" , "%s(%u)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setgid32
+-{ TARGET_NR_setgid32, "setgid32" , NULL, NULL, NULL },
++{ TARGET_NR_setgid32, "setgid32" , "%s(%u)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setgroups
+ { TARGET_NR_setgroups, "setgroups" , NULL, NULL, NULL },
+@@ -1296,7 +1296,7 @@
+ { TARGET_NR_setns, "setns" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setpgid
+-{ TARGET_NR_setpgid, "setpgid" , NULL, NULL, NULL },
++{ TARGET_NR_setpgid, "setpgid" , "%s(%u,%u)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setpgrp
+ { TARGET_NR_setpgrp, "setpgrp" , NULL, NULL, NULL },
+@@ -1311,22 +1311,22 @@
+ { TARGET_NR_setregid32, "setregid32" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setresgid
+-{ TARGET_NR_setresgid, "setresgid" , NULL, NULL, NULL },
++{ TARGET_NR_setresgid, "setresgid" , "%s(%u,%u,%u)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setresgid32
+ { TARGET_NR_setresgid32, "setresgid32" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setresuid
+-{ TARGET_NR_setresuid, "setresuid" , NULL, NULL, NULL },
++{ TARGET_NR_setresuid, "setresuid" , "%s(%u,%u,%u)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setresuid32
+-{ TARGET_NR_setresuid32, "setresuid32" , NULL, NULL, NULL },
++{ TARGET_NR_setresuid32, "setresuid32" , "%s(%u,%u,%u)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setreuid
+-{ TARGET_NR_setreuid, "setreuid" , NULL, NULL, NULL },
++{ TARGET_NR_setreuid, "setreuid" , "%s(%u,%u)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setreuid32
+-{ TARGET_NR_setreuid32, "setreuid32" , NULL, NULL, NULL },
++{ TARGET_NR_setreuid32, "setreuid32" , "%s(%u,%u)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setrlimit
+ { TARGET_NR_setrlimit, "setrlimit" , NULL, NULL, NULL },
+@@ -1335,7 +1335,7 @@
+ { TARGET_NR_set_robust_list, "set_robust_list" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setsid
+-{ TARGET_NR_setsid, "setsid" , NULL, NULL, NULL },
++{ TARGET_NR_setsid, "setsid" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setsockopt
+ { TARGET_NR_setsockopt, "setsockopt" , NULL, NULL, NULL },
 
