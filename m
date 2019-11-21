@@ -2,79 +2,88 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0025AC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 749B1C432C3
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:18:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BCADE2068E
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:14:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C6282068E
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:18:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bfbNjHQL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCADE2068E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sHELJ+af"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C6282068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41124 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXnDi-0000Sa-Sp
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 09:14:06 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37552)
+	id 1iXnIO-00044f-Bx
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 09:18:56 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38465)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <cohuck@redhat.com>) id 1iXnBJ-0006It-N8
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:11:39 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iXnHL-0003Gx-69
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:17:52 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <cohuck@redhat.com>) id 1iXnBH-0006B3-E6
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:11:37 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:27241
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1iXnBH-0006AS-8I
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:11:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574345493;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=aQYCUa9bljjrO3Jb+kS72aFEkgAxJaKCWRx6bz1n6eo=;
- b=bfbNjHQLhZ4mqH9mzq+oaE6/mOeaOzb/q9B4Be+VOHOh2hBVsLezCPl/50MIw/qXSs9ZGN
- v/4Xk0pU8vsoDL+pbpipMZunq4RXmqDeGbSY0VD6GQXPppIpIWRcvkKscjRXdf5Dw02mNv
- FDTx4E2q3gPwng8BIRWGO5okU0Zmd90=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-BnPn4_q6MOmO8f_IEzRaag-1; Thu, 21 Nov 2019 09:11:27 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93DE6100550E;
- Thu, 21 Nov 2019 14:11:25 +0000 (UTC)
-Received: from gondolin (dhcp-192-218.str.redhat.com [10.33.192.218])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3B12D6CE76;
- Thu, 21 Nov 2019 14:11:21 +0000 (UTC)
-Date: Thu, 21 Nov 2019 15:11:18 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH 09/15] s390x: protvirt: SCLP interpretation
-Message-ID: <20191121151118.4caa8523.cohuck@redhat.com>
-In-Reply-To: <20191120114334.2287-10-frankja@linux.ibm.com>
-References: <20191120114334.2287-1-frankja@linux.ibm.com>
- <20191120114334.2287-10-frankja@linux.ibm.com>
-Organization: Red Hat GmbH
+ (envelope-from <stefanha@gmail.com>) id 1iXnHJ-0001a5-Tm
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:17:50 -0500
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34926)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iXnHJ-0001Zx-LN
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:17:49 -0500
+Received: by mail-wm1-x343.google.com with SMTP id 8so3923204wmo.0
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 06:17:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=Uo1gy0bKtpX0ZralV68Q+zpjOjMh91wdG3ZqPhrLw28=;
+ b=sHELJ+afYoiSgK/B/MSg6RshOqHP/236JZF1ukTZ2GWZFcvCAxfdkwDzIg3Egt1Jwl
+ FArgPsbV/+RpTzdNtlJJDn4s1wrLHq/Z4Df9e3RBSvSxrUP5m7NIh+DLYCYljWc/audB
+ JVHyXBm96R6Iv2FBB4DpKgoDlIkKF2O6iyiFxF5pXfDFpXBxARFzB5tSBtPT8+cCHSXs
+ QwN1vE+2RfYG6B3T6MQh00ZcBjDRJr3boTtDCgI/0XYy5ouWBoN+Q9eH85qLdTvMoAUC
+ oR3aTSLUl7O2Gdx/kOi+CUQa6eFIU6eCiMhanOfiQ8rIAQKJFQoOSuj9sUn88m+u4vj7
+ S8/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=Uo1gy0bKtpX0ZralV68Q+zpjOjMh91wdG3ZqPhrLw28=;
+ b=LOqoQC4ugKqfKjyp+MC+zn/zvRTtPCj1JdaH4nRHVdwwWTm/M1otaoqoPhi+0s9GkY
+ cGbyyP19wI2zFhHChivtZ5vpsrdxl8TurRlIBBmv4Zwc4hK9X/jLznOWqpl4wfd0CvsE
+ MlPCXtO9GG2hTRFYYkJ3Xqi+qUkBFFq63wvosr5IKaTGEuPWJdw2/z7DJN3HhZ748jYT
+ WvPpTJ+wWhh912rHj+HLVTxeA/gGOAWebkAbMSUNRmNo9rXlUK8KDpe5xZEx975oAoSR
+ v0sX6ZW9/9pREF6DVUzihbU15N78gUyJww4bNIEiUR+/GnOfs9BiHKVbhL5vo9tqaXF5
+ tuiQ==
+X-Gm-Message-State: APjAAAUeNz9Ug/Hx0aCGhdgCfQVP56pvwpTw+zOzpQGJhr0U3I8bwXJz
+ 8dqw7dmnj4yo83BaL2jxIhs=
+X-Google-Smtp-Source: APXvYqy1FC8aTq/B7AqjyunYyKwA2FambYBixb/B2ONZHtl9MxgQanUxcyA59bL9BtVhN9itTx3jKg==
+X-Received: by 2002:a05:600c:214a:: with SMTP id
+ v10mr10196203wml.102.1574345868434; 
+ Thu, 21 Nov 2019 06:17:48 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id u13sm2813886wmm.45.2019.11.21.06.17.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 21 Nov 2019 06:17:47 -0800 (PST)
+Date: Thu, 21 Nov 2019 14:17:46 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Micky Yun Chan <chanmickyyun@gmail.com>
+Subject: Re: [PATCH v6] Implement backend program convention command for
+ vhost-user-blk
+Message-ID: <20191121141746.GZ439743@stefanha-x1.localdomain>
+References: <20191121015826.4867-1-michan@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: BnPn4_q6MOmO8f_IEzRaag-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="QZ+LYBYf4/WKxcjd"
+Content-Disposition: inline
+In-Reply-To: <20191121015826.4867-1-michan@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::343
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,96 +95,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
- qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mihajlov@linux.ibm.com
+Cc: michan <michan@redhat.com>, qemu-devel@nongnu.org, stefanha@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 20 Nov 2019 06:43:28 -0500
-Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> SCLP for a protected guest is done over the SIDAD, so we need to use
-> the s390_cpu_virt_mem_* functions to access the SIDAD instead of guest
-> memory when reading/writing SCBs.
->=20
-> To not confuse the sclp emulation, we set 0x42000 as the address, but
-> ignore it for reading/writing the SCCB.
->=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  hw/s390x/sclp.c         | 16 ++++++++++++++++
->  include/hw/s390x/sclp.h |  2 ++
->  target/s390x/kvm.c      |  8 +++++++-
->  3 files changed, 25 insertions(+), 1 deletion(-)
->=20
-> diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
-> index f57ce7b739..00d08adc7f 100644
-> --- a/hw/s390x/sclp.c
-> +++ b/hw/s390x/sclp.c
-> @@ -193,6 +193,22 @@ static void sclp_execute(SCLPDevice *sclp, SCCB *scc=
-b, uint32_t code)
->      }
+--QZ+LYBYf4/WKxcjd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Nov 21, 2019 at 09:58:26AM +0800, Micky Yun Chan wrote:
+> diff --git a/docs/interop/vhost-user.json b/docs/interop/vhost-user.json
+> index da6aaf51c8..d25c3a957f 100644
+> --- a/docs/interop/vhost-user.json
+> +++ b/docs/interop/vhost-user.json
+> @@ -54,6 +54,37 @@
+>    ]
 >  }
 > =20
-> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
-> +                                uint32_t code)
+> +##
+> +# @VHostUserBackendBlockFeature:
+> +#
+> +# List of vhost user "block" features.
+> +#
+> +# @read-only: The --read-only command line option is supported.
+> +# @blk-file: The --blk-file command line option is supported.
+
+Please also update docs/interop/vhost-user.rst.  That document
+duplicates the option documentation and it would be good to keep it
+up-to-date.
+
+> +#
+> +# Since: 4.0
+
+QEMU 4.2 is close to being released and the codebase is frozen.  The
+next release will be 5.0.  Please change this to:
+
+  Since: 5.0
+
+> +##
 > +{
-> +    SCLPDevice *sclp =3D get_sclp_device();
-> +    SCLPDeviceClass *sclp_c =3D SCLP_GET_CLASS(sclp);
-> +    SCCB work_sccb;
-> +    hwaddr sccb_len =3D sizeof(SCCB);
-> +
-> +    s390_cpu_virt_mem_read(env_archcpu(env), 0, 0, &work_sccb, sccb_len)=
-;
-> +    sclp_c->execute(sclp, &work_sccb, code);
-> +    s390_cpu_virt_mem_write(env_archcpu(env), 0, 0, &work_sccb,
-> +                            be16_to_cpu(work_sccb.h.length));
-> +    sclp_c->service_interrupt(sclp, sccb);
-> +    return 0;
+> +  'enum': 'VHostUserBackendBlockFeature',
+> +  'data': [ 'read-only', 'blk-file' ]
 > +}
 > +
->  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code)
->  {
->      SCLPDevice *sclp =3D get_sclp_device();
-> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-> index c54413b78c..c0a3faa37d 100644
-> --- a/include/hw/s390x/sclp.h
-> +++ b/include/hw/s390x/sclp.h
-> @@ -217,5 +217,7 @@ void s390_sclp_init(void);
->  void sclp_service_interrupt(uint32_t sccb);
->  void raise_irq_cpu_hotplug(void);
->  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
-> +int sclp_service_call_protected(CPUS390XState *env, uint64_t sccb,
-> +                                uint32_t code);
-> =20
->  #endif
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index 58251c0229..0f2458b553 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -1172,7 +1172,13 @@ static int kvm_sclp_service_call(S390CPU *cpu, str=
-uct kvm_run *run,
->      sccb =3D env->regs[ipbh0 & 0xf];
->      code =3D env->regs[(ipbh0 & 0xf0) >> 4];
-> =20
-> -    r =3D sclp_service_call(env, sccb, code);
-> +    if (run->s390_sieic.icptcode =3D=3D ICPT_PV_INSTR ||
-> +        run->s390_sieic.icptcode =3D=3D ICPT_PV_INSTR_NOT) {
-> +        r =3D sclp_service_call_protected(env, 0x42000, code);
+> +##
+> +# @VHostUserBackendCapabilitiesBlock:
+> +#
+> +# Capabilities reported by vhost user "block" backends
+> +#
+> +# @features: list of supported features.
+> +#
+> +# Since: 4.0
 
-I fear that confuses the reader instead of the emulation :)
+Same here.
 
-Especially as you end up passing that value to
-sclp_c->service_interrupt()...
+--QZ+LYBYf4/WKxcjd
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> +    } else {
-> +        r =3D sclp_service_call(env, sccb, code);
-> +    }
-> +
->      if (r < 0) {
->          kvm_s390_program_interrupt(cpu, -r);
->      } else {
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3WnIoACgkQnKSrs4Gr
+c8htzQgAhtgj2KBMnMwgQU53ckyVPCXvnRShx7W30OqT6mnB9Fv0uLsjNXgxTgF1
+RLyL4IQEatGRqAo7NgoY+HIZjLFxQtdNLUbO5Bdn9QFx6HQk7S7xb1IY9n7MJE2e
+bk6E49REuz7hc1uezCMZ/wKP28pgNNuZ8+t75aUwH4Uai2vXSu37GHOvrDSdnmoj
+cI+IBHENYpTL0jjhofV1F9oMmzll5fcKkrqEqQKPX3ZdmLxsvaXvfV2uBLwMdNy0
+wQaJTTtbQ1UjaGUaE2qC2i/HW6s5ZuHeihnBrty/CDoTBVw0R4xmQ4xCcdYWuYFg
+y3KR06PcGF7OQrkFUvc2dxOD/UzHoA==
+=dsHJ
+-----END PGP SIGNATURE-----
+
+--QZ+LYBYf4/WKxcjd--
 
