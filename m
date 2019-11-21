@@ -2,79 +2,89 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E88C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2456C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:15:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 542F5206CC
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:11:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 542F5206CC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maskray.me
+	by mail.kernel.org (Postfix) with ESMTPS id BB3EC206CC
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:15:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mvista-com.20150623.gappssmtp.com header.i=@mvista-com.20150623.gappssmtp.com header.b="Fkja8nNX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB3EC206CC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mvista.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43020 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXpzf-0008WE-By
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 12:11:47 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37511)
+	id 1iXq2u-0001sx-Tk
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 12:15:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38051)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <emacsray@gmail.com>) id 1iXpyz-00081N-H4
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:11:06 -0500
+ (envelope-from <cminyard@mvista.com>) id 1iXq1x-0001L4-Hc
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:14:11 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <emacsray@gmail.com>) id 1iXpyy-0001Ds-2T
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:11:05 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:39957)
+ (envelope-from <cminyard@mvista.com>) id 1iXq1v-00036a-JA
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:14:08 -0500
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38364)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <emacsray@gmail.com>) id 1iXpyx-0001Cj-RL
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:11:04 -0500
-Received: by mail-pf1-f195.google.com with SMTP id r4so2005009pfl.7
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:11:03 -0800 (PST)
+ (Exim 4.71) (envelope-from <cminyard@mvista.com>) id 1iXq1v-00035T-8x
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:14:07 -0500
+Received: by mail-oi1-x244.google.com with SMTP id a14so3883138oid.5
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:14:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mvista-com.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:subject:message-id:reply-to:references:mime-version
+ :content-disposition:content-transfer-encoding:in-reply-to
+ :user-agent; bh=b1YrrIJoqInpingjgTyZ8K2fdcJ7rd4qQmCHAj2Oo6E=;
+ b=Fkja8nNXUHOG25MLfBusgP6J9kRZqrv2StRIsnsKe5kRBlZVv3voLwvRO74l4ndByC
+ eXxnQGSC0Y/BYWPhzwZKMscrO5RAX626aWk2HJdv2rfU2Uo736O1bkeAbaDaK1u9b9I7
+ AWNXiY0yg7w9L1Slgxc1/rk0cz8YrvOL6tdZyEa4wJ/C8EBtN7svqVU3+S48zKAAeTR2
+ EO/f6SkHPVKakNmCNHhotIL3s3ON4EsWV7GGKRLuDN1zWu+WXMgf3QI4IdaZJTPGUell
+ IjFFcVnPmJDxreobnQhfuzM6Y1aoyW3s0FSIYqhFJTaA7ZGEL4YtWYfXzGZ/ldl7jU6l
+ Z5aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=uVEZFiM+WYWnZs8RY8vKON8yrPY9OJsUeNe7gmzBl+8=;
- b=CCaHBiJTun8HueEsU5IfEudrLDQkdrYaa8AO8gza/KHrfkxTAWQQ+RVXkObx9ivZPp
- Vh8iyIOaLx1mX0KeqTOhPn5qBwlAonixdpSG6F5NqGDYETcgrDl8TgpOKTq09qL3Nzm3
- NdGlYEogZSummU+/nw28fJ6Gj/apmYzH/PA8KRAS7yWeuMZVaGb8pmDCHVP4y5aX8Scx
- d8wSu4cLVvMFMCLbjvSOYdG3r+b5ccAyRspXcm7cQyL0MsNERRsV7GC3P6+bvCBhKnb3
- Z74wJKQGL9WjBisPw5wq04F67BWCiN6rwb3MTEQCDSKiJc58pKe6ArYoKQOp2y9AfJY5
- pChQ==
-X-Gm-Message-State: APjAAAU1E+uS3WoRN9wSdzkJSCx2mRjS9sxH6x8dCbMqFB0FSBEk79p/
- RwvyelExTHyUFsmL91uVSGM=
-X-Google-Smtp-Source: APXvYqw7pP+AMqO5JrDOsMf9IuIGrh7imNe8954UxB9NXzZ3rxBBJIPBDnM4RtRhnHK0I387+FSs5w==
-X-Received: by 2002:a62:4d43:: with SMTP id a64mr12260111pfb.197.1574356262776; 
- Thu, 21 Nov 2019 09:11:02 -0800 (PST)
-Received: from localhost ([2620:15c:2d1:100:7901:ead3:b8cd:1c59])
- by smtp.gmail.com with ESMTPSA id t8sm115996pjr.25.2019.11.21.09.11.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 Nov 2019 09:11:01 -0800 (PST)
-Date: Thu, 21 Nov 2019 09:11:01 -0800
-From: Fangrui Song <i@maskray.me>
-To: Markus Armbruster <armbru@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH] Fix incorrect int->float conversions caught by clang
- -Wimplicit-int-float-conversion
-Message-ID: <20191121171101.jjlxc72n7vtpeqyc@gmail.com>
-References: <20191116010731.3jdxozzfpsqsrcc4@google.com>
- <87tv6z7vb0.fsf@dusky.pond.sub.org> <87pnhmol25.fsf@trasno.org>
- <20191120173018.4jahw3pei3zcupvo@gmail.com>
- <f193df45-e4e7-808d-af20-cb98d8fcf96a@linaro.org>
- <87mucpb7vr.fsf@dusky.pond.sub.org>
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+ :references:mime-version:content-disposition
+ :content-transfer-encoding:in-reply-to:user-agent;
+ bh=b1YrrIJoqInpingjgTyZ8K2fdcJ7rd4qQmCHAj2Oo6E=;
+ b=ZEgs7WBI/YPY0zjGi4GIbDVpCx3BnFMErp7sRitDgIK2lMDJLM3n4Z0EVP2tnQXA3w
+ fVmG5Y/m9fUlDngZQSCxpkaEoMKbIxDOLaE/Qi6spIsLqQr6S5pB40s92wbrCr6eAbXw
+ OxMN5UIFbVM7cD55iDM3jGL98+sD9jf+5qNk3vTzLsQ5b85U1hT4a4Y2eLISkHKr1s7q
+ fBETFPs2mjq5npha+J880I/wHQXXT/vcrYkafKV87xL1agxT7C9Acxm67EwkpoGLOVzG
+ tw4svFkkV3vyEHGiN6xLgGvuAs9w0G0AoYsxCdA2To5i/6YufYwyQT0BX8bzUPPfBA+K
+ dVMw==
+X-Gm-Message-State: APjAAAW1+1WZB7JRjnexHZszyFtAU1c2Z+o0VD2Ffx40kTy7jPOG1kj0
+ gwCl5Lxwbe72kHvxTvw6TY8WlA==
+X-Google-Smtp-Source: APXvYqwFV65+3Bdqy+hHZdCBAhuMApg3hWz6Qu4xXNEMPg466zLG9NZH3vdZHs/f8rPkjA6PhdSc4w==
+X-Received: by 2002:a05:6808:103:: with SMTP id
+ b3mr8152280oie.38.1574356444555; 
+ Thu, 21 Nov 2019 09:14:04 -0800 (PST)
+Received: from minyard.net ([47.184.136.59])
+ by smtp.gmail.com with ESMTPSA id e93sm1173408otb.60.2019.11.21.09.14.03
+ (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 21 Nov 2019 09:14:03 -0800 (PST)
+Date: Thu, 21 Nov 2019 11:14:02 -0600
+From: Corey Minyard <cminyard@mvista.com>
+To: =?utf-8?Q?C=C3=A9dric?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH v2] ppc/pnv: Create BMC devices at machine init
+Message-ID: <20191121171402.GI3556@minyard.net>
+References: <20191121162340.11049-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="mu547a2ytondnir6"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87mucpb7vr.fsf@dusky.pond.sub.org>
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 209.85.210.195
+In-Reply-To: <20191121162340.11049-1-clg@kaod.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2607:f8b0:4864:20::244
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,145 +96,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Reply-To: cminyard@mvista.com
+Cc: qemu-ppc@nongnu.org, Oliver O'Halloran <oohall@gmail.com>,
+ qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Nov 21, 2019 at 05:23:40PM +0100, CÃ©dric Le Goater wrote:
+> The BMC of the OpenPOWER systems monitors the machine state using
+> sensors, controls the power and controls the access to the PNOR flash
+> device containing the firmware image required to boot the host.
+> 
+> QEMU models the power cycle process, access to the sensors and access
+> to the PNOR device. But, for these features to be available, the QEMU
+> PowerNV machine needs two extras devices on the command line, an IPMI
+> BT device for communication and a BMC backend device:
+> 
+>   -device ipmi-bmc-sim,id=bmc0 -device isa-ipmi-bt,bmc=bmc0,irq=10
+> 
+> The BMC properties are then defined accordingly in the device tree and
+> OPAL self adapts. If a BMC device and an IPMI BT device are not
+> available, OPAL does not try to communicate with the BMC in any
+> manner. This is not how real systems behave.
+> 
+> To be closer to the default behavior, create an IPMI BMC simulator
+> device and an IPMI BT device at machine initialization time. We loose
+> the ability to define an external BMC device but there are benefits:
+> 
+>   - a better match with real systems,
+>   - a better test coverage of the OPAL code,
+>   - system powerdown and reset commands that work,
+>   - a QEMU device tree compliant with the specifications (*).
+> 
+> (*) Still needs a MBOX device.
+> 
+> Signed-off-by: CÃ©dric Le Goater <clg@kaod.org>
 
---mu547a2ytondnir6
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Acked-by: Corey Minyard <cminyard@mvista.com>
 
-On 2019-11-21, Markus Armbruster wrote:
->Richard Henderson <richard.henderson@linaro.org> writes:
->
->> On 11/20/19 6:30 PM, Fangrui Song wrote:
->>> On 2019-11-20, Juan Quintela wrote:
->>>> Markus Armbruster <armbru@redhat.com> wrote:
->>>>> Fangrui Song <i@maskray.me> writes:
->[...]
->>>>>> diff --git a/util/cutils.c b/util/cutils.c
->>>>>> index fd591cadf0..2b4484c015 100644
->>>>>> --- a/util/cutils.c
->>>>>> +++ b/util/cutils.c
->>>>>> @@ -239,10 +239,10 @@ static int do_strtosz(const char *nptr, const char
->>>>>> **end,
->>>>>>           goto out;
->>>>>>       }
->>>>>>       /*
->>>>>> -     * Values >= 0xfffffffffffffc00 overflow uint64_t after their trip
->>>>>> +     * Values > nextafter(0x1p64, 0) overflow uint64_t after their trip
->>>>>>        * through double (53 bits of precision).
->>>>>>        */
->>>>>> -    if ((val * mul >= 0xfffffffffffffc00) || val < 0) {
->>>>>> +    if ((val * mul > nextafter(0x1p64, 0)) || val < 0) {
->>>>>>           retval = -ERANGE;
->>>>>>           goto out;
->>>>>>       }
->>>>
->>>> This comment was really bad (it says the same that the code).
->>>> On the other hand, I can *kind of* understand what does 0xffff<more
->>>> f's here>.
->>>>
->>>> But I am at a complete loss about what value is:
->>>>
->>>> nextafter(0x1p64, 0).
->>>>
->>>> Can we put what value is that instead?
->>>
->>> It is a C99 hexadecimal floating-point literal.
->>> 0x1p64 represents hex fraction 1.0 scaled by 2**64, that is 2**64.
->>>
->>> We can write this as `val * mul > 0xfffffffffffff800p0`, but I feel that
->>> counting the number of f's is error-prone and is not fun.
->>>
->>> (We cannot use val * mul >= 0x1p64.
->>> If FLT_EVAL_METHOD == 2, the intermediate computation val * mul will be
->>> performed at long double precision, val * mul may not by representable
->>> by a double and will overflow as (double)0x1p64.)
->>
->> I agree about not spelling out the f's, or the 0x800 at the end.  That's
->> something that the compiler can do for us, resolving this standard library
->> function at compile-time.
->>
->> We just need a better comment.  Perhaps:
->>
->>     /*
->>      * Values near UINT64_MAX overflow to 2**64 when converting
->>      * to double precision.  Compare against the maximum representable
->>      * double precision value below 2**64, computed as "the next value
->>      * after 2**64 (0x1p64) in the direction of 0".
->>      */
->
->Yes, please.
-
-Thanks for the suggestion. Attached a new patch.
-
---mu547a2ytondnir6
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment; filename="qemu.patch"
-
-From 13312e91e5565a6bed8c394d5711603c7a8f8a3c Mon Sep 17 00:00:00 2001
-From: Fangrui Song <i@maskray.me>
-Date: Fri, 15 Nov 2019 16:27:47 -0800
-Subject: [PATCH] Fix incorrect integer->float conversion caught by clang -Wimplicit-int-float-conversion
-To: qemu-devel@nongnu.org
-
-The warning will be enabled by default in clang 10. It is not available for clang <= 9.
-
-qemu/migration/migration.c:2038:24: error: implicit conversion from 'long' to 'double' changes value from 9223372036854775807 to 9223372036854775808 [-Werror,-Wimplicit-int-float-conversion]
-...
-qemu/util/cutils.c:245:23: error: implicit conversion from 'unsigned long' to 'double' changes value from 18446744073709550592 to 18446744073709551616 [-Werror,-Wimplicit-int-float-conversion]
-
-Signed-off-by: Fangrui Song <i@maskray.me>
----
- migration/migration.c | 3 +--
- util/cutils.c         | 8 +++++---
- 2 files changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/migration/migration.c b/migration/migration.c
-index 354ad072fa..09b150663f 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2035,11 +2035,10 @@ void qmp_migrate_set_downtime(double value, Error **errp)
-     }
- 
-     value *= 1000; /* Convert to milliseconds */
--    value = MAX(0, MIN(INT64_MAX, value));
- 
-     MigrateSetParameters p = {
-         .has_downtime_limit = true,
--        .downtime_limit = value,
-+        .downtime_limit = (int64_t)value,
-     };
- 
-     qmp_migrate_set_parameters(&p, errp);
-diff --git a/util/cutils.c b/util/cutils.c
-index fd591cadf0..77acadc70a 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -239,10 +239,12 @@ static int do_strtosz(const char *nptr, const char **end,
-         goto out;
-     }
-     /*
--     * Values >= 0xfffffffffffffc00 overflow uint64_t after their trip
--     * through double (53 bits of precision).
-+     * Values near UINT64_MAX overflow to 2**64 when converting to double
-+     * precision.  Compare against the maximum representable double precision
-+     * value below 2**64, computed as "the next value after 2**64 (0x1p64) in
-+     * the direction of 0".
-      */
--    if ((val * mul >= 0xfffffffffffffc00) || val < 0) {
-+    if ((val * mul > nextafter(0x1p64, 0)) || val < 0) {
-         retval = -ERANGE;
-         goto out;
-     }
--- 
-2.24.0
-
-
---mu547a2ytondnir6--
+> ---
+> 
+>  Changes since v1:
+> 
+>  - renamed ipmi_bt_init() to pnv_ipmi_bt_init()
+> 
+>  include/hw/ppc/pnv.h |  2 +-
+>  hw/ppc/pnv.c         | 33 ++++++++++++++++-----------------
+>  hw/ppc/pnv_bmc.c     | 20 +++++++++++++++++---
+>  3 files changed, 34 insertions(+), 21 deletions(-)
+> 
+> diff --git a/include/hw/ppc/pnv.h b/include/hw/ppc/pnv.h
+> index 07c56c05ad30..90f1343ed07c 100644
+> --- a/include/hw/ppc/pnv.h
+> +++ b/include/hw/ppc/pnv.h
+> @@ -198,7 +198,7 @@ static inline bool pnv_is_power9(PnvMachineState *pnv)
+>   */
+>  void pnv_dt_bmc_sensors(IPMIBmc *bmc, void *fdt);
+>  void pnv_bmc_powerdown(IPMIBmc *bmc);
+> -int pnv_bmc_hiomap(IPMIBmc *bmc);
+> +IPMIBmc *pnv_bmc_create(void);
+>  
+>  /*
+>   * POWER8 MMIO base addresses
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index c3ac0d6d5b4a..f0adb06c8d65 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -551,27 +551,10 @@ static void pnv_powerdown_notify(Notifier *n, void *opaque)
+>  
+>  static void pnv_reset(MachineState *machine)
+>  {
+> -    PnvMachineState *pnv = PNV_MACHINE(machine);
+>      void *fdt;
+> -    Object *obj;
+>  
+>      qemu_devices_reset();
+>  
+> -    /*
+> -     * OpenPOWER systems have a BMC, which can be defined on the
+> -     * command line with:
+> -     *
+> -     *   -device ipmi-bmc-sim,id=bmc0
+> -     *
+> -     * This is the internal simulator but it could also be an external
+> -     * BMC.
+> -     */
+> -    obj = object_resolve_path_type("", "ipmi-bmc-sim", NULL);
+> -    if (obj) {
+> -        pnv->bmc = IPMI_BMC(obj);
+> -        pnv_bmc_hiomap(pnv->bmc);
+> -    }
+> -
+>      fdt = pnv_dt_create(machine);
+>  
+>      /* Pack resulting tree */
+> @@ -629,6 +612,16 @@ static bool pnv_match_cpu(const char *default_type, const char *cpu_type)
+>      return ppc_default->pvr_match(ppc_default, ppc->pvr);
+>  }
+>  
+> +static void pnv_ipmi_bt_init(ISABus *bus, IPMIBmc *bmc, uint32_t irq)
+> +{
+> +    Object *obj;
+> +
+> +    obj = OBJECT(isa_create(bus, "isa-ipmi-bt"));
+> +    object_property_set_link(obj, OBJECT(bmc), "bmc", &error_fatal);
+> +    object_property_set_int(obj, irq, "irq", &error_fatal);
+> +    object_property_set_bool(obj, true, "realized", &error_fatal);
+> +}
+> +
+>  static void pnv_init(MachineState *machine)
+>  {
+>      PnvMachineState *pnv = PNV_MACHINE(machine);
+> @@ -751,6 +744,9 @@ static void pnv_init(MachineState *machine)
+>      }
+>      g_free(chip_typename);
+>  
+> +    /* Create the machine BMC simulator */
+> +    pnv->bmc = pnv_bmc_create();
+> +
+>      /* Instantiate ISA bus on chip 0 */
+>      pnv->isa_bus = pnv_isa_create(pnv->chips[0], &error_fatal);
+>  
+> @@ -760,6 +756,9 @@ static void pnv_init(MachineState *machine)
+>      /* Create an RTC ISA device too */
+>      mc146818_rtc_init(pnv->isa_bus, 2000, NULL);
+>  
+> +    /* Create the IPMI BT device for communication with the BMC */
+> +    pnv_ipmi_bt_init(pnv->isa_bus, pnv->bmc, 10);
+> +
+>      /*
+>       * OpenPOWER systems use a IPMI SEL Event message to notify the
+>       * host to powerdown
+> diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
+> index aa5c89586c63..07fa1e1c7e45 100644
+> --- a/hw/ppc/pnv_bmc.c
+> +++ b/hw/ppc/pnv_bmc.c
+> @@ -17,6 +17,8 @@
+>   */
+>  
+>  #include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "qapi/error.h"
+>  #include "target/ppc/cpu.h"
+>  #include "qemu/log.h"
+>  #include "hw/ipmi/ipmi.h"
+> @@ -211,8 +213,20 @@ static const IPMINetfn hiomap_netfn = {
+>      .cmd_handlers = hiomap_cmds
+>  };
+>  
+> -int pnv_bmc_hiomap(IPMIBmc *bmc)
+> +/*
+> + * Instantiate the machine BMC. PowerNV uses the QEMU internal
+> + * simulator but it could also be external.
+> + */
+> +IPMIBmc *pnv_bmc_create(void)
+>  {
+> -    return ipmi_sim_register_netfn(IPMI_BMC_SIMULATOR(bmc),
+> -                                   IPMI_NETFN_OEM, &hiomap_netfn);
+> +    Object *obj;
+> +
+> +    obj = object_new(TYPE_IPMI_BMC_SIMULATOR);
+> +    object_property_set_bool(obj, true, "realized", &error_fatal);
+> +
+> +    /* Install the HIOMAP protocol handlers to access the PNOR */
+> +    ipmi_sim_register_netfn(IPMI_BMC_SIMULATOR(obj), IPMI_NETFN_OEM,
+> +                            &hiomap_netfn);
+> +
+> +    return IPMI_BMC(obj);
+>  }
+> -- 
+> 2.21.0
+> 
 
