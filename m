@@ -2,77 +2,76 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 641BBC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:25:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A5A7C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:27:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36960206CB
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:25:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36960206CB
+	by mail.kernel.org (Postfix) with ESMTPS id 3A961206CB
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 14:27:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A961206CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXnOU-0008K8-7f
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 09:25:14 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39307)
+	id 1iXnQE-0001hC-7N
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 09:27:02 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39684)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iXnMm-00071v-MP
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:23:29 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iXnOt-0000e4-Ka
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:25:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iXnMl-00040Y-Bg
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:23:28 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4840)
+ (envelope-from <frankja@linux.ibm.com>) id 1iXnOs-0005Sv-Bv
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:25:39 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9048)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iXnMl-00040J-6n
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:23:27 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+ id 1iXnOs-0005R7-3S
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 09:25:38 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xALEM707022069
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:23:26 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wact9hsm3-1
+ xALEMH3i132754
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:25:37 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wdqmyjf89-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:23:25 -0500
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:25:36 -0500
 Received: from localhost
- by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 21 Nov 2019 14:23:15 -0000
+ Thu, 21 Nov 2019 14:25:34 -0000
 Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
- by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 21 Nov 2019 14:23:11 -0000
+ Thu, 21 Nov 2019 14:25:31 -0000
 Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
  [9.149.105.62])
  by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id xALENAvA15270360
+ id xALEPUUU14352684
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 21 Nov 2019 14:23:10 GMT
+ Thu, 21 Nov 2019 14:25:30 GMT
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 263BDAE045;
- Thu, 21 Nov 2019 14:23:10 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 4C68AAE051;
+ Thu, 21 Nov 2019 14:25:30 +0000 (GMT)
 Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id B5830AE051;
- Thu, 21 Nov 2019 14:23:09 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id C8484AE04D;
+ Thu, 21 Nov 2019 14:25:29 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.70.129])
  by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 21 Nov 2019 14:23:09 +0000 (GMT)
-Subject: Re: [PATCH 07/15] s390x: protvirt: Handle diag 308 subcodes 0,1,3,4
-To: Cornelia Huck <cohuck@redhat.com>
+ Thu, 21 Nov 2019 14:25:29 +0000 (GMT)
+Subject: Re: [PATCH 06/15] s390x: protvirt: Support unpack facility
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20191120114334.2287-1-frankja@linux.ibm.com>
- <20191120114334.2287-8-frankja@linux.ibm.com>
- <20191121145001.5e7a182d.cohuck@redhat.com>
- <2919845b-531d-8c79-fb16-36f67fa29789@linux.ibm.com>
- <20191121151737.58f9b513.cohuck@redhat.com>
+ <20191120114334.2287-7-frankja@linux.ibm.com>
+ <8669fc89-c8a9-641d-d9aa-ee4aa011ac26@redhat.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -116,29 +115,29 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Thu, 21 Nov 2019 15:23:09 +0100
+Date: Thu, 21 Nov 2019 15:25:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191121151737.58f9b513.cohuck@redhat.com>
+In-Reply-To: <8669fc89-c8a9-641d-d9aa-ee4aa011ac26@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="DwkXAcHC4EEbfq0V6Vt6UGeBavKtTqCnC"
+ boundary="V2DSOjwH5S1oHPWE1yjCvgbKiwGKcKABT"
 X-TM-AS-GCONF: 00
-x-cbid: 19112114-4275-0000-0000-000003847253
+x-cbid: 19112114-0028-0000-0000-000003BD98E2
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112114-4276-0000-0000-00003897EFEE
-Message-Id: <c421e4e6-c29f-5005-a5e8-bc032ad0af2d@linux.ibm.com>
+x-cbparentid: 19112114-0029-0000-0000-00002480C15B
+Message-Id: <7df881fe-46ec-2522-143e-929f4e3d2421@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-11-21_03:2019-11-21,2019-11-21 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=831 suspectscore=0
- adultscore=0 mlxscore=0 bulkscore=0 clxscore=1015 spamscore=0
- malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-1911210131
+ phishscore=0 spamscore=0
+ lowpriorityscore=0 mlxlogscore=999 priorityscore=1501 impostorscore=0
+ clxscore=1015 suspectscore=0 malwarescore=0 bulkscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911210131
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -150,95 +149,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com,
- qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
- mihajlov@linux.ibm.com
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DwkXAcHC4EEbfq0V6Vt6UGeBavKtTqCnC
-Content-Type: multipart/mixed; boundary="s5bVODSw1lIXkViLC3odQ8vhKVHEABLtS"
+--V2DSOjwH5S1oHPWE1yjCvgbKiwGKcKABT
+Content-Type: multipart/mixed; boundary="60kme51X3jrrT3DUydPwlM8XjTafjl5df"
 
---s5bVODSw1lIXkViLC3odQ8vhKVHEABLtS
+--60kme51X3jrrT3DUydPwlM8XjTafjl5df
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 11/21/19 3:17 PM, Cornelia Huck wrote:
-> On Thu, 21 Nov 2019 15:04:31 +0100
-> Janosch Frank <frankja@linux.ibm.com> wrote:
->=20
->> On 11/21/19 2:50 PM, Cornelia Huck wrote:
->>> On Wed, 20 Nov 2019 06:43:26 -0500
->>> Janosch Frank <frankja@linux.ibm.com> wrote: =20
->>
->>>  =20
->>>>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
->>>>          break;
->>>>      case S390_RESET_LOAD_NORMAL: /* Subcode 1*/ =20
->>>
->>> missing blank before */ (introduced in a previous patch)
->>>
->>>  =20
->>>> +        subsystem_reset();
->>>> +        s390_pv_prepare_reset(env);
->>>>          CPU_FOREACH(t) {
->>>>              if (t =3D=3D cs) {
->>>>                  continue;
->>>>              }
->>>>              run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
->>>>          }
->>>> -        subsystem_reset();
->>>>          run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);=
+On 11/21/19 12:27 PM, David Hildenbrand wrote:
+> On 20.11.19 12:43, Janosch Frank wrote:
 
->>>>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
->>>>          break;
->>>>      case S390_RESET_EXTERNAL: =20
->>>
->>> Annotate this with the subcode as well? (in the patch introducing it)=
- =20
->>
->> I think this has no diag 308 subcode and is triggered by qemu
+>> @@ -357,6 +353,35 @@ static void s390_machine_reset(MachineState *mach=
+ine)
+>>           run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
+>>           run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+>>           break;
+>> +    case S390_RESET_EXTERNAL:
+>> +    case S390_RESET_REIPL: /* Subcode 4 */
+>> +        qemu_devices_reset();
+>> +        s390_crypto_reset();
+>> +        /* configure and start the ipl CPU only */
+>> +        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
+>> +        break;
 >=20
-> -ENOCOFFE
->=20
-> But even more reason to annotate this with the fact that this is
-> triggered by QEMU :)
->=20
-
-You're too late with that idea :)
-I just split out the reordering and the annotation into a new commit:
+> Is there a way to modify this patch to not change unrelated code that=20
+> heavily? Makes it harder to review.
 
 https://github.com/frankjaa/qemu/commit/8c53d5c8a6bbcc53496c7a2877c7cbffc=
 435b708
 
+And please trim your emails.
 
---s5bVODSw1lIXkViLC3odQ8vhKVHEABLtS--
+>=20
+>> +    case S390_RESET_PV: /* Subcode 10 */
+>> +        subsystem_reset();
+>> +        s390_crypto_reset();
+>> +
+>> +        CPU_FOREACH(t) {
+>> +            run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
+>> +        }
+>> +
+>> +        /* Create SE VM */
+>> +        s390_pv_vm_create();
+>> +        CPU_FOREACH(t) {
+>> +            s390_pv_vcpu_create(t);
+>> +        }
+>> +
+>> +        /* Set SE header and unpack */
+>> +        s390_ipl_prepare_pv_header();
+>> +        /* Decrypt image */
+>> +        s390_ipl_pv_unpack();
+>> +        /* Verify integrity */
+>> +        s390_pv_verify();
+>> +        s390_cpu_set_state(S390_CPU_STATE_OPERATING, cpu);
+>> +        break;
+>>       default:
+>>           g_assert_not_reached();
+>>       }
+>> diff --git a/target/s390x/cpu_features_def.inc.h b/target/s390x/cpu_fe=
+atures_def.inc.h
+>> index 31dff0d84e..60db28351d 100644
+>> --- a/target/s390x/cpu_features_def.inc.h
+>> +++ b/target/s390x/cpu_features_def.inc.h
+>> @@ -107,6 +107,7 @@ DEF_FEAT(DEFLATE_BASE, "deflate-base", STFL, 151, =
+"Deflate-conversion facility (
+>>   DEF_FEAT(VECTOR_PACKED_DECIMAL_ENH, "vxpdeh", STFL, 152, "Vector-Pac=
+ked-Decimal-Enhancement Facility")
+>>   DEF_FEAT(MSA_EXT_9, "msa9-base", STFL, 155, "Message-security-assist=
+-extension-9 facility (excluding subfunctions)")
+>>   DEF_FEAT(ETOKEN, "etoken", STFL, 156, "Etoken facility")
+>> +DEF_FEAT(UNPACK, "unpack", STFL, 161, "Unpack facility")
+>>  =20
+>>   /* Features exposed via SCLP SCCB Byte 80 - 98  (bit numbers relativ=
+e to byte-80) */
+>>   DEF_FEAT(SIE_GSLS, "gsls", SCLP_CONF_CHAR, 40, "SIE: Guest-storage-l=
+imit-suppression facility")
+>>
+>=20
+>=20
 
---DwkXAcHC4EEbfq0V6Vt6UGeBavKtTqCnC
+
+
+--60kme51X3jrrT3DUydPwlM8XjTafjl5df--
+
+--V2DSOjwH5S1oHPWE1yjCvgbKiwGKcKABT
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3Wnc0ACgkQ41TmuOI4
-ufgJhxAAggpbibBVAGKyEys3DkrASuJTLhomXmu+zd45DfYObRaducVeJHQl6Ekt
-9BOarBTaP2FlS/KASK3hS51st+JV7Fl0LzOAsn/4LIJrPeFxGoRuzsapPjaCq/3M
-6/JyACgdDfxjUaJ/15+GsDbQda2pNIVQBrQlOaWO9Gjjzk6G2tOmAIMSE8bIGcET
-Mmzrb6I4rSf0fyVOXVkfqAojC/5LgOkd+PkAxYCiuwXMh96bK/TWnKMHR0C5jIRN
-ZJ/rBM8aZf7YpFzkxrzqCAxSlkJRAUGCbS6n85dSa4ivRmwtj8IXiZcutl4i2BR3
-HI1tc/8sgZ99RiLsO1XFGlvjVlsZLMJ4r+u2ORIFOZb6w8k/w/Hr0yassl73Lqyw
-Max3pe1sGdhfxWtL2ySnDls+V25BBb3hkfqbGNOXxPvhxMGPQOEj7+X+b/vPb2/S
-h/m0aHRPfP5Upn3af3FEUz9lfMj9ISTqnKRLnag+WOrMqI14h4xxRdDM9adHpgxS
-FT2+Sz3Xtz6pHV6HqzB3id5qQnytHDcZ+73+Bu7g577NunU7i2k8TcGJ9hR+kmeB
-pT6QjXVJRLudH1wLArJbka8+D0kEJCJ8fBfh2uBhg1e2va/sYmNBRDa/+UWpZbEw
-BBnDGGOLvFvAsgw206xrEF+/Y5hURyyIJvHLKGj4CyjApw8zZ78=
-=7DMQ
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3WnlkACgkQ41TmuOI4
+ufi1wBAAy9QY+TiubvwfASm5n/gDifJjAabsCdfBQq1iQ2NDO5eveqzNAE2dLvsP
+HKoj9Igld7JYzMklK/ALT1hlGVrQvgq7E5aqtHswvgGPsUgG6xPCKRDkOzb2rjoE
+wuR6/nzgzTxzL7MQAoSN7fsFJ44QomymC/TyXEir+918eMaX0/kfIs6hkO+BTjEg
+Ob3Gla7coiBNzGTcFusqBpU1Q6arWGf+FgHro15LO0LDVb4nNHly7QHo9g156dWW
+dTCR6nRzGiBTDnnD73LP2C4LZ8Kq3Be9qfkhghMZzfBA6LckD4qScMjUNysvg6rI
+U6UALlcATyu+bDi6AKCzMHYlBHSYAqUAXR6tBMbAKV49S+oVOj7wFM+aBuh2SLoJ
+DXmdbYsG7WpN+eyzOEgkaTErnhlS0oyYmJsvFa3boJX3fg82Iyenwy4LQ3GnFG+q
+csyMKCyBsaDwEycHhdUExxjvOBOn1rL9Va8kJYm9dDD615Ht/ldMmnSi5+10CQk3
+e2yZXBvOP1gW7RmR8IuxjZoVwxu2rDXIbJXI0dwKK3VuZi5dpI2LKr2V9+aE2p8M
+XvmO7XcxFOdiLdZht6B0WN18r4zAdSDSOLnSBfqduRHXq0JNFIR5mwStgijUKo5i
+te0g4fykWGm36sDUsUibpTnEO8ZBSQwUJo8xL3/J/DFY9zsRhQs=
+=NDBA
 -----END PGP SIGNATURE-----
 
---DwkXAcHC4EEbfq0V6Vt6UGeBavKtTqCnC--
+--V2DSOjwH5S1oHPWE1yjCvgbKiwGKcKABT--
 
 
