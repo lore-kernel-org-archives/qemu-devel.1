@@ -2,85 +2,86 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E92C43141
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D15A7C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:07:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 467AA206F4
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:05:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FB4120692
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 17:07:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gcuwH85Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 467AA206F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SUMXj21G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FB4120692
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXptz-00051y-Dh
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 12:05:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35950)
+	id 1iXpvA-0006To-Qu
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 12:07:08 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36855)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXppM-0000ja-0C
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:01:09 -0500
+ (envelope-from <thuth@redhat.com>) id 1iXptd-0004h9-Gb
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:05:34 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iXppG-0000I4-4t
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:01:07 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38209)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iXppF-0000HW-VV
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:01:02 -0500
-Received: by mail-oi1-x244.google.com with SMTP id a14so3840096oid.5
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 09:01:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:in-reply-to:references:from:date:message-id:subject:to
- :cc; bh=yaCmnMnCIcA6nWBfOP2YZs1sc7JCavrOolsdGFN0ggs=;
- b=gcuwH85QNSI8lKMJmHwVy/iXivo3vf41zmmcmJoih8zHdZqrNc+wkvDyAsruXUiAlH
- 3pdwsIaz5EVMRPbC2Gg5cy3XC644RDmK/RChJ3ytbfbdPgczp3yUFe+l/hMEGMqPOejq
- 517Sjf4R+WSqoCfuwoRKH0M9sypU/MKlHNkMxhN/7X0cAToiLA053xVPiTbMdG6M+mes
- wYCNbZ4cveUZguDL8iSbasHcZJ7jfi/FPHwrcc0WxZVwCDg0PGt8BkIW5w2qbZfnbkpC
- CuQunwnDBM2JtW24wQSSAYAifWXwS/HcELwj4nUqNvm/8fQgRA3j4VJq91HjoDRypnYV
- mN3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:in-reply-to:references:from:date
- :message-id:subject:to:cc;
- bh=yaCmnMnCIcA6nWBfOP2YZs1sc7JCavrOolsdGFN0ggs=;
- b=gYnaevOFgzl90verUaEd6thl9bkcWqHWkr4WLKJ5tE/mFZKbjxoRSkYXLSbU/bKRAz
- 9cCthyzaq94J8C6mBI0Ydx1647st7O/KLwTcaEEgBVjkGIZPf71eb869YuiTL9PtyyNa
- b3tsoIjGP9qLUFHSRTIf4D2RHWVUaLqNfbN4L8zq1mwV9yZUKQa62EpnWlreSKsuG8zL
- uhZgvnT3rLV5+s2Zq+/ECNGJnOLkIiNX64Me70JyQopD4YimeiaidVKMOPxkwHSEcHqE
- im0KM/CiB1umxS7FiLQ5SyEd4ZNWFS2Xrg6MNhXyFHJ3vdRYTtv1OM2dOezUaddmlGw2
- XGRw==
-X-Gm-Message-State: APjAAAUKE5Si33l5vxJzJ1EL9vhc7tgn7PwWpS5rUBYRUylOLPvLEvzd
- ny/FsQQT76r+h/wq3nL97VtxZQkIZeDcwxL8VLw=
-X-Google-Smtp-Source: APXvYqw4rka+IMuZNYfhvgxSVOpkXUHFUZuQq5ejTxWkuRcpY3berMTSyYUGPfVAmOmWXTXwYGdxraHRrE93Oyxho+I=
-X-Received: by 2002:aca:484f:: with SMTP id v76mr8593659oia.62.1574355659961; 
- Thu, 21 Nov 2019 09:00:59 -0800 (PST)
+ (envelope-from <thuth@redhat.com>) id 1iXpta-00059D-UW
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:05:31 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:42579
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <thuth@redhat.com>) id 1iXpta-00058w-NP
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 12:05:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574355929;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=hDK9nPJjEcaWnY0EIQTdrbUwZ13Zr8lT+1KWPZ1DSmU=;
+ b=SUMXj21Gk5cxxRXw2gLyx9uTL13OVXsfA4n2EYrHwh0KleIUgHjNcJtACsFx/XjijrSso9
+ QcK4accyXmn+IvynNgRV8SpKbJdK5k8p9+drf9FY5UYJdh7IUqhOKWEQSqDcP65xo9d0SC
+ BWH7RyM0Pd+iBLZ/cOH0Y9ypRwTlTok=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-14-OqXQno-hM--YchYZP0V6hA-1; Thu, 21 Nov 2019 12:05:27 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40AC91005502
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 17:05:26 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-116-86.ams2.redhat.com
+ [10.36.116.86])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 85EF47A5D2;
+ Thu, 21 Nov 2019 17:05:25 +0000 (UTC)
+Subject: Re: [qemu-web PATCH] Add a blog post about the QEMU-related
+ presentation of KVM Forum 2019
+To: Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20191121115207.5832-1-thuth@redhat.com>
+ <d25b1eb9-343d-f8bf-f090-4e8d77ad8383@redhat.com>
+ <2cc0abb3-095e-8c40-3056-4c7265492a0a@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <9a9278d2-7cde-0390-47b7-983880755d49@redhat.com>
+Date: Thu, 21 Nov 2019 18:05:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Received: by 2002:a05:6830:1391:0:0:0:0 with HTTP; Thu, 21 Nov 2019 09:00:59
- -0800 (PST)
-In-Reply-To: <f7f4ff93-fad0-3d72-a224-c19302dff9e0@redhat.com>
-References: <20191120145724.GA15677@ls3530.fritz.box>
- <CAL1e-=jqoV0v0NdpeL3NUTOfURNJ9qmD6FcCjV30pXsdBeCD=Q@mail.gmail.com>
- <CAL1e-=gOHZOTnyB0=HOAqzqS4gBF1YkB7x3yQYGJvi5qWg20Kg@mail.gmail.com>
- <015ab947-57ba-6d73-d99d-2e3263226c02@gmx.de>
- <f7f4ff93-fad0-3d72-a224-c19302dff9e0@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Thu, 21 Nov 2019 18:00:59 +0100
-Message-ID: <CAL1e-=hHFfkJ3bmOLhk5bBCExvnazA4NgmoCJtN+X3KQ8=9Pjw@mail.gmail.com>
-Subject: Re: [PATCH v2] linux-user/strace: Improve output of various syscalls
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000dcb8ac0597de3d49"
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+In-Reply-To: <2cc0abb3-095e-8c40-3056-4c7265492a0a@redhat.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: OqXQno-hM--YchYZP0V6hA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,138 +93,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000dcb8ac0597de3d49
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-=C5=AB
-
-On Thursday, November 21, 2019, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-wrote:
-
-> On 11/21/19 9:19 AM, Helge Deller wrote:
->
->> On 20.11.19 23:20, Aleksandar Markovic wrote:
->>
->>> On Wed, Nov 20, 2019 at 10:13 PM Aleksandar Markovic
->>> <aleksandar.m.mail@gmail.com> wrote:
+On 21/11/2019 17.04, Paolo Bonzini wrote:
+> On 21/11/19 14:59, Eric Blake wrote:
+>> On 11/21/19 5:52 AM, Thomas Huth wrote:
+>>> There have been quite a lot of QEMU-related talks at KVM Forum this
+>>> year - let's provide a summary for the people who could not attend.
 >>>
->>>>
->>>> On Wed, Nov 20, 2019 at 3:58 PM Helge Deller <deller@gmx.de> wrote:
->>>>
->>>>>
->>>>> Improve strace output of various syscalls which either have none
->>>>> or only int-type parameters.
->>>>>
->>>>
->>>> It would be nice if you included a history of the patch (after the lin=
-e
->>>> "---", as it is customary for single patch submission). You changed
->>>> only ioctl() in v2, right?
->>>>
->>>
->> Yes. Will add history in next round.
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>> =C2=A0 Note: For some talks it's hard to decide whether they really fit=
+ the
+>>> =C2=A0 QEMU blog or not. I've assembled the list below by quickly skimm=
+ing
+>>> =C2=A0 through the schedule and the videos, and that's what I came up w=
+ith ...
+>>> =C2=A0 If you think any of the other talks should be mentioned here, to=
+o,
+>>> =C2=A0 please let me know.
 >>
->> I missed your v2, but responded with several hints to v1.
->>>>
->>>
->> Yes, I saw all your mails.
->> Thanks for your feedback!
+>> Perhaps:
 >>
->> userfaultfd(), membarrier(), mlock2()... - all could be included into
->>> your patch.
->>>
+>> [Making the Most of NBD](https://www.youtube.com/watch?v=3DPMa6KFX9AxM) =
+by
+>> Eric Blake and Richard Jones
 >>
->> I think there are quite some more which I didn't included.
->> That's why I wrote "*various*" and not "*all*" in my changelog.
->> I'm debugging other code, and the ones I fixed are the ones I
->> actually tested with my code.
->>
->
-> If you don't have handy way to test the other syscalls, I'll rather
-> restrict your patch to the one you tested, at least you are certain you
-> didn't introduced regressions. Unless their implementation is trivial, of
-> course.
->
->
-What can be handier than writing a program that contains a single system
-call?
+>> which mentions optimizations to 'qemu-img convert' made possible through
+>> NBD protocol extensions
+>=20
+> Agreed.  Also I would remove the RISC-V talk, as I was going to write a
+> blog post about it too.
 
---000000000000dcb8ac0597de3d49
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+All right, thanks for the feedback, I did the suggested changes and
+pushed the article to the blog now:
 
-=C5=AB<br><br>On Thursday, November 21, 2019, Philippe Mathieu-Daud=C3=A9 &=
-lt;<a href=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt; wrote:<br=
-><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1=
-px #ccc solid;padding-left:1ex">On 11/21/19 9:19 AM, Helge Deller wrote:<br=
->
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-On 20.11.19 23:20, Aleksandar Markovic wrote:<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-On Wed, Nov 20, 2019 at 10:13 PM Aleksandar Markovic<br>
-&lt;<a href=3D"mailto:aleksandar.m.mail@gmail.com" target=3D"_blank">aleksa=
-ndar.m.mail@gmail.com</a>&gt; wrote:<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-<br>
-On Wed, Nov 20, 2019 at 3:58 PM Helge Deller &lt;<a href=3D"mailto:deller@g=
-mx.de" target=3D"_blank">deller@gmx.de</a>&gt; wrote:<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-<br>
-Improve strace output of various syscalls which either have none<br>
-or only int-type parameters.<br>
-</blockquote>
-<br>
-It would be nice if you included a history of the patch (after the line<br>
-&quot;---&quot;, as it is customary for single patch submission). You chang=
-ed<br>
-only ioctl() in v2, right?<br>
-</blockquote></blockquote>
-<br>
-Yes. Will add history in next round.<br>
-<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex"><blockquote class=3D"gmail_quote" style=3D"m=
-argin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
-I missed your v2, but responded with several hints to v1.<br>
-</blockquote></blockquote>
-<br>
-Yes, I saw all your mails.<br>
-Thanks for your feedback!<br>
-<br>
-<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
-x #ccc solid;padding-left:1ex">
-userfaultfd(), membarrier(), mlock2()... - all could be included into<br>
-your patch.<br>
-</blockquote>
-<br>
-I think there are quite some more which I didn&#39;t included.<br>
-That&#39;s why I wrote &quot;*various*&quot; and not &quot;*all*&quot; in m=
-y changelog.<br>
-I&#39;m debugging other code, and the ones I fixed are the ones I<br>
-actually tested with my code.<br>
-</blockquote>
-<br>
-If you don&#39;t have handy way to test the other syscalls, I&#39;ll rather=
- restrict your patch to the one you tested, at least you are certain you di=
-dn&#39;t introduced regressions. Unless their implementation is trivial, of=
- course.<br>
-<br>
-</blockquote><div><br></div><div>What can be handier than writing a program=
- that contains a single system call?</div><div><br></div><div>=C2=A0</div>
+ https://www.qemu.org/2019/11/21/kvm-forum/
 
---000000000000dcb8ac0597de3d49--
+  Thomas
+
 
