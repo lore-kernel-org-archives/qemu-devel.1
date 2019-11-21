@@ -2,85 +2,90 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B598BC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:23:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76EF9C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:33:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 823B620721
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:23:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F92D20855
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:33:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xjgf63In"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 823B620721
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QOoxAM7g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F92D20855
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXlUy-0005Oo-L0
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 07:23:48 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45436)
+	id 1iXldw-0000Ww-Db
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 07:33:04 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48030)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iXlTh-0004Hb-Em
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:22:30 -0500
+ (envelope-from <stefanha@gmail.com>) id 1iXlcn-0008Vy-1w
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:31:54 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iXlTg-0001zt-4r
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:22:29 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:29940
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iXlTg-0001zS-0N
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:22:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574338947;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=z65bZhKVbfwcrdbnAZ9elTV9l/3g/bDNOkIcQi5ABng=;
- b=Xjgf63InHuDpR6p54lgk+HWAkDJ+VQGZhMfnHsK/taj66lyr0XIZDNdM004c06pSCwdFEJ
- ct4BNJ1g0jP1Ukp0q6p2S+eRHjua6+C1NO+d+BwwS52BAGS9lLH3jsufZtI26SjI3vloSX
- 7SmqE/xk2oNPIT5+IV2+Fz1kL6+llUA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-172-ai4jumIGMaOPViwEbKLsBg-1; Thu, 21 Nov 2019 07:22:24 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 398461007276;
- Thu, 21 Nov 2019 12:22:23 +0000 (UTC)
-Received: from [10.36.116.214] (ovpn-116-214.ams2.redhat.com [10.36.116.214])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 230395F93D;
- Thu, 21 Nov 2019 12:22:17 +0000 (UTC)
-Subject: Re: [PATCH 11/15] RFC: s390x: Exit on vcpu reset error
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20191120114334.2287-1-frankja@linux.ibm.com>
- <20191120114334.2287-12-frankja@linux.ibm.com>
- <09359386-a91b-d98c-08f5-5b375f0bd942@redhat.com>
- <f67cdf5e-837b-5596-89ee-136eee04943b@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <6f3dfa9a-bcb9-31f4-af79-9d6e109807dc@redhat.com>
-Date: Thu, 21 Nov 2019 13:22:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <stefanha@gmail.com>) id 1iXlcl-0008Ua-9X
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:31:52 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40722)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iXlcj-0008Qk-1A
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:31:51 -0500
+Received: by mail-wm1-x341.google.com with SMTP id y5so3484523wmi.5
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 04:31:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to:user-agent;
+ bh=DQPXUdy3Y9CjRr+/JWcqif4qOWuzh/BDRfKjkBmxxOA=;
+ b=QOoxAM7gVjhhMoxrPkeuRhcuOka7ZMQf8StAzbDPZAQGK+LqtTfsAJ+kSMbaPTLt70
+ jOiBfRULCeDrnOeFDW4JE+DzXB1M7MMTThFrL14hW931NPSrasVc8qHwDvP55l9XL+VQ
+ 63j6ljuoFMvGqiEQfzqQ0z6tiR/p3oGvPBUwT+iSsZbOtQebz2D8xRw5lA5RWgWAwL69
+ yO14vIsJeB2L4UleO1l8IpRJ/Uiklp1sFiWVzP+WTx7pGKTNRYwDGQygtoofiZjYvkIE
+ PwMIFXb1TnAJOYbnJLrswrJTXNpXFYvWozSvM3tdr8mcL/IsAlH2opE6FeKak9Zev7kT
+ yLwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to:user-agent;
+ bh=DQPXUdy3Y9CjRr+/JWcqif4qOWuzh/BDRfKjkBmxxOA=;
+ b=EU3bKEa28Rdm5JaOfDs0SaGBdxkWge9KIGyYh+XX9px8t20nvNczTz0IQ40+VtWIiQ
+ YEbAVTN8B3zuvAkYwtSUzr/FNrlP7/wrDQLvy+0nLkXvypYtjmL+ydRwWPHLUdm3ZYR4
+ ZW5/nzwLgZVO/t81PgKfy3naQ6h2wN76/K62WTEVAggNP66lHXeogGJToEs9n2zMzWox
+ LgV7e3Q8EdgiRQfpASEZ+t0R4aKUbNW2iYb2+/kUXE4AYBWoWJfTMi6OTIFYbo+Dv7aS
+ Hq43z4Hi3kTaau52qnZEGQqHG3vg2UboLgQsgRhmjPSNjj+B2wRPjenJ1sOGHbgeX3Nt
+ qOwg==
+X-Gm-Message-State: APjAAAUxhqrDuTDDMzvetSUEcalPeYOHQVc9kB/IB+g6exMEiyn9aHiX
+ y8GhAV9DOKTssD79fclAk6Q=
+X-Google-Smtp-Source: APXvYqxEzxbRo/WPcZ24qxdwBm+d1qaFQFbJYH69B2YGrjHVdiJCfPPLx3DcbQz4be/RLbRSVgNAYA==
+X-Received: by 2002:a1c:7704:: with SMTP id t4mr9075325wmi.4.1574339504681;
+ Thu, 21 Nov 2019 04:31:44 -0800 (PST)
+Received: from localhost ([51.15.41.238])
+ by smtp.gmail.com with ESMTPSA id b10sm3180762wrw.53.2019.11.21.04.31.43
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 21 Nov 2019 04:31:43 -0800 (PST)
+Date: Thu, 21 Nov 2019 12:31:42 +0000
+From: Stefan Hajnoczi <stefanha@gmail.com>
+To: Jag Raman <jag.raman@oracle.com>
+Subject: Re: [RFC v4 PATCH 32/49] multi-process: Use separate MMIO
+ communication channel
+Message-ID: <20191121123142.GQ439743@stefanha-x1.localdomain>
+References: <cover.1571905346.git.jag.raman@oracle.com>
+ <b2594fdefb278f890762d12639524c4db7667393.1571905346.git.jag.raman@oracle.com>
+ <20191111162132.GI402228@stefanha-x1.localdomain>
+ <4a528246-f414-49af-170b-98306b9a0c96@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <f67cdf5e-837b-5596-89ee-136eee04943b@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: ai4jumIGMaOPViwEbKLsBg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.61
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="cxMSjUqMQBJIqbX5"
+Content-Disposition: inline
+In-Reply-To: <4a528246-f414-49af-170b-98306b9a0c96@oracle.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,67 +97,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
+ qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com, mst@redhat.com,
+ armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
+ ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
+ liran.alon@oracle.com, Stefan Hajnoczi <stefanha@redhat.com>, rth@twiddle.net,
+ kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
+ ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21.11.19 13:19, Janosch Frank wrote:
-> On 11/21/19 1:14 PM, David Hildenbrand wrote:
->> On 20.11.19 12:43, Janosch Frank wrote:
->>> If a vcpu is not properly reset it might be better to just end the VM.
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>    target/s390x/kvm.c | 2 ++
->>>    1 file changed, 2 insertions(+)
->>>
->>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->>> index 190400df55..0210b54157 100644
->>> --- a/target/s390x/kvm.c
->>> +++ b/target/s390x/kvm.c
->>> @@ -418,11 +418,13 @@ static void kvm_s390_reset_vcpu(S390CPU *cpu, uns=
-igned long type)
->>>            if (kvm_vcpu_ioctl(cs, KVM_S390_VCPU_RESET, type)) {
->>>                error_report("CPU reset type %ld failed on CPU %i",
->>>                             type, cs->cpu_index);
->>> +            exit(1);
->>>            }
->>>            return;
->>>        }
->>>        if (kvm_vcpu_ioctl(cs, KVM_S390_INITIAL_RESET, NULL)) {
->>>            error_report("Initial CPU reset failed on CPU %i", cs->cpu_i=
-ndex);
->>> +        exit(1);
->>>        }
->>>    }
->>>   =20
->>>
->>
->> According to the comment in include/qapi/error.h
->>
->> "Please don't error_setg(&error_fatal, ...), use error_report() and
->> exit(), because that's more obvious."
->>
->> This is the right thing to do.
->>
->> ... and it's a fairly pathological thing to happen either way.
->>
->> Reviewed-by: David Hildenbrand <david@redhat.com>
->>
+
+--cxMSjUqMQBJIqbX5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Nov 13, 2019 at 11:14:50AM -0500, Jag Raman wrote:
+> On 11/11/2019 11:21 AM, Stefan Hajnoczi wrote:
+> > On Thu, Oct 24, 2019 at 05:09:13AM -0400, Jagannathan Raman wrote:
+> > > Using a separate communication channel for MMIO helps
+> > > with improving Performance
+> >=20
+> > Why?
 >=20
-> Do we want to have that separate or should I squash it into the reset
-> changes?
+> Typical initiation of IO operations involves multiple MMIO accesses per
+> IO operation. In some legacy devices like LSI, the completion of the IO
+> operations is also accomplished by polling on MMIO registers. Therefore,
+> MMIO traffic can be hefty in some cases and contribute to Performance.
 >=20
->=20
+> Having a dedicated channel for MMIO ensures that it doesn't have to
+> compete with other messages to the remote process, especially when there
+> are multiple devices emulated by a single remote process.
 
-I' keep it separated.
+A vCPU doing a polling read on an MMIO register will cause a BAR_READ
+message to be sent to the remote process.  The vCPU thread waits for the
+response to this message.
 
---=20
+When there are multiple remote devices each has its own socket, so
+communication with different remote processes does not interfere.
 
-Thanks,
+The only scenarios I can think of are:
+1. Interference within a single device between vCPUs and/or the QEMU
+   monitor.
+2. A single process serving multiple devices that is implemented in a
+   way such that different devices interfere with each other.
 
-David / dhildenb
+It sounds like you are saying the problem is #2, but this is still
+unclear to me.  If the remote process can be implemented in a way such
+that there is no interference when each device has a special MMIO
+socket, then why can't it be implemented in a way such that there is no
+interference when each device's main socket is used (each device has
+it's own!).
 
+Maybe I've missed the point.  It would be good if you could explain in
+more detail.
+
+Stefan
+
+--cxMSjUqMQBJIqbX5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3Wg64ACgkQnKSrs4Gr
+c8g/wwgAm8ZPdiHzPfkL0hR+lc9vVSSrG4+7I+VCFVzXql47Q2RdtA2VE+eLjqrZ
++VsnR7coRWzp7uv/CRPG2GUvCnRP34j5B+LzIRc8jPQYMa07ihuIxYdzsuzlsTkX
+8LPR8xr+bcMZBGi5zTvAk54mC5khanzn+kvpEofTW9oDzAGYej2fGRxTa0O8/aPS
+79lyE/HJErc7880n3Fm49wYeiHYCcP/J5uWU0ATzcINu53Bx7L0Z4jOLtMiM3ZE2
+n8zqJMuCtacUFunyZhLt0FHm0l8Vcx9FgpDpkm0kxQ1Q/paOfs6+B3zZZh9/H1GW
+APwN/87JvPO70u5Qvu/9/inPcCHqqw==
+=rAm4
+-----END PGP SIGNATURE-----
+
+--cxMSjUqMQBJIqbX5--
 
