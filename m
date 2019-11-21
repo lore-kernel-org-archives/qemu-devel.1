@@ -2,83 +2,82 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD99EC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E47FC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:23:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7A4420714
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:22:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B88720714
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:23:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WNAfzT0D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7A4420714
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BQIkKIGh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B88720714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXkXh-0000vO-Pp
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 06:22:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53088)
+	id 1iXkYi-0002RL-5u
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 06:23:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53463)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iXkWe-0000Rg-Dj
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:21:29 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iXkXu-0001S6-4j
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:22:47 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iXkWc-0007Db-Lh
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:21:27 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50639
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <kwolf@redhat.com>) id 1iXkXs-00083E-S5
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:22:46 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36830
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iXkWc-0007DF-Hw
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:21:26 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iXkXs-00082f-NZ
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:22:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574335285;
+ s=mimecast20190719; t=1574335364;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YAvSNhWc8lrjRCvwfzOND2uoYIa/Upr42JwEo7roJoU=;
- b=WNAfzT0DtdvX1b23xgPcl2lLLljLxvXD01QWsi71lgrbCDYS6DXueZxGI99noM3SEeNbE/
- nKq89FN0byGQMrgyCpSut4FOJPPXQ4cKXmiWsBrhjZ1RWFQ9UBTJlgDdoy/q3CFW+Bq55i
- lJ2HlEhr3TFew4ChpELXGiW+wqd/WBQ=
+ bh=Dqu78u6yRo4Gua36j1fiPc0+csz+5H2Qn1kPtuTeits=;
+ b=BQIkKIGhA7XZ3rjGCruTCEE8VgkRlHpv3E1Xmfu+KmmJPjejHg8SBppn6RMl5Qwh/s4/g5
+ LE+GUkX6d20SkOVRkHZoK72xURfB2uN2L8z5G5nE25YO5mDSfvVCdWiZmM18hi5KhcnOtV
+ v7YPC/HGCDrFgLvzPQL6fHNEJvx7Nlo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-295-ze7zzMfuMS6UnVNXoLFRwg-1; Thu, 21 Nov 2019 06:21:22 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-272-B_N_eDliO2y5xuI86tM7TQ-1; Thu, 21 Nov 2019 06:22:42 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45AED8024E3;
- Thu, 21 Nov 2019 11:21:21 +0000 (UTC)
-Received: from [10.36.116.214] (ovpn-116-214.ams2.redhat.com [10.36.116.214])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8F8845ED46;
- Thu, 21 Nov 2019 11:21:19 +0000 (UTC)
-Subject: Re: [PATCH 02/15] s390x: Beautify diag308 handling
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20191120114334.2287-1-frankja@linux.ibm.com>
- <20191120114334.2287-3-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <f4eca3d1-f5ac-8d5a-5b30-4a15a5987358@redhat.com>
-Date: Thu, 21 Nov 2019 12:21:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A966CB3DBD;
+ Thu, 21 Nov 2019 11:22:41 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-225.ams2.redhat.com [10.36.117.225])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5F6D83DA0;
+ Thu, 21 Nov 2019 11:22:37 +0000 (UTC)
+Date: Thu, 21 Nov 2019 12:22:35 +0100
+From: Kevin Wolf <kwolf@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v2 2/6] block: truncate: Don't make backing file data
+ visible
+Message-ID: <20191121112235.GD6007@linux.fritz.box>
+References: <20191120184501.28159-1-kwolf@redhat.com>
+ <20191120184501.28159-3-kwolf@redhat.com>
+ <96c2c681-851d-4b83-2acd-3952fa850e5f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191120114334.2287-3-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: ze7zzMfuMS6UnVNXoLFRwg-1
+In-Reply-To: <96c2c681-851d-4b83-2acd-3952fa850e5f@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: B_N_eDliO2y5xuI86tM7TQ-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -90,130 +89,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, stefanha@redhat.com,
+ qemu-block@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20.11.19 12:43, Janosch Frank wrote:
-> Let's improve readability by:
-> * Using constants for the subcodes
-> * Moving parameter checking into a function
-> * Removing subcode > 6 check as the default case catches that
+Am 20.11.2019 um 22:15 hat Eric Blake geschrieben:
+> On 11/20/19 12:44 PM, Kevin Wolf wrote:
+> > When extending the size of an image that has a backing file larger than
+> > its old size, make sure that the backing file data doesn't become
+> > visible in the guest, but the added area is properly zeroed out.
+> >=20
+> > Consider the following scenario where the overlay is shorter than its
+> > backing file:
+> >=20
+> >      base.qcow2:     AAAAAAAA
+> >      overlay.qcow2:  BBBB
+> >=20
+> > When resizing (extending) overlay.qcow2, the new blocks should not stay
+> > unallocated and make the additional As from base.qcow2 visible like
+> > before this patch, but zeros should be read.
+> >=20
+> > A similar case happens with the various variants of a commit job when a=
+n
+> > intermediate file is short (- for unallocated):
+> >=20
+> >      base.qcow2:     A-A-AAAA
+> >      mid.qcow2:      BB-B
+> >      top.qcow2:      C--C--C-
+> >=20
+> > After commit top.qcow2 to mid.qcow2, the following happens:
+> >=20
+> >      mid.qcow2:      CB-C00C0 (correct result)
+> >      mid.qcow2:      CB-C--C- (before this fix)
+> >=20
+> > Without the fix, blocks that previously read as zeros on top.qcow2
+> > suddenly turn into A.
+> >=20
+> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> > ---
+> >   block/io.c | 32 ++++++++++++++++++++++++++++++++
+> >   1 file changed, 32 insertions(+)
+> >=20
 >=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->   target/s390x/diag.c | 54 +++++++++++++++++++++++++++------------------
->   1 file changed, 32 insertions(+), 22 deletions(-)
+> > +    if (new_bytes && bs->backing && prealloc =3D=3D PREALLOC_MODE_OFF)=
+ {
+> > +        int64_t backing_len;
+> > +
+> > +        backing_len =3D bdrv_getlength(backing_bs(bs));
+> > +        if (backing_len < 0) {
+> > +            ret =3D backing_len;
+> > +            goto out;
+> > +        }
+> > +
+> > +        if (backing_len > old_size) {
+> > +            ret =3D bdrv_co_do_pwrite_zeroes(
+> > +                    bs, old_size, MIN(new_bytes, backing_len - old_siz=
+e),
+> > +                    BDRV_REQ_ZERO_WRITE | BDRV_REQ_MAY_UNMAP);
+> > +            if (ret < 0) {
+> > +                goto out;
+> > +            }
+> > +        }
+> > +    }
 >=20
-> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-> index 53c2f81f2a..067c667ba7 100644
-> --- a/target/s390x/diag.c
-> +++ b/target/s390x/diag.c
-> @@ -53,6 +53,29 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1, u=
-int64_t r3)
->   #define DIAG_308_RC_NO_CONF         0x0102
->   #define DIAG_308_RC_INVALID         0x0402
->  =20
-> +#define DIAG308_RES_MOD_CLR=09=090
-> +#define DIAG308_RES_LOAD_NORM=09=091
-> +#define DIAG308_LOAD_CLEAR=09=093
-> +#define DIAG308_LOAD_NORMAL_DUMP=094
-> +#define DIAG308_SET=09=09=095
-> +#define DIAG308_STORE=09=09=096
-> +
-> +static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64_t =
-addr,
-> +                              uintptr_t ra, bool write)
-> +{
-> +    if ((r1 & 1) || (addr & ~TARGET_PAGE_MASK)) {
-> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-> +        return -EINVAL;
-> +    }
-> +    if (!address_space_access_valid(&address_space_memory, addr,
-> +                                    sizeof(IplParameterBlock), write,
-> +                                    MEMTXATTRS_UNSPECIFIED)) {
-> +        s390_program_interrupt(env, PGM_ADDRESSING, ra);
-> +        return -EINVAL;
-> +    }
-> +    return 0;
-> +}
-> +
->   void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, uint=
-ptr_t ra)
->   {
->       CPUState *cs =3D env_cpu(env);
-> @@ -65,30 +88,24 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1,=
- uint64_t r3, uintptr_t ra)
->           return;
->       }
->  =20
-> -    if ((subcode & ~0x0ffffULL) || (subcode > 6)) {
-> +    if (subcode & ~0x0ffffULL) {
+> Note that if writing zeroes is not fast, and it turns out that we copy a =
+lot
+> of data rather than unallocated sections from the image being committed,
+> that this can actually slow things down (doing a bulk pre-zero doubles up
+> data I/O unless it is fast, which is why we added BDRV_REQ_NO_FALLBACK to
+> avoid slow pre-zeroing).  However, the complication of zeroing only the
+> unallocated clusters rather than a bulk pre-zeroing
 
-Strange, the default case in the switch was basically dead code.
+I'm not sure how there could already be any allocated clusters in the
+area that we just added? (Apart from preallocation, of course, which is
+why this is restricted to PREALLOC_MODE_OFF.)
 
->           s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->           return;
->       }
->  =20
->       switch (subcode) {
-> -    case 0:
-> +    case DIAG308_RES_MOD_CLR:
->           s390_ipl_reset_request(cs, S390_RESET_MODIFIED_CLEAR);
->           break;
-> -    case 1:
-> +    case DIAG308_RES_LOAD_NORM:
->           s390_ipl_reset_request(cs, S390_RESET_LOAD_NORMAL);
->           break;
-> -    case 3:
-> +    case DIAG308_LOAD_CLEAR:
-> +        /* Well we still lack the clearing bit... */
->           s390_ipl_reset_request(cs, S390_RESET_REIPL);
->           break;
-> -    case 5:
-> -        if ((r1 & 1) || (addr & 0x0fffULL)) {
-> -            s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-> -            return;
-> -        }
-> -        if (!address_space_access_valid(&address_space_memory, addr,
-> -                                        sizeof(IplParameterBlock), false=
-,
-> -                                        MEMTXATTRS_UNSPECIFIED)) {
-> -            s390_program_interrupt(env, PGM_ADDRESSING, ra);
-> +    case DIAG308_SET:
-> +        if (diag308_parm_check(env, r1, addr, ra, false)) {
->               return;
->           }
->           iplb =3D g_new0(IplParameterBlock, 1);
-> @@ -110,15 +127,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t r1=
-, uint64_t r3, uintptr_t ra)
->   out:
->           g_free(iplb);
->           return;
-> -    case 6:
-> -        if ((r1 & 1) || (addr & 0x0fffULL)) {
-> -            s390_program_interrupt(env, PGM_SPECIFICATION, ra);
-> -            return;
-> -        }
-> -        if (!address_space_access_valid(&address_space_memory, addr,
-> -                                        sizeof(IplParameterBlock), true,
-> -                                        MEMTXATTRS_UNSPECIFIED)) {
-> -            s390_program_interrupt(env, PGM_ADDRESSING, ra);
-> +    case DIAG308_STORE:
-> +        if (diag308_parm_check(env, r1, addr, ra, true)) {
->               return;
->           }
->           iplb =3D s390_ipl_get_iplb();
->=20
+You're right that if this truncate was called in the context of a commit
+block job rather than a resize, the zeros might be overwritten later.
+I'm not sure if leaving clusters unallocated while the job is running
+(and might be cancelled) is right, though. On the other hand, while the
+job is running, the target image on its own is invalid anyway.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+> for something that is an unlikely corner case (how often do you create
+> an overlay shorter than the backing file?) is not worth the extra code
+> maintenance (unlike in the 'qemu-img convert' case where it was worth
+> the optimization). So I'm fine with how you fixed it here.
 
---=20
+Also note that raw doesn't support backing files and qcow2 generally
+supports zero writes. If you use an external data file and backing file
+at the same time and your file system doesn't support zero writes, you
+could run into the problem. Or if you use a more unusual image format
+(including qcow2 v2).
 
-Thanks,
+So it's really two corner cases combined.
 
-David / dhildenb
+Kevin
 
 
