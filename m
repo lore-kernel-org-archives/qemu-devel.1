@@ -2,78 +2,96 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70B3FC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEE08C432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:10:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A1BD20721
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:09:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A3A120721
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:10:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WF5FN7IG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A1BD20721
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jx/G0HzI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A3A120721
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXkLD-0000LC-BD
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 06:09:39 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50610)
+	id 1iXkLd-0000bc-Q5
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 06:10:05 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50697)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iXkK7-0007rK-3Z
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:08:32 -0500
+ (envelope-from <philmd@redhat.com>) id 1iXkKF-00081k-Pm
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:08:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iXkK5-0002Ob-5p
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:08:30 -0500
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:41797
+ (envelope-from <philmd@redhat.com>) id 1iXkKE-0002TP-Ll
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:08:39 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26035
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iXkK4-0002O9-Nh
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:08:29 -0500
+ (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iXkKE-0002Sh-IO
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:08:38 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574334507;
+ s=mimecast20190719; t=1574334518;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RhjxBMpSXS2HrqnBQ/CmPaJrtVXXxm2Dj8wYCBff9fE=;
- b=WF5FN7IG4io0jK6sCFlr7Ez5oALDKE5/EP0nZ01zOhlkzOLQp8bkn4v3Tx20LajClgWvF4
- Zxs4oJNgB8zPghvdoAiJbAGWUh+ycDO19DB/QqjCuKPs0lD3NWCLu63SDrEd3UsFRgo7Ym
- iLw0v4/YWGarfSDg73FVNTYVsIR9RAQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-s0lAagw9M12c9xgQoIH3pA-1; Thu, 21 Nov 2019 06:08:20 -0500
-X-MC-Unique: s0lAagw9M12c9xgQoIH3pA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25F8D8E4385;
- Thu, 21 Nov 2019 11:08:19 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-117-225.ams2.redhat.com [10.36.117.225])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C3F9760C23;
- Thu, 21 Nov 2019 11:08:17 +0000 (UTC)
-Date: Thu, 21 Nov 2019 12:08:16 +0100
-From: Kevin Wolf <kwolf@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Subject: Re: [RFC PATCH 00/18] Add qemu-storage-daemon
-Message-ID: <20191121110816.GB6007@linux.fritz.box>
-References: <20191017130204.16131-1-kwolf@redhat.com>
- <8a9a5eae-d388-867b-f4a1-080e876389b3@redhat.com>
- <20191106145800.GC7548@dhcp-200-226.str.redhat.com>
- <20191121103238.GF439743@stefanha-x1.localdomain>
+ bh=iHL0UO7MAK8copWACF50qrbewMiXFvk5XnmjfwV6jmk=;
+ b=Jx/G0HzIDrLqzgB8jsqre3bCCdIzqI82aHZQXaNksxiUklaP53NpqAO/Si5pCkiHFrosDN
+ 1+Y+JpEMV9KqDF7L1a9zkiT/xnPZBMqUjZdqVuu3hNoc8wXoo4SCwnSN5FPylexO7QUNOb
+ nd6Ohb8BFD/jFEFJSMi5UM58TnHJkfc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-316-0TC8HXwfPYm0vJ1YK0vWPw-1; Thu, 21 Nov 2019 06:08:30 -0500
+Received: by mail-wm1-f69.google.com with SMTP id y133so1373906wmd.8
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 03:08:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=c4/qmxm5dqKJV3NK8SjSOV5dRQJhUqjY8Y5afRnTv2w=;
+ b=tx+yVWN59Hko/7/VO3HUA91EHBficVt4hjBOmCYBOBTAjKlhCLA4UbQ3tiKwjRlgci
+ /a1oyHLh+GtkxEZBlD1BQ+v4o2fCB8a7kK21u9N8+qrJQO5MTs7BTlANTDCVXdztvKYL
+ PbJuN31kd7xCd87o9afcprmsIv4nvTXyi4K0FX9XIs4PKpdQ75FNHa7PliiDE0fXDczm
+ nlryXps+JN6GesoURa4h7xB5nfCYKHkZ0jOEX3ZI246j7zeZbHSuhM7XUrwtZp9HGkh7
+ W5uCGJrt0IVcvvsXiib+wrwjd+7NwkePMvh2xTsGE5NHWtVd0EaobjCMa60XOjGV+p+x
+ 1n+w==
+X-Gm-Message-State: APjAAAXXhaqeCFxQ9JbKzttbmH1c3hU20vsmqXxS7T6OXbQu6YIO9u9F
+ gMEQYEUicbtCKqgwvGd/G6y6v+arie+jkgokK91rIsboFmZiMfelKja5J2+lnE6EhvxOGx8Ajp+
+ GIx5ImA6Z9uARIEQ=
+X-Received: by 2002:adf:dcc2:: with SMTP id x2mr10185419wrm.359.1574334509330; 
+ Thu, 21 Nov 2019 03:08:29 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwh9qdL2hfxd3B/faG2J2QLv8g8iD3a8H48SqJm5vKfiIpt/i5Kz3TagaWBUlfbtlbML4+PRQ==
+X-Received: by 2002:adf:dcc2:: with SMTP id x2mr10185382wrm.359.1574334509028; 
+ Thu, 21 Nov 2019 03:08:29 -0800 (PST)
+Received: from [192.168.1.35] (131.red-88-21-102.staticip.rima-tde.net.
+ [88.21.102.131])
+ by smtp.gmail.com with ESMTPSA id m13sm2523687wmc.41.2019.11.21.03.08.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 21 Nov 2019 03:08:28 -0800 (PST)
+Subject: Re: [PATCH v2] exynos4210_gic: Suppress gcc9 format-truncation
+ warnings
+To: David Gibson <david@gibson.dropbear.id.au>, qemu-devel@nongnu.org
+References: <20191121013859.287372-1-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <80635d08-4546-9f14-b664-f8f79cf5ec19@redhat.com>
+Date: Thu, 21 Nov 2019 12:08:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191121103238.GF439743@stefanha-x1.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20191121013859.287372-1-david@gibson.dropbear.id.au>
+Content-Language: en-US
+X-MC-Unique: 0TC8HXwfPYm0vJ1YK0vWPw-1
 X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature"; boundary="/NkBOFFp2J2Af1nK"
-Content-Disposition: inline
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
 X-Received-From: 205.139.110.61
@@ -88,62 +106,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Igor Mitsyanko <i.mitsyanko@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---/NkBOFFp2J2Af1nK
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Am 21.11.2019 um 11:32 hat Stefan Hajnoczi geschrieben:
-> On Wed, Nov 06, 2019 at 03:58:00PM +0100, Kevin Wolf wrote:
-> > Am 06.11.2019 um 15:37 hat Max Reitz geschrieben:
-> > > On 17.10.19 15:01, Kevin Wolf wrote:
-> > > The only thing I don=E2=80=99t like is the name, but that=E2=80=99s w=
-hat <Tab> is for.
-> > > :-)
-> >=20
-> > I'm open for suggestions, but I thought 'qsd' was a bit too terse. :-)
-> >=20
-> > (Actually, maybe we could even pick something that doesn't mention
-> > storage or block? After all, it can do all kinds of QEMU backends in
-> > theory. Not sure if there's any standalone use for them, but who
-> > knows...)
+On 11/21/19 2:38 AM, David Gibson wrote:
+> exynos4210_gic_realize() prints the number of cpus into some temporary
+> buffers, but it only allows 3 bytes space for it.  That's plenty:
+> existing machines will only ever set this value to EXYNOS4210_NCPUS
+> (2).  But the compiler can't always figure that out, so some[*] gcc9
+> versions emit -Wformat-truncation warnings.
 >=20
-> It's likely that non-storage use cases will want to a daemon too.  Maybe
-> just qemu-daemon?
+> We can fix that by hinting the constraint to the compiler with a
+> suitably placed assert().
+>=20
+> [*] The bizarre thing here, is that I've long gotten these warnings
+>      compiling in a 32-bit x86 container as host - Fedora 30 with
+>      gcc-9.2.1-1.fc30.i686 - but it compiles just fine on my normal
+>      x86_64 host - Fedora 30 with and gcc-9.2.1-1.fc30.x86_64.
+>=20
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+ >
 
-Do you have specific use cases in mind? Most backends seem rather
-useless without a device to attach them to. In older QEMU versions,
-maybe you could put multiple network backends into a common vlan to
-forward between them, but even that vlan concept doesn't exist any more.
+Reviewed-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 
-Kevin
+--- <- here goes the separator I suppose
 
---/NkBOFFp2J2Af1nK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJd1nAgAAoJEH8JsnLIjy/WwPwQAK08vhvGyjC7Y6qS2Q7e5J8i
-iEL2m66BHfIkPunBOr+kjD7M96tTCfhWb8a5RM1ek9onfDTQdj1LZ6d8O4HndHpQ
-wukWMM5ibCJJ/ii4+boH/UE3cQY3FQ9+ZrDJ4sZkxfpZ0fBWZUrbBUHDbb0UEDUS
-JwyaJil0GZtc7wLzSdUII0zrtnmlIzAhVDRx6YhGkFS2kRVHGdrIsWbzYI6/OmIp
-RguEqxvr2ONSgWE6m5uQ8C4L3pkM0Dt8+QcyGkYq744xcy2Mqhi5sZhrMjYWEviJ
-Wuy13BY+ZjnAWQKH3UMyoTJ2RDi6DzqoNZxQ6VgiBb1gIDIkj2v4Bsw+ICTwRfEP
-Y9y2YZp1EOocnOcL2sCtlex/m+K92ms1pkOL5qiTj2dzU5JkrP9velOogEjiHAK9
-hYvw558xnuiR/giPF5OG38Y/mQtureG4YEprmSyGdi2fGwLOhWjZl6KCVvbajsN6
-+zWMDxch+Epwm1F7N3JtOzaOLsu6MYfZbCoCKUGnOZTvJS9vetP/Ua+tPXZ2o+NQ
-ZHpmWb6fRVDvqmKALPUrWiSgjGhSyfiqxrWj4eiy/jweehSXND6b4GtR+qwRmGPu
-akzxqMgWxe4LvH3fFkxzNhDI4cy5okKNUr9vEYw5wZUjKdhrHrYWKNGf+f+PbhVF
-+V2qXc449uNqXBfO6NNq
-=c6+M
------END PGP SIGNATURE-----
-
---/NkBOFFp2J2Af1nK--
+> Changes since v1:
+>   * Used an assert to hint the compiler, instead of increasing the
+>     buffer size.
+>=20
+> ---
+>   hw/intc/exynos4210_gic.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
+>=20
+> diff --git a/hw/intc/exynos4210_gic.c b/hw/intc/exynos4210_gic.c
+> index a1b699b6ba..ed4d8482e3 100644
+> --- a/hw/intc/exynos4210_gic.c
+> +++ b/hw/intc/exynos4210_gic.c
+> @@ -314,6 +314,14 @@ static void exynos4210_gic_realize(DeviceState *dev,=
+ Error **errp)
+>               EXYNOS4210_EXT_GIC_DIST_REGION_SIZE);
+>  =20
+>       for (i =3D 0; i < s->num_cpu; i++) {
+> +        /*
+> +         * This clues in gcc that our on-stack buffers do, in fact
+> +         * have enough room for the cpu numbers.  gcc 9.2.1 on 32-bit
+> +         * x86 doesn't figure this out, otherwise and gives spurious
+> +         * warnings.
+> +         */
+> +        assert(i <=3D EXYNOS4210_NCPUS);
+> +
+>           /* Map CPU interface per SMP Core */
+>           sprintf(cpu_alias_name, "%s%x", cpu_prefix, i);
+>           memory_region_init_alias(&s->cpu_alias[i], obj,
+>=20
 
 
