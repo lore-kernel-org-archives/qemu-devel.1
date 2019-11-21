@@ -2,87 +2,83 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80DB3C432C3
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A556AC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:15:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B54B2073F
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:08:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7254C2089D
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 12:15:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jby3pZbZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B54B2073F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d44ULUky"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7254C2089D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXlG1-0003Q2-Gw
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 07:08:21 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37557)
+	id 1iXlNO-0005o4-K6
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 07:15:58 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43930)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iXlCv-0000FL-NQ
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:05:10 -0500
+ (envelope-from <david@redhat.com>) id 1iXlMV-0005K2-2U
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:15:04 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iXlCu-00081D-IF
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:05:09 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:51653)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iXlCu-0007xy-Ah
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:05:08 -0500
-Received: by mail-wm1-x343.google.com with SMTP id g206so3161622wme.1
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 04:05:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=vkbc4EaaPPNklPpPrxrPo7vNcXH2XKi9AJPnSujmXvw=;
- b=jby3pZbZBApLcCJGjMWvjENA8DkWIoDpFnLlb6u9Nsyqrik5DPbB9IQDwAtVwfPZ9E
- eMTqZ6tBqUk1rFeO7oyvEmrXT2s/qtEZKYnQpDCDHJUcDE7JeNJUdLb+FN1yRfggbPc3
- aEG2HjjXckSaCgRIYWo9DmrHcvDafoZxM8DgKcsp7+DNkbZf9XOvuG0TpKRvnOkDtBhj
- gvgAn1uvJQaQU9Imv8AcjQpVenhpGBogPTcYMUybIzt9r2PF8wq6FDgZWs77uNZpfVFj
- cLUH3aLi3RMg/YhkgbG/xZnB5OwX4uFXSFoORf2fwLdJzkQm7GsA7qkoLl68NliXCqmu
- 5Wzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=vkbc4EaaPPNklPpPrxrPo7vNcXH2XKi9AJPnSujmXvw=;
- b=dtIagYaHn3EAUTWji+2trg7riwn/QebHfmfYjeHiDETuSzZAAWMhpCVDbskqPrL4La
- F64Zi6ZbKPZKkI1cLukNcIuy9AeFoyjKcGtMMI0u26uDknNjznG0lFcruv8cWYn88Neq
- b+FcCCnznpuslSYY8xg2ZJovrGmyqJsQLxcW2yfnWwoRh4HhI+qXeYFD+SAmZtS4dKV9
- cHKCbnMugewF8Br8ntcMvdeQs9xIePv2O7iN84aL8edPQUfvEBhYs+UcwiiKbFYaaTE6
- Tk9slfRlvmRVkOi5wofo97gYLOhZWSWNiZtoJ/6f5gdhnQOI/XEUf+eN39gKIcmxZakx
- LaCw==
-X-Gm-Message-State: APjAAAUp6uHVyCsk97oReHTMxuB+0EbVYpNHS9Jgveu1GoJ7+LnsRemo
- 7/jMW0ASa2+ikHpW4PtNZgc=
-X-Google-Smtp-Source: APXvYqwFhE3thlvvXrrwhAIUNN2dtcJf3+cEpCJMdQrw74CI6Am4A9EP16NdUX131fgDDSy963WNAg==
-X-Received: by 2002:a7b:cf27:: with SMTP id m7mr9671496wmg.45.1574337906753;
- Thu, 21 Nov 2019 04:05:06 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id s11sm3004901wrr.43.2019.11.21.04.05.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 Nov 2019 04:05:05 -0800 (PST)
-Date: Thu, 21 Nov 2019 12:05:04 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Jagannathan Raman <jag.raman@oracle.com>
-Subject: Re: [RFC v4 PATCH 19/49] multi-process: configure remote side devices
-Message-ID: <20191121120504.GN439743@stefanha-x1.localdomain>
-References: <cover.1571905346.git.jag.raman@oracle.com>
- <f36f81254336de4efb71b4869bd3c9e02d328392.1571905346.git.jag.raman@oracle.com>
+ (envelope-from <david@redhat.com>) id 1iXlMS-0005Ed-IR
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:15:01 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:58136
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iXlMS-0005E6-BX
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 07:15:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574338499;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VPPQ+s+5vOi2Vmd9q9RFDv+JMTC+2jkvktldLmnSFYQ=;
+ b=d44ULUky6CpW7xGqrLIYzQ4nQeXCDlxE42eezwta/Ew8CdXAiZwtVhLI5cDRVea2XNpmdp
+ +044JaiurS+oypumY71aUq9WNztZBviGUMGr1J7Fhlw2r1098GnmktTIuBJZ5N72VzzFEU
+ z6Jgme52uWYLjK66G6cuM1JvZ5olrYA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-368-ZH6BfruuPviql526b-6p9g-1; Thu, 21 Nov 2019 07:14:56 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26F4E1883523;
+ Thu, 21 Nov 2019 12:14:55 +0000 (UTC)
+Received: from [10.36.116.214] (ovpn-116-214.ams2.redhat.com [10.36.116.214])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8022E60138;
+ Thu, 21 Nov 2019 12:14:53 +0000 (UTC)
+Subject: Re: [PATCH 11/15] RFC: s390x: Exit on vcpu reset error
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191120114334.2287-1-frankja@linux.ibm.com>
+ <20191120114334.2287-12-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <09359386-a91b-d98c-08f5-5b375f0bd942@redhat.com>
+Date: Thu, 21 Nov 2019 13:14:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="6o78gXsyQHm68LY/"
-Content-Disposition: inline
-In-Reply-To: <f36f81254336de4efb71b4869bd3c9e02d328392.1571905346.git.jag.raman@oracle.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+In-Reply-To: <20191120114334.2287-12-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: ZH6BfruuPviql526b-6p9g-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,65 +90,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, john.g.johnson@oracle.com,
- qemu-devel@nongnu.org, kraxel@redhat.com, quintela@redhat.com, mst@redhat.com,
- armbru@redhat.com, kanth.ghatraju@oracle.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- liran.alon@oracle.com, stefanha@redhat.com, rth@twiddle.net, kwolf@redhat.com,
- berrange@redhat.com, mreitz@redhat.com, ross.lagerwall@citrix.com,
- marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 20.11.19 12:43, Janosch Frank wrote:
+> If a vcpu is not properly reset it might be better to just end the VM.
+>=20
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>   target/s390x/kvm.c | 2 ++
+>   1 file changed, 2 insertions(+)
+>=20
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index 190400df55..0210b54157 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -418,11 +418,13 @@ static void kvm_s390_reset_vcpu(S390CPU *cpu, unsig=
+ned long type)
+>           if (kvm_vcpu_ioctl(cs, KVM_S390_VCPU_RESET, type)) {
+>               error_report("CPU reset type %ld failed on CPU %i",
+>                            type, cs->cpu_index);
+> +            exit(1);
+>           }
+>           return;
+>       }
+>       if (kvm_vcpu_ioctl(cs, KVM_S390_INITIAL_RESET, NULL)) {
+>           error_report("Initial CPU reset failed on CPU %i", cs->cpu_inde=
+x);
+> +        exit(1);
+>       }
+>   }
+>  =20
+>=20
 
---6o78gXsyQHm68LY/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+According to the comment in include/qapi/error.h
 
-On Thu, Oct 24, 2019 at 05:09:00AM -0400, Jagannathan Raman wrote:
-> +static void set_remote_opts(PCIDevice *dev, QDict *qdict, unsigned int cmd)
-> +{
-> +    QString *qstr;
-> +    MPQemuMsg msg;
-> +    const char *str;
-> +    PCIProxyDev *pdev;
-> +
-> +    pdev = PCI_PROXY_DEV(dev);
-> +
-> +    qstr = qobject_to_json(QOBJECT(qdict));
+"Please don't error_setg(&error_fatal, ...), use error_report() and=20
+exit(), because that's more obvious."
 
-qstr is leaked.
+This is the right thing to do.
 
-> +    str = qstring_get_str(qstr);
-> +
-> +    memset(&msg, 0, sizeof(MPQemuMsg));
-> +
-> +    msg.data2 = (uint8_t *)str;
-> +    msg.cmd = cmd;
-> +    msg.bytestream = 1;
-> +    msg.size = qstring_get_length(qstr) + 1;
-> +    msg.num_fds = 0;
-> +
-> +    mpqemu_msg_send(pdev->mpqemu_link, &msg, pdev->mpqemu_link->com);
-> +
-> +    return;
-> +}
+... and it's a fairly pathological thing to happen either way.
 
---6o78gXsyQHm68LY/
-Content-Type: application/pgp-signature; name="signature.asc"
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
------BEGIN PGP SIGNATURE-----
+--=20
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3WfW8ACgkQnKSrs4Gr
-c8gYBwgAkPvk+VuQ64HojuuUOnIGeAVvSUuNEkUu0kcFvm6TkNbDliiHmEiJAMPC
-GD5+f60FKqsm/xf4eU25MHwZh0GofjJHjUQnA0tVmg/wSNWaDtF2zjgcVRY2FLAT
-HwO5uIOA3RYNqbYRl1+tFcmz4eoUSvaoHe86j97qCX6fnoHJkKcUq5uWiqr6sA+a
-FwHyfoZ61eU0KAqVISCciqVJzK0FM87h1JILY0YUzyBjHxkK3ykvdU14KRoDqPry
-Ud1FOAJtcititVPxZhRelHx7Ltzng4hpPJ9QE6YO8NOVnqdZm2jPMf5ydEMFhO7f
-Xl/ZTG/YojmGMbM2vq24ek71l5FRsA==
-=COoX
------END PGP SIGNATURE-----
+Thanks,
 
---6o78gXsyQHm68LY/--
+David / dhildenb
+
 
