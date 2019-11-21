@@ -6,71 +6,71 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF0DC432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 049ACC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:33:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E5E120714
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:31:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E5E120714
+	by mail.kernel.org (Postfix) with ESMTPS id CC0EE20714
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 11:33:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC0EE20714
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39084 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXkgY-0001Yh-23
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 06:31:42 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54700)
+	id 1iXkiO-0003p6-TX
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 06:33:36 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54849)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iXkdJ-0006Vj-OH
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:28:22 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iXkeB-0007HT-TK
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:29:16 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iXkdI-0002fd-Dh
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:28:21 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48812)
+ (envelope-from <frankja@linux.ibm.com>) id 1iXkeA-000303-QX
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:29:15 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1812)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
  (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iXkdI-0002fM-59
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:28:20 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ id 1iXkeA-0002zi-HA
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 06:29:14 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xALBRH60061117
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 06:28:19 -0500
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wdhxa6qrh-1
+ xALBRj1C019330
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 06:29:13 -0500
+Received: from e06smtp07.uk.ibm.com (e06smtp07.uk.ibm.com [195.75.94.103])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wdqmgvp6w-1
  (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 06:28:19 -0500
+ for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 06:29:13 -0500
 Received: from localhost
- by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
  Violators will be prosecuted
  for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Thu, 21 Nov 2019 11:28:16 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway:
+ Thu, 21 Nov 2019 11:29:09 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp07.uk.ibm.com (192.168.101.137) with IBM ESMTP SMTP Gateway:
  Authorized Use Only! Violators will be prosecuted; 
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Thu, 21 Nov 2019 11:28:12 -0000
+ Thu, 21 Nov 2019 11:29:06 -0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com
  (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id xALBRXm241812354
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xALBT56x46661778
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 21 Nov 2019 11:27:33 GMT
+ Thu, 21 Nov 2019 11:29:05 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 0B745A405F;
- Thu, 21 Nov 2019 11:28:11 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 1ECABA4060;
+ Thu, 21 Nov 2019 11:29:05 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 87E12A4054;
- Thu, 21 Nov 2019 11:28:10 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id A6AF5A405B;
+ Thu, 21 Nov 2019 11:29:04 +0000 (GMT)
 Received: from localhost.localdomain (unknown [9.145.70.129])
  by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 21 Nov 2019 11:28:10 +0000 (GMT)
-Subject: Re: [PATCH 02/15] s390x: Beautify diag308 handling
+ Thu, 21 Nov 2019 11:29:04 +0000 (GMT)
+Subject: Re: [PATCH 15/15] s390x: protvirt: Handle SIGP store status correctly
 To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
 References: <20191120114334.2287-1-frankja@linux.ibm.com>
- <20191120114334.2287-3-frankja@linux.ibm.com>
- <f4eca3d1-f5ac-8d5a-5b30-4a15a5987358@redhat.com>
+ <20191120114334.2287-16-frankja@linux.ibm.com>
+ <92f11251-6348-0767-b6cf-d6dbed6e6fca@redhat.com>
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  mQINBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
@@ -114,26 +114,26 @@ Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-Date: Thu, 21 Nov 2019 12:28:10 +0100
+Date: Thu, 21 Nov 2019 12:29:04 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <f4eca3d1-f5ac-8d5a-5b30-4a15a5987358@redhat.com>
+In-Reply-To: <92f11251-6348-0767-b6cf-d6dbed6e6fca@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="vH2pVTml2dPELYPtLpORat4KxEVNMVWxF"
+ boundary="Db1jOXmY5b35wzvBbi16AKuqdRsS9ri4z"
 X-TM-AS-GCONF: 00
-x-cbid: 19112111-0020-0000-0000-0000038CD898
+x-cbid: 19112111-0028-0000-0000-000003BD8AE1
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112111-0021-0000-0000-000021E31225
-Message-Id: <933f425e-7353-775c-f8b4-efb0c21e9bf8@linux.ibm.com>
+x-cbparentid: 19112111-0029-0000-0000-00002480B2B4
+Message-Id: <40b6b928-3b37-d5fa-b900-d0ddf8672e42@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-11-21_02:2019-11-21,2019-11-21 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=2 spamscore=0
- clxscore=1015 adultscore=0 malwarescore=0 phishscore=0 impostorscore=0
- bulkscore=0 mlxscore=0 priorityscore=1501 mlxlogscore=999
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ malwarescore=0
+ lowpriorityscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501
+ suspectscore=0 impostorscore=0 mlxscore=0 clxscore=1015 spamscore=0
+ phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1910280000 definitions=main-1911210104
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
 X-Received-From: 148.163.156.1
@@ -155,161 +155,90 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vH2pVTml2dPELYPtLpORat4KxEVNMVWxF
-Content-Type: multipart/mixed; boundary="HagdVoBrpDaWBO7eA0fmFJe5e7tjtlGB4"
+--Db1jOXmY5b35wzvBbi16AKuqdRsS9ri4z
+Content-Type: multipart/mixed; boundary="dPYDsU1T0XCepjqsnG4d8KGtGh3wYiJEf"
 
---HagdVoBrpDaWBO7eA0fmFJe5e7tjtlGB4
+--dPYDsU1T0XCepjqsnG4d8KGtGh3wYiJEf
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 11/21/19 12:21 PM, David Hildenbrand wrote:
+On 11/21/19 12:24 PM, David Hildenbrand wrote:
 > On 20.11.19 12:43, Janosch Frank wrote:
->> Let's improve readability by:
->> * Using constants for the subcodes
->> * Moving parameter checking into a function
->> * Removing subcode > 6 check as the default case catches that
+>> Status storing is obviously not done by qemu anymore.
 >>
 >> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 >> ---
->>   target/s390x/diag.c | 54 +++++++++++++++++++++++++++----------------=
---
->>   1 file changed, 32 insertions(+), 22 deletions(-)
+>>   target/s390x/sigp.c | 7 +++++--
+>>   1 file changed, 5 insertions(+), 2 deletions(-)
 >>
->> diff --git a/target/s390x/diag.c b/target/s390x/diag.c
->> index 53c2f81f2a..067c667ba7 100644
->> --- a/target/s390x/diag.c
->> +++ b/target/s390x/diag.c
->> @@ -53,6 +53,29 @@ int handle_diag_288(CPUS390XState *env, uint64_t r1=
-, uint64_t r3)
->>   #define DIAG_308_RC_NO_CONF         0x0102
->>   #define DIAG_308_RC_INVALID         0x0402
->>  =20
->> +#define DIAG308_RES_MOD_CLR		0
->> +#define DIAG308_RES_LOAD_NORM		1
->> +#define DIAG308_LOAD_CLEAR		3
->> +#define DIAG308_LOAD_NORMAL_DUMP	4
->> +#define DIAG308_SET			5
->> +#define DIAG308_STORE			6
->> +
->> +static int diag308_parm_check(CPUS390XState *env, uint64_t r1, uint64=
-_t addr,
->> +                              uintptr_t ra, bool write)
->> +{
->> +    if ((r1 & 1) || (addr & ~TARGET_PAGE_MASK)) {
->> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->> +        return -EINVAL;
->> +    }
->> +    if (!address_space_access_valid(&address_space_memory, addr,
->> +                                    sizeof(IplParameterBlock), write,=
+>> diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
+>> index 2ce22d4dc1..68634d694a 100644
+>> --- a/target/s390x/sigp.c
+>> +++ b/target/s390x/sigp.c
+>> @@ -144,7 +144,9 @@ static void sigp_stop_and_store_status(CPUState *c=
+s, run_on_cpu_data arg)
+>>       case S390_CPU_STATE_STOPPED:
+>>           /* already stopped, just store the status */
+>>           cpu_synchronize_state(cs);
+>> -        s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
+>> +        if (!cpu->env.pv) {
+>> +            s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);=
 
->> +                                    MEMTXATTRS_UNSPECIFIED)) {
->> +        s390_program_interrupt(env, PGM_ADDRESSING, ra);
->> +        return -EINVAL;
->> +    }
->> +    return 0;
->> +}
->> +
->>   void handle_diag_308(CPUS390XState *env, uint64_t r1, uint64_t r3, u=
-intptr_t ra)
->>   {
->>       CPUState *cs =3D env_cpu(env);
->> @@ -65,30 +88,24 @@ void handle_diag_308(CPUS390XState *env, uint64_t =
-r1, uint64_t r3, uintptr_t ra)
->>           return;
->>       }
->>  =20
->> -    if ((subcode & ~0x0ffffULL) || (subcode > 6)) {
->> +    if (subcode & ~0x0ffffULL) {
+>> +        }
 >=20
-> Strange, the default case in the switch was basically dead code.
+> Confused, how is that case handled? The CPU is already stopped, so it=20
+> won't be run again (consequently, next SIE entry can't store it). Who=20
+> will store the status?
+
+Firmware does some magic
+
 >=20
->>           s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->>           return;
+>>           break;
 >>       }
->>  =20
->>       switch (subcode) {
->> -    case 0:
->> +    case DIAG308_RES_MOD_CLR:
->>           s390_ipl_reset_request(cs, S390_RESET_MODIFIED_CLEAR);
->>           break;
->> -    case 1:
->> +    case DIAG308_RES_LOAD_NORM:
->>           s390_ipl_reset_request(cs, S390_RESET_LOAD_NORMAL);
->>           break;
->> -    case 3:
->> +    case DIAG308_LOAD_CLEAR:
->> +        /* Well we still lack the clearing bit... */
->>           s390_ipl_reset_request(cs, S390_RESET_REIPL);
->>           break;
->> -    case 5:
->> -        if ((r1 & 1) || (addr & 0x0fffULL)) {
->> -            s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->> -            return;
->> -        }
->> -        if (!address_space_access_valid(&address_space_memory, addr,
->> -                                        sizeof(IplParameterBlock), fa=
-lse,
->> -                                        MEMTXATTRS_UNSPECIFIED)) {
->> -            s390_program_interrupt(env, PGM_ADDRESSING, ra);
->> +    case DIAG308_SET:
->> +        if (diag308_parm_check(env, r1, addr, ra, false)) {
->>               return;
->>           }
->>           iplb =3D g_new0(IplParameterBlock, 1);
->> @@ -110,15 +127,8 @@ void handle_diag_308(CPUS390XState *env, uint64_t=
- r1, uint64_t r3, uintptr_t ra)
->>   out:
->>           g_free(iplb);
->>           return;
->> -    case 6:
->> -        if ((r1 & 1) || (addr & 0x0fffULL)) {
->> -            s390_program_interrupt(env, PGM_SPECIFICATION, ra);
->> -            return;
->> -        }
->> -        if (!address_space_access_valid(&address_space_memory, addr,
->> -                                        sizeof(IplParameterBlock), tr=
-ue,
->> -                                        MEMTXATTRS_UNSPECIFIED)) {
->> -            s390_program_interrupt(env, PGM_ADDRESSING, ra);
->> +    case DIAG308_STORE:
->> +        if (diag308_parm_check(env, r1, addr, ra, true)) {
->>               return;
->>           }
->>           iplb =3D s390_ipl_get_iplb();
+>>       si->cc =3D SIGP_CC_ORDER_CODE_ACCEPTED;
+>> @@ -497,7 +499,8 @@ void do_stop_interrupt(CPUS390XState *env)
+>>       if (s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu) =3D=3D 0) {
+>>           qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);=
+
+>>       }
+>> -    if (cpu->env.sigp_order =3D=3D SIGP_STOP_STORE_STATUS) {
+>> +    /* Storing will occur on next SIE entry for fmt 4 */
+>> +    if (cpu->env.sigp_order =3D=3D SIGP_STOP_STORE_STATUS && !env->pv=
+) {
+>>           s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
+>>       }
+>>       env->sigp_order =3D 0;
 >>
 >=20
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-
-Thanks!
+>=20
 
 
 
+--dPYDsU1T0XCepjqsnG4d8KGtGh3wYiJEf--
 
---HagdVoBrpDaWBO7eA0fmFJe5e7tjtlGB4--
-
---vH2pVTml2dPELYPtLpORat4KxEVNMVWxF
+--Db1jOXmY5b35wzvBbi16AKuqdRsS9ri4z
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3WdMoACgkQ41TmuOI4
-ufhklQ/+NsQf9u4YlPYN8s07JKtAuAxEqd8r9WZJLK8ZOM8+RpJ+VwSm2PKZdVbv
-/km0iYc6EjlSskDEUl9xXkUQPmBEeDmhmTRpmha1gwS3V7xitiFPESCo/BI2/kRm
-GOCZA4C75nDmgFsXyICpoynkfi6ETIR5ATw0uij2aGatjYPI8C2ajOwIr4+FfpwW
-oOdmXQVGE9uKIhhg+OkHZj4NGA1lnKfCdfYcKkb7I8VnyeZp3nY+HqXZpL+sgmvL
-j+r1ZzhgSxK/Yew7lNHmc7eZ9sjRPosoHEEgQWMppV5kl4gAFh0hGIdX4JjR0T+Y
-lnCp5Ubt382LCXBDLjLWJZT6YxvY6M1/AaOVsRxY+9XajatbdYOCm5bhWNFTsQDc
-/dV4rUBtEjMU/rPyDRgB4IT540a2Ts2qiY0F2PoswrqYrRKN0QKa2fT0R/TAcMoU
-hCEqmNshUAf+DZ2UDIUe1Y0SA4nGsPP/Qb8auVF/mP1L010S2KJkrNCr4DYPGFGC
-IrBG4VfpaeX37gRIAiW+qfT5aa6XbUpqLvoG5hzsVL6Pd7iaPxSjeHj0HMooqXpv
-b/Hb9EBEwwo75/+584v1umxJczai/K6VSGByZco2VKBKsOnVxH97YtoIyN5qBf5h
-5uEBI6upsDftXKGr9NFqwK8EZ0WVqCPo/EL0w3+4c3E4ba3NOpA=
-=Ahkl
+iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3WdQAACgkQ41TmuOI4
+ufgVlg/+L1YlqQ1lhxxobKCz0IBoAg3w1qSXDVleZnmtkeP65VWQJEiRfldRlxhy
+nL78HterCh23WvEQGyXGswHXfh1LsvRlhWXN881fhO9BzpG+bMieBIC17B5mPFB5
+b526Zw3vJMKsWwTHS0ImtPah2NmK2zOcu2zcOWx7S8/XF6WQUVpcLTZdSL+RDDhJ
+VLeVQgSQgPHAXI7NPcq1HqsMC0XUbGqG2ui8yOrwg8CIcCojeH8z/ZXX9zXSQmWS
+7jdKjqi3nIJyKWDZzhl2v2qGeQ4XUCVuXiNo3gytQyFExO4J0LKrSQo+LnZqLINy
+pUn6lzZuC/2w4HbB/UDCd+GnzYsYebhjjoPKfZJ+Uu9XWbhUmbwtxC/NbkmUhHPG
+RdCMsyjf+jUaIMFolaj7cgHOZq3rcJEBijfqlsjBZ7pP4bCQ/8E1dqzxy2iGU4tT
+x8OGHzjwc/8yUwYX0z09EKofCnZH8STC6R/3gqjmjtvvt7J7fovUugLIbfH7zP/S
+bLmu/FCRnReWPSnH45R9iG/Y/nsu/B412I03dIgRFqClpgHnIWsJvNQC1oYQ2YTJ
+o9uqxFpUCF1STadjy2Y2HGiG01jc/KoHVMU1NWQj/GP6Xt+pX3EnOhsLMOtNUzXe
+83dpk20DCgRul8pJM6VNEF4WvSuuLueeBVkX7puo5kaomOUFYD8=
+=GDiW
 -----END PGP SIGNATURE-----
 
---vH2pVTml2dPELYPtLpORat4KxEVNMVWxF--
+--Db1jOXmY5b35wzvBbi16AKuqdRsS9ri4z--
 
 
