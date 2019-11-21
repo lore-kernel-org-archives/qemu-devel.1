@@ -2,87 +2,62 @@ Return-Path: <SRS0=OA/w=ZN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8836C432C0
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4BCAC432C0
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:53:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7397920679
-	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:52:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IykNunYb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7397920679
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 776F320679
+	for <qemu-devel@archiver.kernel.org>; Thu, 21 Nov 2019 13:53:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 776F320679
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXmsp-0003DP-4H
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:52:31 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34023)
+	id 1iXmtk-0004ue-CZ
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 08:53:28 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34226)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@gmail.com>) id 1iXmrb-0001t0-F7
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:51:16 -0500
+ (envelope-from <alxndr@bu.edu>) id 1iXmsR-00036M-AH
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:52:08 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@gmail.com>) id 1iXmra-0003DR-0t
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:51:15 -0500
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:56000)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1iXmrZ-0003Bn-QD
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:51:13 -0500
-Received: by mail-wm1-x343.google.com with SMTP id b11so3780173wmb.5
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 05:51:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to:user-agent;
- bh=KaerfimaGLiAfJXhZnCR1Lc2dMjYR45xPb2iWPC4faE=;
- b=IykNunYbUUg/02YQDZiviDqdmEO5B3RicRcWm7XRnRXWY9dxNnFtDx1MFzNwRI5v7t
- gCjhMlzsffFJtI89z/D2kM9Xj5ho0tQMysK91432zYt2B4GO6sm/JV/45CA/ur6LBd+c
- LLo7hYB25uOFAUJ1oNldFMIL5c8wiUOqb8LkNRJ4WDn0Zcmwb6sy8LHR27HSu9guVCJ7
- gMXtCrDVeuj5tY5L4Drf2JH56rMg5a057NsdbfO5PmrWyh+mgT+MjLq+l8rBF50vFOUa
- w8olUluDcRU9aUEHu3KU1YhP00cXU9ogK9fUZVh7S33Mh4/8eitnCaYbSbNOgP2EBSbg
- TdEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to:user-agent;
- bh=KaerfimaGLiAfJXhZnCR1Lc2dMjYR45xPb2iWPC4faE=;
- b=SP1AixIgI3aAx4ZaS9j6Ix/ZaToW0PEuC0s7jb61YvOJqI1rTOWTWs1GHwGi0pt4k4
- UAOfTfvAkoaZcZeOinXud4gorgk25gsnYS79WVmjXwOdQU0y4LCmTya9JLGNL8K9WrkU
- ERk+vjHksrJe0jcvN0gJvl8e5RU7NEc37txFaXbRF/Cy9nMvh4MKzY4Qr2tmIAthf5hF
- tnCpKX0B+FWOqbKjzBo47prAwFNYfxbRe17E2WiqLR+gLUkDgwgNdWgC79m1W8zu+8N+
- c9l48Pbfnf/DKEZ4s6mx2Lp2eDILIuyTL+zADrCJ8tNNFCXDF6MoHFiecPIu+rSCeldh
- RScg==
-X-Gm-Message-State: APjAAAXadm+87qWteSb38jrMDiyvKoHmWtBw5jNMonFNgmgCJM67kQPB
- Ux873G6c+GVM5wMsN5MGIls=
-X-Google-Smtp-Source: APXvYqynesBaN8v5Y403+D1Hu+lBrEbr9NINY2qZXJ2cxYotNJ82pYKz3eA3wQkVcufMu/Z3bRMEBA==
-X-Received: by 2002:a7b:c38c:: with SMTP id s12mr10296891wmj.84.1574344272142; 
- Thu, 21 Nov 2019 05:51:12 -0800 (PST)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id c15sm3633656wrx.78.2019.11.21.05.51.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 Nov 2019 05:51:10 -0800 (PST)
-Date: Thu, 21 Nov 2019 13:51:09 +0000
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH] vhost-user-input: use free(elem) instead of g_free(elem)
-Message-ID: <20191121135109.GW439743@stefanha-x1.localdomain>
-References: <20191119111626.112206-1-stefanha@redhat.com>
- <20191120114856.GG2785116@redhat.com>
+ (envelope-from <alxndr@bu.edu>) id 1iXmsM-0003zM-0y
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:52:06 -0500
+Received: from relay64.bu.edu ([128.197.228.104]:40100)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <alxndr@bu.edu>) id 1iXmsL-0003xp-Td
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 08:52:01 -0500
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id xALDp60m025016
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Thu, 21 Nov 2019 08:51:12 -0500
+Date: Thu, 21 Nov 2019 08:51:06 -0500
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] net: assert that tx packets have
+ nonzero size
+Message-ID: <20191121135106.kux5bbojnns7bwv7@mozz.bu.edu>
+References: <20190722132344.30798-1-alxndr@bu.edu>
+ <20190722132344.30798-2-alxndr@bu.edu>
+ <d549979a-3482-febc-4dc8-77dae431ad2c@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="HACzHn9G0kmbdSJa"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20191120114856.GG2785116@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2a00:1450:4864:20::343
+In-Reply-To: <d549979a-3482-febc-4dc8-77dae431ad2c@redhat.com>
+User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: quoted-printable
+X-MIME-Autoconverted: from 8bit to quoted-printable by relay64.bu.edu id
+ xALDp60m025016
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.6.x [fuzzy]
+X-Received-From: 128.197.228.104
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -94,63 +69,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "bsd@redhat.com" <bsd@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "stefanha@redhat.com" <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
---HACzHn9G0kmbdSJa
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Nov 20, 2019 at 11:48:56AM +0000, Daniel P. Berrang=E9 wrote:
-> On Tue, Nov 19, 2019 at 11:16:26AM +0000, Stefan Hajnoczi wrote:
-> > The virtqueue element returned by vu_queue_pop() is allocated using
-> > malloc(3) by virtqueue_alloc_element().  Use the matching free(3)
-> > function instead of glib's g_free().
+On 191107 1221, Jason Wang wrote:
 >=20
-> Just as an FYI, since glib 2.46  g_malloc is hardcoded to use the
-> system allocator, so it is now guaranteed that g_malloc/malloc
-> and g_free/free are safely interchangable. I recently got this
-> clarified in the glib docs:
+> On 2019/7/22 =E4=B8=8B=E5=8D=889:24, Oleinik, Alexander wrote:
+> > Virtual devices should not try to send zero-sized packets. The caller
+> > should check the size prior to calling qemu_sendv_packet_async.
+> >=20
+> > Signed-off-by: Alexander Oleinik <alxndr@bu.edu>
+> > ---
+> > v2:
+> >    * Improve the comment to explain the rationale for adding the asse=
+rt.
+> >   net/net.c | 9 +++++++++
+> >   1 file changed, 9 insertions(+)
+> >=20
+> > diff --git a/net/net.c b/net/net.c
+> > index 7d4098254f..4ad21df36f 100644
+> > --- a/net/net.c
+> > +++ b/net/net.c
+> > @@ -741,6 +741,15 @@ ssize_t qemu_sendv_packet_async(NetClientState *=
+sender,
+> >       size_t size =3D iov_size(iov, iovcnt);
+> >       int ret;
+> > +    /*
+> > +     * Since this function returns the size of the sent packets, and=
+ a return
+> > +     * value of zero indicates that the packet will be sent asynchro=
+nously,
+> > +     * there is currently no way to report that a 0-sized packet has=
+ been sent
+> > +     * successfully. Forbid it for now, and if someone needs this fu=
+nctionality
+> > +     * later, the API will require a change.
+> > +     */
+> > +    assert(size);
 >=20
->   https://gitlab.gnome.org/GNOME/glib/merge_requests/1099//diffs
 >=20
-> QEMU mandates 2.48 so we are now safe in that regard
+> This probably will make the assertion triggerable from guest. Is this b=
+etter
+> to warn and return NET_BUFSIZE + 1 here?
+
+Will do. I'll send a v3 out with this change.
+Thank you
+
+> Thanks
 >=20
-> For readability/sanity sake I'd still suggest matching functions
-> but it is not a functional danger any more. Even when it was a
-> risk, that risk only arose if you called GLib's API for installing
-> a custom allocator callback which QEMU never did, so it was always
-> a non-issue.
-
-You are right, although QEMU did use g_mem_set_vtable().  The custom
-functions still used malloc() underneath though so it would be safe
-anyway:
-
-  commit 98cf48f60aa4999f5b2808569a193a401a390e6a
-  Author: Paolo Bonzini <pbonzini@redhat.com>
-  Date:   Wed Sep 16 17:38:44 2015 +0200
-
-      trace: remove malloc tracing
-
---HACzHn9G0kmbdSJa
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3Wlk0ACgkQnKSrs4Gr
-c8jruAf+IuZwBb3rykhFL8wlFVdMbgMyksJXqQ+nGdRPjePaFMb2P/j2iSzEO5DR
-1Mc68R8g/Xqj/36SDE57hQyaaXAmEnrfsSeze+97SdrNBiUhnpKIS5X597XWEX0h
-ZYe2XIbPipKdAZ+DCRJlGiRV2vDQJBq6aUMPuiedVfURr0V70fuYHthS9+8gUmry
-ng/vHpPyyaGTdRRmfj4tHaXNQX9uv7kIGPqxRLxdCpq2gTAmwcwNnrE2ya6tj12r
-UJhSRjb4UC/gNPqEmkHyWOJKWsUimqpEjOAyhBs1D6Kyg3UIy8oq1mrCF0zcHypb
-OFHS3RbnkZRbrP7g5QKupLqY5f9gFA==
-=DOro
------END PGP SIGNATURE-----
-
---HACzHn9G0kmbdSJa--
+>=20
+> > +
+> >       if (size > NET_BUFSIZE) {
+> >           return size;
+> >       }
+>=20
 
