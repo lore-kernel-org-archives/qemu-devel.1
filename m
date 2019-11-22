@@ -2,86 +2,86 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C4BC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 15:11:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E17A7C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 15:12:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2D4F2071B
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 15:11:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UovjnWG+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2D4F2071B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B4B512071B
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 15:12:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4B512071B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYAbD-0008Il-Qd
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 10:11:55 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39906)
+	id 1iYAcA-0001Bn-UN
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 10:12:54 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39914)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iYAaF-0007SE-Ca
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:10:56 -0500
+ (envelope-from <bounces@canonical.com>) id 1iYAaE-0007Sw-J7
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:10:55 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iYAaC-0001SL-KD
+ (envelope-from <bounces@canonical.com>) id 1iYAaD-0001Sv-9S
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:10:54 -0500
+Received: from indium.canonical.com ([91.189.90.7]:54372)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <bounces@canonical.com>)
+ id 1iYAaD-0001S6-33
  for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:10:53 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51620
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iYAaC-0001RM-0s
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 10:10:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574435451;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mPjPqrIxGlTGMbcC2tskOhGPSY1BxY0qx1WX1PF8Zb0=;
- b=UovjnWG+b5ENMFiyUjNwVkhqMNwIFc2t8F/qrT3hfljpdj+s7nnSoEtMGVQBvJilK/H1WW
- HYj3MYh/OLOHdqjPUHtLwEqaE9G3hqW0+BkXhZV9iXdUg2XlnyR9EOINdfa1Y9Zpnaql6Y
- JV03n0VTRbCICuI5BYQqEmxJ5+DfhP4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-270-FppxGJ5yMRSw4YQd8E1boQ-1; Fri, 22 Nov 2019 10:10:48 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D747E80268E;
- Fri, 22 Nov 2019 15:10:47 +0000 (UTC)
-Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9AE9910840CD;
- Fri, 22 Nov 2019 15:10:47 +0000 (UTC)
-Subject: Re: [QUESTION] Usage of '0b' as a prefix for numerical constants?
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>
-References: <CAL1e-=gstogyXyAFV09-_mdqPs525bQP673+TcoxoRRDKwYAqw@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <f78d09e1-c416-9646-7786-8091640da383@redhat.com>
-Date: Fri, 22 Nov 2019 09:10:46 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1iYAaB-00080M-Mx
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 15:10:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id A75822E8070
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 15:10:51 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=gstogyXyAFV09-_mdqPs525bQP673+TcoxoRRDKwYAqw@mail.gmail.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: FppxGJ5yMRSw4YQd8E1boQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 22 Nov 2019 14:56:30 -0000
+From: Ubuntu SRU Bot <1848556@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
+ status=Fix Released; importance=Medium;
+ assignee=christian.ehrhardt@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=eoan; sourcepackage=qemu;
+ component=main; status=Fix Committed; importance=Medium;
+ assignee=christian.ehrhardt@canonical.com; 
+X-Launchpad-Bug: distribution=ubuntu; distroseries=focal; sourcepackage=qemu; 
+ component=main; status=Fix Released; importance=Medium;
+ assignee=christian.ehrhardt@canonical.com; 
+X-Launchpad-Bug-Tags: verification-needed verification-needed-eoan
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: janitor paelzer rodsmith tjaalton ubuntu-sru-bot
+ xanclic
+X-Launchpad-Bug-Reporter: Rod Smith (rodsmith)
+X-Launchpad-Bug-Modifier: Ubuntu SRU Bot (ubuntu-sru-bot)
+References: <157133449178.19203.719001918774596241.malonedeb@gac.canonical.com>
+Message-Id: <20191122145630.0CDD7240348@snakefruit.canonical.com>
+Subject: [Bug 1848556] Autopkgtest regression report
+ (qemu/1:4.0+dfsg-0ubuntu9.2)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="c597c3229eb023b1e626162d5947141bf7befb13";
+ Instance="production-secrets-lazr.conf"
+X-Launchpad-Hash: 979e4042608f3665b8eea3b5446265836e267b3b
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 91.189.90.7
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,52 +90,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1848556 <1848556@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/22/19 8:56 AM, Aleksandar Markovic wrote:
-> Hello, all.
-> 
-> I am currently reviewing some code, and I see it uses '0b' as a prefix
-> of numerical constants, similar to these examples:
-> 
-> switch (((inst >> 22) & 0b1111111000) | ((inst >> 12) & 0b0000000111)) {
-> 
-> or
-> 
-> ARRAY_FIELD_DP32(s->regs, CRB_INTF_ID, RID, 0b0000);
+All autopkgtests for the newly accepted qemu (1:4.0+dfsg-0ubuntu9.2) for eo=
+an have finished running.
+The following regressions have been reported in tests triggered by the pack=
+age:
 
-Binary constants introduced by 0b are a gcc'ism, copied by clang, and 
-thus usable in qemu if we want to (similar to our use of the ?: 
-operator, the {} initializer, the ranged case 0 ... 7, 
-__attribute__((cleanup)), ...).  But it is not standard C.
+ganeti/2.16.0-5ubuntu1 (ppc64el)
 
-> 
-> I remember a while ago, something stopped me from using '0b' as a
-> prefix in my own code (was it checkpatch.pl, or perhaps some statement
-> on coding style, or a compiler, or something else - I don't really
-> remember), so I didn't use it, and used '0x' (hexadecimal constant).
-> 
-> What is really the view of the community on usage of '0b'?
 
-For small constants, 0b111 is just about as readable as 0x7.  But for 
-large constants, I much prefer 0x7f over 0b1111111.
+Please visit the excuses page listed below and investigate the failures, pr=
+oceeding afterwards as per the StableReleaseUpdates policy regarding autopk=
+gtest regressions [1].
 
-> 
-> Please C language standard and compiler experts, and also regular
-> participants like me, speak up.
+https://people.canonical.com/~ubuntu-archive/proposed-
+migration/eoan/update_excuses.html#qemu
 
-If you want to provide a patch for coding standards (either admitting 
-that yes we use the extension and here are some guidelines on using it, 
-or declaring no new uses of it and maybe patching existing uses to 
-switch to hex constants), then go for it.  Maybe wait for more opinions 
-to come in to see which color more of the developers prefer for their 
-bikeshed.
+[1] https://wiki.ubuntu.com/StableReleaseUpdates#Autopkgtest_Regressions
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+Thank you!
 
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1848556
+
+Title:
+  qemu-img check failing on remote image in Eoan
+
+Status in QEMU:
+  Fix Released
+Status in qemu package in Ubuntu:
+  Fix Released
+Status in qemu source package in Eoan:
+  Fix Committed
+Status in qemu source package in Focal:
+  Fix Released
+
+Bug description:
+  Ubuntu SRU Template:
+
+  [Impact]
+
+   * There is fallout due to changes in libcurl that affect qemu and might =
+
+     lead to a hang.
+
+   * Fix by backporting the upstream fix
+
+  [Test Case]
+
+   * If you have network just run
+     $ qemu-img check http://10.193.37.117/cloud/eoan-server-cloudimg-amd64=
+.img
+
+   * Without network, install apache2, and get a complex qemu file (like a =
+
+     cloud image) onto the system. Then access the file via apache http but =
+
+     not localhost (that would work)
+
+  [Regression Potential]
+
+   * The change is local to the libcurl usage of qemu, so that could be =
+
+     affected. But then this is what has been found to not work here, so I'=
+d =
+
+     expect not too much trouble. But if so then in the curl usage (which =
+
+     means disks on http)
+
+  [Other Info]
+   =
+
+   * n/a
+
+  ---
+
+  The "qemu-img check" function is failing on remote (HTTP-hosted)
+  images, beginning with Ubuntu 19.10 (qemu-utils version 1:4.0+dfsg-
+  0ubuntu9). With previous versions, through Ubuntu 19.04/qemu-utils
+  version 1:3.1+dfsg-2ubuntu3.5, the following worked:
+
+  $ /usr/bin/qemu-img check  http://10.193.37.117/cloud/eoan-server-cloudim=
+g-amd64.img
+  No errors were found on the image.
+  19778/36032 =3D 54.89% allocated, 90.34% fragmented, 89.90% compressed cl=
+usters
+  Image end offset: 514064384
+
+  The 10.193.37.117 server holds an Apache server that hosts the cloud
+  images on a LAN. Beginning with Ubuntu 19.10/qemu-utils 1:4.0+dfsg-
+  0ubuntu9, the same command never returns. (I've left it for up to an
+  hour with no change.) I'm able to wget the image from the same server
+  and installation on which qemu-img check fails. I've tried several
+  .img files on the server, ranging from Bionic to Eoan, with the same
+  results with all of them.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1848556/+subscriptions
 
