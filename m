@@ -6,82 +6,76 @@ X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F3DFC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90721C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:28:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C81F720708
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:26:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5280120708
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:28:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yu1qdEGM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C81F720708
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dmb9Q72+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5280120708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY68u-0004eE-Vh
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 05:26:25 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60012)
+	id 1iY6Ar-0006ce-IU
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 05:28:25 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60289)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iY681-0003uq-2h
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:25:30 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iY6AB-0005mb-9Y
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:27:44 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iY67z-00026t-Uy
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:25:29 -0500
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28965
+ (envelope-from <kwolf@redhat.com>) id 1iY6AA-0002qk-CF
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:27:43 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:38239
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iY67z-00026b-RH
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:25:27 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iY6AA-0002pq-6l
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:27:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574418326;
+ s=mimecast20190719; t=1574418459;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=y/puYkLd179hu42yDajM9lvNW7n67w0VO+gNsQtC/ls=;
- b=Yu1qdEGMjZzCHK+8mRh5XJX3d2UMfLwQE6iLAzEY2VQBUpRYp8tSkLQCxtwH0X/SLDJ4x8
- cmgtsJk7s9+N4GEgZFWQANXjxjvlN3oso7ALGXReoOvTvg6Hh2hsPl1XylmQkXsiXhv3kr
- gFMqGE2hEQrY9WLysCDoOtpXoH4Le20=
+ bh=DlwSh/DOeOTjhh84KPTwk9BE6XZ5NYIGOR7PpjePGP0=;
+ b=dmb9Q72+013OYModg+3wCc4841Z9kxeTQZnF2b4KQWz76vDGxJhraHqcTQ00seRR0/mHaG
+ +ZOw33rzYtOr2FFFl1d4zS18U9+iQJ6cNLN4egmLKuj3kvVt7ZVa3lvw2ki6otU/TtfqMo
+ 2WwEh9L+Gy7PMlIF/OAooEb9rSxuQMc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-GGvN9FlhOXyAtqLK4LyJMg-1; Fri, 22 Nov 2019 05:25:23 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-395-zaOMXvwTO_GmPnwyHAq4TA-1; Fri, 22 Nov 2019 05:27:35 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B686107ACE8;
- Fri, 22 Nov 2019 10:25:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 219C610054E3;
+ Fri, 22 Nov 2019 10:27:34 +0000 (UTC)
 Received: from linux.fritz.box (ovpn-117-252.ams2.redhat.com [10.36.117.252])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 151D25DDB2;
- Fri, 22 Nov 2019 10:25:20 +0000 (UTC)
-Date: Fri, 22 Nov 2019 11:25:19 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AA4B76E71D;
+ Fri, 22 Nov 2019 10:27:32 +0000 (UTC)
+Date: Fri, 22 Nov 2019 11:27:31 +0100
 From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4 03/14] qapi: Introduce default values for
- struct members
-Message-ID: <20191122102519.GB4433@linux.fritz.box>
-References: <20190624173935.25747-1-mreitz@redhat.com>
- <20190624173935.25747-4-mreitz@redhat.com>
- <87eey1b73y.fsf@dusky.pond.sub.org>
- <0214e73e-062e-a9c8-16c9-e99354c07277@redhat.com>
- <871ru1811o.fsf@dusky.pond.sub.org>
- <817914b7-79d7-a2c9-142b-0a040b1da7ff@redhat.com>
- <874kyw74jn.fsf@dusky.pond.sub.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 0/9] RFC: [for 5.0]: HMP monitor handlers cleanups
+Message-ID: <20191122102731.GC4433@linux.fritz.box>
+References: <20191120185850.18986-1-mlevitsk@redhat.com>
+ <20191122101528.GB2785@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <874kyw74jn.fsf@dusky.pond.sub.org>
+In-Reply-To: <20191122101528.GB2785@work-vm>
 User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-MC-Unique: GGvN9FlhOXyAtqLK4LyJMg-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: zaOMXvwTO_GmPnwyHAq4TA-1
 X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.61
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -93,65 +87,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Reitz <mreitz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 22.11.2019 um 08:29 hat Markus Armbruster geschrieben:
-> > At any rate, your counterpoint is taken - whatever we pick, we'll want
-> > to make sure that introspection can expose semantics, and whether we
-> > can make '*' redundant with some other form of longhand in the qapi
-> > language is in part determined by whether we also reflect that through
-> > introspection.
+Am 22.11.2019 um 11:15 hat Dr. David Alan Gilbert geschrieben:
+> * Maxim Levitsky (mlevitsk@redhat.com) wrote:
+> > This patch series is bunch of cleanups
+> > to the hmp monitor code.
+> >=20
+> > This series only touched blockdev related hmp handlers.
 >=20
-> Introspection has the true member name, without the '*' prefix.
->=20
-> We'll also want to avoid unnecessary compromises on QAPI schema
-> expressiveness.  If we use null to mean "schema does not specify
-> behavior when member is absent", we can't use it to mean "absent member
-> behaves like the value null".  A bit of a blemish, but I think it's a
-> tolerable one.
+> Hi Maxim,
+>   This looks mostly OK to me from the HMP side - with one change;
+> can you please move the blockdev-hmp-cmds.c into either monitor/ or
+> block/; with that
 
-If you want an example for an option that defaults to null, take the
-backing option of BlockdevOptionsGenericCOWFormat.
-
-What is the reason for even considering limiting the expressiveness? Do
-you think that an additional 'optional' bool, at least for those options
-that don't have a default, would be so bad in the longhand form? Or
-keeping '*' even in the longhand form, as suggested below.
-
-> >                 If that means that keeping '*' in the longhand form of
-> > optional members (whether or not those members have a default value),
-> > then so be it.
->=20
-> I believe both
->=20
->     '*KEY': { 'type': ARG': 'default': null }
->=20
-> and
->=20
->     'KEY': { 'type': ARG': 'default': null }
->=20
-> are viable longhand forms for '*KEY': 'ARG'.
->=20
-> I prefer the latter, but I'm open to arguments.
-
-If you go for the former, then you certainly want to use absent
-'default' to indicate no default, and allow a QNull default with
-'default': null.
-
-The only reason to abuse 'default': null for no default is that you
-can't distinguish optional and non-optional if you use 'KEY' for both
-instead of 'KEY' for mandatory and '*KEY' for optional.
-
-So while I understand and to some degree share your dislike for the '*'
-prefix, I think I cast my pragmatic vote for:
-
-mandatory:                   'KEY':  { 'type': 'ARG' }
-optional without a default:  '*KEY': { 'type': 'ARG' }
-optional with QNull default: '*KEY': { 'type': 'ARG', 'default': null }
+Let's create a block/monitor/hmp.c then. There is more stuff that could
+move into that directory later.
 
 Kevin
 
