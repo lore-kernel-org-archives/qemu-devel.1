@@ -2,126 +2,83 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09461C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B703C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:53:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C883820715
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:31:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB24120706
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:53:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wj+kYYQq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C883820715
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VP/OsA4m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB24120706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY9xw-00021K-Tw
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 09:31:20 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34868)
+	id 1iYAJ7-0007ig-UZ
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 09:53:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37077)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iY9wx-0001VZ-R1
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:30:21 -0500
+ (envelope-from <vgoyal@redhat.com>) id 1iYAHj-00063h-Ul
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:51:49 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iY9ww-000694-1F
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:30:19 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48670
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <vgoyal@redhat.com>) id 1iYADe-0006I3-KX
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:47:35 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:53118
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iY9wv-00068u-Tt
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:30:17 -0500
+ (Exim 4.71) (envelope-from <vgoyal@redhat.com>) id 1iYADe-0006Hk-Fc
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:47:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574433016;
+ s=mimecast20190719; t=1574434053;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=4tmGf8PHTL3JI6iiG6tPsZ78kF1P+rz4citZKjX4yds=;
- b=Wj+kYYQqjWAT/PYxEskwhMA+VWXC0ZJquWr9xANUHyc0aK87f7xYc9nEGETLE/AzAiINFv
- 7Xc7FkY5NByAQreSSbjLN5UM89g7lXdX7YohfjS+YiDZBqO50GF3K/eLHsZbNkMYQbHTfr
- 1cpR8ddWKVbcfbqDvuVoa1J0DIbCr70=
+ in-reply-to:in-reply-to:references:references;
+ bh=mfzF814ow3PsutzoSjuxPHowD7iRZi7qKlFhlA3arBo=;
+ b=VP/OsA4mfgzO5a6fTvqCT/jjQlpNAXBMmaJlPckKtAilkPPPhkLRm0QT4B3Z6zqEtOrJxY
+ A6QnCNeZsBw2Cu1IRZrPAmY1fpkwTaZwEeofNG/yclPaDSCUXkJgoMMAiIUYWc9P2AYmLi
+ NZCgHuqgUzmnEkM2hXBFMRNntjSG/yw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-qecUbHFtMhaPxyVGIWB3kQ-1; Fri, 22 Nov 2019 09:30:13 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-296-671rnpXPOHKpxRgNPVia4g-1; Fri, 22 Nov 2019 09:47:30 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02BD5184CAA2;
- Fri, 22 Nov 2019 14:30:12 +0000 (UTC)
-Received: from [10.36.116.122] (ovpn-116-122.ams2.redhat.com [10.36.116.122])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EF2387701C;
- Fri, 22 Nov 2019 14:30:06 +0000 (UTC)
-Subject: Re: [PATCH v2 4/5] s390x: Move clear reset
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20191122140002.42972-1-frankja@linux.ibm.com>
- <20191122140002.42972-5-frankja@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- SE+xAvmumFBY
-Organization: Red Hat GmbH
-Message-ID: <13192666-7c97-f3fd-fa8d-84a037dae286@redhat.com>
-Date: Fri, 22 Nov 2019 15:30:06 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 11A17800054;
+ Fri, 22 Nov 2019 14:47:29 +0000 (UTC)
+Received: from horse.redhat.com (unknown [10.18.25.35])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ED8D263742;
+ Fri, 22 Nov 2019 14:47:21 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id 5CBE6220AFF; Fri, 22 Nov 2019 09:47:21 -0500 (EST)
+Date: Fri, 22 Nov 2019 09:47:21 -0500
+From: Vivek Goyal <vgoyal@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH 2/4] virtiofd: Create a notification queue
+Message-ID: <20191122144721.GD8636@redhat.com>
+References: <20191115205543.1816-1-vgoyal@redhat.com>
+ <20191115205543.1816-3-vgoyal@redhat.com>
+ <20191122101903.GC464656@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20191122140002.42972-5-frankja@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: qecUbHFtMhaPxyVGIWB3kQ-1
+In-Reply-To: <20191122101903.GC464656@stefanha-x1.localdomain>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-MC-Unique: 671rnpXPOHKpxRgNPVia4g-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -133,90 +90,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: virtio-fs@redhat.com, miklos@szeredi.hu, qemu-devel@nongnu.org,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22.11.19 15:00, Janosch Frank wrote:
-> Let's also move the clear reset function into the reset handler.
+On Fri, Nov 22, 2019 at 10:19:03AM +0000, Stefan Hajnoczi wrote:
+> On Fri, Nov 15, 2019 at 03:55:41PM -0500, Vivek Goyal wrote:
+> >  /* Callback from libvhost-user */
+> >  static void fv_set_features(VuDev *dev, uint64_t features)
+> >  {
+> > +    struct fv_VuDev *vud =3D container_of(dev, struct fv_VuDev, dev);
+> > +    struct fuse_session *se =3D vud->se;
+> > +
+> > +    if ((1 << VIRTIO_FS_F_NOTIFICATION) & features) {
 >=20
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  target/s390x/cpu-qom.h |  1 +
->  target/s390x/cpu.c     | 50 ++++++++----------------------------------
->  2 files changed, 10 insertions(+), 41 deletions(-)
+> For consistency 1ull should be used.  That way the reader does not have
+> to check the bit position to verify that the bitmap isn't truncated at
+> 32 bits.
+
+Ok, will do.
+
 >=20
-> diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
-> index 6f0a12042e..dbe5346ec9 100644
-> --- a/target/s390x/cpu-qom.h
-> +++ b/target/s390x/cpu-qom.h
-> @@ -37,6 +37,7 @@ typedef struct S390CPUDef S390CPUDef;
->  typedef enum cpu_reset_type {
->      S390_CPU_RESET_NORMAL,
->      S390_CPU_RESET_INITIAL,
-> +    S390_CPU_RESET_CLEAR,
->  } cpu_reset_type;
-> =20
->  /**
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 1f423fb676..017181fe4a 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -94,6 +94,9 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type =
-type)
->      s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
-> =20
->      switch (type) {
-> +    case S390_CPU_RESET_CLEAR:
-> +        memset(env, 0, offsetof(CPUS390XState, start_initial_reset_field=
-s));
+> > +        vud->notify_enabled =3D true;
+> > +        se->notify_enabled =3D true;
+>=20
+> Only one copy of this field is needed.  vud has a pointer to se.
 
-I think the preferred term in QEMU is "fall through".
+I need to access ->notify_enabled in passthrough_ll.c to determine if
+notification queue is enabled or not. That determines if async locks are
+supported or not.  And based on that either -EOPNOTSUPP is returned or
+a response to wait is returned.
 
-> +        /* Fallthrough */
->      case S390_CPU_RESET_INITIAL:
->          /* initial reset does not clear everything! */
->          memset(&env->start_initial_reset_fields, 0,
-> @@ -121,46 +124,6 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_ty=
-pe type)
->      }
->  }
-> =20
-> -/* CPUClass:reset() */
-> -static void s390_cpu_full_reset(CPUState *s)
-> -{
-> -    S390CPU *cpu =3D S390_CPU(s);
-> -    S390CPUClass *scc =3D S390_CPU_GET_CLASS(cpu);
-> -    CPUS390XState *env =3D &cpu->env;
-> -
-> -    scc->parent_reset(s);
-> -    cpu->env.sigp_order =3D 0;
-> -    s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
-> -
-> -    memset(env, 0, offsetof(CPUS390XState, end_reset_fields));
-> -
-> -    /* architectured initial values for CR 0 and 14 */
-> -    env->cregs[0] =3D CR0_RESET;
-> -    env->cregs[14] =3D CR14_RESET;
-> -
-> -#if defined(CONFIG_USER_ONLY)
-> -    /* user mode should always be allowed to use the full FPU */
-> -    env->cregs[0] |=3D CR0_AFP;
-> -    if (s390_has_feat(S390_FEAT_VECTOR)) {
-> -        env->cregs[0] |=3D CR0_VECTOR;
-> -    }
-> -#endif
+I did not see passthrough_ll.c accessing vud. I did see it having access
+to session object though. So I created a copy there.
 
-Huh, what happened to that change?
+But I am open to suggestions on what's the best way to access this
+information in passthrough_ll.c
 
-Note that we now also do "env->bpbc =3D false" - is that ok?
+>=20
+> > +    }
+> >  }
+> > =20
+> >  /*
+> > @@ -662,6 +671,65 @@ static void fv_queue_worker(gpointer data, gpointe=
+r user_data)
+> >      free(req);
+> >  }
+> > =20
+> > +static void *fv_queue_notify_thread(void *opaque)
+> > +{
+> > +    struct fv_QueueInfo *qi =3D opaque;
+> > +
+> > +    fuse_log(FUSE_LOG_INFO, "%s: Start for queue %d kick_fd %d\n", __f=
+unc__,
+> > +             qi->qidx, qi->kick_fd);
+> > +
+> > +    while (1) {
+> > +        struct pollfd pf[2];
+> > +
+> > +        pf[0].fd =3D qi->kick_fd;
+> > +        pf[0].events =3D POLLIN;
+> > +        pf[0].revents =3D 0;
+> > +        pf[1].fd =3D qi->kill_fd;
+> > +        pf[1].events =3D POLLIN;
+> > +        pf[1].revents =3D 0;
+> > +
+> > +        fuse_log(FUSE_LOG_DEBUG, "%s: Waiting for Queue %d event\n", _=
+_func__,
+> > +                 qi->qidx);
+> > +        int poll_res =3D ppoll(pf, 2, NULL, NULL);
+> > +
+> > +        if (poll_res =3D=3D -1) {
+> > +            if (errno =3D=3D EINTR) {
+> > +                fuse_log(FUSE_LOG_INFO, "%s: ppoll interrupted, going =
+around\n",
+> > +                         __func__);
+> > +                continue;
+> > +            }
+> > +            fuse_log(FUSE_LOG_ERR, "fv_queue_thread ppoll: %m\n");
+> > +            break;
+> > +        }
+> > +        assert(poll_res >=3D 1);
+> > +        if (pf[0].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+> > +            fuse_log(FUSE_LOG_ERR, "%s: Unexpected poll revents %x Que=
+ue %d\n",
+> > +                     __func__, pf[0].revents, qi->qidx);
+> > +             break;
+> > +        }
+> > +        if (pf[1].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+> > +            fuse_log(FUSE_LOG_ERR, "%s: Unexpected poll revents %x Que=
+ue %d"
+> > +                     "killfd\n", __func__, pf[1].revents, qi->qidx);
+> > +            break;
+> > +        }
+> > +        if (pf[1].revents) {
+> > +            fuse_log(FUSE_LOG_INFO, "%s: kill event on queue %d - quit=
+ting\n",
+> > +                     __func__, qi->qidx);
+> > +            break;
+> > +        }
+> > +        assert(pf[0].revents & POLLIN);
+> > +        fuse_log(FUSE_LOG_DEBUG, "%s: Got queue event on Queue %d\n", =
+__func__,
+> > +                 qi->qidx);
+> > +
+> > +        eventfd_t evalue;
+> > +        if (eventfd_read(qi->kick_fd, &evalue)) {
+> > +            fuse_log(FUSE_LOG_ERR, "Eventfd_read for queue: %m\n");
+> > +            break;
+> > +        }
+> > +    }
+> > +    return NULL;
+> > +}
+>=20
+> It's difficult to review function without any actual functionality using
+> the virtqueue.  I'm not sure a thread is even needed since the device
+> only needs to get a buffer when it has a notification for the driver.
+> I'll have to wait for the following patches to see what happens here...
 
---=20
+This might very well be redundant. I am not sure. Can get rid of
+this thread if not needed at all. So we don't need to monitor even
+kill_fd and take any special action?
 
-Thanks,
+>=20
+> > @@ -378,12 +382,23 @@ static void vuf_set_status(VirtIODevice *vdev, ui=
+nt8_t status)
+> >      }
+> >  }
+> > =20
+> > -static uint64_t vuf_get_features(VirtIODevice *vdev,
+> > -                                      uint64_t requested_features,
+> > -                                      Error **errp)
+> > +static uint64_t vuf_get_features(VirtIODevice *vdev, uint64_t features=
+,
+> > +                                 Error **errp)
+> >  {
+> > -    /* No feature bits used yet */
+> > -    return requested_features;
+> > +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
+> > +
+> > +    virtio_add_feature(&features, VIRTIO_FS_F_NOTIFICATION);
+> > +
+> > +    return vhost_get_features(&fs->vhost_dev, user_feature_bits, featu=
+res);
+> > +}
+> > +
+> > +static void vuf_set_features(VirtIODevice *vdev, uint64_t features)
+> > +{
+> > +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
+> > +
+> > +    if (virtio_has_feature(features, VIRTIO_FS_F_NOTIFICATION)) {
+> > +        fs->notify_enabled =3D true;
+>=20
+> This field is unused, please remove it.
 
-David / dhildenb
+vuf_get_config() uses it.
+
+Thanks
+Vivek
 
 
