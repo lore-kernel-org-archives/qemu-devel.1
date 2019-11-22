@@ -2,80 +2,126 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3542EC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 12:39:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE4DC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 12:43:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3C3920718
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 12:39:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 31E3120706
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 12:43:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JZWRmmn9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3C3920718
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KXHHOiu+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31E3120706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50266 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY8Dp-0006rG-TD
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 07:39:38 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47794)
+	id 1iY8Ha-0008Gh-SS
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 07:43:31 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48100)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <imammedo@redhat.com>) id 1iY8Cw-0006LL-Af
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:38:43 -0500
+ (envelope-from <david@redhat.com>) id 1iY8GZ-0007fE-MI
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:42:28 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <imammedo@redhat.com>) id 1iY8Cu-0004hy-LB
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:38:42 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59672
+ (envelope-from <david@redhat.com>) id 1iY8GY-00065t-Jv
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:42:27 -0500
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49828
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iY8Cu-0004hq-Hc
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:38:40 -0500
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iY8GX-00065Z-JH
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:42:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574426319;
+ s=mimecast20190719; t=1574426545;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=v8kbnIGhU3HsAIJpxQQEEJBFVbTjly7MTqFexcfS0eU=;
- b=JZWRmmn9T8WiNZxWxgYkdu1/cfcHLwa59zO4GhXnesB0LzaNFiRlVfPEksDQKssHDVSX1C
- ZP0Kh5XXv3dOBkd4CGzUTjLtBcuejVHIyzrZrsA5xQ3tD7M0vcsfkXMBPnDzyuYPNvsltG
- 4JxUsLbI3KYFcs8qPYpF2PYOqgN/S2g=
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=Q9y+FOq5KC1CbO7SgGMm8j4GkBknsz2Z87suXIGbVU4=;
+ b=KXHHOiu+rkuaR+MCngs4zssCwPXNfrAFo00+7NWeeJGFnSYvBwHu6FRIGf0Cy35wgI9lW3
+ iql5DiTvcwDN/gcoWVYci+omtBmLC3jSWH3fn77IZ+l5ewdSeWoJhYnW1vJx692CJto5ex
+ 6fqosIMdFocwg5GNA3m1ttOuGiHnkDA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-hsb0_fosPr2YIW71yGJLGQ-1; Fri, 22 Nov 2019 07:38:36 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-172-XtU-7dh6P2mJZ50q7qqEOg-1; Fri, 22 Nov 2019 07:42:21 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9456A107ACC4;
- Fri, 22 Nov 2019 12:38:34 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9191A7A5D2;
- Fri, 22 Nov 2019 12:38:28 +0000 (UTC)
-Date: Fri, 22 Nov 2019 13:38:27 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: no-reply@patchew.org
-Subject: Re: [PATCH v17 00/14] Build ACPI Heterogeneous Memory Attribute
- Table (HMAT)
-Message-ID: <20191122133827.4f5ba34a@redhat.com>
-In-Reply-To: <157441423058.7001.17579951694228090696@37313f22b938>
-References: <20191122074826.1373-1-tao3.xu@intel.com>
- <157441423058.7001.17579951694228090696@37313f22b938>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2FDFB10054E3;
+ Fri, 22 Nov 2019 12:42:20 +0000 (UTC)
+Received: from [10.36.118.121] (unknown [10.36.118.121])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 624C2100EBAC;
+ Fri, 22 Nov 2019 12:42:18 +0000 (UTC)
+Subject: Re: [PATCH 4/4] s390x: Beautify machine reset
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191122075218.23935-1-frankja@linux.ibm.com>
+ <20191122075218.23935-5-frankja@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <dd3cf7f5-de93-c547-e8cc-0df71a4f7c8a@redhat.com>
+Date: Fri, 22 Nov 2019 13:42:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: hsb0_fosPr2YIW71yGJLGQ-1
+In-Reply-To: <20191122075218.23935-5-frankja@linux.ibm.com>
+Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: XtU-7dh6P2mJZ50q7qqEOg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,163 +133,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mst@redhat.com,
- sw@weilnetz.de, tao3.xu@intel.com, fan.du@intel.com, qemu-devel@nongnu.org,
- armbru@redhat.com, jonathan.cameron@huawei.com, jingqi.liu@intel.com,
- mdroth@linux.vnet.ibm.com
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 22 Nov 2019 01:17:12 -0800 (PST)
-no-reply@patchew.org wrote:
-
-> Patchew URL: https://patchew.org/QEMU/20191122074826.1373-1-tao3.xu@intel=
-.com/
+On 22.11.19 08:52, Janosch Frank wrote:
+> * Add comments that tell you which diag308 subcode caused the reset
+> * Sort by diag308 reset subcode
 >=20
-do not ignore warnings "line over 80 characters",
-just fix them
-
->=20
-> Hi,
->=20
-> This series seems to have some coding style problems. See output below fo=
-r
-> more information:
->=20
-> Subject: [PATCH v17 00/14] Build ACPI Heterogeneous Memory Attribute Tabl=
-e (HMAT)
-> Type: series
-> Message-id: 20191122074826.1373-1-tao3.xu@intel.com
->=20
-> =3D=3D=3D TEST SCRIPT BEGIN =3D=3D=3D
-> #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> =3D=3D=3D TEST SCRIPT END =3D=3D=3D
->=20
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->  - [tag update]      patchew/20191121000843.24844-1-beata.michalska@linar=
-o.org -> patchew/20191121000843.24844-1-beata.michalska@linaro.org
->  - [tag update]      patchew/20191122080039.12771-1-armbru@redhat.com -> =
-patchew/20191122080039.12771-1-armbru@redhat.com
-> Switched to a new branch 'test'
-> 9192aa6 tests/bios-tables-test: add test cases for ACPI HMAT
-> 309fd85 tests/numa: Add case for QMP build HMAT
-> 864da49 hmat acpi: Build Memory Side Cache Information Structure(s)
-> 6d92931 hmat acpi: Build System Locality Latency and Bandwidth Informatio=
-n Structure(s)
-> 39ba308 hmat acpi: Build Memory Proximity Domain Attributes Structure(s)
-> 7d0bffc numa: Extend CLI to provide memory side cache information
-> 3fc8a54 numa: Extend CLI to provide memory latency and bandwidth informat=
-ion
-> 592a96a numa: Extend CLI to provide initiator information for numa nodes
-> 7032fc4 tests: Add test for QAPI builtin type time
-> 2d89c93 qapi: Add builtin type time
-> dbe82f5 util/cutils: Add qemu_strtotime_ns()
-> 2fef66f util/cutils: refactor do_strtosz() to support suffixes list
-> 2cae457 util/cutils: Use qemu_strtold_finite to parse size
-> a691b5f util/cutils: Add Add qemu_strtold and qemu_strtold_finite
->=20
-> =3D=3D=3D OUTPUT BEGIN =3D=3D=3D
-> 1/14 Checking commit a691b5f92191 (util/cutils: Add Add qemu_strtold and =
-qemu_strtold_finite)
-> ERROR: consider using qemu_strtold in preference to strtold
-> #61: FILE: util/cutils.c:636:
-> +    *result =3D strtold(nptr, &ep);
->=20
-> total: 1 errors, 0 warnings, 69 lines checked
->=20
-> Patch 1/14 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
->=20
-> 2/14 Checking commit 2cae457669b9 (util/cutils: Use qemu_strtold_finite t=
-o parse size)
-> 3/14 Checking commit 2fef66fd2a82 (util/cutils: refactor do_strtosz() to =
-support suffixes list)
-> 4/14 Checking commit dbe82f50cf86 (util/cutils: Add qemu_strtotime_ns())
-> 5/14 Checking commit 2d89c9350115 (qapi: Add builtin type time)
-> 6/14 Checking commit 7032fc4756a0 (tests: Add test for QAPI builtin type =
-time)
-> 7/14 Checking commit 592a96a0ff21 (numa: Extend CLI to provide initiator =
-information for numa nodes)
-> 8/14 Checking commit 3fc8a542a4b7 (numa: Extend CLI to provide memory lat=
-ency and bandwidth information)
-> WARNING: line over 80 characters
-> #130: FILE: hw/core/numa.c:299:
-> +            /* Set lb_info_provided bit 0 as 1, latency information is p=
-rovided */
->=20
-> total: 0 errors, 1 warnings, 462 lines checked
->=20
-> Patch 8/14 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 9/14 Checking commit 7d0bffca6382 (numa: Extend CLI to provide memory sid=
-e cache information)
-> 10/14 Checking commit 39ba308b5612 (hmat acpi: Build Memory Proximity Dom=
-ain Attributes Structure(s))
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #72:=20
-> new file mode 100644
->=20
-> total: 0 errors, 1 warnings, 185 lines checked
->=20
-> Patch 10/14 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 11/14 Checking commit 6d92931a0a40 (hmat acpi: Build System Locality Late=
-ncy and Bandwidth Information Structure(s))
-> 12/14 Checking commit 864da49c0ce4 (hmat acpi: Build Memory Side Cache In=
-formation Structure(s))
-> 13/14 Checking commit 309fd85d39fc (tests/numa: Add case for QMP build HM=
-AT)
-> WARNING: line over 80 characters
-> #124: FILE: tests/numa-test.c:433:
-> +    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'x-exit-preconf=
-ig' }")));
->=20
-> WARNING: line over 80 characters
-> #159: FILE: tests/numa-test.c:468:
-> +    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'x-exit-preconf=
-ig' }")));
->=20
-> WARNING: line over 80 characters
-> #206: FILE: tests/numa-test.c:515:
-> +    g_assert(!qmp_rsp_is_err(qtest_qmp(qs, "{ 'execute': 'x-exit-preconf=
-ig' }")));
->=20
-> total: 0 errors, 3 warnings, 206 lines checked
->=20
-> Patch 13/14 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 14/14 Checking commit 9192aa6b273f (tests/bios-tables-test: add test case=
-s for ACPI HMAT)
-> WARNING: added, moved or deleted file(s), does MAINTAINERS need updating?
-> #106:=20
-> new file mode 100644
->=20
-> total: 0 errors, 1 warnings, 65 lines checked
->=20
-> Patch 14/14 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> =3D=3D=3D OUTPUT END =3D=3D=3D
->=20
-> Test command exited with code: 1
->=20
->=20
-> The full log is available at
-> http://patchew.org/logs/20191122074826.1373-1-tao3.xu@intel.com/testing.c=
-heckpatch/?type=3Dmessage.
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
+>  hw/s390x/s390-virtio-ccw.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index c1d1440272..88f7758721 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -330,15 +330,7 @@ static void s390_machine_reset(MachineState *machine=
+)
+>      s390_cmma_reset();
+> =20
+>      switch (reset_type) {
+> -    case S390_RESET_EXTERNAL:
+> -    case S390_RESET_REIPL:
+> -        qemu_devices_reset();
+> -        s390_crypto_reset();
+> -
+> -        /* configure and start the ipl CPU only */
+> -        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
+> -        break;
+> -    case S390_RESET_MODIFIED_CLEAR:
+> +    case S390_RESET_MODIFIED_CLEAR: /* Subcode 0 */
+>          CPU_FOREACH(t) {
+>              run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
+>          }
+> @@ -346,7 +338,7 @@ static void s390_machine_reset(MachineState *machine)
+>          s390_crypto_reset();
+>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+>          break;
+> -    case S390_RESET_LOAD_NORMAL:
+> +    case S390_RESET_LOAD_NORMAL: /* Subcode 1 */
+>          CPU_FOREACH(t) {
+>              if (t =3D=3D cs) {
+>                  continue;
+> @@ -357,6 +349,14 @@ static void s390_machine_reset(MachineState *machine=
+)
+>          run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
+>          run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+>          break;
+> +    case S390_RESET_EXTERNAL: /* Externally triggered reboot */
+
+BTW, if we decide to document this *somehow*, S390_RESET_EXTERNAL is
+also used via the diag288 watchdog.
+
+--=20
+
+Thanks,
+
+David / dhildenb
 
 
