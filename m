@@ -2,85 +2,79 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 396A9C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:13:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45162C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:17:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 03E6C2070E
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:13:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F79C2070E
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:17:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SV3Hczyt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03E6C2070E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P1qC6Se9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F79C2070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY5wM-0003lt-6l
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 05:13:26 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58157)
+	id 1iY5zv-0005GC-1y
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 05:17:07 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58683)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <peter.maydell@linaro.org>) id 1iY5u4-0002P6-Br
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:11:05 -0500
+ (envelope-from <dgilbert@redhat.com>) id 1iY5yf-0004X9-Vw
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:15:51 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <peter.maydell@linaro.org>) id 1iY5u2-0002v6-Ue
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:11:04 -0500
-Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:33193)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
- id 1iY5u2-0002uZ-Ov
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:11:02 -0500
-Received: by mail-oi1-x244.google.com with SMTP id m193so6064436oig.0
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 02:11:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=UZu8CCw+Rx79hRd6CZDSCZzbVjcbqJUU1tNgkaY3B2E=;
- b=SV3HczytNFnn8f3xax+eqLDY/l4FSjwOHlD0dKFXyc0fxuhnKc01hUbx2PnnDff6z4
- X/0cBx7eLpcyDl9Fl3UodRr8hJD5pYTGSib+y3wM1FEAiYANbG7A3hgnCbHV/1lG/d1A
- bEh8oHN+VuZhOYdP5HcPe1CdrDGUmJstHr8ObRHyASgPnEJW+GfTR6jb9G+H77kQOmSR
- WN4Qmu6BVsR4OqnnZlSZ5FVuD0rQ+K4IMjUhxBdBnww9g72EUhWQvu/Y7NFs9BEKIxWZ
- JCsf6jRlyWQ5JrI/WI8YYTFSK6Y5GNuWPjGraStwy23HTteXKPXWM6TpGe7SAW/XuZKB
- 6SPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=UZu8CCw+Rx79hRd6CZDSCZzbVjcbqJUU1tNgkaY3B2E=;
- b=ivX8i8NA8ktdr25zG1FDLult2NGbma52fcbEILKjLIVKnJJTlm4PN1ugafaZblKDin
- nErxmYgaGEJaiisLu99afNemH3JgsQ8yvRsfW8bdutva7P/MJWhwhSi2Wm944CYqmwTl
- IAQlxuSHxE5oiiprP0SwwWtSezdzYzIRSQmKkJxZ6kYaf/7/btoUcmIQEj3EGIYQ7OaX
- vHkNGYjIKwkrrnZr1Nh2iNUokcU20wcArng6W/yqdYv/tF/ydXn4mMATnJP7fKnuoWSi
- vyG1vUQEsEantJon0BNCKiI6jUG7uSdPBY2dT3E+7ekwjIIwQy7w26ouHvXcvu9jrRd2
- nKJw==
-X-Gm-Message-State: APjAAAVrJ2ATXlM7MTQb12j9KfJJK1XuHSXCbR5Xxko8eDVuVRxs3Y3z
- cTt84IfYIa4VVWnu47ALw49tM1i9nMkk0qZkGfh5GA==
-X-Google-Smtp-Source: APXvYqzckX9iL1t6dRu47BtF2+/5BjeVX9u1t160ucAgMwjB1MMScgcJSAvUDvZqDosOcnxxvHvFZdCWXbXyOT4Ml6Q=
-X-Received: by 2002:aca:4945:: with SMTP id w66mr11920730oia.98.1574417461437; 
- Fri, 22 Nov 2019 02:11:01 -0800 (PST)
+ (envelope-from <dgilbert@redhat.com>) id 1iY5ye-000607-2T
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:15:49 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:26815
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1iY5yc-0005xm-QE
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:15:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574417745;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4ZhSMq8IjUe1QgSwcyQLAAw0XNYDc5owleo66ELKG2E=;
+ b=P1qC6Se97MI7qd6sPAFLCa/KK1n4v0h5JVcno9JWocM9udxxa6qnsMkSQ9+IuQAY2ojCko
+ ZGKlQvZN7RlEqVyBiKtsw5rJ7heyGnQFf8X/GiXbNgJaQpaJgh0gQ7E/bxBMLtEGnPgxyB
+ E3xa3x+C1DTwQEMDGGKLNxDPPA4kcm4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-121-Lue5DvlBMi-ihL3J05KiAQ-1; Fri, 22 Nov 2019 05:15:36 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45363802678;
+ Fri, 22 Nov 2019 10:15:35 +0000 (UTC)
+Received: from work-vm (unknown [10.36.118.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2653860141;
+ Fri, 22 Nov 2019 10:15:30 +0000 (UTC)
+Date: Fri, 22 Nov 2019 10:15:28 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Subject: Re: [PATCH 0/9] RFC: [for 5.0]: HMP monitor handlers cleanups
+Message-ID: <20191122101528.GB2785@work-vm>
+References: <20191120185850.18986-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
- <20191120152442.26657-13-marcandre.lureau@redhat.com>
- <CAFEAcA8aj71ue1Y_o1PphD8+iAZeOgqo647hgXS0Z22T9Qa8yg@mail.gmail.com>
- <CAJ+F1CJhaQxrceCqPpPULN5RUUQ+jTVaRa912jX0Ct8MM0ucaw@mail.gmail.com>
- <CAFEAcA82swZ82__hee1818L0RtD-3dNEOAKT2hdwgMOcaiAjHw@mail.gmail.com>
- <CAJ+F1CLDai4rWcLQaqXo1GcVRuRj=OwX+50jV4Ch5X_-8HR=CA@mail.gmail.com>
-In-Reply-To: <CAJ+F1CLDai4rWcLQaqXo1GcVRuRj=OwX+50jV4Ch5X_-8HR=CA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Nov 2019 10:10:50 +0000
-Message-ID: <CAFEAcA_mHmc_1BQPeaySCg7t2vd4VC2CUPbAneLYeSRprwZQQw@mail.gmail.com>
-Subject: Re: [PATCH v4 12/37] serial: start making SerialMM a sysbus device
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191120185850.18986-1-mlevitsk@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-MC-Unique: Lue5DvlBMi-ihL3J05KiAQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2607:f8b0:4864:20::244
+Content-Disposition: inline
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,86 +86,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paul Burton <pburton@wavecomp.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 21 Nov 2019 at 18:51, Marc-Andr=C3=A9 Lureau
-<marcandre.lureau@gmail.com> wrote:
->
-> Hi
->
-> On Thu, Nov 21, 2019 at 10:24 PM Peter Maydell <peter.maydell@linaro.org>=
- wrote:
-> >
-> > On Thu, 21 Nov 2019 at 18:15, Marc-Andr=C3=A9 Lureau
-> > <marcandre.lureau@gmail.com> wrote:
-> > >
-> > > On Thu, Nov 21, 2019 at 5:47 PM Peter Maydell <peter.maydell@linaro.o=
-rg> wrote:
-> > > >
-> > > > On Wed, 20 Nov 2019 at 15:27, Marc-Andr=C3=A9 Lureau
-> > > > <marcandre.lureau@redhat.com> wrote:
-> > > > >
-> > > > > Memory mapped serial device is in fact a sysbus device. The follo=
-wing
-> > > > > patches will make use of sysbus facilities for resource and
-> > > > > registration. In particular, "serial-mm: use sysbus facilities" w=
-ill
-> > > > > move internal serial realization to serial_mm_realize callback to
-> > > > > follow qdev best practices.
-> > > >
-> > > > What goes wrong if you just put the realize of smm->serial in
-> > > > the right place to start with ?
-> > >
-> > > You mean squash the following patches?
-> >
-> > No, I meant just having this patch have
-> >
-> > static void serial_mm_realize(DeviceState *dev, Error **errp)
-> > {
-> >     SerialMM *smm =3D SERIAL_MM(dev);
-> >     SerialState *s =3D &smm->serial;
-> >
-> >     object_property_set_bool(OBJECT(dev), true, "realized", &err);
-> >     if (err) {
-> >         error_propagate(errp, err);
-> >         return;
-> >     }
-> > }
-> >
-> > and
-> >
-> > + dc->realize =3D serial_mm_realize;
-> >
-> > rather than manually doing the qdev_init_nofail()
-> > in serial_mm_init(). This seems to me like an integral
-> > part of the change to doing the init of the subdevice in the
-> > init method, so it would be better unless there's a reason
-> > why it breaks something. The rest of patch 15 (which is
-> > what currently makes the equivalent change to realize) is all
-> > about passing through the properties and exposing the
-> > sysbus MMIO/irq regions and should stay a separate patch.
-> >
-> > (setting the 'realized' property is better in a realize method
-> > than using qdev_init_nofail() because it means we can propagate
-> > any error outward rather than killing qemu.)
->
-> Ok, but I implemented realize and moved serial init in "serial: make
-> SerialIO a sysbus device".
+* Maxim Levitsky (mlevitsk@redhat.com) wrote:
+> This patch series is bunch of cleanups
+> to the hmp monitor code.
+>=20
+> This series only touched blockdev related hmp handlers.
 
-That patch is for the TYPE_SERIAL_IO device, isn't it? It
-changes both serial_io_instance_init and serial_io_realize
-to do the instance init and realize of the TYPE_SERIAL device,
-so it doesn't have the same "only doing half a change" issue
-that this patch has for TYPE_SERIAL_MM.
+Hi Maxim,
+  This looks mostly OK to me from the HMP side - with one change;
+can you please move the blockdev-hmp-cmds.c into either monitor/ or
+block/; with that
 
-thanks
--- PMM
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+we also need a corresponding review by a block person.
+
+Dave
+
+
+> No functional changes expected other that
+> light error message changes by the last patch.
+>=20
+> This was inspired by this bugzilla:
+> https://bugzilla.redhat.com/show_bug.cgi?id=3D1719169
+>=20
+> Basically some users still parse hmp error messages,
+> and they would like to have them prefixed with 'Error:'
+>=20
+> In commit 66363e9a43f649360a3f74d2805c9f864da027eb we added
+> the hmp_handle_error which does exactl that but some hmp handlers
+> don't use it.
+>=20
+> In this patch series, I moved all the block related hmp handlers
+> into blockdev-hmp-cmds.c, and then made them use this function
+> to report the errors.
+>=20
+> I hope I didn't change too much code, I just felt that if
+> I touch this code, I can also make it easier to find these
+> handlers, that were scattered over 3 different files.
+>=20
+> Best regards,
+> =09Maxim Levitsky
+>=20
+> Maxim Levitsky (9):
+>   monitor: uninline add_init_drive
+>   monitor: rename device-hotplug.c to blockdev-hmp-cmds.c
+>   monitor: move hmp_drive_del and hmp_commit to blockdev-hmp-cmds.c
+>   monitor: move hmp_drive_mirror and hmp_drive_backup to
+>     blockdev-hmp-cmds.c
+>   monitor: move hmp_block_job* to blockdev-hmp-cmd.c
+>   monitor: move hmp_snapshot_* to blockdev-hmp-cmds.c
+>   monitor: move remaining hmp_block* functions to blockdev-hmp-cmds.c
+>   monitor: move hmp_info_block* to blockdev-hmp-cmds.c
+>   monitor/hmp: Prefer to use hmp_handle_error for error reporting in
+>     block hmp commands
+>=20
+>  MAINTAINERS         |   1 +
+>  Makefile.objs       |   4 +-
+>  blockdev-hmp-cmds.c | 656 ++++++++++++++++++++++++++++++++++++++++++++
+>  blockdev.c          |  95 -------
+>  device-hotplug.c    |  91 ------
+>  monitor/hmp-cmds.c  | 465 -------------------------------
+>  6 files changed, 659 insertions(+), 653 deletions(-)
+>  create mode 100644 blockdev-hmp-cmds.c
+>  delete mode 100644 device-hotplug.c
+>=20
+> --=20
+> 2.17.2
+>=20
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
 
