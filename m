@@ -2,85 +2,87 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94AEAC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 11:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32A99C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 12:03:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CA792068E
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 11:51:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 006D120718
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 12:03:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D8j4K5Ez"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CA792068E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sNmR+xbt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 006D120718
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY7Td-0001qt-JP
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 06:51:53 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42161)
+	id 1iY7ep-0004bm-U4
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 07:03:27 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43796)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <david@redhat.com>) id 1iY7Pm-0006EJ-FF
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 06:47:55 -0500
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iY7dh-0004AW-Fk
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:02:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <david@redhat.com>) id 1iY7Pl-0002vT-AG
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 06:47:54 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24764
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <david@redhat.com>) id 1iY7Pl-0002uf-4A
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 06:47:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574423270;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jc19GHwoov/psI2gg+4nMgqBq1LLwRQsb8kEa0rE78M=;
- b=D8j4K5EztVhA1OAQMW/5dOTmIDFJV67AUCsbvZs+Y8GCGVIFEw36CUfHkZH/VmhGEW55LT
- 8QHHPfK9Nr1BySGsb3mrzKuEtdeAA76wYLvi8oGMTxIQus6D/EHja2pbCLVOyL+GAbECzg
- f1IFIhazYVOudGswhX/5peMDSOdvp0s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-421-H2-cjAmwOeCJWUSV-3LfIQ-1; Fri, 22 Nov 2019 06:47:48 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33BBC18B9FC2;
- Fri, 22 Nov 2019 11:47:47 +0000 (UTC)
-Received: from [10.36.118.121] (unknown [10.36.118.121])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8D39876FF3;
- Fri, 22 Nov 2019 11:47:45 +0000 (UTC)
-Subject: Re: [PATCH 4/4] s390x: Beautify machine reset
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20191122075218.23935-1-frankja@linux.ibm.com>
- <20191122075218.23935-5-frankja@linux.ibm.com>
- <d026944f-1a0a-0dbe-6514-d8e4fd293e35@redhat.com>
- <c2459655-f205-3294-23ba-ba5d3280df41@linux.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <def970f9-6889-c8ed-0f6a-087e4cd3bd87@redhat.com>
-Date: Fri, 22 Nov 2019 12:47:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <marcandre.lureau@gmail.com>) id 1iY7dg-0004de-5L
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:02:17 -0500
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:38904)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1iY7df-0004aP-UP
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:02:16 -0500
+Received: by mail-wm1-x341.google.com with SMTP id z19so7319065wmk.3
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 04:02:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=OITAjyqq/uhNRY6a3jRAIS8MnGh/uTuCwfk7vjO7ZFc=;
+ b=sNmR+xbtW2NPDKGtnfLZJRi7wIJ6mrn+jEp0Gq68Sa3L0aUc0HvMIwSZpFIwvUm1P0
+ jvyzKtLf94+QfvpAvTM57J4oSAedYLX7YJTUiSoyG8zbXanfHwO7IHlsI45aIKj+xzJ5
+ FVK6lOPmYqdqnmTSfslvlNXHvkZbdDXbYEKSpTbeht5mt4rZPE3CA3peVwAZknfwXdWu
+ T/mY4q/aFgcd8vSs4eCIHFp213qgKB0CwUzBBQPL61fT2iAQxA+ezziLe32kzCcnV3/v
+ Ujj+vKW5P00tZtKtOUGBFKbrSrak+4f9nSHH8zIwIQz4sKWKFNR8kEsk+DIFJgntpys0
+ wkMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=OITAjyqq/uhNRY6a3jRAIS8MnGh/uTuCwfk7vjO7ZFc=;
+ b=ZPGIUUIM6bOnXddYLNuOeDOiR/hFdwjjIXHorCdzbR0GGtUXGkuGzyM3z1FHpYNT57
+ 7fTqs1vvqXR8T8ZH3SphNcw9C1jfVsRY7Xh7eCciOsnnbaawLoP18oab06emODQwAVXt
+ JQkXp+dy3FuxBz41aLqhSjqPr0NbnO1xsvXljJnJJMvt+SV1FUuRsw/FUbeOxcmZ/osD
+ ZeFd8fN/OdocRHKD3wWphRYSkuD+AJnF513PpUyQtJUTTXNmjSUHrmYXaxOuTlC2Xu6W
+ 5Ttppc11FUGaawnKYfFxi2xI+C6KtNHx30IOYgaUKoUn51Ap0XlCX/izu/rQeMnBeUK1
+ V6zQ==
+X-Gm-Message-State: APjAAAV5vG6tjIqPC86FPTFwkVgoe2W7sGsZ3w1+Njo7YWWw0C59wfu3
+ EZvNrz56laJFW38lToByPp1HgSIZ+akZCd8IrR0=
+X-Google-Smtp-Source: APXvYqxlUt8QU9AtDIfGQ/nAmvm08jBCg+2ImUoN+LJgxFdpSqaPSIznYji4H79vuVj2Oc79KYEe7AGzi7oOZsHcR9o=
+X-Received: by 2002:a7b:cc0c:: with SMTP id f12mr2853037wmh.5.1574424134290;
+ Fri, 22 Nov 2019 04:02:14 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <c2459655-f205-3294-23ba-ba5d3280df41@linux.ibm.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: H2-cjAmwOeCJWUSV-3LfIQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252; format=flowed
+References: <20191120152442.26657-1-marcandre.lureau@redhat.com>
+ <20191120152442.26657-13-marcandre.lureau@redhat.com>
+ <CAFEAcA8aj71ue1Y_o1PphD8+iAZeOgqo647hgXS0Z22T9Qa8yg@mail.gmail.com>
+ <CAJ+F1CJhaQxrceCqPpPULN5RUUQ+jTVaRa912jX0Ct8MM0ucaw@mail.gmail.com>
+ <CAFEAcA82swZ82__hee1818L0RtD-3dNEOAKT2hdwgMOcaiAjHw@mail.gmail.com>
+ <CAJ+F1CLDai4rWcLQaqXo1GcVRuRj=OwX+50jV4Ch5X_-8HR=CA@mail.gmail.com>
+ <CAFEAcA_mHmc_1BQPeaySCg7t2vd4VC2CUPbAneLYeSRprwZQQw@mail.gmail.com>
+In-Reply-To: <CAFEAcA_mHmc_1BQPeaySCg7t2vd4VC2CUPbAneLYeSRprwZQQw@mail.gmail.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Fri, 22 Nov 2019 16:02:00 +0400
+Message-ID: <CAJ+F1CLNgS7KYjsDV_0i=-tQbLSupz3JCHbizTG9_yWPn_ofcA@mail.gmail.com>
+Subject: Re: [PATCH v4 12/37] serial: start making SerialMM a sysbus device
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::341
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,63 +94,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: Paul Burton <pburton@wavecomp.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <amarkovic@wavecomp.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22.11.19 12:46, Janosch Frank wrote:
-> On 11/22/19 11:59 AM, David Hildenbrand wrote:
->> On 22.11.19 08:52, Janosch Frank wrote:
->>> * Add comments that tell you which diag308 subcode caused the reset
->>> * Sort by diag308 reset subcode
->>>
->>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>> ---
->>>    hw/s390x/s390-virtio-ccw.c | 20 ++++++++++----------
->>>    1 file changed, 10 insertions(+), 10 deletions(-)
->>>
->>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->>> index c1d1440272..88f7758721 100644
->>> --- a/hw/s390x/s390-virtio-ccw.c
->>> +++ b/hw/s390x/s390-virtio-ccw.c
->>> @@ -330,15 +330,7 @@ static void s390_machine_reset(MachineState *machi=
-ne)
->>>        s390_cmma_reset();
->>>   =20
->>>        switch (reset_type) {
->>> -    case S390_RESET_EXTERNAL:
->>> -    case S390_RESET_REIPL:
->>> -        qemu_devices_reset();
->>> -        s390_crypto_reset();
->>> -
->>> -        /* configure and start the ipl CPU only */
->>> -        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
->>> -        break;
->>> -    case S390_RESET_MODIFIED_CLEAR:
->>> +    case S390_RESET_MODIFIED_CLEAR: /* Subcode 0 */
->>
->> IMHO "Subcode X" isn't of much help here. We're out of diag handling.
->>
->> I'd suggest to just document the subcodes along with the definitions, if
->> really needed, and drop this patch, at least I don't quite see the value
->> of moving code around here... or is the code shuffling of any value on
->> your prot virt patches?
->>
->=20
-> It keeps me from consulting the POP every time I need to change things
-> in the machine resets. This is basically a 1:1 mapping of diag 308
-> subcodes to machine resets, so why don't we want to make that obvious
-> and order them by the subcodes?
->=20
+On Fri, Nov 22, 2019 at 2:11 PM Peter Maydell <peter.maydell@linaro.org> wr=
+ote:
+>
+> On Thu, 21 Nov 2019 at 18:51, Marc-Andr=C3=A9 Lureau
+> <marcandre.lureau@gmail.com> wrote:
+> >
+> > Hi
+> >
+> > On Thu, Nov 21, 2019 at 10:24 PM Peter Maydell <peter.maydell@linaro.or=
+g> wrote:
+> > >
+> > > On Thu, 21 Nov 2019 at 18:15, Marc-Andr=C3=A9 Lureau
+> > > <marcandre.lureau@gmail.com> wrote:
+> > > >
+> > > > On Thu, Nov 21, 2019 at 5:47 PM Peter Maydell <peter.maydell@linaro=
+.org> wrote:
+> > > > >
+> > > > > On Wed, 20 Nov 2019 at 15:27, Marc-Andr=C3=A9 Lureau
+> > > > > <marcandre.lureau@redhat.com> wrote:
+> > > > > >
+> > > > > > Memory mapped serial device is in fact a sysbus device. The fol=
+lowing
+> > > > > > patches will make use of sysbus facilities for resource and
+> > > > > > registration. In particular, "serial-mm: use sysbus facilities"=
+ will
+> > > > > > move internal serial realization to serial_mm_realize callback =
+to
+> > > > > > follow qdev best practices.
+> > > > >
+> > > > > What goes wrong if you just put the realize of smm->serial in
+> > > > > the right place to start with ?
+> > > >
+> > > > You mean squash the following patches?
+> > >
+> > > No, I meant just having this patch have
+> > >
+> > > static void serial_mm_realize(DeviceState *dev, Error **errp)
+> > > {
+> > >     SerialMM *smm =3D SERIAL_MM(dev);
+> > >     SerialState *s =3D &smm->serial;
+> > >
+> > >     object_property_set_bool(OBJECT(dev), true, "realized", &err);
+> > >     if (err) {
+> > >         error_propagate(errp, err);
+> > >         return;
+> > >     }
+> > > }
+> > >
+> > > and
+> > >
+> > > + dc->realize =3D serial_mm_realize;
+> > >
+> > > rather than manually doing the qdev_init_nofail()
+> > > in serial_mm_init(). This seems to me like an integral
+> > > part of the change to doing the init of the subdevice in the
+> > > init method, so it would be better unless there's a reason
+> > > why it breaks something. The rest of patch 15 (which is
+> > > what currently makes the equivalent change to realize) is all
+> > > about passing through the properties and exposing the
+> > > sysbus MMIO/irq regions and should stay a separate patch.
+> > >
+> > > (setting the 'realized' property is better in a realize method
+> > > than using qdev_init_nofail() because it means we can propagate
+> > > any error outward rather than killing qemu.)
+> >
+> > Ok, but I implemented realize and moved serial init in "serial: make
+> > SerialIO a sysbus device".
+>
+> That patch is for the TYPE_SERIAL_IO device, isn't it? It
+> changes both serial_io_instance_init and serial_io_realize
+> to do the instance init and realize of the TYPE_SERIAL device,
+> so it doesn't have the same "only doing half a change" issue
+> that this patch has for TYPE_SERIAL_MM.
+>
 
-Because it is not a 1:1 mapping: S390_RESET_EXTERNAL
+Ok, I got it, thanks.
+
+
+
 
 --=20
-
-Thanks,
-
-David / dhildenb
-
+Marc-Andr=C3=A9 Lureau
 
