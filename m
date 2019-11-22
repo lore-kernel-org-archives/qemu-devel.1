@@ -2,85 +2,78 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF800C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:16:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61267C432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:17:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87B2220706
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:16:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 294AE20706
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:17:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PQFh0ti9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87B2220706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ghh9HAwf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 294AE20706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY9jF-0007ZL-Eb
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 09:16:09 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:61000)
+	id 1iY9kR-0008S1-9H
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 09:17:23 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33014)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iY9i6-00070U-SJ
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:14:59 -0500
+ (envelope-from <peter.maydell@linaro.org>) id 1iY9jb-00082r-G5
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:16:32 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <aleksandar.m.mail@gmail.com>) id 1iY9i4-0004Zb-L3
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:14:58 -0500
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:34804)
+ (envelope-from <peter.maydell@linaro.org>) id 1iY9ja-0005hY-5B
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:16:31 -0500
+Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:45328)
  by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <aleksandar.m.mail@gmail.com>)
- id 1iY9i4-0004Z8-GF
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:14:56 -0500
-Received: by mail-ot1-x341.google.com with SMTP id w11so6307787ote.1
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 06:14:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+ id 1iY9jZ-0005h9-Ud
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:16:30 -0500
+Received: by mail-ot1-x342.google.com with SMTP id r24so6234806otk.12
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 06:16:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=bNwuUeYTrXSGPiHVcT7E0sw2b9jkxQuUW57eM/dBzzw=;
- b=PQFh0ti9DzdnNuOzxu8bNHF3JYQfO+e1zA8VenXMsDcJ0G+pXyOqHNOfXcX/70dmOB
- gqSGGQpwlCeS0E5CTKdS6KGSGcPiNeACTABWadGVoXip8Z8FBdXmtiSJFKfiNuPrGeo+
- NooWcgLYDg/cMuRCNLLhOQV3YVuZGEptlB2UkXzouB7HfXql8PJZ3F1O1dgd37+5n2qL
- 2edon2sKXml9bz+y3+Veud1ICtUyhqtkMIEgomvHD2ndrc84fCFRR8BamfXBOgc3DlTH
- 07spFCpx1+TzwdJSbYZr8L14gLRhvCp9MMlvLuQgvQlzogZjmtQC1YgEO3LPbWHqXBT9
- rKCg==
+ :cc; bh=hSDtyz6U5sp6XnbyBvxRlErxfq464IncjSnLonINQOo=;
+ b=ghh9HAwfcrbjJ57AnLua6yovW2OH9d8vzL+r8uggsG5Qhy3z5DXIamPcCZ0ZbF+VWE
+ dPqgPNu3g5yradl75Qvt86Be4lAh/FpECAbFRnaJvjtOtEnmTZVws25w5ehk1PI9PM5p
+ n3GsyIwlYh7Y+McOPKT2EK1Rz7zzDV7pCGmvGGxiBVmzf0bARvjfAzpMpUGedeeb4Un5
+ exF8ALqDzFYqbiYmT0d5HTehmMha3VYfe9bjwV4SVV+gUVmFWuAft5W8gl2R+pdTVoCz
+ qGkOzQdl9s5wVq5dpMPLUHKhAd+ZTyZ1oi1q2+/Y8sgQbHcv5lQ92uquofY9IBWUynoY
+ D0hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=bNwuUeYTrXSGPiHVcT7E0sw2b9jkxQuUW57eM/dBzzw=;
- b=Ew6QOU9QpCR4jPNggXzFTng7XpXCxdXr2iqQlqcPbfP/dSo1Rf8ZOLosWUuijIGUjG
- KjqA3XW+0cREGn4yTIIX9Xy+yUsMOHspIbmuVmDggibu7fgfBQ1T/6LtWMOPECzlY8pO
- 8V0cmFugAMKsZAUtrrxH3Y5issN2zb2JTUjyFHxRA3SiMHSx3bm0uGcN5N80tg71SKk4
- WdHOGFvkBUawoXu9G9UVCq8uMXHPikMaHQSltTQtBiyGyXV/LE9+EMcLvPQc8DqP7v+N
- TWpRH8KF3tLnK6nO+yeq3qI0EqWI6fBaof8gY/Snf2pLBonMrJ/nxWSM2z43j+auOXeq
- G60Q==
-X-Gm-Message-State: APjAAAUnlGLVBoL4vrlLLGL8UK150uLoyHKeRUHt0gbhDAsYAN4XDXoZ
- Zg2aLJT6s2v4GSK9+neJ1Q4Uq0clf1Yi+EiG3nI=
-X-Google-Smtp-Source: APXvYqx+EQ/l6CNXXFyZoThJjyZcgTVNRvS60aoQd4XW0aK7eixlj6QnOLPTP89UQkoaCiQYCv2dfj1CKvpCN3eyfmk=
-X-Received: by 2002:a05:6830:1383:: with SMTP id
- d3mr10907310otq.306.1574432095546; 
- Fri, 22 Nov 2019 06:14:55 -0800 (PST)
+ :message-id:subject:to:cc;
+ bh=hSDtyz6U5sp6XnbyBvxRlErxfq464IncjSnLonINQOo=;
+ b=bPsgcfXFbQ/Lau2joKOi2aUrATvCHf/XJsWUWpiSNeJvL9D2hYGeCRGkqfzQuBIWAg
+ omekDj3yRBsNMXhQz+ZF/Noyq5bC1nlrJjXeZWMVGZWTRKZ2HFcaXeMrRcOAU8cygG+4
+ 4cbc/Aoys8/7TbkTUlsoC8h3niHfGdAmQCnrIqpJ08kyp0uJf0cpuFvaaJUoU6syWTGb
+ kfcZ6tqV2YF/zFcvEE0L5ZCXAurRhcH5y3ilk8YBwLFGmm0oxJwcQLirOAp85lL43wMe
+ PxqOADSxc+ojFA9KhU/oahcQDnihcTduoVrkZWek0HzTwPyTmacICsztsqRhv0IOeBzp
+ ffdw==
+X-Gm-Message-State: APjAAAX/UfXJhV380rX696DVxNZdYQk9wuYEK015KRh9eMou0deiEoOB
+ ojaSNgcxqmBGYzN9npMpIen1mlIR9miq4tkwaxITYwUF5Mg=
+X-Google-Smtp-Source: APXvYqy6zwY6XaY6JDzb+P/uBIHKkFBqLazMlaiiQUPfnuu82nb8cWOMt/d6ZOiFPdTqN8Yx2kqDfuP2HUSJ4HjgCuU=
+X-Received: by 2002:a9d:7f12:: with SMTP id j18mr10334795otq.221.1574432188957; 
+ Fri, 22 Nov 2019 06:16:28 -0800 (PST)
 MIME-Version: 1.0
-References: <1573652826-23987-1-git-send-email-aleksandar.markovic@rt-rk.com>
- <1573652826-23987-5-git-send-email-aleksandar.markovic@rt-rk.com>
- <78b81f32-0eb0-6d51-6ecc-9c8045be3896@redhat.com>
-In-Reply-To: <78b81f32-0eb0-6d51-6ecc-9c8045be3896@redhat.com>
-From: Aleksandar Markovic <aleksandar.m.mail@gmail.com>
-Date: Fri, 22 Nov 2019 15:14:44 +0100
-Message-ID: <CAL1e-=iWZszvg7pY=iL6j0bUch+gF5nhuk+XbGFkipkhzCHHug@mail.gmail.com>
-Subject: Re: [PATCH v2 4/5] MAINTAINERS: Adjust maintainership for R4000
- systems
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+References: <20191122135833.28953-1-maz@kernel.org>
+In-Reply-To: <20191122135833.28953-1-maz@kernel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 22 Nov 2019 14:16:18 +0000
+Message-ID: <CAFEAcA-aRwc9bogn-QbT-q5FzkqieYmQOZMr6H=kK5ixMGANMg@mail.gmail.com>
+Subject: Re: [PATCH] target/arm: Fix ISR_EL1 tracking when executing at EL2
+To: Marc Zyngier <maz@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
  recognized.
-X-Received-From: 2607:f8b0:4864:20::341
+X-Received-From: 2607:f8b0:4864:20::342
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,86 +85,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.markovic@rt-rk.com>,
- =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Aleksandar Markovic <amarkovic@wavecomp.com>,
- Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Richard Henderson <richard.henderson@linaro.org>,
+ Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 22, 2019 at 2:58 PM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
+On Fri, 22 Nov 2019 at 13:59, Marc Zyngier <maz@kernel.org> wrote:
 >
-> Hi Aleksandar,
+> The ARMv8 ARM states when executing at EL2, EL3 or Secure EL1,
+> ISR_EL1 shows the pending status of the physical IRQ, FIQ, or
+> SError interrupts.
 >
-> On 11/13/19 2:47 PM, Aleksandar Markovic wrote:
-> > From: Aleksandar Markovic <amarkovic@wavecomp.com>
-> >
-> > Change the maintainership for R4000 systems to improve its quality.
-> >
-> > Acked-by: Aurelien Jarno <aurelien@aurel32.net>
-> > Signed-off-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-> > ---
-> >   MAINTAINERS | 5 +++--
-> >   1 file changed, 3 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index 6afec32..ba9ca98 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -971,8 +971,9 @@ F: hw/mips/mips_mipssim.c
-> >   F: hw/net/mipsnet.c
-> >
-> >   R4000
-> > -M: Aurelien Jarno <aurelien@aurel32.net>
-> > -R: Aleksandar Rikalo <aleksandar.rikalo@rt-rk.com>
-> > +M: Herv=C3=A9 Poussineau <hpoussin@reactos.org>
+> Unfortunately, QEMU's implementation only considers the HCR_EL2
+> bits, and ignores the current exception level. This means a hypervisor
+> trying to look at its own interrupt state actually sees the guest
+> state, which is unexpected and breaks KVM as of Linux 5.3.
 >
-> Commit 0c10962a033 from Herv=C3=A9 was part of a bigger refactor series, =
-so I
-> don't think he is interested.
+> Instead, check for the running EL and return the physical bits
+> if not running in a virtualized context.
 >
-> > +R: Aurelien Jarno <aurelien@aurel32.net>
-> > +R: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-> >   S: Maintained
-> >   F: hw/mips/mips_r4k.c
->
-> Now back to this board, I am having hard time to understand what it
-> models. IIUC it predates the Malta board, and was trying to model a
-> board able to run the first MIPS cpu when the port was added in 2005
-> (see commit 6af0bf9c7c3a).
-> The Malta board was added 1 year later (commit 5856de800df) and models a
-> real hardware.
->
-> As Aurelien acked to step down maintaining it, it seems the perfect
-> timing to start its deprecation process. I'll prepare a patch for 5.0
-> (unless someone is really using it and willing to maintain it).
->
+> Fixes: 636540e9c40b
+> Reported-by: Quentin Perret <qperret@google.com>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
 
-Philippe, hi.
+Congratulations on your first QEMU patch :-)
 
-Herve told me a while ago that he does care about R4000 being
-supported, as it is closely related to Jazz machines, so please
-don't start any deprecation process.
+I've applied this to target-arm.next and will get it into
+rc3 ("fixes running newer kernels" seems like an rc-ish
+kind of bug).
 
-Herve is the most familiar of all of us with R4000, and, for that
-reason, my suggestion is to keep the patch as it is. Let me know
-if you have any objections.
+RTH: vaguely wondering if this might be related to the
+bug you ran into trying to test your VHE emulation
+patchset...
 
-One alternative approach would be to merge "R4000" and
-"Jazz" sections. But, let's leave it for future as an option,
-if nobody objects.
-
-Yours,
-Aleksandar
-
-> Regards,
->
-> Phil.
->
->
+thanks
+-- PMM
 
