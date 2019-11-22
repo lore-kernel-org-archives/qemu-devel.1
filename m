@@ -2,61 +2,86 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D31C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:07:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2668AC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:09:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99A1920637
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:07:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99A1920637
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id E08B220637
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:09:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GeuT7vhl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E08B220637
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48194 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY3yp-0002iM-1l
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 03:07:51 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39701)
+	id 1iY409-00052Q-3R
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 03:09:13 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42672)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iY3gu-00065K-0C
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:49:21 -0500
+ (envelope-from <armbru@redhat.com>) id 1iY3xM-0001ft-3J
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:06:24 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iY3gs-00033A-JK
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:49:19 -0500
-Received: from mga18.intel.com ([134.134.136.126]:36768)
+ (envelope-from <armbru@redhat.com>) id 1iY3xK-0003Ha-KR
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:06:19 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35329
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iY3gs-0002kF-BP
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:49:18 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Nov 2019 23:49:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,229,1571727600"; d="scan'208";a="210178630"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by orsmga003.jf.intel.com with ESMTP; 21 Nov 2019 23:49:14 -0800
-From: Tao Xu <tao3.xu@intel.com>
-To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
- ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
- sw@weilnetz.de, mdroth@linux.vnet.ibm.com, thuth@redhat.com,
- lvivier@redhat.com
-Subject: [PATCH v17 14/14] tests/bios-tables-test: add test cases for ACPI HMAT
-Date: Fri, 22 Nov 2019 15:48:26 +0800
-Message-Id: <20191122074826.1373-15-tao3.xu@intel.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122074826.1373-1-tao3.xu@intel.com>
-References: <20191122074826.1373-1-tao3.xu@intel.com>
+ (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iY3xK-0003HA-Ei
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:06:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574409977;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=m6dJ0C509wToZGP7p4MNmO/tcMzllleaMvzJ6Bf+648=;
+ b=GeuT7vhluBrA2jKIVsYMSvWSPYPR4s8fMLoCppa2AEBdHD5wFOqblL+EMJy/12lSr772S6
+ 6Tq9qXlgsHtEjYsx73HS+XfVCC47M7+pyluIRY31t5l/eSgmdenUx1ABTLwFjiDaeoPLAs
+ GoDmtYGIob4ud3uWqODy5TNQ9Qot/aY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-160-LrbtbpbHPra8RY8MX08WXQ-1; Fri, 22 Nov 2019 03:06:15 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 732BC1883521;
+ Fri, 22 Nov 2019 08:06:14 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
+ [10.36.116.134])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C06B5DDB2;
+ Fri, 22 Nov 2019 08:06:14 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id B52981138606; Fri, 22 Nov 2019 09:06:12 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Fangrui Song <i@maskray.me>
+Subject: Re: [PATCH v2] Fix incorrect integer->float conversions caught by
+ clang -Wimplicit-int-float-conversion
+References: <20191116010731.3jdxozzfpsqsrcc4@google.com>
+ <20191119204932.5gdzlsplijveqwju@gmail.com>
+ <e456fd62-95d7-4a52-9e14-cf0dbe01f995@redhat.com>
+ <20191122000045.vz3eq6s6aqkv6l6h@gmail.com>
+Date: Fri, 22 Nov 2019 09:06:12 +0100
+In-Reply-To: <20191122000045.vz3eq6s6aqkv6l6h@gmail.com> (Fangrui Song's
+ message of "Thu, 21 Nov 2019 16:00:45 -0800")
+Message-ID: <87lfs8tjwr.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.126
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-MC-Unique: LrbtbpbHPra8RY8MX08WXQ-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 205.139.110.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,165 +93,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jingqi Liu <Jingqi.liu@intel.com>, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, Daniel Black <daniel@linux.ibm.com>,
- jonathan.cameron@huawei.com
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ACPI table HMAT has been introduced, QEMU now builds HMAT tables for
-Heterogeneous Memory with boot option '-numa node'.
+Fangrui Song <i@maskray.me> writes:
 
-Add test cases on PC and Q35 machines with 2 numa nodes.
-Because HMAT is generated when system enable numa, the
-following tables need to be added for this test:
-    tests/data/acpi/pc/APIC.acpihmat
-    tests/data/acpi/pc/SRAT.acpihmat
-    tests/data/acpi/pc/HMAT.acpihmat
-    tests/data/acpi/pc/DSDT.acpihmat
-    tests/data/acpi/q35/APIC.acpihmat
-    tests/data/acpi/q35/SRAT.acpihmat
-    tests/data/acpi/q35/HMAT.acpihmat
-    tests/data/acpi/q35/DSDT.acpihmat
+> On 2019-11-21, Eric Blake wrote:
+>>On 11/19/19 2:49 PM, Fangrui Song wrote:
+>>
+>>>>
+>>>>Can we simply drop the offending line statement instead?
+>>>
+>>>Fixed in the new patch.
+>>>
+>>
+>>>>The first val * mul above this range is 0x1p64.=C2=A0 Rejecting it is
+>>>>correct, because it overflows yint64_t.
+>>>
+>>>I am not subscribed, so apologize that this email may be off the thread.
+>>>
+>>>(The binutils mailing list allows a user to download the raw email so I
+>>>can still reply to a specific email, but this list does not provide such
+>>>feature.)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Daniel Black <daniel@linux.ibm.com>
-Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
----
+There's <https://lists.gnu.org/archive/mbox/qemu-devel/>.
 
-Changes in v17:
-    - Update the latency and bandwidth
+>> Actually, it's better to post a v2 patch as a new top-level thread,
+>> rather than buried as an attachment to a reply to v1, because our CI
+>> tooling doesn't see through the attachment (nor was it easy for me
+>> to reply to the v2 patch - I had to open the attachment to paste its
+>> text inline below...).
+>>
+>>More patch submission hints at https://wiki.qemu.org/Contribute/SubmitAPa=
+tch
+>
+> Retitled to [PATCH v2]
 
-Changes in v15:
-    - Make tests without breaking CI (Michael)
+Good, such versioning is essential to avoid confusion.  Next time, start
+a new top-level thread for v2.  Our patch submission processing
+(automated as well as human) expects that.
 
-Changes in v13:
-    - Use decimal notation with appropriate suffix for cache size
----
- tests/bios-tables-test-allowed-diff.h |  8 +++++
- tests/bios-tables-test.c              | 44 +++++++++++++++++++++++++++
- tests/data/acpi/pc/APIC.acpihmat      |  0
- tests/data/acpi/pc/DSDT.acpihmat      |  0
- tests/data/acpi/pc/HMAT.acpihmat      |  0
- tests/data/acpi/pc/SRAT.acpihmat      |  0
- tests/data/acpi/q35/APIC.acpihmat     |  0
- tests/data/acpi/q35/DSDT.acpihmat     |  0
- tests/data/acpi/q35/HMAT.acpihmat     |  0
- tests/data/acpi/q35/SRAT.acpihmat     |  0
- 10 files changed, 52 insertions(+)
- create mode 100644 tests/data/acpi/pc/APIC.acpihmat
- create mode 100644 tests/data/acpi/pc/DSDT.acpihmat
- create mode 100644 tests/data/acpi/pc/HMAT.acpihmat
- create mode 100644 tests/data/acpi/pc/SRAT.acpihmat
- create mode 100644 tests/data/acpi/q35/APIC.acpihmat
- create mode 100644 tests/data/acpi/q35/DSDT.acpihmat
- create mode 100644 tests/data/acpi/q35/HMAT.acpihmat
- create mode 100644 tests/data/acpi/q35/SRAT.acpihmat
+I just did it for you: "[PATCH v3 0/2] Fix incorrect integer->float
+conversion caught by clang".
 
-diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-test-allowed-diff.h
-index dfb8523c8b..3c9e0c979b 100644
---- a/tests/bios-tables-test-allowed-diff.h
-+++ b/tests/bios-tables-test-allowed-diff.h
-@@ -1 +1,9 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/pc/APIC.acpihmat",
-+"tests/data/acpi/pc/SRAT.acpihmat",
-+"tests/data/acpi/pc/HMAT.acpihmat",
-+"tests/data/acpi/pc/DSDT.acpihmat",
-+"tests/data/acpi/q35/APIC.acpihmat",
-+"tests/data/acpi/q35/SRAT.acpihmat",
-+"tests/data/acpi/q35/HMAT.acpihmat",
-+"tests/data/acpi/q35/DSDT.acpihmat",
-diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
-index 79f5da092f..9fab1d0459 100644
---- a/tests/bios-tables-test.c
-+++ b/tests/bios-tables-test.c
-@@ -947,6 +947,48 @@ static void test_acpi_virt_tcg_numamem(void)
- 
- }
- 
-+static void test_acpi_tcg_acpi_hmat(const char *machine)
-+{
-+    test_data data;
-+
-+    memset(&data, 0, sizeof(data));
-+    data.machine = machine;
-+    data.variant = ".acpihmat";
-+    test_acpi_one(" -machine hmat=on"
-+                  " -smp 2,sockets=2"
-+                  " -m 128M,slots=2,maxmem=1G"
-+                  " -object memory-backend-ram,size=64M,id=m0"
-+                  " -object memory-backend-ram,size=64M,id=m1"
-+                  " -numa node,nodeid=0,memdev=m0"
-+                  " -numa node,nodeid=1,memdev=m1,initiator=0"
-+                  " -numa cpu,node-id=0,socket-id=0"
-+                  " -numa cpu,node-id=0,socket-id=1"
-+                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
-+                  "data-type=access-latency,latency=1ns"
-+                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
-+                  "data-type=access-bandwidth,bandwidth=65534M"
-+                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
-+                  "data-type=access-latency,latency=65534ns"
-+                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
-+                  "data-type=access-bandwidth,bandwidth=32767M"
-+                  " -numa hmat-cache,node-id=0,size=10K,level=1,assoc=direct,"
-+                  "policy=write-back,line=8"
-+                  " -numa hmat-cache,node-id=1,size=10K,level=1,assoc=direct,"
-+                  "policy=write-back,line=8",
-+                  &data);
-+    free_test_data(&data);
-+}
-+
-+static void test_acpi_q35_tcg_acpi_hmat(void)
-+{
-+    test_acpi_tcg_acpi_hmat(MACHINE_Q35);
-+}
-+
-+static void test_acpi_piix4_tcg_acpi_hmat(void)
-+{
-+    test_acpi_tcg_acpi_hmat(MACHINE_PC);
-+}
-+
- static void test_acpi_virt_tcg(void)
- {
-     test_data data = {
-@@ -991,6 +1033,8 @@ int main(int argc, char *argv[])
-         qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
-         qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm);
-         qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
-+        qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_hmat);
-+        qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat);
-     } else if (strcmp(arch, "aarch64") == 0) {
-         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
-         qtest_add_func("acpi/virt/numamem", test_acpi_virt_tcg_numamem);
-diff --git a/tests/data/acpi/pc/APIC.acpihmat b/tests/data/acpi/pc/APIC.acpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/pc/DSDT.acpihmat b/tests/data/acpi/pc/DSDT.acpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/pc/HMAT.acpihmat b/tests/data/acpi/pc/HMAT.acpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/pc/SRAT.acpihmat b/tests/data/acpi/pc/SRAT.acpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/q35/APIC.acpihmat b/tests/data/acpi/q35/APIC.acpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/q35/DSDT.acpihmat b/tests/data/acpi/q35/DSDT.acpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/q35/HMAT.acpihmat b/tests/data/acpi/q35/HMAT.acpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/data/acpi/q35/SRAT.acpihmat b/tests/data/acpi/q35/SRAT.acpihmat
-new file mode 100644
-index 0000000000..e69de29bb2
--- 
-2.20.1
+Many thanks for your fixes!
 
 
