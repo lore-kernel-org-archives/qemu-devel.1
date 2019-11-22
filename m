@@ -2,81 +2,61 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04755C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:07:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D31C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:07:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0DD520637
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:07:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EeA5fkRC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0DD520637
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 99A1920637
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 08:07:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99A1920637
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY3yE-0001qm-Ui
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 03:07:15 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42019)
+	id 1iY3yp-0002iM-1l
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 03:07:51 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39701)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iY3s5-0002yK-8x
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:00:54 -0500
+ (envelope-from <tao3.xu@intel.com>) id 1iY3gu-00065K-0C
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:49:21 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iY3rz-00007h-Oo
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:00:51 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:55858
- helo=us-smtp-1.mimecast.com)
+ (envelope-from <tao3.xu@intel.com>) id 1iY3gs-00033A-JK
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:49:19 -0500
+Received: from mga18.intel.com ([134.134.136.126]:36768)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iY3rx-00006b-PN
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:00:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574409644;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MuSq9iiujh0gUMipQQgmryW+wdqp2u+B8YzVdrLvwVo=;
- b=EeA5fkRCOqbU7mIqpohX+Wk8YNN0h5lD+Etd7F9n1xk2jyCjIfMrkGzYwlfiD/0FC780q0
- 6bjyNIfWAuwfecYlKHVD8mFBEuuirBz4n2kaBQGimoTegdiOBqMkDMULXZtHFGaubk4LRi
- 3GFd9Pw2fms5AcL71l/562iTX2o6MBw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-NrROnIlyPFGHrE8PUpNcuA-1; Fri, 22 Nov 2019 03:00:42 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B5F1801E58;
- Fri, 22 Nov 2019 08:00:41 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 143536E713;
- Fri, 22 Nov 2019 08:00:41 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8C44B11385C7; Fri, 22 Nov 2019 09:00:39 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 1/2] migration: Fix incorrect integer->float conversion
- caught by clang
-Date: Fri, 22 Nov 2019 09:00:38 +0100
-Message-Id: <20191122080039.12771-2-armbru@redhat.com>
-In-Reply-To: <20191122080039.12771-1-armbru@redhat.com>
-References: <20191122080039.12771-1-armbru@redhat.com>
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iY3gs-0002kF-BP
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:49:18 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 21 Nov 2019 23:49:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,229,1571727600"; d="scan'208";a="210178630"
+Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
+ by orsmga003.jf.intel.com with ESMTP; 21 Nov 2019 23:49:14 -0800
+From: Tao Xu <tao3.xu@intel.com>
+To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
+ ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
+ sw@weilnetz.de, mdroth@linux.vnet.ibm.com, thuth@redhat.com,
+ lvivier@redhat.com
+Subject: [PATCH v17 14/14] tests/bios-tables-test: add test cases for ACPI HMAT
+Date: Fri, 22 Nov 2019 15:48:26 +0800
+Message-Id: <20191122074826.1373-15-tao3.xu@intel.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191122074826.1373-1-tao3.xu@intel.com>
+References: <20191122074826.1373-1-tao3.xu@intel.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-MC-Unique: NrROnIlyPFGHrE8PUpNcuA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 205.139.110.120
+Content-Transfer-Encoding: 8bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 134.134.136.126
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -88,56 +68,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fangrui Song <i@maskray.me>, richard.henderson@linaro.org,
- dgilbert@redhat.com, quintela@redhat.com
+Cc: Jingqi Liu <Jingqi.liu@intel.com>, tao3.xu@intel.com, fan.du@intel.com,
+ qemu-devel@nongnu.org, Daniel Black <daniel@linux.ibm.com>,
+ jonathan.cameron@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Fangrui Song <i@maskray.me>
+ACPI table HMAT has been introduced, QEMU now builds HMAT tables for
+Heterogeneous Memory with boot option '-numa node'.
 
-Clang does not like qmp_migrate_set_downtime()'s code to clamp double
-@value to 0..INT64_MAX:
+Add test cases on PC and Q35 machines with 2 numa nodes.
+Because HMAT is generated when system enable numa, the
+following tables need to be added for this test:
+    tests/data/acpi/pc/APIC.acpihmat
+    tests/data/acpi/pc/SRAT.acpihmat
+    tests/data/acpi/pc/HMAT.acpihmat
+    tests/data/acpi/pc/DSDT.acpihmat
+    tests/data/acpi/q35/APIC.acpihmat
+    tests/data/acpi/q35/SRAT.acpihmat
+    tests/data/acpi/q35/HMAT.acpihmat
+    tests/data/acpi/q35/DSDT.acpihmat
 
-    qemu/migration/migration.c:2038:24: error: implicit conversion from 'lo=
-ng' to 'double' changes value from 9223372036854775807 to 92233720368547758=
-08 [-Werror,-Wimplicit-int-float-conversion]
-
-The warning will be enabled by default in clang 10. It is not
-available for clang <=3D 9.
-
-The clamp is actually useless; @value is checked to be within
-0..MAX_MIGRATE_DOWNTIME_SECONDS immediately before.  Delete it.
-
-While there, make the conversion from double to int64_t explicit.
-
-Signed-off-by: Fangrui Song <i@maskray.me>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-[Patch split, commit message improved]
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Reviewed-by: Daniel Black <daniel@linux.ibm.com>
+Reviewed-by: Jingqi Liu <Jingqi.liu@intel.com>
+Suggested-by: Igor Mammedov <imammedo@redhat.com>
+Signed-off-by: Tao Xu <tao3.xu@intel.com>
 ---
- migration/migration.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 354ad072fa..09b150663f 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2035,11 +2035,10 @@ void qmp_migrate_set_downtime(double value, Error *=
-*errp)
-     }
-=20
-     value *=3D 1000; /* Convert to milliseconds */
--    value =3D MAX(0, MIN(INT64_MAX, value));
-=20
-     MigrateSetParameters p =3D {
-         .has_downtime_limit =3D true,
--        .downtime_limit =3D value,
-+        .downtime_limit =3D (int64_t)value,
-     };
-=20
-     qmp_migrate_set_parameters(&p, errp);
---=20
-2.21.0
+Changes in v17:
+    - Update the latency and bandwidth
+
+Changes in v15:
+    - Make tests without breaking CI (Michael)
+
+Changes in v13:
+    - Use decimal notation with appropriate suffix for cache size
+---
+ tests/bios-tables-test-allowed-diff.h |  8 +++++
+ tests/bios-tables-test.c              | 44 +++++++++++++++++++++++++++
+ tests/data/acpi/pc/APIC.acpihmat      |  0
+ tests/data/acpi/pc/DSDT.acpihmat      |  0
+ tests/data/acpi/pc/HMAT.acpihmat      |  0
+ tests/data/acpi/pc/SRAT.acpihmat      |  0
+ tests/data/acpi/q35/APIC.acpihmat     |  0
+ tests/data/acpi/q35/DSDT.acpihmat     |  0
+ tests/data/acpi/q35/HMAT.acpihmat     |  0
+ tests/data/acpi/q35/SRAT.acpihmat     |  0
+ 10 files changed, 52 insertions(+)
+ create mode 100644 tests/data/acpi/pc/APIC.acpihmat
+ create mode 100644 tests/data/acpi/pc/DSDT.acpihmat
+ create mode 100644 tests/data/acpi/pc/HMAT.acpihmat
+ create mode 100644 tests/data/acpi/pc/SRAT.acpihmat
+ create mode 100644 tests/data/acpi/q35/APIC.acpihmat
+ create mode 100644 tests/data/acpi/q35/DSDT.acpihmat
+ create mode 100644 tests/data/acpi/q35/HMAT.acpihmat
+ create mode 100644 tests/data/acpi/q35/SRAT.acpihmat
+
+diff --git a/tests/bios-tables-test-allowed-diff.h b/tests/bios-tables-test-allowed-diff.h
+index dfb8523c8b..3c9e0c979b 100644
+--- a/tests/bios-tables-test-allowed-diff.h
++++ b/tests/bios-tables-test-allowed-diff.h
+@@ -1 +1,9 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/pc/APIC.acpihmat",
++"tests/data/acpi/pc/SRAT.acpihmat",
++"tests/data/acpi/pc/HMAT.acpihmat",
++"tests/data/acpi/pc/DSDT.acpihmat",
++"tests/data/acpi/q35/APIC.acpihmat",
++"tests/data/acpi/q35/SRAT.acpihmat",
++"tests/data/acpi/q35/HMAT.acpihmat",
++"tests/data/acpi/q35/DSDT.acpihmat",
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 79f5da092f..9fab1d0459 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -947,6 +947,48 @@ static void test_acpi_virt_tcg_numamem(void)
+ 
+ }
+ 
++static void test_acpi_tcg_acpi_hmat(const char *machine)
++{
++    test_data data;
++
++    memset(&data, 0, sizeof(data));
++    data.machine = machine;
++    data.variant = ".acpihmat";
++    test_acpi_one(" -machine hmat=on"
++                  " -smp 2,sockets=2"
++                  " -m 128M,slots=2,maxmem=1G"
++                  " -object memory-backend-ram,size=64M,id=m0"
++                  " -object memory-backend-ram,size=64M,id=m1"
++                  " -numa node,nodeid=0,memdev=m0"
++                  " -numa node,nodeid=1,memdev=m1,initiator=0"
++                  " -numa cpu,node-id=0,socket-id=0"
++                  " -numa cpu,node-id=0,socket-id=1"
++                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
++                  "data-type=access-latency,latency=1ns"
++                  " -numa hmat-lb,initiator=0,target=0,hierarchy=memory,"
++                  "data-type=access-bandwidth,bandwidth=65534M"
++                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
++                  "data-type=access-latency,latency=65534ns"
++                  " -numa hmat-lb,initiator=0,target=1,hierarchy=memory,"
++                  "data-type=access-bandwidth,bandwidth=32767M"
++                  " -numa hmat-cache,node-id=0,size=10K,level=1,assoc=direct,"
++                  "policy=write-back,line=8"
++                  " -numa hmat-cache,node-id=1,size=10K,level=1,assoc=direct,"
++                  "policy=write-back,line=8",
++                  &data);
++    free_test_data(&data);
++}
++
++static void test_acpi_q35_tcg_acpi_hmat(void)
++{
++    test_acpi_tcg_acpi_hmat(MACHINE_Q35);
++}
++
++static void test_acpi_piix4_tcg_acpi_hmat(void)
++{
++    test_acpi_tcg_acpi_hmat(MACHINE_PC);
++}
++
+ static void test_acpi_virt_tcg(void)
+ {
+     test_data data = {
+@@ -991,6 +1033,8 @@ int main(int argc, char *argv[])
+         qtest_add_func("acpi/q35/numamem", test_acpi_q35_tcg_numamem);
+         qtest_add_func("acpi/piix4/dimmpxm", test_acpi_piix4_tcg_dimm_pxm);
+         qtest_add_func("acpi/q35/dimmpxm", test_acpi_q35_tcg_dimm_pxm);
++        qtest_add_func("acpi/piix4/acpihmat", test_acpi_piix4_tcg_acpi_hmat);
++        qtest_add_func("acpi/q35/acpihmat", test_acpi_q35_tcg_acpi_hmat);
+     } else if (strcmp(arch, "aarch64") == 0) {
+         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+         qtest_add_func("acpi/virt/numamem", test_acpi_virt_tcg_numamem);
+diff --git a/tests/data/acpi/pc/APIC.acpihmat b/tests/data/acpi/pc/APIC.acpihmat
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/data/acpi/pc/DSDT.acpihmat b/tests/data/acpi/pc/DSDT.acpihmat
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/data/acpi/pc/HMAT.acpihmat b/tests/data/acpi/pc/HMAT.acpihmat
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/data/acpi/pc/SRAT.acpihmat b/tests/data/acpi/pc/SRAT.acpihmat
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/data/acpi/q35/APIC.acpihmat b/tests/data/acpi/q35/APIC.acpihmat
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/data/acpi/q35/DSDT.acpihmat b/tests/data/acpi/q35/DSDT.acpihmat
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/data/acpi/q35/HMAT.acpihmat b/tests/data/acpi/q35/HMAT.acpihmat
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/data/acpi/q35/SRAT.acpihmat b/tests/data/acpi/q35/SRAT.acpihmat
+new file mode 100644
+index 0000000000..e69de29bb2
+-- 
+2.20.1
 
 
