@@ -2,85 +2,94 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF19C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07467C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:07:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B64812071B
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:06:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5XIoTgF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B64812071B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C97F420706
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:07:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C97F420706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51392 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY9Zj-0007tl-U4
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 09:06:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59277)
+	id 1iY9ah-0000hp-06
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 09:07:19 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58518)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <armbru@redhat.com>) id 1iY9Ym-0006ln-9g
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:05:21 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iY9U2-0001Ty-0E
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:00:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <armbru@redhat.com>) id 1iY9Yh-0007VV-0z
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:05:19 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:52680
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <armbru@redhat.com>) id 1iY9Yg-0007UM-Ta
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:05:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574431513;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YjR+Fg4HQa5PPZ47+ey4GLbi05qA4Dkl/H2YEiRdRSU=;
- b=E5XIoTgFbJZTpQRvf3+Tu3fx9Z6EEuxMGOwsGVEnPLUGqiKt0rCsf3jN6t5UgS7G0htg0e
- 4LsL+qSA8tGjocFrJFssMdYAd8W/22AjTZ5HyO7GxVWUddU8NJTvqa6zC7a2d7cZWuM7+X
- ITL7kvtNZuHXC/uWAjpXpF60+LVfer4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-o0vvkV49OfaCYkLHrfa2RQ-1; Fri, 22 Nov 2019 09:05:09 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 930361050905;
- Fri, 22 Nov 2019 14:05:08 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-116-134.ams2.redhat.com
- [10.36.116.134])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E69C2600C6;
- Fri, 22 Nov 2019 14:05:07 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 61FA11138606; Fri, 22 Nov 2019 15:05:06 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Juan Quintela <quintela@redhat.com>
-Subject: Re: [PATCH v3 1/2] migration: Fix incorrect integer->float conversion
- caught by clang
-References: <20191122080039.12771-1-armbru@redhat.com>
- <20191122080039.12771-2-armbru@redhat.com> <87zhgoi93z.fsf@trasno.org>
-Date: Fri, 22 Nov 2019 15:05:06 +0100
-In-Reply-To: <87zhgoi93z.fsf@trasno.org> (Juan Quintela's message of "Fri, 22
- Nov 2019 09:54:56 +0100")
-Message-ID: <87r220qa5p.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.2 (gnu/linux)
+ (envelope-from <frankja@linux.ibm.com>) id 1iY9Tw-0005MX-QC
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:00:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4022)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iY9Tw-0005J1-0m
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:00:20 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAMDr3uG072263
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 09:00:16 -0500
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wdqmjaj96-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 09:00:16 -0500
+Received: from localhost
+ by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Fri, 22 Nov 2019 14:00:14 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+ by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 22 Nov 2019 14:00:11 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAME0ABF52101230
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 22 Nov 2019 14:00:10 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 252F911C075;
+ Fri, 22 Nov 2019 14:00:10 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5BCC211C06E;
+ Fri, 22 Nov 2019 14:00:08 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.41.23])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 22 Nov 2019 14:00:08 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 1/5] s390x: Don't do a normal reset on the initial cpu
+Date: Fri, 22 Nov 2019 08:59:58 -0500
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191122140002.42972-1-frankja@linux.ibm.com>
+References: <20191122140002.42972-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: o0vvkV49OfaCYkLHrfa2RQ-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19112214-0008-0000-0000-00000336291B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112214-0009-0000-0000-00004A5556E7
+Message-Id: <20191122140002.42972-2-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-22_02:2019-11-21,2019-11-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0
+ lowpriorityscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501
+ suspectscore=1 impostorscore=0 mlxscore=0 clxscore=1015 spamscore=0
+ phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1910280000 definitions=main-1911220124
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.156.1
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -92,41 +101,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fangrui Song <i@maskray.me>, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, dgilbert@redhat.com
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Juan Quintela <quintela@redhat.com> writes:
+The initiating cpu needs to be reset with an initial reset. While
+doing a normal reset followed by a initial reset is not wron per-se,
+the Ultravisor will only allow the correct reset to be performed.
 
-> Markus Armbruster <armbru@redhat.com> wrote:
->> From: Fangrui Song <i@maskray.me>
->>
->> Clang does not like qmp_migrate_set_downtime()'s code to clamp double
->> @value to 0..INT64_MAX:
->>
->>     qemu/migration/migration.c:2038:24: error: implicit conversion from =
-'long' to 'double' changes value from 9223372036854775807 to 92233720368547=
-75808 [-Werror,-Wimplicit-int-float-conversion]
->>
->> The warning will be enabled by default in clang 10. It is not
->> available for clang <=3D 9.
->>
->> The clamp is actually useless; @value is checked to be within
->> 0..MAX_MIGRATE_DOWNTIME_SECONDS immediately before.  Delete it.
->>
->> While there, make the conversion from double to int64_t explicit.
->>
->> Signed-off-by: Fangrui Song <i@maskray.me>
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->> [Patch split, commit message improved]
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
->
-> Should I get this through migration tree, or are you going to pull it?
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+---
+ hw/s390x/s390-virtio-ccw.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Plase take this patch through the migration tree.
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index d3edeef0ad..c1d1440272 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -348,6 +348,9 @@ static void s390_machine_reset(MachineState *machine)
+         break;
+     case S390_RESET_LOAD_NORMAL:
+         CPU_FOREACH(t) {
++            if (t == cs) {
++                continue;
++            }
+             run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
+         }
+         subsystem_reset();
+-- 
+2.20.1
 
 
