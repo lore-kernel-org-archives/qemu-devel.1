@@ -2,63 +2,128 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D7DAC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:25:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A9BEC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:28:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64D4A2068F
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:25:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64D4A2068F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 20DBD2068F
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:28:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z+mDBg96"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20DBD2068F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53892 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYDci-0002vS-3V
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 13:25:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37723)
+	id 1iYDfM-000552-9X
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 13:28:24 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58209)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <clg@kaod.org>) id 1iYDUd-0000Te-If
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:17:21 -0500
+ (envelope-from <david@redhat.com>) id 1iYCYc-00015k-4T
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 12:17:23 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <clg@kaod.org>) id 1iYDUc-00042N-2U
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:17:19 -0500
-Received: from 3.mo5.mail-out.ovh.net ([46.105.40.108]:44578)
+ (envelope-from <david@redhat.com>) id 1iYCYa-00007o-Hn
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 12:17:21 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54142
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <clg@kaod.org>) id 1iYDUb-000406-RU
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:17:18 -0500
-Received: from player729.ha.ovh.net (unknown [10.109.146.5])
- by mo5.mail-out.ovh.net (Postfix) with ESMTP id A223425BAD7
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 19:17:14 +0100 (CET)
-Received: from kaod.org (lfbn-1-2229-223.w90-76.abo.wanadoo.fr [90.76.50.223])
- (Authenticated sender: clg@kaod.org)
- by player729.ha.ovh.net (Postfix) with ESMTPSA id 0F301C992A3F;
- Fri, 22 Nov 2019 18:17:09 +0000 (UTC)
-Subject: Re: [PATCH for-5.0 v5 00/23] ppc/pnv: add XIVE support for KVM guests
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20191115162436.30548-1-clg@kaod.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <3a76eea8-9009-8762-be89-c2c045db8721@kaod.org>
-Date: Fri, 22 Nov 2019 19:17:05 +0100
+ (Exim 4.71) (envelope-from <david@redhat.com>) id 1iYCYa-00007J-D9
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 12:17:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574443038;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=tws7WXlNLey9MJ33mTujEovIZPFCPiqaJJ/p3Sr0xNw=;
+ b=Z+mDBg96Kh4cn+3mPbcTPGd/M9Q9jcgeIgA82AkBNQ9kGWbZikhfeBRlJ3SuJulUrBUIrR
+ BqABDw6WqZksCcazfDIeUsMrB4C0CWBXnlT9g1hK+QqUrK6Ei254XTpb21PRgNwU8xY1N8
+ cSMWEadysTspndm5s/um88OI64dOy5A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-353-w6cgXqIBM3-tSP3JC7FzhA-1; Fri, 22 Nov 2019 12:17:15 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F6992F2E;
+ Fri, 22 Nov 2019 17:17:12 +0000 (UTC)
+Received: from [10.36.116.86] (ovpn-116-86.ams2.redhat.com [10.36.116.86])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 30ED244FBC;
+ Fri, 22 Nov 2019 17:17:10 +0000 (UTC)
+Subject: Re: [PATCH v2 4/5] s390x: Move clear reset
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20191122140002.42972-1-frankja@linux.ibm.com>
+ <20191122140002.42972-5-frankja@linux.ibm.com>
+ <13192666-7c97-f3fd-fa8d-84a037dae286@redhat.com>
+ <34b86085-2de3-52b6-8353-574a258b5056@linux.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <c08b4361-95a0-c490-c12e-080c728f855a@redhat.com>
+Date: Fri, 22 Nov 2019 18:17:09 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191115162436.30548-1-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <34b86085-2de3-52b6-8353-574a258b5056@linux.ibm.com>
 Content-Language: en-US
-X-Ovh-Tracer-Id: 2750010522864225107
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehgedguddutdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjqdffgfeufgfipdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgsehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkpheptddrtddrtddrtddpledtrdejiedrhedtrddvvdefnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehplhgrhigvrhejvdelrdhhrgdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrghenucevlhhushhtvghrufhiiigvpedt
-Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: w6cgXqIBM3-tSP3JC7FzhA-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 46.105.40.108
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,90 +135,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/11/2019 17:24, C=C3=A9dric Le Goater wrote:
-> Hello,
->=20
-> The QEMU PowerNV machine emulates a baremetal OpenPOWER system and
-> acts as an hypervisor (L0). Supporting emulation of KVM to run guests
-> (L1) requires a few more extensions, among which guest support for the
-> XIVE interrupt controller on POWER9 processor.
->=20
-> The following changes extend the XIVE models with the new XiveFabric
-> and XivePresenter interfaces to provide support for XIVE escalations
-> and interrupt resend. This mechanism is used by XIVE to notify the
-> hypervisor that a vCPU is not dispatched on a HW thread. Tested on a
-> QEMU PowerNV machine and a simple QEMU pseries guest doing network on
-> a local bridge.
->=20
-> The XIVE interrupt controller offers a way to increase the XIVE
-> resources per chip by configuring multiple XIVE blocks on a chip. This
-> is not currently supported by the model. However, some configurations,
-> such as OPAL/skiboot, use one block-per-chip configuration with some
-> optimizations. One of them is to override the hardwired chip ID by the
-> block id in the PowerBUS operations and for CAM line compares. This
-> patchset improves the support for this setup. Tested with 4 chips.
->=20
-> A series from Suraj adding guest support in the Radix MMU model of the
-> QEMU PowerNV machine is still required and will be send later. The
-> whole patchset can be found under :
->=20
->   https://github.com/legoater/qemu/tree/powernv-4.2
+On 22.11.19 18:15, Janosch Frank wrote:
+> On 11/22/19 3:30 PM, David Hildenbrand wrote:
+>> On 22.11.19 15:00, Janosch Frank wrote:
+>>> Let's also move the clear reset function into the reset handler.
+>>>
+>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+>>> ---
+>>>  target/s390x/cpu-qom.h |  1 +
+>>>  target/s390x/cpu.c     | 50 ++++++++----------------------------------
+>>>  2 files changed, 10 insertions(+), 41 deletions(-)
+>>>
+>>> diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
+>>> index 6f0a12042e..dbe5346ec9 100644
+>>> --- a/target/s390x/cpu-qom.h
+>>> +++ b/target/s390x/cpu-qom.h
+>>> @@ -37,6 +37,7 @@ typedef struct S390CPUDef S390CPUDef;
+>>>  typedef enum cpu_reset_type {
+>>>      S390_CPU_RESET_NORMAL,
+>>>      S390_CPU_RESET_INITIAL,
+>>> +    S390_CPU_RESET_CLEAR,
+>>>  } cpu_reset_type;
+>>>  
+>>>  /**
+>>> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+>>> index 1f423fb676..017181fe4a 100644
+>>> --- a/target/s390x/cpu.c
+>>> +++ b/target/s390x/cpu.c
+>>> @@ -94,6 +94,9 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
+>>>      s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+>>>  
+>>>      switch (type) {
+>>> +    case S390_CPU_RESET_CLEAR:
+>>> +        memset(env, 0, offsetof(CPUS390XState, start_initial_reset_fields));
+>>
+>> I think the preferred term in QEMU is "fall through".
+>>
+>>> +        /* Fallthrough */
+>>>      case S390_CPU_RESET_INITIAL:
+>>>          /* initial reset does not clear everything! */
+>>>          memset(&env->start_initial_reset_fields, 0,
+>>> @@ -121,46 +124,6 @@ static void s390_cpu_reset(CPUState *s, cpu_reset_type type)
+>>>      }
+>>>  }
+>>>  
+>>> -/* CPUClass:reset() */
+>>> -static void s390_cpu_full_reset(CPUState *s)
+>>> -{
+>>> -    S390CPU *cpu = S390_CPU(s);
+>>> -    S390CPUClass *scc = S390_CPU_GET_CLASS(cpu);
+>>> -    CPUS390XState *env = &cpu->env;
+>>> -
+>>> -    scc->parent_reset(s);
+>>> -    cpu->env.sigp_order = 0;
+>>> -    s390_cpu_set_state(S390_CPU_STATE_STOPPED, cpu);
+>>> -
+>>> -    memset(env, 0, offsetof(CPUS390XState, end_reset_fields));
+>>> -
+>>> -    /* architectured initial values for CR 0 and 14 */
+>>> -    env->cregs[0] = CR0_RESET;
+>>> -    env->cregs[14] = CR14_RESET;
+>>> -
+>>> -#if defined(CONFIG_USER_ONLY)
+>>> -    /* user mode should always be allowed to use the full FPU */
+>>> -    env->cregs[0] |= CR0_AFP;
+>>> -    if (s390_has_feat(S390_FEAT_VECTOR)) {
+>>> -        env->cregs[0] |= CR0_VECTOR;
+>>> -    }
+>>> -#endif
+>>
+>> Huh, what happened to that change?
+> 
+> Btw., wouldn't we need that for both initial and clear reset?
 
-
- [ ... ]
-
-> C=C3=A9dric Le Goater (23):
->   ppc/xive: Record the IPB in the associated NVT
->   ppc/xive: Introduce helpers for the NVT id
->   ppc/pnv: Remove pnv_xive_vst_size() routine
->   ppc/pnv: Dump the XIVE NVT table
->   ppc/pnv: Quiesce some XIVE errors
->   ppc/xive: Introduce OS CAM line helpers
->   ppc/xive: Check V bit in TM_PULL_POOL_CTX
->   ppc/xive: Introduce a XivePresenter interface
->   ppc/xive: Implement the XivePresenter interface
-
-David,
-
-I have reworked the following patches to address Greg's comments=20
-and your comment on "ppc/pnv: Dump the XIVE NVT table".=20
-
-Shall I wait for some feedback from you or just resend ?=20
+user-only only does a cpu reset when starting up to initialize the cpu.
+no other resets will be triggered.
+-- 
 
 Thanks,
 
-C.
-
->   ppc/pnv: Loop on the threads of the chip to find a matching NVT
->   ppc/pnv: Introduce a pnv_xive_is_cpu_enabled() helper
->   ppc/xive: Introduce a XiveFabric interface
->   ppc/pnv: Implement the XiveFabric interface
->   ppc/spapr: Implement the XiveFabric interface
->   ppc/xive: Use the XiveFabric and XivePresenter interfaces
->   ppc/xive: Extend the TIMA operation with a XivePresenter parameter
->   ppc/pnv: Clarify how the TIMA is accessed on a multichip system
->   ppc/xive: Move the TIMA operations to the controller model
->   ppc/xive: Remove the get_tctx() XiveRouter handler
->   ppc/xive: Introduce a xive_tctx_ipb_update() helper
->   ppc/xive: Synthesize interrupt from the saved IPB in the NVT
->   ppc/pnv: Introduce a pnv_xive_block_id() helper
->   ppc/pnv: Extend XiveRouter with a get_block_id() handler
->=20
->  include/hw/ppc/pnv.h       |  15 ++
->  include/hw/ppc/pnv_xive.h  |   3 -
->  include/hw/ppc/xive.h      |  72 ++++++--
->  include/hw/ppc/xive_regs.h |  24 +++
->  hw/intc/pnv_xive.c         | 360 ++++++++++++++++++++++++-------------
->  hw/intc/spapr_xive.c       |  88 ++++++++-
->  hw/intc/xive.c             | 350 ++++++++++++++++++++----------------
->  hw/ppc/pnv.c               |  37 +++-
->  hw/ppc/spapr.c             |  36 ++++
->  9 files changed, 691 insertions(+), 294 deletions(-)
->=20
+David / dhildenb
 
 
