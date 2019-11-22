@@ -2,94 +2,63 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07467C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D04C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:08:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C97F420706
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:07:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C97F420706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5783920706
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 14:08:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5783920706
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY9ah-0000hp-06
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 09:07:19 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58518)
+	id 1iY9c9-0002Xp-IP
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 09:08:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59622)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iY9U2-0001Ty-0E
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:00:31 -0500
+ (envelope-from <groug@kaod.org>) id 1iY9ah-0000qM-As
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:07:20 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iY9Tw-0005MX-QC
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:00:25 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4022)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iY9Tw-0005J1-0m
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:00:20 -0500
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xAMDr3uG072263
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 09:00:16 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wdqmjaj96-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 09:00:16 -0500
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Fri, 22 Nov 2019 14:00:14 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 22 Nov 2019 14:00:11 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- xAME0ABF52101230
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 22 Nov 2019 14:00:10 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 252F911C075;
- Fri, 22 Nov 2019 14:00:10 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 5BCC211C06E;
- Fri, 22 Nov 2019 14:00:08 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.41.23])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 22 Nov 2019 14:00:08 +0000 (GMT)
-From: Janosch Frank <frankja@linux.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/5] s390x: Don't do a normal reset on the initial cpu
-Date: Fri, 22 Nov 2019 08:59:58 -0500
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122140002.42972-1-frankja@linux.ibm.com>
-References: <20191122140002.42972-1-frankja@linux.ibm.com>
+ (envelope-from <groug@kaod.org>) id 1iY9af-000084-UJ
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:07:19 -0500
+Received: from 8.mo178.mail-out.ovh.net ([46.105.74.227]:47092)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iY9af-00005n-NV
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 09:07:17 -0500
+Received: from player696.ha.ovh.net (unknown [10.109.159.157])
+ by mo178.mail-out.ovh.net (Postfix) with ESMTP id 124F0807E5
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 15:07:14 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player696.ha.ovh.net (Postfix) with ESMTPSA id 9CE43C7DD11D;
+ Fri, 22 Nov 2019 14:07:09 +0000 (UTC)
+Date: Fri, 22 Nov 2019 15:07:08 +0100
+From: Greg Kurz <groug@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Subject: Re: [PATCH for-5.0 v5 19/23] ppc/xive: Remove the get_tctx()
+ XiveRouter handler
+Message-ID: <20191122150708.2f21714f@bahia.lan>
+In-Reply-To: <20191115162436.30548-20-clg@kaod.org>
+References: <20191115162436.30548-1-clg@kaod.org>
+ <20191115162436.30548-20-clg@kaod.org>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19112214-0008-0000-0000-00000336291B
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112214-0009-0000-0000-00004A5556E7
-Message-Id: <20191122140002.42972-2-frankja@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-22_02:2019-11-21,2019-11-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0
- lowpriorityscore=0 adultscore=0 mlxlogscore=999 priorityscore=1501
- suspectscore=1 impostorscore=0 mlxscore=0 clxscore=1015 spamscore=0
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1911220124
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.156.1
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Ovh-Tracer-Id: 16974629946903271819
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehgedgheekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrieeliedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.74.227
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -101,37 +70,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The initiating cpu needs to be reset with an initial reset. While
-doing a normal reset followed by a initial reset is not wron per-se,
-the Ultravisor will only allow the correct reset to be performed.
+On Fri, 15 Nov 2019 17:24:32 +0100
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-Reviewed-by: David Hildenbrand <david@redhat.com>
----
- hw/s390x/s390-virtio-ccw.c | 3 +++
- 1 file changed, 3 insertions(+)
+> It is now unused.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index d3edeef0ad..c1d1440272 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -348,6 +348,9 @@ static void s390_machine_reset(MachineState *machine)
-         break;
-     case S390_RESET_LOAD_NORMAL:
-         CPU_FOREACH(t) {
-+            if (t == cs) {
-+                continue;
-+            }
-             run_on_cpu(t, s390_do_cpu_reset, RUN_ON_CPU_NULL);
-         }
-         subsystem_reset();
--- 
-2.20.1
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+>  include/hw/ppc/xive.h |  2 --
+>  hw/intc/pnv_xive.c    | 13 -------------
+>  hw/intc/spapr_xive.c  |  8 --------
+>  hw/intc/xive.c        |  7 -------
+>  4 files changed, 30 deletions(-)
+>=20
+> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
+> index dcf897451589..24315480e7c2 100644
+> --- a/include/hw/ppc/xive.h
+> +++ b/include/hw/ppc/xive.h
+> @@ -351,7 +351,6 @@ typedef struct XiveRouterClass {
+>                     XiveNVT *nvt);
+>      int (*write_nvt)(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nvt_idx,
+>                       XiveNVT *nvt, uint8_t word_number);
+> -    XiveTCTX *(*get_tctx)(XiveRouter *xrtr, CPUState *cs);
+>  } XiveRouterClass;
+> =20
+>  int xive_router_get_eas(XiveRouter *xrtr, uint8_t eas_blk, uint32_t eas_=
+idx,
+> @@ -364,7 +363,6 @@ int xive_router_get_nvt(XiveRouter *xrtr, uint8_t nvt=
+_blk, uint32_t nvt_idx,
+>                          XiveNVT *nvt);
+>  int xive_router_write_nvt(XiveRouter *xrtr, uint8_t nvt_blk, uint32_t nv=
+t_idx,
+>                            XiveNVT *nvt, uint8_t word_number);
+> -XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs);
+>  void xive_router_notify(XiveNotifier *xn, uint32_t lisn);
+> =20
+>  /*
+> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
+> index 4501c671d8df..2e568721b44e 100644
+> --- a/hw/intc/pnv_xive.c
+> +++ b/hw/intc/pnv_xive.c
+> @@ -467,18 +467,6 @@ static PnvXive *pnv_xive_tm_get_xive(PowerPCCPU *cpu)
+>      return xive;
+>  }
+> =20
+> -static XiveTCTX *pnv_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
+> -{
+> -    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> -    PnvXive *xive =3D pnv_xive_tm_get_xive(cpu);
+> -
+> -    if (!xive) {
+> -        return NULL;
+> -    }
+> -
+> -    return XIVE_TCTX(pnv_cpu_state(cpu)->intc);
+> -}
+> -
+>  /*
+>   * The internal sources (IPIs) of the interrupt controller have no
+>   * knowledge of the XIVE chip on which they reside. Encode the block
+> @@ -1936,7 +1924,6 @@ static void pnv_xive_class_init(ObjectClass *klass,=
+ void *data)
+>      xrc->write_end =3D pnv_xive_write_end;
+>      xrc->get_nvt =3D pnv_xive_get_nvt;
+>      xrc->write_nvt =3D pnv_xive_write_nvt;
+> -    xrc->get_tctx =3D pnv_xive_get_tctx;
+> =20
+>      xnc->notify =3D pnv_xive_notify;
+>      xpc->match_nvt  =3D pnv_xive_match_nvt;
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 6292da58f62c..1542cef91878 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -427,13 +427,6 @@ static int spapr_xive_write_nvt(XiveRouter *xrtr, ui=
+nt8_t nvt_blk,
+>      g_assert_not_reached();
+>  }
+> =20
+> -static XiveTCTX *spapr_xive_get_tctx(XiveRouter *xrtr, CPUState *cs)
+> -{
+> -    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> -
+> -    return spapr_cpu_state(cpu)->tctx;
+> -}
+> -
+>  static int spapr_xive_match_nvt(XivePresenter *xptr, uint8_t format,
+>                                  uint8_t nvt_blk, uint32_t nvt_idx,
+>                                  bool cam_ignore, uint8_t priority,
+> @@ -771,7 +764,6 @@ static void spapr_xive_class_init(ObjectClass *klass,=
+ void *data)
+>      xrc->write_end =3D spapr_xive_write_end;
+>      xrc->get_nvt =3D spapr_xive_get_nvt;
+>      xrc->write_nvt =3D spapr_xive_write_nvt;
+> -    xrc->get_tctx =3D spapr_xive_get_tctx;
+> =20
+>      sicc->activate =3D spapr_xive_activate;
+>      sicc->deactivate =3D spapr_xive_deactivate;
+> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
+> index ab779c4c2a0f..e576a1e4ba9c 100644
+> --- a/hw/intc/xive.c
+> +++ b/hw/intc/xive.c
+> @@ -1317,13 +1317,6 @@ int xive_router_write_nvt(XiveRouter *xrtr, uint8_=
+t nvt_blk, uint32_t nvt_idx,
+>     return xrc->write_nvt(xrtr, nvt_blk, nvt_idx, nvt, word_number);
+>  }
+> =20
+> -XiveTCTX *xive_router_get_tctx(XiveRouter *xrtr, CPUState *cs)
+> -{
+> -    XiveRouterClass *xrc =3D XIVE_ROUTER_GET_CLASS(xrtr);
+> -
+> -    return xrc->get_tctx(xrtr, cs);
+> -}
+> -
+>  /*
+>   * Encode the HW CAM line in the block group mode format :
+>   *
 
 
