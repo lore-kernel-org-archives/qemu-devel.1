@@ -2,61 +2,95 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10ABDC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:56:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44518C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:56:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D858420659
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:56:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D858420659
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 18F4520659
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:56:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18F4520659
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48028 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY3o1-0005uv-IC
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 02:56:41 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39519)
+	id 1iY3o9-00065o-Rm
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 02:56:49 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40409)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iY3gQ-0005PP-4z
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:48:51 -0500
+ (envelope-from <frankja@linux.ibm.com>) id 1iY3kV-0002TR-2N
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:53:05 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iY3gO-0002nw-Fq
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:48:49 -0500
-Received: from mga18.intel.com ([134.134.136.126]:36768)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iY3gO-0002kF-46
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:48:48 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
- by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Nov 2019 23:48:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,229,1571727600"; d="scan'208";a="210178498"
-Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by orsmga003.jf.intel.com with ESMTP; 21 Nov 2019 23:48:44 -0800
-From: Tao Xu <tao3.xu@intel.com>
-To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
- ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
- sw@weilnetz.de, mdroth@linux.vnet.ibm.com, thuth@redhat.com,
- lvivier@redhat.com
-Subject: [PATCH v17 05/14] qapi: Add builtin type time
-Date: Fri, 22 Nov 2019 15:48:17 +0800
-Message-Id: <20191122074826.1373-6-tao3.xu@intel.com>
+ (envelope-from <frankja@linux.ibm.com>) id 1iY3kT-0004Ta-T0
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:53:02 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47482
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
+ id 1iY3kT-0004TC-Oh
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:53:01 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ xAM7mAlh063289
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 02:53:01 -0500
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 2wdkdff3qv-1
+ (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 02:53:01 -0500
+Received: from localhost
+ by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+ Violators will be prosecuted
+ for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
+ Fri, 22 Nov 2019 07:52:59 -0000
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+ by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway:
+ Authorized Use Only! Violators will be prosecuted; 
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+ Fri, 22 Nov 2019 07:52:57 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
+ [9.149.105.61])
+ by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ xAM7qtmY50069650
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 22 Nov 2019 07:52:55 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6972011C050;
+ Fri, 22 Nov 2019 07:52:55 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5934011C05B;
+ Fri, 22 Nov 2019 07:52:53 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.145.41.23])
+ by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Fri, 22 Nov 2019 07:52:53 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 4/4] s390x: Beautify machine reset
+Date: Fri, 22 Nov 2019 02:52:18 -0500
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122074826.1373-1-tao3.xu@intel.com>
-References: <20191122074826.1373-1-tao3.xu@intel.com>
+In-Reply-To: <20191122075218.23935-1-frankja@linux.ibm.com>
+References: <20191122075218.23935-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 134.134.136.126
+X-TM-AS-GCONF: 00
+x-cbid: 19112207-4275-0000-0000-00000384C27D
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19112207-4276-0000-0000-000038984231
+Message-Id: <20191122075218.23935-5-frankja@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
+ definitions=2019-11-21_07:2019-11-21,2019-11-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 mlxlogscore=999
+ adultscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0 impostorscore=0
+ suspectscore=1 malwarescore=0 priorityscore=1501 bulkscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
+ definitions=main-1911220068
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
+X-Received-From: 148.163.158.5
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -68,189 +102,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: jingqi.liu@intel.com, tao3.xu@intel.com, fan.du@intel.com,
- qemu-devel@nongnu.org, jonathan.cameron@huawei.com
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add optional builtin type time, fallback is uint64. This type use
-qemu_strtotime_ns() for pre-converting time suffix to numbers.
+* Add comments that tell you which diag308 subcode caused the reset
+* Sort by diag308 reset subcode
 
-Signed-off-by: Tao Xu <tao3.xu@intel.com>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
+ hw/s390x/s390-virtio-ccw.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-No changes in v17.
-
-Changes in v14:
-    - Drop time unit picosecond (Eric)
----
- include/qapi/visitor-impl.h  |  4 ++++
- include/qapi/visitor.h       |  8 ++++++++
- qapi/opts-visitor.c          | 22 ++++++++++++++++++++++
- qapi/qapi-visit-core.c       | 12 ++++++++++++
- qapi/qobject-input-visitor.c | 18 ++++++++++++++++++
- qapi/trace-events            |  1 +
- scripts/qapi/schema.py       |  1 +
- 7 files changed, 66 insertions(+)
-
-diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
-index 8ccb3b6c20..e0979563c7 100644
---- a/include/qapi/visitor-impl.h
-+++ b/include/qapi/visitor-impl.h
-@@ -88,6 +88,10 @@ struct Visitor
-     void (*type_size)(Visitor *v, const char *name, uint64_t *obj,
-                       Error **errp);
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index c1d1440272..88f7758721 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -330,15 +330,7 @@ static void s390_machine_reset(MachineState *machine)
+     s390_cmma_reset();
  
-+    /* Optional; fallback is type_uint64() */
-+    void (*type_time)(Visitor *v, const char *name, uint64_t *obj,
-+                      Error **errp);
+     switch (reset_type) {
+-    case S390_RESET_EXTERNAL:
+-    case S390_RESET_REIPL:
+-        qemu_devices_reset();
+-        s390_crypto_reset();
+-
+-        /* configure and start the ipl CPU only */
+-        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
+-        break;
+-    case S390_RESET_MODIFIED_CLEAR:
++    case S390_RESET_MODIFIED_CLEAR: /* Subcode 0 */
+         CPU_FOREACH(t) {
+             run_on_cpu(t, s390_do_cpu_full_reset, RUN_ON_CPU_NULL);
+         }
+@@ -346,7 +338,7 @@ static void s390_machine_reset(MachineState *machine)
+         s390_crypto_reset();
+         run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+         break;
+-    case S390_RESET_LOAD_NORMAL:
++    case S390_RESET_LOAD_NORMAL: /* Subcode 1 */
+         CPU_FOREACH(t) {
+             if (t == cs) {
+                 continue;
+@@ -357,6 +349,14 @@ static void s390_machine_reset(MachineState *machine)
+         run_on_cpu(cs, s390_do_cpu_initial_reset, RUN_ON_CPU_NULL);
+         run_on_cpu(cs, s390_do_cpu_load_normal, RUN_ON_CPU_NULL);
+         break;
++    case S390_RESET_EXTERNAL: /* Externally triggered reboot */
++    case S390_RESET_REIPL: /* Subcode 4 */
++        qemu_devices_reset();
++        s390_crypto_reset();
 +
-     /* Must be set */
-     void (*type_bool)(Visitor *v, const char *name, bool *obj, Error **errp);
- 
-diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-index c5b23851a1..22242e706f 100644
---- a/include/qapi/visitor.h
-+++ b/include/qapi/visitor.h
-@@ -554,6 +554,14 @@ void visit_type_int64(Visitor *v, const char *name, int64_t *obj,
- void visit_type_size(Visitor *v, const char *name, uint64_t *obj,
-                      Error **errp);
- 
-+/*
-+ * Visit a uint64_t value.
-+ * Like visit_type_uint64(), except that some visitors may choose to
-+ * recognize numbers with timeunit suffix, such as "ns", "us" "ms" and "s".
-+ */
-+void visit_type_time(Visitor *v, const char *name, uint64_t *obj,
-+                     Error **errp);
-+
- /*
-  * Visit a boolean value.
-  *
-diff --git a/qapi/opts-visitor.c b/qapi/opts-visitor.c
-index 5fe0276c1c..59b575f0fc 100644
---- a/qapi/opts-visitor.c
-+++ b/qapi/opts-visitor.c
-@@ -526,6 +526,27 @@ opts_type_size(Visitor *v, const char *name, uint64_t *obj, Error **errp)
-     processed(ov, name);
- }
- 
-+static void
-+opts_type_time(Visitor *v, const char *name, uint64_t *obj, Error **errp)
-+{
-+    OptsVisitor *ov = to_ov(v);
-+    const QemuOpt *opt;
-+    int err;
-+
-+    opt = lookup_scalar(ov, name, errp);
-+    if (!opt) {
-+        return;
-+    }
-+
-+    err = qemu_strtotime_ns(opt->str ? opt->str : "", NULL, obj);
-+    if (err < 0) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE, opt->name,
-+                   "a time value");
-+        return;
-+    }
-+
-+    processed(ov, name);
-+}
- 
- static void
- opts_optional(Visitor *v, const char *name, bool *present)
-@@ -573,6 +594,7 @@ opts_visitor_new(const QemuOpts *opts)
-     ov->visitor.type_int64  = &opts_type_int64;
-     ov->visitor.type_uint64 = &opts_type_uint64;
-     ov->visitor.type_size   = &opts_type_size;
-+    ov->visitor.type_time   = &opts_type_time;
-     ov->visitor.type_bool   = &opts_type_bool;
-     ov->visitor.type_str    = &opts_type_str;
- 
-diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-index 5365561b07..ac8896455c 100644
---- a/qapi/qapi-visit-core.c
-+++ b/qapi/qapi-visit-core.c
-@@ -277,6 +277,18 @@ void visit_type_size(Visitor *v, const char *name, uint64_t *obj,
++        /* configure and start the ipl CPU only */
++        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
++        break;
+     default:
+         g_assert_not_reached();
      }
- }
- 
-+void visit_type_time(Visitor *v, const char *name, uint64_t *obj,
-+                     Error **errp)
-+{
-+    assert(obj);
-+    trace_visit_type_time(v, name, obj);
-+    if (v->type_time) {
-+        v->type_time(v, name, obj, errp);
-+    } else {
-+        v->type_uint64(v, name, obj, errp);
-+    }
-+}
-+
- void visit_type_bool(Visitor *v, const char *name, bool *obj, Error **errp)
- {
-     assert(obj);
-diff --git a/qapi/qobject-input-visitor.c b/qapi/qobject-input-visitor.c
-index 32236cbcb1..e476fe0d16 100644
---- a/qapi/qobject-input-visitor.c
-+++ b/qapi/qobject-input-visitor.c
-@@ -627,6 +627,23 @@ static void qobject_input_type_size_keyval(Visitor *v, const char *name,
-     }
- }
- 
-+static void qobject_input_type_time_keyval(Visitor *v, const char *name,
-+                                           uint64_t *obj, Error **errp)
-+{
-+    QObjectInputVisitor *qiv = to_qiv(v);
-+    const char *str = qobject_input_get_keyval(qiv, name, errp);
-+
-+    if (!str) {
-+        return;
-+    }
-+
-+    if (qemu_strtotime_ns(str, NULL, obj) < 0) {
-+        /* TODO report -ERANGE more nicely */
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   full_name(qiv, name), "time");
-+    }
-+}
-+
- static void qobject_input_optional(Visitor *v, const char *name, bool *present)
- {
-     QObjectInputVisitor *qiv = to_qiv(v);
-@@ -708,6 +725,7 @@ Visitor *qobject_input_visitor_new_keyval(QObject *obj)
-     v->visitor.type_any = qobject_input_type_any;
-     v->visitor.type_null = qobject_input_type_null;
-     v->visitor.type_size = qobject_input_type_size_keyval;
-+    v->visitor.type_time = qobject_input_type_time_keyval;
-     v->keyval = true;
- 
-     return &v->visitor;
-diff --git a/qapi/trace-events b/qapi/trace-events
-index 5eb4afa110..c4605a7ccc 100644
---- a/qapi/trace-events
-+++ b/qapi/trace-events
-@@ -29,6 +29,7 @@ visit_type_int16(void *v, const char *name, int16_t *obj) "v=%p name=%s obj=%p"
- visit_type_int32(void *v, const char *name, int32_t *obj) "v=%p name=%s obj=%p"
- visit_type_int64(void *v, const char *name, int64_t *obj) "v=%p name=%s obj=%p"
- visit_type_size(void *v, const char *name, uint64_t *obj) "v=%p name=%s obj=%p"
-+visit_type_time(void *v, const char *name, uint64_t *obj) "v=%p name=%s obj=%p"
- visit_type_bool(void *v, const char *name, bool *obj) "v=%p name=%s obj=%p"
- visit_type_str(void *v, const char *name, char **obj) "v=%p name=%s obj=%p"
- visit_type_number(void *v, const char *name, void *obj) "v=%p name=%s obj=%p"
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index cf0045f34e..210be64909 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -855,6 +855,7 @@ class QAPISchema(object):
-                   ('uint32', 'int',     'uint32_t'),
-                   ('uint64', 'int',     'uint64_t'),
-                   ('size',   'int',     'uint64_t'),
-+                  ('time',   'int',     'uint64_t'),
-                   ('bool',   'boolean', 'bool'),
-                   ('any',    'value',   'QObject' + pointer_suffix),
-                   ('null',   'null',    'QNull' + pointer_suffix)]:
 -- 
 2.20.1
 
