@@ -2,63 +2,79 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B9B4C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D38EC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:21:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F47020658
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:18:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F47020658
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 2773720708
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:21:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aeKwlwz5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2773720708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY61V-0006TX-Ca
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 05:18:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58796)
+	id 1iY64S-0001YT-Bm
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 05:21:48 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59217)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <groug@kaod.org>) id 1iY5zl-0005MZ-VU
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:17:02 -0500
+ (envelope-from <stefanha@redhat.com>) id 1iY621-000779-Ip
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:19:18 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <groug@kaod.org>) id 1iY5zf-0006sP-9P
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:16:55 -0500
-Received: from 12.mo6.mail-out.ovh.net ([178.32.125.228]:33354)
+ (envelope-from <stefanha@redhat.com>) id 1iY61w-0000AV-AK
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:19:17 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52378
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iY5zY-0006fQ-PT
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:16:46 -0500
-Received: from player168.ha.ovh.net (unknown [10.109.160.244])
- by mo6.mail-out.ovh.net (Postfix) with ESMTP id DF0AB1EE376
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 11:16:33 +0100 (CET)
-Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
- [82.253.208.248]) (Authenticated sender: groug@kaod.org)
- by player168.ha.ovh.net (Postfix) with ESMTPSA id CC6A4C5168FC;
- Fri, 22 Nov 2019 10:16:29 +0000 (UTC)
-Date: Fri, 22 Nov 2019 11:16:27 +0100
-From: Greg Kurz <groug@kaod.org>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Subject: Re: [PATCH for-5.0 v5 16/23] ppc/xive: Extend the TIMA operation
- with a XivePresenter parameter
-Message-ID: <20191122111627.5812c34b@bahia.lan>
-In-Reply-To: <20191115162436.30548-17-clg@kaod.org>
-References: <20191115162436.30548-1-clg@kaod.org>
- <20191115162436.30548-17-clg@kaod.org>
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iY61w-0000A7-5o
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:19:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574417951;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=fKz6EwtPkz9w4YV8v08pcDeP8Ex1Xk7zSoshChN00M4=;
+ b=aeKwlwz5Upfaedr3VxnAMoZi7G/T4NFYlQ38feXjEiUg4gAiDVeU0QJ3OeFxDmi0bOwdgd
+ k8X3IACPiIxtclDuB5UGFm2oBVCLXGlJl6qVuA00aErjDv8zBmTKFpfurBFQ89QSti7xGr
+ buDje+ft7lPEZzg8kTVzUGhQGvR2Jqc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-365-YsxkKQ6xNC-a5P-ywpfXog-1; Fri, 22 Nov 2019 05:19:09 -0500
+X-MC-Unique: YsxkKQ6xNC-a5P-ywpfXog-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F6CB800054;
+ Fri, 22 Nov 2019 10:19:08 +0000 (UTC)
+Received: from localhost (unknown [10.36.118.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2064D6E717;
+ Fri, 22 Nov 2019 10:19:04 +0000 (UTC)
+Date: Fri, 22 Nov 2019 10:19:03 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Vivek Goyal <vgoyal@redhat.com>
+Subject: Re: [PATCH 2/4] virtiofd: Create a notification queue
+Message-ID: <20191122101903.GC464656@stefanha-x1.localdomain>
+References: <20191115205543.1816-1-vgoyal@redhat.com>
+ <20191115205543.1816-3-vgoyal@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Ovh-Tracer-Id: 13078734796566010251
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehgedgudefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrudeikedrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+In-Reply-To: <20191115205543.1816-3-vgoyal@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="B4IIlcmfBL/1gGOG"
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 178.32.125.228
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -70,280 +86,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: virtio-fs@redhat.com, miklos@szeredi.hu, qemu-devel@nongnu.org,
+ dgilbert@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 15 Nov 2019 17:24:29 +0100
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+--B4IIlcmfBL/1gGOG
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> The TIMA operations are performed on behalf of the XIVE IVPE sub-engine
-> (Presenter) on the thread interrupt context registers. The current
-> operations supported by the model are simple and do not require access
-> to the controller but more complex operations will need access to the
-> controller NVT table and to its configuration.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
+On Fri, Nov 15, 2019 at 03:55:41PM -0500, Vivek Goyal wrote:
+>  /* Callback from libvhost-user */
+>  static void fv_set_features(VuDev *dev, uint64_t features)
+>  {
+> +    struct fv_VuDev *vud =3D container_of(dev, struct fv_VuDev, dev);
+> +    struct fuse_session *se =3D vud->se;
+> +
+> +    if ((1 << VIRTIO_FS_F_NOTIFICATION) & features) {
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+For consistency 1ull should be used.  That way the reader does not have
+to check the bit position to verify that the bitmap isn't truncated at
+32 bits.
 
->  include/hw/ppc/xive.h |  7 +++---
->  hw/intc/pnv_xive.c    |  4 +--
->  hw/intc/xive.c        | 58 ++++++++++++++++++++++++-------------------
->  3 files changed, 38 insertions(+), 31 deletions(-)
->=20
-> diff --git a/include/hw/ppc/xive.h b/include/hw/ppc/xive.h
-> index b00af988779b..97bbcddb381d 100644
-> --- a/include/hw/ppc/xive.h
-> +++ b/include/hw/ppc/xive.h
-> @@ -463,9 +463,10 @@ typedef struct XiveENDSource {
->  #define XIVE_TM_USER_PAGE       0x3
-> =20
->  extern const MemoryRegionOps xive_tm_ops;
-> -void xive_tctx_tm_write(XiveTCTX *tctx, hwaddr offset, uint64_t value,
-> -                        unsigned size);
-> -uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr offset, unsigned size);
-> +void xive_tctx_tm_write(XivePresenter *xptr, XiveTCTX *tctx, hwaddr offs=
-et,
-> +                        uint64_t value, unsigned size);
-> +uint64_t xive_tctx_tm_read(XivePresenter *xptr, XiveTCTX *tctx, hwaddr o=
-ffset,
-> +                           unsigned size);
-> =20
->  void xive_tctx_pic_print_info(XiveTCTX *tctx, Monitor *mon);
->  Object *xive_tctx_create(Object *cpu, XiveRouter *xrtr, Error **errp);
-> diff --git a/hw/intc/pnv_xive.c b/hw/intc/pnv_xive.c
-> index 4c8c6e51c20f..3ee28f00694a 100644
-> --- a/hw/intc/pnv_xive.c
-> +++ b/hw/intc/pnv_xive.c
-> @@ -1436,7 +1436,7 @@ static void xive_tm_indirect_write(void *opaque, hw=
-addr offset,
->  {
->      XiveTCTX *tctx =3D pnv_xive_get_indirect_tctx(PNV_XIVE(opaque));
-> =20
-> -    xive_tctx_tm_write(tctx, offset, value, size);
-> +    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, size=
-);
+> +        vud->notify_enabled =3D true;
+> +        se->notify_enabled =3D true;
+
+Only one copy of this field is needed.  vud has a pointer to se.
+
+> +    }
 >  }
 > =20
->  static uint64_t xive_tm_indirect_read(void *opaque, hwaddr offset,
-> @@ -1444,7 +1444,7 @@ static uint64_t xive_tm_indirect_read(void *opaque,=
- hwaddr offset,
->  {
->      XiveTCTX *tctx =3D pnv_xive_get_indirect_tctx(PNV_XIVE(opaque));
-> =20
-> -    return xive_tctx_tm_read(tctx, offset, size);
-> +    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size);
->  }
-> =20
->  static const MemoryRegionOps xive_tm_indirect_ops =3D {
-> diff --git a/hw/intc/xive.c b/hw/intc/xive.c
-> index ab62bda85788..a9298783e7d2 100644
-> --- a/hw/intc/xive.c
-> +++ b/hw/intc/xive.c
-> @@ -144,19 +144,20 @@ static inline uint32_t xive_tctx_word2(uint8_t *rin=
-g)
->   * XIVE Thread Interrupt Management Area (TIMA)
->   */
-> =20
-> -static void xive_tm_set_hv_cppr(XiveTCTX *tctx, hwaddr offset,
-> -                                uint64_t value, unsigned size)
-> +static void xive_tm_set_hv_cppr(XivePresenter *xptr, XiveTCTX *tctx,
-> +                                hwaddr offset, uint64_t value, unsigned =
-size)
->  {
->      xive_tctx_set_cppr(tctx, TM_QW3_HV_PHYS, value & 0xff);
->  }
-> =20
-> -static uint64_t xive_tm_ack_hv_reg(XiveTCTX *tctx, hwaddr offset, unsign=
-ed size)
-> +static uint64_t xive_tm_ack_hv_reg(XivePresenter *xptr, XiveTCTX *tctx,
-> +                                   hwaddr offset, unsigned size)
->  {
->      return xive_tctx_accept(tctx, TM_QW3_HV_PHYS);
->  }
-> =20
-> -static uint64_t xive_tm_pull_pool_ctx(XiveTCTX *tctx, hwaddr offset,
-> -                                      unsigned size)
-> +static uint64_t xive_tm_pull_pool_ctx(XivePresenter *xptr, XiveTCTX *tct=
-x,
-> +                                      hwaddr offset, unsigned size)
->  {
->      uint32_t qw2w2_prev =3D xive_tctx_word2(&tctx->regs[TM_QW2_HV_POOL]);
->      uint32_t qw2w2;
-> @@ -166,13 +167,14 @@ static uint64_t xive_tm_pull_pool_ctx(XiveTCTX *tct=
-x, hwaddr offset,
->      return qw2w2;
->  }
-> =20
-> -static void xive_tm_vt_push(XiveTCTX *tctx, hwaddr offset,
-> +static void xive_tm_vt_push(XivePresenter *xptr, XiveTCTX *tctx, hwaddr =
-offset,
->                              uint64_t value, unsigned size)
->  {
->      tctx->regs[TM_QW3_HV_PHYS + TM_WORD2] =3D value & 0xff;
->  }
-> =20
-> -static uint64_t xive_tm_vt_poll(XiveTCTX *tctx, hwaddr offset, unsigned =
-size)
-> +static uint64_t xive_tm_vt_poll(XivePresenter *xptr, XiveTCTX *tctx,
-> +                                hwaddr offset, unsigned size)
->  {
->      return tctx->regs[TM_QW3_HV_PHYS + TM_WORD2] & 0xff;
->  }
-> @@ -315,13 +317,14 @@ static uint64_t xive_tm_raw_read(XiveTCTX *tctx, hw=
-addr offset, unsigned size)
->   * state changes (side effects) in addition to setting/returning the
->   * interrupt management area context of the processor thread.
->   */
-> -static uint64_t xive_tm_ack_os_reg(XiveTCTX *tctx, hwaddr offset, unsign=
-ed size)
-> +static uint64_t xive_tm_ack_os_reg(XivePresenter *xptr, XiveTCTX *tctx,
-> +                                   hwaddr offset, unsigned size)
->  {
->      return xive_tctx_accept(tctx, TM_QW1_OS);
->  }
-> =20
-> -static void xive_tm_set_os_cppr(XiveTCTX *tctx, hwaddr offset,
-> -                                uint64_t value, unsigned size)
-> +static void xive_tm_set_os_cppr(XivePresenter *xptr, XiveTCTX *tctx,
-> +                                hwaddr offset, uint64_t value, unsigned =
-size)
->  {
->      xive_tctx_set_cppr(tctx, TM_QW1_OS, value & 0xff);
->  }
-> @@ -330,8 +333,8 @@ static void xive_tm_set_os_cppr(XiveTCTX *tctx, hwadd=
-r offset,
->   * Adjust the IPB to allow a CPU to process event queues of other
->   * priorities during one physical interrupt cycle.
->   */
-> -static void xive_tm_set_os_pending(XiveTCTX *tctx, hwaddr offset,
-> -                                   uint64_t value, unsigned size)
-> +static void xive_tm_set_os_pending(XivePresenter *xptr, XiveTCTX *tctx,
-> +                                   hwaddr offset, uint64_t value, unsign=
-ed size)
->  {
->      ipb_update(&tctx->regs[TM_QW1_OS], value & 0xff);
->      xive_tctx_notify(tctx, TM_QW1_OS);
-> @@ -366,8 +369,8 @@ static void xive_tctx_set_os_cam(XiveTCTX *tctx, uint=
-32_t qw1w2)
->      memcpy(&tctx->regs[TM_QW1_OS + TM_WORD2], &qw1w2, 4);
->  }
-> =20
-> -static uint64_t xive_tm_pull_os_ctx(XiveTCTX *tctx, hwaddr offset,
-> -                                    unsigned size)
-> +static uint64_t xive_tm_pull_os_ctx(XivePresenter *xptr, XiveTCTX *tctx,
-> +                                    hwaddr offset, unsigned size)
->  {
->      uint32_t qw1w2;
->      uint32_t qw1w2_new;
-> @@ -396,9 +399,11 @@ typedef struct XiveTmOp {
->      uint8_t  page_offset;
->      uint32_t op_offset;
->      unsigned size;
-> -    void     (*write_handler)(XiveTCTX *tctx, hwaddr offset, uint64_t va=
-lue,
-> -                              unsigned size);
-> -    uint64_t (*read_handler)(XiveTCTX *tctx, hwaddr offset, unsigned siz=
-e);
-> +    void     (*write_handler)(XivePresenter *xptr, XiveTCTX *tctx,
-> +                              hwaddr offset,
-> +                              uint64_t value, unsigned size);
-> +    uint64_t (*read_handler)(XivePresenter *xptr, XiveTCTX *tctx, hwaddr=
- offset,
-> +                             unsigned size);
->  } XiveTmOp;
-> =20
->  static const XiveTmOp xive_tm_operations[] =3D {
-> @@ -444,8 +449,8 @@ static const XiveTmOp *xive_tm_find_op(hwaddr offset,=
- unsigned size, bool write)
 >  /*
->   * TIMA MMIO handlers
->   */
-> -void xive_tctx_tm_write(XiveTCTX *tctx, hwaddr offset, uint64_t value,
-> -                        unsigned size)
-> +void xive_tctx_tm_write(XivePresenter *xptr, XiveTCTX *tctx, hwaddr offs=
-et,
-> +                        uint64_t value, unsigned size)
->  {
->      const XiveTmOp *xto;
-> =20
-> @@ -462,7 +467,7 @@ void xive_tctx_tm_write(XiveTCTX *tctx, hwaddr offset=
-, uint64_t value,
->              qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid write access a=
-t TIMA "
->                            "@%"HWADDR_PRIx"\n", offset);
->          } else {
-> -            xto->write_handler(tctx, offset, value, size);
-> +            xto->write_handler(xptr, tctx, offset, value, size);
->          }
->          return;
->      }
-> @@ -472,7 +477,7 @@ void xive_tctx_tm_write(XiveTCTX *tctx, hwaddr offset=
-, uint64_t value,
->       */
->      xto =3D xive_tm_find_op(offset, size, true);
->      if (xto) {
-> -        xto->write_handler(tctx, offset, value, size);
-> +        xto->write_handler(xptr, tctx, offset, value, size);
->          return;
->      }
-> =20
-> @@ -482,7 +487,8 @@ void xive_tctx_tm_write(XiveTCTX *tctx, hwaddr offset=
-, uint64_t value,
->      xive_tm_raw_write(tctx, offset, value, size);
+> @@ -662,6 +671,65 @@ static void fv_queue_worker(gpointer data, gpointer =
+user_data)
+>      free(req);
 >  }
 > =20
-> -uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr offset, unsigned size)
-> +uint64_t xive_tctx_tm_read(XivePresenter *xptr, XiveTCTX *tctx, hwaddr o=
-ffset,
-> +                           unsigned size)
->  {
->      const XiveTmOp *xto;
-> =20
-> @@ -500,7 +506,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
-set, unsigned size)
->                            "@%"HWADDR_PRIx"\n", offset);
->              return -1;
->          }
-> -        return xto->read_handler(tctx, offset, size);
-> +        return xto->read_handler(xptr, tctx, offset, size);
+> +static void *fv_queue_notify_thread(void *opaque)
+> +{
+> +    struct fv_QueueInfo *qi =3D opaque;
+> +
+> +    fuse_log(FUSE_LOG_INFO, "%s: Start for queue %d kick_fd %d\n", __fun=
+c__,
+> +             qi->qidx, qi->kick_fd);
+> +
+> +    while (1) {
+> +        struct pollfd pf[2];
+> +
+> +        pf[0].fd =3D qi->kick_fd;
+> +        pf[0].events =3D POLLIN;
+> +        pf[0].revents =3D 0;
+> +        pf[1].fd =3D qi->kill_fd;
+> +        pf[1].events =3D POLLIN;
+> +        pf[1].revents =3D 0;
+> +
+> +        fuse_log(FUSE_LOG_DEBUG, "%s: Waiting for Queue %d event\n", __f=
+unc__,
+> +                 qi->qidx);
+> +        int poll_res =3D ppoll(pf, 2, NULL, NULL);
+> +
+> +        if (poll_res =3D=3D -1) {
+> +            if (errno =3D=3D EINTR) {
+> +                fuse_log(FUSE_LOG_INFO, "%s: ppoll interrupted, going ar=
+ound\n",
+> +                         __func__);
+> +                continue;
+> +            }
+> +            fuse_log(FUSE_LOG_ERR, "fv_queue_thread ppoll: %m\n");
+> +            break;
+> +        }
+> +        assert(poll_res >=3D 1);
+> +        if (pf[0].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+> +            fuse_log(FUSE_LOG_ERR, "%s: Unexpected poll revents %x Queue=
+ %d\n",
+> +                     __func__, pf[0].revents, qi->qidx);
+> +             break;
+> +        }
+> +        if (pf[1].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+> +            fuse_log(FUSE_LOG_ERR, "%s: Unexpected poll revents %x Queue=
+ %d"
+> +                     "killfd\n", __func__, pf[1].revents, qi->qidx);
+> +            break;
+> +        }
+> +        if (pf[1].revents) {
+> +            fuse_log(FUSE_LOG_INFO, "%s: kill event on queue %d - quitti=
+ng\n",
+> +                     __func__, qi->qidx);
+> +            break;
+> +        }
+> +        assert(pf[0].revents & POLLIN);
+> +        fuse_log(FUSE_LOG_DEBUG, "%s: Got queue event on Queue %d\n", __=
+func__,
+> +                 qi->qidx);
+> +
+> +        eventfd_t evalue;
+> +        if (eventfd_read(qi->kick_fd, &evalue)) {
+> +            fuse_log(FUSE_LOG_ERR, "Eventfd_read for queue: %m\n");
+> +            break;
+> +        }
+> +    }
+> +    return NULL;
+> +}
+
+It's difficult to review function without any actual functionality using
+the virtqueue.  I'm not sure a thread is even needed since the device
+only needs to get a buffer when it has a notification for the driver.
+I'll have to wait for the following patches to see what happens here...
+
+> @@ -378,12 +382,23 @@ static void vuf_set_status(VirtIODevice *vdev, uint=
+8_t status)
 >      }
-> =20
->      /*
-> @@ -508,7 +514,7 @@ uint64_t xive_tctx_tm_read(XiveTCTX *tctx, hwaddr off=
-set, unsigned size)
->       */
->      xto =3D xive_tm_find_op(offset, size, false);
->      if (xto) {
-> -        return xto->read_handler(tctx, offset, size);
-> +        return xto->read_handler(xptr, tctx, offset, size);
->      }
-> =20
->      /*
-> @@ -522,14 +528,14 @@ static void xive_tm_write(void *opaque, hwaddr offs=
-et,
->  {
->      XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
-_cpu);
-> =20
-> -    xive_tctx_tm_write(tctx, offset, value, size);
-> +    xive_tctx_tm_write(XIVE_PRESENTER(opaque), tctx, offset, value, size=
-);
 >  }
 > =20
->  static uint64_t xive_tm_read(void *opaque, hwaddr offset, unsigned size)
+> -static uint64_t vuf_get_features(VirtIODevice *vdev,
+> -                                      uint64_t requested_features,
+> -                                      Error **errp)
+> +static uint64_t vuf_get_features(VirtIODevice *vdev, uint64_t features,
+> +                                 Error **errp)
 >  {
->      XiveTCTX *tctx =3D xive_router_get_tctx(XIVE_ROUTER(opaque), current=
-_cpu);
-> =20
-> -    return xive_tctx_tm_read(tctx, offset, size);
-> +    return xive_tctx_tm_read(XIVE_PRESENTER(opaque), tctx, offset, size);
->  }
-> =20
->  const MemoryRegionOps xive_tm_ops =3D {
+> -    /* No feature bits used yet */
+> -    return requested_features;
+> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
+> +
+> +    virtio_add_feature(&features, VIRTIO_FS_F_NOTIFICATION);
+> +
+> +    return vhost_get_features(&fs->vhost_dev, user_feature_bits, feature=
+s);
+> +}
+> +
+> +static void vuf_set_features(VirtIODevice *vdev, uint64_t features)
+> +{
+> +    VHostUserFS *fs =3D VHOST_USER_FS(vdev);
+> +
+> +    if (virtio_has_feature(features, VIRTIO_FS_F_NOTIFICATION)) {
+> +        fs->notify_enabled =3D true;
+
+This field is unused, please remove it.
+
+--B4IIlcmfBL/1gGOG
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3XthcACgkQnKSrs4Gr
+c8gs5Qf+LyPnQ5S6B38Cg32zP4Ue8WZjyuFmlqBTKJ46vyg7gWkF6vDxWRDt/qu1
+Q1cG3ErePIynsgV1rQyWTRKY0Yx82eahfFeh0QjOJYWwgfWbcRwb+oPUgCUQutXh
+slBJu7InNwyhHnVQYNgXJoltwRVHdg7GA/sUqTbf1pEuocyFoFXInGWGppEystT4
+R9cpoEEtDUqxUvES0DHGZ4f67qXQyAm8WGxfRC/wPZURActXeBEryqt2aShJ7dl2
+FU7OdYj6Fr8XoCSdCLLsEOl5JOEk/ECkYLai3ZBaq+LHARXF68vSlwj8u81M6ffK
+vSQaMpxLrn43n16CieagYSw2XTPqEw==
+=oibv
+-----END PGP SIGNATURE-----
+
+--B4IIlcmfBL/1gGOG--
 
 
