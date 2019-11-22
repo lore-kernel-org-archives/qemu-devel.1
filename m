@@ -2,147 +2,80 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 888B3C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 12:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DDBAC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 12:34:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C3E520714
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 12:32:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C3E520714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4708220714
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 12:34:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6GhPiWI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4708220714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY86t-00040K-Fa
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 07:32:27 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47095)
+	id 1iY88N-0005Cu-D8
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 07:33:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47345)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <frankja@linux.ibm.com>) id 1iY85U-00030b-6m
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:31:01 -0500
+ (envelope-from <imammedo@redhat.com>) id 1iY873-0004Lg-Ul
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:32:40 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <frankja@linux.ibm.com>) id 1iY85T-0002Qp-0e
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:31:00 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8480
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <frankja@linux.ibm.com>)
- id 1iY85S-0002Qj-Qh
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:30:58 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- xAMCSXOv021510
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 07:30:58 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 2wdkdfr09s-1
- (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 07:30:58 -0500
-Received: from localhost
- by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
- Violators will be prosecuted
- for <qemu-devel@nongnu.org> from <frankja@linux.ibm.com>;
- Fri, 22 Nov 2019 12:30:56 -0000
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
- by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway:
- Authorized Use Only! Violators will be prosecuted; 
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
- Fri, 22 Nov 2019 12:30:53 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id xAMCUD1i34865584
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 22 Nov 2019 12:30:13 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 9CB2911C052;
- Fri, 22 Nov 2019 12:30:51 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2923211C04A;
- Fri, 22 Nov 2019 12:30:51 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.145.41.23])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Fri, 22 Nov 2019 12:30:51 +0000 (GMT)
-Subject: Re: [PATCH 4/4] s390x: Beautify machine reset
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-References: <20191122075218.23935-1-frankja@linux.ibm.com>
- <20191122075218.23935-5-frankja@linux.ibm.com>
- <d026944f-1a0a-0dbe-6514-d8e4fd293e35@redhat.com>
- <c2459655-f205-3294-23ba-ba5d3280df41@linux.ibm.com>
- <def970f9-6889-c8ed-0f6a-087e4cd3bd87@redhat.com>
- <20191122131035.4f334a99.cohuck@redhat.com>
- <8217f5a5-1700-9371-d642-8520df9df0ed@linux.ibm.com>
- <925e1c0e-bf63-a244-df72-2f477d014666@redhat.com>
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; prefer-encrypt=mutual; keydata=
- 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
-Date: Fri, 22 Nov 2019 13:30:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <imammedo@redhat.com>) id 1iY870-00031b-Dl
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:32:36 -0500
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29660
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1iY86z-00031I-QZ
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 07:32:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1574425952;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=v1EnpEUS7iebMr2roZTH3kFD+uHBYWnGmltlBYxJYT8=;
+ b=P6GhPiWIlnbMIq+ZS5hFh4UeASeYUBcpMvMJCBGd9g4VSFYCkXfWTKEXyHjvAkBt2d4NCE
+ Iih5MA/GqX7/XxFuc3cVV3QKFBGiDY8hXiPuaNO+/vTqxq2GecO1SeE/eNijC2ernPmHha
+ sWQwirXVjHaBYGSuVnZNNsB3zWRzK0s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-guMKxv28NUWWI4HTTkPWhg-1; Fri, 22 Nov 2019 07:32:29 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1C41801E76;
+ Fri, 22 Nov 2019 12:32:26 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 26A8019C70;
+ Fri, 22 Nov 2019 12:32:20 +0000 (UTC)
+Date: Fri, 22 Nov 2019 13:32:19 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Tao Xu <tao3.xu@intel.com>
+Subject: Re: [PATCH v17 12/14] hmat acpi: Build Memory Side Cache
+ Information Structure(s)
+Message-ID: <20191122133219.1d46d30c@redhat.com>
+In-Reply-To: <20191122074826.1373-13-tao3.xu@intel.com>
+References: <20191122074826.1373-1-tao3.xu@intel.com>
+ <20191122074826.1373-13-tao3.xu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <925e1c0e-bf63-a244-df72-2f477d014666@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="0OYiY1mI57uylnCuWnwVfgvYt1M08aIJv"
-X-TM-AS-GCONF: 00
-x-cbid: 19112212-0008-0000-0000-000003362099
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19112212-0009-0000-0000-00004A554E19
-Message-Id: <79f5a114-7991-51c7-9e8e-609c2bb78818@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-11-22_02:2019-11-21,2019-11-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- phishscore=0 mlxlogscore=999
- adultscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0 impostorscore=0
- suspectscore=0 malwarescore=0 priorityscore=1501 bulkscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-1910280000
- definitions=main-1911220112
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 3.x [generic] [fuzzy]
-X-Received-From: 148.163.158.5
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-MC-Unique: guMKxv28NUWWI4HTTkPWhg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 207.211.31.81
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -154,128 +87,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, qemu-devel@nongnu.org,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mihajlov@linux.ibm.com
+Cc: lvivier@redhat.com, thuth@redhat.com, ehabkost@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, sw@weilnetz.de, fan.du@intel.com, armbru@redhat.com,
+ Daniel Black <daniel@linux.ibm.com>, mdroth@linux.vnet.ibm.com,
+ jingqi.liu@intel.com, Jonathan Cameron <Jonathan.Cameron@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---0OYiY1mI57uylnCuWnwVfgvYt1M08aIJv
-Content-Type: multipart/mixed; boundary="Yhs2o6c0Xan5kbw7wHSIEaZInTxmf5KW7"
+On Fri, 22 Nov 2019 15:48:24 +0800
+Tao Xu <tao3.xu@intel.com> wrote:
 
---Yhs2o6c0Xan5kbw7wHSIEaZInTxmf5KW7
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 11/22/19 1:25 PM, David Hildenbrand wrote:
-> On 22.11.19 13:22, Janosch Frank wrote:
->> On 11/22/19 1:10 PM, Cornelia Huck wrote:
->>> On Fri, 22 Nov 2019 12:47:44 +0100
->>> David Hildenbrand <david@redhat.com> wrote:
->>>
->>>> On 22.11.19 12:46, Janosch Frank wrote:
->>>>> On 11/22/19 11:59 AM, David Hildenbrand wrote:
->>>>>> On 22.11.19 08:52, Janosch Frank wrote:
->>>>>>> * Add comments that tell you which diag308 subcode caused the res=
-et
->>>>>>> * Sort by diag308 reset subcode
->>>>>>>
->>>>>>> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
->>>>>>> ---
->>>>>>>     hw/s390x/s390-virtio-ccw.c | 20 ++++++++++----------
->>>>>>>     1 file changed, 10 insertions(+), 10 deletions(-)
->>>>>>>
->>>>>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-cc=
-w.c
->>>>>>> index c1d1440272..88f7758721 100644
->>>>>>> --- a/hw/s390x/s390-virtio-ccw.c
->>>>>>> +++ b/hw/s390x/s390-virtio-ccw.c
->>>>>>> @@ -330,15 +330,7 @@ static void s390_machine_reset(MachineState =
-*machine)
->>>>>>>         s390_cmma_reset();
->>>>>>>    =20
->>>>>>>         switch (reset_type) {
->>>>>>> -    case S390_RESET_EXTERNAL:
->>>>>>> -    case S390_RESET_REIPL:
->>>>>>> -        qemu_devices_reset();
->>>>>>> -        s390_crypto_reset();
->>>>>>> -
->>>>>>> -        /* configure and start the ipl CPU only */
->>>>>>> -        run_on_cpu(cs, s390_do_cpu_ipl, RUN_ON_CPU_NULL);
->>>>>>> -        break;
->>>>>>> -    case S390_RESET_MODIFIED_CLEAR:
->>>>>>> +    case S390_RESET_MODIFIED_CLEAR: /* Subcode 0 */
->>>>>>
->>>>>> IMHO "Subcode X" isn't of much help here. We're out of diag handli=
-ng.
->>>>>>
->>>>>> I'd suggest to just document the subcodes along with the definitio=
-ns, if
->>>>>> really needed, and drop this patch, at least I don't quite see the=
- value
->>>>>> of moving code around here... or is the code shuffling of any valu=
-e on
->>>>>> your prot virt patches?
->>>>>>  =20
->>>>>
->>>>> It keeps me from consulting the POP every time I need to change thi=
-ngs
->>>>> in the machine resets. This is basically a 1:1 mapping of diag 308
->>>>> subcodes to machine resets, so why don't we want to make that obvio=
-us
->>>>> and order them by the subcodes?
->>>>>   =20
->>>>
->>>> Because it is not a 1:1 mapping: S390_RESET_EXTERNAL
->>>>
->>>
->>> Tack the explanation onto the definitions of S390_RESET_, then?
->>> Probably still quicker than consulting the POP :)
->>>
->>
->> Does it really bother you that much, that I add some explanations to t=
-he
->> things we're doing. The external reset also gets a comment so Conni
->> won't need that much coffee anymore to understand the code :-)
->>
+> From: Liu Jingqi <jingqi.liu@intel.com>
 >=20
-> I'm really sorry, but I fail to see how "Subcode 0" is *any* better tha=
-n=20
-> S390_RESET_MODIFIED_CLEAR (and avoids consulting the PoP) and why the=20
-> order should matter at all here to make it easier to understand.
+> This structure describes memory side cache information for memory
+> proximity domains if the memory side cache is present and the
+> physical device forms the memory side cache.
+> The software could use this information to effectively place
+> the data in memory to maximize the performance of the system
+> memory that use the memory side cache.
 >=20
-> I don't NACK this, I just find it *completely* useless :)
+> Reviewed-by: Daniel Black <daniel@linux.ibm.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+for the future reference,
+You are not supposed to carry over Reviewed-by tags
+if you do non trivial change to the patch.
+
+> Signed-off-by: Liu Jingqi <jingqi.liu@intel.com>
+> Signed-off-by: Tao Xu <tao3.xu@intel.com>
+
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
 >=20
-
-Ugh, time for some rebase conflicts...
-
-
---Yhs2o6c0Xan5kbw7wHSIEaZInTxmf5KW7--
-
---0OYiY1mI57uylnCuWnwVfgvYt1M08aIJv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEwGNS88vfc9+v45Yq41TmuOI4ufgFAl3X1PoACgkQ41TmuOI4
-ufgnRg/7B92ZPW1cZYwdeoMSeNDssYGfXgHTqeBEcAn783FF8roOB2D2MgD1+j7H
-PzBVpDIjuXi2uG3fGEfpvbFtCMfLuwlaFK8zX7/g3YT3HZolOghN7Z7qjJk+MQz4
-s6+LLPfqzsVZwKEw5iJ3aRBeMZ5RPM3jcjenhKa1smPulEhGOftfeyid4MaNHS88
-tFUEIoKPekLJMEr1POtB7B+b9qw1qyeb4TxFri0zh6nI7XWuz6+zp2bsb86Wdywm
-WUiYZ7E2+oJAuRTRahNk9Ko7BCwgfduN6kJbJCpQueQ0Ea15ySlKkKwtU/Ufwviq
-i+zITDlCsTsYQ5pNHOx8KJUnPJYSphY2jIxOkgY4PHgS8aGD7YS3mGqFtR8UqMCV
-lW8QQFNC7HK8nZ5p3l70HhdIb5XMvq548V5yeFiNpEU6YcLY5fB1XCi5f04gJpKF
-oexiD0T8vQH/bWAxRm9oCJGeBkkiLVZ/VQZG6ZQ2nmmj/m8fXFpGO2RzfIj8tAyB
-vE+Hf46YCTlnhut6y708LpwqcARFgGHgjoFUMh+YyQdKhi4y+p5qkK1zrIfXQlaA
-v1mw4ZB4YjwkFnNIvmETBi2E8GtJILR9CpFBmohNgXTiWYqWLvA4zGraJWYOEyic
-C/Ug1Nf3KbCZghWk0v9k2RUzzJzYZZ+wMrI5RFnfCdCaXR9EASQ=
-=27QO
------END PGP SIGNATURE-----
-
---0OYiY1mI57uylnCuWnwVfgvYt1M08aIJv--
+> No changes in v17.
+>=20
+> Changes in v16:
+>     - Use checks and assert to replace masks (Igor)
+>     - Fields in Cache Attributes are promoted to uint32_t before
+>       shifting (Igor)
+>     - Drop cpu_to_le32() (Igor)
+>=20
+> Changes in v13:
+>     - rename level as cache_level
+> ---
+>  hw/acpi/hmat.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 68 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/hw/acpi/hmat.c b/hw/acpi/hmat.c
+> index e5ee8b4317..bb6adb0ccf 100644
+> --- a/hw/acpi/hmat.c
+> +++ b/hw/acpi/hmat.c
+> @@ -143,14 +143,62 @@ static void build_hmat_lb(GArray *table_data, HMAT_=
+LB_Info *hmat_lb,
+>      g_free(entry_list);
+>  }
+> =20
+> +/* ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure: Table 5-1=
+47 */
+> +static void build_hmat_cache(GArray *table_data, uint8_t total_levels,
+> +                             NumaHmatCacheOptions *hmat_cache)
+> +{
+> +    /*
+> +     * Cache Attributes: Bits [3:0] =E2=80=93 Total Cache Levels
+> +     * for this Memory Proximity Domain
+> +     */
+> +    uint32_t cache_attr =3D total_levels;
+> +
+> +    /* Bits [7:4] : Cache Level described in this structure */
+> +    cache_attr |=3D (uint32_t) hmat_cache->level << 4;
+> +
+> +    /* Bits [11:8] - Cache Associativity */
+> +    cache_attr |=3D (uint32_t) hmat_cache->assoc << 8;
+> +
+> +    /* Bits [15:12] - Write Policy */
+> +    cache_attr |=3D (uint32_t) hmat_cache->policy << 12;
+> +
+> +    /* Bits [31:16] - Cache Line size in bytes */
+> +    cache_attr |=3D (uint32_t) hmat_cache->line << 16;
+> +
+> +    /* Type */
+> +    build_append_int_noprefix(table_data, 2, 2);
+> +    /* Reserved */
+> +    build_append_int_noprefix(table_data, 0, 2);
+> +    /* Length */
+> +    build_append_int_noprefix(table_data, 32, 4);
+> +    /* Proximity Domain for the Memory */
+> +    build_append_int_noprefix(table_data, hmat_cache->node_id, 4);
+> +    /* Reserved */
+> +    build_append_int_noprefix(table_data, 0, 4);
+> +    /* Memory Side Cache Size */
+> +    build_append_int_noprefix(table_data, hmat_cache->size, 8);
+> +    /* Cache Attributes */
+> +    build_append_int_noprefix(table_data, cache_attr, 4);
+> +    /* Reserved */
+> +    build_append_int_noprefix(table_data, 0, 2);
+> +    /*
+> +     * Number of SMBIOS handles (n)
+> +     * Linux kernel uses Memory Side Cache Information Structure
+> +     * without SMBIOS entries for now, so set Number of SMBIOS handles
+> +     * as 0.
+> +     */
+> +    build_append_int_noprefix(table_data, 0, 2);
+> +}
+> +
+>  /* Build HMAT sub table structures */
+>  static void hmat_build_table_structs(GArray *table_data, NumaState *numa=
+_state)
+>  {
+>      uint16_t flags;
+>      uint32_t num_initiator =3D 0;
+>      uint32_t initiator_list[MAX_NODES];
+> -    int i, hierarchy, type;
+> +    int i, hierarchy, type, cache_level, total_levels;
+>      HMAT_LB_Info *hmat_lb;
+> +    NumaHmatCacheOptions *hmat_cache;
+> =20
+>      for (i =3D 0; i < numa_state->num_nodes; i++) {
+>          flags =3D 0;
+> @@ -184,6 +232,25 @@ static void hmat_build_table_structs(GArray *table_d=
+ata, NumaState *numa_state)
+>              }
+>          }
+>      }
+> +
+> +    /*
+> +     * ACPI 6.3: 5.2.27.5 Memory Side Cache Information Structure:
+> +     * Table 5-147
+> +     */
+> +    for (i =3D 0; i < numa_state->num_nodes; i++) {
+> +        total_levels =3D 0;
+> +        for (cache_level =3D 1; cache_level < HMAT_LB_LEVELS; cache_leve=
+l++) {
+> +            if (numa_state->hmat_cache[i][cache_level]) {
+> +                total_levels++;
+> +            }
+> +        }
+> +        for (cache_level =3D 0; cache_level <=3D total_levels; cache_lev=
+el++) {
+> +            hmat_cache =3D numa_state->hmat_cache[i][cache_level];
+> +            if (hmat_cache) {
+> +                build_hmat_cache(table_data, total_levels, hmat_cache);
+> +            }
+> +        }
+> +    }
+>  }
+> =20
+>  void build_hmat(GArray *table_data, BIOSLinker *linker, NumaState *numa_=
+state)
 
 
