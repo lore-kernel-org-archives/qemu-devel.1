@@ -2,65 +2,62 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BB4C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 05:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B07C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 06:10:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52F172071F
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 05:52:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Lqq5TvTH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52F172071F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id C75A12068E
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 06:10:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C75A12068E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY1s5-0003C8-DF
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 00:52:45 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56213)
+	id 1iY290-0007T7-RO
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 01:10:14 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57532)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <dgibson@ozlabs.org>) id 1iY1rI-0002fa-TE
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 00:51:58 -0500
+ (envelope-from <groug@kaod.org>) id 1iY28K-0006yT-If
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 01:09:33 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <dgibson@ozlabs.org>) id 1iY1rG-00078S-RW
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 00:51:56 -0500
-Received: from ozlabs.org ([2401:3900:2:1::2]:58803)
+ (envelope-from <groug@kaod.org>) id 1iY28I-0000nC-4o
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 01:09:31 -0500
+Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:57217)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <dgibson@ozlabs.org>)
- id 1iY1rE-00073j-OV; Fri, 22 Nov 2019 00:51:54 -0500
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 47K5Ck45Xfz9sRt; Fri, 22 Nov 2019 16:51:46 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1574401906;
- bh=apma14zKbbpSFvOBnkuzw6uhuoPtWouDzz/N3NAm0d8=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Lqq5TvTH+vcQfatPBwEmtGAzNBK9YhEcBmWW/JaGh02AlscWYCovKh/6UeJ1JuipC
- yhs2GZ/oM7iVDNX7JInGdVgOylY6akY/rWHIyjy1QG3guo5ZLYx3Xktwzagro2Pe5t
- r+CmVg5+IcXftVb/QuDI3ZDA0sD1YFPaPoT67CdQ=
-Date: Fri, 22 Nov 2019 16:50:41 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH 3/5] vfio/pci: Respond to KVM irqchip change notifier
-Message-ID: <20191122055041.GF5582@umbus.fritz.box>
+ (Exim 4.71) (envelope-from <groug@kaod.org>) id 1iY28H-0000lb-Uy
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 01:09:30 -0500
+Received: from player789.ha.ovh.net (unknown [10.108.54.133])
+ by mo179.mail-out.ovh.net (Postfix) with ESMTP id 7160714C64D
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 07:09:27 +0100 (CET)
+Received: from kaod.org (lns-bzn-46-82-253-208-248.adsl.proxad.net
+ [82.253.208.248]) (Authenticated sender: groug@kaod.org)
+ by player789.ha.ovh.net (Postfix) with ESMTPSA id C68B9C5C89B7;
+ Fri, 22 Nov 2019 06:09:14 +0000 (UTC)
+Date: Fri, 22 Nov 2019 07:09:13 +0100
+From: Greg Kurz <groug@kaod.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH 0/5] vfio/spapr: Handle changes of master irq chip for
+ VFIO devices
+Message-ID: <20191122070913.5aa6f784@bahia.lan>
+In-Reply-To: <20191121005607.274347-1-david@gibson.dropbear.id.au>
 References: <20191121005607.274347-1-david@gibson.dropbear.id.au>
- <20191121005607.274347-4-david@gibson.dropbear.id.au>
- <20191122061257.7633bcdd@bahia.lan>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="P5jslYRVNanHST2M"
-Content-Disposition: inline
-In-Reply-To: <20191122061257.7633bcdd@bahia.lan>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
- recognized.
-X-Received-From: 2401:3900:2:1::2
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 8905305313223219686
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedufedrudehfedgledtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdqfffguegfifdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecukfhppedtrddtrddtrddtpdekvddrvdehfedrvddtkedrvdegkeenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepphhlrgihvghrjeekledrhhgrrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
+X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
+ [fuzzy]
+X-Received-From: 46.105.76.148
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -72,225 +69,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, Alexey Kardashevskiy <aik@ozlabs.ru>,
- Jason Wang <jasowang@redhat.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org,
- Alex Williamson <alex.williamson@redhat.com>, qemu-ppc@nongnu.org,
- clg@kaod.org,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+Cc: kvm@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ qemu-devel@nongnu.org, Alex Williamson <alex.williamson@redhat.com>,
+ qemu-ppc@nongnu.org, clg@kaod.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 21 Nov 2019 11:56:02 +1100
+David Gibson <david@gibson.dropbear.id.au> wrote:
 
---P5jslYRVNanHST2M
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> Due to the way feature negotiation works in PAPR (which is a
+> paravirtualized platform), we can end up changing the global irq chip
+> at runtime, including it's KVM accelerate model.  That causes
+> complications for VFIO devices with INTx, which wire themselves up
+> directly to the KVM irqchip for performance.
+> 
+> This series introduces a new notifier to let VFIO devices (and
+> anything else that needs to in the future) know about changes to the
+> master irqchip.  It modifies VFIO to respond to the notifier,
+> reconnecting itself to the new KVM irqchip as necessary.
+> 
+> In particular this removes a misleading (though not wholly inaccurate)
+> warning that occurs when using VFIO devices on a pseries machine type
+> guest.
+> 
+> Open question: should this go into qemu-4.2 or wait until 5.0?  It's
+> has medium complexity / intrusiveness, but it *is* a bugfix that I
+> can't see a simpler way to fix.  It's effectively a regression from
+> qemu-4.0 to qemu-4.1 (because that introduced XIVE support by
+> default), although not from 4.1 to 4.2.
+> 
+> Changes since RFC:
+>  * Fixed some incorrect error paths pointed by aw in 3/5
+>  * 5/5 had some problems previously, but they have been obsoleted by
+>    other changes merged in the meantime
+> 
+> David Gibson (5):
+>   kvm: Introduce KVM irqchip change notifier
+>   vfio/pci: Split vfio_intx_update()
+>   vfio/pci: Respond to KVM irqchip change notifier
+>   spapr: Handle irq backend changes with VFIO PCI devices
+>   spapr: Work around spurious warnings from vfio INTx initialization
+> 
+>  accel/kvm/kvm-all.c    | 18 ++++++++++++
+>  accel/stubs/kvm-stub.c | 12 ++++++++
+>  hw/ppc/spapr_irq.c     | 17 +++++++++++-
+>  hw/vfio/pci.c          | 62 +++++++++++++++++++++++++++---------------
+>  hw/vfio/pci.h          |  1 +
+>  include/sysemu/kvm.h   |  5 ++++
+>  6 files changed, 92 insertions(+), 23 deletions(-)
+> 
 
-On Fri, Nov 22, 2019 at 06:12:57AM +0100, Greg Kurz wrote:
-> On Thu, 21 Nov 2019 11:56:05 +1100
-> David Gibson <david@gibson.dropbear.id.au> wrote:
->=20
-> > VFIO PCI devices already respond to the pci intx routing notifier, in o=
-rder
-> > to update kernel irqchip mappings when routing is updated.  However this
-> > won't handle the case where the irqchip itself is replaced by a differe=
-nt
-> > model while retaining the same routing.  This case can happen on
-> > the pseries machine type due to PAPR feature negotiation.
-> >=20
-> > To handle that case, add a handler for the irqchip change notifier, whi=
-ch
-> > does much the same thing as the routing notifier, but is unconditional,
-> > rather than being a no-op when the routing hasn't changed.
-> >=20
-> > Cc: Alex Williamson <alex.williamson@redhat.com>
-> > Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
-> >=20
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> > ---
-> >  hw/vfio/pci.c | 23 ++++++++++++++++++-----
-> >  hw/vfio/pci.h |  1 +
-> >  2 files changed, 19 insertions(+), 5 deletions(-)
-> >=20
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > index 521289aa7d..95478c2c55 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -256,6 +256,14 @@ static void vfio_intx_routing_notifier(PCIDevice *=
-pdev)
-> >      }
-> >  }
-> > =20
-> > +static void vfio_irqchip_change(Notifier *notify, void *data)
-> > +{
-> > +    VFIOPCIDevice *vdev =3D container_of(notify, VFIOPCIDevice,
-> > +                                       irqchip_change_notifier);
-> > +
-> > +    vfio_intx_update(vdev, &vdev->intx.route);
-> > +}
-> > +
-> >  static int vfio_intx_enable(VFIOPCIDevice *vdev, Error **errp)
-> >  {
-> >      uint8_t pin =3D vfio_pci_read_config(&vdev->pdev, PCI_INTERRUPT_PI=
-N, 1);
-> > @@ -2973,16 +2981,18 @@ static void vfio_realize(PCIDevice *pdev, Error=
- **errp)
-> >                                                    vfio_intx_mmap_enabl=
-e, vdev);
-> >          pci_device_set_intx_routing_notifier(&vdev->pdev,
-> >                                               vfio_intx_routing_notifie=
-r);
-> > +        vdev->irqchip_change_notifier.notify =3D vfio_irqchip_change;
-> > +        kvm_irqchip_add_change_notifier(&vdev->irqchip_change_notifier=
-);
-> >          ret =3D vfio_intx_enable(vdev, errp);
-> >          if (ret) {
-> > -            goto out_teardown;
-> > +            goto out_deregister;
-> >          }
-> >      }
-> > =20
-> >      if (vdev->display !=3D ON_OFF_AUTO_OFF) {
-> >          ret =3D vfio_display_probe(vdev, errp);
-> >          if (ret) {
-> > -            goto out_teardown;
-> > +            goto out_deregister;
-> >          }
-> >      }
-> >      if (vdev->enable_ramfb && vdev->dpy =3D=3D NULL) {
-> > @@ -2992,11 +3002,11 @@ static void vfio_realize(PCIDevice *pdev, Error=
- **errp)
-> >      if (vdev->display_xres || vdev->display_yres) {
-> >          if (vdev->dpy =3D=3D NULL) {
-> >              error_setg(errp, "xres and yres properties require display=
-=3Don");
-> > -            goto out_teardown;
-> > +            goto out_deregister;
-> >          }
-> >          if (vdev->dpy->edid_regs =3D=3D NULL) {
-> >              error_setg(errp, "xres and yres properties need edid suppo=
-rt");
-> > -            goto out_teardown;
-> > +            goto out_deregister;
-> >          }
-> >      }
-> > =20
->=20
-> After this change, we end up with:
->=20
->     if (vfio_pci_read_config(&vdev->pdev, PCI_INTERRUPT_PIN, 1)) {
->         vdev->intx.mmap_timer =3D timer_new_ms(QEMU_CLOCK_VIRTUAL,
->                                                   vfio_intx_mmap_enable, =
-vdev);
->         pci_device_set_intx_routing_notifier(&vdev->pdev,
->                                              vfio_intx_routing_notifier);
->         vdev->irqchip_change_notifier.notify =3D vfio_irqchip_change;
->         kvm_irqchip_add_change_notifier(&vdev->irqchip_change_notifier);
->         ret =3D vfio_intx_enable(vdev, errp);
->         if (ret) {
->             goto out_deregister;
->         }
->     }
->=20
->     if (vdev->display !=3D ON_OFF_AUTO_OFF) {
->         ret =3D vfio_display_probe(vdev, errp);
->         if (ret) {
->             goto out_deregister;
->         }
->     }
->     if (vdev->enable_ramfb && vdev->dpy =3D=3D NULL) {
->         error_setg(errp, "ramfb=3Don requires display=3Don");
->         goto out_teardown;
->              ^^^^^^^^^^^^
->=20
-> This should be out_deregister.
+With the issue spotted in patch 3/5 fixed, the series looks good:
 
-Oops, fixed in my tree.
+Reviewed-by: Greg Kurz <groug@kaod.org>
 
-> The enable_ramfb property belongs to the nohotplug variant. It
-> means QEMU is going to terminate and we probably don't really
-> care to leak notifiers, but this still looks weird and fragile,
-> if enable_ramfb ever becomes usable by hotpluggable devices
-> one day.
->=20
->     }
->     if (vdev->display_xres || vdev->display_yres) {
->         if (vdev->dpy =3D=3D NULL) {
->             error_setg(errp, "xres and yres properties require display=3D=
-on");
->             goto out_deregister;
->         }
->         if (vdev->dpy->edid_regs =3D=3D NULL) {
->             error_setg(errp, "xres and yres properties need edid support"=
-);
->             goto out_deregister;
->         }
->     }
->=20
->=20
-> > @@ -3020,8 +3030,10 @@ static void vfio_realize(PCIDevice *pdev, Error =
-**errp)
-> > =20
-> >      return;
-> > =20
-> > -out_teardown:
-> > +out_deregister:
-> >      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-> > +    kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
-> > +out_teardown:
-> >      vfio_teardown_msi(vdev);
-> >      vfio_bars_exit(vdev);
-> >  error:
-> > @@ -3064,6 +3076,7 @@ static void vfio_exitfn(PCIDevice *pdev)
-> >      vfio_unregister_req_notifier(vdev);
-> >      vfio_unregister_err_notifier(vdev);
-> >      pci_device_set_intx_routing_notifier(&vdev->pdev, NULL);
-> > +    kvm_irqchip_remove_change_notifier(&vdev->irqchip_change_notifier);
-> >      vfio_disable_interrupts(vdev);
-> >      if (vdev->intx.mmap_timer) {
-> >          timer_free(vdev->intx.mmap_timer);
-> > diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> > index b329d50338..35626cd63e 100644
-> > --- a/hw/vfio/pci.h
-> > +++ b/hw/vfio/pci.h
-> > @@ -169,6 +169,7 @@ typedef struct VFIOPCIDevice {
-> >      bool enable_ramfb;
-> >      VFIODisplay *dpy;
-> >      Error *migration_blocker;
-> > +    Notifier irqchip_change_notifier;
-> >  } VFIOPCIDevice;
-> > =20
-> >  uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len);
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---P5jslYRVNanHST2M
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl3Xdy0ACgkQbDjKyiDZ
-s5IRSQ/7B6ScYm5J87bjzK8E2iuuNROYDSmgAoECca06mnQ3x7j1JPU+8jeHa19e
-sl03KucF0NBy2F+CJtgaGhbGKbAUQK6TCV3mMWpTQmDEIlTloH9zCol0WhOKp2s3
-9cJiPCOx3bx1WqQODjBAUyuDjS/gDuudQLJyN0hnS1yhzYIXIe3eeRGzUjXzsYu5
-/HC8rwyhwWU3KzUAqPHMPUqQj3QXgw9e1b6zvuTu1R2cgwHNpZZtLK9HWWN85u2i
-1PCwQMSIBAl1rdvAzm1HNn93z/BXkRJxcMJkofSnpcsLajvd2NggnGS9679iu+Gr
-DJoLkugDCrkCOu/M7uJnf65nWrEN83PAl1WKRB9/VXeTfphnQf3o3mNX3JKlM7CC
-uvUpWVfcfNKYp1mjwlU2zOA7GEhOE6RRGlulhiO/ni7rHznXKAwB7FSUsh2sXgk5
-IVhhwC1nYSvtzBp2Ob7bMmA69oWwbulFjqCMqceoBZDlyRm3362nbipmklm4b4mg
-retQMDc1db3tT8THunktZP+bpB/DfxyWWdvJBnStLxwTQslZY1uwJ4B2NWoHN6cm
-FLW9o6yRbvW8yCacAom3a7RKIOHMoE81VkiCDHWnKeA9gOetWE9p4ChgedXMsUfo
-0hNJMF2ameELGu58mBIUid2M3CPqRnhZreIWkFs1PXI99LXrBGg=
-=AaAb
------END PGP SIGNATURE-----
-
---P5jslYRVNanHST2M--
+Then I've tried passthrough of a BCM5719 gigabit adapter to a guest. It works
+as expected with MSIs but if I force LSI, either through /sys or with the
+pci=nomsi kernel command line, I get no interrupts for the device in the guest.
+Note that the same device works ok with LSI in the host.
 
