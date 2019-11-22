@@ -2,82 +2,82 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCEEDC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BAEAC432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:40:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9724F20707
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:39:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5D0DF20707
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 18:40:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e3m/3yn2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9724F20707
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ieQw3ETE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D0DF20707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYDpe-0000dQ-7m
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 13:39:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36880)
+	id 1iYDqv-0001xl-3A
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 13:40:21 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40128)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <eblake@redhat.com>) id 1iYDNq-00035Y-3s
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:10:20 -0500
+ (envelope-from <eric.auger@redhat.com>) id 1iYDip-0001KN-Ud
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:32:01 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <eblake@redhat.com>) id 1iYDNm-000170-1B
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:10:15 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47863
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <eric.auger@redhat.com>) id 1iYDio-0000cL-FN
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:31:59 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56098
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <eblake@redhat.com>) id 1iYDNk-00011b-KD
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:10:13 -0500
+ (Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+ id 1iYDio-0000bv-9f
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 13:31:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574446201;
+ s=mimecast20190719; t=1574447517;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=x+ahthJA0YWp4qSsc/Mgm4GjmFSS1wqZHk2rl+skoTU=;
- b=e3m/3yn2wZWO5U6pBYZDLScuB5PbZNoUxjAVxj9EufojwPw/XznpIm8wtjpc13RxPnIOss
- SLOhvm12Fh3EMgUq1mRdVlxy4QnqIJFi9PNguLPvHLEs/WQ3MvN8n3Jj4WwYyhAuUUSQ6a
- qnj0VjSkFfTFyTqYOluBp9AKKyt3Ixs=
+ bh=s9rjhk/7jHqlU0LM08VfBejpiGVoEQ1gFejwY9kPP/8=;
+ b=ieQw3ETEbG9lTvrdUr76XGhsbzd+k02DXftMjMIpX0MlRZgtiXwf1SKUOUpB4tOmb6eqEl
+ sgXC9XcudCu++BvZKTlS1UdvtaNs5vhlN8beHMEdM48hlm55JOIVw+7asD9JjKMUm3296g
+ F+O0k/0wd8kQf+Hl+FXZn6iVfaxPu8Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-63--6yVJaf1N1WtMz92szRqPA-1; Fri, 22 Nov 2019 13:09:58 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-10-V4LzwQZ-MhezUPBWDkZPYg-1; Fri, 22 Nov 2019 13:31:56 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B7DB801E74;
- Fri, 22 Nov 2019 18:09:57 +0000 (UTC)
-Received: from [10.3.116.221] (ovpn-116-221.phx2.redhat.com [10.3.116.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2EF4660150;
- Fri, 22 Nov 2019 18:09:54 +0000 (UTC)
-Subject: Re: [PATCH v3 8/8] iotests: Test committing to short backing file
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20191122160511.8377-1-kwolf@redhat.com>
- <20191122160511.8377-9-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <b1ddb940-d98a-4297-179d-553889db6804@redhat.com>
-Date: Fri, 22 Nov 2019 12:09:53 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3D64107ACC5;
+ Fri, 22 Nov 2019 18:31:54 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-116-37.ams2.redhat.com [10.36.116.37])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0E4B06E712;
+ Fri, 22 Nov 2019 18:31:48 +0000 (UTC)
+From: Eric Auger <eric.auger@redhat.com>
+To: eric.auger.pro@gmail.com, eric.auger@redhat.com, qemu-devel@nongnu.org,
+ qemu-arm@nongnu.org, peter.maydell@linaro.org, mst@redhat.com,
+ armbru@redhat.com, jean-philippe.brucker@arm.com, bharatb.linux@gmail.com,
+ yang.zhong@intel.com, dgilbert@redhat.com, quintela@redhat.com
+Subject: [PATCH for-5.0 v11 16/20] hw/arm/virt-acpi-build: Introduce
+ fill_iort_idmap helper
+Date: Fri, 22 Nov 2019 19:29:39 +0100
+Message-Id: <20191122182943.4656-17-eric.auger@redhat.com>
+In-Reply-To: <20191122182943.4656-1-eric.auger@redhat.com>
+References: <20191122182943.4656-1-eric.auger@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20191122160511.8377-9-kwolf@redhat.com>
-Content-Language: en-US
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-MC-Unique: -6yVJaf1N1WtMz92szRqPA-1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-MC-Unique: V4LzwQZ-MhezUPBWDkZPYg-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.81
+X-Received-From: 205.139.110.61
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -89,47 +89,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: vsementsov@virtuozzo.com, qemu-devel@nongnu.org, stefanha@redhat.com,
- mreitz@redhat.com
+Cc: kevin.tian@intel.com, peterx@redhat.com, tnowicki@marvell.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/22/19 10:05 AM, Kevin Wolf wrote:
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->   tests/qemu-iotests/274        | 152 +++++++++++++++++++++++++
->   tests/qemu-iotests/274.out    | 203 ++++++++++++++++++++++++++++++++++
->   tests/qemu-iotests/group      |   1 +
->   tests/qemu-iotests/iotests.py |   2 +-
->   4 files changed, 357 insertions(+), 1 deletion(-)
->   create mode 100755 tests/qemu-iotests/274
->   create mode 100644 tests/qemu-iotests/274.out
-> 
+To avoid code duplication, let's introduce an helper that
+fills one IORT ID mappings array index.
 
-> +    iotests.log('== Resize tests ==')
-> +
-> +    # Use different sizes for different allocation modes:
-> +    #
-> +    # We want to have at least one test where 32 bit truncation in the size of
-> +    # the overlapping area becomes visible. This is covered by the
-> +    # prealloc='off' case (1G to 6G is an overlap of 5G).
-> +    #
-> +    # However, we can only do this for modes that don't preallocate data
-> +    # because otherwise we might run out of space on the test host.
-> +    for (prealloc, base_size, top_size_old, top_size_new, off)  in [
-> +            ('off',       '6G',  '1G',  '8G',  '5G'),
-> +            ('metadata', '32G', '30G', '33G', '31G'),
-> +            ('falloc',   '10M',  '5M', '15M',  '9M'),
-> +            ('full',     '16M',  '8M', '12M', '11M')]:
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-The changes since v3 make sense.
+---
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+v8: new
+---
+ hw/arm/virt-acpi-build.c | 43 ++++++++++++++++++++++++----------------
+ 1 file changed, 26 insertions(+), 17 deletions(-)
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 4cd50175e0..825f3a79c0 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -368,6 +368,17 @@ static void acpi_dsdt_add_power_button(Aml *scope)
+     aml_append(scope, dev);
+ }
+=20
++static inline void
++fill_iort_idmap(AcpiIortIdMapping *idmap, int i,
++                uint32_t input_base, uint32_t id_count,
++                uint32_t output_base, uint32_t output_reference)
++{
++    idmap[i].input_base =3D cpu_to_le32(input_base);
++    idmap[i].id_count =3D cpu_to_le32(id_count);
++    idmap[i].output_base =3D cpu_to_le32(output_base);
++    idmap[i].output_reference =3D cpu_to_le32(output_reference);
++}
++
+ static void
+ build_iort(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+ {
+@@ -426,13 +437,12 @@ build_iort(GArray *table_data, BIOSLinker *linker, Vi=
+rtMachineState *vms)
+         smmu->gerr_gsiv =3D cpu_to_le32(irq + 2);
+         smmu->sync_gsiv =3D cpu_to_le32(irq + 3);
+=20
+-        /* Identity RID mapping covering the whole input RID range */
+-        idmap =3D &smmu->id_mapping_array[0];
+-        idmap->input_base =3D 0;
+-        idmap->id_count =3D cpu_to_le32(0xFFFF);
+-        idmap->output_base =3D 0;
+-        /* output IORT node is the ITS group node (the first node) */
+-        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
++        /*
++         * Identity RID mapping covering the whole input RID range.
++         * The output IORT node is the ITS group node (the first node).
++         */
++        fill_iort_idmap(smmu->id_mapping_array, 0, 0, 0xffff, 0,
++                        iort_node_offset);
+     }
+=20
+     /* Root Complex Node */
+@@ -450,18 +460,17 @@ build_iort(GArray *table_data, BIOSLinker *linker, Vi=
+rtMachineState *vms)
+     rc->memory_properties.memory_flags =3D 0x3; /* CCA =3D CPM =3D DCAS =
+=3D 1 */
+     rc->pci_segment_number =3D 0; /* MCFG pci_segment */
+=20
+-    /* Identity RID mapping covering the whole input RID range */
+-    idmap =3D &rc->id_mapping_array[0];
+-    idmap->input_base =3D 0;
+-    idmap->id_count =3D cpu_to_le32(0xFFFF);
+-    idmap->output_base =3D 0;
+-
+     if (vms->iommu =3D=3D VIRT_IOMMU_SMMUV3) {
+-        /* output IORT node is the smmuv3 node */
+-        idmap->output_reference =3D cpu_to_le32(smmu_offset);
++        /* Identity RID mapping and output IORT node is the iommu node */
++        fill_iort_idmap(rc->id_mapping_array, 0, 0, 0xFFFF, 0,
++                        smmu_offset);
+     } else {
+-        /* output IORT node is the ITS group node (the first node) */
+-        idmap->output_reference =3D cpu_to_le32(iort_node_offset);
++        /*
++         * Identity RID mapping and the output IORT node is the ITS group
++         * node (the first node).
++         */
++        fill_iort_idmap(rc->id_mapping_array, 0, 0, 0xFFFF, 0,
++                        iort_node_offset);
+     }
+=20
+     /*
+--=20
+2.20.1
 
 
