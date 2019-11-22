@@ -2,76 +2,69 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA9ABC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 00:02:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64492C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 00:03:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC79E206C2
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 00:02:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC79E206C2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=maskray.me
+	by mail.kernel.org (Postfix) with ESMTPS id 372FE2068D
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 00:03:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 372FE2068D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iXwOg-0004Hs-Pb
-	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 19:02:02 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38008)
+	id 1iXwQF-0005kM-BC
+	for qemu-devel@archiver.kernel.org; Thu, 21 Nov 2019 19:03:39 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38093)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <emacsray@gmail.com>) id 1iXwNY-0003pR-4b
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 19:00:53 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iXwPK-000584-3x
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 19:02:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <emacsray@gmail.com>) id 1iXwNW-0005po-Ac
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 19:00:51 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:46394)
- by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
- (Exim 4.71) (envelope-from <emacsray@gmail.com>) id 1iXwNW-0005nn-2c
- for qemu-devel@nongnu.org; Thu, 21 Nov 2019 19:00:50 -0500
-Received: by mail-pf1-f193.google.com with SMTP id 193so2546164pfc.13
- for <qemu-devel@nongnu.org>; Thu, 21 Nov 2019 16:00:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=U//hBsWdv/E1moPqjDBvpDQEwfrBxushU5Vtpg5IE9g=;
- b=ICC6xo8ViZNCCxmX5BNfpTnupkYP42qqW/sFvJWgZn/gQi44xDeZ3b5ubtAuPYI7BO
- qI6Ix9PNg6YS8e5yu7fiE+EBMLbSrNA+cfdzzZxFg2wz0D96ScD6YErHfLzIom0yqqxn
- 5tRTcPwMiGEk3wW2ebhXMQ05+vfWBrxfFKPGOzcwH/SxVqtx0jHLPG2vFRhiuQ19ePPK
- HihfpnVO917i1efF5qu/lUnRFH9FtWIAN1Bro94fera06T1DzhTSXU2+lUdu2tT8MsLr
- Zuu6eEDDDxMZY7xIZONPlcaLAj7SDp6zayrJ+dpIHUTTbrU2lz+gpVvNzFWQ//AqKoZQ
- La2A==
-X-Gm-Message-State: APjAAAU4XBq0zC1CQl6m31ytWJ/S+RTQd5iuy0LlYXfL0Yjp5+igdqWa
- fGU7PwV+lAOUdcCll3nbgD8r3aTKuuM=
-X-Google-Smtp-Source: APXvYqzP26Xo9bTNJWJDm8GzBmCIzNw7mjdTEJOwAOPHQNUXeEVZjc0LBd01EFHgac1G27Nxl1SQ7w==
-X-Received: by 2002:a63:596:: with SMTP id 144mr12905603pgf.207.1574380848579; 
- Thu, 21 Nov 2019 16:00:48 -0800 (PST)
-Received: from localhost ([2620:15c:2d1:100:7901:ead3:b8cd:1c59])
- by smtp.gmail.com with ESMTPSA id x9sm1697201pgt.66.2019.11.21.16.00.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 21 Nov 2019 16:00:47 -0800 (PST)
-Date: Thu, 21 Nov 2019 16:00:45 -0800
-From: Fangrui Song <i@maskray.me>
-To: Eric Blake <eblake@redhat.com>
-Subject: [PATCH v2] Fix incorrect integer->float conversions caught by clang
- -Wimplicit-int-float-conversion
-Message-ID: <20191122000045.vz3eq6s6aqkv6l6h@gmail.com>
-References: <20191116010731.3jdxozzfpsqsrcc4@google.com>
- <20191119204932.5gdzlsplijveqwju@gmail.com>
- <e456fd62-95d7-4a52-9e14-cf0dbe01f995@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1iXwPI-0008Ie-1f
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 19:02:41 -0500
+Resent-Date: Thu, 21 Nov 2019 19:02:41 -0500
+Resent-Message-Id: <E1iXwPI-0008Ie-1f@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21177)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iXwPH-0008HP-S7
+ for qemu-devel@nongnu.org; Thu, 21 Nov 2019 19:02:39 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1574380953; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=HDRABMzmzP9LucPRdtRoVHYDzuLqNrY3BN0QvxgIX3SMRxIzHQ7CUZh1MZ3gf1r0PwJPtWGx52INWTtzSFmURpFaEBvoRwkMao0P/4uqOPYFJXtm7rf/1qU/0ZM0ixtRic1y2xds3L4fq0JSa0009jGHqTSYbhbtKXHt0vOajog=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1574380953;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=feJ2c/4SFkEi8+EEAMcKeblEcj43lK4jyp3OwBXt2hg=; 
+ b=NYmobjFbMHBib1X1rDkOD7M5oUSgq81dTcTyO3z0wesPdyJRLKaSlPnsG+CCuPIEaEXrpex/zQxDZvZ60bQcwk4TLW/3kCcfepdtQu4CurxcLVX/cWH9R41MoCvs09BLVtiHjjTP7IyRBQ2oaGNVOgPDBHClS8icGkpOcDsm1Kk=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1574380952238154.1694260311889;
+ Thu, 21 Nov 2019 16:02:32 -0800 (PST)
+In-Reply-To: <cover.1574375668.git.dirty@apple.com>
+Subject: Re: [PATCH 0/5] hvf: stability fixes for HVF
+Message-ID: <157438095124.7001.5289891906438578030@37313f22b938>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="bfqawgghx64xvo3e"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e456fd62-95d7-4a52-9e14-cf0dbe01f995@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: qemu-devel@nongnu.org
+Date: Thu, 21 Nov 2019 16:02:32 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 209.85.210.193
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -83,172 +76,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS9jb3Zlci4xNTc0Mzc1NjY4Lmdp
+dC5kaXJ0eUBhcHBsZS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8gaGF2ZSBzb21l
+IGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9yZSBpbmZvcm1h
+dGlvbjoKClN1YmplY3Q6IFtQQVRDSCAwLzVdIGh2Zjogc3RhYmlsaXR5IGZpeGVzIGZvciBIVkYK
+VHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IGNvdmVyLjE1NzQzNzU2NjguZ2l0LmRpcnR5QGFwcGxl
+LmNvbQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNl
+IGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFt
+ZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcg
+LS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwg
+LS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClN3aXRjaGVkIHRvIGEg
+bmV3IGJyYW5jaCAndGVzdCcKZTFkMTY3OSBodmY6IHNhdmUgYXdheSB0eXBlIGFzIHdlbGwgYXMg
+dmVjdG9yIHNvIHdlIGNhbiByZWluamVjdCB0aGVtCmIyMDFhMWIgaHZmOiBtb3JlIGFjY3VyYXRl
+bHkgbWF0Y2ggU0RNIHdoZW4gc2V0dGluZyBDUjAgYW5kIFBEUFRFIHJlZ2lzdGVycwo5OTViZDA3
+IGh2ZjogY29ycmVjdGx5IGhhbmRsZSBSRVggcHJlZml4IGluIHJlbGF0aW9uIHRvIGxlZ2FjeSBw
+cmVmaXhlcwozZWJiN2NmIGh2ZjogcmVtb3ZlIFRTQyBzeW5jaHJvbml6YXRpb24gY29kZSBiZWNh
+dXNlIGl0IGlzbid0IGZ1bGx5IGNvbXBsZXRlCjVhOTllNGYgaHZmOiBub24tUkFNLCBub24tUk9N
+RCBtZW1vcnkgcmFuZ2VzIGFyZSBub3cgY29ycmVjdGx5IG1hcHBlZCBpbgoKPT09IE9VVFBVVCBC
+RUdJTiA9PT0KMS81IENoZWNraW5nIGNvbW1pdCA1YTk5ZTRmYzQ2NDMgKGh2Zjogbm9uLVJBTSwg
+bm9uLVJPTUQgbWVtb3J5IHJhbmdlcyBhcmUgbm93IGNvcnJlY3RseSBtYXBwZWQgaW4pCldBUk5J
+Tkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiM3
+MjogRklMRTogdGFyZ2V0L2kzODYvaHZmL2h2Zi5jOjE3MToKKyAgICAgICAgICAgIC8qIElmIHRo
+ZSBtZW1vcnkgZGV2aWNlIGlzIG5vdCBpbiByb21kX21vZGUsIHRoZW4gd2UgYWN0dWFsbHkgd2Fu
+dAoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0
+ZSBsaW5lCiM3MzogRklMRTogdGFyZ2V0L2kzODYvaHZmL2h2Zi5jOjE3MjoKKyAgICAgICAgICAg
+ICAqIHRvIHJlbW92ZSB0aGUgaHZmIG1lbW9yeSBzbG90IHNvIGFsbCBhY2Nlc3NlcyB3aWxsIHRy
+YXAuICovCgpFUlJPUjogRXJyb3IgbWVzc2FnZXMgc2hvdWxkIG5vdCBjb250YWluIG5ld2xpbmVz
+CiM5MjogRklMRTogdGFyZ2V0L2kzODYvaHZmL2h2Zi5jOjE5NDoKKyAgICAgICAgICAgIGVycm9y
+X3JlcG9ydCgiRmFpbGVkIHRvIHJlc2V0IG92ZXJsYXBwaW5nIHNsb3RcbiIpOwoKV0FSTklORzog
+bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzEwMDogRklMRTogdGFyZ2V0L2kzODYvaHZmL2h2Zi5j
+OjIwMzoKKyAgICBpZiAoYXJlYS0+cmVhZG9ubHkgfHwgKCFtZW1vcnlfcmVnaW9uX2lzX3JhbShh
+cmVhKSAmJiBtZW1vcnlfcmVnaW9uX2lzX3JvbWQoYXJlYSkpKQoKRVJST1I6IGJyYWNlcyB7fSBh
+cmUgbmVjZXNzYXJ5IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojMTAwOiBGSUxFOiB0
+YXJnZXQvaTM4Ni9odmYvaHZmLmM6MjAzOgorICAgIGlmIChhcmVhLT5yZWFkb25seSB8fCAoIW1l
+bW9yeV9yZWdpb25faXNfcmFtKGFyZWEpICYmIG1lbW9yeV9yZWdpb25faXNfcm9tZChhcmVhKSkp
+ClsuLi5dCisgICAgZWxzZQpbLi4uXQoKRVJST1I6IEVycm9yIG1lc3NhZ2VzIHNob3VsZCBub3Qg
+Y29udGFpbiBuZXdsaW5lcwojMTE1OiBGSUxFOiB0YXJnZXQvaTM4Ni9odmYvaHZmLmM6MjI5Ogor
+ICAgICAgICBlcnJvcl9yZXBvcnQoIkVycm9yIHJlZ2lzdGVyaW5nIG5ldyBtZW1vcnkgc2xvdFxu
+Iik7CgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMg
+c3RhdGVtZW50CiMxMjQ6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi9odmYuYzozNTc6CisgICAgaWYg
+KCFzbG90KQpbLi4uXQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxMjY6IEZJTEU6
+IHRhcmdldC9pMzg2L2h2Zi9odmYuYzozNTk6CisgICAgaWYgKCFtZW1vcnlfcmVnaW9uX2lzX3Jh
+bShzbG90LT5yZWdpb24pICYmICEocmVhZCAmJiBtZW1vcnlfcmVnaW9uX2lzX3JvbWQoc2xvdC0+
+cmVnaW9uKSkpCgpFUlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9m
+IHRoaXMgc3RhdGVtZW50CiMxMjY6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi9odmYuYzozNTk6Cisg
+ICAgaWYgKCFtZW1vcnlfcmVnaW9uX2lzX3JhbShzbG90LT5yZWdpb24pICYmICEocmVhZCAmJiBt
+ZW1vcnlfcmVnaW9uX2lzX3JvbWQoc2xvdC0+cmVnaW9uKSkpClsuLi5dCgp0b3RhbDogNiBlcnJv
+cnMsIDMgd2FybmluZ3MsIDEyOCBsaW5lcyBjaGVja2VkCgpQYXRjaCAxLzUgaGFzIHN0eWxlIHBy
+b2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2Ug
+cG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBp
+biBNQUlOVEFJTkVSUy4KCjIvNSBDaGVja2luZyBjb21taXQgM2ViYjdjZjRhYjdmIChodmY6IHJl
+bW92ZSBUU0Mgc3luY2hyb25pemF0aW9uIGNvZGUgYmVjYXVzZSBpdCBpc24ndCBmdWxseSBjb21w
+bGV0ZSkKMy81IENoZWNraW5nIGNvbW1pdCA5OTViZDA3ZWQ3NTYgKGh2ZjogY29ycmVjdGx5IGhh
+bmRsZSBSRVggcHJlZml4IGluIHJlbGF0aW9uIHRvIGxlZ2FjeSBwcmVmaXhlcykKV0FSTklORzog
+bGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM0OiBGSUxFOiB0YXJnZXQvaTM4Ni9odmYveDg2X2Rl
+Y29kZS5jOjE2OTE6Cit0YXJnZXRfdWxvbmcgZ2V0X3JlZ19yZWYoQ1BVWDg2U3RhdGUgKmVudiwg
+aW50IHJlZywgaW50IHJleF9wcmVzZW50LCBpbnQgaXNfZXh0ZW5kZWQsCgpXQVJOSU5HOiBsaW5l
+IG92ZXIgODAgY2hhcmFjdGVycwojNjU6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi94ODZfZGVjb2Rl
+LmM6MTcxNToKK3RhcmdldF91bG9uZyBnZXRfcmVnX3ZhbChDUFVYODZTdGF0ZSAqZW52LCBpbnQg
+cmVnLCBpbnQgcmV4X3ByZXNlbnQsIGludCBpc19leHRlbmRlZCwKCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiM3MDogRklMRTogdGFyZ2V0L2kzODYvaHZmL3g4Nl9kZWNvZGUuYzox
+NzE5OgorICAgIG1lbWNweSgmdmFsLCAodm9pZCAqKWdldF9yZWdfcmVmKGVudiwgcmVnLCByZXhf
+cHJlc2VudCwgaXNfZXh0ZW5kZWQsIHNpemUpLCBzaXplKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM3ODogRklMRTogdGFyZ2V0L2kzODYvaHZmL3g4Nl9kZWNvZGUuYzoxODUy
+OgorICAgICAgICAvKiBSRVggcHJlZml4IG11c3QgY29tZSBhZnRlciBsZWdhY3kgcHJlZml4ZXMu
+ICBSRVggYmVmb3JlIGxlZ2FjeSBpcyBpZ25vcmVkLgoKV0FSTklORzogQmxvY2sgY29tbWVudHMg
+dXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzc4OiBGSUxFOiB0YXJnZXQvaTM4
+Ni9odmYveDg2X2RlY29kZS5jOjE4NTI6CisgICAgICAgIC8qIFJFWCBwcmVmaXggbXVzdCBjb21l
+IGFmdGVyIGxlZ2FjeSBwcmVmaXhlcy4gIFJFWCBiZWZvcmUgbGVnYWN5IGlzIGlnbm9yZWQuCgpX
+QVJOSU5HOiBCbG9jayBjb21tZW50cyB1c2UgKiBvbiBzdWJzZXF1ZW50IGxpbmVzCiM3OTogRklM
+RTogdGFyZ2V0L2kzODYvaHZmL3g4Nl9kZWNvZGUuYzoxODUzOgorICAgICAgICAvKiBSRVggcHJl
+Zml4IG11c3QgY29tZSBhZnRlciBsZWdhY3kgcHJlZml4ZXMuICBSRVggYmVmb3JlIGxlZ2FjeSBp
+cyBpZ25vcmVkLgorICAgICAgICAgICBDbGVhciByZXggdG8gc2ltdWxhdGUgdGhpcy4gKi8KCldB
+Uk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIHRyYWlsaW5nICovIG9uIGEgc2VwYXJhdGUgbGlu
+ZQojNzk6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi94ODZfZGVjb2RlLmM6MTg1MzoKKyAgICAgICAg
+ICAgQ2xlYXIgcmV4IHRvIHNpbXVsYXRlIHRoaXMuICovCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAg
+Y2hhcmFjdGVycwojMTkyOiBGSUxFOiB0YXJnZXQvaTM4Ni9odmYveDg2X2RlY29kZS5oOjMwNjoK
+K3RhcmdldF91bG9uZyBnZXRfcmVnX3JlZihDUFVYODZTdGF0ZSAqZW52LCBpbnQgcmVnLCBpbnQg
+cmV4X3ByZXNlbnQsIGludCBpc19leHRlbmRlZCwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiMxOTU6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi94ODZfZGVjb2RlLmg6MzA4OgordGFy
+Z2V0X3Vsb25nIGdldF9yZWdfdmFsKENQVVg4NlN0YXRlICplbnYsIGludCByZWcsIGludCByZXhf
+cHJlc2VudCwgaW50IGlzX2V4dGVuZGVkLAoKdG90YWw6IDAgZXJyb3JzLCA5IHdhcm5pbmdzLCAx
+NjkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMy81IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
+dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
+dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjQv
+NSBDaGVja2luZyBjb21taXQgYjIwMWExYjNiODIyIChodmY6IG1vcmUgYWNjdXJhdGVseSBtYXRj
+aCBTRE0gd2hlbiBzZXR0aW5nIENSMCBhbmQgUERQVEUgcmVnaXN0ZXJzKQo1LzUgQ2hlY2tpbmcg
+Y29tbWl0IGUxZDE2Nzk1Yjk3YSAoaHZmOiBzYXZlIGF3YXkgdHlwZSBhcyB3ZWxsIGFzIHZlY3Rv
+ciBzbyB3ZSBjYW4gcmVpbmplY3QgdGhlbSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3Rl
+cnMKIzI1OiBGSUxFOiB0YXJnZXQvaTM4Ni9odmYvaHZmLmM6NjM3OgorICAgICAgICAgICAgLyog
+U2F2ZSBhd2F5IHRoZSBldmVudCB0eXBlIGFzIHdlbGwgc28gd2UgY2FuIGluamVjdCB0aGUgY29y
+cmVjdCB0eXBlLiAqLwoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMyNjogRklMRTog
+dGFyZ2V0L2kzODYvaHZmL2h2Zi5jOjYzODoKKyAgICAgICAgICAgIGVudi0+aW50ZXJydXB0X2lu
+amVjdGVkID0gaWR0dmVjX2luZm8gJiAoVk1DU19JRFRfVkVDX1RZUEUgfCBWTUNTX0lEVF9WRUNf
+VkVDTlVNKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzNDogRklMRTogdGFy
+Z2V0L2kzODYvaHZmL2h2Zi5jOjY0NToKKyAgICAgICAgICAgIC8qIFNhdmUgYXdheSB0aGUgZXZl
+bnQgdHlwZSBhcyB3ZWxsIHNvIHdlIGNhbiBpbmplY3QgdGhlIGNvcnJlY3QgdHlwZS4gKi8KCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzNTogRklMRTogdGFyZ2V0L2kzODYvaHZm
+L2h2Zi5jOjY0NjoKKyAgICAgICAgICAgIGVudi0+ZXhjZXB0aW9uX25yID0gaWR0dmVjX2luZm8g
+JiAoVk1DU19JRFRfVkVDX1RZUEUgfCBWTUNTX0lEVF9WRUNfVkVDTlVNKTsKCldBUk5JTkc6IGxp
+bmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMDg6IEZJTEU6IHRhcmdldC9pMzg2L2h2Zi94ODZodmYu
+YzozODk6CisgICAgICAgICAgICAgICAgLyogTWFrZSBzdXJlIHRvIGluZGljYXRlIHRoYXQgVk1D
+U19FTlRSWV9FWENFUFRJT05fRVJST1IgaXMgdmFsaWQgKi8KCnRvdGFsOiAxIGVycm9ycywgNCB3
+YXJuaW5ncywgOTEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS81IGhhcyBzdHlsZSBwcm9ibGVtcywg
+cGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZl
+cyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRB
+SU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
+OiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
+cy9jb3Zlci4xNTc0Mzc1NjY4LmdpdC5kaXJ0eUBhcHBsZS5jb20vdGVzdGluZy5jaGVja3BhdGNo
+Lz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRj
+aGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8g
+cGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
 
---bfqawgghx64xvo3e
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-
-On 2019-11-21, Eric Blake wrote:
->On 11/19/19 2:49 PM, Fangrui Song wrote:
->
->>>
->>>Can we simply drop the offending line statement instead?
->>
->>Fixed in the new patch.
->>
->
->>>The first val * mul above this range is 0x1p64.  Rejecting it is
->>>correct, because it overflows yint64_t.
->>
->>I am not subscribed, so apologize that this email may be off the thread.
->>
->>(The binutils mailing list allows a user to download the raw email so I
->>can still reply to a specific email, but this list does not provide such
->>feature.)
->
->Actually, it's better to post a v2 patch as a new top-level thread, 
->rather than buried as an attachment to a reply to v1, because our CI 
->tooling doesn't see through the attachment (nor was it easy for me to 
->reply to the v2 patch - I had to open the attachment to paste its text 
->inline below...).
->
->More patch submission hints at https://wiki.qemu.org/Contribute/SubmitAPatch
-
-Retitled to [PATCH v2]
-
->>>From 5f1c5a42794ddcbabb63d9af920d9f437ea90a9f Mon Sep 17 00:00:00 2001
->>From: Fangrui Song <i@maskray.me>
->>Date: Fri, 15 Nov 2019 16:27:47 -0800
->>Subject: [PATCH] Fix incorrect integer->float conversions caught by clang
->> -Wimplicit-int-float-conversion
->>To: qemu-devel@nongnu.org
->>
->>The warning will be enabled by default in clang 10. It is not available for clang <= 9.
->>
->
->>+++ b/migration/migration.c
->>@@ -2035,11 +2035,10 @@ void qmp_migrate_set_downtime(double value, Error **errp)
->>     }
->>     value *= 1000; /* Convert to milliseconds */
->>-    value = MAX(0, MIN(INT64_MAX, value));
->>     MigrateSetParameters p = {
->>         .has_downtime_limit = true,
->>-        .downtime_limit = value,
->>+        .downtime_limit = (int64_t)value,
->>     };
->
->The explicit cast looks odd without a comment (generally, we try to 
->avoid casts, so a comment such as /* explicit cast to silence compiler 
->*/ can be useful)
->
-
-downtime_limit is an int64_t while value is a double.
-
-There is a diagnostic (-Wfloat-conversion, included by -Wconversion)
-
-   warning: conversion from ‘double’ to ‘int64_t’ {aka ‘long int’} may change value [-Wfloat-conversion]
-
-but it is not enabled by -Wall or -Wextra.
-
-I am not familiar with qemu coding style, but I strongly feel it is a good
-thing to add an explicit cast. If it does not fit the style, I hope a
-maintainer can delete that for me.
-
->>     qmp_migrate_set_parameters(&p, errp);
->>diff --git a/util/cutils.c b/util/cutils.c
->>index fd591cadf0..2b4484c015 100644
->>--- a/util/cutils.c
->>+++ b/util/cutils.c
->>@@ -239,10 +239,10 @@ static int do_strtosz(const char *nptr, const char **end,
->>         goto out;
->>     }
->>     /*
->>-     * Values >= 0xfffffffffffffc00 overflow uint64_t after their trip
->>+     * Values > nextafter(0x1p64, 0) overflow uint64_t after their trip
->>      * through double (53 bits of precision).
->
->I thought we agreed on more text than just this (in particular, that 
->the nextafter() call represents 2^64 rounded towards zero).
->
->>      */
->>-    if ((val * mul >= 0xfffffffffffffc00) || val < 0) {
->>+    if ((val * mul > nextafter(0x1p64, 0)) || val < 0) {
->>         retval = -ERANGE;
->>         goto out;
->>     }
-
-Sorry, I uploaded the wrong patch file. Attaching the correct one now.
-
---bfqawgghx64xvo3e
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment; filename="qemu.patch"
-
-From d533585df39083e88adc50b881a4be74125c837e Mon Sep 17 00:00:00 2001
-From: Fangrui Song <i@maskray.me>
-Date: Fri, 15 Nov 2019 16:27:47 -0800
-Subject: [PATCH] Fix incorrect integer->float conversion caught by clang
- -Wimplicit-int-float-conversion
-To: qemu-devel@nongnu.org
-
-The warning will be enabled by default in clang 10. It is not available for clang <= 9.
-
-qemu/migration/migration.c:2038:24: error: implicit conversion from 'long' to 'double' changes value from 9223372036854775807 to 9223372036854775808 [-Werror,-Wimplicit-int-float-conversion]
-...
-qemu/util/cutils.c:245:23: error: implicit conversion from 'unsigned long' to 'double' changes value from 18446744073709550592 to 18446744073709551616 [-Werror,-Wimplicit-int-float-conversion]
-
-Signed-off-by: Fangrui Song <i@maskray.me>
----
- migration/migration.c | 3 +--
- util/cutils.c         | 8 +++++---
- 2 files changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/migration/migration.c b/migration/migration.c
-index 354ad072fa..09b150663f 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2035,11 +2035,10 @@ void qmp_migrate_set_downtime(double value, Error **errp)
-     }
- 
-     value *= 1000; /* Convert to milliseconds */
--    value = MAX(0, MIN(INT64_MAX, value));
- 
-     MigrateSetParameters p = {
-         .has_downtime_limit = true,
--        .downtime_limit = value,
-+        .downtime_limit = (int64_t)value,
-     };
- 
-     qmp_migrate_set_parameters(&p, errp);
-diff --git a/util/cutils.c b/util/cutils.c
-index fd591cadf0..77acadc70a 100644
---- a/util/cutils.c
-+++ b/util/cutils.c
-@@ -239,10 +239,12 @@ static int do_strtosz(const char *nptr, const char **end,
-         goto out;
-     }
-     /*
--     * Values >= 0xfffffffffffffc00 overflow uint64_t after their trip
--     * through double (53 bits of precision).
-+     * Values near UINT64_MAX overflow to 2**64 when converting to double
-+     * precision.  Compare against the maximum representable double precision
-+     * value below 2**64, computed as "the next value after 2**64 (0x1p64) in
-+     * the direction of 0".
-      */
--    if ((val * mul >= 0xfffffffffffffc00) || val < 0) {
-+    if ((val * mul > nextafter(0x1p64, 0)) || val < 0) {
-         retval = -ERANGE;
-         goto out;
-     }
--- 
-2.24.0
-
-
---bfqawgghx64xvo3e--
 
