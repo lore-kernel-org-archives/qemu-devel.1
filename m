@@ -2,84 +2,84 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D65C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 13:49:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50885C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 13:51:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6595A20707
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 13:49:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cy8gJ9yw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6595A20707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 23FEC20707
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 13:51:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23FEC20707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY9JM-0001uI-6P
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 08:49:24 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56391)
+	id 1iY9LA-00030H-83
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 08:51:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43521)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <vgoyal@redhat.com>) id 1iY9G6-0000Qh-9X
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 08:46:03 -0500
+ (envelope-from <yadong.qi@intel.com>) id 1iY41x-0007TX-NV
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:11:06 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <vgoyal@redhat.com>) id 1iY9G3-0006SA-R4
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 08:46:01 -0500
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33901
- helo=us-smtp-delivery-1.mimecast.com)
+ (envelope-from <yadong.qi@intel.com>) id 1iY41v-0006E6-Ps
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:11:04 -0500
+Received: from mga04.intel.com ([192.55.52.120]:41277)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <vgoyal@redhat.com>) id 1iY9G2-0006Rh-Se
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 08:45:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574430357;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WShRKj48036N4/tpgIhVdr3bMBYpW0E56yC2fO+jE3I=;
- b=Cy8gJ9ywBeHYby9SJAlph+rD+RI9ulUOPJ2ofpnhgOEyN4c/P9nh1ISS6FTqBp7ZopUGNc
- wm9V4uSC/zRnxaZQznJUr8OSUJ648f2plMzSgxCjio0F8X9j0hC4rqJ+o+Lq6ejuHlMICb
- NxDaRwJuzN6JU+NCX4qqGFtLaW1Aii0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-399-tqpa3nqrObOwhk0FSTcJfA-1; Fri, 22 Nov 2019 08:45:54 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6414B8024C3;
- Fri, 22 Nov 2019 13:45:53 +0000 (UTC)
-Received: from horse.redhat.com (unknown [10.18.25.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1CB3C75E57;
- Fri, 22 Nov 2019 13:45:48 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
- id A218F220AFF; Fri, 22 Nov 2019 08:45:47 -0500 (EST)
-Date: Fri, 22 Nov 2019 08:45:47 -0500
-From: Vivek Goyal <vgoyal@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH 1/4] virtiofsd: Release file locks using F_UNLCK
-Message-ID: <20191122134547.GC8636@redhat.com>
-References: <20191115205543.1816-1-vgoyal@redhat.com>
- <20191115205543.1816-2-vgoyal@redhat.com>
- <20191122100713.GB464656@stefanha-x1.localdomain>
+ (Exim 4.71) (envelope-from <yadong.qi@intel.com>) id 1iY41v-0006BL-I5
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 03:11:03 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+ by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
+ 22 Nov 2019 00:10:59 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.69,229,1571727600"; d="scan'208";a="358064271"
+Received: from fmsmsx104.amr.corp.intel.com ([10.18.124.202])
+ by orsmga004.jf.intel.com with ESMTP; 22 Nov 2019 00:10:58 -0800
+Received: from FMSMSX109.amr.corp.intel.com (10.18.116.9) by
+ fmsmsx104.amr.corp.intel.com (10.18.124.202) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 22 Nov 2019 00:10:57 -0800
+Received: from shsmsx153.ccr.corp.intel.com (10.239.6.53) by
+ fmsmsx109.amr.corp.intel.com (10.18.116.9) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 22 Nov 2019 00:10:57 -0800
+Received: from shsmsx103.ccr.corp.intel.com ([169.254.4.60]) by
+ SHSMSX153.ccr.corp.intel.com ([169.254.12.215]) with mapi id 14.03.0439.000;
+ Fri, 22 Nov 2019 16:10:56 +0800
+From: "Qi, Yadong" <yadong.qi@intel.com>
+To: Peter Xu <peterx@redhat.com>, "Zhang, Qi1" <qi1.zhang@intel.com>
+Subject: RE: [PATCH v2 1/2] intel_iommu: split the resevred fields arrays
+ into two ones
+Thread-Topic: [PATCH v2 1/2] intel_iommu: split the resevred fields arrays
+ into two ones
+Thread-Index: AQHVnvNLAxHfUS6liUe0mpSogunjTqeW1viQ
+Date: Fri, 22 Nov 2019 08:10:55 +0000
+Message-ID: <C69EF7F3128A684C897EAA242006F9A2526930ED@SHSMSX103.ccr.corp.intel.com>
+References: <cover.1570503331.git.qi1.zhang@intel.com>
+ <d3aa65ad0510cdafd5d7dcbc54bc250feb6aa59b.1570503331.git.qi1.zhang@intel.com>
+ <20191119160607.GK9053@xz-x1>
+In-Reply-To: <20191119160607.GK9053@xz-x1>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNzUxNDY5ODEtNzIyMi00YjRlLTllMWUtOTlhOGRlMGU0ZjFhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiV0pyMjJ2ajZGS0grQVhnWlVIQk1WNENIOW9yRURRN1hiTmwxbnhOQThyeHg3RHRzZXlpSngyNGlUenUrVmZ6aiJ9
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.40]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20191122100713.GB464656@stefanha-x1.localdomain>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-MC-Unique: tqpa3nqrObOwhk0FSTcJfA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 192.55.52.120
+X-Mailman-Approved-At: Fri, 22 Nov 2019 08:44:30 -0500
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -91,55 +91,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, miklos@szeredi.hu, qemu-devel@nongnu.org,
- dgilbert@redhat.com
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>, "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "ehabkost@redhat.com" <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Nov 22, 2019 at 10:07:13AM +0000, Stefan Hajnoczi wrote:
-> On Fri, Nov 15, 2019 at 03:55:40PM -0500, Vivek Goyal wrote:
-> > diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/pas=
-sthrough_ll.c
-> > index bc214df0c7..028e7da273 100644
-> > --- a/contrib/virtiofsd/passthrough_ll.c
-> > +++ b/contrib/virtiofsd/passthrough_ll.c
-> > @@ -936,6 +936,14 @@ static void put_shared(struct lo_data *lo, struct =
-lo_inode *inode)
-> >  =09}
-> >  }
-> > =20
-> > +static void release_plock(gpointer data)
->=20
-> The name posix_locks_value_destroy() would be clearer because it matches
-> g_hash_table_new_full() terminology and the function cannot be confused
-> with a lock acquire/release operation.
-
-Ok, will use this name.
-
->=20
-> This patch conflicts with the cleanups that are currently being made to
-> virtiofsd:
-> https://github.com/stefanha/qemu/commit/1e493175feca58a81a2d0cbdac93b92e5=
-425d850#diff-ca2dea995d1e6cdb95c8a47c7cca51ceR773
-
-Yes it will. I see you are removing element from hash table on lo_flush().
-This works fine today but with waiting locks, we drop the
-inode->plock_mutex lock and then wait for the lock and expect
-"lo_inode_plock" to not go away.
-
-So I don't think you can remove the element from hash table upon
-lo_flush(). May be we can refcount lo_inode_plock structure and first
-release all the locks using setlk(UNLCK) and then drop the reference. If
-this is last refernce, it will be freed.
-
-And waiting lock code, will obtain a refernce under inode->posix_locks
-and then wait for lock outside the lock.
-
-IOW, I will say don't do this optimization of lookup + remove because
-it will not work with blocking locks.
-
-Thanks
-Vivek
-
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFBldGVyIFh1IDxwZXRlcnhA
+cmVkaGF0LmNvbT4NCj4gU2VudDogV2VkbmVzZGF5LCBOb3ZlbWJlciAyMCwgMjAxOSAxMjowNiBB
+TQ0KPiBUbzogWmhhbmcsIFFpMSA8cWkxLnpoYW5nQGludGVsLmNvbT4NCj4gQ2M6IHFlbXUtZGV2
+ZWxAbm9uZ251Lm9yZzsgZWhhYmtvc3RAcmVkaGF0LmNvbTsgbXN0QHJlZGhhdC5jb207DQo+IHBi
+b256aW5pQHJlZGhhdC5jb207IFFpLCBZYWRvbmcgPHlhZG9uZy5xaUBpbnRlbC5jb20+OyBydGhA
+dHdpZGRsZS5uZXQNCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2MiAxLzJdIGludGVsX2lvbW11OiBz
+cGxpdCB0aGUgcmVzZXZyZWQgZmllbGRzIGFycmF5cyBpbnRvDQo+IHR3byBvbmVzDQo+IA0KPiBP
+biBUdWUsIE5vdiAxOSwgMjAxOSBhdCAwODoyODoxM1BNICswODAwLCBxaTEuemhhbmdAaW50ZWwu
+Y29tIHdyb3RlOg0KPiA+IEBAIC0zNTQ3LDE1ICszNTQ4LDE3IEBAIHN0YXRpYyB2b2lkIHZ0ZF9p
+bml0KEludGVsSU9NTVVTdGF0ZSAqcykNCj4gPiAgICAgIC8qDQo+ID4gICAgICAgKiBSc3ZkIGZp
+ZWxkIG1hc2tzIGZvciBzcHRlDQo+ID4gICAgICAgKi8NCj4gPiAtICAgIHZ0ZF9wYWdpbmdfZW50
+cnlfcnN2ZF9maWVsZFswXSA9IH4wVUxMOw0KPiA+IC0gICAgdnRkX3BhZ2luZ19lbnRyeV9yc3Zk
+X2ZpZWxkWzFdID0gVlREX1NQVEVfUEFHRV9MMV9SU1ZEX01BU0socy0NCj4gPmF3X2JpdHMpOw0K
+PiA+IC0gICAgdnRkX3BhZ2luZ19lbnRyeV9yc3ZkX2ZpZWxkWzJdID0gVlREX1NQVEVfUEFHRV9M
+Ml9SU1ZEX01BU0socy0NCj4gPmF3X2JpdHMpOw0KPiA+IC0gICAgdnRkX3BhZ2luZ19lbnRyeV9y
+c3ZkX2ZpZWxkWzNdID0gVlREX1NQVEVfUEFHRV9MM19SU1ZEX01BU0socy0NCj4gPmF3X2JpdHMp
+Ow0KPiA+IC0gICAgdnRkX3BhZ2luZ19lbnRyeV9yc3ZkX2ZpZWxkWzRdID0gVlREX1NQVEVfUEFH
+RV9MNF9SU1ZEX01BU0socy0NCj4gPmF3X2JpdHMpOw0KPiA+IC0gICAgdnRkX3BhZ2luZ19lbnRy
+eV9yc3ZkX2ZpZWxkWzVdID0gVlREX1NQVEVfTFBBR0VfTDFfUlNWRF9NQVNLKHMtDQo+ID5hd19i
+aXRzKTsNCj4gPiAtICAgIHZ0ZF9wYWdpbmdfZW50cnlfcnN2ZF9maWVsZFs2XSA9IFZURF9TUFRF
+X0xQQUdFX0wyX1JTVkRfTUFTSyhzLQ0KPiA+YXdfYml0cyk7DQo+ID4gLSAgICB2dGRfcGFnaW5n
+X2VudHJ5X3JzdmRfZmllbGRbN10gPSBWVERfU1BURV9MUEFHRV9MM19SU1ZEX01BU0socy0NCj4g
+PmF3X2JpdHMpOw0KPiA+IC0gICAgdnRkX3BhZ2luZ19lbnRyeV9yc3ZkX2ZpZWxkWzhdID0gVlRE
+X1NQVEVfTFBBR0VfTDRfUlNWRF9NQVNLKHMtDQo+ID5hd19iaXRzKTsNCj4gPiArICAgIHZ0ZF9z
+cHRlX3JzdmRbMF0gPSB+MFVMTDsNCj4gPiArICAgIHZ0ZF9zcHRlX3JzdmRbMV0gPSBWVERfU1BU
+RV9QQUdFX0wxX1JTVkRfTUFTSyhzLT5hd19iaXRzKTsNCj4gPiArICAgIHZ0ZF9zcHRlX3JzdmRb
+Ml0gPSBWVERfU1BURV9QQUdFX0wyX1JTVkRfTUFTSyhzLT5hd19iaXRzKTsNCj4gPiArICAgIHZ0
+ZF9zcHRlX3JzdmRbM10gPSBWVERfU1BURV9QQUdFX0wzX1JTVkRfTUFTSyhzLT5hd19iaXRzKTsN
+Cj4gPiArICAgIHZ0ZF9zcHRlX3JzdmRbNF0gPSBWVERfU1BURV9QQUdFX0w0X1JTVkRfTUFTSyhz
+LT5hd19iaXRzKTsNCj4gPiArDQo+ID4gKyAgICB2dGRfc3B0ZV9yc3ZkX2xhcmdlWzBdID0gfjBV
+TEw7DQo+ID4gKyAgICB2dGRfc3B0ZV9yc3ZkX2xhcmdlWzFdID0gVlREX1NQVEVfTFBBR0VfTDFf
+UlNWRF9NQVNLKHMtPmF3X2JpdHMpOw0KPiA+ICsgICAgdnRkX3NwdGVfcnN2ZF9sYXJnZVsyXSA9
+IFZURF9TUFRFX0xQQUdFX0wyX1JTVkRfTUFTSyhzLT5hd19iaXRzKTsNCj4gPiArICAgIHZ0ZF9z
+cHRlX3JzdmRfbGFyZ2VbM10gPSBWVERfU1BURV9MUEFHRV9MM19SU1ZEX01BU0socy0+YXdfYml0
+cyk7DQo+ID4gKyAgICB2dGRfc3B0ZV9yc3ZkX2xhcmdlWzRdID0gVlREX1NQVEVfTFBBR0VfTDRf
+UlNWRF9NQVNLKHMtPmF3X2JpdHMpOw0KPiANCj4gVGhpcyBsb29rcyBnb29kIHRvIG1lIGluIGdl
+bmVyYWwsIGJ1dC4uLiBTaW5jZSB3ZSdyZSBhdCBpdCwgZG8geW91IHRoaW5rIHdlIGNhbg0KPiBk
+aXJlY3RseSBkcm9wIFZURF9TUFRFX0xQQUdFX0wxX1JTVkRfTUFTSyBhbmQNCj4gVlREX1NQVEVf
+TFBBR0VfTDRfUlNWRF9NQVNLPyAgQXJlIHRoZXkgcmVhbGx5IHVzZWZ1bD8NCg0KWWVzLCB0aGUg
+TFBBR0VfTDEgYW5kIExQQUdFX0w0IGFyZSB1c2VsZXNzLiAgSSB3aWxsIHRyeSB0byBtYWtlIHRo
+ZSBjaGFuZ2UuDQoNCg0KQmVzdCBSZWdhcmQNCllhZG9uZw0KDQo=
 
