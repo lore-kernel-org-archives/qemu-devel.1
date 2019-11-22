@@ -2,100 +2,70 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B944C432C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 19:43:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCA0C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 20:27:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4864B20658
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 19:43:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZ2fVk0k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4864B20658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1D16220708
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 20:27:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D16220708
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYEpg-0000kj-BD
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 14:43:08 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49043)
+	id 1iYFWk-0003Vz-9H
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 15:27:38 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55028)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <philmd@redhat.com>) id 1iYEof-0008KR-V9
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 14:42:07 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iYFVd-0002w4-PT
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 15:26:31 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <philmd@redhat.com>) id 1iYEod-0005BH-4l
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 14:42:04 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:45029
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <philmd@redhat.com>) id 1iYEod-0005B1-1C
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 14:42:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574451722;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=kP1d71RujJG8R6w3M7TwO/JzpHHg8Y21s1bWY8+jkgc=;
- b=IZ2fVk0kTRE+18ve9LyxF5w1JKVSLUXjBFDk6UEIqYYDTdsVCJA0xpx4+axnQqQI/PtKXW
- brEQba8t2mkAt/m9xqfvc3j9xoiLpC6PMOs1US2OsFDqKhNkvP5QF4ni3QvLm7z0AvrT2/
- e5IUK6sNsCjZUEWfm3Wz4A51WYtW0j0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-1cDf-pszN4O781O7exBsSA-1; Fri, 22 Nov 2019 14:41:58 -0500
-Received: by mail-wr1-f72.google.com with SMTP id c6so4317557wrm.18
- for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 11:41:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=YNYqHA4DSfWnWa74/rLsawo64tbCUWrEOadlK4S6zQ8=;
- b=jix1QsIMI/f6E8SXSxHf1NO8DSO8+spaRSNNabKU+QbyCG8qEmc9Y24tBm8ES+6PL3
- pw1bCGdUfpOJyoAdM4h+7XxuxOtO5XqBzALw9LZP+kgimskQSoSmtDZGmNQUAGgnneUz
- kD7ecUawTD5UHdO8Bqj8f2t5t32OlBJSTn4Yjstl6lt0bqkJRAYQ4EvxG7xG6HM7ab33
- lTJU2kqoW8UKM9raN0xgvrAjLJI5iDcLkLjKklpN2WVhfFDHf8OH2/0TnY/mxHiQuGmo
- kXBMyFKMT/99OhM4dQ6nSKZDgedu7cqFBNA+HPQMoJ5a87oKRpviX7Yvp/zFdmVLjpXW
- tA0Q==
-X-Gm-Message-State: APjAAAVV2qrK9kQboBjiwv7XcZU0o0i2UKRbyQQ/FEFnQEkBHD5y6ACR
- lVXcygDRei0uVQ1dK3LMelS7x5pjBtP+yRDluNgfduBKebSit6QnQDJRKUkxRjx8zFopxAzzf9T
- vggq47KtY6gu6+Nc=
-X-Received: by 2002:a1c:7507:: with SMTP id o7mr17499055wmc.163.1574451717731; 
- Fri, 22 Nov 2019 11:41:57 -0800 (PST)
-X-Google-Smtp-Source: APXvYqxRQ/4rCwCc3SRVcWxd6ZwztRnLCTsgA5PiTxhzlKHn1TckUGmR2XRH2KiXdAE1VGttPYDo0Q==
-X-Received: by 2002:a1c:7507:: with SMTP id o7mr17499043wmc.163.1574451717529; 
- Fri, 22 Nov 2019 11:41:57 -0800 (PST)
-Received: from [192.168.1.35] (131.red-88-21-102.staticip.rima-tde.net.
- [88.21.102.131])
- by smtp.gmail.com with ESMTPSA id 19sm10390159wrc.47.2019.11.22.11.41.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 22 Nov 2019 11:41:56 -0800 (PST)
-Subject: Re: [PATCH] linux-user: fix translation of statx structures
-To: Aleksandar Markovic <aleksandar.m.mail@gmail.com>,
- Ariadne Conill <ariadne@dereferenced.org>
-References: <20191122174040.569252-1-ariadne@dereferenced.org>
- <CAL1e-=jBhF476ZErrbZ_ANBnrKhNNgYtntGDB-5BDMXdT9J0aQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7cd7bcbf-70f1-02b8-fa25-6e335f0669a1@redhat.com>
-Date: Fri, 22 Nov 2019 20:41:55 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.1.1
+ (envelope-from <no-reply@patchew.org>) id 1iYFVc-00074b-4s
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 15:26:29 -0500
+Resent-Date: Fri, 22 Nov 2019 15:26:29 -0500
+Resent-Message-Id: <E1iYFVc-00074b-4s@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21172)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iYFVb-00073L-T6
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 15:26:28 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1574454379; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=iiFy3Bjv96YSzkIRvRqQh+1Yah3m2TrNoFO/ZUWT2RQATQ2V52t5bYAY7Wz1K+4RsrBHRhwmCbzA0EczdnQU9VCJNMHaxSDY40yvWltf3fdKry1dBor/tsBzJnoDHGn17U1ZwazWqQgh+obvMZuR2///zZKvWSKR0DepMR7naiA=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1574454379;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=JvnUUgdXuanyU96aq/LCeYAFfGe91s+AoORRx7nWduc=; 
+ b=TYbOb/vwWxPXLBIOvKyevCJ3NOcuZ/OH1Lec6+vYRBr6xzRrcZ+1SPJjNcvLQ/WeorlkCv2c61r/NYZQ9PHDks5bKdoIdP9YTQX5BhfLycj8k3TSIyLmUHRd4pzBy9aMaFGnzrXTQuOshKCdIHrPAjPMKR18w3quhHkp8/cfAwk=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1574454377144481.51732741716796;
+ Fri, 22 Nov 2019 12:26:17 -0800 (PST)
+In-Reply-To: <20191122172201.11456-1-philmd@redhat.com>
+Subject: Re: [RFC PATCH-for-5.0] hw/pci-host: Add Kconfig selector for IGD
+ PCIe pass-through
+Message-ID: <157445437557.7001.12443690176718184739@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <CAL1e-=jBhF476ZErrbZ_ANBnrKhNNgYtntGDB-5BDMXdT9J0aQ@mail.gmail.com>
-Content-Language: en-US
-X-MC-Unique: 1cDf-pszN4O781O7exBsSA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: philmd@redhat.com
+Date: Fri, 22 Nov 2019 12:26:17 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 207.211.31.120
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -107,86 +77,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, mst@redhat.com, armbru@redhat.com, qemu-devel@nongnu.org,
+ alex.williamson@redhat.com, pbonzini@redhat.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/22/19 7:27 PM, Aleksandar Markovic wrote:
-> On Fri, Nov 22, 2019 at 7:22 PM Ariadne Conill <ariadne@dereferenced.org>=
- wrote:
->>
->> All timestamps were copied to atime instead of to their respective
->> fields.
->>
-
-Fixes: efa921845c0
-
->> Signed-off-by: Ariadne Conill <ariadne@dereferenced.org>
->> ---
->=20
-> What a bug.
->=20
-> Laurent, perhaps a good candidate for 4.2?
-
-Agreed.
-
->=20
-> Thanks for submitting this, Ariadne Conill!
-
-And welcome to QEMU :)
-
-> Reviewed-by: Aleksandar Markovic <amarkovic@wavecomp.com>
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
->>   linux-user/syscall.c | 12 ++++++------
->>   1 file changed, 6 insertions(+), 6 deletions(-)
->>
->> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->> index ce399a55f0..171c0caef3 100644
->> --- a/linux-user/syscall.c
->> +++ b/linux-user/syscall.c
->> @@ -6743,12 +6743,12 @@ static inline abi_long host_to_target_statx(stru=
-ct target_statx *host_stx,
->>       __put_user(host_stx->stx_attributes_mask, &target_stx->stx_attribu=
-tes_mask);
->>       __put_user(host_stx->stx_atime.tv_sec, &target_stx->stx_atime.tv_s=
-ec);
->>       __put_user(host_stx->stx_atime.tv_nsec, &target_stx->stx_atime.tv_=
-nsec);
->> -    __put_user(host_stx->stx_btime.tv_sec, &target_stx->stx_atime.tv_se=
-c);
->> -    __put_user(host_stx->stx_btime.tv_nsec, &target_stx->stx_atime.tv_n=
-sec);
->> -    __put_user(host_stx->stx_ctime.tv_sec, &target_stx->stx_atime.tv_se=
-c);
->> -    __put_user(host_stx->stx_ctime.tv_nsec, &target_stx->stx_atime.tv_n=
-sec);
->> -    __put_user(host_stx->stx_mtime.tv_sec, &target_stx->stx_atime.tv_se=
-c);
->> -    __put_user(host_stx->stx_mtime.tv_nsec, &target_stx->stx_atime.tv_n=
-sec);
->> +    __put_user(host_stx->stx_btime.tv_sec, &target_stx->stx_btime.tv_se=
-c);
->> +    __put_user(host_stx->stx_btime.tv_nsec, &target_stx->stx_btime.tv_n=
-sec);
->> +    __put_user(host_stx->stx_ctime.tv_sec, &target_stx->stx_ctime.tv_se=
-c);
->> +    __put_user(host_stx->stx_ctime.tv_nsec, &target_stx->stx_ctime.tv_n=
-sec);
->> +    __put_user(host_stx->stx_mtime.tv_sec, &target_stx->stx_mtime.tv_se=
-c);
->> +    __put_user(host_stx->stx_mtime.tv_nsec, &target_stx->stx_mtime.tv_n=
-sec);
->>       __put_user(host_stx->stx_rdev_major, &target_stx->stx_rdev_major);
->>       __put_user(host_stx->stx_rdev_minor, &target_stx->stx_rdev_minor);
->>       __put_user(host_stx->stx_dev_major, &target_stx->stx_dev_major);
->> --
->> 2.24.0
->>
->>
->=20
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyMjE3MjIwMS4xMTQ1
+Ni0xLXBoaWxtZEByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIGZhaWxlZCB0aGUgZG9j
+a2VyLXF1aWNrQGNlbnRvczcgYnVpbGQgdGVzdC4gUGxlYXNlIGZpbmQgdGhlIHRlc3RpbmcgY29t
+bWFuZHMgYW5kCnRoZWlyIG91dHB1dCBiZWxvdy4gSWYgeW91IGhhdmUgRG9ja2VyIGluc3RhbGxl
+ZCwgeW91IGNhbiBwcm9iYWJseSByZXByb2R1Y2UgaXQKbG9jYWxseS4KCj09PSBURVNUIFNDUklQ
+VCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKbWFrZSBkb2NrZXItaW1hZ2UtY2VudG9zNyBWPTEgTkVU
+V09SSz0xCnRpbWUgbWFrZSBkb2NrZXItdGVzdC1xdWlja0BjZW50b3M3IFNIT1dfRU5WPTEgSj0x
+NCBORVRXT1JLPTEKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KCiAgTElOSyAgICBhYXJjaDY0LXNv
+ZnRtbXUvcWVtdS1zeXN0ZW0tYWFyY2g2NApody92ZmlvL3BjaS5vOiBJbiBmdW5jdGlvbiBgdmZp
+b19yZWFsaXplJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3ZmaW8vcGNpLmM6Mjk0OTogdW5kZWZp
+bmVkIHJlZmVyZW5jZSB0byBgdmZpb19wY2lfaWdkX29wcmVnaW9uX2luaXQnCmNvbGxlY3QyOiBl
+cnJvcjogbGQgcmV0dXJuZWQgMSBleGl0IHN0YXR1cwptYWtlWzFdOiAqKiogW3FlbXUtc3lzdGVt
+LXg4Nl82NF0gRXJyb3IgMQptYWtlOiAqKiogW3g4Nl82NC1zb2Z0bW11L2FsbF0gRXJyb3IgMgpt
+YWtlOiAqKiogV2FpdGluZyBmb3IgdW5maW5pc2hlZCBqb2JzLi4uLgpody92ZmlvL3BjaS5vOiBJ
+biBmdW5jdGlvbiBgdmZpb19yZWFsaXplJzoKL3RtcC9xZW11LXRlc3Qvc3JjL2h3L3ZmaW8vcGNp
+LmM6Mjk0OTogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgdmZpb19wY2lfaWdkX29wcmVnaW9uX2lu
+aXQnCmNvbGxlY3QyOiBlcnJvcjogbGQgcmV0dXJuZWQgMSBleGl0IHN0YXR1cwptYWtlWzFdOiAq
+KiogW3FlbXUtc3lzdGVtLWFhcmNoNjRdIEVycm9yIDEKbWFrZTogKioqIFthYXJjaDY0LXNvZnRt
+bXUvYWxsXSBFcnJvciAyClRyYWNlYmFjayAobW9zdCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxl
+ICIuL3Rlc3RzL2RvY2tlci9kb2NrZXIucHkiLCBsaW5lIDY2MiwgaW4gPG1vZHVsZT4KICAgIHN5
+cy5leGl0KG1haW4oKSkKLS0tCiAgICByYWlzZSBDYWxsZWRQcm9jZXNzRXJyb3IocmV0Y29kZSwg
+Y21kKQpzdWJwcm9jZXNzLkNhbGxlZFByb2Nlc3NFcnJvcjogQ29tbWFuZCAnWydzdWRvJywgJy1u
+JywgJ2RvY2tlcicsICdydW4nLCAnLS1sYWJlbCcsICdjb20ucWVtdS5pbnN0YW5jZS51dWlkPTU3
+YjhmNmUwMDU5NjRmMGNiNTA1YTAyMTM5NDE0ZTg4JywgJy11JywgJzEwMDMnLCAnLS1zZWN1cml0
+eS1vcHQnLCAnc2VjY29tcD11bmNvbmZpbmVkJywgJy0tcm0nLCAnLWUnLCAnVEFSR0VUX0xJU1Q9
+JywgJy1lJywgJ0VYVFJBX0NPTkZJR1VSRV9PUFRTPScsICctZScsICdWPScsICctZScsICdKPTE0
+JywgJy1lJywgJ0RFQlVHPScsICctZScsICdTSE9XX0VOVj0xJywgJy1lJywgJ0NDQUNIRV9ESVI9
+L3Zhci90bXAvY2NhY2hlJywgJy12JywgJy9ob21lL3BhdGNoZXcyLy5jYWNoZS9xZW11LWRvY2tl
+ci1jY2FjaGU6L3Zhci90bXAvY2NhY2hlOnonLCAnLXYnLCAnL3Zhci90bXAvcGF0Y2hldy10ZXN0
+ZXItdG1wLW83OG50c3JrL3NyYy9kb2NrZXItc3JjLjIwMTktMTEtMjItMTUuMjMuNDAuMjgzNzI6
+L3Zhci90bXAvcWVtdTp6LHJvJywgJ3FlbXU6Y2VudG9zNycsICcvdmFyL3RtcC9xZW11L3J1bics
+ICd0ZXN0LXF1aWNrJ10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDIuCmZpbHRlcj0t
+LWZpbHRlcj1sYWJlbD1jb20ucWVtdS5pbnN0YW5jZS51dWlkPTU3YjhmNmUwMDU5NjRmMGNiNTA1
+YTAyMTM5NDE0ZTg4Cm1ha2VbMV06ICoqKiBbZG9ja2VyLXJ1bl0gRXJyb3IgMQptYWtlWzFdOiBM
+ZWF2aW5nIGRpcmVjdG9yeSBgL3Zhci90bXAvcGF0Y2hldy10ZXN0ZXItdG1wLW83OG50c3JrL3Ny
+YycKbWFrZTogKioqIFtkb2NrZXItcnVuLXRlc3QtcXVpY2tAY2VudG9zN10gRXJyb3IgMgoKcmVh
+bCAgICAybTM2LjI4MnMKdXNlciAgICAwbTcuODg0cwoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
+bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAxOTExMjIxNzIyMDEuMTE0NTYtMS1waGls
+bWRAcmVkaGF0LmNvbS90ZXN0aW5nLmRvY2tlci1xdWlja0BjZW50b3M3Lz90eXBlPW1lc3NhZ2Uu
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3Bh
+dGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBy
+ZWRoYXQuY29t
 
 
