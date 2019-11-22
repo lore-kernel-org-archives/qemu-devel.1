@@ -6,49 +6,50 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7D6C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82057C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:52:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC26820708
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:50:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC26820708
+	by mail.kernel.org (Postfix) with ESMTPS id 597B120659
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 07:52:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 597B120659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY3i5-0006ww-MS
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 02:50:33 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39505)
+	id 1iY3kK-0001W3-6N
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 02:52:52 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39468)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <tao3.xu@intel.com>) id 1iY3gM-0005Ke-R9
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:48:48 -0500
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <tao3.xu@intel.com>) id 1iY3gL-0002n8-1N
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:48:46 -0500
-Received: from mga18.intel.com ([134.134.136.126]:36768)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iY3gK-0002kF-NL
+ (envelope-from <tao3.xu@intel.com>) id 1iY3gI-0005Fp-Tl
  for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:48:44 -0500
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+ (envelope-from <tao3.xu@intel.com>) id 1iY3gH-0002m2-Ia
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:48:42 -0500
+Received: from mga18.intel.com ([134.134.136.126]:36761)
+ by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <tao3.xu@intel.com>) id 1iY3gH-0002i6-8x
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 02:48:41 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384;
- 21 Nov 2019 23:48:44 -0800
+ 21 Nov 2019 23:48:40 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.69,229,1571727600"; d="scan'208";a="210178481"
+X-IronPort-AV: E=Sophos;i="5.69,229,1571727600"; d="scan'208";a="210178468"
 Received: from tao-optiplex-7060.sh.intel.com ([10.239.159.36])
- by orsmga003.jf.intel.com with ESMTP; 21 Nov 2019 23:48:41 -0800
+ by orsmga003.jf.intel.com with ESMTP; 21 Nov 2019 23:48:38 -0800
 From: Tao Xu <tao3.xu@intel.com>
 To: mst@redhat.com, imammedo@redhat.com, eblake@redhat.com,
  ehabkost@redhat.com, marcel.apfelbaum@gmail.com, armbru@redhat.com,
  sw@weilnetz.de, mdroth@linux.vnet.ibm.com, thuth@redhat.com,
  lvivier@redhat.com
-Subject: [PATCH v17 04/14] util/cutils: Add qemu_strtotime_ns()
-Date: Fri, 22 Nov 2019 15:48:16 +0800
-Message-Id: <20191122074826.1373-5-tao3.xu@intel.com>
+Subject: [PATCH v17 03/14] util/cutils: refactor do_strtosz() to support
+ suffixes list
+Date: Fri, 22 Nov 2019 15:48:15 +0800
+Message-Id: <20191122074826.1373-4-tao3.xu@intel.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191122074826.1373-1-tao3.xu@intel.com>
 References: <20191122074826.1373-1-tao3.xu@intel.com>
@@ -74,10 +75,7 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To convert strings with time suffixes to numbers, support time unit are
-"ns" for nanosecond, "us" for microsecond, "ms" for millisecond or "s"
-for second. Add test for qemu_strtotime_ns, test the input of basic,
-time suffixes, float, invaild, trailing and overflow.
+Add do_strtomul() to convert string according to different suffixes.
 
 Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Tao Xu <tao3.xu@intel.com>
@@ -85,245 +83,133 @@ Signed-off-by: Tao Xu <tao3.xu@intel.com>
 
 No changes in v17.
 
-Changes in v16:
-    - Update the test because precision is 64 bits
-
 Changes in v15:
     - Add a new patch to refactor do_strtosz() (Eduardo)
-    - use ARRAY_SIZE(suffixes) instead of hardcoding the
-      suffixes number (Eduardo)
 ---
- include/qemu/cutils.h |   1 +
- tests/test-cutils.c   | 173 ++++++++++++++++++++++++++++++++++++++++++
- util/cutils.c         |  14 ++++
- 3 files changed, 188 insertions(+)
+ util/cutils.c | 72 ++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 42 insertions(+), 30 deletions(-)
 
-diff --git a/include/qemu/cutils.h b/include/qemu/cutils.h
-index 48cf9bf776..befa94f2d4 100644
---- a/include/qemu/cutils.h
-+++ b/include/qemu/cutils.h
-@@ -185,5 +185,6 @@ int uleb128_decode_small(const uint8_t *in, uint32_t *n);
-  * *str1 is <, == or > than *str2.
-  */
- int qemu_pstrcmp0(const char **str1, const char **str2);
-+int qemu_strtotime_ns(const char *nptr, const char **end, uint64_t *result);
- 
- #endif
-diff --git a/tests/test-cutils.c b/tests/test-cutils.c
-index 465514b85f..0ff1d816f1 100644
---- a/tests/test-cutils.c
-+++ b/tests/test-cutils.c
-@@ -2148,6 +2148,167 @@ static void test_qemu_strtosz_metric(void)
-     g_assert(endptr == str + 6);
- }
- 
-+static void test_qemu_strtotime_ns_simple(void)
-+{
-+    const char *str;
-+    const char *endptr;
-+    int err;
-+    uint64_t res = 0xbaadf00d;
-+
-+    str = "0";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 0);
-+    g_assert(endptr == str + 1);
-+
-+    str = "56789";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 56789);
-+    g_assert(endptr == str + 5);
-+
-+    err = qemu_strtotime_ns(str, NULL, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 56789);
-+
-+    /* Note: precision is 64 bits (UINT64_MAX) */
-+
-+    str = "18446744073709551614"; /* UINT64_MAX - 1 */
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 0xfffffffffffffffe);
-+    g_assert(endptr == str + 20);
-+
-+    str = "18446744073709551615"; /* UINT64_MAX */
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 0xffffffffffffffff);
-+    g_assert(endptr == str + 20);
-+}
-+
-+static void test_qemu_strtotime_ns_units(void)
-+{
-+    const char *ns = "1ns";
-+    const char *us = "1us";
-+    const char *ms = "1ms";
-+    const char *s = "1s";
-+    int err;
-+    const char *endptr;
-+    uint64_t res = 0xbaadf00d;
-+
-+    /* default time unit is ns */
-+    err = qemu_strtotime_ns(ns, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 1);
-+    g_assert(endptr == ns + 3);
-+
-+    err = qemu_strtotime_ns(us, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 1000);
-+    g_assert(endptr == us + 3);
-+
-+    err = qemu_strtotime_ns(ms, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 1000000);
-+    g_assert(endptr == ms + 3);
-+
-+    err = qemu_strtotime_ns(s, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 1000000000LL);
-+    g_assert(endptr == s + 2);
-+}
-+
-+static void test_qemu_strtotime_ns_float(void)
-+{
-+    const char *str = "56.789us";
-+    int err;
-+    const char *endptr;
-+    uint64_t res = 0xbaadf00d;
-+
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 56.789 * 1000);
-+    g_assert(endptr == str + 8);
-+}
-+
-+static void test_qemu_strtotime_ns_invalid(void)
-+{
-+    const char *str;
-+    const char *endptr;
-+    int err;
-+    uint64_t res = 0xbaadf00d;
-+
-+    str = "";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
-+
-+    str = " \t ";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
-+
-+    str = "crap";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
-+
-+    str = "inf";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
-+
-+    str = "NaN";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+    g_assert(endptr == str);
-+}
-+
-+static void test_qemu_strtotime_ns_trailing(void)
-+{
-+    const char *str;
-+    const char *endptr;
-+    int err;
-+    uint64_t res = 0xbaadf00d;
-+
-+    str = "123xxx";
-+
-+    err = qemu_strtotime_ns(str, NULL, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+
-+    str = "1msxxx";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, 0);
-+    g_assert_cmpint(res, ==, 1000000);
-+    g_assert(endptr == str + 3);
-+
-+    err = qemu_strtotime_ns(str, NULL, &res);
-+    g_assert_cmpint(err, ==, -EINVAL);
-+}
-+
-+static void test_qemu_strtotime_ns_erange(void)
-+{
-+    const char *str;
-+    const char *endptr;
-+    int err;
-+    uint64_t res = 0xbaadf00d;
-+
-+    str = "-1";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -ERANGE);
-+    g_assert(endptr == str + 2);
-+
-+    str = "18446744073709551616"; /* 2^64 */
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -ERANGE);
-+    g_assert(endptr == str + 20);
-+
-+    str = "200000000000000ms";
-+    err = qemu_strtotime_ns(str, &endptr, &res);
-+    g_assert_cmpint(err, ==, -ERANGE);
-+    g_assert(endptr == str + 17);
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-@@ -2425,5 +2586,17 @@ int main(int argc, char **argv)
-     g_test_add_func("/cutils/strtosz/metric",
-                     test_qemu_strtosz_metric);
- 
-+    g_test_add_func("/cutils/strtotime/simple",
-+                    test_qemu_strtotime_ns_simple);
-+    g_test_add_func("/cutils/strtotime/units",
-+                    test_qemu_strtotime_ns_units);
-+    g_test_add_func("/cutils/strtotime/float",
-+                    test_qemu_strtotime_ns_float);
-+    g_test_add_func("/cutils/strtotime/invalid",
-+                    test_qemu_strtotime_ns_invalid);
-+    g_test_add_func("/cutils/strtotime/trailing",
-+                    test_qemu_strtotime_ns_trailing);
-+    g_test_add_func("/cutils/strtotime/erange",
-+                    test_qemu_strtotime_ns_erange);
-     return g_test_run();
- }
 diff --git a/util/cutils.c b/util/cutils.c
-index ffef92338a..0a885a0a90 100644
+index d94a468954..ffef92338a 100644
 --- a/util/cutils.c
 +++ b/util/cutils.c
-@@ -283,6 +283,20 @@ int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result)
-     return do_strtosz(nptr, end, "B", 1000, result);
+@@ -181,41 +181,37 @@ int fcntl_setfl(int fd, int flag)
+ }
+ #endif
+ 
+-static int64_t suffix_mul(char suffix, int64_t unit)
++static int64_t suffix_mul(const char *suffixes[], int num_suffix,
++                          const char *endptr, int *offset, int64_t unit)
+ {
+-    switch (qemu_toupper(suffix)) {
+-    case 'B':
+-        return 1;
+-    case 'K':
+-        return unit;
+-    case 'M':
+-        return unit * unit;
+-    case 'G':
+-        return unit * unit * unit;
+-    case 'T':
+-        return unit * unit * unit * unit;
+-    case 'P':
+-        return unit * unit * unit * unit * unit;
+-    case 'E':
+-        return unit * unit * unit * unit * unit * unit;
++    int i, suffix_len;
++    int64_t mul = 1;
++
++    for (i = 0; i < num_suffix; i++) {
++        suffix_len = strlen(suffixes[i]);
++        if (g_ascii_strncasecmp(suffixes[i], endptr, suffix_len) == 0) {
++            *offset = suffix_len;
++            return mul;
++    }
++        mul *= unit;
+     }
++
+     return -1;
+ }
+ 
+ /*
+- * Convert string to bytes, allowing either B/b for bytes, K/k for KB,
+- * M/m for MB, G/g for GB or T/t for TB. End pointer will be returned
+- * in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on
+- * other error.
++ * Convert string according to different suffixes. End pointer will be returned
++ * in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on other error.
+  */
+-static int do_strtosz(const char *nptr, const char **end,
+-                      const char default_suffix, int64_t unit,
++static int do_strtomul(const char *nptr, const char **end,
++                       const char *suffixes[], int num_suffix,
++                       const char *default_suffix, int64_t unit,
+                       uint64_t *result)
+ {
+     int retval;
+     const char *endptr;
+-    unsigned char c;
+     int mul_required = 0;
++    int offset = 0;
+     long double val, mul, integral, fraction;
+ 
+     retval = qemu_strtold_finite(nptr, &endptr, &val);
+@@ -226,12 +222,12 @@ static int do_strtosz(const char *nptr, const char **end,
+     if (fraction != 0) {
+         mul_required = 1;
+     }
+-    c = *endptr;
+-    mul = suffix_mul(c, unit);
++
++    mul = suffix_mul(suffixes, num_suffix, endptr, &offset, unit);
+     if (mul >= 0) {
+-        endptr++;
++        endptr += offset;
+     } else {
+-        mul = suffix_mul(default_suffix, unit);
++        mul = suffix_mul(suffixes, num_suffix, default_suffix, &offset, unit);
+         assert(mul >= 0);
+     }
+     if (mul == 1 && mul_required) {
+@@ -256,19 +252,35 @@ out:
+     return retval;
  }
  
 +/*
-+ * Convert string to time, support time unit are ns for nanosecond, us for
-+ * microsecond, ms for millisecond and s for second. End pointer will be
-+ * returned in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on
++ * Convert string to bytes, allowing either B/b for bytes, K/k for KB,
++ * M/m for MB, G/g for GB or T/t for TB. End pointer will be returned
++ * in *end, if not NULL. Return -ERANGE on overflow, and -EINVAL on
 + * other error.
 + */
-+int qemu_strtotime_ns(const char *nptr, const char **end, uint64_t *result)
++static int do_strtosz(const char *nptr, const char **end,
++                      const char *default_suffix, int64_t unit,
++                      uint64_t *result)
 +{
-+    static const char *suffixes[] = { "ns", "us", "ms", "s" };
++    static const char *suffixes[] = { "B", "K", "M", "G", "T", "P", "E" };
 +
-+    return do_strtomul(nptr, end, suffixes, ARRAY_SIZE(suffixes), "ns", 1000,
-+                       result);
++    return do_strtomul(nptr, end, suffixes, ARRAY_SIZE(suffixes),
++                       default_suffix, unit, result);
 +}
 +
+ int qemu_strtosz(const char *nptr, const char **end, uint64_t *result)
+ {
+-    return do_strtosz(nptr, end, 'B', 1024, result);
++    return do_strtosz(nptr, end, "B", 1024, result);
+ }
+ 
+ int qemu_strtosz_MiB(const char *nptr, const char **end, uint64_t *result)
+ {
+-    return do_strtosz(nptr, end, 'M', 1024, result);
++    return do_strtosz(nptr, end, "M", 1024, result);
+ }
+ 
+ int qemu_strtosz_metric(const char *nptr, const char **end, uint64_t *result)
+ {
+-    return do_strtosz(nptr, end, 'B', 1000, result);
++    return do_strtosz(nptr, end, "B", 1000, result);
+ }
+ 
  /**
-  * Helper function for error checking after strtol() and the like
-  */
 -- 
 2.20.1
 
