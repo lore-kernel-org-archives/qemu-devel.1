@@ -2,80 +2,68 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D032C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C80DDC432C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:12:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 662A12070E
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:08:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QBuPgPi/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 662A12070E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A02282070E
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 10:12:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A02282070E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49002 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iY5rO-0001iR-Jt
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 05:08:18 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57750)
+	id 1iY5v4-0002qd-LJ
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 05:12:06 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58140)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <stefanha@redhat.com>) id 1iY5qZ-0000vD-1u
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:07:28 -0500
+ (envelope-from <no-reply@patchew.org>) id 1iY5u1-0002Oz-J4
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:11:02 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <stefanha@redhat.com>) id 1iY5qV-00019M-RA
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:07:24 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32514
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1iY5qV-00018j-Hb
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:07:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574417242;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=B1D+SwtVggmk3dwwOmgbNe+ZvEWx5vL7A2JAQDruqG0=;
- b=QBuPgPi/C/7/kNBJJfZSo5X7c5op3OHw5vm3iwucQ5YZq3UEabr2j5q64r2dG1cT6CAGdr
- KufVXUEKgYdmJveyH56/Vc7oo9bit81GFjB3K7oxX27dShj+ym4oZ3Egs7tfdqLXDXkq08
- GZaLU1DrPg27oEeCZKS79W/NxE6VU4Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-YPkeqQ2vNtWDL-vyNSOjVQ-1; Fri, 22 Nov 2019 05:07:19 -0500
-X-MC-Unique: YPkeqQ2vNtWDL-vyNSOjVQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 273128018A1;
- Fri, 22 Nov 2019 10:07:18 +0000 (UTC)
-Received: from localhost (unknown [10.36.118.40])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6FEE46E71B;
- Fri, 22 Nov 2019 10:07:14 +0000 (UTC)
-Date: Fri, 22 Nov 2019 10:07:13 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Vivek Goyal <vgoyal@redhat.com>
-Subject: Re: [PATCH 1/4] virtiofsd: Release file locks using F_UNLCK
-Message-ID: <20191122100713.GB464656@stefanha-x1.localdomain>
-References: <20191115205543.1816-1-vgoyal@redhat.com>
- <20191115205543.1816-2-vgoyal@redhat.com>
+ (envelope-from <no-reply@patchew.org>) id 1iY5tz-0002tT-Nw
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 05:11:01 -0500
+Resent-Date: Fri, 22 Nov 2019 05:11:01 -0500
+Resent-Message-Id: <E1iY5tz-0002tT-Nw@eggs.gnu.org>
+Received: from sender4-of-o51.zoho.com ([136.143.188.51]:21164)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+ (Exim 4.71) (envelope-from <no-reply@patchew.org>)
+ id 1iY5tz-0002sg-GM; Fri, 22 Nov 2019 05:10:59 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1574417450; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=j23Uun3Q78hmXktWcIsAiPFOdF0fHi6uqc7sMipWvpuzP7Zp15TLouknMvIDxw5tGi76fecug9J1OlDJjlioyjS/4moD8EhXeHsyZOZjIJpR7hO8tcM+El/yOZw0yXOnK7ySpBJ7YQtkSYGG+x+vR8pyW8hdAmSo88TqJYBOCz4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1574417450;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=vKKgFQxitGhg1Do2t5gNmPt7zMDkvrTyQ+nMJ+hu32c=; 
+ b=Y8xHsyQ08KrdAj8H2MlMbWroHd3gzsSVKNKEqCG5krkMu9s+CwqDJ2Iq36of76uZUm5Ph66sPUDIGSVRvO0+w/YOhpSBo9ricuxm0G43oMEiuFdo5kQtdOckyY1lql3sWPTkpRbKiKrhf6Ll3g1FpyrAMOv7LT6sQflAVr96kXU=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ dkim=pass  header.i=patchew.org;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1574417449144924.5787763219571;
+ Fri, 22 Nov 2019 02:10:49 -0800 (PST)
+In-Reply-To: <20191122075218.23935-1-frankja@linux.ibm.com>
+Subject: Re: [PATCH 0/4] s390x: Reset cleanup
+Message-ID: <157441744777.7001.4986349569481081153@37313f22b938>
 MIME-Version: 1.0
-In-Reply-To: <20191115205543.1816-2-vgoyal@redhat.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Mimecast-Spam-Score: 0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="p4qYPpj5QlsIQJ0K"
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: frankja@linux.ibm.com
+Date: Fri, 22 Nov 2019 02:10:49 -0800 (PST)
+X-ZohoMailClient: External
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 136.143.188.51
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -87,56 +75,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, miklos@szeredi.hu, qemu-devel@nongnu.org,
- dgilbert@redhat.com
+Reply-To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+ qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mihajlov@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---p4qYPpj5QlsIQJ0K
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Nov 15, 2019 at 03:55:40PM -0500, Vivek Goyal wrote:
-> diff --git a/contrib/virtiofsd/passthrough_ll.c b/contrib/virtiofsd/passt=
-hrough_ll.c
-> index bc214df0c7..028e7da273 100644
-> --- a/contrib/virtiofsd/passthrough_ll.c
-> +++ b/contrib/virtiofsd/passthrough_ll.c
-> @@ -936,6 +936,14 @@ static void put_shared(struct lo_data *lo, struct lo=
-_inode *inode)
->  =09}
->  }
-> =20
-> +static void release_plock(gpointer data)
-
-The name posix_locks_value_destroy() would be clearer because it matches
-g_hash_table_new_full() terminology and the function cannot be confused
-with a lock acquire/release operation.
-
-This patch conflicts with the cleanups that are currently being made to
-virtiofsd:
-https://github.com/stefanha/qemu/commit/1e493175feca58a81a2d0cbdac93b92e542=
-5d850#diff-ca2dea995d1e6cdb95c8a47c7cca51ceR773
-
-Stefan
-
---p4qYPpj5QlsIQJ0K
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEyBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl3Xs1EACgkQnKSrs4Gr
-c8jESgf3bZc3dPzFuIExzraXonKWmv9lpbHO635oRtv46DMrNro6Wb0HCXKgcOqE
-AHSyfGUR/+l+wEXpIC0zBvtYYlv/5zyKqLgGrqQqd9BGLbpZt/Wkm4jm2KUKnuQT
-9bsrzcWtxeqGXTHB3lcYHM6pY/+luYL9b2W5VmEi26Qflr8dZvlLNFMcL+lH8MPy
-barXW/5O4y0575UmaegFcQ04knNblHvkmRTxNNkG1fW5hTT9n72AyyJNzP8mnpdO
-1LZWrBrJur/6xTy4OxWPDYyAzJNLT8ReYPGouPk9mkLLIqs5+NnVSX4s3ZJGLbVU
-W5Y4ON+7KulyCr6/J/NFJ7BqVkNn
-=U24S
------END PGP SIGNATURE-----
-
---p4qYPpj5QlsIQJ0K--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDE5MTEyMjA3NTIxOC4yMzkz
+NS0xLWZyYW5ramFAbGludXguaWJtLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
+YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
+IGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1BBVENIIDAvNF0gczM5MHg6IFJlc2V0IGNsZWFudXAK
+VHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMTkxMTIyMDc1MjE4LjIzOTM1LTEtZnJhbmtqYUBs
+aW51eC5pYm0uY29tCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCBy
+ZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
+ZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2tw
+YXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
+bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBh
+IG5ldyBicmFuY2ggJ3Rlc3QnCmI1NTdkZWEgczM5MHg6IEJlYXV0aWZ5IG1hY2hpbmUgcmVzZXQK
+ZTUyNDRjNyBzMzkweDogQmVhdXRpZnkgZGlhZzMwOCBoYW5kbGluZwoyODhmNDM2IHMzOTB4OiBD
+bGVhbnVwIGNwdSByZXNldHMKOWY4NWFmNiBzMzkweDogRG9uJ3QgZG8gYSBub3JtYWwgcmVzZXQg
+b24gdGhlIGluaXRpYWwgY3B1Cgo9PT0gT1VUUFVUIEJFR0lOID09PQoxLzQgQ2hlY2tpbmcgY29t
+bWl0IDlmODVhZjY4ODQ0YSAoczM5MHg6IERvbid0IGRvIGEgbm9ybWFsIHJlc2V0IG9uIHRoZSBp
+bml0aWFsIGNwdSkKMi80IENoZWNraW5nIGNvbW1pdCAyODhmNDM2ZGM4ZTkgKHMzOTB4OiBDbGVh
+bnVwIGNwdSByZXNldHMpCjMvNCBDaGVja2luZyBjb21taXQgZTUyNDRjN2VkZGU4IChzMzkweDog
+QmVhdXRpZnkgZGlhZzMwOCBoYW5kbGluZykKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
+ciB1c2UgdGFicwojMjU6IEZJTEU6IHRhcmdldC9zMzkweC9kaWFnLmM6NTY6CisjZGVmaW5lIERJ
+QUczMDhfUkVTRVRfTU9EX0NMUl5JXkkwJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
+ciB1c2UgdGFicwojMjY6IEZJTEU6IHRhcmdldC9zMzkweC9kaWFnLmM6NTc6CisjZGVmaW5lIERJ
+QUczMDhfUkVTRVRfTE9BRF9OT1JNXkleSTEkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5l
+dmVyIHVzZSB0YWJzCiMyNzogRklMRTogdGFyZ2V0L3MzOTB4L2RpYWcuYzo1ODoKKyNkZWZpbmUg
+RElBRzMwOF9MT0FEX0NMRUFSXkleSTMkCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVy
+IHVzZSB0YWJzCiMyODogRklMRTogdGFyZ2V0L3MzOTB4L2RpYWcuYzo1OToKKyNkZWZpbmUgRElB
+RzMwOF9MT0FEX05PUk1BTF9EVU1QXkk0JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
+ciB1c2UgdGFicwojMjk6IEZJTEU6IHRhcmdldC9zMzkweC9kaWFnLmM6NjA6CisjZGVmaW5lIERJ
+QUczMDhfU0VUXkleSV5JNSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRh
+YnMKIzMwOiBGSUxFOiB0YXJnZXQvczM5MHgvZGlhZy5jOjYxOgorI2RlZmluZSBESUFHMzA4X1NU
+T1JFXkleSV5JNiQKCnRvdGFsOiA2IGVycm9ycywgMCB3YXJuaW5ncywgODMgbGluZXMgY2hlY2tl
+ZAoKUGF0Y2ggMy80IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo0LzQgQ2hlY2tpbmcgY29t
+bWl0IGI1NTdkZWExOGJjMSAoczM5MHg6IEJlYXV0aWZ5IG1hY2hpbmUgcmVzZXQpCj09PSBPVVRQ
+VVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBs
+b2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMTkxMTIyMDc1MjE4
+LjIzOTM1LTEtZnJhbmtqYUBsaW51eC5pYm0uY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
+ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
+cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
 
 
