@@ -2,79 +2,91 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F272C432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B17C5C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:20:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEEDA2071C
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:16:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B16720672
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:20:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XgaymrD3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEEDA2071C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vzm0Xa7c"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B16720672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYBbV-0003gn-TQ
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 11:16:17 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47892)
+	id 1iYBf3-00067K-SN
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 11:19:59 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49777)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iYBRA-0000SX-WE
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:05:38 -0500
+ (envelope-from <richard.henderson@linaro.org>) id 1iYBcs-0004vH-Oi
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:17:43 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iYBR9-0002vb-Fy
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:05:36 -0500
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47893
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iYBR9-0002u1-BT
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:05:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574438735;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XrtsKI6UtYWJu+YSlWZgfDftptplBLsPijshH5RaEuE=;
- b=XgaymrD3Z64h8BEmso8fL8O9+tH3KZJ4QQoTcLbvIbtcBsRZKRgzeefE7DuyZgDkFu+yfi
- wdvyul3AjHixgz++DZYSazur3n2fmDCYYE66G5cKXEQsp8V30vMflSKOmOuxhBpjIk/HGg
- nl7yd5MKkL4YFYX31bSczMTCYnmWcuE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-371-RjzgS99zNYytX2rf00FBcA-1; Fri, 22 Nov 2019 11:05:31 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54D5ADB20;
- Fri, 22 Nov 2019 16:05:30 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-117-252.ams2.redhat.com
- [10.36.117.252])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AC6B110372C3;
- Fri, 22 Nov 2019 16:05:28 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v3 5/8] iotests: Add qemu_io_log()
-Date: Fri, 22 Nov 2019 17:05:08 +0100
-Message-Id: <20191122160511.8377-6-kwolf@redhat.com>
-In-Reply-To: <20191122160511.8377-1-kwolf@redhat.com>
-References: <20191122160511.8377-1-kwolf@redhat.com>
+ (envelope-from <richard.henderson@linaro.org>) id 1iYBcr-0000MW-J4
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:17:42 -0500
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:35767)
+ by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+ (Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+ id 1iYBcr-0000JN-A7
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:17:41 -0500
+Received: by mail-wr1-x441.google.com with SMTP id s5so9316439wrw.2
+ for <qemu-devel@nongnu.org>; Fri, 22 Nov 2019 08:17:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=WvkgKLfCm3oyyF/6eWVRcAnvU9WJaNPwvddjPCT4la4=;
+ b=vzm0Xa7cydf1lIrU+ou6NsJG/bGBAd8Y3sEQ60d5ixwboPDsgg5kklZhCKgTZRr+ld
+ 7EVGt/Fkar8DS3iDUAcSAO7N3+Fkjj5eJuWXWE1lcfvB7uKgCwCFim7apMb11PrfZLTC
+ qAtcbTVkD38JHcM7Fc8JNOmSqqk12Mk21aGvTfkPFqYZMNTIY9EDfpXtpzbdsXtFpiPq
+ 3Wy80+m+UP0BdLxYCRIJlC3vG0IkFrV19FZ5Bn5ylkieqllxOFqrvmNPvn+v8tIBpIpF
+ q3McRLoywWDkL/7WPwdozAWVRR4uHw5gFC9U+wJCCY/+A6nL+oe3TuuT2VNHXm/7ICZ9
+ CLqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=WvkgKLfCm3oyyF/6eWVRcAnvU9WJaNPwvddjPCT4la4=;
+ b=briJ5Xt3Yddzwdw512QXD7aQzn0r9ykLJ8cZNW0ZQUTTz8/ufu6ZODBp7aRPz1tKzM
+ AwLFl4bu61T5KoKj4ISB3GqUwy/L0pMUmGURVUZfHSQzDxZ63/rIqsZDAoMbZbswSrhq
+ 9pwi6htPNJOwAqCAPQXWGG/iLRbEQTiv0RPFo9prOzDzSpMnyT6G7wMWNhSOClmFOm+b
+ teIcjslPyaYmEqb0/3M6kuvQStH/0KlRD+s1CAFrk528KoDhA73xr9uag8TmA2lzgdBz
+ XaymjTwxdxZ2PoV0WkMp9a76PMOat0xxeG/KSY4CqoJqQmxl8lkgfWC9q1yCsAZRZVJq
+ gHlg==
+X-Gm-Message-State: APjAAAUsV6ISie21nck4ilQdk7tCIAK7FgD9wMjnvuAcCEEHifhe+z1/
+ VuUVxGFy0//s1jISy1MbAhW7ag==
+X-Google-Smtp-Source: APXvYqzVHEhABmyalNc3HjsbmGT64hEKZ5wiz27rJOdJmb7xqQ5juGNVQRnlwH+yk1zabw2N5pDqGg==
+X-Received: by 2002:a5d:6ac9:: with SMTP id u9mr17999585wrw.383.1574439459334; 
+ Fri, 22 Nov 2019 08:17:39 -0800 (PST)
+Received: from [10.0.0.120] (host-87-242-235-70.ppp.onetel.net.uk.
+ [87.242.235.70])
+ by smtp.gmail.com with ESMTPSA id d13sm179633wrv.88.2019.11.22.08.17.38
+ (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+ Fri, 22 Nov 2019 08:17:38 -0800 (PST)
+Subject: Re: [PATCH] target/arm: Fix ISR_EL1 tracking when executing at EL2
+To: Peter Maydell <peter.maydell@linaro.org>, Marc Zyngier <maz@kernel.org>
+References: <20191122135833.28953-1-maz@kernel.org>
+ <CAFEAcA-aRwc9bogn-QbT-q5FzkqieYmQOZMr6H=kK5ixMGANMg@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Openpgp: preference=signencrypt
+Message-ID: <12a72593-6634-37a8-366b-56d48cfed9d1@linaro.org>
+Date: Fri, 22 Nov 2019 16:17:36 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: RjzgS99zNYytX2rf00FBcA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
- [fuzzy]
-X-Received-From: 207.211.31.81
+In-Reply-To: <CAFEAcA-aRwc9bogn-QbT-q5FzkqieYmQOZMr6H=kK5ixMGANMg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-detected-operating-system: by eggs.gnu.org: Genre and OS details not
+ recognized.
+X-Received-From: 2a00:1450:4864:20::441
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -86,42 +98,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com
+Cc: Quentin Perret <qperret@google.com>, Will Deacon <will@kernel.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, kvmarm@lists.cs.columbia.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a function that runs qemu-io and logs the output with the
-appropriate filters applied.
+On 11/22/19 2:16 PM, Peter Maydell wrote:
+> RTH: vaguely wondering if this might be related to the
+> bug you ran into trying to test your VHE emulation
+> patchset...
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- tests/qemu-iotests/iotests.py | 5 +++++
- 1 file changed, 5 insertions(+)
+Thanks for the thought.  It might be related, but it isn't the final cause:
+the inner guest does not yet succeed including this patch.
 
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index df0708923d..fc78852ae5 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -162,6 +162,11 @@ def qemu_io(*args):
-         sys.stderr.write('qemu-io received signal %i: %s\n' % (-exitcode, =
-' '.join(args)))
-     return subp.communicate()[0]
-=20
-+def qemu_io_log(*args):
-+    result =3D qemu_io(*args)
-+    log(result, filters=3D[filter_testfiles, filter_qemu_io])
-+    return result
-+
- def qemu_io_silent(*args):
-     '''Run qemu-io and return the exit code, suppressing stdout'''
-     args =3D qemu_io_args + list(args)
---=20
-2.20.1
+
+r~
 
 
