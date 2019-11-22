@@ -2,78 +2,88 @@ Return-Path: <SRS0=TsRd=ZO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A54EC432C0
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:14:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98AE5C432C0
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:14:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D77F62071C
-	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:14:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B1492071C
+	for <qemu-devel@archiver.kernel.org>; Fri, 22 Nov 2019 16:14:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eESFS+uB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D77F62071C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a6/x4CNK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B1492071C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1iYBZL-000114-My
-	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 11:14:03 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47854)
+	id 1iYBZY-0001Ld-Cf
+	for qemu-devel@archiver.kernel.org; Fri, 22 Nov 2019 11:14:16 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48952)
  by lists.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <kwolf@redhat.com>) id 1iYBR8-0000Ou-Gc
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:05:35 -0500
+ (envelope-from <kwolf@redhat.com>) id 1iYBXm-0008Av-22
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:12:27 -0500
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
- (envelope-from <kwolf@redhat.com>) id 1iYBR7-0002r4-A2
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:05:34 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41609
+ (envelope-from <kwolf@redhat.com>) id 1iYBXi-0005t8-OP
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:12:24 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32611
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
- (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iYBR7-0002op-3e
- for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:05:33 -0500
+ (Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1iYBXi-0005sq-KD
+ for qemu-devel@nongnu.org; Fri, 22 Nov 2019 11:12:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1574438732;
+ s=mimecast20190719; t=1574439141;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=2/6lgTvhUffQT9Ya7xc06OJxjRNaeStSgj7a61gvGUo=;
- b=eESFS+uBXQV3Met9XOZrGNoIpOY1MbQlbXKdB5t+lwJpEUTwZzusMzmMAD/nhXsYC60v7R
- KeSb0jk5ZpAu5B2WubqJTh/he3zqQWFukkCylz6hO8yXK7Ug+5hl1DQXGVs1OtflF4ByWX
- v6AhA4TjmnoIXRHIw1SSOrlOqXcLGW8=
+ bh=aa8cr2L5PAalYf6hTB88HRavTcaQp/GfSYwCnB3HnFo=;
+ b=a6/x4CNKVFiGsTaxZkXCr/UoIM7Xo+i0fYsJlp3t2tLLLvok7BOYXBmzNMz2hQcR5T6uBu
+ m0jdQO8jJFbvwtg9gz4/Z2reo4fa9VyCzta42WkmqtqjQLmEI30icf3c51s63Nhb5IdNho
+ w6d0NyTpm43nHaLAuFxMaXt5fvs+azs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-pc2zqUFHO6un948GWoxDVw-1; Fri, 22 Nov 2019 11:05:29 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-21-mZ9A0nC0ODyza3paZhaUtA-1; Fri, 22 Nov 2019 11:12:19 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 67691107ACC5;
- Fri, 22 Nov 2019 16:05:28 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-117-252.ams2.redhat.com
- [10.36.117.252])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B2B0810372C3;
- Fri, 22 Nov 2019 16:05:26 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABB3418B5F6B;
+ Fri, 22 Nov 2019 16:12:18 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-117-252.ams2.redhat.com [10.36.117.252])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6602446453;
+ Fri, 22 Nov 2019 16:12:17 +0000 (UTC)
+Date: Fri, 22 Nov 2019 17:12:15 +0100
 From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v3 4/8] block: truncate: Don't make backing file data visible
-Date: Fri, 22 Nov 2019 17:05:07 +0100
-Message-Id: <20191122160511.8377-5-kwolf@redhat.com>
-In-Reply-To: <20191122160511.8377-1-kwolf@redhat.com>
-References: <20191122160511.8377-1-kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 03/14] qapi: Introduce default values for
+ struct members
+Message-ID: <20191122161215.GD4433@linux.fritz.box>
+References: <20190624173935.25747-1-mreitz@redhat.com>
+ <20190624173935.25747-4-mreitz@redhat.com>
+ <87eey1b73y.fsf@dusky.pond.sub.org>
+ <0214e73e-062e-a9c8-16c9-e99354c07277@redhat.com>
+ <871ru1811o.fsf@dusky.pond.sub.org>
+ <817914b7-79d7-a2c9-142b-0a040b1da7ff@redhat.com>
+ <874kyw74jn.fsf@dusky.pond.sub.org>
+ <20191122102519.GB4433@linux.fritz.box>
+ <87k17sq8im.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-MC-Unique: pc2zqUFHO6un948GWoxDVw-1
+In-Reply-To: <87k17sq8im.fsf@dusky.pond.sub.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-MC-Unique: mZ9A0nC0ODyza3paZhaUtA-1
 X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 X-detected-operating-system: by eggs.gnu.org: GNU/Linux 2.2.x-3.x [generic]
  [fuzzy]
-X-Received-From: 205.139.110.120
+X-Received-From: 207.211.31.120
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -85,106 +95,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-devel@nongnu.org,
- mreitz@redhat.com, stefanha@redhat.com
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When extending the size of an image that has a backing file larger than
-its old size, make sure that the backing file data doesn't become
-visible in the guest, but the added area is properly zeroed out.
+Am 22.11.2019 um 15:40 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
+>=20
+> > Am 22.11.2019 um 08:29 hat Markus Armbruster geschrieben:
+> >> > At any rate, your counterpoint is taken - whatever we pick, we'll wa=
+nt
+> >> > to make sure that introspection can expose semantics, and whether we
+> >> > can make '*' redundant with some other form of longhand in the qapi
+> >> > language is in part determined by whether we also reflect that throu=
+gh
+> >> > introspection.
+> >>=20
+> >> Introspection has the true member name, without the '*' prefix.
+> >>=20
+> >> We'll also want to avoid unnecessary compromises on QAPI schema
+> >> expressiveness.  If we use null to mean "schema does not specify
+> >> behavior when member is absent", we can't use it to mean "absent membe=
+r
+> >> behaves like the value null".  A bit of a blemish, but I think it's a
+> >> tolerable one.
+> >
+> > If you want an example for an option that defaults to null, take the
+> > backing option of BlockdevOptionsGenericCOWFormat.
+> >
+> > What is the reason for even considering limiting the expressiveness? Do
+> > you think that an additional 'optional' bool, at least for those option=
+s
+> > that don't have a default, would be so bad in the longhand form? Or
+> > keeping '*' even in the longhand form, as suggested below.
+>=20
+> Well, one reason is this:
+>=20
+>     ##
+>     # @SchemaInfoObjectMember:
+>     #
+>     # An object member.
+>     #
+>     # @name: the member's name, as defined in the QAPI schema.
+>     #
+>     # @type: the name of the member's type.
+>     #
+>     # @default: default when used as command parameter.
+>     #           If absent, the parameter is mandatory.
+>     #           If present, the value must be null.  The parameter is
+>     #           optional, and behavior when it's missing is not specified
+>     #           here.
+>     #           Future extension: if present and non-null, the parameter
+>     #           is optional, and defaults to this value.
+>     #
+>     # Since: 2.5
+>     ##
+>=20
+> If we want to be able to express the difference between "behavior when
+> absent is not specified here" and "absent behaves like value null", then
+> we need to somehow add that bit of information here.
+>=20
+> Could use a feature.  Features are not yet implemented for members, but
+> we need them anyway.
 
-Consider the following scenario where the overlay is shorter than its
-backing file:
+That definition wasn't a great idea, I'm afraid. :-(
 
-    base.qcow2:     AAAAAAAA
-    overlay.qcow2:  BBBB
+But "default is QNull" is still acceptable behaviour for "not
+specified" if the client doesn't need to know what the default is.
 
-When resizing (extending) overlay.qcow2, the new blocks should not stay
-unallocated and make the additional As from base.qcow2 visible like
-before this patch, but zeros should be read.
+> >> >                 If that means that keeping '*' in the longhand form =
+of
+> >> > optional members (whether or not those members have a default value)=
+,
+> >> > then so be it.
+> >>=20
+> >> I believe both
+> >>=20
+> >>     '*KEY': { 'type': ARG': 'default': null }
+> >>=20
+> >> and
+> >>=20
+> >>     'KEY': { 'type': ARG': 'default': null }
+> >>=20
+> >> are viable longhand forms for '*KEY': 'ARG'.
+> >>=20
+> >> I prefer the latter, but I'm open to arguments.
+> >
+> > If you go for the former, then you certainly want to use absent
+> > 'default' to indicate no default, and allow a QNull default with
+> > 'default': null.
+> >
+> > The only reason to abuse 'default': null for no default is that you
+> > can't distinguish optional and non-optional if you use 'KEY' for both
+> > instead of 'KEY' for mandatory and '*KEY' for optional.
+> >
+> > So while I understand and to some degree share your dislike for the '*'
+> > prefix, I think I cast my pragmatic vote for:
+> >
+> > mandatory:                   'KEY':  { 'type': 'ARG' }
+> > optional without a default:  '*KEY': { 'type': 'ARG' }
+> > optional with QNull default: '*KEY': { 'type': 'ARG', 'default': null }
+>=20
+> The last one could also be     'KEY': { 'type': 'ARG', 'default': null }
+> without loss of expressiveness.
+>=20
+> Differently ugly.
 
-A similar case happens with the various variants of a commit job when an
-intermediate file is short (- for unallocated):
+Not loss of expressiveness, but loss of consistency.
 
-    base.qcow2:     A-A-AAAA
-    mid.qcow2:      BB-B
-    top.qcow2:      C--C--C-
+> Here's yet another idea.  For the "absent is not specified here" case,
+> use
+>=20
+>     'KEY': { 'type': 'ARG', optional: true }
+>     '*KEY': 'ARG'
+>=20
+> For the "absent defaults to DEFVAL" case, use
+>=20
+>     'KEY': { 'type': 'ARG', optional: true, 'default': DEFVAL }
+>     'KEY': { 'type': 'ARG', 'default': DEFVAL }
 
-After commit top.qcow2 to mid.qcow2, the following happens:
+I assume this means: 'optional' defaults to true if 'default' is
+present, and to false if 'default' is absent. (It's an example of a
+default that can't be expressed in the schema.)
 
-    mid.qcow2:      CB-C00C0 (correct result)
-    mid.qcow2:      CB-C--C- (before this fix)
+Works for me.
 
-Without the fix, blocks that previously read as zeros on top.qcow2
-suddenly turn into A.
-
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- block/io.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
-
-diff --git a/block/io.c b/block/io.c
-index 42e7558954..61a63d9dc2 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -3392,12 +3392,45 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child,=
- int64_t offset, bool exact,
-     ret =3D refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-     if (ret < 0) {
-         error_setg_errno(errp, -ret, "Could not refresh total sector count=
-");
-+        goto fail_refresh_total_sectors;
-     } else {
-         offset =3D bs->total_sectors * BDRV_SECTOR_SIZE;
-     }
-+
-+    /*
-+     * If the image has a backing file that is large enough that it would
-+     * provide data for the new area, we cannot leave it unallocated becau=
-se
-+     * then the backing file content would become visible. Instead, zero-f=
-ill
-+     * the area where backing file and new area overlap.
-+     *
-+     * Note that if the image has a backing file, but was opened without t=
-he
-+     * backing file, taking care of keeping things consistent with that ba=
-cking
-+     * file is the user's responsibility.
-+     */
-+    if (new_bytes && bs->backing && prealloc =3D=3D PREALLOC_MODE_OFF) {
-+        int64_t backing_len;
-+
-+        backing_len =3D bdrv_getlength(backing_bs(bs));
-+        if (backing_len < 0) {
-+            ret =3D backing_len;
-+            goto fail_refresh_total_sectors;
-+        }
-+
-+        if (backing_len > old_size) {
-+            ret =3D bdrv_co_do_pwrite_zeroes(
-+                    bs, old_size, MIN(new_bytes, backing_len - old_size),
-+                    BDRV_REQ_ZERO_WRITE | BDRV_REQ_MAY_UNMAP |
-+                    (no_fallback ? BDRV_REQ_NO_FALLBACK : 0));
-+            if (ret < 0) {
-+                goto fail_refresh_total_sectors;
-+            }
-+        }
-+    }
-+
-     /* It's possible that truncation succeeded but refresh_total_sectors
-      * failed, but the latter doesn't affect how we should finish the requ=
-est.
-      * Pass 0 as the last parameter so that dirty bitmaps etc. are handled=
-. */
-+fail_refresh_total_sectors:
-     bdrv_co_write_req_finish(child, offset - new_bytes, new_bytes, &req, 0=
-);
-=20
- out:
---=20
-2.20.1
+Kevin
 
 
